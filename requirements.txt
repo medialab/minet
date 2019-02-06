@@ -1,0 +1,6 @@
+# Dev Dependencies
+pycodestyle==2.4.0
+pytest==3.5.1
+
+# Dependencies
+urllib3==1.24.1
