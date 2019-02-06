@@ -49,9 +49,7 @@ def main():
             target_subparser.print_help()
 
     if args.action == 'fetch':
-        print('FETCH ACTION start', args)
         fetch_action(args)
-        print('FETCH ACTION end')
 
 
 if __name__ == '__main__':

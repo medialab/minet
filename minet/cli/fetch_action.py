@@ -35,6 +35,7 @@ def fetch_action(namespace):
     namespace.monitoring_file.seek(0, os.SEEK_SET)
 
     monitoring_reader = csv.reader(namespace.monitoring_file)
+    next(monitoring_reader, None)
 
     http = urllib3.PoolManager()
 
