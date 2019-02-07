@@ -32,6 +32,8 @@ def fetch_action(namespace):
     # Writing the headers of the monitoring file
     if namespace.monitoring_file.tell() == 0:
         fieldnames = headers + ['status']
+        if namespace.id_column is None:
+            fieldnames = ['id'] + fieldnames
         monitoring_writer.writerow(fieldnames)
 
     # Putting the cursor at the beginning of the monitoring file
@@ -63,6 +65,7 @@ def fetch_action(namespace):
 
             if namespace.id_column is None:
                 url_id = uuid.uuid4()
+                line = [url_id] + line
             else:
                 id_position = headers.index(namespace.id_column)
                 url_id = line[id_position]
