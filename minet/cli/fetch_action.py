@@ -14,6 +14,8 @@ import uuid
 from minet.cli.utils import custom_reader
 # from minet.fetch import fetch
 
+USER_AGENT = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:65.0) Gecko/20100101 Firefox/65.0"
+
 
 def fetch_action(namespace):
 
@@ -21,6 +23,7 @@ def fetch_action(namespace):
     if not os.path.isdir(HTML_FILES):
         os.makedirs(HTML_FILES)
 
+    # Initializing both reader and writer
     headers, position, source_reader = custom_reader(
         namespace.file, namespace.column)
 
@@ -49,8 +52,14 @@ def fetch_action(namespace):
         if (not monitoring_line) and line:
             url = line[position]
             print('Fetching', url)
-            r = http.request('GET', url)
-            html = r.data.decode('utf-8')
+            try:
+                r = http.request('GET', url, headers={
+                                 'user-agent': USER_AGENT}, retries=False)
+                html = r.data.decode('utf-8')
+                status = r.status
+            except Exception as e:
+                html = ''
+                status = str(e)
 
             if namespace.id_column is None:
                 url_id = uuid.uuid4()
@@ -60,7 +69,7 @@ def fetch_action(namespace):
 
             with open(os.path.join(HTML_FILES, str(url_id) + '.html'), "w") as text_file:
                 text_file.write(html)
-            line = line + [r.status]
+            line = line + [status]
             monitoring_writer.writerow(line)
 
         # yield html
