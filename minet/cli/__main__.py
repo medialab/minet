@@ -10,6 +10,7 @@ import sys
 from argparse import ArgumentParser, FileType
 
 from minet.cli.fetch_action import fetch_action
+from minet.cli.facebook_action import facebook_action
 
 SUBPARSERS = {}
 
@@ -29,8 +30,17 @@ def main():
     fetch_subparser.add_argument(
         '-s', '--storage-location', help='HTML storage location', default='data')
     fetch_subparser.add_argument(
-        '-id', '--id-column', help='url id column', default=None)
+        '-id', '--id-column', help='The column of url IDs (if the source csv has one)', default=None)
     SUBPARSERS['fetch'] = fetch_subparser
+
+    facebook_subparser = subparsers.add_parser(
+        'facebook', description='Adds the Facebook share count for each url of a given CSV column.')
+    facebook_subparser.add_argument('column', help='column')
+    facebook_subparser.add_argument(
+        'file', help='csv file containing the urls to fetch shares from', type=FileType('r'), default=sys.stdin, nargs='?')
+    facebook_subparser.add_argument(
+        '-o', '--output', help='output file', type=FileType('w'), default=sys.stdout)
+    SUBPARSERS['facebook'] = facebook_subparser
 
     # extract_content_subparser = subparsers.add_parser('extract_content', description='Return the text content of the urls of a given csv')
 
@@ -50,6 +60,9 @@ def main():
 
     if args.action == 'fetch':
         fetch_action(args)
+
+    if args.action == 'facebook':
+        facebook_action(args)
 
 
 if __name__ == '__main__':
