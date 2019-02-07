@@ -33,30 +33,30 @@ Additional options:
 - **`--monitoring_file FILE_NAME`** : location of the monitoring file used to save progress.
     Is *./data/monitoring.csv* by default.
 
+![Minet](img/fetch.png)
 
 ##### Example
 
-Imagine you have a `urls.csv` file containing urls you want to extract data from:
-
-id | url
---- | ---
-1 | www.howtominegoldin3easysteps.com
-2 | www.bestpickaxes.com/reviews
-3 | www.minersblog.com/tips/best_locations
-
-Just use this command:
+Imagine you have a `urls.csv` file containing urls - in a column called `'urls'` - you want to extract data from. Just use this command:
 
 ```shell
 minet fetch url urls.csv
 ```
 
 That's it, your HTML files are stored in *./data/htmlfiles*, ready for text content extraction for instance.
-![Minet](img/html_files.png)
+
+---
 
 ### facebook
 
-Quickly fetches the (rounded) Facebook share count of each url in a given csv, without the need of an API nor access token.
+Quickly fetches the (*rounded**) Facebook share count of each url in a given csv, without the need of an API nor access token (and thus no rate limitation).
 Works in a multithreaded & lazy way (the csv is not loaded into memory).
+
+*The share count of a url is the sum of :*
+- *the number of likes of the url*
+- *the number of shares of the url*
+- *the number of likes & comments on stories about this url*
+
 
 ```shell
 minet facebook COLUMN FILE
@@ -65,16 +65,11 @@ Additional options:
 - **`-o OUTPUT`** specifies the location of the output csv (being the source csv `FILE` with an additional *facebook_share_count* column).
     Is `stdout` by default.
 
----
+![Minet](img/facebook.png)
+
 ##### Example
 
-Here's your `urls.csv` file with the urls you want the share count of.
-
-| url |
-| --- |
-www.howtominegoldin3easysteps.com |
-www.bestpickaxes.com/reviews |
-www.minersblog.com/tips/best_locations |
+Let's say you have a `urls.csv` file with - in a `'url'` column - the urls you want the share count of.
 
 Just use this command:
 
@@ -82,10 +77,4 @@ Just use this command:
 minet facebook url urls.csv -o urls_with_fb_data.csv
 ```
 
-As a result, you get this `urls_with_fb_data.csv` file:
-
-| url | facebook_share_count |
-| --- | --- |
-www.howtominegoldin3easysteps.com | 8200
-www.bestpickaxes.com/reviews | 345
-www.minersblog.com/tips/best_locations | 12000
+As a result, you get a `urls_with_fb_data.csv` file with a *facebook_share_count* column.
