@@ -2,7 +2,7 @@
 
 A webmining CLI tool & library for python.
 
-Minet features:
+*Minet* features:
 - Multithreaded HTML fetching
 - Multiprocessing text content extraction
 - Facebook's share count fetching
