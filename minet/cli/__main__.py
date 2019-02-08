@@ -11,6 +11,7 @@ from argparse import ArgumentParser, FileType
 
 from minet.cli.fetch_action import fetch_action
 from minet.cli.facebook_action import facebook_action
+from minet.cli.extract_action import extract_action
 
 SUBPARSERS = {}
 
@@ -42,7 +43,15 @@ def main():
         '-o', '--output', help='output file', type=FileType('w'), default=sys.stdout)
     SUBPARSERS['facebook'] = facebook_subparser
 
-    # extract_content_subparser = subparsers.add_parser('extract_content', description='Return the text content of the urls of a given csv')
+    extract_content_subparser = subparsers.add_parser(
+        'extract_content', description='Return the text content of the urls of a given csv')
+    extract_content_subparser.add_argument(
+        '--monitoring-file', help='csv monitoring file containing the urls to extract content from', type=FileType('r'), default=join('data', 'monitoring.csv'), nargs='?')
+    extract_content_subparser.add_argument(
+        '-s', '--storage-location', help='HTML & text storage location', default='data')
+    extract_content_subparser.add_argument(
+        '-o', '--output', help='output file', type=FileType('w'), default=sys.stdout)
+    SUBPARSERS['extract'] = facebook_subparser
 
     help_suparser = subparsers.add_parser('help')
     help_suparser.add_argument('subcommand', help='name of the subcommand')
@@ -60,6 +69,9 @@ def main():
 
     if args.action == 'fetch':
         fetch_action(args)
+
+    if args.action == 'extract':
+        extract_action(args)
 
     if args.action == 'facebook':
         facebook_action(args)
