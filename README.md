@@ -14,6 +14,7 @@ A webmining CLI tool & library for python.
 ```shell
 pip install minet
 ```
+> You can also create a Minet [executable](docs/create_executable.md).
 
 ## Commands
 
@@ -52,10 +53,10 @@ That's it, your HTML files are stored in *./data/htmlfiles*, ready for text cont
 Quickly fetches the (*rounded**) Facebook share count of each url in a given csv, without the need of an API nor access token (and thus no rate limitation).
 Works in a multithreaded & lazy way (the csv is not loaded into memory).
 
-*The share count of a url is the sum of :*
-- *the number of likes of the url*
-- *the number of shares of the url*
-- *the number of likes & comments on stories about this url*
+> *The share count of a url is the sum of :*
+> - *the number of likes of the url*
+> - *the number of shares of the url*
+> - *the number of likes & comments on stories about this url*
 
 
 ```shell
