@@ -16,14 +16,14 @@ def HTML_to_content(string, url_id, folder):
         print('Dragnet extraction error:', e)
         extraction_result = 'Dragnet extraction error'
 
-    with open(os.path.join(folder, 'contentfiles', url_id + '.txt'), 'w') as result:
+    with open(os.path.join(folder, 'content', url_id + '.txt'), 'w') as result:
         result.write(extraction_result)
 
     return extraction_result
 
 
 def extract_content(data_path, monitoring_file_path, id_column='id'):
-    content_files_path = os.path.join(data_path, 'contentfiles')
+    content_files_path = os.path.join(data_path, 'content')
     html_files_path = os.path.join(data_path, 'html')
     nb_of_processed_files = 0
     if not os.path.exists(content_files_path):
@@ -34,7 +34,7 @@ def extract_content(data_path, monitoring_file_path, id_column='id'):
         id_position = headers.index(id_column)
         for line in reader:
             file_id = line[id_position]
-            if not os.path.isfile(os.path.join(data_path, 'contentfiles', file_id + '.txt')):
+            if not os.path.isfile(os.path.join(data_path, 'content', file_id + '.txt')):
                 with open(os.path.join(html_files_path, file_id + '.html'), 'r') as f:
                     html_string = f.read()
                     content = HTML_to_content(
