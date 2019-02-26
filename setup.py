@@ -15,15 +15,16 @@ setup(name='minet',
       python_requires='>=3',
       packages=find_packages(exclude=['test']),
       install_requires=[
-          'ural==0.5.0',
-          'urllib3==1.24.1',
-          'bs4',
-          'lxml==4.3.0',
-          'numpy==1.16.1',
-          'cython==0.29.4',
-          'progress==1.4'
+        'beautifulsoup4==4.7.1',
+        'cython==0.29.4',
+        'lxml==4.3.0',
+        'numpy==1.16.1',
+        'quenouille==0.2.0',
+        'ural==0.5.0',
+        'urllib3==1.24.1',
+        'dragnet==2.0.3'
       ],
       entry_points={
-          'console_scripts': ['minet=minet.cli.__main__:main']
+        'console_scripts': ['minet=minet.cli.__main__:main']
       },
       zip_safe=True)
