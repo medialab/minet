@@ -5,4 +5,5 @@ python -m minet.cli fetch url ftest/resources/urls.csv \
   --total 10000 \
   --filename id \
   -o ftest/report.csv \
-  -s id,url
+  -s id,url \
+  -t 25

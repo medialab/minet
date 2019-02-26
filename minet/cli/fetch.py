@@ -10,7 +10,7 @@ import os
 import csv
 import certifi
 from os.path import join
-from urllib3 import PoolManager
+from urllib3 import PoolManager, Timeout
 from tqdm import tqdm
 from quenouille import imap
 from tld import get_fld
@@ -98,7 +98,13 @@ def fetch_action(namespace):
     output_writer.writerow(output_headers)
 
     # Creating the http pool
-    pool = PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+    pool = PoolManager(
+        cert_reqs='CERT_REQUIRED',
+        ca_certs=certifi.where(),
+        num_pools=namespace.threads,
+        maxsize=namespace.threads,
+        timeout=Timeout(connect=2.0, read=7.0)
+    )
 
     # Generator yielding urls to fetch
     def payloads():
