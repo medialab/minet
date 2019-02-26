@@ -1,2 +1,4 @@
-data
+.DS_Store
 __pycache__
+data
+ftest/content
