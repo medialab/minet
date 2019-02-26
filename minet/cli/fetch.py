@@ -8,11 +8,13 @@
 #
 import os
 import certifi
+from os.path import join
 from urllib3 import PoolManager
 from urllib3.exceptions import HTTPError
 from tqdm import tqdm
 from quenouille import imap
 from tld import get_fld
+from uuid import uuid4
 from ural import ensure_protocol
 
 from minet.cli.utils import custom_reader
@@ -26,21 +28,23 @@ def domain_name(job):
     return get_fld(job[2], fix_protocol=True)
 
 
+def fetch(pool, url):
+    try:
+        r = pool.request('GET', ensure_protocol(url))
+        return None, r
+    except HTTPError as e:
+        return e, None
+
+
 def worker(job):
     """
     Function using the urllib3 pool to actually fetch our contents from the web.
     """
-    pool, line, payload = job
+    pool, line, url = job
 
-    error = None
+    error, result = fetch(pool, url)
 
-    try:
-        r = pool.request('GET', ensure_protocol(payload))
-    except HTTPError as e:
-        error = e
-        r = None
-
-    return error, payload, line, r
+    return error, url, line, result
 
 
 def fetch_action(namespace):
@@ -58,13 +62,17 @@ def fetch_action(namespace):
             url = line[pos].strip()
 
             if not url:
+
+                # TODO: this could desynchronize loading bar total
                 continue
 
             yield (pool, line, url)
 
     # Streaming the file and fetching the url using multiple threads
+    loading_bar = tqdm(payloads(), total=namespace.total)
+
     multithreaded_iterator = imap(
-        payloads(),
+        loading_bar,
         worker,
         namespace.threads,
         group=domain_name,
@@ -74,8 +82,19 @@ def fetch_action(namespace):
     )
 
     for error, url, line, result in multithreaded_iterator:
+
+        # No error
         if error is None:
-            # print(url, result.status, result.data)
-            pass
+
+            # NOTE: it would be nice to have an id that can be sorted by time
+            uuid = uuid4()
+
+            # Writing file on disk
+            # TODO: get correct extension!
+            loading_bar.write(url)
+            with open(join(namespace.output_dir, '%s.html' % uuid), 'wb') as f:
+                f.write(result.data)
+
+        # Handling potential errors
         else:
-            print(error)
+            loading_bar.write(repr(error))

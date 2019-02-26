@@ -58,6 +58,13 @@ def main():
         type=int,
         default=10
     )
+    fetch_subparser.add_argument(
+        '--total',
+        help='total number of lines in csv file. necessary if you want a finite progress indicator',
+        type=int
+    )
+
+    # TODO: lru_cache, normalize urls?
 
     SUBPARSERS['fetch'] = fetch_subparser
 
