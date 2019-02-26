@@ -11,13 +11,19 @@ class TestRangeSet(object):
         s.add(3)
 
         assert s.intervals == [(3, 3)]
-        assert s.min == (3, 3)
-        assert s.max == (3, 3)
 
         s.add(7)
 
-        assert s.intervals == [(3, 7)]
-        assert s.min == (3, 7)
-        assert s.max == (3, 7)
+        assert s.intervals == [(3, 3), (7, 7)]
 
-        print(s.min, s.max, s.intervals)
+        s.add(1)
+
+        assert s.intervals == [(1, 1), (3, 3), (7, 7)]
+
+        s.add(2)
+
+        assert s.intervals == [(1, 3), (7, 7)]
+
+        # s.add(4)
+
+        # assert s.intervals == [(1, 4), (7, 7)]

@@ -3,46 +3,51 @@
 # =============================================================================
 #
 # Simplistic implementation of a range set in python relying on a sorted list of
-# intervals. It is very useful to represent a set of dense intervals using very
-# little memory & is used across the task-resuming schemes of the CLI tool.
+# contiguous intervals. It is very useful to represent a set of dense intervals
+# using very little memory & is used across the task-resuming schemes of the
+# CLI tool.
+#
+# It takes a lot of inspiration from the inversion list data structure.
 #
 from bisect import bisect_left
 
 
 class RangeSet(object):
     def __init__(self):
-        self.min = None
-        self.max = None
+        # TODO: replace this by `blist` if not performany enough
         self.intervals = []
 
     def add(self, point):
 
+        interval = (point, point)
+        N = len(self.intervals)
+
         # Set is empty
-        if self.min is None:
-            interval = (point, point)
-            self.min = interval
-            self.max = interval
+        if N == 0:
             self.intervals.append(interval)
+            return
+
+        # Finding insertion point
+        index = bisect_left(self.intervals, interval)
+
+        if index >= N:
+            self.intervals.append(interval)
+            return
+
+        matched_interval = self.intervals[index]
+
+        if point == matched_interval[0] - 1:
+            self.intervals[index] = (point, matched_interval[1])
+
+            if index != 0:
+                previous_interval = self.intervals[index - 1]
+
+                if point == previous_interval[1] + 1:
+                    self.intervals[index] = (previous_interval[0], matched_interval[1])
+                    self.intervals.pop(index - 1)
 
             return
 
-        # Monotonic shortcuts
-        if point == self.min[0] or point == self.max[1]:
+        if point < matched_interval[0]:
+            self.intervals.insert(index, interval)
             return
-
-        only_one_interval = self.min == self.max
-
-        if point < self.min[0]:
-            self.min = (point, self.min[1])
-            self.intervals[0] = self.min
-            return
-
-        if point > self.max[1]:
-            self.max = (self.max[0], point)
-            self.intervals[-1] = self.max
-            return
-
-        # Using binary search to find insertion point
-        index = bisect_left(self.intervals, (point, point))
-
-        print(index)
