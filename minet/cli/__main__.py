@@ -53,6 +53,18 @@ def main():
         default='content'
     )
     fetch_subparser.add_argument(
+        '-f', '--filename',
+        help='name of the column used to build retrieved file names. defaults to uuid v4'
+    )
+    fetch_subparser.add_argument(
+        '-o', '--output',
+        help='path to the report file'
+    )
+    fetch_subparser.add_argument(
+        '-s', '--select',
+        help='columns to include in report (separated by `,`)'
+    )
+    fetch_subparser.add_argument(
         '-t', '--threads',
         help='number of threads to use',
         type=int,

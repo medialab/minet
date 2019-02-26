@@ -7,6 +7,7 @@
 # optimize both running time & memory.
 #
 import os
+import csv
 import certifi
 from os.path import join
 from urllib3 import PoolManager
@@ -18,6 +19,8 @@ from uuid import uuid4
 from ural import ensure_protocol
 
 from minet.cli.utils import custom_reader
+
+OUTPUT_ADDITIONAL_HEADERS = ['status', 'error', 'filename']
 
 
 def domain_name(job):
@@ -49,9 +52,20 @@ def worker(job):
 
 def fetch_action(namespace):
     input_headers, pos, reader = custom_reader(namespace.file, namespace.column)
+    filename_pos = input_headers.index(namespace.filename) if namespace.filename else filename_pos
+
+    selected_fields = namespace.select.split(',') if namespace.select else None
+    selected_pos = [input_headers.index(h) for h in selected_fields] if selected_fields else None
 
     # First we need to create the relevant directory
     os.makedirs(namespace.output_dir, exist_ok=True)
+
+    # Reading output
+    output_headers = (input_headers if not selected_pos else [input_headers[i] for i in selected_pos])
+    output_headers += OUTPUT_ADDITIONAL_HEADERS
+    output_file = open(namespace.output, 'w')
+    output_writer = csv.writer(output_file)
+    output_writer.writerow(output_headers)
 
     # Creating the http pool
     pool = PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
@@ -86,15 +100,37 @@ def fetch_action(namespace):
         # No error
         if error is None:
 
-            # NOTE: it would be nice to have an id that can be sorted by time
-            uuid = uuid4()
+            filename = None
+
+            # TODO: get correct extension!
+            if filename_pos is not None:
+                filename = line[filename_pos] + '.html'
+            else:
+                # NOTE: it would be nice to have an id that can be sorted by time
+                filename = uuid4() + '.html'
 
             # Writing file on disk
-            # TODO: get correct extension!
             loading_bar.write(url)
-            with open(join(namespace.output_dir, '%s.html' % uuid), 'wb') as f:
+            with open(join(namespace.output_dir, filename), 'wb') as f:
                 f.write(result.data)
+
+            # Reporting in output
+            if selected_pos:
+                line = [line[i] for i in selected_pos]
+
+            line.extend([result.status, '', filename])
+            output_writer.writerow(line)
 
         # Handling potential errors
         else:
             loading_bar.write(repr(error))
+
+            # Reporting in output
+            if selected_pos:
+                line = [line[i] for i in selected_pos]
+
+            line.extend(['', repr(error), ''])
+            output_writer.writerow(line)
+
+    # Closing files
+    output_file.close()
