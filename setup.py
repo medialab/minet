@@ -20,8 +20,9 @@ setup(name='minet',
         'lxml==4.3.0',
         'numpy==1.16.1',
         'quenouille==0.2.0',
-        'ural==0.5.0',
-        'urllib3==1.24.1',
+        'tld==0.9.2',
+        'ural==0.6.0',
+        'urllib3[secure]==1.24.1',
         'dragnet==2.0.3'
       ],
       entry_points={
