@@ -14,14 +14,10 @@ import uuid
 from minet.cli.utils import custom_reader
 # from minet.fetch import fetch
 
-from progress.bar import FillingSquaresBar
-
 USER_AGENT = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:65.0) Gecko/20100101 Firefox/65.0"
 
 
 def fetch_action(namespace):
-
-    bar = FillingSquaresBar('Fetching')
 
     HTML_FILES = os.path.join(namespace.storage_location, 'html')
     if not os.path.isdir(HTML_FILES):
@@ -81,7 +77,4 @@ def fetch_action(namespace):
                 text_file.write(html)
             line = line + [status]
             monitoring_writer.writerow(line)
-        bar.next()
-    bar.goto(100)
-    bar.finish()
     # yield html
