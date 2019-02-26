@@ -11,19 +11,38 @@ import csv
 import certifi
 from os.path import join
 from urllib3 import PoolManager
-from urllib3.exceptions import HTTPError, MaxRetryError
 from tqdm import tqdm
 from quenouille import imap
 from tld import get_fld
 from uuid import uuid4
 from ural import ensure_protocol
 
+from urllib3.exceptions import (
+    HTTPError,
+    ConnectTimeoutError,
+    MaxRetryError,
+    ReadTimeoutError,
+    ResponseError
+)
+
 from minet.cli.utils import custom_reader
 
 OUTPUT_ADDITIONAL_HEADERS = ['status', 'error', 'filename']
 
+# TODO: make this an option!
+SPOOFED_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36'
+
+def max_retry_error_reporter(error):
+    if isinstance(error, (ConnectTimeoutError, ReadTimeoutError)):
+        return 'timeout'
+
+    if isinstance(error.reason, ResponseError) and 'redirect' in repr(error.reason):
+        return 'too-many-redirects'
+
+    return 'max-retries-exceeded'
+
 ERROR_REPORTERS = {
-    MaxRetryError: lambda e: ('too-many-redirects' if 'redirect' in repr(e.reason) else 'max-retries-exceeded')
+    MaxRetryError: max_retry_error_reporter
 }
 
 
@@ -37,7 +56,14 @@ def domain_name(job):
 
 def fetch(pool, url):
     try:
-        r = pool.request('GET', ensure_protocol(url))
+        r = pool.request(
+            'GET',
+            ensure_protocol(url),
+            headers={
+                'User-Agent': SPOOFED_UA
+            }
+        )
+
         return None, r
     except HTTPError as e:
         return e, None
