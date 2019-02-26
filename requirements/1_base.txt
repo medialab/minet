@@ -1,12 +1,12 @@
 # Dev Dependencies
 pycodestyle==2.4.0
 pytest==3.5.1
+twine==1.11.0
 
 # Dependencies
-ural==0.5.0
-urllib3==1.24.1
-bs4
+beautifulsoup4==4.7.1
+cython==0.29.4
 lxml==4.3.0
 numpy==1.16.1
-cython==0.29.4
-progress==1.4
+ural==0.5.0
+urllib3==1.24.1
