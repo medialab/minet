@@ -11,7 +11,7 @@ import csv
 import certifi
 from os.path import join
 from urllib3 import PoolManager
-from urllib3.exceptions import HTTPError
+from urllib3.exceptions import HTTPError, MaxRetryError
 from tqdm import tqdm
 from quenouille import imap
 from tld import get_fld
@@ -21,6 +21,10 @@ from ural import ensure_protocol
 from minet.cli.utils import custom_reader
 
 OUTPUT_ADDITIONAL_HEADERS = ['status', 'error', 'filename']
+
+ERROR_REPORTERS = {
+    MaxRetryError: lambda e: ('too-many-redirects' if 'redirect' in repr(e.reason) else 'max-retries-exceeded')
+}
 
 
 def domain_name(job):
@@ -83,7 +87,13 @@ def fetch_action(namespace):
             yield (pool, line, url)
 
     # Streaming the file and fetching the url using multiple threads
-    loading_bar = tqdm(payloads(), total=namespace.total)
+    loading_bar = tqdm(
+        payloads(),
+        desc='Fetching pages',
+        total=namespace.total,
+        dynamic_ncols=True,
+        unit=' urls'
+    )
 
     multithreaded_iterator = imap(
         loading_bar,
@@ -110,7 +120,6 @@ def fetch_action(namespace):
                 filename = uuid4() + '.html'
 
             # Writing file on disk
-            loading_bar.write(url)
             with open(join(namespace.output_dir, filename), 'wb') as f:
                 f.write(result.data)
 
@@ -123,13 +132,15 @@ def fetch_action(namespace):
 
         # Handling potential errors
         else:
-            loading_bar.write(repr(error))
+            # loading_bar.write(repr(error))
+
+            reporter = ERROR_REPORTERS.get(type(error), repr)
 
             # Reporting in output
             if selected_pos:
                 line = [line[i] for i in selected_pos]
 
-            line.extend(['', repr(error), ''])
+            line.extend(['', reporter(error), ''])
             output_writer.writerow(line)
 
     # Closing files
