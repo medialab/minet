@@ -21,6 +21,7 @@ from ural import ensure_protocol
 
 from urllib3.exceptions import (
     HTTPError,
+    ClosedPoolError,
     ConnectTimeoutError,
     MaxRetryError,
     ReadTimeoutError,
@@ -57,9 +58,9 @@ def domain_name(job):
     return get_fld(job[2], fix_protocol=True)
 
 
-def fetch(pool, url):
+def fetch(manager, url):
     try:
-        r = pool.request(
+        r = manager.request(
             'GET',
             ensure_protocol(url),
             headers={
@@ -76,11 +77,11 @@ def fetch(pool, url):
 
 def worker(job):
     """
-    Function using the urllib3 pool to actually fetch our contents from the web.
+    Function using the urllib3 manager to actually fetch our contents from the web.
     """
-    pool, line, url = job
+    manager, line, url = job
 
-    error, result = fetch(pool, url)
+    error, result = fetch(manager, url)
 
     return error, url, line, result, result.data if result else None
 
@@ -102,8 +103,8 @@ def fetch_action(namespace):
     output_writer = csv.writer(output_file)
     output_writer.writerow(output_headers)
 
-    # Creating the http pool
-    pool = PoolManager(
+    # Creating the http pool manager
+    manager = PoolManager(
         cert_reqs='CERT_REQUIRED',
         ca_certs=certifi.where(),
         num_pools=namespace.threads,
@@ -129,7 +130,7 @@ def fetch_action(namespace):
                 loading_bar.update()
                 continue
 
-            yield (pool, line, url)
+            yield (manager, line, url)
 
     # Streaming the file and fetching the url using multiple threads
     multithreaded_iterator = imap_unordered(
