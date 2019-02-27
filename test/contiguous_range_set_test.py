@@ -40,20 +40,29 @@ class TestContiguousRangeSet(object):
 
         assert s.intervals == [(-1, -1), (1, 7)]
 
-    def test_contains(self):
+    def test_stateful_contains(self):
         s = ContiguousRangeSet()
 
+        s.add(0)
         s.add(1)
         s.add(2)
-        s.add(4)
         s.add(5)
+        s.add(7)
+        s.add(6)
 
-        assert 1 in s
-        assert 2 in s
-        assert 3 not in s
-        assert 4 in s
-        assert 5 in s
-        assert 6 not in s
-        assert 7 not in s
-        assert 100 not in s
-        assert -1 not in s
+        assert s.intervals == [(0, 2), (5, 7)]
+
+        assert s.stateful_contains(0)
+        assert s.stateful_contains(1)
+        assert s.stateful_contains(2)
+        assert not s.stateful_contains(3)
+        assert not s.stateful_contains(4)
+        assert s.stateful_contains(5)
+        assert s.stateful_contains(6)
+        assert s.stateful_contains(7)
+        assert not s.stateful_contains(8)
+        assert not s.stateful_contains(1)
+        assert not s.stateful_contains(3)
+        assert not s.stateful_contains(6)
+        assert not s.stateful_contains(-1)
+        assert not s.stateful_contains(100)

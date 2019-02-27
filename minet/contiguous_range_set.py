@@ -13,11 +13,21 @@ from bisect import bisect_left
 
 
 class ContiguousRangeSet(object):
+    """
+    Class representing contiguous ranges of integers as a sorted list of
+    intervals.
+    """
+
     def __init__(self):
         # NOTE: replace this by `blist` if not performany enough
         self.intervals = []
+        self.current_stateful_interval = 0
 
     def add(self, point):
+        """
+        Method adding a single point to the set. We assume that the point
+        cannot yet be in the set.
+        """
 
         interval = (point, point)
         N = len(self.intervals)
@@ -31,6 +41,12 @@ class ContiguousRangeSet(object):
         index = bisect_left(self.intervals, interval)
 
         if index >= N:
+            last_interval = self.intervals[-1]
+
+            if point == last_interval[1] + 1:
+                self.intervals[-1] = (last_interval[0], point)
+                return
+
             self.intervals.append(interval)
             return
 
@@ -58,17 +74,26 @@ class ContiguousRangeSet(object):
             self.intervals.insert(index, interval)
             return
 
-    def __contains__(self, point):
+    def stateful_contains(self, point):
+        """
+        Method returning whether the given point is found in the set. This
+        method is stateful and assumes we will ask for points in a monotonic
+        increasing order.
+        """
+
         N = len(self.intervals)
 
-        if N == 0:
+        if N == 0 or self.current_stateful_interval >= N:
             return False
 
-        index = bisect_left(self.intervals, (point, point))
+        I = self.intervals[self.current_stateful_interval]
 
-        if index >= N:
+        if point < I[0]:
             return False
 
-        matched_interval = self.intervals[index]
+        if point > I[1]:
+            self.current_stateful_interval += 1
+            return False
 
-        return index < N and matched_interval[0] >= point and matched_interval[1] <= point
+        return True
+
