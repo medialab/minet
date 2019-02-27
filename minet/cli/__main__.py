@@ -68,7 +68,7 @@ def main():
         '-t', '--threads',
         help='number of threads to use',
         type=int,
-        default=10
+        default=25
     )
     fetch_subparser.add_argument(
         '--total',

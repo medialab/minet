@@ -6,6 +6,8 @@
 # in the given column. This is done in a respectful multithreaded fashion to
 # optimize both running time & memory.
 #
+
+# TODO: use https://github.com/kennethreitz/requests/blob/c501ec986daa4961cd9dee370b5d45ff2e524b37/requests/utils.py
 import os
 import csv
 import certifi
