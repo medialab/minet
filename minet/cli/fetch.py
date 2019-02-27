@@ -6,8 +6,6 @@
 # in the given column. This is done in a respectful multithreaded fashion to
 # optimize both running time & memory.
 #
-
-# TODO: use https://github.com/kennethreitz/requests/blob/c501ec986daa4961cd9dee370b5d45ff2e524b37/requests/utils.py
 import os
 import csv
 import certifi
@@ -30,6 +28,7 @@ from urllib3.exceptions import (
     ResponseError
 )
 
+from minet.utils import guess_encoding
 from minet.cli.utils import custom_reader
 
 mimetypes.init()
@@ -94,7 +93,36 @@ def worker(job):
 
     error, result = fetch(http, url)
 
-    return error, url, line, result, result.data if result else None
+    if error:
+        return error, url, line, result, None, None
+
+    # Forcing urllib3 to read data in thread
+    data = result.data
+
+    # Solving mime type
+    (mimetype, _) = mimetypes.guess_type(url)
+
+    if mimetype is None:
+        mimetype = 'text/html'
+
+    exts = mimetypes.guess_all_extensions(mimetype)
+
+    if not exts:
+        ext = '.html'
+    else:
+        ext = max(exts, key=len)
+
+    # Solving encoding
+    is_xml = ext == '.html' or ext == '.xml'
+    encoding = guess_encoding(result, data, is_xml=is_xml, use_chardet=True)
+
+    info = {
+        'mime': mimetype,
+        'ext': ext,
+        'encoding': encoding
+    }
+
+    return error, url, line, result, data, info
 
 
 def fetch_action(namespace):
@@ -157,7 +185,7 @@ def fetch_action(namespace):
     errors = 0
     status_codes = Counter()
 
-    for i, (error, url, line, result, data) in enumerate(multithreaded_iterator):
+    for i, (error, url, line, result, data, info) in enumerate(multithreaded_iterator):
 
         # Updating stats
         if error is not None:
@@ -179,23 +207,12 @@ def fetch_action(namespace):
 
             filename = None
 
-            (mimetype, _) = mimetypes.guess_type(url)
-
-            if mimetype is None:
-                mimetype = 'text/html'
-
-            exts = mimetypes.guess_all_extensions(mimetype)
-
-            if not exts:
-                ext = '.html'
-            else:
-                ext = max(exts, key=len)
-
+            # Building filename
             if filename_pos is not None:
-                filename = line[filename_pos] + ext
+                filename = line[filename_pos] + info['ext']
             else:
                 # NOTE: it would be nice to have an id that can be sorted by time
-                filename = uuid4() + ext
+                filename = uuid4() + info['ext']
 
             # Writing file on disk
             with open(join(namespace.output_dir, filename), 'wb') as f:
@@ -205,7 +222,7 @@ def fetch_action(namespace):
             if selected_pos:
                 line = [line[i] for i in selected_pos]
 
-            line.extend([i, result.status, '', filename, ''])
+            line.extend([i, result.status, '', filename, info['encoding']])
             output_writer.writerow(line)
 
         # Handling potential errors
