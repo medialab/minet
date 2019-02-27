@@ -12,7 +12,7 @@ import certifi
 from os.path import join
 from urllib3 import PoolManager, Timeout
 from tqdm import tqdm
-from quenouille import imap
+from quenouille import imap_unordered
 from tld import get_fld
 from uuid import uuid4
 from ural import ensure_protocol
@@ -27,7 +27,7 @@ from urllib3.exceptions import (
 
 from minet.cli.utils import custom_reader
 
-OUTPUT_ADDITIONAL_HEADERS = ['status', 'error', 'filename']
+OUTPUT_ADDITIONAL_HEADERS = ['line', 'status', 'error', 'filename']
 
 # TODO: make this an option!
 SPOOFED_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36'
@@ -106,6 +106,13 @@ def fetch_action(namespace):
         timeout=Timeout(connect=2.0, read=7.0)
     )
 
+    loading_bar = tqdm(
+        desc='Fetching pages',
+        total=namespace.total,
+        dynamic_ncols=True,
+        unit=' urls'
+    )
+
     # Generator yielding urls to fetch
     def payloads():
         for line in reader:
@@ -113,22 +120,15 @@ def fetch_action(namespace):
 
             if not url:
 
-                # TODO: this could desynchronize loading bar total
+                # TODO: write report line all the same!
+                loading_bar.update()
                 continue
 
             yield (pool, line, url)
 
     # Streaming the file and fetching the url using multiple threads
-    loading_bar = tqdm(
+    multithreaded_iterator = imap_unordered(
         payloads(),
-        desc='Fetching pages',
-        total=namespace.total,
-        dynamic_ncols=True,
-        unit=' urls'
-    )
-
-    multithreaded_iterator = imap(
-        loading_bar,
         worker,
         namespace.threads,
         group=domain_name,
@@ -137,7 +137,8 @@ def fetch_action(namespace):
         group_throttle=0.25
     )
 
-    for error, url, line, result in multithreaded_iterator:
+    for i, (error, url, line, result) in enumerate(multithreaded_iterator):
+        loading_bar.update()
 
         # No error
         if error is None:
@@ -159,7 +160,7 @@ def fetch_action(namespace):
             if selected_pos:
                 line = [line[i] for i in selected_pos]
 
-            line.extend([result.status, '', filename])
+            line.extend([i, result.status, '', filename])
             output_writer.writerow(line)
 
         # Handling potential errors
@@ -172,7 +173,7 @@ def fetch_action(namespace):
             if selected_pos:
                 line = [line[i] for i in selected_pos]
 
-            line.extend(['', reporter(error), ''])
+            line.extend([i, '', reporter(error), ''])
             output_writer.writerow(line)
 
     # Closing files
