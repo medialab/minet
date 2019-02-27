@@ -107,8 +107,8 @@ def fetch_action(namespace):
     http = PoolManager(
         cert_reqs='CERT_REQUIRED',
         ca_certs=certifi.where(),
-        num_pools=namespace.threads,
-        maxsize=namespace.threads,
+        num_pools=namespace.threads * 2,
+        maxsize=1, # NOTE: should be the same as group_parallelism,
         timeout=Timeout(connect=2.0, read=7.0)
     )
 
