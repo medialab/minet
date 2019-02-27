@@ -1,18 +1,18 @@
 # =============================================================================
-# Minet Range Set Collection
+# Minet Contiguous Range Set Collection
 # =============================================================================
 #
-# Simplistic implementation of a range set in python relying on a sorted list of
-# contiguous intervals. It is very useful to represent a set of dense intervals
-# using very little memory & is used across the task-resuming schemes of the
-# CLI tool.
+# Simplistic implementation of a contiguous range set in python relying on a
+# sorted list of contiguous intervals. It is very useful to represent a set of
+# dense intervals using very little memory & is used across the task-resuming
+# schemes of the CLI tool.
 #
 # It takes a lot of inspiration from the inversion list data structure.
 #
 from bisect import bisect_left
 
 
-class RangeSet(object):
+class ContiguousRangeSet(object):
     def __init__(self):
         # NOTE: replace this by `blist` if not performany enough
         self.intervals = []

@@ -1,12 +1,12 @@
 # =============================================================================
-# Minet RangeSet Unit Tests
+# Minet ContiguousRangeSet Unit Tests
 # =============================================================================
-from minet.range_set import RangeSet
+from minet.contiguous_range_set import ContiguousRangeSet
 
 
-class TestRangeSet(object):
+class TestContiguousRangeSet(object):
     def test_basics(self):
-        s = RangeSet()
+        s = ContiguousRangeSet()
 
         s.add(3)
 
