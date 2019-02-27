@@ -16,6 +16,7 @@ setup(name='minet',
       packages=find_packages(exclude=['test']),
       install_requires=[
         'beautifulsoup4==4.7.1',
+        'chardet==3.0.4',
         'cython==0.29.4',
         'lxml==4.3.0',
         'numpy==1.16.1',

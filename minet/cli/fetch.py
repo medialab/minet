@@ -8,6 +8,7 @@
 #
 import os
 import csv
+# import chardet
 import certifi
 from os.path import join
 from urllib3 import PoolManager, Timeout
@@ -27,7 +28,7 @@ from urllib3.exceptions import (
 
 from minet.cli.utils import custom_reader
 
-OUTPUT_ADDITIONAL_HEADERS = ['line', 'status', 'error', 'filename']
+OUTPUT_ADDITIONAL_HEADERS = ['line', 'status', 'error', 'filename', 'encoding']
 
 # TODO: make this an option!
 SPOOFED_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36'
@@ -77,7 +78,7 @@ def worker(job):
 
     error, result = fetch(pool, url)
 
-    return error, url, line, result
+    return error, url, line, result, result.data if result else None
 
 
 def fetch_action(namespace):
@@ -137,13 +138,14 @@ def fetch_action(namespace):
         group_throttle=0.25
     )
 
-    for i, (error, url, line, result) in enumerate(multithreaded_iterator):
+    for i, (error, url, line, result, data) in enumerate(multithreaded_iterator):
         loading_bar.update()
 
         # No error
         if error is None:
 
             filename = None
+            # chardet_result = chardet.detect(result.data)
 
             # TODO: get correct extension!
             if filename_pos is not None:
@@ -154,13 +156,13 @@ def fetch_action(namespace):
 
             # Writing file on disk
             with open(join(namespace.output_dir, filename), 'wb') as f:
-                f.write(result.data)
+                f.write(data)
 
             # Reporting in output
             if selected_pos:
                 line = [line[i] for i in selected_pos]
 
-            line.extend([i, result.status, '', filename])
+            line.extend([i, result.status, '', filename, ''])
             output_writer.writerow(line)
 
         # Handling potential errors
@@ -173,7 +175,7 @@ def fetch_action(namespace):
             if selected_pos:
                 line = [line[i] for i in selected_pos]
 
-            line.extend([i, '', reporter(error), ''])
+            line.extend([i, '', reporter(error), '', ''])
             output_writer.writerow(line)
 
     # Closing files

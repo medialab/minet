@@ -76,7 +76,7 @@ def main():
         type=int
     )
 
-    # TODO: lru_cache, normalize urls?
+    # TODO: lru_cache, normalize urls, utf-8 normalization?
 
     SUBPARSERS['fetch'] = fetch_subparser
 
