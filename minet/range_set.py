@@ -14,7 +14,7 @@ from bisect import bisect_left
 
 class RangeSet(object):
     def __init__(self):
-        # TODO: replace this by `blist` if not performany enough
+        # NOTE: replace this by `blist` if not performany enough
         self.intervals = []
 
     def add(self, point):
@@ -35,17 +35,23 @@ class RangeSet(object):
             return
 
         matched_interval = self.intervals[index]
+        previous_interval = self.intervals[index - 1] if index != 0 else None
 
         if point == matched_interval[0] - 1:
+
             self.intervals[index] = (point, matched_interval[1])
 
-            if index != 0:
-                previous_interval = self.intervals[index - 1]
+            if previous_interval is not None:
 
                 if point == previous_interval[1] + 1:
                     self.intervals[index] = (previous_interval[0], matched_interval[1])
                     self.intervals.pop(index - 1)
 
+            return
+
+        elif previous_interval is not None and point == previous_interval[1] + 1:
+
+            self.intervals[index - 1] = (previous_interval[0], point)
             return
 
         if point < matched_interval[0]:

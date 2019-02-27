@@ -24,6 +24,18 @@ class TestRangeSet(object):
 
         assert s.intervals == [(1, 3), (7, 7)]
 
-        # s.add(4)
+        s.add(4)
 
-        # assert s.intervals == [(1, 4), (7, 7)]
+        assert s.intervals == [(1, 4), (7, 7)]
+
+        s.add(6)
+
+        assert s.intervals == [(1, 4), (6, 7)]
+
+        s.add(5)
+
+        assert s.intervals == [(1, 7)]
+
+        s.add(-1)
+
+        assert s.intervals == [(-1, -1), (1, 7)]
