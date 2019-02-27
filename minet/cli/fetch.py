@@ -11,6 +11,7 @@
 import os
 import csv
 import certifi
+import mimetypes
 from os.path import join
 from collections import Counter
 from urllib3 import PoolManager, Timeout
@@ -30,6 +31,8 @@ from urllib3.exceptions import (
 )
 
 from minet.cli.utils import custom_reader
+
+mimetypes.init()
 
 OUTPUT_ADDITIONAL_HEADERS = ['line', 'status', 'error', 'filename', 'encoding']
 
@@ -176,12 +179,23 @@ def fetch_action(namespace):
 
             filename = None
 
-            # TODO: get correct extension!
+            (mimetype, _) = mimetypes.guess_type(url)
+
+            if mimetype is None:
+                mimetype = 'text/html'
+
+            exts = mimetypes.guess_all_extensions(mimetype)
+
+            if not exts:
+                ext = '.html'
+            else:
+                ext = max(exts, key=len)
+
             if filename_pos is not None:
-                filename = line[filename_pos] + '.html'
+                filename = line[filename_pos] + ext
             else:
                 # NOTE: it would be nice to have an id that can be sorted by time
-                filename = uuid4() + '.html'
+                filename = uuid4() + ext
 
             # Writing file on disk
             with open(join(namespace.output_dir, filename), 'wb') as f:
