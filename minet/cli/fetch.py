@@ -114,6 +114,7 @@ def worker(job):
 
     # Solving encoding
     is_xml = ext == '.html' or ext == '.xml'
+
     encoding = guess_encoding(result, data, is_xml=is_xml, use_chardet=True)
 
     info = {
@@ -214,6 +215,16 @@ def fetch_action(namespace):
                 # NOTE: it would be nice to have an id that can be sorted by time
                 filename = uuid4() + info['ext']
 
+            # Standardize encoding?
+            encoding = info['encoding']
+
+            if namespace.standardize_encoding:
+
+                # TODO: what to do when encoding is not found?
+                if encoding is None and encoding != 'utf-8':
+                    data = data.decode(encoding, errors='replace').encode()
+                    encoding = 'utf-8'
+
             # Writing file on disk
             with open(join(namespace.output_dir, filename), 'wb') as f:
                 f.write(data)
@@ -222,7 +233,7 @@ def fetch_action(namespace):
             if selected_pos:
                 line = [line[i] for i in selected_pos]
 
-            line.extend([i, result.status, '', filename, info['encoding']])
+            line.extend([i, result.status, '', filename, encoding or ''])
             output_writer.writerow(line)
 
         # Handling potential errors

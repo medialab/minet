@@ -57,6 +57,11 @@ def main():
         help='name of the column used to build retrieved file names. defaults to uuid v4'
     )
     fetch_subparser.add_argument(
+        '--standardize-encoding',
+        help='whether to systematically convert retrieved text to UTF-8',
+        action='store_true'
+    )
+    fetch_subparser.add_argument(
         '-o', '--output',
         help='path to the report file'
     )
