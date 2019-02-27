@@ -8,7 +8,6 @@
 #
 import os
 import csv
-# import chardet
 import certifi
 from os.path import join
 from urllib3 import PoolManager, Timeout
@@ -145,7 +144,6 @@ def fetch_action(namespace):
         if error is None:
 
             filename = None
-            # chardet_result = chardet.detect(result.data)
 
             # TODO: get correct extension!
             if filename_pos is not None:
