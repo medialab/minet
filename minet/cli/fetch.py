@@ -58,9 +58,9 @@ def domain_name(job):
     return get_fld(job[2], fix_protocol=True)
 
 
-def fetch(manager, url):
+def fetch(http, url):
     try:
-        r = manager.request(
+        r = http.request(
             'GET',
             ensure_protocol(url),
             headers={
@@ -77,11 +77,11 @@ def fetch(manager, url):
 
 def worker(job):
     """
-    Function using the urllib3 manager to actually fetch our contents from the web.
+    Function using the urllib3 http to actually fetch our contents from the web.
     """
-    manager, line, url = job
+    http, line, url = job
 
-    error, result = fetch(manager, url)
+    error, result = fetch(http, url)
 
     return error, url, line, result, result.data if result else None
 
@@ -104,7 +104,7 @@ def fetch_action(namespace):
     output_writer.writerow(output_headers)
 
     # Creating the http pool manager
-    manager = PoolManager(
+    http = PoolManager(
         cert_reqs='CERT_REQUIRED',
         ca_certs=certifi.where(),
         num_pools=namespace.threads,
@@ -130,7 +130,7 @@ def fetch_action(namespace):
                 loading_bar.update()
                 continue
 
-            yield (manager, line, url)
+            yield (http, line, url)
 
     # Streaming the file and fetching the url using multiple threads
     multithreaded_iterator = imap_unordered(
