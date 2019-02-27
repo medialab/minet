@@ -57,3 +57,18 @@ class ContiguousRangeSet(object):
         if point < matched_interval[0]:
             self.intervals.insert(index, interval)
             return
+
+    def __contains__(self, point):
+        N = len(self.intervals)
+
+        if N == 0:
+            return False
+
+        index = bisect_left(self.intervals, (point, point))
+
+        if index >= N:
+            return False
+
+        matched_interval = self.intervals[index]
+
+        return index < N and matched_interval[0] >= point and matched_interval[1] <= point
