@@ -44,7 +44,8 @@ def max_retry_error_reporter(error):
     return 'max-retries-exceeded'
 
 ERROR_REPORTERS = {
-    MaxRetryError: max_retry_error_reporter
+    MaxRetryError: max_retry_error_reporter,
+    UnicodeEncodeError: 'headers-encoding'
 }
 
 
@@ -67,7 +68,9 @@ def fetch(pool, url):
         )
 
         return None, r
-    except HTTPError as e:
+
+    # TODO: when urllib3 updates and release #1487, we'll need to change that
+    except (HTTPError, UnicodeEncodeError) as e:
         return e, None
 
 
@@ -171,11 +174,13 @@ def fetch_action(namespace):
 
             reporter = ERROR_REPORTERS.get(type(error), repr)
 
+            error_code = reporter(error) if callable(reporter) else reporter
+
             # Reporting in output
             if selected_pos:
                 line = [line[i] for i in selected_pos]
 
-            line.extend([i, '', reporter(error), '', ''])
+            line.extend([i, '', error_code, '', ''])
             output_writer.writerow(line)
 
     # Closing files
