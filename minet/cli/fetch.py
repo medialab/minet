@@ -12,6 +12,7 @@ import os
 import csv
 import certifi
 from os.path import join
+from collections import Counter
 from urllib3 import PoolManager, Timeout
 from tqdm import tqdm
 from quenouille import imap_unordered
@@ -59,6 +60,8 @@ def domain_name(job):
 
 
 def fetch(http, url):
+
+    # TODO: probably need to do redirects myself to avoid ClosedPoolError
     try:
         r = http.request(
             'GET',
@@ -69,6 +72,11 @@ def fetch(http, url):
         )
 
         return None, r
+
+    except ClosedPoolError:
+
+        # TODO: this is a clunky workaround
+        return fetch(http, url)
 
     # TODO: when urllib3 updates and release #1487, we'll need to change that
     except (HTTPError, UnicodeEncodeError) as e:
@@ -143,7 +151,24 @@ def fetch_action(namespace):
         group_throttle=0.25
     )
 
+    errors = 0
+    status_codes = Counter()
+
     for i, (error, url, line, result, data) in enumerate(multithreaded_iterator):
+
+        # Updating stats
+        if error is not None:
+            errors += 1
+        else:
+            if result.status >= 400:
+                status_codes[result.status] += 1
+
+        postfix = {'errors': errors}
+
+        for code, count in status_codes.most_common(1):
+            postfix[str(code)] = count
+
+        loading_bar.set_postfix(**postfix)
         loading_bar.update()
 
         # No error
