@@ -4,7 +4,7 @@ SOURCE = minet
 # Commands
 all: lint test
 test: unit
-publish: lint test upload clean
+publish: test upload clean # TODO: lint is missing
 
 clean:
 	rm -rf *.egg-info .pytest_cache build dist
