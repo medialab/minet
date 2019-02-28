@@ -10,6 +10,7 @@ clean:
 	rm -rf *.egg-info .pytest_cache build dist
 	find . -name "*.pyc" | xargs rm
 	rm -rf ftest/content
+	rm *.spec
 
 deps:
 	find ./requirements -name "*.txt" | xargs -n 1 pip install -r
