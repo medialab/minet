@@ -9,6 +9,7 @@ import sys
 import shutil
 from argparse import ArgumentParser, FileType, ArgumentDefaultsHelpFormatter
 
+from minet.cli.extract import extract_action
 from minet.cli.fetch import fetch_action
 
 SUBPARSERS = {}
@@ -31,7 +32,7 @@ def main():
     # Fetch action subparser
     fetch_subparser = subparsers.add_parser(
         'fetch',
-        description='Fetches the HTML of the urls of a given CSV column.',
+        description='Fetches the urls of a given CSV column',
         formatter_class=custom_formatter
     )
 
@@ -85,6 +86,33 @@ def main():
 
     SUBPARSERS['fetch'] = fetch_subparser
 
+    # Extract action subparser
+    extract_subparser = subparsers.add_parser(
+        'extract',
+        description='Uses multiple processes to extract the main content of HTML pages using `dragnet`.',
+        formatter_class=custom_formatter
+    )
+
+    extract_subparser.add_argument(
+        'directory',
+        help='directory where the HTML files are stored'
+    )
+
+    extract_subparser.add_argument(
+        '-p', '--processes',
+        help='number of processes to use',
+        type=int,
+        default=4
+    )
+
+    extract_subparser.add_argument(
+        '--total',
+        help='total number of HTML documents. necessary if you want a finite progress indicator',
+        type=int
+    )
+
+    SUBPARSERS['extract'] = extract_subparser
+
     help_suparser = subparsers.add_parser('help')
     help_suparser.add_argument('subcommand', help='name of the subcommand')
     SUBPARSERS['help'] = help_suparser
@@ -101,6 +129,9 @@ def main():
 
     elif args.action == 'fetch':
         fetch_action(args)
+
+    elif args.action == 'extract':
+        extract_action(args)
 
     else:
         parser.print_help()

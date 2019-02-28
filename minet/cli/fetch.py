@@ -156,7 +156,7 @@ def fetch_action(namespace):
         desc='Fetching pages',
         total=namespace.total,
         dynamic_ncols=True,
-        unit=' urls'
+        unit=' url'
     )
 
     # Generator yielding urls to fetch
