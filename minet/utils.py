@@ -33,6 +33,7 @@ def guess_encoding(response, data, is_xml=False, use_chardet=False):
             if charset is not None:
                 return charset.lower()
 
+    # TODO: use re.search to go faster!
     if is_xml:
         matches = re.findall(CHARSET_RE, data)
 
