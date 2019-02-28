@@ -38,12 +38,12 @@ def main():
 
     fetch_subparser.add_argument(
         'column',
-        help='column of the csv file containing urls to fetch'
+        help='column of the CSV file containing urls to fetch'
     )
 
     fetch_subparser.add_argument(
         'file',
-        help='csv file containing the urls to fetch',
+        help='CSV file containing the urls to fetch',
         type=FileType('r'),
         default=sys.stdin,
         nargs='?'
@@ -78,7 +78,7 @@ def main():
     )
     fetch_subparser.add_argument(
         '--total',
-        help='total number of lines in csv file. necessary if you want a finite progress indicator',
+        help='total number of lines in CSV file. necessary if you want a finite progress indicator',
         type=int
     )
 
@@ -94,8 +94,8 @@ def main():
     )
 
     extract_subparser.add_argument(
-        'directory',
-        help='directory where the HTML files are stored'
+        'source',
+        help='CSV report or directory where the HTML files are stored'
     )
 
     extract_subparser.add_argument(
