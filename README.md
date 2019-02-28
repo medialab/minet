@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/medialab/minet.svg)](https://travis-ci.org/medialab/minet)
+
 ![Minet](img/minet.png)
 
 A webmining CLI tool & library for python.
@@ -29,8 +31,8 @@ minet fetch COLUMN FILE
 Additional options:
 - **`-s STORAGE_LOCATION`** specifies the location where the (temporary) HTML files are stored.
   Is *./data* by default.
-- **`-id COLUMN_NAME`** : name of the url ID column, if present in the csv `FILE`. Used for the name of the HTML files. 
-    If not specified, UUIDs are generated. 
+- **`-id COLUMN_NAME`** : name of the url ID column, if present in the csv `FILE`. Used for the name of the HTML files.
+    If not specified, UUIDs are generated.
 - **`--monitoring_file FILE_NAME`** : location of the monitoring file used to save progress.
     Is *./data/monitoring.csv* by default.
 
