@@ -34,7 +34,7 @@ def worker(path):
 
 def extract_action(namespace):
 
-    files = iglob(join(namespace.directory, '*.html'))
+    files = iglob(join(namespace.source, '*.html'))
 
     loading_bar = tqdm(
         desc='Extracting content',

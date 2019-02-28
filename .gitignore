@@ -2,6 +2,9 @@
 .pytest_cache
 .vscode
 __pycache__
+build
 data
+dist
 ftest/content
 ftest/report.csv
+*.spec
