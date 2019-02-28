@@ -128,7 +128,7 @@ def worker(job):
 
 def fetch_action(namespace):
     input_headers, pos, reader = custom_reader(namespace.file, namespace.column)
-    filename_pos = input_headers.index(namespace.filename) if namespace.filename else filename_pos
+    filename_pos = input_headers.index(namespace.filename) if namespace.filename else None
 
     selected_fields = namespace.select.split(',') if namespace.select else None
     selected_pos = [input_headers.index(h) for h in selected_fields] if selected_fields else None
