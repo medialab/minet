@@ -219,9 +219,7 @@ def fetch_action(namespace):
             encoding = info['encoding']
 
             if namespace.standardize_encoding:
-
-                # TODO: what to do when encoding is not found?
-                if encoding is None and encoding != 'utf-8':
+                if encoding is None or encoding != 'utf-8':
                     data = data.decode(encoding, errors='replace').encode()
                     encoding = 'utf-8'
 
