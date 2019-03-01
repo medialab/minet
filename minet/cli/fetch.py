@@ -8,6 +8,7 @@
 #
 import os
 import csv
+import json
 import certifi
 import mimetypes
 from os.path import join
@@ -28,6 +29,7 @@ from urllib3.exceptions import (
     ResponseError
 )
 
+from minet.scrape import scrape
 from minet.utils import guess_encoding
 from minet.cli.utils import custom_reader
 
@@ -89,7 +91,7 @@ def worker(job):
     """
     Function using the urllib3 http to actually fetch our contents from the web.
     """
-    http, line, url = job
+    http, line, url, scraper = job
 
     error, result = fetch(http, url)
 
@@ -123,6 +125,9 @@ def worker(job):
         'encoding': encoding
     }
 
+    if scraper:
+        info['scraped_data'] = list(scrape(data, scraper))
+
     return error, url, line, result, data, info
 
 
@@ -135,6 +140,13 @@ def fetch_action(namespace):
 
     # First we need to create the relevant directory
     os.makedirs(namespace.output_dir, exist_ok=True)
+
+    # Using a scraper?
+    scraper = None
+
+    if namespace.scraper:
+        with open(namespace.scraper, 'r') as sf:
+            scraper = json.load(sf)
 
     # Reading output
     output_headers = (input_headers if not selected_pos else [input_headers[i] for i in selected_pos])
@@ -170,7 +182,7 @@ def fetch_action(namespace):
                 loading_bar.update()
                 continue
 
-            yield (http, line, url)
+            yield (http, line, url, scraper)
 
     # Streaming the file and fetching the url using multiple threads
     multithreaded_iterator = imap_unordered(
@@ -213,7 +225,7 @@ def fetch_action(namespace):
                 filename = line[filename_pos] + info['ext']
             else:
                 # NOTE: it would be nice to have an id that can be sorted by time
-                filename = uuid4() + info['ext']
+                filename = str(uuid4()) + info['ext']
 
             # Standardize encoding?
             encoding = info['encoding']
@@ -222,6 +234,12 @@ def fetch_action(namespace):
                 if encoding is None or encoding != 'utf-8':
                     data = data.decode(encoding, errors='replace').encode()
                     encoding = 'utf-8'
+
+            # Scraped?
+            if scraper:
+                for item in info['scraped_data']:
+                    loading_bar.write(url + ',' + ','.join(list(item.values())))
+                    continue
 
             # Writing file on disk
             with open(join(namespace.output_dir, filename), 'wb') as f:
