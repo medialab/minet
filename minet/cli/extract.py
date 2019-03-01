@@ -14,7 +14,7 @@ from dragnet import extract_content
 
 from minet.cli.utils import custom_reader
 
-OUTPUT_ADDITIONAL_HEADERS = ['dragnet_error', 'dragnet_text']
+OUTPUT_ADDITIONAL_HEADERS = ['extract_error', 'extracted_text']
 
 ERROR_REPORTERS = {
     UnicodeDecodeError: 'wrong-encoding'
@@ -26,7 +26,7 @@ def worker(payload):
     line, path, encoding = payload
 
     # Reading file
-    with codecs.open(path, 'r', encoding=encoding) as f:
+    with codecs.open(path, 'r', encoding=encoding, errors='replace') as f:
         try:
             raw_html = f.read()
         except UnicodeDecodeError as e:
