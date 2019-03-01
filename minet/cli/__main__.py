@@ -45,6 +45,7 @@ def main():
         default=sys.stdin,
         nargs='?'
     )
+
     fetch_subparser.add_argument(
         '-d', '--output-dir',
         help='directory where the fetched files will be written',
@@ -91,17 +92,31 @@ def main():
     )
 
     extract_subparser.add_argument(
-        'source',
-        help='CSV report or directory where the HTML files are stored'
+        'report',
+        help='input CSV fetch action report file',
+        type=FileType('r'),
+        default=sys.stdin,
+        nargs='?'
     )
 
+    extract_subparser.add_argument(
+        '-i', '--input-directory',
+        help='directory where the HTML files are stored'
+    )
+    extract_subparser.add_argument(
+        '-o', '--output',
+        help='path to the output report file'
+    )
     extract_subparser.add_argument(
         '-p', '--processes',
         help='number of processes to use',
         type=int,
         default=4
     )
-
+    extract_subparser.add_argument(
+        '-s', '--select',
+        help='columns to include in report (separated by `,`)'
+    )
     extract_subparser.add_argument(
         '--total',
         help='total number of HTML documents. necessary if you want a finite progress indicator',
