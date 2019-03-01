@@ -9,9 +9,6 @@ import sys
 import shutil
 from argparse import ArgumentParser, FileType, ArgumentDefaultsHelpFormatter
 
-from minet.cli.extract import extract_action
-from minet.cli.fetch import fetch_action
-
 SUBPARSERS = {}
 
 terminal_size = shutil.get_terminal_size()
@@ -128,9 +125,11 @@ def main():
             target_subparser.print_help()
 
     elif args.action == 'fetch':
+        from minet.cli.fetch import fetch_action
         fetch_action(args)
 
     elif args.action == 'extract':
+        from minet.cli.extract import extract_action
         extract_action(args)
 
     else:
