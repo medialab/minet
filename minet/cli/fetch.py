@@ -8,6 +8,7 @@
 #
 import os
 import csv
+import sys
 import json
 import certifi
 import mimetypes
@@ -30,7 +31,7 @@ from urllib3.exceptions import (
 )
 
 from minet.utils import guess_encoding
-from minet.cli.utils import custom_reader
+from minet.cli.utils import custom_reader, DummyTqdmFile
 
 mimetypes.init()
 
@@ -137,10 +138,23 @@ def fetch_action(namespace):
     # First we need to create the relevant directory
     os.makedirs(namespace.output_dir, exist_ok=True)
 
+    # Loading bar
+    loading_bar = tqdm(
+        desc='Fetching pages',
+        total=namespace.total,
+        dynamic_ncols=True,
+        unit=' urls'
+    )
+
     # Reading output
     output_headers = (input_headers if not selected_pos else [input_headers[i] for i in selected_pos])
     output_headers += OUTPUT_ADDITIONAL_HEADERS
-    output_file = open(namespace.output, 'w')
+
+    if namespace.output is None:
+        output_file = DummyTqdmFile(sys.stdout)
+    else:
+        output_file = open(namespace.output, 'w')
+
     output_writer = csv.writer(output_file)
     output_writer.writerow(output_headers)
 
@@ -151,13 +165,6 @@ def fetch_action(namespace):
         num_pools=namespace.threads * 2,
         maxsize=1, # NOTE: should be the same as group_parallelism,
         timeout=Timeout(connect=2.0, read=7.0)
-    )
-
-    loading_bar = tqdm(
-        desc='Fetching pages',
-        total=namespace.total,
-        dynamic_ncols=True,
-        unit=' urls'
     )
 
     # Generator yielding urls to fetch
@@ -251,4 +258,5 @@ def fetch_action(namespace):
             output_writer.writerow(line)
 
     # Closing files
-    output_file.close()
+    if namespace.output is not None:
+        output_file.close()

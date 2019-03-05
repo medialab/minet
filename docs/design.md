@@ -13,6 +13,12 @@ xsv select url_column file.csv | minet fetch url_column -d html_folder > report.
 
 # Consuming a single url (for piping into `scrape` e.g.)
 minet fetch http://google.fr -d html_folder
+
+# Override stdout
+minet fetch url_column file.csv -d html_folder -o report.csv
+
+# Resuming
+minet fetch url_column file.csv -d html_folder --resume-from report.csv
 ```
 
 `extract` polymorphism
