@@ -7,7 +7,7 @@
 #
 import sys
 import shutil
-from argparse import ArgumentParser, FileType, ArgumentDefaultsHelpFormatter
+from argparse import ArgumentParser, FileType, RawTextHelpFormatter
 
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
 
@@ -16,7 +16,7 @@ SUBPARSERS = {}
 terminal_size = shutil.get_terminal_size()
 
 def custom_formatter(prog):
-    return ArgumentDefaultsHelpFormatter(
+    return RawTextHelpFormatter(
         prog,
         max_help_position=50,
         width=terminal_size.columns,
@@ -31,18 +31,18 @@ def main():
     # Fetch action subparser
     fetch_subparser = subparsers.add_parser(
         'fetch',
-        description='Fetches the urls of a given CSV column',
+        description='Fetches the urls of a given CSV column.',
         formatter_class=custom_formatter
     )
 
     fetch_subparser.add_argument(
         'column',
-        help='column of the CSV file containing urls to fetch'
+        help='Column of the CSV file containing urls to fetch.'
     )
 
     fetch_subparser.add_argument(
         'file',
-        help='CSV file containing the urls to fetch',
+        help='CSV file containing the urls to fetch.',
         type=FileType('r'),
         default=sys.stdin,
         nargs='?'
@@ -50,35 +50,35 @@ def main():
 
     fetch_subparser.add_argument(
         '-d', '--output-dir',
-        help='directory where the fetched files will be written',
+        help='Directory where the fetched files will be written. Defaults to "%s".' % DEFAULT_CONTENT_FOLDER,
         default=DEFAULT_CONTENT_FOLDER
     )
     fetch_subparser.add_argument(
         '-f', '--filename',
-        help='name of the column used to build retrieved file names. defaults to uuid v4'
+        help='Name of the column used to build retrieved file names. Defaults to an uuid v4 with correct extension.'
     )
     fetch_subparser.add_argument(
         '--standardize-encoding',
-        help='whether to systematically convert retrieved text to UTF-8',
+        help='Whether to systematically convert retrieved text to UTF-8.',
         action='store_true'
     )
     fetch_subparser.add_argument(
         '-o', '--output',
-        help='path to the report file'
+        help='Path to the output report file. By default, the report will be printed to stdout.'
     )
     fetch_subparser.add_argument(
         '-s', '--select',
-        help='columns to include in report (separated by `,`)'
+        help='Columns to include in report (separated by `,`).'
     )
     fetch_subparser.add_argument(
         '-t', '--threads',
-        help='number of threads to use',
+        help='Number of threads to use. Defaults to 25.',
         type=int,
         default=25
     )
     fetch_subparser.add_argument(
         '--total',
-        help='total number of lines in CSV file. necessary if you want a finite progress indicator',
+        help='Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
         type=int
     )
 
@@ -95,7 +95,7 @@ def main():
 
     extract_subparser.add_argument(
         'report',
-        help='input CSV fetch action report file',
+        help='Input CSV fetch action report file.',
         type=FileType('r'),
         default=sys.stdin,
         nargs='?'
@@ -103,25 +103,26 @@ def main():
 
     extract_subparser.add_argument(
         '-i', '--input-directory',
-        help='directory where the HTML files are stored'
+        help='Directory where the HTML files are stored. Defaults to "%s".' % DEFAULT_CONTENT_FOLDER,
+        default=DEFAULT_CONTENT_FOLDER
     )
     extract_subparser.add_argument(
         '-o', '--output',
-        help='path to the output report file'
+        help='Path to the output report file. By default, the report will be printed to stdout.'
     )
     extract_subparser.add_argument(
         '-p', '--processes',
-        help='number of processes to use',
+        help='Number of processes to use. Defaults to 4.',
         type=int,
         default=4
     )
     extract_subparser.add_argument(
         '-s', '--select',
-        help='columns to include in report (separated by `,`)'
+        help='Columns to include in report (separated by `,`).'
     )
     extract_subparser.add_argument(
         '--total',
-        help='total number of HTML documents. necessary if you want a finite progress indicator',
+        help='Total number of HTML documents. Necessary if you want to display a finite progress indicator.',
         type=int
     )
 
