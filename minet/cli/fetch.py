@@ -143,7 +143,8 @@ def fetch_action(namespace):
     selected_pos = [input_headers.index(h) for h in selected_fields] if selected_fields else None
 
     # First we need to create the relevant directory
-    os.makedirs(namespace.output_dir, exist_ok=True)
+    if not namespace.contents_in_report:
+        os.makedirs(namespace.output_dir, exist_ok=True)
 
     # Loading bar
     loading_bar = tqdm(
@@ -156,6 +157,9 @@ def fetch_action(namespace):
     # Reading output
     output_headers = (input_headers if not selected_pos else [input_headers[i] for i in selected_pos])
     output_headers += OUTPUT_ADDITIONAL_HEADERS
+
+    if namespace.contents_in_report:
+        output_headers.append('raw_content')
 
     if namespace.output is None:
         output_file = DummyTqdmFile(sys.stdout)
@@ -203,6 +207,8 @@ def fetch_action(namespace):
 
     for i, (error, url, line, result, data, info) in enumerate(multithreaded_iterator):
 
+        content_write_flag = 'wb'
+
         # Updating stats
         if error is not None:
             errors += 1
@@ -233,20 +239,26 @@ def fetch_action(namespace):
             # Standardize encoding?
             encoding = info['encoding']
 
-            if namespace.standardize_encoding:
-                if encoding is None or encoding != 'utf-8':
-                    data = data.decode(encoding, errors='replace').encode()
+            if namespace.standardize_encoding or namespace.contents_in_report:
+                if encoding is None or encoding != 'utf-8' or namespace.contents_in_report:
+                    data = data.decode(encoding, errors='replace')
                     encoding = 'utf-8'
+                    content_write_flag = 'w'
 
             # Writing file on disk
-            with open(join(namespace.output_dir, filename), 'wb') as f:
-                f.write(data)
+            if not namespace.contents_in_report:
+                with open(join(namespace.output_dir, filename), content_write_flag) as f:
+                    f.write(data)
 
             # Reporting in output
             if selected_pos:
                 line = [line[i] for i in selected_pos]
 
             line.extend([i, result.status, '', filename, encoding or ''])
+
+            if namespace.contents_in_report:
+                line.append(data)
+
             output_writer.writerow(line)
 
         # Handling potential errors

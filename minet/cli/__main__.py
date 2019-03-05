@@ -46,14 +46,14 @@ def main():
         '''
         examples:
 
-            . Fetching a batch of url from existing CSV file:
-              `minet fetch url_column file.csv > report.csv`
+        . Fetching a batch of url from existing CSV file:
+            `minet fetch url_column file.csv > report.csv`
 
-            . CSV input from stdin:
-              `xsv select url_column file.csv | minet fetch url_column > report.csv`
+        . CSV input from stdin:
+            `xsv select url_column file.csv | minet fetch url_column > report.csv`
 
-            . Fetching a single url, useful to pipe into `minet scrape`:
-              `minet fetch http://google.com | minet scrape ./scrape.json > scraped.csv`
+        . Fetching a single url, useful to pipe into `minet scrape`:
+            `minet fetch http://google.com | minet scrape ./scrape.json > scraped.csv`
         '''
     )
 
@@ -77,6 +77,11 @@ def main():
         nargs='?'
     )
 
+    fetch_subparser.add_argument(
+        '--contents-in-report',
+        help='Whether to include retrieved contents, e.g. html, directly in the report\nand avoid writing them in a separate folder. This requires to standardize\nencoding and won\'t work on binary formats.',
+        action='store_true'
+    )
     fetch_subparser.add_argument(
         '-d', '--output-dir',
         help='Directory where the fetched files will be written. Defaults to "%s".' % DEFAULT_CONTENT_FOLDER,
@@ -131,14 +136,14 @@ def main():
         '''
         examples:
 
-            . Extracting raw text from a `minet fetch` report:
-              `minet extract report.csv > extracted.csv`
+        . Extracting raw text from a `minet fetch` report:
+            `minet extract report.csv > extracted.csv`
 
-            . Working on a report from stdin:
-              `minet fetch url_column file.csv | minet extract > extracted.csv`
+        . Working on a report from stdin:
+            `minet fetch url_column file.csv | minet extract > extracted.csv`
 
-            . Extracting raw text from a bunch of files:
-              `minet extract --glob "./content/*.html" > extracted.csv`
+        . Extracting raw text from a bunch of files:
+            `minet extract --glob "./content/*.html" > extracted.csv`
         '''
     )
 
