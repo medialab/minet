@@ -29,6 +29,7 @@ def main():
     subparsers = parser.add_subparsers(
         help='action to execute', title='actions', dest='action')
 
+    # Fetch action subparser
     fetch_description = dedent(
         '''
         Minet Fetch Command
@@ -43,7 +44,7 @@ def main():
 
     fetch_epilog = dedent(
         '''
-        Examples:
+        examples:
 
             . Fetching a batch of url from existing CSV file:
               `minet fetch url_column file.csv > report.csv`
@@ -56,7 +57,6 @@ def main():
         '''
     )
 
-    # Fetch action subparser
     fetch_subparser = subparsers.add_parser(
         'fetch',
         description=fetch_description,
@@ -116,9 +116,36 @@ def main():
     SUBPARSERS['fetch'] = fetch_subparser
 
     # Extract action subparser
+    extract_description = dedent(
+        '''
+        Minet Extract Command
+        =====================
+
+        Use multiple processes to extract raw text from a batch of HTML files.
+        This command can either work on a `minet fetch` report or on a bunch
+        of files. It will output an augmented report with the extracted text.
+        '''
+    )
+
+    extract_epilog = dedent(
+        '''
+        examples:
+
+            . Extracting raw text from a `minet fetch` report:
+              `minet extract report.csv > extracted.csv`
+
+            . Working on a report from stdin:
+              `minet fetch url_column file.csv | minet extract > extracted.csv`
+
+            . Extracting raw text from a bunch of files:
+              `minet extract --glob "./content/*.html" > extracted.csv`
+        '''
+    )
+
     extract_subparser = subparsers.add_parser(
         'extract',
-        description='Use multiple processes to extract raw text from HTML pages using.',
+        description=extract_description,
+        epilog=extract_epilog,
         formatter_class=custom_formatter
     )
 
