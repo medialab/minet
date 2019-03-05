@@ -9,6 +9,8 @@ import sys
 import shutil
 from argparse import ArgumentParser, FileType, ArgumentDefaultsHelpFormatter
 
+from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
+
 SUBPARSERS = {}
 
 terminal_size = shutil.get_terminal_size()
@@ -49,7 +51,7 @@ def main():
     fetch_subparser.add_argument(
         '-d', '--output-dir',
         help='directory where the fetched files will be written',
-        default='content'
+        default=DEFAULT_CONTENT_FOLDER
     )
     fetch_subparser.add_argument(
         '-f', '--filename',
