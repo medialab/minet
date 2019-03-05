@@ -12,6 +12,7 @@ import sys
 import json
 import certifi
 import mimetypes
+from io import StringIO
 from os.path import join
 from collections import Counter
 from urllib3 import PoolManager, Timeout
@@ -19,7 +20,7 @@ from tqdm import tqdm
 from quenouille import imap_unordered
 from tld import get_fld
 from uuid import uuid4
-from ural import ensure_protocol
+from ural import ensure_protocol, is_url
 
 from urllib3.exceptions import (
     HTTPError,
@@ -129,6 +130,12 @@ def worker(job):
 
 
 def fetch_action(namespace):
+
+    # Do we need to fetch only a single url?
+    if namespace.file is sys.stdin and is_url(namespace.column):
+        namespace.file = StringIO('url\n%s' % namespace.column)
+        namespace.column = 'url'
+
     input_headers, pos, reader = custom_reader(namespace.file, namespace.column)
     filename_pos = input_headers.index(namespace.filename) if namespace.filename else None
 
