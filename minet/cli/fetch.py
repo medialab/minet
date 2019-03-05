@@ -263,8 +263,6 @@ def fetch_action(namespace):
 
         # Handling potential errors
         else:
-            # loading_bar.write(repr(error))
-
             reporter = ERROR_REPORTERS.get(type(error), repr)
 
             error_code = reporter(error) if callable(reporter) else reporter
