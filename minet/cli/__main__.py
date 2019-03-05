@@ -67,10 +67,6 @@ def main():
         help='path to the report file'
     )
     fetch_subparser.add_argument(
-        '--scraper',
-        help="path to a scraper json definition file"
-    )
-    fetch_subparser.add_argument(
         '-s', '--select',
         help='columns to include in report (separated by `,`)'
     )
