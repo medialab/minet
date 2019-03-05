@@ -7,6 +7,7 @@
 #
 import sys
 import shutil
+from textwrap import dedent
 from argparse import ArgumentParser, FileType, RawTextHelpFormatter
 
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
@@ -28,10 +29,38 @@ def main():
     subparsers = parser.add_subparsers(
         help='action to execute', title='actions', dest='action')
 
+    fetch_description = dedent(
+        '''
+        Minet Fetch Command
+        ===================
+
+        Use multiple threads to fetch batches of urls from a CSV file. The
+        command outputs a CSV report with additional metadata about the
+        HTTP calls and will generally write the retrieved files in a folder
+        given by the user.
+        '''
+    )
+
+    fetch_epilog = dedent(
+        '''
+        Examples:
+
+            . Fetching a batch of url from existing CSV file:
+              `minet fetch url_column file.csv > report.csv`
+
+            . CSV input from stdin:
+              `xsv select url_column file.csv | minet fetch url_column > report.csv`
+
+            . Fetching a single url, useful to pipe into `minet scrape`:
+              `minet fetch http://google.com | minet scrape ./scrape.json > scraped.csv`
+        '''
+    )
+
     # Fetch action subparser
     fetch_subparser = subparsers.add_parser(
         'fetch',
-        description='Fetches the urls of a given CSV column.',
+        description=fetch_description,
+        epilog=fetch_epilog,
         formatter_class=custom_formatter
     )
 
@@ -89,7 +118,7 @@ def main():
     # Extract action subparser
     extract_subparser = subparsers.add_parser(
         'extract',
-        description='Uses multiple processes to extract the main content of HTML pages using `dragnet`.',
+        description='Use multiple processes to extract raw text from HTML pages using.',
         formatter_class=custom_formatter
     )
 
@@ -101,6 +130,11 @@ def main():
         nargs='?'
     )
 
+    extract_subparser.add_argument(
+        '-e', '--extractor',
+        help='Extraction engine to use. Defaults to `dragnet`.',
+        choices=['dragnet', 'html2text']
+    )
     extract_subparser.add_argument(
         '-i', '--input-directory',
         help='Directory where the HTML files are stored. Defaults to "%s".' % DEFAULT_CONTENT_FOLDER,
