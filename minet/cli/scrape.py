@@ -57,7 +57,6 @@ def scrape_action(namespace):
             status = int(line[pos.status]) if line[pos.status] else None
 
             if status is None or status >= 400:
-                output_writer.writerow(line)
                 loading_bar.update()
                 continue
 
