@@ -9,6 +9,13 @@ from collections import namedtuple
 from tqdm import tqdm
 
 
+def safe_index(l, e):
+    try:
+        return l.index(e)
+    except ValueError:
+        return None
+
+
 def custom_reader(f, target_header):
 
     reader = csv.reader(f)
@@ -17,9 +24,9 @@ def custom_reader(f, target_header):
 
     if isinstance(target_header, tuple):
         HeaderPositions = namedtuple('HeaderPositions', target_header)
-        position = HeaderPositions(**{t: headers.index(t) for t in target_header})
+        position = HeaderPositions(**{t: safe_index(headers, t) for t in target_header})
     else:
-        position = headers.index(target_header)
+        position = safe_index(headers, target_header)
 
     return headers, position, reader
 
@@ -41,3 +48,6 @@ class DummyTqdmFile(object):
 
     def flush(self):
         return self.file.flush()
+
+    def close(self):
+        pass

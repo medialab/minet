@@ -1,7 +1,7 @@
 # =============================================================================
 # Minet Scrape Unit Tests
 # =============================================================================
-from minet.scrape import scrape
+from minet.scrape import scrape, headers_from_definition
 
 BASIC_HTML = """
     <ul>
@@ -59,3 +59,16 @@ class TestScrape(object):
         })
 
         assert list(result) == [{'id': 'li1', 'text': 'One'}, {'id': 'li2', 'text': 'Two'}]
+
+    def test_headers(self):
+        headers = headers_from_definition({'iterator': 'li'})
+
+        assert headers == ['value']
+
+        headers = headers_from_definition({'iterator': 'li', 'item': 'id'})
+
+        assert headers == ['value']
+
+        headers = headers_from_definition({'iterator': 'li', 'item': {'fields': {'id': 'id'}}})
+
+        assert headers == ['id']

@@ -69,3 +69,11 @@ def scrape(html, specs):
     return scrape_from_soup(soup, specs)
 
 
+def headers_from_definition(specs):
+    item = specs.get('item')
+    fields = item.get('fields') if isinstance(item, dict) else None
+
+    if fields is None or isinstance(item, str):
+        return ['value']
+
+    return list(item['fields'].keys())

@@ -5,6 +5,7 @@
 #
 # CLI enpoint of the Minet library.
 #
+import csv
 import sys
 import shutil
 from textwrap import dedent
@@ -15,6 +16,7 @@ from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
 SUBPARSERS = {}
 
 terminal_size = shutil.get_terminal_size()
+csv.field_size_limit(sys.maxsize)
 
 def custom_formatter(prog):
     return RawTextHelpFormatter(

@@ -5,14 +5,14 @@
 # Logic of the scrape action.
 #
 import csv
+import json
 import sys
 import codecs
-import warnings
 from os.path import join
 from multiprocessing import Pool
 from tqdm import tqdm
 
-from minet.scrape import scrape
+from minet.scrape import scrape, headers_from_definition
 from minet.cli.utils import custom_reader, DummyTqdmFile
 
 ERROR_REPORTERS = {
@@ -21,38 +21,40 @@ ERROR_REPORTERS = {
 
 
 def worker(payload):
+    line, path, encoding, content, scraper = payload
 
-    line, path, encoding = payload
-
-    # Reading file
-    with codecs.open(path, 'r', encoding=encoding, errors='replace') as f:
-        try:
-            raw_html = f.read()
-        except UnicodeDecodeError as e:
-            return e, line, None
+    # Reading from file
+    if content is None:
+        with codecs.open(path, 'r', encoding=encoding, errors='replace') as f:
+            try:
+                content = f.read()
+            except UnicodeDecodeError as e:
+                return e, line, None
 
     # Attempting extraction
     try:
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
-            content = extract_content(raw_html)
+        items = list(scrape(content, scraper))
     except BaseException as e:
         # TODO: I don't know yet what can happen
         raise
 
-    return None, line, content
+    return None, line, items
 
 
 def scrape_action(namespace):
-    input_headers, pos, reader = custom_reader(namespace.report, ('status', 'filename', 'encoding'))
+    input_headers, pos, reader = custom_reader(namespace.report, ('status', 'filename', 'encoding', 'raw_content'))
 
     if namespace.output is None:
         output_file = DummyTqdmFile(sys.stdout)
     else:
         output_file = open(namespace.output, 'w')
 
-    output_writer = csv.writer(output_file)
-    # output_writer.writerow(output_headers)
+    # Parsing scraper definition
+    scraper = json.load(namespace.scraper)
+
+    output_headers = headers_from_definition(scraper)
+    output_writer = csv.DictWriter(output_file, fieldnames=output_headers)
+    output_writer.writeheader()
 
     def files():
         for line in reader:
@@ -63,10 +65,14 @@ def scrape_action(namespace):
                 loading_bar.update()
                 continue
 
+            if pos.raw_content is not None:
+                yield line, None, None, line[pos.raw_content], scraper
+                continue
+
             path = join(namespace.input_directory, line[pos.filename])
             encoding = line[pos.encoding].strip() or 'utf-8'
 
-            yield line, path, encoding
+            yield line, path, encoding, None, scraper
 
     loading_bar = tqdm(
         desc='Scraping pages',
@@ -79,6 +85,10 @@ def scrape_action(namespace):
         for error, line, items in pool.imap_unordered(worker, files()):
             loading_bar.update()
 
-            loading_bar.write(items)
+            for item in items:
+                if not isinstance(item, dict):
+                    item = {'value': item}
+
+                output_writer.writerow(item)
 
     output_file.close()
