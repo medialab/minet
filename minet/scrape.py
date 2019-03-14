@@ -41,7 +41,7 @@ def extract_value(element, spec):
         elements = element.select(sel)
 
         if not elements:
-            return None
+            return spec.get('default')
 
         element = elements[0]
 
