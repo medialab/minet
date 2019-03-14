@@ -10,6 +10,13 @@ BASIC_HTML = """
     </ul>
 """
 
+NESTED_HTML = """
+    <ul>
+        <li id="li1"><span class="first">One</span> <span class="second">1</span></li>
+        <li id="li2"><span class="first">Two</span> <span class="second">2</span></li>
+    </ul>
+"""
+
 class TestScrape(object):
     def test_basics(self):
         result = scrape(BASIC_HTML, {
@@ -59,6 +66,22 @@ class TestScrape(object):
         })
 
         assert list(result) == [{'id': 'li1', 'text': 'One'}, {'id': 'li2', 'text': 'Two'}]
+
+        result = scrape(NESTED_HTML, {
+            'iterator': 'li',
+            'item': {
+                'fields': {
+                    'label': {
+                        'sel': '.first'
+                    },
+                    'number': {
+                        'sel': '.second'
+                    }
+                }
+            }
+        })
+
+        assert list(result) == [{'number': '1', 'label': 'One'}, {'number': '2', 'label': 'Two'}]
 
     def test_headers(self):
         headers = headers_from_definition({'iterator': 'li'})

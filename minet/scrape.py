@@ -5,15 +5,15 @@
 # Function interpreting minet's scraping JSON descriptive DSL format to
 # actually scrape content off of HTML content.
 #
+import re
 from bs4 import BeautifulSoup
 
 
 def extract_value(element, spec):
-    value = element.get_text()
 
     # No specs -> returning text
     if spec is None:
-        return value
+        return element.get_text()
 
     # If spec is a string, we want an attribute
     if isinstance(spec, str):
@@ -26,9 +26,25 @@ def extract_value(element, spec):
         o = {}
 
         for k, s in fields.items():
-            o[k] = extract_value(element, s)
+            v = extract_value(element, s)
+
+            if v is not None:
+                o[k] = v
 
         return o
+
+    # Subselection
+    sel = spec.get('sel')
+
+    if sel is not None:
+        element = element.select(sel)
+
+        if not element:
+            return None
+
+        element = element[0]
+
+    value = element.get_text()
 
     # Retrieving attributes
     attr = spec.get('attr')
@@ -44,6 +60,7 @@ def extract_value(element, spec):
 
     if expression is not None:
         return eval(expression, None, {
+            're': re,
             'element': element,
             'value': value
         })
@@ -57,9 +74,11 @@ def scrape_from_soup(soup, specs):
     iterator = specs.get('iterator')
 
     if iterator is None:
-        iterator = [soup]
+        elements = [soup]
+    else:
+        elements = soup.select(iterator)
 
-    for element in soup.select(specs['iterator']):
+    for element in elements:
         yield extract_value(element, item_specs)
 
 
