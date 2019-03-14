@@ -5,6 +5,7 @@
 # Logic of the extract action.
 #
 import csv
+import sys
 import codecs
 import warnings
 from os.path import join
@@ -12,7 +13,7 @@ from multiprocessing import Pool
 from tqdm import tqdm
 from dragnet import extract_content
 
-from minet.cli.utils import custom_reader
+from minet.cli.utils import custom_reader, DummyTqdmFile
 
 OUTPUT_ADDITIONAL_HEADERS = ['extract_error', 'extracted_text']
 
@@ -45,9 +46,6 @@ def worker(payload):
 
 
 def extract_action(namespace):
-
-    output_file = open(namespace.output, 'w')
-
     input_headers, pos, reader = custom_reader(namespace.report, ('status', 'filename', 'encoding'))
 
     selected_fields = namespace.select.split(',') if namespace.select else None
@@ -55,6 +53,12 @@ def extract_action(namespace):
 
     output_headers = (input_headers if not selected_pos else [input_headers[i] for i in selected_pos])
     output_headers += OUTPUT_ADDITIONAL_HEADERS
+
+    if namespace.output is None:
+        output_file = DummyTqdmFile(sys.stdout)
+    else:
+        output_file = open(namespace.output, 'w')
+
     output_writer = csv.writer(output_file)
     output_writer.writerow(output_headers)
 
@@ -71,7 +75,6 @@ def extract_action(namespace):
             encoding = line[pos.encoding].strip() or 'utf-8'
 
             yield line, path, encoding
-
 
     loading_bar = tqdm(
         desc='Extracting content',
