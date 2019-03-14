@@ -8,44 +8,59 @@
 from bs4 import BeautifulSoup
 
 
-def scrape_from_soup(soup, specs):
+def extract_value(element, spec):
+    value = element.get_text()
 
+    # No specs -> returning text
+    if spec is None:
+        return value
+
+    # If spec is a string, we want an attribute
+    if isinstance(spec, str):
+        return element.get(spec)
+
+    # Dictionary?
+    fields = spec.get('fields')
+
+    if fields is not None:
+        o = {}
+
+        for k, s in fields.items():
+            o[k] = extract_value(element, s)
+
+        return o
+
+    # Retrieving attributes
+    attr = spec.get('attr')
+
+    if attr is not None:
+        value = element.get(attr)
+
+    # Retrieving raw text or html etc.
+    # TODO...
+
+    # Eval?
+    expression = spec.get('eval')
+
+    if expression is not None:
+        return eval(expression, None, {
+            'element': element,
+            'value': value
+        })
+
+    return value
+
+
+def scrape_from_soup(soup, specs):
     item_specs = specs.get('item')
 
-    if specs['iterator']:
-        for element in soup.select(specs['iterator']):
+    iterator = specs.get('iterator')
 
-            if item_specs is None:
-                yield element.get_text()
-                continue
+    if iterator is None:
+        iterator = [soup]
 
-            item = {}
-
-            for k, s in item_specs.items():
-                sel = s.get('sel')
-
-                if sel is not None:
-                    sub_element = element.select(sel)[0]
-                else:
-                    sub_element = element
-
-                # Empty value
-                v = None
-
-                # Extraction methods
-                if s.get('method') == 'text':
-                    v = sub_element.get_text()
-
-                # Attributes
-                else:
-                    attr = s.get('attr')
-
-                    if attr is not None:
-                        v = sub_element.get(attr)
-
-                item[k] = v
-
-            yield item
+    for element in soup.select(specs['iterator']):
+        yield extract_value(element, item_specs)
 
 
 def scrape(html, specs):

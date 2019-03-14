@@ -194,6 +194,77 @@ def main():
 
     SUBPARSERS['extract'] = extract_subparser
 
+    # Scrape action subparser
+    scrape_description = dedent(
+        '''
+        Minet Scrape Command
+        =====================
+
+        Use multiple processes to scrape data from a batch of HTML files.
+        This command can either work on a `minet fetch` report or on a bunch
+        of files. It will output the scraped items.
+        '''
+    )
+
+    scrape_epilog = dedent(
+        '''
+        examples:
+
+        . Scraping item from a `minet fetch` report:
+            `minet scrape scraper.json report.csv > scraped.csv`
+
+        . Working on a report from stdin:
+            `minet fetch url_column file.csv | minet fetch scraper.json > scraped.csv`
+
+        . Scraping items from a bunch of files:
+            `minet scrape scraper.json --glob "./content/*.html" > scraped.csv`
+        '''
+    )
+
+    scrape_subparser = subparsers.add_parser(
+        'scrape',
+        description=scrape_description,
+        epilog=scrape_epilog,
+        formatter_class=custom_formatter
+    )
+
+    scrape_subparser.add_argument(
+        'scraper',
+        help='Path to a scraper definition file.',
+        type=FileType('r')
+    )
+
+    scrape_subparser.add_argument(
+        'report',
+        help='Input CSV fetch action report file.',
+        type=FileType('r'),
+        default=sys.stdin,
+        nargs='?'
+    )
+
+    scrape_subparser.add_argument(
+        '-i', '--input-directory',
+        help='Directory where the HTML files are stored. Defaults to "%s".' % DEFAULT_CONTENT_FOLDER,
+        default=DEFAULT_CONTENT_FOLDER
+    )
+    scrape_subparser.add_argument(
+        '-o', '--output',
+        help='Path to the output report file. By default, the report will be printed to stdout.'
+    )
+    scrape_subparser.add_argument(
+        '-p', '--processes',
+        help='Number of processes to use. Defaults to 4.',
+        type=int,
+        default=4
+    )
+    scrape_subparser.add_argument(
+        '--total',
+        help='Total number of HTML documents. Necessary if you want to display a finite progress indicator.',
+        type=int
+    )
+
+    SUBPARSERS['scrape'] = scrape_subparser
+
     help_suparser = subparsers.add_parser('help')
     help_suparser.add_argument('subcommand', help='name of the subcommand')
     SUBPARSERS['help'] = help_suparser
@@ -215,6 +286,10 @@ def main():
     elif args.action == 'extract':
         from minet.cli.extract import extract_action
         extract_action(args)
+
+    elif args.action == 'scrape':
+        from minet.cli.scrape import scrape_action
+        scrape_action(args)
 
     else:
         parser.print_help()

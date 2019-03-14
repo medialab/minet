@@ -20,12 +20,40 @@ class TestScrape(object):
 
         result = scrape(BASIC_HTML, {
             'iterator': 'li',
+            'item': 'id'
+        })
+
+        assert list(result) == ['li1', 'li2']
+
+        result = scrape(BASIC_HTML, {
+            'iterator': 'li',
             'item': {
-                'id': {
-                    'attr': 'id'
-                },
-                'text': {
-                    'method': 'text'
+                'eval': 'element.get("id") + "-ok"'
+            }
+        })
+
+        assert list(result) == ['li1-ok', 'li2-ok']
+
+        result = scrape(BASIC_HTML, {
+            'iterator': 'li',
+            'item': {
+                'attr': 'id',
+                'eval': 'value + "-test"'
+            }
+        })
+
+        assert list(result) == ['li1-test', 'li2-test']
+
+        result = scrape(BASIC_HTML, {
+            'iterator': 'li',
+            'item': {
+                'fields': {
+                    'id': {
+                        'attr': 'id'
+                    },
+                    'text': {
+                        'method': 'text'
+                    }
                 }
             }
         })
