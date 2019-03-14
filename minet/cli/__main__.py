@@ -113,6 +113,12 @@ def main():
         default=25
     )
     fetch_subparser.add_argument(
+        '--throttle',
+        help='Time to wait - in seconds - between 2 calls to the same server. Defaults to 0.2.',
+        type=float,
+        default=0.2
+    )
+    fetch_subparser.add_argument(
         '--total',
         help='Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
         type=int

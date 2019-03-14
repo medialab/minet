@@ -199,7 +199,7 @@ def fetch_action(namespace):
         group=domain_name,
         group_parallelism=1,
         group_buffer_size=25,
-        group_throttle=0.25
+        group_throttle=namespace.throttle
     )
 
     errors = 0
