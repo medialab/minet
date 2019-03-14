@@ -7,4 +7,5 @@ data
 dist
 ftest/content
 ftest/report.csv
+*.egg-info
 *.spec
