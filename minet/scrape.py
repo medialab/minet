@@ -35,14 +35,15 @@ def extract_value(element, spec):
 
     # Subselection
     sel = spec.get('sel')
+    elements = [element]
 
     if sel is not None:
-        element = element.select(sel)
+        elements = element.select(sel)
 
-        if not element:
+        if not elements:
             return None
 
-        element = element[0]
+        element = elements[0]
 
     value = element.get_text()
 
@@ -62,6 +63,7 @@ def extract_value(element, spec):
         return eval(expression, None, {
             're': re,
             'element': element,
+            'elements': elements,
             'value': value
         })
 
