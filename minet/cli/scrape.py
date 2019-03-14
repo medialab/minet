@@ -31,12 +31,8 @@ def worker(payload):
             except UnicodeDecodeError as e:
                 return e, line, None
 
-    # Attempting extraction
-    try:
-        items = list(scrape(content, scraper))
-    except BaseException as e:
-        # TODO: I don't know yet what can happen
-        raise
+    # Attempting to scrape
+    items = list(scrape(content, scraper))
 
     return None, line, items
 
