@@ -22,6 +22,7 @@ setup(name='minet',
         'numpy==1.16.1',
         'quenouille==0.3.0',
         'tld==0.9.2',
+        'tqdm==4.31.1',
         'ural==0.6.0',
         'urllib3[secure]==1.24.1',
         'dragnet==2.0.3'
