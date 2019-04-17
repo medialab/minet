@@ -21,6 +21,7 @@ from quenouille import imap_unordered
 from tld import get_fld
 from uuid import uuid4
 from ural import ensure_protocol, is_url, get_domain_name
+from pycookiecheat import chrome_cookies
 
 from urllib3.exceptions import (
     HTTPError,
@@ -39,7 +40,7 @@ mimetypes.init()
 OUTPUT_ADDITIONAL_HEADERS = ['line', 'status', 'error', 'filename', 'encoding']
 
 # TODO: make this an option!
-SPOOFED_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36'
+SPOOFED_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36'
 
 def max_retry_error_reporter(error):
     if isinstance(error, (ConnectTimeoutError, ReadTimeoutError)):
@@ -56,16 +57,23 @@ ERROR_REPORTERS = {
 }
 
 
-def fetch(http, url):
+def fetch(http, url, cookies=None):
+
+    # Formatting headers
+    headers = {
+        'User-Agent': SPOOFED_UA
+    }
+
+    # Formatting cookies header
+    if cookies is not None:
+        headers['Cookie'] = '; '.join('%s=%s' % r for r in cookies.items())
 
     # TODO: probably need to do redirects myself to avoid ClosedPoolError
     try:
         r = http.request(
             'GET',
-            ensure_protocol(url),
-            headers={
-                'User-Agent': SPOOFED_UA
-            }
+            url,
+            headers=headers
         )
 
         return None, r
@@ -84,9 +92,19 @@ def worker(job):
     """
     Function using the urllib3 http to actually fetch our contents from the web.
     """
-    http, line, url = job
+    namespace, http, line, url = job
 
-    error, result = fetch(http, url)
+    url = ensure_protocol(url)
+    cookies = None
+
+    # Should we grab cookies?
+    if namespace.grab_cookies:
+        cookies = chrome_cookies(url)
+
+        if len(cookies) == 0:
+            cookies = None
+
+    error, result = fetch(http, url, cookies=cookies)
 
     if error:
         return error, url, line, result, None, None
@@ -181,14 +199,14 @@ def fetch_action(namespace):
                 loading_bar.update()
                 continue
 
-            yield (http, line, url)
+            yield (namespace, http, line, url)
 
     # Streaming the file and fetching the url using multiple threads
     multithreaded_iterator = imap_unordered(
         payloads(),
         worker,
         namespace.threads,
-        group=get_domain_name,
+        group=lambda job: get_domain_name(job[3]),
         group_parallelism=1,
         group_buffer_size=25,
         group_throttle=namespace.throttle
