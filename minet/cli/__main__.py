@@ -114,7 +114,7 @@ def main():
     )
     fetch_subparser.add_argument(
         '--throttle',
-        help='Time to wait - in seconds - between 2 calls to the same server. Defaults to 0.2.',
+        help='Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.',
         type=float,
         default=0.2
     )

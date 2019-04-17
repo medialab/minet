@@ -20,7 +20,7 @@ from tqdm import tqdm
 from quenouille import imap_unordered
 from tld import get_fld
 from uuid import uuid4
-from ural import ensure_protocol, is_url
+from ural import ensure_protocol, is_url, get_domain_name
 
 from urllib3.exceptions import (
     HTTPError,
@@ -54,14 +54,6 @@ ERROR_REPORTERS = {
     MaxRetryError: max_retry_error_reporter,
     UnicodeEncodeError: 'headers-encoding'
 }
-
-
-def domain_name(job):
-    """
-    Function returning the TLD from a job to guarantee max domain name
-    concurrency in multithreaded logic.
-    """
-    return get_fld(job[2], fix_protocol=True)
 
 
 def fetch(http, url):
@@ -196,7 +188,7 @@ def fetch_action(namespace):
         payloads(),
         worker,
         namespace.threads,
-        group=domain_name,
+        group=get_domain_name,
         group_parallelism=1,
         group_buffer_size=25,
         group_throttle=namespace.throttle
