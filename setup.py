@@ -25,7 +25,7 @@ setup(name='minet',
         'tld>=0.9.2',
         'tqdm>=4.31.1',
         'ural>=0.7.0',
-        'urllib3[secure]>=1.24.1',
+        'urllib3[secure]>=1.24.2',
         # 'dragnet>=2.0.3'
       ],
       entry_points={
