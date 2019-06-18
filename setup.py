@@ -26,7 +26,7 @@ setup(name='minet',
         'tqdm>=4.31.1',
         'ural>=0.7.0',
         'urllib3[secure]>=1.24.1',
-        'dragnet>=2.0.3'
+        # 'dragnet>=2.0.3'
       ],
       entry_points={
         'console_scripts': ['minet=minet.cli.__main__:main']

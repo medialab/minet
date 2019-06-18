@@ -211,7 +211,7 @@ def main():
     scrape_description = dedent(
         '''
         Minet Scrape Command
-        =====================
+        ====================
 
         Use multiple processes to scrape data from a batch of HTML files.
         This command can either work on a `minet fetch` report or on a bunch
@@ -297,6 +297,16 @@ def main():
         fetch_action(args)
 
     elif args.action == 'extract':
+        try:
+            import dragnet
+        except:
+            print('The `dragnet` library is not installed. The `extract` command won\'t work.')
+            print('To install it correctly, run the following commands in order:')
+            print()
+            print('  pip install lxml numpy Cython')
+            print('  pip install dragnet')
+            sys.exit(1)
+
         from minet.cli.extract import extract_action
         extract_action(args)
 
