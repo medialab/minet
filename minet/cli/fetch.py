@@ -191,13 +191,19 @@ def fetch_action(namespace):
     # Generator yielding urls to fetch
     def payloads():
         for line in reader:
-            url = line[pos].strip()
+            url = line[pos]
 
             if not url:
 
                 # TODO: write report line all the same!
                 loading_bar.update()
                 continue
+
+            # Url templating
+            if namespace.url_template:
+                url = url.format(value=url)
+            else:
+                url = url.strip()
 
             yield (namespace, http, line, url)
 

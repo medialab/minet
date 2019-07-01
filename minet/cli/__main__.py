@@ -128,6 +128,10 @@ def main():
         help='Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
         type=int
     )
+    fetch_subparser.add_argument(
+        '--url-template',
+        help='A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.'
+    )
 
     # TODO: lru_cache, normalize urls, print current urls? print end report?
 
