@@ -201,7 +201,7 @@ def fetch_action(namespace):
 
             # Url templating
             if namespace.url_template:
-                url = url.format(value=url)
+                url = namespace.url_template.format(value=url)
             else:
                 url = url.strip()
 
