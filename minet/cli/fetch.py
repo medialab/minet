@@ -247,7 +247,10 @@ def fetch_action(namespace):
 
             # Building filename
             if filename_pos is not None:
-                filename = line[filename_pos] + info['ext']
+                if namespace.filename_template:
+                    filename = namespace.filename_template.format(value=line[filename_pos])
+                else:
+                    filename = line[filename_pos] + info['ext']
             else:
                 # NOTE: it would be nice to have an id that can be sorted by time
                 filename = str(uuid4()) + info['ext']

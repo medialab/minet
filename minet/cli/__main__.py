@@ -94,6 +94,10 @@ def main():
         help='Name of the column used to build retrieved file names. Defaults to an uuid v4 with correct extension.'
     )
     fetch_subparser.add_argument(
+        '--filename-template',
+        help='A template for the name of the fetched files.'
+    )
+    fetch_subparser.add_argument(
         '-g', '--grab-cookies',
         help='Whether to attempt to grab cookies from your computer\'s chrome browser.',
         action='store_true'
