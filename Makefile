@@ -5,7 +5,7 @@ SOURCE = minet
 all: lint test
 compile: clean pyinstaller
 test: unit
-publish: test upload clean # TODO: lint is missing
+publish: clean test upload clean # TODO: lint is missing
 
 clean:
 	rm -rf *.egg-info .pytest_cache build dist
