@@ -6,7 +6,7 @@ build
 data
 dist
 ftest/content
-ftest/report.csv
+ftest/*.csv
 *.jsonl
 *.egg-info
 *.spec

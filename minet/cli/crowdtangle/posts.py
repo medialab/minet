@@ -12,12 +12,29 @@ import urllib3
 import certifi
 from tqdm import tqdm
 
-URL_TEMPLATE = 'https://api.crowdtangle.com/posts?count=100&sortBy=date&token=%s'
+URL_TEMPLATE = 'https://api.crowdtangle.com/posts?count=100&sortBy=%(sort_by)s&token=%(token)s'
 DEFAULT_WAIT_TIME = 10
 
 
-def forge_posts_url(token):
-    return URL_TEMPLATE % token
+def forge_posts_url(namespace):
+    base_url = URL_TEMPLATE % {
+        'sort_by': namespace.sort_by,
+        'token': namespace.token
+    }
+
+    if namespace.language:
+        base_url += '&language=%s' % namespace.language
+
+    if namespace.start_date:
+        base_url += '&startDate=%s' % namespace.start_date
+
+    if namespace.end_date:
+        base_url += '&endDate=%s' % namespace.end_date
+
+    if namespace.list_ids:
+        base_url += '&list-ids=%s' % namespace.list_ids
+
+    return base_url
 
 CSV_HEADERS = [
     'ct_id',
@@ -25,6 +42,7 @@ CSV_HEADERS = [
     'type',
     'title',
     'message',
+    'description',
     'date',
     'updated',
     'link',
@@ -69,6 +87,7 @@ def format_post_for_csv(post):
         post['type'],
         post.get('title', ''),
         post['message'],
+        post.get('description', ''),
         post['date'],
         post['updated'],
         post['link'],
@@ -114,15 +133,19 @@ def crowdtangle_posts_action(namespace, output_file):
         ca_certs=certifi.where(),
     )
 
+    N = 0
+    url = forge_posts_url(namespace)
+
+    print_error('Using the following starting url:')
+    print_error(url)
+    print_error()
+
     # Loading bar
     loading_bar = tqdm(
         desc='Fetching posts',
         dynamic_ncols=True,
         unit=' posts'
     )
-
-    N = 0
-    url = forge_posts_url(namespace.token)
 
     if namespace.format == 'csv':
         writer = csv.writer(output_file)

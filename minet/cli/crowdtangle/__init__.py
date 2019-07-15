@@ -14,8 +14,8 @@ def crowdtangle_action(namespace):
 
     # A token is needed to be able to access the API
     if not namespace.token:
-        print('A token is needed to be able to access CrowdTangle\'s API.')
-        print('You can provide one using the `--token` argument.')
+        print('A token is needed to be able to access CrowdTangle\'s API.', file=sys.stderr)
+        print('You can provide one using the `--token` argument.', file=sys.stderr)
         sys.exit(1)
 
     if namespace.output is None:

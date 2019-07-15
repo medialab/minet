@@ -183,7 +183,15 @@ def main():
             ===============================
 
             Gather post data from the designated dashboard (indicated by
-            a token).
+            a given token).
+            '''
+        ),
+        epilog=dedent(
+        '''
+            examples:
+
+            . Fetching the 500 most latest posts from a dashboard:
+                `minet ct posts --token YOUR_TOKEN --limit 500 > latest-posts.csv`
             '''
         ),
         formatter_class=custom_formatter
@@ -192,15 +200,37 @@ def main():
     common_ct_arguments(crowdtangle_posts_subparser)
 
     crowdtangle_posts_subparser.add_argument(
+        '--end-date',
+        help='The latest date at which a post could be posted (UTC!).'
+    )
+    crowdtangle_posts_subparser.add_argument(
         '-f', '--format',
         help='Output format.',
         choices=['csv', 'jsonl'],
-        default='jsonl'
+        default='csv'
+    )
+    crowdtangle_posts_subparser.add_argument(
+        '--language',
+        help='Language of posts to retrieve.'
     )
     crowdtangle_posts_subparser.add_argument(
         '-l', '--limit',
-        help='Maximum number of posts to retrieve.',
+        help='Maximum number of posts to retrieve. Will fetch every post by default.',
         type=int
+    )
+    crowdtangle_posts_subparser.add_argument(
+        '--list-ids',
+        help='Ids of the lists from which to retrieve posts, separated by commas.'
+    )
+    crowdtangle_posts_subparser.add_argument(
+        '--sort-by',
+        help='The order in which to retrieve posts.',
+        choices=['date', 'interaction_rate', 'overperforming', 'total_interactions', 'underperforming'],
+        default='date'
+    )
+    crowdtangle_posts_subparser.add_argument(
+        '--start-date',
+        help='The earliest date at which a post could be posted (UTC!).'
     )
 
     SUBPARSERS['ct'] = crowdtangle_subparser
