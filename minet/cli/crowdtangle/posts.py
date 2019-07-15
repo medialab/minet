@@ -4,6 +4,7 @@
 #
 # Logic of the `ct posts` action.
 #
+import csv
 import sys
 import json
 import time
@@ -17,6 +18,90 @@ DEFAULT_WAIT_TIME = 10
 
 def forge_posts_url(token):
     return URL_TEMPLATE % token
+
+CSV_HEADERS = [
+    'ct_id',
+    'fb_id',
+    'type',
+    'title',
+    'message',
+    'date',
+    'updated',
+    'link',
+    'post_url',
+    'score'
+]
+
+STATISTICS = [
+    'like',
+    'share',
+    'comment',
+    'love',
+    'wow',
+    'haha',
+    'sad',
+    'angry',
+    'thankful'
+]
+
+for name in STATISTICS:
+    CSV_HEADERS.append('actual_%s_count' % name)
+    CSV_HEADERS.append('expected_%s_count' % name)
+
+CSV_HEADERS = CSV_HEADERS + [
+    'account_ct_id',
+    'account_fb_id',
+    'account_name',
+    'account_handle',
+    'account_profile_image',
+    'account_subscriber_count',
+    'account_url',
+    'account_verified',
+    'expanded_links',
+    'media'
+]
+
+
+def format_post_for_csv(post):
+    row = [
+        post['id'],
+        post['platformId'],
+        post['type'],
+        post.get('title', ''),
+        post['message'],
+        post['date'],
+        post['updated'],
+        post['link'],
+        post['postUrl'],
+        post['score']
+    ]
+
+    stats = post['statistics']
+    actual_stats = stats['actual']
+    expected_stats = stats['expected']
+
+    for name in STATISTICS:
+        key = '%sCount' % name
+
+        row.append(actual_stats[key])
+        row.append(expected_stats[key])
+
+    account = post['account']
+
+    row.extend([
+        account['id'],
+        account['platformId'],
+        account['name'],
+        account['handle'],
+        account['profileImage'],
+        account['subscriberCount'],
+        account['url'],
+        '1' if account['verified'] else '',
+        json.dumps(post['expandedLinks'], ensure_ascii=False),
+        json.dumps(post['media'], ensure_ascii=False)
+    ])
+
+    return row
 
 
 def print_error(*msg):
@@ -38,6 +123,10 @@ def crowdtangle_posts_action(namespace, output_file):
 
     N = 0
     url = forge_posts_url(namespace.token)
+
+    if namespace.format == 'csv':
+        writer = csv.writer(output_file)
+        writer.writerow(CSV_HEADERS)
 
     while True:
         result = http.request('GET', url)
@@ -75,6 +164,8 @@ def crowdtangle_posts_action(namespace, output_file):
 
             if namespace.format == 'jsonl':
                 output_file.write(json.dumps(post, ensure_ascii=False) + '\n')
+            else:
+                writer.writerow(format_post_for_csv(post))
 
             if N >= namespace.limit:
                 enough_to_stop = True

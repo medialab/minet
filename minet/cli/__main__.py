@@ -194,7 +194,7 @@ def main():
     crowdtangle_posts_subparser.add_argument(
         '-f', '--format',
         help='Output format.',
-        choices=['jsonl'],
+        choices=['csv', 'jsonl'],
         default='jsonl'
     )
     crowdtangle_posts_subparser.add_argument(
