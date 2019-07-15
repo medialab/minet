@@ -2,82 +2,46 @@
 
 ![Minet](img/minet.png)
 
-A webmining CLI tool & library for python.
+**minet** is webmining CLI tool & library for python. It adopts a lo-fi approach to various webmining problems by letting you perform a variety of actions from the comfort of your command line. No database needed: raw data files will get you going.
 
-*Minet* features:
-- Multithreaded HTML fetching
-- Multiprocessing text content extraction
-- Facebook's share count fetching
-- Custom scraping script?
+## Features
+
+* Multithreaded, memory-efficient fetching from the web.
+* Multiprocessed raw text content extraction from HTML pages.
+* Multiprocessed scraping from HTML pages using a comfy JSON DSL.
+* Data collection from various APIs such as [CrowdTangle](https://www.crowdtangle.com/).
 
 ## Installation
 
 `minet` can be installed using pip:
+
 ```shell
 pip install minet
 ```
-> You can also create a Minet [executable](docs/create_executable.md).
 
-## Commands
+## Usage
 
-### fetch
+* [fetch](#fetch)
+* [extract](#extract)
+* [scrape](#scrape)
+* [CrowdTangle (ct)](#crowdtangle)
+  * [posts](#posts)
 
-Handy command to fetch the HTML content of every url provided in a *potentially huge* given csv.
-Works in a multithreaded & lazy way (the csv is not loaded into memory), and starts where it stopped at last execution.
+## fetch
 
-```shell
-minet fetch COLUMN FILE
+## extract
+
+If you want to be able to use the `extract` command, you will need to install the [`dragnet`](https://github.com/dragnet-org/dragnet) library. Because it is a bit cumbersome to install, it's not included in `minet`'s dependencies yet.
+
+Just run the following & in the same order (`dragnet` needs to have specific deps installed before its setup compilations can be run):
+
 ```
-Additional options:
-- **`-s STORAGE_LOCATION`** specifies the location where the (temporary) HTML files are stored.
-  Is *./data* by default.
-- **`-id COLUMN_NAME`** : name of the url ID column, if present in the csv `FILE`. Used for the name of the HTML files.
-    If not specified, UUIDs are generated.
-- **`--monitoring_file FILE_NAME`** : location of the monitoring file used to save progress.
-    Is *./data/monitoring.csv* by default.
-
-![Minet](img/fetch.png)
-
-##### Example
-
-Imagine you have a `urls.csv` file containing urls - in a column called `'urls'` - you want to extract data from. Just use this command:
-
-```shell
-minet fetch url urls.csv
+pip install lxml numpy Cython
+pip install dragnet
 ```
 
-That's it, your HTML files are stored in *./data/htmlfiles*, ready for text content extraction for instance.
+## scrape
 
----
+## CrowdTangle
 
-### facebook
-
-Quickly fetches the (*rounded**) Facebook share count of each url in a given csv, without the need of an API nor access token (and thus no rate limitation).
-Works in a multithreaded & lazy way (the csv is not loaded into memory).
-
-> *The share count of a url is the sum of :*
-> - *the number of likes of the url*
-> - *the number of shares of the url*
-> - *the number of likes & comments on stories about this url*
-
-
-```shell
-minet facebook COLUMN FILE
-```
-Additional options:
-- **`-o OUTPUT`** specifies the location of the output csv (being the source csv `FILE` with an additional *facebook_share_count* column).
-    Is `stdout` by default.
-
-![Minet](img/facebook.png)
-
-##### Example
-
-Let's say you have a `urls.csv` file with - in a `'url'` column - the urls you want the share count of.
-
-Just use this command:
-
-```shell
-minet facebook url urls.csv -o urls_with_fb_data.csv
-```
-
-As a result, you get a `urls_with_fb_data.csv` file with a *facebook_share_count* column.
+### posts
