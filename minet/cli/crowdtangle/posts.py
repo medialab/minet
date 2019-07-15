@@ -6,19 +6,21 @@
 #
 import sys
 import json
+import time
 import urllib3
 import certifi
 from tqdm import tqdm
 
 URL_TEMPLATE = 'https://api.crowdtangle.com/posts?count=100&sortBy=date&token=%s'
+DEFAULT_WAIT_TIME = 10
 
 
 def forge_posts_url(token):
     return URL_TEMPLATE % token
 
 
-def print_error(msg):
-    print(msg, file=sys.stderr)
+def print_error(*msg):
+    print(*msg, file=sys.stderr)
 
 
 def crowdtangle_posts_action(namespace, output_file):
@@ -45,6 +47,12 @@ def crowdtangle_posts_action(namespace, output_file):
 
             print_error('Your API token is invalid.')
             print_error('Check that you indicated a valid one using the `--token` argument.')
+            sys.exit(1)
+
+        if result.status >= 400:
+            loading_bar.close()
+
+            print_error(result.data, result.status)
             sys.exit(1)
 
         try:
@@ -88,5 +96,8 @@ def crowdtangle_posts_action(namespace, output_file):
             break
 
         url = pagination['nextPage']
+
+        # Waiting a bit to respect the 6 reqs/min limit
+        time.sleep(DEFAULT_WAIT_TIME)
 
     loading_bar.close()
