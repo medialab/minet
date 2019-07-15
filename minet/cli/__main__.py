@@ -29,7 +29,7 @@ def custom_formatter(prog):
 def main():
     parser = ArgumentParser(prog='minet')
     subparsers = parser.add_subparsers(
-        help='action to execute', title='actions', dest='action')
+        help='Action to execute', title='actions', dest='action')
 
     # Fetch action subparser
     fetch_description = dedent(
@@ -140,6 +140,70 @@ def main():
     # TODO: lru_cache, normalize urls, print current urls? print end report?
 
     SUBPARSERS['fetch'] = fetch_subparser
+
+    # Crowdtangle actions subparser
+    crowdtangle_description = dedent(
+        '''
+        Minet CrowdTangle Command
+        =========================
+
+        Gather data from the CrowdTangle APIs easily and efficiently.
+        '''
+    )
+
+    crowdtangle_subparser = subparsers.add_parser(
+        'ct',
+        description=crowdtangle_description,
+        formatter_class=custom_formatter
+    )
+
+    crowdtangle_subparser_subparsers = crowdtangle_subparser.add_subparsers(
+        help='Action to perform using the CrowdTangle API.',
+        title='actions',
+        dest='ct_action'
+    )
+
+    def common_ct_arguments(sub):
+        sub.add_argument(
+            '-o', '--output',
+            help='Path to the output file. By default, everything will be printed to stdout.'
+        )
+        sub.add_argument(
+            '-t', '--token',
+            help='CrowdTangle dashboard API token.'
+        )
+
+    common_ct_arguments(crowdtangle_subparser)
+
+    crowdtangle_posts_subparser = crowdtangle_subparser_subparsers.add_parser(
+        'posts',
+        description=dedent(
+            '''
+            Minet CrowdTangle Posts Command
+            ===============================
+
+            Gather post data from the designated dashboard (indicated by
+            a token).
+            '''
+        ),
+        formatter_class=custom_formatter
+    )
+
+    common_ct_arguments(crowdtangle_posts_subparser)
+
+    crowdtangle_posts_subparser.add_argument(
+        '-f', '--format',
+        help='Output format.',
+        choices=['jsonl'],
+        default='jsonl'
+    )
+    crowdtangle_posts_subparser.add_argument(
+        '-l', '--limit',
+        help='Maximum number of posts to retrieve.',
+        type=int
+    )
+
+    SUBPARSERS['ct'] = crowdtangle_subparser
 
     # Extract action subparser
     extract_description = dedent(
@@ -287,7 +351,7 @@ def main():
     SUBPARSERS['scrape'] = scrape_subparser
 
     help_suparser = subparsers.add_parser('help')
-    help_suparser.add_argument('subcommand', help='name of the subcommand')
+    help_suparser.add_argument('subcommand', help='Name of the subcommand', nargs='?')
     SUBPARSERS['help'] = help_suparser
 
     args = parser.parse_args()
@@ -303,6 +367,10 @@ def main():
     elif args.action == 'fetch':
         from minet.cli.fetch import fetch_action
         fetch_action(args)
+
+    elif args.action == 'ct':
+        from minet.cli.crowdtangle import crowdtangle_action
+        crowdtangle_action(args)
 
     elif args.action == 'extract':
         try:
