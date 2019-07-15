@@ -233,6 +233,7 @@ def main():
         help='The earliest date at which a post could be posted (UTC!).'
     )
 
+    # TODO: document default values for options
     SUBPARSERS['ct'] = crowdtangle_subparser
 
     # Extract action subparser
