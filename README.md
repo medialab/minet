@@ -82,8 +82,102 @@ pip install lxml numpy Cython
 pip install dragnet
 ```
 
+```
+Minet Extract Command
+=====================
+
+Use multiple processes to extract raw text from a batch of HTML files.
+This command can either work on a `minet fetch` report or on a bunch
+of files. It will output an augmented report with the extracted text.
+
+positional arguments:
+  report                                          Input CSV fetch action report file.
+
+optional arguments:
+  -h, --help                                      show this help message and exit
+  -e {dragnet,html2text}, --extractor {dragnet,html2text}
+                                                  Extraction engine to use. Defaults to `dragnet`.
+  -i INPUT_DIRECTORY, --input-directory INPUT_DIRECTORY
+                                                  Directory where the HTML files are stored. Defaults to "content".
+  -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
+  -p PROCESSES, --processes PROCESSES             Number of processes to use. Defaults to 4.
+  -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
+  --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Extracting raw text from a `minet fetch` report:
+    `minet extract report.csv > extracted.csv`
+
+. Working on a report from stdin:
+    `minet fetch url_column file.csv | minet extract > extracted.csv`
+
+. Extracting raw text from a bunch of files:
+    `minet extract --glob "./content/*.html" > extracted.csv`
+```
+
 ## scrape
+
+TODO: document the scraping DSL
+
+```
+Minet Scrape Command
+====================
+
+Use multiple processes to scrape data from a batch of HTML files.
+This command can either work on a `minet fetch` report or on a bunch
+of files. It will output the scraped items.
+
+positional arguments:
+  scraper                                         Path to a scraper definition file.
+  report                                          Input CSV fetch action report file.
+
+optional arguments:
+  -h, --help                                      show this help message and exit
+  -i INPUT_DIRECTORY, --input-directory INPUT_DIRECTORY
+                                                  Directory where the HTML files are stored. Defaults to "content".
+  -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
+  -p PROCESSES, --processes PROCESSES             Number of processes to use. Defaults to 4.
+  --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Scraping item from a `minet fetch` report:
+    `minet scrape scraper.json report.csv > scraped.csv`
+
+. Working on a report from stdin:
+    `minet fetch url_column file.csv | minet fetch scraper.json > scraped.csv`
+
+. Scraping items from a bunch of files:
+    `minet scrape scraper.json --glob "./content/*.html" > scraped.csv`
+```
 
 ## CrowdTangle
 
 ### posts
+
+```
+Minet CrowdTangle Posts Command
+===============================
+
+Gather post data from the designated dashboard (indicated by
+a given token).
+
+optional arguments:
+  -h, --help                                      show this help message and exit
+  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
+  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
+  --end-date END_DATE                             The latest date at which a post could be posted (UTC!).
+  -f {csv,jsonl}, --format {csv,jsonl}            Output format.
+  --language LANGUAGE                             Language of posts to retrieve.
+  -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
+  --list-ids LIST_IDS                             Ids of the lists from which to retrieve posts, separated by commas.
+  --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
+                                                  The order in which to retrieve posts.
+  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
+
+examples:
+
+. Fetching the 500 most latest posts from a dashboard:
+    `minet ct posts --token YOUR_TOKEN --limit 500 > latest-posts.csv`
+```
