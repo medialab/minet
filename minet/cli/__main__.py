@@ -229,7 +229,7 @@ def main():
     )
     crowdtangle_posts_subparser.add_argument(
         '-f', '--format',
-        help='Output format.',
+        help='Output format. Defaults to `csv`.',
         choices=['csv', 'jsonl'],
         default='csv'
     )
@@ -248,7 +248,7 @@ def main():
     )
     crowdtangle_posts_subparser.add_argument(
         '--sort-by',
-        help='The order in which to retrieve posts.',
+        help='The order in which to retrieve posts. Defaults to `date`.',
         choices=['date', 'interaction_rate', 'overperforming', 'total_interactions', 'underperforming'],
         default='date'
     )
@@ -257,7 +257,6 @@ def main():
         help='The earliest date at which a post could be posted (UTC!).'
     )
 
-    # TODO: document default values for options
     SUBPARSERS['ct'] = crowdtangle_subparser
 
     # Extract action subparser

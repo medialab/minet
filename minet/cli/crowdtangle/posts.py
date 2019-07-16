@@ -13,9 +13,9 @@ import certifi
 from tqdm import tqdm
 
 from minet.cli.utils import print_err
+from minet.cli.crowdtangle.utils import create_paginated_action
 
 URL_TEMPLATE = 'https://api.crowdtangle.com/posts?count=100&sortBy=%(sort_by)s&token=%(token)s'
-DEFAULT_WAIT_TIME = 10
 
 
 def forge_posts_url(namespace):
@@ -43,13 +43,16 @@ CSV_HEADERS = [
     'fb_id',
     'type',
     'title',
+    'caption',
     'message',
     'description',
     'date',
     'updated',
     'link',
     'post_url',
-    'score'
+    'score',
+    'video_length_ms',
+    'live_video_status'
 ]
 
 STATISTICS = [
@@ -88,13 +91,16 @@ def format_post_for_csv(post):
         post['platformId'],
         post['type'],
         post.get('title', ''),
-        post['message'],
+        post.get('caption', ''),
+        post.get('message', ''),
         post.get('description', ''),
         post['date'],
         post['updated'],
-        post['link'],
+        post.get('link', ''),
         post['postUrl'],
-        post['score']
+        post['score'],
+        post.get('videoLengthMS', ''),
+        post.get('liveVideoStatus', '')
     ]
 
     stats = post['statistics']
@@ -113,103 +119,21 @@ def format_post_for_csv(post):
         account['id'],
         account['platformId'],
         account['name'],
-        account['handle'],
+        account.get('handle', ''),
         account['profileImage'],
         account['subscriberCount'],
         account['url'],
         '1' if account['verified'] else '',
-        json.dumps(post['expandedLinks'], ensure_ascii=False),
-        json.dumps(post['media'], ensure_ascii=False)
+        json.dumps(post['expandedLinks'], ensure_ascii=False) if 'expandedLinks' in post else '',
+        json.dumps(post['media'], ensure_ascii=False) if 'media' in post else ''
     ])
 
     return row
 
-
-def crowdtangle_posts_action(namespace, output_file):
-    http = urllib3.PoolManager(
-        cert_reqs='CERT_REQUIRED',
-        ca_certs=certifi.where(),
-    )
-
-    N = 0
-    url = forge_posts_url(namespace)
-
-    print_err('Using the following starting url:')
-    print_err(url)
-    print_err()
-
-    # Loading bar
-    loading_bar = tqdm(
-        desc='Fetching posts',
-        dynamic_ncols=True,
-        unit=' posts'
-    )
-
-    if namespace.format == 'csv':
-        writer = csv.writer(output_file)
-        writer.writerow(CSV_HEADERS)
-
-    while True:
-        result = http.request('GET', url)
-
-        if result.status == 401:
-            loading_bar.close()
-
-            print_err('Your API token is invalid.')
-            print_err('Check that you indicated a valid one using the `--token` argument.')
-            sys.exit(1)
-
-        if result.status >= 400:
-            loading_bar.close()
-
-            print_err(result.data, result.status)
-            sys.exit(1)
-
-        try:
-            data = json.loads(result.data)['result']
-        except:
-            loading_bar.close()
-            print_err('Misformatted JSON result.')
-            sys.exit(1)
-
-        if 'posts' not in data or len(data['posts']) == 0:
-            break
-
-        posts = data['posts']
-        enough_to_stop = False
-
-        for post in posts:
-
-            N += 1
-            loading_bar.update()
-
-            if namespace.format == 'jsonl':
-                output_file.write(json.dumps(post, ensure_ascii=False) + '\n')
-            else:
-                writer.writerow(format_post_for_csv(post))
-
-            if N >= namespace.limit:
-                enough_to_stop = True
-                break
-
-        # NOTE: I wish I had labeled loops in python...
-        if enough_to_stop:
-            loading_bar.close()
-            print_err('The indicated limit of posts was reached.')
-            break
-
-        # Pagination
-        # NOTE: we could adjust the `count` GET param but I am lazy
-        pagination = data['pagination']
-
-        if 'nextPage' not in pagination:
-            loading_bar.close()
-            print_err('We reached the end of pagination.')
-            break
-
-        url = pagination['nextPage']
-
-        # Waiting a bit to respect the 6 reqs/min limit
-        time.sleep(DEFAULT_WAIT_TIME)
-
-    loading_bar.close()
+crowdtangle_posts_action = create_paginated_action(
+    url_forge=forge_posts_url,
+    csv_headers=CSV_HEADERS,
+    csv_formatter=format_post_for_csv,
+    item_name='posts',
+    item_key='posts'
+)
