@@ -79,7 +79,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                 if namespace.format == 'jsonl':
                     output_file.write(json.dumps(item, ensure_ascii=False) + '\n')
                 else:
-                    writer.writerow(csv_formatter(item))
+                    writer.writerow(csv_formatter(namespace, item))
 
                 if N >= namespace.limit:
                     enough_to_stop = True

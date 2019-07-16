@@ -78,7 +78,7 @@ CSV_HEADERS = CSV_HEADERS + [
 ]
 
 
-def format_post_for_csv(post):
+def format_post_for_csv(namespace, post):
     row = [
         post['id'],
         post['platformId'],

@@ -7,7 +7,7 @@
 
 CROWDTANGLE_DEFAULT_WAIT_TIME = 10
 
-CROWDTANGLE_POST_TYPES = set([
+CROWDTANGLE_POST_TYPES = [
     'episode',
     'extra_clip',
     'link',
@@ -22,4 +22,4 @@ CROWDTANGLE_POST_TYPES = set([
     'video',
     'vine',
     'youtube'
-])
+]

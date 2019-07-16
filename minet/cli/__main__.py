@@ -12,6 +12,7 @@ from textwrap import dedent
 from argparse import ArgumentParser, FileType, RawTextHelpFormatter
 
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
+from minet.cli.utils import BooleanAction
 
 SUBPARSERS = {}
 
@@ -32,6 +33,7 @@ def main():
         help='Action to execute', title='actions', dest='action')
 
     # Fetch action subparser
+    # -------------------------------------------------------------------------
     fetch_description = dedent(
         '''
         Minet Fetch Command
@@ -142,6 +144,7 @@ def main():
     SUBPARSERS['fetch'] = fetch_subparser
 
     # Crowdtangle actions subparser
+    # -------------------------------------------------------------------------
     crowdtangle_description = dedent(
         '''
         Minet CrowdTangle Command
@@ -175,6 +178,50 @@ def main():
 
     common_ct_arguments(crowdtangle_subparser)
 
+    # Crowdtangle leaderboard `ct leaderboard`
+    crowdtangle_leaderboard_subparser = crowdtangle_subparser_subparsers.add_parser(
+        'leaderboard',
+        description=dedent(
+            '''
+            Minet CrowdTangle Leaderboard Command
+            =====================================
+
+            Gather information and aggregated stats about pages and groups of
+            the designated dashboard (indicated by a given token).
+            '''
+        ),
+        epilog=dedent(
+        '''
+            examples:
+
+            . Fetching accounts statistics for every account in your dashboard:
+                `minet ct leaderboard --token YOUR_TOKEN > accounts-stats.csv`
+            '''
+        ),
+        formatter_class=custom_formatter
+    )
+
+    common_ct_arguments(crowdtangle_leaderboard_subparser)
+
+    crowdtangle_leaderboard_subparser.add_argument(
+        '--no-breakdown',
+        help='Whether to skip statistics breakdown by post type in the CSV output.',
+        dest='breakdown',
+        action=BooleanAction,
+    )
+    crowdtangle_leaderboard_subparser.add_argument(
+        '-f', '--format',
+        help='Output format. Defaults to `csv`.',
+        choices=['csv', 'jsonl'],
+        default='csv'
+    )
+    crowdtangle_leaderboard_subparser.add_argument(
+        '-l', '--limit',
+        help='Maximum number of posts to retrieve. Will fetch every post by default.',
+        type=int
+    )
+
+    # Crowdtangle lists `ct lists`
     crowdtangle_lists_subparser = crowdtangle_subparser_subparsers.add_parser(
         'lists',
         description=dedent(
@@ -199,6 +246,7 @@ def main():
 
     common_ct_arguments(crowdtangle_lists_subparser)
 
+    # Crowdtangle posts `ct posts`
     crowdtangle_posts_subparser = crowdtangle_subparser_subparsers.add_parser(
         'posts',
         description=dedent(
@@ -257,45 +305,10 @@ def main():
         help='The earliest date at which a post could be posted (UTC!).'
     )
 
-    crowdtangle_leaderboard_subparser = crowdtangle_subparser_subparsers.add_parser(
-        'leaderboard',
-        description=dedent(
-            '''
-            Minet CrowdTangle Leaderboard Command
-            =====================================
-
-            Gather information and aggregated stats about pages and groups of
-            the designated dashboard (indicated by a given token).
-            '''
-        ),
-        epilog=dedent(
-        '''
-            examples:
-
-            . Fetching accounts statistics for every account in your dashboard:
-                `minet ct leaderboard --token YOUR_TOKEN > accounts-stats.csv`
-            '''
-        ),
-        formatter_class=custom_formatter
-    )
-
-    common_ct_arguments(crowdtangle_leaderboard_subparser)
-
-    crowdtangle_leaderboard_subparser.add_argument(
-        '-f', '--format',
-        help='Output format. Defaults to `csv`.',
-        choices=['csv', 'jsonl'],
-        default='csv'
-    )
-    crowdtangle_leaderboard_subparser.add_argument(
-        '-l', '--limit',
-        help='Maximum number of posts to retrieve. Will fetch every post by default.',
-        type=int
-    )
-
     SUBPARSERS['ct'] = crowdtangle_subparser
 
     # Extract action subparser
+    # -------------------------------------------------------------------------
     extract_description = dedent(
         '''
         Minet Extract Command
@@ -370,6 +383,7 @@ def main():
     SUBPARSERS['extract'] = extract_subparser
 
     # Scrape action subparser
+    # -------------------------------------------------------------------------
     scrape_description = dedent(
         '''
         Minet Scrape Command
@@ -440,6 +454,8 @@ def main():
 
     SUBPARSERS['scrape'] = scrape_subparser
 
+    # Help subparser
+    # -------------------------------------------------------------------------
     help_suparser = subparsers.add_parser('help')
     help_suparser.add_argument('subcommand', help='Name of the subcommand', nargs='?')
     SUBPARSERS['help'] = help_suparser

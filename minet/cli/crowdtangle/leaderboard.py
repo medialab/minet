@@ -32,7 +32,7 @@ CSV_HEADERS = [
 STATISTICS = [
     ('loveCount', 'love_count'),
     ('wowCount', 'wow_count'),
-    ('thankfulCount', 'thankfulCount'),
+    ('thankfulCount', 'thankful_count'),
     ('interactionRate', 'interaction_rate'),
     ('likeCount', 'like_count'),
     ('hahaCount', 'haha_count'),
@@ -51,7 +51,20 @@ for _, substitute_key in STATISTICS:
     CSV_HEADERS.append(substitute_key)
 
 
-def format_account_for_csv(item):
+def build_csv_headers(namespace):
+    basic_headers = list(CSV_HEADERS)
+
+    if not namespace.breakdown:
+        return basic_headers
+
+    for post_type in CROWDTANGLE_POST_TYPES:
+        for _, substitute_key in STATISTICS:
+            basic_headers.append('%s_%s' % (post_type, substitute_key))
+
+    return basic_headers
+
+
+def format_account_for_csv(namespace, item):
     account = item['account']
     subscriber_data = item['subscriberData']
 
@@ -73,12 +86,24 @@ def format_account_for_csv(item):
     for key, _ in STATISTICS:
         row.append(summary.get(key, ''))
 
+    if not namespace.breakdown:
+        return row
+
+    breakdown = item['breakdown']
+
+    for post_type in CROWDTANGLE_POST_TYPES:
+
+        data = breakdown.get(post_type)
+
+        for key, _ in STATISTICS:
+            row.append(data.get(key, '') if data else '')
+
     return row
 
 
 crowdtangle_leaderboard_action = create_paginated_action(
     url_forge=forge_leaderboard_url,
-    csv_headers=lambda _: CSV_HEADERS,
+    csv_headers=build_csv_headers,
     csv_formatter=format_account_for_csv,
     item_name='accounts',
     item_key='accountStatistics'
