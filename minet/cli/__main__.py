@@ -208,6 +208,7 @@ def main():
         help='Whether to skip statistics breakdown by post type in the CSV output.',
         dest='breakdown',
         action=BooleanAction,
+        default=True
     )
     crowdtangle_leaderboard_subparser.add_argument(
         '-f', '--format',

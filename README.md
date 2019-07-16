@@ -25,6 +25,7 @@ pip install minet
 * [extract](#extract)
 * [scrape](#scrape)
 * [CrowdTangle (ct)](#crowdtangle)
+  * [leaderboard](#leaderboard)
   * [lists](#lists)
   * [posts](#posts)
 
@@ -155,6 +156,30 @@ examples:
 
 ## CrowdTangle
 
+### leaderboard
+
+```
+Minet CrowdTangle Leaderboard Command
+=====================================
+
+Gather information and aggregated stats about pages and groups of
+the designated dashboard (indicated by a given token).
+
+optional arguments:
+  -h, --help                            show this help message and exit
+  -o OUTPUT, --output OUTPUT            Path to the output file. By default, everything will be printed to stdout.
+  -t TOKEN, --token TOKEN               CrowdTangle dashboard API token.
+  --no-breakdown                        Whether to skip statistics breakdown by post type in the CSV output.
+  -f {csv,jsonl}, --format {csv,jsonl}  Output format. Defaults to `csv`.
+  -l LIMIT, --limit LIMIT               Maximum number of posts to retrieve. Will fetch every post by default.
+  --list-id LIST_ID                     Optional list id from which to retrieve accounts.
+
+examples:
+
+. Fetching accounts statistics for every account in your dashboard:
+    `minet ct leaderboard --token YOUR_TOKEN > accounts-stats.csv`
+```
+
 ### lists
 
 ```
@@ -189,12 +214,12 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
   --end-date END_DATE                             The latest date at which a post could be posted (UTC!).
-  -f {csv,jsonl}, --format {csv,jsonl}            Output format.
+  -f {csv,jsonl}, --format {csv,jsonl}            Output format. Defaults to `csv`.
   --language LANGUAGE                             Language of posts to retrieve.
   -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
   --list-ids LIST_IDS                             Ids of the lists from which to retrieve posts, separated by commas.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
-                                                  The order in which to retrieve posts.
+                                                  The order in which to retrieve posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
 
 examples:
