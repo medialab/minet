@@ -12,6 +12,8 @@ import urllib3
 import certifi
 from tqdm import tqdm
 
+from minet.cli.utils import print_err
+
 URL_TEMPLATE = 'https://api.crowdtangle.com/posts?count=100&sortBy=%(sort_by)s&token=%(token)s'
 DEFAULT_WAIT_TIME = 10
 
@@ -123,10 +125,6 @@ def format_post_for_csv(post):
     return row
 
 
-def print_error(*msg):
-    print(*msg, file=sys.stderr)
-
-
 def crowdtangle_posts_action(namespace, output_file):
     http = urllib3.PoolManager(
         cert_reqs='CERT_REQUIRED',
@@ -136,9 +134,9 @@ def crowdtangle_posts_action(namespace, output_file):
     N = 0
     url = forge_posts_url(namespace)
 
-    print_error('Using the following starting url:')
-    print_error(url)
-    print_error()
+    print_err('Using the following starting url:')
+    print_err(url)
+    print_err()
 
     # Loading bar
     loading_bar = tqdm(
@@ -157,21 +155,21 @@ def crowdtangle_posts_action(namespace, output_file):
         if result.status == 401:
             loading_bar.close()
 
-            print_error('Your API token is invalid.')
-            print_error('Check that you indicated a valid one using the `--token` argument.')
+            print_err('Your API token is invalid.')
+            print_err('Check that you indicated a valid one using the `--token` argument.')
             sys.exit(1)
 
         if result.status >= 400:
             loading_bar.close()
 
-            print_error(result.data, result.status)
+            print_err(result.data, result.status)
             sys.exit(1)
 
         try:
             data = json.loads(result.data)['result']
         except:
             loading_bar.close()
-            print_error('Misformatted JSON result.')
+            print_err('Misformatted JSON result.')
             sys.exit(1)
 
         if 'posts' not in data or len(data['posts']) == 0:
@@ -197,7 +195,7 @@ def crowdtangle_posts_action(namespace, output_file):
         # NOTE: I wish I had labeled loops in python...
         if enough_to_stop:
             loading_bar.close()
-            print_error('The indicated limit of posts was reached.')
+            print_err('The indicated limit of posts was reached.')
             break
 
         # Pagination
@@ -206,7 +204,7 @@ def crowdtangle_posts_action(namespace, output_file):
 
         if 'nextPage' not in pagination:
             loading_bar.close()
-            print_error('We reached the end of pagination.')
+            print_err('We reached the end of pagination.')
             break
 
         url = pagination['nextPage']

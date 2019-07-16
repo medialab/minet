@@ -5,8 +5,13 @@
 # Miscellaneous helpers used by the CLI tools.
 #
 import csv
+import sys
 from collections import namedtuple
 from tqdm import tqdm
+
+
+def print_err(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
 
 
 def safe_index(l, e):

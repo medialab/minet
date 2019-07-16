@@ -175,6 +175,30 @@ def main():
 
     common_ct_arguments(crowdtangle_subparser)
 
+    crowdtangle_lists_subparser = crowdtangle_subparser_subparsers.add_parser(
+        'lists',
+        description=dedent(
+            '''
+            Minet CrowdTangle Lists Command
+            ===============================
+
+            Retrieve the lists from a CrowdTangle dashboard (indicated by a
+            given token).
+            '''
+        ),
+        epilog=dedent(
+        '''
+            examples:
+
+            . Fetching a dashboard's lists:
+                `minet ct lists --token YOUR_TOKEN > lists.csv`
+            '''
+        ),
+        formatter_class=custom_formatter
+    )
+
+    common_ct_arguments(crowdtangle_lists_subparser)
+
     crowdtangle_posts_subparser = crowdtangle_subparser_subparsers.add_parser(
         'posts',
         description=dedent(
@@ -387,6 +411,7 @@ def main():
 
     args = parser.parse_args()
 
+    # TODO: handle sub commands?
     if args.action == 'help':
         target_subparser = SUBPARSERS.get(args.subcommand)
 

@@ -25,6 +25,7 @@ pip install minet
 * [extract](#extract)
 * [scrape](#scrape)
 * [CrowdTangle (ct)](#crowdtangle)
+  * [lists](#lists)
   * [posts](#posts)
 
 ## fetch
@@ -153,6 +154,26 @@ examples:
 ```
 
 ## CrowdTangle
+
+### lists
+
+```
+Minet CrowdTangle Lists Command
+===============================
+
+Retrieve the lists from a CrowdTangle dashboard (indicated by a
+given token).
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, everything will be printed to stdout.
+  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token.
+
+examples:
+
+. Fetching a dashboard's lists:
+    `minet ct lists --token YOUR_TOKEN > lists.csv`
+```
 
 ### posts
 

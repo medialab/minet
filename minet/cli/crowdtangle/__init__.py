@@ -6,16 +6,15 @@
 #
 import sys
 
-from minet.cli.crowdtangle.posts import crowdtangle_posts_action
-from minet.cli.utils import DummyTqdmFile
+from minet.cli.utils import DummyTqdmFile, print_err
 
 
 def crowdtangle_action(namespace):
 
     # A token is needed to be able to access the API
     if not namespace.token:
-        print('A token is needed to be able to access CrowdTangle\'s API.', file=sys.stderr)
-        print('You can provide one using the `--token` argument.', file=sys.stderr)
+        print_err('A token is needed to be able to access CrowdTangle\'s API.')
+        print_err('You can provide one using the `--token` argument.')
         sys.exit(1)
 
     if namespace.output is None:
@@ -24,7 +23,14 @@ def crowdtangle_action(namespace):
         output_file = open(namespace.output, 'w')
 
     if namespace.ct_action == 'posts':
+        from minet.cli.crowdtangle.posts import crowdtangle_posts_action
+
         crowdtangle_posts_action(namespace, output_file)
+
+    elif namespace.ct_action == 'lists':
+        from minet.cli.crowdtangle.lists import crowdtangle_lists_action
+
+        crowdtangle_lists_action(namespace, output_file)
 
     # Cleanup
     if namespace.output is not None:
