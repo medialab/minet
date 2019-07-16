@@ -13,6 +13,9 @@ URL_TEMPLATE = 'https://api.crowdtangle.com/leaderboard?count=100&token=%s'
 def forge_leaderboard_url(namespace):
     base_url = URL_TEMPLATE % namespace.token
 
+    if namespace.list_id:
+        base_url += '&listId=%s' % namespace.list_id
+
     return base_url
 
 

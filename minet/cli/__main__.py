@@ -220,6 +220,10 @@ def main():
         help='Maximum number of posts to retrieve. Will fetch every post by default.',
         type=int
     )
+    crowdtangle_leaderboard_subparser.add_argument(
+        '--list-id',
+        help='Optional list id from which to retrieve accounts.'
+    )
 
     # Crowdtangle lists `ct lists`
     crowdtangle_lists_subparser = crowdtangle_subparser_subparsers.add_parser(
