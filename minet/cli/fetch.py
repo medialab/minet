@@ -18,7 +18,6 @@ from collections import Counter
 from urllib3 import PoolManager, Timeout
 from tqdm import tqdm
 from quenouille import imap_unordered
-from tld import get_fld
 from uuid import uuid4
 from ural import ensure_protocol, is_url, get_domain_name
 from pycookiecheat import chrome_cookies
