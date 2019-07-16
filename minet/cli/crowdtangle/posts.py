@@ -4,15 +4,8 @@
 #
 # Logic of the `ct posts` action.
 #
-import csv
-import sys
 import json
-import time
-import urllib3
-import certifi
-from tqdm import tqdm
 
-from minet.cli.utils import print_err
 from minet.cli.crowdtangle.utils import create_paginated_action
 
 URL_TEMPLATE = 'https://api.crowdtangle.com/posts?count=100&sortBy=%(sort_by)s&token=%(token)s'
@@ -132,7 +125,7 @@ def format_post_for_csv(post):
 
 crowdtangle_posts_action = create_paginated_action(
     url_forge=forge_posts_url,
-    csv_headers=CSV_HEADERS,
+    csv_headers=lambda _: CSV_HEADERS,
     csv_formatter=format_post_for_csv,
     item_name='posts',
     item_key='posts'

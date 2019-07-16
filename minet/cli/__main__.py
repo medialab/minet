@@ -257,6 +257,42 @@ def main():
         help='The earliest date at which a post could be posted (UTC!).'
     )
 
+    crowdtangle_leaderboard_subparser = crowdtangle_subparser_subparsers.add_parser(
+        'leaderboard',
+        description=dedent(
+            '''
+            Minet CrowdTangle Leaderboard Command
+            =====================================
+
+            Gather information and aggregated stats about pages and groups of
+            the designated dashboard (indicated by a given token).
+            '''
+        ),
+        epilog=dedent(
+        '''
+            examples:
+
+            . Fetching accounts statistics for every account in your dashboard:
+                `minet ct leaderboard --token YOUR_TOKEN > accounts-stats.csv`
+            '''
+        ),
+        formatter_class=custom_formatter
+    )
+
+    common_ct_arguments(crowdtangle_leaderboard_subparser)
+
+    crowdtangle_leaderboard_subparser.add_argument(
+        '-f', '--format',
+        help='Output format. Defaults to `csv`.',
+        choices=['csv', 'jsonl'],
+        default='csv'
+    )
+    crowdtangle_leaderboard_subparser.add_argument(
+        '-l', '--limit',
+        help='Maximum number of posts to retrieve. Will fetch every post by default.',
+        type=int
+    )
+
     SUBPARSERS['ct'] = crowdtangle_subparser
 
     # Extract action subparser

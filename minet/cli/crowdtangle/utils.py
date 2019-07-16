@@ -41,7 +41,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
 
         if namespace.format == 'csv':
             writer = csv.writer(output_file)
-            writer.writerow(csv_headers)
+            writer.writerow(csv_headers(namespace))
 
         while True:
             result = http.request('GET', url)

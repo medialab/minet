@@ -6,3 +6,20 @@
 #
 
 CROWDTANGLE_DEFAULT_WAIT_TIME = 10
+
+CROWDTANGLE_POST_TYPES = set([
+    'episode',
+    'extra_clip',
+    'link',
+    'live_video',
+    'live_video_complete',
+    'live_video_scheduled',
+    'native_video',
+    'photo',
+    'status',
+    'trailer',
+    'tweet',
+    'video',
+    'vine',
+    'youtube'
+])

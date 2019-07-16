@@ -32,6 +32,11 @@ def crowdtangle_action(namespace):
 
         crowdtangle_lists_action(namespace, output_file)
 
+    elif namespace.ct_action == 'leaderboard':
+        from minet.cli.crowdtangle.leaderboard import crowdtangle_leaderboard_action
+
+        crowdtangle_leaderboard_action(namespace, output_file)
+
     # Cleanup
     if namespace.output is not None:
         output_file.close()
