@@ -28,6 +28,8 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
         N = 0
         url = url_forge(namespace)
 
+        has_limit = bool(namespace.limit)
+
         print_err('Using the following starting url:')
         print_err(url)
         print_err()
@@ -81,7 +83,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                 else:
                     writer.writerow(csv_formatter(namespace, item))
 
-                if N >= namespace.limit:
+                if has_limit and N >= namespace.limit:
                     enough_to_stop = True
                     break
 
