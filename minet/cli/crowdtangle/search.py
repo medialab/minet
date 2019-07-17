@@ -5,6 +5,7 @@
 # Logic of the `ct search` action.
 #
 import json
+from urllib.parse import quote
 
 from minet.cli.crowdtangle.utils import create_paginated_action
 from minet.cli.crowdtangle.posts import CSV_HEADERS, format_post_for_csv
@@ -16,7 +17,7 @@ def forge_posts_url(namespace):
     base_url = URL_TEMPLATE % {
         'sort_by': namespace.sort_by,
         'token': namespace.token,
-        'terms': namespace.terms
+        'terms': quote(namespace.terms)
     }
 
     if namespace.start_date:
