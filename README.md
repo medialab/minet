@@ -28,6 +28,7 @@ pip install minet
   * [leaderboard](#leaderboard)
   * [lists](#lists)
   * [posts](#posts)
+  * [search](#search)
 
 ## fetch
 
@@ -226,4 +227,35 @@ examples:
 
 . Fetching the 500 most latest posts from a dashboard:
     `minet ct posts --token YOUR_TOKEN --limit 500 > latest-posts.csv`
+```
+
+### search
+
+```
+Minet CrowdTangle Search Command
+================================
+
+Search posts on the whole CrowdTangle platform.
+
+positional arguments:
+  terms                                           The search query term or terms.
+
+optional arguments:
+  -h, --help                                      show this help message and exit
+  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
+  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
+  --end-date END_DATE                             The latest date at which a post could be posted (UTC!).
+  -f {csv,jsonl}, --format {csv,jsonl}            Output format. Defaults to `csv`.
+  -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
+  --offset OFFSET                                 Count offset.
+  -p PLATFORMS, --platforms PLATFORMS             The platforms, separated by comma from which to retrieve posts.
+  --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
+                                                  The order in which to retrieve posts. Defaults to `date`.
+  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
+  --types TYPES                                   Types of post to include, separated by comma.
+
+examples:
+
+. Fetching a dashboard's lists:
+    `minet ct search --token YOUR_TOKEN > posts.csv`
 ```
