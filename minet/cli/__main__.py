@@ -357,6 +357,15 @@ def main():
         type=int
     )
     crowdtangle_search_subparser.add_argument(
+        '--offset',
+        help='Count offset.',
+        type=int
+    )
+    crowdtangle_search_subparser.add_argument(
+        '-p', '--platforms',
+        help='The platforms, separated by comma from which to retrieve posts.'
+    )
+    crowdtangle_search_subparser.add_argument(
         '--sort-by',
         help='The order in which to retrieve posts. Defaults to `date`.',
         choices=CROWDTANGLE_SORT_TYPES,
@@ -365,6 +374,10 @@ def main():
     crowdtangle_search_subparser.add_argument(
         '--start-date',
         help='The earliest date at which a post could be posted (UTC!).'
+    )
+    crowdtangle_search_subparser.add_argument(
+        '--types',
+        help='Types of post to include, separated by comma.'
     )
 
     SUBPARSERS['ct'] = crowdtangle_subparser

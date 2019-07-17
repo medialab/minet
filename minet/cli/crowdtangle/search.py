@@ -25,6 +25,15 @@ def forge_posts_url(namespace):
     if namespace.end_date:
         base_url += '&endDate=%s' % namespace.end_date
 
+    if namespace.platforms:
+        base_url += '&platforms=%s' % namespace.platforms
+
+    if namespace.types:
+        base_url += '&types=%s' % namespace.types
+
+    if namespace.offset:
+        base_url += '&offset=%s' % namespace.offset
+
     return base_url
 
 

@@ -38,7 +38,8 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
         loading_bar = tqdm(
             desc='Fetching %s' % item_name,
             dynamic_ncols=True,
-            unit=' %s' % item_name
+            unit=' %s' % item_name,
+            total=namespace.limit
         )
 
         if namespace.format == 'csv':

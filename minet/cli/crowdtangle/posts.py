@@ -69,6 +69,7 @@ for name in STATISTICS:
 CSV_HEADERS = CSV_HEADERS + [
     'account_ct_id',
     'account_id',
+    'account_platform',
     'account_name',
     'account_handle',
     'account_profile_image',
@@ -113,7 +114,8 @@ def format_post_for_csv(namespace, post):
 
     row.extend([
         account['id'],
-        account['platformId'],
+        account.get('platformId'),
+        account['platform'],
         account['name'],
         account.get('handle', ''),
         account['profileImage'],
