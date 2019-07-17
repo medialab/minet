@@ -33,7 +33,8 @@ def forge_posts_url(namespace):
 
 CSV_HEADERS = [
     'ct_id',
-    'fb_id',
+    'id',
+    'platform',
     'type',
     'title',
     'caption',
@@ -51,6 +52,7 @@ CSV_HEADERS = [
 STATISTICS = [
     'like',
     'share',
+    'favorite',
     'comment',
     'love',
     'wow',
@@ -66,7 +68,7 @@ for name in STATISTICS:
 
 CSV_HEADERS = CSV_HEADERS + [
     'account_ct_id',
-    'account_fb_id',
+    'account_id',
     'account_name',
     'account_handle',
     'account_profile_image',
@@ -82,6 +84,7 @@ def format_post_for_csv(namespace, post):
     row = [
         post['id'],
         post['platformId'],
+        post['platform'],
         post['type'],
         post.get('title', ''),
         post.get('caption', ''),
@@ -103,8 +106,8 @@ def format_post_for_csv(namespace, post):
     for name in STATISTICS:
         key = '%sCount' % name
 
-        row.append(actual_stats[key])
-        row.append(expected_stats[key])
+        row.append(actual_stats.get(key, ''))
+        row.append(expected_stats.get(key, ''))
 
     account = post['account']
 
@@ -125,7 +128,7 @@ def format_post_for_csv(namespace, post):
 
 crowdtangle_posts_action = create_paginated_action(
     url_forge=forge_posts_url,
-    csv_headers=lambda _: CSV_HEADERS,
+    csv_headers=CSV_HEADERS,
     csv_formatter=format_post_for_csv,
     item_name='posts',
     item_key='posts'

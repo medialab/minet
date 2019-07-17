@@ -23,3 +23,11 @@ CROWDTANGLE_POST_TYPES = [
     'vine',
     'youtube'
 ]
+
+CROWDTANGLE_SORT_TYPES = [
+    'date',
+    'interaction_rate',
+    'overperforming',
+    'total_interactions',
+    'underperforming'
+]

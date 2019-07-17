@@ -14,6 +14,8 @@ from argparse import ArgumentParser, FileType, RawTextHelpFormatter
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
 from minet.cli.utils import BooleanAction
 
+from minet.cli.crowdtangle.constants import CROWDTANGLE_SORT_TYPES
+
 SUBPARSERS = {}
 
 terminal_size = shutil.get_terminal_size()
@@ -302,10 +304,65 @@ def main():
     crowdtangle_posts_subparser.add_argument(
         '--sort-by',
         help='The order in which to retrieve posts. Defaults to `date`.',
-        choices=['date', 'interaction_rate', 'overperforming', 'total_interactions', 'underperforming'],
+        choices=CROWDTANGLE_SORT_TYPES,
         default='date'
     )
     crowdtangle_posts_subparser.add_argument(
+        '--start-date',
+        help='The earliest date at which a post could be posted (UTC!).'
+    )
+
+    # Crowdtangle search `ct search`
+    crowdtangle_search_subparser = crowdtangle_subparser_subparsers.add_parser(
+        'search',
+        description=dedent(
+            '''
+            Minet CrowdTangle Search Command
+            ================================
+
+            Search posts on the whole CrowdTangle platform.
+            '''
+        ),
+        epilog=dedent(
+        '''
+            examples:
+
+            . Fetching a dashboard's lists:
+                `minet ct search --token YOUR_TOKEN > posts.csv`
+            '''
+        ),
+        formatter_class=custom_formatter
+    )
+
+    common_ct_arguments(crowdtangle_search_subparser)
+
+    crowdtangle_search_subparser.add_argument(
+        'terms',
+        help='The search query term or terms.'
+    )
+
+    crowdtangle_search_subparser.add_argument(
+        '--end-date',
+        help='The latest date at which a post could be posted (UTC!).'
+    )
+    crowdtangle_search_subparser.add_argument(
+        '-f', '--format',
+        help='Output format. Defaults to `csv`.',
+        choices=['csv', 'jsonl'],
+        default='csv'
+    )
+    crowdtangle_search_subparser.add_argument(
+        '-l', '--limit',
+        help='Maximum number of posts to retrieve. Will fetch every post by default.',
+        type=int
+    )
+    crowdtangle_search_subparser.add_argument(
+        '--sort-by',
+        help='The order in which to retrieve posts. Defaults to `date`.',
+        choices=CROWDTANGLE_SORT_TYPES,
+        default='date'
+    )
+    crowdtangle_search_subparser.add_argument(
         '--start-date',
         help='The earliest date at which a post could be posted (UTC!).'
     )

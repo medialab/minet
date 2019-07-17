@@ -5,7 +5,7 @@
 # Logic of the `ct posts` action.
 #
 from minet.cli.crowdtangle.utils import create_paginated_action
-from minet.cli.crowdtangle.defaults import CROWDTANGLE_POST_TYPES
+from minet.cli.crowdtangle.constants import CROWDTANGLE_POST_TYPES
 
 URL_TEMPLATE = 'https://api.crowdtangle.com/leaderboard?count=100&token=%s'
 

@@ -13,7 +13,7 @@ import certifi
 from tqdm import tqdm
 
 from minet.cli.utils import print_err
-from minet.cli.crowdtangle.defaults import CROWDTANGLE_DEFAULT_WAIT_TIME
+from minet.cli.crowdtangle.constants import CROWDTANGLE_DEFAULT_WAIT_TIME
 
 
 def create_paginated_action(url_forge, csv_headers, csv_formatter,
@@ -43,7 +43,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
 
         if namespace.format == 'csv':
             writer = csv.writer(output_file)
-            writer.writerow(csv_headers(namespace))
+            writer.writerow(csv_headers(namespace) if callable(csv_headers) else csv_headers)
 
         while True:
             result = http.request('GET', url)
