@@ -21,9 +21,14 @@ pip install minet
 
 ## Commands
 
+*Basic commands*
+
 * [fetch](#fetch)
 * [extract](#extract)
 * [scrape](#scrape)
+
+*API-related commands*
+
 * [CrowdTangle (ct)](#crowdtangle)
   * [leaderboard](#leaderboard)
   * [lists](#lists)
