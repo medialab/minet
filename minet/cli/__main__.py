@@ -311,6 +311,11 @@ def main():
         '--start-date',
         help='The earliest date at which a post could be posted (UTC!).'
     )
+    crowdtangle_posts_subparser.add_argument(
+        '--url-report',
+        help='Path to an optional report file to write about urls found in posts.',
+        type=FileType('w')
+    )
 
     # Crowdtangle search `ct search`
     crowdtangle_search_subparser = crowdtangle_subparser_subparsers.add_parser(
@@ -378,6 +383,11 @@ def main():
     crowdtangle_search_subparser.add_argument(
         '--types',
         help='Types of post to include, separated by comma.'
+    )
+    crowdtangle_search_subparser.add_argument(
+        '--url-report',
+        help='Path to an optional report file to write about urls found in posts.',
+        type=FileType('w')
     )
 
     SUBPARSERS['ct'] = crowdtangle_subparser

@@ -11,9 +11,40 @@ import time
 import urllib3
 import certifi
 from tqdm import tqdm
+from ural import get_domain_name, normalize_url
 
 from minet.cli.utils import print_err
 from minet.cli.crowdtangle.constants import CROWDTANGLE_DEFAULT_WAIT_TIME
+
+URL_REPORT_HEADERS = [
+    'post_ct_id',
+    'post_id',
+    'account_ct_id',
+    'account_name',
+    'account_handle',
+    'original_url',
+    'url',
+    'normalized_url',
+    'domain_name'
+]
+
+
+def format_url_for_csv(url_item, post):
+    account = post['account']
+
+    url = url_item['expanded']
+
+    return [
+        post['id'],
+        post.get('platformId', ''),
+        account['id'],
+        account['name'],
+        account.get('handle', ''),
+        url_item['original'],
+        url,
+        normalize_url(url, strip_trailing_slash=True),
+        get_domain_name(url)
+    ]
 
 
 def create_paginated_action(url_forge, csv_headers, csv_formatter,
@@ -24,6 +55,12 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
             cert_reqs='CERT_REQUIRED',
             ca_certs=certifi.where(),
         )
+
+        url_report_writer = None
+
+        if namespace.url_report:
+            url_report_writer = csv.writer(namespace.url_report)
+            url_report_writer.writerow(URL_REPORT_HEADERS)
 
         N = 0
         url = url_forge(namespace)
@@ -83,6 +120,13 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                     output_file.write(json.dumps(item, ensure_ascii=False) + '\n')
                 else:
                     writer.writerow(csv_formatter(namespace, item))
+
+                if url_report_writer:
+                    urls = item.get('expandedLinks')
+
+                    if urls:
+                        for url_item in urls:
+                            url_report_writer.writerow(format_url_for_csv(url_item, item))
 
                 if has_limit and N >= namespace.limit:
                     enough_to_stop = True

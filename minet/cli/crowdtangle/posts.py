@@ -118,11 +118,11 @@ def format_post_for_csv(namespace, post):
 
     if 'expandedLinks' in post:
         links = '|'.join(link['original'] for link in post['expandedLinks'])
-        expanded_links = '|'.join(link['original'] for link in post['expandedLinks'])
+        expanded_links = '|'.join(link['expanded'] for link in post['expandedLinks'])
 
     row.extend([
         account['id'],
-        account.get('platformId'),
+        account.get('platformId', ''),
         account['platform'],
         account['name'],
         account.get('handle', ''),
