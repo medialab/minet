@@ -222,6 +222,7 @@ optional arguments:
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
+  --url-report URL_REPORT                         Path to an optional report file to write about urls found in posts.
 
 examples:
 
@@ -253,6 +254,7 @@ optional arguments:
                                                   The order in which to retrieve posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
   --types TYPES                                   Types of post to include, separated by comma.
+  --url-report URL_REPORT                         Path to an optional report file to write about urls found in posts.
 
 examples:
 
