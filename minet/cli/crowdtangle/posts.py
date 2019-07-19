@@ -41,6 +41,7 @@ CSV_HEADERS = [
     'message',
     'description',
     'date',
+    'datetime',
     'updated',
     'link',
     'post_url',
@@ -92,7 +93,8 @@ def format_post_for_csv(namespace, post):
         post.get('caption', ''),
         post.get('message', ''),
         post.get('description', ''),
-        post['date'],
+        post['date'].split(' ', 1)[0],
+        post['date']
         post['updated'],
         post.get('link', ''),
         post['postUrl'],
