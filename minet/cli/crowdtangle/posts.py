@@ -76,6 +76,7 @@ CSV_HEADERS = CSV_HEADERS + [
     'account_subscriber_count',
     'account_url',
     'account_verified',
+    'links',
     'expanded_links',
     'media'
 ]
@@ -112,6 +113,13 @@ def format_post_for_csv(namespace, post):
 
     account = post['account']
 
+    links = ''
+    expanded_links = ''
+
+    if 'expandedLinks' in post:
+        links = '|'.join(link['original'] for link in post['expandedLinks'])
+        expanded_links = '|'.join(link['original'] for link in post['expandedLinks'])
+
     row.extend([
         account['id'],
         account.get('platformId'),
@@ -122,7 +130,8 @@ def format_post_for_csv(namespace, post):
         account['subscriberCount'],
         account['url'],
         '1' if account['verified'] else '',
-        json.dumps(post['expandedLinks'], ensure_ascii=False) if 'expandedLinks' in post else '',
+        links,
+        expanded_links,
         json.dumps(post['media'], ensure_ascii=False) if 'media' in post else ''
     ])
 
