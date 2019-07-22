@@ -367,6 +367,11 @@ def main():
         type=int
     )
     crowdtangle_search_subparser.add_argument(
+        '--partition-strategy',
+        help='Query partition strategy to use to overcome result limits.',
+        choices=['day']
+    )
+    crowdtangle_search_subparser.add_argument(
         '-p', '--platforms',
         help='The platforms, separated by comma from which to retrieve posts.'
     )
