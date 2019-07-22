@@ -368,7 +368,7 @@ def main():
     )
     crowdtangle_search_subparser.add_argument(
         '--partition-strategy',
-        help='Query partition strategy to use to overcome result limits.',
+        help='Query partition strategy to use to overcome the API search result limits.',
         choices=['day']
     )
     crowdtangle_search_subparser.add_argument(

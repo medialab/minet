@@ -7,7 +7,6 @@
 import re
 import chardet
 import cgi
-from datetime import date, timedelta
 
 # Handy regexes
 CHARSET_RE = re.compile(rb'<meta.*?charset=["\']*(.+?)["\'>]', flags=re.I)
@@ -56,17 +55,3 @@ def guess_encoding(response, data, is_xml=False, use_chardet=False):
             return chardet_result['encoding'].lower()
 
     return None
-
-
-def day_range(end):
-    start_date = date(*[int(i) for i in end.split('-')])
-    current_date = date.today()
-
-    day_delta = timedelta(days=1)
-
-    while start_date != current_date:
-        yield current_date.isoformat()
-
-        current_date -= day_delta
-
-    yield end

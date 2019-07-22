@@ -94,7 +94,7 @@ def format_post_for_csv(namespace, post):
         post.get('message', ''),
         post.get('description', ''),
         post['date'].split(' ', 1)[0],
-        post['date']
+        post['date'],
         post['updated'],
         post.get('link', ''),
         post['postUrl'],

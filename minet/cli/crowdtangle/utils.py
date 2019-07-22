@@ -10,6 +10,7 @@ import json
 import time
 import urllib3
 import certifi
+from datetime import date, timedelta
 from tqdm import tqdm
 from ural import get_domain_name, normalize_url
 
@@ -47,6 +48,19 @@ def format_url_for_csv(url_item, post):
     ]
 
 
+def day_range(end):
+    day_delta = timedelta(days=1)
+
+    start_date = date(*[int(i) for i in end.split('-')])
+    current_date = date.today() + day_delta
+
+    while start_date != current_date:
+        end_date = current_date
+        current_date -= day_delta
+
+        yield current_date.isoformat(), end_date.isoformat()
+
+
 def create_paginated_action(url_forge, csv_headers, csv_formatter,
                             item_name, item_key):
 
@@ -58,9 +72,19 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
 
         url_report_writer = None
 
-        if namespace.url_report:
+        if getattr(namespace, 'url_report', False):
             url_report_writer = csv.writer(namespace.url_report)
             url_report_writer.writerow(URL_REPORT_HEADERS)
+
+        partition_strategy = getattr(namespace, 'partition_strategy', None)
+        partition_range = None
+
+        if partition_strategy == 'day':
+            partition_range = day_range(namespace.start_date)
+
+            start_date, end_date = next(partition_range, (None,))
+            namespace.start_date = start_date
+            namespace.end_date = end_date
 
         N = 0
         url = url_forge(namespace)
@@ -78,6 +102,9 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
             unit=' %s' % item_name,
             total=namespace.limit
         )
+
+        if partition_strategy == 'day':
+            loading_bar.set_postfix(day=namespace.start_date)
 
         if namespace.format == 'csv':
             writer = csv.writer(output_file)
@@ -107,7 +134,22 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                 sys.exit(1)
 
             if item_key not in data or len(data[item_key]) == 0:
-                break
+                if partition_strategy is None:
+                    break
+
+                start_date, end_date = next(partition_range, (None, None))
+
+                if start_date is None:
+                    break
+
+                namespace.start_date = start_date
+                namespace.end_date = end_date
+
+                url = url_forge(namespace)
+
+                loading_bar.set_postfix(date=start_date)
+
+                continue
 
             items = data[item_key]
             enough_to_stop = False
@@ -143,9 +185,23 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
             pagination = data['pagination']
 
             if 'nextPage' not in pagination:
-                loading_bar.close()
-                print_err('We reached the end of pagination.')
-                break
+                if partition_strategy is None:
+                    break
+
+                start_date, end_date = next(partition_range, (None, None))
+
+                if start_date is None:
+                    break
+
+                namespace.start_date = start_date
+                namespace.end_date = end_date
+
+                url = url_forge(namespace)
+
+                loading_bar.set_postfix(date=start_date)
+
+                continue
+
 
             url = pagination['nextPage']
 
@@ -153,6 +209,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
             time.sleep(CROWDTANGLE_DEFAULT_WAIT_TIME)
 
         loading_bar.close()
+        print_err('We reached the end of pagination.')
 
 
     return action
