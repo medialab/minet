@@ -52,7 +52,7 @@ def day_range(end):
     day_delta = timedelta(days=1)
 
     start_date = date(*[int(i) for i in end.split('-')])
-    current_date = date.today() + day_delta
+    current_date = date.today()
 
     while start_date != current_date:
         end_date = current_date
