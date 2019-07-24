@@ -254,6 +254,7 @@ optional arguments:
   -f {csv,jsonl}, --format {csv,jsonl}            Output format. Defaults to `csv`.
   -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
   --offset OFFSET                                 Count offset.
+  --partition-strategy {day}                      Query partition strategy to use to overcome the API search result limits.
   -p PLATFORMS, --platforms PLATFORMS             The platforms, separated by comma from which to retrieve posts.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
