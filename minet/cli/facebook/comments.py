@@ -4,17 +4,25 @@
 #
 # Logic of the `fb comments` action.
 #
+import re
 import csv
 import sys
+import time
 import urllib3
 import certifi
 from bs4 import BeautifulSoup
 from pycookiecheat import chrome_cookies
 from collections import deque
+from urllib.parse import urljoin
+
 from minet.cli.utils import DummyTqdmFile, print_err
 
 # TODO: centralize this for god's sake
 SPOOFED_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:69.0) Gecko/20100101 Firefox/69.0'
+BASE_URL = 'https://m.facebook.com'
+THROTTLE = 0.5
+
+VALID_ID_RE = re.compile(r'^(?:see_next_)?\d+$')
 
 CSV_HEADERS = [
     'post_id',
@@ -29,11 +37,11 @@ CSV_HEADERS = [
 ]
 
 
-def format_csv_row(post):
+def format_csv_row(comments):
     row = []
 
     for key in CSV_HEADERS:
-        row.append(post[key] or '')
+        row.append(comments[key] or '')
 
     return row
 
@@ -41,32 +49,51 @@ def scrape_comments(html, in_reply_to=None):
     soup = BeautifulSoup(html, 'lxml')
 
     data = {
-        'posts': [],
+        'post_id': None,
+        'comments': [],
         'next': None,
         'replies': [],
         'in_reply_to': in_reply_to
     }
 
-    for item in soup.select('.by'):
+    valid_items = (
+        item
+        for item
+        in soup.select('[id]')
+        if VALID_ID_RE.match(item.get('id'))
+    )
+
+    for item in valid_items:
         item_id = item.get('id')
 
         if item_id is None:
             continue
 
         if item_id.startswith('see_next'):
-            pass
+            next_link = item.select_one('a')
+            data['next'] = urljoin(BASE_URL, next_link.get('href'))
             break
+
+        # Skipping comment if same as commented
+        if item_id == in_reply_to:
+            continue
 
         user_link = item.select_one('h3 > a')
         user_name = user_link.get_text().strip()
 
+        # TODO: link to comment
+
         # TODO: clean it!
         user_url = user_link.get('href')
 
+        # TODO: maybe get html instead
         comment_text = item.select_one('h3 + div').get_text().strip()
         formatted_date = item.select_one('abbr').get_text().strip()
 
         post_id = item.select_one('[id^="like_"]').get('id').split('_')[1]
+
+        # TODO: this is baaaad
+        data['post_id'] = post_id
 
         reactions_item = item.select_one('[aria-label*=" reaction"]')
         reactions = '0'
@@ -74,16 +101,22 @@ def scrape_comments(html, in_reply_to=None):
         if reactions_item is not None:
             reactions = reactions_item.get_text().strip()
 
-        replies_item = item.select('a[href^="/comment/replies"]')[-1]
+        replies_items = item.select('a[href^="/comment/replies"]')
         replies = '0'
 
-        if replies_item is not None:
-            replies_text = replies_item.get_text()
+        if len(replies_items) > 0:
+            replies_item = replies_items[-1]
 
-            if replies_text != 'Reply':
-                replies = replies_text.split('·')[-1].split(' replie')[0].strip()
+            if replies_item is not None:
+                replies_text = replies_item.get_text()
 
-        data['posts'].append({
+                if replies_text != 'Reply':
+                    replies = replies_text.split('·')[-1].split(' replie')[0].strip()
+
+                    replies_url = replies_item.get('href')
+                    data['replies'].append((urljoin(BASE_URL, replies_url), item_id))
+
+        data['comments'].append({
             'post_id': post_id,
             'comment_id': item_id,
             'user_name': user_name,
@@ -134,15 +167,25 @@ def facebook_comments_action(namespace):
         result = http.request('GET', target, headers=headers)
         return result.data.decode('utf-8')
 
-    url_queue = deque([url])
+    url_queue = deque([(url, None)])
 
-    while len(url_queue) != 0:
-        current_url = url_queue.popleft()
+    LIMIT = 5
+    i = 0
+
+    while len(url_queue) != 0 and i < LIMIT:
+        i += 1
+        current_url, in_reply_to = url_queue.popleft()
 
         html = fetch(current_url)
-        data = scrape_comments(html)
+        data = scrape_comments(html, in_reply_to)
 
-        for post in data['posts']:
-            writer.writerow(format_csv_row(post))
+        for reply_url, commented_id in data['replies']:
+            url_queue.append((reply_url, commented_id))
 
+        if data['next'] is not None:
+            url_queue.append(data['next'])
 
+        for comment in data['comments']:
+            writer.writerow(format_csv_row(comment))
+
+        time.sleep(THROTTLE)
