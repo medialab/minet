@@ -192,7 +192,7 @@ def facebook_comments_action(namespace):
             url_queue.append((reply_url, commented_id))
 
         if data['next'] is not None:
-            url_queue.append(data['next'])
+            url_queue.append((data['next'], in_reply_to))
 
         for comment in data['comments']:
             loading_bar.update()
