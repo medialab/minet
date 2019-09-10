@@ -107,6 +107,12 @@ def main():
         action='store_true'
     )
     fetch_subparser.add_argument(
+        '-H', '--header',
+        help='Custom headers used with every requests.',
+        action='append',
+        dest='headers'
+    )
+    fetch_subparser.add_argument(
         '--standardize-encoding',
         help='Whether to systematically convert retrieved text to UTF-8.',
         action='store_true'

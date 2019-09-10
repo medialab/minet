@@ -80,7 +80,7 @@ def fetch(http, url, cookies=None):
     except ClosedPoolError:
 
         # TODO: this is a clunky workaround
-        return fetch(http, url)
+        return fetch(http, url, cookies=cookies)
 
     # TODO: when urllib3 updates and release #1487, we'll need to change that
     except (HTTPError, UnicodeEncodeError) as e:
@@ -139,6 +139,8 @@ def worker(job):
 
 
 def fetch_action(namespace):
+    print(namespace)
+    sys.exit(0)
 
     # Do we need to fetch only a single url?
     if namespace.file is sys.stdin and is_url(namespace.column):
