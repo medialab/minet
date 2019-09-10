@@ -14,6 +14,7 @@ from bs4 import BeautifulSoup
 from pycookiecheat import chrome_cookies
 from collections import deque
 from urllib.parse import urljoin
+from tqdm import tqdm
 
 from minet.cli.utils import DummyTqdmFile, print_err
 
@@ -142,6 +143,13 @@ def facebook_comments_action(namespace):
     writer = csv.writer(output_file)
     writer.writerow(CSV_HEADERS)
 
+    # Loading bar
+    loading_bar = tqdm(
+        desc='Scraping comments',
+        dynamic_ncols=True,
+        unit=' comments'
+    )
+
     # Reformatting url to hit mobile website
     # TODO: support ids & better heuristics for m. implementation
     # TODO: beware of locale
@@ -169,15 +177,16 @@ def facebook_comments_action(namespace):
 
     url_queue = deque([(url, None)])
 
-    LIMIT = 5
-    i = 0
+    url_count = 0
+    replies_count = 0
 
-    while len(url_queue) != 0 and i < LIMIT:
-        i += 1
+    while len(url_queue) != 0:
         current_url, in_reply_to = url_queue.popleft()
 
         html = fetch(current_url)
         data = scrape_comments(html, in_reply_to)
+
+        url_count += 1
 
         for reply_url, commented_id in data['replies']:
             url_queue.append((reply_url, commented_id))
@@ -186,6 +195,12 @@ def facebook_comments_action(namespace):
             url_queue.append(data['next'])
 
         for comment in data['comments']:
+            loading_bar.update()
             writer.writerow(format_csv_row(comment))
+
+            if in_reply_to is not None:
+                replies_count += 1
+
+        loading_bar.set_postfix(urls=url_count, replies=replies_count)
 
         time.sleep(THROTTLE)
