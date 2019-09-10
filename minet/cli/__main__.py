@@ -472,6 +472,63 @@ def main():
 
     SUBPARSERS['extract'] = extract_subparser
 
+    # Facebook actions subparser
+    # -------------------------------------------------------------------------
+    facebook_description = dedent(
+        '''
+        Minet Facebook Command
+        ======================
+
+        Collects data from Facebook.
+        '''
+    )
+
+    facebook_subparser = subparsers.add_parser(
+        'fb',
+        description=facebook_description,
+        formatter_class=custom_formatter
+    )
+
+    facebook_subparser_subparsers = facebook_subparser.add_subparsers(
+        help='Action to perform to collect data on Facebook',
+        title='actions',
+        dest='fb_action'
+    )
+
+    # Facebook comments scraper `fb comments`
+    facebook_comments_subparser = facebook_subparser_subparsers.add_parser(
+        'comments',
+        description=dedent(
+            '''
+            Minet Facebook Comments Command
+            ===============================
+
+            Scrape series of comments on Facebook.
+            '''
+        ),
+        epilog=dedent(
+        '''
+            examples:
+
+            . Fetching a dashboard's lists:
+                `minet fb comments`
+            '''
+        ),
+        formatter_class=custom_formatter
+    )
+
+    facebook_comments_subparser.add_argument(
+        'url',
+        help='Url of the post from which to scrape comments.'
+    )
+
+    facebook_comments_subparser.add_argument(
+        '-o', '--output',
+        help='Path to the output file. By default, everything will be printed to stdout.'
+    )
+
+    SUBPARSERS['fb'] = facebook_subparser
+
     # Scrape action subparser
     # -------------------------------------------------------------------------
     scrape_description = dedent(
@@ -552,20 +609,7 @@ def main():
 
     args = parser.parse_args()
 
-    # TODO: handle sub commands?
-    if args.action == 'help':
-        target_subparser = SUBPARSERS.get(args.subcommand)
-
-        if target_subparser is None:
-            parser.print_help()
-        else:
-            target_subparser.print_help()
-
-    elif args.action == 'fetch':
-        from minet.cli.fetch import fetch_action
-        fetch_action(args)
-
-    elif args.action == 'ct':
+    if args.action == 'ct':
         from minet.cli.crowdtangle import crowdtangle_action
         crowdtangle_action(args)
 
@@ -582,6 +626,23 @@ def main():
 
         from minet.cli.extract import extract_action
         extract_action(args)
+
+    elif args.action == 'fb':
+        from minet.cli.facebook import facebook_action
+        facebook_action(args)
+
+    elif args.action == 'fetch':
+        from minet.cli.fetch import fetch_action
+        fetch_action(args)
+
+    elif args.action == 'help':
+        # TODO: handle sub commands?
+        target_subparser = SUBPARSERS.get(args.subcommand)
+
+        if target_subparser is None:
+            parser.print_help()
+        else:
+            target_subparser.print_help()
 
     elif args.action == 'scrape':
         from minet.cli.scrape import scrape_action
