@@ -20,7 +20,6 @@ from tqdm import tqdm
 from quenouille import imap_unordered
 from uuid import uuid4
 from ural import ensure_protocol, is_url, get_domain_name
-from pycookiecheat import chrome_cookies
 
 from urllib3.exceptions import (
     HTTPError,
@@ -31,7 +30,7 @@ from urllib3.exceptions import (
     ResponseError
 )
 
-from minet.utils import guess_encoding
+from minet.utils import guess_encoding, grab_cookies
 from minet.cli.utils import custom_reader, DummyTqdmFile
 
 mimetypes.init()
@@ -98,9 +97,12 @@ def worker(job):
 
     # Should we grab cookies?
     if namespace.grab_cookies:
-        cookies = chrome_cookies(url)
 
-        if len(cookies) == 0:
+        # TODO: this is not performant!
+        # TODO: make user choose firefox or chrome
+        cookies = grab_cookies()(url)
+
+        if not cookies:
             cookies = None
 
     error, result = fetch(http, url, cookies=cookies)
@@ -139,8 +141,6 @@ def worker(job):
 
 
 def fetch_action(namespace):
-    print(namespace)
-    sys.exit(0)
 
     # Do we need to fetch only a single url?
     if namespace.file is sys.stdin and is_url(namespace.column):
