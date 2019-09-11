@@ -96,4 +96,3 @@ class ContiguousRangeSet(object):
             return False
 
         return True
-

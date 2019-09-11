@@ -31,6 +31,7 @@ def forge_posts_url(namespace):
 
     return base_url
 
+
 CSV_HEADERS = [
     'ct_id',
     'id',
@@ -138,6 +139,7 @@ def format_post_for_csv(namespace, post):
     ])
 
     return row
+
 
 crowdtangle_posts_action = create_paginated_action(
     url_forge=forge_posts_url,

@@ -40,6 +40,7 @@ OUTPUT_ADDITIONAL_HEADERS = ['line', 'status', 'error', 'filename', 'encoding']
 # TODO: make this an option!
 SPOOFED_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36'
 
+
 def max_retry_error_reporter(error):
     if isinstance(error, (ConnectTimeoutError, ReadTimeoutError)):
         return 'timeout'
@@ -48,6 +49,7 @@ def max_retry_error_reporter(error):
         return 'too-many-redirects'
 
     return 'max-retries-exceeded'
+
 
 ERROR_REPORTERS = {
     MaxRetryError: max_retry_error_reporter
@@ -183,7 +185,7 @@ def fetch_action(namespace):
         cert_reqs='CERT_REQUIRED',
         ca_certs=certifi.where(),
         num_pools=namespace.threads * 2,
-        maxsize=1, # NOTE: should be the same as group_parallelism,
+        maxsize=1,  # NOTE: should be the same as group_parallelism,
         timeout=Timeout(connect=2.0, read=7.0)
     )
 

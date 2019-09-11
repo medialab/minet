@@ -21,6 +21,7 @@ SUBPARSERS = {}
 terminal_size = shutil.get_terminal_size()
 csv.field_size_limit(sys.maxsize)
 
+
 def custom_formatter(prog):
     return RawTextHelpFormatter(
         prog,
@@ -199,7 +200,7 @@ def main():
             '''
         ),
         epilog=dedent(
-        '''
+            '''
             examples:
 
             . Fetching accounts statistics for every account in your dashboard:
@@ -247,7 +248,7 @@ def main():
             '''
         ),
         epilog=dedent(
-        '''
+            '''
             examples:
 
             . Fetching a dashboard's lists:
@@ -272,7 +273,7 @@ def main():
             '''
         ),
         epilog=dedent(
-        '''
+            '''
             examples:
 
             . Fetching the 500 most latest posts from a dashboard:
@@ -335,7 +336,7 @@ def main():
             '''
         ),
         epilog=dedent(
-        '''
+            '''
             examples:
 
             . Fetching a dashboard's lists:
@@ -513,7 +514,7 @@ def main():
             '''
         ),
         epilog=dedent(
-        '''
+            '''
             examples:
 
             . Fetching a dashboard's lists:
@@ -656,6 +657,7 @@ def main():
 
     else:
         parser.print_help()
+
 
 if __name__ == '__main__':
     main()

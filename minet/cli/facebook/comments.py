@@ -65,6 +65,7 @@ def format_csv_row(comments):
 
     return row
 
+
 def scrape_comments(html, in_reply_to=None):
     soup = BeautifulSoup(html, 'lxml')
 

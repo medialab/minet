@@ -29,7 +29,7 @@ deps:
 
 lint:
 	@echo Linting source code using pep8...
-	pycodestyle --ignore E501,E722 $(SOURCE) test
+	pycodestyle --ignore E501,E722,E741 $(SOURCE) test
 	@echo
 
 unit:

@@ -202,7 +202,6 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
 
                 continue
 
-
             url = pagination['nextPage']
 
             # Waiting a bit to respect the 6 reqs/min limit
@@ -210,6 +209,5 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
 
         loading_bar.close()
         print_err('We reached the end of pagination.')
-
 
     return action
