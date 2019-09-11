@@ -17,7 +17,6 @@ from tqdm import tqdm
 from minet.utils import grab_cookies, create_safe_pool, fetch
 from minet.cli.utils import DummyTqdmFile
 
-# TODO: centralize this for god's sake
 DEFAULT_THROTTLE = 0.5
 BASE_URL = 'https://m.facebook.com'
 VALID_ID_RE = re.compile(r'^(?:see_next_)?\d+$')
