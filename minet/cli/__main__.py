@@ -11,6 +11,8 @@ import shutil
 from textwrap import dedent
 from argparse import ArgumentParser, FileType, RawTextHelpFormatter
 
+
+from minet.defaults import DEFAULT_THROTTLE
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
 from minet.cli.utils import BooleanAction
 
@@ -134,9 +136,9 @@ def main():
     )
     fetch_subparser.add_argument(
         '--throttle',
-        help='Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.',
+        help='Time to wait - in seconds - between 2 calls to the same domain. Defaults to %s.' % DEFAULT_THROTTLE,
         type=float,
-        default=0.2
+        default=DEFAULT_THROTTLE
     )
     fetch_subparser.add_argument(
         '--total',

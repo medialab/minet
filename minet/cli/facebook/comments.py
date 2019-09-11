@@ -18,9 +18,8 @@ from minet.utils import grab_cookies, create_safe_pool, fetch
 from minet.cli.utils import DummyTqdmFile
 
 # TODO: centralize this for god's sake
+DEFAULT_THROTTLE = 0.5
 BASE_URL = 'https://m.facebook.com'
-THROTTLE = 0.5
-
 VALID_ID_RE = re.compile(r'^(?:see_next_)?\d+$')
 
 CSV_HEADERS = [
@@ -210,4 +209,5 @@ def facebook_comments_action(namespace):
 
         loading_bar.set_postfix(urls=url_count, replies=replies_count)
 
-        time.sleep(THROTTLE)
+        # Don't be too greedy
+        time.sleep(DEFAULT_THROTTLE)
