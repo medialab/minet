@@ -7,8 +7,15 @@
 import re
 import chardet
 import cgi
+import certifi
 import browser_cookie3
+import urllib3
 from urllib.request import Request
+
+from minet.defaults import (
+    DEFAULT_CONNECT_TIMEOUT,
+    DEFAULT_READ_TIMEOUT
+)
 
 # Handy regexes
 CHARSET_RE = re.compile(rb'<meta.*?charset=["\']*(.+?)["\'>]', flags=re.I)
@@ -84,3 +91,16 @@ def grab_cookies(browser='firefox'):
             return None
 
     raise Exception('minet.utils.grab_cookies: unknown "%s" browser.' % browser)
+
+
+def create_safe_pool(**kwargs):
+    """
+    Helper function returning a urllib3 pool manager with sane defaults.
+    """
+
+    return urllib3.PoolManager(
+        cert_reqs='CERT_REQUIRED',
+        ca_certs=certifi.where(),
+        timeout=urllib3.Timeout(connect=DEFAULT_CONNECT_TIMEOUT, read=DEFAULT_READ_TIMEOUT),
+        **kwargs
+    )

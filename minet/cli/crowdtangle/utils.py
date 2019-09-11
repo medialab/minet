@@ -8,12 +8,11 @@ import csv
 import sys
 import json
 import time
-import urllib3
-import certifi
 from datetime import date, timedelta
 from tqdm import tqdm
 from ural import get_domain_name, normalize_url
 
+from minet.utils import create_safe_pool
 from minet.cli.utils import print_err
 from minet.cli.crowdtangle.constants import CROWDTANGLE_DEFAULT_WAIT_TIME
 
@@ -65,10 +64,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                             item_name, item_key):
 
     def action(namespace, output_file):
-        http = urllib3.PoolManager(
-            cert_reqs='CERT_REQUIRED',
-            ca_certs=certifi.where(),
-        )
+        http = create_safe_pool()
 
         url_report_writer = None
 

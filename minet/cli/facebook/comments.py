@@ -14,11 +14,8 @@ from urllib.parse import urljoin
 from http.cookies import SimpleCookie
 from tqdm import tqdm
 
-from minet.utils import grab_cookies
-from minet.cli.utils import (
-    DummyTqdmFile,
-    create_safe_pool
-)
+from minet.utils import grab_cookies, create_safe_pool
+from minet.cli.utils import DummyTqdmFile
 
 # TODO: centralize this for god's sake
 SPOOFED_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:69.0) Gecko/20100101 Firefox/69.0'

@@ -7,9 +7,8 @@
 import csv
 import sys
 import json
-import urllib3
-import certifi
 
+from minet.utils import create_safe_pool
 from minet.cli.utils import print_err
 
 URL_TEMPLATE = 'https://api.crowdtangle.com/lists?token=%s'
@@ -30,10 +29,7 @@ def format_list_for_csv(l):
 
 
 def crowdtangle_lists_action(namespace, output_file):
-    http = urllib3.PoolManager(
-        cert_reqs='CERT_REQUIRED',
-        ca_certs=certifi.where(),
-    )
+    http = create_safe_pool()
 
     result = http.request('GET', URL_TEMPLATE % namespace.token)
 

@@ -7,8 +7,6 @@
 import csv
 import sys
 import argparse
-import urllib3
-import certifi
 from collections import namedtuple
 from tqdm import tqdm
 
@@ -71,11 +69,3 @@ class BooleanAction(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, False if option_string.startswith('--no') else True)
-
-
-def create_safe_pool(**kwargs):
-    return urllib3.PoolManager(
-        cert_reqs='CERT_REQUIRED',
-        ca_certs=certifi.where(),
-        **kwargs
-    )

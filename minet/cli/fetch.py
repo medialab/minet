@@ -9,12 +9,10 @@
 import os
 import csv
 import sys
-import certifi
 import mimetypes
 from io import StringIO
 from os.path import join
 from collections import Counter
-from urllib3 import PoolManager, Timeout
 from tqdm import tqdm
 from quenouille import imap_unordered
 from uuid import uuid4
@@ -29,7 +27,7 @@ from urllib3.exceptions import (
     ResponseError
 )
 
-from minet.utils import guess_encoding, grab_cookies
+from minet.utils import guess_encoding, grab_cookies, create_safe_pool
 from minet.cli.utils import custom_reader, DummyTqdmFile
 
 mimetypes.init()
@@ -180,12 +178,9 @@ def fetch_action(namespace):
     output_writer.writerow(output_headers)
 
     # Creating the http pool manager
-    http = PoolManager(
-        cert_reqs='CERT_REQUIRED',
-        ca_certs=certifi.where(),
+    http = create_safe_pool(
         num_pools=namespace.threads * 2,
-        maxsize=1,  # NOTE: should be the same as group_parallelism,
-        timeout=Timeout(connect=2.0, read=7.0)
+        maxsize=1
     )
 
     # Generator yielding urls to fetch
