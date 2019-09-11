@@ -50,8 +50,7 @@ def max_retry_error_reporter(error):
     return 'max-retries-exceeded'
 
 ERROR_REPORTERS = {
-    MaxRetryError: max_retry_error_reporter,
-    UnicodeEncodeError: 'headers-encoding'
+    MaxRetryError: max_retry_error_reporter
 }
 
 
@@ -81,8 +80,7 @@ def fetch(http, url, cookies=None):
         # TODO: this is a clunky workaround
         return fetch(http, url, cookies=cookies)
 
-    # TODO: when urllib3 updates and release #1487, we'll need to change that
-    except (HTTPError, UnicodeEncodeError) as e:
+    except HTTPError as e:
         return e, None
 
 
