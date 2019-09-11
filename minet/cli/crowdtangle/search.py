@@ -4,7 +4,6 @@
 #
 # Logic of the `ct search` action.
 #
-import json
 from urllib.parse import quote
 
 from minet.cli.crowdtangle.utils import create_paginated_action

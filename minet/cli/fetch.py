@@ -9,7 +9,6 @@
 import os
 import csv
 import sys
-import json
 import certifi
 import mimetypes
 from io import StringIO

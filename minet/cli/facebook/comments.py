@@ -17,7 +17,6 @@ from tqdm import tqdm
 from minet.utils import grab_cookies
 from minet.cli.utils import (
     DummyTqdmFile,
-    print_err,
     create_safe_pool
 )
 

@@ -4,9 +4,6 @@
 #
 # Logic of the `fb` action.
 #
-import sys
-
-from minet.cli.utils import DummyTqdmFile, print_err
 
 
 def facebook_action(namespace):
