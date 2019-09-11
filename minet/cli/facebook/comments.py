@@ -175,9 +175,11 @@ def facebook_comments_action(namespace):
     http = create_safe_pool()
 
     def fetch_page(target):
+        error, result = fetch(http, target, cookie=cookie)
 
-        # TODO: Handle errors
-        _, result = fetch(http, target, cookie=cookie)
+        if error is not None:
+            raise error
+
         return result.data.decode('utf-8')
 
     url_queue = deque([(url, None)])
