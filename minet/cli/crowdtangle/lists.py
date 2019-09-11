@@ -8,7 +8,7 @@ import csv
 import sys
 import json
 
-from minet.utils import create_safe_pool
+from minet.utils import create_safe_pool, fetch
 from minet.cli.utils import print_err
 
 URL_TEMPLATE = 'https://api.crowdtangle.com/lists?token=%s'
@@ -31,7 +31,7 @@ def format_list_for_csv(l):
 def crowdtangle_lists_action(namespace, output_file):
     http = create_safe_pool()
 
-    result = http.request('GET', URL_TEMPLATE % namespace.token)
+    _, result = fetch(http, URL_TEMPLATE % namespace.token)
 
     if result.status == 401:
         print_err('Your API token is invalid.')

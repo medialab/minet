@@ -12,7 +12,7 @@ from datetime import date, timedelta
 from tqdm import tqdm
 from ural import get_domain_name, normalize_url
 
-from minet.utils import create_safe_pool
+from minet.utils import create_safe_pool, fetch
 from minet.cli.utils import print_err
 from minet.cli.crowdtangle.constants import CROWDTANGLE_DEFAULT_WAIT_TIME
 
@@ -107,7 +107,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
             writer.writerow(csv_headers(namespace) if callable(csv_headers) else csv_headers)
 
         while True:
-            result = http.request('GET', url)
+            _, result = fetch(http, url)
 
             if result.status == 401:
                 loading_bar.close()

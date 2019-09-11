@@ -14,11 +14,10 @@ from urllib.parse import urljoin
 from http.cookies import SimpleCookie
 from tqdm import tqdm
 
-from minet.utils import grab_cookies, create_safe_pool
+from minet.utils import grab_cookies, create_safe_pool, fetch
 from minet.cli.utils import DummyTqdmFile
 
 # TODO: centralize this for god's sake
-SPOOFED_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:69.0) Gecko/20100101 Firefox/69.0'
 BASE_URL = 'https://m.facebook.com'
 THROTTLE = 0.5
 
@@ -177,14 +176,10 @@ def facebook_comments_action(namespace):
 
     http = create_safe_pool()
 
-    # TODO: abstract cookie string logic
-    headers = {
-        'User-Agent': SPOOFED_UA,
-        'Cookie': cookie
-    }
+    def fetch_page(target):
 
-    def fetch(target):
-        result = http.request('GET', target, headers=headers)
+        # TODO: Handle errors
+        _, result = fetch(http, target, cookie=cookie)
         return result.data.decode('utf-8')
 
     url_queue = deque([(url, None)])
@@ -195,7 +190,7 @@ def facebook_comments_action(namespace):
     while len(url_queue) != 0:
         current_url, in_reply_to = url_queue.popleft()
 
-        html = fetch(current_url)
+        html = fetch_page(current_url)
         data = scrape_comments(html, in_reply_to)
 
         url_count += 1

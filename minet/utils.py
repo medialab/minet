@@ -10,11 +10,13 @@ import cgi
 import certifi
 import browser_cookie3
 import urllib3
+from urllib3.exceptions import ClosedPoolError, HTTPError
 from urllib.request import Request
 
 from minet.defaults import (
     DEFAULT_CONNECT_TIMEOUT,
-    DEFAULT_READ_TIMEOUT
+    DEFAULT_READ_TIMEOUT,
+    DEFAULT_SPOOFED_UA
 )
 
 # Handy regexes
@@ -93,6 +95,10 @@ def grab_cookies(browser='firefox'):
     raise Exception('minet.utils.grab_cookies: unknown "%s" browser.' % browser)
 
 
+def dict_to_cookie_string(d):
+    return '; '.join('%s=%s' % r for r in d.items())
+
+
 def create_safe_pool(**kwargs):
     """
     Helper function returning a urllib3 pool manager with sane defaults.
@@ -104,3 +110,33 @@ def create_safe_pool(**kwargs):
         timeout=urllib3.Timeout(connect=DEFAULT_CONNECT_TIMEOUT, read=DEFAULT_READ_TIMEOUT),
         **kwargs
     )
+
+
+def fetch(http, url, method='GET', headers=None, cookie=None, spoof_ua=True):
+    """
+    Generic fetch helpers using a urllib3 pool to access some resource.
+    """
+
+    # Formatting headers
+    final_headers = {}
+
+    if spoof_ua:
+        final_headers['User-Agent'] = DEFAULT_SPOOFED_UA
+
+    if cookie:
+        if not isinstance(cookie, str):
+            cookie = dict_to_cookie_string(cookie)
+
+        final_headers['Cookie'] = cookie
+
+    # Note: headers passed explicitly by users always win
+    if headers is not None:
+        final_headers.update(headers)
+
+    # Performing request
+    try:
+        result = http.request(method, url, headers=final_headers)
+    except (ClosedPoolError, HTTPError) as e:
+        return e, None
+
+    return None, result

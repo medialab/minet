@@ -27,10 +27,12 @@ from urllib3.exceptions import (
     ResponseError
 )
 
-from minet.utils import guess_encoding, grab_cookies, create_safe_pool
+from minet.utils import guess_encoding, grab_cookies, create_safe_pool, fetch
 from minet.cli.utils import custom_reader, DummyTqdmFile
 
 mimetypes.init()
+
+GET_COOKIE_FOR_URL = None
 
 OUTPUT_ADDITIONAL_HEADERS = ['line', 'status', 'error', 'filename', 'encoding']
 
@@ -53,36 +55,6 @@ ERROR_REPORTERS = {
 }
 
 
-def fetch(http, url, cookies=None):
-
-    # Formatting headers
-    headers = {
-        'User-Agent': SPOOFED_UA
-    }
-
-    # Formatting cookies header
-    if cookies is not None:
-        headers['Cookie'] = '; '.join('%s=%s' % r for r in cookies.items())
-
-    # TODO: probably need to do redirects myself to avoid ClosedPoolError
-    try:
-        r = http.request(
-            'GET',
-            url,
-            headers=headers
-        )
-
-        return None, r
-
-    except ClosedPoolError:
-
-        # TODO: this is a clunky workaround
-        return fetch(http, url, cookies=cookies)
-
-    except HTTPError as e:
-        return e, None
-
-
 def worker(job):
     """
     Function using the urllib3 http to actually fetch our contents from the web.
@@ -90,19 +62,13 @@ def worker(job):
     namespace, http, line, url = job
 
     url = ensure_protocol(url)
-    cookies = None
+    cookie = None
 
-    # Should we grab cookies?
+    # Should we grab cookie?
     if namespace.grab_cookies:
+        cookie = GET_COOKIE_FOR_URL(url)
 
-        # TODO: this is not performant!
-        # TODO: make user choose firefox or chrome
-        cookies = grab_cookies()(url)
-
-        if not cookies:
-            cookies = None
-
-    error, result = fetch(http, url, cookies=cookies)
+    error, result = fetch(http, url, cookie=cookie)
 
     if error:
         return error, url, line, result, None, None
@@ -138,6 +104,7 @@ def worker(job):
 
 
 def fetch_action(namespace):
+    global GET_COOKIE_FOR_URL
 
     # Do we need to fetch only a single url?
     if namespace.file is sys.stdin and is_url(namespace.column):
@@ -153,6 +120,11 @@ def fetch_action(namespace):
     # First we need to create the relevant directory
     if not namespace.contents_in_report:
         os.makedirs(namespace.output_dir, exist_ok=True)
+
+    # Cookie grabber
+    # TODO: make user choose firefox or chrome
+    if namespace.grab_cookies:
+        GET_COOKIE_FOR_URL = grab_cookies()
 
     # Loading bar
     loading_bar = tqdm(
