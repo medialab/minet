@@ -7,6 +7,8 @@
 import re
 import chardet
 import cgi
+import browser_cookie3
+from urllib.request import Request
 
 # Handy regexes
 CHARSET_RE = re.compile(rb'<meta.*?charset=["\']*(.+?)["\'>]', flags=re.I)
@@ -55,3 +57,30 @@ def guess_encoding(response, data, is_xml=False, use_chardet=False):
             return chardet_result['encoding'].lower()
 
     return None
+
+
+class CookieResolver(object):
+    def __init__(self, jar):
+        self.jar = jar
+
+    def __call__(self, url):
+        req = Request(url)
+        self.jar.add_cookie_header(req)
+
+        return req.get_header('Cookie') or None
+
+
+def grab_cookies(browser='firefox'):
+    if browser == 'firefox':
+        try:
+            return CookieResolver(browser_cookie3.firefox())
+        except:
+            return None
+
+    if browser == 'chrome':
+        try:
+            return CookieResolver(browser_cookie3.chrome())
+        except:
+            return None
+
+    raise Exception('minet.utils.grab_cookies: unknown "%s" browser.' % browser)

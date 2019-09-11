@@ -9,12 +9,17 @@ import csv
 import sys
 import time
 from bs4 import BeautifulSoup
-from pycookiecheat import chrome_cookies
 from collections import deque
 from urllib.parse import urljoin
+from http.cookies import SimpleCookie
 from tqdm import tqdm
 
-from minet.cli.utils import DummyTqdmFile, print_err, create_safe_pool
+from minet.utils import grab_cookies
+from minet.cli.utils import (
+    DummyTqdmFile,
+    print_err,
+    create_safe_pool
+)
 
 # TODO: centralize this for god's sake
 SPOOFED_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:69.0) Gecko/20100101 Firefox/69.0'
@@ -34,6 +39,22 @@ CSV_HEADERS = [
     'replies',
     'in_reply_to'
 ]
+
+
+def fix_cookie(cookie_string):
+    cookie = SimpleCookie()
+    cookie.load(cookie_string)
+
+    # NOTE: those cookie items can rat you out
+    try:
+        del cookie['m_pixel_ratio']
+        del cookie['wd']
+    except KeyError:
+        pass
+
+    cookie['locale'] = 'en_US'
+
+    return '; '.join(key + '=' + morsel.coded_value for key, morsel in cookie.items())
 
 
 def format_csv_row(comments):
@@ -153,17 +174,16 @@ def facebook_comments_action(namespace):
     # TODO: beware of locale
     url = namespace.url.replace('www', 'm')
 
-    # Grabbing cookies from local Chrome
-    cookies = chrome_cookies(url)
-    del cookies['m_pixel_ratio']
-    del cookies['wd']
+    # Grabbing cookies
+    get_cookie_for_url = grab_cookies()
+    cookie = fix_cookie(get_cookie_for_url(url))
 
     http = create_safe_pool()
 
     # TODO: abstract cookie string logic
     headers = {
         'User-Agent': SPOOFED_UA,
-        'Cookie': '; '.join('%s=%s' % r for r in cookies.items())
+        'Cookie': cookie
     }
 
     def fetch(target):
