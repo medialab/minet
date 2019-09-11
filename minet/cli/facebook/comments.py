@@ -8,15 +8,13 @@ import re
 import csv
 import sys
 import time
-import urllib3
-import certifi
 from bs4 import BeautifulSoup
 from pycookiecheat import chrome_cookies
 from collections import deque
 from urllib.parse import urljoin
 from tqdm import tqdm
 
-from minet.cli.utils import DummyTqdmFile, print_err
+from minet.cli.utils import DummyTqdmFile, print_err, create_safe_pool
 
 # TODO: centralize this for god's sake
 SPOOFED_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:69.0) Gecko/20100101 Firefox/69.0'
@@ -160,10 +158,7 @@ def facebook_comments_action(namespace):
     del cookies['m_pixel_ratio']
     del cookies['wd']
 
-    http = urllib3.PoolManager(
-        cert_reqs='CERT_REQUIRED',
-        ca_certs=certifi.where(),
-    )
+    http = create_safe_pool()
 
     # TODO: abstract cookie string logic
     headers = {
