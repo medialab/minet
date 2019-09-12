@@ -15,7 +15,7 @@ from http.cookies import SimpleCookie
 from tqdm import tqdm
 
 from minet.utils import grab_cookies, create_safe_pool, fetch
-from minet.cli.utils import DummyTqdmFile
+from minet.cli.utils import DummyTqdmFile, die
 
 DEFAULT_THROTTLE = 0.5
 BASE_URL = 'https://m.facebook.com'
@@ -156,21 +156,22 @@ def facebook_comments_action(namespace):
     writer = csv.writer(output_file)
     writer.writerow(CSV_HEADERS)
 
-    # Loading bar
-    loading_bar = tqdm(
-        desc='Scraping comments',
-        dynamic_ncols=True,
-        unit=' comments'
-    )
-
     # Reformatting url to hit mobile website
-    # TODO: support ids & better heuristics for m. implementation
-    # TODO: beware of locale
     url = namespace.url.replace('www', 'm')
 
     # Grabbing cookies
-    get_cookie_for_url = grab_cookies()
-    cookie = fix_cookie(get_cookie_for_url(url))
+    if namespace.cookie == 'firefox' or namespace.cookie == 'chrome':
+        get_cookie_for_url = grab_cookies(namespace.cookie)
+
+        if get_cookie_for_url is None:
+            die('Could not extract cookies from %s.' % namespace.cookie)
+
+        cookie = get_cookie_for_url(url)
+
+    else:
+        cookie = namespace.cookie
+
+    cookie = fix_cookie(cookie)
 
     http = create_safe_pool()
 
@@ -181,6 +182,13 @@ def facebook_comments_action(namespace):
             raise error
 
         return result.data.decode('utf-8')
+
+    # Loading bar
+    loading_bar = tqdm(
+        desc='Scraping comments',
+        dynamic_ncols=True,
+        unit=' comments'
+    )
 
     url_queue = deque([(url, None)])
 
@@ -208,7 +216,13 @@ def facebook_comments_action(namespace):
             if in_reply_to is not None:
                 replies_count += 1
 
-        loading_bar.set_postfix(urls=url_count, replies=replies_count)
+        loading_bar.set_postfix(
+            urls=url_count,
+            replies=replies_count,
+            q=len(url_queue)
+        )
 
         # Don't be too greedy
         time.sleep(DEFAULT_THROTTLE)
+
+    loading_bar.close()

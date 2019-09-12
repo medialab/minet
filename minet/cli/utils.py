@@ -15,6 +15,11 @@ def print_err(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
 
+def die(msg):
+    print_err(msg)
+    sys.exit(1)
+
+
 def safe_index(l, e):
     try:
         return l.index(e)

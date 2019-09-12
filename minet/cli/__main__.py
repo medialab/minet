@@ -532,6 +532,11 @@ def main():
     )
 
     facebook_comments_subparser.add_argument(
+        '-c', '--cookie',
+        help='Authenticated cookie to use or browser from which to extract it (support "firefox" and "chrome").',
+        default='firefox'
+    )
+    facebook_comments_subparser.add_argument(
         '-o', '--output',
         help='Path to the output file. By default, everything will be printed to stdout.'
     )
