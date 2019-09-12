@@ -125,7 +125,7 @@ def scrape_comments(html, in_reply_to=None):
                 replies_text = replies_item.get_text()
 
                 if replies_text != 'Reply':
-                    replies = replies_text.split('·')[-1].split(' replie')[0].strip()
+                    replies = replies_text.split('·')[-1].split(' repl')[0].strip()
 
                     replies_url = replies_item.get('href')
                     data['replies'].append((urljoin(BASE_URL, replies_url), item_id))
