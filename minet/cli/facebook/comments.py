@@ -31,6 +31,7 @@ CSV_HEADERS = [
     'user_url',
     'user_label',
     'comment_text',
+    'comment_html',
     'formatted_date',
     'date',
     'reactions',
@@ -113,8 +114,9 @@ def scrape_comments(html, in_reply_to=None):
         user = extract_user_from_facebook_url(user_href)
 
         # TODO: link to comment
-        # TODO: maybe get html instead
-        comment_text = item.select_one('h3 + div').get_text().strip()
+        content_element = item.select_one('h3 + div')
+        comment_text = content_element.get_text().strip()
+        comment_html = str(content_element)
         formatted_date = item.select_one('abbr').get_text().strip()
         parsed_date = parse_formatted_date(formatted_date)
 
@@ -152,6 +154,7 @@ def scrape_comments(html, in_reply_to=None):
             'user_url': user.url,
             'user_label': user_label,
             'comment_text': comment_text,
+            'comment_html': comment_html,
             'formatted_date': formatted_date,
             'date': parsed_date.isoformat() if parsed_date else '',
             'reactions': reactions,
