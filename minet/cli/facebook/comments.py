@@ -13,6 +13,7 @@ from collections import deque
 from urllib.parse import urljoin
 from http.cookies import SimpleCookie
 from tqdm import tqdm
+from ural.facebook import extract_user_from_facebook_url
 
 from minet.utils import grab_cookies, create_safe_pool, fetch
 from minet.cli.utils import DummyTqdmFile, die
@@ -24,7 +25,8 @@ VALID_ID_RE = re.compile(r'^(?:see_next_)?\d+$')
 CSV_HEADERS = [
     'post_id',
     'comment_id',
-    'user_name',
+    'user_id',
+    'user_handle',
     'user_url',
     'comment_text',
     'formatted_date',
@@ -92,14 +94,10 @@ def scrape_comments(html, in_reply_to=None):
         if item_id == in_reply_to:
             continue
 
-        user_link = item.select_one('h3 > a')
-        user_name = user_link.get_text().strip()
+        user_href = item.select_one('h3 > a').get('href')
+        user = extract_user_from_facebook_url(user_href)
 
         # TODO: link to comment
-
-        # TODO: clean it!
-        user_url = user_link.get('href')
-
         # TODO: maybe get html instead
         comment_text = item.select_one('h3 + div').get_text().strip()
         formatted_date = item.select_one('abbr').get_text().strip()
@@ -133,8 +131,9 @@ def scrape_comments(html, in_reply_to=None):
         data['comments'].append({
             'post_id': post_id,
             'comment_id': item_id,
-            'user_name': user_name,
-            'user_url': user_url,
+            'user_id': user.id or '',
+            'user_handle': user.handle or '',
+            'user_url': user.url,
             'comment_text': comment_text,
             'formatted_date': formatted_date,
             'reactions': reactions,
