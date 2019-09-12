@@ -3,6 +3,7 @@ beautifulsoup4==4.7.1
 browser-cookie3==0.7.6
 chardet==3.0.4
 cython==0.29.4
+dateparser==0.7.1
 lxml==4.3.0
 numpy==1.16.1
 quenouille==0.3.0

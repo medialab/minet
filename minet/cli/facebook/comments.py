@@ -8,6 +8,7 @@ import re
 import csv
 import sys
 import time
+import dateparser
 from bs4 import BeautifulSoup
 from collections import deque
 from urllib.parse import urljoin
@@ -28,8 +29,10 @@ CSV_HEADERS = [
     'user_id',
     'user_handle',
     'user_url',
+    'user_label',
     'comment_text',
     'formatted_date',
+    'date',
     'reactions',
     'replies',
     'in_reply_to'
@@ -59,6 +62,16 @@ def format_csv_row(comments):
         row.append(comments[key] or '')
 
     return row
+
+
+def parse_formatted_date(formatted_date):
+    try:
+        return dateparser.parse(
+            formatted_date,
+            languages=['en']
+        )
+    except ValueError:
+        return None
 
 
 def scrape_comments(html, in_reply_to=None):
@@ -94,13 +107,16 @@ def scrape_comments(html, in_reply_to=None):
         if item_id == in_reply_to:
             continue
 
-        user_href = item.select_one('h3 > a').get('href')
+        user_link = item.select_one('h3 > a')
+        user_label = user_link.get_text().strip()
+        user_href = user_link.get('href')
         user = extract_user_from_facebook_url(user_href)
 
         # TODO: link to comment
         # TODO: maybe get html instead
         comment_text = item.select_one('h3 + div').get_text().strip()
         formatted_date = item.select_one('abbr').get_text().strip()
+        parsed_date = parse_formatted_date(formatted_date)
 
         post_id = item.select_one('[id^="like_"]').get('id').split('_')[1]
 
@@ -134,8 +150,10 @@ def scrape_comments(html, in_reply_to=None):
             'user_id': user.id or '',
             'user_handle': user.handle or '',
             'user_url': user.url,
+            'user_label': user_label,
             'comment_text': comment_text,
             'formatted_date': formatted_date,
+            'date': parsed_date.isoformat() if parsed_date else '',
             'reactions': reactions,
             'replies': replies,
             'in_reply_to': in_reply_to

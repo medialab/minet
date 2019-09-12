@@ -19,8 +19,6 @@ from uuid import uuid4
 from ural import ensure_protocol, is_url, get_domain_name
 
 from urllib3.exceptions import (
-    HTTPError,
-    ClosedPoolError,
     ConnectTimeoutError,
     MaxRetryError,
     ReadTimeoutError,
