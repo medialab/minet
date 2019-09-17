@@ -50,8 +50,7 @@ COMMANDS = {
     # Fetch action subparser
     # --------------------------------------------------------------------------
     'fetch': {
-        'description': dedent(
-            '''
+        'description': '''
             Minet Fetch Command
             ===================
 
@@ -59,10 +58,8 @@ COMMANDS = {
             command outputs a CSV report with additional metadata about the
             HTTP calls and will generally write the retrieved files in a folder
             given by the user.
-            '''
-        ),
-        'epilog': dedent(
-            '''
+        ''',
+        'epilog': '''
             examples:
 
             . Fetching a batch of url from existing CSV file:
@@ -73,8 +70,7 @@ COMMANDS = {
 
             . Fetching a single url, useful to pipe into `minet scrape`:
                 `minet fetch http://google.com | minet scrape ./scrape.json > scraped.csv`
-            '''
-        ),
+        ''',
         'arguments': [
             {
                 'name': 'column',
@@ -156,14 +152,12 @@ COMMANDS = {
     # Crowdtangle action subparser
     # --------------------------------------------------------------------------
     'ct': {
-        'description': dedent(
-            '''
+        'description': '''
             Minet CrowdTangle Command
             =========================
 
             Gather data from the CrowdTangle APIs easily and efficiently.
-            '''
-        ),
+        ''',
         'subparsers': {
             'help': 'Action to perform using the CrowdTangle API.',
             'title': 'actions',
@@ -180,23 +174,19 @@ COMMANDS = {
             ],
             'commands': {
                 'leaderboard': {
-                    'description': dedent(
-                        '''
+                    'description': '''
                         Minet CrowdTangle Leaderboard Command
                         =====================================
 
                         Gather information and aggregated stats about pages and groups of
                         the designated dashboard (indicated by a given token).
-                        '''
-                    ),
-                    'epilog': dedent(
-                        '''
+                    ''',
+                    'epilog': '''
                         examples:
 
                         . Fetching accounts statistics for every account in your dashboard:
                             `minet ct leaderboard --token YOUR_TOKEN > accounts-stats.csv`
-                        '''
-                    ),
+                    ''',
                     'arguments': [
                         {
                             'flag': '--no-breakdown',
@@ -223,42 +213,34 @@ COMMANDS = {
                     ]
                 },
                 'lists': {
-                    'description': dedent(
-                        '''
+                    'description': '''
                         Minet CrowdTangle Lists Command
                         ===============================
 
                         Retrieve the lists from a CrowdTangle dashboard (indicated by a
                         given token).
-                        '''
-                    ),
-                    'epilog': dedent(
-                        '''
+                    ''',
+                    'epilog': '''
                         examples:
 
                         . Fetching a dashboard's lists:
                             `minet ct lists --token YOUR_TOKEN > lists.csv`
-                        '''
-                    )
+                    '''
                 },
                 'posts': {
-                    'description': dedent(
-                        '''
+                    'description': '''
                         Minet CrowdTangle Posts Command
                         ===============================
 
                         Gather post data from the designated dashboard (indicated by
                         a given token).
-                        '''
-                    ),
-                    'epilog': dedent(
-                        '''
+                    ''',
+                    'epilog': '''
                         examples:
 
                         . Fetching the 500 most latest posts from a dashboard:
                             `minet ct posts --token YOUR_TOKEN --limit 500 > latest-posts.csv`
-                        '''
-                    ),
+                    ''',
                     'arguments': [
                         {
                             'flag': '--end-date',
@@ -301,22 +283,18 @@ COMMANDS = {
                     ]
                 },
                 'search': {
-                    'description': dedent(
-                        '''
+                    'description': '''
                         Minet CrowdTangle Search Command
                         ================================
 
                         Search posts on the whole CrowdTangle platform.
-                        '''
-                    ),
-                    'epilog': dedent(
-                        '''
+                    ''',
+                    'epilog': '''
                         examples:
 
                         . Fetching a dashboard's lists:
                             `minet ct search --token YOUR_TOKEN > posts.csv`
-                        '''
-                    ),
+                    ''',
                     'arguments': [
                         {
                             'name': 'terms',
@@ -379,18 +357,15 @@ COMMANDS = {
     # Extract action subparser
     # -------------------------------------------------------------------------
     'extract': {
-        'description': dedent(
-            '''
+        'description': '''
             Minet Extract Command
             =====================
 
             Use multiple processes to extract raw text from a batch of HTML files.
             This command can either work on a `minet fetch` report or on a bunch
             of files. It will output an augmented report with the extracted text.
-            '''
-        ),
-        'epilog': dedent(
-            '''
+        ''',
+        'epilog': '''
             examples:
 
             . Extracting raw text from a `minet fetch` report:
@@ -401,8 +376,7 @@ COMMANDS = {
 
             . Extracting raw text from a bunch of files:
                 `minet extract --glob "./content/*.html" > extracted.csv`
-            '''
-        ),
+        ''',
         'arguments': [
             {
                 'name': 'report',
@@ -446,36 +420,30 @@ COMMANDS = {
     # Facebook actions subparser
     # -------------------------------------------------------------------------
     'fb': {
-        'description': dedent(
-            '''
+        'description': '''
             Minet Facebook Command
             ======================
 
             Collects data from Facebook.
-            '''
-        ),
+        ''',
         'subparsers': {
             'help': 'Action to perform to collect data on Facebook',
             'title': 'actions',
             'dest': 'fb_actions',
             'commands': {
                 'comments': {
-                    'description': dedent(
-                        '''
+                    'description': '''
                         Minet Facebook Comments Command
                         ===============================
 
                         Scrape series of comments on Facebook.
-                        '''
-                    ),
-                    'epilog': dedent(
-                        '''
+                    ''',
+                    'epilog': '''
                         examples:
 
                         . Fetching a dashboard's lists:
                             `minet fb comments`
-                        '''
-                    ),
+                    ''',
                     'arguments': [
                         {
                             'name': 'url',
@@ -499,18 +467,15 @@ COMMANDS = {
     # Scrape action subparser
     # -------------------------------------------------------------------------
     'scrape': {
-        'description': dedent(
-            '''
+        'description': '''
             Minet Scrape Command
             ====================
 
             Use multiple processes to scrape data from a batch of HTML files.
             This command can either work on a `minet fetch` report or on a bunch
             of files. It will output the scraped items.
-            '''
-        ),
-        'epilog': dedent(
-            '''
+        ''',
+        'epilog': '''
             examples:
 
             . Scraping item from a `minet fetch` report:
@@ -521,8 +486,7 @@ COMMANDS = {
 
             . Scraping items from a bunch of files:
                 `minet scrape scraper.json --glob "./content/*.html" > scraped.csv`
-            '''
-        ),
+        ''',
         'arguments': [
             {
                 'name': 'scraper',
@@ -584,8 +548,8 @@ def main():
     for name, command in COMMANDS.items():
         subparser = subparsers.add_parser(
             name,
-            description=command['description'],
-            epilog=command.get('epilog', ''),
+            description=dedent(command['description']),
+            epilog=dedent(command.get('epilog', '')),
             formatter_class=custom_formatter
         )
 
@@ -608,8 +572,8 @@ def main():
             for subname, subcommand in command['subparsers']['commands'].items():
                 subsubparser = subparser_subparsers.add_parser(
                     subname,
-                    description=subcommand['description'],
-                    epilog=subcommand.get('epilog', ''),
+                    description=dedent(subcommand['description']),
+                    epilog=dedent(subcommand.get('epilog', '')),
                     formatter_class=custom_formatter
                 )
 
