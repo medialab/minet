@@ -5,7 +5,7 @@
 # General constants used throughout the CrowdTangle actions.
 #
 
-CROWDTANGLE_DEFAULT_WAIT_TIME = 10
+CROWDTANGLE_DEFAULT_RATE_LIMIT = 6  # Number of hits per minute
 
 CROWDTANGLE_POST_TYPES = [
     'episode',

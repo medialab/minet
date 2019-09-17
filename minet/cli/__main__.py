@@ -15,7 +15,7 @@ from minet.defaults import DEFAULT_THROTTLE
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
 from minet.cli.utils import BooleanAction
 
-from minet.cli.crowdtangle.constants import CROWDTANGLE_SORT_TYPES
+from minet.cli.crowdtangle.constants import CROWDTANGLE_SORT_TYPES, CROWDTANGLE_DEFAULT_RATE_LIMIT
 
 SUBPARSERS = {}
 
@@ -163,6 +163,12 @@ COMMANDS = {
             'title': 'actions',
             'dest': 'ct_action',
             'common_arguments': [
+                {
+                    'flag': '--rate-limit',
+                    'help': 'Authorized number of hits by minutes. Defaults to %i.' % CROWDTANGLE_DEFAULT_RATE_LIMIT,
+                    'type': int,
+                    'default': CROWDTANGLE_DEFAULT_RATE_LIMIT
+                },
                 {
                     'flags': ['-o', '--output'],
                     'help': 'Path to the output file. By default, everything will be printed to stdout.'

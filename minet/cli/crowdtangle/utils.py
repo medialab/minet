@@ -14,7 +14,7 @@ from ural import get_domain_name, normalize_url
 
 from minet.utils import create_safe_pool, fetch
 from minet.cli.utils import print_err
-from minet.cli.crowdtangle.constants import CROWDTANGLE_DEFAULT_WAIT_TIME
+from minet.cli.crowdtangle.constants import CROWDTANGLE_DEFAULT_RATE_LIMIT
 
 URL_REPORT_HEADERS = [
     'post_ct_id',
@@ -86,6 +86,8 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
         url = url_forge(namespace)
 
         has_limit = bool(namespace.limit)
+
+        sleep_time = 60 // (namespace.rate_limit if namespace.rate_limit else CROWDTANGLE_DEFAULT_RATE_LIMIT)
 
         print_err('Using the following starting url:')
         print_err(url)
@@ -201,7 +203,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
             url = pagination['nextPage']
 
             # Waiting a bit to respect the 6 reqs/min limit
-            time.sleep(CROWDTANGLE_DEFAULT_WAIT_TIME)
+            time.sleep(sleep_time)
 
         loading_bar.close()
         print_err('We reached the end of pagination.')
