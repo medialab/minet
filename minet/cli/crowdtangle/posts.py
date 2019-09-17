@@ -27,7 +27,7 @@ def forge_posts_url(namespace):
         base_url += '&endDate=%s' % namespace.end_date
 
     if namespace.list_ids:
-        base_url += '&list-ids=%s' % namespace.list_ids
+        base_url += '&listIds=%s' % namespace.list_ids
 
     return base_url
 
