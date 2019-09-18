@@ -435,7 +435,7 @@ COMMANDS = {
         'subparsers': {
             'help': 'Action to perform to collect data on Facebook',
             'title': 'actions',
-            'dest': 'fb_actions',
+            'dest': 'fb_action',
             'commands': {
                 'comments': {
                     'description': '''
