@@ -150,6 +150,9 @@ def rate_limited(max_per_period, period=1.0):
     Thread-safe rate limiting decorator.
     From: https://gist.github.com/gregburek/1441055
 
+    Note that this version of the function takes running time of the function
+    into account.
+
     Args:
         max_per_period (int): Maximum number of call per period.
         period (float): Period in seconds. Defaults to 1.0.
@@ -170,16 +173,23 @@ def rate_limited(max_per_period, period=1.0):
         def rate_limited_function(*args, **kwargs):
             lock.acquire()
             nonlocal last_time_called
+
+            fn_time = 0.0
+            before = None
+
             try:
                 elapsed = time.perf_counter() - last_time_called
                 left_to_wait = min_interval - elapsed
 
                 if left_to_wait > 0:
+                    # import sys
+                    # print('waiting', left_to_wait, file=sys.stderr)
                     time.sleep(left_to_wait)
 
+                before = time.perf_counter()
                 return func(*args, **kwargs)
             finally:
-                last_time_called = time.perf_counter()
+                last_time_called = before if before is not None else time.perf_counter()
                 lock.release()
 
         return rate_limited_function
