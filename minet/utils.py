@@ -184,8 +184,6 @@ def rate_limited(max_per_period, period=1.0):
                 left_to_wait = min_interval - elapsed
 
                 if left_to_wait > 0 and not first_call:
-                    # import sys
-                    # print('waiting', left_to_wait, file=sys.stderr)
                     time.sleep(left_to_wait)
 
                 before = time.perf_counter()
