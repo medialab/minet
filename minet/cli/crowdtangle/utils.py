@@ -64,7 +64,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                             item_name, item_key):
 
     def action(namespace, output_file):
-        http = create_safe_pool(timeout=Timeout(connect=10, read=60))
+        http = create_safe_pool(timeout=Timeout(connect=10, read=60 * 5))
 
         url_report_writer = None
 
@@ -114,6 +114,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
 
             # Debug
             if err is not None:
+                loading_bar.close()
                 print_err(url)
                 raise err
 
