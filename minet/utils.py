@@ -10,6 +10,9 @@ import cgi
 import certifi
 import browser_cookie3
 import urllib3
+import threading
+import time
+from functools import wraps
 from urllib3.exceptions import ClosedPoolError, HTTPError
 from urllib.request import Request
 
@@ -140,3 +143,44 @@ def fetch(http, url, method='GET', headers=None, cookie=None, spoof_ua=True):
         return e, None
 
     return None, result
+
+
+def rate_limited(max_per_period, period=1.0):
+    """
+    Thread-safe rate limiting decorator.
+    From: https://gist.github.com/gregburek/1441055
+
+    Args:
+        max_per_period (int): Maximum number of call per period.
+        period (float): Period in seconds. Defaults to 1.0.
+
+    Returns:
+        callable: Decorator.
+
+    """
+    max_per_second = max_per_period / period
+
+    lock = threading.Lock()
+    min_interval = 1.0 / max_per_second
+
+    def decorate(func):
+        last_time_called = time.perf_counter()
+
+        @wraps(func)
+        def rate_limited_function(*args, **kwargs):
+            lock.acquire()
+            nonlocal last_time_called
+            try:
+                elapsed = time.perf_counter() - last_time_called
+                left_to_wait = min_interval - elapsed
+                if left_to_wait > 0:
+                    time.sleep(left_to_wait)
+
+                return func(*args, **kwargs)
+            finally:
+                last_time_called = time.perf_counter()
+                lock.release()
+
+        return rate_limited_function
+
+    return decorate
