@@ -168,11 +168,13 @@ def rate_limited(max_per_period, period=1.0):
 
     def decorate(func):
         last_time_called = time.perf_counter()
+        first_call = True
 
         @wraps(func)
         def rate_limited_function(*args, **kwargs):
             lock.acquire()
             nonlocal last_time_called
+            nonlocal first_call
 
             fn_time = 0.0
             before = None
@@ -181,7 +183,7 @@ def rate_limited(max_per_period, period=1.0):
                 elapsed = time.perf_counter() - last_time_called
                 left_to_wait = min_interval - elapsed
 
-                if left_to_wait > 0:
+                if left_to_wait > 0 and not first_call:
                     # import sys
                     # print('waiting', left_to_wait, file=sys.stderr)
                     time.sleep(left_to_wait)
@@ -189,6 +191,7 @@ def rate_limited(max_per_period, period=1.0):
                 before = time.perf_counter()
                 return func(*args, **kwargs)
             finally:
+                first_call = False
                 last_time_called = before if before is not None else time.perf_counter()
                 lock.release()
 
