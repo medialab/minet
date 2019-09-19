@@ -102,15 +102,19 @@ def dict_to_cookie_string(d):
     return '; '.join('%s=%s' % r for r in d.items())
 
 
-def create_safe_pool(**kwargs):
+DEFAULT_URLLIB3_TIMEOUT = urllib3.Timeout(connect=DEFAULT_CONNECT_TIMEOUT, read=DEFAULT_READ_TIMEOUT)
+
+def create_safe_pool(timeout=None, **kwargs):
     """
     Helper function returning a urllib3 pool manager with sane defaults.
     """
 
+    timeout = kwargs['timeout'] if 'timeout' in kwargs else DEFAULT_URLLIB3_TIMEOUT
+
     return urllib3.PoolManager(
         cert_reqs='CERT_REQUIRED',
         ca_certs=certifi.where(),
-        timeout=urllib3.Timeout(connect=DEFAULT_CONNECT_TIMEOUT, read=DEFAULT_READ_TIMEOUT),
+        timeout=timeout,
         **kwargs
     )
 

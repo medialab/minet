@@ -10,6 +10,7 @@ import json
 from datetime import date, timedelta
 from tqdm import tqdm
 from ural import get_domain_name, normalize_url
+from urllib3 import Timeout
 
 from minet.utils import create_safe_pool, fetch, rate_limited
 from minet.cli.utils import print_err
@@ -63,7 +64,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                             item_name, item_key):
 
     def action(namespace, output_file):
-        http = create_safe_pool()
+        http = create_safe_pool(timeout=Timeout(connect=10, read=60))
 
         url_report_writer = None
 
@@ -109,7 +110,12 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
         rate_limited_fetch = rate_limited(rate_limit, 60.0)(fetch)
 
         while True:
-            _, result = rate_limited_fetch(http, url)
+            err, result = rate_limited_fetch(http, url)
+
+            # Debug
+            if err is not None:
+                print_err(url)
+                raise err
 
             if result.status == 401:
                 loading_bar.close()
