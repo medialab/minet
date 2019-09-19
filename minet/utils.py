@@ -104,6 +104,7 @@ def dict_to_cookie_string(d):
 
 DEFAULT_URLLIB3_TIMEOUT = urllib3.Timeout(connect=DEFAULT_CONNECT_TIMEOUT, read=DEFAULT_READ_TIMEOUT)
 
+
 def create_safe_pool(timeout=None, **kwargs):
     """
     Helper function returning a urllib3 pool manager with sane defaults.
@@ -149,6 +150,8 @@ def fetch(http, url, method='GET', headers=None, cookie=None, spoof_ua=True):
     return None, result
 
 
+# TODO: probably add a context manager to avoid slowing down because of FS I/O
+# There is an example of this in the crowdtangle.utils loop
 def rate_limited(max_per_period, period=1.0):
     """
     Thread-safe rate limiting decorator.
