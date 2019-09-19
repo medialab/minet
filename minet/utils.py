@@ -173,6 +173,7 @@ def rate_limited(max_per_period, period=1.0):
             try:
                 elapsed = time.perf_counter() - last_time_called
                 left_to_wait = min_interval - elapsed
+
                 if left_to_wait > 0:
                     time.sleep(left_to_wait)
 

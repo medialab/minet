@@ -114,6 +114,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
             if result.status == 401:
                 loading_bar.close()
 
+                # TODO: refacto this with `minet.cli.utils.die`
                 print_err('Your API token is invalid.')
                 print_err('Check that you indicated a valid one using the `--token` argument.')
                 sys.exit(1)
