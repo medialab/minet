@@ -10,9 +10,7 @@ import cgi
 import certifi
 import browser_cookie3
 import urllib3
-import threading
 import time
-from functools import wraps
 from urllib3.exceptions import ClosedPoolError, HTTPError
 from urllib.request import Request
 
@@ -150,56 +148,47 @@ def fetch(http, url, method='GET', headers=None, cookie=None, spoof_ua=True):
     return None, result
 
 
-# TODO: probably add a context manager to avoid slowing down because of FS I/O
-# There is an example of this in the crowdtangle.utils loop
-def rate_limited(max_per_period, period=1.0):
+class RateLimiter(object):
     """
-    Thread-safe rate limiting decorator.
-    From: https://gist.github.com/gregburek/1441055
+    Naive rate limiter context manager with smooth output ().
 
-    Note that this version of the function takes running time of the function
-    into account.
+    Note that it won't work in a multi-threaded environment.
 
     Args:
-        max_per_period (int): Maximum number of call per period.
-        period (float): Period in seconds. Defaults to 1.0.
-
-    Returns:
-        callable: Decorator.
+        max_per_period (int): Maximum number of calls per period.
+        period (float): Duration of a period in seconds. Defaults to 1.0.
 
     """
-    max_per_second = max_per_period / period
 
-    lock = threading.Lock()
-    min_interval = 1.0 / max_per_second
+    def __init__(self, max_per_period, period=1.0):
+        max_per_second = max_per_period / period
+        self.min_interval = 1.0 / max_per_second
+        self.max_budget = period / 4
+        self.budget = 0.0
+        self.last_entry = None
 
-    def decorate(func):
-        last_time_called = time.perf_counter()
-        first_call = True
+    def __enter__(self):
+        self.last_entry = time.perf_counter()
 
-        @wraps(func)
-        def rate_limited_function(*args, **kwargs):
-            lock.acquire()
-            nonlocal last_time_called
-            nonlocal first_call
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        running_time = time.perf_counter() - self.last_entry
 
-            fn_time = 0.0
-            before = None
+        delta = self.min_interval - running_time
 
-            try:
-                elapsed = time.perf_counter() - last_time_called
-                left_to_wait = min_interval - elapsed
+        # Consuming budget
+        if delta >= self.budget:
+            delta -= self.budget
+            self.budget = 0
+        else:
+            self.budget -= delta
+            delta = 0
 
-                if left_to_wait > 0 and not first_call:
-                    time.sleep(left_to_wait)
+        # Do we need to sleep?
+        if delta > 0:
+            time.sleep(delta)
+        elif delta < 0:
+            self.budget -= delta
 
-                before = time.perf_counter()
-                return func(*args, **kwargs)
-            finally:
-                first_call = False
-                last_time_called = before if before is not None else time.perf_counter()
-                lock.release()
-
-        return rate_limited_function
-
-    return decorate
+        # Clamping budget
+        # TODO: this should be improved by a circular buffer of last calls
+        self.budget = min(self.budget, self.max_budget)

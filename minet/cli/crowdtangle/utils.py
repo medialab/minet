@@ -12,7 +12,7 @@ from tqdm import tqdm
 from ural import get_domain_name, normalize_url
 from urllib3 import Timeout
 
-from minet.utils import create_safe_pool, fetch, rate_limited
+from minet.utils import create_safe_pool, fetch, RateLimiter
 from minet.cli.utils import print_err
 from minet.cli.crowdtangle.constants import CROWDTANGLE_DEFAULT_RATE_LIMIT
 
@@ -107,110 +107,111 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
             writer.writerow(csv_headers(namespace) if callable(csv_headers) else csv_headers)
 
         rate_limit = namespace.rate_limit if namespace.rate_limit else CROWDTANGLE_DEFAULT_RATE_LIMIT
-        rate_limited_fetch = rate_limited(rate_limit, 60.0)(fetch)
+        rate_limiter = RateLimiter(rate_limit, 60.0)
 
         while True:
-            err, result = rate_limited_fetch(http, url)
+            with rate_limiter:
+                err, result = fetch(http, url)
 
-            # Debug
-            if err is not None:
-                loading_bar.close()
-                print_err(url)
-                raise err
+                # Debug
+                if err is not None:
+                    loading_bar.close()
+                    print_err(url)
+                    raise err
 
-            if result.status == 401:
-                loading_bar.close()
+                if result.status == 401:
+                    loading_bar.close()
 
-                # TODO: refacto this with `minet.cli.utils.die`
-                print_err('Your API token is invalid.')
-                print_err('Check that you indicated a valid one using the `--token` argument.')
-                sys.exit(1)
+                    # TODO: refacto this with `minet.cli.utils.die`
+                    print_err('Your API token is invalid.')
+                    print_err('Check that you indicated a valid one using the `--token` argument.')
+                    sys.exit(1)
 
-            if result.status >= 400:
-                loading_bar.close()
+                if result.status >= 400:
+                    loading_bar.close()
 
-                print_err(result.data, result.status)
-                sys.exit(1)
+                    print_err(result.data, result.status)
+                    sys.exit(1)
 
-            try:
-                data = json.loads(result.data)['result']
-            except:
-                loading_bar.close()
-                print_err('Misformatted JSON result.')
-                sys.exit(1)
+                try:
+                    data = json.loads(result.data)['result']
+                except:
+                    loading_bar.close()
+                    print_err('Misformatted JSON result.')
+                    sys.exit(1)
 
-            if item_key not in data or len(data[item_key]) == 0:
-                if partition_strategy is None:
+                if item_key not in data or len(data[item_key]) == 0:
+                    if partition_strategy is None:
+                        break
+
+                    start_date, end_date = next(partition_range, (None, None))
+
+                    if start_date is None:
+                        break
+
+                    namespace.start_date = start_date
+                    namespace.end_date = end_date
+
+                    url = url_forge(namespace)
+
+                    loading_bar.set_postfix(date=start_date)
+
+                    continue
+
+                items = data[item_key]
+                enough_to_stop = False
+
+                for item in items:
+                    N += 1
+
+                    # TODO: could be done with the count instead
+                    loading_bar.update()
+
+                    if namespace.format == 'jsonl':
+                        output_file.write(json.dumps(item, ensure_ascii=False) + '\n')
+                    else:
+                        writer.writerow(csv_formatter(namespace, item))
+
+                    if url_report_writer:
+                        urls = item.get('expandedLinks')
+
+                        if urls:
+                            for url_item in urls:
+                                url_report_writer.writerow(format_url_for_csv(url_item, item))
+
+                    if has_limit and N >= namespace.limit:
+                        enough_to_stop = True
+                        break
+
+                # NOTE: I wish I had labeled loops in python...
+                if enough_to_stop:
+                    loading_bar.close()
+                    print_err('The indicated limit of %s was reached.' % item_name)
                     break
 
-                start_date, end_date = next(partition_range, (None, None))
+                # Pagination
+                # NOTE: we could adjust the `count` GET param but I am lazy
+                pagination = data['pagination']
 
-                if start_date is None:
-                    break
+                if 'nextPage' not in pagination:
+                    if partition_strategy is None:
+                        break
 
-                namespace.start_date = start_date
-                namespace.end_date = end_date
+                    start_date, end_date = next(partition_range, (None, None))
 
-                url = url_forge(namespace)
+                    if start_date is None:
+                        break
 
-                loading_bar.set_postfix(date=start_date)
+                    namespace.start_date = start_date
+                    namespace.end_date = end_date
 
-                continue
+                    url = url_forge(namespace)
 
-            items = data[item_key]
-            enough_to_stop = False
+                    loading_bar.set_postfix(date=start_date)
 
-            for item in items:
-                N += 1
+                    continue
 
-                # TODO: could be done with the count instead
-                loading_bar.update()
-
-                if namespace.format == 'jsonl':
-                    output_file.write(json.dumps(item, ensure_ascii=False) + '\n')
-                else:
-                    writer.writerow(csv_formatter(namespace, item))
-
-                if url_report_writer:
-                    urls = item.get('expandedLinks')
-
-                    if urls:
-                        for url_item in urls:
-                            url_report_writer.writerow(format_url_for_csv(url_item, item))
-
-                if has_limit and N >= namespace.limit:
-                    enough_to_stop = True
-                    break
-
-            # NOTE: I wish I had labeled loops in python...
-            if enough_to_stop:
-                loading_bar.close()
-                print_err('The indicated limit of %s was reached.' % item_name)
-                break
-
-            # Pagination
-            # NOTE: we could adjust the `count` GET param but I am lazy
-            pagination = data['pagination']
-
-            if 'nextPage' not in pagination:
-                if partition_strategy is None:
-                    break
-
-                start_date, end_date = next(partition_range, (None, None))
-
-                if start_date is None:
-                    break
-
-                namespace.start_date = start_date
-                namespace.end_date = end_date
-
-                url = url_forge(namespace)
-
-                loading_bar.set_postfix(date=start_date)
-
-                continue
-
-            url = pagination['nextPage']
+                url = pagination['nextPage']
 
         loading_bar.close()
         print_err('We reached the end of pagination.')
