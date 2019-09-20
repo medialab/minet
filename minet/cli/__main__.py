@@ -9,14 +9,23 @@ import csv
 import sys
 import shutil
 from textwrap import dedent
-from argparse import ArgumentParser, FileType, RawTextHelpFormatter
+from argparse import (
+    ArgumentParser,
+    ArgumentTypeError,
+    FileType,
+    RawTextHelpFormatter
+)
 
 from minet.__version__ import __version__
 from minet.defaults import DEFAULT_THROTTLE
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
 from minet.cli.utils import BooleanAction
 
-from minet.cli.crowdtangle.constants import CROWDTANGLE_SORT_TYPES, CROWDTANGLE_DEFAULT_RATE_LIMIT
+from minet.cli.crowdtangle.constants import (
+    CROWDTANGLE_SORT_TYPES,
+    CROWDTANGLE_DEFAULT_RATE_LIMIT,
+    CROWDTANGLE_PARTITION_STRATEGIES
+)
 
 SUBPARSERS = {}
 
@@ -42,6 +51,18 @@ def omit(d, key_to_omit):
         nd[k] = v
 
     return nd
+
+
+def partition_strategy_type(string):
+    if string in CROWDTANGLE_PARTITION_STRATEGIES:
+        return string
+
+    try:
+        return int(string)
+    except ValueError:
+        choices = ' or '.join(CROWDTANGLE_PARTITION_STRATEGIES)
+
+        raise ArgumentTypeError('partition strategy should either be %s, or an number of posts.' % choices)
 
 
 # Defining the list of CLI commands
@@ -274,6 +295,11 @@ COMMANDS = {
                             'help': 'Ids of the lists from which to retrieve posts, separated by commas.'
                         },
                         {
+                            'flag': '--partition-strategy',
+                            'help': 'Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts.',
+                            'type': partition_strategy_type
+                        },
+                        {
                             'flag': '--sort-by',
                             'help': 'The order in which to retrieve posts. Defaults to `date`.',
                             'choices': CROWDTANGLE_SORT_TYPES,
@@ -330,8 +356,8 @@ COMMANDS = {
                         },
                         {
                             'flag': '--partition-strategy',
-                            'help': 'Query partition strategy to use to overcome the API search result limits.',
-                            'choices': ['day']
+                            'help': 'Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts.',
+                            'type': partition_strategy_type
                         },
                         {
                             'flags': ['-p', '--platforms'],

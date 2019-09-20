@@ -16,7 +16,12 @@ def print_err(*args, **kwargs):
 
 
 def die(msg):
-    print_err(msg)
+    if not isinstance(msg, list):
+        msg = [msg]
+
+    for m in msg:
+        print_err(m)
+
     sys.exit(1)
 
 

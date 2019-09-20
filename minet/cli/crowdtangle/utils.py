@@ -13,7 +13,7 @@ from ural import get_domain_name, normalize_url
 from urllib3 import Timeout
 
 from minet.utils import create_safe_pool, fetch, RateLimiter
-from minet.cli.utils import print_err
+from minet.cli.utils import print_err, die
 from minet.cli.crowdtangle.constants import CROWDTANGLE_DEFAULT_RATE_LIMIT
 
 URL_REPORT_HEADERS = [
@@ -122,10 +122,10 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                 if result.status == 401:
                     loading_bar.close()
 
-                    # TODO: refacto this with `minet.cli.utils.die`
-                    print_err('Your API token is invalid.')
-                    print_err('Check that you indicated a valid one using the `--token` argument.')
-                    sys.exit(1)
+                    die([
+                        'Your API token is invalid.',
+                        'Check that you indicated a valid one using the `--token` argument.'
+                    ])
 
                 if result.status >= 400:
                     loading_bar.close()

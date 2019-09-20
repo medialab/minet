@@ -31,3 +31,7 @@ CROWDTANGLE_SORT_TYPES = [
     'total_interactions',
     'underperforming'
 ]
+
+CROWDTANGLE_PARTITION_STRATEGIES = {
+    'day'
+}
