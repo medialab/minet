@@ -3,8 +3,16 @@ from setuptools import setup, find_packages
 with open('./README.md', 'r') as f:
     long_description = f.read()
 
+# Version
+# Info: https://packaging.python.org/guides/single-sourcing-package-version/
+# Example: https://github.com/pypa/warehouse/blob/64ca42e42d5613c8339b3ec5e1cb7765c6b23083/warehouse/__about__.py
+meta_package = {}
+with open('./minet/__version__.py') as f:
+  exec(f.read(), meta_package)
+
+
 setup(name='minet',
-      version='0.8.2',
+      version=meta_package['__version__'],
       description='A webmining CLI tool & library for python.',
       long_description=long_description,
       long_description_content_type='text/markdown',

@@ -11,6 +11,7 @@ import shutil
 from textwrap import dedent
 from argparse import ArgumentParser, FileType, RawTextHelpFormatter
 
+from minet.__version__ import __version__
 from minet.defaults import DEFAULT_THROTTLE
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
 from minet.cli.utils import BooleanAction
@@ -547,6 +548,9 @@ def main():
 
     # Building the argument parser
     parser = ArgumentParser(prog='minet')
+
+    parser.add_argument('--version', action='store_true')
+
     subparsers = parser.add_subparsers(
         help='Action to execute',
         title='actions',
@@ -606,7 +610,12 @@ def main():
     # Parsing arguments and triggering commands
     args = parser.parse_args()
 
-    if args.action in ['ct', 'crowdtangle']:
+    # Printing version?
+    if args.version:
+        print('minet %s' % __version__)
+
+    # TODO: abstract this
+    elif args.action in ['ct', 'crowdtangle']:
         from minet.cli.crowdtangle import crowdtangle_action
         crowdtangle_action(args)
 
