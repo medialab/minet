@@ -5,7 +5,6 @@
 # Miscellaneous generic functions used throughout the CrowdTangle actions.
 #
 import csv
-import sys
 import json
 from datetime import date, timedelta
 from tqdm import tqdm
@@ -66,13 +65,17 @@ class PartitionStrategyNoop(object):
     def __init__(self, namespace, url_forge):
         self.namespace = namespace
         self.url_forge = url_forge
+        self.started = False
 
     def __call__(self, items):
-        return self.url_forge(self.namespace)
+        if not self.started:
+            self.started = True
+            return self.url_forge(self.namespace)
+
+        return None
 
     def get_postfix(self):
-        return {}
-
+        return None
 
 
 class PartitionStrategyDay(object):
@@ -94,7 +97,7 @@ class PartitionStrategyDay(object):
         return self.url_forge(self.namespace)
 
     def get_postfix(self):
-        return {'day': self.start_date}
+        return {'day': self.namespace.start_date}
 
 
 PARTITION_STRATEGIES = {
@@ -145,8 +148,14 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
             url_report_writer.writerow(URL_REPORT_HEADERS)
 
         if getattr(namespace, 'partition_strategy', None):
-            partition_strategy = None
-            # TODO
+            if isinstance(namespace.partition_strategy, int):
+                pass
+            else:
+
+                if namespace.partition_strategy == 'day' and not namespace.start_date:
+                    die('"--partition-strategy day" requires a "--start-date".')
+
+                partition_strategy = PARTITION_STRATEGIES[namespace.partition_strategy](namespace, url_forge)
         else:
             partition_strategy = PartitionStrategyNoop(namespace, url_forge)
 
@@ -170,7 +179,11 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
 
         def set_postfix():
             postfix = {'calls': C}
-            postfix.update(partition_strategy.get_postfix())
+
+            addendum = partition_strategy.get_postfix()
+
+            if addendum is not None:
+                postfix.update(addendum)
 
             loading_bar.set_postfix(**postfix)
 
@@ -183,7 +196,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
         rate_limit = namespace.rate_limit if namespace.rate_limit else CROWDTANGLE_DEFAULT_RATE_LIMIT
         rate_limiter = RateLimiter(rate_limit, 60.0)
 
-        while True:
+        while url is not None:
             with rate_limiter:
                 status, meta, items = step(http, url, item_key)
                 C += 1
@@ -210,7 +223,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                     die('Misformatted JSON result.')
 
                 if status == 'exhausted':
-                    # TODO: do we need to apply partition strategy
+                    url = partition_strategy(None)
                     continue
 
                 enough_to_stop = False
@@ -251,8 +264,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                     if partition_strategy is None:
                         break
 
-                    # TODO: we need to apply partition strategy
-
+                    url = partition_strategy(items)
                     continue
 
                 url = next_url

@@ -9,4 +9,5 @@ ftest/content
 ftest/*.csv
 *.jsonl
 *.egg-info
+*.pyc
 *.spec
