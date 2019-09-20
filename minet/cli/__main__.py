@@ -151,7 +151,8 @@ COMMANDS = {
 
     # Crowdtangle action subparser
     # --------------------------------------------------------------------------
-    'ct': {
+    'crowdtangle': {
+        'aliases': ['ct'],
         'description': '''
             Minet CrowdTangle Command
             =========================
@@ -425,7 +426,8 @@ COMMANDS = {
 
     # Facebook actions subparser
     # -------------------------------------------------------------------------
-    'fb': {
+    'facebook': {
+        'aliases': ['fb'],
         'description': '''
             Minet Facebook Command
             ======================
@@ -556,7 +558,8 @@ def main():
             name,
             description=dedent(command['description']),
             epilog=dedent(command.get('epilog', '')),
-            formatter_class=custom_formatter
+            formatter_class=custom_formatter,
+            aliases=command.get('aliases', [])
         )
 
         if 'arguments' in command:
@@ -589,6 +592,10 @@ def main():
                 if 'arguments' in subcommand:
                     add_arguments(subsubparser, subcommand['arguments'])
 
+        if 'aliases' in command:
+            for alias in command['aliases']:
+                SUBPARSERS[alias] = subparser
+
         SUBPARSERS[name] = subparser
 
     # Help subparser
@@ -599,7 +606,7 @@ def main():
     # Parsing arguments and triggering commands
     args = parser.parse_args()
 
-    if args.action == 'ct':
+    if args.action in ['ct', 'crowdtangle']:
         from minet.cli.crowdtangle import crowdtangle_action
         crowdtangle_action(args)
 
@@ -617,7 +624,7 @@ def main():
         from minet.cli.extract import extract_action
         extract_action(args)
 
-    elif args.action == 'fb':
+    elif args.action in ['fb', 'facebook']:
         from minet.cli.facebook import facebook_action
         facebook_action(args)
 
