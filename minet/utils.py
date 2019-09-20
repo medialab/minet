@@ -10,6 +10,9 @@ import cgi
 import certifi
 import browser_cookie3
 import urllib3
+import threading
+import time
+from functools import wraps
 from urllib3.exceptions import ClosedPoolError, HTTPError
 from urllib.request import Request
 
@@ -99,15 +102,20 @@ def dict_to_cookie_string(d):
     return '; '.join('%s=%s' % r for r in d.items())
 
 
-def create_safe_pool(**kwargs):
+DEFAULT_URLLIB3_TIMEOUT = urllib3.Timeout(connect=DEFAULT_CONNECT_TIMEOUT, read=DEFAULT_READ_TIMEOUT)
+
+
+def create_safe_pool(timeout=None, **kwargs):
     """
     Helper function returning a urllib3 pool manager with sane defaults.
     """
 
+    timeout = kwargs['timeout'] if 'timeout' in kwargs else DEFAULT_URLLIB3_TIMEOUT
+
     return urllib3.PoolManager(
         cert_reqs='CERT_REQUIRED',
         ca_certs=certifi.where(),
-        timeout=urllib3.Timeout(connect=DEFAULT_CONNECT_TIMEOUT, read=DEFAULT_READ_TIMEOUT),
+        timeout=timeout,
         **kwargs
     )
 
@@ -140,3 +148,58 @@ def fetch(http, url, method='GET', headers=None, cookie=None, spoof_ua=True):
         return e, None
 
     return None, result
+
+
+# TODO: probably add a context manager to avoid slowing down because of FS I/O
+# There is an example of this in the crowdtangle.utils loop
+def rate_limited(max_per_period, period=1.0):
+    """
+    Thread-safe rate limiting decorator.
+    From: https://gist.github.com/gregburek/1441055
+
+    Note that this version of the function takes running time of the function
+    into account.
+
+    Args:
+        max_per_period (int): Maximum number of call per period.
+        period (float): Period in seconds. Defaults to 1.0.
+
+    Returns:
+        callable: Decorator.
+
+    """
+    max_per_second = max_per_period / period
+
+    lock = threading.Lock()
+    min_interval = 1.0 / max_per_second
+
+    def decorate(func):
+        last_time_called = time.perf_counter()
+        first_call = True
+
+        @wraps(func)
+        def rate_limited_function(*args, **kwargs):
+            lock.acquire()
+            nonlocal last_time_called
+            nonlocal first_call
+
+            fn_time = 0.0
+            before = None
+
+            try:
+                elapsed = time.perf_counter() - last_time_called
+                left_to_wait = min_interval - elapsed
+
+                if left_to_wait > 0 and not first_call:
+                    time.sleep(left_to_wait)
+
+                before = time.perf_counter()
+                return func(*args, **kwargs)
+            finally:
+                first_call = False
+                last_time_called = before if before is not None else time.perf_counter()
+                lock.release()
+
+        return rate_limited_function
+
+    return decorate

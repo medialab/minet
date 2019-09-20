@@ -4,7 +4,7 @@ with open('./README.md', 'r') as f:
     long_description = f.read()
 
 setup(name='minet',
-      version='0.8.0',
+      version='0.8.2',
       description='A webmining CLI tool & library for python.',
       long_description=long_description,
       long_description_content_type='text/markdown',

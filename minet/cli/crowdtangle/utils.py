@@ -7,12 +7,12 @@
 import csv
 import sys
 import json
-import time
 from datetime import date, timedelta
 from tqdm import tqdm
 from ural import get_domain_name, normalize_url
+from urllib3 import Timeout
 
-from minet.utils import create_safe_pool, fetch
+from minet.utils import create_safe_pool, fetch, rate_limited
 from minet.cli.utils import print_err
 from minet.cli.crowdtangle.constants import CROWDTANGLE_DEFAULT_RATE_LIMIT
 
@@ -64,7 +64,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                             item_name, item_key):
 
     def action(namespace, output_file):
-        http = create_safe_pool()
+        http = create_safe_pool(timeout=Timeout(connect=10, read=60 * 5))
 
         url_report_writer = None
 
@@ -87,8 +87,6 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
 
         has_limit = bool(namespace.limit)
 
-        sleep_time = 60 // (namespace.rate_limit if namespace.rate_limit else CROWDTANGLE_DEFAULT_RATE_LIMIT)
-
         print_err('Using the following starting url:')
         print_err(url)
         print_err()
@@ -108,12 +106,22 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
             writer = csv.writer(output_file)
             writer.writerow(csv_headers(namespace) if callable(csv_headers) else csv_headers)
 
+        rate_limit = namespace.rate_limit if namespace.rate_limit else CROWDTANGLE_DEFAULT_RATE_LIMIT
+        rate_limited_fetch = rate_limited(rate_limit, 60.0)(fetch)
+
         while True:
-            _, result = fetch(http, url)
+            err, result = rate_limited_fetch(http, url)
+
+            # Debug
+            if err is not None:
+                loading_bar.close()
+                print_err(url)
+                raise err
 
             if result.status == 401:
                 loading_bar.close()
 
+                # TODO: refacto this with `minet.cli.utils.die`
                 print_err('Your API token is invalid.')
                 print_err('Check that you indicated a valid one using the `--token` argument.')
                 sys.exit(1)
@@ -154,6 +162,8 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
 
             for item in items:
                 N += 1
+
+                # TODO: could be done with the count instead
                 loading_bar.update()
 
                 if namespace.format == 'jsonl':
@@ -201,9 +211,6 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                 continue
 
             url = pagination['nextPage']
-
-            # Waiting a bit to respect the 6 reqs/min limit
-            time.sleep(sleep_time)
 
         loading_bar.close()
         print_err('We reached the end of pagination.')
