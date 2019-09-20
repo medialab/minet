@@ -7,6 +7,7 @@
 #
 import csv
 import sys
+import signal
 import shutil
 from textwrap import dedent
 from argparse import (
@@ -29,8 +30,14 @@ from minet.cli.crowdtangle.constants import (
 
 SUBPARSERS = {}
 
+# Getting terminal size
 terminal_size = shutil.get_terminal_size()
+
+# Increasing max CSV file limit to avoid pesky issues
 csv.field_size_limit(sys.maxsize)
+
+# Hiding stack traces on ctrl+c
+signal.signal(signal.SIGINT, lambda x, y: sys.exit(1))
 
 
 def custom_formatter(prog):
