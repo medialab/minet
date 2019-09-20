@@ -120,9 +120,8 @@ def fetch_action(namespace):
         os.makedirs(namespace.output_dir, exist_ok=True)
 
     # Cookie grabber
-    # TODO: make user choose firefox or chrome
     if namespace.grab_cookies:
-        GET_COOKIE_FOR_URL = grab_cookies()
+        GET_COOKIE_FOR_URL = grab_cookies(namespace.grab_cookies)
 
     # Loading bar
     loading_bar = tqdm(

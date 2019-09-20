@@ -103,8 +103,8 @@ COMMANDS = {
             },
             {
                 'flags': ['-g', '--grab-cookies'],
-                'help': 'Whether to attempt to grab cookies from your computer\'s chrome browser.',
-                'action': 'store_true'
+                'help': 'Whether to attempt to grab cookies from your computer\'s browser.',
+                'choices': ['firefox', 'chrome']
             },
             {
                 'flags': ['-H', '--header'],
