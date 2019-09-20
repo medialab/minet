@@ -77,8 +77,11 @@ class PartitionStrategyNoop(object):
     def get_postfix(self):
         return None
 
+    def should_go_next(self, items):
+        return True
 
-class PartitionStrategyDay(object):
+
+class PartitionStrategyDay(PartitionStrategyNoop):
     def __init__(self, namespace, url_forge):
         self.namespace = namespace
         self.url_forge = url_forge
@@ -98,6 +101,48 @@ class PartitionStrategyDay(object):
 
     def get_postfix(self):
         return {'day': self.namespace.start_date}
+
+
+class PartitionStrategyLimit(PartitionStrategyNoop):
+    def __init__(self, namespace, url_forge, limit):
+        self.namespace = namespace
+        self.url_forge = url_forge
+        self.last_item = None
+        self.started = False
+        self.seen = 0
+        self.limit = limit
+
+    def __call__(self, items):
+        if items is None and self.started:
+            return None
+
+        self.started = True
+
+        if items:
+            self.last_item = items[-1]
+            self.seen += len(items)
+
+            if self.seen > self.limit:
+                self.seen = 0
+
+        if self.last_item is not None:
+            self.namespace.end_date = self.last_item['date']
+
+        return self.url_forge(self.namespace)
+
+    def get_postfix(self):
+        if self.namespace.end_date:
+            return {'date': self.namespace.end_date}
+
+    def should_go_next(self, items):
+
+        # TODO: seen updates and limit testing should happen here
+        n = len(items)
+
+        if self.seen + n > self.limit:
+            return False
+
+        return True
 
 
 PARTITION_STRATEGIES = {
@@ -148,14 +193,16 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
             url_report_writer.writerow(URL_REPORT_HEADERS)
 
         if getattr(namespace, 'partition_strategy', None):
-            if isinstance(namespace.partition_strategy, int):
-                pass
+            pt = namespace.partition_strategy
+
+            if isinstance(pt, int):
+                partition_strategy = PartitionStrategyLimit(namespace, url_forge, pt)
             else:
 
-                if namespace.partition_strategy == 'day' and not namespace.start_date:
+                if pt == 'day' and not namespace.start_date:
                     die('"--partition-strategy day" requires a "--start-date".')
 
-                partition_strategy = PARTITION_STRATEGIES[namespace.partition_strategy](namespace, url_forge)
+                partition_strategy = PARTITION_STRATEGIES[pt](namespace, url_forge)
         else:
             partition_strategy = PartitionStrategyNoop(namespace, url_forge)
 
@@ -267,7 +314,10 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                     url = partition_strategy(items)
                     continue
 
-                url = next_url
+                if partition_strategy.should_go_next(items):
+                    url = next_url
+                else:
+                    url = partition_strategy(items)
 
         loading_bar.close()
 
