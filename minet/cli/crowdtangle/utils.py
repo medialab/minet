@@ -16,6 +16,8 @@ from minet.utils import create_safe_pool, fetch, RateLimiter
 from minet.cli.utils import print_err, die
 from minet.cli.crowdtangle.constants import CROWDTANGLE_DEFAULT_RATE_LIMIT
 
+DAY_DELTA = timedelta(days=1)
+
 URL_REPORT_HEADERS = [
     'post_ct_id',
     'post_id',
@@ -60,6 +62,76 @@ def day_range(end):
         yield current_date.isoformat(), end_date.isoformat()
 
 
+class PartitionStrategyNoop(object):
+    def __init__(self, namespace, url_forge):
+        self.namespace = namespace
+        self.url_forge = url_forge
+
+    def __call__(self, items):
+        return self.url_forge(self.namespace)
+
+    def get_postfix(self):
+        return {}
+
+
+
+class PartitionStrategyDay(object):
+    def __init__(self, namespace, url_forge):
+        self.namespace = namespace
+        self.url_forge = url_forge
+
+        self.range = day_range(namespace.start_date)
+
+    def __call__(self, items):
+        start_date, end_date = next(self.range, (None, None))
+
+        if start_date is None:
+            return None
+
+        self.namespace.start_date = start_date
+        self.namespace.end_date = end_date
+
+        return self.url_forge(self.namespace)
+
+    def get_postfix(self):
+        return {'day': self.start_date}
+
+
+PARTITION_STRATEGIES = {
+    'day': PartitionStrategyDay
+}
+
+
+def step(http, url, item_key):
+    err, result = fetch(http, url)
+
+    # Debug
+    if err:
+        return 'http-error', err, None
+
+    # Bad auth
+    if result.status == 401:
+        return 'bad-auth', None, None
+
+    # Bad params
+    if result.status >= 400:
+        return 'bad-params', result, None
+
+    try:
+        data = json.loads(result.data)['result']
+    except:
+        return 'bad-json', None, None
+
+    if item_key not in data or len(data[item_key]) == 0:
+        return 'exhausted', None, None
+
+    # Extracting next link
+    pagination = data['pagination']
+    meta = pagination['nextPage'] if 'nextPage' in pagination else None
+
+    return 'ok', meta, data[item_key]
+
+
 def create_paginated_action(url_forge, csv_headers, csv_formatter,
                             item_name, item_key):
 
@@ -72,18 +144,15 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
             url_report_writer = csv.writer(namespace.url_report)
             url_report_writer.writerow(URL_REPORT_HEADERS)
 
-        partition_strategy = getattr(namespace, 'partition_strategy', None)
-        partition_range = None
-
-        if partition_strategy == 'day':
-            partition_range = day_range(namespace.start_date)
-
-            start_date, end_date = next(partition_range, (None,))
-            namespace.start_date = start_date
-            namespace.end_date = end_date
+        if getattr(namespace, 'partition_strategy', None):
+            partition_strategy = None
+            # TODO
+        else:
+            partition_strategy = PartitionStrategyNoop(namespace, url_forge)
 
         N = 0
-        url = url_forge(namespace)
+        C = 0
+        url = partition_strategy(None)
 
         has_limit = bool(namespace.limit)
 
@@ -99,8 +168,13 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
             total=namespace.limit
         )
 
-        if partition_strategy == 'day':
-            loading_bar.set_postfix(day=namespace.start_date)
+        def set_postfix():
+            postfix = {'calls': C}
+            postfix.update(partition_strategy.get_postfix())
+
+            loading_bar.set_postfix(**postfix)
+
+        set_postfix()
 
         if namespace.format == 'csv':
             writer = csv.writer(output_file)
@@ -111,55 +185,38 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
 
         while True:
             with rate_limiter:
-                err, result = fetch(http, url)
+                status, meta, items = step(http, url, item_key)
+                C += 1
 
                 # Debug
-                if err is not None:
+                if status == 'http-error':
                     loading_bar.close()
                     print_err(url)
-                    raise err
+                    raise meta
 
-                if result.status == 401:
+                if status == 'bad-auth':
                     loading_bar.close()
-
                     die([
                         'Your API token is invalid.',
                         'Check that you indicated a valid one using the `--token` argument.'
                     ])
 
-                if result.status >= 400:
+                if status == 'bad-params':
                     loading_bar.close()
+                    die([result.data, result.status])
 
-                    print_err(result.data, result.status)
-                    sys.exit(1)
-
-                try:
-                    data = json.loads(result.data)['result']
-                except:
+                if status == 'bad-json':
                     loading_bar.close()
-                    print_err('Misformatted JSON result.')
-                    sys.exit(1)
+                    die('Misformatted JSON result.')
 
-                if item_key not in data or len(data[item_key]) == 0:
-                    if partition_strategy is None:
-                        break
-
-                    start_date, end_date = next(partition_range, (None, None))
-
-                    if start_date is None:
-                        break
-
-                    namespace.start_date = start_date
-                    namespace.end_date = end_date
-
-                    url = url_forge(namespace)
-
-                    loading_bar.set_postfix(date=start_date)
-
+                if status == 'exhausted':
+                    # TODO: do we need to apply partition strategy
                     continue
 
-                items = data[item_key]
                 enough_to_stop = False
+                next_url = meta
+
+                set_postfix()
 
                 for item in items:
                     N += 1
@@ -189,31 +246,17 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                     print_err('The indicated limit of %s was reached.' % item_name)
                     break
 
-                # Pagination
-                # NOTE: we could adjust the `count` GET param but I am lazy
-                pagination = data['pagination']
-
-                if 'nextPage' not in pagination:
+                # Paginating
+                if next_url is None:
                     if partition_strategy is None:
                         break
 
-                    start_date, end_date = next(partition_range, (None, None))
-
-                    if start_date is None:
-                        break
-
-                    namespace.start_date = start_date
-                    namespace.end_date = end_date
-
-                    url = url_forge(namespace)
-
-                    loading_bar.set_postfix(date=start_date)
+                    # TODO: we need to apply partition strategy
 
                     continue
 
-                url = pagination['nextPage']
+                url = next_url
 
         loading_bar.close()
-        print_err('We reached the end of pagination.')
 
     return action
