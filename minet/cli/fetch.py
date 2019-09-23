@@ -52,6 +52,16 @@ ERROR_REPORTERS = {
     MaxRetryError: max_retry_error_reporter
 }
 
+WorkerPayload = namedtuple(
+    'WorkerPayload',
+    [
+        'http',
+        'line',
+        'namespace',
+        'context'
+    ]
+)
+
 worker_result_fields = [
     'url',
     'line',
