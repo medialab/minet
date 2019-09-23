@@ -160,17 +160,18 @@ class RateLimiter(object):
 
     """
 
-    def __init__(self, max_per_period, period=1.0):
+    def __init__(self, max_per_period, period=1.0, with_budget=False):
         max_per_second = max_per_period / period
         self.min_interval = 1.0 / max_per_second
         self.max_budget = period / 4
         self.budget = 0.0
         self.last_entry = None
+        self.with_budget = with_budget
 
     def __enter__(self):
         self.last_entry = time.perf_counter()
 
-    def __exit__(self, exc_type, exc_value, exc_traceback):
+    def exit_with_budget(self):
         running_time = time.perf_counter() - self.last_entry
 
         delta = self.min_interval - running_time
@@ -192,3 +193,17 @@ class RateLimiter(object):
         # Clamping budget
         # TODO: this should be improved by a circular buffer of last calls
         self.budget = min(self.budget, self.max_budget)
+
+    def exit(self):
+        running_time = time.perf_counter() - self.last_entry
+
+        delta = self.min_interval - running_time
+
+        if delta > 0:
+            time.sleep(delta)
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        if self.with_budget:
+            return self.exit_with_budget()
+
+        return self.exit()
