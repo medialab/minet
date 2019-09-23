@@ -5,11 +5,11 @@ SOURCE = minet
 all: lint test
 compile: clean pyinstaller
 test: unit
-publish: clean test upload clean # TODO: lint is missing
+publish: clean lint test upload clean
 
 clean:
 	rm -rf *.egg-info .pytest_cache build dist
-	find . -name "*.pyc" | xargs rm
+	find . -name "*.pyc" | xargs rm -f
 	rm -rf ftest/content
 	rm -f *.spec
 
