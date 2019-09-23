@@ -105,6 +105,7 @@ def worker(payload):
     error, response = fetch(
         http,
         url,
+        method=context['global_method'],
         cookie=cookie,
         headers=headers
     )
@@ -173,6 +174,9 @@ def fetch_action(namespace):
 
     context = {}
 
+    # HTTP method
+    context['global_method'] = namespace.method
+
     # Cookie grabber
     if namespace.grab_cookies:
         context['grab_cookies'] = grab_cookies(namespace.grab_cookies)
@@ -227,6 +231,7 @@ def fetch_action(namespace):
                 continue
 
             # Url templating
+            # NOTE: it must be done here because group parallelism requires it
             if namespace.url_template:
                 url = namespace.url_template.format(value=url)
             else:

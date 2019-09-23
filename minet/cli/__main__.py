@@ -174,6 +174,12 @@ COMMANDS = {
             {
                 'flag': '--url-template',
                 'help': 'A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.'
+            },
+            {
+                'flags': ['-X', '--request'],
+                'help': 'The http method to use. Will default to GET.',
+                'dest': 'method',
+                'default': 'GET'
             }
         ]
     },
