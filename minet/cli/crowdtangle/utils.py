@@ -60,6 +60,7 @@ def day_range(end):
 
         yield current_date.isoformat(), end_date.isoformat()
 
+
 # TODO: __call__ should receive a status to make finer decisions
 class PartitionStrategyNoop(object):
     def __init__(self, namespace, url_forge):
