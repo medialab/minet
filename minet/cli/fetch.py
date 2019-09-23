@@ -30,8 +30,6 @@ from minet.cli.utils import custom_reader, DummyTqdmFile
 
 mimetypes.init()
 
-GET_COOKIE_FOR_URL = None
-
 OUTPUT_ADDITIONAL_HEADERS = ['line', 'status', 'error', 'filename', 'encoding']
 
 # TODO: make this an option!
@@ -57,6 +55,7 @@ WorkerPayload = namedtuple(
     [
         'http',
         'line',
+        'url',
         'namespace',
         'context'
     ]
@@ -78,18 +77,19 @@ WorkerResult = namedtuple(
 )
 
 
-def worker(job):
+def worker(payload):
     """
     Function using the urllib3 http to actually fetch our contents from the web.
     """
-    namespace, http, line, url = job
+    http, line, url, namespace, context = payload
 
+    # Ensuring we have a protocol
     url = ensure_protocol(url)
-    cookie = None
 
     # Should we grab cookie?
+    cookie = None
     if namespace.grab_cookies:
-        cookie = GET_COOKIE_FOR_URL(url)
+        cookie = context['grab_cookies'](url)
 
     error, response = fetch(http, url, cookie=cookie)
 
@@ -139,7 +139,6 @@ def worker(job):
 
 
 def fetch_action(namespace):
-    global GET_COOKIE_FOR_URL
 
     # Do we need to fetch only a single url?
     if namespace.file is sys.stdin and is_url(namespace.column):
@@ -156,9 +155,11 @@ def fetch_action(namespace):
     if not namespace.contents_in_report:
         os.makedirs(namespace.output_dir, exist_ok=True)
 
+    context = {}
+
     # Cookie grabber
     if namespace.grab_cookies:
-        GET_COOKIE_FOR_URL = grab_cookies(namespace.grab_cookies)
+        context['grab_cookies'] = grab_cookies(namespace.grab_cookies)
 
     # Loading bar
     loading_bar = tqdm(
@@ -194,6 +195,7 @@ def fetch_action(namespace):
         for line in reader:
             url = line[pos]
 
+            # Validation
             if not url:
 
                 # TODO: write report line all the same!
@@ -206,14 +208,22 @@ def fetch_action(namespace):
             else:
                 url = url.strip()
 
-            yield (namespace, http, line, url)
+            payload = WorkerPayload(
+                http=http,
+                line=line,
+                url=url,
+                namespace=namespace,
+                context=context
+            )
+
+            yield payload
 
     # Streaming the file and fetching the url using multiple threads
     multithreaded_iterator = imap_unordered(
         payloads(),
         worker,
         namespace.threads,
-        group=lambda job: get_domain_name(job[3]),
+        group=lambda payload: get_domain_name(payload.url),
         group_parallelism=1,
         group_buffer_size=25,
         group_throttle=namespace.throttle
