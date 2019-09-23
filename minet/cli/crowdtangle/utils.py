@@ -60,7 +60,7 @@ def day_range(end):
 
         yield current_date.isoformat(), end_date.isoformat()
 
-
+# TODO: __call__ should receive a status to make finer decisions
 class PartitionStrategyNoop(object):
     def __init__(self, namespace, url_forge):
         self.namespace = namespace
@@ -239,6 +239,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
         rate_limit = namespace.rate_limit if namespace.rate_limit else CROWDTANGLE_DEFAULT_RATE_LIMIT
         rate_limiter = RateLimiter(rate_limit, 60.0)
 
+        # TODO: those conditions are a bit hacky. code could be clearer
         while url is not None and url != last_url:
             with rate_limiter:
                 status, meta, items = step(http, url, item_key)
