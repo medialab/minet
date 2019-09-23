@@ -108,38 +108,33 @@ class PartitionStrategyLimit(PartitionStrategyNoop):
         self.namespace = namespace
         self.url_forge = url_forge
         self.last_item = None
-        self.started = False
         self.seen = 0
+        self.shifts = 0
         self.limit = limit
 
     def __call__(self, items):
-        if items is None and self.started:
-            return None
-
-        self.started = True
-
-        if items:
-            self.last_item = items[-1]
-            self.seen += len(items)
-
-            if self.seen > self.limit:
-                self.seen = 0
-
         if self.last_item is not None:
-            self.namespace.end_date = self.last_item['date']
+            if items is None:
+                return None
+
+            self.namespace.end_date = self.last_item['date'].replace(' ', 'T')
 
         return self.url_forge(self.namespace)
 
     def get_postfix(self):
         if self.namespace.end_date:
-            return {'date': self.namespace.end_date}
+            return {'date': self.namespace.end_date, 'shifts': self.shifts}
 
     def should_go_next(self, items):
-
-        # TODO: seen updates and limit testing should happen here
         n = len(items)
 
-        if self.seen + n > self.limit:
+        if n > 0:
+            self.last_item = items[-1]
+            self.seen += n
+
+        if self.seen >= self.limit:
+            self.seen = 0
+            self.shifts += 1
             return False
 
         return True
@@ -209,6 +204,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
         N = 0
         C = 0
         url = partition_strategy(None)
+        last_url = None
 
         has_limit = bool(namespace.limit)
 
@@ -243,7 +239,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
         rate_limit = namespace.rate_limit if namespace.rate_limit else CROWDTANGLE_DEFAULT_RATE_LIMIT
         rate_limiter = RateLimiter(rate_limit, 60.0)
 
-        while url is not None:
+        while url is not None and url != last_url:
             with rate_limiter:
                 status, meta, items = step(http, url, item_key)
                 C += 1
@@ -263,7 +259,10 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
 
                 if status == 'bad-params':
                     loading_bar.close()
-                    die([result.data, result.status])
+                    die([
+                        'Error status %i:' % meta.status,
+                        json.loads(meta.data)['message']
+                    ])
 
                 if status == 'bad-json':
                     loading_bar.close()
@@ -277,12 +276,13 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                 next_url = meta
 
                 set_postfix()
+                n = 0
+
+                last_url = url
 
                 for item in items:
+                    n += 1
                     N += 1
-
-                    # TODO: could be done with the count instead
-                    loading_bar.update()
 
                     if namespace.format == 'jsonl':
                         output_file.write(json.dumps(item, ensure_ascii=False) + '\n')
@@ -305,6 +305,8 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                     loading_bar.close()
                     print_err('The indicated limit of %s was reached.' % item_name)
                     break
+                else:
+                    loading_bar.update(n)
 
                 # Paginating
                 if next_url is None:
