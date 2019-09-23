@@ -25,7 +25,13 @@ from urllib3.exceptions import (
     ResponseError
 )
 
-from minet.utils import guess_encoding, grab_cookies, create_safe_pool, fetch
+from minet.utils import (
+    guess_encoding,
+    grab_cookies,
+    create_safe_pool,
+    fetch,
+    parse_http_header
+)
 from minet.cli.utils import custom_reader, DummyTqdmFile
 
 mimetypes.init()
@@ -91,7 +97,17 @@ def worker(payload):
     if namespace.grab_cookies:
         cookie = context['grab_cookies'](url)
 
-    error, response = fetch(http, url, cookie=cookie)
+    # Custom headers
+    headers = None
+    if namespace.headers:
+        headers = context['global_headers']
+
+    error, response = fetch(
+        http,
+        url,
+        cookie=cookie,
+        headers=headers
+    )
 
     if error:
         return WorkerResult(
@@ -160,6 +176,14 @@ def fetch_action(namespace):
     # Cookie grabber
     if namespace.grab_cookies:
         context['grab_cookies'] = grab_cookies(namespace.grab_cookies)
+
+    # Global headers
+    if namespace.headers:
+        context['global_headers'] = {}
+
+        for header in namespace.headers:
+            k, v = parse_http_header(header)
+            context['global_headers'][k] = v
 
     # Loading bar
     loading_bar = tqdm(

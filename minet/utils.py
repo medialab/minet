@@ -69,6 +69,12 @@ def guess_encoding(response, data, is_xml=False, use_chardet=False):
     return None
 
 
+def parse_http_header(header):
+    key, value = header.split(':', 1)
+
+    return key.strip(), value.strip()
+
+
 class CookieResolver(object):
     def __init__(self, jar):
         self.jar = jar
