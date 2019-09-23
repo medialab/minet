@@ -12,7 +12,7 @@ import sys
 import mimetypes
 from io import StringIO
 from os.path import join
-from collections import Counter
+from collections import Counter, namedtuple
 from tqdm import tqdm
 from quenouille import imap_unordered
 from uuid import uuid4
@@ -52,6 +52,21 @@ ERROR_REPORTERS = {
     MaxRetryError: max_retry_error_reporter
 }
 
+worker_result_fields = [
+    'url',
+    'line',
+    'error',
+    'response',
+    'data',
+    'info'
+]
+
+WorkerResult = namedtuple(
+    'WorkerResult',
+    worker_result_fields,
+    defaults=[None] * len(worker_result_fields)
+)
+
 
 def worker(job):
     """
@@ -66,13 +81,18 @@ def worker(job):
     if namespace.grab_cookies:
         cookie = GET_COOKIE_FOR_URL(url)
 
-    error, result = fetch(http, url, cookie=cookie)
+    error, response = fetch(http, url, cookie=cookie)
 
     if error:
-        return error, url, line, result, None, None
+        return WorkerResult(
+            url=url,
+            line=line,
+            response=response,
+            error=error
+        )
 
     # Forcing urllib3 to read data in thread
-    data = result.data
+    data = response.data
 
     # Solving mime type
     (mimetype, _) = mimetypes.guess_type(url)
@@ -90,7 +110,7 @@ def worker(job):
     # Solving encoding
     is_xml = ext == '.html' or ext == '.xml'
 
-    encoding = guess_encoding(result, data, is_xml=is_xml, use_chardet=True)
+    encoding = guess_encoding(response, data, is_xml=is_xml, use_chardet=True)
 
     info = {
         'mime': mimetype,
@@ -98,7 +118,14 @@ def worker(job):
         'encoding': encoding
     }
 
-    return error, url, line, result, data, info
+    return WorkerResult(
+        url=url,
+        line=line,
+        response=response,
+        error=error,
+        data=data,
+        info=info
+    )
 
 
 def fetch_action(namespace):
@@ -185,16 +212,19 @@ def fetch_action(namespace):
     errors = 0
     status_codes = Counter()
 
-    for i, (error, url, line, result, data, info) in enumerate(multithreaded_iterator):
+    for i, result in enumerate(multithreaded_iterator):
+        response = result.response
+        line = result.line
+        data = result.data
 
         content_write_flag = 'wb'
 
         # Updating stats
-        if error is not None:
+        if result.error is not None:
             errors += 1
         else:
-            if result.status >= 400:
-                status_codes[result.status] += 1
+            if response.status >= 400:
+                status_codes[response.status] += 1
 
         postfix = {'errors': errors}
 
@@ -205,7 +235,7 @@ def fetch_action(namespace):
         loading_bar.update()
 
         # No error
-        if error is None:
+        if result.error is None:
 
             filename = None
 
@@ -214,13 +244,13 @@ def fetch_action(namespace):
                 if namespace.filename_template:
                     filename = namespace.filename_template.format(value=line[filename_pos])
                 else:
-                    filename = line[filename_pos] + info['ext']
+                    filename = line[filename_pos] + result.info['ext']
             else:
                 # NOTE: it would be nice to have an id that can be sorted by time
-                filename = str(uuid4()) + info['ext']
+                filename = str(uuid4()) + result.info['ext']
 
             # Standardize encoding?
-            encoding = info['encoding']
+            encoding = result.info['encoding']
 
             if namespace.standardize_encoding or namespace.contents_in_report:
                 if encoding is None or encoding != 'utf-8' or namespace.contents_in_report:
@@ -237,7 +267,7 @@ def fetch_action(namespace):
             if selected_pos:
                 line = [line[i] for i in selected_pos]
 
-            line.extend([i, result.status, '', filename, encoding or ''])
+            line.extend([i, response.status, '', filename, encoding or ''])
 
             if namespace.contents_in_report:
                 line.append(data)
@@ -246,9 +276,9 @@ def fetch_action(namespace):
 
         # Handling potential errors
         else:
-            reporter = ERROR_REPORTERS.get(type(error), repr)
+            reporter = ERROR_REPORTERS.get(type(result.error), repr)
 
-            error_code = reporter(error) if callable(reporter) else reporter
+            error_code = reporter(result.error) if callable(reporter) else reporter
 
             # Reporting in output
             if selected_pos:
