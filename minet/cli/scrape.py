@@ -8,6 +8,7 @@ import csv
 import json
 import sys
 import codecs
+from collections import namedtuple
 from os.path import join
 from multiprocessing import Pool
 from tqdm import tqdm
@@ -19,6 +20,17 @@ ERROR_REPORTERS = {
     UnicodeDecodeError: 'wrong-encoding'
 }
 
+WorkerPayload = namedtuple(
+    'WorkerPayload',
+    ['scraper', 'line', 'path', 'encoding', 'content'],
+    [None, None]
+)
+
+WorkerResult = namedtuple(
+    'WorkerResult',
+    ['error', 'items']
+)
+
 
 def worker(payload):
     line, path, encoding, content, scraper = payload
@@ -29,12 +41,12 @@ def worker(payload):
             try:
                 content = f.read()
             except UnicodeDecodeError as e:
-                return e, line, None
+                return WorkerResult(e, None)
 
     # Attempting to scrape
     items = list(scrape(content, scraper))
 
-    return None, line, items
+    return WorkerResult(None, items)
 
 
 def scrape_action(namespace):
@@ -77,7 +89,7 @@ def scrape_action(namespace):
     )
 
     with Pool(namespace.processes) as pool:
-        for error, line, items in pool.imap_unordered(worker, files()):
+        for error, items in pool.imap_unordered(worker, files()):
             loading_bar.update()
 
             for item in items:
