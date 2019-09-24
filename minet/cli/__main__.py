@@ -554,6 +554,10 @@ COMMANDS = {
                 'nargs': '?'
             },
             {
+                'flags': ['-g', '--glob'],
+                'help': 'Whether to scrape a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.'
+            },
+            {
                 'flags': ['-i', '--input-directory'],
                 'help': 'Directory where the HTML files are stored. Defaults to "%s".' % DEFAULT_CONTENT_FOLDER,
                 'default': DEFAULT_CONTENT_FOLDER
