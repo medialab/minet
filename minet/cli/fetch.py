@@ -131,6 +131,8 @@ def worker(payload):
 
     if not exts:
         ext = '.html'
+    elif '.html' in exts:
+        ext = '.html'
     else:
         ext = max(exts, key=len)
 
