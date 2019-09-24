@@ -23,7 +23,7 @@ ERROR_REPORTERS = {
 WorkerPayload = namedtuple(
     'WorkerPayload',
     ['scraper', 'line', 'path', 'encoding', 'content'],
-    [None, None]
+    [None, None, None]
 )
 
 WorkerResult = namedtuple(
@@ -33,7 +33,7 @@ WorkerResult = namedtuple(
 
 
 def worker(payload):
-    line, path, encoding, content, scraper = payload
+    scraper, line, path, encoding, content = payload
 
     # Reading from file
     if content is None:
@@ -49,8 +49,38 @@ def worker(payload):
     return WorkerResult(None, items)
 
 
-def scrape_action(namespace):
+def create_report_iterator(namespace):
     input_headers, pos, reader = custom_reader(namespace.report, ('status', 'filename', 'encoding', 'raw_content'))
+
+    for line in reader:
+        status = int(line[pos.status]) if line[pos.status] else None
+
+        if status is None or status >= 400:
+            loading_bar.update()
+            continue
+
+        if pos.raw_content is not None:
+            yield WorkerPayload(
+                scraper,
+                line,
+                content=line[pos.raw_content]
+            )
+
+            continue
+
+        path = join(namespace.input_directory, line[pos.filename])
+        encoding = line[pos.encoding].strip() or 'utf-8'
+
+        yield WorkerPayload(
+            scraper,
+            line,
+            path=path,
+            encoding=encoding,
+            content=None
+        )
+
+
+def scrape_action(namespace):
 
     if namespace.output is None:
         output_file = DummyTqdmFile(sys.stdout)
@@ -64,22 +94,7 @@ def scrape_action(namespace):
     output_writer = csv.DictWriter(output_file, fieldnames=output_headers)
     output_writer.writeheader()
 
-    def files():
-        for line in reader:
-            status = int(line[pos.status]) if line[pos.status] else None
-
-            if status is None or status >= 400:
-                loading_bar.update()
-                continue
-
-            if pos.raw_content is not None:
-                yield line, None, None, line[pos.raw_content], scraper
-                continue
-
-            path = join(namespace.input_directory, line[pos.filename])
-            encoding = line[pos.encoding].strip() or 'utf-8'
-
-            yield line, path, encoding, None, scraper
+    files = create_report_iterator(namespace)
 
     loading_bar = tqdm(
         desc='Scraping pages',
