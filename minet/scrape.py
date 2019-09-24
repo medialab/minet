@@ -9,7 +9,7 @@ import re
 from bs4 import BeautifulSoup
 
 
-def extract_value(element, spec):
+def extract_value(element, spec, root=None, html=None, context=None):
 
     # No specs -> returning text
     if spec is None:
@@ -26,7 +26,7 @@ def extract_value(element, spec):
         o = {}
 
         for k, s in fields.items():
-            v = extract_value(element, s)
+            v = extract_value(element, s, root, html, context)
 
             if v is not None:
                 o[k] = v
@@ -61,16 +61,23 @@ def extract_value(element, spec):
 
     if expression is not None:
         return eval(expression, None, {
+
+            # Useful deps
             're': re,
+
+            # Local values
             'element': element,
             'elements': elements,
-            'value': value
+            'value': value,
+
+            # Context
+            'root': root
         })
 
     return value
 
 
-def scrape_from_soup(soup, specs):
+def scrape_from_soup(soup, specs, html=None):
     item_specs = specs.get('item')
 
     iterator = specs.get('iterator')
@@ -81,13 +88,18 @@ def scrape_from_soup(soup, specs):
         elements = soup.select(iterator)
 
     for element in elements:
-        yield extract_value(element, item_specs)
+        yield extract_value(
+            element,
+            item_specs,
+            root=soup,
+            html=html
+        )
 
 
 def scrape(html, specs):
     soup = BeautifulSoup(html, 'lxml')
 
-    return scrape_from_soup(soup, specs)
+    return scrape_from_soup(soup, specs, html)
 
 
 def headers_from_definition(specs):

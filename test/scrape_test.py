@@ -17,6 +17,15 @@ NESTED_HTML = """
     </ul>
 """
 
+META_HTML = """
+    <div id="ok">
+        <ul>
+            <li id="li1">One</li>
+            <li id="li2">Two</li>
+        </ul>
+    </div>
+"""
+
 
 # TODO: test the ds example from tp
 class TestScrape(object):
@@ -84,6 +93,20 @@ class TestScrape(object):
         })
 
         assert list(result) == [{'number': '1', 'label': 'One'}, {'number': '2', 'label': 'Two'}]
+
+    def test_addenda(self):
+        result = scrape(META_HTML, {
+            'iterator': 'li',
+            'item': {
+                'fields': {
+                    'root_id': {
+                        'eval': 'root.select_one("#ok").get("id")'
+                    }
+                }
+            }
+        })
+
+        assert list(result) == [{'root_id': 'ok'}, {'root_id': 'ok'}]
 
     def test_headers(self):
         headers = headers_from_definition({'iterator': 'li'})
