@@ -20,7 +20,8 @@ def crowdtangle_action(namespace):
     if namespace.output is None:
         output_file = DummyTqdmFile(sys.stdout)
     else:
-        output_file = open(namespace.output, 'w')
+        flag = 'a+' if getattr(namespace, 'resume', False) else 'w'
+        output_file = open(namespace.output, flag)
 
     if namespace.ct_action == 'posts':
         from minet.cli.crowdtangle.posts import crowdtangle_posts_action

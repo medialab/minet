@@ -12,7 +12,7 @@ from ural import get_domain_name, normalize_url
 from urllib3 import Timeout
 
 from minet.utils import create_safe_pool, fetch, RateLimiter
-from minet.cli.utils import print_err, die
+from minet.cli.utils import print_err, die, custom_reader
 from minet.cli.crowdtangle.constants import CROWDTANGLE_DEFAULT_RATE_LIMIT
 
 DAY_DELTA = timedelta(days=1)
@@ -189,6 +189,37 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
         if getattr(namespace, 'resume', False):
             need_to_resume = True
 
+            if namespace.output is None:
+                die(
+                    'Cannot --resume without knowing the output (use -o/--output rather stdout).',
+                )
+
+            if namespace.sort_by != 'date':
+                die('Cannot --resume if --sort_by is not `date`.')
+
+            if namespace.format != 'csv':
+                die('Cannot --resume jsonl format yet.')
+
+            with open(namespace.output, 'r') as f:
+
+                # TODO: will get ugly if file does not yet exist
+                _, resume_pos, resume_reader = custom_reader(f, 'datetime')
+
+                last_line = None
+                resume_loader = tqdm(desc='Resuming', unit=' lines')
+
+                for line in resume_reader:
+                    resume_loader.update()
+                    last_line = line
+
+                resume_loader.close()
+
+                if last_line is not None:
+                    last_date = last_line[resume_pos].replace(' ', 'T')
+                    namespace.end_date = last_date
+
+                    print_err('Resuming from: %s' % last_date)
+
         if getattr(namespace, 'url_report', False):
             url_report_writer = csv.writer(namespace.url_report)
             url_report_writer.writerow(URL_REPORT_HEADERS)
@@ -240,7 +271,9 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
 
         if namespace.format == 'csv':
             writer = csv.writer(output_file)
-            writer.writerow(csv_headers(namespace) if callable(csv_headers) else csv_headers)
+
+            if not need_to_resume:
+                writer.writerow(csv_headers(namespace) if callable(csv_headers) else csv_headers)
 
         rate_limit = namespace.rate_limit if namespace.rate_limit else CROWDTANGLE_DEFAULT_RATE_LIMIT
         rate_limiter = RateLimiter(rate_limit, 60.0)
