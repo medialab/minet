@@ -268,7 +268,9 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                     loading_bar.close()
                     die([
                         'Error status %i:' % meta.status,
-                        json.loads(meta.data)['message']
+                        json.loads(meta.data)['message'],
+                        'Last called url:',
+                        url
                     ])
 
                 if status == 'bad-json':
