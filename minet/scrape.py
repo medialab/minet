@@ -8,6 +8,8 @@
 import re
 from bs4 import BeautifulSoup
 
+DEFAULT_CONTEXT = {}
+
 
 def extract_value(element, spec, root=None, html=None, context=None):
 
@@ -71,6 +73,7 @@ def extract_value(element, spec, root=None, html=None, context=None):
             'value': value,
 
             # Context
+            'context': context or DEFAULT_CONTEXT,
             'html': html,
             'root': root
         })
@@ -78,7 +81,7 @@ def extract_value(element, spec, root=None, html=None, context=None):
     return value
 
 
-def scrape_from_soup(soup, specs, html=None):
+def scrape_from_soup(soup, specs, html=None, context=None):
     item_specs = specs.get('item')
 
     iterator = specs.get('iterator')
@@ -93,14 +96,15 @@ def scrape_from_soup(soup, specs, html=None):
             element,
             item_specs,
             root=soup,
-            html=html
+            html=html if html is not None else str(soup),
+            context=context
         )
 
 
-def scrape(html, specs):
+def scrape(html, specs, context=None):
     soup = BeautifulSoup(html, 'lxml')
 
-    return scrape_from_soup(soup, specs, html)
+    return scrape_from_soup(soup, specs, html, context)
 
 
 def headers_from_definition(specs):
