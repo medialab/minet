@@ -18,6 +18,7 @@ NESTED_HTML = """
 """
 
 META_HTML = """
+    Exemple
     <div id="ok">
         <ul>
             <li id="li1">One</li>
@@ -94,7 +95,7 @@ class TestScrape(object):
 
         assert list(result) == [{'number': '1', 'label': 'One'}, {'number': '2', 'label': 'Two'}]
 
-    def test_addenda(self):
+    def test_context(self):
         result = scrape(META_HTML, {
             'iterator': 'li',
             'item': {
@@ -107,6 +108,14 @@ class TestScrape(object):
         })
 
         assert list(result) == [{'root_id': 'ok'}, {'root_id': 'ok'}]
+
+        result = scrape(META_HTML, {
+            'item': {
+                'eval': 'html.split("<div", 1)[0].strip()'
+            }
+        })
+
+        assert list(result) == ['Exemple']
 
     def test_headers(self):
         headers = headers_from_definition({'iterator': 'li'})

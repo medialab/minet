@@ -71,6 +71,7 @@ def extract_value(element, spec, root=None, html=None, context=None):
             'value': value,
 
             # Context
+            'html': html,
             'root': root
         })
 
