@@ -184,6 +184,11 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
 
         url_report_writer = None
 
+        # Do we need to resume?
+        need_to_resume = False
+        if getattr(namespace, 'resume', False):
+            need_to_resume = True
+
         if getattr(namespace, 'url_report', False):
             url_report_writer = csv.writer(namespace.url_report)
             url_report_writer.writerow(URL_REPORT_HEADERS)

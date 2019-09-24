@@ -313,6 +313,11 @@ COMMANDS = {
                             'type': partition_strategy_type
                         },
                         {
+                            'flag': '--resume',
+                            'help': 'Whether to resume an interrupted collection. Requires -o/--output & --sort-by date',
+                            'action': 'store_true'
+                        },
+                        {
                             'flag': '--sort-by',
                             'help': 'The order in which to retrieve posts. Defaults to `date`.',
                             'choices': CROWDTANGLE_SORT_TYPES,
