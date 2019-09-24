@@ -8,6 +8,7 @@ import csv
 import json
 import sys
 import codecs
+from glob import iglob
 from collections import namedtuple
 from os.path import join
 from multiprocessing import Pool
@@ -23,7 +24,7 @@ ERROR_REPORTERS = {
 WorkerPayload = namedtuple(
     'WorkerPayload',
     ['scraper', 'line', 'path', 'encoding', 'content'],
-    [None, None, None]
+    defaults=[None, None, None]
 )
 
 WorkerResult = namedtuple(
@@ -49,7 +50,7 @@ def worker(payload):
     return WorkerResult(None, items)
 
 
-def create_report_iterator(namespace):
+def create_report_iterator(namespace, loading_bar, scraper):
     input_headers, pos, reader = custom_reader(namespace.report, ('status', 'filename', 'encoding', 'raw_content'))
 
     for line in reader:
@@ -80,6 +81,17 @@ def create_report_iterator(namespace):
         )
 
 
+def create_glob_iterator(namespace, scraper):
+    for p in iglob(namespace.glob, recursive=True):
+        yield WorkerPayload(
+            scraper,
+            line=None,
+            path=p,
+            encoding='utf-8',
+            content=None
+        )
+
+
 def scrape_action(namespace):
 
     if namespace.output is None:
@@ -94,8 +106,6 @@ def scrape_action(namespace):
     output_writer = csv.DictWriter(output_file, fieldnames=output_headers)
     output_writer.writeheader()
 
-    files = create_report_iterator(namespace)
-
     loading_bar = tqdm(
         desc='Scraping pages',
         total=namespace.total,
@@ -103,8 +113,15 @@ def scrape_action(namespace):
         unit=' pages'
     )
 
+    loading_bar.set_postfix(p=namespace.processes)
+
+    if namespace.glob is not None:
+        files = create_glob_iterator(namespace, scraper)
+    else:
+        files = create_report_iterator(namespace, loading_bar, scraper)
+
     with Pool(namespace.processes) as pool:
-        for error, items in pool.imap_unordered(worker, files()):
+        for error, items in pool.imap_unordered(worker, files):
             loading_bar.update()
 
             for item in items:

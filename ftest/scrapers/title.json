@@ -1,6 +1,6 @@
 {
-  "sel": "meta[title]",
   "item": {
-    "attr": "title"
+    "sel": "title",
+    "method": "text"
   }
 }
