@@ -11,8 +11,17 @@ import certifi
 import browser_cookie3
 import urllib3
 import time
+from collections import OrderedDict
+from urllib.parse import urljoin
+from urllib3 import HTTPResponse
 from urllib3.exceptions import ClosedPoolError, HTTPError
 from urllib.request import Request
+
+from minet.exceptions import (
+    MaxRedirectsError,
+    InfiniteRedirectsError,
+    InvalidRedirectError
+)
 
 from minet.defaults import (
     DEFAULT_CONNECT_TIMEOUT,
@@ -27,6 +36,7 @@ XML_RE = re.compile(rb'^<\?xml.*?encoding=["\']*(.+?)["\'>]')
 
 # Constants
 CHARDET_CONFIDENCE_THRESHOLD = 0.9
+REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
 
 
 def guess_response_encoding(response, data, is_xml=False, use_chardet=False):
@@ -125,7 +135,7 @@ def create_safe_pool(timeout=None, **kwargs):
 
 
 def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
-            headers_only=False):
+            headers_only=False, redirect=None):
     """
     Generic request helpers using a urllib3 pool to access some resource.
     """
@@ -148,17 +158,56 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
 
     # Performing request
     try:
-        result = http.request(
+        response = http.request(
             method,
             url,
             headers=final_headers,
             preload_content=True if not headers_only else False,
-            release_conn=True
+            release_conn=True,
+            redirect=redirect
         )
     except (ClosedPoolError, HTTPError) as e:
         return e, None
 
-    return None, result
+    return None, response
+
+
+def resolve(http, url, max=5):
+    """
+    Helper function attempting to resolve the given url.
+    """
+    url_stack = OrderedDict()
+
+    for _ in range(max):
+        error, response = request(
+            http,
+            url,
+            method='HEAD',
+            redirect=False,
+            headers_only=True
+        )
+
+        if error:
+            url_stack[url] = (error, url)
+            return error, response, list(url_stack.values())
+
+        if url in url_stack:
+            return InfiniteRedirectsError('Infinite redirects'), list(url_stack.values())
+
+        url_stack[url] = (response.status, url)
+
+        if response.status not in REDIRECT_STATUSES:
+            return None, list(url_stack.values())
+
+        location = response.getheader('location')
+
+        if not location:
+            return InvalidRedirectError('Redirection is invalid'), list(url_stack.values())
+
+        # Go to next
+        url = urljoin(url, location)
+
+    return MaxRedirectsError('Maximum number of redirects exceeded'), list(url_stack)
 
 
 class RateLimiter(object):
