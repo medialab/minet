@@ -29,7 +29,7 @@ XML_RE = re.compile(rb'^<\?xml.*?encoding=["\']*(.+?)["\'>]')
 CHARDET_CONFIDENCE_THRESHOLD = 0.9
 
 
-def guess_encoding(response, data, is_xml=False, use_chardet=False):
+def guess_response_encoding(response, data, is_xml=False, use_chardet=False):
     """
     Function taking an urllib3 response object and attempting to guess its
     encoding.
