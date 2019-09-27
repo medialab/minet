@@ -105,7 +105,8 @@ def fetch_action(namespace):
     output_writer = csv.writer(output_file)
     output_writer.writerow(output_headers)
 
-    def url_key(line):
+    def url_key(item):
+        line = item[1]
         url = line[pos].strip()
 
         if not url:
@@ -117,7 +118,7 @@ def fetch_action(namespace):
 
         return url
 
-    def request_args(url, line):
+    def request_args(url, item):
         cookie = None
 
         # Cookie
@@ -140,14 +141,14 @@ def fetch_action(namespace):
     status_codes = Counter()
 
     multithreaded_iterator = fetch(
-        reader,
+        enumerate(reader),
         key=url_key,
         request_args=request_args,
         threads=namespace.threads,
         throttle=namespace.throttle
     )
 
-    for i, result in enumerate(multithreaded_iterator):
+    for result in multithreaded_iterator:
         if not result.url:
 
             # TODO: should write the report all the same...
@@ -155,7 +156,7 @@ def fetch_action(namespace):
             continue
 
         response = result.response
-        line = result.item
+        line_index, line = result.item
         data = response.data if response is not None else None
 
         content_write_flag = 'wb'
@@ -207,9 +208,9 @@ def fetch_action(namespace):
 
             # Reporting in output
             if selected_pos:
-                line = [line[i] for i in selected_pos]
+                line = [line[p] for p in selected_pos]
 
-            line.extend([i, response.status, '', filename or '', encoding or ''])
+            line.extend([line_index, response.status, '', filename or '', encoding or ''])
 
             if namespace.contents_in_report:
                 line.append(data)
@@ -226,7 +227,7 @@ def fetch_action(namespace):
             if selected_pos:
                 line = [line[p] for p in selected_pos]
 
-            line.extend([i, '', error_code, '', ''])
+            line.extend([line_index, '', error_code, '', ''])
             output_writer.writerow(line)
 
     # Closing files
