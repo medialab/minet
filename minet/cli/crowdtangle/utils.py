@@ -11,7 +11,7 @@ from tqdm import tqdm
 from ural import get_domain_name, normalize_url
 from urllib3 import Timeout
 
-from minet.utils import create_safe_pool, fetch, RateLimiter
+from minet.utils import create_safe_pool, request, RateLimiter
 from minet.cli.utils import print_err, die, custom_reader
 from minet.cli.crowdtangle.constants import CROWDTANGLE_DEFAULT_RATE_LIMIT
 
@@ -147,7 +147,7 @@ PARTITION_STRATEGIES = {
 
 
 def step(http, url, item_key):
-    err, result = fetch(http, url)
+    err, result = request(http, url)
 
     # Debug
     if err:

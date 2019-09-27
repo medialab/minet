@@ -16,7 +16,7 @@ from http.cookies import SimpleCookie
 from tqdm import tqdm
 from ural.facebook import extract_user_from_facebook_url
 
-from minet.utils import grab_cookies, create_safe_pool, fetch
+from minet.utils import grab_cookies, create_safe_pool, request
 from minet.cli.utils import DummyTqdmFile, die
 
 DEFAULT_THROTTLE = 0.5
@@ -195,8 +195,8 @@ def facebook_comments_action(namespace):
 
     http = create_safe_pool()
 
-    def fetch_page(target):
-        error, result = fetch(http, target, cookie=cookie)
+    def request_page(target):
+        error, result = request(http, target, cookie=cookie)
 
         if error is not None:
             raise error
@@ -218,7 +218,7 @@ def facebook_comments_action(namespace):
     while len(url_queue) != 0:
         current_url, in_reply_to = url_queue.popleft()
 
-        html = fetch_page(current_url)
+        html = request_page(current_url)
         data = scrape_comments(html, in_reply_to)
 
         url_count += 1

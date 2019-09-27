@@ -32,7 +32,7 @@ lint:
 	pycodestyle --ignore E501,E722,E741 $(SOURCE) test
 	@echo
 	@echo Searching for unused imports...
-	importchecker $(SOURCE)
+	importchecker $(SOURCE) | grep -v __init__ | grep -v dragnet || true
 	@echo
 
 unit:

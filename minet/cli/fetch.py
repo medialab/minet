@@ -29,7 +29,7 @@ from minet.utils import (
     guess_encoding,
     grab_cookies,
     create_safe_pool,
-    fetch,
+    request,
     parse_http_header
 )
 from minet.cli.utils import custom_reader, DummyTqdmFile
@@ -82,7 +82,7 @@ WorkerResult = namedtuple(
 
 def worker(payload):
     """
-    Function using the urllib3 http to actually fetch our contents from the web.
+    Function using the urllib3 http to actually request our contents from the web.
     """
     http, line, url, namespace, context = payload
 
@@ -99,7 +99,7 @@ def worker(payload):
     if namespace.headers:
         headers = context['global_headers']
 
-    error, response = fetch(
+    error, response = request(
         http,
         url,
         method=context['global_method'],

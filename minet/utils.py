@@ -124,9 +124,9 @@ def create_safe_pool(timeout=None, **kwargs):
     )
 
 
-def fetch(http, url, method='GET', headers=None, cookie=None, spoof_ua=True):
+def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True):
     """
-    Generic fetch helpers using a urllib3 pool to access some resource.
+    Generic request helpers using a urllib3 pool to access some resource.
     """
 
     # Formatting headers
