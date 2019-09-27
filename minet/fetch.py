@@ -13,7 +13,8 @@ from ural import get_domain_name, ensure_protocol
 from minet.utils import (
     create_safe_pool,
     guess_response_encoding,
-    request
+    request,
+    resolve
 )
 
 from minet.defaults import (
@@ -43,6 +44,16 @@ FetchWorkerResult = namedtuple(
         'error',
         'response',
         'meta'
+    ]
+)
+
+ResolveWorkerResult = namedtuple(
+    'ResolveWorkerResult',
+    [
+        'url',
+        'item',
+        'error',
+        'stack'
     ]
 )
 
@@ -140,6 +151,96 @@ def fetch(iterator, key=None, request_args=None, threads=25,
             response=response,
             error=error,
             meta=meta
+        )
+
+    # Group resolver
+    def grouper(payload):
+        if payload.url is None:
+            return
+
+        return get_domain_name(payload.url)
+
+    # Thread payload iterator
+    def payloads():
+        for item in iterator:
+            url = item if key is None else key(item)
+
+            if not url:
+                yield FetchWorkerPayload(
+                    http=http,
+                    item=item,
+                    url=None,
+                    request_args=request_args
+                )
+
+            # Url cleanup
+            url = ensure_protocol(url.strip())
+
+            yield FetchWorkerPayload(
+                http=http,
+                item=item,
+                url=url,
+                request_args=request_args
+            )
+
+    return imap_unordered(
+        payloads(),
+        worker,
+        threads,
+        group=grouper,
+        group_parallelism=DEFAULT_GROUP_PARALLELISM,
+        group_buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
+        group_throttle=throttle
+    )
+
+
+def resolve(iterator, key=None, request_args=None, threads=25,
+            throttle=DEFAULT_THROTTLE, max_redirects=5):
+    """
+    Function returning a multithreaded iterator over fetched urls.
+
+    Args:
+        iterator (iterable): An iterator over urls or arbitrary items.
+        key (callable, optional): Function extracting url from yielded items.
+        request_args (callable, optional): Function returning specific
+            arguments to pass to the request for a yielded item.
+        threads (int, optional): Number of threads to use. Defaults to 25.
+        throttle (float, optional): Per-domain throttle in seconds.
+            Defaults to 0.2.
+        max_redirects (int, optional): Max number of redirects to resolve.
+
+    Yields:
+        ResolveWorkerResult
+
+    """
+
+    # Creating the http pool manager
+    http = create_safe_pool(
+        num_pools=threads * 2,
+        maxsize=1
+    )
+
+    # Thread worker
+    def worker(payload):
+        http, item, url, request_args = payload
+
+        if url is None:
+            return ResolveWorkerResult(
+                url=None,
+                item=item,
+                error=None,
+                stack=None
+            )
+
+        kwargs = request_args(url, item) if request_args is not None else {}
+
+        error, stack = resolve(http, url, **kwargs)
+
+        return ResolveWorkerResult(
+            url=url,
+            item=item,
+            error=error,
+            stack=stack
         )
 
     # Group resolver
