@@ -189,7 +189,7 @@ def resolve(http, url, max=5):
 
         if error:
             url_stack[url] = (error, url)
-            return error, response, list(url_stack.values())
+            return error, list(url_stack.values())
 
         if url in url_stack:
             return InfiniteRedirectsError('Infinite redirects'), list(url_stack.values())

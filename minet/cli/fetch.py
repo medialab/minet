@@ -23,7 +23,7 @@ from urllib3.exceptions import (
     ResponseError
 )
 
-from minet.fetch import fetch
+from minet.fetch import multithreaded_fetch
 from minet.utils import (
     grab_cookies,
     parse_http_header
@@ -140,7 +140,7 @@ def fetch_action(namespace):
     errors = 0
     status_codes = Counter()
 
-    multithreaded_iterator = fetch(
+    multithreaded_iterator = multithreaded_fetch(
         enumerate(reader),
         key=url_key,
         request_args=request_args,

@@ -58,9 +58,9 @@ ResolveWorkerResult = namedtuple(
 )
 
 
-def fetch(iterator, key=None, request_args=None, threads=25,
-          throttle=DEFAULT_THROTTLE, guess_extension=True,
-          guess_encoding=True):
+def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
+                        throttle=DEFAULT_THROTTLE, guess_extension=True,
+                        guess_encoding=True):
     """
     Function returning a multithreaded iterator over fetched urls.
 
@@ -194,10 +194,10 @@ def fetch(iterator, key=None, request_args=None, threads=25,
     )
 
 
-def resolve(iterator, key=None, request_args=None, threads=25,
-            throttle=DEFAULT_THROTTLE, max_redirects=5):
+def multithreaded_resolve(iterator, key=None, request_args=None, threads=25,
+                          throttle=DEFAULT_THROTTLE, max_redirects=5):
     """
-    Function returning a multithreaded iterator over fetched urls.
+    Function returning a multithreaded iterator over resolved urls.
 
     Args:
         iterator (iterable): An iterator over urls or arbitrary items.
@@ -234,7 +234,7 @@ def resolve(iterator, key=None, request_args=None, threads=25,
 
         kwargs = request_args(url, item) if request_args is not None else {}
 
-        error, stack = resolve(http, url, **kwargs)
+        error, stack = resolve(http, url, max=max_redirects, **kwargs)
 
         return ResolveWorkerResult(
             url=url,
