@@ -21,14 +21,14 @@ ERROR_REPORTERS = {
     UnicodeDecodeError: 'wrong-encoding'
 }
 
-WorkerPayload = namedtuple(
-    'WorkerPayload',
+ScrapeWorkerPayload = namedtuple(
+    'ScrapeWorkerPayload',
     ['scraper', 'line', 'path', 'encoding', 'content'],
     defaults=[None, None, None]
 )
 
-WorkerResult = namedtuple(
-    'WorkerResult',
+ScrapeWorkerResult = namedtuple(
+    'ScrapeWorkerResult',
     ['error', 'items']
 )
 
@@ -42,12 +42,12 @@ def worker(payload):
             try:
                 content = f.read()
             except UnicodeDecodeError as e:
-                return WorkerResult(e, None)
+                return ScrapeWorkerResult(e, None)
 
     # Attempting to scrape
     items = list(scrape(content, scraper))
 
-    return WorkerResult(None, items)
+    return ScrapeWorkerResult(None, items)
 
 
 def create_report_iterator(namespace, loading_bar, scraper):
@@ -61,7 +61,7 @@ def create_report_iterator(namespace, loading_bar, scraper):
             continue
 
         if pos.raw_content is not None:
-            yield WorkerPayload(
+            yield ScrapeWorkerPayload(
                 scraper,
                 line,
                 content=line[pos.raw_content]
@@ -72,7 +72,7 @@ def create_report_iterator(namespace, loading_bar, scraper):
         path = join(namespace.input_directory, line[pos.filename])
         encoding = line[pos.encoding].strip() or 'utf-8'
 
-        yield WorkerPayload(
+        yield ScrapeWorkerPayload(
             scraper,
             line,
             path=path,
@@ -83,7 +83,7 @@ def create_report_iterator(namespace, loading_bar, scraper):
 
 def create_glob_iterator(namespace, scraper):
     for p in iglob(namespace.glob, recursive=True):
-        yield WorkerPayload(
+        yield ScrapeWorkerPayload(
             scraper,
             line=None,
             path=p,
