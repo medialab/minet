@@ -9,14 +9,12 @@
 import os
 import csv
 import sys
-import mimetypes
 from io import StringIO
 from os.path import join
-from collections import Counter, namedtuple
+from collections import Counter
 from tqdm import tqdm
-from quenouille import imap_unordered
 from uuid import uuid4
-from ural import ensure_protocol, is_url, get_domain_name
+from ural import is_url
 
 from urllib3.exceptions import (
     ConnectTimeoutError,
@@ -25,16 +23,12 @@ from urllib3.exceptions import (
     ResponseError
 )
 
+from minet.fetch import fetch
 from minet.utils import (
-    guess_encoding,
     grab_cookies,
-    create_safe_pool,
-    request,
     parse_http_header
 )
 from minet.cli.utils import custom_reader, DummyTqdmFile
-
-mimetypes.init()
 
 OUTPUT_ADDITIONAL_HEADERS = ['line', 'status', 'error', 'filename', 'encoding']
 
@@ -52,106 +46,6 @@ def max_retry_error_reporter(error):
 ERROR_REPORTERS = {
     MaxRetryError: max_retry_error_reporter
 }
-
-WorkerPayload = namedtuple(
-    'WorkerPayload',
-    [
-        'http',
-        'line',
-        'url',
-        'namespace',
-        'context'
-    ]
-)
-
-worker_result_fields = [
-    'url',
-    'line',
-    'error',
-    'response',
-    'data',
-    'info'
-]
-
-WorkerResult = namedtuple(
-    'WorkerResult',
-    worker_result_fields,
-    defaults=[None] * len(worker_result_fields)
-)
-
-
-def worker(payload):
-    """
-    Function using the urllib3 http to actually request our contents from the web.
-    """
-    http, line, url, namespace, context = payload
-
-    # Ensuring we have a protocol
-    url = ensure_protocol(url)
-
-    # Should we grab cookie?
-    cookie = None
-    if namespace.grab_cookies:
-        cookie = context['grab_cookies'](url)
-
-    # Custom headers
-    headers = None
-    if namespace.headers:
-        headers = context['global_headers']
-
-    error, response = request(
-        http,
-        url,
-        method=context['global_method'],
-        cookie=cookie,
-        headers=headers
-    )
-
-    if error:
-        return WorkerResult(
-            url=url,
-            line=line,
-            response=response,
-            error=error
-        )
-
-    # Forcing urllib3 to read data in thread
-    data = response.data
-
-    # Solving mime type
-    (mimetype, _) = mimetypes.guess_type(url)
-
-    if mimetype is None:
-        mimetype = 'text/html'
-
-    exts = mimetypes.guess_all_extensions(mimetype)
-
-    if not exts:
-        ext = '.html'
-    elif '.html' in exts:
-        ext = '.html'
-    else:
-        ext = max(exts, key=len)
-
-    # Solving encoding
-    is_xml = ext == '.html' or ext == '.xml'
-
-    encoding = guess_encoding(response, data, is_xml=is_xml, use_chardet=True)
-
-    info = {
-        'mime': mimetype,
-        'ext': ext,
-        'encoding': encoding
-    }
-
-    return WorkerResult(
-        url=url,
-        line=line,
-        response=response,
-        error=error,
-        data=data,
-        info=info
-    )
 
 
 def fetch_action(namespace):
@@ -171,22 +65,22 @@ def fetch_action(namespace):
     if not namespace.contents_in_report:
         os.makedirs(namespace.output_dir, exist_ok=True)
 
-    context = {}
-
     # HTTP method
-    context['global_method'] = namespace.method
+    http_method = namespace.method
 
     # Cookie grabber
+    get_cookie = None
     if namespace.grab_cookies:
-        context['grab_cookies'] = grab_cookies(namespace.grab_cookies)
+        get_cookie = grab_cookies(namespace.grab_cookies)
 
     # Global headers
+    global_headers = None
     if namespace.headers:
-        context['global_headers'] = {}
+        global_headers = {}
 
         for header in namespace.headers:
             k, v = parse_http_header(header)
-            context['global_headers'][k] = v
+            global_headers = v
 
     # Loading bar
     loading_bar = tqdm(
@@ -211,59 +105,58 @@ def fetch_action(namespace):
     output_writer = csv.writer(output_file)
     output_writer.writerow(output_headers)
 
-    # Creating the http pool manager
-    http = create_safe_pool(
-        num_pools=namespace.threads * 2,
-        maxsize=1
-    )
+    def url_key(line):
+        url = line[pos].strip()
 
-    # Generator yielding urls to fetch
-    def payloads():
-        for line in reader:
-            url = line[pos]
+        if not url:
+            return
 
-            # Validation
-            if not url:
+        # Url templating
+        if namespace.url_template:
+            return namespace.url_template.format(value=url)
 
-                # TODO: write report line all the same!
-                loading_bar.update()
-                continue
+        return url
 
-            # Url templating
-            # NOTE: it must be done here because group parallelism requires it
-            if namespace.url_template:
-                url = namespace.url_template.format(value=url)
-            else:
-                url = url.strip()
+    def request_args(url, line):
+        cookie = None
 
-            payload = WorkerPayload(
-                http=http,
-                line=line,
-                url=url,
-                namespace=namespace,
-                context=context
-            )
+        # Cookie
+        if get_cookie:
+            cookie = get_cookie(url)
 
-            yield payload
+        # Headers
+        headers = None
 
-    # Streaming the file and fetching the url using multiple threads
-    multithreaded_iterator = imap_unordered(
-        payloads(),
-        worker,
-        namespace.threads,
-        group=lambda payload: get_domain_name(payload.url),
-        group_parallelism=1,
-        group_buffer_size=25,
-        group_throttle=namespace.throttle
-    )
+        if global_headers:
+            headers = global_headers
+
+        return {
+            'method': http_method,
+            'cookie': cookie,
+            'headers': headers
+        }
 
     errors = 0
     status_codes = Counter()
 
+    multithreaded_iterator = fetch(
+        reader,
+        key=url_key,
+        request_args=request_args,
+        threads=namespace.threads,
+        throttle=namespace.throttle
+    )
+
     for i, result in enumerate(multithreaded_iterator):
+        if not result.url:
+
+            # TODO: should write the report all the same...
+            loading_bar.update()
+            continue
+
         response = result.response
-        line = result.line
-        data = result.data
+        line = result.item
+        data = response.data if response is not None else None
 
         content_write_flag = 'wb'
 
@@ -293,13 +186,13 @@ def fetch_action(namespace):
                     if namespace.filename_template:
                         filename = namespace.filename_template.format(value=line[filename_pos])
                     else:
-                        filename = line[filename_pos] + result.info['ext']
+                        filename = line[filename_pos] + result.meta['ext']
                 else:
                     # NOTE: it would be nice to have an id that can be sorted by time
-                    filename = str(uuid4()) + result.info['ext']
+                    filename = str(uuid4()) + result.meta['ext']
 
             # Standardize encoding?
-            encoding = result.info['encoding']
+            encoding = result.meta['encoding']
 
             if data and namespace.standardize_encoding or namespace.contents_in_report:
                 if encoding is None or encoding != 'utf-8' or namespace.contents_in_report:
@@ -331,7 +224,7 @@ def fetch_action(namespace):
 
             # Reporting in output
             if selected_pos:
-                line = [line[i] for i in selected_pos]
+                line = [line[p] for p in selected_pos]
 
             line.extend([i, '', error_code, '', ''])
             output_writer.writerow(line)

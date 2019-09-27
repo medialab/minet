@@ -8,7 +8,7 @@
 import mimetypes
 from collections import namedtuple
 from quenouille import imap_unordered
-from url import get_domain_name, ensure_protocol
+from ural import get_domain_name, ensure_protocol
 
 from minet.utils import (
     create_safe_pool,
@@ -43,7 +43,6 @@ worker_result_fields = [
     'item',
     'error',
     'response',
-    'data',
     'meta'
 ]
 
@@ -62,7 +61,7 @@ def worker(payload):
             item=item
         )
 
-    kwargs = request_args(item) if callable(request_args) else {}
+    kwargs = request_args(url, item) if request_args is not None else {}
 
     error, response = request(http, url, **kwargs)
 
@@ -108,7 +107,6 @@ def worker(payload):
         item=item,
         response=response,
         error=error,
-        data=data,
         meta=meta
     )
 
@@ -136,6 +134,7 @@ def fetch(iterator, key=None, request_args=None, threads=25,
 
     Yields:
         FetchWorkerResult
+
     """
 
     # Creating the http pool manager
@@ -149,14 +148,14 @@ def fetch(iterator, key=None, request_args=None, threads=25,
             url = item if key is None else key(item)
 
             if not url:
-                yield WorkerPayload(http=http, item=item, url=url)
+                yield FetchWorkerPayload(http=http, item=item, url=None)
 
             # Url cleanup
             url = ensure_protocol(url.strip())
 
-            yield WorkerPayload(
+            yield FetchWorkerPayload(
                 http=http,
-                line=line,
+                item=item,
                 url=url,
                 request_args=request_args
             )
