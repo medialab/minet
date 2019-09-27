@@ -23,8 +23,7 @@ ERROR_REPORTERS = {
 
 ScrapeWorkerPayload = namedtuple(
     'ScrapeWorkerPayload',
-    ['scraper', 'line', 'path', 'encoding', 'content'],
-    defaults=[None, None, None]
+    ['scraper', 'line', 'path', 'encoding', 'content']
 )
 
 ScrapeWorkerResult = namedtuple(
@@ -64,6 +63,8 @@ def create_report_iterator(namespace, loading_bar, scraper):
             yield ScrapeWorkerPayload(
                 scraper,
                 line,
+                path=None,
+                encoding=None,
                 content=line[pos.raw_content]
             )
 

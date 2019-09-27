@@ -25,31 +25,25 @@ from minet.defaults import (
 # Mimetypes init
 mimetypes.init()
 
-worker_payload_fields = [
-    'http',
-    'item',
-    'url',
-    'request_args'
-]
-
 FetchWorkerPayload = namedtuple(
     'FetchWorkerPayload',
-    worker_payload_fields,
-    defaults=[None] * len(worker_payload_fields)
+    [
+        'http',
+        'item',
+        'url',
+        'request_args'
+    ]
 )
-
-worker_result_fields = [
-    'url',
-    'item',
-    'error',
-    'response',
-    'meta'
-]
 
 FetchWorkerResult = namedtuple(
     'FetchWorkerResult',
-    worker_result_fields,
-    defaults=[None] * len(worker_result_fields)
+    [
+        'url',
+        'item',
+        'error',
+        'response',
+        'meta'
+    ]
 )
 
 
@@ -89,7 +83,11 @@ def fetch(iterator, key=None, request_args=None, threads=25,
 
         if url is None:
             return FetchWorkerResult(
-                item=item
+                url=None,
+                item=item,
+                response=None,
+                error=None,
+                meta=None
             )
 
         kwargs = request_args(url, item) if request_args is not None else {}
@@ -101,7 +99,8 @@ def fetch(iterator, key=None, request_args=None, threads=25,
                 url=url,
                 item=item,
                 response=response,
-                error=error
+                error=error,
+                meta=None
             )
 
         # Forcing urllib3 to read data in thread
@@ -156,7 +155,12 @@ def fetch(iterator, key=None, request_args=None, threads=25,
             url = item if key is None else key(item)
 
             if not url:
-                yield FetchWorkerPayload(http=http, item=item, url=None)
+                yield FetchWorkerPayload(
+                    http=http,
+                    item=item,
+                    url=None,
+                    request_args=request_args
+                )
 
             # Url cleanup
             url = ensure_protocol(url.strip())
