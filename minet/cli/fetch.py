@@ -38,9 +38,6 @@ mimetypes.init()
 
 OUTPUT_ADDITIONAL_HEADERS = ['line', 'status', 'error', 'filename', 'encoding']
 
-# TODO: make this an option!
-SPOOFED_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36'
-
 
 def max_retry_error_reporter(error):
     if isinstance(error, (ConnectTimeoutError, ReadTimeoutError)):
