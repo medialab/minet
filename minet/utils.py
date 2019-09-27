@@ -188,7 +188,7 @@ def resolve(http, url, max=5):
         )
 
         if error:
-            url_stack[url] = (error, url)
+            url_stack[url] = (None, url)
             return error, list(url_stack.values())
 
         if url in url_stack:
@@ -205,9 +205,15 @@ def resolve(http, url, max=5):
             return InvalidRedirectError('Redirection is invalid'), list(url_stack.values())
 
         # Go to next
-        url = urljoin(url, location)
+        next_url = urljoin(url, location.strip())
 
-    return MaxRedirectsError('Maximum number of redirects exceeded'), list(url_stack)
+        # Self loop?
+        if next_url == url:
+            return None, list(url_stack.values())
+
+        url = next_url
+
+    return MaxRedirectsError('Maximum number of redirects exceeded'), list(url_stack.values())
 
 
 class RateLimiter(object):
