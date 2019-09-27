@@ -107,16 +107,17 @@ def fetch(iterator, key=None, request_args=None, threads=25,
         # Forcing urllib3 to read data in thread
         data = response.data
 
-        # Solving mime type
+        # Meta
+        meta = {}
+
+        # Guessing mime type
         mimetype, _ = mimetypes.guess_type(url)
 
         if mimetype is None:
             mimetype = 'text/html'
 
-        # Meta
-        meta = {}
-
         # Guessing extension
+        # TODO: maybe move to utils
         if guess_extension:
             exts = mimetypes.guess_all_extensions(mimetype)
 
