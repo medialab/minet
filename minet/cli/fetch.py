@@ -291,26 +291,27 @@ def fetch_action(namespace):
             filename = None
 
             # Building filename
-            if filename_pos is not None:
-                if namespace.filename_template:
-                    filename = namespace.filename_template.format(value=line[filename_pos])
+            if data:
+                if filename_pos is not None:
+                    if namespace.filename_template:
+                        filename = namespace.filename_template.format(value=line[filename_pos])
+                    else:
+                        filename = line[filename_pos] + result.info['ext']
                 else:
-                    filename = line[filename_pos] + result.info['ext']
-            else:
-                # NOTE: it would be nice to have an id that can be sorted by time
-                filename = str(uuid4()) + result.info['ext']
+                    # NOTE: it would be nice to have an id that can be sorted by time
+                    filename = str(uuid4()) + result.info['ext']
 
             # Standardize encoding?
             encoding = result.info['encoding']
 
-            if namespace.standardize_encoding or namespace.contents_in_report:
+            if data and namespace.standardize_encoding or namespace.contents_in_report:
                 if encoding is None or encoding != 'utf-8' or namespace.contents_in_report:
                     data = data.decode(encoding, errors='replace')
                     encoding = 'utf-8'
                     content_write_flag = 'w'
 
             # Writing file on disk
-            if not namespace.contents_in_report:
+            if data and not namespace.contents_in_report:
                 with open(join(namespace.output_dir, filename), content_write_flag) as f:
                     f.write(data)
 
@@ -318,7 +319,7 @@ def fetch_action(namespace):
             if selected_pos:
                 line = [line[i] for i in selected_pos]
 
-            line.extend([i, response.status, '', filename, encoding or ''])
+            line.extend([i, response.status, '', filename or '', encoding or ''])
 
             if namespace.contents_in_report:
                 line.append(data)
