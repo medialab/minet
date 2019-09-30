@@ -458,7 +458,7 @@ examples:
 
 Function fetching urls in a multithreaded fashion.
 
-```
+```python
 from minet import multithreaded_fetch
 
 # Most basic usage
@@ -512,7 +512,7 @@ A `FetchWorkerResult` having the following attributes:
 
 Function resolving url redirections in a multithreaded fashion.
 
-```
+```python
 from minet import multithreaded_resolve
 
 # Most basic usage
