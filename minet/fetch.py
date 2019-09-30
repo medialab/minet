@@ -207,7 +207,7 @@ def multithreaded_resolve(iterator, key=None, request_args=None, threads=25,
         threads (int, optional): Number of threads to use. Defaults to 25.
         throttle (float, optional): Per-domain throttle in seconds.
             Defaults to 0.2.
-        max_redirects (int, optional): Max number of redirects to resolve.
+        max_redirects (int, optional): Max number of redirections to follow.
 
     Yields:
         ResolveWorkerResult

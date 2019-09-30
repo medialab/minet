@@ -48,7 +48,8 @@ pip install minet
 
 ### API
 
-TODO...
+* [multithreaded_fetch](#multithreaded_fetch)
+* [multithreaded_resolve](#multithreaded_resolve)
 
 ---
 
@@ -129,3 +130,105 @@ TODO: document the scraping DSL
 ---
 
 ## API
+
+### multithreaded_fetch
+
+Function fetching urls in a multithreaded fashion.
+
+```
+from minet import multithreaded_fetch
+
+# Most basic usage
+urls = ['https://google.com', 'https://twitter.com']
+
+for result in multithreaded_fetch(urls):
+  print(result.url, result.response.status)
+
+# Using a list of dicts
+
+urls = [
+  {
+    'url': 'https://google.com',
+    'label': 'Google'
+  },
+  {
+    'url': 'https://twitter.com',
+    'label': 'Twitter'
+  }
+]
+
+for result in multithreaded_fetch(urls, key=lambda x: x['url']):
+  print(result.item['label'], result.response.status)
+```
+
+*Arguments*:
+
+* **iterator** *iterable*: An iterator over urls or arbitrary items, if you provide a `key` argument along with it.
+* **key** *?callable*: A function extracting the url to fetch from the items yielded by the provided iterator.
+* **request_args** *?callable*: A function returning arguments to pass to the internal `request` helper for a call.
+* **threads** *?int*: Number of threads to use. Defaults to `25`.
+* **throttle** *?float*: Per-domain throttle in seconds. Defaults to `0.2`.
+* **guess_extension** *?bool*: Whether to attempt to guess the resource's extension. Defaults to `True`.
+* **guess_encoding** *?bool*: Whether to attempt to guess the resource's encoding. Defaults to `True`.
+
+*Yields*:
+
+A `FetchWorkerResult` having the following attributes:
+
+* **url** *?string*: the fetched url.
+* **item** *any*: original item from the iterator.
+* **error** *?Exception*: an error.
+* **response** *?urllib3.HTTPResponse*: the http response.
+* **meta** *?dict*: additional metadata:
+  * **mime** *?string*: resource's mimetype.
+  * **ext** *?string*: resource's extension.
+  * **encoding** *?string*: resource's encoding.
+
+
+### multithreaded_resolve
+
+Function resolving url redirections in a multithreaded fashion.
+
+```
+from minet import multithreaded_resolve
+
+# Most basic usage
+urls = ['https://bit.ly/whatever', 'https://t.co/whatever']
+
+for result in multithreaded_resolve(urls):
+  print(result.stack)
+
+# Using a list of dicts
+
+urls = [
+  {
+    'url': 'https://bit.ly/whatever',
+    'label': 'Bit.ly'
+  },
+  {
+    'url': 'https://t.co/whatever',
+    'label': 'Twitter'
+  }
+]
+
+for result in multithreaded_resolve(urls, key=lambda x: x['url']):
+  print(result.stack)
+```
+
+*Arguments*:
+
+* **iterator** *iterable*: An iterator over urls or arbitrary items, if you provide a `key` argument along with it.
+* **key** *?callable*: A function extracting the url to fetch from the items yielded by the provided iterator.
+* **request_args** *?callable*: A function returning arguments to pass to the internal `request` helper for a call.
+* **threads** *?int*: Number of threads to use. Defaults to `25`.
+* **throttle** *?float*: Per-domain throttle in seconds. Defaults to `0.2`.
+* **max_redirects** *?int*: Max number of redirections to follow. Defaults to `5`.
+
+*Yields*:
+
+A `ResolveWorkerResult` having the following attributes:
+
+* **url** *?string*: the fetched url.
+* **item** *any*: original item from the iterator.
+* **error** *?Exception*: an error.
+* **stack** *?list*: the redirection stack.
