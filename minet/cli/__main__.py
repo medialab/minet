@@ -20,7 +20,7 @@ from argparse import (
 from minet.__version__ import __version__
 from minet.defaults import DEFAULT_THROTTLE
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
-from minet.cli.utils import BooleanAction
+from minet.cli.utils import BooleanAction, die
 
 from minet.cli.crowdtangle.constants import (
     CROWDTANGLE_SORT_TYPES,
@@ -72,8 +72,26 @@ def partition_strategy_type(string):
         raise ArgumentTypeError('partition strategy should either be %s, or an number of posts.' % choices)
 
 
+def get_subparser(o, keys):
+    parser = None
+
+    for key in keys:
+        item = o.get(key)
+
+        if item is None:
+            return None
+
+        parser = item['parser']
+
+        if 'subparsers' in item:
+            o = item['subparsers']
+        else:
+            break
+
+    return parser
+
+
 # Defining the list of CLI commands
-# TODO: generate docs from this data
 COMMANDS = {
 
     # Fetch action subparser
@@ -614,6 +632,11 @@ def main():
             aliases=command.get('aliases', [])
         )
 
+        to_index = {
+            'parser': subparser,
+            'subparsers': {}
+        }
+
         if 'arguments' in command:
             add_arguments(subparser, command['arguments'])
 
@@ -644,16 +667,22 @@ def main():
                 if 'arguments' in subcommand:
                     add_arguments(subsubparser, subcommand['arguments'])
 
+                to_index['subparsers'][subname] = {
+                    'parser': subsubparser
+                }
+
         if 'aliases' in command:
             for alias in command['aliases']:
-                SUBPARSERS[alias] = subparser
+                SUBPARSERS[alias] = to_index
 
-        SUBPARSERS[name] = subparser
+        SUBPARSERS[name] = to_index
 
     # Help subparser
     help_suparser = subparsers.add_parser('help')
-    help_suparser.add_argument('subcommand', help='Name of the subcommand', nargs='?')
-    SUBPARSERS['help'] = help_suparser
+    help_suparser.add_argument('subcommand', help='Name of the subcommand', nargs='*')
+    SUBPARSERS['help'] = {
+        'parser': help_suparser
+    }
 
     # Parsing arguments and triggering commands
     args = parser.parse_args()
@@ -690,13 +719,12 @@ def main():
         fetch_action(args)
 
     elif args.action == 'help':
-        # TODO: handle sub commands?
-        target_subparser = SUBPARSERS.get(args.subcommand)
+        target = get_subparser(SUBPARSERS, args.subcommand)
 
-        if target_subparser is None:
-            parser.print_help()
+        if target is None:
+            die('Unknow command "%s"' % ' '.join(args.subcommand))
         else:
-            target_subparser.print_help()
+            target.print_help()
 
     elif args.action == 'scrape':
         from minet.cli.scrape import scrape_action
