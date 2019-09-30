@@ -131,7 +131,7 @@ TODO: document the scraping DSL
 
 ## API
 
-### multithreaded_fetch
+## multithreaded_fetch
 
 Function fetching urls in a multithreaded fashion.
 
@@ -185,7 +185,7 @@ A `FetchWorkerResult` having the following attributes:
   * **encoding** *?string*: resource's encoding.
 
 
-### multithreaded_resolve
+## multithreaded_resolve
 
 Function resolving url redirections in a multithreaded fashion.
 
