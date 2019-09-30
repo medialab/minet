@@ -9,6 +9,7 @@ import csv
 import sys
 import signal
 import shutil
+import importlib
 from textwrap import dedent
 from argparse import (
     ArgumentParser,
@@ -91,12 +92,27 @@ def get_subparser(o, keys):
     return parser
 
 
+def check_dragnet():
+    try:
+        import dragnet
+    except:
+        die([
+            'The `dragnet` library is not installed. The `extract` command won\'t work.',
+            'To install it correctly, run the following commands in order:',
+            '',
+            '  pip install lxml numpy Cython',
+            '  pip install dragnet'
+        ])
+
+
 # Defining the list of CLI commands
 COMMANDS = {
 
     # Fetch action subparser
     # --------------------------------------------------------------------------
     'fetch': {
+        'package': 'minet.cli.fetch',
+        'action': 'fetch_action',
         'title': 'Minet Fetch Command',
         'description': '''
             Use multiple threads to fetch batches of urls from a CSV file. The
@@ -203,6 +219,8 @@ COMMANDS = {
     # Crowdtangle action subparser
     # --------------------------------------------------------------------------
     'crowdtangle': {
+        'package': 'minet.cli.crowdtangle',
+        'action': 'crowdtangle_action',
         'aliases': ['ct'],
         'title': 'Minet Crowdtangle Command',
         'description': '''
@@ -415,6 +433,8 @@ COMMANDS = {
     # Extract action subparser
     # -------------------------------------------------------------------------
     'extract': {
+        'package': 'minet.cli.extract',
+        'action': 'extract_action',
         'title': 'Minet Extract Command',
         'description': '''
             Use multiple processes to extract raw text from a batch of HTML files.
@@ -433,6 +453,7 @@ COMMANDS = {
             . Extracting raw text from a bunch of files:
                 `minet extract --glob "./content/*.html" > extracted.csv`
         ''',
+        'before': check_dragnet,
         'arguments': [
             {
                 'name': 'report',
@@ -476,6 +497,8 @@ COMMANDS = {
     # Facebook actions subparser
     # -------------------------------------------------------------------------
     'facebook': {
+        'package': 'minet.cli.facebook',
+        'action': 'facebook_action',
         'aliases': ['fb'],
         'title': 'Minet Facebook Command',
         'description': '''
@@ -520,6 +543,8 @@ COMMANDS = {
     # Scrape action subparser
     # -------------------------------------------------------------------------
     'scrape': {
+        'package': 'minet.cli.scrape',
+        'action': 'scrape_action',
         'title': 'Minet Scrape Command',
         'description': '''
             Use multiple processes to scrape data from a batch of HTML files.
@@ -624,6 +649,7 @@ def build_parser(commands):
 
         to_index = {
             'parser': subparser,
+            'command': command,
             'subparsers': {}
         }
 
@@ -668,11 +694,8 @@ def build_parser(commands):
         subparser_index[name] = to_index
 
     # Help subparser
-    help_suparser = subparsers.add_parser('help')
-    help_suparser.add_argument('subcommand', help='Name of the subcommand', nargs='*')
-    subparser_index['help'] = {
-        'parser': help_suparser
-    }
+    help_subparser = subparsers.add_parser('help')
+    help_subparser.add_argument('subcommand', help='Name of the subcommand', nargs='*')
 
     return parser, subparser_index
 
@@ -685,35 +708,23 @@ def main():
     # Parsing arguments and triggering commands
     args = parser.parse_args()
 
+    action = subparser_index.get(args.action)
+
     # Printing version?
     if args.version:
         print('minet %s' % __version__)
 
-    elif args.action in ['ct', 'crowdtangle']:
-        from minet.cli.crowdtangle import crowdtangle_action
-        crowdtangle_action(args)
+    elif action is not None:
 
-    elif args.action == 'extract':
-        try:
-            import dragnet
-        except:
-            print('The `dragnet` library is not installed. The `extract` command won\'t work.')
-            print('To install it correctly, run the following commands in order:')
-            print()
-            print('  pip install lxml numpy Cython')
-            print('  pip install dragnet')
-            sys.exit(1)
+        # Need to check something?
+        if 'before' in action['command']:
+            action['command']['before']()
 
-        from minet.cli.extract import extract_action
-        extract_action(args)
+        # Lazy loading module for faster startup
+        m = importlib.import_module(action['command']['package'])
+        fn = getattr(m, action['command']['action'])
 
-    elif args.action in ['fb', 'facebook']:
-        from minet.cli.facebook import facebook_action
-        facebook_action(args)
-
-    elif args.action == 'fetch':
-        from minet.cli.fetch import fetch_action
-        fetch_action(args)
+        fn(args)
 
     elif args.action == 'help':
         target = get_subparser(subparser_index, args.subcommand)
@@ -722,10 +733,6 @@ def main():
             die('Unknow command "%s"' % ' '.join(args.subcommand))
         else:
             target.print_help()
-
-    elif args.action == 'scrape':
-        from minet.cli.scrape import scrape_action
-        scrape_action(args)
 
     else:
         parser.print_help()
