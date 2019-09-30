@@ -242,6 +242,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
         C = 0
         url = partition_strategy(None)
         last_url = None
+        last_items = set()
 
         has_limit = bool(namespace.limit)
 
@@ -323,6 +324,9 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                 last_url = url
 
                 for item in items:
+                    if item['id'] in last_items:
+                        continue
+
                     n += 1
                     N += 1
 
@@ -349,6 +353,9 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                     break
                 else:
                     loading_bar.update(n)
+
+                # We need to track last items to avoid registering the same one twice
+                last_items = set(item['id'] for item in items)
 
                 # Paginating
                 if next_url is None:
