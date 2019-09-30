@@ -610,12 +610,14 @@ def add_arguments(subparser, arguments):
             subparser.add_argument(*argument['flags'], **omit(argument, 'flags'))
 
 
-def main():
+def build_parser(commands):
 
     # Building the argument parser
     parser = ArgumentParser(prog='minet')
 
     parser.add_argument('--version', action='store_true')
+
+    subparser_index = {}
 
     subparsers = parser.add_subparsers(
         help='Action to execute',
@@ -673,16 +675,24 @@ def main():
 
         if 'aliases' in command:
             for alias in command['aliases']:
-                SUBPARSERS[alias] = to_index
+                subparser_index[alias] = to_index
 
-        SUBPARSERS[name] = to_index
+        subparser_index[name] = to_index
 
     # Help subparser
     help_suparser = subparsers.add_parser('help')
     help_suparser.add_argument('subcommand', help='Name of the subcommand', nargs='*')
-    SUBPARSERS['help'] = {
+    subparser_index['help'] = {
         'parser': help_suparser
     }
+
+    return parser, subparser_index
+
+
+def main():
+
+    # Building parser
+    parser, subparser_index = build_parser(COMMANDS)
 
     # Parsing arguments and triggering commands
     args = parser.parse_args()
@@ -691,7 +701,6 @@ def main():
     if args.version:
         print('minet %s' % __version__)
 
-    # TODO: abstract this
     elif args.action in ['ct', 'crowdtangle']:
         from minet.cli.crowdtangle import crowdtangle_action
         crowdtangle_action(args)
@@ -719,7 +728,7 @@ def main():
         fetch_action(args)
 
     elif args.action == 'help':
-        target = get_subparser(SUBPARSERS, args.subcommand)
+        target = get_subparser(subparser_index, args.subcommand)
 
         if target is None:
             die('Unknow command "%s"' % ' '.join(args.subcommand))
