@@ -54,8 +54,13 @@ def create_report_iterator(namespace, loading_bar, scraper):
 
     for line in reader:
         status = int(line[pos.status]) if line[pos.status] else None
+        filename = line[pos.filename]
 
-        if status is None or status >= 400:
+        if (
+            status is None or
+            status >= 400 or
+            not filename
+        ):
             loading_bar.update()
             continue
 
@@ -70,7 +75,7 @@ def create_report_iterator(namespace, loading_bar, scraper):
 
             continue
 
-        path = join(namespace.input_directory, line[pos.filename])
+        path = join(namespace.input_directory, filename)
         encoding = line[pos.encoding].strip() or 'utf-8'
 
         yield ScrapeWorkerPayload(
