@@ -35,6 +35,9 @@ lint:
 	importchecker $(SOURCE) | grep -v __init__ | grep -v dragnet || true
 	@echo
 
+readme:
+	python generate_readme.py > README.md
+
 unit:
 	@echo Running unit tests...
 	pytest -s

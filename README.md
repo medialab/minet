@@ -19,7 +19,7 @@
 pip install minet
 ```
 
-## Commands
+## CLI
 
 *Basic commands*
 
@@ -29,15 +29,29 @@ pip install minet
 
 *API-related commands*
 
-* [CrowdTangle (ct)](#crowdtangle)
+* [crowdtangle (ct)](#crowdtangle)
   * [leaderboard](#leaderboard)
   * [lists](#lists)
   * [posts](#posts)
   * [search](#search)
+* [facebook (fb)](#facebook)
+  * [comments](#comments)
+
+## API
+
+TODO...
 
 ## fetch
 
+
 ```
+usage: minet fetch [-h] [--contents-in-report] [-d OUTPUT_DIR] [-f FILENAME]
+                   [--filename-template FILENAME_TEMPLATE] [-g {firefox,chrome}]
+                   [-H HEADERS] [--standardize-encoding] [-o OUTPUT] [-s SELECT]
+                   [-t THREADS] [--throttle THROTTLE] [--total TOTAL]
+                   [--url-template URL_TEMPLATE] [-X METHOD]
+                   column [file]
+
 Minet Fetch Command
 ===================
 
@@ -47,25 +61,28 @@ HTTP calls and will generally write the retrieved files in a folder
 given by the user.
 
 positional arguments:
-  column                                  Column of the CSV file containing urls to fetch.
-  file                                    CSV file containing the urls to fetch.
+  column                                          Column of the CSV file containing urls to fetch.
+  file                                            CSV file containing the urls to fetch.
 
 optional arguments:
-  -h, --help                              show this help message and exit
-  --contents-in-report                    Whether to include retrieved contents, e.g. html, directly in the report
-                                          and avoid writing them in a separate folder. This requires to standardize
-                                          encoding and won't work on binary formats.
-  -d OUTPUT_DIR, --output-dir OUTPUT_DIR  Directory where the fetched files will be written. Defaults to "content".
-  -f FILENAME, --filename FILENAME        Name of the column used to build retrieved file names. Defaults to an uuid v4 with correct extension.
-  --filename-template FILENAME_TEMPLATE   A template for the name of the fetched files.
-  -g, --grab-cookies                      Whether to attempt to grab cookies from your computer's chrome browser.
-  --standardize-encoding                  Whether to systematically convert retrieved text to UTF-8.
-  -o OUTPUT, --output OUTPUT              Path to the output report file. By default, the report will be printed to stdout.
-  -s SELECT, --select SELECT              Columns to include in report (separated by `,`).
-  -t THREADS, --threads THREADS           Number of threads to use. Defaults to 25.
-  --throttle THROTTLE                     Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
-  --total TOTAL                           Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
-  --url-template URL_TEMPLATE             A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.
+  -h, --help                                      show this help message and exit
+  --contents-in-report                            Whether to include retrieved contents, e.g. html, directly in the report
+                                                  and avoid writing them in a separate folder. This requires to standardize
+                                                  encoding and won't work on binary formats.
+  -d OUTPUT_DIR, --output-dir OUTPUT_DIR          Directory where the fetched files will be written. Defaults to "content".
+  -f FILENAME, --filename FILENAME                Name of the column used to build retrieved file names. Defaults to an uuid v4 with correct extension.
+  --filename-template FILENAME_TEMPLATE           A template for the name of the fetched files.
+  -g {firefox,chrome}, --grab-cookies {firefox,chrome}
+                                                  Whether to attempt to grab cookies from your computer's browser.
+  -H HEADERS, --header HEADERS                    Custom headers used with every requests.
+  --standardize-encoding                          Whether to systematically convert retrieved text to UTF-8.
+  -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
+  -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
+  -t THREADS, --threads THREADS                   Number of threads to use. Defaults to 25.
+  --throttle THROTTLE                             Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
+  --total TOTAL                                   Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
+  --url-template URL_TEMPLATE                     A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.
+  -X METHOD, --request METHOD                     The http method to use. Will default to GET.
 
 examples:
 
@@ -77,7 +94,9 @@ examples:
 
 . Fetching a single url, useful to pipe into `minet scrape`:
     `minet fetch http://google.com | minet scrape ./scrape.json > scraped.csv`
+
 ```
+
 
 ## extract
 
@@ -90,7 +109,12 @@ pip install lxml numpy Cython
 pip install dragnet
 ```
 
+
 ```
+usage: minet extract [-h] [-e {dragnet,html2text}] [-i INPUT_DIRECTORY]
+                     [-o OUTPUT] [-p PROCESSES] [-s SELECT] [--total TOTAL]
+                     [report]
+
 Minet Extract Command
 =====================
 
@@ -122,13 +146,20 @@ examples:
 
 . Extracting raw text from a bunch of files:
     `minet extract --glob "./content/*.html" > extracted.csv`
+
 ```
+
 
 ## scrape
 
 TODO: document the scraping DSL
 
+
 ```
+usage: minet scrape [-h] [-g GLOB] [-i INPUT_DIRECTORY] [-o OUTPUT]
+                    [-p PROCESSES] [--total TOTAL]
+                    scraper [report]
+
 Minet Scrape Command
 ====================
 
@@ -142,6 +173,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                      show this help message and exit
+  -g GLOB, --glob GLOB                            Whether to scrape a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.
   -i INPUT_DIRECTORY, --input-directory INPUT_DIRECTORY
                                                   Directory where the HTML files are stored. Defaults to "content".
   -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
@@ -158,13 +190,43 @@ examples:
 
 . Scraping items from a bunch of files:
     `minet scrape scraper.json --glob "./content/*.html" > scraped.csv`
+
 ```
+
 
 ## CrowdTangle
 
-### leaderboard
 
 ```
+usage: minet crowdtangle [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT] [-t TOKEN]
+                         {leaderboard,lists,posts,search} ...
+
+Minet Crowdtangle Command
+=========================
+
+Gather data from the CrowdTangle APIs easily and efficiently.
+
+optional arguments:
+  -h, --help                        show this help message and exit
+  --rate-limit RATE_LIMIT           Authorized number of hits by minutes. Defaults to 6.
+  -o OUTPUT, --output OUTPUT        Path to the output file. By default, everything will be printed to stdout.
+  -t TOKEN, --token TOKEN           CrowdTangle dashboard API token.
+
+actions:
+  {leaderboard,lists,posts,search}  Action to perform using the CrowdTangle API.
+
+```
+
+
+### leaderboard
+
+
+```
+usage: minet crowdtangle leaderboard [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
+                                     [-t TOKEN] [--no-breakdown]
+                                     [-f {csv,jsonl}] [-l LIMIT]
+                                     [--list-id LIST_ID]
+
 Minet CrowdTangle Leaderboard Command
 =====================================
 
@@ -173,6 +235,7 @@ the designated dashboard (indicated by a given token).
 
 optional arguments:
   -h, --help                            show this help message and exit
+  --rate-limit RATE_LIMIT               Authorized number of hits by minutes. Defaults to 6.
   -o OUTPUT, --output OUTPUT            Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN               CrowdTangle dashboard API token.
   --no-breakdown                        Whether to skip statistics breakdown by post type in the CSV output.
@@ -184,11 +247,17 @@ examples:
 
 . Fetching accounts statistics for every account in your dashboard:
     `minet ct leaderboard --token YOUR_TOKEN > accounts-stats.csv`
+
 ```
+
 
 ### lists
 
+
 ```
+usage: minet crowdtangle lists [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
+                               [-t TOKEN]
+
 Minet CrowdTangle Lists Command
 ===============================
 
@@ -197,6 +266,7 @@ given token).
 
 optional arguments:
   -h, --help                  show this help message and exit
+  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN     CrowdTangle dashboard API token.
 
@@ -204,11 +274,24 @@ examples:
 
 . Fetching a dashboard's lists:
     `minet ct lists --token YOUR_TOKEN > lists.csv`
+
 ```
+
 
 ### posts
 
+
 ```
+usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
+                               [-t TOKEN] [--end-date END_DATE] [-f {csv,jsonl}]
+                               [--language LANGUAGE] [-l LIMIT]
+                               [--list-ids LIST_IDS]
+                               [--partition-strategy PARTITION_STRATEGY]
+                               [--resume]
+                               [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
+                               [--start-date START_DATE]
+                               [--url-report URL_REPORT]
+
 Minet CrowdTangle Posts Command
 ===============================
 
@@ -217,6 +300,7 @@ a given token).
 
 optional arguments:
   -h, --help                                      show this help message and exit
+  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
   --end-date END_DATE                             The latest date at which a post could be posted (UTC!).
@@ -224,6 +308,8 @@ optional arguments:
   --language LANGUAGE                             Language of posts to retrieve.
   -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
   --list-ids LIST_IDS                             Ids of the lists from which to retrieve posts, separated by commas.
+  --partition-strategy PARTITION_STRATEGY         Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts.
+  --resume                                        Whether to resume an interrupted collection. Requires -o/--output & --sort-by date
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
@@ -233,37 +319,99 @@ examples:
 
 . Fetching the 500 most latest posts from a dashboard:
     `minet ct posts --token YOUR_TOKEN --limit 500 > latest-posts.csv`
+
 ```
+
 
 ### search
 
+
 ```
-Minet CrowdTangle Search Command
-================================
+usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
+                               [-t TOKEN] [--end-date END_DATE] [-f {csv,jsonl}]
+                               [--language LANGUAGE] [-l LIMIT]
+                               [--list-ids LIST_IDS]
+                               [--partition-strategy PARTITION_STRATEGY]
+                               [--resume]
+                               [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
+                               [--start-date START_DATE]
+                               [--url-report URL_REPORT]
 
-Search posts on the whole CrowdTangle platform.
+Minet CrowdTangle Posts Command
+===============================
 
-positional arguments:
-  terms                                           The search query term or terms.
+Gather post data from the designated dashboard (indicated by
+a given token).
 
 optional arguments:
   -h, --help                                      show this help message and exit
+  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
   --end-date END_DATE                             The latest date at which a post could be posted (UTC!).
   -f {csv,jsonl}, --format {csv,jsonl}            Output format. Defaults to `csv`.
+  --language LANGUAGE                             Language of posts to retrieve.
   -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
-  --offset OFFSET                                 Count offset.
-  --partition-strategy {day}                      Query partition strategy to use to overcome the API search result limits.
-  -p PLATFORMS, --platforms PLATFORMS             The platforms, separated by comma from which to retrieve posts.
+  --list-ids LIST_IDS                             Ids of the lists from which to retrieve posts, separated by commas.
+  --partition-strategy PARTITION_STRATEGY         Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts.
+  --resume                                        Whether to resume an interrupted collection. Requires -o/--output & --sort-by date
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
-  --types TYPES                                   Types of post to include, separated by comma.
   --url-report URL_REPORT                         Path to an optional report file to write about urls found in posts.
 
 examples:
 
-. Fetching a dashboard's lists:
-    `minet ct search --token YOUR_TOKEN > posts.csv`
+. Fetching the 500 most latest posts from a dashboard:
+    `minet ct posts --token YOUR_TOKEN --limit 500 > latest-posts.csv`
+
 ```
+
+
+## Facebook
+
+
+```
+usage: minet facebook [-h] {comments} ...
+
+Minet Facebook Command
+======================
+
+Collects data from Facebook.
+
+optional arguments:
+  -h, --help  show this help message and exit
+
+actions:
+  {comments}  Action to perform to collect data on Facebook
+
+```
+
+
+### comments
+
+
+```
+usage: minet facebook comments [-h] [-c COOKIE] [-o OUTPUT] url
+
+Minet Facebook Comments Command
+===============================
+
+Scrape series of comments on Facebook.
+
+positional arguments:
+  url                         Url of the post from which to scrape comments.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (support "firefox" and "chrome").
+  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+
+examples:
+
+. Fetching a dashboard's lists:
+    `minet fb comments`
+
+```
+
+
