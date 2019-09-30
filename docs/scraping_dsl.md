@@ -31,6 +31,6 @@ Possibility to pass fields & context in order using an array so they depend on e
 5. `fields` runs alone or die.
 6. Then => go to 1. => `get` or `attr` or `constant` => `eval` => `transform`.
 
-Test working recursion.
+Test working recursion. Test scrapeTable.
 
 Add limit & slices to iteration.
