@@ -13,7 +13,7 @@
   * `sel_eval`: evaluate a local selection.
   * `item`: defines the value to retrieve.
   * `fields`: defines the fields to retrieve.
-  * `extract`: get the text or inner html or outer html or table rows etc.
+  * `extract`: get the text or inner html or outer html etc.
   * `attr`: name of attribute to get.
   * `transform`: value transformation chain.
   * `context`: defines local context.
@@ -33,4 +33,6 @@ Possibility to pass fields & context in order using an array so they depend on e
 
 Test working recursion. Test scrapeTable.
 
-Add limit & slices to iteration.
+Add limit & slices to iteration. Add filters (filter None by default if only yield).
+
+Replace `item` by `yield` and put it as an opponent of `fields`. Add `tabulate`.
