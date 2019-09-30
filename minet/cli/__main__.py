@@ -97,10 +97,8 @@ COMMANDS = {
     # Fetch action subparser
     # --------------------------------------------------------------------------
     'fetch': {
+        'title': 'Minet Fetch Command',
         'description': '''
-            Minet Fetch Command
-            ===================
-
             Use multiple threads to fetch batches of urls from a CSV file. The
             command outputs a CSV report with additional metadata about the
             HTTP calls and will generally write the retrieved files in a folder
@@ -206,10 +204,8 @@ COMMANDS = {
     # --------------------------------------------------------------------------
     'crowdtangle': {
         'aliases': ['ct'],
+        'title': 'Minet Crowdtangle Command',
         'description': '''
-            Minet CrowdTangle Command
-            =========================
-
             Gather data from the CrowdTangle APIs easily and efficiently.
         ''',
         'subparsers': {
@@ -234,10 +230,8 @@ COMMANDS = {
             ],
             'commands': {
                 'leaderboard': {
+                    'title': 'Minet CrowdTangle Leaderboard Command',
                     'description': '''
-                        Minet CrowdTangle Leaderboard Command
-                        =====================================
-
                         Gather information and aggregated stats about pages and groups of
                         the designated dashboard (indicated by a given token).
                     ''',
@@ -273,10 +267,8 @@ COMMANDS = {
                     ]
                 },
                 'lists': {
+                    'title': 'Minet CrowdTangle Lists Command',
                     'description': '''
-                        Minet CrowdTangle Lists Command
-                        ===============================
-
                         Retrieve the lists from a CrowdTangle dashboard (indicated by a
                         given token).
                     ''',
@@ -288,10 +280,8 @@ COMMANDS = {
                     '''
                 },
                 'posts': {
+                    'title': 'Minet CrowdTangle Posts Command',
                     'description': '''
-                        Minet CrowdTangle Posts Command
-                        ===============================
-
                         Gather post data from the designated dashboard (indicated by
                         a given token).
                     ''',
@@ -353,10 +343,8 @@ COMMANDS = {
                     ]
                 },
                 'search': {
+                    'title': 'Minet CrowdTangle Search Command',
                     'description': '''
-                        Minet CrowdTangle Search Command
-                        ================================
-
                         Search posts on the whole CrowdTangle platform.
                     ''',
                     'epilog': '''
@@ -427,10 +415,8 @@ COMMANDS = {
     # Extract action subparser
     # -------------------------------------------------------------------------
     'extract': {
+        'title': 'Minet Extract Command',
         'description': '''
-            Minet Extract Command
-            =====================
-
             Use multiple processes to extract raw text from a batch of HTML files.
             This command can either work on a `minet fetch` report or on a bunch
             of files. It will output an augmented report with the extracted text.
@@ -491,10 +477,8 @@ COMMANDS = {
     # -------------------------------------------------------------------------
     'facebook': {
         'aliases': ['fb'],
+        'title': 'Minet Facebook Command',
         'description': '''
-            Minet Facebook Command
-            ======================
-
             Collects data from Facebook.
         ''',
         'subparsers': {
@@ -503,10 +487,8 @@ COMMANDS = {
             'dest': 'fb_action',
             'commands': {
                 'comments': {
+                    'title': 'Minet Facebook Comments Command',
                     'description': '''
-                        Minet Facebook Comments Command
-                        ===============================
-
                         Scrape series of comments on Facebook.
                     ''',
                     'epilog': '''
@@ -538,10 +520,8 @@ COMMANDS = {
     # Scrape action subparser
     # -------------------------------------------------------------------------
     'scrape': {
+        'title': 'Minet Scrape Command',
         'description': '''
-            Minet Scrape Command
-            ====================
-
             Use multiple processes to scrape data from a batch of HTML files.
             This command can either work on a `minet fetch` report or on a bunch
             of files. It will output the scraped items.
@@ -610,6 +590,14 @@ def add_arguments(subparser, arguments):
             subparser.add_argument(*argument['flags'], **omit(argument, 'flags'))
 
 
+def build_description(command):
+    description = command['title'] + '\n' + ('=' * len(command['title']))
+
+    description += '\n\n' + dedent(command.get('description', ''))
+
+    return description
+
+
 def build_parser(commands):
 
     # Building the argument parser
@@ -628,7 +616,7 @@ def build_parser(commands):
     for name, command in COMMANDS.items():
         subparser = subparsers.add_parser(
             name,
-            description=dedent(command['description']),
+            description=build_description(command),
             epilog=dedent(command.get('epilog', '')),
             formatter_class=custom_formatter,
             aliases=command.get('aliases', [])
@@ -658,7 +646,7 @@ def build_parser(commands):
             for subname, subcommand in command['subparsers']['commands'].items():
                 subsubparser = subparser_subparsers.add_parser(
                     subname,
-                    description=dedent(subcommand['description']),
+                    description=build_description(subcommand),
                     epilog=dedent(subcommand.get('epilog', '')),
                     formatter_class=custom_formatter
                 )
