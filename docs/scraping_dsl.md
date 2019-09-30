@@ -30,3 +30,7 @@ Possibility to pass fields & context in order using an array so they depend on e
 4. `item` runs or defaults to `{"extract": "text"}`.
 5. `fields` runs alone or die.
 6. Then => go to 1. => `get` or `attr` or `constant` => `eval` => `transform`.
+
+Test working recursion.
+
+Add limit & slices to iteration.
