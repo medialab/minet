@@ -23,6 +23,10 @@ from urllib3.exceptions import (
     ResponseError
 )
 
+from minet.exceptions import (
+    InvalidURLError
+)
+
 from minet.fetch import multithreaded_fetch
 from minet.utils import (
     grab_cookies,
@@ -44,7 +48,8 @@ def max_retry_error_reporter(error):
 
 
 ERROR_REPORTERS = {
-    MaxRetryError: max_retry_error_reporter
+    MaxRetryError: max_retry_error_reporter,
+    InvalidURLError: 'invalid-url'
 }
 
 

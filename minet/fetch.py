@@ -174,6 +174,8 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
                     request_args=request_args
                 )
 
+                continue
+
             # Url cleanup
             url = ensure_protocol(url.strip())
 
@@ -264,6 +266,8 @@ def multithreaded_resolve(iterator, key=None, request_args=None, threads=25,
                     url=None,
                     request_args=request_args
                 )
+
+                continue
 
             # Url cleanup
             url = ensure_protocol(url.strip())
