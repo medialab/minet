@@ -92,14 +92,27 @@ def parse_http_header(header):
 
 def parse_http_refresh(value):
     try:
-        duration, url = value.strip().split(';url=')
-        return int(duration), url
+
+        if isinstance(value, bytes):
+            value = value.decode()
+
+        duration, url = value.strip().split(';', 1)
+
+        if not url.lower().startswith('url='):
+            return None
+
+        return int(duration), str(url.split('=', 1)[1])
     except:
         return None
 
 
 def find_meta_refresh(html_chunk):
-    pass
+    m = META_REFRESH_RE.search(html_chunk)
+
+    if not m:
+        return None
+
+    return parse_http_refresh(m.group(1))
 
 
 class CookieResolver(object):
