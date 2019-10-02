@@ -4,7 +4,8 @@ URLS = [
   'http://bit.ly/2KkpxiW',
   'https://demo.cyotek.com/features/redirectlooptest.php',
   'https://bit.ly/2gnvlgb',
-  'http://bit.ly/2YupNmj'
+  'http://bit.ly/2YupNmj',
+  # 'http://www.outremersbeyou.com/talent-de-la-semaine-la-designer-comorienne-aisha-wadaane-je-suis-fiere-de-mes-origines/'
 ]
 
 http = create_safe_pool()

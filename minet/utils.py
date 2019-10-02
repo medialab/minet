@@ -20,7 +20,8 @@ from urllib.request import Request
 from minet.exceptions import (
     MaxRedirectsError,
     InfiniteRedirectsError,
-    InvalidRedirectError
+    InvalidRedirectError,
+    SelfRedirectError
 )
 
 from minet.defaults import (
@@ -210,7 +211,7 @@ def resolve(http, url, max=5):
 
         # Self loop?
         if next_url == url:
-            return None, list(url_stack.values())
+            return SelfRedirectError('Self redirection.'), list(url_stack.values())
 
         url = next_url
 
