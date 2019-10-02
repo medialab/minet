@@ -200,7 +200,8 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             headers=final_headers,
             preload_content=True if not headers_only and not stream else False,
             release_conn=True if not stream else False,
-            redirect=redirect
+            redirect=redirect,
+            retries=False
         )
     except (ClosedPoolError, HTTPError) as e:
         return e, None
