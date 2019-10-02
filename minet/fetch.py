@@ -70,8 +70,9 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
         request_args (callable, optional): Function returning specific
             arguments to pass to the request for a yielded item.
         threads (int, optional): Number of threads to use. Defaults to 25.
-        throttle (float, optional): Per-domain throttle in seconds.
-            Defaults to 0.2.
+        throttle (float or callable, optional): Per-domain throttle in seconds.
+            Or a function taking domain name and item and returning the
+            throttle to apply. Defaults to 0.2.
         guess_extension (bool, optional): Attempt to guess the resource's
             extension? Defaults to True.
         guess_encoding (bool, optional): Attempt to guess the resource's
@@ -205,8 +206,9 @@ def multithreaded_resolve(iterator, key=None, request_args=None, threads=25,
         request_args (callable, optional): Function returning specific
             arguments to pass to the request for a yielded item.
         threads (int, optional): Number of threads to use. Defaults to 25.
-        throttle (float, optional): Per-domain throttle in seconds.
-            Defaults to 0.2.
+        throttle (float or callable, optional): Per-domain throttle in seconds.
+            Or a function taking domain name and item and returning the
+            throttle to apply. Defaults to 0.2.
         max_redirects (int, optional): Max number of redirections to follow.
 
     Yields:

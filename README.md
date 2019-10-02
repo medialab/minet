@@ -490,7 +490,7 @@ for result in multithreaded_fetch(urls, key=lambda x: x['url']):
 * **key** *?callable*: A function extracting the url to fetch from the items yielded by the provided iterator.
 * **request_args** *?callable*: A function returning arguments to pass to the internal `request` helper for a call.
 * **threads** *?int*: Number of threads to use. Defaults to `25`.
-* **throttle** *?float*: Per-domain throttle in seconds. Defaults to `0.2`.
+* **throttle** *?float|callable*: Per-domain throttle in seconds. Or a function taking the domain and current item and returning the throttle to apply. Defaults to `0.2`.
 * **guess_extension** *?bool*: Whether to attempt to guess the resource's extension. Defaults to `True`.
 * **guess_encoding** *?bool*: Whether to attempt to guess the resource's encoding. Defaults to `True`.
 
@@ -544,7 +544,7 @@ for result in multithreaded_resolve(urls, key=lambda x: x['url']):
 * **key** *?callable*: A function extracting the url to fetch from the items yielded by the provided iterator.
 * **request_args** *?callable*: A function returning arguments to pass to the internal `request` helper for a call.
 * **threads** *?int*: Number of threads to use. Defaults to `25`.
-* **throttle** *?float*: Per-domain throttle in seconds. Defaults to `0.2`.
+* **throttle** *?float|callable*: Per-domain throttle in seconds. Or a function taking the domain and current item and returning the throttle to apply. Defaults to `0.2`.
 * **max_redirects** *?int*: Max number of redirections to follow. Defaults to `5`.
 
 *Yields*:
