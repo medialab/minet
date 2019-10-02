@@ -12,6 +12,7 @@ import browser_cookie3
 import urllib3
 import time
 from collections import OrderedDict
+from ural import is_url
 from urllib.parse import urljoin
 from urllib3 import HTTPResponse
 from urllib3.exceptions import ClosedPoolError, HTTPError
@@ -21,6 +22,7 @@ from minet.exceptions import (
     MaxRedirectsError,
     InfiniteRedirectsError,
     InvalidRedirectError,
+    InvalidURLError,
     SelfRedirectError
 )
 
@@ -141,6 +143,10 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
     Generic request helpers using a urllib3 pool to access some resource.
     """
 
+    # Validating URL
+    if not is_url(url):
+        return InvalidURLError('Invalid URL'), None
+
     # Formatting headers
     final_headers = {}
 
@@ -211,7 +217,7 @@ def resolve(http, url, max=5):
 
         # Self loop?
         if next_url == url:
-            return SelfRedirectError('Self redirection.'), list(url_stack.values())
+            return SelfRedirectError('Self redirection'), list(url_stack.values())
 
         url = next_url
 
