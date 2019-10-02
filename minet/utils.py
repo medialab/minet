@@ -184,7 +184,8 @@ def resolve(http, url, max=5):
             url,
             method='HEAD',
             redirect=False,
-            headers_only=True
+            headers_only=True,
+            spoof_ua=False
         )
 
         if error:
