@@ -5,7 +5,8 @@
 #   'https://demo.cyotek.com/features/redirectlooptest.php',
 #   'https://bit.ly/2gnvlgb',
 #   'http://bit.ly/2YupNmj',
-#   'http://www.outremersbeyou.com/talent-de-la-semaine-la-designer-comorienne-aisha-wadaane-je-suis-fiere-de-mes-origines/'
+#   'http://www.outremersbeyou.com/talent-de-la-semaine-la-designer-comorienne-aisha-wadaane-je-suis-fiere-de-mes-origines/',
+#   'http://www.otsukare.info/2015/03/26/refresh-http-header'
 # ]
 
 # http = create_safe_pool()

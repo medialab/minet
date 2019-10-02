@@ -35,7 +35,9 @@ from minet.defaults import (
 # Handy regexes
 CHARSET_RE = re.compile(rb'<meta.*?charset=["\']*(.+?)["\'>]', flags=re.I)
 PRAGMA_RE = re.compile(rb'<meta.*?content=["\']*;?charset=(.+?)["\'>]', flags=re.I)
-XML_RE = re.compile(rb'^<\?xml.*?encoding=["\']*(.+?)["\'>]')
+XML_RE = re.compile(rb'^<\?xml.*?encoding=["\']*(.+?)["\'>]', flags=re.I)
+NOSCRIPT_RE = re.compile(rb'<noscript[^>]*>.*</noscript[^>]*>', flags=re.I)
+META_REFRESH_RE = re.compile(rb'''<meta\s+http-equiv=['"]?refresh['"]?\s+content=['"]?([^"']+)['">]?''', flags=re.I)
 
 # Constants
 CHARDET_CONFIDENCE_THRESHOLD = 0.9
@@ -86,6 +88,18 @@ def parse_http_header(header):
     key, value = header.split(':', 1)
 
     return key.strip(), value.strip()
+
+
+def parse_http_refresh(value):
+    try:
+        duration, url = value.strip().split(';url=')
+        return int(duration), url
+    except:
+        return None
+
+
+def find_meta_refresh(html_chunk):
+    pass
 
 
 class CookieResolver(object):
@@ -179,6 +193,7 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
     return None, response
 
 
+# TODO: refresh header + meta refresh
 def resolve(http, url, max=5):
     """
     Helper function attempting to resolve the given url.
