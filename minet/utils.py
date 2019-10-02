@@ -138,7 +138,7 @@ def create_safe_pool(timeout=None, **kwargs):
 
 
 def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
-            headers_only=False, redirect=None):
+            headers_only=False, redirect=None, stream=False):
     """
     Generic request helpers using a urllib3 pool to access some resource.
     """
@@ -169,8 +169,8 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             method,
             url,
             headers=final_headers,
-            preload_content=True if not headers_only else False,
-            release_conn=True,
+            preload_content=True if not headers_only and not stream else False,
+            release_conn=True if not stream else False,
             redirect=redirect
         )
     except (ClosedPoolError, HTTPError) as e:
