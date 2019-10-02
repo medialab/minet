@@ -6,16 +6,17 @@
 #
 import sys
 
-from minet.cli.utils import DummyTqdmFile, print_err
+from minet.cli.utils import DummyTqdmFile, die
 
 
 def crowdtangle_action(namespace):
 
     # A token is needed to be able to access the API
     if not namespace.token:
-        print_err('A token is needed to be able to access CrowdTangle\'s API.')
-        print_err('You can provide one using the `--token` argument.')
-        sys.exit(1)
+        die([
+            'A token is needed to be able to access CrowdTangle\'s API.',
+            'You can provide one using the `--token` argument.'
+        ])
 
     if namespace.output is None:
         output_file = DummyTqdmFile(sys.stdout)

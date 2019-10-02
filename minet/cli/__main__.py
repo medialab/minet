@@ -392,6 +392,11 @@ COMMANDS = {
                             'type': int
                         },
                         {
+                            'flag': '--not-in-title',
+                            'help': 'Whether to search terms in account titles also.',
+                            'action': 'store_true'
+                        },
+                        {
                             'flag': '--offset',
                             'help': 'Count offset.',
                             'type': int

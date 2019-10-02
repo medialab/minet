@@ -34,6 +34,9 @@ def forge_posts_url(namespace):
     if namespace.offset:
         base_url += '&offset=%s' % namespace.offset
 
+    if namespace.not_in_title:
+        base_url += '&notInTitle'
+
     return base_url
 
 
