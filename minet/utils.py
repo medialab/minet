@@ -90,6 +90,8 @@ def parse_http_header(header):
     return key.strip(), value.strip()
 
 
+# TODO: take more cases into account...
+#   http://www.otsukare.info/2015/03/26/refresh-http-header
 def parse_http_refresh(value):
     try:
 
@@ -207,7 +209,7 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
 
 
 # TODO: refresh header + meta refresh
-def resolve(http, url, max=5):
+def resolve(http, url, max=5, follow_refresh_headers=True):
     """
     Helper function attempting to resolve the given url.
     """
@@ -231,11 +233,20 @@ def resolve(http, url, max=5):
             return InfiniteRedirectsError('Infinite redirects'), list(url_stack.values())
 
         url_stack[url] = (response.status, url)
+        location = None
 
         if response.status not in REDIRECT_STATUSES:
-            return None, list(url_stack.values())
 
-        location = response.getheader('location')
+            if response.status < 400 and follow_refresh_headers:
+                refresh = response.getheader('refresh')
+
+                if refresh is not None:
+                    _, location = parse_http_refresh(refresh)
+
+            if location is None:
+                return None, list(url_stack.values())
+        else:
+            location = response.getheader('location')
 
         if not location:
             return InvalidRedirectError('Redirection is invalid'), list(url_stack.values())
