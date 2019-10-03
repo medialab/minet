@@ -237,13 +237,17 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
     """
     Helper function attempting to resolve the given url.
     """
-    need_to_release_conn = follow_meta_refresh
 
     url_stack = OrderedDict()
     error = None
     response = None
 
     for _ in range(max_redirects):
+
+        if response:
+            response.release_conn()
+            response.close()
+
         http_error, response = request(
             http,
             url,
@@ -252,7 +256,7 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             cookie=cookie,
             redirect=False,
             preload_content=False,
-            release_conn=not need_to_release_conn,
+            release_conn=False,
             spoof_ua=spoof_ua
         )
 
@@ -317,17 +321,15 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             break
 
         # Go to next
-        if need_to_release_conn and response:
-            response.release_conn()
-
         url = next_url
 
     # We reached max redirects
     else:
         error = MaxRedirectsError('Maximum number of redirects exceeded')
 
-    if need_to_release_conn and response and not return_response:
+    if response and not return_response:
         response.release_conn()
+        response.close()
 
     compiled_stack = list(url_stack.values())
 
