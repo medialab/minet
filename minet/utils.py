@@ -209,8 +209,9 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
     return None, response
 
 
-def resolve(http, url, method='GET', spoof_ua=True, max_redirects=5,
-            follow_refresh_headers=True, follow_meta_refresh=False,
+# TODO: attempt to catch some JS redirections
+def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
+            max_redirects=5, follow_refresh_headers=True, follow_meta_refresh=False,
             return_response=False):
     """
     Helper function attempting to resolve the given url.
@@ -226,6 +227,8 @@ def resolve(http, url, method='GET', spoof_ua=True, max_redirects=5,
             http,
             url,
             method=method,
+            headers=headers,
+            cookie=cookie,
             redirect=False,
             preload_content=False,
             release_conn=True if not need_to_release_conn else False,
