@@ -175,24 +175,39 @@ class TestScrape(object):
 
         assert result == 'Exemple'
 
-    #     result = scrape(BASIC_HTML, {
-    #         'iterator': 'li',
-    #         'item': {
-    #             'fields': {
-    #                 'text': {
-    #                     'method': 'text'
-    #                 },
-    #                 'context': {
-    #                     'eval': 'context["value"]'
-    #                 }
-    #             }
-    #         }
-    #     }, context={'value': 1})
+        result = scrape({
+            'iterator': 'li',
+            'fields': {
+                'text': {
+                    'method': 'text'
+                },
+                'context': {
+                    'eval': 'context["value"]'
+                }
+            }
+        }, BASIC_HTML, context={'value': 1})
 
-    #     assert list(result) == [
-    #         {'text': 'One', 'context': 1},
-    #         {'text': 'Two', 'context': 1}
-    #     ]
+        assert list(result) == [
+            {'text': 'One', 'context': 1},
+            {'text': 'Two', 'context': 1}
+        ]
+
+        result = scrape({
+            'iterator': 'li',
+            'fields': {
+                'text': {
+                    'method': 'text'
+                },
+                'context': {
+                    'get': 'value'
+                }
+            }
+        }, BASIC_HTML, context={'value': 1})
+
+        assert list(result) == [
+            {'text': 'One', 'context': 1},
+            {'text': 'Two', 'context': 1}
+        ]
 
     def test_headers(self):
         headers = headers_from_definition({'iterator': 'li'})

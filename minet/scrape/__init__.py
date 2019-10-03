@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from minet.scrape.apply import apply_scraper
 
 
-def scrape(scraper, html, engine='lxml'):
+def scrape(scraper, html, engine='lxml', context=None):
     is_already_soup = isinstance(html, BeautifulSoup)
 
     if not is_already_soup:
@@ -20,7 +20,8 @@ def scrape(scraper, html, engine='lxml'):
         scraper,
         soup,
         root=soup,
-        html=str(soup) if is_already_soup else html
+        html=str(soup) if is_already_soup else html,
+        context=context
     )
 
 
