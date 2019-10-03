@@ -40,3 +40,10 @@ Add limit & slices to iteration. Add filters (filter None by default if only yie
 
 * Need to take scalar vs. list output.
 * Need to wire up context.
+* Need to try catch process.
+* Need to reform the root tree.
+* Need to handle jsonl.
+* Need to handle yml.
+* Need to validate.
+
+* Need to report errors finely.

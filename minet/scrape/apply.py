@@ -11,6 +11,17 @@ DEFAULT_CONTEXT = {}
 EXTRACTOR_NAMES = set(['text', 'html', 'inner_html', 'outer_html'])
 
 
+def merge_contexts(global_context, local_context):
+    if global_context is None:
+        return local_context
+
+    for k, v in global_context.items():
+        if k not in local_context:
+            local_context[k] = v
+
+    return local_context
+
+
 def extract(element, extractor_name):
     if extractor_name == 'text':
         return element.get_text()
@@ -72,6 +83,21 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
         pass
     else:
         elements = [element]
+
+    # Handling local context
+    if 'context' in scraper:
+        local_context = {}
+
+        for k, field_scraper in scraper['context'].items():
+            local_context[k] = apply_scraper(
+                field_scraper,
+                element,
+                root=root,
+                html=html,
+                context=context
+            )
+
+        context = merge_contexts(context, local_context)
 
     # Actual iteration
     acc = None if single_value else []

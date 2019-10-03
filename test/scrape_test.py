@@ -209,6 +209,54 @@ class TestScrape(object):
             {'text': 'Two', 'context': 1}
         ]
 
+        result = scrape({
+            'context': {
+                'divid': {
+                    'sel': '#ok',
+                    'attr': 'id'
+                }
+            },
+            'iterator': 'li',
+            'fields': {
+                'context': {
+                    'get': 'divid'
+                },
+                'value': 'text'
+            }
+        }, META_HTML)
+
+        assert result == [{'context': 'ok', 'value': 'One'}, {'context': 'ok', 'value': 'Two'}]
+
+        result = scrape({
+            'context': {
+                'title': {
+                    'constant': 'Scrape'
+                }
+            },
+            'iterator': 'li',
+            'fields': {
+                'local': {
+                    'context': {
+                        'divid': {
+                            'eval': 'root.select_one("#ok").get("id")'
+                        }
+                    },
+                    'get': 'divid'
+                },
+                'global': {
+                    'get': 'divid'
+                },
+                'title': {
+                    'get': 'title'
+                }
+            }
+        }, META_HTML, context={'divid': 'notok'})
+
+        assert result == [
+            {'local': 'ok', 'global': 'notok', 'title': 'Scrape'},
+            {'local': 'ok', 'global': 'notok', 'title': 'Scrape'}
+        ]
+
     def test_headers(self):
         headers = headers_from_definition({'iterator': 'li'})
 
