@@ -198,7 +198,8 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
 
 
 def multithreaded_resolve(iterator, key=None, request_args=None, threads=25,
-                          throttle=DEFAULT_THROTTLE, max_redirects=5):
+                          throttle=DEFAULT_THROTTLE, max_redirects=5,
+                          follow_refresh_header=True, follow_meta_refresh=False):
     """
     Function returning a multithreaded iterator over resolved urls.
 
@@ -212,6 +213,10 @@ def multithreaded_resolve(iterator, key=None, request_args=None, threads=25,
             Or a function taking domain name and item and returning the
             throttle to apply. Defaults to 0.2.
         max_redirects (int, optional): Max number of redirections to follow.
+        follow_refresh_header (bool, optional): Whether to follow refresh
+            headers. Defaults to True.
+        follow_meta_refresh (bool, optional): Whether to follow meta refresh.
+            Defaults to False.
 
     Yields:
         ResolveWorkerResult
@@ -238,7 +243,13 @@ def multithreaded_resolve(iterator, key=None, request_args=None, threads=25,
 
         kwargs = request_args(url, item) if request_args is not None else {}
 
-        error, stack = resolve(http, url, max_redirects=max_redirects, **kwargs)
+        error, stack = resolve(
+            http,
+            url,
+            max_redirects=max_redirects,
+            follow_refresh_header=follow_refresh_header,
+            follow_meta_refresh=follow_meta_refresh,
+            **kwargs)
 
         return ResolveWorkerResult(
             url=url,

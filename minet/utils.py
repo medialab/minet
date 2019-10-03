@@ -232,7 +232,7 @@ class Redirection(object):
 
 # TODO: attempt to catch some JS redirections
 def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
-            max_redirects=5, follow_refresh_headers=True, follow_meta_refresh=False,
+            max_redirects=5, follow_refresh_header=True, follow_meta_refresh=False,
             return_response=False):
     """
     Helper function attempting to resolve the given url.
@@ -278,7 +278,7 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
 
             if response.status < 400:
 
-                if follow_refresh_headers:
+                if follow_refresh_header:
                     refresh = response.getheader('refresh')
 
                     if refresh is not None:
