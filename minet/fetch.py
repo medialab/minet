@@ -31,8 +31,7 @@ FetchWorkerPayload = namedtuple(
     [
         'http',
         'item',
-        'url',
-        'request_args'
+        'url'
     ]
 )
 
@@ -92,7 +91,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
 
     # Thread worker
     def worker(payload):
-        http, item, url, request_args = payload
+        http, item, url = payload
 
         if url is None:
             return FetchWorkerResult(
@@ -171,8 +170,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
                 yield FetchWorkerPayload(
                     http=http,
                     item=item,
-                    url=None,
-                    request_args=request_args
+                    url=None
                 )
 
                 continue
@@ -183,8 +181,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
             yield FetchWorkerPayload(
                 http=http,
                 item=item,
-                url=url,
-                request_args=request_args
+                url=url
             )
 
     return imap_unordered(
@@ -232,7 +229,7 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
 
     # Thread worker
     def worker(payload):
-        http, item, url, resolve_args = payload
+        http, item, url = payload
 
         if url is None:
             return ResolveWorkerResult(
@@ -275,8 +272,7 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
                 yield FetchWorkerPayload(
                     http=http,
                     item=item,
-                    url=None,
-                    resolve_args=resolve_args
+                    url=None
                 )
 
                 continue
@@ -287,8 +283,7 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
             yield FetchWorkerPayload(
                 http=http,
                 item=item,
-                url=url,
-                resolve_args=resolve_args
+                url=url
             )
 
     return imap_unordered(
