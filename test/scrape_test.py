@@ -110,6 +110,29 @@ class TestScrape(object):
 
         assert result == [{'number': '1', 'label': 'One'}, {'number': '2', 'label': 'Two'}]
 
+        result = scrape({
+            'iterator': 'li',
+            'fields': {
+                'inner': {
+                    'extract': 'inner_html'
+                },
+                'outer': {
+                    'extract': 'outer_html'
+                }
+            }
+        }, NESTED_HTML)
+
+        assert result == [
+            {
+                'inner': '<span class="first">One</span> <span class="second">1</span>',
+                'outer': '<li id="li1"><span class="first">One</span> <span class="second">1</span></li>'
+            },
+            {
+                'inner': '<span class="first">Two</span> <span class="second">2</span>',
+                'outer': '<li id="li2"><span class="first">Two</span> <span class="second">2</span></li>'
+            }
+        ]
+
     def test_recursive(self):
         result = scrape({
             'iterator': 'li',

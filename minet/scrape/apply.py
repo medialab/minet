@@ -16,10 +16,12 @@ def extract(element, extractor_name):
         return element.get_text()
 
     if extractor_name == 'html' or extractor_name == 'inner_html':
-        return element.encode_contents()
+        return element.encode_contents().decode()
 
     if extractor_name == 'outer_html':
         return str(element)
+
+    raise TypeError('Unknown "%s" extractor' % extractor_name)
 
 
 def eval_expression(expression, element=None, elements=None, value=None,
@@ -104,6 +106,8 @@ def apply_scraper(scraper, element, root=None, html=None):
             # Attribute
             if 'attr' in scraper:
                 value = element.get(scraper['attr'])
+            elif 'extract' in scraper:
+                value = extract(element, scraper['extract'])
             else:
 
                 # Default value is text
