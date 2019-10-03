@@ -209,29 +209,37 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
     return None, response
 
 
-# TODO: refresh header + meta refresh
-def resolve(http, url, max_redirects=5, follow_refresh_headers=True):
+# TODO: meta refresh
+def resolve(http, url, method='GET', spoof_ua=False, max_redirects=5,
+            follow_refresh_headers=True):
     """
     Helper function attempting to resolve the given url.
     """
     url_stack = OrderedDict()
 
+    error = None
+    response = None
+
     for _ in range(max_redirects):
-        error, response = request(
+        http_error, response = request(
             http,
             url,
-            method='GET',
+            method=method,
             redirect=False,
             headers_only=True,
-            spoof_ua=False
+            spoof_ua=spoof_ua
         )
 
-        if error:
+        # Request error
+        if http_error:
             url_stack[url] = (None, url)
-            return error, list(url_stack.values())
+            error = http_error
+            break
 
+        # Cycle
         if url in url_stack:
-            return InfiniteRedirectsError('Infinite redirects'), list(url_stack.values())
+            error = InfiniteRedirectsError('Infinite redirects')
+            break
 
         url_stack[url] = (response.status, url)
         location = None
@@ -244,24 +252,33 @@ def resolve(http, url, max_redirects=5, follow_refresh_headers=True):
                 if refresh is not None:
                     _, location = parse_http_refresh(refresh)
 
+            # Found the end
             if location is None:
-                return None, list(url_stack.values())
+                break
         else:
             location = response.getheader('location')
 
+        # Invalid redirection
         if not location:
-            return InvalidRedirectError('Redirection is invalid'), list(url_stack.values())
+            error = InvalidRedirectError('Redirection is invalid')
+            break
 
-        # Go to next
+        # Resolving next url
         next_url = urljoin(url, location.strip())
 
         # Self loop?
         if next_url == url:
-            return SelfRedirectError('Self redirection'), list(url_stack.values())
+            error = SelfRedirectError('Self redirection')
+            break
 
+        # Go to next
         url = next_url
 
-    return MaxRedirectsError('Maximum number of redirects exceeded'), list(url_stack.values())
+    # We reached max redirects
+    else:
+        error = MaxRedirectsError('Maximum number of redirects exceeded')
+
+    return error, list(url_stack.values())
 
 
 class RateLimiter(object):
