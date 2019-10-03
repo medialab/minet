@@ -84,6 +84,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
     """
 
     # Creating the http pool manager
+    # NOTE: maxsize should increase with group_parallelism
     http = create_safe_pool(
         num_pools=threads * 2,
         maxsize=1

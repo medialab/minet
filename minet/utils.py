@@ -252,7 +252,7 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             cookie=cookie,
             redirect=False,
             preload_content=False,
-            release_conn=True if not need_to_release_conn else False,
+            release_conn=not need_to_release_conn,
             spoof_ua=spoof_ua
         )
 
