@@ -120,27 +120,25 @@ class TestScrape(object):
 
         assert result == [['One', '1'], ['Two', '2']]
 
-    # def test_context(self):
-    #     result = scrape(META_HTML, {
-    #         'iterator': 'li',
-    #         'item': {
-    #             'fields': {
-    #                 'root_id': {
-    #                     'eval': 'root.select_one("#ok").get("id")'
-    #                 }
-    #             }
-    #         }
-    #     })
+    def test_context(self):
+        result = scrape({
+            'iterator': 'li',
+            'fields': {
+                'root_id': {
+                    'eval': 'root.select_one("#ok").get("id")'
+                }
+            }
+        }, META_HTML)
 
-    #     assert list(result) == [{'root_id': 'ok'}, {'root_id': 'ok'}]
+        assert result == [{'root_id': 'ok'}, {'root_id': 'ok'}]
 
-    #     result = scrape(META_HTML, {
-    #         'item': {
-    #             'eval': 'html.split("<div", 1)[0].strip()'
-    #         }
-    #     })
+        result = scrape({
+            'item': {
+                'eval': 'html.split("<div", 1)[0].strip()'
+            }
+        }, META_HTML)
 
-    #     assert list(result) == ['Exemple']
+        assert result == 'Exemple'
 
     #     result = scrape(BASIC_HTML, {
     #         'iterator': 'li',

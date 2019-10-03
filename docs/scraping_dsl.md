@@ -30,7 +30,7 @@ Possibility to pass fields & context in order using an array so they depend on e
 2. `iterator` or `iterator_eval` runs to refine local iterating selection.
 3. `context` run to populate.
 4. `item` vs `fields` vs `tabulate`.
-6. Then => go to 1. => `get` or `attr` or `constant` => `eval` => `transform`.
+5. Then => go to 1. => `get` or `attr` or `constant` => `eval` => `transform`.
 
 Test working recursion. Test scrapeTable.
 

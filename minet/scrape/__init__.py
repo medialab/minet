@@ -9,12 +9,19 @@ from minet.scrape.apply import apply_scraper
 
 
 def scrape(scraper, html, engine='lxml'):
-    soup = html
+    is_already_soup = isinstance(html, BeautifulSoup)
 
-    if not isinstance(soup, BeautifulSoup):
+    if not is_already_soup:
         soup = BeautifulSoup(html, engine)
+    else:
+        soup = html
 
-    return apply_scraper(scraper, soup)
+    return apply_scraper(
+        scraper,
+        soup,
+        root=soup,
+        html=str(soup) if is_already_soup else html
+    )
 
 
 def headers_from_definition(scraper):

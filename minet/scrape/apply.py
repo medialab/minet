@@ -42,7 +42,7 @@ def eval_expression(expression, element=None, elements=None, value=None,
     })
 
 
-def apply_scraper(scraper, element):
+def apply_scraper(scraper, element, root=None, html=None):
 
     # Is this a tail call of item
     if isinstance(scraper, str):
@@ -81,13 +81,23 @@ def apply_scraper(scraper, element):
             value = {}
 
             for k, field_scraper in scraper['fields'].items():
-                value[k] = apply_scraper(field_scraper, element)
+                value[k] = apply_scraper(
+                    field_scraper,
+                    element,
+                    root=root,
+                    html=html
+                )
 
         # Do we have a scalar?
         elif 'item' in scraper:
 
             # Default value is text
-            value = apply_scraper(scraper['item'], element)
+            value = apply_scraper(
+                scraper['item'],
+                element,
+                root=root,
+                html=html
+            )
 
         else:
 
@@ -107,8 +117,8 @@ def apply_scraper(scraper, element):
                     elements=elements,
                     value=value,
                     context=None,
-                    html=None,
-                    root=None
+                    html=html,
+                    root=root
                 )
 
         if single_value:
