@@ -35,3 +35,8 @@ Possibility to pass fields & context in order using an array so they depend on e
 Test working recursion. Test scrapeTable.
 
 Add limit & slices to iteration. Add filters (filter None by default if only yield).
+
+## Update CLI
+
+* Need to take scalar vs. list output.
+* Need to wire up context.

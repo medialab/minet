@@ -108,6 +108,8 @@ def apply_scraper(scraper, element, root=None, html=None):
                 value = element.get(scraper['attr'])
             elif 'extract' in scraper:
                 value = extract(element, scraper['extract'])
+            elif 'constant' in scraper:
+                value = scraper['constant']
             else:
 
                 # Default value is text
