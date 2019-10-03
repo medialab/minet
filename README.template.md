@@ -219,11 +219,11 @@ for result in multithreaded_resolve(urls, key=lambda x: x['url']):
 
 * **iterator** *iterable*: An iterator over urls or arbitrary items, if you provide a `key` argument along with it.
 * **key** *?callable*: A function extracting the url to fetch from the items yielded by the provided iterator.
-* **request_args** *?callable*: A function returning arguments to pass to the internal `request` helper for a call.
+* **resolve_args** *?callable*: A function returning arguments to pass to the internal `resolve` helper for a call.
 * **threads** *?int*: Number of threads to use. Defaults to `25`.
 * **throttle** *?float|callable*: Per-domain throttle in seconds. Or a function taking the domain and current item and returning the throttle to apply. Defaults to `0.2`.
 * **max_redirects** *?int*: Max number of redirections to follow. Defaults to `5`.
-* **follow_refresh_header* *?bool*: Whether to follow `Refresh` headers or not. Defaults to `True`.
+* **follow_refresh_header** *?bool*: Whether to follow `Refresh` headers or not. Defaults to `True`.
 * **follow_meta_refresh** *?bool*: Whether to follow meta refresh tags. It's more costly because we need to stream the start of the response's body and cannot rely on headers alone. Defaults to  `False`.
 
 *Yields*:

@@ -68,7 +68,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
         iterator (iterable): An iterator over urls or arbitrary items.
         key (callable, optional): Function extracting url from yielded items.
         request_args (callable, optional): Function returning specific
-            arguments to pass to the request for a yielded item.
+            arguments to pass to the request util per yielded item.
         threads (int, optional): Number of threads to use. Defaults to 25.
         throttle (float or callable, optional): Per-domain throttle in seconds.
             Or a function taking domain name and item and returning the
@@ -198,7 +198,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
     )
 
 
-def multithreaded_resolve(iterator, key=None, request_args=None, threads=25,
+def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
                           throttle=DEFAULT_THROTTLE, max_redirects=5,
                           follow_refresh_header=True, follow_meta_refresh=False):
     """
@@ -207,8 +207,8 @@ def multithreaded_resolve(iterator, key=None, request_args=None, threads=25,
     Args:
         iterator (iterable): An iterator over urls or arbitrary items.
         key (callable, optional): Function extracting url from yielded items.
-        request_args (callable, optional): Function returning specific
-            arguments to pass to the request for a yielded item.
+        resolve_args (callable, optional): Function returning specific
+            arguments to pass to the resolve util per yielded item.
         threads (int, optional): Number of threads to use. Defaults to 25.
         throttle (float or callable, optional): Per-domain throttle in seconds.
             Or a function taking domain name and item and returning the
@@ -232,7 +232,7 @@ def multithreaded_resolve(iterator, key=None, request_args=None, threads=25,
 
     # Thread worker
     def worker(payload):
-        http, item, url, request_args = payload
+        http, item, url, resolve_args = payload
 
         if url is None:
             return ResolveWorkerResult(
@@ -242,7 +242,7 @@ def multithreaded_resolve(iterator, key=None, request_args=None, threads=25,
                 stack=None
             )
 
-        kwargs = request_args(url, item) if request_args is not None else {}
+        kwargs = resolve_args(url, item) if resolve_args is not None else {}
 
         error, stack = resolve(
             http,
@@ -276,7 +276,7 @@ def multithreaded_resolve(iterator, key=None, request_args=None, threads=25,
                     http=http,
                     item=item,
                     url=None,
-                    request_args=request_args
+                    resolve_args=resolve_args
                 )
 
                 continue
@@ -288,7 +288,7 @@ def multithreaded_resolve(iterator, key=None, request_args=None, threads=25,
                 http=http,
                 item=item,
                 url=url,
-                request_args=request_args
+                resolve_args=resolve_args
             )
 
     return imap_unordered(
