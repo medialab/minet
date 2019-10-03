@@ -61,3 +61,15 @@ class TestUtils(object):
         r = set(int(m.decode().rsplit('/', 1)[-1]) for m in locations)
 
         assert r == set(range(7))
+
+        location = find_javascript_relocation(JAVASCRIPT_LOCATION)
+
+        assert location == 'https://twitter.com/i/web/status/0'
+
+        location = find_javascript_relocation(META_REFRESH)
+
+        assert location == 'https://twitter.com/i/web/status/1155764949777620992'
+
+        location = find_javascript_relocation(b'NOTHING')
+
+        assert location is None
