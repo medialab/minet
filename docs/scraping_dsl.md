@@ -14,6 +14,7 @@
   * `item`: defines the value to retrieve.
   * `fields`: defines the fields t@o retrieve.
   * `tabulate`: retrieves from a table. => should be against iterate
+  * `default`: defines a default value. (Could replace `constant`).
   * `extract`: get the text or inner html or outer html etc. or context etc.
   * `attr`: name of attribute to get.
   * `transform`: value transformation chain.
