@@ -6,6 +6,7 @@ cython==0.29.4
 dateparser==0.7.1
 lxml==4.3.0
 numpy==1.16.1
+pyyaml==5.1.2
 quenouille==0.4.0
 tld>=0.9.3
 tqdm==4.31.1
