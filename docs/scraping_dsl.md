@@ -12,9 +12,9 @@
   * `sel`: defines local selection.
   * `sel_eval`: evaluate a local selection.
   * `item`: defines the value to retrieve.
-  * `fields`: defines the fields to retrieve.
-  * `tabulate`: retrieves from a table.
-  * `extract`: get the text or inner html or outer html etc.
+  * `fields`: defines the fields t@o retrieve.
+  * `tabulate`: retrieves from a table. => should be against iterate
+  * `extract`: get the text or inner html or outer html etc. or context etc.
   * `attr`: name of attribute to get.
   * `transform`: value transformation chain.
   * `context`: defines local context.
