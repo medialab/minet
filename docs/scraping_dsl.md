@@ -13,6 +13,7 @@
   * `sel_eval`: evaluate a local selection.
   * `item`: defines the value to retrieve.
   * `fields`: defines the fields to retrieve.
+  * `tabulate`: retrieves from a table.
   * `extract`: get the text or inner html or outer html etc.
   * `attr`: name of attribute to get.
   * `transform`: value transformation chain.
@@ -27,12 +28,9 @@ Possibility to pass fields & context in order using an array so they depend on e
 1. `sel` or `sel_eval` to refine local selection.
 2. `iterator` or `iterator_eval` runs to refine local iterating selection.
 3. `context` run to populate.
-4. `item` runs or defaults to `{"extract": "text"}`.
-5. `fields` runs alone or die.
+4. `item` vs `fields` vs `tabulate`.
 6. Then => go to 1. => `get` or `attr` or `constant` => `eval` => `transform`.
 
 Test working recursion. Test scrapeTable.
 
 Add limit & slices to iteration. Add filters (filter None by default if only yield).
-
-Replace `item` by `yield` and put it as an opponent of `fields`. Add `tabulate`.
