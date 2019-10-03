@@ -210,7 +210,8 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
 
 
 def resolve(http, url, method='GET', spoof_ua=True, max_redirects=5,
-            follow_refresh_headers=True, follow_meta_refresh=False):
+            follow_refresh_headers=True, follow_meta_refresh=False,
+            return_response=False):
     """
     Helper function attempting to resolve the given url.
     """
@@ -291,10 +292,15 @@ def resolve(http, url, method='GET', spoof_ua=True, max_redirects=5,
     else:
         error = MaxRedirectsError('Maximum number of redirects exceeded')
 
-    if need_to_release_conn and response:
+    if need_to_release_conn and response and not return_response:
         response.release_conn()
 
-    return error, list(url_stack.values())
+    compiled_stack = list(url_stack.values())
+
+    if return_response:
+        return error, compiled_stack, response
+
+    return error, compiled_stack
 
 
 class RateLimiter(object):
