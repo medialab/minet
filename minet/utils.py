@@ -38,6 +38,7 @@ PRAGMA_RE = re.compile(rb'<meta.*?content=["\']*;?charset=(.+?)["\'>]', flags=re
 XML_RE = re.compile(rb'^<\?xml.*?encoding=["\']*(.+?)["\'>]', flags=re.I)
 NOSCRIPT_RE = re.compile(rb'<noscript[^>]*>.*</noscript[^>]*>', flags=re.I)
 META_REFRESH_RE = re.compile(rb'''<meta\s+http-equiv=['"]?refresh['"]?\s+content=['"]?([^"']+)['">]?''', flags=re.I)
+JAVASCRIPT_LOCATION_RE = re.compile(rb'''(?:window\.)?location(?:\s*=\s*|\.replace\(\s*)['"`](.*?)['"`]''')
 
 # Constants
 CHARDET_CONFIDENCE_THRESHOLD = 0.9
@@ -115,6 +116,12 @@ def find_meta_refresh(html_chunk):
         return None
 
     return parse_http_refresh(m.group(1))
+
+
+def find_javascript_relocation(html_chunk):
+    m = JAVASCRIPT_LOCATION_RE.search(html_chunk)
+
+    print(m)
 
 
 class CookieResolver(object):

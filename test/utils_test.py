@@ -3,7 +3,9 @@
 # =============================================================================
 from minet.utils import (
     parse_http_refresh,
-    find_meta_refresh
+    find_meta_refresh,
+    find_javascript_relocation,
+    JAVASCRIPT_LOCATION_RE
 )
 
 HTTP_REFRESH_TESTS = [
@@ -27,6 +29,21 @@ META_REFRESH = rb'''
     </script>
 '''
 
+JAVASCRIPT_LOCATION = rb'''
+    <head>
+        <title>https://twitter.com/i/web/status/1155764949777620992</title>
+    </head>
+    <script>
+        window.opener = null;
+        location = "https:\/\/twitter.com\/i\/web\/status\/0"
+        window.location = "https:\/\/twitter.com\/i\/web\/status\/1"
+        location.replace("https:\/\/twitter.com\/i\/web\/status\/2");location = "https:\/\/twitter.com\/i\/web\/status\/3"
+        window.location.replace("https:\/\/twitter.com\/i\/web\/status\/4")
+        window.location='https:\/\/twitter.com\/i\/web\/status\/5'
+        window.location      ="https:\/\/twitter.com\/i\/web\/status\/6"
+    </script>
+'''
+
 
 class TestUtils(object):
     def test_parse_http_refresh(self):
@@ -37,3 +54,10 @@ class TestUtils(object):
         meta_refresh = find_meta_refresh(META_REFRESH)
 
         assert meta_refresh == (0, 'https://twitter.com/i/web/status/1155764949777620992')
+
+    def test_find_javascript_relocation(self):
+        locations = JAVASCRIPT_LOCATION_RE.findall(JAVASCRIPT_LOCATION)
+
+        r = set(int(m.decode().rsplit('/', 1)[-1]) for m in locations)
+
+        assert r == set(range(7))
