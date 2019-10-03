@@ -47,3 +47,5 @@ Add limit & slices to iteration. Add filters (filter None by default if only yie
 * Need to validate.
 
 * Need to report errors finely.
+
+* iterator_eval + sel_eval could return a string? typecheck

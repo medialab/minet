@@ -12,8 +12,8 @@ BASIC_HTML = """
 
 NESTED_HTML = """
     <ul>
-        <li id="li1"><span class="first">One</span> <span class="second">1</span></li>
-        <li id="li2"><span class="first">Two</span> <span class="second">2</span></li>
+        <li id="li1" class="li"><span class="first">One</span> <span class="second">1</span></li>
+        <li id="li2" class="li"><span class="first">Two</span> <span class="second">2</span></li>
     </ul>
 """
 
@@ -125,11 +125,11 @@ class TestScrape(object):
         assert result == [
             {
                 'inner': '<span class="first">One</span> <span class="second">1</span>',
-                'outer': '<li id="li1"><span class="first">One</span> <span class="second">1</span></li>'
+                'outer': '<li class="li" id="li1"><span class="first">One</span> <span class="second">1</span></li>'
             },
             {
                 'inner': '<span class="first">Two</span> <span class="second">2</span>',
-                'outer': '<li id="li2"><span class="first">Two</span> <span class="second">2</span></li>'
+                'outer': '<li class="li" id="li2"><span class="first">Two</span> <span class="second">2</span></li>'
             }
         ]
 
@@ -164,6 +164,26 @@ class TestScrape(object):
         }, NESTED_HTML)
 
         assert result == [['One', '1'], ['Two', '2']]
+
+    def test_selection_eval(self):
+
+        result = scrape({
+            'iterator': 'li',
+            'item': {
+                'sel_eval': 'element.select_one("span")'
+            }
+        }, NESTED_HTML)
+
+        assert result == ['One', 'Two']
+
+        result = scrape({
+            'iterator_eval': 'element.select("li") + element.select("span")',
+            'item': {
+                'attr': 'class'
+            }
+        }, NESTED_HTML)
+
+        assert result == [['li'], ['li'], ['first'], ['second'], ['first'], ['second']]
 
     def test_context(self):
         result = scrape({

@@ -68,8 +68,14 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
     if 'sel' in scraper:
         element = element.select_one(scraper['sel'])
     elif 'sel_eval' in scraper:
-        # TODO
-        pass
+        element = eval_expression(
+            scraper['sel_eval'],
+            element=element,
+            elements=[],
+            context=context,
+            html=html,
+            root=root
+        )
 
     # Then we need to solve iterator
     single_value = True
@@ -78,9 +84,15 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
         elements = element.select(scraper['iterator'])
         single_value = False
     elif 'iterator_eval' in scraper:
-        # TODO
+        elements = eval_expression(
+            scraper['iterator_eval'],
+            element=element,
+            elements=[],
+            context=context,
+            html=html,
+            root=root
+        )
         single_value = False
-        pass
     else:
         elements = [element]
 
