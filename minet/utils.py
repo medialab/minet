@@ -209,6 +209,27 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
     return None, response
 
 
+class Redirection(object):
+    __slots__ = ('status', 'type', 'url')
+
+    def __init__(self, url):
+        self.status = None
+        self.url = url
+        self.type = 'hit'
+
+    def __repr__(self):
+        class_name = self.__class__.__name__
+
+        return (
+            '<%(class_name)s type=%(type)s status=%(status)s url=%(url)s>'
+        ) % {
+            'class_name': class_name,
+            'type': self.type,
+            'status': self.status,
+            'url': self.url
+        }
+
+
 # TODO: attempt to catch some JS redirections
 def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             max_redirects=5, follow_refresh_headers=True, follow_meta_refresh=False,
@@ -235,9 +256,12 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             spoof_ua=spoof_ua
         )
 
+        redirection = Redirection(url)
+
         # Request error
         if http_error:
-            url_stack[url] = (None, url)
+            redirection.type = 'error'
+            url_stack[url] = redirection
             error = http_error
             break
 
@@ -246,7 +270,8 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             error = InfiniteRedirectsError('Infinite redirects')
             break
 
-        url_stack[url] = (response.status, url)
+        redirection.status = response.status
+        url_stack[url] = redirection
         location = None
 
         if response.status not in REDIRECT_STATUSES:
@@ -259,6 +284,8 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
                     if refresh is not None:
                         _, location = parse_http_refresh(refresh)
 
+                        redirection.type = 'refresh-header'
+
                 if location is None and follow_meta_refresh:
                     chunk = response.read(1024)
                     meta_refresh = find_meta_refresh(chunk)
@@ -266,10 +293,14 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
                     if meta_refresh is not None:
                         location = meta_refresh[1]
 
+                        redirection.type = 'meta-refresh'
+
             # Found the end
             if location is None:
+                redirection.type = 'hit'
                 break
         else:
+            redirection.type = 'location-header'
             location = response.getheader('location')
 
         # Invalid redirection
