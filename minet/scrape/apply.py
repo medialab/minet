@@ -10,6 +10,12 @@ import re
 DEFAULT_CONTEXT = {}
 EXTRACTOR_NAMES = set(['text', 'html', 'inner_html', 'outer_html'])
 
+TRANSFORMERS = {
+    'lower': lambda x: x.lower(),
+    'strip': lambda x: x.strip(),
+    'upper': lambda x: x.upper()
+}
+
 
 def merge_contexts(global_context, local_context):
     if global_context is None:
@@ -53,6 +59,21 @@ def eval_expression(expression, element=None, elements=None, value=None,
         'html': html,
         'root': root
     })
+
+
+def apply_transform_chain(chain, value):
+    if not isinstance(chain, list):
+        chain = [chain]
+
+    for transform in chain:
+        fn = TRANSFORMERS.get(transform)
+
+        if fn is None:
+            raise TypeError('Unknown "%s" transformer' % transform)
+
+        value = fn(value)
+
+    return value
 
 
 def apply_scraper(scraper, element, root=None, html=None, context=None):
@@ -171,6 +192,10 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
                     )
             except:
                 value = None
+
+        # Transform
+        if 'transform' in scraper and value is not None:
+            value = apply_transform_chain(scraper['transform'], value)
 
         # Default value?
         if 'default' in scraper and value is None:
