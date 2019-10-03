@@ -6,7 +6,8 @@ URLS = [
     'https://bit.ly/2gnvlgb',
     'http://bit.ly/2YupNmj',
     'http://www.outremersbeyou.com/talent-de-la-semaine-la-designer-comorienne-aisha-wadaane-je-suis-fiere-de-mes-origines/',
-    'http://la-grange.net/2015/03/26/refresh/'
+    'http://la-grange.net/2015/03/26/refresh/',
+    'https://ebay.us/BUkuxU'
 ]
 
 http = create_safe_pool()

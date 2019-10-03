@@ -238,7 +238,7 @@ def multithreaded_resolve(iterator, key=None, request_args=None, threads=25,
 
         kwargs = request_args(url, item) if request_args is not None else {}
 
-        error, stack = resolve(http, url, max=max_redirects, **kwargs)
+        error, stack = resolve(http, url, max_redirects=max_redirects, **kwargs)
 
         return ResolveWorkerResult(
             url=url,

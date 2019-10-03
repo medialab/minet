@@ -210,17 +210,17 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
 
 
 # TODO: refresh header + meta refresh
-def resolve(http, url, max=5, follow_refresh_headers=True):
+def resolve(http, url, max_redirects=5, follow_refresh_headers=True):
     """
     Helper function attempting to resolve the given url.
     """
     url_stack = OrderedDict()
 
-    for _ in range(max):
+    for _ in range(max_redirects):
         error, response = request(
             http,
             url,
-            method='HEAD',
+            method='GET',
             redirect=False,
             headers_only=True,
             spoof_ua=False
