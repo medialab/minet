@@ -209,14 +209,14 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
     return None, response
 
 
-# TODO: meta refresh
-def resolve(http, url, method='GET', spoof_ua=False, max_redirects=5,
-            follow_refresh_headers=True):
+def resolve(http, url, method='GET', spoof_ua=True, max_redirects=5,
+            follow_refresh_headers=True, follow_meta_refresh=False):
     """
     Helper function attempting to resolve the given url.
     """
-    url_stack = OrderedDict()
+    need_to_release_conn = follow_meta_refresh
 
+    url_stack = OrderedDict()
     error = None
     response = None
 
@@ -227,7 +227,7 @@ def resolve(http, url, method='GET', spoof_ua=False, max_redirects=5,
             method=method,
             redirect=False,
             preload_content=False,
-            release_conn=True,
+            release_conn=True if not need_to_release_conn else False,
             spoof_ua=spoof_ua
         )
 
@@ -247,11 +247,20 @@ def resolve(http, url, method='GET', spoof_ua=False, max_redirects=5,
 
         if response.status not in REDIRECT_STATUSES:
 
-            if response.status < 400 and follow_refresh_headers:
-                refresh = response.getheader('refresh')
+            if response.status < 400:
 
-                if refresh is not None:
-                    _, location = parse_http_refresh(refresh)
+                if follow_refresh_headers:
+                    refresh = response.getheader('refresh')
+
+                    if refresh is not None:
+                        _, location = parse_http_refresh(refresh)
+
+                if location is None and follow_meta_refresh:
+                    chunk = response.read(1024)
+                    meta_refresh = find_meta_refresh(chunk)
+
+                    if meta_refresh is not None:
+                        location = meta_refresh[1]
 
             # Found the end
             if location is None:
@@ -273,11 +282,17 @@ def resolve(http, url, method='GET', spoof_ua=False, max_redirects=5,
             break
 
         # Go to next
+        if need_to_release_conn and response:
+            response.release_conn()
+
         url = next_url
 
     # We reached max redirects
     else:
         error = MaxRedirectsError('Maximum number of redirects exceeded')
+
+    if need_to_release_conn and response:
+        response.release_conn()
 
     return error, list(url_stack.values())
 
