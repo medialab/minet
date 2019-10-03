@@ -15,3 +15,12 @@ def scrape(scraper, html, engine='lxml'):
         soup = BeautifulSoup(html, engine)
 
     return apply_scraper(scraper, soup)
+
+
+def headers_from_definition(scraper):
+    fields = scraper.get('fields')
+
+    if fields is None:
+        return ['value']
+
+    return list(scraper['fields'].keys())

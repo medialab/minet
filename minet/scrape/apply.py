@@ -5,14 +5,51 @@
 # Function taking a scraper definition and applying its logic recursively
 # to yield its result.
 #
+import re
+
+DEFAULT_CONTEXT = {}
+EXTRACTOR_NAMES = set(['text', 'html', 'inner_html', 'outer_html'])
 
 
-def eval_expression():
-    # TODO: useful to get needed deps
-    pass
+def extract(element, extractor_name):
+    if extractor_name == 'text':
+        return element.get_text()
+
+    if extractor_name == 'html' or extractor_name == 'inner_html':
+        return element.encode_contents()
+
+    if extractor_name == 'outer_html':
+        return str(element)
+
+
+def eval_expression(expression, element=None, elements=None, value=None,
+                    context=None, html=None, root=None):
+
+    return eval(expression, None, {
+
+        # Dependencies
+        're': re,
+
+        # Local values
+        'element': element,
+        'elements': elements,
+        'value': value,
+
+        # Context
+        'context': context or DEFAULT_CONTEXT,
+        'html': html,
+        'root': root
+    })
 
 
 def apply_scraper(scraper, element):
+
+    # Is this a tail call of item
+    if isinstance(scraper, str):
+        if scraper in EXTRACTOR_NAMES:
+            return extract(element, scraper)
+
+        return element.get(scraper)
 
     # First we need to solve local selection
     if 'sel' in scraper:
@@ -54,8 +91,25 @@ def apply_scraper(scraper, element):
 
         else:
 
-            # Default value is text
-            value = element.get_text()
+            # Attribute
+            if 'attr' in scraper:
+                value = element.get(scraper['attr'])
+            else:
+
+                # Default value is text
+                value = element.get_text()
+
+            # Eval?
+            if 'eval' in scraper:
+                value = eval_expression(
+                    scraper['eval'],
+                    element=element,
+                    elements=elements,
+                    value=value,
+                    context=None,
+                    html=None,
+                    root=None
+                )
 
         if single_value:
             acc = value

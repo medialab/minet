@@ -11,8 +11,8 @@
   * `iterator_eval`: evaluate the selection on which to iterate.
   * `sel`: defines local selection.
   * `sel_eval`: evaluate a local selection.
-  * `item`: defines the value to retrieve.
-  * `fields`: defines the fields t@o retrieve.
+  * `item`: defines the value to retrieve. can be a string => attr, if not here equals text extraction.
+  * `fields`: defines the fields to retrieve.
   * `tabulate`: retrieves from a table. => should be against iterate
   * `default`: defines a default value. (Could replace `constant`).
   * `extract`: get the text or inner html or outer html etc. or context etc.

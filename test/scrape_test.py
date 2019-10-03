@@ -1,7 +1,7 @@
 # =============================================================================
 # Minet Scrape Unit Tests
 # =============================================================================
-from minet.scrape import scrape
+from minet.scrape import scrape, headers_from_definition
 
 BASIC_HTML = """
     <ul>
@@ -36,63 +36,79 @@ class TestScrape(object):
 
         assert result == ['One', 'Two']
 
-    #     result = scrape(BASIC_HTML, {
-    #         'iterator': 'li',
-    #         'item': 'id'
-    #     })
+        result = scrape({
+            'iterator': 'li',
+            'item': 'id'
+        }, BASIC_HTML)
 
-    #     assert list(result) == ['li1', 'li2']
+        assert result == ['li1', 'li2']
 
-    #     result = scrape(BASIC_HTML, {
-    #         'iterator': 'li',
-    #         'item': {
-    #             'eval': 'element.get("id") + "-ok"'
-    #         }
-    #     })
+        result = scrape({
+            'iterator': 'li',
+            'item': {
+                'attr': 'id'
+            }
+        }, BASIC_HTML)
 
-    #     assert list(result) == ['li1-ok', 'li2-ok']
+        assert result == ['li1', 'li2']
 
-    #     result = scrape(BASIC_HTML, {
-    #         'iterator': 'li',
-    #         'item': {
-    #             'attr': 'id',
-    #             'eval': 'value + "-test"'
-    #         }
-    #     })
+        result = scrape({
+            'sel': '#ok',
+            'item': 'id'
+        }, META_HTML)
 
-    #     assert list(result) == ['li1-test', 'li2-test']
+        assert result == 'ok'
 
-    #     result = scrape(BASIC_HTML, {
-    #         'iterator': 'li',
-    #         'item': {
-    #             'fields': {
-    #                 'id': {
-    #                     'attr': 'id'
-    #                 },
-    #                 'text': {
-    #                     'method': 'text'
-    #                 }
-    #             }
-    #         }
-    #     })
+        result = scrape({
+            'sel': '#ok',
+            'iterator': 'li',
+            'item': 'id'
+        }, META_HTML)
 
-    #     assert list(result) == [{'id': 'li1', 'text': 'One'}, {'id': 'li2', 'text': 'Two'}]
+        assert result == ['li1', 'li2']
 
-    #     result = scrape(NESTED_HTML, {
-    #         'iterator': 'li',
-    #         'item': {
-    #             'fields': {
-    #                 'label': {
-    #                     'sel': '.first'
-    #                 },
-    #                 'number': {
-    #                     'sel': '.second'
-    #                 }
-    #             }
-    #         }
-    #     })
+        result = scrape({
+            'iterator': 'li',
+            'item': {
+                'eval': 'element.get("id") + "-ok"'
+            }
+        }, BASIC_HTML)
 
-    #     assert list(result) == [{'number': '1', 'label': 'One'}, {'number': '2', 'label': 'Two'}]
+        assert result == ['li1-ok', 'li2-ok']
+
+        result = scrape({
+            'iterator': 'li',
+            'item': {
+                'attr': 'id',
+                'eval': 'value + "-test"'
+            }
+        }, BASIC_HTML)
+
+        result == ['li1-test', 'li2-test']
+
+        result = scrape({
+            'iterator': 'li',
+            'fields': {
+                'id': 'id',
+                'text': 'text'
+            }
+        }, BASIC_HTML)
+
+        assert result == [{'id': 'li1', 'text': 'One'}, {'id': 'li2', 'text': 'Two'}]
+
+        result = scrape({
+            'iterator': 'li',
+            'fields': {
+                'label': {
+                    'sel': '.first'
+                },
+                'number': {
+                    'sel': '.second'
+                }
+            }
+        }, NESTED_HTML)
+
+        assert result == [{'number': '1', 'label': 'One'}, {'number': '2', 'label': 'Two'}]
 
     def test_recursive(self):
         result = scrape({
@@ -145,15 +161,15 @@ class TestScrape(object):
     #         {'text': 'Two', 'context': 1}
     #     ]
 
-    # def test_headers(self):
-    #     headers = headers_from_definition({'iterator': 'li'})
+    def test_headers(self):
+        headers = headers_from_definition({'iterator': 'li'})
 
-    #     assert headers == ['value']
+        assert headers == ['value']
 
-    #     headers = headers_from_definition({'iterator': 'li', 'item': 'id'})
+        headers = headers_from_definition({'iterator': 'li', 'item': 'id'})
 
-    #     assert headers == ['value']
+        assert headers == ['value']
 
-    #     headers = headers_from_definition({'iterator': 'li', 'item': {'fields': {'id': 'id'}}})
+        headers = headers_from_definition({'iterator': 'li', 'fields': {'id': 'id'}})
 
-    #     assert headers == ['id']
+        assert headers == ['id']
