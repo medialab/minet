@@ -247,7 +247,7 @@ class Redirection(object):
 # TODO: attempt to catch some JS redirections
 def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             max_redirects=5, follow_refresh_header=True, follow_meta_refresh=False,
-            return_response=False):
+            follow_js_relocation=False, return_response=False):
     """
     Helper function attempting to resolve the given url.
     """
@@ -304,6 +304,8 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
 
                         redirection.type = 'refresh-header'
 
+                chunk = None
+
                 if location is None and follow_meta_refresh:
                     chunk = response.read(1024)
                     meta_refresh = find_meta_refresh(chunk)
@@ -312,6 +314,17 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
                         location = meta_refresh[1]
 
                         redirection.type = 'meta-refresh'
+
+                if location is None and follow_js_relocation:
+                    if chunk is None:
+                        chunk = response.read(1024)
+
+                    js_relocation = find_javascript_relocation(chunk)
+
+                    if js_relocation is not None:
+                        location = js_relocation
+
+                        redirection.type = 'js-relocation'
 
             # Found the end
             if location is None:

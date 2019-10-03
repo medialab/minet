@@ -197,7 +197,8 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
 
 def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
                           throttle=DEFAULT_THROTTLE, max_redirects=5,
-                          follow_refresh_header=True, follow_meta_refresh=False):
+                          follow_refresh_header=True, follow_meta_refresh=False,
+                          follow_js_relocation=False):
     """
     Function returning a multithreaded iterator over resolved urls.
 
@@ -247,6 +248,7 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
             max_redirects=max_redirects,
             follow_refresh_header=follow_refresh_header,
             follow_meta_refresh=follow_meta_refresh,
+            follow_js_relocation=follow_js_relocation,
             **kwargs)
 
         return ResolveWorkerResult(

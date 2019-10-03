@@ -8,7 +8,7 @@ with open('./ftest/resources/resolutions.csv') as f, \
     writer = csv.writer(of)
     writer.writerow(['original', 'current', 'error', 'type'])
 
-    for result in tqdm(multithreaded_resolve(reader, key=lambda x: x['url'], threads=100, follow_meta_refresh=False), total=10000):
+    for result in tqdm(multithreaded_resolve(reader, key=lambda x: x['url'], threads=100, follow_js_relocation=True), total=10000):
         stack = result.stack
         error = result.error
 
