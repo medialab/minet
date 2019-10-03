@@ -145,6 +145,16 @@ class TestScrape(object):
 
         assert result == [{'value': 'One', 'constant': 'Same'}, {'value': 'Two', 'constant': 'Same'}]
 
+        result = scrape({
+            'iterator': 'li',
+            'item': {
+                'attr': 'class',
+                'default': 'no-class'
+            }
+        }, BASIC_HTML)
+
+        assert result == ['no-class', 'no-class']
+
     def test_recursive(self):
         result = scrape({
             'iterator': 'li',

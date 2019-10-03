@@ -103,6 +103,7 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
     acc = None if single_value else []
 
     for element in elements:
+        value = None
 
         # Do we have fields?
         if 'fields' in scraper:
@@ -131,31 +132,37 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
 
         else:
 
-            # Attribute
-            if 'attr' in scraper:
-                value = element.get(scraper['attr'])
-            elif 'extract' in scraper:
-                value = extract(element, scraper['extract'])
-            elif 'get' in scraper:
-                value = context[scraper['get']]
-            elif 'constant' in scraper:
-                value = scraper['constant']
-            else:
+            try:
+                if 'attr' in scraper:
+                    value = element.get(scraper['attr'])
+                elif 'extract' in scraper:
+                    value = extract(element, scraper['extract'])
+                elif 'get' in scraper:
+                    value = context[scraper['get']]
+                elif 'constant' in scraper:
+                    value = scraper['constant']
+                else:
 
-                # Default value is text
-                value = element.get_text()
+                    # Default value is text
+                    value = element.get_text()
 
-            # Eval?
-            if 'eval' in scraper:
-                value = eval_expression(
-                    scraper['eval'],
-                    element=element,
-                    elements=elements,
-                    value=value,
-                    context=context,
-                    html=html,
-                    root=root
-                )
+                # Eval?
+                if 'eval' in scraper:
+                    value = eval_expression(
+                        scraper['eval'],
+                        element=element,
+                        elements=elements,
+                        value=value,
+                        context=context,
+                        html=html,
+                        root=root
+                    )
+            except:
+                value = None
+
+        # Default value?
+        if 'default' in scraper and value is None:
+            value = scraper['default']
 
         if single_value:
             acc = value
