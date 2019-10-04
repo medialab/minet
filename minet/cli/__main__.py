@@ -145,9 +145,10 @@ COMMANDS = {
                 'nargs': '?'
             },
             {
-                'flag': '--contents-in-report',
+                'flags': ['--contents-in-report', '--no-contents-in-report'],
                 'help': 'Whether to include retrieved contents, e.g. html, directly in the report\nand avoid writing them in a separate folder. This requires to standardize\nencoding and won\'t work on binary formats.',
-                'action': 'store_true'
+                'dest': 'contents_in_report',
+                'action': BooleanAction
             },
             {
                 'flags': ['-d', '--output-dir'],

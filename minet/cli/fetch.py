@@ -60,6 +60,10 @@ def fetch_action(namespace):
         namespace.file = StringIO('url\n%s' % namespace.column)
         namespace.column = 'url'
 
+        # If we are hitting a single url we enable contents_in_report
+        if namespace.contents_in_report is None:
+            namespace.contents_in_report = True
+
     input_headers, pos, reader = custom_reader(namespace.file, namespace.column)
     filename_pos = input_headers.index(namespace.filename) if namespace.filename else None
 
