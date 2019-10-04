@@ -45,6 +45,7 @@ Add limit & slices to iteration. Add filters (filter None by default if only yie
 * Need to handle jsonl.
 * Need to handle yml.
 * Need to validate.
+* Need to add item count to loading bar
 
 * Need to report errors finely.
 

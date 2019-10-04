@@ -1,17 +1,15 @@
 {
   "iterator": "tr.athing",
-  "item": {
-    "fields": {
-      "id": {
-        "attr": "id"
-      },
-      "title": {
-        "sel": "a.storylink"
-      },
-      "url": {
-        "sel": "a.storylink",
-        "attr": "href"
-      }
+  "fields": {
+    "id": {
+      "attr": "id"
+    },
+    "title": {
+      "sel": "a.storylink"
+    },
+    "url": {
+      "sel": "a.storylink",
+      "attr": "href"
     }
   }
 }
