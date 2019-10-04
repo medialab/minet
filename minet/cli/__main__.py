@@ -633,7 +633,7 @@ def build_parser(commands):
     # Building the argument parser
     parser = ArgumentParser(prog='minet')
 
-    parser.add_argument('--version', action='store_true')
+    parser.add_argument('--version', action='version', version='minet %s' % __version__)
 
     subparser_index = {}
 
@@ -715,11 +715,7 @@ def main():
 
     action = subparser_index.get(args.action)
 
-    # Printing version?
-    if args.version:
-        print('minet %s' % __version__)
-
-    elif action is not None:
+    if action is not None:
 
         # Need to check something?
         if 'before' in action['command']:
