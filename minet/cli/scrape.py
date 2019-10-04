@@ -44,7 +44,7 @@ def worker(payload):
                 return ScrapeWorkerResult(e, None)
 
     # Attempting to scrape
-    items = list(scrape(content, scraper))
+    items = scrape(scraper, content)
 
     return ScrapeWorkerResult(None, items)
 
@@ -129,6 +129,9 @@ def scrape_action(namespace):
     with Pool(namespace.processes) as pool:
         for error, items in pool.imap_unordered(worker, files):
             loading_bar.update()
+
+            if not isinstance(items, list):
+                items = [items]
 
             for item in items:
                 if not isinstance(item, dict):

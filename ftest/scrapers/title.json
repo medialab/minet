@@ -1,6 +1,5 @@
 {
   "item": {
-    "sel": "title",
-    "method": "text"
+    "sel": "title"
   }
 }
