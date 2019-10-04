@@ -307,7 +307,13 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
                 chunk = None
 
                 if location is None and follow_meta_refresh:
-                    chunk = response.read(1024)
+                    try:
+                        chunk = response.read(1024)
+                    except URLLIB3_ERRORS as e:
+                        error = e
+                        redirection.type = 'error'
+                        break
+
                     meta_refresh = find_meta_refresh(chunk)
 
                     if meta_refresh is not None:
@@ -316,8 +322,13 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
                         redirection.type = 'meta-refresh'
 
                 if location is None and follow_js_relocation:
-                    if chunk is None:
-                        chunk = response.read(1024)
+                    try:
+                        if chunk is None:
+                            chunk = response.read(1024)
+                    except URLLIB3_ERRORS as e:
+                        error = e
+                        redirection.type = 'error'
+                        break
 
                     js_relocation = find_javascript_relocation(chunk)
 
