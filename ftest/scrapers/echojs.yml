@@ -1,0 +1,14 @@
+---
+iterator: article
+fields:
+    title:
+        sel: h2 > a
+    url:
+        sel: h2 > a
+        attr: href
+    author:
+        sel: username > a
+    up:
+        sel: .upvotes
+    down:
+        sel: .downvotes

@@ -6,6 +6,7 @@
 #
 import csv
 import json
+import yaml
 import sys
 import codecs
 from glob import iglob
@@ -15,7 +16,7 @@ from multiprocessing import Pool
 from tqdm import tqdm
 
 from minet.scrape import scrape, headers_from_definition
-from minet.cli.utils import custom_reader, DummyTqdmFile
+from minet.cli.utils import custom_reader, DummyTqdmFile, die
 
 ERROR_REPORTERS = {
     UnicodeDecodeError: 'wrong-encoding'
@@ -106,7 +107,17 @@ def scrape_action(namespace):
         output_file = open(namespace.output, 'w')
 
     # Parsing scraper definition
-    scraper = json.load(namespace.scraper)
+    scraper_name = namespace.scraper.name
+
+    if scraper_name.endswith('.json'):
+        scraper = json.load(namespace.scraper)
+    elif scraper_name.endswith('.yml') or scraper_name.endswith('.yaml'):
+        scraper = yaml.load(namespace.scraper)
+    else:
+        die([
+            'Unknown scraper format.',
+            'Expecting a JSON or YAML file.'
+        ])
 
     output_headers = headers_from_definition(scraper)
     output_writer = csv.DictWriter(output_file, fieldnames=output_headers)
