@@ -564,7 +564,10 @@ COMMANDS = {
                 `minet scrape scraper.json report.csv > scraped.csv`
 
             . Working on a report from stdin:
-                `minet fetch url_column file.csv | minet fetch scraper.json > scraped.csv`
+                `minet fetch url_column file.csv | minet scrape scraper.json > scraped.csv`
+
+            . Scraping a single page from the web:
+                `minet fetch https://news.ycombinator.com/ | minet scrape scraper.json > scraped.csv`
 
             . Scraping items from a bunch of files:
                 `minet scrape scraper.json --glob "./content/*.html" > scraped.csv`
