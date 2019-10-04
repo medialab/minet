@@ -14,6 +14,7 @@ from collections import namedtuple
 from os.path import join, basename
 from multiprocessing import Pool
 from tqdm import tqdm
+from yaml import Loader as YAMLLoader
 
 from minet.scrape import scrape, headers_from_definition
 from minet.cli.utils import custom_reader, DummyTqdmFile, die
@@ -122,7 +123,7 @@ def scrape_action(namespace):
     if scraper_name.endswith('.json'):
         scraper = json.load(namespace.scraper)
     elif scraper_name.endswith('.yml') or scraper_name.endswith('.yaml'):
-        scraper = yaml.load(namespace.scraper)
+        scraper = yaml.load(namespace.scraper, Loader=YAMLLoader)
     else:
         die([
             'Unknown scraper format.',
