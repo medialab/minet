@@ -6,6 +6,7 @@
 #
 import csv
 import sys
+import json
 import argparse
 from collections import namedtuple
 from tqdm import tqdm
@@ -79,3 +80,12 @@ class BooleanAction(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, False if option_string.startswith('--no') else True)
+
+
+class JSONLWriter(object):
+    def __init__(self, file):
+        self.file = file
+
+    def writerow(self, item):
+        row = json.dumps(item, ensure_ascii=False)
+        self.file.write(row + '\n')

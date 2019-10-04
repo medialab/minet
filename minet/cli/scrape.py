@@ -17,7 +17,7 @@ from tqdm import tqdm
 from yaml import Loader as YAMLLoader
 
 from minet.scrape import scrape, headers_from_definition
-from minet.cli.utils import custom_reader, DummyTqdmFile, die
+from minet.cli.utils import custom_reader, DummyTqdmFile, die, JSONLWriter
 
 ERROR_REPORTERS = {
     UnicodeDecodeError: 'wrong-encoding'
@@ -130,9 +130,12 @@ def scrape_action(namespace):
             'Expecting a JSON or YAML file.'
         ])
 
-    output_headers = headers_from_definition(scraper)
-    output_writer = csv.DictWriter(output_file, fieldnames=output_headers)
-    output_writer.writeheader()
+    if namespace.format == 'csv':
+        output_headers = headers_from_definition(scraper)
+        output_writer = csv.DictWriter(output_file, fieldnames=output_headers)
+        output_writer.writeheader()
+    else:
+        output_writer = JSONLWriter(output_file)
 
     loading_bar = tqdm(
         desc='Scraping pages',

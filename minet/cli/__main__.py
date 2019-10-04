@@ -586,6 +586,12 @@ COMMANDS = {
                 'nargs': '?'
             },
             {
+                'flags': ['-f', '--format'],
+                'help': 'Output format.',
+                'choices': ['csv', 'jsonl'],
+                'default': 'csv'
+            },
+            {
                 'flags': ['-g', '--glob'],
                 'help': 'Whether to scrape a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.'
             },
