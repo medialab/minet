@@ -59,7 +59,7 @@ ResolveWorkerResult = namedtuple(
 
 def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
                         throttle=DEFAULT_THROTTLE, guess_extension=True,
-                        guess_encoding=True):
+                        guess_encoding=True, buffer_size=DEFAULT_GROUP_BUFFER_SIZE):
     """
     Function returning a multithreaded iterator over fetched urls.
 
@@ -76,6 +76,9 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
             extension? Defaults to True.
         guess_encoding (bool, optional): Attempt to guess the resource's
             encoding? Defaults to True.
+        buffer_size (int, optional): Max number of items per domain to enqueue
+            into memory in hope of finding a new domain that can be processed
+            immediately. Defaults to 1.
 
     Yields:
         FetchWorkerResult
@@ -190,7 +193,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
         threads,
         group=grouper,
         group_parallelism=DEFAULT_GROUP_PARALLELISM,
-        group_buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
+        group_buffer_size=buffer_size,
         group_throttle=throttle
     )
 
@@ -198,7 +201,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
 def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
                           throttle=DEFAULT_THROTTLE, max_redirects=5,
                           follow_refresh_header=True, follow_meta_refresh=False,
-                          follow_js_relocation=False):
+                          follow_js_relocation=False, buffer_size=DEFAULT_GROUP_BUFFER_SIZE):
     """
     Function returning a multithreaded iterator over resolved urls.
 
@@ -216,6 +219,9 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
             headers. Defaults to True.
         follow_meta_refresh (bool, optional): Whether to follow meta refresh.
             Defaults to False.
+        buffer_size (int, optional): Max number of items per domain to enqueue
+            into memory in hope of finding a new domain that can be processed
+            immediately. Defaults to 1.
 
     Yields:
         ResolveWorkerResult
@@ -294,6 +300,6 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
         threads,
         group=grouper,
         group_parallelism=DEFAULT_GROUP_PARALLELISM,
-        group_buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
+        group_buffer_size=buffer_size,
         group_throttle=throttle
     )

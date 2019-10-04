@@ -170,6 +170,7 @@ for result in multithreaded_fetch(urls, key=lambda x: x['url']):
 * **throttle** *?float|callable*: Per-domain throttle in seconds. Or a function taking the domain and current item and returning the throttle to apply. Defaults to `0.2`.
 * **guess_extension** *?bool*: Whether to attempt to guess the resource's extension. Defaults to `True`.
 * **guess_encoding** *?bool*: Whether to attempt to guess the resource's encoding. Defaults to `True`.
+* **buffer_size** *?int*: Max number of items per domain to enqueue into memory in hope of finding a new domain that can be processed immediately. Defaults to 1.
 
 *Yields*:
 
@@ -225,6 +226,7 @@ for result in multithreaded_resolve(urls, key=lambda x: x['url']):
 * **max_redirects** *?int*: Max number of redirections to follow. Defaults to `5`.
 * **follow_refresh_header** *?bool*: Whether to follow `Refresh` headers or not. Defaults to `True`.
 * **follow_meta_refresh** *?bool*: Whether to follow meta refresh tags. It's more costly because we need to stream the start of the response's body and cannot rely on headers alone. Defaults to  `False`.
+* **buffer_size** *?int*: Max number of items per domain to enqueue into memory in hope of finding a new domain that can be processed immediately. Defaults to 1.
 
 *Yields*:
 
