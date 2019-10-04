@@ -15,7 +15,7 @@ from collections import OrderedDict
 from ural import is_url
 from urllib.parse import urljoin
 from urllib3 import HTTPResponse
-from urllib3.exceptions import ClosedPoolError, HTTPError
+from urllib3.exceptions import ClosedPoolError, HTTPError, DecodeError
 from urllib.request import Request
 
 from minet.exceptions import (
@@ -44,6 +44,7 @@ ESCAPED_SLASH_RE = re.compile(rb'\\\/')
 # Constants
 CHARDET_CONFIDENCE_THRESHOLD = 0.9
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
+URLLIB3_ERRORS = (ClosedPoolError, HTTPError, DecodeError)
 
 
 def guess_response_encoding(response, data, is_xml=False, use_chardet=False):
@@ -217,7 +218,7 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             redirect=redirect,
             retries=False
         )
-    except (ClosedPoolError, HTTPError) as e:
+    except URLLIB3_ERRORS as e:
         return e, None
 
     return None, response
@@ -244,7 +245,6 @@ class Redirection(object):
         }
 
 
-# TODO: attempt to catch some JS redirections
 def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             max_redirects=5, follow_refresh_header=True, follow_meta_refresh=False,
             follow_js_relocation=False, return_response=False):
