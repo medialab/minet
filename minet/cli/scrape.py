@@ -11,7 +11,7 @@ import sys
 import codecs
 from glob import iglob
 from collections import namedtuple
-from os.path import join
+from os.path import join, basename
 from multiprocessing import Pool
 from tqdm import tqdm
 
@@ -44,8 +44,18 @@ def worker(payload):
             except UnicodeDecodeError as e:
                 return ScrapeWorkerResult(e, None)
 
+    # Building context
+    context = {}
+
+    if line:
+        context['line'] = line
+
+    if path:
+        context['path'] = path
+        context['basename'] = basename(path)
+
     # Attempting to scrape
-    items = scrape(scraper, content)
+    items = scrape(scraper, content, context=context)
 
     return ScrapeWorkerResult(None, items)
 

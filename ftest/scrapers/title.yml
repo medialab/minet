@@ -1,0 +1,6 @@
+---
+fields:
+    file:
+        get: basename
+    title:
+        sel: title
