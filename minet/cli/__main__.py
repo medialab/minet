@@ -616,6 +616,56 @@ COMMANDS = {
                 'type': int
             }
         ]
+    },
+
+    # Url Join action subparser
+    # -------------------------------------------------------------------------
+    'url-join': {
+        'package': 'minet.cli.url_join',
+        'action': 'url_join_action',
+        'title': 'Minet Url Join Command',
+        'description': '''
+            Join two CSV files by matching them on columns containing urls. In
+            fact, the command will index the first file's urls into a
+            hierchical trie before attempting to match the second file's ones.
+        ''',
+        'epilog': '''
+            examples:
+
+            . Joining two files:
+                `minet url-join url webentities.csv post_url posts.csv > joined.csv`
+
+            . Keeping only some columns from first file:
+                `minet url-join url webentities.csv post_url posts.csv -s url,id > joined.csv`
+        ''',
+        'arguments': [
+            {
+                'name': 'column1',
+                'help': 'Name of the url column in the first file.'
+            },
+            {
+                'name': 'file1',
+                'help': 'Path to the first file.',
+                'type': FileType('r')
+            },
+            {
+                'name': 'column2',
+                'help': 'Name of the url column in the second file.'
+            },
+            {
+                'name': 'file2',
+                'help': 'Path to the second file.',
+                'type': FileType('r')
+            },
+            {
+                'flags': ['-o', '--output'],
+                'help': 'Path to the output joined file. By default, the join will be printed to stdout.'
+            },
+            {
+                'flags': ['-s', '--select'],
+                'help': 'Columns from the first file to keep, separated by comma.'
+            }
+        ]
     }
 }
 

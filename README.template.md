@@ -35,6 +35,7 @@ pip install minet
 * [fetch](#fetch)
 * [extract](#extract)
 * [scrape](#scrape)
+* [url-join](#url-join)
 
 *API-related commands*
 
@@ -98,6 +99,10 @@ pip install dragnet
 TODO: document the scraping DSL
 
 <% scrape %>
+
+## url-join
+
+<% url-join %>
 
 ## CrowdTangle
 

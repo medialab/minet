@@ -56,7 +56,7 @@ class DummyTqdmFile(object):
     """
     file = None
 
-    def __init__(self, file):
+    def __init__(self, file=sys.stdout):
         self.file = file
 
     def write(self, x):

@@ -35,6 +35,7 @@ pip install minet
 * [fetch](#fetch)
 * [extract](#extract)
 * [scrape](#scrape)
+* [url-join](#url-join)
 
 *API-related commands*
 
@@ -191,8 +192,8 @@ TODO: document the scraping DSL
 
 
 ```
-usage: minet scrape [-h] [-g GLOB] [-i INPUT_DIRECTORY] [-o OUTPUT]
-                    [-p PROCESSES] [--total TOTAL]
+usage: minet scrape [-h] [-f {csv,jsonl}] [-g GLOB] [-i INPUT_DIRECTORY]
+                    [-o OUTPUT] [-p PROCESSES] [--total TOTAL]
                     scraper [report]
 
 Minet Scrape Command
@@ -208,6 +209,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                      show this help message and exit
+  -f {csv,jsonl}, --format {csv,jsonl}            Output format.
   -g GLOB, --glob GLOB                            Whether to scrape a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.
   -i INPUT_DIRECTORY, --input-directory INPUT_DIRECTORY
                                                   Directory where the HTML files are stored. Defaults to "content".
@@ -221,10 +223,48 @@ examples:
     `minet scrape scraper.json report.csv > scraped.csv`
 
 . Working on a report from stdin:
-    `minet fetch url_column file.csv | minet fetch scraper.json > scraped.csv`
+    `minet fetch url_column file.csv | minet scrape scraper.json > scraped.csv`
+
+. Scraping a single page from the web:
+    `minet fetch https://news.ycombinator.com/ | minet scrape scraper.json > scraped.csv`
 
 . Scraping items from a bunch of files:
     `minet scrape scraper.json --glob "./content/*.html" > scraped.csv`
+
+```
+
+
+## url-join
+
+
+```
+usage: minet url-join [-h] [-o OUTPUT] [-s SELECT] column1 file1 column2 file2
+
+Minet Url Join Command
+======================
+
+Join two CSV files by matching them on columns containing urls. In
+fact, the command will index the first file's urls into a
+hierchical trie before attempting to match the second file's ones.
+
+positional arguments:
+  column1                     Name of the url column in the first file.
+  file1                       Path to the first file.
+  column2                     Name of the url column in the second file.
+  file2                       Path to the second file.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -o OUTPUT, --output OUTPUT  Path to the output joined file. By default, the join will be printed to stdout.
+  -s SELECT, --select SELECT  Columns from the first file to keep, separated by comma.
+
+examples:
+
+. Joining two files:
+    `minet url-join url webentities.csv post_url posts.csv > joined.csv`
+
+. Keeping only some columns from first file:
+    `minet url-join url webentities.csv post_url posts.csv -s url,id > joined.csv`
 
 ```
 

@@ -3,7 +3,7 @@ from textwrap import dedent
 
 from minet.cli.__main__ import build_parser, COMMANDS, get_subparser
 
-TEMPLATE_RE = re.compile(r'<%\s+([A-Za-z/]+)\s+%>')
+TEMPLATE_RE = re.compile(r'<%\s+([A-Za-z/\-]+)\s+%>')
 
 
 def replacer(match):
