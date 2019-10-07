@@ -146,6 +146,25 @@ def fetch_action(namespace):
             'headers': headers
         }
 
+    def write_output(index, line, status=None, error=None, filename=None,
+                     encoding=None, data=None):
+
+        if selected_pos:
+            line = [line[p] for p in selected_pos]
+
+        line.extend([
+            index,
+            status or '',
+            error or '',
+            filename or '',
+            encoding or ''
+        ])
+
+        if namespace.contents_in_report:
+            line.append(data or '')
+
+        output_writer.writerow(line)
+
     errors = 0
     status_codes = Counter()
 
@@ -158,14 +177,19 @@ def fetch_action(namespace):
     )
 
     for result in multithreaded_iterator:
+        line_index, line = result.item
+
         if not result.url:
 
-            # TODO: should write the report all the same...
+            write_output(
+                line_index,
+                line
+            )
+
             loading_bar.update()
             continue
 
         response = result.response
-        line_index, line = result.item
         data = response.data if response is not None else None
 
         content_write_flag = 'wb'
@@ -216,15 +240,14 @@ def fetch_action(namespace):
                     f.write(data)
 
             # Reporting in output
-            if selected_pos:
-                line = [line[p] for p in selected_pos]
-
-            line.extend([line_index, response.status, '', filename or '', encoding or ''])
-
-            if namespace.contents_in_report:
-                line.append(data)
-
-            output_writer.writerow(line)
+            write_output(
+                line_index,
+                line,
+                status=response.status,
+                filename=filename,
+                encoding=encoding,
+                data=data
+            )
 
         # Handling potential errors
         else:
@@ -232,12 +255,11 @@ def fetch_action(namespace):
 
             error_code = reporter(result.error) if callable(reporter) else reporter
 
-            # Reporting in output
-            if selected_pos:
-                line = [line[p] for p in selected_pos]
-
-            line.extend([line_index, '', error_code, '', ''])
-            output_writer.writerow(line)
+            write_output(
+                line_index,
+                line,
+                error=error_code
+            )
 
     # Closing files
     if namespace.output is not None:
