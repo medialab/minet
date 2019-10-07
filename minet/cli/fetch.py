@@ -34,7 +34,7 @@ from minet.utils import (
 )
 from minet.cli.utils import custom_reader, DummyTqdmFile
 
-OUTPUT_ADDITIONAL_HEADERS = ['line', 'status', 'error', 'filename', 'encoding']
+OUTPUT_ADDITIONAL_HEADERS = ['line', 'resolved', 'status', 'error', 'filename', 'encoding']
 
 
 def max_retry_error_reporter(error):
@@ -146,14 +146,15 @@ def fetch_action(namespace):
             'headers': headers
         }
 
-    def write_output(index, line, status=None, error=None, filename=None,
-                     encoding=None, data=None):
+    def write_output(index, line, resolved=None, status=None, error=None,
+                     filename=None, encoding=None, data=None):
 
         if selected_pos:
             line = [line[p] for p in selected_pos]
 
         line.extend([
             index,
+            resolved or '',
             status or '',
             error or '',
             filename or '',
@@ -240,9 +241,12 @@ def fetch_action(namespace):
                     f.write(data)
 
             # Reporting in output
+            resolved_url = response.geturl()
+
             write_output(
                 line_index,
                 line,
+                resolved=resolved_url if resolved_url != result.url else None,
                 status=response.status,
                 filename=filename,
                 encoding=encoding,
