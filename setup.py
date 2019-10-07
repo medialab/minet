@@ -33,7 +33,7 @@ setup(name='minet',
         'pyyaml',
         'quenouille>=0.4.0',
         'tqdm>=4.31.1',
-        'ural>=0.10.1',
+        'ural>=0.11.0',
         'urllib3[secure]>=1.25.3',
         # 'dragnet>=2.0.3'
       ],
