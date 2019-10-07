@@ -381,13 +381,36 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
     if headers is not None:
         final_headers.update(headers)
 
-    return raw_request(
-        http,
-        url,
-        method,
-        headers=final_headers
-    )
+    if not follow_redirects:
+        return raw_request(
+            http,
+            url,
+            method,
+            headers=final_headers
+        )
+    else:
+        err, stack, response = raw_resolve(
+            http,
+            url,
+            method,
+            headers=final_headers,
+            max_redirects=max_redirects,
+            return_response=True
+        )
 
+        if err:
+            return err, None
+
+        try:
+            response._body = response.read()
+        except Exception as e:
+            return explain_request_error(e), None
+        finally:
+            if response is not None:
+                response.close()
+                response.release_conn()
+
+        return None, response
 
 class RateLimiter(object):
     """
