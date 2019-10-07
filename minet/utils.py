@@ -183,8 +183,8 @@ def explain_request_error(error):
     return error
 
 
-def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
-            redirect=None, preload_content=True, release_conn=True):
+def raw_request(http, url, method='GET', headers=None,
+                preload_content=True, release_conn=True):
     """
     Generic request helpers using a urllib3 pool to access some resource.
     """
@@ -193,31 +193,15 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
     if not is_url(url, require_protocol=True, tld_aware=True, allow_spaces_in_path=True):
         return InvalidURLError('Invalid URL'), None
 
-    # Formatting headers
-    final_headers = {}
-
-    if spoof_ua:
-        final_headers['User-Agent'] = DEFAULT_SPOOFED_UA
-
-    if cookie:
-        if not isinstance(cookie, str):
-            cookie = dict_to_cookie_string(cookie)
-
-        final_headers['Cookie'] = cookie
-
-    # Note: headers passed explicitly by users always win
-    if headers is not None:
-        final_headers.update(headers)
-
     # Performing request
     try:
         response = http.request(
             method,
             url,
-            headers=final_headers,
+            headers=headers,
             preload_content=preload_content,
             release_conn=release_conn,
-            redirect=redirect,
+            redirect=False,
             retries=False
         )
     except Exception as e:
@@ -247,9 +231,9 @@ class Redirection(object):
         }
 
 
-def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
-            max_redirects=5, follow_refresh_header=True, follow_meta_refresh=False,
-            follow_js_relocation=False, return_response=False):
+def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
+                follow_refresh_header=True, follow_meta_refresh=False,
+                follow_js_relocation=False, return_response=False):
     """
     Helper function attempting to resolve the given url.
     """
@@ -264,16 +248,13 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             response.release_conn()
             response.close()
 
-        http_error, response = request(
+        http_error, response = raw_request(
             http,
             url,
             method=method,
             headers=headers,
-            cookie=cookie,
-            redirect=False,
             preload_content=False,
-            release_conn=False,
-            spoof_ua=spoof_ua
+            release_conn=False
         )
 
         redirection = Redirection(url)
@@ -379,6 +360,33 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
         return error, compiled_stack, response
 
     return error, compiled_stack
+
+
+def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
+            follow_redirects=True, max_redirects=5):
+
+    # Formatting headers
+    final_headers = {}
+
+    if spoof_ua:
+        final_headers['User-Agent'] = DEFAULT_SPOOFED_UA
+
+    if cookie:
+        if not isinstance(cookie, str):
+            cookie = dict_to_cookie_string(cookie)
+
+        final_headers['Cookie'] = cookie
+
+    # Note: headers passed explicitly by users always win
+    if headers is not None:
+        final_headers.update(headers)
+
+    return raw_request(
+        http,
+        url,
+        method,
+        headers=final_headers
+    )
 
 
 class RateLimiter(object):
