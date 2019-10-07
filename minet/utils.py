@@ -188,7 +188,7 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
     """
 
     # Validating URL
-    if not is_url(url):
+    if not is_url(url, require_protocol=True, tld_aware=True, allow_spaces_in_path=True):
         return InvalidURLError('Invalid URL'), None
 
     # Formatting headers
