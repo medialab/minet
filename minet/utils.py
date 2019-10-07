@@ -405,7 +405,7 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
 
         # Finishing reading body
         try:
-            response._body = (response._body or '') + response.read()
+            response._body = (response._body or b'') + response.read()
         except Exception as e:
             return explain_request_error(e), response
         finally:
