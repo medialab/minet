@@ -401,13 +401,13 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
         )
 
         if err:
-            return err, None
+            return err, response
 
         # Finishing reading body
         try:
             response._body = (response._body or '') + response.read()
         except Exception as e:
-            return explain_request_error(e), None
+            return explain_request_error(e), response
         finally:
             if response is not None:
                 response.close()
