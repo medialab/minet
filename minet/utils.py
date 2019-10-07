@@ -15,7 +15,6 @@ from collections import OrderedDict
 from ural import is_url
 from urllib.parse import urljoin
 from urllib3 import HTTPResponse
-from urllib3.exceptions import ClosedPoolError, HTTPError, DecodeError
 from urllib.request import Request
 
 from minet.exceptions import (
@@ -44,7 +43,6 @@ ESCAPED_SLASH_RE = re.compile(rb'\\\/')
 # Constants
 CHARDET_CONFIDENCE_THRESHOLD = 0.9
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
-URLLIB3_ERRORS = (ClosedPoolError, HTTPError, DecodeError)
 
 
 def guess_response_encoding(response, data, is_xml=False, use_chardet=False):
@@ -181,6 +179,10 @@ def create_safe_pool(timeout=None, **kwargs):
     )
 
 
+def explain_request_error(error):
+    return error
+
+
 def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             redirect=None, preload_content=True, release_conn=True):
     """
@@ -218,8 +220,8 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             redirect=redirect,
             retries=False
         )
-    except URLLIB3_ERRORS as e:
-        return e, None
+    except Exception as e:
+        return explain_request_error(e), None
 
     return None, response
 
@@ -309,8 +311,8 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
                 if location is None and follow_meta_refresh:
                     try:
                         chunk = response.read(1024)
-                    except URLLIB3_ERRORS as e:
-                        error = e
+                    except Exception as e:
+                        error = explain_request_error(e)
                         redirection.type = 'error'
                         break
 
@@ -325,8 +327,8 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
                     try:
                         if chunk is None:
                             chunk = response.read(1024)
-                    except URLLIB3_ERRORS as e:
-                        error = e
+                    except Exception as e:
+                        error = explain_request_error(e)
                         redirection.type = 'error'
                         break
 
