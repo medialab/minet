@@ -20,6 +20,8 @@ def url_join_action(namespace):
         left_headers = namespace.select.split(',')
         selected_pos = [left_headers.index(h) for h in left_headers]
 
+    empty = [''] * len(left_headers)
+
     if namespace.output is None:
         output_file = DummyTqdmFile()
     else:
@@ -66,7 +68,7 @@ def url_join_action(namespace):
         loading_bar.update()
 
         if match is None:
-            output_writer.writerow(line)
+            output_writer.writerow(line + empty)
             continue
 
         line.extend(match)

@@ -36,6 +36,7 @@ pip install minet
 * [extract](#extract)
 * [scrape](#scrape)
 * [url-join](#url-join)
+* [url-parse](#url-parse)
 
 *API-related commands*
 
@@ -103,6 +104,10 @@ TODO: document the scraping DSL
 ## url-join
 
 <% url-join %>
+
+## url-parse
+
+<% url-parse %>
 
 ## CrowdTangle
 

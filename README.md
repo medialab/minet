@@ -36,6 +36,7 @@ pip install minet
 * [extract](#extract)
 * [scrape](#scrape)
 * [url-join](#url-join)
+* [url-parse](#url-parse)
 
 *API-related commands*
 
@@ -265,6 +266,45 @@ examples:
 
 . Keeping only some columns from first file:
     `minet url-join url webentities.csv post_url posts.csv -s url,id > joined.csv`
+
+```
+
+
+## url-parse
+
+
+```
+usage: minet url-parse [-h] [-o OUTPUT] [-s SELECT] [--separator SEPARATOR]
+                       [--total TOTAL]
+                       column [file]
+
+Minet Url Parse Command
+=======================
+
+Overload a CSV file containing urls with a selection of additional
+metadata such as their normalized version, domain name etc.
+
+positional arguments:
+  column                      Name of the column containing urls.
+  file                        Target CSV file.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the result will be printed to stdout.
+  -s SELECT, --select SELECT  Columns to keep in output, separated by comma.
+  --separator SEPARATOR       Split url column by a separator?
+  --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Creating a report about a file's urls:
+    `minet url-report url posts.csv > report.csv`
+
+. Keeping only selected columns from the input file:
+    `minet url-report url posts.csv -s id,url,title > report.csv`
+
+. Multiple urls joined by separator:
+    `minet url-report urls posts.csv --separator "|" > report.csv`
 
 ```
 

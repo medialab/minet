@@ -666,6 +666,60 @@ COMMANDS = {
                 'help': 'Columns from the first file to keep, separated by comma.'
             }
         ]
+    },
+
+    # Url Parse action subparser
+    # -------------------------------------------------------------------------
+    'url-parse': {
+        'package': 'minet.cli.url_parse',
+        'action': 'url_parse_action',
+        'title': 'Minet Url Parse Command',
+        'description': '''
+            Overload a CSV file containing urls with a selection of additional
+            metadata such as their normalized version, domain name etc.
+        ''',
+        'epilog': '''
+            examples:
+
+            . Creating a report about a file's urls:
+                `minet url-report url posts.csv > report.csv`
+
+            . Keeping only selected columns from the input file:
+                `minet url-report url posts.csv -s id,url,title > report.csv`
+
+            . Multiple urls joined by separator:
+                `minet url-report urls posts.csv --separator "|" > report.csv`
+        ''',
+        'arguments': [
+            {
+                'name': 'column',
+                'help': 'Name of the column containing urls.'
+            },
+            {
+                'name': 'file',
+                'help': 'Target CSV file.',
+                'type': FileType('r'),
+                'default': sys.stdin,
+                'nargs': '?'
+            },
+            {
+                'flags': ['-o', '--output'],
+                'help': 'Path to the output file. By default, the result will be printed to stdout.'
+            },
+            {
+                'flags': ['-s', '--select'],
+                'help': 'Columns to keep in output, separated by comma.'
+            },
+            {
+                'flag': '--separator',
+                'help': 'Split url column by a separator?'
+            },
+            {
+                'flag': '--total',
+                'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
+                'type': int
+            }
+        ]
     }
 }
 
