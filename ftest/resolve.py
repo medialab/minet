@@ -17,7 +17,10 @@ URLS = [
     'http://la-grange.net/2015/03/26/refresh/',
 
     # GET & UA nonsense
-    'https://ebay.us/BUkuxU'
+    'https://ebay.us/BUkuxU',
+
+    # Incorrect refresh header
+    'http://ow.ly/csT350v7mRc'
 ]
 
 http = create_safe_pool()

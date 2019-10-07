@@ -302,9 +302,11 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
                     refresh = response.getheader('refresh')
 
                     if refresh is not None:
-                        _, location = parse_http_refresh(refresh)
+                        p = parse_http_refresh(refresh)
 
-                        redirection.type = 'refresh-header'
+                        if p is not None:
+                            location = p[1]
+                            redirection.type = 'refresh-header'
 
                 chunk = None
 
