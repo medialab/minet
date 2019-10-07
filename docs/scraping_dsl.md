@@ -5,7 +5,7 @@
 * `lambdas`: lambda definitions to precompile.
 * `transforms`: transformation chains.
 * `settings`: settings.
-  * `selection_mode`: xpath or css.
+  * `selection_mode`: xpath or css or jq.
 * `scraper`: scraper definition:
   * `iterator`: iterates over the given selector.
   * `iterator_eval`: evaluate the selection on which to iterate.
