@@ -289,17 +289,15 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
                             location = p[1]
                             redirection.type = 'refresh-header'
 
-                chunk = None
-
                 if location is None and follow_meta_refresh:
                     try:
-                        chunk = response.read(1024)
+                        response._body = response.read(1024)
                     except Exception as e:
                         error = explain_request_error(e)
                         redirection.type = 'error'
                         break
 
-                    meta_refresh = find_meta_refresh(chunk)
+                    meta_refresh = find_meta_refresh(response._body)
 
                     if meta_refresh is not None:
                         location = meta_refresh[1]
@@ -308,14 +306,14 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
 
                 if location is None and follow_js_relocation:
                     try:
-                        if chunk is None:
-                            chunk = response.read(1024)
+                        if response._body is None:
+                            response._body = response.read(1024)
                     except Exception as e:
                         error = explain_request_error(e)
                         redirection.type = 'error'
                         break
 
-                    js_relocation = find_javascript_relocation(chunk)
+                    js_relocation = find_javascript_relocation(response._body)
 
                     if js_relocation is not None:
                         location = js_relocation
@@ -363,7 +361,8 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
 
 
 def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
-            follow_redirects=True, max_redirects=5):
+            follow_redirects=True, max_redirects=5, follow_refresh_header=True,
+            follow_meta_refresh=False, follow_js_relocation=False):
 
     # Formatting headers
     final_headers = {}
@@ -395,14 +394,18 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             method,
             headers=final_headers,
             max_redirects=max_redirects,
-            return_response=True
+            return_response=True,
+            follow_refresh_header=follow_refresh_header,
+            follow_meta_refresh=follow_meta_refresh,
+            follow_js_relocation=follow_js_relocation
         )
 
         if err:
             return err, None
 
+        # Finishing reading body
         try:
-            response._body = response.read()
+            response._body = (response._body or '') + response.read()
         except Exception as e:
             return explain_request_error(e), None
         finally:
@@ -411,6 +414,7 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
                 response.release_conn()
 
         return None, response
+
 
 class RateLimiter(object):
     """
