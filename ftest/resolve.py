@@ -1,6 +1,11 @@
-from minet.utils import resolve, create_safe_pool
+from minet.utils import raw_resolve, create_safe_pool
 
 URLS = [
+
+    # Direct hit
+    'https://www.lemonde.fr/',
+
+    # Regular redirect
     'http://bit.ly/2KkpxiW',
 
     # Self loop
@@ -20,14 +25,17 @@ URLS = [
     'https://ebay.us/BUkuxU',
 
     # Incorrect refresh header
-    'http://ow.ly/csT350v7mRc'
+    'http://ow.ly/csT350v7mRc',
+
+    # Utf-8 location header
+    'http://ow.ly/2awz50v1JkO'
 ]
 
 http = create_safe_pool()
 
 for url in URLS:
     print()
-    error, stack = resolve(http, url, follow_meta_refresh=True)
+    error, stack = raw_resolve(http, url, follow_meta_refresh=True)
     print(error)
     for item in stack:
         print(item)
