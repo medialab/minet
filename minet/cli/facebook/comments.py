@@ -167,15 +167,6 @@ def scrape_comments(html, in_reply_to=None):
 
 def facebook_comments_action(namespace):
 
-    # Handling output
-    if namespace.output is None:
-        output_file = DummyTqdmFile(sys.stdout)
-    else:
-        output_file = open(namespace.output, 'w')
-
-    writer = csv.writer(output_file)
-    writer.writerow(CSV_HEADERS)
-
     # Reformatting url to hit mobile website
     url = namespace.url.replace('www', 'm')
 
@@ -189,9 +180,25 @@ def facebook_comments_action(namespace):
         cookie = get_cookie_for_url(url)
 
     else:
-        cookie = namespace.cookie
+        cookie = namespace.cookie.strip()
+
+    if not cookie:
+        die([
+            'Relevant cookie not found.',
+            'A Facebook authentication cookie is necessary to be able to fetch comments.',
+            'Use the --cookie flag to choose a browser from which to extract the cookie or give your cookie directly.'
+        ])
 
     cookie = fix_cookie(cookie)
+
+    # Handling output
+    if namespace.output is None:
+        output_file = DummyTqdmFile(sys.stdout)
+    else:
+        output_file = open(namespace.output, 'w')
+
+    writer = csv.writer(output_file)
+    writer.writerow(CSV_HEADERS)
 
     http = create_safe_pool()
 
