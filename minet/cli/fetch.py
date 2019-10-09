@@ -219,7 +219,10 @@ def fetch_action(namespace):
             if data:
                 if filename_pos is not None:
                     if namespace.filename_template:
-                        filename = namespace.filename_template.format(value=line[filename_pos])
+                        filename = namespace.filename_template.format(
+                            value=line[filename_pos],
+                            ext=result.meta['ext']
+                        )
                     else:
                         filename = line[filename_pos] + result.meta['ext']
                 else:
