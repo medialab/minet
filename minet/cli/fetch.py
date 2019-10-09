@@ -30,11 +30,21 @@ from minet.exceptions import (
 from minet.fetch import multithreaded_fetch
 from minet.utils import (
     grab_cookies,
-    parse_http_header
+    parse_http_header,
+    SliceFormatter
 )
 from minet.cli.utils import custom_reader, DummyTqdmFile
 
-OUTPUT_ADDITIONAL_HEADERS = ['line', 'resolved', 'status', 'error', 'filename', 'encoding']
+OUTPUT_ADDITIONAL_HEADERS = [
+    'line',
+    'resolved',
+    'status',
+    'error',
+    'filename',
+    'encoding'
+]
+
+CUSTOM_FORMATTER = SliceFormatter()
 
 
 def max_retry_error_reporter(error):
@@ -215,7 +225,8 @@ def fetch_action(namespace):
             if data:
                 if filename_pos is not None or namespace.filename_template:
                     if namespace.filename_template:
-                        filename = namespace.filename_template.format(
+                        filename = CUSTOM_FORMATTER.format(
+                            namespace.filename_template,
                             value=line[filename_pos] if filename_pos else None,
                             ext=result.meta['ext'],
                             line={h: line[i] for i, h in enumerate(input_headers)}

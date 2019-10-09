@@ -11,6 +11,8 @@ import certifi
 import browser_cookie3
 import urllib3
 import time
+import string
+import _string
 from collections import OrderedDict
 from ural import is_url
 from urllib.parse import urljoin
@@ -475,3 +477,22 @@ class RateLimiter(object):
             return self.exit_with_budget()
 
         return self.exit()
+
+
+class SliceFormatter(string.Formatter):
+    def get_field(self, field_name, args, kwargs):
+        first, rest = _string.formatter_field_name_split(field_name)
+
+        obj = self.get_value(first, args, kwargs)
+
+        for is_attr, i in rest:
+            if is_attr:
+                obj = getattr(obj, i)
+            else:
+                if isinstance(i, str) and ',' in i:
+                    indexes = map(int, i.split(','))
+                    obj = obj[slice(*indexes)]
+                else:
+                    obj = obj[i]
+
+        return obj, first
