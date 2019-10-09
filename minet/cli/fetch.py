@@ -10,7 +10,7 @@ import os
 import csv
 import sys
 from io import StringIO
-from os.path import join
+from os.path import join, dirname
 from collections import Counter
 from tqdm import tqdm
 from uuid import uuid4
@@ -69,10 +69,6 @@ def fetch_action(namespace):
 
     selected_fields = namespace.select.split(',') if namespace.select else None
     selected_pos = [input_headers.index(h) for h in selected_fields] if selected_fields else None
-
-    # First we need to create the relevant directory
-    if not namespace.contents_in_report:
-        os.makedirs(namespace.output_dir, exist_ok=True)
 
     # HTTP method
     http_method = namespace.method
@@ -240,7 +236,12 @@ def fetch_action(namespace):
 
             # Writing file on disk
             if data and not namespace.contents_in_report:
-                with open(join(namespace.output_dir, filename), content_write_flag) as f:
+                resource_path = join(namespace.output_dir, filename)
+                resource_dir = dirname(resource_path)
+
+                os.makedirs(resource_dir, exist_ok=True)
+
+                with open(resource_path, content_write_flag) as f:
                     f.write(data)
 
             # Reporting in output
