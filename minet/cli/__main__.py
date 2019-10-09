@@ -474,6 +474,11 @@ COMMANDS = {
                 'nargs': '?'
             },
             {
+                'flag': '--compress',
+                'help': 'Whether to compress the contents.',
+                'action': 'store_true'
+            },
+            {
                 'flags': ['--contents-in-report', '--no-contents-in-report'],
                 'help': 'Whether to include retrieved contents, e.g. html, directly in the report\nand avoid writing them in a separate folder. This requires to standardize\nencoding and won\'t work on binary formats.',
                 'dest': 'contents_in_report',

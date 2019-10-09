@@ -9,6 +9,7 @@
 import os
 import csv
 import sys
+import gzip
 from io import StringIO
 from os.path import join, dirname
 from collections import Counter
@@ -248,13 +249,17 @@ def fetch_action(namespace):
 
             # Writing file on disk
             if data and not namespace.contents_in_report:
+
+                if namespace.compress:
+                    filename += '.gz'
+
                 resource_path = join(namespace.output_dir, filename)
                 resource_dir = dirname(resource_path)
 
                 os.makedirs(resource_dir, exist_ok=True)
 
                 with open(resource_path, content_write_flag) as f:
-                    f.write(data)
+                    f.write(gzip.compress(data) if namespace.compress else data)
 
             # Reporting in output
             resolved_url = response.geturl()
