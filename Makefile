@@ -53,6 +53,3 @@ unit:
 upload:
 	python setup.py sdist bdist_wheel
 	twine upload dist/*
-
-hello: clean
-	@echo whatev
