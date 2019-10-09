@@ -41,6 +41,7 @@ NOSCRIPT_RE = re.compile(rb'<noscript[^>]*>.*</noscript[^>]*>', flags=re.I)
 META_REFRESH_RE = re.compile(rb'''<meta\s+http-equiv=['"]?refresh['"]?\s+content=['"]?([^"']+)['">]?''', flags=re.I)
 JAVASCRIPT_LOCATION_RE = re.compile(rb'''(?:window\.)?location(?:\s*=\s*|\.replace\(\s*)['"`](.*?)['"`]''')
 ESCAPED_SLASH_RE = re.compile(rb'\\\/')
+ASCII_RE = re.compile(r'^[ -~]*$')
 
 # Constants
 CHARDET_CONFIDENCE_THRESHOLD = 0.9
@@ -334,6 +335,22 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
         if not location:
             error = InvalidRedirectError('Redirection is invalid')
             break
+
+        # Location badly encoded?
+        try:
+            if not ASCII_RE.match(location):
+                byte_location = location.encode('latin1')
+                detection = chardet.detect(byte_location)
+                guessed_encoding = detection['encoding'].lower()
+
+                if (
+                    guessed_encoding != 'iso-8859-1' and
+                    guessed_encoding != 'ascii' and
+                    detection['confidence'] >= CHARDET_CONFIDENCE_THRESHOLD
+                ):
+                    location = byte_location.decode(guessed_encoding)
+        except:
+            pass
 
         # Resolving next url
         next_url = urljoin(url, location.strip())
