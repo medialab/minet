@@ -59,8 +59,6 @@ def url_parse_action(namespace):
             normalized = normalize_url(url, strip_trailing_slash=True)
             domain = get_domain_name(url)
 
-            line.extend([normalized, domain])
-
-            writer.writerow(line)
+            writer.writerow(line + [normalized, domain])
 
     output_file.close()
