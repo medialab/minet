@@ -96,7 +96,7 @@ def fetch_action(namespace):
     )
 
     # Reading output
-    output_headers = (input_headers if not selected_pos else [input_headers[i] for i in selected_pos])
+    output_headers = (list(input_headers) if not selected_pos else [input_headers[i] for i in selected_pos])
     output_headers += OUTPUT_ADDITIONAL_HEADERS
 
     if namespace.contents_in_report:
@@ -213,11 +213,12 @@ def fetch_action(namespace):
 
             # Building filename
             if data:
-                if filename_pos is not None:
+                if filename_pos is not None or namespace.filename_template:
                     if namespace.filename_template:
                         filename = namespace.filename_template.format(
-                            value=line[filename_pos],
-                            ext=result.meta['ext']
+                            value=line[filename_pos] if filename_pos else None,
+                            ext=result.meta['ext'],
+                            line={h: line[i] for i, h in enumerate(input_headers)}
                         )
                     else:
                         filename = line[filename_pos] + result.meta['ext']
