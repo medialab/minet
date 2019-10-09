@@ -36,7 +36,7 @@ from minet.utils import (
     parse_http_header,
     SliceFormatter
 )
-from minet.cli.utils import custom_reader, DummyTqdmFile
+from minet.cli.utils import custom_reader, DummyTqdmFile, die
 
 OUTPUT_ADDITIONAL_HEADERS = [
     'line',
