@@ -556,31 +556,55 @@ COMMANDS = {
         'description': '''
             Commands related to the MIT Mediacloud API v2.
         ''',
-        'subparsers': {
-            'help': 'Action to perform using the Mediacloud API.',
-            'title': 'actions',
-            'dest': 'mc_action',
-            'commands': {
-                'topic': {
-                    'title': 'Minet Mediacloud Topic Command',
-                    'description': '''
-                        Gather information and aggregated stats about pages and groups of
-                        the designated dashboard (indicated by a given token).
-                    ''',
-                    'subparsers': {
-                        'help': 'Topic action to perform.',
-                        'title': 'topic_actions',
-                        'dest': 'mc_topic_action',
-                        'commands': {
-                            'stories': {
-                                'title': 'Minet Mediacloud Topic Stories Command',
-                                'description': 'Retrieves the list of stories from a mediacloud topic.'
-                            }
-                        }
-                    }
-                }
+        'arguments': [
+            {
+                'name': 'topic_id',
+                'help': 'Id of the topic'
+            },
+            {
+                'flags': ['-t', '--token'],
+                'help': 'Mediacloud API token (also called key).'
+            },
+            {
+                'flags': ['-o', '--output'],
+                'help': 'Path to the output report file. By default, the report will be printed to stdout.'
             }
-        }
+        ],
+        # 'subparsers': {
+        #     'help': 'Action to perform using the Mediacloud API.',
+        #     'title': 'actions',
+        #     'dest': 'mc_action',
+        #     'common_arguments': [
+        #         {
+        #             'name': 'topic_id',
+        #             'help': 'Id of the topic'
+        #         },
+        #         {
+        #             'flags': ['-t', '--token'],
+        #             'help': 'Mediacloud API token (also called key).'
+        #         }
+        #     ],
+        #     'commands': {
+        #         'topic': {
+        #             'title': 'Minet Mediacloud Topic Command',
+        #             'description': '''
+        #                 Gather information and aggregated stats about pages and groups of
+        #                 the designated dashboard (indicated by a given token).
+        #             ''',
+        #             'subparsers': {
+        #                 'help': 'Topic action to perform.',
+        #                 'title': 'topic_actions',
+        #                 'dest': 'mc_topic_action',
+        #                 'commands': {
+        #                     'stories': {
+        #                         'title': 'Minet Mediacloud Topic Stories Command',
+        #                         'description': 'Retrieves the list of stories from a mediacloud topic.'
+        #                     }
+        #                 }
+        #             }
+        #         }
+        #     }
+        # }
     },
 
     # Scrape action subparser
