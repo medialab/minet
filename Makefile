@@ -5,7 +5,8 @@ SOURCE = minet
 all: lint test
 compile: clean pyinstaller
 test: unit
-publish: clean lint test upload clean
+publish: clean lint test upload
+	make clean
 
 clean:
 	rm -rf *.egg-info .pytest_cache build dist
@@ -47,3 +48,6 @@ unit:
 upload:
 	python setup.py sdist bdist_wheel
 	twine upload dist/*
+
+hello: clean
+	@echo whatev
