@@ -149,10 +149,14 @@ def fetch_action(namespace):
             already_done.add(int(index))
 
     # Loading bar
-    # TODO: decrement total from len(already_done)
+    total = namespace.total
+
+    if total is not None and resuming:
+        total -= len(already_done)
+
     loading_bar = tqdm(
         desc='Fetching pages',
-        total=namespace.total,
+        total=total,
         dynamic_ncols=True,
         unit=' urls'
     )
