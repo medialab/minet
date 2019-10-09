@@ -7,6 +7,7 @@
 import csv
 import json
 from tqdm import tqdm
+from urllib3 import Timeout
 
 from minet.cli.mediacloud.constants import MEDIACLOUD_API_BASE_URL
 from minet.utils import create_safe_pool, request
@@ -87,7 +88,7 @@ def mediacloud_topic_action(namespace, output_file):
     writer = csv.writer(output_file)
     writer.writerow(OUPUT_HEADERS)
 
-    http = create_safe_pool()
+    http = create_safe_pool(timeout=Timeout(connect=10, read=60 * 5))
 
     loading_bar = tqdm(
         desc='Fetching stories',
