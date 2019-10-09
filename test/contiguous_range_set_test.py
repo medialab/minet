@@ -66,3 +66,16 @@ class TestContiguousRangeSet(object):
         assert not s.stateful_contains(6)
         assert not s.stateful_contains(-1)
         assert not s.stateful_contains(100)
+
+    def test_len(self):
+        s = ContiguousRangeSet()
+
+        s.add(0)
+        s.add(1)
+        s.add(2)
+        s.add(5)
+        s.add(7)
+        s.add(6)
+        s.add(10)
+
+        assert len(s) == 7

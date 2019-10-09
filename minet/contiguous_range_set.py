@@ -23,6 +23,14 @@ class ContiguousRangeSet(object):
         self.intervals = []
         self.current_stateful_interval = 0
 
+    def __len__(self):
+        count = 0
+
+        for start, end in self.intervals:
+            count += (end + 1 - start)
+
+        return count
+
     def add(self, point):
         """
         Method adding a single point to the set. We assume that the point
