@@ -108,115 +108,6 @@ def check_dragnet():
 # Defining the list of CLI commands
 COMMANDS = {
 
-    # Fetch action subparser
-    # --------------------------------------------------------------------------
-    'fetch': {
-        'package': 'minet.cli.fetch',
-        'action': 'fetch_action',
-        'title': 'Minet Fetch Command',
-        'description': '''
-            Use multiple threads to fetch batches of urls from a CSV file. The
-            command outputs a CSV report with additional metadata about the
-            HTTP calls and will generally write the retrieved files in a folder
-            given by the user.
-        ''',
-        'epilog': '''
-            examples:
-
-            . Fetching a batch of url from existing CSV file:
-                `minet fetch url_column file.csv > report.csv`
-
-            . CSV input from stdin:
-                `xsv select url_column file.csv | minet fetch url_column > report.csv`
-
-            . Fetching a single url, useful to pipe into `minet scrape`:
-                `minet fetch http://google.com | minet scrape ./scrape.json > scraped.csv`
-        ''',
-        'arguments': [
-            {
-                'name': 'column',
-                'help': 'Column of the CSV file containing urls to fetch.'
-            },
-            {
-                'name': 'file',
-                'help': 'CSV file containing the urls to fetch.',
-                'type': FileType('r'),
-                'default': sys.stdin,
-                'nargs': '?'
-            },
-            {
-                'flags': ['--contents-in-report', '--no-contents-in-report'],
-                'help': 'Whether to include retrieved contents, e.g. html, directly in the report\nand avoid writing them in a separate folder. This requires to standardize\nencoding and won\'t work on binary formats.',
-                'dest': 'contents_in_report',
-                'action': BooleanAction
-            },
-            {
-                'flags': ['-d', '--output-dir'],
-                'help': 'Directory where the fetched files will be written. Defaults to "%s".' % DEFAULT_CONTENT_FOLDER,
-                'default': DEFAULT_CONTENT_FOLDER
-            },
-            {
-                'flags': ['-f', '--filename'],
-                'help': 'Name of the column used to build retrieved file names. Defaults to an uuid v4 with correct extension.'
-            },
-            {
-                'flag': '--filename-template',
-                'help': 'A template for the name of the fetched files.'
-            },
-            {
-                'flags': ['-g', '--grab-cookies'],
-                'help': 'Whether to attempt to grab cookies from your computer\'s browser.',
-                'choices': ['firefox', 'chrome']
-            },
-            {
-                'flags': ['-H', '--header'],
-                'help': 'Custom headers used with every requests.',
-                'action': 'append',
-                'dest': 'headers'
-            },
-            {
-                'flag': '--standardize-encoding',
-                'help': 'Whether to systematically convert retrieved text to UTF-8.',
-                'action': 'store_true'
-            },
-            {
-                'flags': ['-o', '--output'],
-                'help': 'Path to the output report file. By default, the report will be printed to stdout.'
-            },
-            {
-                'flags': ['-s', '--select'],
-                'help': 'Columns to include in report (separated by `,`).'
-            },
-            {
-                'flags': ['-t', '--threads'],
-                'help': 'Number of threads to use. Defaults to 25.',
-                'type': int,
-                'default': 25
-            },
-            {
-                'flag': '--throttle',
-                'help': 'Time to wait - in seconds - between 2 calls to the same domain. Defaults to %s.' % DEFAULT_THROTTLE,
-                'type': float,
-                'default': DEFAULT_THROTTLE
-            },
-            {
-                'flag': '--total',
-                'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
-                'type': int
-            },
-            {
-                'flag': '--url-template',
-                'help': 'A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.'
-            },
-            {
-                'flags': ['-X', '--request'],
-                'help': 'The http method to use. Will default to GET.',
-                'dest': 'method',
-                'default': 'GET'
-            }
-        ]
-    },
-
     # Crowdtangle action subparser
     # --------------------------------------------------------------------------
     'crowdtangle': {
@@ -541,6 +432,152 @@ COMMANDS = {
                             'help': 'Path to the output report file. By default, the report will be printed to stdout.'
                         }
                     ]
+                }
+            }
+        }
+    },
+
+    # Fetch action subparser
+    # --------------------------------------------------------------------------
+    'fetch': {
+        'package': 'minet.cli.fetch',
+        'action': 'fetch_action',
+        'title': 'Minet Fetch Command',
+        'description': '''
+            Use multiple threads to fetch batches of urls from a CSV file. The
+            command outputs a CSV report with additional metadata about the
+            HTTP calls and will generally write the retrieved files in a folder
+            given by the user.
+        ''',
+        'epilog': '''
+            examples:
+
+            . Fetching a batch of url from existing CSV file:
+                `minet fetch url_column file.csv > report.csv`
+
+            . CSV input from stdin:
+                `xsv select url_column file.csv | minet fetch url_column > report.csv`
+
+            . Fetching a single url, useful to pipe into `minet scrape`:
+                `minet fetch http://google.com | minet scrape ./scrape.json > scraped.csv`
+        ''',
+        'arguments': [
+            {
+                'name': 'column',
+                'help': 'Column of the CSV file containing urls to fetch.'
+            },
+            {
+                'name': 'file',
+                'help': 'CSV file containing the urls to fetch.',
+                'type': FileType('r'),
+                'default': sys.stdin,
+                'nargs': '?'
+            },
+            {
+                'flags': ['--contents-in-report', '--no-contents-in-report'],
+                'help': 'Whether to include retrieved contents, e.g. html, directly in the report\nand avoid writing them in a separate folder. This requires to standardize\nencoding and won\'t work on binary formats.',
+                'dest': 'contents_in_report',
+                'action': BooleanAction
+            },
+            {
+                'flags': ['-d', '--output-dir'],
+                'help': 'Directory where the fetched files will be written. Defaults to "%s".' % DEFAULT_CONTENT_FOLDER,
+                'default': DEFAULT_CONTENT_FOLDER
+            },
+            {
+                'flags': ['-f', '--filename'],
+                'help': 'Name of the column used to build retrieved file names. Defaults to an uuid v4 with correct extension.'
+            },
+            {
+                'flag': '--filename-template',
+                'help': 'A template for the name of the fetched files.'
+            },
+            {
+                'flags': ['-g', '--grab-cookies'],
+                'help': 'Whether to attempt to grab cookies from your computer\'s browser.',
+                'choices': ['firefox', 'chrome']
+            },
+            {
+                'flags': ['-H', '--header'],
+                'help': 'Custom headers used with every requests.',
+                'action': 'append',
+                'dest': 'headers'
+            },
+            {
+                'flag': '--standardize-encoding',
+                'help': 'Whether to systematically convert retrieved text to UTF-8.',
+                'action': 'store_true'
+            },
+            {
+                'flags': ['-o', '--output'],
+                'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+            },
+            {
+                'flags': ['-s', '--select'],
+                'help': 'Columns to include in report (separated by `,`).'
+            },
+            {
+                'flags': ['-t', '--threads'],
+                'help': 'Number of threads to use. Defaults to 25.',
+                'type': int,
+                'default': 25
+            },
+            {
+                'flag': '--throttle',
+                'help': 'Time to wait - in seconds - between 2 calls to the same domain. Defaults to %s.' % DEFAULT_THROTTLE,
+                'type': float,
+                'default': DEFAULT_THROTTLE
+            },
+            {
+                'flag': '--total',
+                'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
+                'type': int
+            },
+            {
+                'flag': '--url-template',
+                'help': 'A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.'
+            },
+            {
+                'flags': ['-X', '--request'],
+                'help': 'The http method to use. Will default to GET.',
+                'dest': 'method',
+                'default': 'GET'
+            }
+        ]
+    },
+
+    # Mediacloud action subparser
+    # -------------------------------------------------------------------------
+    'mediacloud': {
+        'package': 'minet.cli.mediacloud',
+        'action': 'mediacloud_action',
+        'title': 'Minet Mediacloud Command',
+        'aliases': ['mc'],
+        'description': '''
+            Commands related to the MIT Mediacloud API v2.
+        ''',
+        'subparsers': {
+            'help': 'Action to perform using the Mediacloud API.',
+            'title': 'actions',
+            'dest': 'mc_action',
+            'commands': {
+                'topic': {
+                    'title': 'Minet Mediacloud Topic Command',
+                    'description': '''
+                        Gather information and aggregated stats about pages and groups of
+                        the designated dashboard (indicated by a given token).
+                    ''',
+                    'subparsers': {
+                        'help': 'Topic action to perform.',
+                        'title': 'topic_actions',
+                        'dest': 'mc_topic_action',
+                        'commands': {
+                            'stories': {
+                                'title': 'Minet Mediacloud Topic Stories Command',
+                                'description': 'Retrieves the list of stories from a mediacloud topic.'
+                            }
+                        }
+                    }
                 }
             }
         }
