@@ -82,10 +82,11 @@ minet --version
 
 
 ```
-usage: minet fetch [-h] [--contents-in-report] [-d OUTPUT_DIR] [-f FILENAME]
-                   [--filename-template FILENAME_TEMPLATE] [-g {firefox,chrome}]
-                   [-H HEADERS] [--standardize-encoding] [-o OUTPUT] [-s SELECT]
-                   [-t THREADS] [--throttle THROTTLE] [--total TOTAL]
+usage: minet fetch [-h] [--compress] [--contents-in-report] [-d OUTPUT_DIR]
+                   [-f FILENAME] [--filename-template FILENAME_TEMPLATE]
+                   [-g {firefox,chrome}] [-H HEADERS] [--resume]
+                   [--standardize-encoding] [-o OUTPUT] [-s SELECT] [-t THREADS]
+                   [--throttle THROTTLE] [--total TOTAL]
                    [--url-template URL_TEMPLATE] [-X METHOD]
                    column [file]
 
@@ -103,6 +104,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                      show this help message and exit
+  --compress                                      Whether to compress the contents.
   --contents-in-report, --no-contents-in-report   Whether to include retrieved contents, e.g. html, directly in the report
                                                   and avoid writing them in a separate folder. This requires to standardize
                                                   encoding and won't work on binary formats.
@@ -112,6 +114,7 @@ optional arguments:
   -g {firefox,chrome}, --grab-cookies {firefox,chrome}
                                                   Whether to attempt to grab cookies from your computer's browser.
   -H HEADERS, --header HEADERS                    Custom headers used with every requests.
+  --resume                                        Whether to resume from an aborted report.
   --standardize-encoding                          Whether to systematically convert retrieved text to UTF-8.
   -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).

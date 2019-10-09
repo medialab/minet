@@ -11,7 +11,7 @@ import csv
 import sys
 import gzip
 from io import StringIO
-from os.path import join, dirname
+from os.path import join, dirname, isfile
 from collections import Counter
 from tqdm import tqdm
 from uuid import uuid4
@@ -27,6 +27,8 @@ from urllib3.exceptions import (
 from minet.exceptions import (
     InvalidURLError
 )
+
+from minet.contiguous_range_set import ContiguousRangeSet
 
 from minet.fetch import multithreaded_fetch
 from minet.utils import (
@@ -66,6 +68,14 @@ ERROR_REPORTERS = {
 
 def fetch_action(namespace):
 
+    # Are we resuming
+    resuming = namespace.resume
+
+    if resuming and not namespace.output:
+        die([
+            'Cannot --resume without specifying -o/--output.'
+        ])
+
     # Do we need to fetch only a single url?
     if namespace.file is sys.stdin and is_url(namespace.column):
         namespace.file = StringIO('url\n%s' % namespace.column)
@@ -98,14 +108,6 @@ def fetch_action(namespace):
             k, v = parse_http_header(header)
             global_headers = v
 
-    # Loading bar
-    loading_bar = tqdm(
-        desc='Fetching pages',
-        total=namespace.total,
-        dynamic_ncols=True,
-        unit=' urls'
-    )
-
     # Reading output
     output_headers = (list(input_headers) if not selected_pos else [input_headers[i] for i in selected_pos])
     output_headers += OUTPUT_ADDITIONAL_HEADERS
@@ -116,10 +118,44 @@ def fetch_action(namespace):
     if namespace.output is None:
         output_file = DummyTqdmFile(sys.stdout)
     else:
-        output_file = open(namespace.output, 'w')
+        flag = 'w'
+
+        if resuming and isfile(namespace.output):
+            flag = 'r+'
+
+        output_file = open(namespace.output, flag)
 
     output_writer = csv.writer(output_file)
-    output_writer.writerow(output_headers)
+
+    if not resuming:
+        output_writer.writerow(output_headers)
+    else:
+
+        # Reading report to know what need to be done
+        _, rpos, resuming_reader = custom_reader(output_file, 'line')
+
+        resuming_reader_loading = tqdm(
+            resuming_reader,
+            desc='Resuming',
+            dynamic_ncols=True,
+            unit=' lines'
+        )
+
+        already_done = ContiguousRangeSet()
+
+        for line in resuming_reader_loading:
+            index = line[rpos]
+
+            already_done.add(int(index))
+
+    # Loading bar
+    # TODO: decrement total from len(already_done)
+    loading_bar = tqdm(
+        desc='Fetching pages',
+        total=namespace.total,
+        dynamic_ncols=True,
+        unit=' urls'
+    )
 
     def url_key(item):
         line = item[1]
@@ -176,8 +212,13 @@ def fetch_action(namespace):
     errors = 0
     status_codes = Counter()
 
+    target_iterator = enumerate(reader)
+
+    if resuming:
+        target_iterator = (pair for pair in target_iterator if not already_done.stateful_contains(pair[0]))
+
     multithreaded_iterator = multithreaded_fetch(
-        enumerate(reader),
+        target_iterator,
         key=url_key,
         request_args=request_args,
         threads=namespace.threads,

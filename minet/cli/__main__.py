@@ -509,6 +509,11 @@ COMMANDS = {
                 'dest': 'headers'
             },
             {
+                'flag': '--resume',
+                'help': 'Whether to resume from an aborted report.',
+                'action': 'store_true'
+            },
+            {
                 'flag': '--standardize-encoding',
                 'help': 'Whether to systematically convert retrieved text to UTF-8.',
                 'action': 'store_true'
