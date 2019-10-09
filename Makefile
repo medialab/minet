@@ -1,19 +1,24 @@
 # Variables
 SOURCE = minet
 
-# Commands
-all: lint test
-compile: clean pyinstaller
-test: unit
-publish: clean lint test upload
-	make clean
-
-clean:
+# Functions
+define clean
 	rm -rf *.egg-info .pytest_cache build dist
 	find . -name "*.pyc" | xargs rm -f
 	find . -name __pycache__ | xargs rm -rf
 	rm -rf ftest/content
 	rm -f *.spec
+endef
+
+# Commands
+all: lint test
+compile: clean pyinstaller
+test: unit
+publish: clean lint test upload
+	$(call clean)
+
+clean:
+	$(call clean)
 
 pyinstaller:
 	pyinstaller minet/cli/__main__.py \
