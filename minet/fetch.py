@@ -14,7 +14,7 @@ from minet.utils import (
     create_safe_pool,
     guess_response_encoding,
     request,
-    raw_resolve
+    resolve
 )
 
 from minet.defaults import (
@@ -248,7 +248,7 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
 
         kwargs = resolve_args(url, item) if resolve_args is not None else {}
 
-        error, stack = raw_resolve(
+        error, stack = resolve(
             http,
             url,
             max_redirects=max_redirects,

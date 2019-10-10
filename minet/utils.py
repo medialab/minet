@@ -443,6 +443,24 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
         return None, response
 
 
+def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
+            follow_redirects=True, max_redirects=5, follow_refresh_header=True,
+            follow_meta_refresh=False, follow_js_relocation=False):
+
+    final_headers = build_request_headers(headers=headers, cookie=cookie, spoof_ua=spoof_ua)
+
+    return raw_resolve(
+        http,
+        url,
+        method,
+        headers=final_headers,
+        max_redirects=max_redirects,
+        follow_refresh_header=follow_refresh_header,
+        follow_meta_refresh=follow_meta_refresh,
+        follow_js_relocation=follow_js_relocation
+    )
+
+
 class RateLimiter(object):
     """
     Naive rate limiter context manager with smooth output ().

@@ -1,4 +1,4 @@
-from minet.utils import raw_resolve, create_safe_pool
+from minet.utils import resolve, create_safe_pool
 
 URLS = [
 
@@ -35,7 +35,7 @@ http = create_safe_pool()
 
 for url in URLS:
     print()
-    error, stack = raw_resolve(http, url, follow_meta_refresh=True)
+    error, stack = resolve(http, url, follow_meta_refresh=True)
     print(error)
     for item in stack:
         print(item)
