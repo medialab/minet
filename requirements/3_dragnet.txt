@@ -1,2 +1,2 @@
 # Dragnet is installed last...
-dragnet==2.0.3
+dragnet==2.0.4
