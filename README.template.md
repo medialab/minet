@@ -2,7 +2,7 @@
 
 ![Minet](img/minet.png)
 
-**minet** is webmining CLI tool & library for python. It adopts a lo-fi approach to various webmining problems by letting you perform a variety of actions from the comfort of your command line. No database needed: raw data files will get you going.
+**minet** is a webmining CLI tool & library for python. It adopts a lo-fi approach to various webmining problems by letting you perform a variety of actions from the comfort of your command line. No database needed: raw data files will get you going.
 
 In addition, **minet** also exposes its high-level programmatic interface as a library so you can tweak its behavior at will.
 
@@ -11,6 +11,7 @@ In addition, **minet** also exposes its high-level programmatic interface as a l
 * Multithreaded, memory-efficient fetching from the web.
 * Multiprocessed raw text content extraction from HTML pages.
 * Multiprocessed scraping from HTML pages using a comfy JSON DSL.
+* URL-related heuristics utilities such as normalization and matching.
 * Data collection from various APIs such as [CrowdTangle](https://www.crowdtangle.com/).
 
 ## Installation
