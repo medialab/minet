@@ -90,19 +90,15 @@ def build_description(command):
     return description
 
 
-def build_parser(commands):
-
-    # Building the argument parser
-    parser = ArgumentParser(prog='minet')
-
-    parser.add_argument('--version', action='version', version='minet %s' % __version__)
+def build_subparsers(parser, index, commands, help='Action to execute', title='actions',
+                     dest='action', common_arguments=[]):
 
     subparser_index = {}
 
     subparsers = parser.add_subparsers(
-        help='Action to execute',
-        title='actions',
-        dest='action'
+        help=help,
+        title=title,
+        dest=dest
     )
 
     for name, command in commands.items():
@@ -120,45 +116,46 @@ def build_parser(commands):
             'subparsers': {}
         }
 
+        add_arguments(subparser, common_arguments)
+
         if 'arguments' in command:
             add_arguments(subparser, command['arguments'])
 
-        # TODO: this could be abstracted in recursive construct
         if 'subparsers' in command:
-            subparser_subparsers = subparser.add_subparsers(
-                help=command['subparsers']['help'],
-                title=command['subparsers']['title'],
-                dest=command['subparsers']['dest']
+            subsubparsers = command['subparsers']
+            subcommon_arguments = subsubparsers.get('common_arguments', [])
+
+            add_arguments(subparser, subcommon_arguments)
+
+            build_subparsers(
+                subparser,
+                to_index['subparsers'],
+                subsubparsers['commands'],
+                help=subsubparsers['help'],
+                title=subsubparsers['title'],
+                dest=subsubparsers['dest'],
+                common_arguments=common_arguments + subcommon_arguments
             )
-
-            common_arguments = command['subparsers'].get('common_arguments')
-
-            if common_arguments:
-                add_arguments(subparser, common_arguments)
-
-            for subname, subcommand in command['subparsers']['commands'].items():
-                subsubparser = subparser_subparsers.add_parser(
-                    subname,
-                    description=build_description(subcommand),
-                    epilog=dedent(subcommand.get('epilog', '')),
-                    formatter_class=custom_formatter
-                )
-
-                if common_arguments:
-                    add_arguments(subsubparser, common_arguments)
-
-                if 'arguments' in subcommand:
-                    add_arguments(subsubparser, subcommand['arguments'])
-
-                to_index['subparsers'][subname] = {
-                    'parser': subsubparser
-                }
 
         if 'aliases' in command:
             for alias in command['aliases']:
-                subparser_index[alias] = to_index
+                index[alias] = to_index
 
-        subparser_index[name] = to_index
+        index[name] = to_index
+
+    return subparsers
+
+
+def build_parser(commands):
+
+    # Building the argument parser
+    parser = ArgumentParser(prog='minet')
+
+    parser.add_argument('--version', action='version', version='minet %s' % __version__)
+
+    subparser_index = {}
+
+    subparsers = build_subparsers(parser, subparser_index, commands)
 
     # Help subparser
     help_subparser = subparsers.add_parser('help')
