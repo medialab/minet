@@ -5,9 +5,7 @@
 # Defining every minet command.
 #
 import sys
-from argparse import (
-    FileType
-)
+from argparse import FileType
 
 from minet.defaults import DEFAULT_THROTTLE
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
