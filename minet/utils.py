@@ -379,9 +379,7 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
     return error, compiled_stack
 
 
-def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
-            follow_redirects=True, max_redirects=5, follow_refresh_header=True,
-            follow_meta_refresh=False, follow_js_relocation=False):
+def build_request_headers(headers=None, cookie=None, spoof_ua=False):
 
     # Formatting headers
     final_headers = {}
@@ -398,6 +396,16 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
     # Note: headers passed explicitly by users always win
     if headers is not None:
         final_headers.update(headers)
+
+    return final_headers
+
+
+def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
+            follow_redirects=True, max_redirects=5, follow_refresh_header=True,
+            follow_meta_refresh=False, follow_js_relocation=False):
+
+    # Formatting headers
+    final_headers = build_request_headers(headers=headers, cookie=cookie, spoof_ua=spoof_ua)
 
     if not follow_redirects:
         return raw_request(
