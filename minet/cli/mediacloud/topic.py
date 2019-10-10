@@ -11,6 +11,7 @@ from urllib3 import Timeout
 
 from minet.cli.mediacloud.constants import MEDIACLOUD_API_BASE_URL
 from minet.utils import create_safe_pool, request
+from minet.cli.utils import print_err
 
 
 def forge_url(namespace, link_id=None):
@@ -55,11 +56,12 @@ OUPUT_HEADERS = [
     'media_inlink_count',
     'post_count',
     'snapshots_id',
-    'timespans_id'
+    'timespans_id',
+    'next_link_id'
 ]
 
 
-def format_csv_row(item):
+def format_csv_row(item, next_link_id):
     return [
         item['guid'],
         item['stories_id'],
@@ -78,8 +80,22 @@ def format_csv_row(item):
         item['media_inlink_count'],
         item['post_count'] or '',
         item['snapshots_id'],
-        item['timespans_id']
+        item['timespans_id'],
+        next_link_id or ''
     ]
+
+
+def get_next_link_id(data):
+
+    if 'link_ids' not in data:
+        return None
+
+    pagination = data['link_ids']
+
+    if not pagination.get('next'):
+        return None
+
+    return pagination['next']
 
 
 def mediacloud_topic_action(namespace, output_file):
@@ -88,7 +104,11 @@ def mediacloud_topic_action(namespace, output_file):
     writer = csv.writer(output_file)
     writer.writerow(OUPUT_HEADERS)
 
-    http = create_safe_pool(timeout=Timeout(connect=10, read=60 * 5))
+    http = create_safe_pool(timeout=Timeout(connect=30, read=60 * 5))
+
+    print_err('Using the following starting url:')
+    print_err(forge_url(namespace, link_id))
+    print_err()
 
     loading_bar = tqdm(
         desc='Fetching stories',
@@ -105,17 +125,14 @@ def mediacloud_topic_action(namespace, output_file):
         if 'stories' not in data or len(data['stories']) == 0:
             break
 
+        next_link_id = get_next_link_id(data)
+
         for story in data['stories']:
-            writer.writerow(format_csv_row(story))
+            writer.writerow(format_csv_row(story, next_link_id))
 
         loading_bar.update(len(data['stories']))
 
-        if 'link_ids' not in data:
+        if next_link_id is None:
             break
 
-        pagination = data['link_ids']
-
-        if not pagination.get('next'):
-            break
-
-        link_id = pagination['next']
+        link_id = next_link_id

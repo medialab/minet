@@ -9,7 +9,6 @@ import sys
 import gzip
 import codecs
 import warnings
-from os.path import join
 from multiprocessing import Pool
 from tqdm import tqdm
 from dragnet import extract_content
