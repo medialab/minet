@@ -1,0 +1,30 @@
+---
+# Version using an url evaluation
+start_url: https://echojs.com/latest
+next:
+  eval: "'https://echojs.com/latest/%i' % (i * 30)"
+scraper:
+  iterator: article > h2 > a
+  fields:
+    title: text
+    url:
+      attr: href
+
+# TODO: Possibility to have text extractors, html extractors
+# TODO: Possibility to define several scrapers and return something in next
+# TODO: daemon
+
+---
+# Version scraping the next urls
+start_url: https://echojs.com/latest
+next:
+  scraper:
+    item:
+      sel: .more
+      attr: href
+scraper:
+  iterator: article > h2 > a
+  fields:
+    title: text
+    url:
+      attr: href

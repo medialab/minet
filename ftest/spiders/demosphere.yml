@@ -1,0 +1,32 @@
+---
+spiders:
+  archive:
+    start_url: https://paris.demosphere.net/?selectStartTime=1172703601&endTime=1175378401&limit=1000&showArchiveLinks=1
+    next:
+      scraper:
+        iterator: '#archive > table td > a'
+        fields:
+          url:
+            attr: href  # Will need autoresolve
+          scraper:
+            constant: month
+  month:
+    next:
+      scraper:
+        iterator: .dcal > .day a[href^='/rv/']
+        fields:
+          url:
+            attr: href  # Will need autoresolve
+          scraper:
+            constant: rv
+  rv:
+    scraper:
+      fields:
+        title:
+          sel: title
+          transform: strip
+        url:
+          sel: link[rel=canonical]
+          attr: href
+
+# TODO: need to run breadth-first by default
