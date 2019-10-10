@@ -12,11 +12,11 @@ def replacer(match):
 
     target = get_subparser(subparser_index, keys)
 
-    return dedent('''
+    return (dedent('''
         ```
         %s
         ```
-    ''') % target.format_help()
+    ''') % target.format_help()).strip()
 
 parser, subparser_index = build_parser(MINET_COMMANDS)
 

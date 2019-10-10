@@ -39,7 +39,7 @@ pip install minet
 * [url-join](#url-join)
 * [url-parse](#url-parse)
 
-*API-related commands*
+*Platform-related commands*
 
 * [crowdtangle (ct)](#crowdtangle)
   * [leaderboard](#leaderboard)
@@ -48,6 +48,10 @@ pip install minet
   * [search](#search)
 * [facebook (fb)](#facebook)
   * [comments](#comments)
+* [mediacloud (mc)](#mediacloud)
+  * [topic](#topic)
+    * [stories](#stories)
+
 
 ### API
 
@@ -80,7 +84,6 @@ minet --version
 ```
 
 ## fetch
-
 
 ```
 usage: minet fetch [-h] [--compress] [--contents-in-report] [-d OUTPUT_DIR]
@@ -138,7 +141,6 @@ examples:
 
 ```
 
-
 ## extract
 
 If you want to be able to use the `extract` command, you will need to install the [`dragnet`](https://github.com/dragnet-org/dragnet) library. Because it is a bit cumbersome to install, it's not included in `minet`'s dependencies yet.
@@ -149,7 +151,6 @@ Just run the following & in the same order (`dragnet` needs to have specific dep
 pip install lxml numpy Cython
 pip install dragnet
 ```
-
 
 ```
 usage: minet extract [-h] [-e {dragnet,html2text}] [-i INPUT_DIRECTORY]
@@ -190,11 +191,9 @@ examples:
 
 ```
 
-
 ## scrape
 
 TODO: document the scraping DSL
-
 
 ```
 usage: minet scrape [-h] [-f {csv,jsonl}] [-g GLOB] [-i INPUT_DIRECTORY]
@@ -238,9 +237,7 @@ examples:
 
 ```
 
-
 ## url-join
-
 
 ```
 usage: minet url-join [-h] [-o OUTPUT] [-s SELECT] column1 file1 column2 file2
@@ -273,9 +270,7 @@ examples:
 
 ```
 
-
 ## url-parse
-
 
 ```
 usage: minet url-parse [-h] [-o OUTPUT] [-s SELECT] [--separator SEPARATOR]
@@ -312,9 +307,7 @@ examples:
 
 ```
 
-
 ## CrowdTangle
-
 
 ```
 usage: minet crowdtangle [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT] [-t TOKEN]
@@ -336,9 +329,7 @@ actions:
 
 ```
 
-
 ### leaderboard
-
 
 ```
 usage: minet crowdtangle leaderboard [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
@@ -369,9 +360,7 @@ examples:
 
 ```
 
-
 ### lists
-
 
 ```
 usage: minet crowdtangle lists [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
@@ -396,9 +385,7 @@ examples:
 
 ```
 
-
 ### posts
-
 
 ```
 usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
@@ -440,11 +427,9 @@ examples:
     `minet ct posts --token YOUR_TOKEN --limit 500 > latest-posts.csv`
 
 ```
-
 
 ### search
 
-
 ```
 usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                [-t TOKEN] [--end-date END_DATE] [-f {csv,jsonl}]
@@ -486,9 +471,7 @@ examples:
 
 ```
 
-
 ## Facebook
-
 
 ```
 usage: minet facebook [-h] {comments} ...
@@ -506,9 +489,7 @@ actions:
 
 ```
 
-
 ### comments
-
 
 ```
 usage: minet facebook comments [-h] [-c COOKIE] [-o OUTPUT] url
@@ -533,6 +514,29 @@ examples:
 
 ```
 
+## Mediacloud
+
+### topic
+
+#### stories
+
+```
+usage: minet mediacloud topic stories [-h] [-t TOKEN] [-o OUTPUT] topic_id
+
+Minet Mediacloud Topic Stories Command
+======================================
+
+Retrieves the list of stories from a mediacloud topic.
+
+positional arguments:
+  topic_id                    Id of the topic
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -t TOKEN, --token TOKEN     Mediacloud API token (also called key).
+  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+
+```
 
 ---
 

@@ -39,7 +39,7 @@ pip install minet
 * [url-join](#url-join)
 * [url-parse](#url-parse)
 
-*API-related commands*
+*Platform-related commands*
 
 * [crowdtangle (ct)](#crowdtangle)
   * [leaderboard](#leaderboard)
@@ -48,6 +48,10 @@ pip install minet
   * [search](#search)
 * [facebook (fb)](#facebook)
   * [comments](#comments)
+* [mediacloud (mc)](#mediacloud)
+  * [topic](#topic)
+    * [stories](#stories)
+
 
 ### API
 
@@ -137,6 +141,14 @@ TODO: document the scraping DSL
 ### comments
 
 <% fb/comments %>
+
+## Mediacloud
+
+### topic
+
+#### stories
+
+<% mc/topic/stories %>
 
 ---
 
