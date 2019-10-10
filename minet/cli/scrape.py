@@ -9,24 +9,24 @@ import json
 import yaml
 import sys
 import codecs
-from glob import iglob
 from collections import namedtuple
-from os.path import join, basename
+from os.path import basename
 from multiprocessing import Pool
 from tqdm import tqdm
 from yaml import Loader as YAMLLoader
 
 from minet.scrape import scrape, headers_from_definition
-from minet.cli.utils import custom_reader, DummyTqdmFile, die, JSONLWriter
+from minet.cli.utils import (
+    DummyTqdmFile,
+    die,
+    JSONLWriter,
+    create_glob_iterator,
+    create_report_iterator
+)
 
 ERROR_REPORTERS = {
     UnicodeDecodeError: 'wrong-encoding'
 }
-
-ScrapeWorkerPayload = namedtuple(
-    'ScrapeWorkerPayload',
-    ['scraper', 'line', 'path', 'encoding', 'content']
-)
 
 ScrapeWorkerResult = namedtuple(
     'ScrapeWorkerResult',
@@ -35,7 +35,7 @@ ScrapeWorkerResult = namedtuple(
 
 
 def worker(payload):
-    scraper, line, path, encoding, content = payload
+    line, path, encoding, content, scraper = payload
 
     # Reading from file
     if content is None:
@@ -59,55 +59,6 @@ def worker(payload):
     items = scrape(scraper, content, context=context)
 
     return ScrapeWorkerResult(None, items)
-
-
-def create_report_iterator(namespace, loading_bar, scraper):
-    input_headers, pos, reader = custom_reader(namespace.report, ('status', 'filename', 'encoding', 'raw_content'))
-
-    for line in reader:
-        status = int(line[pos.status]) if line[pos.status] else None
-        filename = line[pos.filename]
-
-        if (
-            status is None or
-            status >= 400 or
-            not filename
-        ):
-            loading_bar.update()
-            continue
-
-        if pos.raw_content is not None:
-            yield ScrapeWorkerPayload(
-                scraper,
-                line,
-                path=None,
-                encoding=None,
-                content=line[pos.raw_content]
-            )
-
-            continue
-
-        path = join(namespace.input_directory, filename)
-        encoding = line[pos.encoding].strip() or 'utf-8'
-
-        yield ScrapeWorkerPayload(
-            scraper,
-            line,
-            path=path,
-            encoding=encoding,
-            content=None
-        )
-
-
-def create_glob_iterator(namespace, scraper):
-    for p in iglob(namespace.glob, recursive=True):
-        yield ScrapeWorkerPayload(
-            scraper,
-            line=None,
-            path=p,
-            encoding='utf-8',
-            content=None
-        )
 
 
 def scrape_action(namespace):
@@ -149,7 +100,7 @@ def scrape_action(namespace):
     if namespace.glob is not None:
         files = create_glob_iterator(namespace, scraper)
     else:
-        files = create_report_iterator(namespace, loading_bar, scraper)
+        files = create_report_iterator(namespace, scraper, loading_bar)
 
     with Pool(namespace.processes) as pool:
         for error, items in pool.imap_unordered(worker, files):

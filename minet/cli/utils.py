@@ -8,6 +8,8 @@ import csv
 import sys
 import json
 import argparse
+from glob import iglob
+from os.path import join
 from collections import namedtuple
 from tqdm import tqdm
 
@@ -89,3 +91,55 @@ class JSONLWriter(object):
     def writerow(self, item):
         row = json.dumps(item, ensure_ascii=False)
         self.file.write(row + '\n')
+
+
+WorkerPayload = namedtuple(
+    'WorkerPayload',
+    ['line', 'path', 'encoding', 'content', 'args']
+)
+
+
+def create_report_iterator(namespace, args=None, loading_bar=None):
+    input_headers, pos, reader = custom_reader(namespace.report, ('status', 'filename', 'encoding', 'raw_content'))
+
+    for line in reader:
+        status = int(line[pos.status]) if line[pos.status] else None
+        filename = line[pos.filename]
+
+        if status is None or status >= 400 or not filename:
+            if loading_bar is not None:
+                loading_bar.update()
+            continue
+
+        if pos.raw_content is not None:
+            yield WorkerPayload(
+                line=line,
+                path=None,
+                encoding=None,
+                content=line[pos.raw_content],
+                args=args
+            )
+
+            continue
+
+        path = join(namespace.input_directory, filename)
+        encoding = line[pos.encoding].strip() or 'utf-8'
+
+        yield WorkerPayload(
+            line=line,
+            path=path,
+            encoding=encoding,
+            content=None,
+            args=args
+        )
+
+
+def create_glob_iterator(namespace, args):
+    for p in iglob(namespace.glob, recursive=True):
+        yield WorkerPayload(
+            line=None,
+            path=p,
+            encoding='utf-8',
+            content=None,
+            args=args
+        )
