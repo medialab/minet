@@ -6,6 +6,7 @@
 #
 import csv
 import json
+import gzip
 import yaml
 import sys
 import codecs
@@ -39,11 +40,17 @@ def worker(payload):
 
     # Reading from file
     if content is None:
-        with codecs.open(path, 'r', encoding=encoding, errors='replace') as f:
-            try:
-                content = f.read()
-            except UnicodeDecodeError as e:
-                return ScrapeWorkerResult(e, None)
+        try:
+            if path.endswith('.gz'):
+                with open(path, 'rb') as f:
+                    content_bytes = gzip.decompress(f.read())
+
+                content = content_bytes.decode(encoding, errors='replace')
+            else:
+                with codecs.open(path, 'r', encoding=encoding, errors='replace') as f:
+                    content = f.read()
+        except UnicodeDecodeError as e:
+            return ScrapeWorkerResult(e, None)
 
     # Building context
     context = {}

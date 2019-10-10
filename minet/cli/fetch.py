@@ -304,6 +304,8 @@ def fetch_action(namespace):
                 os.makedirs(resource_dir, exist_ok=True)
 
                 with open(resource_path, content_write_flag) as f:
+
+                    # TODO: what if standardize_encoding + compress?
                     f.write(gzip.compress(data) if namespace.compress else data)
 
             # Reporting in output
