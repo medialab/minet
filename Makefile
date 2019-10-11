@@ -29,7 +29,8 @@ pyinstaller:
 		--hidden-import sklearn.neighbors.quad_tree \
 		--hidden-import sklearn.tree._utils \
 		--hidden-import scipy.ndimage \
-		--onefile
+		--onefile \
+		--clean
 
 deps:
 	find ./requirements -name "*.txt" | xargs -n 1 pip install -r
