@@ -539,3 +539,11 @@ class SliceFormatter(string.Formatter):
                     obj = obj[i]
 
         return obj, first
+
+
+def fstring_eval(template, **kwargs):
+    return eval(
+        'f"""%s"""' % template,
+        None,
+        kwargs
+    )
