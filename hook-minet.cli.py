@@ -9,7 +9,10 @@ hiddenimports = [
     'sklearn.neighbors.typedefs',
     'sklearn.neighbors.quad_tree',
     'sklearn.tree._utils',
-    'scipy.ndimage'
+    'sklearn.utils.sparsetools._graph_validation',
+    'sklearn.utils.sparsetools._graph_tools',
+    'scipy.ndimage',
+    'dragnet'
 ]
 
 for p in iglob('minet/cli/**/*.py', recursive=True):
