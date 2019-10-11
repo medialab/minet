@@ -21,7 +21,7 @@ clean:
 	$(call clean)
 
 deps:
-	find ./requirements -name "*.txt" | xargs -n 1 pip install -r
+	find ./requirements -name "*.txt" | xargs -n 1 pip3 install -r
 
 lint:
 	@echo Linting source code using pep8...
