@@ -3,6 +3,8 @@
 start_url: https://echojs.com/latest
 next:
   eval: "'https://echojs.com/latest/%i' % (i * 30)"
+  # or
+  format: 'https://echojs.com/latest/{i * 30}'
 scraper:
   iterator: article > h2 > a
   fields:
