@@ -10,6 +10,7 @@ import sys
 import signal
 import shutil
 import importlib
+import multiprocessing
 from textwrap import dedent
 from argparse import (
     ArgumentParser,
@@ -199,4 +200,5 @@ def main():
 
 
 if __name__ == '__main__':
+    multiprocessing.freeze_support()
     main()
