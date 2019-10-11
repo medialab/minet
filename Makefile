@@ -6,7 +6,6 @@ define clean
 	rm -rf *.egg-info .pytest_cache build dist
 	find . -name "*.pyc" | xargs rm -f
 	find . -name __pycache__ | xargs rm -rf
-	rm -rf ftest/content
 	rm -f *.spec
 endef
 

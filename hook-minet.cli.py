@@ -1,5 +1,6 @@
 import re
 import tld
+import dragnet
 from glob import iglob
 from os.path import dirname, join
 
@@ -9,8 +10,6 @@ hiddenimports = [
     'sklearn.neighbors.typedefs',
     'sklearn.neighbors.quad_tree',
     'sklearn.tree._utils',
-    'sklearn.utils.sparsetools._graph_validation',
-    'sklearn.utils.sparsetools._graph_tools',
     'scipy.ndimage',
     'dragnet'
 ]
@@ -30,6 +29,10 @@ datas = [
     (
         join(dirname(tld.__file__), 'res', 'effective_tld_names.dat.txt'),
         'tld/res'
+    ),
+    (
+        join(dirname(dragnet.__file__), 'pickled_models', 'py3_sklearn_0.18.0', 'kohlschuetter_readability_weninger_content_model.pkl.gz'),
+        'dragnet/pickled_models/py3_sklearn_0.18.0'
     )
 ]
 
