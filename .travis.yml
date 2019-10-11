@@ -26,6 +26,7 @@ matrix:
       language: shell
       before_install:
         - choco install python --version=3.6.8
+        - choco install visualstudio2017-workload-python
         - choco install make
         - python -m pip install -U pip
       env:
@@ -35,4 +36,4 @@ matrix:
 install: make deps
 script:
   - make test
-  - make pyinstaller
+  # - make pyinstaller
