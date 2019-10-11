@@ -27,6 +27,6 @@ pyinstaller minet/cli/__main__.py \
 		--hidden-import minet.cli.mediacloud.constants \
 		--hidden-import minet.cli.mediacloud \
 		--hidden-import minet.cli.mediacloud.topic \
-		--add-data `python scripts/find_data.py`:tld/res \
+		--add-data `python3 scripts/find_data.py`:tld/res \
 		--onefile \
 		--clean
