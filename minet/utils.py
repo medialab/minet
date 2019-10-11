@@ -5,7 +5,7 @@
 # Miscellaneous helper function used throughout the library.
 #
 import re
-import chardet
+import cchardet as chardet
 import cgi
 import certifi
 import browser_cookie3
