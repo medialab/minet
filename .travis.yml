@@ -36,4 +36,4 @@ matrix:
 install: make deps
 script:
   - make test
-  # - make pyinstaller
+  - make pyinstaller

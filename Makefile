@@ -44,4 +44,9 @@ upload:
 	twine upload dist/*
 
 pyinstaller: clean
-	./scripts/pyinstaller.sh
+	pyinstaller \
+		--additional-hooks-dir=. \
+		--name minet \
+		--clean \
+		--onefile \
+		minet/cli/__main__.py
