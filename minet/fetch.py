@@ -23,6 +23,9 @@ from minet.defaults import (
     DEFAULT_THROTTLE
 )
 
+# Fix for pyinstaller. Do not remove!
+import encodings.idna
+
 # Mimetypes init
 mimetypes.init()
 
