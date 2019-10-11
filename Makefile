@@ -43,5 +43,5 @@ upload:
 	python setup.py sdist bdist_wheel
 	twine upload dist/*
 
-pyinstaller:
+pyinstaller: clean
 	./scripts/pyinstaller.sh
