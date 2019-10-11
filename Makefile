@@ -21,7 +21,10 @@ clean:
 	$(call clean)
 
 deps:
-	find ./requirements -name "*.txt" | xargs -n 1 pip3 install -r
+	pip3 install -U pip
+	pip3 install -r requirements/1_dev.txt
+	pip3 install -r requirements/2_base.txt
+	pip3 install -r requirements/3_dragnet.txt
 
 lint:
 	@echo Linting source code using pep8...
