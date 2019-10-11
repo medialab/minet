@@ -10,7 +10,7 @@ define clean
 	rm -f *.spec
 endef
 
-# Commands
+# Targets
 all: lint test
 compile: clean pyinstaller
 test: unit
@@ -19,18 +19,6 @@ publish: clean lint test upload
 
 clean:
 	$(call clean)
-
-pyinstaller:
-	pyinstaller minet/cli/__main__.py \
-		-n minet \
-		--hidden-import lxml \
-		--hidden-import lxml.etree \
-		--hidden-import sklearn.neighbors.typedefs \
-		--hidden-import sklearn.neighbors.quad_tree \
-		--hidden-import sklearn.tree._utils \
-		--hidden-import scipy.ndimage \
-		--onefile \
-		--clean
 
 deps:
 	find ./requirements -name "*.txt" | xargs -n 1 pip install -r
@@ -44,7 +32,7 @@ lint:
 	@echo
 
 readme:
-	python generate_readme.py > README.md
+	python -m scripts.generate_readme > README.md
 
 unit:
 	@echo Running unit tests...
@@ -54,3 +42,6 @@ unit:
 upload:
 	python setup.py sdist bdist_wheel
 	twine upload dist/*
+
+pyinstaller:
+	./scripts/pyinstaller.sh
