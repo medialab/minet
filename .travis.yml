@@ -49,7 +49,7 @@ script:
   - make test
   - if [[ $PYINSTALLER_BUILD = true ]]; then make pyinstaller; fi
   - if [[ $PYINSTALLER_BUILD = true ]]; then mv ./dist/minet ./dist/$PYINSTALLER_BUILD_NAME; fi
-  - ls -lh ./dist
+  - if [[ $PYINSTALLER_BUILD = true ]]; then ls -lh ./dist; fi
 
 deploy:
   provider: releases

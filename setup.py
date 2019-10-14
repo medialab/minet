@@ -34,8 +34,7 @@ setup(name='minet',
         'quenouille>=0.4.0',
         'tqdm>=4.31.1',
         'ural>=0.11.0',
-        'urllib3[secure]>=1.25.3',
-        # 'dragnet>=2.0.4'
+        'urllib3[secure]>=1.25.3'
       ],
       entry_points={
         'console_scripts': ['minet=minet.cli.__main__:main']
