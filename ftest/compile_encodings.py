@@ -10,7 +10,12 @@ with open('./ftest/resources/encodings.csv') as f:
         encodings = line[0]
 
         for e in encodings.split('|'):
-            ENCODINGS.add(e.replace('-', '').replace('_', '').replace(' ', ''))
+            ENCODINGS.add(e
+                .replace('-', '')
+                .replace('_', '')
+                .replace(' ', '')
+                .lower()
+            )
 
 for e in sorted(ENCODINGS):
     print('"%s",' % e)
