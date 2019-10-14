@@ -18,7 +18,7 @@ matrix:
       env: PYINSTALLER_BUILD=true
       before_install:
         - pyenv install 3.6.9
-        - pyenv activate 3.6.9
+        - pyenv shell 3.6.9
     - os: osx
       osx_image: xcode11
       language: shell
@@ -39,3 +39,12 @@ install: make deps
 script:
   - make test
   - make pyinstaller
+# deploy:
+#   provider: releases
+#   api_key: $GITHUB_TOKEN
+#   file: ./dist/minet
+#   skip_cleanup: true
+#   on:
+#     branch: master
+#     tags: true
+#     condition: $PYINSTALLER_BUILD = true
