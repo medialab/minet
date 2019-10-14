@@ -6,6 +6,11 @@
 #
 
 
+# General errors
+class UnknownEncoding(Exception):
+    pass
+
+
 # Miscellaneous HTTP errors
 class InvalidURLError(Exception):
     pass
