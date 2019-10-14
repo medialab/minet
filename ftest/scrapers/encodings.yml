@@ -1,0 +1,8 @@
+iterator: '#standard-encodings tbody[valign=top] > tr'
+item:
+    eval: '
+        "|".join(
+            [element.select_one("td:nth-child(1)").get_text()] +
+            element.select_one("td:nth-child(2)").get_text().split(", ")
+        )
+    '
