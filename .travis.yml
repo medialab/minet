@@ -23,6 +23,11 @@ matrix:
       python: 3.6
       env: PYINSTALLER_BUILD=true PYINSTALLER_BUILD_NAME=minet_linux_precise
       dist: precise
+      before_install:
+        - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+        - sudo apt-get update -y
+        - sudo apt-get install -y g++-4.8
+        - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 50
 
     # OSX
     - os: osx
