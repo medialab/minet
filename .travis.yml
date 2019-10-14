@@ -18,6 +18,7 @@ matrix:
       env: PYINSTALLER_BUILD=true
       before_install:
         - pyenv install 3.6.9
+        - pyenv init
         - pyenv shell 3.6.9
     - os: osx
       osx_image: xcode11
