@@ -51,8 +51,7 @@ def worker(payload):
             warnings.simplefilter('ignore')
             content = extract_content(raw_html)
     except BaseException as e:
-        # TODO: I don't know yet what can happen
-        raise
+        return e, line, None
 
     return None, line, content
 
