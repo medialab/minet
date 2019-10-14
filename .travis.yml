@@ -5,11 +5,24 @@ matrix:
     # Linux
     - os: linux
       python: 3.5
+      dist: xenial
     - os: linux
       python: 3.6
-      env: PYINSTALLER_BUILD=true PYINSTALLER_BUILD_NAME=minet_linux
+      env: PYINSTALLER_BUILD=true PYINSTALLER_BUILD_NAME=minet_linux_xenial
+      dist: xenial
     - os: linux
       python: 3.7
+      dist: xenial
+
+    # Older linux
+    - os: linux
+      python: 3.6
+      env: PYINSTALLER_BUILD=true PYINSTALLER_BUILD_NAME=minet_linux_trusty
+      dist: trusty
+    - os: linux
+      python: 3.6
+      env: PYINSTALLER_BUILD=true PYINSTALLER_BUILD_NAME=minet_linux_precise
+      dist: precise
 
     # OSX
     - os: osx
