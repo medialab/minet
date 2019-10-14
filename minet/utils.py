@@ -537,7 +537,6 @@ class RateLimiter(object):
 
 class PseudoFStringFormatter(string.Formatter):
     def get_field(self, field_name, args, kwargs):
-        print(field_name, kwargs)
         result = eval(field_name, None, kwargs)
 
         return result, None
