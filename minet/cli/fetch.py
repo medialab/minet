@@ -17,17 +17,6 @@ from tqdm import tqdm
 from uuid import uuid4
 from ural import is_url
 
-from urllib3.exceptions import (
-    ConnectTimeoutError,
-    MaxRetryError,
-    ReadTimeoutError,
-    ResponseError
-)
-
-from minet.exceptions import (
-    InvalidURLError
-)
-
 from minet.contiguous_range_set import ContiguousRangeSet
 
 from minet.fetch import multithreaded_fetch
@@ -36,6 +25,7 @@ from minet.utils import (
     parse_http_header,
     SliceFormatter
 )
+from minet.cli.reporters import report_error
 from minet.cli.utils import custom_reader, DummyTqdmFile, die
 
 OUTPUT_ADDITIONAL_HEADERS = [
@@ -48,22 +38,6 @@ OUTPUT_ADDITIONAL_HEADERS = [
 ]
 
 CUSTOM_FORMATTER = SliceFormatter()
-
-
-def max_retry_error_reporter(error):
-    if isinstance(error, (ConnectTimeoutError, ReadTimeoutError)):
-        return 'timeout'
-
-    if isinstance(error.reason, ResponseError) and 'redirect' in repr(error.reason):
-        return 'too-many-redirects'
-
-    return 'max-retries-exceeded'
-
-
-ERROR_REPORTERS = {
-    MaxRetryError: max_retry_error_reporter,
-    InvalidURLError: 'invalid-url'
-}
 
 
 def fetch_action(namespace):
@@ -323,9 +297,7 @@ def fetch_action(namespace):
 
         # Handling potential errors
         else:
-            reporter = ERROR_REPORTERS.get(type(result.error), repr)
-
-            error_code = reporter(result.error) if callable(reporter) else reporter
+            error_code = report_error(result.error)
 
             write_output(
                 line_index,

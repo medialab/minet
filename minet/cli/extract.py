@@ -19,15 +19,11 @@ from minet.cli.utils import (
     DummyTqdmFile,
     create_report_iterator
 )
+from minet.cli.reporters import report_error
 
 from minet.exceptions import UnknownEncodingError
 
 OUTPUT_ADDITIONAL_HEADERS = ['extract_error', 'extracted_text']
-
-ERROR_REPORTERS = {
-    UnicodeDecodeError: 'wrong-encoding',
-    UnknownEncodingError: 'unknown-encoding'
-}
 
 
 def worker(payload):
@@ -94,7 +90,7 @@ def extract_action(namespace):
             loading_bar.update()
 
             if error is not None:
-                message = ERROR_REPORTERS.get(type(error), repr(error))
+                message = report_error(error)
                 line.extend([message, ''])
                 output_writer.writerow(line)
                 continue

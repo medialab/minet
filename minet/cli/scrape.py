@@ -25,10 +25,6 @@ from minet.cli.utils import (
     create_report_iterator
 )
 
-ERROR_REPORTERS = {
-    UnicodeDecodeError: 'wrong-encoding'
-}
-
 ScrapeWorkerResult = namedtuple(
     'ScrapeWorkerResult',
     ['error', 'items']
