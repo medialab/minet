@@ -23,7 +23,7 @@ from minet.fetch import multithreaded_fetch
 from minet.utils import (
     grab_cookies,
     parse_http_header,
-    SliceFormatter
+    PseudoFStringFormatter
 )
 from minet.cli.reporters import report_error
 from minet.cli.utils import custom_reader, DummyTqdmFile, die
@@ -37,7 +37,7 @@ OUTPUT_ADDITIONAL_HEADERS = [
     'encoding'
 ]
 
-CUSTOM_FORMATTER = SliceFormatter()
+CUSTOM_FORMATTER = PseudoFStringFormatter()
 
 
 def fetch_action(namespace):
@@ -247,7 +247,7 @@ def fetch_action(namespace):
                     if namespace.filename_template:
                         filename = CUSTOM_FORMATTER.format(
                             namespace.filename_template,
-                            value=line[filename_pos] if filename_pos else None,
+                            value=line[filename_pos] if filename_pos is not None else None,
                             ext=result.meta['ext'],
                             line={h: line[i] for i, h in enumerate(input_headers)}
                         )

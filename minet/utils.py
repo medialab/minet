@@ -535,23 +535,12 @@ class RateLimiter(object):
         return self.exit()
 
 
-class SliceFormatter(string.Formatter):
+class PseudoFStringFormatter(string.Formatter):
     def get_field(self, field_name, args, kwargs):
-        first, rest = _string.formatter_field_name_split(field_name)
+        print(field_name, kwargs)
+        result = eval(field_name, None, kwargs)
 
-        obj = self.get_value(first, args, kwargs)
-
-        for is_attr, i in rest:
-            if is_attr:
-                obj = getattr(obj, i)
-            else:
-                if isinstance(i, str) and ',' in i:
-                    indexes = map(int, i.split(','))
-                    obj = obj[slice(*indexes)]
-                else:
-                    obj = obj[i]
-
-        return obj, first
+        return result, None
 
 
 def fstring_eval(template, **kwargs):

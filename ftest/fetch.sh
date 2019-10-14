@@ -7,6 +7,7 @@ python -m minet.cli fetch url ftest/resources/urls.csv \
   -d ftest/content \
   --total 10000 \
   --filename id \
+  --filename-template '{value[:4]}/{value}{ext}' \
   --grab-cookies firefox \
   --compress \
   -s id,url \
