@@ -13,21 +13,28 @@ from multiprocessing import Pool
 from tqdm import tqdm
 from dragnet import extract_content
 
+from minet.encodings import is_supported_encoding
 from minet.cli.utils import (
     custom_reader,
     DummyTqdmFile,
     create_report_iterator
 )
 
+from minet.exceptions import UnknownEncodingError
+
 OUTPUT_ADDITIONAL_HEADERS = ['extract_error', 'extracted_text']
 
 ERROR_REPORTERS = {
-    UnicodeDecodeError: 'wrong-encoding'
+    UnicodeDecodeError: 'wrong-encoding',
+    UnknownEncodingError: 'unknown-encoding'
 }
 
 
 def worker(payload):
     line, path, encoding, content, _ = payload
+
+    if not is_supported_encoding(encoding):
+        return UnknownEncodingError('Unknown encoding: "%s"' % encoding), line, None
 
     # Reading file
     try:

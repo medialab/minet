@@ -7,7 +7,7 @@
 
 
 # General errors
-class UnknownEncoding(Exception):
+class UnknownEncodingError(Exception):
     pass
 
 
