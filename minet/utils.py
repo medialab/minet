@@ -19,6 +19,8 @@ from urllib.parse import urljoin
 from urllib3 import HTTPResponse
 from urllib.request import Request
 
+from minet.encodings import is_supported_encoding
+
 from minet.exceptions import (
     MaxRedirectsError,
     InfiniteRedirectsError,
@@ -48,12 +50,15 @@ CHARDET_CONFIDENCE_THRESHOLD = 0.9
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
 
 
+# TODO: add a version that tallies the possibilities
 def guess_response_encoding(response, data, is_xml=False, use_chardet=False):
     """
     Function taking an urllib3 response object and attempting to guess its
     encoding.
     """
     content_type_header = response.getheader('content-type')
+
+    suboptimal_charset = None
 
     if content_type_header is not None:
         parsed_header = cgi.parse_header(content_type_header)
@@ -62,7 +67,10 @@ def guess_response_encoding(response, data, is_xml=False, use_chardet=False):
             charset = parsed_header[1].get('charset')
 
             if charset is not None:
-                return charset.lower()
+                if is_supported_encoding(charset):
+                    return charset.lower()
+                else:
+                    suboptimal_charset = charset
 
     # TODO: use re.search to go faster!
     if is_xml:
@@ -77,7 +85,12 @@ def guess_response_encoding(response, data, is_xml=False, use_chardet=False):
         # NOTE: here we are returning the last one, but we could also use
         # frequency at the expense of performance
         if len(matches) != 0:
-            return matches[-1].lower().decode()
+            charset = matches[-1].lower().decode()
+
+            if is_supported_encoding(charset):
+                return charset
+            else:
+                suboptimal_charset = charset
 
     if use_chardet:
         chardet_result = chardet.detect(data)
@@ -85,7 +98,7 @@ def guess_response_encoding(response, data, is_xml=False, use_chardet=False):
         if chardet_result['confidence'] >= CHARDET_CONFIDENCE_THRESHOLD:
             return chardet_result['encoding'].lower()
 
-    return None
+    return suboptimal_charset
 
 
 def parse_http_header(header):
