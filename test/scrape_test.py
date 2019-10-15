@@ -364,3 +364,9 @@ class TestScrape(object):
         headers = headers_from_definition({'iterator': 'li', 'fields': {'id': 'id'}})
 
         assert headers == ['id']
+
+        headers = headers_from_definition({'sel': 'table', 'tabulate': {'headers': ['id']}})
+
+        assert headers == ['id']
+
+        headers = headers_from_definition({'sel': 'table', 'tabulate': True})
