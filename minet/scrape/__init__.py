@@ -5,7 +5,7 @@
 # Module exposing utilities related to minet's scraping DSL.
 #
 from bs4 import BeautifulSoup
-from minet.scrape.apply import apply_scraper
+from minet.scrape.apply import apply_scraper, tabulate
 
 
 def scrape(scraper, html, engine='lxml', context=None):

@@ -1,7 +1,8 @@
 # =============================================================================
 # Minet Scrape Unit Tests
 # =============================================================================
-from minet.scrape import scrape, headers_from_definition
+from bs4 import BeautifulSoup
+from minet.scrape import scrape, headers_from_definition, tabulate
 
 BASIC_HTML = """
     <ul>
@@ -25,6 +26,27 @@ META_HTML = """
             <li id="li2">Two</li>
         </ul>
     </div>
+"""
+
+TABLE_TH_HTML = """
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Surname</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>John</td>
+                <td>Mayall</td>
+            </tr>
+            <tr>
+                <td>Mary</td>
+                <td>Susan</td>
+            </tr>
+        </tbody>
+    </table>
 """
 
 
@@ -317,6 +339,12 @@ class TestScrape(object):
             {'local': 'ok', 'global': 'notok', 'title': 'Scrape'},
             {'local': 'ok', 'global': 'notok', 'title': 'Scrape'}
         ]
+
+    def test_tabulate(self):
+        soup = BeautifulSoup(TABLE_TH_HTML, 'lxml')
+        table = soup.select_one('table')
+
+        assert list(tabulate(table)) == [{'Name': 'John', 'Surname': 'Mayall'}, {'Name': 'Mary', 'Surname': 'Susan'}]
 
     def test_headers(self):
         headers = headers_from_definition({'iterator': 'li'})

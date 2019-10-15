@@ -79,6 +79,26 @@ def apply_transform_chain(chain, value):
     return value
 
 
+def tabulate(element, headers_inference='th'):
+    body = element.find('tbody', recursive=False)
+    head = element.find('thead', recursive=False)
+
+    if body is None:
+        body = element
+
+    if head is None:
+        head = element
+
+    trs = body.select('tr:has(td)', recursive=False)
+    ths = head.select('tr > th', recursive=False)
+
+    if headers_inference == 'th':
+        headers = [th.get_text() for th in ths]
+
+    for tr in trs:
+        yield {headers[i]: td.get_text() for i, td in enumerate(tr.find_all('td', recursive=False))}
+
+
 def apply_scraper(scraper, element, root=None, html=None, context=None):
 
     # Is this a tail call of item

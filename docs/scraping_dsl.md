@@ -21,6 +21,7 @@
   * `context`: defines local context.
   * `eval`: evaluates an expression to retrieve desired value.
   * `constant`: gives a constant value.
+  * `format`: formats the current value.
 
 Possibility to pass fields & context in order using an array so they depend on each other?
 
