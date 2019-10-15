@@ -39,18 +39,18 @@ matrix:
       language: shell
 
     # Windows
-    - os: windows
-      language: shell
-      before_install:
-        - choco install python --version=3.6.8
-        - choco install visualstudio2017-workload-python
-        - choco install make
-        - python -m pip install -U pip
-        - pip install https://download.lfd.uci.edu/pythonlibs/g5apjq5m/lxml-4.4.1-cp36-cp36m-win_amd64.whl
-      env:
-        - PATH=/c/Python36:/c/Python36/Scripts:$PATH
-        - PYINSTALLER_BUILD=true
-        - PYINSTALLER_BUILD_NAME=minet_windows
+    # - os: windows
+    #   language: shell
+    #   before_install:
+    #     - choco install python --version=3.6.8
+    #     - choco install visualstudio2017-workload-python
+    #     - choco install make
+    #     - python -m pip install -U pip
+    #     - pip install https://download.lfd.uci.edu/pythonlibs/g5apjq5m/lxml-4.4.1-cp36-cp36m-win_amd64.whl
+    #   env:
+    #     - PATH=/c/Python36:/c/Python36/Scripts:$PATH
+    #     - PYINSTALLER_BUILD=true
+    #     - PYINSTALLER_BUILD_NAME=minet_windows
 
 install: make deps
 script:
