@@ -32,3 +32,12 @@ def headers_from_definition(scraper):
         return ['value']
 
     return list(scraper['fields'].keys())
+
+
+class Scraper(object):
+    def __init__(self, definition):
+        self.definition = definition
+        self.headers = headers_from_definition(definition)
+
+    def __call__(self, html, context=None):
+        return scrape(html, context=context)
