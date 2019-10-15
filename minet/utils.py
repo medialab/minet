@@ -180,7 +180,7 @@ def dict_to_cookie_string(d):
 DEFAULT_URLLIB3_TIMEOUT = urllib3.Timeout(connect=DEFAULT_CONNECT_TIMEOUT, read=DEFAULT_READ_TIMEOUT)
 
 
-def create_pool(timeout=None, **kwargs):
+def create_pool(proxy=None, **kwargs):
     """
     Helper function returning a urllib3 pool manager with sane defaults.
     """
@@ -192,6 +192,9 @@ def create_pool(timeout=None, **kwargs):
     }
 
     manager_kwargs.update(kwargs)
+
+    if proxy is not None:
+        return urllib3.ProxyManager(proxy, **manager_kwargs)
 
     return urllib3.PoolManager(**manager_kwargs)
 
