@@ -10,7 +10,7 @@ from tqdm import tqdm
 from urllib3 import Timeout
 
 from minet.cli.mediacloud.constants import MEDIACLOUD_API_BASE_URL
-from minet.utils import create_safe_pool, request
+from minet.utils import create_pool, request
 from minet.cli.utils import print_err
 
 
@@ -104,7 +104,7 @@ def mediacloud_topic_action(namespace, output_file):
     writer = csv.writer(output_file)
     writer.writerow(OUPUT_HEADERS)
 
-    http = create_safe_pool(timeout=Timeout(connect=30, read=60 * 5))
+    http = create_pool(timeout=Timeout(connect=30, read=60 * 5))
 
     print_err('Using the following starting url:')
     print_err(forge_url(namespace, link_id))

@@ -11,7 +11,7 @@ from quenouille import imap_unordered
 from ural import get_domain_name, ensure_protocol
 
 from minet.utils import (
-    create_safe_pool,
+    create_pool,
     guess_response_encoding,
     request,
     resolve
@@ -90,7 +90,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
 
     # Creating the http pool manager
     # NOTE: maxsize should increase with group_parallelism
-    http = create_safe_pool(
+    http = create_pool(
         num_pools=threads * 2,
         maxsize=1
     )
@@ -232,7 +232,7 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
     """
 
     # Creating the http pool manager
-    http = create_safe_pool(
+    http = create_pool(
         num_pools=threads * 2,
         maxsize=1
     )

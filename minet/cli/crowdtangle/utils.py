@@ -11,7 +11,7 @@ from tqdm import tqdm
 from ural import get_domain_name, normalize_url
 from urllib3 import Timeout
 
-from minet.utils import create_safe_pool, request, RateLimiter
+from minet.utils import create_pool, request, RateLimiter
 from minet.cli.utils import print_err, die, custom_reader
 from minet.cli.crowdtangle.constants import CROWDTANGLE_DEFAULT_RATE_LIMIT
 
@@ -180,7 +180,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                             item_name, item_key):
 
     def action(namespace, output_file):
-        http = create_safe_pool(timeout=Timeout(connect=10, read=60 * 5))
+        http = create_pool(timeout=Timeout(connect=10, read=60 * 5))
 
         url_report_writer = None
 

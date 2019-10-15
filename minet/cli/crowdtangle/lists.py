@@ -8,7 +8,7 @@ import csv
 import sys
 import json
 
-from minet.utils import create_safe_pool, request
+from minet.utils import create_pool, request
 from minet.cli.utils import print_err
 
 URL_TEMPLATE = 'https://api.crowdtangle.com/lists?token=%s'
@@ -29,7 +29,7 @@ def format_list_for_csv(l):
 
 
 def crowdtangle_lists_action(namespace, output_file):
-    http = create_safe_pool()
+    http = create_pool()
 
     _, result = request(http, URL_TEMPLATE % namespace.token)
 

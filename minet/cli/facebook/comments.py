@@ -16,7 +16,7 @@ from http.cookies import SimpleCookie
 from tqdm import tqdm
 from ural.facebook import extract_user_from_facebook_url
 
-from minet.utils import grab_cookies, create_safe_pool, request
+from minet.utils import grab_cookies, create_pool, request
 from minet.cli.utils import DummyTqdmFile, die
 
 DEFAULT_THROTTLE = 0.5
@@ -200,7 +200,7 @@ def facebook_comments_action(namespace):
     writer = csv.writer(output_file)
     writer.writerow(CSV_HEADERS)
 
-    http = create_safe_pool()
+    http = create_pool()
 
     def request_page(target):
         error, result = request(http, target, cookie=cookie)

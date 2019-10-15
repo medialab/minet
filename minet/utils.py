@@ -180,19 +180,20 @@ def dict_to_cookie_string(d):
 DEFAULT_URLLIB3_TIMEOUT = urllib3.Timeout(connect=DEFAULT_CONNECT_TIMEOUT, read=DEFAULT_READ_TIMEOUT)
 
 
-def create_safe_pool(timeout=None, **kwargs):
+def create_pool(timeout=None, **kwargs):
     """
     Helper function returning a urllib3 pool manager with sane defaults.
     """
 
-    timeout = kwargs['timeout'] if 'timeout' in kwargs else DEFAULT_URLLIB3_TIMEOUT
+    manager_kwargs = {
+        'cert_reqs': 'CERT_REQUIRED',
+        'ca_certs': certifi.where(),
+        'timeout': DEFAULT_URLLIB3_TIMEOUT
+    }
 
-    return urllib3.PoolManager(
-        cert_reqs='CERT_REQUIRED',
-        ca_certs=certifi.where(),
-        timeout=timeout,
-        **kwargs
-    )
+    manager_kwargs.update(kwargs)
+
+    return urllib3.PoolManager(**manager_kwargs)
 
 
 def explain_request_error(error):

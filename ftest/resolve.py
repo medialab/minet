@@ -1,4 +1,4 @@
-from minet.utils import resolve, create_safe_pool
+from minet.utils import resolve, create_pool
 
 URLS = [
 
@@ -31,7 +31,7 @@ URLS = [
     'http://ow.ly/2awz50v1JkO'
 ]
 
-http = create_safe_pool()
+http = create_pool()
 
 for url in URLS:
     print()
