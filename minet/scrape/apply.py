@@ -7,6 +7,9 @@
 #
 import re
 
+from minet.utils import PseudoFStringFormatter
+
+FORMATTER = PseudoFStringFormatter()
 DEFAULT_CONTEXT = {}
 EXTRACTOR_NAMES = set(['text', 'html', 'inner_html', 'outer_html'])
 
@@ -178,6 +181,14 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
 
                     # Default value is text
                     value = element.get_text()
+
+                # Format?
+                if 'format' in scraper:
+                    value = FORMATTER.format(
+                        scraper['format'],
+                        value=value,
+                        context=context
+                    )
 
                 # Eval?
                 if 'eval' in scraper:
