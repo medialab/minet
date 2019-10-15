@@ -344,7 +344,13 @@ class TestScrape(object):
         soup = BeautifulSoup(TABLE_TH_HTML, 'lxml')
         table = soup.select_one('table')
 
-        assert list(tabulate(table)) == [{'Name': 'John', 'Surname': 'Mayall'}, {'Name': 'Mary', 'Surname': 'Susan'}]
+        result = list(tabulate(table))
+
+        assert result == [{'Name': 'John', 'Surname': 'Mayall'}, {'Name': 'Mary', 'Surname': 'Susan'}]
+
+        result = list(tabulate(table, headers=['name', 'surname']))
+
+        assert result == [{'name': 'John', 'surname': 'Mayall'}, {'name': 'Mary', 'surname': 'Susan'}]
 
     def test_headers(self):
         headers = headers_from_definition({'iterator': 'li'})

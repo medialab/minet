@@ -79,7 +79,7 @@ def apply_transform_chain(chain, value):
     return value
 
 
-def tabulate(element, headers_inference='th'):
+def tabulate(element, headers_inference='th', headers=None):
     body = element.find('tbody', recursive=False)
     head = element.find('thead', recursive=False)
 
@@ -92,8 +92,9 @@ def tabulate(element, headers_inference='th'):
     trs = body.select('tr:has(td)', recursive=False)
     ths = head.select('tr > th', recursive=False)
 
-    if headers_inference == 'th':
-        headers = [th.get_text() for th in ths]
+    if headers is None:
+        if headers_inference == 'th':
+            headers = [th.get_text() for th in ths]
 
     for tr in trs:
         yield {headers[i]: td.get_text() for i, td in enumerate(tr.find_all('td', recursive=False))}
