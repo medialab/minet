@@ -31,7 +31,7 @@ setup(name='minet',
         'lxml>=4.3.0',
         'numpy>=1.16.1',
         'pyyaml',
-        'quenouille>=0.4.0',
+        'quenouille>=0.5.0',
         'tqdm>=4.31.1',
         'ural>=0.12.0',
         'urllib3[secure]>=1.25.3'
