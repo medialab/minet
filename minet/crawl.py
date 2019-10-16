@@ -4,11 +4,13 @@
 #
 # Functions related to the crawling utilities of minet.
 #
-from queue import Queue
+from queue import Queue, Empty
 from persistqueue import SQLiteQueue
-from quenouille import imap_unordered, iter_queue
+from quenouille import imap_unordered
+from quenouille.constants import FOREVER
 from ural import get_domain_name
 from collections import namedtuple
+from threading import Lock
 
 from minet.scrape import Scraper
 from minet.utils import (
@@ -25,6 +27,7 @@ from minet.defaults import (
 )
 
 FORMATTER = PseudoFStringFormatter()
+TICK = 0.1
 
 CrawlWorkerResult = namedtuple(
     'CrawlWorkerResult',
@@ -38,6 +41,29 @@ CrawlWorkerResult = namedtuple(
     ]
 )
 
+
+class ThreadSafeCounter(object):
+    def __init__(self):
+        self.counter = 0
+        self.lock = Lock()
+
+    def __iadd__(self, inc):
+        with self.lock:
+            self.counter += inc
+
+        return self
+
+    def __isub__(self, dec):
+        with self.lock:
+            self.counter -= dec
+
+        return self
+
+    def __eq__(self, other):
+        return self.counter == other
+
+    def __ne__(self, other):
+        return self.counter != other
 
 class CrawlJob(object):
     __slots__ = ('url', 'level')
@@ -109,12 +135,34 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         maxsize=1
     )
 
+    currently_working_threads = ThreadSafeCounter()
+    def queue_iterator():
+        nonlocal currently_working_threads
+
+        # TODO: should not need the TICK shenaningans
+        while True:
+            print('Attempt')
+            with currently_working_threads.lock:
+                if queue.qsize() == 0 and currently_working_threads == 0:
+                    break
+
+            try:
+                timeout = TICK if queue.qsize() == 0 else FOREVER
+                result = queue.get(timeout=timeout)
+
+                currently_working_threads += 1
+
+                print('YIELDING', result)
+                yield result
+            except Empty:
+                pass
+
     def grouper(payload):
         return get_domain_name(payload[1].url)
 
     def worker(payload):
         spider, job = payload
-
+        print('WORKING', job)
         err, response = request(http, job.url)
 
         if err:
@@ -147,10 +195,16 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
             next_jobs=next_jobs
         )
 
-    queue_iterator = iter_queue(queue)
+    it = queue_iterator()
+
+    print(next(it))
+    queue.put('TEST')
+    print(next(it))
+
+    return
 
     multithreaded_iterator = imap_unordered(
-        queue_iterator,
+        queue_iterator(),
         worker,
         threads,
         group=grouper,
@@ -169,5 +223,7 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
             for next_job in result.next_jobs:
                 queue.put((spider, next_job))
 
-        for item in result.items:
-            print(item)
+        print('DONE', result.job)
+
+        # for item in result.items:
+        #     print(item)
