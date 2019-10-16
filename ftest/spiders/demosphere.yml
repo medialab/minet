@@ -8,7 +8,7 @@ spiders:
         fields:
           url:
             attr: href  # Will need autoresolve
-          scraper:
+          spider:
             constant: month
   month:
     next:
@@ -17,7 +17,7 @@ spiders:
         fields:
           url:
             attr: href  # Will need autoresolve
-          scraper:
+          spider:
             constant: rv
   rv:
     scraper:
