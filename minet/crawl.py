@@ -9,6 +9,7 @@ from persistqueue import SQLiteQueue
 from quenouille import imap_unordered, iter_queue
 from ural import get_domain_name
 
+from minet.scrape import Scraper
 from minet.utils import create_pool, request
 
 from minet.defaults import (
@@ -19,15 +20,18 @@ from minet.defaults import (
 
 
 class CrawlJob(object):
-    __slots__ = ('url')
+    __slots__ = ('url', 'spider')
 
-    def __init__(self, url):
+    def __init__(self, spider, url):
+        self.spider = spider
         self.url = url
 
 
 class Spider(object):
     def __init__(self, definition):
         self.definition = definition
+        self.start_urls = [definition['start_url']]
+        self.scraper = Scraper(definition['scraper'])
 
 
 def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
@@ -41,11 +45,10 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
     else:
         queue = SQLiteQueue(queue_path, auto_commit=True, multithreading=True)
 
-    # Finding start urls
-    start_urls = [spec['start_url']]
+    spider = Spider(spec)
 
-    for url in start_urls:
-        queue.put(CrawlJob(url))
+    for url in spider.start_urls:
+        queue.put(CrawlJob(spider, url))
 
     http = create_pool(
         num_pools=threads * 2,
@@ -56,7 +59,9 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         return get_domain_name(job.url)
 
     def worker(job):
-        return request(http, job.url)
+        err, response = request(http, job.url)
+
+        return err, response
 
     queue_iterator = iter_queue(queue)
 

@@ -1,0 +1,10 @@
+---
+start_url: https://echojs.com/latest
+next:
+  format: 'https://echojs.com/latest/{i * 30}'
+scraper:
+  iterator: article > h2 > a
+  fields:
+    title: text
+    url:
+      attr: href
