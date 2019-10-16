@@ -76,4 +76,4 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
     )
 
     for result in multithreaded_iterator:
-        print(result)
+        print(result[1].geturl())

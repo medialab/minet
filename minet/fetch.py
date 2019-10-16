@@ -5,16 +5,15 @@
 # Exposing a specialized quenouille wrapper grabbing various urls from the
 # web in a multithreaded fashion.
 #
-import mimetypes
 from collections import namedtuple
 from quenouille import imap_unordered
 from ural import get_domain_name, ensure_protocol
 
 from minet.utils import (
     create_pool,
-    guess_response_encoding,
     request,
-    resolve
+    resolve,
+    extract_response_meta
 )
 
 from minet.defaults import (
@@ -22,12 +21,6 @@ from minet.defaults import (
     DEFAULT_GROUP_BUFFER_SIZE,
     DEFAULT_THROTTLE
 )
-
-# Fix for pyinstaller. Do not remove!
-import encodings.idna
-
-# Mimetypes init
-mimetypes.init()
 
 FetchWorkerPayload = namedtuple(
     'FetchWorkerPayload',
@@ -125,32 +118,11 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
         data = response.data
 
         # Meta
-        meta = {}
-
-        # Guessing mime type
-        mimetype, _ = mimetypes.guess_type(url)
-
-        if mimetype is None:
-            mimetype = 'text/html'
-
-        # Guessing extension
-        # TODO: maybe move to utils
-        if guess_extension:
-            exts = mimetypes.guess_all_extensions(mimetype)
-
-            if not exts:
-                ext = '.html'
-            elif '.html' in exts:
-                ext = '.html'
-            else:
-                ext = max(exts, key=len)
-
-            meta['mime'] = mimetype
-            meta['ext'] = ext
-
-        # Guessing encoding
-        if guess_encoding:
-            meta['encoding'] = guess_response_encoding(response, data, is_xml=True, use_chardet=True)
+        meta = extract_response_meta(
+            response,
+            guess_encoding=guess_encoding,
+            guess_extension=guess_extension
+        )
 
         return FetchWorkerResult(
             url=url,

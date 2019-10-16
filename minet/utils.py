@@ -13,6 +13,7 @@ import json
 import yaml
 import time
 import string
+import mimetypes
 import cchardet as chardet
 from collections import OrderedDict
 from ural import is_url
@@ -36,6 +37,11 @@ from minet.defaults import (
     DEFAULT_SPOOFED_UA
 )
 
+# Fix for pyinstaller. Do not remove!
+import encodings.idna
+
+mimetypes.init()
+
 # Handy regexes
 CHARSET_RE = re.compile(rb'<meta.*?charset=["\']*(.+?)["\'>]', flags=re.I)
 PRAGMA_RE = re.compile(rb'<meta.*?content=["\']*;?charset=(.+?)["\'>]', flags=re.I)
@@ -52,7 +58,7 @@ REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
 
 
 # TODO: add a version that tallies the possibilities
-def guess_response_encoding(response, data, is_xml=False, use_chardet=False):
+def guess_response_encoding(response, is_xml=False, use_chardet=False):
     """
     Function taking an urllib3 response object and attempting to guess its
     encoding.
@@ -72,6 +78,8 @@ def guess_response_encoding(response, data, is_xml=False, use_chardet=False):
                     return charset.lower()
                 else:
                     suboptimal_charset = charset
+
+    data = response.data
 
     # TODO: use re.search to go faster!
     if is_xml:
@@ -477,6 +485,37 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
         follow_meta_refresh=follow_meta_refresh,
         follow_js_relocation=follow_js_relocation
     )
+
+
+def extract_response_meta(response, guess_encoding=True, guess_extension=True):
+    meta = {}
+
+    # Guessing mime type
+    mimetype, _ = mimetypes.guess_type(response.geturl())
+
+    if mimetype is None:
+        mimetype = 'text/html'
+
+    # Guessing extension
+    # TODO: maybe move to utils
+    if guess_extension:
+        exts = mimetypes.guess_all_extensions(mimetype)
+
+        if not exts:
+            ext = '.html'
+        elif '.html' in exts:
+            ext = '.html'
+        else:
+            ext = max(exts, key=len)
+
+        meta['mime'] = mimetype
+        meta['ext'] = ext
+
+    # Guessing encoding
+    if guess_encoding:
+        meta['encoding'] = guess_response_encoding(response, is_xml=True, use_chardet=True)
+
+    return meta
 
 
 class RateLimiter(object):
