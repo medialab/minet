@@ -48,4 +48,4 @@ class Scraper(object):
         self.headers = headers_from_definition(definition)
 
     def __call__(self, html, context=None):
-        return scrape(html, context=context)
+        return scrape(self.definition, html, context=context)

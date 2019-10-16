@@ -8,14 +8,27 @@ from queue import Queue
 from persistqueue import SQLiteQueue
 from quenouille import imap_unordered, iter_queue
 from ural import get_domain_name
+from collections import namedtuple
 
 from minet.scrape import Scraper
-from minet.utils import create_pool, request
+from minet.utils import create_pool, request, extract_response_meta
 
 from minet.defaults import (
     DEFAULT_GROUP_PARALLELISM,
     DEFAULT_GROUP_BUFFER_SIZE,
     DEFAULT_THROTTLE
+)
+
+CrawlWorkerResult = namedtuple(
+    'CrawlWorkerResult',
+    [
+        'job',
+        'items',
+        'error',
+        'response',
+        'meta',
+        'next_jobs'
+    ]
 )
 
 
@@ -61,7 +74,32 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
     def worker(job):
         err, response = request(http, job.url)
 
-        return err, response
+        if err:
+            return CrawlWorkerResult(
+                job=job,
+                items=None,
+                error=err,
+                response=response,
+                meta=meta,
+                next_jobs=None
+            )
+
+        meta = extract_response_meta(response)
+
+        # Decoding response data
+        data = response.data.decode(meta['encoding'], errors='replace')
+
+        # Scraping items
+        items = job.spider.scraper(data)
+
+        return CrawlWorkerResult(
+            job=job,
+            items=items,
+            error=None,
+            response=response,
+            meta=meta,
+            next_jobs=None
+        )
 
     queue_iterator = iter_queue(queue)
 
@@ -76,4 +114,4 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
     )
 
     for result in multithreaded_iterator:
-        print(result[1].geturl())
+        print(result)
