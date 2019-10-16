@@ -11,13 +11,20 @@ from ural import get_domain_name
 from collections import namedtuple
 
 from minet.scrape import Scraper
-from minet.utils import create_pool, request, extract_response_meta
+from minet.utils import (
+    create_pool,
+    request,
+    extract_response_meta,
+    PseudoFStringFormatter
+)
 
 from minet.defaults import (
     DEFAULT_GROUP_PARALLELISM,
     DEFAULT_GROUP_BUFFER_SIZE,
     DEFAULT_THROTTLE
 )
+
+FORMATTER = PseudoFStringFormatter()
 
 CrawlWorkerResult = namedtuple(
     'CrawlWorkerResult',
@@ -33,18 +40,52 @@ CrawlWorkerResult = namedtuple(
 
 
 class CrawlJob(object):
-    __slots__ = ('url', 'spider')
+    __slots__ = ('url', 'level')
 
-    def __init__(self, spider, url):
-        self.spider = spider
+    def __init__(self, url, level=0):
         self.url = url
+        self.level = level
+
+    def __repr__(self):
+        class_name = self.__class__.__name__
+
+        return (
+            '<%(class_name)s level=%(level)s url=%(url)s>'
+        ) % {
+            'class_name': class_name,
+            'url': self.url,
+            'level': self.level
+        }
 
 
 class Spider(object):
     def __init__(self, definition):
         self.definition = definition
+        self.next_definition = definition.get('next')
         self.start_urls = [definition['start_url']]
         self.scraper = Scraper(definition['scraper'])
+        self.max_level = definition.get('max_level', float('inf'))
+
+    def get_next_jobs(self, job, html):
+        if not self.next_definition:
+            return
+
+        next_level = job.level + 1
+
+        if next_level >= self.max_level:
+            return
+
+        # Formatting next url
+        if 'format' in self.next_definition:
+            job = CrawlJob(
+                FORMATTER.format(
+                    self.next_definition['format'],
+                    level=next_level
+                ),
+                level=next_level
+            )
+
+            return [job]
 
 
 def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
@@ -61,17 +102,19 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
     spider = Spider(spec)
 
     for url in spider.start_urls:
-        queue.put(CrawlJob(spider, url))
+        queue.put((spider, CrawlJob(url)))
 
     http = create_pool(
         num_pools=threads * 2,
         maxsize=1
     )
 
-    def grouper(job):
-        return get_domain_name(job.url)
+    def grouper(payload):
+        return get_domain_name(payload[1].url)
 
-    def worker(job):
+    def worker(payload):
+        spider, job = payload
+
         err, response = request(http, job.url)
 
         if err:
@@ -90,7 +133,10 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         data = response.data.decode(meta['encoding'], errors='replace')
 
         # Scraping items
-        items = job.spider.scraper(data)
+        items = spider.scraper(data)
+
+        # Finding next jobs
+        next_jobs = spider.get_next_jobs(job, data)
 
         return CrawlWorkerResult(
             job=job,
@@ -98,7 +144,7 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
             error=None,
             response=response,
             meta=meta,
-            next_jobs=None
+            next_jobs=next_jobs
         )
 
     queue_iterator = iter_queue(queue)
@@ -114,4 +160,14 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
     )
 
     for result in multithreaded_iterator:
-        print(result)
+        if result.error:
+            print('Error', result.error)
+            # TODO: handle error
+            continue
+
+        if result.next_jobs is not None:
+            for next_job in result.next_jobs:
+                queue.put((spider, next_job))
+
+        for item in result.items:
+            print(item)
