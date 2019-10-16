@@ -5,14 +5,15 @@
 # Miscellaneous helper function used throughout the library.
 #
 import re
-import cchardet as chardet
 import cgi
 import certifi
 import browser_cookie3
 import urllib3
+import json
+import yaml
 import time
 import string
-import _string
+import cchardet as chardet
 from collections import OrderedDict
 from ural import is_url
 from urllib.parse import urljoin
@@ -552,3 +553,27 @@ def fstring_eval(template, **kwargs):
         None,
         kwargs
     )
+
+
+def load_definition(f):
+    string_path = isinstance(f, str)
+
+    if string_path:
+        path = f
+        f = open(path)
+    else:
+        path = f.name
+
+    if path.endswith('.json'):
+        definition = json.load(f)
+
+    elif path.endswith('.yml') or path.endswith('.yaml'):
+        definition = yaml.load(f, Loader=yaml.Loader)
+
+    else:
+        raise TypeError('Unsupported definition file format')
+
+    if string_path:
+        f.close()
+
+    return definition

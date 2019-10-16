@@ -5,17 +5,15 @@
 # Logic of the scrape action.
 #
 import csv
-import json
 import gzip
-import yaml
 import sys
 import codecs
 from collections import namedtuple
 from os.path import basename
 from multiprocessing import Pool
 from tqdm import tqdm
-from yaml import Loader as YAMLLoader
 
+from minet.utils import load_definition
 from minet.scrape import scrape, headers_from_definition
 from minet.cli.utils import (
     DummyTqdmFile,
@@ -72,17 +70,15 @@ def scrape_action(namespace):
         output_file = open(namespace.output, 'w')
 
     # Parsing scraper definition
-    scraper_name = namespace.scraper.name
-
-    if scraper_name.endswith('.json'):
-        scraper = json.load(namespace.scraper)
-    elif scraper_name.endswith('.yml') or scraper_name.endswith('.yaml'):
-        scraper = yaml.load(namespace.scraper, Loader=YAMLLoader)
-    else:
+    try:
+        scraper = load_definition(namespace.scraper)
+    except TypeError:
         die([
             'Unknown scraper format.',
             'Expecting a JSON or YAML file.'
         ])
+    except:
+        die('Invalid scraper file.')
 
     if namespace.format == 'csv':
         output_headers = headers_from_definition(scraper)

@@ -18,16 +18,16 @@ from minet.defaults import (
 )
 
 
-class Spider(object):
-    def __init__(self, definition):
-        self.definition = definition
-
-
 class CrawlJob(object):
     __slots__ = ('url')
 
     def __init__(self, url):
         self.url = url
+
+
+class Spider(object):
+    def __init__(self, definition):
+        self.definition = definition
 
 
 def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
