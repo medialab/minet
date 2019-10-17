@@ -41,21 +41,23 @@ CrawlWorkerResult = namedtuple(
 
 
 class CrawlJob(object):
-    __slots__ = ('url', 'level')
+    __slots__ = ('url', 'level', 'spider')
 
-    def __init__(self, url, level=0):
+    def __init__(self, url, level=0, spider='default'):
         self.url = url
         self.level = level
+        self.spider = spider
 
     def __repr__(self):
         class_name = self.__class__.__name__
 
         return (
-            '<%(class_name)s level=%(level)s url=%(url)s>'
+            '<%(class_name)s level=%(level)s url=%(url)s spider=%(spider)s>'
         ) % {
             'class_name': class_name,
             'url': self.url,
-            'level': self.level
+            'level': self.level,
+            'spider': self.spider
         }
 
 
@@ -116,10 +118,15 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
     else:
         queue = SQLiteQueue(queue_path, auto_commit=True, multithreading=True)
 
-    spider = Spider(spec)
+    # Creating spiders
+    spiders = {
+        'default': Spider(spec)
+    }
 
-    for url in spider.start_urls:
-        queue.put((spider, CrawlJob(url)))
+    # Collecting start jobs
+    for spider in spiders.values():
+        for url in spider.start_urls:
+            queue.put(CrawlJob(url))
 
     http = create_pool(
         num_pools=threads * 2,
@@ -128,11 +135,11 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
 
     queue_iterator = QueueIterator(queue)
 
-    def grouper(payload):
-        return get_domain_name(payload[1].url)
+    def grouper(job):
+        return get_domain_name(job.url)
 
-    def worker(payload):
-        spider, job = payload
+    def worker(job):
+        spider = spiders[job.spider]
 
         err, response = request(http, job.url)
 
@@ -188,7 +195,7 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         # Enqueuing next jobs
         if result.next_jobs is not None:
             for next_job in result.next_jobs:
-                queue.put((spider, next_job))
+                queue.put(next_job)
 
         queue_iterator.task_done()
 
