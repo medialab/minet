@@ -65,6 +65,7 @@ class ThreadSafeCounter(object):
     def __ne__(self, other):
         return self.counter != other
 
+
 class CrawlJob(object):
     __slots__ = ('url', 'level')
 
@@ -136,6 +137,7 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
     )
 
     currently_working_threads = ThreadSafeCounter()
+
     def queue_iterator():
         nonlocal currently_working_threads
 
