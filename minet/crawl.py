@@ -152,6 +152,10 @@ class Spider(object):
 def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
           throttle=DEFAULT_THROTTLE):
 
+    # NOTE: crawling could work depth-first but:
+    #   1. LifoQueue has no persistent equivalent yet
+    #   2. buffer_size should be 0 (requires to fix quenouille issue #1)
+
     # Memory queue
     if queue_path is None:
         queue = Queue()
