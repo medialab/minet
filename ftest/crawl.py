@@ -3,6 +3,5 @@ from minet.utils import load_definition
 
 spider = load_definition('./ftest/spiders/echojs_scraper.yml')
 
-for result in crawl(spider):
-    for item in result.scraped:
-        print(item['title'])
+for result in crawl(spider, throttle=2):
+    print(result.job)

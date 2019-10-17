@@ -40,6 +40,12 @@ CrawlWorkerResult = namedtuple(
 )
 
 
+def ensure_list(value):
+    if not isinstance(value, list):
+        return [value]
+    return value
+
+
 class CrawlJob(object):
     __slots__ = ('url', 'level', 'spider')
 
@@ -62,23 +68,55 @@ class CrawlJob(object):
 
 
 class Spider(object):
-    def __init__(self, definition):
+    def __init__(self, definition, name='default'):
+
+        # Descriptors
+        self.name = name
         self.definition = definition
         self.next_definition = definition.get('next')
-        self.start_urls = [definition['start_url']]
-        self.scraper = Scraper(definition['scraper'])
-        self.next_scraper = None
+
+        # Settings
         self.max_level = definition.get('max_level', float('inf'))
 
-        if 'scraper' in self.next_definition:
+        # Scrapers
+        self.scraper = None
+        self.next_scraper = None
+
+        if 'scraper' in definition:
+            self.scraper = Scraper(definition['scraper'])
+
+        if self.next_definition is not None and 'scraper' in self.next_definition:
             self.next_scraper = Scraper(self.next_definition['scraper'])
+
+    def get_start_jobs(self):
+        start_urls = (
+            ensure_list(self.definition.get('start_url', [])) +
+            ensure_list(self.definition.get('start_urls', []))
+        )
+
+        return [CrawlJob(url, spider=self.name) for url in start_urls]
+
+    def job_from_target(self, target, current_url, next_level):
+        if isinstance(target, str):
+            return CrawlJob(
+                url=urljoin(current_url, target),
+                level=next_level,
+                spider=self.name
+            )
+
+        raise NotImplementedError
 
     def next_targets_iter(self, job, html):
         next_level = job.level + 1
 
         # Scraping next results
         if self.next_scraper is not None:
-            yield from self.next_scraper(html)
+            scraped = self.next_scraper(html)
+
+            if isinstance(scraped, list):
+                yield from scraped
+            else:
+                yield scraped
 
         # Formatting next url
         elif 'format' in self.next_definition:
@@ -99,10 +137,7 @@ class Spider(object):
         next_jobs = []
 
         for target in self.next_targets_iter(job, html):
-            next_jobs.append(CrawlJob(
-                url=urljoin(current_url, target),
-                level=next_level
-            ))
+            next_jobs.append(self.job_from_target(target, current_url, next_level))
 
         return next_jobs
 
@@ -119,14 +154,19 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         queue = SQLiteQueue(queue_path, auto_commit=True, multithreading=True)
 
     # Creating spiders
-    spiders = {
-        'default': Spider(spec)
-    }
+    if 'spiders' in spec:
+        spiders = {name: Spider(s, name=name) for name, s in spec['spiders'].items()}
+    else:
+        spiders = {'default': Spider(spec)}
+
+    def enqueue(jobs):
+        for job in jobs:
+            assert isinstance(job, CrawlJob)
+            queue.put(job)
 
     # Collecting start jobs
     for spider in spiders.values():
-        for url in spider.start_urls:
-            queue.put(CrawlJob(url))
+        enqueue(spider.get_start_jobs())
 
     http = create_pool(
         num_pools=threads * 2,
@@ -159,7 +199,10 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         data = response.data.decode(meta['encoding'], errors='replace')
 
         # Scraping items
-        scraped = spider.scraper(data)
+        scraped = None
+
+        if spider.scraper is not None:
+            scraped = spider.scraper(data)
 
         # Finding next jobs
         next_jobs = spider.get_next_jobs(job, data, response.geturl())
@@ -194,8 +237,7 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
 
         # Enqueuing next jobs
         if result.next_jobs is not None:
-            for next_job in result.next_jobs:
-                queue.put(next_job)
+            enqueue(result.next_jobs)
 
         queue_iterator.task_done()
 

@@ -7,7 +7,7 @@ spiders:
         iterator: '#archive > table td > a'
         fields:
           url:
-            attr: href  # Will need autoresolve
+            attr: href
           spider:
             constant: month
   month:
@@ -16,7 +16,7 @@ spiders:
         iterator: .dcal > .day a[href^='/rv/']
         fields:
           url:
-            attr: href  # Will need autoresolve
+            attr: href
           spider:
             constant: rv
   rv:
@@ -28,5 +28,3 @@ spiders:
         url:
           sel: link[rel=canonical]
           attr: href
-
-# TODO: need to run breadth-first by default
