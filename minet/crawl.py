@@ -9,6 +9,7 @@ from persistqueue import SQLiteQueue
 from quenouille import imap_unordered, QueueIterator
 from ural import get_domain_name
 from collections import namedtuple
+from urllib.parse import urljoin
 
 from minet.scrape import Scraper
 from minet.utils import (
@@ -70,7 +71,21 @@ class Spider(object):
         if 'scraper' in self.next_definition:
             self.next_scraper = Scraper(self.next_definition['scraper'])
 
-    def get_next_jobs(self, job, html):
+    def next_targets_iter(self, job, html):
+        next_level = job.level + 1
+
+        # Scraping next results
+        if self.next_scraper is not None:
+            yield from self.next_scraper(html)
+
+        # Formatting next url
+        elif 'format' in self.next_definition:
+            yield FORMATTER.format(
+                self.next_definition['format'],
+                level=next_level
+            )
+
+    def get_next_jobs(self, job, html, current_url):
         if not self.next_definition:
             return
 
@@ -79,24 +94,15 @@ class Spider(object):
         if next_level > self.max_level:
             return
 
-        # Scraping next results
-        if self.next_scraper is not None:
-            return [
-                CrawlJob(url, level=next_level)
-                for url in self.next_scraper(html)
-            ]
+        next_jobs = []
 
-        # Formatting next url
-        elif 'format' in self.next_definition:
-            job = CrawlJob(
-                FORMATTER.format(
-                    self.next_definition['format'],
-                    level=next_level
-                ),
+        for target in self.next_targets_iter(job, html):
+            next_jobs.append(CrawlJob(
+                url=urljoin(current_url, target),
                 level=next_level
-            )
+            ))
 
-            return [job]
+        return next_jobs
 
 
 def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
@@ -133,10 +139,10 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         if err:
             return CrawlWorkerResult(
                 job=job,
-                items=None,
+                scraped=None,
                 error=err,
                 response=response,
-                meta=meta,
+                meta=None,
                 next_jobs=None
             )
 
@@ -149,7 +155,7 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         scraped = spider.scraper(data)
 
         # Finding next jobs
-        next_jobs = spider.get_next_jobs(job, data)
+        next_jobs = spider.get_next_jobs(job, data, response.geturl())
 
         return CrawlWorkerResult(
             job=job,
