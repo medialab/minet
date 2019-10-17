@@ -141,18 +141,20 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
 
         # TODO: should not need the TICK shenaningans
         while True:
-            print('Attempt')
+            # print('Attempt')
             with currently_working_threads.lock:
                 if queue.qsize() == 0 and currently_working_threads == 0:
                     break
 
             try:
-                timeout = TICK if queue.qsize() == 0 else FOREVER
-                result = queue.get(timeout=timeout)
+
+                # TODO: timeout should be function of qsize
+                # TODO: if qsize > 0, timeout forever else use condition
+                result = queue.get_nowait()
 
                 currently_working_threads += 1
 
-                print('YIELDING', result)
+                print('YIELDING', result, currently_working_threads.counter)
                 yield result
             except Empty:
                 pass
@@ -195,14 +197,6 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
             next_jobs=next_jobs
         )
 
-    it = queue_iterator()
-
-    print(next(it))
-    queue.put('TEST')
-    print(next(it))
-
-    return
-
     multithreaded_iterator = imap_unordered(
         queue_iterator(),
         worker,
@@ -217,6 +211,8 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         if result.error:
             print('Error', result.error)
             # TODO: handle error
+
+            currently_working_threads -= 1
             continue
 
         if result.next_jobs is not None:
@@ -227,3 +223,5 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
 
         # for item in result.items:
         #     print(item)
+
+        currently_working_threads -= 1
