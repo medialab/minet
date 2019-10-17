@@ -148,6 +148,19 @@ class Spider(object):
         return next_jobs
 
 
+class TaskContext(object):
+    def __init__(self, queue, queue_iterator):
+        self.queue = queue
+        self.queue_iterator = queue_iterator
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.queue.task_done()
+        self.queue_iterator.task_done()
+
+
 def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
           throttle=DEFAULT_THROTTLE):
 
@@ -187,6 +200,7 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
     )
 
     queue_iterator = QueueIterator(queue)
+    task_context = TaskContext(queue, queue_iterator)
 
     def grouper(job):
         return get_domain_name(job.url)
@@ -241,23 +255,20 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
 
     for result in multithreaded_iterator:
 
-        # Errored job
-        if result.error:
-            queue.task_done()
-            queue_iterator.task_done()
+        with task_context:
+
+            # Errored job
+            if result.error:
+                yield result
+
+                continue
+
+            # Enqueuing next jobs
+            # TODO: enqueueing could also be done in worker
+            if result.next_jobs is not None:
+                enqueue(result.next_jobs)
+
             yield result
-
-            continue
-
-        # Enqueuing next jobs
-        # TODO: enqueueing could also be done in worker
-        if result.next_jobs is not None:
-            enqueue(result.next_jobs)
-
-        queue.task_done()
-        queue_iterator.task_done()
-
-        yield result
 
     # Releasing queue (needed by persistqueue)
     if using_persistent_queue:
