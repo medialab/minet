@@ -243,6 +243,7 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
             continue
 
         # Enqueuing next jobs
+        # TODO: enqueueing could also be done in worker
         if result.next_jobs is not None:
             enqueue(result.next_jobs)
 
