@@ -4,13 +4,11 @@
 #
 # Functions related to the crawling utilities of minet.
 #
-from queue import Queue, Empty
+from queue import Queue
 from persistqueue import SQLiteQueue
-from quenouille import imap_unordered
-from quenouille.constants import FOREVER
+from quenouille import imap_unordered, QueueIterator
 from ural import get_domain_name
 from collections import namedtuple
-from threading import Lock, Event
 
 from minet.scrape import Scraper
 from minet.utils import (
@@ -27,7 +25,6 @@ from minet.defaults import (
 )
 
 FORMATTER = PseudoFStringFormatter()
-TICK = 0.1
 
 CrawlWorkerResult = namedtuple(
     'CrawlWorkerResult',
@@ -40,35 +37,6 @@ CrawlWorkerResult = namedtuple(
         'next_jobs'
     ]
 )
-
-
-class ThreadSafeCounter(object):
-    def __init__(self):
-        self.counter = 0
-        self.lock = Lock()
-        self.event = Event()
-
-    def __iadd__(self, inc):
-        with self.lock:
-            self.counter += inc
-
-            self.event.clear()
-
-        return self
-
-    def __isub__(self, dec):
-        with self.lock:
-            self.counter -= dec
-
-            self.event.set()
-
-        return self
-
-    def __eq__(self, other):
-        return self.counter == other
-
-    def __ne__(self, other):
-        return self.counter != other
 
 
 class CrawlJob(object):
@@ -141,31 +109,7 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         maxsize=1
     )
 
-    currently_working_threads = ThreadSafeCounter()
-
-    def queue_iterator():
-        nonlocal currently_working_threads
-
-        # TODO: should not need the TICK shenaningans
-        while True:
-            # print('Attempt')
-            with currently_working_threads.lock:
-                if queue.qsize() == 0 and currently_working_threads == 0:
-                    break
-
-            if queue.qsize() == 0:
-                currently_working_threads.event.wait()
-                continue
-
-            try:
-                result = queue.get(timeout=FOREVER)
-
-                currently_working_threads += 1
-
-                print('YIELDING', result, currently_working_threads.counter)
-                yield result
-            except Empty:
-                pass
+    queue_iterator = QueueIterator(queue)
 
     def grouper(payload):
         return get_domain_name(payload[1].url)
@@ -206,7 +150,7 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         )
 
     multithreaded_iterator = imap_unordered(
-        queue_iterator(),
+        queue_iterator,
         worker,
         threads,
         group=grouper,
@@ -216,20 +160,17 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
     )
 
     for result in multithreaded_iterator:
-        if result.error:
-            print('Error', result.error)
-            # TODO: handle error
+        with queue_iterator:
+            if result.error:
+                print('Error', result.error)
+                # TODO: handle error
+                continue
 
-            currently_working_threads -= 1
-            continue
+            if result.next_jobs is not None:
+                for next_job in result.next_jobs:
+                    queue.put((spider, next_job))
 
-        if result.next_jobs is not None:
-            for next_job in result.next_jobs:
-                queue.put((spider, next_job))
+            print('DONE', result.job, len(result.items), result.items[0]['title'])
 
-        print('DONE', result.job, len(result.items))
-
-        # for item in result.items:
-        #     print(item)
-
-        currently_working_threads -= 1
+            # for item in result.items:
+            #     print(item)
