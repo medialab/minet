@@ -1,0 +1,12 @@
+---
+start_url: https://echojs.com/latest
+next:
+  scraper:
+    iterator: '#newslist article > h2 > a'
+    item:
+      attr: href
+max_level: 1
+scraper:
+  item:
+    sel: title
+    transform: strip

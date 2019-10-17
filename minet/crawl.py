@@ -30,7 +30,7 @@ CrawlWorkerResult = namedtuple(
     'CrawlWorkerResult',
     [
         'job',
-        'items',
+        'scraped',
         'error',
         'response',
         'meta',
@@ -64,7 +64,11 @@ class Spider(object):
         self.next_definition = definition.get('next')
         self.start_urls = [definition['start_url']]
         self.scraper = Scraper(definition['scraper'])
+        self.next_scraper = None
         self.max_level = definition.get('max_level', float('inf'))
+
+        if 'scraper' in self.next_definition:
+            self.next_scraper = Scraper(self.next_definition['scraper'])
 
     def get_next_jobs(self, job, html):
         if not self.next_definition:
@@ -72,11 +76,18 @@ class Spider(object):
 
         next_level = job.level + 1
 
-        if next_level >= self.max_level:
+        if next_level > self.max_level:
             return
 
+        # Scraping next results
+        if self.next_scraper is not None:
+            return [
+                CrawlJob(url, level=next_level)
+                for url in self.next_scraper(html)
+            ]
+
         # Formatting next url
-        if 'format' in self.next_definition:
+        elif 'format' in self.next_definition:
             job = CrawlJob(
                 FORMATTER.format(
                     self.next_definition['format'],
@@ -116,7 +127,7 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
 
     def worker(payload):
         spider, job = payload
-        print('WORKING', job)
+
         err, response = request(http, job.url)
 
         if err:
@@ -135,14 +146,14 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         data = response.data.decode(meta['encoding'], errors='replace')
 
         # Scraping items
-        items = spider.scraper(data)
+        scraped = spider.scraper(data)
 
         # Finding next jobs
         next_jobs = spider.get_next_jobs(job, data)
 
         return CrawlWorkerResult(
             job=job,
-            items=items,
+            scraped=scraped,
             error=None,
             response=response,
             meta=meta,
@@ -170,7 +181,4 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
                 for next_job in result.next_jobs:
                     queue.put((spider, next_job))
 
-            print('DONE', result.job, len(result.items), result.items[0]['title'])
-
-            # for item in result.items:
-            #     print(item)
+            print('DONE', result.job, result.scraped)
