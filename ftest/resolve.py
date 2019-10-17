@@ -28,7 +28,8 @@ URLS = [
     'http://ow.ly/csT350v7mRc',
 
     # Utf-8 location header
-    'http://ow.ly/2awz50v1JkO'
+    'http://ow.ly/2awz50v1JkO',
+    'http://xfru.it/v2uFaC'
 ]
 
 http = create_pool()
