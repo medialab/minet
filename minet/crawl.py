@@ -178,16 +178,18 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
 
     for result in multithreaded_iterator:
 
-        # TODO: at one point it will be beneficial for performance to call
-        # queue_iterator.task_done explicitly
-        with queue_iterator:
-            if result.error:
-                print('Error', result.error)
-                # TODO: handle error
-                continue
+        # Errored job
+        if result.error:
+            queue_iterator.task_done()
+            yield result
 
-            if result.next_jobs is not None:
-                for next_job in result.next_jobs:
-                    queue.put((spider, next_job))
+            continue
 
-            print('DONE', result.job, result.scraped)
+        # Enqueuing next jobs
+        if result.next_jobs is not None:
+            for next_job in result.next_jobs:
+                queue.put((spider, next_job))
+
+        queue_iterator.task_done()
+
+        yield result
