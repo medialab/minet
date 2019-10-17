@@ -10,6 +10,7 @@ from quenouille import imap_unordered, QueueIterator
 from ural import get_domain_name
 from collections import namedtuple
 from urllib.parse import urljoin
+from shutil import rmtree
 
 from minet.scrape import Scraper
 from minet.utils import (
@@ -154,13 +155,15 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
     #   1. LifoQueue has no persistent equivalent yet
     #   2. buffer_size should be 0 (requires to fix quenouille issue #1)
 
+    using_persistent_queue = queue_path is not None
+
     # Memory queue
-    if queue_path is None:
+    if not using_persistent_queue:
         queue = Queue()
 
     # Persistent queue
     else:
-        queue = SQLiteQueue(queue_path, multithreading=True)
+        queue = SQLiteQueue(queue_path, multithreading=True, auto_commit=False)
 
     # Creating spiders
     if 'spiders' in spec:
@@ -173,9 +176,10 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
             assert isinstance(job, CrawlJob)
             queue.put(job)
 
-    # Collecting start jobs
-    for spider in spiders.values():
-        enqueue(spider.get_start_jobs())
+    # Collecting start jobs - we only add those if queue is not pre-existing
+    if queue.qsize() == 0:
+        for spider in spiders.values():
+            enqueue(spider.get_start_jobs())
 
     http = create_pool(
         num_pools=threads * 2,
@@ -239,6 +243,7 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
 
         # Errored job
         if result.error:
+            queue.task_done()
             queue_iterator.task_done()
             yield result
 
@@ -249,10 +254,12 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         if result.next_jobs is not None:
             enqueue(result.next_jobs)
 
-        # queue.task_done()
+        queue.task_done()
         queue_iterator.task_done()
 
         yield result
 
     # Releasing queue (needed by persistqueue)
-    del queue
+    if using_persistent_queue:
+        del queue
+        rmtree(queue_path)
