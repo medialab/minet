@@ -171,6 +171,9 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
     )
 
     for result in multithreaded_iterator:
+
+        # TODO: at one point it will be beneficial for performance to call
+        # queue_iterator.task_done explicitly
         with queue_iterator:
             if result.error:
                 print('Error', result.error)
