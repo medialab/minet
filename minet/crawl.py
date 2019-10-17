@@ -104,6 +104,13 @@ class Spider(object):
                 spider=self.name
             )
 
+        # TODO: validate target
+        return CrawlJob(
+            url=urljoin(current_url, target['url']),
+            level=next_level,
+            spider=target.get('spider', self.name)
+        )
+
         raise NotImplementedError
 
     def next_targets_iter(self, job, html):
