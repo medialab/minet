@@ -10,7 +10,7 @@ from quenouille import imap_unordered
 from quenouille.constants import FOREVER
 from ural import get_domain_name
 from collections import namedtuple
-from threading import Lock
+from threading import Lock, Event
 
 from minet.scrape import Scraper
 from minet.utils import (
@@ -46,16 +46,21 @@ class ThreadSafeCounter(object):
     def __init__(self):
         self.counter = 0
         self.lock = Lock()
+        self.event = Event()
 
     def __iadd__(self, inc):
         with self.lock:
             self.counter += inc
+
+            self.event.clear()
 
         return self
 
     def __isub__(self, dec):
         with self.lock:
             self.counter -= dec
+
+            self.event.set()
 
         return self
 
@@ -148,11 +153,12 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
                 if queue.qsize() == 0 and currently_working_threads == 0:
                     break
 
-            try:
+            if queue.qsize() == 0:
+                currently_working_threads.event.wait()
+                continue
 
-                # TODO: timeout should be function of qsize
-                # TODO: if qsize > 0, timeout forever else use condition
-                result = queue.get_nowait()
+            try:
+                result = queue.get(timeout=FOREVER)
 
                 currently_working_threads += 1
 
@@ -221,7 +227,7 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
             for next_job in result.next_jobs:
                 queue.put((spider, next_job))
 
-        print('DONE', result.job)
+        print('DONE', result.job, len(result.items))
 
         # for item in result.items:
         #     print(item)
