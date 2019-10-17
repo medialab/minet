@@ -111,8 +111,6 @@ class Spider(object):
             spider=target.get('spider', self.name)
         )
 
-        raise NotImplementedError
-
     def next_targets_iter(self, job, html):
         next_level = job.level + 1
 
@@ -162,7 +160,7 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
 
     # Persistent queue
     else:
-        queue = SQLiteQueue(queue_path, auto_commit=True, multithreading=True)
+        queue = SQLiteQueue(queue_path, multithreading=True)
 
     # Creating spiders
     if 'spiders' in spec:
@@ -195,8 +193,6 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         err, response = request(http, job.url)
 
         if err:
-
-            queue.task_done()
             return CrawlWorkerResult(
                 job=job,
                 scraped=None,
@@ -220,7 +216,6 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         # Finding next jobs
         next_jobs = spider.get_next_jobs(job, data, response.geturl())
 
-        queue.task_done()
         return CrawlWorkerResult(
             job=job,
             scraped=scraped,
@@ -254,6 +249,7 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         if result.next_jobs is not None:
             enqueue(result.next_jobs)
 
+        # queue.task_done()
         queue_iterator.task_done()
 
         yield result
