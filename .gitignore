@@ -8,6 +8,7 @@ data
 dist
 ftest/content
 ftest/*.csv
+*.q
 *.jsonl
 *.egg-info
 *.pyc
