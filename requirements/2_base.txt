@@ -8,7 +8,7 @@ lxml==4.3.0
 numpy==1.16.1
 persist-queue==0.4.2
 pyyaml==5.1.2
-quenouille==0.5.0
+quenouille==0.6.0
 tld>=0.9.3
 tqdm==4.31.1
 ural==0.12.0

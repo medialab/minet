@@ -32,7 +32,7 @@ setup(name='minet',
         'numpy>=1.16.1',
         'persist-queue>=0.4.2',
         'pyyaml',
-        'quenouille>=0.5.0',
+        'quenouille>=0.6.0',
         'tqdm>=4.31.1',
         'ural>=0.12.0',
         'urllib3[secure]>=1.25.3'
