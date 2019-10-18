@@ -17,11 +17,15 @@ class InvalidURLError(Exception):
 
 
 # Redirection errors
-class MaxRedirectsError(Exception):
+class RedirectError(Exception):
     pass
 
 
-class InfiniteRedirectsError(Exception):
+class MaxRedirectsError(RedirectError):
+    pass
+
+
+class InfiniteRedirectsError(RedirectError):
     pass
 
 
@@ -29,5 +33,5 @@ class SelfRedirectError(InfiniteRedirectsError):
     pass
 
 
-class InvalidRedirectError(Exception):
+class InvalidRedirectError(RedirectError):
     pass

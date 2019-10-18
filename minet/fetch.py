@@ -229,7 +229,8 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
             follow_refresh_header=follow_refresh_header,
             follow_meta_refresh=follow_meta_refresh,
             follow_js_relocation=follow_js_relocation,
-            **kwargs)
+            **kwargs
+        )
 
         return ResolveWorkerResult(
             url=url,
