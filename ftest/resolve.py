@@ -29,7 +29,10 @@ URLS = [
 
     # Utf-8 location header
     'http://ow.ly/2awz50v1JkO',
-    'http://xfru.it/v2uFaC'
+    'http://xfru.it/v2uFaC',
+
+    # IP Host redirect
+    'https://bit.ly/2ANzJNW'
 ]
 
 http = create_pool()
