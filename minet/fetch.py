@@ -56,7 +56,7 @@ ResolveWorkerResult = namedtuple(
 def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
                         throttle=DEFAULT_THROTTLE, guess_extension=True,
                         guess_encoding=True, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
-                        insecure=False):
+                        insecure=False, timeout=None):
     """
     Function returning a multithreaded iterator over fetched urls.
 
@@ -78,6 +78,8 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
             immediately. Defaults to 1.
         insecure (bool, optional): Whether to ignore SSL certification errors
             when performing requests. Defaults to False.
+        timeout (float or urllib3.Timeout, optional): Custom timeout for every
+            request.
 
     Yields:
         FetchWorkerResult
@@ -101,6 +103,9 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
             )
 
         kwargs = request_args(url, item) if request_args is not None else {}
+
+        if 'timeout' not in kwargs:
+            kwargs['timeout'] = timeout
 
         error, response = request(http, url, **kwargs)
 
@@ -176,7 +181,7 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
                           throttle=DEFAULT_THROTTLE, max_redirects=5,
                           follow_refresh_header=True, follow_meta_refresh=False,
                           follow_js_relocation=False, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
-                          insecure=False):
+                          insecure=False, timeout=None):
     """
     Function returning a multithreaded iterator over resolved urls.
 
@@ -199,6 +204,8 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
             immediately. Defaults to 1.
         insecure (bool, optional): Whether to ignore SSL certification errors
             when performing requests. Defaults to False.
+        timeout (float or urllib3.Timeout, optional): Custom timeout for every
+            request.
 
     Yields:
         ResolveWorkerResult
@@ -221,6 +228,9 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
             )
 
         kwargs = resolve_args(url, item) if resolve_args is not None else {}
+
+        if 'timeout' not in kwargs:
+            kwargs['timeout'] = timeout
 
         error, stack = resolve(
             http,
