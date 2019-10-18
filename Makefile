@@ -47,7 +47,7 @@ upload:
 
 pyinstaller: clean
 	pyinstaller \
-		--additional-hooks-dir=. \
+		--additional-hooks-dir=./hooks \
 		--name minet \
 		--clean \
 		--onefile \
