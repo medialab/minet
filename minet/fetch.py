@@ -87,7 +87,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
     """
 
     # Creating the http pool manager
-    http = create_pool(threads=threads, insecure=insecure)
+    http = create_pool(threads=threads, insecure=insecure, timeout=timeout)
 
     # Thread worker
     def worker(payload):
@@ -103,9 +103,6 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
             )
 
         kwargs = request_args(url, item) if request_args is not None else {}
-
-        if 'timeout' not in kwargs:
-            kwargs['timeout'] = timeout
 
         error, response = request(http, url, **kwargs)
 
@@ -213,7 +210,7 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
     """
 
     # Creating the http pool manager
-    http = create_pool(threads=threads, insecure=insecure)
+    http = create_pool(threads=threads, insecure=insecure, timeout=timeout)
 
     # Thread worker
     def worker(payload):
@@ -228,9 +225,6 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
             )
 
         kwargs = resolve_args(url, item) if resolve_args is not None else {}
-
-        if 'timeout' not in kwargs:
-            kwargs['timeout'] = timeout
 
         error, stack = resolve(
             http,

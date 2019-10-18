@@ -226,7 +226,7 @@ def explain_request_error(error):
 
 
 def raw_request(http, url, method='GET', headers=None,
-                preload_content=True, release_conn=True):
+                preload_content=True, release_conn=True, timeout=None):
     """
     Generic request helpers using a urllib3 pool to access some resource.
     """
@@ -244,7 +244,8 @@ def raw_request(http, url, method='GET', headers=None,
             preload_content=preload_content,
             release_conn=release_conn,
             redirect=False,
-            retries=False
+            retries=False,
+            timeout=timeout
         )
     except Exception as e:
         return explain_request_error(e), None
@@ -275,7 +276,7 @@ class Redirection(object):
 
 def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
                 follow_refresh_header=True, follow_meta_refresh=False,
-                follow_js_relocation=False, return_response=False):
+                follow_js_relocation=False, return_response=False, timeout=None):
     """
     Helper function attempting to resolve the given url.
     """
@@ -296,7 +297,8 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
             method=method,
             headers=headers,
             preload_content=False,
-            release_conn=False
+            release_conn=False,
+            timeout=timeout
         )
 
         redirection = Redirection(url)
@@ -441,7 +443,7 @@ def build_request_headers(headers=None, cookie=None, spoof_ua=False):
 
 def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             follow_redirects=True, max_redirects=5, follow_refresh_header=True,
-            follow_meta_refresh=False, follow_js_relocation=False):
+            follow_meta_refresh=False, follow_js_relocation=False, timeout=None):
 
     # Formatting headers
     final_headers = build_request_headers(headers=headers, cookie=cookie, spoof_ua=spoof_ua)
@@ -451,7 +453,8 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             http,
             url,
             method,
-            headers=final_headers
+            headers=final_headers,
+            timeout=timeout
         )
     else:
         err, stack, response = raw_resolve(
@@ -463,7 +466,8 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             return_response=True,
             follow_refresh_header=follow_refresh_header,
             follow_meta_refresh=follow_meta_refresh,
-            follow_js_relocation=follow_js_relocation
+            follow_js_relocation=follow_js_relocation,
+            timeout=timeout
         )
 
         if err:
@@ -484,7 +488,7 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
 
 def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             follow_redirects=True, max_redirects=5, follow_refresh_header=True,
-            follow_meta_refresh=False, follow_js_relocation=False):
+            follow_meta_refresh=False, follow_js_relocation=False, timeout=None):
 
     final_headers = build_request_headers(headers=headers, cookie=cookie, spoof_ua=spoof_ua)
 
@@ -496,7 +500,8 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
         max_redirects=max_redirects,
         follow_refresh_header=follow_refresh_header,
         follow_meta_refresh=follow_meta_refresh,
-        follow_js_relocation=follow_js_relocation
+        follow_js_relocation=follow_js_relocation,
+        timeout=timeout
     )
 
 
