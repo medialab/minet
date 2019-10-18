@@ -9,15 +9,12 @@ SSL_ISSUES = [
     'http://ow.ly/zpnt30mdb9N'
 ]
 
-http = create_pool()
+http = create_pool(insecure=True)
 
 for url in SSL_ISSUES:
     print(url)
     err, stack, response = raw_resolve(http, url, return_response=True)
     print('Error', err, type(err))
-
-    if response is not None:
-        print(response)
 
     for r in stack:
         print(r)

@@ -189,24 +189,31 @@ def dict_to_cookie_string(d):
 DEFAULT_URLLIB3_TIMEOUT = urllib3.Timeout(connect=DEFAULT_CONNECT_TIMEOUT, read=DEFAULT_READ_TIMEOUT)
 
 
-def create_pool(proxy=None, threads=None, **kwargs):
+def create_pool(proxy=None, threads=None, insecure=False, **kwargs):
     """
     Helper function returning a urllib3 pool manager with sane defaults.
     """
 
     manager_kwargs = {
-        'cert_reqs': 'CERT_REQUIRED',
-        'ca_certs': certifi.where(),
         'timeout': DEFAULT_URLLIB3_TIMEOUT
     }
 
-    manager_kwargs.update(kwargs)
+    if not insecure:
+        manager_kwargs['cert_reqs'] = 'CERT_REQUIRED'
+        manager_kwargs['ca_certs'] = certifi.where()
+    else:
+        manager_kwargs['cert_reqs'] = 'CERT_NONE'
+        # manager_kwargs['assert_hostname'] = False
+
+        urllib3.disable_warnings()
 
     if threads is not None:
 
         # TODO: maxsize should increase with group_parallelism
         manager_kwargs['maxsize'] = 1
         manager_kwargs['num_pools'] = threads * 2
+
+    manager_kwargs.update(kwargs)
 
     if proxy is not None:
         return urllib3.ProxyManager(proxy, **manager_kwargs)
