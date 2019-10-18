@@ -68,6 +68,25 @@ class CrawlJob(object):
         }
 
 
+class CrawlerState(object):
+    __slots__ = ('jobs_done', 'jobs_queued')
+
+    def __init__(self):
+        self.jobs_done = 0
+        self.jobs_queued = 0
+
+    def __repr__(self):
+        class_name = self.__class__.__name__
+
+        return (
+            '<%(class_name)s done=%(jobs_done)s queued=%(jobs_queued)s>'
+        ) % {
+            'class_name': class_name,
+            'jobs_done': self.jobs_done,
+            'jobs_queued': self.jobs_queued
+        }
+
+
 class Spider(object):
     def __init__(self, definition, name='default'):
 
