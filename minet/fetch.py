@@ -82,11 +82,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
     """
 
     # Creating the http pool manager
-    # NOTE: maxsize should increase with group_parallelism
-    http = create_pool(
-        num_pools=threads * 2,
-        maxsize=1
-    )
+    http = create_pool(threads=threads)
 
     # Thread worker
     def worker(payload):
@@ -204,10 +200,7 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
     """
 
     # Creating the http pool manager
-    http = create_pool(
-        num_pools=threads * 2,
-        maxsize=1
-    )
+    http = create_pool(threads=threads)
 
     # Thread worker
     def worker(payload):

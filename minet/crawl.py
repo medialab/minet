@@ -193,10 +193,7 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         for spider in spiders.values():
             enqueue(spider.get_start_jobs())
 
-    http = create_pool(
-        num_pools=threads * 2,
-        maxsize=1
-    )
+    http = create_pool(threads=threads)
 
     queue_iterator = QueueIterator(queue)
     task_context = TaskContext(queue, queue_iterator)

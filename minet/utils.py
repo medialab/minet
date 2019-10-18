@@ -189,7 +189,7 @@ def dict_to_cookie_string(d):
 DEFAULT_URLLIB3_TIMEOUT = urllib3.Timeout(connect=DEFAULT_CONNECT_TIMEOUT, read=DEFAULT_READ_TIMEOUT)
 
 
-def create_pool(proxy=None, **kwargs):
+def create_pool(proxy=None, threads=None, **kwargs):
     """
     Helper function returning a urllib3 pool manager with sane defaults.
     """
@@ -201,6 +201,12 @@ def create_pool(proxy=None, **kwargs):
     }
 
     manager_kwargs.update(kwargs)
+
+    if threads is not None:
+
+        # TODO: maxsize should increase with group_parallelism
+        manager_kwargs['maxsize'] = 1
+        manager_kwargs['num_pools'] = threads * 2
 
     if proxy is not None:
         return urllib3.ProxyManager(proxy, **manager_kwargs)
