@@ -55,7 +55,8 @@ ResolveWorkerResult = namedtuple(
 
 def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
                         throttle=DEFAULT_THROTTLE, guess_extension=True,
-                        guess_encoding=True, buffer_size=DEFAULT_GROUP_BUFFER_SIZE):
+                        guess_encoding=True, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
+                        insecure=False):
     """
     Function returning a multithreaded iterator over fetched urls.
 
@@ -75,6 +76,8 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
         buffer_size (int, optional): Max number of items per domain to enqueue
             into memory in hope of finding a new domain that can be processed
             immediately. Defaults to 1.
+        insecure (bool, optional): Whether to ignore SSL certification errors
+            when performing requests. Defaults to False.
 
     Yields:
         FetchWorkerResult
@@ -82,7 +85,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
     """
 
     # Creating the http pool manager
-    http = create_pool(threads=threads)
+    http = create_pool(threads=threads, insecure=insecure)
 
     # Thread worker
     def worker(payload):
@@ -172,7 +175,8 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
 def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
                           throttle=DEFAULT_THROTTLE, max_redirects=5,
                           follow_refresh_header=True, follow_meta_refresh=False,
-                          follow_js_relocation=False, buffer_size=DEFAULT_GROUP_BUFFER_SIZE):
+                          follow_js_relocation=False, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
+                          insecure=False):
     """
     Function returning a multithreaded iterator over resolved urls.
 
@@ -193,6 +197,8 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
         buffer_size (int, optional): Max number of items per domain to enqueue
             into memory in hope of finding a new domain that can be processed
             immediately. Defaults to 1.
+        insecure (bool, optional): Whether to ignore SSL certification errors
+            when performing requests. Defaults to False.
 
     Yields:
         ResolveWorkerResult
@@ -200,7 +206,7 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
     """
 
     # Creating the http pool manager
-    http = create_pool(threads=threads)
+    http = create_pool(threads=threads, insecure=insecure)
 
     # Thread worker
     def worker(payload):
