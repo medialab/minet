@@ -236,16 +236,22 @@ def raw_request(http, url, method='GET', headers=None,
         return InvalidURLError('Invalid URL'), None
 
     # Performing request
+    request_kwargs = {
+        'headers': headers,
+        'preload_content': preload_content,
+        'release_conn': release_conn,
+        'redirect': False,
+        'retries': False
+    }
+
+    if timeout is not None:
+        request_kwargs['timeout'] = timeout
+
     try:
         response = http.request(
             method,
             url,
-            headers=headers,
-            preload_content=preload_content,
-            release_conn=release_conn,
-            redirect=False,
-            retries=False,
-            timeout=timeout
+            **request_kwargs
         )
     except Exception as e:
         return explain_request_error(e), None
