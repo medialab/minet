@@ -4,7 +4,11 @@
 #
 # Logic of the `hyphe dump` action.
 #
-from minet.utils import create_pool, jsonrpc
+from minet.utils import create_pool
+from minet.cli.hyphe.utils import create_corpus_jsonrpc
+
+# Constants
+BATCH_SIZE = 100
 
 
 def hyphe_dump_action(namespace):
@@ -14,15 +18,20 @@ def hyphe_dump_action(namespace):
         namespace.url += '/'
 
     http = create_pool()
+    jsonrpc = create_corpus_jsonrpc(http, namespace.url, namespace.corpus)
 
-    def hyphe_jsonrpc(method, *args, **kwargs):
-        err, jsonrpc_result = jsonrpc(http, namespace.url, method, *args, **kwargs)
+    # First we need to start the corpus
+    err, result = jsonrpc('start_corpus')
 
-        if err:
-            return err, None
+    print(result)
 
-        return None, jsonrpc_result[0]
-
-    err, data = hyphe_jsonrpc('get_status')
-
-    print(err, data)
+# {
+# 	"method": "store.paginate_webentity_pages",
+# 	"params": {
+# 		"webentity_id": 24,
+# 		"corpus": "test",
+# 		"count": 10,
+# 		"include_page_data": true,
+# 		"onlyCrawled": true
+# 	}
+# }
