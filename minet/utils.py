@@ -476,7 +476,7 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
         final_body = body.encode('utf-8')
 
     if json_body is not None:
-        final_body = json.dumps(json_body).encode('utf-8')
+        final_body = json.dumps(json_body, ensure_ascii=False).encode('utf-8')
 
     if not follow_redirects:
         return raw_request(
@@ -572,8 +572,30 @@ def extract_response_meta(response, guess_encoding=True, guess_extension=True):
     return meta
 
 
-def jsonrpc(url, method, *args, **kwargs):
-    pass
+def jsonrpc(http, url, method, *args, **kwargs):
+    params = []
+
+    if len(args) > 0:
+        params = args
+    elif len(kwargs) > 0:
+        params = kwargs
+
+    err, response = request(
+        http,
+        url,
+        method='POST',
+        json_body={
+            'method': method,
+            'params': params
+        }
+    )
+
+    if err is not None:
+        return err, None
+
+    data = json.loads(response.data)
+
+    return None, data
 
 
 class RateLimiter(object):
