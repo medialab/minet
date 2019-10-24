@@ -188,6 +188,11 @@ def main():
         fn(args)
 
     elif args.action == 'help':
+
+        if len(args.subcommand) == 0:
+            parser.print_help()
+            return
+
         target = get_subparser(subparser_index, args.subcommand)
 
         if target is None:

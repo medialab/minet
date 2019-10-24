@@ -493,6 +493,47 @@ MINET_COMMANDS = {
         ]
     },
 
+    # Hyphe action subparser
+    # -------------------------------------------------------------------------
+    'hyphe': {
+        'package': 'minet.cli.hyphe',
+        'action': 'hyphe_action',
+        'title': 'Minet Hyphe Command',
+        'description': '''
+            Commands related to the Hyphe crawler.
+        ''',
+        'subparsers': {
+            'help': 'Action to perform.',
+            'title': 'actions',
+            'dest': 'hyphe_action',
+            'commands': {
+                'dump': {
+                    'title': 'Minet Hyphe Dump Command',
+                    'description': '''
+                        Command dumping page-level information from a given
+                        Hyphe corpus.
+                    ''',
+                    # 'epilog': '''
+                    #     examples:
+
+                    #     . Fetching a dashboard's lists:
+                    #         `minet fb comments`
+                    # ''',
+                    'arguments': [
+                        {
+                            'name': 'url',
+                            'help': 'Url of the Hyphe API.'
+                        },
+                        {
+                            'name': 'corpus',
+                            'help': 'Id of the corpus.'
+                        }
+                    ]
+                }
+            }
+        }
+    },
+
     # Mediacloud action subparser
     # -------------------------------------------------------------------------
     'mediacloud': {
