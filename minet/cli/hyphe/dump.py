@@ -5,7 +5,10 @@
 # Logic of the `hyphe dump` action.
 #
 from minet.utils import create_pool
-from minet.cli.hyphe.utils import create_corpus_jsonrpc
+from minet.cli.hyphe.utils import (
+    create_corpus_jsonrpc,
+    ensure_corpus_is_started
+)
 
 # Constants
 BATCH_SIZE = 100
@@ -21,9 +24,7 @@ def hyphe_dump_action(namespace):
     jsonrpc = create_corpus_jsonrpc(http, namespace.url, namespace.corpus)
 
     # First we need to start the corpus
-    err, result = jsonrpc('start_corpus')
-
-    print(result)
+    ensure_corpus_is_started(jsonrpc)
 
 # {
 # 	"method": "store.paginate_webentity_pages",

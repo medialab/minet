@@ -17,3 +17,22 @@ def create_corpus_jsonrpc(http, url, corpus):
         return None, jsonrpc_result[0]
 
     return hyphe_jsonrpc
+
+
+def ensure_corpus_is_started(corpus_jsonrpc):
+    err, result = corpus_jsonrpc('start_corpus')
+
+    if err:
+        raise err
+
+    if result['result']['status'] == 'ready':
+        return True
+
+    # Pinging until ready
+    while _ in range(10):
+        err, result = corpus_jsonrpc('ping', timeout=5)
+
+        if result['result'] == 'pong':
+            return True
+
+    raise Exception('Could not start Hyphe corpus')
