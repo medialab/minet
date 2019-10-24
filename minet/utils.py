@@ -430,7 +430,7 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
     return error, compiled_stack
 
 
-def build_request_headers(headers=None, cookie=None, spoof_ua=False):
+def build_request_headers(headers=None, cookie=None, spoof_ua=False, json_body=False):
 
     # Formatting headers
     final_headers = {}
@@ -444,6 +444,9 @@ def build_request_headers(headers=None, cookie=None, spoof_ua=False):
 
         final_headers['Cookie'] = cookie
 
+    if json_body:
+        final_headers['Content-Type'] = 'application/json'
+
     # Note: headers passed explicitly by users always win
     if headers is not None:
         final_headers.update(headers)
@@ -454,13 +457,14 @@ def build_request_headers(headers=None, cookie=None, spoof_ua=False):
 def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             follow_redirects=True, max_redirects=5, follow_refresh_header=True,
             follow_meta_refresh=False, follow_js_relocation=False, timeout=None,
-            body=None):
+            body=None, json_body=None):
 
     # Formatting headers
     final_headers = build_request_headers(
         headers=headers,
         cookie=cookie,
-        spoof_ua=spoof_ua
+        spoof_ua=spoof_ua,
+        json_body=json_body is not None
     )
 
     # Dealing with body
@@ -470,6 +474,9 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
         final_body = body
     elif isinstance(body, str):
         final_body = body.encode('utf-8')
+
+    if json_body is not None:
+        final_body = json.dumps(json_body).encode('utf-8')
 
     if not follow_redirects:
         return raw_request(
