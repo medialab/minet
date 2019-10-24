@@ -226,7 +226,8 @@ def explain_request_error(error):
 
 
 def raw_request(http, url, method='GET', headers=None,
-                preload_content=True, release_conn=True, timeout=None):
+                preload_content=True, release_conn=True, timeout=None,
+                body=None):
     """
     Generic request helpers using a urllib3 pool to access some resource.
     """
@@ -238,6 +239,7 @@ def raw_request(http, url, method='GET', headers=None,
     # Performing request
     request_kwargs = {
         'headers': headers,
+        'body': body,
         'preload_content': preload_content,
         'release_conn': release_conn,
         'redirect': False,
@@ -282,7 +284,8 @@ class Redirection(object):
 
 def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
                 follow_refresh_header=True, follow_meta_refresh=False,
-                follow_js_relocation=False, return_response=False, timeout=None):
+                follow_js_relocation=False, return_response=False, timeout=None,
+                body=None):
     """
     Helper function attempting to resolve the given url.
     """
@@ -302,6 +305,7 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
             url,
             method=method,
             headers=headers,
+            body=body,
             preload_content=False,
             release_conn=False,
             timeout=timeout
@@ -449,10 +453,23 @@ def build_request_headers(headers=None, cookie=None, spoof_ua=False):
 
 def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             follow_redirects=True, max_redirects=5, follow_refresh_header=True,
-            follow_meta_refresh=False, follow_js_relocation=False, timeout=None):
+            follow_meta_refresh=False, follow_js_relocation=False, timeout=None,
+            body=None):
 
     # Formatting headers
-    final_headers = build_request_headers(headers=headers, cookie=cookie, spoof_ua=spoof_ua)
+    final_headers = build_request_headers(
+        headers=headers,
+        cookie=cookie,
+        spoof_ua=spoof_ua
+    )
+
+    # Dealing with body
+    final_body = None
+
+    if isinstance(body, bytes):
+        final_body = body
+    elif isinstance(body, str):
+        final_body = body.encode('utf-8')
 
     if not follow_redirects:
         return raw_request(
@@ -460,6 +477,7 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             url,
             method,
             headers=final_headers,
+            body=final_body,
             timeout=timeout
         )
     else:
@@ -468,6 +486,7 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             url,
             method,
             headers=final_headers,
+            body=final_body,
             max_redirects=max_redirects,
             return_response=True,
             follow_refresh_header=follow_refresh_header,
@@ -496,7 +515,11 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             follow_redirects=True, max_redirects=5, follow_refresh_header=True,
             follow_meta_refresh=False, follow_js_relocation=False, timeout=None):
 
-    final_headers = build_request_headers(headers=headers, cookie=cookie, spoof_ua=spoof_ua)
+    final_headers = build_request_headers(
+        headers=headers,
+        cookie=cookie,
+        spoof_ua=spoof_ua
+    )
 
     return raw_resolve(
         http,
@@ -540,6 +563,10 @@ def extract_response_meta(response, guess_encoding=True, guess_extension=True):
         meta['encoding'] = guess_response_encoding(response, is_xml=True, use_chardet=True)
 
     return meta
+
+
+def jsonrpc(url, method, *args, **kwargs):
+    pass
 
 
 class RateLimiter(object):
