@@ -6,11 +6,14 @@
 #
 import os
 import csv
-from os.path import join
+import base64
+import zlib
+import gzip
+from os.path import join, dirname
 from tqdm import tqdm
 from datetime import datetime
 
-from minet.utils import create_pool
+from minet.utils import create_pool, md5
 from minet.cli.hyphe.constants import WEBENTITY_STATUSES
 from minet.cli.hyphe.utils import (
     create_corpus_jsonrpc,
@@ -74,7 +77,7 @@ def webentities_iter(jsonrpc, statuses=WEBENTITY_STATUSES):
         yield from webentities_by_status_iter(jsonrpc, status)
 
 
-def webentity_pages_iter(jsonrpc, webentity):
+def webentity_pages_iter(jsonrpc, webentity, body=False):
     token = None
 
     while True:
@@ -83,7 +86,8 @@ def webentity_pages_iter(jsonrpc, webentity):
             webentity_id=webentity['id'],
             count=BATCH_SIZE,
             pagination_token=token,
-            include_page_metas=True
+            include_page_metas=True,
+            include_page_body=body
         )
 
         result = result['result']
@@ -97,9 +101,9 @@ def webentity_pages_iter(jsonrpc, webentity):
             break
 
 
-def pages_iter(jsonrpc, webentities):
+def pages_iter(jsonrpc, webentities, body=False):
     for webentity in webentities.values():
-        yield from webentity_pages_iter(jsonrpc, webentity)
+        yield from webentity_pages_iter(jsonrpc, webentity, body=body)
 
 
 WEBENTITY_HEADERS = [
@@ -145,9 +149,13 @@ PAGE_HEADERS = [
     'error'
 ]
 
+ADDITIONAL_PAGE_HEADERS = [
+    'filename'
+]
 
-def format_page_for_csv(webentity, page):
-    return [
+
+def format_page_for_csv(webentity, page, filename=None):
+    row = [
         page['url'],
         page['lru'],
         webentity['id'],
@@ -160,6 +168,18 @@ def format_page_for_csv(webentity, page):
         page.get('size', '') or '',
         page.get('error', '')
     ]
+
+    if filename:
+        row.append(filename)
+
+    return row
+
+
+def format_page_filename(webentity, page):
+    h = md5(page['url'])
+
+    # TODO: could be something other than html?
+    return '%s/%s/%s.html.gz' % (webentity['id'], h[:2], h)
 
 
 def hyphe_dump_action(namespace):
@@ -174,6 +194,10 @@ def hyphe_dump_action(namespace):
 
     webentities_output_path = join(output_dir, 'webentities.csv')
     pages_output_path = join(output_dir, 'pages.csv')
+
+    if namespace.body:
+        body_output_dir = join(output_dir, 'content')
+        os.makedirs(body_output_dir, exist_ok=True)
 
     # Fixing trailing slash
     if not namespace.url.endswith('/'):
@@ -213,7 +237,7 @@ def hyphe_dump_action(namespace):
     # Finally we paginate pages
     pages_file = open(pages_output_path, 'w')
     pages_writer = csv.writer(pages_file)
-    pages_writer.writerow(PAGE_HEADERS)
+    pages_writer.writerow(PAGE_HEADERS + (ADDITIONAL_PAGE_HEADERS if namespace.body else []))
 
     loading_bar = tqdm(
         desc='Dumping pages',
@@ -222,6 +246,20 @@ def hyphe_dump_action(namespace):
         total=count_total_pages(stats)
     )
 
-    for webentity, page in pages_iter(jsonrpc, webentities):
+    for webentity, page in pages_iter(jsonrpc, webentities, body=namespace.body):
         loading_bar.update()
-        pages_writer.writerow(format_page_for_csv(webentity, page))
+        filename = None
+
+        if namespace.body and 'body' in page:
+            filename = format_page_filename(webentity, page)
+            filepath = join(body_output_dir, filename)
+            os.makedirs(dirname(filepath), exist_ok=True)
+
+            with open(filepath, 'wb') as f:
+                binary = base64.b64decode(page['body'])
+                binary = zlib.decompress(binary)
+                binary = gzip.compress(binary)
+
+                f.write(binary)
+
+        pages_writer.writerow(format_page_for_csv(webentity, page, filename=filename))

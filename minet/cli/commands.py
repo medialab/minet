@@ -513,12 +513,12 @@ MINET_COMMANDS = {
                         Command dumping page-level information from a given
                         Hyphe corpus.
                     ''',
-                    # 'epilog': '''
-                    #     examples:
+                    'epilog': '''
+                        examples:
 
-                    #     . Fetching a dashboard's lists:
-                    #         `minet fb comments`
-                    # ''',
+                        . Dumping a corpus into the ./corpus directory:
+                            `minet hyphe dump http://myhyphe.com/api/ corpus-name -d corpus`
+                    ''',
                     'arguments': [
                         {
                             'name': 'url',
@@ -531,6 +531,11 @@ MINET_COMMANDS = {
                         {
                             'flags': ['-d', '--output-dir'],
                             'help': 'Output directory for dumped files. Will default to some name based on corpus name.'
+                        },
+                        {
+                            'flag': '--body',
+                            'help': 'Whether to download pages body.',
+                            'action': 'store_true'
                         }
                     ]
                 }

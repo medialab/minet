@@ -8,6 +8,7 @@ import re
 import cgi
 import certifi
 import browser_cookie3
+import hashlib
 import urllib3
 import json
 import yaml
@@ -55,6 +56,12 @@ ASCII_RE = re.compile(r'^[ -~]*$')
 # Constants
 CHARDET_CONFIDENCE_THRESHOLD = 0.9
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
+
+
+def md5(string):
+    h = hashlib.md5()
+    h.update(string.encode())
+    return h.hexdigest()
 
 
 # TODO: add a version that tallies the possibilities
