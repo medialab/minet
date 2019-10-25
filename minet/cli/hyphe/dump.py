@@ -139,6 +139,7 @@ PAGE_HEADERS = [
     'url',
     'lru',
     'webentity',
+    'webentity_status',
     'status',
     'crawled',
     'encoding',
@@ -154,12 +155,13 @@ ADDITIONAL_PAGE_HEADERS = [
 ]
 
 
-def format_page_for_csv(webentity, page, filename=None):
+def format_page_for_csv(webentity, page, filename=None, body=False):
     row = [
         page['url'],
         page['lru'],
         webentity['id'],
         webentity['status'],
+        page.get('status', ''),
         '1' if page['crawled'] else '0',
         page.get('encoding', ''),
         page.get('content_type', ''),
@@ -171,6 +173,8 @@ def format_page_for_csv(webentity, page, filename=None):
 
     if filename:
         row.append(filename)
+    elif body:
+        row.append('')
 
     return row
 
@@ -262,4 +266,4 @@ def hyphe_dump_action(namespace):
 
                 f.write(binary)
 
-        pages_writer.writerow(format_page_for_csv(webentity, page, filename=filename))
+        pages_writer.writerow(format_page_for_csv(webentity, page, filename=filename, body=namespace.body))

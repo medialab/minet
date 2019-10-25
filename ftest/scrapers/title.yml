@@ -4,3 +4,4 @@ fields:
         get: basename
     title:
         sel: title
+        transform: strip
