@@ -50,6 +50,8 @@ def worker(payload):
     context = {}
 
     if line:
+
+        # TODO: dictify line
         context['line'] = line
 
     if path:
