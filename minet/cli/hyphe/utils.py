@@ -14,6 +14,9 @@ def create_corpus_jsonrpc(http, url, corpus):
         if err:
             return err, None
 
+        if 'fault' in jsonrpc_result:
+            return jsonrpc_result, None
+
         return None, jsonrpc_result[0]
 
     return hyphe_jsonrpc
