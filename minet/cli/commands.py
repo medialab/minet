@@ -527,6 +527,10 @@ MINET_COMMANDS = {
                         {
                             'name': 'corpus',
                             'help': 'Id of the corpus.'
+                        },
+                        {
+                            'flags': ['-d', '--output-dir'],
+                            'help': 'Output directory for dumped files. Will default to some name based on corpus name.'
                         }
                     ]
                 }

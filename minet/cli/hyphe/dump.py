@@ -132,6 +132,10 @@ def hyphe_dump_action(namespace):
 
     # Paths
     output_dir = 'hyphe_corpus_%s' % namespace.corpus
+
+    if namespace.output_dir is not None:
+        output_dir = namespace.output_dir
+
     os.makedirs(output_dir, exist_ok=True)
 
     webentities_output_path = join(output_dir, 'webentities.csv')
