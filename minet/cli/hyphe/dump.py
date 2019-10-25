@@ -26,6 +26,14 @@ def hyphe_dump_action(namespace):
     # First we need to start the corpus
     ensure_corpus_is_started(jsonrpc)
 
+    # Then we gather some handy statistics
+    err, stats = jsonrpc('get_status')
+
+    # Then we fetch webentities
+    err, result = jsonrpc('store.get_webentities_by_status', status='IN', count=10)
+
+    from pprint import pprint
+    pprint(result['result'])
 # {
 # 	"method": "store.paginate_webentity_pages",
 # 	"params": {

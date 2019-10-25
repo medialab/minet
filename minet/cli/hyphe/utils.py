@@ -29,7 +29,7 @@ def ensure_corpus_is_started(corpus_jsonrpc):
         return True
 
     # Pinging until ready
-    while _ in range(10):
+    for _ in range(10):
         err, result = corpus_jsonrpc('ping', timeout=5)
 
         if result['result'] == 'pong':
