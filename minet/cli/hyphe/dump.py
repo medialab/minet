@@ -4,6 +4,9 @@
 #
 # Logic of the `hyphe dump` action.
 #
+import os
+import csv
+from os.path import join
 from tqdm import tqdm
 
 from minet.utils import create_pool
@@ -96,8 +99,41 @@ def pages_iter(jsonrpc, webentities):
     for webentity in webentities.values():
         yield from webentity_pages_iter(jsonrpc, webentity['id'])
 
+WEBENTITY_HEADERS = [
+    'id',
+    'name'
+]
+
+
+def format_webentity_for_csv(webentity):
+    return [
+        webentity['id'],
+        webentity['name']
+    ]
+
+PAGE_HEADERS = [
+    'url',
+    'lru',
+    'crawled'
+]
+
+
+def format_page_for_csv(page):
+    return [
+        page['url'],
+        page['lru'],
+        '1' if page['crawled'] else '0'
+    ]
+
 
 def hyphe_dump_action(namespace):
+
+    # Paths
+    output_dir = 'hyphe_corpus_%s' % namespace.corpus
+    os.makedirs(output_dir, exist_ok=True)
+
+    webentities_output_path = join(output_dir, 'webentities.csv')
+    pages_output_path = join(output_dir, 'pages.csv')
 
     # Fixing trailing slash
     if not namespace.url.endswith('/'):
@@ -113,6 +149,10 @@ def hyphe_dump_action(namespace):
     err, stats = jsonrpc('get_status')
 
     # Then we fetch webentities
+    webentities_file = open(webentities_output_path, 'w')
+    webentities_writer = csv.writer(webentities_file)
+    webentities_writer.writerow(WEBENTITY_HEADERS)
+
     loading_bar = tqdm(
         desc='Paginating web entities',
         unit=' webentities',
@@ -125,10 +165,16 @@ def hyphe_dump_action(namespace):
     for webentity in webentities_iter(jsonrpc):
         loading_bar.update()
         webentities[webentity['id']] = webentity
+        webentities_writer.writerow(format_webentity_for_csv(webentity))
 
+    webentities_file.close()
     loading_bar.close()
 
     # Finally we paginate pages
+    pages_file = open(pages_output_path, 'w')
+    pages_writer = csv.writer(pages_file)
+    pages_writer.writerow(PAGE_HEADERS)
+
     loading_bar = tqdm(
         desc='Dumping pages',
         unit=' pages',
@@ -138,3 +184,4 @@ def hyphe_dump_action(namespace):
 
     for page in pages_iter(jsonrpc, webentities):
         loading_bar.update()
+        pages_writer.writerow(format_page_for_csv(page))
