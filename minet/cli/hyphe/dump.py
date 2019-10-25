@@ -73,13 +73,13 @@ def webentities_iter(jsonrpc, statuses=WEBENTITY_STATUSES):
         yield from webentities_by_status_iter(jsonrpc, status)
 
 
-def webentity_pages_iter(jsonrpc, webentity_id):
+def webentity_pages_iter(jsonrpc, webentity):
     token = None
 
     while True:
         err, result = jsonrpc(
             'store.paginate_webentity_pages',
-            webentity_id=webentity_id,
+            webentity_id=webentity['id'],
             count=BATCH_SIZE,
             pagination_token=token
         )
@@ -87,7 +87,7 @@ def webentity_pages_iter(jsonrpc, webentity_id):
         result = result['result']
 
         for page in result['pages']:
-            yield page
+            yield webentity, page
 
         if 'token' in result and result['token']:
             token = result['token']
@@ -97,33 +97,53 @@ def webentity_pages_iter(jsonrpc, webentity_id):
 
 def pages_iter(jsonrpc, webentities):
     for webentity in webentities.values():
-        yield from webentity_pages_iter(jsonrpc, webentity['id'])
+        yield from webentity_pages_iter(jsonrpc, webentity)
 
 
 WEBENTITY_HEADERS = [
     'id',
-    'name'
+    'name',
+    'status',
+    'pages',
+    'homepage',
+    'prefixes',
+    'degree',
+    'undirected_degree',
+    'indegree',
+    'outdegree'
 ]
 
 
 def format_webentity_for_csv(webentity):
     return [
         webentity['id'],
-        webentity['name']
+        webentity['name'],
+        webentity['status'],
+        webentity['pages_total'],
+        webentity['homepage'],
+        ' '.join(webentity['prefixes']),
+        webentity['indegree'] + webentity['outdegree'],
+        webentity['undirected_degree'],
+        webentity['indegree'],
+        webentity['outdegree'],
     ]
 
 
 PAGE_HEADERS = [
     'url',
     'lru',
+    'webentity',
+    'status',
     'crawled'
 ]
 
 
-def format_page_for_csv(page):
+def format_page_for_csv(webentity, page):
     return [
         page['url'],
         page['lru'],
+        webentity['id'],
+        webentity['status'],
         '1' if page['crawled'] else '0'
     ]
 
@@ -188,6 +208,6 @@ def hyphe_dump_action(namespace):
         total=count_total_pages(stats)
     )
 
-    for page in pages_iter(jsonrpc, webentities):
+    for webentity, page in pages_iter(jsonrpc, webentities):
         loading_bar.update()
-        pages_writer.writerow(format_page_for_csv(page))
+        pages_writer.writerow(format_page_for_csv(webentity, page))
