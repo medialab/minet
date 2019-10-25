@@ -8,6 +8,7 @@ import os
 import csv
 from os.path import join
 from tqdm import tqdm
+from datetime import datetime
 
 from minet.utils import create_pool
 from minet.cli.hyphe.constants import WEBENTITY_STATUSES
@@ -81,7 +82,8 @@ def webentity_pages_iter(jsonrpc, webentity):
             'store.paginate_webentity_pages',
             webentity_id=webentity['id'],
             count=BATCH_SIZE,
-            pagination_token=token
+            pagination_token=token,
+            include_page_metas=True
         )
 
         result = result['result']
@@ -134,17 +136,25 @@ PAGE_HEADERS = [
     'lru',
     'webentity',
     'status',
-    'crawled'
+    'crawled',
+    'encoding',
+    'crawled_timestamp',
+    'crawled_datetime'
 ]
 
 
 def format_page_for_csv(webentity, page):
+    is_crawled = page['crawled'] or False
+
     return [
         page['url'],
         page['lru'],
         webentity['id'],
         webentity['status'],
-        '1' if page['crawled'] else '0'
+        '1' if is_crawled else '0',
+        page.get('encoding', ''),
+        page['crawled_timestamp'] if is_crawled else '',
+        datetime.fromtimestamp(page['crawled_timestamp']).isoformat() if is_crawled else ''
     ]
 
 
