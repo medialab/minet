@@ -99,6 +99,7 @@ def pages_iter(jsonrpc, webentities):
     for webentity in webentities.values():
         yield from webentity_pages_iter(jsonrpc, webentity['id'])
 
+
 WEBENTITY_HEADERS = [
     'id',
     'name'
@@ -110,6 +111,7 @@ def format_webentity_for_csv(webentity):
         webentity['id'],
         webentity['name']
     ]
+
 
 PAGE_HEADERS = [
     'url',
