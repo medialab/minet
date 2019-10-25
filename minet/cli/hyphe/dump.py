@@ -138,8 +138,11 @@ PAGE_HEADERS = [
     'status',
     'crawled',
     'encoding',
+    'content_type',
     'crawl_timestamp',
-    'crawl_datetime'
+    'crawl_datetime',
+    'size',
+    'error'
 ]
 
 
@@ -151,8 +154,11 @@ def format_page_for_csv(webentity, page):
         webentity['status'],
         '1' if page['crawled'] else '0',
         page.get('encoding', ''),
+        page.get('content_type', ''),
         page['crawl_timestamp'] if 'crawl_timestamp' in page else '',
-        datetime.fromtimestamp(int(page['crawl_timestamp']) / 1000).isoformat(timespec='seconds') if 'crawl_timestamp' in page else ''
+        datetime.fromtimestamp(int(page['crawl_timestamp']) / 1000).isoformat(timespec='seconds') if 'crawl_timestamp' in page else '',
+        page.get('size', '') or '',
+        page.get('error', '')
     ]
 
 
