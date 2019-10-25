@@ -4,6 +4,8 @@
 #
 # Logic of the `hyphe dump` action.
 #
+from pprint import pprint
+
 from minet.utils import create_pool
 from minet.cli.hyphe.utils import (
     create_corpus_jsonrpc,
@@ -12,6 +14,37 @@ from minet.cli.hyphe.utils import (
 
 # Constants
 BATCH_SIZE = 100
+
+
+# Helpers
+def webentities_by_status_iter(jsonrpc, status):
+    token = None
+    next_page = None
+
+    while True:
+        if token is None:
+            err, result = jsonrpc(
+                'store.get_webentities_by_status',
+                status=status,
+                count=BATCH_SIZE
+            )
+        else:
+            err, result = jsonrpc(
+                'store.get_webentities_page',
+                pagination_token=token,
+                n_page=next_page
+            )
+
+        result = result['result']
+
+        for webentity in result['webentities']:
+            yield webentity
+
+        if 'next_page' in result and result['next_page']:
+            token = result['token']
+            next_page = result['next_page']
+        else:
+            break
 
 
 def hyphe_dump_action(namespace):
@@ -30,10 +63,9 @@ def hyphe_dump_action(namespace):
     err, stats = jsonrpc('get_status')
 
     # Then we fetch webentities
-    err, result = jsonrpc('store.get_webentities_by_status', status='IN', count=10)
+    for webentity in webentities_by_status_iter(jsonrpc, 'DISCOVERED'):
+        print(webentity['name'])
 
-    from pprint import pprint
-    pprint(result['result'])
 # {
 # 	"method": "store.paginate_webentity_pages",
 # 	"params": {
