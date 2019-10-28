@@ -6,6 +6,7 @@
 # to yield its result.
 #
 import re
+from urllib.parse import urljoin
 
 from minet.utils import PseudoFStringFormatter
 
@@ -50,6 +51,7 @@ def eval_expression(expression, element=None, elements=None, value=None,
     return eval(expression, None, {
 
         # Dependencies
+        'urljoin': urljoin,
         're': re,
 
         # Local values
