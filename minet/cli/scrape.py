@@ -20,7 +20,8 @@ from minet.cli.utils import (
     die,
     JSONLWriter,
     create_glob_iterator,
-    create_report_iterator
+    create_report_iterator,
+    LazyLineDict
 )
 
 ScrapeWorkerResult = namedtuple(
@@ -30,7 +31,7 @@ ScrapeWorkerResult = namedtuple(
 
 
 def worker(payload):
-    line, path, encoding, content, scraper = payload
+    line, headers, path, encoding, content, scraper = payload
 
     # Reading from file
     if content is None:
@@ -50,9 +51,7 @@ def worker(payload):
     context = {}
 
     if line:
-
-        # TODO: dictify line
-        context['line'] = line
+        context['line'] = LazyLineDict(headers, line)
 
     if path:
         context['path'] = path

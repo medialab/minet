@@ -26,7 +26,12 @@ from minet.utils import (
     PseudoFStringFormatter
 )
 from minet.cli.reporters import report_error
-from minet.cli.utils import custom_reader, DummyTqdmFile, die
+from minet.cli.utils import (
+    custom_reader,
+    DummyTqdmFile,
+    die,
+    LazyLineDict
+)
 
 OUTPUT_ADDITIONAL_HEADERS = [
     'line',
@@ -61,6 +66,7 @@ def fetch_action(namespace):
 
     input_headers, pos, reader = custom_reader(namespace.file, namespace.column)
     filename_pos = input_headers.index(namespace.filename) if namespace.filename else None
+    indexed_input_headers = {h: p for p, h in enumerate(input_headers)}
 
     selected_fields = namespace.select.split(',') if namespace.select else None
     selected_pos = [input_headers.index(h) for h in selected_fields] if selected_fields else None
@@ -249,7 +255,7 @@ def fetch_action(namespace):
                             namespace.filename_template,
                             value=line[filename_pos] if filename_pos is not None else None,
                             ext=result.meta['ext'],
-                            line={h: line[i] for i, h in enumerate(input_headers)}
+                            line=LazyLineDict(indexed_input_headers, line)
                         )
                     else:
                         filename = line[filename_pos] + result.meta['ext']

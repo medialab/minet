@@ -95,12 +95,14 @@ class JSONLWriter(object):
 
 WorkerPayload = namedtuple(
     'WorkerPayload',
-    ['line', 'path', 'encoding', 'content', 'args']
+    ['line', 'headers', 'path', 'encoding', 'content', 'args']
 )
 
 
 def create_report_iterator(namespace, args=None, loading_bar=None):
     input_headers, pos, reader = custom_reader(namespace.report, ('status', 'filename', 'encoding', 'raw_content'))
+
+    indexed_headers = {h: p for p, h in enumerate(input_headers)}
 
     for line in reader:
         status = int(line[pos.status]) if line[pos.status] else None
@@ -114,6 +116,7 @@ def create_report_iterator(namespace, args=None, loading_bar=None):
         if pos.raw_content is not None:
             yield WorkerPayload(
                 line=line,
+                headers=indexed_headers,
                 path=None,
                 encoding=None,
                 content=line[pos.raw_content],
@@ -127,6 +130,7 @@ def create_report_iterator(namespace, args=None, loading_bar=None):
 
         yield WorkerPayload(
             line=line,
+            headers=indexed_headers,
             path=path,
             encoding=encoding,
             content=None,
@@ -138,8 +142,18 @@ def create_glob_iterator(namespace, args):
     for p in iglob(namespace.glob, recursive=True):
         yield WorkerPayload(
             line=None,
+            headers=None,
             path=p,
             encoding='utf-8',
             content=None,
             args=args
         )
+
+
+class LazyLineDict(object):
+    def __init__(self, headers, line):
+        self.headers = headers
+        self.line = line
+
+    def __getitem__(self, key):
+        return self.line[self.headers[key]]

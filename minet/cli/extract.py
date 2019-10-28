@@ -27,7 +27,7 @@ OUTPUT_ADDITIONAL_HEADERS = ['extract_error', 'extracted_text']
 
 
 def worker(payload):
-    line, path, encoding, content, _ = payload
+    line, _, path, encoding, content, _ = payload
 
     if not is_supported_encoding(encoding):
         return UnknownEncodingError('Unknown encoding: "%s"' % encoding), line, None
