@@ -11,6 +11,14 @@ BASIC_HTML = """
     </ul>
 """
 
+HOLEY_HTML = """
+    <ul>
+        <li id="li1">One</li>
+        <li>Two</li>
+        <li id="li3">Three</li>
+    </ul>
+"""
+
 NESTED_HTML = """
     <ul>
         <li id="li1" class="li"><span class="first">One</span> <span class="second">1</span></li>
@@ -186,6 +194,30 @@ class TestScrape(object):
         }, BASIC_HTML)
 
         assert result == ['id = li1', 'id = li2']
+
+    def test_filter(self):
+        result = scrape({
+            'iterator': 'li',
+            'item': 'id'
+        }, HOLEY_HTML)
+
+        assert result == ['li1', None, 'li3']
+
+        result = scrape({
+            'iterator': 'li',
+            'item': 'id',
+            'filter_eval': 'bool(value)'
+        }, HOLEY_HTML)
+
+        assert result == ['li1', 'li3']
+
+        result = scrape({
+            'iterator': 'li',
+            'item': 'id',
+            'filter': True
+        }, HOLEY_HTML)
+
+        assert result == ['li1', 'li3']
 
     def test_recursive(self):
         result = scrape({

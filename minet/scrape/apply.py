@@ -238,6 +238,26 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
         if single_value:
             acc = value
         else:
+
+            # Filtering?
+            if 'filter_eval' in scraper:
+                passed_filter = eval_expression(
+                    scraper['filter_eval'],
+                    element=element,
+                    elements=elements,
+                    value=value,
+                    context=context,
+                    html=html,
+                    root=root
+                )
+
+                if not passed_filter:
+                    continue
+
+            if 'filter' in scraper:
+                if not value:
+                    continue
+
             acc.append(value)
 
     return acc
