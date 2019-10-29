@@ -46,6 +46,7 @@ pip install minet
   * [lists](#lists)
   * [posts](#posts)
   * [search](#search)
+  * [summary](#summary)
 * [facebook (fb)](#facebook)
   * [comments](#comments)
 * [mediacloud (mc)](#mediacloud)
@@ -311,7 +312,7 @@ examples:
 
 ```
 usage: minet crowdtangle [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT] [-t TOKEN]
-                         {leaderboard,lists,posts,search} ...
+                         {leaderboard,lists,posts,search,summary} ...
 
 Minet Crowdtangle Command
 =========================
@@ -319,13 +320,13 @@ Minet Crowdtangle Command
 Gather data from the CrowdTangle APIs easily and efficiently.
 
 optional arguments:
-  -h, --help                        show this help message and exit
-  --rate-limit RATE_LIMIT           Authorized number of hits by minutes. Defaults to 6.
-  -o OUTPUT, --output OUTPUT        Path to the output file. By default, everything will be printed to stdout.
-  -t TOKEN, --token TOKEN           CrowdTangle dashboard API token.
+  -h, --help                                show this help message and exit
+  --rate-limit RATE_LIMIT                   Authorized number of hits by minutes. Defaults to 6.
+  -o OUTPUT, --output OUTPUT                Path to the output file. By default, everything will be printed to stdout.
+  -t TOKEN, --token TOKEN                   CrowdTangle dashboard API token.
 
 actions:
-  {leaderboard,lists,posts,search}  Action to perform using the CrowdTangle API.
+  {leaderboard,lists,posts,search,summary}  Action to perform using the CrowdTangle API.
 
 ```
 
@@ -471,6 +472,39 @@ examples:
 
 ```
 
+### summary
+
+```
+usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
+                                 [-t TOKEN] [--start-date START_DATE]
+                                 [--total TOTAL]
+                                 column [file]
+
+Minet CrowdTangle Link Summary Command
+======================================
+
+Retrieve aggregated statistics about link sharing
+on the Crowdtangle API and by platform.
+
+positional arguments:
+  column                      Name of the column containing the URL in the CSV file.
+  file                        CSV file containing the inquired URLs.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, everything will be printed to stdout.
+  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token.
+  --start-date START_DATE     The earliest date at which a post could be posted (UTC!).
+  --total TOTAL               Total number of HTML documents. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Computing a summary of aggregated stats for urls contained in a CSV row:
+    `minet ct summary url urls.csv --token YOUR_TOKEN --start-date 2019-01-01 > summary.csv`
+
+```
+
 ## Facebook
 
 ```
@@ -583,6 +617,7 @@ for result in multithreaded_fetch(urls, key=lambda x: x['url']):
 * **guess_encoding** *?bool* [`True`]: Whether to attempt to guess the resource's encoding.
 * **buffer_size** *?int* [`25`]: Max number of items per domain to enqueue into memory in hope of finding a new domain that can be processed immediately.
 * **insecure** *?bool* [`False`]: Whether to ignore SSL certification errors when performing requests.
+* **timeout** *?float|urllib3.Timeout*: Custom timeout for every request.
 
 *Yields*:
 
@@ -640,6 +675,7 @@ for result in multithreaded_resolve(urls, key=lambda x: x['url']):
 * **follow_meta_refresh** *?bool* [`False`]: Whether to follow meta refresh tags. It's more costly because we need to stream the start of the response's body and cannot rely on headers alone.
 * **buffer_size** *?int* [`25`]: Max number of items per domain to enqueue into memory in hope of finding a new domain that can be processed immediately.
 * **insecure** *?bool* [`False`]: Whether to ignore SSL certification errors when performing requests.
+* **timeout** *?float|urllib3.Timeout*: Custom timeout for every request.
 
 *Yields*:
 

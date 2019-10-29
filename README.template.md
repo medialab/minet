@@ -46,6 +46,7 @@ pip install minet
   * [lists](#lists)
   * [posts](#posts)
   * [search](#search)
+  * [summary](#summary)
 * [facebook (fb)](#facebook)
   * [comments](#comments)
 * [mediacloud (mc)](#mediacloud)
@@ -133,6 +134,10 @@ TODO: document the scraping DSL
 ### search
 
 <% ct/posts %>
+
+### summary
+
+<% ct/summary %>
 
 ## Facebook
 
