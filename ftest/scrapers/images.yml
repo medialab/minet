@@ -6,3 +6,4 @@ fields:
     src:
         attr: src
         eval: urljoin(context['line']['url'], value) if value else ''
+filter: src

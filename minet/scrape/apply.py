@@ -255,7 +255,12 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
                     continue
 
             if 'filter' in scraper:
-                if not value:
+                filtering_clause = scraper['filter']
+
+                if filtering_clause is True and not value:
+                    continue
+
+                if isinstance(filtering_clause, str) and not value.get(filtering_clause):
                     continue
 
             acc.append(value)

@@ -219,6 +219,26 @@ class TestScrape(object):
 
         assert result == ['li1', 'li3']
 
+        result = scrape({
+            'iterator': 'li',
+            'fields': {
+                'id': 'id'
+            },
+            'filter': True
+        }, HOLEY_HTML)
+
+        assert result == [{'id': 'li1'}, {'id': None}, {'id': 'li3'}]
+
+        result = scrape({
+            'iterator': 'li',
+            'fields': {
+                'id': 'id'
+            },
+            'filter': 'id'
+        }, HOLEY_HTML)
+
+        assert result == [{'id': 'li1'}, {'id': 'li3'}]
+
     def test_recursive(self):
         result = scrape({
             'iterator': 'li',
