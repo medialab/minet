@@ -5,8 +5,10 @@
 # Logic of the `ct summary` action.
 #
 import csv
+from io import StringIO
 from urllib.parse import quote
 from tqdm import tqdm
+from ural import is_url
 
 from minet.utils import create_pool, request_json, RateLimiter, nested_get
 from minet.cli.utils import die, custom_reader
@@ -39,7 +41,7 @@ CSV_PADDING = ['0'] * len(CSV_HEADERS)
 
 
 def format_summary_for_csv(stats):
-    return [stats['%sCount'] for t in CROWDTANGLE_REACTION_TYPES]
+    return [stats['%sCount' % t] for t in CROWDTANGLE_REACTION_TYPES]
 
 
 def crowdtangle_summary_action(namespace, output_file):
@@ -47,6 +49,10 @@ def crowdtangle_summary_action(namespace, output_file):
         die('Missing --start-date!')
 
     http = create_pool()
+
+    if is_url(namespace.column):
+        namespace.file = StringIO('url\n%s' % namespace.column)
+        namespace.column = 'url'
 
     input_headers, pos, reader = custom_reader(namespace.file, namespace.column)
 
