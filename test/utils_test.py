@@ -2,6 +2,7 @@
 # Minet Utils Unit Tests
 # =============================================================================
 from minet.utils import (
+    nested_get,
     parse_http_refresh,
     find_meta_refresh,
     find_javascript_relocation,
@@ -29,6 +30,15 @@ META_REFRESH = rb'''
     </script>
 '''
 
+NESTED_OBJECT = {
+    'a': {
+        'b': [{'c': 4}],
+        'd': {
+            'e': 5
+        }
+    }
+}
+
 JAVASCRIPT_LOCATION = rb'''
     <head>
         <title>https://twitter.com/i/web/status/1155764949777620992</title>
@@ -46,6 +56,12 @@ JAVASCRIPT_LOCATION = rb'''
 
 
 class TestUtils(object):
+    def test_nested_get(self):
+        assert nested_get('a.d.e', NESTED_OBJECT) == 5
+        assert nested_get('b.d.a.a', NESTED_OBJECT) is None
+        assert nested_get(['a', 'b', 0, 'c'], NESTED_OBJECT) == 4
+        assert nested_get(['a', 'b', 1, 'c', 2], NESTED_OBJECT) is None
+
     def test_parse_http_refresh(self):
         for header_value, result in HTTP_REFRESH_TESTS:
             assert parse_http_refresh(header_value) == result

@@ -703,3 +703,16 @@ def load_definition(f):
         f.close()
 
     return definition
+
+
+def nested_get(path, o):
+    if isinstance(path, str):
+        path = path.split('.')
+
+    for step in path:
+        try:
+            o = o[step]
+        except (IndexError, KeyError):
+            return None
+
+    return o
