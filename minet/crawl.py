@@ -100,10 +100,15 @@ class Spider(object):
 
         # Scrapers
         self.scraper = None
+        self.scrapers = {}
         self.next_scraper = None
 
         if 'scraper' in definition:
             self.scraper = Scraper(definition['scraper'])
+
+        if 'scrapers' in definition:
+            for name, scraper in definition['scrapers'].items():
+                self.scrapers[name] = Scraper(scraper)
 
         if self.next_definition is not None and 'scraper' in self.next_definition:
             self.next_scraper = Scraper(self.next_definition['scraper'])
@@ -166,6 +171,20 @@ class Spider(object):
 
         return next_jobs
 
+    def scrape(self, response_data):
+        scraped = {
+            'single': None,
+            'multiple': {}
+        }
+
+        if self.scraper is not None:
+            scraped['single'] = self.scraper(response_data)
+
+        for name, scraper in self.scrapers.items():
+            scraped['multiple'][name] = scraper(response_data)
+
+        return scraped
+
 
 class TaskContext(object):
     def __init__(self, queue, queue_iterator):
@@ -180,6 +199,7 @@ class TaskContext(object):
         self.queue_iterator.task_done()
 
 
+# TODO: create a Crawler class with helpers such as retrieving the headers
 def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
           throttle=DEFAULT_THROTTLE):
 
@@ -241,10 +261,7 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         data = response.data.decode(meta['encoding'], errors='replace')
 
         # Scraping items
-        scraped = None
-
-        if spider.scraper is not None:
-            scraped = spider.scraper(data)
+        scraped = spider.scrape(data)
 
         # Finding next jobs
         next_jobs = spider.get_next_jobs(job, data, response.geturl())

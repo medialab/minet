@@ -1,0 +1,17 @@
+---
+start_url: https://echojs.com/latest
+next:
+  scraper:
+    iterator: a.more
+    item:
+      attr: href
+max_level: 10
+scrapers:
+  title:
+    sel: title
+  articles:
+    iterator: article > h2 > a
+    fields:
+      title: text
+      url:
+        attr: href
