@@ -161,6 +161,8 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
     # Actual iteration
     acc = None if single_value else []
 
+    already_seen = set() if 'uniq' in scraper and not single_value else None
+
     for element in elements:
         value = None
 
@@ -262,6 +264,21 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
 
                 if isinstance(filtering_clause, str) and not value.get(filtering_clause):
                     continue
+
+            if 'uniq' in scraper:
+                uniq_clause = scraper['uniq']
+                k = value
+
+                if uniq_clause is True and value in already_seen:
+                    continue
+
+                if isinstance(uniq_clause, str):
+                    k = value.get(uniq_clause)
+
+                    if k in already_seen:
+                        continue
+
+                already_seen.add(k)
 
             acc.append(value)
 
