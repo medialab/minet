@@ -259,6 +259,25 @@ MINET_COMMANDS = {
                             'type': FileType('w')
                         }
                     ]
+                },
+                'summary': {
+                    'title': 'Minet CrowdTangle Link Summary Command',
+                    'description': '''
+                        Retrieve aggregated statistics about link sharing
+                        on the Crowdtangle API and by platform.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Computing a summary of aggregated stats for urls contained in a CSV row:
+                            `minet ct summary url urls.csv --token YOUR_TOKEN --start-date 2019-01-01 > summary.csv`
+                    ''',
+                    'arguments': [
+                        {
+                            'flag': '--start-date',
+                            'help': 'The earliest date at which a post could be posted (UTC!).'
+                        }
+                    ]
                 }
             }
         }

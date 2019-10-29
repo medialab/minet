@@ -44,6 +44,11 @@ def crowdtangle_action(namespace):
 
         crowdtangle_search_action(namespace, output_file)
 
+    elif namespace.ct_action == 'summary':
+        from minet.cli.crowdtangle.summary import crowdtangle_summary_action
+
+        crowdtangle_summary_action(namespace, output_file)
+
     # Cleanup
     if namespace.output is not None:
         output_file.close()
