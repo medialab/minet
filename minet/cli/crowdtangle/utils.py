@@ -177,7 +177,7 @@ def step(http, url, item_key):
 
 
 def create_paginated_action(url_forge, csv_headers, csv_formatter,
-                            item_name, item_key):
+                            item_name, item_key, default_rate_limit=CROWDTANGLE_DEFAULT_RATE_LIMIT):
 
     def action(namespace, output_file):
         http = create_pool(timeout=Timeout(connect=10, read=60 * 5))
@@ -276,7 +276,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
             if not need_to_resume:
                 writer.writerow(csv_headers(namespace) if callable(csv_headers) else csv_headers)
 
-        rate_limit = namespace.rate_limit if namespace.rate_limit else CROWDTANGLE_DEFAULT_RATE_LIMIT
+        rate_limit = namespace.rate_limit if namespace.rate_limit else default_rate_limit
         rate_limiter = RateLimiter(rate_limit, 60.0)
 
         # TODO: those conditions are a bit hacky. code could be clearer

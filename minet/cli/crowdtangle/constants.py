@@ -6,6 +6,7 @@
 #
 
 CROWDTANGLE_DEFAULT_RATE_LIMIT = 6  # Number of hits per minute
+CROWDTANTLE_LINKS_DEFAULT_RATE_LIMIT = 2
 
 CROWDTANGLE_POST_TYPES = [
     'episode',
