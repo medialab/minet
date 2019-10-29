@@ -8,7 +8,7 @@
 import re
 from urllib.parse import urljoin
 
-from minet.utils import PseudoFStringFormatter
+from minet.utils import PseudoFStringFormatter, nested_get
 
 FORMATTER = PseudoFStringFormatter()
 DEFAULT_CONTEXT = {}
@@ -197,7 +197,7 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
                 elif 'extract' in scraper:
                     value = extract(element, scraper['extract'])
                 elif 'get' in scraper:
-                    value = context[scraper['get']]
+                    value = nested_get(scraper['get'], context)
                 elif 'constant' in scraper:
                     value = scraper['constant']
                 else:

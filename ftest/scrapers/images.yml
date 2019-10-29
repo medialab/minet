@@ -2,7 +2,7 @@
 iterator: img
 fields:
     url:
-        eval: context['line']['url']
+        get: line.url
     src:
         attr: src
         eval: urljoin(context['line']['url'], value) if value else ''
