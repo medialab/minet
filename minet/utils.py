@@ -17,6 +17,7 @@ import string
 import mimetypes
 import cchardet as chardet
 from collections import OrderedDict
+from json.decoder import JSONDecodeError
 from ural import is_url
 from urllib.parse import urljoin
 from urllib3 import HTTPResponse
@@ -603,6 +604,18 @@ def jsonrpc(http, url, method, *args, **kwargs):
     data = json.loads(response.data)
 
     return None, data
+
+
+def request_json(http, url, *args, **kwargs):
+    err, response = request(http, url, *args, **kwargs)
+
+    if err:
+        return err, response, None
+
+    try:
+        return None, response, json.loads(response.data.decode())
+    except (JSONDecodeError, UnicodeDecodeError) as e:
+        return e, response, None
 
 
 class RateLimiter(object):

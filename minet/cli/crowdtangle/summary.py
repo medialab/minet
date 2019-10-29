@@ -5,11 +5,16 @@
 # Logic of the `ct summary` action.
 #
 import csv
-import json
 from urllib.parse import quote
+from tqdm import tqdm
 
-from minet.utils import create_pool, request, RateLimiter
-from minet.cli.utils import print_err, die
+from minet.utils import create_pool, request_json, RateLimiter, nested_get
+from minet.cli.utils import die, custom_reader
+
+from minet.cli.crowdtangle.constants import (
+    CROWDTANTLE_LINKS_DEFAULT_RATE_LIMIT,
+    CROWDTANGLE_REACTION_TYPES
+)
 
 URL_TEMPLATE = (
     'https://api.crowdtangle.com/links'
@@ -29,15 +34,12 @@ def forge_url(namespace, link):
     }
 
 
-CSV_HEADERS = [
+CSV_HEADERS = ['%s_count' % t for t in CROWDTANGLE_REACTION_TYPES]
+CSV_PADDING = ['0'] * len(CSV_HEADERS)
 
-]
 
-
-def format_list_for_csv(item):
-    return [
-
-    ]
+def format_summary_for_csv(stats):
+    return [stats['%sCount'] for t in CROWDTANGLE_REACTION_TYPES]
 
 
 def crowdtangle_summary_action(namespace, output_file):
@@ -46,29 +48,44 @@ def crowdtangle_summary_action(namespace, output_file):
 
     http = create_pool()
 
-    url = forge_url(namespace, 'http://lemonde.fr')
+    input_headers, pos, reader = custom_reader(namespace.file, namespace.column)
 
-    print_err('Using the following starting url:')
-    print_err(url)
-    print_err()
+    output_headers = input_headers + CSV_HEADERS
+    output_writer = csv.writer(output_file)
+    output_writer.writerow(output_headers)
 
-    print(namespace, output_file)
+    rate_limiter = RateLimiter(CROWDTANTLE_LINKS_DEFAULT_RATE_LIMIT, 60.0)
 
-    # _, result = request(http, URL_TEMPLATE % namespace.token)
+    loading_bar = tqdm(
+        desc='Collecting data',
+        dynamic_ncols=True,
+        total=namespace.total,
+        unit=' urls'
+    )
 
-    # if result.status == 401:
-    #     print_err('Your API token is invalid.')
-    #     print_err('Check that you indicated a valid one using the `--token` argument.')
-    #     sys.exit(1)
+    for line in reader:
+        with rate_limiter:
+            link = line[pos]
 
-    # if result.status >= 400:
-    #     print_err(result.data, result.status)
-    #     sys.exit(1)
+            # Fetching
+            err, response, data = request_json(http, forge_url(namespace, link))
 
-    # writer = csv.writer(output_file)
-    # writer.writerow(CSV_HEADERS)
+            # Handling errors
+            if err:
+                die(err)
+            elif response.status == 401:
+                die([
+                    'Your API token is invalid.',
+                    'Check that you indicated a valid one using the `--token` argument.'
+                ])
+            elif response.status >= 400:
+                die(response.data, response.status)
 
-    # data = json.loads(result.data)
+            summary = nested_get(['result', 'summary', 'facebook'], data)
 
-    # for l in data['result']['lists']:
-    #     writer.writerow(format_list_for_csv(l))
+            if summary is None:
+                output_writer.writerow(line + CSV_PADDING)
+            else:
+                output_writer.writerow(line + format_summary_for_csv(summary))
+
+            loading_bar.update()

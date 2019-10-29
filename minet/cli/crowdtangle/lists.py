@@ -8,7 +8,7 @@ import csv
 import json
 
 from minet.utils import create_pool, request
-from minet.cli.utils import print_err, die
+from minet.cli.utils import die
 
 URL_TEMPLATE = 'https://api.crowdtangle.com/lists?token=%s'
 

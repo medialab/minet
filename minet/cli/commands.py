@@ -274,8 +274,24 @@ MINET_COMMANDS = {
                     ''',
                     'arguments': [
                         {
+                            'name': 'column',
+                            'help': 'Name of the column containing the URL in the CSV file.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the inquired URLs.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
                             'flag': '--start-date',
                             'help': 'The earliest date at which a post could be posted (UTC!).'
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of HTML documents. Necessary if you want to display a finite progress indicator.',
+                            'type': int
                         }
                     ]
                 }

@@ -36,3 +36,21 @@ CROWDTANGLE_SORT_TYPES = [
 CROWDTANGLE_PARTITION_STRATEGIES = {
     'day'
 }
+
+CROWDTANGLE_PLATFORMS = {
+    'facebook',
+    'instagram',
+    'reddit'
+}
+
+CROWDTANGLE_REACTION_TYPES = [
+    'angry',
+    'comment',
+    'haha',
+    'like',
+    'love',
+    'sad',
+    'share',
+    'thankful',
+    'wow'
+]
