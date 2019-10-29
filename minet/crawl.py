@@ -20,6 +20,8 @@ from minet.utils import (
     PseudoFStringFormatter
 )
 
+from minet.exceptions import UnknownSpiderError
+
 from minet.defaults import (
     DEFAULT_GROUP_PARALLELISM,
     DEFAULT_GROUP_BUFFER_SIZE,
@@ -241,7 +243,10 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
         return get_domain_name(job.url)
 
     def worker(job):
-        spider = spiders[job.spider]
+        spider = spiders.get(job.spider)
+
+        if spider is None:
+            raise UnknownSpiderError('Unknown spider "%s"' % job.spider)
 
         err, response = request(http, job.url)
 

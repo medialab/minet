@@ -35,3 +35,12 @@ class SelfRedirectError(InfiniteRedirectsError):
 
 class InvalidRedirectError(RedirectError):
     pass
+
+
+# Crawling errors
+class CrawlError(Exception):
+    pass
+
+
+class UnknownSpiderError(CrawlError):
+    pass
