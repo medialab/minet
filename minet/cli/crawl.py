@@ -104,6 +104,8 @@ class ScraperReporter(object):
 
 
 class ScraperReporterPool(object):
+    SINGLE_SCRAPER = '$SINGLE_SCRAPER$'
+
     def __init__(self, crawler, output_dir, resume=False):
         self.reporters = {}
 
@@ -112,16 +114,36 @@ class ScraperReporterPool(object):
 
             self.reporters['default'] = {}
 
+            if spider.scraper is not None:
+                path = join(output_dir, 'scraped.csv')
+                reporter = ScraperReporter(path, scraper, resume)
+                self.reporters['default'][ScraperReporterPool.SINGLE_SCRAPER] = reporter
+
             for name, scraper in spider.scrapers.items():
                 path = join(output_dir, 'scraped', '%s.csv' % name)
 
                 reporter = ScraperReporter(path, scraper, resume)
                 self.reporters['default'][name] = reporter
         else:
-            pass
+            for spider_name, spider in crawler.spiders.items():
+                self.reporters[spider_name] = {}
+
+                if spider.scraper is not None:
+                    path = join(output_dir, 'scraped', spider_name, 'scraped.csv')
+                    reporter = ScraperReporter(path, scraper, resume)
+                    self.reporters[spider_name][ScraperReporterPool.SINGLE_SCRAPER] = reporter
+
+                for name, scraper in spider.scrapers.items():
+                    path = join(output_dir, 'scraped', spider_name, '%s.csv' % name)
+
+                    reporter = ScraperReporter(path, scraper, resume)
+                    self.reporters[spider_name][name] = reporter
 
     def write(self, spider_name, scraped):
         reporter = self.reporters[spider_name]
+
+        if scraped['single'] is not None:
+            reporter[ScraperReporterPool.SINGLE_SCRAPER].writer(scraped['single'])
 
         for name, items in scraped['multiple'].items():
             reporter[name].write(items)
@@ -134,14 +156,14 @@ class ScraperReporterPool(object):
 
 def crawl_action(namespace):
 
-    if namespace.resume:
-        print_err('Resuming crawl...')
-    else:
-        rmtree(namespace.output_dir, ignore_errors=True)
-
     # Loading crawler definition
     queue_path = join(namespace.output_dir, 'queue')
     definition = load_definition(namespace.crawler)
+
+    if namespace.resume:
+        print_err('Resuming crawl...')
+    else:
+        rmtree(queue_path, ignore_errors=True)
 
     # Scaffolding output directory
     os.makedirs(namespace.output_dir, exist_ok=True)
