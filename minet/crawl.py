@@ -279,6 +279,10 @@ class Crawler(object):
         # Finding next jobs
         next_jobs = spider.get_next_jobs(job, data, response.geturl())
 
+        # Enqueuing next jobs
+        if next_jobs is not None:
+            self.enqueue(next_jobs)
+
         return CrawlWorkerResult(
             job=job,
             scraped=scraped,
@@ -305,18 +309,6 @@ class Crawler(object):
         def generator():
             for result in multithreaded_iterator:
                 with task_context:
-
-                    # Errored job
-                    if result.error:
-                        yield result
-
-                        continue
-
-                    # Enqueuing next jobs
-                    # TODO: enqueueing should also be done in worker
-                    if result.next_jobs is not None:
-                        self.enqueue(result.next_jobs)
-
                     yield result
 
             self.cleanup()
