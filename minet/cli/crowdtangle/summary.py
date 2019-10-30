@@ -60,7 +60,8 @@ def crowdtangle_summary_action(namespace, output_file):
     output_writer = csv.writer(output_file)
     output_writer.writerow(output_headers)
 
-    rate_limiter = RateLimiter(CROWDTANTLE_LINKS_DEFAULT_RATE_LIMIT, 60.0)
+    rate_limit = namespace.rate_limit if namespace.rate_limit is not None else CROWDTANTLE_LINKS_DEFAULT_RATE_LIMIT
+    rate_limiter = RateLimiter(rate_limit, 60.0)
 
     loading_bar = tqdm(
         desc='Collecting data',
