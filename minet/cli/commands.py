@@ -45,6 +45,46 @@ def check_dragnet():
 
 MINET_COMMANDS = {
 
+    # Crawl action subparser
+    # --------------------------------------------------------------------------
+    'crawl': {
+        'package': 'minet.cli.crawl',
+        'action': 'crawl_action',
+        'title': 'Minet Crawl Command',
+        'description': '''
+            Use multiple threads to crawl the web using minet crawling and
+            scraping DSL.
+        ''',
+        'epilog': '''
+            examples:
+
+            . TODO:
+                `minet crawl`
+        ''',
+        'arguments': [
+            {
+                'name': 'crawler',
+                'help': 'Path to the crawler definition file.'
+            },
+            {
+                'flags': ['-d', '--output-dir'],
+                'help': 'Output directory.',
+                'default': 'crawl'
+            },
+            {
+                'flags': ['-q', '--persist-queue'],
+                'help': 'Whether to persist the crawler queue on file to be able to resume the crawl.',
+                'action': 'store_true'
+            },
+            {
+                'flag': '--throttle',
+                'help': 'Time to wait - in seconds - between 2 calls to the same domain. Defaults to %s.' % DEFAULT_THROTTLE,
+                'type': float,
+                'default': DEFAULT_THROTTLE
+            },
+        ]
+    },
+
     # Crowdtangle action subparser
     # --------------------------------------------------------------------------
     'crowdtangle': {
