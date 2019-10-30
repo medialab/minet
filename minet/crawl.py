@@ -220,6 +220,7 @@ class Crawler(object):
 
         self.using_persistent_queue = queue_path is not None
         self.http = create_pool(threads=threads)
+        self.state = CrawlerState()
 
         # Memory queue
         if not self.using_persistent_queue:
@@ -242,6 +243,8 @@ class Crawler(object):
         for job in jobs:
             assert type(job) is CrawlJob
             self.queue.put(job)
+
+        self.state.jobs_queued = self.queue.qsize()
 
     def start(self):
 
@@ -282,6 +285,8 @@ class Crawler(object):
         # Enqueuing next jobs
         if next_jobs is not None:
             self.enqueue(next_jobs)
+
+        self.state.jobs_done += 1
 
         return CrawlWorkerResult(
             job=job,
