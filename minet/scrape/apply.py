@@ -115,6 +115,8 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
     if 'sel' in scraper:
         element = element.select_one(scraper['sel'])
     elif 'sel_eval' in scraper:
+
+        # TODO: validate
         element = eval_expression(
             scraper['sel_eval'],
             element=element,
@@ -123,6 +125,8 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
             html=html,
             root=root
         )
+
+    # What to do when user wants to work on multiple selection without iterating
 
     # Then we need to solve iterator
     single_value = True
