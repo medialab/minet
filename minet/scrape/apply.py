@@ -34,13 +34,13 @@ def merge_contexts(global_context, local_context):
 
 def extract(element, extractor_name):
     if extractor_name == 'text':
-        return element.get_text()
+        return element.get_text().strip()
 
     if extractor_name == 'html' or extractor_name == 'inner_html':
-        return element.encode_contents().decode()
+        return element.encode_contents().decode().strip()
 
     if extractor_name == 'outer_html':
-        return str(element)
+        return str(element).strip()
 
     raise TypeError('Unknown "%s" extractor' % extractor_name)
 
@@ -205,7 +205,7 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
                 else:
 
                     # Default value is text
-                    value = element.get_text()
+                    value = extract(element, 'text')
 
                 # Format?
                 if 'format' in scraper:
