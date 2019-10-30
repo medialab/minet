@@ -259,6 +259,8 @@ class Crawler(object):
                 self.enqueue(spider.get_start_jobs())
 
     def work(self, job):
+        self.state.jobs_queued = self.queue.qsize()
+
         spider = self.spiders.get(job.spider)
 
         if spider is None:

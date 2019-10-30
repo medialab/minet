@@ -1,5 +1,7 @@
 ---
 spiders:
+
+  # Retrieving links to the month pages
   archive:
     start_url: https://paris.demosphere.net/?selectStartTime=1172703601&endTime=1175378401&limit=1000&showArchiveLinks=1
     next:
@@ -12,6 +14,8 @@ spiders:
           spider:
             constant: month
     max_depth: 0
+
+  # Retrieving full list of events per month
   month:
     next:
       scraper:
@@ -22,9 +26,13 @@ spiders:
           spider:
             constant: rv
     max_depth: 1
+
+  # Retrieving the actual events
   rv:
     scrapers:
-      rvs:
+
+      # Scraping events
+      events:
         fields:
           title:
             sel: title
@@ -63,3 +71,53 @@ spiders:
           second:
             sel: .dayrank2
             constant: 1
+
+      # Scraping comments
+      comments:
+        iterator: "#comments-list .comment"
+        context:
+          url:
+            sel: link[rel=canonical]
+            attr: href
+        fields:
+          url:
+            get: url
+          id:
+            attr: id
+            split: value.split('-')[-1]
+          title:
+            sel: .comment-title > a
+          author:
+            sel: .comment-information
+            eval: "value.strip().rsplit(',', 1)[0].replace('Par ', '')"
+          date:
+            sel: .comment-information
+            eval: "value.strip().split('le ')[-1].split(' à')[0]"
+          time:
+            sel: .comment-information
+            eval: "value.strip().split('à ')[-1]"
+          text:
+            sel: .comment-body > p
+            extract: outer_html
+
+      # Scraping text
+      paragraphs:
+        iterator: .textPart
+        context:
+          url:
+            sel: link[rel=canonical]
+            attr: href
+        fields:
+          url:
+            get: url
+          title:
+            sel: .openingBlock
+          text:
+            sel: .openingBlock ~ p:not(.floatRight):not(.closingBlock)
+            eval: "''.join(e.get_text() for e in elements).strip()"
+          links:
+            sel: .demosphere-source-link > a
+            eval: "'|'.join(e.get('href') for e in elements)"
+          sources:
+            sel: .demosphere-sources > a
+            eval: "'|'.join(e.get('href') for e in elements)"
