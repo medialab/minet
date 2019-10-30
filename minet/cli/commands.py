@@ -72,8 +72,8 @@ MINET_COMMANDS = {
                 'default': 'crawl'
             },
             {
-                'flags': ['-q', '--persist-queue'],
-                'help': 'Whether to persist the crawler queue on file to be able to resume the crawl.',
+                'flag': '--resume',
+                'help': 'Whether to resume an interrupted crawl.',
                 'action': 'store_true'
             },
             {
