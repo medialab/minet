@@ -5,7 +5,7 @@ next:
     iterator: a.more
     item:
       attr: href
-max_level: 10
+max_level: 4
 scrapers:
   title:
     sel: title

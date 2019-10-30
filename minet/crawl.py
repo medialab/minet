@@ -236,10 +236,10 @@ class Crawler(object):
         # Creating spiders
         if 'spiders' in spec:
             spiders = {name: Spider(s, name=name) for name, s in spec['spiders'].items()}
-            self.single_spider = True
+            self.single_spider = False
         else:
             spiders = {'default': Spider(spec)}
-            self.single_spider = False
+            self.single_spider = True
 
         self.queue = queue
         self.spiders = spiders
@@ -330,7 +330,7 @@ class Crawler(object):
         # Releasing queue (needed by persistqueue)
         if self.using_persistent_queue:
             del self.queue
-            rmtree(self.queue_path)
+            rmtree(self.queue_path, ignore_errors=True)
 
 
 def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,

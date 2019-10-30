@@ -6,7 +6,7 @@
 #
 import os
 import csv
-from os.path import join, isfile
+from os.path import join, isfile, dirname
 from tqdm import tqdm
 from shutil import rmtree
 
@@ -63,6 +63,8 @@ def open_report(path, headers, resume=False):
     if resume and isfile(path):
         flag = 'a'
 
+    os.makedirs(dirname(path), exist_ok=True)
+
     f = open(path, flag)
     writer = csv.writer(f)
 
@@ -72,12 +74,74 @@ def open_report(path, headers, resume=False):
     return f, writer
 
 
+class ScraperReporter(object):
+    def __init__(self, path, scraper, resume=False):
+        if scraper.headers is None:
+            raise NotImplementedError('Scraper headers could not be inferred.')
+
+        f, writer = open_report(path, scraper.headers, resume)
+
+        self.headers = scraper.headers
+        self.file = f
+        self.writer = writer
+
+    def write(self, items):
+
+        # TODO: maybe abstract this once step above
+        if not isinstance(items, list):
+            items = [items]
+
+        for item in items:
+            if not isinstance(item, dict):
+                self.writer.writerow([item])
+                continue
+
+            row = [item.get(k, '') for k in self.headers]
+            self.writer.writerow(row)
+
+    def close(self):
+        self.file.close()
+
+
+class ScraperReporterPool(object):
+    def __init__(self, crawler, output_dir, resume=False):
+        self.reporters = {}
+
+        if crawler.single_spider:
+            spider = crawler.spiders['default']
+
+            self.reporters['default'] = {}
+
+            for name, scraper in spider.scrapers.items():
+                path = join(output_dir, 'scraped', '%s.csv' % name)
+
+                reporter = ScraperReporter(path, scraper, resume)
+                self.reporters['default'][name] = reporter
+        else:
+            pass
+
+    def write(self, spider_name, scraped):
+        reporter = self.reporters[spider_name]
+
+        for name, items in scraped['multiple'].items():
+            reporter[name].write(items)
+
+    def close(self):
+        for spider_reporters in self.reporters.values():
+            for reporter in spider_reporters.values():
+                reporter.close()
+
+
 def crawl_action(namespace):
 
     if namespace.resume:
         print_err('Resuming crawl...')
     else:
-        rmtree(namespace.output_dir)
+        rmtree(namespace.output_dir, ignore_errors=True)
+
+    # Loading crawler definition
+    queue_path = join(namespace.output_dir, 'queue')
+    definition = load_definition(namespace.crawler)
 
     # Scaffolding output directory
     os.makedirs(namespace.output_dir, exist_ok=True)
@@ -89,15 +153,17 @@ def crawl_action(namespace):
         resume=namespace.resume
     )
 
-    queue_path = join(namespace.output_dir, 'queue')
-
-    # Loading crawler definition
-    definition = load_definition(namespace.crawler)
-
+    # Creating crawler
     crawler = Crawler(
         definition,
         throttle=namespace.throttle,
         queue_path=queue_path
+    )
+
+    reporter_pool = ScraperReporterPool(
+        crawler,
+        namespace.output_dir,
+        resume=namespace.resume
     )
 
     # Loading bar
@@ -121,5 +187,11 @@ def crawl_action(namespace):
         update_loading_bar()
         jobs_writer.writerow(format_job_for_csv(result))
 
+        if result.error is not None:
+            continue
+
+        reporter_pool.write(result.job.spider, result.scraped)
+
     loading_bar.close()
     jobs_output.close()
+    reporter_pool.close()
