@@ -8,6 +8,7 @@ data
 dist
 ftest/content
 ftest/corpus
+ftest/crawl
 ftest/*.csv
 *.q
 *.jsonl
