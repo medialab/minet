@@ -69,6 +69,10 @@ class CrawlJob(object):
             'spider': self.spider
         }
 
+    @staticmethod
+    def grouper(job):
+        return get_domain_name(job.url)
+
 
 class CrawlerState(object):
     __slots__ = ('jobs_done', 'jobs_queued')
@@ -201,54 +205,58 @@ class TaskContext(object):
         self.queue_iterator.task_done()
 
 
-# TODO: create a Crawler class with helpers such as retrieving the headers
-def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
-          throttle=DEFAULT_THROTTLE):
+class Crawler(object):
+    def __init__(self, spec, queue_path=None, threads=25,
+                 buffer_size=DEFAULT_GROUP_BUFFER_SIZE, throttle=DEFAULT_THROTTLE):
 
-    # NOTE: crawling could work depth-first but:
-    # buffer_size should be 0 (requires to fix quenouille issue #1)
+        # NOTE: crawling could work depth-first but:
+        # buffer_size should be 0 (requires to fix quenouille issue #1)
 
-    using_persistent_queue = queue_path is not None
+        # Params
+        self.queue_path = queue_path
+        self.threads = threads
+        self.buffer_size = buffer_size
+        self.throttle = throttle
 
-    # Memory queue
-    if not using_persistent_queue:
-        queue = Queue()
+        self.using_persistent_queue = queue_path is not None
+        self.http = create_pool(threads=threads)
 
-    # Persistent queue
-    else:
-        queue = SQLiteQueue(queue_path, multithreading=True, auto_commit=False)
+        # Memory queue
+        if not self.using_persistent_queue:
+            queue = Queue()
 
-    # Creating spiders
-    if 'spiders' in spec:
-        spiders = {name: Spider(s, name=name) for name, s in spec['spiders'].items()}
-    else:
-        spiders = {'default': Spider(spec)}
+        # Persistent queue
+        else:
+            queue = SQLiteQueue(queue_path, multithreading=True, auto_commit=False)
 
-    def enqueue(jobs):
+        # Creating spiders
+        if 'spiders' in spec:
+            spiders = {name: Spider(s, name=name) for name, s in spec['spiders'].items()}
+        else:
+            spiders = {'default': Spider(spec)}
+
+        self.queue = queue
+        self.spiders = spiders
+
+    def enqueue(self, jobs):
         for job in jobs:
-            assert isinstance(job, CrawlJob)
-            queue.put(job)
+            assert type(job) is CrawlJob
+            self.queue.put(job)
 
-    # Collecting start jobs - we only add those if queue is not pre-existing
-    if queue.qsize() == 0:
-        for spider in spiders.values():
-            enqueue(spider.get_start_jobs())
+    def start(self):
 
-    http = create_pool(threads=threads)
+        # Collecting start jobs - we only add those if queue is not pre-existing
+        if self.queue.qsize() == 0:
+            for spider in self.spiders.values():
+                self.enqueue(spider.get_start_jobs())
 
-    queue_iterator = QueueIterator(queue)
-    task_context = TaskContext(queue, queue_iterator)
-
-    def grouper(job):
-        return get_domain_name(job.url)
-
-    def worker(job):
-        spider = spiders.get(job.spider)
+    def work(self, job):
+        spider = self.spiders.get(job.spider)
 
         if spider is None:
             raise UnknownSpiderError('Unknown spider "%s"' % job.spider)
 
-        err, response = request(http, job.url)
+        err, response = request(self.http, job.url)
 
         if err:
             return CrawlWorkerResult(
@@ -280,34 +288,60 @@ def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SI
             next_jobs=next_jobs
         )
 
-    multithreaded_iterator = imap_unordered(
-        queue_iterator,
-        worker,
-        threads,
-        group=grouper,
-        group_parallelism=DEFAULT_GROUP_PARALLELISM,
-        group_buffer_size=buffer_size,
-        group_throttle=throttle
+    def __iter__(self):
+        queue_iterator = QueueIterator(self.queue)
+        task_context = TaskContext(self.queue, queue_iterator)
+
+        multithreaded_iterator = imap_unordered(
+            queue_iterator,
+            self.work,
+            self.threads,
+            group=CrawlJob.grouper,
+            group_parallelism=DEFAULT_GROUP_PARALLELISM,
+            group_buffer_size=self.buffer_size,
+            group_throttle=self.throttle
+        )
+
+        def generator():
+            for result in multithreaded_iterator:
+                with task_context:
+
+                    # Errored job
+                    if result.error:
+                        yield result
+
+                        continue
+
+                    # Enqueuing next jobs
+                    # TODO: enqueueing should also be done in worker
+                    if result.next_jobs is not None:
+                        self.enqueue(result.next_jobs)
+
+                    yield result
+
+            self.cleanup()
+
+        return generator()
+
+    def cleanup(self):
+
+        # Releasing queue (needed by persistqueue)
+        if self.using_persistent_queue:
+            del self.queue
+            rmtree(self.queue_path)
+
+
+def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
+          throttle=DEFAULT_THROTTLE):
+
+    crawler = Crawler(
+        spec,
+        queue_path=queue_path,
+        threads=threads,
+        buffer_size=buffer_size,
+        throttle=throttle
     )
 
-    for result in multithreaded_iterator:
+    crawler.start()
 
-        with task_context:
-
-            # Errored job
-            if result.error:
-                yield result
-
-                continue
-
-            # Enqueuing next jobs
-            # TODO: enqueueing could also be done in worker
-            if result.next_jobs is not None:
-                enqueue(result.next_jobs)
-
-            yield result
-
-    # Releasing queue (needed by persistqueue)
-    if using_persistent_queue:
-        del queue
-        rmtree(queue_path)
+    yield from crawler
