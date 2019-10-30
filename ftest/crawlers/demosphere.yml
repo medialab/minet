@@ -4,13 +4,14 @@ spiders:
     start_url: https://paris.demosphere.net/?selectStartTime=1172703601&endTime=1175378401&limit=1000&showArchiveLinks=1
     next:
       scraper:
-        iterator: '#archive > table td > a'
+        sel: '#archive > table td > a'
         fields:
           url:
             attr: href
-            eval: value.replace('&limit=300', '')
+            eval: value.replace('&limit=1000', '')
           spider:
             constant: month
+    max_depth: 0
   month:
     next:
       scraper:
@@ -20,6 +21,7 @@ spiders:
             attr: href
           spider:
             constant: rv
+    max_depth: 1
   rv:
     scrapers:
       rvs:

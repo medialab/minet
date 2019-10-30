@@ -195,10 +195,10 @@ def crawl_action(namespace):
         dynamic_ncols=True
     )
 
-    def update_loading_bar():
+    def update_loading_bar(result):
         state = crawler.state
 
-        loading_bar.set_postfix(queue=state.jobs_queued)
+        loading_bar.set_postfix(queue=state.jobs_queued, spider=result.job.spider)
         loading_bar.update()
 
     # Starting crawler
@@ -206,7 +206,7 @@ def crawl_action(namespace):
 
     # Running crawler
     for result in crawler:
-        update_loading_bar()
+        update_loading_bar(result)
         jobs_writer.writerow(format_job_for_csv(result))
 
         if result.error is not None:
