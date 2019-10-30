@@ -236,8 +236,10 @@ class Crawler(object):
         # Creating spiders
         if 'spiders' in spec:
             spiders = {name: Spider(s, name=name) for name, s in spec['spiders'].items()}
+            self.single_spider = True
         else:
             spiders = {'default': Spider(spec)}
+            self.single_spider = False
 
         self.queue = queue
         self.spiders = spiders
