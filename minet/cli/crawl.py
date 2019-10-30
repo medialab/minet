@@ -6,7 +6,7 @@
 #
 import os
 import csv
-from os.path import join, isfile, isdir
+from os.path import join, isfile
 from tqdm import tqdm
 from shutil import rmtree
 

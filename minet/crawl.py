@@ -57,6 +57,9 @@ class CrawlJob(object):
         self.level = level
         self.spider = spider
 
+    def id(self):
+        return '%x' % id(self)
+
     def __repr__(self):
         class_name = self.__class__.__name__
 
@@ -177,17 +180,17 @@ class Spider(object):
 
         return next_jobs
 
-    def scrape(self, response_data):
+    def scrape(self, response_data, context=None):
         scraped = {
             'single': None,
             'multiple': {}
         }
 
         if self.scraper is not None:
-            scraped['single'] = self.scraper(response_data)
+            scraped['single'] = self.scraper(response_data, context=context)
 
         for name, scraper in self.scrapers.items():
-            scraped['multiple'][name] = scraper(response_data)
+            scraped['multiple'][name] = scraper(response_data, context=context)
 
         return scraped
 
@@ -277,7 +280,7 @@ class Crawler(object):
         data = response.data.decode(meta['encoding'], errors='replace')
 
         # Scraping items
-        scraped = spider.scrape(data)
+        scraped = spider.scrape(data, context={'job': job.id()})
 
         # Finding next jobs
         next_jobs = spider.get_next_jobs(job, data, response.geturl())
