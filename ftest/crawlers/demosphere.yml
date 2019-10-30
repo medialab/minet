@@ -8,6 +8,7 @@ spiders:
         fields:
           url:
             attr: href
+            eval: value.replace('&limit=300', '')
           spider:
             constant: month
   month:
@@ -20,11 +21,43 @@ spiders:
           spider:
             constant: rv
   rv:
-    scraper:
-      fields:
-        title:
-          sel: title
-          transform: strip
-        url:
-          sel: link[rel=canonical]
-          attr: href
+    scrapers:
+      rvs:
+        fields:
+          title:
+            sel: title
+          url:
+            sel: link[rel=canonical]
+            attr: href
+          date:
+            sel: '#dateContents > .date'
+            attr: data-val
+          time:
+            sel: '#dateContents > .time'
+            attr: data-val
+          themes:
+            sel: .topicsList > a
+            eval: "'|'.join([e.get_text().strip() for e in elements])"
+          comments:
+            sel: .actionBoxLinkText
+            eval: "re.sub(r'[^0-9]', '', value)"
+          parts:
+            sel: '#textPart0 .textNav > a'
+            eval: len(elements)
+            default: 1
+          address:
+            sel: .address-text > a
+            eval: "' § '.join([s.strip() for s in value.split('\\n')])"
+          coordinates:
+            sel: .mapimage-link
+            attr: href
+            eval: "value.split('place/')[-1].split('/')[0]"
+          incomplete:
+            sel: .incomplete
+            constant: 1
+          first:
+            sel: .dayrank1
+            constant: 1
+          second:
+            sel: .dayrank2
+            constant: 1
