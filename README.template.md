@@ -49,6 +49,8 @@ pip install minet
   * [summary](#summary)
 * [facebook (fb)](#facebook)
   * [comments](#comments)
+* [hyphe](#hyphe)
+  * [dump](#dump)
 * [mediacloud (mc)](#mediacloud)
   * [topic](#topic)
     * [stories](#stories)
@@ -146,6 +148,12 @@ TODO: document the scraping DSL
 ### comments
 
 <% fb/comments %>
+
+## Hyphe
+
+### dump
+
+<% hyphe/dump %>
 
 ## Mediacloud
 

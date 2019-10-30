@@ -49,6 +49,8 @@ pip install minet
   * [summary](#summary)
 * [facebook (fb)](#facebook)
   * [comments](#comments)
+* [hyphe](#hyphe)
+  * [dump](#dump)
 * [mediacloud (mc)](#mediacloud)
   * [topic](#topic)
     * [stories](#stories)
@@ -545,6 +547,35 @@ examples:
 
 . Fetching a dashboard's lists:
     `minet fb comments`
+
+```
+
+## Hyphe
+
+### dump
+
+```
+usage: minet hyphe dump [-h] [-d OUTPUT_DIR] [--body] url corpus
+
+Minet Hyphe Dump Command
+========================
+
+Command dumping page-level information from a given
+Hyphe corpus.
+
+positional arguments:
+  url                                     Url of the Hyphe API.
+  corpus                                  Id of the corpus.
+
+optional arguments:
+  -h, --help                              show this help message and exit
+  -d OUTPUT_DIR, --output-dir OUTPUT_DIR  Output directory for dumped files. Will default to some name based on corpus name.
+  --body                                  Whether to download pages body.
+
+examples:
+
+. Dumping a corpus into the ./corpus directory:
+    `minet hyphe dump http://myhyphe.com/api/ corpus-name -d corpus`
 
 ```
 
