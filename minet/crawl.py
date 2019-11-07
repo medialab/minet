@@ -209,7 +209,7 @@ class TaskContext(object):
 
 
 class Crawler(object):
-    def __init__(self, spec, queue_path=None, threads=25,
+    def __init__(self, spec=None, queue_path=None, threads=25,
                  buffer_size=DEFAULT_GROUP_BUFFER_SIZE, throttle=DEFAULT_THROTTLE):
 
         # NOTE: crawling could work depth-first but:
@@ -234,12 +234,13 @@ class Crawler(object):
             queue = SQLiteQueue(queue_path, multithreading=True, auto_commit=False)
 
         # Creating spiders
-        if 'spiders' in spec:
-            spiders = {name: Spider(s, name=name) for name, s in spec['spiders'].items()}
-            self.single_spider = False
-        else:
-            spiders = {'default': Spider(spec)}
-            self.single_spider = True
+        if spec is not None:
+            if 'spiders' in spec:
+                spiders = {name: Spider(s, name=name) for name, s in spec['spiders'].items()}
+                self.single_spider = False
+            else:
+                spiders = {'default': Spider(spec)}
+                self.single_spider = True
 
         self.queue = queue
         self.spiders = spiders
@@ -335,7 +336,7 @@ class Crawler(object):
             rmtree(self.queue_path, ignore_errors=True)
 
 
-def crawl(spec, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
+def crawl(spec=None, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
           throttle=DEFAULT_THROTTLE):
 
     crawler = Crawler(
