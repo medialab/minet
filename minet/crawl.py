@@ -97,6 +97,22 @@ class CrawlerState(object):
         }
 
 
+class AbstractSpider(object):
+    def __init__(self, name='default'):
+
+        # Descriptors
+        self.name = name
+
+    def start_jobs(self):
+        return None
+
+    def scrape(self, job, response, content):
+        return None
+
+    def next_jobs(self, job, response, content):
+        return None
+
+
 class Spider(object):
     def __init__(self, definition, name='default'):
 
