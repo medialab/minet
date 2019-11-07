@@ -224,6 +224,7 @@ class Crawler(object):
         self.using_persistent_queue = queue_path is not None
         self.http = create_pool(threads=threads)
         self.state = CrawlerState()
+        self.started = False
 
         # Memory queue
         if not self.using_persistent_queue:
@@ -254,10 +255,15 @@ class Crawler(object):
 
     def start(self):
 
+        if self.started:
+            return
+
         # Collecting start jobs - we only add those if queue is not pre-existing
         if self.queue.qsize() == 0:
             for spider in self.spiders.values():
                 self.enqueue(spider.get_start_jobs())
+
+        self.started = True
 
     def work(self, job):
         self.state.jobs_queued = self.queue.qsize()
@@ -306,6 +312,9 @@ class Crawler(object):
         )
 
     def __iter__(self):
+
+        self.start()
+
         queue_iterator = QueueIterator(self.queue)
         task_context = TaskContext(self.queue, queue_iterator)
 
@@ -336,17 +345,8 @@ class Crawler(object):
             rmtree(self.queue_path, ignore_errors=True)
 
 
-def crawl(spec=None, queue_path=None, threads=25, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
-          throttle=DEFAULT_THROTTLE):
+def crawl(*args, **kwargs):
 
-    crawler = Crawler(
-        spec,
-        queue_path=queue_path,
-        threads=threads,
-        buffer_size=buffer_size,
-        throttle=throttle
-    )
-
-    crawler.start()
+    crawler = Crawler(*args, **kwargs)
 
     yield from crawler
