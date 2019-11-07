@@ -284,7 +284,7 @@ class Crawler(object):
         data = response.data.decode(meta['encoding'], errors='replace')
 
         # Scraping items
-        scraped = spider.scrape(data, context={'job': job.id()})
+        scraped = spider.scrape(data, context={'job': job.id(), 'url': job.url})
 
         # Finding next jobs
         next_jobs = spider.get_next_jobs(job, data, response.geturl())

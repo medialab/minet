@@ -46,8 +46,8 @@ spiders:
             sel: '#dateContents > .time'
             attr: data-val
           themes:
-            sel: .topicsList > a
-            eval: "'|'.join([e.get_text().strip() for e in elements])"
+            it: .topicsList > a
+            join: '|'
           comments:
             sel: .actionBoxLinkText
             eval: "re.sub(r'[^0-9]', '', value)"
@@ -113,11 +113,16 @@ spiders:
           title:
             sel: .openingBlock
           text:
-            sel: .openingBlock ~ p:not(.floatRight):not(.closingBlock)
-            eval: "''.join(e.get_text() for e in elements).strip()"
+            it: .openingBlock ~ p:not(.floatRight):not(.closingBlock)
+            item:
+              extract: text
+              transform: strip
+            join: '\n'
           links:
-            sel: .demosphere-source-link > a
-            eval: "'|'.join(e.get('href') for e in elements)"
+            it: .demosphere-source-link > a
+            item: href
+            join: '|'
           sources:
-            sel: .demosphere-sources > a
-            eval: "'|'.join(e.get('href') for e in elements)"
+            it: .demosphere-sources > a
+            item: href
+            join: '|'

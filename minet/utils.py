@@ -724,8 +724,11 @@ def nested_get(path, o):
 
     for step in path:
         try:
-            o = o[step]
-        except (IndexError, KeyError):
+            if isinstance(o, (dict, list)):
+                o = o[step]
+            else:
+                getattr(o, step)
+        except (IndexError, KeyError, AttributeError):
             return None
 
     return o
