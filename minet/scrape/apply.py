@@ -21,6 +21,12 @@ TRANSFORMERS = {
 }
 
 
+def get_aliases(o, aliases):
+    for alias in aliases:
+        if alias in o:
+            return o[alias]
+
+
 def merge_contexts(global_context, local_context):
     if global_context is None:
         return local_context
@@ -111,9 +117,12 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
 
         return element.get(scraper)
 
+    sel = get_aliases(scraper, ['sel', '$'])
+    iterator = get_aliases(scraper, ['iterator', 'it', '$$'])
+
     # First we need to solve local selection
-    if 'sel' in scraper:
-        element = element.select_one(scraper['sel'])
+    if sel is not None:
+        element = element.select_one(sel)
     elif 'sel_eval' in scraper:
 
         # TODO: validate
@@ -126,13 +135,11 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
             root=root
         )
 
-    # What to do when user wants to work on multiple selection without iterating
-
     # Then we need to solve iterator
     single_value = True
 
-    if 'iterator' in scraper:
-        elements = element.select(scraper['iterator'])
+    if iterator is not None:
+        elements = element.select(iterator)
         single_value = False
     elif 'iterator_eval' in scraper:
         elements = eval_expression(

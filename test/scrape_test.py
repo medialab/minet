@@ -173,7 +173,7 @@ class TestScrape(object):
         ]
 
         result = scrape({
-            'iterator': 'li',
+            'it': 'li',
             'fields': {
                 'value': 'text',
                 'constant': {
@@ -229,7 +229,7 @@ class TestScrape(object):
         assert result == ['li1', 'li3']
 
         result = scrape({
-            'iterator': 'li',
+            '$$': 'li',
             'fields': {
                 'id': 'id'
             },
@@ -398,7 +398,7 @@ class TestScrape(object):
         result = scrape({
             'context': {
                 'divid': {
-                    'sel': '#ok',
+                    '$': '#ok',
                     'attr': 'id'
                 }
             },
