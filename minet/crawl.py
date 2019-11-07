@@ -97,12 +97,8 @@ class CrawlerState(object):
         }
 
 
+# TODO: add BeautifulsoupSpider
 class AbstractSpider(object):
-    def __init__(self, name='default'):
-
-        # Descriptors
-        self.name = name
-
     def start_jobs(self):
         return None
 
