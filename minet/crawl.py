@@ -50,12 +50,13 @@ def ensure_list(value):
 
 
 class CrawlJob(object):
-    __slots__ = ('url', 'level', 'spider')
+    __slots__ = ('url', 'level', 'spider', 'data')
 
-    def __init__(self, url, level=0, spider='default'):
+    def __init__(self, url, level=0, spider='default', data=None):
         self.url = url
         self.level = level
         self.spider = spider
+        self.data = data
 
     def id(self):
         return '%x' % id(self)
