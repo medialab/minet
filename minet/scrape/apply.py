@@ -286,4 +286,7 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
 
             acc.append(value)
 
+    if not single_value and 'join' in scraper:
+        acc = scraper['join'].join(acc)
+
     return acc
