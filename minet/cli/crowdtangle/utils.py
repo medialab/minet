@@ -9,11 +9,13 @@ import json
 from datetime import date, timedelta
 from tqdm import tqdm
 from ural import get_domain_name, normalize_url
-from urllib3 import Timeout
 
 from minet.utils import create_pool, request, RateLimiter
 from minet.cli.utils import print_err, die, custom_reader
-from minet.cli.crowdtangle.constants import CROWDTANGLE_DEFAULT_RATE_LIMIT
+from minet.cli.crowdtangle.constants import (
+    CROWDTANGLE_DEFAULT_RATE_LIMIT,
+    CROWDTANGLE_DEFAULT_TIMEOUT
+)
 
 DAY_DELTA = timedelta(days=1)
 
@@ -180,7 +182,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                             item_name, item_key, default_rate_limit=CROWDTANGLE_DEFAULT_RATE_LIMIT):
 
     def action(namespace, output_file):
-        http = create_pool(timeout=Timeout(connect=10, read=60 * 5))
+        http = create_pool(timeout=CROWDTANGLE_DEFAULT_TIMEOUT)
 
         url_report_writer = None
 

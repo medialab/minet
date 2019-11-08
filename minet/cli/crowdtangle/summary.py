@@ -15,7 +15,8 @@ from minet.cli.utils import die, custom_reader
 
 from minet.cli.crowdtangle.constants import (
     CROWDTANTLE_LINKS_DEFAULT_RATE_LIMIT,
-    CROWDTANGLE_REACTION_TYPES
+    CROWDTANGLE_REACTION_TYPES,
+    CROWDTANGLE_DEFAULT_TIMEOUT
 )
 
 URL_TEMPLATE = (
@@ -48,7 +49,7 @@ def crowdtangle_summary_action(namespace, output_file):
     if not namespace.start_date:
         die('Missing --start-date!')
 
-    http = create_pool()
+    http = create_pool(timeout=CROWDTANGLE_DEFAULT_TIMEOUT)
 
     if is_url(namespace.column):
         namespace.file = StringIO('url\n%s' % namespace.column)
