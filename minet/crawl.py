@@ -99,6 +99,7 @@ class CrawlerState(object):
 
 
 # TODO: add BeautifulsoupSpider
+# TODO: add crawler start url + function spider
 class Spider(object):
     def __init__(self, name='default'):
         self.name = name
@@ -106,10 +107,16 @@ class Spider(object):
     def start_jobs(self):
         return None
 
-    def scrape(self, job, response, content):
+    def extract_meta_from_response(self, job, response):
+        return extract_response_meta(response)
+
+    def process_content(self, job, response, meta=None):
+        return response.data.decode(meta['encoding'], errors='replace')
+
+    def scrape(self, job, response, content, meta=None):
         return None
 
-    def next_jobs(self, job, response, content):
+    def next_jobs(self, job, response, content, meta=None):
         return None
 
 
@@ -184,7 +191,7 @@ class DefinitionSpider(Spider):
                 data=target.get('data')
             )
 
-    def next_jobs(self, job, response, content):
+    def next_jobs(self, job, response, content, meta=None):
         if not self.next_definition:
             return
 
@@ -196,7 +203,7 @@ class DefinitionSpider(Spider):
         for target in self.next_targets(content, next_level):
             yield self.job_from_target(response.geturl(), target, next_level)
 
-    def scrape(self, job, response, content):
+    def scrape(self, job, response, content, meta=None):
         scraped = {
             'single': None,
             'multiple': {}
@@ -307,17 +314,16 @@ class Crawler(object):
                 next_jobs=None
             )
 
-        meta = extract_response_meta(response)
+        meta = spider.extract_meta_from_response(job, response)
 
         # Decoding response content
-        # TODO: abstract at spider level using parse_content
-        content = response.data.decode(meta['encoding'], errors='replace')
+        content = spider.process_content(job, response, meta)
 
         # Scraping items
-        scraped = spider.scrape(job, response, content)
+        scraped = spider.scrape(job, response, content, meta)
 
         # Finding next jobs
-        next_jobs = spider.next_jobs(job, response, content)
+        next_jobs = spider.next_jobs(job, response, content, meta)
 
         # Enqueuing next jobs
         if next_jobs is not None:
