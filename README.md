@@ -9,8 +9,9 @@ In addition, **minet** also exposes its high-level programmatic interface as a l
 ## Features
 
 * Multithreaded, memory-efficient fetching from the web.
+* Multithreaded, scalable crawling using a comfy DSL.
 * Multiprocessed raw text content extraction from HTML pages.
-* Multiprocessed scraping from HTML pages using a comfy JSON DSL.
+* Multiprocessed scraping from HTML pages using a comfy DSL.
 * URL-related heuristics utilities such as normalization and matching.
 * Data collection from various APIs such as [CrowdTangle](https://www.crowdtangle.com/).
 
