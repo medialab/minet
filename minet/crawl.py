@@ -38,6 +38,7 @@ CrawlWorkerResult = namedtuple(
         'error',
         'response',
         'meta',
+        'content',
         'next_jobs'
     ]
 )
@@ -98,7 +99,10 @@ class CrawlerState(object):
 
 
 # TODO: add BeautifulsoupSpider
-class AbstractSpider(object):
+class Spider(object):
+    def __init__(self, name='default'):
+        self.name = name
+
     def start_jobs(self):
         return None
 
@@ -109,7 +113,7 @@ class AbstractSpider(object):
         return None
 
 
-class Spider(object):
+class DefinitionSpider(Spider):
     def __init__(self, definition, name='default'):
 
         # Descriptors
@@ -135,35 +139,20 @@ class Spider(object):
         if self.next_definition is not None and 'scraper' in self.next_definition:
             self.next_scraper = Scraper(self.next_definition['scraper'])
 
-    def get_start_jobs(self):
+    def start_jobs(self):
         start_urls = (
             ensure_list(self.definition.get('start_url', [])) +
             ensure_list(self.definition.get('start_urls', []))
         )
 
-        return [CrawlJob(url, spider=self.name) for url in start_urls]
+        for url in start_urls:
+            yield CrawlJob(url, spider=self.name)
 
-    def job_from_target(self, target, current_url, next_level):
-        if isinstance(target, str):
-            return CrawlJob(
-                url=urljoin(current_url, target),
-                level=next_level,
-                spider=self.name
-            )
-
-        # TODO: validate target
-        return CrawlJob(
-            url=urljoin(current_url, target['url']),
-            level=next_level,
-            spider=target.get('spider', self.name)
-        )
-
-    def next_targets_iter(self, job, html):
-        next_level = job.level + 1
+    def next_targets(self, content, next_level):
 
         # Scraping next results
         if self.next_scraper is not None:
-            scraped = self.next_scraper(html)
+            scraped = self.next_scraper(content)
 
             if isinstance(scraped, list):
                 yield from scraped
@@ -177,7 +166,25 @@ class Spider(object):
                 level=next_level
             )
 
-    def get_next_jobs(self, job, html, current_url):
+    def job_from_target(self, current_url, target, next_level):
+        if isinstance(target, str):
+            return CrawlJob(
+                url=urljoin(current_url, target),
+                spider=self.name,
+                level=next_level
+            )
+
+        else:
+
+            # TODO: validate target
+            return CrawlJob(
+                url=urljoin(current_url, target['url']),
+                spider=target.get('spider', self.name),
+                level=next_level,
+                data=target.get('data')
+            )
+
+    def next_jobs(self, job, response, content):
         if not self.next_definition:
             return
 
@@ -186,24 +193,22 @@ class Spider(object):
         if next_level > self.max_level:
             return
 
-        next_jobs = []
+        for target in self.next_targets(content, next_level):
+            yield self.job_from_target(response.geturl(), target, next_level)
 
-        for target in self.next_targets_iter(job, html):
-            next_jobs.append(self.job_from_target(target, current_url, next_level))
-
-        return next_jobs
-
-    def scrape(self, response_data, context=None):
+    def scrape(self, job, response, content):
         scraped = {
             'single': None,
             'multiple': {}
         }
 
+        context = {'job': job.id(), 'url': job.url}
+
         if self.scraper is not None:
-            scraped['single'] = self.scraper(response_data, context=context)
+            scraped['single'] = self.scraper(content, context=context)
 
         for name, scraper in self.scrapers.items():
-            scraped['multiple'][name] = scraper(response_data, context=context)
+            scraped['multiple'][name] = scraper(content, context=context)
 
         return scraped
 
@@ -250,19 +255,22 @@ class Crawler(object):
         # Creating spiders
         if spec is not None:
             if 'spiders' in spec:
-                spiders = {name: Spider(s, name=name) for name, s in spec['spiders'].items()}
+                spiders = {name: DefinitionSpider(s, name=name) for name, s in spec['spiders'].items()}
                 self.single_spider = False
             else:
-                spiders = {'default': Spider(spec)}
+                spiders = {'default': DefinitionSpider(spec)}
                 self.single_spider = True
 
         self.queue = queue
         self.spiders = spiders
 
-    def enqueue(self, jobs):
-        for job in jobs:
-            assert type(job) is CrawlJob
-            self.queue.put(job)
+    def enqueue(self, job_or_jobs):
+        if not isinstance(job_or_jobs, CrawlJob):
+            for job in job_or_jobs:
+                assert isinstance(job, CrawlJob)
+                self.queue.put(job)
+        else:
+            self.queue.put(job_or_jobs)
 
         self.state.jobs_queued = self.queue.qsize()
 
@@ -274,7 +282,7 @@ class Crawler(object):
         # Collecting start jobs - we only add those if queue is not pre-existing
         if self.queue.qsize() == 0:
             for spider in self.spiders.values():
-                self.enqueue(spider.get_start_jobs())
+                self.enqueue(spider.start_jobs())
 
         self.started = True
 
@@ -295,19 +303,21 @@ class Crawler(object):
                 error=err,
                 response=response,
                 meta=None,
+                content=None,
                 next_jobs=None
             )
 
         meta = extract_response_meta(response)
 
-        # Decoding response data
-        data = response.data.decode(meta['encoding'], errors='replace')
+        # Decoding response content
+        # TODO: abstract at spider level using parse_content
+        content = response.data.decode(meta['encoding'], errors='replace')
 
         # Scraping items
-        scraped = spider.scrape(data, context={'job': job.id(), 'url': job.url})
+        scraped = spider.scrape(job, response, content)
 
         # Finding next jobs
-        next_jobs = spider.get_next_jobs(job, data, response.geturl())
+        next_jobs = spider.next_jobs(job, response, content)
 
         # Enqueuing next jobs
         if next_jobs is not None:
@@ -321,6 +331,7 @@ class Crawler(object):
             error=None,
             response=response,
             meta=meta,
+            content=content,
             next_jobs=next_jobs
         )
 
