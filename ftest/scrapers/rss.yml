@@ -1,0 +1,8 @@
+---
+iterator: link[type='application/rss+xml'], link[type='application/atom+xml']
+fields:
+    url:
+        get: line.url
+    rss:
+        attr: href
+        eval: urljoin(context['line']['url'], value)

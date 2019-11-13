@@ -724,7 +724,7 @@ def nested_get(path, o):
 
     for step in path:
         try:
-            if isinstance(o, (dict, list)):
+            if callable(getattr(o, '__getitem__')):
                 o = o[step]
             else:
                 getattr(o, step)
