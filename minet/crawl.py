@@ -7,6 +7,7 @@
 from queue import Queue
 from persistqueue import SQLiteQueue
 from quenouille import imap_unordered, QueueIterator
+from bs4 import BeautifulSoup
 from ural import get_domain_name
 from collections import namedtuple
 from urllib.parse import urljoin
@@ -98,7 +99,6 @@ class CrawlerState(object):
         }
 
 
-# TODO: add BeautifulsoupSpider
 # TODO: add crawler start url + function spider
 class Spider(object):
     def __init__(self, name='default'):
@@ -118,6 +118,17 @@ class Spider(object):
 
     def next_jobs(self, job, response, content, meta=None):
         return None
+
+
+class BeautifulSoupSpider(Spider):
+    def __init__(self, name='default', engine='lxml'):
+        super().__init__(name)
+        self.engine = engine
+
+    def process_content(self, job, response, meta=None):
+        decoded_content = super().process_content(job, response, meta)
+
+        soup = BeautifulSoup(decoded_content, self.engine)
 
 
 class DefinitionSpider(Spider):
@@ -234,7 +245,7 @@ class TaskContext(object):
 
 
 class Crawler(object):
-    def __init__(self, spec=None, queue_path=None, threads=25,
+    def __init__(self, spec=None, spider=None, spiders=None, queue_path=None, threads=25,
                  buffer_size=DEFAULT_GROUP_BUFFER_SIZE, throttle=DEFAULT_THROTTLE):
 
         # NOTE: crawling could work depth-first but:
@@ -267,6 +278,12 @@ class Crawler(object):
             else:
                 spiders = {'default': DefinitionSpider(spec)}
                 self.single_spider = True
+
+        elif spider is not None:
+            spiders = {'default': spider}
+
+        elif spiders is None:
+            raise TypeError('minet.Crawler: expecting either `spec`, `spider` or `spiders`.')
 
         self.queue = queue
         self.spiders = spiders
@@ -375,6 +392,7 @@ class Crawler(object):
             rmtree(self.queue_path, ignore_errors=True)
 
 
+# Transfer __doc__
 def crawl(*args, **kwargs):
 
     crawler = Crawler(*args, **kwargs)
