@@ -274,6 +274,8 @@ class TaskContext(object):
 
 
 class Crawler(object):
+
+    # TODO: start_jobs with multiple spiders
     def __init__(self, spec=None, spider=None, spiders=None, start_jobs=None,
                  queue_path=None, threads=25,
                  buffer_size=DEFAULT_GROUP_BUFFER_SIZE, throttle=DEFAULT_THROTTLE):
@@ -342,11 +344,17 @@ class Crawler(object):
         # Collecting start jobs - we only add those if queue is not pre-existing
         if self.queue.qsize() == 0:
 
+            # NOTE: start jobs are all buffered into memory
+            # We could use a blocking queue with max size but this could prove
+            # difficult to resume crawls based upon lazy iterators
             if self.start_jobs:
                 self.enqueue(self.start_jobs)
 
             for spider in self.spiders.values():
-                self.enqueue(spider.start_jobs())
+                spider_start_jobs = spider.start_jobs()
+
+                if spider_start_jobs is not None:
+                    self.enqueue(spider_start_jobs)
 
         self.started = True
 
