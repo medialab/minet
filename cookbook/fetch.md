@@ -221,10 +221,10 @@ with open('./urls.csv') as f:
     reader = csv.DictReader(f)
 
     for result in multithreaded_fetch(reader, key=lambda line: line['url']):
-      if result.error is not None:
-        print('Something went wrong', result.error)
-      else:
-        print(result.response.status)
+        if result.error is not None:
+            print('Something went wrong', result.error)
+        else:
+            print(result.response.status)
 ```
 
 Check out full documentation about this API [here](/README.md#multithreaded_fetch)
