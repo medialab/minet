@@ -5,7 +5,7 @@
 # Logic of the `url-join` action.
 #
 import csv
-from ural import LRUTrie
+from ural.lru import NormalizedLRUTrie
 from tqdm import tqdm
 
 from minet.cli.utils import custom_reader, DummyTqdmFile
@@ -37,7 +37,7 @@ def url_join_action(namespace):
     )
 
     # First step is to index left file
-    trie = LRUTrie(strip_trailing_slash=True)
+    trie = NormalizedLRUTrie(strip_trailing_slash=True)
 
     for line in left_reader:
         url = line[left_pos].strip()
