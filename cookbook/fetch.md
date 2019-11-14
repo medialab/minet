@@ -18,6 +18,7 @@ Let's use the `minet fetch` command to do so!
   * [Displaying a finite loading bar](#displaying-a-finite-loading-bar)
   * [Keeping only selected columns in report](#keeping-only-selected-columns-in-report)
   * [Standardizing encoding of fetched files](#standardizing-encoding-of-fetched-files)
+  * [Compressing the output](#compressing-the-output)
   * [Resuming an operation](#resuming-an-operation)
 * [Unix compliance](#unix-compliance)
 * [Fetching from a python script](#fetching-from-a-python-script)
@@ -73,6 +74,60 @@ Now let's check some of the most useful options of the `fetch` command:
 
 ### Customizing the output directory and file names
 
+By default, `minet` will write the fetched files in a folder named `content` relative to your working directory. But maybe this is not what you want. Here is how to change this:
+
+```bash
+minet fetch url urls.csv -d /store/project/html > /store/project/report.csv
+```
+
+Also, by default, because the Internet is a messy place and it could be hard to find an unambiguous name for all the fetched html files, `minet` will use a [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier) as file names.
+
+But you might want to customize your file names because you have relevant metadata.
+
+It is then possible to tell minet to use another column from your file as filename likewise:
+
+*urls.csv*
+
+| id    | url                          |
+|-------|------------------------------|
+| 1     | https://www.lemonde.fr       |
+| 2     | https://www.lefigaro.fr      |
+| 3     | https://www.liberation.fr    |
+| ...   | ...                          |
+| 54038 | https://news.ycombinator.com |
+
+```bash
+minet fetch url urls.csv --filename id > report.csv
+
+ls content
+>>> 1.html 2.html 3.html ...
+```
+
+But what if you want more complex things? What if you want to create a specific folder hierarchy for performance or organizational reasons? It is also possible to pass a template to `minet` so it will be able to build the desired file paths.
+
+*urls.csv*
+
+| id    | url                          | media      |
+|-------|------------------------------|------------|
+| 1     | https://www.lemonde.fr       | lemonde    |
+| 2     | https://www.lefigaro.fr      | lefigaro   |
+| 3     | https://www.liberation.fr    | liberation |
+| ...   | ...                          | ...        |
+| 54038 | https://news.ycombinator.com | hackernews |
+
+
+```bash
+minet fetch url urls.csv \
+    --filename-template '{line["media"]}/{line["id"]}{ext}' \
+    > report.csv
+
+ls content
+>>> hackernews lefigaro lemonde liberation
+
+ls content/liberation
+>>> 1.html
+```
+
 ### Throttling & Threading
 
 ### Displaying a finite loading bar
@@ -82,6 +137,20 @@ Now let's check some of the most useful options of the `fetch` command:
 ### Standardizing encoding of fetched files
 
 ### Resuming an operation
+
+Let's say we started fetching urls likewise:
+
+```bash
+minet fetch url urls.csv > report.csv
+```
+
+But somewhere around the 1000th one, something broke, or Internet went down, or your server was shutdown by an unexpected power outage. This kind of things arrives. Wouldn't it be nice if we could resume the process without having to restart from scratch?
+
+Well you perfectly can and here is what you would need to change:
+
+```bash
+minet fetch url urls.csv -o report.csv --resume
+```
 
 ## Unix compliance
 
@@ -110,13 +179,13 @@ import csv
 from minet import multithreaded_fetch
 
 with open('./urls.csv') as f:
-  reader = csv.DictReader(f)
+    reader = csv.DictReader(f)
 
-  for result in multithreaded_fetch(reader, key=lambda line: line['url']):
-    if result.error is not None:
-      print('Something went wrong', result.error)
-    else:
-      print(result.response.status)
+    for result in multithreaded_fetch(reader, key=lambda line: line['url']):
+      if result.error is not None:
+        print('Something went wrong', result.error)
+      else:
+        print(result.response.status)
 ```
 
 Check out full documentation about this API [here](/README.md#multithreaded_fetch)
