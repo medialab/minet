@@ -9,3 +9,4 @@ But learning a new tool is never an easy thing and this is why this cookbook tri
 ## Summary
 
 1. [Fetching a large amount of urls](./fetch.md)
+2. [Scraping DSL Tutorial](./scraping_dsl.md)
