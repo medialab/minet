@@ -80,6 +80,13 @@ class CrawlJob(object):
         return get_domain_name(job.url)
 
 
+def ensure_job(url_or_job):
+    if isinstance(url_or_job, CrawlJob):
+        return url_or_job
+
+    return CrawlJob(url=url_or_job)
+
+
 class CrawlerState(object):
     __slots__ = ('jobs_done', 'jobs_queued')
 
@@ -318,12 +325,12 @@ class Crawler(object):
         self.spiders = spiders
 
     def enqueue(self, job_or_jobs):
-        if not isinstance(job_or_jobs, CrawlJob):
+        if not isinstance(job_or_jobs, (CrawlJob, str)):
             for job in job_or_jobs:
-                assert isinstance(job, CrawlJob)
-                self.queue.put(job)
+                assert isinstance(job, (CrawlJob, str))
+                self.queue.put(ensure_job(job))
         else:
-            self.queue.put(job_or_jobs)
+            self.queue.put(ensure_job(job_or_jobs))
 
         self.state.jobs_queued = self.queue.qsize()
 
