@@ -140,6 +140,8 @@ class BeautifulSoupSpider(Spider):
 
         soup = BeautifulSoup(decoded_content, self.engine)
 
+        return soup
+
 
 class DefinitionSpider(Spider):
     def __init__(self, definition, name='default'):
