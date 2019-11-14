@@ -10,6 +10,14 @@ Note that all examples will be presented in YAML format, even if any JSON-like f
 
 ## Summary
 
+* [Scraping a single item](#scraping-a-single-item)
+* [Declaring what to extract](#declaring-what-to-extract)
+* [Fields](#fields)
+* [Iteration](#iteration)
+* [Subselection](#subselection)
+* [Aliases](#aliases)
+* [Recursivity](#recursivity)
+
 ## Scraping a single item
 
 Let's start easy, we only need to scrape a single thing from our HTML page: its title. The title is usually the text contained in the `<title>` tag:
@@ -34,20 +42,22 @@ So, here is the simplest scraper ever:
 sel: title # Here we use CSS selection to target the first <title> tag
 ```
 
+If you are a bit shaky about CSS selection and want to refresh your memory or simply learn, I can't recommand you [this](https://flukeout.github.io/) wonderful tutorial enough.
+
 Applying this scraper on the beforementioned HTML will yield the following result:
 
-```
-My Awesome Web Page
+```json
+"My Awesome Web Page"
 ```
 
 Two things should be noted here:
 
 1. In the absence of any additional information, the scraper will fallback to extract the node's text.
-2. Extracted text is always stripped (or trimmed, if you come from another language than python) of its leading and trailing whitespace for convenience.
+2. Extracted text is always stripped of its leading and trailing whitespace for convenience.
 
 ## Declaring what to extract
 
-But maybe you want something more than a selected node's text. What if you want its inner html? Or one of its attribute? Then you need to say so using the `item` key:
+But maybe we want something more than a selected node's text. What if we want its inner html? Or one of its attribute? Then we need to say so using the `item` key:
 
 ```yml
 ---
@@ -57,8 +67,8 @@ item: html # Here, we want the node's inner html
 
 This will yield:
 
-```
-<div id="main" class="container">Hello World!</div>
+```json
+"<div id=\"main\" class=\"container\">Hello World!</div>"
 ```
 
 Note that the first example we saw is actually a shorthand for:
@@ -72,6 +82,7 @@ item: text
 But what if we want to extract a node's attribute? Well it's as simple as:
 
 ```yml
+---
 # Note that here I wrap the selector in quotes so that YAML
 # does not interpret this as a comment
 sel: '#main'
@@ -80,8 +91,8 @@ item: title
 
 This will naturally yield:
 
-```
-hello
+```json
+"hello"
 ```
 
 So, to recap, here is what `item` can be:
@@ -93,8 +104,113 @@ So, to recap, here is what `item` can be:
 
 ## Fields
 
+Now we might want to extract several pieces of informations from our selected node rather than a single one. To do so, we can use the `field` key, **instead** of `item` to structure the output:
+
+```yml
+---
+sel: '#main'
+fields:
+  content: text
+  title: title
+```
+
+This will yield:
+
+```json
+{
+  "content": "Hello World!",
+  "title": "hello"
+}
+```
+
 ## Iteration
 
+So far, we now how to select a single node and extract information about it. But oftentimes, we want to iterate over a selection of nodes and extract information about each of them.
+
+Let's consider the following page:
+
+```html
+<main>
+  <article>
+    <h2>
+      <a href="http://howtoscrape.com">
+        How to scrape?
+      </a>
+    </h2>
+    <div>
+      Posted by <span>George</span>
+    </div>
+  </article>
+  <article>
+    <h2>
+      <a href="http://howtocrawl.co.uk">
+        How to crawl?
+      </a>
+    </h2>
+    <div>
+      Posted by <span>Mary</span>
+    </div>
+  </article>
+</main>
+```
+
+To be able to iterate over the page's articles, we will use the `iterator` key to be able to select multiple nodes from which to extract information:
+
+```yml
 ---
+iterator: article a # This is still CSS selection
+```
+
+This will yield an array containing one item per selected node:
+
+```json
+[
+  "How to scrape?",
+  "How to crawl?"
+]
+```
+
+You can of course still use the `item` and `fields` keys to declare finely what to extract:
+
+```yml
+---
+iterator: article a
+item: href
+```
+
+will yield:
+
+```json
+[
+  "http://howtoscrape.com",
+  "http://howtocrawl.co.uk"
+]
+```
+
+```yml
+iterator: article a
+fields:
+  title: text
+  url: href
+```
+
+will yield:
+
+```json
+[
+  {
+    "title": "How to scrape?",
+    "url": "http://howtoscrape.com"
+  },
+  {
+    "title": "How to crawl?",
+    "url": "http://howtocrawl.co.uk"
+  }
+]
+```
+
+## Subselection
 
 ## Aliases
+
+## Recursivity
