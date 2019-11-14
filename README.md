@@ -34,6 +34,7 @@ pip install minet
 
 *Basic commands*
 
+* [crawl](#crawl)
 * [fetch](#fetch)
 * [extract](#extract)
 * [scrape](#scrape)
@@ -85,6 +86,33 @@ To check the installed version of `minet`, you can use the `--version` flag:
 ```
 minet --version
 >>> minet x.x.x
+```
+
+## crawl
+
+```
+usage: minet crawl [-h] [-d OUTPUT_DIR] [--resume] [--throttle THROTTLE] crawler
+
+Minet Crawl Command
+===================
+
+Use multiple threads to crawl the web using minet crawling and
+scraping DSL.
+
+positional arguments:
+  crawler                                 Path to the crawler definition file.
+
+optional arguments:
+  -h, --help                              show this help message and exit
+  -d OUTPUT_DIR, --output-dir OUTPUT_DIR  Output directory.
+  --resume                                Whether to resume an interrupted crawl.
+  --throttle THROTTLE                     Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
+
+examples:
+
+. TODO:
+    `minet crawl`
+
 ```
 
 ## fetch

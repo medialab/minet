@@ -34,6 +34,7 @@ pip install minet
 
 *Basic commands*
 
+* [crawl](#crawl)
 * [fetch](#fetch)
 * [extract](#extract)
 * [scrape](#scrape)
@@ -86,6 +87,10 @@ To check the installed version of `minet`, you can use the `--version` flag:
 minet --version
 >>> minet x.x.x
 ```
+
+## crawl
+
+<% crawl %>
 
 ## fetch
 
