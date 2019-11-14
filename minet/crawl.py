@@ -119,6 +119,16 @@ class Spider(object):
     def next_jobs(self, job, response, content, meta=None):
         return None
 
+    def __repr__(self):
+        class_name = self.__class__.__name__
+
+        return (
+            '<%(class_name)s name=%(name)s>'
+        ) % {
+            'class_name': class_name,
+            'name': self.name
+        }
+
 
 class BeautifulSoupSpider(Spider):
     def __init__(self, name='default', engine='lxml'):
@@ -158,6 +168,8 @@ class DefinitionSpider(Spider):
             self.next_scraper = Scraper(self.next_definition['scraper'])
 
     def start_jobs(self):
+
+        # TODO: possibility to name this as jobs
         start_urls = (
             ensure_list(self.definition.get('start_url', [])) +
             ensure_list(self.definition.get('start_urls', []))
