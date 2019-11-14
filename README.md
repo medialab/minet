@@ -25,6 +25,8 @@ pip install minet
 
 ## Usage
 
+To learn how to use `minet` and understand how it may fit your use cases, you should definitely check out our [Cookbook](./cookbook).
+
 ### CLI
 
 *Global utilities*
