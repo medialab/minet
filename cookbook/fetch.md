@@ -72,11 +72,15 @@ Now let's check some of the most useful options of the `fetch` command:
 
 ### Customizing the output directory and file names
 
+#### Output directory
+
 By default, `minet` will write the fetched files in a folder named `content` relative to your working directory. But maybe this is not what you want. Here is how to change this:
 
 ```bash
 minet fetch url urls.csv -d /store/project/html > /store/project/report.csv
 ```
+
+#### File names
 
 Also, by default, because the Internet is a messy place and it could be hard to find an unambiguous name for all the fetched html files, `minet` will generate [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier)s to use as file names.
 
@@ -98,6 +102,8 @@ minet fetch url urls.csv --filename id > report.csv
 ls content
 >>> 1.html 2.html 3.html ...
 ```
+
+#### File paths
 
 But what if you want more complex things? What if you want to create a specific folder hierarchy for performance or organizational reasons? It is also possible to pass a template to `minet` so it will be able to build the desired file paths.
 
@@ -122,6 +128,14 @@ ls content
 
 ls content/liberation
 >>> 1.html
+```
+
+#### File paths performance tip
+
+It is not a good idea to store hundreds of thousands files in a single directory because it can easily become a performance pit on some file systems. So, if you need to fetch a whole lot of urls, it can be a good idea to randomly distribute fetched files into directories based on the first characters of their names, for instance:
+
+```bash
+minet fetch url urls.csv --filename-template '{value[:4]}/{value}{ext}' > report.csv
 ```
 
 ### Throttling & Threading
