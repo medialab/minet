@@ -8,4 +8,4 @@ But learning a new tool is never an easy thing and this is why this cookbook tri
 
 ## Summary
 
-1. [Fetching a bunch of urls from the web](./fetch.md)
+1. [Fetching a lot of urls from the web](./fetch.md)

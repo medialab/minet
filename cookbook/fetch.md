@@ -1,4 +1,4 @@
-# Fetching a bunch of urls from the web
+# Fetching a lot of urls from the web
 
 Let's say you are interested in what urls are shared by some Twitter accounts and you suceeded in collecting them using a dedicated tool ([gazouilloire](https://github.com/medialab/gazouilloire) or [TCAT](https://github.com/digitalmethodsinitiative/dmi-tcat), for instance).
 
@@ -50,7 +50,7 @@ You will need to give at least two pieces of information to `minet` so it can wo
 1. `minet` needs to know the name you gave to the column containing urls in your CSV file.
 2. Then `minet` needs to know where you put the beforementioned CSV file.
 
-When firing this command, `minet` will start fetching the urls in your file as fast as possible while writing the found HTML files into a folder named `content` in your working directory.
+When firing this command, `minet` will start fetching the urls from the indicated column as fast as possible while writing the found HTML files into a folder named `content`, in your working directory.
 
 To help you figure out which urls are now dead (404, for instance) or to be able to give you additional information `minet` will also print a CSV report to your terminal.
 
