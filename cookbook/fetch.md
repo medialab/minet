@@ -1,4 +1,4 @@
-# Fetching a lot of urls from the web
+# Fetching a large amount of urls
 
 Let's say you are interested in what urls are shared by some Twitter accounts and you suceeded in collecting them using a dedicated tool ([gazouilloire](https://github.com/medialab/gazouilloire) or [TCAT](https://github.com/digitalmethodsinitiative/dmi-tcat), for instance).
 
