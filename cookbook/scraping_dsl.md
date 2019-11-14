@@ -10,14 +10,6 @@ Note that all examples will be presented in YAML format, even if any JSON-like f
 
 ## Summary
 
-* [Scraping a single item](#scraping-a-single-item)
-* [Declaring what to extract](#declaring-what-to-extract)
-* [Fields](#fields)
-* [Iteration](#iteration)
-* [Subselection](#subselection)
-* [Aliases](#aliases)
-* [Recursivity](#recursivity)
-
 ## Scraping a single item
 
 Let's start easy, we only need to scrape a single thing from our HTML page: its title. The title is usually the text contained in the `<title>` tag:
@@ -102,7 +94,7 @@ So, to recap, here is what `item` can be:
 3. `outer_html` to extract the selected node's outer html
 4. the name of any of the selected node's attributes
 
-## Fields
+## Declaring multiple fields to extract
 
 Now we might want to extract several pieces of informations from our selected node rather than a single one. To do so, we can use the `field` key, **instead** of `item` to structure the output:
 
@@ -123,7 +115,7 @@ This will yield:
 }
 ```
 
-## Iteration
+## Iterating over multiple nodes
 
 So far, we now how to select a single node and extract information about it. But oftentimes, we want to iterate over a selection of nodes and extract information about each of them.
 
