@@ -80,11 +80,9 @@ By default, `minet` will write the fetched files in a folder named `content` rel
 minet fetch url urls.csv -d /store/project/html > /store/project/report.csv
 ```
 
-Also, by default, because the Internet is a messy place and it could be hard to find an unambiguous name for all the fetched html files, `minet` will use a [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier) as file names.
+Also, by default, because the Internet is a messy place and it could be hard to find an unambiguous name for all the fetched html files, `minet` will generate [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier)s to use as file names.
 
-But you might want to customize your file names because you have relevant metadata.
-
-It is then possible to tell minet to use another column from your file as filename likewise:
+But you might want to customize your file names because you have relevant metadata: It is then possible to tell `minet` to use another column from your file as file name likewise:
 
 *urls.csv*
 
@@ -130,11 +128,52 @@ ls content/liberation
 
 ### Throttling & Threading
 
+Not to be too hard on servers and to avoid being kicked by those, `minet` throttles its requests by domain. But, by default, `minet` can still be a bit aggressive, using only a throttle of `0.2` seconds. You might want to change that:
+
+```bash
+# Waiting 2 seconds between requests on a same domain
+minet fetch url urls.csv --throttle 2 > report.csv
+```
+
+Also, if your computer is powerful enough and if you know you are going to fetch pages from a wide variety of domains, you can increase the number of used threads to complete the task even faster:
+
+```bash
+minet fetch url urls.csv --threads 100 > report.csv
+```
+
 ### Displaying a finite loading bar
+
+By default, and because we cannot know the number of urls we have to fetch beforehand, `minet` displays an indefinite progress bar. If you happen to know the number of urls, you can indicate it likewise to have a more useful progress bar:
+
+```bash
+minet fetch url urls.csv --total 50000 > report.csv
+
+# If your input file is not too large, this can be useful:
+minet fetch url urls.csv --total `xsv count urls.csv` > report.csv
+```
+
+Note that most of `minet` commands recognize this `--total` option.
 
 ### Keeping only selected columns in report
 
+If the input CSV file is very large and full of metadata, you might want to thin the report a little bit by selecting the columns to keep:
+
+```bash
+minet fetch url urls.csv -s url > report.csv
+
+# To keep more that one column, separate their name with ",":
+minet fetch url urls.csv -s id,url > report.csv
+```
+
 ### Standardizing encoding of fetched files
+
+The web is a messy place and not every page is wisely encoded in `utf-8`. As such, `minet`, like web browsers, attempts to guess the page's encoding and will indicate it in its report. However, you might also say that you are done with encoding issues and tell `minet` to standardize everything to `utf-8` for simplicity's sake:
+
+```bash
+minet fetch url urls.csv --standardize-encoding > report.csv
+```
+
+Just note that in some cases, where we cannot really find the correct encoding, this operation will be lossy as we may replace or delete some unknown characters.
 
 ### Resuming an operation
 
