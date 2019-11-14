@@ -39,16 +39,16 @@ Being a diligent researcher, you decided to store the found url in a very simple
 
 You could very well create a script that will fetch the url one by one until you are done. But the Internet is quite slow and this could take a while. `minet`, on the contrary, is able to leverage [multithreading](https://en.wikipedia.org/wiki/Multithreading) to fetch multiple urls at once (typically at least 25) so you can complete this task faster.
 
-Here is what you would need to type in your terminal to make it happen:
+Here is what you would type in your terminal to make it happen:
 
 ```bash
 minet fetch url urls.csv > report.csv
 ```
 
-You will need to give at least two pieces of information to `minet` so it can work its magic:
+`minet` needs at least two pieces of information to be able to work its magic:
 
-1. `minet` needs to know the name you gave to the column containing urls in your CSV file.
-2. Then `minet` needs to know where you put the beforementioned CSV file.
+1. the name you gave to the column containing urls in your CSV file.
+2. the location of the beforementioned CSV file.
 
 When firing this command, `minet` will start fetching the urls from the indicated column as fast as possible while writing the found HTML files into a folder named `content`, in your working directory.
 
