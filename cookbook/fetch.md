@@ -10,20 +10,18 @@ Let's use the `minet fetch` command to do so!
 
 ## Summary
 
-* [Summary](#summary)
-* [Baby steps](#baby-steps)
-* [Options, options, options](#options-options-options)
+* [First steps](#first-steps)
+* [Options](#options)
   * [Customizing the output directory and file names](#customizing-the-output-directory-and-file-names)
   * [Throttling & Threading](#throttling--threading)
   * [Displaying a finite loading bar](#displaying-a-finite-loading-bar)
   * [Keeping only selected columns in report](#keeping-only-selected-columns-in-report)
   * [Standardizing encoding of fetched files](#standardizing-encoding-of-fetched-files)
-  * [Compressing the output](#compressing-the-output)
   * [Resuming an operation](#resuming-an-operation)
 * [Unix compliance](#unix-compliance)
 * [Fetching from a python script](#fetching-from-a-python-script)
 
-## Baby steps
+## First steps
 
 Being a diligent researcher, you decided to store the found url in a very simple [CSV](https://en.wikipedia.org/wiki/Comma-separated_values) file containing more than 50k urls:
 
@@ -58,7 +56,7 @@ This CSV report is in fact a copy of the input file with some added columns such
 
 But since reading the report in your terminal might not be very handy, our example redirects what is printed into the `report.csv` file using this handy piece of shell syntax: `>`.
 
-## Options, options, options
+## Options
 
 Most of `minet` commands come with a wide array of options. If you ever feel lost, or forgot some option or argument? Don't forget you can always ask `minet` to help you remember:
 
