@@ -99,7 +99,6 @@ class CrawlerState(object):
         }
 
 
-# TODO: add crawler start url + function spider
 class Spider(object):
     def __init__(self, name='default'):
         self.name = name
@@ -128,6 +127,15 @@ class Spider(object):
             'class_name': class_name,
             'name': self.name
         }
+
+
+class FunctionSpider(Spider):
+    def __init__(self, fn, name='default'):
+        super().__init__(name)
+        self.fn = fn
+
+    def process(self, job, response, content, meta=None):
+        return self.fn(job, response, content, meta)
 
 
 class BeautifulSoupSpider(Spider):
@@ -259,13 +267,15 @@ class TaskContext(object):
 
 
 class Crawler(object):
-    def __init__(self, spec=None, spider=None, spiders=None, queue_path=None, threads=25,
+    def __init__(self, spec=None, spider=None, spiders=None, start_jobs=None,
+                 queue_path=None, threads=25,
                  buffer_size=DEFAULT_GROUP_BUFFER_SIZE, throttle=DEFAULT_THROTTLE):
 
         # NOTE: crawling could work depth-first but:
         # buffer_size should be 0 (requires to fix quenouille issue #1)
 
         # Params
+        self.start_jobs = start_jobs
         self.queue_path = queue_path
         self.threads = threads
         self.buffer_size = buffer_size
@@ -299,6 +309,11 @@ class Crawler(object):
         elif spiders is None:
             raise TypeError('minet.Crawler: expecting either `spec`, `spider` or `spiders`.')
 
+        # Solving function spiders
+        for name, s in spiders.items():
+            if callable(s) and not isinstance(s, Spider):
+                spiders[name] = FunctionSpider(s, name)
+
         self.queue = queue
         self.spiders = spiders
 
@@ -319,6 +334,10 @@ class Crawler(object):
 
         # Collecting start jobs - we only add those if queue is not pre-existing
         if self.queue.qsize() == 0:
+
+            if self.start_jobs:
+                self.enqueue(self.start_jobs)
+
             for spider in self.spiders.values():
                 self.enqueue(spider.start_jobs())
 
@@ -350,11 +369,15 @@ class Crawler(object):
         # Decoding response content
         content = spider.process_content(job, response, meta)
 
-        # Scraping items
-        scraped = spider.scrape(job, response, content, meta)
+        if isinstance(spider, FunctionSpider):
+            next_jobs, scraped = spider.process(job, response, content, meta)
+        else:
 
-        # Finding next jobs
-        next_jobs = spider.next_jobs(job, response, content, meta)
+            # Scraping items
+            scraped = spider.scrape(job, response, content, meta)
+
+            # Finding next jobs
+            next_jobs = spider.next_jobs(job, response, content, meta)
 
         # Enqueuing next jobs
         if next_jobs is not None:
