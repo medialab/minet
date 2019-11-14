@@ -1,6 +1,6 @@
 # Minet Cookbook
 
-`minet` is a CLI (*C*ommand *L*ine *I*nterface) tool tailored to perform typical [web mining](https://en.wikipedia.org/wiki/Web_mining) tasks easily.
+`minet` is a CLI (**C**ommand **L**ine **I**nterface) tool tailored to perform typical [web mining](https://en.wikipedia.org/wiki/Web_mining) tasks easily.
 
 Being written in `python`, `minet` can also be used as a library to help you perform the same tasks from the comfort of your own scripts.
 

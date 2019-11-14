@@ -14,12 +14,13 @@ Let's use the `minet fetch` command to do so!
 * [Baby steps](#baby-steps)
 * [Options, options, options](#options-options-options)
   * [Customizing the output directory and file names](#customizing-the-output-directory-and-file-names)
-  * [Throttling](#throttling)
+  * [Throttling & Threading](#throttling--threading)
   * [Displaying a finite loading bar](#displaying-a-finite-loading-bar)
   * [Keeping only selected columns in report](#keeping-only-selected-columns-in-report)
   * [Standardizing encoding of fetched files](#standardizing-encoding-of-fetched-files)
   * [Resuming an operation](#resuming-an-operation)
 * [Unix compliance](#unix-compliance)
+* [Fetching from a python script](#fetching-from-a-python-script)
 
 ## Baby steps
 
@@ -72,7 +73,7 @@ Now let's check some of the most useful options of the `fetch` command:
 
 ### Customizing the output directory and file names
 
-### Throttling
+### Throttling & Threading
 
 ### Displaying a finite loading bar
 
@@ -99,3 +100,23 @@ Also, `minet` is perfectly capable of handling `stdin` if you need to:
 # Want to filter the input file to fetch only facebook urls?
 xsv search -s url facebook | minet fetch url > report.csv
 ```
+
+## Fetching from a python script
+
+Maybe CLI is not your tool of choice and prefer scripting right away. Maybe you need very specific logic not offered by `minet` CLI. You can still beneficiate from `minet` multithreaded logic in your own code. To do so, just use `minet` as a python library:
+
+```python
+import csv
+from minet import multithreaded_fetch
+
+with open('./urls.csv') as f:
+  reader = csv.DictReader(f)
+
+  for result in multithreaded_fetch(reader, key=lambda line: line['url']):
+    if result.error is not None:
+      print('Something went wrong', result.error)
+    else:
+      print(result.response.status)
+```
+
+Check out full documentation about this API [here](/README.md#multithreaded_fetch)
