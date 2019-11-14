@@ -36,7 +36,7 @@ To learn how to use `minet` and understand how it may fit your use cases, you sh
 * [-h/--help/help](#help-flag)
 * [--version](#version-flag)
 
-*Basic commands*
+*Generic commands*
 
 * [crawl](#crawl)
 * [fetch](#fetch)
