@@ -61,7 +61,7 @@ But since reading the report in your terminal might not be very handy, our examp
 Most of `minet` commands come with a wide array of options. If you ever feel lost, or forgot some option or argument? Don't forget you can always ask `minet` to help you remember:
 
 ```bash
-# This work with every command
+# This works with every command
 minet fetch --help
 
 # Or if you are in a hurry:
@@ -127,7 +127,7 @@ ls content
 >>> hackernews lefigaro lemonde liberation
 
 ls content/liberation
->>> 1.html
+>>> 3.html
 ```
 
 #### File paths performance tip
@@ -195,7 +195,7 @@ Let's say we started fetching urls likewise:
 minet fetch url urls.csv > report.csv
 ```
 
-But somewhere around the 1000th one, something broke, or Internet went down, or your server was shutdown by an unexpected power outage. This kind of things arrives. Wouldn't it be nice if we could resume the process without having to restart from scratch?
+But somewhere around the 1000th one, something broke, or Internet went down, or your server was shutdown by an unexpected power outage. This kind of things happens. Wouldn't it be nice if we could resume the process without having to restart from scratch?
 
 Well you perfectly can and here is what you would need to change:
 
@@ -209,7 +209,7 @@ Whenever possible, `minet` tries to be Unix-compliant. This means that most of i
 
 ```bash
 # Only interested in the frequency of http codes?
-minet fecth url urls.csv | xsv frequency -s status
+minet fetch url urls.csv | xsv frequency -s status
 ```
 
 Note that I often use the wonderful CSV handling CLI tool [xsv](https://github.com/BurntSushi/xsv) in my examples because I tend to use it a lot. But other similar tools exists: be sure to check out [miller](https://github.com/johnkerl/miller) and [csvkit](https://csvkit.readthedocs.io/en/latest/), for instance.
@@ -223,7 +223,7 @@ xsv search -s url facebook | minet fetch url > report.csv
 
 ## Fetching from a python script
 
-Maybe CLI is not your tool of choice and prefer scripting right away. Maybe you need very specific logic not offered by `minet` CLI. You can still beneficiate from `minet` multithreaded logic in your own code. To do so, just use `minet` as a python library:
+Maybe CLI is not your tool of choice and you prefer scripting right away. Maybe you need very specific logic not offered by `minet` CLI. You can still beneficiate from `minet` multithreaded logic in your own code. To do so, just use `minet` as a python library:
 
 ```python
 import csv
