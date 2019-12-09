@@ -14,7 +14,8 @@ from collections import deque
 from urllib.parse import urljoin
 from http.cookies import SimpleCookie
 from tqdm import tqdm
-from ural.facebook import extract_user_from_facebook_url
+from ural import force_protocol
+from ural.facebook import extract_user_from_facebook_url, convert_facebook_url_to_mobile
 
 from minet.utils import grab_cookies, create_pool, request
 from minet.cli.utils import DummyTqdmFile, die
@@ -168,7 +169,8 @@ def scrape_comments(html, in_reply_to=None):
 def facebook_comments_action(namespace):
 
     # Reformatting url to hit mobile website
-    url = namespace.url.replace('www', 'm')
+    url = force_protocol(namespace.url, 'https')
+    url = convert_facebook_url_to_mobile(url)
 
     # Grabbing cookies
     if namespace.cookie == 'firefox' or namespace.cookie == 'chrome':
