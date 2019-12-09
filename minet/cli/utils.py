@@ -7,6 +7,7 @@
 import csv
 import sys
 import json
+import codecs
 import argparse
 from glob import iglob
 from os.path import join
@@ -40,6 +41,9 @@ def custom_reader(f, target_header):
     reader = csv.reader(f)
 
     headers = next(reader, None)
+
+    if headers[0].startswith(codecs.BOM_UTF8.decode()):
+        headers[0] = headers[0][1:]
 
     if isinstance(target_header, tuple):
         HeaderPositions = namedtuple('HeaderPositions', target_header)
