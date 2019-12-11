@@ -19,6 +19,7 @@ from ural.facebook import extract_user_from_facebook_url, convert_facebook_url_t
 
 from minet.utils import grab_cookies, create_pool, request
 from minet.cli.utils import DummyTqdmFile, die
+from minet.cli.facebook.utils import grab_facebook_cookie
 
 DEFAULT_THROTTLE = 0.5
 BASE_URL = 'https://m.facebook.com'
@@ -172,27 +173,10 @@ def facebook_comments_action(namespace):
     url = force_protocol(namespace.url, 'https')
     url = convert_facebook_url_to_mobile(url)
 
-    # Grabbing cookies
-    if namespace.cookie == 'firefox' or namespace.cookie == 'chrome':
-        get_cookie_for_url = grab_cookies(namespace.cookie)
-
-        if get_cookie_for_url is None:
-            die('Could not extract cookies from %s.' % namespace.cookie)
-
-        cookie = get_cookie_for_url(url)
-
-    else:
-        cookie = namespace.cookie.strip()
-
-    if not cookie:
-        die([
-            'Relevant cookie not found.',
-            'A Facebook authentication cookie is necessary to be able to fetch comments.',
-            'Use the --cookie flag to choose a browser from which to extract the cookie or give your cookie directly.'
-        ])
-
+    # Grabbing cookie
+    cookie = grab_facebook_cookie(namespace)
     cookie = fix_cookie(cookie)
-
+    print(cookie, url)
     # Handling output
     if namespace.output is None:
         output_file = DummyTqdmFile(sys.stdout)
