@@ -216,8 +216,12 @@ def facebook_post_stats_action(namespace):
             data['scraped']['account_name'] = soup.select_one('h5 a').get_text().strip()
             data['scraped']['timestamp'] = timestamp
             data['scraped']['time'] = datetime.fromtimestamp(timestamp).isoformat()
-            data['scraped']['aria_label'] = timestamp_elem.parent.get('aria-label')
-            data['scraped']['text'] = soup.select_one('[data-testid="post_message"]').get_text()
+
+            try:
+                data['scraped']['aria_label'] = timestamp_elem.parent.get('aria-label')
+                data['scraped']['text'] = soup.select_one('[data-testid="post_message"]').get_text()
+            except:
+                pass
 
         return None, data
 
