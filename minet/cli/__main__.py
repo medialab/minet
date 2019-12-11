@@ -22,6 +22,9 @@ from minet.cli.utils import die
 
 from minet.cli.commands import MINET_COMMANDS
 
+# Handling pipes correctly
+signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+
 SUBPARSERS = {}
 
 # Getting terminal size
