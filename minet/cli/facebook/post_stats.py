@@ -17,8 +17,8 @@ from minet.cli.facebook.utils import grab_facebook_cookie
 from minet.cli.facebook.constants import FACEBOOK_DEFAULT_THROTTLE
 
 EXTRACTOR_TEMPLATE = rb'\(function\(\)\{bigPipe\.onPageletArrive\((\{.+share_fbid:"%s".+\})\);\}\),"onPageletArrive'
-CURRENT_AVAILABILITY_DISCLAIMER = b'Sorry, this content isn\'t available right now'
-AVAILABILITY_DISCLAIMER = b'The link you followed may be broken, or the page may have been removed.'
+CURRENT_AVAILABILITY_DISCLAIMER = b'The link you followed may have expired, or the page may only be visible to an audience'
+AVAILABILITY_DISCLAIMER = b'The link you followed may be broken, or the page may have been removed'
 
 # TODO: top
 REPORT_HEADERS = [
