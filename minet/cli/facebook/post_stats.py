@@ -19,9 +19,9 @@ from minet.cli.facebook.constants import FACEBOOK_WEB_DEFAULT_THROTTLE
 EXTRACTOR_TEMPLATE = rb'\(function\(\)\{bigPipe\.onPageletArrive\((\{.+share_fbid:"%s".+\})\);\}\),"onPageletArrive'
 CURRENT_AVAILABILITY_DISCLAIMER = b'The link you followed may have expired, or the page may only be visible to an audience'
 AVAILABILITY_DISCLAIMER = b'The link you followed may be broken, or the page may have been removed'
+LOGIN_DISCLAIMER = b'You must log in to continue'
 CAPTCHA = b'id="captcha"'
 
-# TODO: top
 REPORT_HEADERS = [
     'error',
     'share_count',
@@ -35,7 +35,8 @@ REACTION_KEYS = OrderedDict({
     3: 'wow',
     4: 'haha',
     7: 'sad',
-    8: 'angry'
+    8: 'angry',
+    12: 'pride'
 })
 
 for emotion_name in REACTION_KEYS.values():
@@ -73,7 +74,8 @@ def collect_top_reactions(data):
         emotion = REACTION_KEYS.get(edge['node']['key'])
 
         if emotion is None:
-            raise TypeError('Found unkown emotion %s' % edge)
+            print_err('Found unkown emotion %s' % edge)
+            continue
 
         index[emotion] = edge['reaction_count'] or 0
 
@@ -103,7 +105,8 @@ def format(data):
 def facebook_post_stats_action(namespace):
 
     # Grabbing cookie
-    cookie = grab_facebook_cookie(namespace)
+    # NOTE: not using cookie to avoid captchas
+    # cookie = grab_facebook_cookie(namespace)
 
     # Handling output
     output_file = open_output_file(namespace.output)
@@ -119,7 +122,7 @@ def facebook_post_stats_action(namespace):
     http = create_pool()
 
     def fetch_facebook_page_stats(url):
-        err, response = request(http, url, cookie=cookie)
+        err, response = request(http, url, cookie='locale=en_US')
 
         if err:
             return 'http-error', None
@@ -143,6 +146,9 @@ def facebook_post_stats_action(namespace):
             AVAILABILITY_DISCLAIMER in html
         ):
             return 'unavailable', None
+
+        if LOGIN_DISCLAIMER in html:
+            return 'private-or-unavailable', None
 
         # TODO: integrate into ural
         post_id = url.rsplit('/', 1)[-1]
