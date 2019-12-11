@@ -8,28 +8,25 @@ import csv
 from ural import is_url, normalize_url, get_domain_name
 from tqdm import tqdm
 
-from minet.cli.utils import custom_reader, DummyTqdmFile
+from minet.cli.utils import CSVEnricher, DummyTqdmFile
 
 REPORT_HEADERS = ['normalized_url', 'domain_name']
-EMPTY = [''] * len(REPORT_HEADERS)
 
 
 def url_parse_action(namespace):
-
-    headers, pos, reader = custom_reader(namespace.file, namespace.column)
-
-    if namespace.select:
-        selected_headers = namespace.select.split(',')
-        selected_pos = [headers.index(h) for h in selected_headers]
-        headers = selected_headers
 
     if namespace.output is None:
         output_file = DummyTqdmFile()
     else:
         output_file = open(namespace.output, 'w')
 
-    writer = csv.writer(output_file)
-    writer.writerow(headers + REPORT_HEADERS)
+    enricher = CSVEnricher(
+        namespace.file,
+        namespace.column,
+        output_file,
+        report_headers=REPORT_HEADERS,
+        select=namespace.select.split(',') if namespace.select else None
+    )
 
     loading_bar = tqdm(
         desc='Reporting',
@@ -38,13 +35,10 @@ def url_parse_action(namespace):
         total=namespace.total
     )
 
-    for line in reader:
-        url_data = line[pos].strip()
+    for line in enricher:
+        url_data = line[enricher.pos].strip()
 
         loading_bar.update()
-
-        if namespace.select:
-            line = [line[p] for p in selected_pos]
 
         if namespace.separator:
             urls = url_data.split(namespace.separator)
@@ -53,12 +47,12 @@ def url_parse_action(namespace):
 
         for url in urls:
             if not is_url(url, allow_spaces_in_path=True):
-                writer.writerow(line + EMPTY)
+                enricher.write_empty(line)
                 continue
 
             normalized = normalize_url(url, strip_trailing_slash=True)
             domain = get_domain_name(url)
 
-            writer.writerow(line + [normalized, domain])
+            enricher.write(line, [normalized, domain])
 
     output_file.close()

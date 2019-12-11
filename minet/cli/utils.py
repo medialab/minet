@@ -54,6 +54,66 @@ def custom_reader(f, target_header):
     return headers, position, reader
 
 
+class CSVEnricher(object):
+    def __init__(self, f, target, output_file, report_headers, select=None):
+        headers, pos, reader = custom_reader(f, target)
+
+        self.report_headers = report_headers
+        self.pos = pos
+        self.reader = reader
+        self.padding = [''] * len(report_headers)
+
+        self.select = select
+        self.selected_pos = None
+
+        if select is not None:
+            self.selected_pos = [headers.index(h) for h in select]
+            headers = select
+
+        writer = csv.writer(output_file)
+        writer.writerow(headers + report_headers)
+        self.writer = writer
+
+    def __iter__(self):
+        return iter(self.reader)
+
+    def __filter_line(self, line):
+        if self.selected_pos is not None:
+            return [line[p] for p in self.selected_pos]
+
+        return line
+
+    def write_empty(self, line):
+        line = self.__filter_line(line)
+
+        self.writer.writerow(line + self.padding)
+
+    def write(self, line, row):
+        assert len(row) == len(self.report_headers)
+
+        line = self.__filter_line(line)
+
+        self.writer.writerow(line + row)
+
+
+def url_parse_action(namespace):
+
+    headers, pos, reader = custom_reader(namespace.file, namespace.column)
+
+    if namespace.select:
+        selected_headers = namespace.select.split(',')
+        selected_pos = [headers.index(h) for h in selected_headers]
+        headers = selected_headers
+
+    if namespace.output is None:
+        output_file = DummyTqdmFile()
+    else:
+        output_file = open(namespace.output, 'w')
+
+    writer = csv.writer(output_file)
+    writer.writerow(headers + REPORT_HEADERS)
+
+
 class DummyTqdmFile(object):
     """
     Dummy file-like that will write to tqdm. Taken straight from the lib's
