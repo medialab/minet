@@ -444,6 +444,46 @@ MINET_COMMANDS = {
                             'help': 'Path to the output report file. By default, the report will be printed to stdout.'
                         }
                     ]
+                },
+
+                'post-stats': {
+                    'title': 'Minet Facebookk Post Stats Command',
+                    'description': '''
+                        Retrieve statistics about a given list of Facebook posts.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Fetching stats about lists of posts in a CSV file:
+                            `minet fb post-stats post_url fb-posts.csv`
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the CSV column containing the posts\' urls.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the posts.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-c', '--cookie'],
+                            'help': 'Authenticated cookie to use or browser from which to extract it (support "firefox" and "chrome").',
+                            'default': 'firefox'
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
                 }
             }
         }

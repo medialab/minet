@@ -4,7 +4,6 @@
 #
 # Logic of the `url-parse` action.
 #
-import csv
 from ural import is_url, normalize_url, get_domain_name
 from tqdm import tqdm
 
