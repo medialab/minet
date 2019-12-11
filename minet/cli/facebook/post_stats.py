@@ -8,6 +8,8 @@ import re
 import json5
 import time
 from tqdm import tqdm
+from bs4 import BeautifulSoup
+from datetime import datetime
 from collections import OrderedDict
 from ural.facebook import is_facebook_url
 
@@ -16,7 +18,8 @@ from minet.cli.utils import open_output_file, CSVEnricher, print_err, die
 from minet.cli.facebook.utils import grab_facebook_cookie
 from minet.cli.facebook.constants import FACEBOOK_WEB_DEFAULT_THROTTLE
 
-EXTRACTOR_TEMPLATE = rb'\(function\(\)\{bigPipe\.onPageletArrive\((\{.+share_fbid:"%s".+\})\);\}\),"onPageletArrive'
+META_EXTRACTOR_TEMPLATE = rb'\(function\(\)\{bigPipe\.onPageletArrive\((\{.+share_fbid:"%s".+\})\);\}\),"onPageletArrive'
+HTML_EXTRACTOR_TEMPLATE = rb'<code[^>]*><!--(.+%s.+)--></code>'
 CURRENT_AVAILABILITY_DISCLAIMER = b'The link you followed may have expired, or the page may only be visible to an audience'
 AVAILABILITY_DISCLAIMER = b'The link you followed may be broken, or the page may have been removed'
 LOGIN_DISCLAIMER = b'You must log in to continue'
@@ -24,6 +27,11 @@ CAPTCHA = b'id="captcha"'
 
 REPORT_HEADERS = [
     'error',
+    'account_name',
+    'timestamp',
+    'time',
+    'aria_label',
+    'text',
     'share_count',
     'comment_count',
     'reaction_count',
@@ -90,9 +98,15 @@ def format_err(err):
 
 def format(data):
     video_view_count = data.get('video_view_count')
+    scraped = data['scraped'] or {}
 
     row = [
         '',
+        scraped.get('account_name', ''),
+        scraped.get('timestamp', ''),
+        scraped.get('time', ''),
+        scraped.get('aria_label', ''),
+        scraped.get('text', ''),
         get_count(data['share_count']),
         get_count(data['comment_count']),
         get_count(data['reaction_count']),
@@ -156,10 +170,12 @@ def facebook_post_stats_action(namespace):
             return 'private-or-unavailable', None
 
         # TODO: integrate into ural
-        post_id = url.rsplit('/', 1)[-1]
-        extractor = re.compile(EXTRACTOR_TEMPLATE % post_id.encode())
+        bpost_id = url.rsplit('/', 1)[-1].encode()
 
-        match = extractor.search(html)
+        # Extracting metadata
+        meta_extractor = re.compile(META_EXTRACTOR_TEMPLATE % bpost_id)
+
+        match = meta_extractor.search(html)
 
         if match is None:
             return 'extraction-failed', None
@@ -183,6 +199,25 @@ def facebook_post_stats_action(namespace):
 
         if get_count(data['reaction_count']) != get_count(data['reactors']):
             print_err('Found different reactions/reactors for %s' % url)
+
+        # Extracting data from hidden html
+        hidden_html_extractor = re.compile(HTML_EXTRACTOR_TEMPLATE % bpost_id)
+        match = hidden_html_extractor.search(html)
+
+        if match is not None:
+            hidden_html = match.group(1).decode()
+            soup = BeautifulSoup(hidden_html, 'lxml')
+
+            data['scraped'] = {}
+
+            timestamp_elem = soup.select_one('[data-utime]')
+            timestamp = int(timestamp_elem.get('data-utime'))
+
+            data['scraped']['account_name'] = soup.select_one('h5 a').get_text().strip()
+            data['scraped']['timestamp'] = timestamp
+            data['scraped']['time'] = datetime.fromtimestamp(timestamp).isoformat()
+            data['scraped']['aria_label'] = timestamp_elem.parent.get('aria-label')
+            data['scraped']['text'] = soup.select_one('[data-testid="post_message"]').get_text()
 
         return None, data
 
