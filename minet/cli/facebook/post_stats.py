@@ -9,6 +9,7 @@ import json5
 import time
 from tqdm import tqdm
 from collections import OrderedDict
+from ural.facebook import is_facebook_url
 
 from minet.utils import create_pool, request, nested_get
 from minet.cli.utils import open_output_file, CSVEnricher, print_err
@@ -182,8 +183,12 @@ def facebook_post_stats_action(namespace):
         post_url = line[enricher.pos]
         loading_bar.update()
 
-        if not post_url or not is_facebook_post_url(post_url):
-            enricher.write_empty(line)
+        if (
+            not post_url or
+            not is_facebook_post_url(post_url) or
+            not is_facebook_url(post_url)
+        ):
+            enricher.write(line, format_err('not-facebook-post'))
             continue
 
         err, data = fetch_facebook_page_stats(post_url)
