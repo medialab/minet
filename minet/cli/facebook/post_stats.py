@@ -16,7 +16,7 @@ from minet.cli.utils import open_output_file, CSVEnricher, print_err
 from minet.cli.facebook.utils import grab_facebook_cookie
 from minet.cli.facebook.constants import FACEBOOK_DEFAULT_THROTTLE
 
-EXTRACTOR_TEMPLATE = rb'\(function\(\)\{bigPipe\.onPageletArrive\((\{allResources:.+share_fbid:"%s".+\})\);\}\),"onPageletArrive'
+EXTRACTOR_TEMPLATE = rb'\(function\(\)\{bigPipe\.onPageletArrive\((\{.+share_fbid:"%s".+\})\);\}\),"onPageletArrive'
 CURRENT_AVAILABILITY_DISCLAIMER = b'Sorry, this content isn\'t available right now'
 AVAILABILITY_DISCLAIMER = b'The link you followed may be broken, or the page may have been removed.'
 
