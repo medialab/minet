@@ -26,7 +26,8 @@ REPORT_HEADERS = [
     'error',
     'share_count',
     'comment_count',
-    'reaction_count'
+    'reaction_count',
+    'video_view_count'
 ]
 
 REACTION_KEYS = OrderedDict({
@@ -36,6 +37,7 @@ REACTION_KEYS = OrderedDict({
     4: 'haha',
     7: 'sad',
     8: 'angry',
+    11: 'thankful',
     12: 'pride'
 })
 
@@ -87,11 +89,14 @@ def format_err(err):
 
 
 def format(data):
+    video_view_count = data.get('video_view_count')
+
     row = [
         '',
         get_count(data['share_count']),
         get_count(data['comment_count']),
-        get_count(data['reaction_count'])
+        get_count(data['reaction_count']),
+        video_view_count if isinstance(video_view_count, int) else ''
     ]
 
     emotion_index = collect_top_reactions(data)
@@ -172,9 +177,6 @@ def facebook_post_stats_action(namespace):
         # TODO: try to find a post where comments are disabled
         if get_count(data['seen_by_count']):
             print_err('Found seen_by_count: %i for %s' % (get_count(data['seen_by_count']), url))
-
-        if get_count(data['video_view_count']):
-            print_err('Found video_view_count: %i for %s' % (get_count(data['video_view_count']), url))
 
         if 'political_figure_data' in data and data['political_figure_data']:
             print_err('Found political_figure_data: %i for %s' % (data['political_figure_data'], url))
