@@ -75,7 +75,10 @@ class CSVEnricher(object):
         self.writer = writer
 
     def __iter__(self):
-        return iter(self.reader)
+        return self
+
+    def __next__(self):
+        return next(self.reader)
 
     def __filter_line(self, line):
         if self.selected_pos is not None:

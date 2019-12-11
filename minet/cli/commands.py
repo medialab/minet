@@ -479,6 +479,10 @@ MINET_COMMANDS = {
                             'help': 'Path to the output report file. By default, the report will be printed to stdout.'
                         },
                         {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).'
+                        },
+                        {
                             'flag': '--total',
                             'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
                             'type': int
