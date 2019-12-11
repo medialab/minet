@@ -18,7 +18,7 @@ from ural.facebook import extract_user_from_facebook_url, convert_facebook_url_t
 from minet.utils import create_pool, request
 from minet.cli.utils import open_output_file
 from minet.cli.facebook.utils import grab_facebook_cookie
-from minet.cli.facebook.constants import FACEBOOK_DEFAULT_THROTTLE
+from minet.cli.facebook.constants import FACEBOOK_MOBILE_DEFAULT_THROTTLE
 
 BASE_URL = 'https://m.facebook.com'
 VALID_ID_RE = re.compile(r'^(?:see_next_)?\d+$')
@@ -214,6 +214,6 @@ def facebook_comments_action(namespace):
         )
 
         # Don't be too greedy
-        time.sleep(FACEBOOK_DEFAULT_THROTTLE)
+        time.sleep(FACEBOOK_MOBILE_DEFAULT_THROTTLE)
 
     loading_bar.close()

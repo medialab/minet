@@ -12,13 +12,14 @@ from collections import OrderedDict
 from ural.facebook import is_facebook_url
 
 from minet.utils import create_pool, request, nested_get
-from minet.cli.utils import open_output_file, CSVEnricher, print_err
+from minet.cli.utils import open_output_file, CSVEnricher, print_err, die
 from minet.cli.facebook.utils import grab_facebook_cookie
-from minet.cli.facebook.constants import FACEBOOK_DEFAULT_THROTTLE
+from minet.cli.facebook.constants import FACEBOOK_WEB_DEFAULT_THROTTLE
 
 EXTRACTOR_TEMPLATE = rb'\(function\(\)\{bigPipe\.onPageletArrive\((\{.+share_fbid:"%s".+\})\);\}\),"onPageletArrive'
 CURRENT_AVAILABILITY_DISCLAIMER = b'The link you followed may have expired, or the page may only be visible to an audience'
 AVAILABILITY_DISCLAIMER = b'The link you followed may be broken, or the page may have been removed'
+CAPTCHA = b'id="captcha"'
 
 # TODO: top
 REPORT_HEADERS = [
@@ -131,6 +132,12 @@ def facebook_post_stats_action(namespace):
 
         html = response.data
 
+        if CAPTCHA in html:
+            die([
+                'Rate limit reached!',
+                'Last url: %s' % url
+            ])
+
         if (
             CURRENT_AVAILABILITY_DISCLAIMER in html or
             AVAILABILITY_DISCLAIMER in html
@@ -199,4 +206,4 @@ def facebook_post_stats_action(namespace):
             enricher.write(line, format(data))
 
         # Throttling
-        time.sleep(FACEBOOK_DEFAULT_THROTTLE)
+        time.sleep(FACEBOOK_WEB_DEFAULT_THROTTLE)

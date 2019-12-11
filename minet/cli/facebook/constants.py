@@ -5,4 +5,5 @@
 # General constants used throughout the CrowdTangle actions.
 #
 
-FACEBOOK_DEFAULT_THROTTLE = 0.5
+FACEBOOK_MOBILE_DEFAULT_THROTTLE = 0.5
+FACEBOOK_WEB_DEFAULT_THROTTLE = 2.0
