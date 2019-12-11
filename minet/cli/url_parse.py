@@ -7,17 +7,14 @@
 from ural import is_url, normalize_url, get_domain_name
 from tqdm import tqdm
 
-from minet.cli.utils import CSVEnricher, DummyTqdmFile
+from minet.cli.utils import CSVEnricher, open_output_file
 
 REPORT_HEADERS = ['normalized_url', 'domain_name']
 
 
 def url_parse_action(namespace):
 
-    if namespace.output is None:
-        output_file = DummyTqdmFile()
-    else:
-        output_file = open(namespace.output, 'w')
+    output_file = open_output_file(namespace.output)
 
     enricher = CSVEnricher(
         namespace.file,

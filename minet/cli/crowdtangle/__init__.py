@@ -6,7 +6,7 @@
 #
 import sys
 
-from minet.cli.utils import DummyTqdmFile, die
+from minet.cli.utils import open_output_file, die
 
 
 def crowdtangle_action(namespace):
@@ -18,11 +18,10 @@ def crowdtangle_action(namespace):
             'You can provide one using the `--token` argument.'
         ])
 
-    if namespace.output is None:
-        output_file = DummyTqdmFile(sys.stdout)
-    else:
-        flag = 'a+' if getattr(namespace, 'resume', False) else 'w'
-        output_file = open(namespace.output, flag)
+    output_file = open_output_file(
+        namespace.output,
+        flag='a+' if getattr(namespace, 'resume', False) else 'w'
+    )
 
     if namespace.ct_action == 'posts':
         from minet.cli.crowdtangle.posts import crowdtangle_posts_action

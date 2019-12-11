@@ -5,7 +5,6 @@
 # Logic of the extract action.
 #
 import csv
-import sys
 import gzip
 import codecs
 import warnings
@@ -16,7 +15,7 @@ from dragnet import extract_content
 from minet.encodings import is_supported_encoding
 from minet.cli.utils import (
     custom_reader,
-    DummyTqdmFile,
+    open_output_file,
     create_report_iterator
 )
 from minet.cli.reporters import report_error
@@ -65,10 +64,7 @@ def extract_action(namespace):
     output_headers = (list(input_headers) if not selected_pos else [input_headers[i] for i in selected_pos])
     output_headers += OUTPUT_ADDITIONAL_HEADERS
 
-    if namespace.output is None:
-        output_file = DummyTqdmFile(sys.stdout)
-    else:
-        output_file = open(namespace.output, 'w')
+    output_file = open_output_file(namespace.output)
 
     output_writer = csv.writer(output_file)
     output_writer.writerow(output_headers)

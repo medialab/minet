@@ -136,6 +136,13 @@ class DummyTqdmFile(object):
         pass
 
 
+def open_output_file(output, flag='w'):
+    if output is None:
+        return DummyTqdmFile(sys.stdout)
+
+    return open(output, flag)
+
+
 class BooleanAction(argparse.Action):
     """
     Custom argparse action to handle --no-* flags.

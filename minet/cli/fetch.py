@@ -28,7 +28,7 @@ from minet.utils import (
 from minet.cli.reporters import report_error
 from minet.cli.utils import (
     custom_reader,
-    DummyTqdmFile,
+    open_output_file,
     die,
     LazyLineDict
 )
@@ -95,15 +95,12 @@ def fetch_action(namespace):
     if namespace.contents_in_report:
         output_headers.append('raw_content')
 
-    if namespace.output is None:
-        output_file = DummyTqdmFile(sys.stdout)
-    else:
-        flag = 'w'
+    flag = 'w'
 
-        if resuming and isfile(namespace.output):
-            flag = 'r+'
+    if namespace.output is not None and resuming and isfile(namespace.output):
+        flag = 'r+'
 
-        output_file = open(namespace.output, flag)
+    output_file = open_output_file(namespace.output, flag=flag)
 
     output_writer = csv.writer(output_file)
 

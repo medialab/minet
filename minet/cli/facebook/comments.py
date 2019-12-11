@@ -6,7 +6,6 @@
 #
 import re
 import csv
-import sys
 import time
 import dateparser
 from bs4 import BeautifulSoup
@@ -18,7 +17,7 @@ from ural import force_protocol
 from ural.facebook import extract_user_from_facebook_url, convert_facebook_url_to_mobile
 
 from minet.utils import create_pool, request
-from minet.cli.utils import DummyTqdmFile
+from minet.cli.utils import open_output_file
 from minet.cli.facebook.utils import grab_facebook_cookie
 from minet.cli.facebook.constants import FACEBOOK_DEFAULT_THROTTLE
 
@@ -178,10 +177,7 @@ def facebook_comments_action(namespace):
     cookie = fix_cookie(cookie)
 
     # Handling output
-    if namespace.output is None:
-        output_file = DummyTqdmFile(sys.stdout)
-    else:
-        output_file = open(namespace.output, 'w')
+    output_file = open_output_file(namespace.output)
 
     writer = csv.writer(output_file)
     writer.writerow(CSV_HEADERS)

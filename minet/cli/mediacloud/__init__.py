@@ -4,7 +4,7 @@
 #
 # Logic of the `mc` action.
 #
-from minet.cli.utils import die, DummyTqdmFile
+from minet.cli.utils import die, open_output_file
 
 
 def mediacloud_action(namespace):
@@ -16,10 +16,7 @@ def mediacloud_action(namespace):
             'You can provide one using the `--token` argument.'
         ])
 
-    if namespace.output is None:
-        output_file = DummyTqdmFile()
-    else:
-        output_file = open(namespace.output, 'w')
+    output_file = open_output_file(namespace.output)
 
     from minet.cli.mediacloud.topic import mediacloud_topic_action
     mediacloud_topic_action(namespace, output_file)

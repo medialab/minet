@@ -8,7 +8,7 @@ import csv
 from ural.lru import NormalizedLRUTrie
 from tqdm import tqdm
 
-from minet.cli.utils import custom_reader, DummyTqdmFile
+from minet.cli.utils import custom_reader, open_output_file
 
 
 def url_join_action(namespace):
@@ -22,10 +22,7 @@ def url_join_action(namespace):
 
     empty = [''] * len(left_headers)
 
-    if namespace.output is None:
-        output_file = DummyTqdmFile()
-    else:
-        output_file = open(namespace.output, 'w')
+    output_file = open_output_file(namespace.output)
 
     output_writer = csv.writer(output_file)
     output_writer.writerow(right_headers + left_headers)

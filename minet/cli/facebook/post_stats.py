@@ -4,10 +4,9 @@
 #
 # Logic of the `fb post-stats` action.
 #
-import sys
 from tqdm import tqdm
 
-from minet.cli.utils import DummyTqdmFile
+from minet.cli.utils import open_output_file
 from minet.cli.facebook.utils import grab_facebook_cookie
 
 
@@ -17,9 +16,6 @@ def facebook_post_stats_action(namespace):
     cookie = grab_facebook_cookie(namespace)
 
     # Handling output
-    if namespace.output is None:
-        output_file = DummyTqdmFile(sys.stdout)
-    else:
-        output_file = open(namespace.output, 'w')
+    output_file = open_output_file(namespace.output)
 
     print(cookie)

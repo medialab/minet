@@ -6,7 +6,6 @@
 #
 import csv
 import gzip
-import sys
 import codecs
 from collections import namedtuple
 from os.path import basename
@@ -16,7 +15,7 @@ from tqdm import tqdm
 from minet.utils import load_definition
 from minet.scrape import scrape, headers_from_definition
 from minet.cli.utils import (
-    DummyTqdmFile,
+    open_output_file,
     die,
     JSONLWriter,
     create_glob_iterator,
@@ -65,10 +64,7 @@ def worker(payload):
 
 def scrape_action(namespace):
 
-    if namespace.output is None:
-        output_file = DummyTqdmFile(sys.stdout)
-    else:
-        output_file = open(namespace.output, 'w')
+    output_file = open_output_file(namespace.output)
 
     # Parsing scraper definition
     try:
