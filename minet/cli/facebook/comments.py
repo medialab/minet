@@ -176,7 +176,7 @@ def facebook_comments_action(namespace):
     # Grabbing cookie
     cookie = grab_facebook_cookie(namespace)
     cookie = fix_cookie(cookie)
-    print(cookie, url)
+
     # Handling output
     if namespace.output is None:
         output_file = DummyTqdmFile(sys.stdout)
