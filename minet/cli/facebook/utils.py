@@ -4,10 +4,28 @@
 #
 # Miscellaneous helpers used by `minet fb`.
 #
+from http.cookies import SimpleCookie
+
 from minet.utils import grab_cookies
 from minet.cli.utils import die
 
 FACEBOOK_URL = 'https://www.facebook.com/'
+
+
+def fix_cookie(cookie_string):
+    cookie = SimpleCookie()
+    cookie.load(cookie_string)
+
+    # NOTE: those cookie items can rat you out
+    try:
+        del cookie['m_pixel_ratio']
+        del cookie['wd']
+    except KeyError:
+        pass
+
+    cookie['locale'] = 'en_US'
+
+    return '; '.join(key + '=' + morsel.coded_value for key, morsel in cookie.items())
 
 
 def grab_facebook_cookie(namespace):
@@ -29,4 +47,4 @@ def grab_facebook_cookie(namespace):
             'Use the --cookie flag to choose a browser from which to extract the cookie or give your cookie directly.'
         ])
 
-    return cookie
+    return fix_cookie(cookie)

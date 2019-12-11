@@ -11,7 +11,6 @@ import dateparser
 from bs4 import BeautifulSoup
 from collections import deque
 from urllib.parse import urljoin
-from http.cookies import SimpleCookie
 from tqdm import tqdm
 from ural import force_protocol
 from ural.facebook import extract_user_from_facebook_url, convert_facebook_url_to_mobile
@@ -39,22 +38,6 @@ CSV_HEADERS = [
     'replies',
     'in_reply_to'
 ]
-
-
-def fix_cookie(cookie_string):
-    cookie = SimpleCookie()
-    cookie.load(cookie_string)
-
-    # NOTE: those cookie items can rat you out
-    try:
-        del cookie['m_pixel_ratio']
-        del cookie['wd']
-    except KeyError:
-        pass
-
-    cookie['locale'] = 'en_US'
-
-    return '; '.join(key + '=' + morsel.coded_value for key, morsel in cookie.items())
 
 
 def format_csv_row(comments):
@@ -174,7 +157,6 @@ def facebook_comments_action(namespace):
 
     # Grabbing cookie
     cookie = grab_facebook_cookie(namespace)
-    cookie = fix_cookie(cookie)
 
     # Handling output
     output_file = open_output_file(namespace.output)
