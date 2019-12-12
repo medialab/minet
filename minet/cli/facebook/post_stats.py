@@ -25,9 +25,11 @@ CAPTCHA = b'id="captcha"'
 
 REPORT_HEADERS = [
     'error',
+    'canonical',
     'account_name',
     'timestamp',
     'time',
+    'link',
     'aria_label',
     'text',
     'share_count',
@@ -100,9 +102,11 @@ def format(data):
 
     row = [
         '',
+        data.get('url', ''),
         scraped.get('account_name', ''),
         scraped.get('timestamp', ''),
         scraped.get('time', ''),
+        scraped.get('link', ''),
         scraped.get('aria_label', ''),
         scraped.get('text', ''),
         get_count(data['share_count']),
@@ -211,11 +215,21 @@ def facebook_post_stats_action(namespace):
             data['scraped']['timestamp'] = timestamp
             data['scraped']['time'] = datetime.fromtimestamp(timestamp).isoformat()
 
+            # TODO: use a context manager
             try:
                 data['scraped']['aria_label'] = timestamp_elem.parent.get('aria-label')
+            except:
+                pass
+
+            try:
                 data['scraped']['text'] = soup.select_one('[data-testid="post_message"]').get_text()
             except:
                 pass
+
+            # try:
+            #     data['scraped']['link'] = soup.select_one('[data-lynx-uri]').get('href')
+            # except:
+            #     pass
 
         return None, data
 
