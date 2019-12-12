@@ -1,5 +1,6 @@
 # Dev dependencies
 importchecker==2.0
+ipython==7.10.1
 pycodestyle==2.4.0
 PyInstaller==3.5
 pytest==3.5.1

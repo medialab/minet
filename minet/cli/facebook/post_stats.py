@@ -6,14 +6,13 @@
 #
 import re
 import json5
-import time
 from tqdm import tqdm
 from bs4 import BeautifulSoup
 from datetime import datetime
 from collections import OrderedDict
 from ural.facebook import is_facebook_url
 
-from minet.utils import create_pool, request, nested_get
+from minet.utils import create_pool, request, nested_get, sleep_with_entropy
 from minet.cli.utils import open_output_file, CSVEnricher, print_err, die
 from minet.cli.facebook.constants import FACEBOOK_WEB_DEFAULT_THROTTLE
 
@@ -248,4 +247,4 @@ def facebook_post_stats_action(namespace):
             enricher.write(line, format(data))
 
         # Throttling
-        time.sleep(FACEBOOK_WEB_DEFAULT_THROTTLE)
+        sleep_with_entropy(FACEBOOK_WEB_DEFAULT_THROTTLE, 5.0)

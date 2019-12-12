@@ -16,6 +16,7 @@ import time
 import string
 import mimetypes
 import cchardet as chardet
+from random import uniform
 from collections import OrderedDict
 from json.decoder import JSONDecodeError
 from ural import is_url
@@ -732,3 +733,8 @@ def nested_get(path, o):
             return None
 
     return o
+
+
+def sleep_with_entropy(seconds, max_random_addendum):
+    random_addendum = uniform(0, max_random_addendum)
+    time.sleep(seconds + random_addendum)
