@@ -470,11 +470,6 @@ MINET_COMMANDS = {
                             'nargs': '?'
                         },
                         {
-                            'flags': ['-c', '--cookie'],
-                            'help': 'Authenticated cookie to use or browser from which to extract it (support "firefox" and "chrome").',
-                            'default': 'firefox'
-                        },
-                        {
                             'flags': ['-o', '--output'],
                             'help': 'Path to the output report file. By default, the report will be printed to stdout.'
                         },

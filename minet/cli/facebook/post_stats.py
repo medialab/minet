@@ -15,7 +15,6 @@ from ural.facebook import is_facebook_url
 
 from minet.utils import create_pool, request, nested_get
 from minet.cli.utils import open_output_file, CSVEnricher, print_err, die
-from minet.cli.facebook.utils import grab_facebook_cookie
 from minet.cli.facebook.constants import FACEBOOK_WEB_DEFAULT_THROTTLE
 
 META_EXTRACTOR_TEMPLATE = rb'\(function\(\)\{bigPipe\.onPageletArrive\((\{.+share_fbid:"%s".+\})\);\}\),"onPageletArrive'
@@ -122,10 +121,6 @@ def format(data):
 
 
 def facebook_post_stats_action(namespace):
-
-    # Grabbing cookie
-    # NOTE: not using cookie to avoid captchas
-    # cookie = grab_facebook_cookie(namespace)
 
     # Handling output
     output_file = open_output_file(namespace.output)
