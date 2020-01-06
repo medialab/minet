@@ -90,6 +90,10 @@ def guess_response_encoding(response, is_xml=False, use_chardet=False):
 
     data = response.data
 
+    # Data is empty
+    if not data.strip():
+        return None
+
     # TODO: use re.search to go faster!
     if is_xml:
         matches = re.findall(CHARSET_RE, data)
@@ -112,6 +116,13 @@ def guess_response_encoding(response, is_xml=False, use_chardet=False):
 
     if use_chardet:
         chardet_result = chardet.detect(data)
+
+        # Could not detect anything
+        if (
+            not chardet_result or
+            chardet_result.get('confidence') is None
+        ):
+            return None
 
         if chardet_result['confidence'] >= CHARDET_CONFIDENCE_THRESHOLD:
             return chardet_result['encoding'].lower()
