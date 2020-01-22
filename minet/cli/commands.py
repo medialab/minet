@@ -699,7 +699,15 @@ MINET_COMMANDS = {
                                 'arguments': [
                                     {
                                         'name': 'topic_id',
-                                        'help': 'Id of the topic'
+                                        'help': 'Id of the topic.'
+                                    },
+                                    {
+                                        'flag': '--media-id',
+                                        'help': 'Return only stories belonging to the given media_ids.'
+                                    },
+                                    {
+                                        'flag': '--from-media-id',
+                                        'help': 'Return only stories that are linked from stories in the given media_id.'
                                     }
                                 ]
                             }

@@ -24,6 +24,12 @@ def forge_url(namespace, link_id=None):
     if link_id is not None:
         url += '&link_id=%s' % link_id
 
+    if namespace.media_id:
+        url += '&media_id=%s' % namespace.media_id
+
+    if namespace.from_media_id:
+        url += '&link_from_media_id=%s' % namespace.from_media_id
+
     return url
 
 
