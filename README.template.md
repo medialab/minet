@@ -60,7 +60,8 @@ To learn how to use `minet` and understand how it may fit your use cases, you sh
 * [mediacloud (mc)](#mediacloud)
   * [topic](#topic)
     * [stories](#stories)
-
+* [youtube (yt)](#youtube)
+  * [url-parse](#youtube-url-parse)
 
 ### API
 
@@ -172,6 +173,12 @@ TODO: document the scraping DSL
 #### stories
 
 <% mc/topic/stories %>
+
+## Youtube
+
+### url-parse
+
+<% yt/url_parse %>
 
 ---
 

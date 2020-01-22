@@ -36,7 +36,7 @@ To learn how to use `minet` and understand how it may fit your use cases, you sh
 * [-h/--help/help](#help-flag)
 * [--version](#version-flag)
 
-*Basic commands*
+*Generic commands*
 
 * [crawl](#crawl)
 * [fetch](#fetch)
@@ -60,7 +60,8 @@ To learn how to use `minet` and understand how it may fit your use cases, you sh
 * [mediacloud (mc)](#mediacloud)
   * [topic](#topic)
     * [stories](#stories)
-
+* [youtube (yt)](#youtube)
+  * [url-parse](#youtube-url-parse)
 
 ### API
 
@@ -543,7 +544,7 @@ examples:
 ## Facebook
 
 ```
-usage: minet facebook [-h] {comments} ...
+usage: minet facebook [-h] {comments,post-stats} ...
 
 Minet Facebook Command
 ======================
@@ -551,10 +552,10 @@ Minet Facebook Command
 Collects data from Facebook.
 
 optional arguments:
-  -h, --help  show this help message and exit
+  -h, --help             show this help message and exit
 
 actions:
-  {comments}  Action to perform to collect data on Facebook
+  {comments,post-stats}  Action to perform to collect data on Facebook
 
 ```
 
@@ -619,7 +620,10 @@ examples:
 #### stories
 
 ```
-usage: minet mediacloud topic stories [-h] [-t TOKEN] [-o OUTPUT] topic_id
+usage: minet mediacloud topic stories [-h] [-t TOKEN] [-o OUTPUT]
+                                      [--media-id MEDIA_ID]
+                                      [--from-media-id FROM_MEDIA_ID]
+                                      topic_id
 
 Minet Mediacloud Topic Stories Command
 ======================================
@@ -627,14 +631,22 @@ Minet Mediacloud Topic Stories Command
 Retrieves the list of stories from a mediacloud topic.
 
 positional arguments:
-  topic_id                    Id of the topic
+  topic_id                       Id of the topic.
 
 optional arguments:
-  -h, --help                  show this help message and exit
-  -t TOKEN, --token TOKEN     Mediacloud API token (also called key).
-  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  -h, --help                     show this help message and exit
+  -t TOKEN, --token TOKEN        Mediacloud API token (also called key).
+  -o OUTPUT, --output OUTPUT     Path to the output report file. By default, the report will be printed to stdout.
+  --media-id MEDIA_ID            Return only stories belonging to the given media_ids.
+  --from-media-id FROM_MEDIA_ID  Return only stories that are linked from stories in the given media_id.
 
 ```
+
+## Youtube
+
+### url-parse
+
+<% yt/url_parse %>
 
 ---
 
