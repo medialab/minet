@@ -16,7 +16,7 @@ YOUTUBE_TYPES = {
     YoutubeChannel: 'channel'
 }
 
-def parse_url (namespace, output_file):
+def url_parse (namespace, output_file):
     enricher = CSVEnricher(
         namespace.file,
         namespace.column,

@@ -360,7 +360,7 @@ MINET_COMMANDS = {
                 },
             ],
             'commands': {
-                'parse-url': {
+                'url_parse': {
                     'title': 'Parse Youtube URLs',
                     'description': 'Extract informations from Youtube URLs',
                     'arguments': [
