@@ -339,6 +339,52 @@ MINET_COMMANDS = {
         }
     },
 
+    # Crowdtangle action subparser
+    # --------------------------------------------------------------------------
+    'youtube': {
+        'package': 'minet.cli.youtube',
+        'action': 'youtube_action',
+        'aliases': ['yt'],
+        'title': 'Minet Youtube parser command',
+        'description': '''
+            Gather data from Youtube.
+        ''',
+        'subparsers': {
+            'help': 'Actions to perform on Youtube.',
+            'title': 'actions',
+            'dest': 'yt_action',
+            'common_arguments': [
+                {
+                    'flags': ['-o', '--output'],
+                    'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+                },
+            ],
+            'commands': {
+                'parse-url': {
+                    'title': 'Parse Youtube URLs',
+                    'description': 'Extract informations from Youtube URLs',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the URL in the CSV file.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the inquired URLs.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).'
+                        }
+                    ]
+                }
+            }
+        }
+    },
+
     # Extract action subparser
     # -------------------------------------------------------------------------
     'extract': {
