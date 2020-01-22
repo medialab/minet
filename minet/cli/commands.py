@@ -357,10 +357,10 @@ MINET_COMMANDS = {
                 {
                     'flags': ['-o', '--output'],
                     'help': 'Path to the output report file. By default, the report will be printed to stdout.'
-                },
+                }
             ],
             'commands': {
-                'url_parse': {
+                'url-parse': {
                     'title': 'Parse Youtube URLs',
                     'description': 'Extract informations from Youtube URLs',
                     'arguments': [

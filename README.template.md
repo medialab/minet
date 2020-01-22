@@ -178,7 +178,7 @@ TODO: document the scraping DSL
 
 ### url-parse
 
-<% yt/url_parse %>
+<% yt/url-parse %>
 
 ---
 

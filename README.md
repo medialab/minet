@@ -646,7 +646,24 @@ optional arguments:
 
 ### url-parse
 
-<% yt/url_parse %>
+```
+usage: minet youtube url-parse [-h] [-o OUTPUT] [-s SELECT] column [file]
+
+Parse Youtube URLs
+==================
+
+Extract informations from Youtube URLs
+
+positional arguments:
+  column                      Name of the column containing the URL in the CSV file.
+  file                        CSV file containing the inquired URLs.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+
+```
 
 ---
 

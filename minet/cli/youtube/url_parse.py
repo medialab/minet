@@ -1,9 +1,9 @@
 from tqdm import tqdm
 from ural.youtube import (
-  parse_youtube_url,
-  YoutubeVideo,
-  YoutubeUser,
-  YoutubeChannel
+    parse_youtube_url,
+    YoutubeVideo,
+    YoutubeUser,
+    YoutubeChannel
 )
 
 from minet.cli.utils import CSVEnricher
@@ -16,7 +16,8 @@ YOUTUBE_TYPES = {
     YoutubeChannel: 'channel'
 }
 
-def url_parse (namespace, output_file):
+
+def url_parse(namespace, output_file):
     enricher = CSVEnricher(
         namespace.file,
         namespace.column,
