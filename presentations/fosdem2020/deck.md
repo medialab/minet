@@ -13,6 +13,10 @@ marp: true
     color: white;
   }
 
+  a {
+    color: #1f5baa;
+  }
+
   code {
     color: #CC3300;
   }
@@ -108,9 +112,29 @@ marp: true
 
 ---
 
-## But web mining is hard
+## Web mining is hard
+
+You need to know The Web™:
+
+`DNS` `HTTP` `HTML` `CSS` `JS` `DOM` `AJAX` `SSR` `CSR` `XPATH` ...
+
+---
+
+## How do you teach researchers web technologies
+
+- The same as anyone else really ([CSS as sushi plates anyone?](https://flukeout.github.io/))
+- What most consider as an easy layer of technologies really ISN'T
+- We really are standing on the shoulders of giants
+
+---
+
+## A point against the Jupyterization of researchers
+
+---
 
 <!-- TODO: how to teach them? the notebooking and the rest -->
+
+## Web mining is H.A.R.D.
 
 <!--
 
