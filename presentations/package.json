@@ -1,0 +1,18 @@
+{
+  "name": "presentations",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "build": "./build.sh",
+    "deploy": "npm run build && gh-pages -d ./build"
+  },
+  "author": {
+    "name": "Guillaume Plique",
+    "url": "http://github.com/Yomguithereal"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "gh-pages": "^2.2.0"
+  }
+}
