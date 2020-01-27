@@ -133,5 +133,6 @@ ToDo:
 * Relocalizing data collection on the researcher's end (sometimes you don't need a server etc. => ties to bookmarklet and a minet GUI)
 * minet gifs
 * how to teach researchers about the web technologies: the same as anyone (sushi CSS): empowering them by letting them script (should go before our opinion that one may not have the required time. vs. the notebook philosophy => webmining is a hard problem, requiring engineering skills) not saying they should not: just that some don't want to invest this kind of resources & time and they have the right to do so.
+* we need to teach people how to scrape: legal issues in some countries => wiggling when publishing (the monkey army)
 
 -->
