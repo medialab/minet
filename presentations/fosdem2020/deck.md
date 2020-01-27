@@ -7,10 +7,14 @@ marp: true
 ---
 
 <style>
-  h1 {
+  h1, h2 {
     background-color: #1f5baa;
     padding: 25px;
     color: white;
+  }
+
+  code {
+    color: #CC3300;
   }
 </style>
 
@@ -79,11 +83,33 @@ marp: true
 
 ![twitter-api](img/twitter-api.png)
 
+---
+
+# But why is this useful to [social] sciences?
+
+---
+
+## Bad take
+
+1. Every social sciences data collection is biaised (i.e. observer's paradox)
+2. People express themselves without being asked to, on the Internet
+3. What's more they are not being observed (lol, I know...)
+4. Webmining is therefore a superior source of data for social sciences!
+
+---
+
+## Good take
+
+1. Internet data comes with its own biases that you should be aware of
+2. Apply `media studies` and `STS` without moderation
+3. Still is another data source. This cannot be shunned!
+
+<!-- Note: Google Trends example -->
+
 <!--
 
 Plan:
 
-* Why is that useful to social sciences? Labov's paradox etc. => other biases, such as Google Trends drifting
 * But webmining is hard: you need to master at least subsets of web technologies
 * How do we try, in the médialab, to empower researchers with a wide array of webmining tools: brief presentation of the lab, its triangle and why it enables us to take a step back and achieve some R&D.
 * Chronological story?
