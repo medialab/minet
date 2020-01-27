@@ -94,7 +94,7 @@ marp: true
 1. Every social sciences data collection is biaised (i.e. observer's paradox)
 2. People express themselves without being asked to, on the Internet
 3. What's more they are not being observed (lol, I know...)
-4. Webmining is therefore a superior source of data for social sciences!
+4. Web mining is therefore a superior source of data for social sciences!
 
 ---
 
@@ -105,6 +105,12 @@ marp: true
 3. Still is another data source. This cannot be shunned!
 
 <!-- Note: Google Trends example -->
+
+---
+
+## But web mining is hard
+
+<!-- TODO: how to teach them? the notebooking and the rest -->
 
 <!--
 
