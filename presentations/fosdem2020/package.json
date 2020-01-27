@@ -1,0 +1,19 @@
+{
+  "name": "fosdem2020",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FOSDEM 2020 presentation regarding web mining tools for researchers.",
+  "main": "index.js",
+  "scripts": {
+    "build": "marp deck.md -o deck.html",
+    "dev": "marp --server ."
+  },
+  "author": {
+    "name": "Guillaume Plique",
+    "url": "http://github.com/Yomguithereal"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@marp-team/marp-cli": "^0.17.0"
+  }
+}
