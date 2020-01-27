@@ -15,7 +15,7 @@ marp: true
 </style>
 
 <style scoped>
-  h1, h3 {
+  h1 {
     text-align: center;
   }
 
@@ -45,17 +45,44 @@ marp: true
 
 ---
 
+<style scoped>
+  h1 {
+    text-align: center;
+  }
+</style>
+
 # Why and how to enable researchers to perform complex web mining tasks?
 
 ---
 
-# Second slide
+# What is web mining?
+
+---
+
+# Scraping
+
+![echojs](img/echojs.png)
+
+---
+
+![echojs-html](img/echojs-html.png)
+
+---
+
+# Crawling
+
+![hyphe-network](img/hyphe-network.png)
+
+---
+
+# Collecting data from APIs
+
+![twitter-api](img/twitter-api.png)
 
 <!--
 
 Plan:
 
-* What is webmining: scraping & crawling
 * Why is that useful to social sciences? Labov's paradox etc. => other biases, such as Google Trends drifting
 * But webmining is hard: you need to master at least subsets of web technologies
 * How do we try, in the médialab, to empower researchers with a wide array of webmining tools: brief presentation of the lab, its triangle and why it enables us to take a step back and achieve some R&D.
