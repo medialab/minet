@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "build": "marp deck.md -o deck.html",
+    "clean": "rm deck.html",
     "dev": "marp --server ."
   },
   "author": {
