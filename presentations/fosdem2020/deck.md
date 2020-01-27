@@ -10,9 +10,6 @@ marp: true
   h1 {
     background-color: #1f5baa;
     padding: 25px;
-  }
-
-  h1 {
     color: white;
   }
 </style>
