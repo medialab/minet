@@ -7,14 +7,28 @@ marp: true
 ---
 
 <style>
-  h1, h2 {
+  h1, h2, h3 {
     background-color: #1f5baa;
     padding: 25px;
     color: white;
+    text-align: center;
+  }
+
+  p {
+    text-align: center;
+  }
+
+  h3 {
+    padding: 15px;
   }
 
   a {
     color: #1f5baa;
+  }
+
+  ol {
+    list-style-type: decimal-leading-zero;
+    padding-left: 4em;
   }
 
   code {
@@ -23,16 +37,7 @@ marp: true
 </style>
 
 <style scoped>
-  h1 {
-    text-align: center;
-  }
-
-  section > p:first-child {
-    text-align: center;
-  }
-
   p {
-    text-align: center;
     margin-bottom: 0;
   }
 
@@ -52,12 +57,6 @@ marp: true
 *Guillaume Plique, SciencesPo médialab*
 
 ---
-
-<style scoped>
-  h1 {
-    text-align: center;
-  }
-</style>
 
 # Why and how to enable researchers to perform complex web mining tasks?
 
@@ -122,25 +121,58 @@ You need to know The Web™:
 
 ## How do you teach researchers web technologies
 
-- The same as anyone else really ([CSS as sushi plates anyone?](https://flukeout.github.io/))
-- What most consider as an easy layer of technologies really ISN'T
-- We really are standing on the shoulders of giants
+1. The same as anyone else really ([CSS as sushi plates anyone?](https://flukeout.github.io/))
+2. What most consider as an easy layer of technologies really ISN'T
+3. We really are standing on the shoulders of giants
 
 ---
 
 ## A point against the Jupyterization of researchers
 
----
+1. Some researchers don't have the **time** nor the **will** to learn how to do advanced computer stuff.
+2. This should be **OK**!
 
-<!-- TODO: how to teach them? the notebooking and the rest -->
+---
 
 ## Web mining is H.A.R.D.
 
+It really is a craftsmanship.
+
+---
+
+## Internet is a dirty, dirty place
+
+Browsers truly are heuristical wonders!
+
+---
+
+## Multithreading, parallelization, throttling etc.
+
+Once we cut access to Google to our whole university!
+
+---
+
+## Complex spidering, scalability, storage, indexing, recombobulation, steam engines, fancy boats, unionization, agility, upper management, Peters syndrom, eXtreme programming
+
+*Most of it is irrelevant and made up but you get the point.*
+
+---
+
+## How do we empower researchers then?
+
+---
+
+## By designing tools suited to their research questions
+
+---
+
+# SciencesPo's médialab
+
+<!-- so how do you empower researchers then: by designing tools -->
 <!--
 
 Plan:
 
-* But webmining is hard: you need to master at least subsets of web technologies
 * How do we try, in the médialab, to empower researchers with a wide array of webmining tools: brief presentation of the lab, its triangle and why it enables us to take a step back and achieve some R&D.
 * Chronological story?
 * Scraping and API "abusing" against platforms' hegemony
@@ -156,7 +188,7 @@ ToDo:
 
 * Bookmarklets => how to scale with minet
 * anecdote: scraping the web using Selenium losing your time when you could retro-engineer the AJAX API. Sometimes modern web practices give more than they take
-* Add DIME logo
+* Add DIME and médialab logo
 * Trade-off between empowering & scalability => what about a GUI for minet? We also need to design user paths
 * Mention real research questions => from small (bookmarklet) to wide (polarisation)
 * Hardships: badly coded websites (browser are a pile of very complex heuristics: page encoding how?), multithreading, throttling, proxies (how we cut all our university access to Google), complex spidering, scalability, storage, indexing etc.
