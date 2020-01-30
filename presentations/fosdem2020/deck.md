@@ -34,6 +34,18 @@ marp: true
   code {
     color: #CC3300;
   }
+
+  code span {
+    color: black;
+  }
+
+  code .hljs-keyword {
+    color: #006699;
+  }
+
+  code .hljs-string {
+    color: #CC3300;
+  }
 </style>
 
 <style scoped>
@@ -59,6 +71,20 @@ marp: true
 ---
 
 # Why and how to enable researchers to perform complex web mining tasks?
+
+---
+
+<style scoped>
+  img:first-child {
+    margin-top: 30px;
+  }
+</style>
+
+## Guillaume Plique, a.k.a. Yomguithereal
+
+![logo-medialab w:350px](img/logo-medialab.svg)
+
+![logo-dime-shs w:350px](img/logo-dime-shs.svg)
 
 ---
 
@@ -127,6 +153,15 @@ You need to know The Web™:
 
 ---
 
+## Teaching researchers how to scrape
+
+1. Fighting the platforms and their APIs
+2. Legal issues in some countries
+3. Sometimes forbidden to teach it (~lock picking)
+4. Publication wiggles (the monkey army)
+
+---
+
 ## A point against the Jupyterization of researchers
 
 1. Some researchers don't have the **time** nor the **will** to learn how to do advanced computer stuff.
@@ -154,48 +189,153 @@ Once we cut access to Google to our whole university!
 
 ## Complex spidering, scalability, storage, indexing, recombobulation, steam engines, fancy boats, unionization, agility, upper management, Peters syndrom, eXtreme programming
 
-*Most of it is irrelevant and made up but you get the point.*
+*Most of it is irrelevant and made up but you get the point...*
 
 ---
+
+<style scoped>
+  strong {
+    text-decoration: underline;
+  }
+</style>
 
 ## How do we empower researchers then?
 
----
-
-## By designing tools suited to their research questions
+By **designing** tools suited to their research questions
 
 ---
 
 # SciencesPo's médialab
 
-<!-- so how do you empower researchers then: by designing tools -->
+1. Social Science Researchers
+2. Designers
+3. Engineers
+
+---
+
+## A brief history of the lab's webmining tools
+
+1. [artoo.js](https://medialab.github.io/artoo/)
+2. [minet](https://github.com/medialab/minet)
+3. [Hyphe](https://hyphe.medialab.sciences-po.fr/)
+4. ([Gazouilloire](https://github.com/medialab/gazouilloire))
+
+---
+
+## Parasitizing web browsers instead of emulating them!
+
+![artoo h:300px](img/artoo-icon.svg)
+
+[Demo Time!](https://www.echojs.com/)
+
+<!-- Note: anecdote about the Selenium researchers -->
+
+---
+
+## Leveraging bookmarklets to empower researchers
+
+![artoo h:450px](img/artoo-generator.png)
+
+<!-- Note: used for several hit jobs -->
+
+---
+
+<style scoped>
+  p {
+    margin-bottom: 0;
+  }
+
+  p > em {
+    font-size: 20px;
+  }
+</style>
+
+## But can we scale up?
+
+![img](img/minet.png)
+
+*Not-contractual logo*
+
+---
+
+## The Unix philosophy
+
+```
+xsv search -s url urls.csv | minet fetch url -d html > result.txt
+```
+
+---
+
+## The low-fi approach
+
+![img](img/minet-progress1.gif)
+
+![img](img/minet-progress2.gif)
+
+<!-- Note: used for polarisation -->
+
+---
+
+## Relocalizing data collection
+
+1. Sometimes you don't need a server
+2. We are rarely doing BigData™
+3. Let's put the researcher at the center so they can control their data
+
+---
+
+### A programmatic API
+
+Jupyter's back y'all!
+
+```python
+from minet import multithreaded_fetch
+
+for result in multithreaded_fetch(urls_iterator):
+  print(result.status)
+```
+
+---
+
+## Trade-off between scalability & usability
+
+What about a GUI for minet?
+
+We need to be able to **design** user paths.
+
+---
+
+## The next frontier: Crawling the Web
+
+---
+
+![hyphe](img/hyphe.png)
+
+---
+
+## A dedicated interface
+
+![hyphe-network](img/hyphe-network.png)
+
+---
+
+## Serving a robust methodology
+
+![hyphe-methodology h:450px](img/hyphe-methodology.png)
+
+---
+
+## Thank you for listening!
+
+Pull requests welcome :)
+
 <!--
 
-Plan:
-
-* How do we try, in the médialab, to empower researchers with a wide array of webmining tools: brief presentation of the lab, its triangle and why it enables us to take a step back and achieve some R&D.
-* Chronological story?
-* Scraping and API "abusing" against platforms' hegemony
-
-Tools:
-
-* artoo.js
-* minet
-* Hyphe
 * Gazouilloire
 
 ToDo:
 
-* Bookmarklets => how to scale with minet
-* anecdote: scraping the web using Selenium losing your time when you could retro-engineer the AJAX API. Sometimes modern web practices give more than they take
-* Add DIME and médialab logo
-* Trade-off between empowering & scalability => what about a GUI for minet? We also need to design user paths
-* Mention real research questions => from small (bookmarklet) to wide (polarisation)
-* Hardships: badly coded websites (browser are a pile of very complex heuristics: page encoding how?), multithreading, throttling, proxies (how we cut all our university access to Google), complex spidering, scalability, storage, indexing etc.
-* Relocalizing data collection on the researcher's end (sometimes you don't need a server etc. => ties to bookmarklet and a minet GUI)
-* minet gifs
-* how to teach researchers about the web technologies: the same as anyone (sushi CSS): empowering them by letting them script (should go before our opinion that one may not have the required time. vs. the notebook philosophy => webmining is a hard problem, requiring engineering skills) not saying they should not: just that some don't want to invest this kind of resources & time and they have the right to do so.
+* Scraping and API "abusing" against platforms' hegemony
 * we need to teach people how to scrape: legal issues in some countries => wiggling when publishing (the monkey army)
-* minet low fi approach regarding dbs (reducing overhead) -> remove the cruft for people, make it easy to go down the scripting path again
 
 -->
