@@ -328,14 +328,3 @@ We need to be able to **design** user paths.
 ## Thank you for listening!
 
 Pull requests welcome :)
-
-<!--
-
-* Gazouilloire
-
-ToDo:
-
-* Scraping and API "abusing" against platforms' hegemony
-* we need to teach people how to scrape: legal issues in some countries => wiggling when publishing (the monkey army)
-
--->
