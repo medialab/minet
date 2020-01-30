@@ -13,7 +13,11 @@ from collections import deque
 from urllib.parse import urljoin
 from tqdm import tqdm
 from ural import force_protocol
-from ural.facebook import extract_user_from_facebook_url, convert_facebook_url_to_mobile
+from ural.facebook import (
+    parse_facebook_url,
+    convert_facebook_url_to_mobile,
+    FacebookUser
+)
 
 from minet.utils import create_pool, request
 from minet.cli.utils import open_output_file
@@ -95,7 +99,7 @@ def scrape_comments(html, in_reply_to=None):
         user_link = item.select_one('h3 > a')
         user_label = user_link.get_text().strip()
         user_href = user_link.get('href')
-        user = extract_user_from_facebook_url(user_href)
+        user = parse_facebook_url(urljoin(BASE_URL, user_href))
 
         # TODO: link to comment
         content_element = item.select_one('h3 + div')
@@ -133,9 +137,9 @@ def scrape_comments(html, in_reply_to=None):
         data['comments'].append({
             'post_id': post_id,
             'comment_id': item_id,
-            'user_id': user.id or '',
-            'user_handle': user.handle or '',
-            'user_url': user.url,
+            'user_id': getattr(user, 'id', ''),
+            'user_handle': getattr(user, 'handle', ''),
+            'user_url': getattr(user, 'url', ''),
             'user_label': user_label,
             'comment_text': comment_text,
             'comment_html': comment_html,
