@@ -131,7 +131,7 @@ marp: true
 
 1. Internet data comes with its own biases that you should be aware of
 2. Apply `media studies` and `STS` without moderation
-3. Still is another data source. This cannot be shunned!
+3. Still is another very interesting and large data source!
 
 <!-- Note: Google Trends example -->
 
@@ -162,10 +162,10 @@ You need to know The Web™:
 
 ---
 
-## A point against the Jupyterization of researchers
+## Jupyterizing researchers is not a solution
 
-1. Some researchers don't have the **time** nor the **will** to learn how to do advanced computer stuff.
-2. This should be **OK**!
+1. Some researchers don't have the **time** nor the **will** to learn python and web stuff.
+2. We should be OK with that!
 
 ---
 
