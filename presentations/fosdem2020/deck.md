@@ -258,13 +258,29 @@ By **designing** tools suited to their research questions
 
 ---
 
+## Handling the pesky details for you
+
+1. Multithreaded, memory-efficient **fetching** from the web.
+2. Multithreaded, scalable **crawling** using a comfy DSL.
+3. Multiprocessed raw text **content extraction** from HTML pages.
+4. Multiprocessed **scraping** from HTML pages using a comfy DSL.
+5. **URL-related heuristics** utilities such as normalization and matching.
+6. Data collection from various **APIs** such as CrowdTangle.
+
+
+---
+
 ## The Unix philosophy
+
+Do <u>one</u> thing well
 
 ```
 xsv search -s url urls.csv | minet fetch url -d html > result.txt
 ```
 
-Demo time!
+---
+
+## Demo time!
 
 ---
 
@@ -299,14 +315,6 @@ for result in multithreaded_fetch(urls_iterator):
 
 ---
 
-## Trade-off between scalability & usability
-
-What about a GUI for minet?
-
-We need to be able to **design** user paths.
-
----
-
 ## The next frontier: Crawling the Web
 
 ---
@@ -324,6 +332,24 @@ We need to be able to **design** user paths.
 ## Serving a robust methodology
 
 ![hyphe-methodology h:450px](img/hyphe-methodology.png)
+
+---
+
+## Non-trivial technical challenges
+
+![its-a-traph](img/its-a-traph.png)
+
+---
+
+## Trade-off between scalability & usability
+
+We need to be able to **design** user paths.
+
+---
+
+## The future!
+
+What about a GUI for minet?
 
 ---
 
