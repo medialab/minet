@@ -60,7 +60,7 @@ marp: true
 
 ![width:250px](img/artoo-icon.svg)
 
-# Empowering social scientists with web mining tools
+<h1>Empowering social scientists<br>with web mining tools</h1>
 
 *FOSDEM 2020*
 
@@ -169,7 +169,7 @@ You need to know The Web™:
 
 ---
 
-## Web mining is H.A.R.D.
+<h2>Web mining is <u>HARD</u></h2>
 
 It really is a craftsmanship.
 
@@ -254,7 +254,7 @@ By **designing** tools suited to their research questions
 
 ![img](img/minet.png)
 
-*Not-contractual logo*
+*Not-contractual logo - Jules Farjas ©*
 
 ---
 
@@ -329,4 +329,4 @@ We need to be able to **design** user paths.
 
 ## Thank you for listening!
 
-Pull requests welcome :)
+![bernard-minet](img/bernard-minet.gif)
