@@ -315,7 +315,7 @@ for result in multithreaded_fetch(urls_iterator):
 
 ---
 
-## The next frontier: Crawling the Web
+## How to enable researchers to crawl the Web?
 
 ---
 
