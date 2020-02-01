@@ -213,7 +213,7 @@ By **designing** tools suited to their research questions
 
 ---
 
-## A brief history of the lab's webmining tools
+## A brief guided tour of tools we designed
 
 1. [artoo.js](https://medialab.github.io/artoo/)
 2. [minet](https://github.com/medialab/minet)
