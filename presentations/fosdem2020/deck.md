@@ -84,7 +84,7 @@ marp: true
 
 ![logo-medialab w:350px](img/logo-medialab.svg)
 
-![logo-dime-shs w:350px](img/logo-dime-shs.svg)
+![idefi w:150px](img/idefi.png)
 
 ---
 
@@ -263,6 +263,8 @@ By **designing** tools suited to their research questions
 ```
 xsv search -s url urls.csv | minet fetch url -d html > result.txt
 ```
+
+Demo time!
 
 ---
 
