@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "build": "marp deck.md -o deck.html --html",
-    "clean": "rm deck.html",
+    "build:pdf": "marp deck.md -o webmining-fosdem2020.pdf --html --allow-local-files",
+    "clean": "rm deck.html && rm *.csv && rm -rf html",
     "dev": "marp --server . --html"
   },
   "author": {
