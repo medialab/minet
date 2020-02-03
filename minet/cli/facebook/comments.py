@@ -97,6 +97,11 @@ def scrape_comments(html, in_reply_to=None):
             continue
 
         user_link = item.select_one('h3 > a')
+
+        # TODO: this should be fixed. Truncated comments are not correctly handled
+        if not user_link:
+            continue
+
         user_label = user_link.get_text().strip()
         user_href = user_link.get('href')
         user = parse_facebook_url(urljoin(BASE_URL, user_href))
