@@ -6,6 +6,7 @@
 # to yield its result.
 #
 import re
+import json
 from urllib.parse import urljoin
 
 from minet.utils import PseudoFStringFormatter, nested_get
@@ -57,6 +58,7 @@ def eval_expression(expression, element=None, elements=None, value=None,
     return eval(expression, None, {
 
         # Dependencies
+        'json': json,
         'urljoin': urljoin,
         're': re,
 
