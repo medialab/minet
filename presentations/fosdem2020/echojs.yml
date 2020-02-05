@@ -1,0 +1,5 @@
+---
+iterator: article > h2 > a
+fields:
+  title: text
+  link: href

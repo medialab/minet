@@ -60,7 +60,7 @@ marp: true
 
 ![width:250px](img/artoo-icon.svg)
 
-# Empowering social scientists with web mining tools
+<h1>Empowering social scientists<br>with web mining tools</h1>
 
 *FOSDEM 2020*
 
@@ -84,7 +84,7 @@ marp: true
 
 ![logo-medialab w:350px](img/logo-medialab.svg)
 
-![logo-dime-shs w:350px](img/logo-dime-shs.svg)
+![idefi w:150px](img/idefi.png)
 
 ---
 
@@ -131,7 +131,7 @@ marp: true
 
 1. Internet data comes with its own biases that you should be aware of
 2. Apply `media studies` and `STS` without moderation
-3. Still is another data source. This cannot be shunned!
+3. Still is another very interesting and large data source!
 
 <!-- Note: Google Trends example -->
 
@@ -162,14 +162,14 @@ You need to know The Web™:
 
 ---
 
-## A point against the Jupyterization of researchers
+## Jupyterizing researchers is not a solution
 
-1. Some researchers don't have the **time** nor the **will** to learn how to do advanced computer stuff.
-2. This should be **OK**!
+1. Some researchers don't have the **time** nor the **will** to learn python and web stuff.
+2. We should be OK with that!
 
 ---
 
-## Web mining is H.A.R.D.
+<h2>Web mining is <u>HARD</u></h2>
 
 It really is a craftsmanship.
 
@@ -213,7 +213,7 @@ By **designing** tools suited to their research questions
 
 ---
 
-## A brief history of the lab's webmining tools
+## A brief guided tour of tools we designed
 
 1. [artoo.js](https://medialab.github.io/artoo/)
 2. [minet](https://github.com/medialab/minet)
@@ -254,15 +254,33 @@ By **designing** tools suited to their research questions
 
 ![img](img/minet.png)
 
-*Not-contractual logo*
+*Not-contractual logo - Jules Farjas ©*
+
+---
+
+## Handling the pesky details for you
+
+1. Multithreaded, memory-efficient **fetching** from the web.
+2. Multithreaded, scalable **crawling** using a comfy DSL.
+3. Multiprocessed raw text **content extraction** from HTML pages.
+4. Multiprocessed **scraping** from HTML pages using a comfy DSL.
+5. **URL-related heuristics** utilities such as normalization and matching.
+6. Data collection from various **APIs** such as CrowdTangle.
+
 
 ---
 
 ## The Unix philosophy
 
+Do <u>one</u> thing well
+
 ```
 xsv search -s url urls.csv | minet fetch url -d html > result.txt
 ```
+
+---
+
+## Demo time!
 
 ---
 
@@ -297,15 +315,7 @@ for result in multithreaded_fetch(urls_iterator):
 
 ---
 
-## Trade-off between scalability & usability
-
-What about a GUI for minet?
-
-We need to be able to **design** user paths.
-
----
-
-## The next frontier: Crawling the Web
+## How to enable researchers to crawl the Web?
 
 ---
 
@@ -325,6 +335,24 @@ We need to be able to **design** user paths.
 
 ---
 
+## Non-trivial technical challenges
+
+![its-a-traph](img/its-a-traph.png)
+
+---
+
+## Trade-off between scalability & usability
+
+We need to be able to **design** user paths.
+
+---
+
+## The future!
+
+What about a GUI for minet?
+
+---
+
 ## Thank you for listening!
 
-Pull requests welcome :)
+![bernard-minet](img/bernard-minet.gif)

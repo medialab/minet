@@ -5,9 +5,10 @@
   "description": "FOSDEM 2020 presentation regarding web mining tools for researchers.",
   "main": "index.js",
   "scripts": {
-    "build": "marp deck.md -o deck.html",
-    "clean": "rm deck.html",
-    "dev": "marp --server ."
+    "build": "marp deck.md -o deck.html --html",
+    "build:pdf": "marp deck.md -o webmining-fosdem2020.pdf --html --allow-local-files",
+    "clean": "rm deck.html && rm *.csv && rm -rf html",
+    "dev": "marp --server . --html"
   },
   "author": {
     "name": "Guillaume Plique",
