@@ -4,12 +4,23 @@
 #
 # Logic of the `url-parse` action.
 #
-from ural import is_url, normalize_url, get_domain_name
+from ural import (
+    is_url,
+    normalize_url,
+    get_hostname,
+    get_domain_name,
+    get_normalized_hostname
+)
 from tqdm import tqdm
 
 from minet.cli.utils import CSVEnricher, open_output_file
 
-REPORT_HEADERS = ['normalized_url', 'domain_name']
+REPORT_HEADERS = [
+    'normalized_url',
+    'domain_name',
+    'hostname',
+    'normalized_hostname'
+]
 
 
 def url_parse_action(namespace):
@@ -47,8 +58,12 @@ def url_parse_action(namespace):
                 continue
 
             normalized = normalize_url(url, strip_trailing_slash=True)
-            domain = get_domain_name(url)
 
-            enricher.write(line, [normalized, domain])
+            enricher.write(line, [
+                normalize_url(url, strip_trailing_slash=True),
+                get_domain_name(url),
+                get_hostname(url),
+                get_normalized_hostname(url)
+            ])
 
     output_file.close()
