@@ -8,7 +8,7 @@ from ural.youtube import (
 
 from minet.cli.utils import CSVEnricher
 
-REPORT_HEADERS = ['type', 'id', 'name']
+REPORT_HEADERS = ['youtube_type', 'youtube_id', 'youtube_name']
 
 YOUTUBE_TYPES = {
     YoutubeVideo: 'video',
