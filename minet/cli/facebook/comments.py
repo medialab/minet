@@ -15,8 +15,7 @@ from tqdm import tqdm
 from ural import force_protocol
 from ural.facebook import (
     parse_facebook_url,
-    convert_facebook_url_to_mobile,
-    FacebookUser
+    convert_facebook_url_to_mobile
 )
 
 from minet.utils import create_pool, request
