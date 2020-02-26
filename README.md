@@ -708,6 +708,7 @@ for result in multithreaded_fetch(urls, key=lambda x: x['url']):
 * **throttle** *?float|callable* [`0.2`]: Per-domain throttle in seconds. Or a function taking the domain and current item and returning the throttle to apply.
 * **guess_extension** *?bool* [`True`]: Whether to attempt to guess the resource's extension.
 * **guess_encoding** *?bool* [`True`]: Whether to attempt to guess the resource's encoding.
+* **domain_parallelism** *?int* [`1`]: Max number of urls per domain to hit at the same time.
 * **buffer_size** *?int* [`25`]: Max number of items per domain to enqueue into memory in hope of finding a new domain that can be processed immediately.
 * **insecure** *?bool* [`False`]: Whether to ignore SSL certification errors when performing requests.
 * **timeout** *?float|urllib3.Timeout*: Custom timeout for every request.

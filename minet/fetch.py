@@ -56,7 +56,7 @@ ResolveWorkerResult = namedtuple(
 def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
                         throttle=DEFAULT_THROTTLE, guess_extension=True,
                         guess_encoding=True, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
-                        insecure=False, timeout=None):
+                        insecure=False, timeout=None, domain_parallelism=DEFAULT_GROUP_PARALLELISM):
     """
     Function returning a multithreaded iterator over fetched urls.
 
@@ -73,6 +73,8 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
             extension? Defaults to True.
         guess_encoding (bool, optional): Attempt to guess the resource's
             encoding? Defaults to True.
+        domain_parallelism (int, optional): Max number of urls per domain to
+            hit at the same time. Defaults to 1.
         buffer_size (int, optional): Max number of items per domain to enqueue
             into memory in hope of finding a new domain that can be processed
             immediately. Defaults to 1.
@@ -168,7 +170,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
         worker,
         threads,
         group=grouper,
-        group_parallelism=DEFAULT_GROUP_PARALLELISM,
+        group_parallelism=domain_parallelism,
         group_buffer_size=buffer_size,
         group_throttle=throttle
     )
