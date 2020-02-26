@@ -380,6 +380,27 @@ MINET_COMMANDS = {
                             'help': 'Columns to include in report (separated by `,`).'
                         }
                     ]
+                },
+                'videos': {
+                    'title': 'Youtube videos',
+                    'description': 'Retrieve metadata about Youtube videos using the API.',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the video\'s url or id.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the Youtube videos urls or ids.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).'
+                        }
+                    ]
                 }
             }
         }

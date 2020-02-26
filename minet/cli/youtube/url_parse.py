@@ -1,3 +1,10 @@
+# =============================================================================
+# Minet Youtube Url Parse CLI Action
+# =============================================================================
+#
+# Action reading an input CSV file line by line and parsing the Youtube urls
+# contained in a given column.
+#
 from tqdm import tqdm
 from ural.youtube import (
     parse_youtube_url,
@@ -17,7 +24,7 @@ YOUTUBE_TYPES = {
 }
 
 
-def url_parse(namespace, output_file):
+def url_parse_action(namespace, output_file):
     enricher = CSVEnricher(
         namespace.file,
         namespace.column,
