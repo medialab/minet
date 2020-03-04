@@ -146,7 +146,7 @@ TODO: document the scraping DSL
 
 ### search
 
-<% ct/posts %>
+<% ct/search %>
 
 ### summary
 

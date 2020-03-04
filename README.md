@@ -468,21 +468,24 @@ examples:
 ### search
 
 ```
-usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
-                               [-t TOKEN] [--end-date END_DATE] [-f {csv,jsonl}]
-                               [--language LANGUAGE] [-l LIMIT]
-                               [--list-ids LIST_IDS]
-                               [--partition-strategy PARTITION_STRATEGY]
-                               [--resume]
-                               [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
-                               [--start-date START_DATE]
-                               [--url-report URL_REPORT]
+usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
+                                [-t TOKEN] [--end-date END_DATE]
+                                [-f {csv,jsonl}] [-l LIMIT] [--not-in-title]
+                                [--offset OFFSET]
+                                [--partition-strategy PARTITION_STRATEGY]
+                                [-p PLATFORMS]
+                                [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
+                                [--start-date START_DATE] [--types TYPES]
+                                [--url-report URL_REPORT]
+                                terms
 
-Minet CrowdTangle Posts Command
-===============================
+Minet CrowdTangle Search Command
+================================
 
-Gather post data from the designated dashboard (indicated by
-a given token).
+Search posts on the whole CrowdTangle platform.
+
+positional arguments:
+  terms                                           The search query term or terms.
 
 optional arguments:
   -h, --help                                      show this help message and exit
@@ -491,20 +494,21 @@ optional arguments:
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
   --end-date END_DATE                             The latest date at which a post could be posted (UTC!).
   -f {csv,jsonl}, --format {csv,jsonl}            Output format. Defaults to `csv`.
-  --language LANGUAGE                             Language of posts to retrieve.
   -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
-  --list-ids LIST_IDS                             Ids of the lists from which to retrieve posts, separated by commas.
+  --not-in-title                                  Whether to search terms in account titles also.
+  --offset OFFSET                                 Count offset.
   --partition-strategy PARTITION_STRATEGY         Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts.
-  --resume                                        Whether to resume an interrupted collection. Requires -o/--output & --sort-by date
+  -p PLATFORMS, --platforms PLATFORMS             The platforms, separated by comma from which to retrieve posts.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
+  --types TYPES                                   Types of post to include, separated by comma.
   --url-report URL_REPORT                         Path to an optional report file to write about urls found in posts.
 
 examples:
 
-. Fetching the 500 most latest posts from a dashboard:
-    `minet ct posts --token YOUR_TOKEN --limit 500 > latest-posts.csv`
+. Fetching a dashboard's lists:
+    `minet ct search --token YOUR_TOKEN > posts.csv`
 
 ```
 
