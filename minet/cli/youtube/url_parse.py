@@ -53,3 +53,4 @@ def url_parse_action(namespace, output_file):
             line,
             [YOUTUBE_TYPES.get(type(youtube_url)), youtube_url.id, getattr(youtube_url, 'name', None)]
         )
+

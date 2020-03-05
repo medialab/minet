@@ -399,6 +399,10 @@ MINET_COMMANDS = {
                         {
                             'flags': ['-s', '--select'],
                             'help': 'Columns to include in report (separated by `,`).'
+                        },
+                        {
+                            'flags': ['-k', '--key'],
+                            'help': 'YouTube API Data dashboard API key.'
                         }
                     ]
                 }
