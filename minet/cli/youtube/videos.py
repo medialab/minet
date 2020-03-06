@@ -5,12 +5,9 @@
 # Action reading an input CSV file line by line and retrieving metadata about
 # the given Youtube videos using Google's APIs.
 #
-
-import time
 from tqdm import tqdm
 from minet.cli.utils import CSVEnricher, die
 from minet.utils import create_pool, request_json
-from ural import force_protocol
 from ural.youtube import (
     extract_video_id_from_youtube_url,
     is_youtube_video_id,
