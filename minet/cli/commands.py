@@ -582,7 +582,7 @@ MINET_COMMANDS = {
         'arguments': [
             {
                 'name': 'column',
-                'help': 'Column of the CSV file containing urls to fetch.'
+                'help': 'Column of the CSV file containing urls to fetch or a single url to fetch.'
             },
             {
                 'name': 'file',

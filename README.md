@@ -140,7 +140,7 @@ HTTP calls and will generally write the retrieved files in a folder
 given by the user.
 
 positional arguments:
-  column                                          Column of the CSV file containing urls to fetch.
+  column                                          Column of the CSV file containing urls to fetch or a single url to fetch.
   file                                            CSV file containing the urls to fetch.
 
 optional arguments:
