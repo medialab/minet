@@ -47,7 +47,7 @@ def get_data(data_json, no):
             elements = val
 
     for el in elements:
-        if (num+1) in no:
+        if (num + 1) in no:
             num += 2
         else:
             num += 1
@@ -176,6 +176,7 @@ def videos_action(namespace, output_file):
             die(err)
         elif response.status == 403:
             # limite du quota
+            pass
 
         elif response.status >= 400:
             die(response.status)
@@ -193,6 +194,3 @@ def videos_action(namespace, output_file):
                 elif n in no:
                     enricher.write_empty(info)
                     break
-
-
-
