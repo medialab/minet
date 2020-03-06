@@ -39,9 +39,7 @@ def get_data(data_json, no):
     elements = []
     num = 0
 
-    for key, val in data_json.items():
-        if key == 'items':
-            elements = val
+    elements = data_json['items']
 
     for el in elements:
         if (num + 1) in no:
@@ -62,37 +60,22 @@ def get_data(data_json, no):
         favorite_count = 0
         comment_count = 0
 
-        for k, v in el.items():
-            if k == 'id':
-                video_id = v
-            if k == 'snippet':
-                snippet = v
-            if k == 'statistics':
-                stat = v
+        video_id = el['id']
+        snippet = el['snippet']
+        stat = el['statistics']
+        print(stat)
 
-        for a, b in snippet.items():
-            if a == 'publishedAt':
-                published_at = b
-            if a == 'channelId':
-                channel_id = b
-            if a == 'channelTitle':
-                channel_title = b
-            if a == 'title':
-                title = b
-            if a == 'description':
-                description = b
+        published_at = snippet['publishedAt']
+        channel_id = snippet['channelId']
+        channel_title = snippet['channelTitle']
+        title = snippet['title']
+        description = snippet['description']
 
-        for st, nb in stat.items():
-            if st == 'viewCount':
-                view_count = nb
-            if st == 'likeCount':
-                like_count = nb
-            if st == 'dislikeCount':
-                dislike_count = nb
-            if st == 'favoriteCount':
-                favorite_count = nb
-            if st == 'commentCount':
-                comment_count = nb
+        view_count = stat['viewCount']
+        like_count = stat['likeCount']
+        dislike_count = stat['dislikeCount']
+        favorite_count = stat['favoriteCount']
+        comment_count = stat['commentCount']
 
         liste = [video_id, published_at, channel_id, title, description, channel_title, view_count, like_count, dislike_count, favorite_count, comment_count]
         data[num] = liste
@@ -101,34 +84,34 @@ def get_data(data_json, no):
 
 
 def gen_chunks(enricher):
-    chunk = []
+
+    id = []
     li = []
     index = []
-    num = 0
+    chunk = (id, li, index)
 
-    for line in enricher:
-        num += 1
+    for num, line in enumerate(enricher):
         url_data = line[enricher.pos]
 
-        if len(chunk) == 50:
-            yield chunk, li, index
+        if len(id) == 50:
+            yield chunk
             chunk.clear()
 
         if is_youtube_video_id(url_data):
-            chunk.append(url_data)
+            id.append(url_data)
 
         elif is_youtube_url(url_data):
             video_id = extract_video_id_from_youtube_url(url_data)
 
             if video_id:
-                chunk.append(video_id)
+                id.append(video_id)
             else:
-                chunk.append(0)
+                id.append(None)
                 index.append(num)
 
         li.append(line)
 
-    yield chunk, li, index
+    yield chunk
 
 
 def videos_action(namespace, output_file):
@@ -144,7 +127,7 @@ def videos_action(namespace, output_file):
     loading_bar = tqdm(
         desc='Retrieving',
         dynamic_ncols=True,
-        unit=' chunks',
+        unit=' videos',
     )
 
     row_count = 0
@@ -153,16 +136,13 @@ def videos_action(namespace, output_file):
         row_count += 1
 
         gen = gen_chunks(enricher)
-        chunk, li, index = next(gen)
+        chunk = next(gen)
 
         no = []
-        for i in index:
+        for i in chunk[2]:
             no.append(i)
 
-        list_id = ''
-        for id in chunk:
-            if id != 0:
-                list_id = list_id + id + ','
+        list_id = ",".join(chunk[0])
 
         url = URL_TEMPLATE % {'list_id': list_id[:-1], 'key': namespace.key}
         print(url)
@@ -180,11 +160,9 @@ def videos_action(namespace, output_file):
 
         data = get_data(result, no)
 
-        loading_bar.update()
+        loading_bar.update(len(chunk[0]))
 
-        n = 0
-        for info in li:
-            n += 1
+        for n, info in enumerate(chunk[1]):
             for x, y in data.items():
                 if x == n:
                     enricher.write(info, y)
