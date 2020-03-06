@@ -339,7 +339,7 @@ MINET_COMMANDS = {
         }
     },
 
-    # Crowdtangle action subparser
+    # Youtube action subparser
     # --------------------------------------------------------------------------
     'youtube': {
         'package': 'minet.cli.youtube',
