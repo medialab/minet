@@ -27,43 +27,27 @@ REPORT_HEADERS = [
     'like_count',
     'dislike_count',
     'favorite_count',
-    'comment_count'
+    'comment_count',
+    'no_stat_likes'
 ]
 
 
-def get_data(data_json, no):
+def get_data(data_json):
     data = {}
     snippet = {}
     stat = {}
     items = []
     elements = []
     num = 0
+    no_stat_likes = ''
 
     elements = data_json['items']
 
-    for el in elements:
-        if (num + 1) in no:
-            num += 2
-        else:
-            num += 1
-
-        liste = []
-        video_id = 0
-        published_at = ''
-        channel_id = 0
-        title = ''
-        description = ''
-        channel_title = ''
-        view_count = 0
-        like_count = 0
-        dislike_count = 0
-        favorite_count = 0
-        comment_count = 0
+    for num, el in enumerate(elements):
 
         video_id = el['id']
         snippet = el['snippet']
         stat = el['statistics']
-        print(stat)
 
         published_at = snippet['publishedAt']
         channel_id = snippet['channelId']
@@ -71,45 +55,44 @@ def get_data(data_json, no):
         title = snippet['title']
         description = snippet['description']
 
-        view_count = stat['viewCount']
-        like_count = stat['likeCount']
-        dislike_count = stat['dislikeCount']
-        favorite_count = stat['favoriteCount']
-        comment_count = stat['commentCount']
+        view_count = stat.get('viewCount', None)
+        like_count = stat.get('likeCount', None)
+        dislike_count = stat.get('dislikeCount', None)
+        favorite_count = stat.get('favoriteCount', None)
+        comment_count = stat.get('commentCount', None)
 
-        liste = [video_id, published_at, channel_id, title, description, channel_title, view_count, like_count, dislike_count, favorite_count, comment_count]
+        if not like_count:
+            no_stat_likes = '1'
+
+        liste = [video_id, published_at, channel_id, title, description, channel_title, view_count, like_count, dislike_count, favorite_count, comment_count, no_stat_likes]
         data[num] = liste
 
     return data
 
 
 def gen_chunks(enricher):
-
-    id = []
-    li = []
-    index = []
-    chunk = (id, li, index)
+    chunk = []
 
     for num, line in enumerate(enricher):
+        index = 0
+
         url_data = line[enricher.pos]
 
-        if len(id) == 50:
+        if len(chunk) == 50:
             yield chunk
             chunk.clear()
 
         if is_youtube_video_id(url_data):
-            id.append(url_data)
+            video_id = url_data
 
         elif is_youtube_url(url_data):
             video_id = extract_video_id_from_youtube_url(url_data)
 
-            if video_id:
-                id.append(video_id)
-            else:
-                id.append(None)
-                index.append(num)
+            if not video_id:
+                index = num
 
-        li.append(line)
+        tup = (video_id, line, index)
+        chunk.append(tup)
 
     yield chunk
 
@@ -138,14 +121,16 @@ def videos_action(namespace, output_file):
         gen = gen_chunks(enricher)
         chunk = next(gen)
 
-        no = []
-        for i in chunk[2]:
-            no.append(i)
+        v_id = []
+        for i in chunk:
+            if i[0]:
+                v_id.append(i[0])
+            else:
+                enricher.write_empty(i[1])
 
-        list_id = ",".join(chunk[0])
+        list_id = ",".join(v_id)
 
-        url = URL_TEMPLATE % {'list_id': list_id[:-1], 'key': namespace.key}
-        print(url)
+        url = URL_TEMPLATE % {'list_id': list_id, 'key': namespace.key}
         http = create_pool()
         err, response, result = request_json(http, url)
 
@@ -158,14 +143,12 @@ def videos_action(namespace, output_file):
         elif response.status >= 400:
             die(response.status)
 
-        data = get_data(result, no)
+        data = get_data(result)
 
-        loading_bar.update(len(chunk[0]))
+        loading_bar.update(len(chunk))
 
-        for n, info in enumerate(chunk[1]):
+        for n, info in enumerate(chunk):
             for x, y in data.items():
                 if x == n:
-                    enricher.write(info, y)
-                elif n in no:
-                    enricher.write_empty(info)
-                    break
+                    enricher.write(info[1], y)
+
