@@ -193,7 +193,8 @@ def facebook_post_stats_action(namespace):
             print_err('Found seen_by_count: %i for %s' % (get_count(data['seen_by_count']), url))
 
         if 'political_figure_data' in data and data['political_figure_data']:
-            print_err('Found political_figure_data: %i for %s' % (data['political_figure_data'], url))
+            print_err('Found political_figure_data:')
+            print_err(data['political_figure_data'])
 
         if get_count(data['reaction_count']) != get_count(data['reactors']):
             print_err('Found different reactions/reactors for %s' % url)
