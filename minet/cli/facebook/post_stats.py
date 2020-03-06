@@ -206,6 +206,10 @@ def facebook_post_stats_action(namespace):
             hidden_html = match.group(1).decode()
             soup = BeautifulSoup(hidden_html, 'lxml')
 
+            # Sometimes fetching a post behaves weirdly
+            if soup.select_one('h5 a') is None:
+                return 'extraction-failed', None
+
             data['scraped'] = {}
 
             timestamp_elem = soup.select_one('[data-utime]')
