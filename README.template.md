@@ -12,7 +12,7 @@ In addition, **minet** also exposes its high-level programmatic interface as a l
 * Multithreaded, scalable crawling using a comfy DSL.
 * Multiprocessed raw text content extraction from HTML pages.
 * Multiprocessed scraping from HTML pages using a comfy DSL.
-* URL-related heuristics utilities such as normalization and matching.
+* URL-related heuristics utilities such as extraction, normalization and matching.
 * Data collection from various APIs such as [CrowdTangle](https://www.crowdtangle.com/).
 
 ## Installation
@@ -42,6 +42,7 @@ To learn how to use `minet` and understand how it may fit your use cases, you sh
 * [fetch](#fetch)
 * [extract](#extract)
 * [scrape](#scrape)
+* [url-extract](#url-extract)
 * [url-join](#url-join)
 * [url-parse](#url-parse)
 
@@ -119,6 +120,10 @@ pip install dragnet
 TODO: document the scraping DSL
 
 <% scrape %>
+
+## url-extract
+
+<% url-extract %>
 
 ## url-join
 

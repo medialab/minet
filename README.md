@@ -12,7 +12,7 @@ In addition, **minet** also exposes its high-level programmatic interface as a l
 * Multithreaded, scalable crawling using a comfy DSL.
 * Multiprocessed raw text content extraction from HTML pages.
 * Multiprocessed scraping from HTML pages using a comfy DSL.
-* URL-related heuristics utilities such as normalization and matching.
+* URL-related heuristics utilities such as extraction, normalization and matching.
 * Data collection from various APIs such as [CrowdTangle](https://www.crowdtangle.com/).
 
 ## Installation
@@ -42,6 +42,7 @@ To learn how to use `minet` and understand how it may fit your use cases, you sh
 * [fetch](#fetch)
 * [extract](#extract)
 * [scrape](#scrape)
+* [url-extract](#url-extract)
 * [url-join](#url-join)
 * [url-parse](#url-parse)
 
@@ -271,6 +272,40 @@ examples:
 
 . Scraping items from a bunch of files:
     `minet scrape scraper.json --glob "./content/*.html" > scraped.csv`
+
+```
+
+## url-extract
+
+```
+usage: minet url-extract [-h] [-o OUTPUT] [-s SELECT] [--from {text,html}]
+                         [--total TOTAL]
+                         column [file]
+
+Minet Url Extract Command
+=========================
+
+Extract urls from a CSV column containing either raw text or raw
+HTML.
+
+positional arguments:
+  column                      Name of the column containing text or html.
+  file                        Target CSV file.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the result will be printed to stdout.
+  -s SELECT, --select SELECT  Columns to keep in output, separated by comma.
+  --from {text,html}          Extract urls from which kind of source?
+  --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Extracting urls from a text column:
+    `minet url-extract text posts.csv > urls.csv`
+
+. Extracting urls from a html column:
+    `minet url-extract html --from html posts.csv > urls.csv`
 
 ```
 

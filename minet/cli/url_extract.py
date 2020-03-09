@@ -5,6 +5,7 @@
 # Logic of the `url-extract` action.
 #
 from tqdm import tqdm
+from ural import urls_from_text, urls_from_html
 
 from minet.cli.utils import CSVEnricher, open_output_file
 
@@ -12,11 +13,13 @@ REPORT_HEADERS = [
     'url'
 ]
 
+EXTRACTORS = {
+    'html': urls_from_html,
+    'text': urls_from_text
+}
+
 
 def url_extract_action(namespace):
-    print(namespace)
-    return
-
     output_file = open_output_file(namespace.output)
 
     enricher = CSVEnricher(
@@ -27,35 +30,24 @@ def url_extract_action(namespace):
         select=namespace.select.split(',') if namespace.select else None
     )
 
+    extract = EXTRACTORS[getattr(namespace, 'from')]
+
     loading_bar = tqdm(
-        desc='Reporting',
+        desc='Reading',
         dynamic_ncols=True,
         unit=' lines',
         total=namespace.total
     )
 
     for line in enricher:
-        url_data = line[enricher.pos].strip()
-
         loading_bar.update()
 
-        if namespace.separator:
-            urls = url_data.split(namespace.separator)
-        else:
-            urls = [url_data]
+        content = line[enricher.pos].strip()
 
-        for url in urls:
-            if not is_url(url, allow_spaces_in_path=True):
-                enricher.write_empty(line)
-                continue
+        if not content:
+            continue
 
-            normalized = normalize_url(url, strip_trailing_slash=True)
-
-            enricher.write(line, [
-                normalize_url(url, strip_trailing_slash=True),
-                get_domain_name(url),
-                get_hostname(url),
-                get_normalized_hostname(url)
-            ])
+        for url in extract(content):
+            enricher.write(line, [url])
 
     output_file.close()
