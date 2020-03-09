@@ -36,7 +36,7 @@ def url_parse_action(namespace):
     )
 
     loading_bar = tqdm(
-        desc='Reporting',
+        desc='Parsing',
         dynamic_ncols=True,
         unit=' lines',
         total=namespace.total

@@ -34,7 +34,7 @@ def url_extract_action(namespace):
     extract = EXTRACTORS[getattr(namespace, 'from')]
 
     loading_bar = tqdm(
-        desc='Reading',
+        desc='Extracting',
         dynamic_ncols=True,
         unit=' lines',
         total=namespace.total
