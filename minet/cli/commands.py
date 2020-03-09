@@ -889,18 +889,22 @@ MINET_COMMANDS = {
                 'nargs': '?'
             },
             {
-                'flags': ['-o', '--output'],
-                'help': 'Path to the output file. By default, the result will be printed to stdout.'
-            },
-            {
-                'flags': ['-s', '--select'],
-                'help': 'Columns to keep in output, separated by comma.'
+                'flag': '--base-url',
+                'help': 'Base url used to resolve relative urls.'
             },
             {
                 'flag': '--from',
                 'help': 'Extract urls from which kind of source?',
                 'choices': ['text', 'html'],
                 'default': 'text'
+            },
+            {
+                'flags': ['-o', '--output'],
+                'help': 'Path to the output file. By default, the result will be printed to stdout.'
+            },
+            {
+                'flags': ['-s', '--select'],
+                'help': 'Columns to keep in output, separated by comma.'
             },
             {
                 'flag': '--total',

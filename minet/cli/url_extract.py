@@ -6,6 +6,7 @@
 #
 from tqdm import tqdm
 from ural import urls_from_text, urls_from_html
+from urllib.parse import urljoin
 
 from minet.cli.utils import CSVEnricher, open_output_file
 
@@ -48,6 +49,9 @@ def url_extract_action(namespace):
             continue
 
         for url in extract(content):
+            if namespace.base_url is not None:
+                url = urljoin(namespace.base_url, url)
+
             enricher.write(line, [url])
 
     output_file.close()
