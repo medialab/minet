@@ -1022,6 +1022,13 @@ MINET_COMMANDS = {
                 'help': 'Split url column by a separator?'
             },
             {
+                'flags': ['--strip-protocol', '--no-strip-protocol'],
+                'help': 'Whether or not to strip the protocol when normalizing the url. Defaults to strip protocol.',
+                'dest': 'strip_protocol',
+                'action': BooleanAction,
+                'default': True
+            },
+            {
                 'flag': '--total',
                 'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
                 'type': int
