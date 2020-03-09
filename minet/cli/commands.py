@@ -325,6 +325,17 @@ MINET_COMMANDS = {
                             'nargs': '?'
                         },
                         {
+                            'name': '--posts',
+                            'help': 'Path to a file containing the retrieved posts.',
+                            'type': FileType('w')
+                        },
+                        {
+                            'flag': '--sort-by',
+                            'help': 'How to sort retrieved posts. Defaults to `date`.',
+                            'choices': ['date', 'subscriber_count', 'total_interactions'],
+                            'default': 'date'
+                        },
+                        {
                             'flag': '--start-date',
                             'help': 'The earliest date at which a post could be posted (UTC!).'
                         },
