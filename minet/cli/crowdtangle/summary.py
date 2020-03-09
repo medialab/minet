@@ -22,7 +22,7 @@ from minet.cli.crowdtangle.constants import (
 URL_TEMPLATE = (
     'https://api.crowdtangle.com/links'
     '?token=%(token)s'
-    '&count=1'
+    '&count=%(count)s'
     '&startDate=%(start_date)s'
     '&includeSummary=true'
     '&link=%(link)s'
@@ -32,6 +32,7 @@ URL_TEMPLATE = (
 def forge_url(namespace, link):
     return URL_TEMPLATE % {
         'token': namespace.token,
+        'count': 1,
         'start_date': namespace.start_date,
         'link': quote(link, safe='')
     }
