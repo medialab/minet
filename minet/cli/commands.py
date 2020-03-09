@@ -857,6 +857,59 @@ MINET_COMMANDS = {
         ]
     },
 
+    # Url Extract action subparser
+    # -------------------------------------------------------------------------
+    'url-extract': {
+        'package': 'minet.cli.url_extract',
+        'action': 'url_extract_action',
+        'title': 'Minet Url Extract Command',
+        'description': '''
+            Extract urls from a CSV column containing either raw text or raw
+            HTML.
+        ''',
+        'epilog': '''
+            examples:
+
+            . Extracting urls from a text column:
+                `minet url-extract text posts.csv > urls.csv`
+
+            . Extracting urls from a html column:
+                `minet url-extract html --from html posts.csv > urls.csv`
+        ''',
+        'arguments': [
+            {
+                'name': 'column',
+                'help': 'Name of the column containing text or html.'
+            },
+            {
+                'name': 'file',
+                'help': 'Target CSV file.',
+                'type': FileType('r'),
+                'default': sys.stdin,
+                'nargs': '?'
+            },
+            {
+                'flags': ['-o', '--output'],
+                'help': 'Path to the output file. By default, the result will be printed to stdout.'
+            },
+            {
+                'flags': ['-s', '--select'],
+                'help': 'Columns to keep in output, separated by comma.'
+            },
+            {
+                'flag': '--from',
+                'help': 'Extract urls from which kind of source?',
+                'choices': ['text', 'html'],
+                'default': 'text'
+            },
+            {
+                'flag': '--total',
+                'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
+                'type': int
+            }
+        ]
+    },
+
     # Url Join action subparser
     # -------------------------------------------------------------------------
     'url-join': {
