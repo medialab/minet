@@ -514,7 +514,7 @@ MINET_COMMANDS = {
                 },
 
                 'post-stats': {
-                    'title': 'Minet Facebookk Post Stats Command',
+                    'title': 'Minet Facebook Post Stats Command',
                     'description': '''
                         Retrieve statistics about a given list of Facebook posts.
                     ''',
