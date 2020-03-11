@@ -523,7 +523,6 @@ MINET_COMMANDS = {
                         }
                     ]
                 },
-
                 'post-stats': {
                     'title': 'Minet Facebook Post Stats Command',
                     'description': '''
@@ -561,7 +560,32 @@ MINET_COMMANDS = {
                             'type': int
                         }
                     ]
-                }
+                },
+                'url-parse': {
+                    'title': 'Parse Facebook URLs',
+                    'description': 'Extract informations from Facebook URLs',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the URL in the CSV file.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the inquired URLs.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).'
+                        }
+                    ]
+                },
             }
         }
     },
