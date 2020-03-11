@@ -36,12 +36,13 @@ REPORT_HEADERS = [
     'no_stat_likes'
 ]
 
+
 def wait():
     now_utc = datetime.utcnow()
     # PST
-    result = now_utc + timedelta(hours= -7)
+    result = now_utc + timedelta(hours=-7)
     midnight_pacific = datetime.combine(result, datetime.min.time())
-    return (midnight_pacific - resul).seconds
+    return (midnight_pacific - result).seconds
 
 
 def get_data(data_json):
@@ -162,5 +163,3 @@ def videos_action(namespace, output_file):
             else:
                 enricher.write(line[1], data[rank])
                 rank += 1
-
-
