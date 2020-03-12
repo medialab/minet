@@ -7,9 +7,8 @@
 #
 import time
 import datetime
-import pytz
 from pytz import timezone
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from tqdm import tqdm
 from minet.cli.utils import CSVEnricher, die
 from minet.utils import create_pool, request_json
@@ -38,11 +37,11 @@ REPORT_HEADERS = [
 
 
 def wait():
-    now_utc = datetime.utcnow()
-    # PST
-    result = now_utc + timedelta(hours=-7)
-    midnight_pacific = datetime.combine(result, datetime.min.time())
-    return (midnight_pacific - result).seconds
+    now_utc = timezone('utc').localize(datetime.utcnow())
+    pacific_time = now_utc.astimezone(timezone('US/Pacific')).replace(tzinfo=None)
+    midnight_pacific = datetime.combine(pacific_time, datetime.min.time())
+    print(pacific_time)
+    return(midnight_pacific - pacific_time).seconds
 
 
 def get_data(data_json):
