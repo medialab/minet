@@ -6,7 +6,6 @@
 # the given Youtube videos using Google's APIs.
 #
 import time
-import datetime
 from pytz import timezone
 from datetime import date, datetime
 from tqdm import tqdm
@@ -40,21 +39,20 @@ def wait():
     now_utc = timezone('utc').localize(datetime.utcnow())
     pacific_time = now_utc.astimezone(timezone('US/Pacific')).replace(tzinfo=None)
     midnight_pacific = datetime.combine(pacific_time, datetime.min.time())
-    print(pacific_time)
-    return(midnight_pacific - pacific_time).seconds
+    return (midnight_pacific - pacific_time).seconds
 
 
 def get_data(data_json):
     data = []
-    snippet = {}
-    stat = {}
+    snippet = None
+    stat = None
     elements = []
-    no_stat_likes = ''
 
     elements = data_json['items']
 
     for el in elements:
 
+        no_stat_likes = ''
         video_id = el['id']
         snippet = el['snippet']
         stat = el['statistics']
@@ -74,7 +72,19 @@ def get_data(data_json):
         if not like_count:
             no_stat_likes = '1'
 
-        data.append([video_id, published_at, channel_id, title, description, channel_title, view_count, like_count, dislike_count, favorite_count, comment_count, no_stat_likes])
+        data.append([
+            video_id,
+            published_at,
+            channel_id,
+            title, description,
+            channel_title,
+            view_count,
+            like_count,
+            dislike_count,
+            favorite_count,
+            comment_count,
+            no_stat_likes
+        ])
 
     return data
 
@@ -117,17 +127,14 @@ def videos_action(namespace, output_file):
         unit=' videos',
     )
 
+    http = create_pool()
+
     for chunk in gen_chunks(enricher):
 
-        all_ids = []
-        for i in chunk:
-            if i[0]:
-                all_ids.append(i[0])
-
+        all_ids = [row[0] for row in chunk if row[0]]
         list_id = ",".join(all_ids)
 
         url = URL_TEMPLATE % {'list_id': list_id, 'key': namespace.key}
-        http = create_pool()
         err, response, result = request_json(http, url)
 
         if err:
@@ -139,26 +146,23 @@ def videos_action(namespace, output_file):
 
         data = get_data(result)
 
-        id_available = []
-        for sub_list in data:
-            id_available.append(sub_list[0])
-
-        not_available = list(set(all_ids).difference(set(id_available)))
+        id_available = set(sub_list[0] for sub_list in data)
+        not_available = set(all_ids).difference(set(id_available))
 
         loading_bar.update(len(chunk))
 
         rank = 0
-        line_empty = ['' for i in range(len(REPORT_HEADERS) - 1)]
+        line_empty = []
 
         for line in chunk:
             if not line[0]:
                 enricher.write_empty(line[1])
 
             elif line[0] in not_available:
-                line_empty.insert(0, line[0])
+                line_empty = [line[0]] + [''] * (len(REPORT_HEADERS) - 1)
                 enricher.write(line[1], line_empty)
-                line_empty.pop(0)
 
             else:
                 enricher.write(line[1], data[rank])
                 rank += 1
+
