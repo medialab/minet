@@ -44,13 +44,9 @@ def time_in_seconds():
 
 def get_data(data_json):
     data_indexed = {}
-    index = 0
 
     for element in data_json['items']:
 
-        data = None
-        snippet = None
-        stat = None
         no_stat_likes = ''
         video_id = element['id']
         snippet = element['snippet']
@@ -72,7 +68,6 @@ def get_data(data_json):
             no_stat_likes = '1'
 
         data = [
-            video_id,
             published_at,
             channel_id,
             title, description,
@@ -85,8 +80,7 @@ def get_data(data_json):
             no_stat_likes
         ]
 
-        data_indexed[index] = data
-        index += 1
+        data_indexed[video_id] = data
 
     return data_indexed
 
@@ -149,24 +143,23 @@ def videos_action(namespace, output_file):
 
         data = get_data(result)
 
-        id_available = set(item[0] for item in data.values())
+        id_available = set(key for key, value in data.items())
         not_available = set(all_ids).difference(id_available)
 
         loading_bar.update(len(chunk))
 
         line_empty = []
 
-        for line in chunk:
-            ID = line[0]
+        for item in chunk:
+            video_id, line = item
 
-            if not ID:
-                enricher.write_empty(line[1])
+            if video_id is None:
+                enricher.write_empty(line)
 
-            elif ID in not_available:
-                line_empty = [ID] + [''] * (len(REPORT_HEADERS) - 1)
-                enricher.write(line[1], line_empty)
+            elif video_id in not_available:
+                line_empty = [video_id] + [''] * (len(REPORT_HEADERS) - 1)
+                enricher.write(line, line_empty)
 
             else:
-                for key, value in data.items():
-                    if value[0] == ID:
-                        enricher.write(line[1], data[key])
+                full_line = [video_id] + data[video_id]
+                enricher.write(line, full_line)
