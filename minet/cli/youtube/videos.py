@@ -35,7 +35,7 @@ REPORT_HEADERS = [
 ]
 
 
-def wait():
+def time_in_seconds():
     now_utc = timezone('utc').localize(datetime.utcnow())
     pacific_time = now_utc.astimezone(timezone('US/Pacific')).replace(tzinfo=None)
     midnight_pacific = datetime.combine(pacific_time, datetime.min.time())
@@ -43,19 +43,18 @@ def wait():
 
 
 def get_data(data_json):
-    data = []
-    snippet = None
-    stat = None
-    elements = []
+    data_indexed = {}
+    index = 0
 
-    elements = data_json['items']
+    for element in data_json['items']:
 
-    for el in elements:
-
+        data = None
+        snippet = None
+        stat = None
         no_stat_likes = ''
-        video_id = el['id']
-        snippet = el['snippet']
-        stat = el['statistics']
+        video_id = element['id']
+        snippet = element['snippet']
+        stat = element['statistics']
 
         published_at = snippet['publishedAt']
         channel_id = snippet['channelId']
@@ -72,7 +71,7 @@ def get_data(data_json):
         if not like_count:
             no_stat_likes = '1'
 
-        data.append([
+        data = [
             video_id,
             published_at,
             channel_id,
@@ -84,9 +83,12 @@ def get_data(data_json):
             favorite_count,
             comment_count,
             no_stat_likes
-        ])
+        ]
 
-    return data
+        data_indexed[index] = data
+        index += 1
+
+    return data_indexed
 
 
 def gen_chunks(enricher):
@@ -95,6 +97,7 @@ def gen_chunks(enricher):
     for num, line in enumerate(enricher):
 
         url_data = line[enricher.pos]
+        video_id = None
 
         if len(chunk) == 50:
             yield chunk
@@ -140,29 +143,31 @@ def videos_action(namespace, output_file):
         if err:
             die(err)
         elif response.status == 403:
-            time.sleep(wait())
+            time.sleep(time_in_seconds())
         elif response.status >= 400:
             die(response.status)
 
         data = get_data(result)
 
-        id_available = set(sub_list[0] for sub_list in data)
-        not_available = set(all_ids).difference(set(id_available))
+        id_available = set(item[0] for item in data.values())
+        not_available = set(all_ids).difference(id_available)
 
         loading_bar.update(len(chunk))
 
-        rank = 0
         line_empty = []
+        rank = 0
 
         for line in chunk:
-            if not line[0]:
+            ID = line[0]
+
+            if not ID:
                 enricher.write_empty(line[1])
 
-            elif line[0] in not_available:
-                line_empty = [line[0]] + [''] * (len(REPORT_HEADERS) - 1)
+            elif ID in not_available:
+                line_empty = [ID] + [''] * (len(REPORT_HEADERS) - 1)
                 enricher.write(line[1], line_empty)
 
             else:
+                while ID != data[rank][0]:
+                    rank += 1
                 enricher.write(line[1], data[rank])
-                rank += 1
-
