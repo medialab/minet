@@ -157,7 +157,6 @@ def videos_action(namespace, output_file):
         line_empty = []
 
         for line in chunk:
-            rank = 0
             ID = line[0]
 
             if not ID:
@@ -168,6 +167,6 @@ def videos_action(namespace, output_file):
                 enricher.write(line[1], line_empty)
 
             else:
-                while ID != data[rank][0]:
-                    rank += 1
-                enricher.write(line[1], data[rank])
+                for key, value in data.items():
+                    if value[0] == ID:
+                        enricher.write(line[1], data[key])
