@@ -68,6 +68,7 @@ def get_data(data_json):
             no_stat_likes = '1'
 
         data = [
+            video_id,
             published_at,
             channel_id,
             title, description,
@@ -143,7 +144,7 @@ def videos_action(namespace, output_file):
 
         data = get_data(result)
 
-        id_available = set(key for key, value in data.items())
+        id_available = set(data)
         not_available = set(all_ids).difference(id_available)
 
         loading_bar.update(len(chunk))
@@ -161,5 +162,4 @@ def videos_action(namespace, output_file):
                 enricher.write(line, line_empty)
 
             else:
-                full_line = [video_id] + data[video_id]
-                enricher.write(line, full_line)
+                enricher.write(line, data[video_id])
