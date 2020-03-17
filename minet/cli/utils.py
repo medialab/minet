@@ -61,6 +61,7 @@ class CSVEnricher(object):
         self.report_headers = report_headers
         self.pos = pos
         self.reader = reader
+
         self.padding = [''] * len(report_headers)
 
         self.select = select

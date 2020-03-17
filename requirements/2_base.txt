@@ -9,6 +9,7 @@ keyring<19.3
 lxml==4.3.0
 numpy==1.16.1
 persist-queue==0.4.2
+pytz==2019.3
 pyyaml==5.1.2
 quenouille==0.6.0
 tqdm==4.31.1
