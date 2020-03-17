@@ -184,6 +184,7 @@ TODO: document the scraping DSL
 ### videos
 
 <% yt/videos %>
+
 ---
 
 ## API
