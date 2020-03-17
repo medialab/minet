@@ -155,9 +155,9 @@ def videos_action(namespace, output_file):
         loading_bar.update(len(chunk))
 
         line_empty = []
-        rank = 0
 
         for line in chunk:
+            rank = 0
             ID = line[0]
 
             if not ID:
