@@ -665,6 +665,25 @@ optional arguments:
 
 ```
 
+### videos
+
+```
+usage: minet youtube videos [-h] [-k KEY] column [file]
+
+Minet Youtube Videos CLI Action
+==================
+Action reading an input CSV file line by line and retrieving metadata about the given Youtube videos using Google's APIs.
+
+positional arguments:
+  column                      Name of the column containing the video URL in the CSV file.
+  file                                    CSV file containing the inquired URLs.
+  -k KEY, --key KEY           Youtube data API key
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+
+```
 ---
 
 ## API

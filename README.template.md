@@ -62,6 +62,7 @@ To learn how to use `minet` and understand how it may fit your use cases, you sh
     * [stories](#stories)
 * [youtube (yt)](#youtube)
   * [url-parse](#youtube-url-parse)
+  * [videos](#youtube-videos)
 
 ### API
 
@@ -180,6 +181,9 @@ TODO: document the scraping DSL
 
 <% yt/url-parse %>
 
+### videos
+
+<% yt/videos %>
 ---
 
 ## API
