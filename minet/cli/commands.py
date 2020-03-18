@@ -325,6 +325,17 @@ MINET_COMMANDS = {
                             'nargs': '?'
                         },
                         {
+                            'name': '--posts',
+                            'help': 'Path to a file containing the retrieved posts.',
+                            'type': FileType('w')
+                        },
+                        {
+                            'flag': '--sort-by',
+                            'help': 'How to sort retrieved posts. Defaults to `date`.',
+                            'choices': ['date', 'subscriber_count', 'total_interactions'],
+                            'default': 'date'
+                        },
+                        {
                             'flag': '--start-date',
                             'help': 'The earliest date at which a post could be posted (UTC!).'
                         },
@@ -339,7 +350,7 @@ MINET_COMMANDS = {
         }
     },
 
-    # Crowdtangle action subparser
+    # Youtube action subparser
     # --------------------------------------------------------------------------
     'youtube': {
         'package': 'minet.cli.youtube',
@@ -399,6 +410,10 @@ MINET_COMMANDS = {
                         {
                             'flags': ['-s', '--select'],
                             'help': 'Columns to include in report (separated by `,`).'
+                        },
+                        {
+                            'flags': ['-k', '--key'],
+                            'help': 'YouTube API Data dashboard API key.'
                         }
                     ]
                 }
@@ -512,9 +527,8 @@ MINET_COMMANDS = {
                         }
                     ]
                 },
-
                 'post-stats': {
-                    'title': 'Minet Facebookk Post Stats Command',
+                    'title': 'Minet Facebook Post Stats Command',
                     'description': '''
                         Retrieve statistics about a given list of Facebook posts.
                     ''',
@@ -550,7 +564,32 @@ MINET_COMMANDS = {
                             'type': int
                         }
                     ]
-                }
+                },
+                'url-parse': {
+                    'title': 'Parse Facebook URLs',
+                    'description': 'Extract informations from Facebook URLs',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the URL in the CSV file.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the inquired URLs.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).'
+                        }
+                    ]
+                },
             }
         }
     },
@@ -582,7 +621,7 @@ MINET_COMMANDS = {
         'arguments': [
             {
                 'name': 'column',
-                'help': 'Column of the CSV file containing urls to fetch.'
+                'help': 'Column of the CSV file containing urls to fetch or a single url to fetch.'
             },
             {
                 'name': 'file',
@@ -857,6 +896,63 @@ MINET_COMMANDS = {
         ]
     },
 
+    # Url Extract action subparser
+    # -------------------------------------------------------------------------
+    'url-extract': {
+        'package': 'minet.cli.url_extract',
+        'action': 'url_extract_action',
+        'title': 'Minet Url Extract Command',
+        'description': '''
+            Extract urls from a CSV column containing either raw text or raw
+            HTML.
+        ''',
+        'epilog': '''
+            examples:
+
+            . Extracting urls from a text column:
+                `minet url-extract text posts.csv > urls.csv`
+
+            . Extracting urls from a html column:
+                `minet url-extract html --from html posts.csv > urls.csv`
+        ''',
+        'arguments': [
+            {
+                'name': 'column',
+                'help': 'Name of the column containing text or html.'
+            },
+            {
+                'name': 'file',
+                'help': 'Target CSV file.',
+                'type': FileType('r'),
+                'default': sys.stdin,
+                'nargs': '?'
+            },
+            {
+                'flag': '--base-url',
+                'help': 'Base url used to resolve relative urls.'
+            },
+            {
+                'flag': '--from',
+                'help': 'Extract urls from which kind of source?',
+                'choices': ['text', 'html'],
+                'default': 'text'
+            },
+            {
+                'flags': ['-o', '--output'],
+                'help': 'Path to the output file. By default, the result will be printed to stdout.'
+            },
+            {
+                'flags': ['-s', '--select'],
+                'help': 'Columns to keep in output, separated by comma.'
+            },
+            {
+                'flag': '--total',
+                'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
+                'type': int
+            }
+        ]
+    },
+
     # Url Join action subparser
     # -------------------------------------------------------------------------
     'url-join': {
@@ -952,6 +1048,13 @@ MINET_COMMANDS = {
             {
                 'flag': '--separator',
                 'help': 'Split url column by a separator?'
+            },
+            {
+                'flags': ['--strip-protocol', '--no-strip-protocol'],
+                'help': 'Whether or not to strip the protocol when normalizing the url. Defaults to strip protocol.',
+                'dest': 'strip_protocol',
+                'action': BooleanAction,
+                'default': True
             },
             {
                 'flag': '--total',

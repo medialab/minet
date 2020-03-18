@@ -12,7 +12,7 @@ In addition, **minet** also exposes its high-level programmatic interface as a l
 * Multithreaded, scalable crawling using a comfy DSL.
 * Multiprocessed raw text content extraction from HTML pages.
 * Multiprocessed scraping from HTML pages using a comfy DSL.
-* URL-related heuristics utilities such as normalization and matching.
+* URL-related heuristics utilities such as extraction, normalization and matching.
 * Data collection from various APIs such as [CrowdTangle](https://www.crowdtangle.com/).
 
 ## Installation
@@ -42,6 +42,7 @@ To learn how to use `minet` and understand how it may fit your use cases, you sh
 * [fetch](#fetch)
 * [extract](#extract)
 * [scrape](#scrape)
+* [url-extract](#url-extract)
 * [url-join](#url-join)
 * [url-parse](#url-parse)
 
@@ -121,6 +122,10 @@ TODO: document the scraping DSL
 
 <% scrape %>
 
+## url-extract
+
+<% url-extract %>
+
 ## url-join
 
 <% url-join %>
@@ -147,7 +152,7 @@ TODO: document the scraping DSL
 
 ### search
 
-<% ct/posts %>
+<% ct/search %>
 
 ### summary
 
@@ -228,6 +233,7 @@ for result in multithreaded_fetch(urls, key=lambda x: x['url']):
 * **throttle** *?float|callable* [`0.2`]: Per-domain throttle in seconds. Or a function taking the domain and current item and returning the throttle to apply.
 * **guess_extension** *?bool* [`True`]: Whether to attempt to guess the resource's extension.
 * **guess_encoding** *?bool* [`True`]: Whether to attempt to guess the resource's encoding.
+* **domain_parallelism** *?int* [`1`]: Max number of urls per domain to hit at the same time.
 * **buffer_size** *?int* [`25`]: Max number of items per domain to enqueue into memory in hope of finding a new domain that can be processed immediately.
 * **insecure** *?bool* [`False`]: Whether to ignore SSL certification errors when performing requests.
 * **timeout** *?float|urllib3.Timeout*: Custom timeout for every request.

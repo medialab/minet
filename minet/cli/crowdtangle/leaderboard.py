@@ -109,5 +109,6 @@ crowdtangle_leaderboard_action = create_paginated_action(
     csv_headers=build_csv_headers,
     csv_formatter=format_account_for_csv,
     item_name='accounts',
-    item_key='accountStatistics'
+    item_key='accountStatistics',
+    item_id_getter=lambda x: x['account']['id']
 )

@@ -18,22 +18,31 @@ from minet.cli.crowdtangle.constants import (
     CROWDTANGLE_REACTION_TYPES,
     CROWDTANGLE_DEFAULT_TIMEOUT
 )
+from minet.cli.crowdtangle.posts import (
+    format_post_for_csv,
+    CSV_HEADERS as POST_REPORT_CSV_HEADERS
+)
+
+POST_REPORT_CSV_HEADERS = ['url'] + POST_REPORT_CSV_HEADERS
 
 URL_TEMPLATE = (
     'https://api.crowdtangle.com/links'
     '?token=%(token)s'
-    '&count=1'
+    '&count=%(count)s'
     '&startDate=%(start_date)s'
     '&includeSummary=true'
     '&link=%(link)s'
+    '&sortBy=%(sort_by)s'
 )
 
 
 def forge_url(namespace, link):
     return URL_TEMPLATE % {
         'token': namespace.token,
+        'count': 1 if namespace.posts is None else 100,
         'start_date': namespace.start_date,
-        'link': quote(link, safe='')
+        'link': quote(link, safe=''),
+        'sort_by': namespace.sort_by
     }
 
 
@@ -60,6 +69,12 @@ def crowdtangle_summary_action(namespace, output_file):
     output_headers = input_headers + CSV_HEADERS
     output_writer = csv.writer(output_file)
     output_writer.writerow(output_headers)
+
+    posts_writer = None
+
+    if namespace.posts is not None:
+        posts_writer = csv.writer(namespace.posts)
+        posts_writer.writerow(POST_REPORT_CSV_HEADERS)
 
     rate_limit = namespace.rate_limit if namespace.rate_limit is not None else CROWDTANTLE_LINKS_DEFAULT_RATE_LIMIT
     rate_limiter = RateLimiter(rate_limit, 60.0)
@@ -95,5 +110,11 @@ def crowdtangle_summary_action(namespace, output_file):
                 output_writer.writerow(line + CSV_PADDING)
             else:
                 output_writer.writerow(line + format_summary_for_csv(summary))
+
+            posts = nested_get(['result', 'posts'], data)
+
+            if posts is not None and namespace.posts is not None:
+                for post in posts:
+                    posts_writer.writerow([link] + format_post_for_csv(namespace, post))
 
             loading_bar.update()

@@ -36,7 +36,7 @@ def url_parse_action(namespace):
     )
 
     loading_bar = tqdm(
-        desc='Reporting',
+        desc='Parsing',
         dynamic_ncols=True,
         unit=' lines',
         total=namespace.total
@@ -57,10 +57,12 @@ def url_parse_action(namespace):
                 enricher.write_empty(line)
                 continue
 
-            normalized = normalize_url(url, strip_trailing_slash=True)
-
             enricher.write(line, [
-                normalize_url(url, strip_trailing_slash=True),
+                normalize_url(
+                    url,
+                    strip_protocol=namespace.strip_protocol,
+                    strip_trailing_slash=True
+                ),
                 get_domain_name(url),
                 get_hostname(url),
                 get_normalized_hostname(url)

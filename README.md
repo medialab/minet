@@ -12,7 +12,7 @@ In addition, **minet** also exposes its high-level programmatic interface as a l
 * Multithreaded, scalable crawling using a comfy DSL.
 * Multiprocessed raw text content extraction from HTML pages.
 * Multiprocessed scraping from HTML pages using a comfy DSL.
-* URL-related heuristics utilities such as normalization and matching.
+* URL-related heuristics utilities such as extraction, normalization and matching.
 * Data collection from various APIs such as [CrowdTangle](https://www.crowdtangle.com/).
 
 ## Installation
@@ -42,6 +42,7 @@ To learn how to use `minet` and understand how it may fit your use cases, you sh
 * [fetch](#fetch)
 * [extract](#extract)
 * [scrape](#scrape)
+* [url-extract](#url-extract)
 * [url-join](#url-join)
 * [url-parse](#url-parse)
 
@@ -140,7 +141,7 @@ HTTP calls and will generally write the retrieved files in a folder
 given by the user.
 
 positional arguments:
-  column                                          Column of the CSV file containing urls to fetch.
+  column                                          Column of the CSV file containing urls to fetch or a single url to fetch.
   file                                            CSV file containing the urls to fetch.
 
 optional arguments:
@@ -271,6 +272,40 @@ examples:
 
 . Scraping items from a bunch of files:
     `minet scrape scraper.json --glob "./content/*.html" > scraped.csv`
+
+```
+
+## url-extract
+
+```
+usage: minet url-extract [-h] [-o OUTPUT] [-s SELECT] [--from {text,html}]
+                         [--total TOTAL]
+                         column [file]
+
+Minet Url Extract Command
+=========================
+
+Extract urls from a CSV column containing either raw text or raw
+HTML.
+
+positional arguments:
+  column                      Name of the column containing text or html.
+  file                        Target CSV file.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the result will be printed to stdout.
+  -s SELECT, --select SELECT  Columns to keep in output, separated by comma.
+  --from {text,html}          Extract urls from which kind of source?
+  --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Extracting urls from a text column:
+    `minet url-extract text posts.csv > urls.csv`
+
+. Extracting urls from a html column:
+    `minet url-extract html --from html posts.csv > urls.csv`
 
 ```
 
@@ -468,21 +503,24 @@ examples:
 ### search
 
 ```
-usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
-                               [-t TOKEN] [--end-date END_DATE] [-f {csv,jsonl}]
-                               [--language LANGUAGE] [-l LIMIT]
-                               [--list-ids LIST_IDS]
-                               [--partition-strategy PARTITION_STRATEGY]
-                               [--resume]
-                               [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
-                               [--start-date START_DATE]
-                               [--url-report URL_REPORT]
+usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
+                                [-t TOKEN] [--end-date END_DATE]
+                                [-f {csv,jsonl}] [-l LIMIT] [--not-in-title]
+                                [--offset OFFSET]
+                                [--partition-strategy PARTITION_STRATEGY]
+                                [-p PLATFORMS]
+                                [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
+                                [--start-date START_DATE] [--types TYPES]
+                                [--url-report URL_REPORT]
+                                terms
 
-Minet CrowdTangle Posts Command
-===============================
+Minet CrowdTangle Search Command
+================================
 
-Gather post data from the designated dashboard (indicated by
-a given token).
+Search posts on the whole CrowdTangle platform.
+
+positional arguments:
+  terms                                           The search query term or terms.
 
 optional arguments:
   -h, --help                                      show this help message and exit
@@ -491,20 +529,21 @@ optional arguments:
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
   --end-date END_DATE                             The latest date at which a post could be posted (UTC!).
   -f {csv,jsonl}, --format {csv,jsonl}            Output format. Defaults to `csv`.
-  --language LANGUAGE                             Language of posts to retrieve.
   -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
-  --list-ids LIST_IDS                             Ids of the lists from which to retrieve posts, separated by commas.
+  --not-in-title                                  Whether to search terms in account titles also.
+  --offset OFFSET                                 Count offset.
   --partition-strategy PARTITION_STRATEGY         Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts.
-  --resume                                        Whether to resume an interrupted collection. Requires -o/--output & --sort-by date
+  -p PLATFORMS, --platforms PLATFORMS             The platforms, separated by comma from which to retrieve posts.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
+  --types TYPES                                   Types of post to include, separated by comma.
   --url-report URL_REPORT                         Path to an optional report file to write about urls found in posts.
 
 examples:
 
-. Fetching the 500 most latest posts from a dashboard:
-    `minet ct posts --token YOUR_TOKEN --limit 500 > latest-posts.csv`
+. Fetching a dashboard's lists:
+    `minet ct search --token YOUR_TOKEN > posts.csv`
 
 ```
 
@@ -728,6 +767,7 @@ for result in multithreaded_fetch(urls, key=lambda x: x['url']):
 * **throttle** *?float|callable* [`0.2`]: Per-domain throttle in seconds. Or a function taking the domain and current item and returning the throttle to apply.
 * **guess_extension** *?bool* [`True`]: Whether to attempt to guess the resource's extension.
 * **guess_encoding** *?bool* [`True`]: Whether to attempt to guess the resource's encoding.
+* **domain_parallelism** *?int* [`1`]: Max number of urls per domain to hit at the same time.
 * **buffer_size** *?int* [`25`]: Max number of items per domain to enqueue into memory in hope of finding a new domain that can be processed immediately.
 * **insecure** *?bool* [`False`]: Whether to ignore SSL certification errors when performing requests.
 * **timeout** *?float|urllib3.Timeout*: Custom timeout for every request.

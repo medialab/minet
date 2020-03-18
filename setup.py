@@ -33,10 +33,11 @@ setup(name='minet',
         'lxml>=4.3.0',
         'numpy>=1.16.1',
         'persist-queue>=0.4.2',
+        'pytz>=2019.3',
         'pyyaml',
         'quenouille>=0.6.0',
         'tqdm>=4.31.1',
-        'ural>=0.20.0',
+        'ural>=0.21.0',
         'urllib3[secure]>=1.25.3'
       ],
       entry_points={

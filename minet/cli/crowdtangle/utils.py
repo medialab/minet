@@ -178,8 +178,13 @@ def step(http, url, item_key):
     return 'ok', meta, data[item_key]
 
 
+def default_item_id_getter(item):
+    return item['id']
+
+
 def create_paginated_action(url_forge, csv_headers, csv_formatter,
-                            item_name, item_key, default_rate_limit=CROWDTANGLE_DEFAULT_RATE_LIMIT):
+                            item_name, item_key, default_rate_limit=CROWDTANGLE_DEFAULT_RATE_LIMIT,
+                            item_id_getter=default_item_id_getter):
 
     def action(namespace, output_file):
         http = create_pool(timeout=CROWDTANGLE_DEFAULT_TIMEOUT)
@@ -326,7 +331,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                 last_url = url
 
                 for item in items:
-                    if item['id'] in last_items:
+                    if item_id_getter(item) in last_items:
                         continue
 
                     n += 1
@@ -357,7 +362,7 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                     loading_bar.update(n)
 
                 # We need to track last items to avoid registering the same one twice
-                last_items = set(item['id'] for item in items)
+                last_items = set(item_id_getter(item) for item in items)
 
                 # Paginating
                 if next_url is None:
