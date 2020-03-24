@@ -39,29 +39,19 @@ def get_replies(data_replies, data):
 
     for item in data_replies:
 
-        comment_id = item['id']
         snippet = item['snippet']
 
-        author_name = snippet['authorDisplayName']
-        author_channel_id = snippet['authorChannelId']['value']
-        author_channel_url = snippet['authorChannelUrl']
-        text = snippet['textOriginal']
-        like_count = snippet['likeCount']
-        publisehd_at = snippet['publishedAt']
-        updated_at = snippet['updatedAt']
-        reply_to = snippet['parentId']
-
         data.append({
-            'comment_id': comment_id,
-            'author_name': author_name,
-            'author_channel_url': author_channel_url,
-            'author_channel_id': author_channel_id,
-            'text': text,
-            'like_count': like_count,
-            'publisehd_at': publisehd_at,
-            'updated_at': updated_at,
+            'comment_id': item['id'],
+            'author_name': snippet['authorDisplayName'],
+            'author_channel_url': snippet['authorChannelUrl'],
+            'author_channel_id': snippet['authorChannelId']['value'],
+            'text': snippet['textOriginal'],
+            'like_count': snippet['likeCount'],
+            'publisehd_at': snippet['publishedAt'],
+            'updated_at': snippet['updatedAt'],
             'total_reply': None,
-            'reply_to': reply_to
+            'reply_to': snippet['parentId']
         })
 
     return data
@@ -152,7 +142,6 @@ def comments_action(namespace, output_file):
             die(response.status)
 
         nextPage, all_data = get_data(result, all_data)
-
 
     for comment in all_data:
         loading_bar.update()
