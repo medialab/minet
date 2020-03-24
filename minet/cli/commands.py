@@ -416,6 +416,20 @@ MINET_COMMANDS = {
                             'help': 'YouTube API Data dashboard API key.'
                         }
                     ]
+                },
+                'comments': {
+                    'title': 'Youtube comments',
+                    'description': 'Retrieve metadata about Youtube comments using the API.',
+                    'arguments': [
+                        {
+                            'name': 'id',
+                            'help': 'Youtube video\'s id.',
+                        },
+                        {
+                            'flags': ['-k', '--key'],
+                            'help': 'YouTube API Data dashboard API key.'
+                        }
+                    ]
                 }
             }
         }
