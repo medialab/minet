@@ -7,7 +7,7 @@
 #
 import time
 from pytz import timezone
-from datetime import date, datetime
+from datetime import datetime
 from tqdm import tqdm
 from minet.cli.utils import CSVEnricher, die
 from minet.utils import create_pool, request_json
