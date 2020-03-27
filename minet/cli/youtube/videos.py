@@ -6,9 +6,8 @@
 # the given Youtube videos using Google's APIs.
 #
 import time
-from pytz import timezone
-from datetime import date, datetime
 from tqdm import tqdm
+from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
 from minet.cli.utils import CSVEnricher, die
 from minet.utils import create_pool, request_json
 from ural.youtube import (
@@ -33,14 +32,6 @@ REPORT_HEADERS = [
     'comment_count',
     'no_stat_likes'
 ]
-
-
-def time_in_seconds():
-    now_utc = timezone('utc').localize(datetime.utcnow())
-    pacific_time = now_utc.astimezone(timezone('US/Pacific')).replace(tzinfo=None)
-    midnight_pacific = datetime.combine(pacific_time, datetime.min.time())
-    return (midnight_pacific - pacific_time).seconds
-
 
 def get_data(data_json):
     data_indexed = {}
@@ -138,7 +129,8 @@ def videos_action(namespace, output_file):
         if err:
             die(err)
         elif response.status == 403:
-            time.sleep(time_in_seconds())
+            time.sleep(seconds_to_midnight_pacific_time())
+            continue
         elif response.status >= 400:
             die(response.status)
 

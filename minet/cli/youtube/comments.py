@@ -6,9 +6,8 @@
 #
 import time
 import csv
-from pytz import timezone
-from datetime import datetime
 from tqdm import tqdm
+from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
 from minet.cli.utils import die, open_output_file
 from minet.utils import create_pool, request_json
 
@@ -22,19 +21,11 @@ CSV_HEADERS = [
     'author_channel_id',
     'text',
     'like_count',
-    'publisehd_at',
+    'published_at',
     'updated_at',
     'total_reply',
     'reply_to'
 ]
-
-
-def seconds_to_midnight_pacific_time():
-    now_utc = timezone('utc').localize(datetime.utcnow())
-    pacific_time = now_utc.astimezone(timezone('US/Pacific')).replace(tzinfo=None)
-    midnight_pacific = datetime.combine(pacific_time, datetime.min.time())
-    return (midnight_pacific - pacific_time).seconds
-
 
 def get_replies(data_replies):
 
@@ -49,7 +40,7 @@ def get_replies(data_replies):
         author_channel_id = snippet['authorChannelId']['value']
         text = snippet['textOriginal']
         like_count = snippet['likeCount']
-        publisehd_at = snippet['publishedAt']
+        published_at = snippet['publishedAt']
         updated_at = snippet['updatedAt']
         total_reply = 0
         reply_to = snippet['parentId']
@@ -62,7 +53,7 @@ def get_replies(data_replies):
             author_channel_id,
             text,
             like_count,
-            publisehd_at,
+            published_at,
             updated_at,
             total_reply,
             reply_to
@@ -98,7 +89,7 @@ def get_data(data_json):
         author_channel_id = info['authorChannelId']['value']
         text = info['textOriginal']
         like_count = info['likeCount']
-        publisehd_at = info['publishedAt']
+        published_at = info['publishedAt']
         updated_at = info['updatedAt']
         total_reply = total_reply
         reply_to = ''
@@ -111,7 +102,7 @@ def get_data(data_json):
             author_channel_id,
             text,
             like_count,
-            publisehd_at,
+            published_at,
             updated_at,
             total_reply,
             reply_to
@@ -151,12 +142,12 @@ def comments_action(namespace, output_file):
             die(err)
         elif response.status == 403:
             time.sleep(time_in_seconds())
+            continue
         elif response.status >= 400:
             die(response.status)
 
         next_page, data = get_data(result)
-        all_data += data
 
-    for comment in all_data:
-        loading_bar.update()
-        writer.writerow(comment)
+        for comment in data:
+            loading_bar.update()
+            writer.writerow(comment)
