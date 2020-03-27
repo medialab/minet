@@ -27,6 +27,7 @@ CSV_HEADERS = [
     'reply_to'
 ]
 
+
 def get_replies(data_replies):
 
     data = []
@@ -141,7 +142,7 @@ def comments_action(namespace, output_file):
         if err:
             die(err)
         elif response.status == 403:
-            time.sleep(time_in_seconds())
+            time.sleep(seconds_to_midnight_pacific_time())
             continue
         elif response.status >= 400:
             die(response.status)

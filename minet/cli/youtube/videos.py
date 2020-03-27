@@ -33,6 +33,7 @@ REPORT_HEADERS = [
     'no_stat_likes'
 ]
 
+
 def get_data(data_json):
     data_indexed = {}
 

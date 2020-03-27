@@ -8,6 +8,7 @@
 from pytz import timezone
 from datetime import datetime
 
+
 def seconds_to_midnight_pacific_time():
     now_utc = timezone('utc').localize(datetime.utcnow())
     pacific_time = now_utc.astimezone(timezone('US/Pacific')).replace(tzinfo=None)
