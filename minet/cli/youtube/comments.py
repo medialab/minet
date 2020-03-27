@@ -28,72 +28,45 @@ CSV_HEADERS = [
 ]
 
 
-def get_replies(data_replies):
-
-    data = []
-    for item in data_replies:
-
-        snippet = item['snippet']
-        video_id = ''
-        comment_id = item['id']
-        author_name = snippet['authorDisplayName']
-        author_channel_url = snippet['authorChannelUrl']
-        author_channel_id = snippet['authorChannelId']['value']
-        text = snippet['textOriginal']
-        like_count = snippet['likeCount']
-        published_at = snippet['publishedAt']
-        updated_at = snippet['updatedAt']
-        total_reply = 0
-        reply_to = snippet['parentId']
-
-        data.append([
-            video_id,
-            comment_id,
-            author_name,
-            author_channel_url,
-            author_channel_id,
-            text,
-            like_count,
-            published_at,
-            updated_at,
-            total_reply,
-            reply_to
-        ])
-
-    return data
-
-
 def get_data(data_json):
-
     data = []
-    next_page = ''
+    data_replies = []
 
     next_page = data_json.get('nextPageToken', None)
+    all_items = data_json.get('items', None)
+    is_reply = False
 
-    for item in data_json['items']:
+    if not all_items:
+        all_items = data_json.get('comments', None)
+        is_reply = True
 
+    for item in all_items:
+
+        comment_id = item.get('id', None)
         snippet = item['snippet']
 
-        top_comment = snippet['topLevelComment']
-        total_reply = snippet['totalReplyCount']
+        if is_reply:
+            comment_data = snippet
+        else:
+            replies = item.get('replies', None)
 
-        if total_reply > 0:
-            replies = item['replies']
-            data += get_replies(replies['comments'])
+            if replies:
+                _, data_replies = get_data(replies)
+                data += data_replies
 
-        info = top_comment['snippet']
+            top_comment = snippet.get('topLevelComment', None)
+            comment_data = top_comment.get('snippet', None)
 
-        video_id = snippet['videoId']
-        comment_id = top_comment['id']
-        author_name = info['authorDisplayName']
-        author_channel_url = info['authorChannelUrl']
-        author_channel_id = info['authorChannelId']['value']
-        text = info['textOriginal']
-        like_count = info['likeCount']
-        published_at = info['publishedAt']
-        updated_at = info['updatedAt']
-        total_reply = total_reply
-        reply_to = ''
+        author_name = comment_data['authorDisplayName']
+        author_channel_url = comment_data['authorChannelUrl']
+        author_channel_id = comment_data['authorChannelId']['value']
+        video_id = comment_data['videoId']
+        text = comment_data['textOriginal']
+        like_count = comment_data['likeCount']
+        total_reply = comment_data.get('totalReplyCount', None)
+        published_at = comment_data['publishedAt']
+        updated_at = comment_data['updatedAt']
+        reply_to = comment_data.get('parentId', None)
 
         data.append([
             video_id,
