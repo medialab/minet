@@ -57,13 +57,13 @@ def get_data(data_json):
             top_comment = snippet.get('topLevelComment', None)
             comment_data = top_comment.get('snippet', None)
 
+        total_reply = snippet.get('totalReplyCount', None)
         author_name = comment_data['authorDisplayName']
         author_channel_url = comment_data['authorChannelUrl']
         author_channel_id = comment_data['authorChannelId']['value']
         video_id = comment_data['videoId']
         text = comment_data['textOriginal']
         like_count = comment_data['likeCount']
-        total_reply = comment_data.get('totalReplyCount', None)
         published_at = comment_data['publishedAt']
         updated_at = comment_data['updatedAt']
         reply_to = comment_data.get('parentId', None)
