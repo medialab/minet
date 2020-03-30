@@ -52,7 +52,7 @@ def get_data(data_json):
 
             if replies:
                 _, data_replies = get_data(replies)
-                data += data_replies
+                data.extend(data_replies)
 
             top_comment = snippet.get('topLevelComment', None)
             comment_data = top_comment.get('snippet', None)
