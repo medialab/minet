@@ -233,6 +233,9 @@ MINET_COMMANDS = {
                     'title': 'Minet CrowdTangle Search Command',
                     'description': '''
                         Search posts on the whole CrowdTangle platform.
+
+                        More on Crowdtangle API docs here:
+                        https://github.com/CrowdTangle/API/wiki/Search
                     ''',
                     'epilog': '''
                         examples:
@@ -246,6 +249,10 @@ MINET_COMMANDS = {
                             'help': 'The search query term or terms.'
                         },
                         {
+                            'flag': '--and',
+                            'help': 'AND clause to add to the query terms.'
+                        },
+                        {
                             'flag': '--end-date',
                             'help': 'The latest date at which a post could be posted (UTC!).'
                         },
@@ -254,6 +261,10 @@ MINET_COMMANDS = {
                             'help': 'Output format. Defaults to `csv`.',
                             'choices': ['csv', 'jsonl'],
                             'default': 'csv'
+                        },
+                        {
+                            'flag': '--language',
+                            'help': 'Language ISO code like "fr" or "zh-CN".'
                         },
                         {
                             'flags': ['-l', '--limit'],

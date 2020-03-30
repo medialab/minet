@@ -37,6 +37,12 @@ def forge_posts_url(namespace):
     if namespace.not_in_title:
         base_url += '&notInTitle'
 
+    if getattr(namespace, 'and'):
+        base_url += '&and=%s' % quote(getattr(namespace, 'and'))
+
+    if namespace.language:
+        base_url += '&language=%s' % namespace.language
+
     return base_url
 
 
