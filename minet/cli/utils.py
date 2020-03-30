@@ -193,7 +193,7 @@ def create_report_iterator(namespace, args=None, loading_bar=None):
                 line=line,
                 headers=indexed_headers,
                 path=None,
-                encoding=None,
+                encoding=line[pos.encoding],
                 content=line[pos.raw_content],
                 args=args
             )

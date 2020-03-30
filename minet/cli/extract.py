@@ -32,17 +32,20 @@ def worker(payload):
         return UnknownEncodingError('Unknown encoding: "%s"' % encoding), line, None
 
     # Reading file
-    try:
-        if path.endswith('.gz'):
-            with open(path, 'rb') as f:
-                raw_html_bytes = gzip.decompress(f.read())
+    if content is None:
+        try:
+            if path.endswith('.gz'):
+                with open(path, 'rb') as f:
+                    raw_html_bytes = gzip.decompress(f.read())
 
-            raw_html = raw_html_bytes.decode(encoding, errors='replace')
-        else:
-            with codecs.open(path, 'r', encoding=encoding, errors='replace') as f:
-                raw_html = f.read()
-    except UnicodeDecodeError as e:
-        return e, line, None
+                raw_html = raw_html_bytes.decode(encoding, errors='replace')
+            else:
+                with codecs.open(path, 'r', encoding=encoding, errors='replace') as f:
+                    raw_html = f.read()
+        except UnicodeDecodeError as e:
+            return e, line, None
+    else:
+        raw_html = content
 
     # Attempting extraction
     try:
