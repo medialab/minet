@@ -62,9 +62,9 @@ To learn how to use `minet` and understand how it may fit your use cases, you sh
   * [topic](#topic)
     * [stories](#stories)
 * [youtube (yt)](#youtube)
+  * [comments](#comments)
   * [url-parse](#youtube-url-parse)
   * [videos](#videos)
-  * [comments](#comments)
 
 ### API
 
@@ -696,6 +696,26 @@ optional arguments:
 
 ## Youtube
 
+### comments
+
+```
+usage: minet youtube comments [-h] [-o OUTPUT] [-k KEY] id
+
+Youtube comments
+================
+
+Retrieve metadata about Youtube comments using the API.
+
+positional arguments:
+  id                          Youtube video's id.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  -k KEY, --key KEY           YouTube API Data dashboard API key.
+
+```
+
 ### url-parse
 
 ```
@@ -736,26 +756,6 @@ optional arguments:
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
   -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
   -k KEY, --key KEY           YouTube API Data dashboard API key.
-
-```
-
-### comments
-
-```
-usage: minet youtube comments [-h] [-o OUTPUT] [-k KEY] video_id
-
-Minet Youtube Videos CLI Action
-==================
-
-Action retrieving comments about the given Youtube video using Google's APIs.
-
-positional arguments:
-  video_id                    Video id of the video from which to retrieve comments..
-  -k KEY, --key KEY           Key from Youtube Data API.
-
-optional arguments:
-  -h, --help                  show this help message and exit
-  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
 
 ```
 
