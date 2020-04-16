@@ -22,16 +22,6 @@ from minet.crowdtangle.summary import crowdtangle_summary
 CSV_PADDING = ['0'] * len(CROWDTANGLE_SUMMARY_CSV_HEADERS)
 
 
-def forge_url_from_namespace(namespace, link):
-    return forge_url(
-        link=link,
-        token=namespace.token,
-        start_date=namespace.start_date,
-        sort_by=namespace.sort_by,
-        include_posts=namespace.posts is not None
-    )
-
-
 def crowdtangle_summary_action(namespace, output_file):
     if not namespace.start_date:
         die('Missing --start-date!')
