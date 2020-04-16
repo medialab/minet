@@ -694,6 +694,35 @@ class RateLimiter(object):
         return self.exit()
 
 
+class RetryableIterator(object):
+    """
+    Iterator exposing a #.retry method that will make sure the next item
+    is the same as the current one.
+    """
+
+    def __init__(self, iterator):
+        self.iterator = iter(iterator)
+        self.current_value = None
+        self.retried = False
+        self.retries = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.retried:
+            self.retried = False
+            return self.current_value
+
+        self.retries = 0
+        self.current_value = next(self.iterator)
+        return self.current_value
+
+    def retry(self):
+        self.retries += 1
+        self.retried = True
+
+
 class RateLimitedIterator(object):
     """
     Handy iterator wrapper that will yield its items while respecting a given
@@ -702,7 +731,7 @@ class RateLimitedIterator(object):
     """
 
     def __init__(self, iterator, max_per_period, period=1.0):
-        self.iterator = iter(iterator)
+        self.iterator = RetryableIterator(iterator)
         self.rate_limiter = RateLimiter(max_per_period, period)
         self.empty = False
 
@@ -711,6 +740,13 @@ class RateLimitedIterator(object):
         except StopIteration:
             self.next_value = None
             self.empty = True
+
+    @property
+    def retries(self):
+        return self.iterator.retries
+
+    def retry(self):
+        return self.iterator.retry()
 
     def __iter__(self):
         if self.empty:
