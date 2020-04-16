@@ -694,6 +694,43 @@ class RateLimiter(object):
         return self.exit()
 
 
+class RateLimitedIterator(object):
+    """
+    Handy iterator wrapper that will yield its items while respecting a given
+    rate limit and that will not sleep needlessly when the iterator is
+    finally fully consumed.
+    """
+
+    def __init__(self, iterator, max_per_period, period=1.0):
+        self.iterator = iter(iterator)
+        self.rate_limiter = RateLimiter(max_per_period, period)
+        self.empty = False
+
+        try:
+            self.next_value = next(self.iterator)
+        except StopIteration:
+            self.next_value = None
+            self.empty = True
+
+    def __iter__(self):
+        if self.empty:
+            return
+
+        while True:
+            self.rate_limiter.enter()
+
+            yield self.next_value
+
+            # NOTE: if the iterator is fully consumed, this will raise StopIteration
+            # and skip the exit part that could sleep needlessly
+            try:
+                self.next_value = next(self.iterator)
+            except StopIteration:
+                return
+
+            self.rate_limiter.exit()
+
+
 class PseudoFStringFormatter(string.Formatter):
     def get_field(self, field_name, args, kwargs):
         result = eval(field_name, None, kwargs)
