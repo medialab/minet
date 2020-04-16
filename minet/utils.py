@@ -650,8 +650,11 @@ class RateLimiter(object):
         self.last_entry = None
         self.with_budget = with_budget
 
-    def __enter__(self):
+    def enter(self):
         self.last_entry = time.perf_counter()
+
+    def __enter__(self):
+        return self.enter()
 
     def exit_with_budget(self):
         running_time = time.perf_counter() - self.last_entry
