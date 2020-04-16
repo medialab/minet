@@ -12,7 +12,7 @@ from ural import get_domain_name, normalize_url
 
 from minet.utils import create_pool, request, RateLimiter
 from minet.cli.utils import print_err, die, custom_reader
-from minet.cli.crowdtangle.constants import (
+from minet.crowdtangle.constants import (
     CROWDTANGLE_DEFAULT_RATE_LIMIT,
     CROWDTANGLE_DEFAULT_TIMEOUT
 )

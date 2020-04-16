@@ -6,18 +6,22 @@
 #
 
 
+class MinetError(Exception):
+    pass
+
+
 # General errors
-class UnknownEncodingError(Exception):
+class UnknownEncodingError(MinetError):
     pass
 
 
 # Miscellaneous HTTP errors
-class InvalidURLError(Exception):
+class InvalidURLError(MinetError):
     pass
 
 
 # Redirection errors
-class RedirectError(Exception):
+class RedirectError(MinetError):
     pass
 
 
@@ -38,7 +42,7 @@ class InvalidRedirectError(RedirectError):
 
 
 # Crawling errors
-class CrawlError(Exception):
+class CrawlError(MinetError):
     pass
 
 

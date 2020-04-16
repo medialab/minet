@@ -11,7 +11,7 @@ from minet.defaults import DEFAULT_THROTTLE
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
 from minet.cli.utils import BooleanAction, die
 
-from minet.cli.crowdtangle.constants import (
+from minet.crowdtangle.constants import (
     CROWDTANGLE_SORT_TYPES,
     CROWDTANGLE_DEFAULT_RATE_LIMIT,
     CROWDTANGLE_PARTITION_STRATEGIES

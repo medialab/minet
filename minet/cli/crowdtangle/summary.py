@@ -13,7 +13,7 @@ from ural import is_url
 from minet.utils import create_pool, request_json, RateLimiter, nested_get
 from minet.cli.utils import die, custom_reader
 
-from minet.cli.crowdtangle.constants import (
+from minet.crowdtangle.constants import (
     CROWDTANTLE_LINKS_DEFAULT_RATE_LIMIT,
     CROWDTANGLE_REACTION_TYPES,
     CROWDTANGLE_DEFAULT_TIMEOUT
@@ -25,25 +25,15 @@ from minet.cli.crowdtangle.posts import (
 
 POST_REPORT_CSV_HEADERS = ['url'] + POST_REPORT_CSV_HEADERS
 
-URL_TEMPLATE = (
-    'https://api.crowdtangle.com/links'
-    '?token=%(token)s'
-    '&count=%(count)s'
-    '&startDate=%(start_date)s'
-    '&includeSummary=true'
-    '&link=%(link)s'
-    '&sortBy=%(sort_by)s'
-)
 
-
-def forge_url(namespace, link):
-    return URL_TEMPLATE % {
-        'token': namespace.token,
-        'count': 1 if namespace.posts is None else 100,
-        'start_date': namespace.start_date,
-        'link': quote(link, safe=''),
-        'sort_by': namespace.sort_by
-    }
+def forge_url_from_namespace(namespace, link):
+    return forge_url(
+        link=link,
+        token=namespace.token,
+        start_date=namespace.start_date,
+        sort_by=namespace.sort_by,
+        include_posts=namespace.posts is not None
+    )
 
 
 CSV_HEADERS = ['%s_count' % t for t in CROWDTANGLE_REACTION_TYPES]
