@@ -632,7 +632,7 @@ def request_json(http, url, *args, **kwargs):
 
 class RateLimiter(object):
     """
-    Naive rate limiter context manager with smooth output ().
+    Naive rate limiter context manager with smooth output.
 
     Note that it won't work in a multi-threaded environment.
 
