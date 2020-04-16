@@ -25,6 +25,9 @@ from minet.crowdtangle.formatters import (
     format_summary
 )
 
+CrowdTangleSummaryResult = namedtuple('CrowdTangleSummaryResult', ['link', 'item', 'stats'])
+CrowdTangleSummaryResultWithPosts = namedtuple('CrowdTangleSummaryResultWithPosts', ['link', 'item', 'stats', 'posts'])
+
 URL_TEMPLATE = (
     'https://api.crowdtangle.com/links'
     '?token=%(token)s'
@@ -34,9 +37,6 @@ URL_TEMPLATE = (
     '&link=%(link)s'
     '&sortBy=%(sort_by)s'
 )
-
-CrowdTangleSummaryResult = namedtuple('CrowdTangleSummaryResult', ['link', 'item', 'stats'])
-CrowdTangleSummaryResultWithPosts = namedtuple('CrowdTangleSummaryResultWithPosts', ['link', 'item', 'stats', 'posts'])
 
 
 def forge_url(link, token, start_date, sort_by, include_posts=False):
