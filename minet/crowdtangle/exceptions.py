@@ -11,3 +11,11 @@ class CrowdTangleError(MinetError):
 
 class CrowdTangleMissingTokenError(CrowdTangleError):
     pass
+
+
+class CrowdTangleInvalidTokenError(CrowdTangleError):
+    pass
+
+
+class CrowdTangleInvalidRequest(CrowdTangleError):
+    pass

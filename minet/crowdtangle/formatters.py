@@ -8,6 +8,7 @@ import json
 from collections import OrderedDict
 
 from minet.crowdtangle.constants import (
+    CROWDTANGLE_REACTION_TYPES,
     CROWDTANGLE_POST_CSV_HEADERS,
     CROWDTANGLE_POST_CSV_HEADERS_WITH_LINK,
     CROWDTANGLE_SUMMARY_CSV_HEADERS,

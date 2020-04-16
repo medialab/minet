@@ -6,8 +6,14 @@
 #
 from urllib3 import Timeout
 
+CROWDTANGLE_OUTPUT_FORMATS = {
+    'raw',
+    'csv_row',
+    'csv_dict_row'
+}
+
 CROWDTANGLE_DEFAULT_RATE_LIMIT = 6  # Number of hits per minute
-CROWDTANTLE_LINKS_DEFAULT_RATE_LIMIT = 2
+CROWDTANGLE_LINKS_DEFAULT_RATE_LIMIT = 2
 
 CROWDTANGLE_DEFAULT_TIMEOUT = Timeout(connect=10, read=60 * 5)
 
@@ -35,6 +41,14 @@ CROWDTANGLE_SORT_TYPES = [
     'total_interactions',
     'underperforming'
 ]
+
+CROWDTANGLE_SUMMARY_SORT_TYPES = {
+    'date',
+    'subscriber_count',
+    'total_interactions'
+}
+
+CROWDTANGLE_SUMMARY_DEFAULT_SORT_TYPE = 'date'
 
 CROWDTANGLE_STATISTICS = [
     'like',

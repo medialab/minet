@@ -13,6 +13,7 @@ from minet.cli.utils import BooleanAction, die
 
 from minet.crowdtangle.constants import (
     CROWDTANGLE_SORT_TYPES,
+    CROWDTANGLE_SUMMARY_SORT_TYPES,
     CROWDTANGLE_DEFAULT_RATE_LIMIT,
     CROWDTANGLE_PARTITION_STRATEGIES
 )
@@ -343,7 +344,7 @@ MINET_COMMANDS = {
                         {
                             'flag': '--sort-by',
                             'help': 'How to sort retrieved posts. Defaults to `date`.',
-                            'choices': ['date', 'subscriber_count', 'total_interactions'],
+                            'choices': CROWDTANGLE_SUMMARY_SORT_TYPES,
                             'default': 'date'
                         },
                         {
