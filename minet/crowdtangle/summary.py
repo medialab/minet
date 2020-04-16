@@ -63,7 +63,7 @@ def crowdtangle_summary(iterator, token=None, start_date=None, with_top_posts=Fa
         raise TypeError('minet.crowdtangle.summary: expecting a `start_date` kwarg.')
 
     if sort_by not in CROWDTANGLE_SUMMARY_SORT_TYPES:
-        raise TypeError('minet.crowdtangle.summary: unkown `sort_by`.')
+        raise TypeError('minet.crowdtangle.summary: unknown `sort_by`.')
 
     http = create_pool(timeout=CROWDTANGLE_DEFAULT_TIMEOUT)
     rate_limiter = RateLimiter(rate_limit, 60.0)
