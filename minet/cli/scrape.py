@@ -7,6 +7,7 @@
 import csv
 import gzip
 import codecs
+import ndjson
 from collections import namedtuple
 from os.path import basename
 from multiprocessing import Pool
@@ -17,7 +18,6 @@ from minet.scrape import scrape, headers_from_definition
 from minet.cli.utils import (
     open_output_file,
     die,
-    JSONLWriter,
     create_glob_iterator,
     create_report_iterator,
     LazyLineDict
@@ -82,7 +82,7 @@ def scrape_action(namespace):
         output_writer = csv.DictWriter(output_file, fieldnames=output_headers)
         output_writer.writeheader()
     else:
-        output_writer = JSONLWriter(output_file)
+        output_writer = ndjson.writer(output_file)
 
     loading_bar = tqdm(
         desc='Scraping pages',
