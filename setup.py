@@ -37,7 +37,7 @@ setup(name='minet',
         'pyyaml',
         'quenouille>=0.6.0',
         'tqdm>=4.31.1',
-        'ural>=0.21.0',
+        'ural>=0.22.1',
         'urllib3[secure]>=1.25.3'
       ],
       entry_points={
