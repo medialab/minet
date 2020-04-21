@@ -30,7 +30,9 @@ REPORT_HEADERS = [
     'dislike_count',
     'favorite_count',
     'comment_count',
-    'no_stat_likes'
+    'no_stat_likes',
+    'duration',
+    'caption'
 ]
 
 
@@ -42,6 +44,7 @@ def get_data(data_json):
         no_stat_likes = ''
         video_id = element['id']
         snippet = element['snippet']
+        content_details = element['contentDetails']
         stat = element['statistics']
 
         published_at = snippet['publishedAt']
@@ -49,6 +52,9 @@ def get_data(data_json):
         channel_title = snippet['channelTitle']
         title = snippet['title']
         description = snippet['description']
+
+        duration = content_details['duration']
+        caption = content_details['caption']
 
         view_count = stat.get('viewCount', None)
         like_count = stat.get('likeCount', None)
@@ -70,7 +76,9 @@ def get_data(data_json):
             dislike_count,
             favorite_count,
             comment_count,
-            no_stat_likes
+            no_stat_likes,
+            duration,
+            caption
         ]
 
         data_indexed[video_id] = data
