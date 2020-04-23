@@ -127,13 +127,18 @@ class DummyTqdmFile(object):
 
     def __init__(self, file=sys.stdout):
         self.file = file
+        self.cursor = 0
 
     def write(self, x):
+        self.cursor += 1
         # Avoid print() second call (useless \n)
         tqdm.write(x, file=self.file, end='')
 
     def flush(self):
         return self.file.flush()
+
+    def tell(self):
+        return self.cursor
 
     def close(self):
         pass

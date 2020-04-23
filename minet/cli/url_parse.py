@@ -4,6 +4,7 @@
 #
 # Logic of the `url-parse` action.
 #
+import casanova
 from ural import (
     is_url,
     normalize_url,
@@ -27,23 +28,24 @@ def url_parse_action(namespace):
 
     output_file = open_output_file(namespace.output)
 
-    enricher = CSVEnricher(
+    enricher = casanova.enricher(
         namespace.file,
-        namespace.column,
         output_file,
-        report_headers=REPORT_HEADERS,
-        select=namespace.select.split(',') if namespace.select else None
+        add=REPORT_HEADERS,
+        keep=namespace.select.split(',') if namespace.select else None
     )
+
+    url_pos = enricher.pos[namespace.column]
 
     loading_bar = tqdm(
         desc='Parsing',
         dynamic_ncols=True,
-        unit=' lines',
+        unit=' rows',
         total=namespace.total
     )
 
-    for line in enricher:
-        url_data = line[enricher.pos].strip()
+    for row in enricher:
+        url_data = row[url_pos].strip()
 
         loading_bar.update()
 
@@ -54,10 +56,10 @@ def url_parse_action(namespace):
 
         for url in urls:
             if not is_url(url, allow_spaces_in_path=True):
-                enricher.write_empty(line)
+                enricher.writerow(row)
                 continue
 
-            enricher.write(line, [
+            enricher.writerow(row, [
                 normalize_url(
                     url,
                     strip_protocol=namespace.strip_protocol,
