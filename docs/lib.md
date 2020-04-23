@@ -2,6 +2,8 @@
 
 ## Summary
 
+*Generic Utilities*
+
 * [multithreaded_fetch](#multithreaded_fetch)
 * [multithreaded_resolve](#multithreaded_resolve)
 
