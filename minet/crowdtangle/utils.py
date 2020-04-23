@@ -97,7 +97,7 @@ class PartitionStrategyLimit(PartitionStrategyNoop):
         return self.url_forge(**self.kwargs)
 
     def get_detail(self):
-        if self.kwargs.get('end_date') is not None:
+        if 'end_date' in self.kwargs:
             return {'date': self.kwargs['end_date'], 'shifts': self.shifts}
 
     def should_go_next(self, items):
