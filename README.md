@@ -561,7 +561,7 @@ examples:
 ```
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [--posts POSTS]
-                                 [--sort-by {date,subscriber_count,total_interactions}]
+                                 [--sort-by {total_interactions,subscriber_count,date}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -581,7 +581,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
   --posts POSTS                                   Path to a file containing the retrieved posts.
-  --sort-by {date,subscriber_count,total_interactions}
+  --sort-by {total_interactions,subscriber_count,date}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.

@@ -692,11 +692,6 @@ MINET_COMMANDS = {
                 'dest': 'headers'
             },
             {
-                'flag': '--no-headers',
-                'help': 'Whether input CSV file has headers or not.',
-                'action': 'store_true'
-            },
-            {
                 'flag': '--resume',
                 'help': 'Whether to resume from an aborted report.',
                 'action': 'store_true'
