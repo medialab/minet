@@ -17,5 +17,17 @@ class CrowdTangleInvalidTokenError(CrowdTangleError):
     pass
 
 
-class CrowdTangleInvalidRequest(CrowdTangleError):
+class CrowdTangleInvalidRequestError(CrowdTangleError):
+    pass
+
+
+class CrowdTangleMissingStartDateError(CrowdTangleError):
+    pass
+
+
+class CrowdTangleInvalidJSONError(CrowdTangleError):
+    pass
+
+
+class CrowdTangleExhaustedPagination(CrowdTangleError):
     pass

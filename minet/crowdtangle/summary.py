@@ -9,7 +9,7 @@ from urllib.parse import quote
 from minet.crowdtangle.exceptions import (
     CrowdTangleMissingTokenError,
     CrowdTangleInvalidTokenError,
-    CrowdTangleInvalidRequest
+    CrowdTangleInvalidRequestError
 )
 from minet.utils import request_json, nested_get
 from minet.crowdtangle.constants import (
@@ -76,7 +76,7 @@ def crowdtangle_summary(http, link, token=None, start_date=None, with_top_posts=
         raise CrowdTangleInvalidTokenError
 
     if response.status >= 400:
-        raise CrowdTangleInvalidRequest(api_url)
+        raise CrowdTangleInvalidRequestError(api_url)
 
     stats = nested_get(['result', 'summary', 'facebook'], data)
     posts = nested_get(['result', 'posts'], data) if with_top_posts else None

@@ -4,16 +4,19 @@
 #
 # Miscellaneous generic functions used throughout the CrowdTangle namespace.
 #
-import csv
 import json
 from datetime import date, timedelta
-from tqdm import tqdm
 
-from minet.utils import create_pool, request, RateLimiter
-from minet.cli.utils import print_err, die, custom_reader
+from minet.utils import request, rate_limited_from_state
 from minet.crowdtangle.constants import (
-    CROWDTANGLE_DEFAULT_RATE_LIMIT,
-    CROWDTANGLE_DEFAULT_TIMEOUT
+    CROWDTANGLE_OUTPUT_FORMATS
+)
+from minet.crowdtangle.exceptions import (
+    CrowdTangleMissingStartDateError,
+    CrowdTangleInvalidTokenError,
+    CrowdTangleInvalidRequestError,
+    CrowdTangleInvalidJSONError,
+    CrowdTangleExhaustedPagination
 )
 
 DAY_DELTA = timedelta(days=1)
@@ -34,15 +37,15 @@ def day_range(end):
 
 # TODO: __call__ should receive a status to make finer decisions
 class PartitionStrategyNoop(object):
-    def __init__(self, namespace, url_forge):
-        self.namespace = namespace
+    def __init__(self, kwargs, url_forge):
+        self.kwargs = kwargs
         self.url_forge = url_forge
         self.started = False
 
     def __call__(self, items):
         if not self.started:
             self.started = True
-            return self.url_forge(self.namespace)
+            return self.url_forge(**self.kwargs)
 
         return None
 
@@ -54,11 +57,11 @@ class PartitionStrategyNoop(object):
 
 
 class PartitionStrategyDay(PartitionStrategyNoop):
-    def __init__(self, namespace, url_forge):
-        self.namespace = namespace
+    def __init__(self, kwargs, url_forge):
+        self.kwargs = kwargs
         self.url_forge = url_forge
 
-        self.range = day_range(namespace.start_date)
+        self.range = day_range(kwargs['start_date'])
 
     def __call__(self, items):
         start_date, end_date = next(self.range, (None, None))
@@ -66,18 +69,18 @@ class PartitionStrategyDay(PartitionStrategyNoop):
         if start_date is None:
             return None
 
-        self.namespace.start_date = start_date
-        self.namespace.end_date = end_date
+        self.kwargs['start_date'] = start_date
+        self.kwargs['end_date'] = end_date
 
-        return self.url_forge(self.namespace)
+        return self.url_forge(**self.kwargs)
 
     def get_postfix(self):
-        return {'day': self.namespace.start_date}
+        return {'day': self.kwargs['start_date']}
 
 
 class PartitionStrategyLimit(PartitionStrategyNoop):
-    def __init__(self, namespace, url_forge, limit):
-        self.namespace = namespace
+    def __init__(self, kwargs, url_forge, limit):
+        self.kwargs = kwargs
         self.url_forge = url_forge
         self.last_item = None
         self.seen = 0
@@ -89,13 +92,13 @@ class PartitionStrategyLimit(PartitionStrategyNoop):
             if items is None:
                 return None
 
-            self.namespace.end_date = self.last_item['date'].replace(' ', 'T')
+            self.kwargs['end_date'] = self.last_item['date'].replace(' ', 'T')
 
-        return self.url_forge(self.namespace)
+        return self.url_forge(**self.kwargs)
 
     def get_postfix(self):
-        if self.namespace.end_date:
-            return {'date': self.namespace.end_date, 'shifts': self.shifts}
+        if self.kwargs['end_date']:
+            return {'date': self.kwargs['end_date'], 'shifts': self.shifts}
 
     def should_go_next(self, items):
         n = len(items)
@@ -122,91 +125,54 @@ def step(http, url, item_key):
 
     # Debug
     if err:
-        return 'http-error', err, None
+        raise err
 
     # Bad auth
     if result.status == 401:
-        return 'bad-auth', None, None
+        raise CrowdTangleInvalidTokenError
 
     # Bad params
     if result.status >= 400:
-        return 'bad-params', result, None
+        raise CrowdTangleInvalidRequestError
 
     try:
         data = json.loads(result.data)['result']
     except:
-        return 'bad-json', None, None
+        raise CrowdTangleInvalidJSONError
 
     if item_key not in data or len(data[item_key]) == 0:
-        return 'exhausted', None, None
+        raise CrowdTangleExhaustedPagination
 
     # Extracting next link
     pagination = data['pagination']
-    meta = pagination['nextPage'] if 'nextPage' in pagination else None
+    next_page = pagination['nextPage'] if 'nextPage' in pagination else None
 
-    return 'ok', meta, data[item_key]
+    return data[item_key], next_page
 
 
 def default_item_id_getter(item):
     return item['id']
 
 
-def create_paginated_action(url_forge, csv_headers, csv_formatter,
-                            item_name, item_key, default_rate_limit=CROWDTANGLE_DEFAULT_RATE_LIMIT,
+def make_paginated_iterator(url_forge, item_name, item_key, formatter,
                             item_id_getter=default_item_id_getter):
 
-    def action(namespace, output_file):
-        http = create_pool(timeout=CROWDTANGLE_DEFAULT_TIMEOUT)
+    def create_iterator(http, token, rate_limiter_state, partition_strategy=None,
+                        limit=None, format='csv_dict_row', **kwargs):
 
-        # Do we need to resume?
-        need_to_resume = False
-        if getattr(namespace, 'resume', False):
-            need_to_resume = True
+        if format not in CROWDTANGLE_OUTPUT_FORMATS:
+            raise TypeError('minet.crowdtangle: unkown `format`.')
 
-            if namespace.output is None:
-                die(
-                    'Cannot --resume without knowing the output (use -o/--output rather stdout).',
-                )
-
-            if namespace.sort_by != 'date':
-                die('Cannot --resume if --sort_by is not `date`.')
-
-            if namespace.format != 'csv':
-                die('Cannot --resume jsonl format yet.')
-
-            with open(namespace.output, 'r') as f:
-
-                # TODO: will get ugly if file does not yet exist
-                _, resume_pos, resume_reader = custom_reader(f, 'datetime')
-
-                last_line = None
-                resume_loader = tqdm(desc='Resuming', unit=' lines')
-
-                for line in resume_reader:
-                    resume_loader.update()
-                    last_line = line
-
-                resume_loader.close()
-
-                if last_line is not None:
-                    last_date = last_line[resume_pos].replace(' ', 'T')
-                    namespace.end_date = last_date
-
-                    print_err('Resuming from: %s' % last_date)
-
-        if getattr(namespace, 'partition_strategy', None):
-            pt = namespace.partition_strategy
-
-            if isinstance(pt, int):
-                partition_strategy = PartitionStrategyLimit(namespace, url_forge, pt)
+        if partition_strategy is not None:
+            if isinstance(partition_strategy, int):
+                partition_strategy = PartitionStrategyLimit(kwargs, url_forge, partition_strategy)
             else:
+                if partition_strategy == 'day' and kwargs.get('start_date') is None:
+                    raise CrowdTangleMissingStartDateError
 
-                if pt == 'day' and not namespace.start_date:
-                    die('"--partition-strategy day" requires a "--start-date".')
-
-                partition_strategy = PARTITION_STRATEGIES[pt](namespace, url_forge)
+                partition_strategy = PARTITION_STRATEGIES[partition_strategy](kwargs, url_forge)
         else:
-            partition_strategy = PartitionStrategyNoop(namespace, url_forge)
+            partition_strategy = PartitionStrategyNoop(kwargs, url_forge)
 
         N = 0
         C = 0
@@ -214,81 +180,23 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
         last_url = None
         last_items = set()
 
-        has_limit = bool(namespace.limit)
+        has_limit = limit is not None
 
-        print_err('Using the following starting url:')
-        print_err(url)
-        print_err()
-
-        # Loading bar
-        loading_bar = tqdm(
-            desc='Fetching %s' % item_name,
-            dynamic_ncols=True,
-            unit=' %s' % item_name,
-            total=namespace.limit
-        )
-
-        def set_postfix():
-            postfix = {'calls': C}
-
-            addendum = partition_strategy.get_postfix()
-
-            if addendum is not None:
-                postfix.update(addendum)
-
-            loading_bar.set_postfix(**postfix)
-
-        set_postfix()
-
-        if namespace.format == 'csv':
-            writer = csv.writer(output_file)
-
-            if not need_to_resume:
-                writer.writerow(csv_headers(namespace) if callable(csv_headers) else csv_headers)
-
-        rate_limit = namespace.rate_limit if namespace.rate_limit else default_rate_limit
-        rate_limiter = RateLimiter(rate_limit, 60.0)
+        rate_limited_step = rate_limited_from_state(rate_limiter_state)(step)
 
         # TODO: those conditions are a bit hacky. code could be clearer
         while url is not None and url != last_url:
             with rate_limiter:
-                status, meta, items = step(http, url, item_key)
+
                 C += 1
 
-                # Debug
-                if status == 'http-error':
-                    loading_bar.close()
-                    print_err(url)
-                    raise meta
-
-                if status == 'bad-auth':
-                    loading_bar.close()
-                    die([
-                        'Your API token is invalid.',
-                        'Check that you indicated a valid one using the `--token` argument.'
-                    ])
-
-                if status == 'bad-params':
-                    loading_bar.close()
-                    die([
-                        'Error status %i:' % meta.status,
-                        json.loads(meta.data)['message'],
-                        'Last called url:',
-                        url
-                    ])
-
-                if status == 'bad-json':
-                    loading_bar.close()
-                    die('Misformatted JSON result.')
-
-                if status == 'exhausted':
-                    url = partition_strategy(None)
+                try:
+                    items, next_url = rate_limited_step(http, url, item_key)
+                except CrowdTangleExhaustedPagination:
                     continue
 
                 enough_to_stop = False
-                next_url = meta
 
-                set_postfix()
                 n = 0
 
                 last_url = url
@@ -300,31 +208,25 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                     n += 1
                     N += 1
 
-                    if namespace.format == 'jsonl':
-                        output_file.write(json.dumps(item, ensure_ascii=False) + '\n')
+                    if format == 'csv_dict_row':
+                        yield formatter(item, as_dict=True)
+                    elif format == 'csv_row':
+                        yield formatter(item)
                     else:
-                        writer.writerow(csv_formatter(namespace, item))
+                        yield item
 
-                    if has_limit and N >= namespace.limit:
+                    if has_limit and N >= limit:
                         enough_to_stop = True
                         break
 
-                # NOTE: I wish I had labeled loops in python...
                 if enough_to_stop:
-                    loading_bar.close()
-                    print_err('The indicated limit of %s was reached.' % item_name)
                     break
-                else:
-                    loading_bar.update(n)
 
                 # We need to track last items to avoid registering the same one twice
                 last_items = set(item_id_getter(item) for item in items)
 
                 # Paginating
                 if next_url is None:
-                    if partition_strategy is None:
-                        break
-
                     url = partition_strategy(items)
                     continue
 
@@ -332,7 +234,5 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                     url = next_url
                 else:
                     url = partition_strategy(items)
-
-        loading_bar.close()
 
     return action
