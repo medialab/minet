@@ -806,6 +806,22 @@ def rate_limited(max_per_period, period=1.0):
     return decorate
 
 
+def rate_limited_from_state(state):
+    def decorate(fn):
+
+        @functools.wraps(fn)
+        def decorated(*args, **kwargs):
+            state.wait_if_needed()
+            result = fn(*args, **kwargs)
+            state.update()
+
+            return result
+
+        return decorated
+
+    return decorate
+
+
 def rate_limited_method(attr='rate_limiter_state'):
     def decorate(fn):
 
