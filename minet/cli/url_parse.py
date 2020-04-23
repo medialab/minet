@@ -14,7 +14,7 @@ from ural import (
 )
 from tqdm import tqdm
 
-from minet.cli.utils import CSVEnricher, open_output_file
+from minet.cli.utils import open_output_file
 
 REPORT_HEADERS = [
     'normalized_url',
