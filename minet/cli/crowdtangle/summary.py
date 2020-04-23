@@ -22,6 +22,7 @@ from minet.crowdtangle import CrowdTangleClient
 
 
 def crowdtangle_summary_action(namespace, output_file):
+    print(namespace)
     if not namespace.start_date:
         die('Missing --start-date!')
 

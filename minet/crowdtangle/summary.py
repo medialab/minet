@@ -33,7 +33,7 @@ URL_TEMPLATE = (
 )
 
 
-def forge_url(link, token, start_date, sort_by, include_posts=False):
+def url_forge(link, token, start_date, sort_by, include_posts=False):
     return URL_TEMPLATE % {
         'token': token,
         'count': 1 if not include_posts else 100,
@@ -59,7 +59,7 @@ def crowdtangle_summary(http, link, token=None, start_date=None, with_top_posts=
         raise TypeError('minet.crowdtangle.summary: unknown `sort_by`.')
 
     # Fetching
-    api_url = forge_url(
+    api_url = url_forge(
         link,
         token,
         start_date,

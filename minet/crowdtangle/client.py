@@ -15,6 +15,7 @@ from minet.crowdtangle.constants import (
     CROWDTANGLE_DEFAULT_RATE_LIMIT,
     CROWDTANGLE_LINKS_DEFAULT_RATE_LIMIT
 )
+from minet.crowdtangle.posts import crowdtangle_posts
 from minet.crowdtangle.summary import crowdtangle_summary
 
 
@@ -38,5 +39,13 @@ class CrowdTangleClient(object):
             self.http,
             link,
             token=self.token,
+            **kwargs
+        )
+
+    def posts(self, **kwargs):
+        return crowdtangle_posts(
+            self.http,
+            token=self.token,
+            rate_limiter_state=self.rate_limiter_state,
             **kwargs
         )

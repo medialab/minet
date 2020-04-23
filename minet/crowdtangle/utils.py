@@ -49,7 +49,7 @@ class PartitionStrategyNoop(object):
 
         return None
 
-    def get_postfix(self):
+    def get_detail(self):
         return None
 
     def should_go_next(self, items):
@@ -74,7 +74,7 @@ class PartitionStrategyDay(PartitionStrategyNoop):
 
         return self.url_forge(**self.kwargs)
 
-    def get_postfix(self):
+    def get_detail(self):
         return {'day': self.kwargs['start_date']}
 
 
@@ -96,8 +96,8 @@ class PartitionStrategyLimit(PartitionStrategyNoop):
 
         return self.url_forge(**self.kwargs)
 
-    def get_postfix(self):
-        if self.kwargs['end_date']:
+    def get_detail(self):
+        if self.kwargs.get('end_date') is not None:
             return {'date': self.kwargs['end_date'], 'shifts': self.shifts}
 
     def should_go_next(self, items):
@@ -154,11 +154,17 @@ def default_item_id_getter(item):
     return item['id']
 
 
-def make_paginated_iterator(url_forge, item_name, item_key, formatter,
+def make_paginated_iterator(url_forge, item_key, formatter,
                             item_id_getter=default_item_id_getter):
 
     def create_iterator(http, token, rate_limiter_state, partition_strategy=None,
-                        limit=None, format='csv_dict_row', **kwargs):
+                        limit=None, format='csv_dict_row', per_call=False, detailed=False,
+                        namespace=None, **kwargs):
+
+        if namespace is not None:
+            kwargs = vars(namespace)
+        else:
+            kwargs['token'] = token
 
         if format not in CROWDTANGLE_OUTPUT_FORMATS:
             raise TypeError('minet.crowdtangle: unkown `format`.')
@@ -186,53 +192,62 @@ def make_paginated_iterator(url_forge, item_name, item_key, formatter,
 
         # TODO: those conditions are a bit hacky. code could be clearer
         while url is not None and url != last_url:
-            with rate_limiter:
+            C += 1
 
-                C += 1
+            try:
+                items, next_url = rate_limited_step(http, url, item_key)
+            except CrowdTangleExhaustedPagination:
+                url = partition_strategy(None)
+                continue
 
-                try:
-                    items, next_url = rate_limited_step(http, url, item_key)
-                except CrowdTangleExhaustedPagination:
+            enough_to_stop = False
+
+            n = 0
+
+            last_url = url
+
+            acc = []
+
+            for item in items:
+                if item_id_getter(item) in last_items:
                     continue
 
-                enough_to_stop = False
+                n += 1
+                N += 1
 
-                n = 0
+                if format == 'csv_dict_row':
+                    item = formatter(item, as_dict=True)
+                elif format == 'csv_row':
+                    item = formatter(item)
 
-                last_url = url
+                acc.append(item)
 
-                for item in items:
-                    if item_id_getter(item) in last_items:
-                        continue
-
-                    n += 1
-                    N += 1
-
-                    if format == 'csv_dict_row':
-                        yield formatter(item, as_dict=True)
-                    elif format == 'csv_row':
-                        yield formatter(item)
-                    else:
-                        yield item
-
-                    if has_limit and N >= limit:
-                        enough_to_stop = True
-                        break
-
-                if enough_to_stop:
+                if has_limit and N >= limit:
+                    enough_to_stop = True
                     break
 
-                # We need to track last items to avoid registering the same one twice
-                last_items = set(item_id_getter(item) for item in items)
-
-                # Paginating
-                if next_url is None:
-                    url = partition_strategy(items)
-                    continue
-
-                if partition_strategy.should_go_next(items):
-                    url = next_url
+            if per_call:
+                if detailed:
+                    yield partition_strategy.get_detail(), acc
                 else:
-                    url = partition_strategy(items)
+                    yield acc
+            else:
+                yield from acc
 
-    return action
+            if enough_to_stop:
+                break
+
+            # We need to track last items to avoid registering the same one twice
+            last_items = set(item_id_getter(item) for item in items)
+
+            # Paginating
+            if next_url is None:
+                url = partition_strategy(items)
+                continue
+
+            if partition_strategy.should_go_next(items):
+                url = next_url
+            else:
+                url = partition_strategy(items)
+
+    return create_iterator
