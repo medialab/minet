@@ -8,7 +8,6 @@ import csv
 import json
 from datetime import date, timedelta
 from tqdm import tqdm
-from ural import get_domain_name, normalize_url
 
 from minet.utils import create_pool, request, RateLimiter
 from minet.cli.utils import print_err, die, custom_reader
@@ -18,36 +17,6 @@ from minet.crowdtangle.constants import (
 )
 
 DAY_DELTA = timedelta(days=1)
-
-URL_REPORT_HEADERS = [
-    'post_ct_id',
-    'post_id',
-    'account_ct_id',
-    'account_name',
-    'account_handle',
-    'original_url',
-    'url',
-    'normalized_url',
-    'domain_name'
-]
-
-
-def format_url_for_csv(url_item, post):
-    account = post['account']
-
-    url = url_item['expanded']
-
-    return [
-        post['id'],
-        post.get('platformId', ''),
-        account['id'],
-        account['name'],
-        account.get('handle', ''),
-        url_item['original'],
-        url,
-        normalize_url(url, strip_trailing_slash=True),
-        get_domain_name(url)
-    ]
 
 
 def day_range(end):
@@ -189,8 +158,6 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
     def action(namespace, output_file):
         http = create_pool(timeout=CROWDTANGLE_DEFAULT_TIMEOUT)
 
-        url_report_writer = None
-
         # Do we need to resume?
         need_to_resume = False
         if getattr(namespace, 'resume', False):
@@ -226,10 +193,6 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                     namespace.end_date = last_date
 
                     print_err('Resuming from: %s' % last_date)
-
-        if getattr(namespace, 'url_report', False):
-            url_report_writer = csv.writer(namespace.url_report)
-            url_report_writer.writerow(URL_REPORT_HEADERS)
 
         if getattr(namespace, 'partition_strategy', None):
             pt = namespace.partition_strategy
@@ -341,13 +304,6 @@ def create_paginated_action(url_forge, csv_headers, csv_formatter,
                         output_file.write(json.dumps(item, ensure_ascii=False) + '\n')
                     else:
                         writer.writerow(csv_formatter(namespace, item))
-
-                    if url_report_writer:
-                        urls = item.get('expandedLinks')
-
-                        if urls:
-                            for url_item in urls:
-                                url_report_writer.writerow(format_url_for_csv(url_item, item))
 
                     if has_limit and N >= namespace.limit:
                         enough_to_stop = True

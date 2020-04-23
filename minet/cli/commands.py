@@ -222,11 +222,6 @@ MINET_COMMANDS = {
                         {
                             'flag': '--start-date',
                             'help': 'The earliest date at which a post could be posted (UTC!).'
-                        },
-                        {
-                            'flag': '--url-report',
-                            'help': 'Path to an optional report file to write about urls found in posts.',
-                            'type': FileType('w')
                         }
                     ]
                 },
@@ -304,11 +299,6 @@ MINET_COMMANDS = {
                         {
                             'flag': '--types',
                             'help': 'Types of post to include, separated by comma.'
-                        },
-                        {
-                            'flag': '--url-report',
-                            'help': 'Path to an optional report file to write about urls found in posts.',
-                            'type': FileType('w')
                         }
                     ]
                 },
