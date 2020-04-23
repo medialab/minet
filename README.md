@@ -472,7 +472,6 @@ usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                [--resume]
                                [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
                                [--start-date START_DATE]
-                               [--url-report URL_REPORT]
 
 Minet CrowdTangle Posts Command
 ===============================
@@ -495,7 +494,6 @@ optional arguments:
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
-  --url-report URL_REPORT                         Path to an optional report file to write about urls found in posts.
 
 examples:
 
@@ -515,7 +513,6 @@ usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                 [-p PLATFORMS]
                                 [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
                                 [--start-date START_DATE] [--types TYPES]
-                                [--url-report URL_REPORT]
                                 terms
 
 Minet CrowdTangle Search Command
@@ -547,7 +544,6 @@ optional arguments:
                                                   The order in which to retrieve posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
   --types TYPES                                   Types of post to include, separated by comma.
-  --url-report URL_REPORT                         Path to an optional report file to write about urls found in posts.
 
 examples:
 
@@ -560,8 +556,8 @@ examples:
 
 ```
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
-                                 [-t TOKEN] [--posts POSTS]
-                                 [--sort-by {total_interactions,subscriber_count,date}]
+                                 [-t TOKEN] [--posts POSTS] [-s SELECT]
+                                 [--sort-by {total_interactions,date,subscriber_count}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -581,7 +577,8 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
   --posts POSTS                                   Path to a file containing the retrieved posts.
-  --sort-by {total_interactions,subscriber_count,date}
+  -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
+  --sort-by {total_interactions,date,subscriber_count}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
