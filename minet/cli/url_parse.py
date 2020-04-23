@@ -35,8 +35,6 @@ def url_parse_action(namespace):
         keep=namespace.select.split(',') if namespace.select else None
     )
 
-    url_pos = enricher.pos[namespace.column]
-
     loading_bar = tqdm(
         desc='Parsing',
         dynamic_ncols=True,
@@ -44,15 +42,15 @@ def url_parse_action(namespace):
         total=namespace.total
     )
 
-    for row in enricher:
-        url_data = row[url_pos].strip()
+    for row, url in enricher.cells(namespace.column, with_rows=True):
+        url = url.strip()
 
         loading_bar.update()
 
         if namespace.separator:
-            urls = url_data.split(namespace.separator)
+            urls = url.split(namespace.separator)
         else:
-            urls = [url_data]
+            urls = [url]
 
         for url in urls:
             if not is_url(url, allow_spaces_in_path=True):
