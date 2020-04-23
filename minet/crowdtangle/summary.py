@@ -4,7 +4,6 @@
 #
 # Function related to link summary using CrowdTangle's APIs.
 #
-from collections import namedtuple
 from urllib.parse import quote
 
 from minet.crowdtangle.exceptions import (
@@ -12,21 +11,16 @@ from minet.crowdtangle.exceptions import (
     CrowdTangleInvalidTokenError,
     CrowdTangleInvalidRequest
 )
-from minet.utils import create_pool, request_json, RateLimiter, nested_get
+from minet.utils import request_json, nested_get
 from minet.crowdtangle.constants import (
-    CROWDTANGLE_LINKS_DEFAULT_RATE_LIMIT,
     CROWDTANGLE_SUMMARY_DEFAULT_SORT_TYPE,
     CROWDTANGLE_SUMMARY_SORT_TYPES,
-    CROWDTANGLE_DEFAULT_TIMEOUT,
     CROWDTANGLE_OUTPUT_FORMATS
 )
 from minet.crowdtangle.formatters import (
     format_post,
     format_summary
 )
-
-CrowdTangleSummaryResult = namedtuple('CrowdTangleSummaryResult', ['link', 'item', 'stats'])
-CrowdTangleSummaryResultWithPosts = namedtuple('CrowdTangleSummaryResultWithPosts', ['link', 'item', 'stats', 'posts'])
 
 URL_TEMPLATE = (
     'https://api.crowdtangle.com/links'
@@ -49,8 +43,7 @@ def forge_url(link, token, start_date, sort_by, include_posts=False):
     }
 
 
-def crowdtangle_summary(iterator, token=None, start_date=None, with_top_posts=False,
-                        rate_limit=CROWDTANGLE_LINKS_DEFAULT_RATE_LIMIT, key=None,
+def crowdtangle_summary(http, link, token=None, start_date=None, with_top_posts=False,
                         sort_by=CROWDTANGLE_SUMMARY_DEFAULT_SORT_TYPE, format='csv_dict_row'):
 
     if token is None:
@@ -65,54 +58,43 @@ def crowdtangle_summary(iterator, token=None, start_date=None, with_top_posts=Fa
     if sort_by not in CROWDTANGLE_SUMMARY_SORT_TYPES:
         raise TypeError('minet.crowdtangle.summary: unknown `sort_by`.')
 
-    http = create_pool(timeout=CROWDTANGLE_DEFAULT_TIMEOUT)
-    rate_limiter = RateLimiter(rate_limit, 60.0)
+    # Fetching
+    api_url = forge_url(
+        link,
+        token,
+        start_date,
+        sort_by,
+        with_top_posts
+    )
 
-    for item in iterator:
-        link = item
+    err, response, data = request_json(http, api_url)
 
-        if callable(key):
-            link = key(item)
+    if err is not None:
+        raise err
 
-        with rate_limiter:
+    if response.status == 401:
+        raise CrowdTangleInvalidTokenError
 
-            # Fetching
-            api_url = forge_url(
-                link,
-                token,
-                start_date,
-                sort_by,
-                with_top_posts
-            )
+    if response.status >= 400:
+        raise CrowdTangleInvalidRequest(api_url)
 
-            err, response, data = request_json(http, api_url)
+    stats = nested_get(['result', 'summary', 'facebook'], data)
+    posts = nested_get(['result', 'posts'], data) if with_top_posts else None
 
-            if err is not None:
-                raise err
+    if stats is not None:
+        if format == 'csv_dict_row':
+            stats = format_summary(stats, as_dict=True)
+        elif format == 'csv_row':
+            stats = format_summary(stats)
 
-            if response.status == 401:
-                raise CrowdTangleInvalidTokenError
+    if not with_top_posts:
+        return stats
 
-            if response.status >= 400:
-                raise CrowdTangleInvalidRequest(api_url)
+    else:
+        if posts is not None:
+            if format == 'csv_dict_row':
+                posts = [format_post(post, as_dict=True) for post in posts]
+            elif format == 'csv_row':
+                posts = [format_post(post) for post in posts]
 
-            stats = nested_get(['result', 'summary', 'facebook'], data)
-            posts = nested_get(['result', 'posts'], data) if with_top_posts else None
-
-            if stats is not None:
-                if format == 'csv_dict_row':
-                    stats = format_summary(stats, as_dict=True)
-                elif format == 'csv_row':
-                    stats = format_summary(stats)
-
-            if not with_top_posts:
-                yield CrowdTangleSummaryResult(link, item, stats)
-
-            else:
-                if posts is not None:
-                    if format == 'csv_dict_row':
-                        posts = [format_post(post, as_dict=True) for post in posts]
-                    elif format == 'csv_row':
-                        posts = [format_post(post) for post in posts]
-
-                yield CrowdTangleSummaryResultWithPosts(link, item, stats, posts)
+        return stats, posts

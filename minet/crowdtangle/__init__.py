@@ -2,4 +2,4 @@
 # Minet CrowdTangle Endpoint
 # =============================================================================
 #
-from minet.crowdtangle.summary import crowdtangle_summary
+from minet.crowdtangle.client import CrowdTangleClient

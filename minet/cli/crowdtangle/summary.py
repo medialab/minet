@@ -5,11 +5,12 @@
 # Logic of the `ct summary` action.
 #
 import csv
+import casanova
 from io import StringIO
 from tqdm import tqdm
 from ural import is_url
 
-from minet.cli.utils import die, custom_reader
+from minet.cli.utils import die
 from minet.crowdtangle.constants import (
     CROWDTANGLE_SUMMARY_CSV_HEADERS,
     CROWDTANGLE_POST_CSV_HEADERS_WITH_LINK
@@ -17,9 +18,7 @@ from minet.crowdtangle.constants import (
 from minet.crowdtangle.exceptions import (
     CrowdTangleInvalidTokenError
 )
-from minet.crowdtangle.summary import crowdtangle_summary
-
-CSV_PADDING = ['0'] * len(CROWDTANGLE_SUMMARY_CSV_HEADERS)
+from minet.crowdtangle import CrowdTangleClient
 
 
 def crowdtangle_summary_action(namespace, output_file):
@@ -30,11 +29,12 @@ def crowdtangle_summary_action(namespace, output_file):
         namespace.file = StringIO('url\n%s' % namespace.column)
         namespace.column = 'url'
 
-    input_headers, pos, reader = custom_reader(namespace.file, namespace.column)
-
-    output_headers = input_headers + CROWDTANGLE_SUMMARY_CSV_HEADERS
-    output_writer = csv.writer(output_file)
-    output_writer.writerow(output_headers)
+    enricher = casanova.enricher(
+        namespace.file,
+        output_file,
+        keep=namespace.select.split(',') if namespace.select else None,
+        add=CROWDTANGLE_SUMMARY_CSV_HEADERS
+    )
 
     posts_writer = None
 
@@ -49,40 +49,36 @@ def crowdtangle_summary_action(namespace, output_file):
         unit=' urls'
     )
 
-    def key(line):
-        return line[pos]
+    client = CrowdTangleClient(namespace.token, rate_limit=namespace.rate_limit)
 
-    iterator = crowdtangle_summary(
-        reader,
-        key=key,
-        token=namespace.token,
-        start_date=namespace.start_date,
-        with_top_posts=namespace.posts is not None,
-        rate_limit=namespace.rate_limit,
-        sort_by=namespace.sort_by,
-        format='csv_row'
-    )
+    for row, url in enricher.cells(namespace.column, with_rows=True):
+        url = url.strip()
 
-    try:
-        for result in iterator:
-            line = result.item
+        try:
+            stats = client.summary(
+                url,
+                start_date=namespace.start_date,
+                with_top_posts=namespace.posts is not None,
+                sort_by=namespace.sort_by,
+                format='csv_row'
+            )
 
-            if result.stats is None:
-                output_writer.writerow(line + CSV_PADDING)
-            else:
-                output_writer.writerow(line + result.stats)
+        except CrowdTangleInvalidTokenError:
+            die([
+                'Your API token is invalid.',
+                'Check that you indicated a valid one using the `--token` argument.'
+            ])
 
-            if namespace.posts is not None and result.posts is not None:
-                for post in result.posts:
+        except Exception as err:
+            raise err
+
+        if namespace.posts is not None:
+            stats, posts = stats
+
+            if posts is not None:
+                for post in posts:
                     posts_writer.writerow(post)
 
-            loading_bar.update()
+        enricher.writerow(row, stats)
 
-    except CrowdTangleInvalidTokenError:
-        die([
-            'Your API token is invalid.',
-            'Check that you indicated a valid one using the `--token` argument.'
-        ])
-
-    except Exception as err:
-        raise err
+        loading_bar.update()

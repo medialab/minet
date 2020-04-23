@@ -342,6 +342,10 @@ MINET_COMMANDS = {
                             'type': FileType('w')
                         },
                         {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).'
+                        },
+                        {
                             'flag': '--sort-by',
                             'help': 'How to sort retrieved posts. Defaults to `date`.',
                             'choices': CROWDTANGLE_SUMMARY_SORT_TYPES,

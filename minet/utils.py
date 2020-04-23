@@ -15,6 +15,7 @@ import yaml
 import time
 import string
 import mimetypes
+import functools
 import cchardet as chardet
 from random import uniform
 from collections import OrderedDict
@@ -791,6 +792,8 @@ def rate_limited(max_per_period, period=1.0):
     state = RateLimiterState(max_per_period, period)
 
     def decorate(fn):
+
+        @functools.wraps(fn)
         def decorated(*args, **kwargs):
             state.wait_if_needed()
             result = fn(*args, **kwargs)
@@ -805,6 +808,8 @@ def rate_limited(max_per_period, period=1.0):
 
 def rate_limited_method(attr='rate_limiter_state'):
     def decorate(fn):
+
+        @functools.wraps(fn)
         def decorated(self, *args, **kwargs):
             state = getattr(self, attr)
 
