@@ -20,7 +20,7 @@ def replacer(match):
 
 parser, subparser_index = build_parser(MINET_COMMANDS)
 
-with open('./README.template.md') as f:
+with open('./docs/cli.template.md') as f:
     template_string = f.read()
 
 template_string = re.sub(TEMPLATE_RE, replacer, template_string)

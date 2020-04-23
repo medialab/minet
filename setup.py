@@ -21,7 +21,7 @@ setup(name='minet',
       author='Jules Farjas, Guillaume Plique',
       keywords='webmining',
       python_requires='>=3',
-      packages=find_packages(exclude=['ftest', 'test']),
+      packages=find_packages(exclude=['ftest', 'scripts', 'test']),
       install_requires=[
         'beautifulsoup4>=4.7.1',
         'browser-cookie3==0.7.6',
