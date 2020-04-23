@@ -4,11 +4,12 @@
 #
 # Logic of the `url-extract` action.
 #
+import casanova
 from tqdm import tqdm
 from ural import urls_from_text, urls_from_html
 from urllib.parse import urljoin
 
-from minet.cli.utils import CSVEnricher, open_output_file
+from minet.cli.utils import open_output_file
 
 REPORT_HEADERS = [
     'url'
@@ -23,12 +24,11 @@ EXTRACTORS = {
 def url_extract_action(namespace):
     output_file = open_output_file(namespace.output)
 
-    enricher = CSVEnricher(
+    enricher = casanova.enricher(
         namespace.file,
-        namespace.column,
         output_file,
-        report_headers=REPORT_HEADERS,
-        select=namespace.select.split(',') if namespace.select else None
+        add=REPORT_HEADERS,
+        keep=namespace.select.split(',') if namespace.select else None
     )
 
     extract = EXTRACTORS[getattr(namespace, 'from')]
@@ -36,14 +36,14 @@ def url_extract_action(namespace):
     loading_bar = tqdm(
         desc='Extracting',
         dynamic_ncols=True,
-        unit=' lines',
+        unit=' rows',
         total=namespace.total
     )
 
-    for line in enricher:
+    for row, content in enricher.cells(namespace.column, with_rows=True):
         loading_bar.update()
 
-        content = line[enricher.pos].strip()
+        content = content.strip()
 
         if not content:
             continue
@@ -52,6 +52,6 @@ def url_extract_action(namespace):
             if namespace.base_url is not None:
                 url = urljoin(namespace.base_url, url)
 
-            enricher.write(line, [url])
+            enricher.writerow(row, [url])
 
     output_file.close()
