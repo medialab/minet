@@ -27,6 +27,7 @@
   * [summary](#summary)
 * [facebook (fb)](#facebook)
   * [comments](#comments)
+  * [url-parse](#facebook-url-parse)
 * [hyphe](#hyphe)
   * [dump](#dump)
 * [mediacloud (mc)](#mediacloud)
@@ -520,7 +521,7 @@ examples:
 ```
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [--posts POSTS] [-s SELECT]
-                                 [--sort-by {subscriber_count,date,total_interactions}]
+                                 [--sort-by {subscriber_count,total_interactions,date}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -541,7 +542,7 @@ optional arguments:
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {subscriber_count,date,total_interactions}
+  --sort-by {subscriber_count,total_interactions,date}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
@@ -593,6 +594,27 @@ examples:
 
 . Fetching a dashboard's lists:
     `minet fb comments`
+
+```
+
+<h3 id="facebook-url-parse">url-parse</h3>
+
+```
+usage: minet facebook url-parse [-h] [-o OUTPUT] [-s SELECT] column [file]
+
+Parse Facebook URLs
+===================
+
+Extract informations from Facebook URLs
+
+positional arguments:
+  column                      Name of the column containing the URL in the CSV file.
+  file                        CSV file containing the inquired URLs.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
 
 ```
 
@@ -676,7 +698,7 @@ optional arguments:
 
 ```
 
-### url-parse
+<h3 id="youtube-url-parse">url-parse</h3>
 
 ```
 usage: minet youtube url-parse [-h] [-o OUTPUT] [-s SELECT] column [file]

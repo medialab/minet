@@ -27,6 +27,7 @@
   * [summary](#summary)
 * [facebook (fb)](#facebook)
   * [comments](#comments)
+  * [url-parse](#facebook-url-parse)
 * [hyphe](#hyphe)
   * [dump](#dump)
 * [mediacloud (mc)](#mediacloud)
@@ -130,6 +131,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% fb/comments %>
 
+<h3 id="facebook-url-parse">url-parse</h3>
+
+<% fb/url-parse %>
+
 ## Hyphe
 
 ### dump
@@ -150,7 +155,7 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% yt/comments %>
 
-### url-parse
+<h3 id="youtube-url-parse">url-parse</h3>
 
 <% yt/url-parse %>
 
