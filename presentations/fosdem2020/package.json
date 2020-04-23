@@ -16,6 +16,6 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@marp-team/marp-cli": "^0.17.0"
+    "@marp-team/marp-cli": "^0.17.4"
   }
 }
