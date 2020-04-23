@@ -63,6 +63,23 @@ CROWDTANGLE_STATISTICS = [
     'thankful'
 ]
 
+CROWDTANGLE_FULL_STATISTICS = STATISTICS = [
+    ('loveCount', 'love_count'),
+    ('wowCount', 'wow_count'),
+    ('thankfulCount', 'thankful_count'),
+    ('interactionRate', 'interaction_rate'),
+    ('likeCount', 'like_count'),
+    ('hahaCount', 'haha_count'),
+    ('commentCount', 'comment_count'),
+    ('shareCount', 'share_count'),
+    ('sadCount', 'sad_count'),
+    ('angryCount', 'angry_count'),
+    ('postCount', 'post_count'),
+    ('totalInteractionCount', 'total_interaction_count'),
+    ('totalVideoTimeMS', 'total_video_time_ms'),
+    ('threePlusMinuteVideoCount', 'three_plus_minute_video_count')
+]
+
 CROWDTANGLE_PARTITION_STRATEGIES = {
     'day'
 }
@@ -132,3 +149,31 @@ CROWDTANGLE_POST_CSV_HEADERS += CROWDTANGLE_MEDIA_CSV_HEADERS
 CROWDTANGLE_POST_CSV_HEADERS_WITH_LINK = ['url'] + CROWDTANGLE_POST_CSV_HEADERS
 
 CROWDTANGLE_SUMMARY_CSV_HEADERS = ['%s_count' % t for t in CROWDTANGLE_REACTION_TYPES]
+
+CROWDTANGLE_LEADERBOARD_CSV_HEADERS = [
+    'ct_id',
+    'name',
+    'handle',
+    'profile_image',
+    'subscriber_count',
+    'url',
+    'verified',
+    'initial_subscriber_count',
+    'final_subscriber_count',
+    'subscriber_data_notes'
+]
+
+for _, substitute_key in CROWDTANGLE_FULL_STATISTICS:
+    CROWDTANGLE_LEADERBOARD_CSV_HEADERS.append(substitute_key)
+
+CROWDTANGLE_LEADERBOARD_CSV_HEADERS_WITH_BREAKDOWN = list(CROWDTANGLE_LEADERBOARD_CSV_HEADERS)
+
+for post_type in CROWDTANGLE_POST_TYPES:
+    for _, substitute_key in CROWDTANGLE_FULL_STATISTICS:
+        CROWDTANGLE_LEADERBOARD_CSV_HEADERS_WITH_BREAKDOWN.append('%s_%s' % (post_type, substitute_key))
+
+CROWDTANGLE_LIST_CSV_HEADERS = [
+    'id',
+    'title',
+    'type'
+]

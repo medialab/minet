@@ -8,11 +8,16 @@ import json
 from collections import OrderedDict
 
 from minet.crowdtangle.constants import (
+    CROWDTANGLE_POST_TYPES,
     CROWDTANGLE_REACTION_TYPES,
     CROWDTANGLE_POST_CSV_HEADERS,
     CROWDTANGLE_POST_CSV_HEADERS_WITH_LINK,
     CROWDTANGLE_SUMMARY_CSV_HEADERS,
-    CROWDTANGLE_STATISTICS
+    CROWDTANGLE_LEADERBOARD_CSV_HEADERS,
+    CROWDTANGLE_LEADERBOARD_CSV_HEADERS_WITH_BREAKDOWN,
+    CROWDTANGLE_LIST_CSV_HEADERS,
+    CROWDTANGLE_STATISTICS,
+    CROWDTANGLE_FULL_STATISTICS
 )
 
 
@@ -93,5 +98,61 @@ def format_summary(stats, as_dict=False):
 
     if as_dict:
         return row_to_ordered_dict(CROWDTANGLE_SUMMARY_CSV_HEADERS)
+
+    return row
+
+
+def format_leaderboard(item, with_breakdown=False, as_dict=False):
+    account = item['account']
+    subscriber_data = item['subscriberData']
+
+    row = [
+        account['id'],
+        account['name'],
+        account.get('handle', ''),
+        account['profileImage'],
+        account['subscriberCount'],
+        account['url'],
+        '1' if account['verified'] else '',
+        subscriber_data['initialCount'],
+        subscriber_data['finalCount'],
+        subscriber_data.get('notes', '')
+    ]
+
+    summary = item['summary']
+
+    for key, _ in CROWDTANGLE_FULL_STATISTICS:
+        row.append(summary.get(key, ''))
+
+    if with_breakdown:
+        breakdown = item['breakdown']
+
+        for post_type in CROWDTANGLE_POST_TYPES:
+
+            data = breakdown.get(post_type)
+
+            for key, _ in CROWDTANGLE_FULL_STATISTICS:
+                row.append(data.get(key, '') if data else '')
+
+    if as_dict:
+        headers = CROWDTANGLE_LEADERBOARD_CSV_HEADERS
+
+        if with_breakdown:
+            headers = CROWDTANGLE_LEADERBOARD_CSV_HEADERS_WITH_BREAKDOWN
+
+        return row_to_ordered_dict(headers, row)
+
+    return row
+
+
+def format_list(item, as_dict=False):
+    row = [
+        item['id'],
+        item['title'],
+        item['type']
+    ]
+
+    if as_dict:
+        row = row_to_ordered_dict(CROWDTANGLE_LIST_CSV_HEADERS, row)
 
     return row
