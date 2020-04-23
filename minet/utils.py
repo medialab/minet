@@ -767,6 +767,34 @@ class RateLimitedIterator(object):
             self.rate_limiter.exit()
 
 
+def rate_limited(max_per_period, period=1.0):
+    max_per_second = max_per_period / period
+    min_interval = 1.0 / max_per_second
+    last_entry = None
+
+    def decorate(fn):
+        def decorated(*args, **kwargs):
+            nonlocal last_entry
+
+            if last_entry is not None:
+
+                # Do we need to wait?
+                running_time = time.perf_counter() - last_entry
+                delta = min_interval - running_time
+
+                if delta > 0:
+                    time.sleep(delta)
+
+            result = fn(*args, **kwargs)
+            last_entry = time.perf_counter()
+
+            return result
+
+        return decorated
+
+    return decorate
+
+
 class PseudoFStringFormatter(string.Formatter):
     def get_field(self, field_name, args, kwargs):
         result = eval(field_name, None, kwargs)

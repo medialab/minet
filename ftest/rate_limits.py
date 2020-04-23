@@ -1,6 +1,11 @@
 import time
-from minet import RateLimitedIterator, RetryableIterator
+from minet import RateLimitedIterator, RetryableIterator, rate_limited
 
+def print_title(title):
+    print()
+    print(title)
+
+print_title('retryable')
 iterator = RetryableIterator(range(3))
 
 retries = 0
@@ -11,6 +16,7 @@ for i in iterator:
         iterator.retry()
         continue
 
+print_title('retryable rate limited')
 iterator = RateLimitedIterator(range(3), 50)
 
 retries = 0
@@ -24,6 +30,15 @@ for i in iterator:
 for i in RateLimitedIterator(range(0), 1):
     print(i)
 
-print('start')
+print_title('rate limited')
 for i in RateLimitedIterator(range(5), 1):
     print(i)
+
+print_title('decorator')
+
+@rate_limited(1)
+def work(i):
+    print(i)
+
+for i in range(5):
+    work(i)
