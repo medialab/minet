@@ -30,4 +30,4 @@ To learn how to use `minet` and understand how it may fit your use cases, you sh
 ## Usage
 
 * [Using minet as a command line tool](./docs/cli.md)
-* [Using minet as a python library](./docs/library.md)
+* [Using minet as a python library](./docs/lib.md)
