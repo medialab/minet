@@ -27,6 +27,7 @@ for i in iterator:
         iterator.retry()
         continue
 
+print_title('empty rate limited')
 for i in RateLimitedIterator(range(0), 1):
     print(i)
 

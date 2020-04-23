@@ -767,26 +767,34 @@ class RateLimitedIterator(object):
             self.rate_limiter.exit()
 
 
+class RateLimiterState(object):
+    def __init__(self, max_per_period, period=1.0):
+        max_per_second = max_per_period / period
+        self.min_interval = 1.0 / max_per_second
+        self.last_entry = None
+
+    def wait_if_needed(self):
+        if self.last_entry is None:
+            return
+
+        running_time = time.perf_counter() - self.last_entry
+        delta = self.min_interval - running_time
+
+        if delta > 0:
+            time.sleep(delta)
+
+    def update(self):
+        self.last_entry = time.perf_counter()
+
+
 def rate_limited(max_per_period, period=1.0):
-    max_per_second = max_per_period / period
-    min_interval = 1.0 / max_per_second
-    last_entry = None
+    state = RateLimiterState(max_per_period, period)
 
     def decorate(fn):
         def decorated(*args, **kwargs):
-            nonlocal last_entry
-
-            if last_entry is not None:
-
-                # Do we need to wait?
-                running_time = time.perf_counter() - last_entry
-                delta = min_interval - running_time
-
-                if delta > 0:
-                    time.sleep(delta)
-
+            state.wait_if_needed()
             result = fn(*args, **kwargs)
-            last_entry = time.perf_counter()
+            state.update()
 
             return result
 
