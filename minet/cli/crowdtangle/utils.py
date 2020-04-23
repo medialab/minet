@@ -75,7 +75,7 @@ def make_paginated_action(method_name, item_name, csv_headers):
 
         create_iterator = getattr(client, method_name)
         iterator = create_iterator(
-            partition_strategy=namespace.partition_strategy,
+            partition_strategy=getattr(namespace, 'partition_strategy', None),
             limit=namespace.limit,
             format='csv_row' if namespace.format == 'csv' else 'raw',
             per_call=True,

@@ -15,6 +15,7 @@ from minet.crowdtangle.constants import (
     CROWDTANGLE_DEFAULT_RATE_LIMIT,
     CROWDTANGLE_LINKS_DEFAULT_RATE_LIMIT
 )
+from minet.crowdtangle.leaderboard import crowdtangle_leaderboard
 from minet.crowdtangle.posts import crowdtangle_posts
 from minet.crowdtangle.summary import crowdtangle_summary
 
@@ -33,12 +34,11 @@ class CrowdTangleClient(object):
         self.summary_rate_limiter_state = RateLimiterState(summary_rate_limit, period=60)
         self.http = create_pool(timeout=CROWDTANGLE_DEFAULT_TIMEOUT)
 
-    @rate_limited_method('summary_rate_limiter_state')
-    def summary(self, link, **kwargs):
-        return crowdtangle_summary(
+    def leaderboard(self, **kwargs):
+        return crowdtangle_leaderboard(
             self.http,
-            link,
             token=self.token,
+            rate_limiter_state=self.rate_limiter_state,
             **kwargs
         )
 
@@ -47,5 +47,14 @@ class CrowdTangleClient(object):
             self.http,
             token=self.token,
             rate_limiter_state=self.rate_limiter_state,
+            **kwargs
+        )
+
+    @rate_limited_method('summary_rate_limiter_state')
+    def summary(self, link, **kwargs):
+        return crowdtangle_summary(
+            self.http,
+            link,
+            token=self.token,
             **kwargs
         )
