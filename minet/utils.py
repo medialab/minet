@@ -803,6 +803,25 @@ def rate_limited(max_per_period, period=1.0):
     return decorate
 
 
+def rate_limited_method(attr='rate_limiter_state'):
+    def decorate(fn):
+        def decorated(self, *args, **kwargs):
+            state = getattr(self, attr)
+
+            if not isinstance(state, RateLimiterState):
+                raise ValueError
+
+            state.wait_if_needed()
+            result = fn(self, *args, **kwargs)
+            state.update()
+
+            return result
+
+        return decorated
+
+    return decorate
+
+
 class PseudoFStringFormatter(string.Formatter):
     def get_field(self, field_name, args, kwargs):
         result = eval(field_name, None, kwargs)

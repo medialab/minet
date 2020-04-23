@@ -1,5 +1,11 @@
 import time
-from minet import RateLimitedIterator, RetryableIterator, rate_limited
+from minet import (
+    RateLimitedIterator,
+    RateLimiterState,
+    RetryableIterator,
+    rate_limited,
+    rate_limited_method
+)
 
 def print_title(title):
     print()
@@ -43,3 +49,17 @@ def work(i):
 
 for i in range(5):
     work(i)
+
+print_title('method decorator')
+
+class Worker(object):
+    def __init__(self):
+        self.state = RateLimiterState(1)
+
+    @rate_limited_method('state')
+    def work(self, i):
+        print(i)
+
+worker = Worker()
+for i in range(5):
+    worker.work(i)
