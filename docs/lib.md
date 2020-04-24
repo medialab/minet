@@ -15,6 +15,8 @@
   * [#.posts](#posts)
   * [#.search](#search)
   * [#.summary](#summary)
+* [MediacloudClient](#mediacloudclient)
+  * [#.topic_stories](#topic_stories)
 
 ## multithreaded_fetch
 
@@ -249,3 +251,31 @@ stats, posts = client.summary(
 * **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
 * **sort_by** *?str* [`date`]: how to sort posts. Can be `date`, `subscriber_count` or `total_interactions`.
 * **with_top_posts** *?bool*: whether to also return top 100 posts.
+
+## MediacloudClient
+
+Client that can be used to access [Mediacloud](https://mediacloud.org/) APIs.
+
+For more information about their API, check out their [documentation](https://github.com/berkmancenter/mediacloud/blob/master/doc/api_2_0_spec/api_2_0_spec.md) (for [topics](https://github.com/berkmancenter/mediacloud/blob/master/doc/api_2_0_spec/topics_api_2_0_spec.md) and for [admin](https://github.com/berkmancenter/mediacloud/blob/master/doc/api_2_0_spec/admin_api_2_0_spec.md)).
+
+```python
+from minet.mediacloud import MediacloudClient
+
+client = MediacloudClient(token='MYAPIKEY')
+```
+
+### #.topic_stories
+
+Method yielding all of a given topic's stories.
+
+```python
+for story in client.topic_stories(4536):
+  print(story)
+```
+
+*Arguments*
+
+* **topic_id** *str*: id of target topic.
+* **from_media_id** *?str*: return only stories linked from a media having this id.
+* **media_id** *?str*: return only stories coming from a media having this id.
+* **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
