@@ -60,11 +60,12 @@ class CrowdTangleClient(object):
             **kwargs
         )
 
-    def search(self, **kwargs):
+    def search(self, terms, **kwargs):
         return crowdtangle_search(
             self.http,
             token=self.token,
             rate_limiter_state=self.rate_limiter_state,
+            terms=terms,
             **kwargs
         )
 

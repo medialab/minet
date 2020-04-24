@@ -131,6 +131,8 @@ A `ResolveWorkerResult` having the following attributes:
 
 Client that can be used to access [CrowdTangle](https://www.crowdtangle.com/)'s APIs while ensuring you respect rate limits.
 
+For more details about the CrowdTangle API, be sure to check their [documentation](https://github.com/CrowdTangle/API/wiki).
+
 ```python
 from minet.crowdtangle import CrowdTangleClient
 
@@ -147,11 +149,83 @@ client = CrowdTangleClient(token='MYTOKEN', rate_limit=50)
 
 ### #.leaderboard
 
+Method yielding stats about the accounts tracked by your dashboard.
+
+```python
+for account_stats in client.leaderboard():
+  print(account_stats)
+
+# For a specific list:
+for account_stats in client.leaderboard(list_id=9457):
+  print(account_stats)
+```
+
+*Arguments*
+
+* **list_id** *?str*: whether to return only accounts from the given list.
+* **limit** *?int*: max number of accounts to return.
+* **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
+* **partition_strategy** *?str|int*: query partition strategy to use to mitigate the APIs issues regarding pagination. Can be either `day` or a number of results before rolling the query. `500` seems to be a good compromise.
+* **per_call** *?bool* [`False`]: whether to yield once per API call or once per retrieved item.
+
 ### #.lists
+
+Method returning your dashboard's lists.
+
+```python
+lists = client.lists()
+```
+
+*Arguments*
+
+* **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
 
 ### #.posts
 
+Method yielding posts from groups or pages tracked by your dashboard.
+
+```python
+for post in client.posts():
+  print(post)
+```
+
+*Arguments*
+
+* **language** *?str*: filter posts by language.
+* **list_ids** *?iterable*: retrieve only posts from those lists.
+* **sort_by** *?str* [`date`]: how to sort retrieved posts. Can be either `date` or `interaction_date` or `overperforming` or `total_interactions` or `underperforming`.
+* **end_date** *?str*: end date.
+* **start_date** *?str*: start date.
+* **limit** *?int*: max number of posts to return.
+* **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
+* **partition_strategy** *?str|int*: query partition strategy to use to mitigate the APIs issues regarding pagination. Can be either `day` or a number of results before rolling the query. `500` seems to be a good compromise.
+* **per_call** *?bool* [`False`]: whether to yield once per API call or once per retrieved item.
+
 ### #.search
+
+Method searching for posts based on a given query.
+
+```python
+for post in client.search('tree'):
+  print(post)
+```
+
+*Arguments*
+
+* **terms** *str*: search query.
+* **and** *?str*: and component of the query.
+* **language** *?str*: filter posts by language.
+* **not_in_title** *?bool* [`False`]: whether to search account titles or not.
+* **platforms** *?iterable<str>*: only return posts from the given platforms.
+* **sort_by** *?str* [`date`]: how to sort retrieved posts. Can be either `date` or `interaction_date` or `overperforming` or `total_interactions` or `underperforming`.
+* **end_date** *?str*: end date.
+* **start_date** *?str*: start date.
+* **types** *?iterable<str>*: only return those post types.
+* **limit** *?int*: max number of posts to return.
+* **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
+* **partition_strategy** *?str|int*: query partition strategy to use to mitigate the APIs issues regarding pagination. Can be either `day` or a number of results before rolling the query. `500` seems to be a good compromise.
+* **per_call** *?bool* [`False`]: whether to yield once per API call or once per retrieved item.
+
 
 ### #.summary
 
