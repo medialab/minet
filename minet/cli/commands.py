@@ -9,26 +9,17 @@ from argparse import FileType
 
 from minet.defaults import DEFAULT_THROTTLE
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
-from minet.cli.utils import BooleanAction, die
+from minet.cli.utils import die
+from minet.cli.argparse import (
+    BooleanAction,
+    CrowdtanglePartitionStrategyType
+)
 
 from minet.crowdtangle.constants import (
     CROWDTANGLE_SORT_TYPES,
     CROWDTANGLE_SUMMARY_SORT_TYPES,
-    CROWDTANGLE_DEFAULT_RATE_LIMIT,
-    CROWDTANGLE_PARTITION_STRATEGIES
+    CROWDTANGLE_DEFAULT_RATE_LIMIT
 )
-
-
-def partition_strategy_type(string):
-    if string in CROWDTANGLE_PARTITION_STRATEGIES:
-        return string
-
-    try:
-        return int(string)
-    except ValueError:
-        choices = ' or '.join(CROWDTANGLE_PARTITION_STRATEGIES)
-
-        raise ArgumentTypeError('partition strategy should either be %s, or an number of posts.' % choices)
 
 
 def check_dragnet():
@@ -206,7 +197,7 @@ MINET_COMMANDS = {
                         {
                             'flag': '--partition-strategy',
                             'help': 'Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts.',
-                            'type': partition_strategy_type
+                            'type': CrowdtanglePartitionStrategyType()
                         },
                         {
                             'flag': '--resume',
@@ -280,7 +271,7 @@ MINET_COMMANDS = {
                         {
                             'flag': '--partition-strategy',
                             'help': 'Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts.',
-                            'type': partition_strategy_type
+                            'type': CrowdtanglePartitionStrategyType()
                         },
                         {
                             'flags': ['-p', '--platforms'],
