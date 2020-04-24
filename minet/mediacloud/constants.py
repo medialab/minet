@@ -32,3 +32,21 @@ MEDIACLOUD_TOPIC_STORIES_CSV_HEADERS = [
     'timespans_id',
     'next_link_id'
 ]
+
+MEDIACLOUD_STORIES_CSV_HEADER = [
+    'guid',
+    'stories_id',
+    'processed_stories_id',
+    'title',
+    'url',
+    'language',
+    'collect_date',
+    'publish_date',
+    'media_id',
+    'media_name',
+    'media_url',
+    'tags',
+    'tag_sets',
+    'tags_ids',
+    'tag_sets_ids'
+]

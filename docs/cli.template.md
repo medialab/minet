@@ -31,6 +31,7 @@
 * [hyphe](#hyphe)
   * [dump](#dump)
 * [mediacloud (mc)](#mediacloud)
+  * [search](#search)
   * [topic](#topic)
     * [stories](#stories)
 * [youtube (yt)](#youtube)
@@ -142,6 +143,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 <% hyphe/dump %>
 
 ## Mediacloud
+
+### search
+
+<% mc/search %>
 
 ### topic
 

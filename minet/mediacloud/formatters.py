@@ -6,7 +6,11 @@
 #
 from collections import OrderedDict
 
-from minet.mediacloud.constants import MEDIACLOUD_TOPIC_STORIES_CSV_HEADERS
+from minet.mediacloud.utils import explode_tags
+from minet.mediacloud.constants import (
+    MEDIACLOUD_TOPIC_STORIES_CSV_HEADERS,
+    MEDIACLOUD_STORIES_CSV_HEADER
+)
 
 
 def row_to_ordered_dict(headers, row):
@@ -38,5 +42,32 @@ def format_topic_story(story, next_link_id, as_dict=False):
 
     if as_dict:
         row = row_to_ordered_dict(MEDIACLOUD_TOPIC_STORIES_CSV_HEADERS, row)
+
+    return row
+
+
+TAGS_PADDING = [''] * 4
+
+
+def format_story(story, as_dict=False):
+    tags = story.get('story_tags')
+
+    row = [
+        story['guid'],
+        story['stories_id'],
+        story['processed_stories_id'],
+        story['title'],
+        story['url'],
+        story['language'],
+        story['collect_date'],
+        story['publish_date'],
+        story['media_id'],
+        story['media_name'],
+        story['media_url'],
+        *(explode_tags(tags, join_char='|') if tags else TAGS_PADDING)
+    ]
+
+    if as_dict:
+        row = row_to_ordered_dict(MEDIACLOUD_STORIES_CSV_HEADER, row)
 
     return row

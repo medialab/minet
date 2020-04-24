@@ -31,6 +31,7 @@
 * [hyphe](#hyphe)
   * [dump](#dump)
 * [mediacloud (mc)](#mediacloud)
+  * [search](#search)
   * [topic](#topic)
     * [stories](#stories)
 * [youtube (yt)](#youtube)
@@ -521,7 +522,7 @@ examples:
 ```
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [--posts POSTS] [-s SELECT]
-                                 [--sort-by {subscriber_count,total_interactions,date}]
+                                 [--sort-by {date,subscriber_count,total_interactions}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -542,7 +543,7 @@ optional arguments:
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {subscriber_count,total_interactions,date}
+  --sort-by {date,subscriber_count,total_interactions}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
@@ -648,6 +649,26 @@ examples:
 ```
 
 ## Mediacloud
+
+### search
+
+```
+usage: minet mediacloud search [-h] [-t TOKEN] [-o OUTPUT] query
+
+Minet Mediacloud Search Command
+===============================
+
+Search stories on the Mediacloud platform.
+
+positional arguments:
+  query                       Search query.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -t TOKEN, --token TOKEN     Mediacloud API token (also called key).
+  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+
+```
 
 ### topic
 

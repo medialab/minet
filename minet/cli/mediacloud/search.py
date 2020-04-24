@@ -8,12 +8,12 @@ import csv
 from tqdm import tqdm
 
 from minet.mediacloud import MediacloudClient
-# from minet.mediacloud.constants import MEDIACLOUD_TOPIC_STORIES_CSV_HEADERS
+from minet.mediacloud.constants import MEDIACLOUD_STORIES_CSV_HEADER
 
 
 def mediacloud_search_action(namespace, output_file):
-    # writer = csv.writer(output_file)
-    # writer.writerow(MEDIACLOUD_TOPIC_STORIES_CSV_HEADERS)
+    writer = csv.writer(output_file)
+    writer.writerow(MEDIACLOUD_STORIES_CSV_HEADER)
 
     client = MediacloudClient(namespace.token)
 
@@ -26,13 +26,11 @@ def mediacloud_search_action(namespace, output_file):
         unit=' stories'
     )
 
-    # iterator = client.topic_stories(
-    #     namespace.topic_id,
-    #     media_id=namespace.media_id,
-    #     from_media_id=namespace.from_media_id,
-    #     format='csv_row'
-    # )
+    iterator = client.search(
+        namespace.query,
+        format='csv_row'
+    )
 
-    # for story in iterator:
-    #     writer.writerow(story)
-    #     loading_bar.update()
+    for story in iterator:
+        writer.writerow(story)
+        loading_bar.update()

@@ -11,10 +11,11 @@ from minet.mediacloud.constants import (
     MEDIACLOUD_API_BASE_URL,
     MEDIACLOUD_DEFAULT_BATCH
 )
-# from minet.mediacloud.formatters import format_topic_story
+from minet.mediacloud.formatters import format_story
+from minet.mediacloud.utils import get_last_processed_stories_id
 
 
-def url_forge(token, query, count=False):
+def url_forge(token, query, count=False, last_processed_stories_id=None):
 
     url = '%s/stories_public/%s?key=%s' % (
         MEDIACLOUD_API_BASE_URL,
@@ -26,6 +27,9 @@ def url_forge(token, query, count=False):
 
     if not count:
         url += '&rows=%i' % MEDIACLOUD_DEFAULT_BATCH
+
+        if last_processed_stories_id is not None:
+            url += '&last_processed_stories_id=%i' % last_processed_stories_id
 
     return url
 
@@ -42,36 +46,32 @@ def mediacloud_search(http, token, query, count=False, format='csv_dict_row'):
 
         return data['count']
 
-    raise TypeError
+    def generator():
+        last_processed_stories_id = None
 
-    # while True:
-    #     url = url_forge(
-    #         token,
-    #         topic_id=topic_id,
-    #         link_id=link_id,
-    #         media_id=media_id,
-    #         from_media_id=from_media_id,
-    #     )
+        while True:
+            url = url_forge(
+                token,
+                query,
+                last_processed_stories_id=last_processed_stories_id
+            )
 
-    #     err, _, data = request_json(http, url)
+            err, _, data = request_json(http, url)
 
-    #     if err:
-    #         raise err
+            if err:
+                raise err
 
-    #     if 'stories' not in data or len(data['stories']) == 0:
-    #         return
+            for story in data:
+                if format == 'csv_dict_row':
+                    yield format_story(story, as_dict=True)
+                elif format == 'csv_row':
+                    yield format_story(story)
+                else:
+                    yield story
 
-    #     next_link_id = get_next_link_id(data)
+            last_processed_stories_id = get_last_processed_stories_id(data)
 
-    #     for story in data['stories']:
-    #         if format == 'csv_dict_row':
-    #             yield format_topic_story(story, next_link_id, as_dict=True)
-    #         elif format == 'csv_row':
-    #             yield format_topic_story(story, next_link_id)
-    #         else:
-    #             yield story
+            if last_processed_stories_id is None:
+                return
 
-    #     if next_link_id is None:
-    #         return
-
-    #     link_id = next_link_id
+    return generator()
