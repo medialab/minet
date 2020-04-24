@@ -4,6 +4,8 @@
 
 *Generic utilities*
 
+* [scrape](#scrape)
+* [Scraper](#scraper)
 * [multithreaded_fetch](#multithreaded_fetch)
 * [multithreaded_resolve](#multithreaded_resolve)
 
@@ -17,6 +19,58 @@
   * [#.summary](#summary)
 * [MediacloudClient](#mediacloudclient)
   * [#.topic_stories](#topic_stories)
+
+## scrape
+
+Apply a minet scraper definition (described [here](../cookbook/scraping_dsl.md)) to some html or soup and get the extracted data.
+
+```python
+from minet import scrape
+
+scraper_definition = {
+  'iterator': 'p'
+}
+
+data = scrape(scraper_definition, some_html)
+```
+
+*Arguments*
+
+* **definition** *dict*: scraper definition written using minet's DSL.
+* **html** *str|soup*: either a HTML string or bs4 soup to scrape.
+* **engine** *?str* [`lxml`]: bs4 engine to use to parse html.
+* **context** *?dict*: optional context to use.
+
+## Scraper
+
+Tiny abstraction built over [#.scrape](#scrape) to "compile" the given definition and apply it easily on multiple html documents.
+
+```python
+from minet import Scraper
+
+scraper_definition = {
+  'iterator': 'p'
+}
+
+scraper = Scraper(scraper_definition)
+
+data = scraper(some_html)
+
+# You can also create a scraper from a JSON or YML file
+scraper = Scraper.from_file('./scraper.yml')
+
+with open('./scraper.json') as f:
+  scraper = Scraper.from_file(f)
+```
+
+*Arguments*
+
+* **definition** *dict*: scraper definition written using minet's DSL.
+
+*Attributes*
+
+* **definition** *dict*: definition used by the scraper.
+* **headers** *list*: CSV headers if they could be statically inferred from the scraper's definition.
 
 ## multithreaded_fetch
 

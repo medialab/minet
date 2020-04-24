@@ -53,5 +53,5 @@ class Scraper(object):
         return scrape(self.definition, html, context=context)
 
     @staticmethod
-    def from_definition(target):
+    def from_file(target):
         return Scraper(load_definition(target))
