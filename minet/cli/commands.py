@@ -193,7 +193,8 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--list-ids',
-                            'help': 'Ids of the lists from which to retrieve posts, separated by commas.'
+                            'help': 'Ids of the lists from which to retrieve posts, separated by commas.',
+                            'type': SplitterType()
                         },
                         {
                             'flag': '--partition-strategy',
@@ -276,7 +277,8 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-p', '--platforms'],
-                            'help': 'The platforms, separated by comma from which to retrieve posts.'
+                            'help': 'The platforms, separated by comma from which to retrieve posts.',
+                            'type': SplitterType()
                         },
                         {
                             'flag': '--sort-by',
@@ -290,7 +292,8 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--types',
-                            'help': 'Types of post to include, separated by comma.'
+                            'help': 'Types of post to include, separated by comma.',
+                            'type': SplitterType()
                         }
                     ]
                 },

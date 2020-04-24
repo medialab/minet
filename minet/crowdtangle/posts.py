@@ -28,7 +28,7 @@ def url_forge(token=None, sort_by=None, language=None, start_date=None,
         base_url += '&endDate=%s' % end_date
 
     if list_ids:
-        base_url += '&listIds=%s' % list_ids
+        base_url += '&listIds=%s' % ','.join(list_ids)
 
     return base_url
 

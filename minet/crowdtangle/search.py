@@ -26,10 +26,10 @@ def url_forge(**kwargs):
         base_url += '&endDate=%s' % kwargs['end_date']
 
     if kwargs.get('platforms') is not None:
-        base_url += '&platforms=%s' % kwargs['platforms']
+        base_url += '&platforms=%s' % ','.join(kwargs['platforms'])
 
     if kwargs.get('types') is not None:
-        base_url += '&types=%s' % kwargs['types']
+        base_url += '&types=%s' % ','.join(kwargs['types'])
 
     if kwargs.get('offset') is not None:
         base_url += '&offset=%s' % kwargs['offset']
