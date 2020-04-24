@@ -22,7 +22,7 @@ class BooleanAction(Action):
 
 
 class CrowdtanglePartitionStrategyType(object):
-    def __call__(string):
+    def __call__(self, string):
         if string in CROWDTANGLE_PARTITION_STRATEGIES:
             return string
 
@@ -32,3 +32,11 @@ class CrowdtanglePartitionStrategyType(object):
             choices = ' or '.join(CROWDTANGLE_PARTITION_STRATEGIES)
 
             raise ArgumentTypeError('partition strategy should either be %s, or an number of posts.' % choices)
+
+
+class SplitterType(object):
+    def __init__(self, splitchar=','):
+        self.splitchar = splitchar
+
+    def __call__(self, string):
+        return string.split(',')

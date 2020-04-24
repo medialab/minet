@@ -32,7 +32,7 @@ def url_parse_action(namespace):
         namespace.file,
         output_file,
         add=REPORT_HEADERS,
-        keep=namespace.select.split(',') if namespace.select else None
+        keep=namespace.select
     )
 
     loading_bar = tqdm(
