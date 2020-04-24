@@ -18,7 +18,12 @@ def mediacloud_action(namespace):
 
     output_file = open_output_file(namespace.output)
 
-    from minet.cli.mediacloud.topic import mediacloud_topic_action
-    mediacloud_topic_action(namespace, output_file)
+    if namespace.mc_action == 'topic':
+        from minet.cli.mediacloud.topic import mediacloud_topic_action
+        mediacloud_topic_action(namespace, output_file)
+
+    elif namespace.mc_action == 'search':
+        from minet.cli.mediacloud.search import mediacloud_search_action
+        mediacloud_search_action(namespace, output_file)
 
     output_file.close()

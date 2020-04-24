@@ -803,6 +803,18 @@ MINET_COMMANDS = {
                 }
             ],
             'commands': {
+                'search': {
+                    'title': 'Minet Mediacloud Search Command',
+                    'description': '''
+                        Search stories on the Mediacloud platform.
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'query',
+                            'help': 'Search query.'
+                        }
+                    ]
+                },
                 'topic': {
                     'title': 'Minet Mediacloud Topic Command',
                     'description': '''
