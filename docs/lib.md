@@ -2,10 +2,19 @@
 
 ## Summary
 
-*Generic Utilities*
+*Generic utilities*
 
 * [multithreaded_fetch](#multithreaded_fetch)
 * [multithreaded_resolve](#multithreaded_resolve)
+
+*Platform-related commands*
+
+* [CrowdTangleClient](#crowdtangleclient)
+  * [#.leaderboard](#leaderboard)
+  * [#.lists](#lists)
+  * [#.posts](#posts)
+  * [#.search](#search)
+  * [#.summary](#summary)
 
 ## multithreaded_fetch
 
@@ -118,3 +127,51 @@ A `ResolveWorkerResult` having the following attributes:
 * **error** *?Exception*: an error.
 * **stack** *?list*: the redirection stack.
 
+## CrowdTangleClient
+
+Client that can be used to access [CrowdTangle](https://www.crowdtangle.com/)'s APIs while ensuring you respect rate limits.
+
+```python
+from minet.crowdtangle import CrowdTangleClient
+
+client = CrowdTangleClient(token='MYTOKEN')
+
+# If you want to use a custom rate limit:
+client = CrowdTangleClient(token='MYTOKEN', rate_limit=50)
+```
+
+*Arguments*
+
+* **token** *str*: CrowdTangle dashboard API token.
+* **rate_limit** *?int* [`6`]: number of allowed hits per minute.
+
+### #.leaderboard
+
+### #.lists
+
+### #.posts
+
+### #.search
+
+### #.summary
+
+Method that can be used to compile stats about the given link and optionally return the top 100 posts having shared the link.
+
+```python
+stats = client.summary('https://www.lemonde.fr', start_date='2019-01-01')
+
+# If you want top posts
+stats, posts = client.summary(
+  'https://www.lemonde.fr',
+  start_date='2019-01-01',
+  with_top_posts=True
+)
+```
+
+*Arguments*
+
+* **link** *str*: url to query.
+* **start_date** *str*: start date for the agregation.
+* **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
+* **sort_by** *?str* [`date`]: how to sort posts. Can be `date`, `subscriber_count` or `total_interactions`.
+* **with_top_posts** *?bool*: whether to also return top 100 posts.
