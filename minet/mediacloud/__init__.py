@@ -1,8 +1,5 @@
 # =============================================================================
-# Minet Mediacloud Constants
+# Minet Mediacloud Endpoint
 # =============================================================================
 #
-# Bunch of mediacloud-related constants.
-#
-
-MEDIACLOUD_API_BASE_URL = 'https://api.mediacloud.org/api/v2'
+from minet.mediacloud.client import MediacloudClient
