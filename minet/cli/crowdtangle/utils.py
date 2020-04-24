@@ -16,7 +16,7 @@ from minet.crowdtangle.exceptions import (
 )
 
 
-def make_paginated_action(method_name, item_name, csv_headers):
+def make_paginated_action(method_name, item_name, csv_headers, get_args=None):
 
     def action(namespace, output_file):
 
@@ -73,8 +73,14 @@ def make_paginated_action(method_name, item_name, csv_headers):
 
         client = CrowdTangleClient(namespace.token, rate_limit=namespace.rate_limit)
 
+        args = []
+
+        if callable(get_args):
+            args = get_args(namespace)
+
         create_iterator = getattr(client, method_name)
         iterator = create_iterator(
+            *args,
             partition_strategy=getattr(namespace, 'partition_strategy', None),
             limit=namespace.limit,
             format='csv_row' if namespace.format == 'csv' else 'raw',
