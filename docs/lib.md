@@ -17,11 +17,11 @@ Note that if you are interested in the url cleaning, extraction and join methods
   * [#.leaderboard](#leaderboard)
   * [#.lists](#lists)
   * [#.posts](#posts)
-  * [#.search](#search)
+  * [#.search](#ct-search)
   * [#.summary](#summary)
 * [MediacloudClient](#mediacloudclient)
   * [#.count](#count)
-  * [#.search](#search)
+  * [#.search](#mc-search)
   * [#.topic_stories](#topic_stories)
 
 ## scrape
@@ -261,7 +261,7 @@ for post in client.posts():
 * **partition_strategy** *?str|int*: query partition strategy to use to mitigate the APIs issues regarding pagination. Can be either `day` or a number of results before rolling the query. `500` seems to be a good compromise.
 * **per_call** *?bool* [`False`]: whether to yield once per API call or once per retrieved item.
 
-### #.search
+<h3 id="ct-search">#.search</h3>
 
 Method searching for posts based on a given query.
 
@@ -326,7 +326,7 @@ client = MediacloudClient(token='MYAPIKEY')
 
 Method returning the number of stories matching a given query. Check out [#.search](#search) docs to read about its arguments etc.
 
-### #.search
+<h3 id="mc-search">#.search</h3>
 
 Method yielding all stories matching a given query.
 

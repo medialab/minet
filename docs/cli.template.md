@@ -23,7 +23,7 @@
   * [leaderboard](#leaderboard)
   * [lists](#lists)
   * [posts](#posts)
-  * [search](#search)
+  * [search](#ct-search)
   * [summary](#summary)
 * [facebook (fb)](#facebook)
   * [comments](#comments)
@@ -31,7 +31,7 @@
 * [hyphe](#hyphe)
   * [dump](#dump)
 * [mediacloud (mc)](#mediacloud)
-  * [search](#search)
+  * [search](#mc-search)
   * [topic](#topic)
     * [stories](#stories)
 * [youtube (yt)](#youtube)
@@ -116,7 +116,7 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% ct/posts %>
 
-### search
+<h3 id="ct-search">search</h3>
 
 <% ct/search %>
 
@@ -144,7 +144,7 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 ## Mediacloud
 
-### search
+<h3 id="mc-search">search</h3>
 
 <% mc/search %>
 
