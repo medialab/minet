@@ -522,7 +522,7 @@ examples:
 ```
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [--posts POSTS] [-s SELECT]
-                                 [--sort-by {date,subscriber_count,total_interactions}]
+                                 [--sort-by {subscriber_count,total_interactions,date}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -543,7 +543,7 @@ optional arguments:
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {date,subscriber_count,total_interactions}
+  --sort-by {subscriber_count,total_interactions,date}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
@@ -653,7 +653,8 @@ examples:
 ### search
 
 ```
-usage: minet mediacloud search [-h] [-t TOKEN] [-o OUTPUT] query
+usage: minet mediacloud search [-h] [-t TOKEN] [-o OUTPUT] [-c COLLECTIONS]
+                               query
 
 Minet Mediacloud Search Command
 ===============================
@@ -661,12 +662,13 @@ Minet Mediacloud Search Command
 Search stories on the Mediacloud platform.
 
 positional arguments:
-  query                       Search query.
+  query                                      Search query.
 
 optional arguments:
-  -h, --help                  show this help message and exit
-  -t TOKEN, --token TOKEN     Mediacloud API token (also called key).
-  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  -h, --help                                 show this help message and exit
+  -t TOKEN, --token TOKEN                    Mediacloud API token (also called key).
+  -o OUTPUT, --output OUTPUT                 Path to the output report file. By default, the report will be printed to stdout.
+  -c COLLECTIONS, --collections COLLECTIONS  List of searched collections separated by commas.
 
 ```
 

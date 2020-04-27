@@ -18,6 +18,8 @@
   * [#.search](#search)
   * [#.summary](#summary)
 * [MediacloudClient](#mediacloudclient)
+  * [#.count](#count)
+  * [#.search](#search)
   * [#.topic_stories](#topic_stories)
 
 ## scrape
@@ -317,6 +319,25 @@ from minet.mediacloud import MediacloudClient
 
 client = MediacloudClient(token='MYAPIKEY')
 ```
+
+### #.count
+
+Method returning the number of stories matching a given query. Check out [#.search](#search) docs to read about its arguments etc.
+
+### #.search
+
+Method yielding all stories matching a given query.
+
+```python
+for story in client.search('andropov'):
+  print(story)
+```
+
+*Arguments*
+
+* **query** *str*: SOLR search query. To see how to query efficiently, check out those [docs](https://mediacloud.org/support/query-guide/) for more information.
+* **collections** *?list<int|str>*: a list of collections where stories should be searched.
+* **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
 
 ### #.topic_stories
 
