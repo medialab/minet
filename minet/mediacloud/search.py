@@ -15,13 +15,25 @@ from minet.mediacloud.formatters import format_story
 from minet.mediacloud.utils import get_last_processed_stories_id
 
 
-def url_forge(token, query, count=False, last_processed_stories_id=None):
+def query_additions(query, collections=None):
+    if collections is not None:
+        query += ' AND ('
+        query += ' OR '.join('tags_id_media:%s' % str(collection) for collection in collections)
+        query += ')'
+
+    return query
+
+
+def url_forge(token, query, collections=None, count=False,
+              last_processed_stories_id=None):
 
     url = '%s/stories_public/%s?key=%s' % (
         MEDIACLOUD_API_BASE_URL,
         'count' if count else 'list',
         token
     )
+
+    query = query_additions(query, collections=collections)
 
     url += '&q=%s' % quote_plus(query)
 
@@ -34,7 +46,7 @@ def url_forge(token, query, count=False, last_processed_stories_id=None):
     return url
 
 
-def mediacloud_search(http, token, query, count=False, format='csv_dict_row'):
+def mediacloud_search(http, token, query, count=False, collections=None, format='csv_dict_row'):
 
     def generator():
         last_processed_stories_id = None
@@ -43,6 +55,7 @@ def mediacloud_search(http, token, query, count=False, format='csv_dict_row'):
             url = url_forge(
                 token,
                 query,
+                collections=collections,
                 count=count,
                 last_processed_stories_id=last_processed_stories_id
             )

@@ -812,6 +812,11 @@ MINET_COMMANDS = {
                         {
                             'name': 'query',
                             'help': 'Search query.'
+                        },
+                        {
+                            'flags': ['-c', '--collections'],
+                            'help': 'List of searched collections separated by commas.',
+                            'type': SplitterType()
                         }
                     ]
                 },

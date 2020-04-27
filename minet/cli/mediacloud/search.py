@@ -17,7 +17,14 @@ def mediacloud_search_action(namespace, output_file):
 
     client = MediacloudClient(namespace.token)
 
-    count = client.count(namespace.query)
+    kwargs = {
+        'collections': namespace.collections
+    }
+
+    count = client.count(
+        namespace.query,
+        **kwargs
+    )
 
     loading_bar = tqdm(
         desc='Searching stories',
@@ -28,7 +35,8 @@ def mediacloud_search_action(namespace, output_file):
 
     iterator = client.search(
         namespace.query,
-        format='csv_row'
+        format='csv_row',
+        **kwargs
     )
 
     for story in iterator:
