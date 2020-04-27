@@ -2,6 +2,8 @@
 
 ## Summary
 
+Note that if you are interested in the url cleaning, extraction and join methods exposed by minet's CLI, all of the used functions can be found in the [ural](https://github.com/medialab/ural) package instead.
+
 *Generic utilities*
 
 * [scrape](#scrape)
