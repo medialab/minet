@@ -10,13 +10,14 @@ from tqdm import tqdm
 from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
 from minet.cli.utils import CSVEnricher, die
 from minet.utils import create_pool, request_json
+from youtube_transcript_api import YouTubeTranscriptApi
 from ural.youtube import (
     extract_video_id_from_youtube_url,
     is_youtube_video_id,
     is_youtube_url
 )
 
-URL_TEMPLATE = 'https://www.googleapis.com/youtube/v3/videos?id=%(list_id)s&key=%(key)s&part=snippet,statistics'
+URL_TEMPLATE = 'https://www.googleapis.com/youtube/v3/videos?id=%(list_id)s&key=%(key)s&part=snippet,statistics,contentDetails'
 
 REPORT_HEADERS = [
     'video_id',
@@ -30,7 +31,10 @@ REPORT_HEADERS = [
     'dislike_count',
     'favorite_count',
     'comment_count',
-    'no_stat_likes'
+    'no_stat_likes',
+    'duration',
+    'caption',
+    'text_caption'
 ]
 
 
@@ -40,9 +44,14 @@ def get_data(data_json):
     for element in data_json['items']:
 
         no_stat_likes = ''
+        text_caption = ''
         video_id = element['id']
         snippet = element['snippet']
         stat = element['statistics']
+        content_details = element['contentDetails']
+
+        duration = content_details['duration']
+        caption = content_details['caption']
 
         published_at = snippet['publishedAt']
         channel_id = snippet['channelId']
@@ -59,6 +68,14 @@ def get_data(data_json):
         if not like_count:
             no_stat_likes = '1'
 
+        if caption == 'true':
+            try:
+                caption_data = YouTubeTranscriptApi.get_transcript(video_id, languages=['fr', 'en'])
+                for element in caption_data:
+                    text_caption += element['text']
+            except:
+                continue
+
         data = [
             video_id,
             published_at,
@@ -70,7 +87,10 @@ def get_data(data_json):
             dislike_count,
             favorite_count,
             comment_count,
-            no_stat_likes
+            no_stat_likes,
+            duration,
+            caption,
+            text_caption
         ]
 
         data_indexed[video_id] = data
