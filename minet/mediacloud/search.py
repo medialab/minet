@@ -36,16 +36,6 @@ def url_forge(token, query, count=False, last_processed_stories_id=None):
 
 def mediacloud_search(http, token, query, count=False, format='csv_dict_row'):
 
-    if count:
-        url = url_forge(token, query, count=True)
-
-        err, _, data = request_json(http, url)
-
-        if err:
-            raise err
-
-        return data['count']
-
     def generator():
         last_processed_stories_id = None
 
@@ -53,6 +43,7 @@ def mediacloud_search(http, token, query, count=False, format='csv_dict_row'):
             url = url_forge(
                 token,
                 query,
+                count=count,
                 last_processed_stories_id=last_processed_stories_id
             )
 
@@ -60,6 +51,10 @@ def mediacloud_search(http, token, query, count=False, format='csv_dict_row'):
 
             if err:
                 raise err
+
+            if count:
+                yield data['count']
+                return
 
             for story in data:
                 if format == 'csv_dict_row':
@@ -73,5 +68,8 @@ def mediacloud_search(http, token, query, count=False, format='csv_dict_row'):
 
             if last_processed_stories_id is None:
                 return
+
+    if count:
+        return next(generator())
 
     return generator()
