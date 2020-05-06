@@ -30,12 +30,13 @@ def mediacloud_search_action(namespace, output_file):
     )
 
     try:
-        count = client.count(
-            namespace.query,
-            **kwargs
-        )
+        if not namespace.skip_count:
+            count = client.count(
+                namespace.query,
+                **kwargs
+            )
 
-        loading_bar.total = count
+            loading_bar.total = count
 
         iterator = client.search(
             namespace.query,

@@ -817,6 +817,11 @@ MINET_COMMANDS = {
                             'flags': ['-c', '--collections'],
                             'help': 'List of searched collections separated by commas.',
                             'type': SplitterType()
+                        },
+                        {
+                            'flag': '--skip-count',
+                            'help': 'Whether to skip the first API call counting the number of posts for the progress bar.',
+                            'action': 'store_true'
                         }
                     ]
                 },
