@@ -69,7 +69,7 @@ def mediacloud_search(http, token, query, count=False, collections=None, format=
                 raise err
 
             if response.status >= 500:
-                raise MediacloudServerError
+                raise MediacloudServerError(server_error=data.get('error'))
 
             if count:
                 yield data['count']
