@@ -218,6 +218,19 @@ MINET_COMMANDS = {
                         }
                     ]
                 },
+                'posts-by-id': {
+                    'title': 'Minet CrowdTangle Post By Id Command',
+                    'description': '''
+                        Retrieve metadata about batches of posts using Crowdtangle's API.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Retrieving information about a single post:
+                            `minet ct posts-by-id`
+                    ''',
+                    'arguments': []
+                },
                 'search': {
                     'title': 'Minet CrowdTangle Search Command',
                     'description': '''

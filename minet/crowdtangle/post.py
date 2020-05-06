@@ -1,8 +1,8 @@
 # =============================================================================
-# Minet CrowdTangle Lists
+# Minet CrowdTangle Post
 # =============================================================================
 #
-# Function used to retrieved lists from a given dashboard.
+# Function used to retrieve information per post by id.
 #
 from minet.crowdtangle.exceptions import (
     CrowdTangleMissingTokenError,
@@ -14,22 +14,22 @@ from minet.crowdtangle.constants import (
     CROWDTANGLE_OUTPUT_FORMATS
 )
 from minet.crowdtangle.formatters import (
-    format_list
+    format_post
 )
 
-URL_TEMPLATE = 'https://api.crowdtangle.com/lists?token=%s'
+URL_TEMPLATE = 'https://api.crowdtangle.com/post/%s?token=%s'
 
 
-def crowdtangle_lists(http, token=None, format='csv_dict_row'):
+def crowdtangle_post(http, post_id, token=None, format='csv_dict_row'):
 
     if token is None:
         raise CrowdTangleMissingTokenError
 
     if format not in CROWDTANGLE_OUTPUT_FORMATS:
-        raise TypeError('minet.crowdtangle.lists: unkown `format`.')
+        raise TypeError('minet.crowdtangle.post: unkown `format`.')
 
     # Fetching
-    api_url = URL_TEMPLATE % token
+    api_url = URL_TEMPLATE % (post_id, token)
 
     err, response, data = request_json(http, api_url)
 
@@ -42,11 +42,11 @@ def crowdtangle_lists(http, token=None, format='csv_dict_row'):
     if response.status >= 400:
         raise CrowdTangleInvalidRequestError(api_url)
 
-    lists = nested_get(['result', 'lists'], data)
+    post = nested_get(['result', 0], data)
 
     if format == 'csv_dict_row':
-        return [format_list(l, as_dict=True) for l in lists]
+        return format_post(post, as_dict=True)
     elif format == 'csv_row':
-        return [format_list(l) for l in lists]
+        return format_post(post)
 
-    return lists
+    return post

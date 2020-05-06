@@ -22,6 +22,7 @@
 * [crowdtangle (ct)](#crowdtangle)
   * [leaderboard](#leaderboard)
   * [lists](#lists)
+  * [posts-by-id](#posts-by-id)
   * [posts](#posts)
   * [search](#ct-search)
   * [summary](#summary)
@@ -352,7 +353,8 @@ examples:
 
 ```
 usage: minet crowdtangle [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT] [-t TOKEN]
-                         {leaderboard,lists,posts,search,summary} ...
+                         {leaderboard,lists,posts,posts-by-id,search,summary}
+                         ...
 
 Minet Crowdtangle Command
 =========================
@@ -360,13 +362,14 @@ Minet Crowdtangle Command
 Gather data from the CrowdTangle APIs easily and efficiently.
 
 optional arguments:
-  -h, --help                                show this help message and exit
-  --rate-limit RATE_LIMIT                   Authorized number of hits by minutes. Defaults to 6.
-  -o OUTPUT, --output OUTPUT                Path to the output file. By default, everything will be printed to stdout.
-  -t TOKEN, --token TOKEN                   CrowdTangle dashboard API token.
+  -h, --help                                      show this help message and exit
+  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6.
+  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
+  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
 
 actions:
-  {leaderboard,lists,posts,search,summary}  Action to perform using the CrowdTangle API.
+  {leaderboard,lists,posts,posts-by-id,search,summary}
+                                                  Action to perform using the CrowdTangle API.
 
 ```
 
@@ -423,6 +426,30 @@ examples:
 
 . Fetching a dashboard's lists:
     `minet ct lists --token YOUR_TOKEN > lists.csv`
+
+```
+
+### posts-by-id
+
+```
+usage: minet crowdtangle posts-by-id [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
+                                     [-t TOKEN]
+
+Minet CrowdTangle Post By Id Command
+====================================
+
+Retrieve metadata about batches of posts using Crowdtangle's API.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, everything will be printed to stdout.
+  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token.
+
+examples:
+
+. Retrieving information about a single post:
+    `minet ct posts-by-id`
 
 ```
 
@@ -522,7 +549,7 @@ examples:
 ```
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [--posts POSTS] [-s SELECT]
-                                 [--sort-by {date,total_interactions,subscriber_count}]
+                                 [--sort-by {date,subscriber_count,total_interactions}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -543,7 +570,7 @@ optional arguments:
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {date,total_interactions,subscriber_count}
+  --sort-by {date,subscriber_count,total_interactions}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.

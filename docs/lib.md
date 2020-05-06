@@ -16,6 +16,7 @@ Note that if you are interested in the url cleaning, extraction and join methods
 * [CrowdTangleClient](#crowdtangleclient)
   * [#.leaderboard](#leaderboard)
   * [#.lists](#lists)
+  * [#.post](#crowdtangle-post)
   * [#.posts](#posts)
   * [#.search](#ct-search)
   * [#.summary](#summary)
@@ -238,6 +239,19 @@ lists = client.lists()
 
 *Arguments*
 
+* **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
+
+<h3 id="crowdtangle-post">#.post</h3>
+
+Method returning a post's metadata by id.
+
+```python
+post = client.post()
+```
+
+*Arguments*
+
+* **post_id** *int|str*: id of post to get.
 * **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
 
 ### #.posts

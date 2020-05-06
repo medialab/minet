@@ -22,6 +22,7 @@
 * [crowdtangle (ct)](#crowdtangle)
   * [leaderboard](#leaderboard)
   * [lists](#lists)
+  * [posts-by-id](#posts-by-id)
   * [posts](#posts)
   * [search](#ct-search)
   * [summary](#summary)
@@ -111,6 +112,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### lists
 
 <% ct/lists %>
+
+### posts-by-id
+
+<% ct/posts-by-id %>
 
 ### posts
 

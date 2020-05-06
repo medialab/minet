@@ -17,6 +17,7 @@ from minet.crowdtangle.constants import (
 )
 from minet.crowdtangle.leaderboard import crowdtangle_leaderboard
 from minet.crowdtangle.lists import crowdtangle_lists
+from minet.crowdtangle.post import crowdtangle_post
 from minet.crowdtangle.posts import crowdtangle_posts
 from minet.crowdtangle.search import crowdtangle_search
 from minet.crowdtangle.summary import crowdtangle_summary
@@ -48,6 +49,15 @@ class CrowdTangleClient(object):
     def lists(self, **kwargs):
         return crowdtangle_lists(
             self.http,
+            token=self.token,
+            **kwargs
+        )
+
+    @rate_limited_method('rate_limiter_state')
+    def post(self, post_id, **kwargs):
+        return crowdtangle_post(
+            self.http,
+            post_id,
             token=self.token,
             **kwargs
         )
