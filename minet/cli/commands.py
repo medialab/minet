@@ -226,10 +226,35 @@ MINET_COMMANDS = {
                     'epilog': '''
                         examples:
 
+                        . Retrieving information about a batch of posts:
+                            `minet ct posts-by-id post-url posts.csv --token YOUR_TOKEN > metadata.csv`
+
                         . Retrieving information about a single post:
-                            `minet ct posts-by-id`
+                            `minet ct posts-by-id 1784333048289665 --token YOUR_TOKEN`
                     ''',
-                    'arguments': []
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the posts URL or id in the CSV file.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the inquired URLs or ids.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of posts. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
                 },
                 'search': {
                     'title': 'Minet CrowdTangle Search Command',
