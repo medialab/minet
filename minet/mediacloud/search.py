@@ -11,6 +11,9 @@ from minet.mediacloud.constants import (
     MEDIACLOUD_API_BASE_URL,
     MEDIACLOUD_DEFAULT_BATCH
 )
+from minet.mediacloud.exceptions import (
+    MediacloudServerError
+)
 from minet.mediacloud.formatters import format_story
 from minet.mediacloud.utils import get_last_processed_stories_id
 
@@ -60,10 +63,13 @@ def mediacloud_search(http, token, query, count=False, collections=None, format=
                 last_processed_stories_id=last_processed_stories_id
             )
 
-            err, _, data = request_json(http, url)
+            err, response, data = request_json(http, url)
 
             if err:
                 raise err
+
+            if response.status >= 500:
+                raise MediacloudServerError
 
             if count:
                 yield data['count']
