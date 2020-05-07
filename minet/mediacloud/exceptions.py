@@ -1,5 +1,5 @@
 # =============================================================================
-# Minet Mediacloud Exceptions.
+# Minet Mediacloud Exceptions
 # =============================================================================
 #
 from minet.exceptions import MinetError

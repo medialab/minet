@@ -1,5 +1,5 @@
 # =============================================================================
-# Minet CrowdTangle Exceptions.
+# Minet CrowdTangle Exceptions
 # =============================================================================
 #
 from minet.exceptions import MinetError

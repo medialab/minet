@@ -1,5 +1,5 @@
 # =============================================================================
-# Minet Facebook Exceptions.
+# Minet Facebook Exceptions
 # =============================================================================
 #
 from minet.exceptions import MinetError

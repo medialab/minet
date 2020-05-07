@@ -6,12 +6,16 @@
 #
 from collections import OrderedDict
 
+from minet.utils import RateLimiterState
 
 FACEBOOK_URL = 'https://www.facebook.com'
 FACEBOOK_MOBILE_URL = 'https://m.facebook.com'
 
 FACEBOOK_MOBILE_DEFAULT_THROTTLE = 0.5
 FACEBOOK_WEB_DEFAULT_THROTTLE = 20.0
+
+FACEBOOK_MOBILE_RATE_LIMITER_STATE = RateLimiterState(1, FACEBOOK_MOBILE_DEFAULT_THROTTLE)
+FACEBOOK_WEB_RATE_LIMITER_STATE = RateLimiterState(1, FACEBOOK_WEB_DEFAULT_THROTTLE)
 
 FACEBOOK_COMMENT_CSV_HEADERS = [
     'post_id',
