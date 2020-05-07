@@ -1,14 +1,15 @@
 # =============================================================================
-# Minet Facebook CLI Action Utils
+# Minet Facebook Utils
 # =============================================================================
 #
-# Miscellaneous helpers used by `minet fb`.
+# Miscellaneous helpers used by the minet.facebook namespace.
 #
 from http.cookies import SimpleCookie
 
 from minet.utils import grab_cookies
 from minet.cli.utils import die
-from minet.facebook.constants import FACEBOOK_URL
+
+FACEBOOK_URL = 'https://www.facebook.com/'
 
 
 def fix_cookie(cookie_string):
