@@ -631,6 +631,15 @@ def request_json(http, url, *args, **kwargs):
         return e, response, None
 
 
+def request_text(http, url, *args, encoding='utf-8', **kwargs):
+    err, response = request(http, url, *args, **kwargs)
+
+    if err:
+        return err, response, None
+
+    return None, response, response.data.decode(encoding)
+
+
 class RateLimiter(object):
     """
     Naive rate limiter context manager with smooth output.
