@@ -97,7 +97,7 @@ def format_summary(stats, as_dict=False):
     row = [stats['%sCount' % t] for t in CROWDTANGLE_REACTION_TYPES]
 
     if as_dict:
-        return row_to_ordered_dict(CROWDTANGLE_SUMMARY_CSV_HEADERS)
+        return row_to_ordered_dict(CROWDTANGLE_SUMMARY_CSV_HEADERS, row)
 
     return row
 
