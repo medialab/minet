@@ -42,7 +42,10 @@ def crowdtangle_post(http, post_id, token=None, format='csv_dict_row'):
     if response.status >= 400:
         raise CrowdTangleInvalidRequestError(api_url)
 
-    post = nested_get(['result', 0], data)
+    post = nested_get(['result', 'posts', 0], data)
+
+    if post is None:
+        return
 
     if format == 'csv_dict_row':
         return format_post(post, as_dict=True)

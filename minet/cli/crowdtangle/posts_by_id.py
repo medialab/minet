@@ -35,22 +35,17 @@ def crowdtangle_posts_by_id_action(namespace, output_file):
 
     try:
         for row, url in enricher.cells(namespace.column, with_rows=True):
-            loading_bar.update()
-
             url = ensure_protocol(url)
 
             post_id = facebook.post_id_from_url(url)
-            print(post_id)
-            die('Stopping for now!')
 
             if post_id is None:
                 enricher.writerow(row)
-                continue
+            else:
+                post = client.post(post_id, format='csv_row')
+                enricher.writerow(row, post)
 
-            post = client.post(post_id, format='csv_row')
-
-            print(post)
-            break
+            loading_bar.update()
 
     except CrowdTangleInvalidTokenError:
         die([
