@@ -400,7 +400,7 @@ MINET_COMMANDS = {
         'package': 'minet.cli.youtube',
         'action': 'youtube_action',
         'aliases': ['yt'],
-        'title': 'Minet Youtube parser command',
+        'title': 'Minet Youtube command',
         'description': '''
             Gather data from Youtube.
         ''',
@@ -975,6 +975,18 @@ MINET_COMMANDS = {
                 'type': int
             }
         ]
+    },
+
+    # Twitter action subparser
+    # -------------------------------------------------------------------------
+    'twitter': {
+        'package': 'minet.cli.twitter',
+        'action': 'twitter_action',
+        'aliases': ['tw'],
+        'title': 'Minet Twitter Command',
+        'description': '''
+            Gather data from Twitter.
+        '''
     },
 
     # Url Extract action subparser
