@@ -39,6 +39,7 @@ setup(name='minet',
         'pyyaml',
         'quenouille>=0.6.0',
         'tqdm>=4.31.1',
+        'twitter>=1.18.0',
         'ural>=0.22.1',
         'urllib3[secure]>=1.25.3'
       ],
