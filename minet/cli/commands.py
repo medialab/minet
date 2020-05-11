@@ -250,6 +250,11 @@ MINET_COMMANDS = {
                             'type': SplitterType()
                         },
                         {
+                            'flag': '--resume',
+                            'help': 'Whether to resume an aborted collection.',
+                            'action': 'store_true'
+                        },
+                        {
                             'flag': '--total',
                             'help': 'Total number of posts. Necessary if you want to display a finite progress indicator.',
                             'type': int
