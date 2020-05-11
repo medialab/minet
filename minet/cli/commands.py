@@ -986,7 +986,81 @@ MINET_COMMANDS = {
         'title': 'Minet Twitter Command',
         'description': '''
             Gather data from Twitter.
-        '''
+        ''',
+        'subparsers': {
+            'help': 'Action to perform using the Twitter API.',
+            'title': 'actions',
+            'dest': 'tw_action',
+            'common_arguments': [
+                {
+                    'flag': '--api-key',
+                    'help': 'Twitter API key.'
+                },
+                {
+                    'flag': '--api-secret-key',
+                    'help': 'Twitter API secret key.'
+                },
+                {
+                    'flag': '--access-token',
+                    'help': 'Twitter API access token.'
+                },
+                {
+                    'flag': '--access-token-secret',
+                    'help': 'Twitter API access token secret.'
+                }
+            ],
+            'commands': {
+                'friends': {
+                    'title': 'Minet Twitter Friends Command',
+                    'description': '''
+                        Retrieve friends, i.e. followed users, of given user.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Getting friends of a list of user:
+                            `minet tw friends screen_name users.csv > friends.csv`
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the Twitter account screen names.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the inquired Twitter users.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flag': '--id',
+                            'help': 'Whether to use Twitter user ids rather than screen names.',
+                            'action': 'store_true'
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'help': 'Path to the output file. By default, the result will be printed to stdout.'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--resume',
+                            'help': 'Whether to resume an aborted collection.',
+                            'action': 'store_true'
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of accounts. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
+                }
+            }
+        }
     },
 
     # Url Extract action subparser
