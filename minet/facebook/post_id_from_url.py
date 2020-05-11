@@ -26,7 +26,7 @@ def post_id_from_url(post_url):
 
     soup = BeautifulSoup(html, 'lxml')
 
-    root_element = soup.select_one('#u_0_0')
+    root_element = soup.select_one('#m_story_permalink_view [data-ft]')
 
     if root_element is None:
         return
