@@ -39,4 +39,4 @@ class SplitterType(object):
         self.splitchar = splitchar
 
     def __call__(self, string):
-        return string.split(',')
+        return string.split(self.splitchar)
