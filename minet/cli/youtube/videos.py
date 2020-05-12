@@ -9,8 +9,7 @@ import time
 from tqdm import tqdm
 from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
 from minet.cli.utils import CSVEnricher, die
-from minet.utils import create_pool, request_json
-from youtube_transcript_api import YouTubeTranscriptApi
+from minet.utils import create_pool, request_json, request
 from ural.youtube import (
     extract_video_id_from_youtube_url,
     is_youtube_video_id,
@@ -50,14 +49,14 @@ def get_data(data_json):
         stat = element['statistics']
         content_details = element['contentDetails']
 
-        duration = content_details['duration']
-        caption = content_details['caption']
-
         published_at = snippet['publishedAt']
         channel_id = snippet['channelId']
         channel_title = snippet['channelTitle']
         title = snippet['title']
         description = snippet['description']
+
+        duration = content_details['duration']
+        caption = content_details['caption']
 
         view_count = stat.get('viewCount', None)
         like_count = stat.get('likeCount', None)
@@ -67,14 +66,6 @@ def get_data(data_json):
 
         if not like_count:
             no_stat_likes = '1'
-
-        if caption == 'true':
-            try:
-                caption_data = YouTubeTranscriptApi.get_transcript(video_id, languages=['fr', 'en'])
-                for element in caption_data:
-                    text_caption += element['text']
-            except:
-                continue
 
         data = [
             video_id,
