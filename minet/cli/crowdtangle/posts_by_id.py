@@ -7,7 +7,7 @@
 import casanova
 from tqdm import tqdm
 from ural import ensure_protocol
-from ural.facebook import is_facebook_url
+from ural.facebook import is_facebook_post_url
 
 import minet.facebook as facebook
 from minet.cli.utils import die, LoadingBarContext
@@ -58,7 +58,7 @@ def crowdtangle_posts_by_id_action(namespace, output_file):
 
                 url = ensure_protocol(url)
 
-                if not is_facebook_url(url):
+                if not is_facebook_post_url(url):
                     enricher.writerow(row)
                     continue
 
