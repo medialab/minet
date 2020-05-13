@@ -25,7 +25,7 @@ setup(name='minet',
       install_requires=[
         'beautifulsoup4>=4.7.1',
         'browser-cookie3==0.7.6',
-        'casanova==0.5.0',
+        'casanova==0.7.0',
         'cchardet==2.1.4',
         'cython>=0.29.4',
         'dateparser>=0.7.1',
@@ -40,7 +40,7 @@ setup(name='minet',
         'quenouille>=0.6.0',
         'tqdm>=4.31.1',
         'twitter>=1.18.0',
-        'ural>=0.22.1',
+        'ural>=0.24.0',
         'urllib3[secure]>=1.25.3'
       ],
       entry_points={
