@@ -4,11 +4,11 @@ from minet.facebook import post_id_from_url
 CT_URL = 'https://api.crowdtangle.com/post/%s?token=%s'
 
 URLS = [
-    # 'https://www.facebook.com/groups/277506326438568/permalink/319815378874329',
-    # 'https://www.facebook.com/permalink.php?story_fbid=1354978971282622&id=598338556946671',
-    # 'https://www.facebook.com/permalink.php?story_fbid=1611111632462822&id=100006920017953',
-    # 'https://www.facebook.com/Sante.Nutrition.org/posts/1454663224647529',
-    # 'https://www.facebook.com/bvoltaire.fr/posts/1381087101956645',
+    'https://www.facebook.com/groups/277506326438568/permalink/319815378874329',
+    'https://www.facebook.com/permalink.php?story_fbid=1354978971282622&id=598338556946671',
+    'https://www.facebook.com/permalink.php?story_fbid=1611111632462822&id=100006920017953',
+    'https://www.facebook.com/Sante.Nutrition.org/posts/1454663224647529',
+    'https://www.facebook.com/bvoltaire.fr/posts/1381087101956645',
     'https://www.facebook.com/meilleurdesmondesoff/posts/1954103778253459',
     'https://www.facebook.com/meilleurdesmondesoff/posts/1806885356308636',
     'https://www.facebook.com/meilleurdesmondesoff/posts/1810737099256795',
