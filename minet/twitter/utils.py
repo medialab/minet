@@ -5,19 +5,20 @@
 # Miscellaneous utility functions to be used in the twitter packages.
 #
 
-
-import sys, json
+import json
 from time import time, sleep
 from datetime import datetime
-from twitter import Twitter, OAuth, OAuth2, TwitterHTTPError
+from twitter import (Twitter, OAuth, OAuth2, TwitterHTTPError)
+from minet.cli.utils import print_err
+
 
 class TwitterWrapper(object):
 
     MAX_TRYOUTS = 5
 
     def __init__(self, api_keys):
-        self.oauth = OAuth(api_keys['OAUTH_TOKEN'], api_keys['OAUTH_SECRET'], api_keys['KEY'], api_keys['SECRET'])
-        self.oauth2 = OAuth2(bearer_token=json.loads(Twitter(api_version=None, format="", secure=True, auth=OAuth2(api_keys['KEY'], api_keys['SECRET'])).oauth2.token(grant_type="client_credentials"))['access_token'])
+        self.oauth = OAuth(api_keys['oath_token'], api_keys['oath_token_secret'], api_keys['api_key'], api_keys['api_secret_key'])
+        self.oauth2 = OAuth2(bearer_token=json.loads(Twitter(api_version=None, format="", secure=True, auth=OAuth2(api_keys['api_key'], api_keys['api_secret_key'])).oauth2.token(grant_type="client_credentials"))['access_token'])
         self.api = {
             'user': Twitter(auth=self.oauth),
             'app': Twitter(auth=self.oauth2)
@@ -38,16 +39,16 @@ class TwitterWrapper(object):
                 if route not in self.waits:
                     self.waits[route] = {"user": now, "app": now}
                 self.waits[route][auth] = reset
-                print("REACHED API LIMITS on %s %s until %s for auth %s" % (route, args, reset, auth), file=sys.stderr)
+                print_err("REACHED API LIMITS on %s %s until %s for auth %s" % (route, args, reset, auth))
                 minwait = sorted([(a, w) for a, w in self.waits[route].items()], key=lambda x: x[1])[0]
                 if minwait[1] > now:
                     sleeptime = 5 + max(0, int(minwait[1] - now))
-                    print("  will wait for %s for the next %ss (%s)" % (minwait[0], sleeptime, datetime.fromtimestamp(now + sleeptime).isoformat()[11:19]), file=sys.stderr)
+                    print_err("  will wait for %s for the next %ss (%s)" % (minwait[0], sleeptime, datetime.fromtimestamp(now + sleeptime).isoformat()[11:19]))
                     sleep(sleeptime)
                 self.auth[route] = minwait[0]
                 return self.call(route, args, tryouts)
             elif tryouts:
-                return self.call(route, args, tryouts-1)
+                return self.call(route, args, tryouts - 1)
             else:
-                print("ERROR after %s tryouts for %s %s %s" % (self.MAX_TRYOUTS, route, auth, args), file=sys.stderr)
-                print(sys.stderr, "%s: %s" % (type(e), e), file=sys.stderr)
+                print_err("ERROR after %s tryouts for %s %s %s" % (self.MAX_TRYOUTS, route, auth, args))
+                print_err("%s: %s" % (type(e), e))
