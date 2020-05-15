@@ -35,7 +35,7 @@ def twitter_friends_action(namespace, output_file):
 
         result = wrapper.call('friends.ids', args={'user_id': user_id})
 
-        if result:
+        if result is not None:
             all_ids = result.get('ids', None)
-            for id in all_ids:
-                enricher.writerow(row, [id])
+            for friend_id in all_ids:
+                enricher.writerow(row, [friend_id])
