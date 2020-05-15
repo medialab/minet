@@ -39,7 +39,6 @@ def twitter_friends_action(namespace, output_file):
     )
 
     for row, user_id in enricher.cells(namespace.column, with_rows=True):
-
         all_ids = []
 
         result = wrapper.call('friends.ids', args={'user_id': user_id})
