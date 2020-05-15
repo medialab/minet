@@ -15,8 +15,8 @@ REPORT_HEADERS = [
 def twitter_friends_action(namespace, output_file):
 
     TWITTER = {
-        'oath_token': namespace.access_token,
-        'oath_token_secret': namespace.access_token_secret,
+        'access_token': namespace.access_token,
+        'access_token_secret': namespace.access_token_secret,
         'api_key': namespace.api_key,
         'api_secret_key': namespace.api_secret_key
     }
@@ -34,7 +34,8 @@ def twitter_friends_action(namespace, output_file):
         all_ids = []
 
         result = wrapper.call('friends.ids', args={'user_id': user_id})
-        all_ids = result.get('ids', None)
 
-        for id in all_ids:
-            enricher.writerow(row, [id])
+        if result:
+            all_ids = result.get('ids', None)
+            for id in all_ids:
+                enricher.writerow(row, [id])
