@@ -6,6 +6,7 @@
 #
 import casanova
 from minet.twitter.utils import TwitterWrapper
+from tqdm import tqdm
 
 REPORT_HEADERS = [
     'friends_id'
@@ -30,6 +31,13 @@ def twitter_friends_action(namespace, output_file):
         add=REPORT_HEADERS
     )
 
+    loading_bar = tqdm(
+        desc='Retrieving ids',
+        dynamic_ncols=True,
+        total=namespace.total,
+        unit=' line'
+    )
+
     for row, user_id in enricher.cells(namespace.column, with_rows=True):
         all_ids = []
 
@@ -39,3 +47,7 @@ def twitter_friends_action(namespace, output_file):
             all_ids = result.get('ids', None)
             for friend_id in all_ids:
                 enricher.writerow(row, [friend_id])
+
+        loading_bar.update()
+
+    loading_bar.close()
