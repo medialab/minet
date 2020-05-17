@@ -203,7 +203,8 @@ def fetch_action(namespace):
         key=url_key,
         request_args=request_args,
         threads=namespace.threads,
-        throttle=namespace.throttle
+        throttle=namespace.throttle,
+        domain_parallelism=namespace.domain_parallelism,
     )
 
     for result in multithreaded_iterator:

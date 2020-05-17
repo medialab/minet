@@ -768,7 +768,13 @@ MINET_COMMANDS = {
                 'help': 'The http method to use. Will default to GET.',
                 'dest': 'method',
                 'default': 'GET'
-            }
+            },
+            {
+                'flag': '--domain-parallelism',
+                'help': 'Max number of urls per domain to hit at the same time. Defaults to 1',
+                'type': int,
+                'default': 1
+            },
         ]
     },
 
