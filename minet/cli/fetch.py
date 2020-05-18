@@ -204,7 +204,7 @@ def fetch_action(namespace):
         request_args=request_args,
         threads=namespace.threads,
         throttle=namespace.throttle,
-        domain_parallelism=namespace.domain_parallelism,
+        domain_parallelism=namespace.domain_parallelism
     )
 
     for result in multithreaded_iterator:
