@@ -774,7 +774,7 @@ MINET_COMMANDS = {
                 'help': 'The http method to use. Will default to GET.',
                 'dest': 'method',
                 'default': 'GET'
-            },
+            }
         ]
     },
 
