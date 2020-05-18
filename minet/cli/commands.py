@@ -706,6 +706,12 @@ MINET_COMMANDS = {
                 'default': DEFAULT_CONTENT_FOLDER
             },
             {
+                'flag': '--domain-parallelism',
+                'help': 'Max number of urls per domain to hit at the same time. Defaults to 1',
+                'type': int,
+                'default': 1
+            },
+            {
                 'flags': ['-f', '--filename'],
                 'help': 'Name of the column used to build retrieved file names. Defaults to an uuid v4 with correct extension.'
             },
