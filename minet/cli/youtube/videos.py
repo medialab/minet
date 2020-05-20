@@ -8,6 +8,7 @@
 import time
 from tqdm import tqdm
 from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
+from bs4 import BeautifulSoup
 from minet.cli.utils import CSVEnricher, die
 from minet.utils import create_pool, request_json, request
 from ural.youtube import (
@@ -17,6 +18,7 @@ from ural.youtube import (
 )
 
 URL_TEMPLATE = 'https://www.googleapis.com/youtube/v3/videos?id=%(list_id)s&key=%(key)s&part=snippet,statistics,contentDetails'
+URL_TEMP_CAPTIONS = 'https://www.youtube.com/api/timedtext?lang=fr&v=%(id)s'
 
 REPORT_HEADERS = [
     'video_id',
@@ -36,6 +38,7 @@ REPORT_HEADERS = [
     'text_caption'
 ]
 
+http = create_pool()
 
 def get_data(data_json):
     data_indexed = {}
@@ -67,6 +70,21 @@ def get_data(data_json):
         if not like_count:
             no_stat_likes = '1'
 
+        if caption == 'true':
+
+            url_caption = URL_TEMP_CAPTIONS % {'id': video_id}
+            err, result_caption = request(http, url_caption)
+
+            if err:
+                die(err)
+            elif result_caption.status == 403:
+                time.sleep(seconds_to_midnight_pacific_time())
+                continue
+            elif result_caption.status >= 400:
+                die(result_caption.status)
+
+            text_caption = get_caption(result_caption)
+
         data = [
             video_id,
             published_at,
@@ -87,6 +105,21 @@ def get_data(data_json):
         data_indexed[video_id] = data
 
     return data_indexed
+
+
+def get_caption(data_caption):
+
+    soup = BeautifulSoup(data_caption.data, 'xml')
+
+    full_text = []
+
+    for item in soup.find_all('text'):
+        text = item.get_text().replace('&#39;', '\'').replace('&quot;', '"')
+        full_text.append(text)
+
+    caption_text = " ".join(full_text)
+
+    return caption_text
 
 
 def gen_chunks(enricher):
@@ -127,8 +160,6 @@ def videos_action(namespace, output_file):
         dynamic_ncols=True,
         unit=' videos',
     )
-
-    http = create_pool()
 
     for chunk in gen_chunks(enricher):
 
