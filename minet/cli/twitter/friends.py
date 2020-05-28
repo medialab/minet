@@ -40,13 +40,30 @@ def twitter_friends_action(namespace, output_file):
 
     for row, user_id in enricher.cells(namespace.column, with_rows=True):
         all_ids = []
+        next_cursor = 0
+        result = None
 
-        result = wrapper.call('friends.ids', args={'user_id': user_id})
+        wrapper_args = {'user_id': user_id}
+        result = wrapper.call('friends.ids', wrapper_args)
 
         if result is not None:
-            all_ids = result.get('ids', None)
+            all_ids = result.get('ids', [])
+            next_cursor = result.get('next_cursor', None)
+
             for friend_id in all_ids:
                 enricher.writerow(row, [friend_id])
+
+            while next_cursor > 0:
+                wrapper_args['cursor'] = next_cursor
+                result = wrapper.call('friends.ids', wrapper_args)
+
+                if result is not None:
+                    all_ids = result.get('ids', [])
+                    next_cursor = result.get('next_cursor', None)
+
+                    for friend_id in all_ids:
+                        enricher.writerow(row, [friend_id])
+
 
         loading_bar.update()
 
