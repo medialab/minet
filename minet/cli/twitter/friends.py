@@ -51,10 +51,12 @@ def twitter_friends_action(namespace, output_file):
 
             if result is not None:
                 all_ids = result.get('ids', [])
-                next_cursor = result.get('next_cursor', None)
+                next_cursor = result.get('next_cursor', 0)
 
                 for friend_id in all_ids:
                     enricher.writerow(row, [friend_id])
+            else:
+                next_cursor = 0
 
         loading_bar.update()
 
