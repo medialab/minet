@@ -36,7 +36,7 @@
   * [topic](#topic)
     * [stories](#stories)
 * [twitter](#twitter)
-  * [frineds](#friends)
+  * [friends](#friends)
 * [youtube (yt)](#youtube)
   * [comments](#comments)
   * [url-parse](#youtube-url-parse)
