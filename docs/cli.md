@@ -39,6 +39,8 @@
   * [comments](#comments)
   * [url-parse](#youtube-url-parse)
   * [videos](#videos)
+* [twitter](#twitter)
+  * [friends](#friends)
 
 
 <h2 id="help-flag">-h/--help</h2>
@@ -793,3 +795,28 @@ optional arguments:
 
 ```
 
+## Twitter
+
+### friends
+
+```
+usage: minet twitter friends [-h] [-o OUTPUT] [--api-key] [--api-secret-key] [--access-token] [--access-token-secret] column [file]
+
+Twitter friends
+================
+
+Retrieve friends ids for a given user id or screename using the twitter API.
+
+positional arguments:
+  column                      Name of the column containing the user's id or screename.
+  file                        CSV file containing the user's ids or screename.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  --api-key                   Twitter API key
+  --api-secret-key            Twitter API secret key
+  --access-token              Twitter API access token
+  --access-token-secret       Twitter API access token secret
+
+```
