@@ -35,12 +35,12 @@
   * [search](#mc-search)
   * [topic](#topic)
     * [stories](#stories)
+* [twitter](#twitter)
+  * [frineds](#friends)
 * [youtube (yt)](#youtube)
   * [comments](#comments)
   * [url-parse](#youtube-url-parse)
   * [videos](#videos)
-* [twitter](#twitter)
-  * [friends](#friends)
 
 
 <h2 id="help-flag">-h/--help</h2>
@@ -435,23 +435,35 @@ examples:
 
 ```
 usage: minet crowdtangle posts-by-id [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
-                                     [-t TOKEN]
+                                     [-t TOKEN] [-s SELECT] [--resume]
+                                     [--total TOTAL]
+                                     column [file]
 
 Minet CrowdTangle Post By Id Command
 ====================================
 
 Retrieve metadata about batches of posts using Crowdtangle's API.
 
+positional arguments:
+  column                      Name of the column containing the posts URL or id in the CSV file.
+  file                        CSV file containing the inquired URLs or ids.
+
 optional arguments:
   -h, --help                  show this help message and exit
   --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN     CrowdTangle dashboard API token.
+  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+  --resume                    Whether to resume an aborted collection.
+  --total TOTAL               Total number of posts. Necessary if you want to display a finite progress indicator.
 
 examples:
 
+. Retrieving information about a batch of posts:
+    `minet ct posts-by-id post-url posts.csv --token YOUR_TOKEN > metadata.csv`
+
 . Retrieving information about a single post:
-    `minet ct posts-by-id`
+    `minet ct posts-by-id 1784333048289665 --token YOUR_TOKEN`
 
 ```
 
@@ -551,7 +563,7 @@ examples:
 ```
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [--posts POSTS] [-s SELECT]
-                                 [--sort-by {date,subscriber_count,total_interactions}]
+                                 [--sort-by {subscriber_count,date,total_interactions}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -572,7 +584,7 @@ optional arguments:
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {date,subscriber_count,total_interactions}
+  --sort-by {subscriber_count,date,total_interactions}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
@@ -730,6 +742,46 @@ optional arguments:
 
 ```
 
+## Twitter
+
+### friends
+
+```
+usage: minet twitter friends [-h] [--api-key API_KEY]
+                             [--api-secret-key API_SECRET_KEY]
+                             [--access-token ACCESS_TOKEN]
+                             [--access-token-secret ACCESS_TOKEN_SECRET] [--id]
+                             [-o OUTPUT] [-s SELECT] [--resume] [--total TOTAL]
+                             column [file]
+
+Minet Twitter Friends Command
+=============================
+
+Retrieve friends, i.e. followed users, of given user.
+
+positional arguments:
+  column                                     Name of the column containing the Twitter account screen names.
+  file                                       CSV file containing the inquired Twitter users.
+
+optional arguments:
+  -h, --help                                 show this help message and exit
+  --api-key API_KEY                          Twitter API key.
+  --api-secret-key API_SECRET_KEY            Twitter API secret key.
+  --access-token ACCESS_TOKEN                Twitter API access token.
+  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret.
+  --id                                       Whether to use Twitter user ids rather than screen names.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
+  -s SELECT, --select SELECT                 Columns to include in report (separated by `,`).
+  --resume                                   Whether to resume an aborted collection.
+  --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Getting friends of a list of user:
+    `minet tw friends screen_name users.csv > friends.csv`
+
+```
+
 ## Youtube
 
 ### comments
@@ -795,28 +847,3 @@ optional arguments:
 
 ```
 
-## Twitter
-
-### friends
-
-```
-usage: minet twitter friends [-h] [-o OUTPUT] [--api-key] [--api-secret-key] [--access-token] [--access-token-secret] column [file]
-
-Twitter friends
-================
-
-Retrieve friends ids for a given user id or screename using the twitter API.
-
-positional arguments:
-  column                      Name of the column containing the user's id or screename.
-  file                        CSV file containing the user's ids or screename.
-
-optional arguments:
-  -h, --help                  show this help message and exit
-  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
-  --api-key                   Twitter API key
-  --api-secret-key            Twitter API secret key
-  --access-token              Twitter API access token
-  --access-token-secret       Twitter API access token secret
-
-```

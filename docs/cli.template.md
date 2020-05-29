@@ -35,6 +35,8 @@
   * [search](#mc-search)
   * [topic](#topic)
     * [stories](#stories)
+* [twitter](#twitter)
+  * [frineds](#friends)
 * [youtube (yt)](#youtube)
   * [comments](#comments)
   * [url-parse](#youtube-url-parse)
@@ -158,6 +160,12 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 #### stories
 
 <% mc/topic/stories %>
+
+## Twitter
+
+### friends
+
+<% twitter/friends %>
 
 ## Youtube
 
