@@ -36,7 +36,7 @@
   * [topic](#topic)
     * [stories](#stories)
 * [twitter](#twitter)
-  * [frineds](#friends)
+  * [friends](#friends)
 * [youtube (yt)](#youtube)
   * [comments](#comments)
   * [url-parse](#youtube-url-parse)
@@ -563,7 +563,7 @@ examples:
 ```
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [--posts POSTS] [-s SELECT]
-                                 [--sort-by {subscriber_count,date,total_interactions}]
+                                 [--sort-by {total_interactions,date,subscriber_count}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -584,7 +584,7 @@ optional arguments:
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {subscriber_count,date,total_interactions}
+  --sort-by {total_interactions,date,subscriber_count}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
