@@ -37,6 +37,7 @@
     * [stories](#stories)
 * [twitter](#twitter)
   * [friends](#friends)
+  * [followers](#followers)
 * [youtube (yt)](#youtube)
   * [comments](#comments)
   * [url-parse](#youtube-url-parse)
@@ -779,6 +780,45 @@ examples:
 
 . Getting friends of a list of user:
     `minet tw friends screen_name users.csv > friends.csv`
+
+```
+
+### followers
+
+```
+usage: minet twitter followers [-h] [--api-key API_KEY]
+                               [--api-secret-key API_SECRET_KEY]
+                               [--access-token ACCESS_TOKEN]
+                               [--access-token-secret ACCESS_TOKEN_SECRET]
+                               [--id] [-o OUTPUT] [-s SELECT] [--resume]
+                               [--total TOTAL]
+                               column [file]
+
+Minet Twitter Followers Command
+===============================
+
+Retrieve followers of given user.
+
+positional arguments:
+  column                                     Name of the column containing the Twitter account screen names.
+  file                                       CSV file containing the inquired Twitter users.
+
+optional arguments:
+  -h, --help                                 show this help message and exit
+  --api-key API_KEY                          Twitter API key.
+  --api-secret-key API_SECRET_KEY            Twitter API secret key.
+  --access-token ACCESS_TOKEN                Twitter API access token.
+  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret.
+  --id                                       Whether to use Twitter user ids rather than screen names.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
+  -s SELECT, --select SELECT                 Columns to include in report (separated by `,`).
+  --resume                                   Whether to resume an aborted collection.
+  --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Getting followers of a list of user:
+    `minet tw friends screen_name users.csv > followers.csv`
 
 ```
 
