@@ -36,12 +36,15 @@ def make_twitter_action(method_name, csv_headers):
             unit=' line'
         )
 
-        for row, user_id in enricher.cells(namespace.column, with_rows=True):
+        for row, user in enricher.cells(namespace.column, with_rows=True):
             all_ids = []
             next_cursor = -1
             result = None
 
-            wrapper_args = {'user_id': user_id}
+            if namespace.id:
+                wrapper_args = {'user_id': user}
+            else:
+                wrapper_args = {'screen_name': user}
 
             while next_cursor != 0:
                 wrapper_args['cursor'] = next_cursor
