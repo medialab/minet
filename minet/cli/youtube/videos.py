@@ -18,7 +18,7 @@ from ural.youtube import (
 )
 
 URL_TEMPLATE = 'https://www.googleapis.com/youtube/v3/videos?id=%(list_id)s&key=%(key)s&part=snippet,statistics,contentDetails'
-URL_TEMP_CAPTIONS = 'https://www.youtube.com/api/timedtext?lang=fr&v=%(id)s'
+CAPTIONS_URL_TEMPLATE = 'https://www.youtube.com/api/timedtext?lang=fr&v=%(id)s'
 
 REPORT_HEADERS = [
     'video_id',
@@ -34,8 +34,7 @@ REPORT_HEADERS = [
     'comment_count',
     'no_stat_likes',
     'duration',
-    'caption',
-    'text_caption'
+    'caption'
 ]
 
 http = create_pool()
@@ -70,20 +69,6 @@ def get_data(data_json):
         if not like_count:
             no_stat_likes = '1'
 
-        if caption == 'true':
-
-            url_caption = URL_TEMP_CAPTIONS % {'id': video_id}
-            err, result_caption = request(http, url_caption)
-
-            if err:
-                die(err)
-            elif result_caption.status == 403:
-                time.sleep(seconds_to_midnight_pacific_time())
-                continue
-            elif result_caption.status >= 400:
-                die(result_caption.status)
-
-            text_caption = get_caption(result_caption)
 
         data = [
             video_id,
@@ -98,28 +83,12 @@ def get_data(data_json):
             comment_count,
             no_stat_likes,
             duration,
-            caption,
-            text_caption
+            caption
         ]
 
         data_indexed[video_id] = data
 
     return data_indexed
-
-
-def get_caption(data_caption):
-
-    soup = BeautifulSoup(data_caption.data, 'xml')
-
-    full_text = []
-
-    for item in soup.find_all('text'):
-        text = item.get_text().replace('&#39;', '\'').replace('&quot;', '"')
-        full_text.append(text)
-
-    caption_text = " ".join(full_text)
-
-    return caption_text
 
 
 def gen_chunks(enricher):
@@ -185,6 +154,8 @@ def videos_action(namespace, output_file):
         loading_bar.update(len(chunk))
 
         line_empty = []
+
+        break
 
         for item in chunk:
             video_id, line = item
