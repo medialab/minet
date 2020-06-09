@@ -36,8 +36,8 @@
   * [topic](#topic)
     * [stories](#stories)
 * [twitter](#twitter)
-  * [friends](#friends)
   * [followers](#followers)
+  * [friends](#friends)
 * [youtube (yt)](#youtube)
   * [comments](#comments)
   * [url-parse](#youtube-url-parse)
@@ -164,13 +164,13 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 ## Twitter
 
-### friends
-
-<% twitter/friends %>
-
 ### followers
 
 <% twitter/followers %>
+
+### friends
+
+<% twitter/friends %>
 
 ## Youtube
 
