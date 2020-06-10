@@ -40,6 +40,11 @@ def twitter_action(namespace):
 
         twitter_followers_action(namespace, output_file)
 
+    elif namespace.tw_action == 'users':
+        from minet.cli.twitter.users import twitter_users_action
+
+        twitter_users_action(namespace, output_file)
+
     # Cleanup
     if namespace.output is not None:
         output_file.close()

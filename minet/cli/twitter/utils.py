@@ -1,15 +1,15 @@
 # =============================================================================
-# Minet CrowdTangle CLI Utils
+# Minet Twitter CLI Utils
 # =============================================================================
 #
-# Miscellaneous generic functions used throughout the CrowdTangle actions.
+# Miscellaneous generic functions used throughout the twitter actions.
 #
 import casanova
 from minet.twitter.utils import TwitterWrapper
 from tqdm import tqdm
 
 
-def make_twitter_action(method_name, csv_headers):
+def make_twitter_action(method_name, duh, csv_headers):
 
     def action(namespace, output_file):
 
