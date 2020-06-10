@@ -19,6 +19,7 @@ REPORT_HEADERS = [
     'friends_count',
     'favourites_count',
     'listed_count',
+    'statuses_count',
     'created_at',
     'verified'
 ]
@@ -69,10 +70,11 @@ def twitter_users_action(namespace, output_file):
             friends_count = result.get('friends_count', None)
             favourites_count = result.get('favourites_count', None)
             listed_count = result.get('listed_count', None)
+            statuses_count = result.get('statuses_count', None)
             created_at = result.get('created_at', None)
             verified = result.get('verified', None)
 
-            enricher.writerow(row, [screen_name, name, location, description, url, protected, followers_count, friends_count, favourites_count, listed_count, created_at, verified])
+            enricher.writerow(row, [screen_name, name, location, description, url, protected, followers_count, friends_count, favourites_count, listed_count, statuses_count, created_at, verified])
 
         loading_bar.update()
 
