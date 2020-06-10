@@ -1064,6 +1064,55 @@ MINET_COMMANDS = {
                             'type': int
                         }
                     ]
+                },
+                'followers': {
+                    'title': 'Minet Twitter Followers Command',
+                    'description': '''
+                        Retrieve followers of given user.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Getting followers of a list of user:
+                            `minet tw friends screen_name users.csv > followers.csv`
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the Twitter account screen names.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the inquired Twitter users.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flag': '--id',
+                            'help': 'Whether to use Twitter user ids rather than screen names.',
+                            'action': 'store_true'
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'help': 'Path to the output file. By default, the result will be printed to stdout.'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--resume',
+                            'help': 'Whether to resume an aborted collection.',
+                            'action': 'store_true'
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of accounts. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
                 }
             }
         }

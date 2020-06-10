@@ -2,15 +2,15 @@
 # Minet Twitter Friends CLI Action
 # =============================================================================
 #
-# Logic of the `tw friends` action.
+# Logic of the `tw followers` action.
 #
 from minet.cli.twitter.utils import make_twitter_action
 
 REPORT_HEADERS = [
-    'friends_id'
+    'followers_id'
 ]
 
-twitter_friends_action = make_twitter_action(
-    method_name='friends',
+twitter_followers_action = make_twitter_action(
+    method_name='followers',
     csv_headers=REPORT_HEADERS
 )
