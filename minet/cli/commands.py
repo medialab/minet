@@ -463,9 +463,9 @@ MINET_COMMANDS = {
                             'help': 'Columns to include in report (separated by `,`).'
                         },
                         {
-                            'flag': '--en',
-                            'help': 'Whether to retrieve english captions rather than french.',
-                            'action': 'store_true'
+                            'flag': '--language',
+                            'help': 'Language (ISO code like "fr") of captions to retrieve.',
+                            'default': 'en'
                         },
                     ]
                 }
