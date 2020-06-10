@@ -5,8 +5,9 @@
 # Miscellaneous generic functions used throughout the CrowdTangle actions.
 #
 import casanova
-from minet.twitter.utils import TwitterWrapper
 from tqdm import tqdm
+
+from minet.twitter.utils import TwitterWrapper
 
 
 def make_twitter_action(method_name, csv_headers):
@@ -63,6 +64,5 @@ def make_twitter_action(method_name, csv_headers):
             loading_bar.update()
 
         loading_bar.close()
-
 
     return action
