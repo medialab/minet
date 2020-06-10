@@ -43,11 +43,9 @@ def captions_action(namespace, output_file):
     for line in enricher:
 
         video_id = line[enricher.pos]
+        language = namespace.language
 
-        if namespace.en:
-            url_caption = CAPTIONS_URL_TEMPLATE % {'lg': 'en', 'id': video_id}
-        else:
-            url_caption = CAPTIONS_URL_TEMPLATE % {'lg': 'fr', 'id': video_id}
+        url_caption = CAPTIONS_URL_TEMPLATE % {'lg': language, 'id': video_id}
 
         err, result_caption = request(http, url_caption)
 
