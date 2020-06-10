@@ -41,9 +41,9 @@ def captions_action(namespace, output_file):
     http = create_pool()
 
     for line in enricher:
-        print(line)
 
         video_id = line[enricher.pos]
+
         if namespace.en:
             url_caption = CAPTIONS_URL_TEMPLATE % {'lg': 'en', 'id': video_id}
         else:
