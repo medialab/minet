@@ -6,10 +6,11 @@
 # the given Youtube videos using Google's APIs.
 #
 import time
+import casanova
 from pytz import timezone
 from datetime import date, datetime
 from tqdm import tqdm
-from minet.cli.utils import CSVEnricher, die
+from minet.cli.utils import die
 from minet.utils import create_pool, request_json
 from ural.youtube import (
     extract_video_id_from_youtube_url,
@@ -17,7 +18,7 @@ from ural.youtube import (
     is_youtube_url
 )
 
-URL_TEMPLATE = 'https://www.googleapis.com/youtube/v3/videos?id=%(list_id)s&key=%(key)s&part=snippet,statistics'
+URL_TEMPLATE = 'https://www.googleapis.com/youtube/v3/videos?id=%(list_id)s&key=%(key)s&part=snippet,statistics,contentDetails'
 
 REPORT_HEADERS = [
     'video_id',
@@ -48,6 +49,7 @@ def get_data(data_json):
     data_indexed = {}
 
     for element in data_json['items']:
+        print(element)
 
         no_stat_likes = ''
         video_id = element['id']
@@ -94,12 +96,11 @@ def get_data(data_json):
     return data_indexed
 
 
-def gen_chunks(enricher):
+def gen_chunks(enricher, column):
     chunk = []
 
-    for num, line in enumerate(enricher):
+    for row, url_data in enricher.cells(column, with_rows=True):
 
-        url_data = line[enricher.pos]
         video_id = None
 
         if len(chunk) == 50:
@@ -112,19 +113,18 @@ def gen_chunks(enricher):
         elif is_youtube_url(url_data):
             video_id = extract_video_id_from_youtube_url(url_data)
 
-        chunk.append((video_id, line))
+        chunk.append((video_id, row))
 
     yield chunk
 
 
 def videos_action(namespace, output_file):
 
-    enricher = CSVEnricher(
+    enricher = casanova.enricher(
         namespace.file,
-        namespace.column,
         output_file,
-        report_headers=REPORT_HEADERS,
-        select=namespace.select.split(',') if namespace.select else None
+        keep=namespace.select,
+        add=REPORT_HEADERS
     )
 
     loading_bar = tqdm(
@@ -133,9 +133,11 @@ def videos_action(namespace, output_file):
         unit=' videos',
     )
 
+    column = namespace.column
+
     http = create_pool()
 
-    for chunk in gen_chunks(enricher):
+    for chunk in gen_chunks(enricher, column):
 
         all_ids = [row[0] for row in chunk if row[0]]
         list_id = ",".join(all_ids)
@@ -163,11 +165,11 @@ def videos_action(namespace, output_file):
             video_id, line = item
 
             if video_id is None:
-                enricher.write_empty(line)
+                enricher.writerow(line)
 
             elif video_id in not_available:
                 line_empty = [video_id] + [''] * (len(REPORT_HEADERS) - 1)
-                enricher.write(line, line_empty)
+                enricher.writerow(line, line_empty)
 
             else:
-                enricher.write(line, data[video_id])
+                enricher.writerow(line, data[video_id])
