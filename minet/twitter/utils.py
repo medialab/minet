@@ -7,6 +7,7 @@
 
 import json
 from time import time, sleep
+from pytz import timezone
 from datetime import datetime
 from twitter import Twitter, OAuth, OAuth2, TwitterHTTPError
 from minet.cli.utils import print_err
@@ -64,12 +65,12 @@ class TwitterWrapper(object):
                 print_err("%s: %s" % (type(e), e))
 
 
-def get_timestamp(t, locale):
+def get_timestamp(t):
     tim = datetime.strptime(t, '%a %b %d %H:%M:%S +0000 %Y')
-    if locale:
-        utc_date = timezone('UTC').localize(tim)
-        locale_date = utc_date.astimezone(locale)
-        return time.mktime(locale_date.timetuple())
+    # if locale:
+    #     utc_date = timezone('UTC').localize(tim)
+    #     locale_date = utc_date.astimezone(locale)
+    #     return time.mktime(locale_date.timetuple())
     return tim.isoformat()
 
 
@@ -80,7 +81,6 @@ def clean_user_entities(user_data):
                 for url in user_data['entities'][k]['urls']:
                     if not url['expanded_url']:
                         continue
-                    try:
+                    if k in user_data:
                         user_data[k] = user_data[k].replace(url['url'], url['expanded_url'])
-                    except:
-                        print_err("WARNING, couldn't process entity", url, k, user_data[k])
+

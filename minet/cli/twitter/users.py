@@ -7,7 +7,7 @@
 import casanova
 from minet.twitter.utils import TwitterWrapper, clean_user_entities, get_timestamp
 from tqdm import tqdm
-
+from datetime import datetime
 
 REPORT_HEADERS = [
     'id_str',
@@ -31,66 +31,32 @@ REPORT_HEADERS = [
     'profile_banner_url'
 ]
 
-def get_data(result):
+def get_data(result, user):
 
     data_indexed = {}
-    locale = None
 
     for element in result:
         clean_user_entities(element)
 
-        id_str = element.get('id_str', None)
-        screen_name = element.get('screen_name', None)
-        name = element.get('name', None)
-        location = element.get('location', None)
-        created_at = element.get('created_at', None)
-        created_at_iso = get_timestamp(created_at, locale)
-        description = element.get('description', None)
-        url =  element.get('url', None)
-        protected = element.get('protected', None)
-        verified = element.get('verified', None)
-        followers_count = element.get('followers_count', None)
-        friends_count = element.get('friends_count', None)
-        favourites_count = element.get('favourites_count', None)
-        listed_count = element.get('listed_count', None)
-        statuses_count = element.get('statuses_count', None)
-        default_profile = element.get('default_profile', None)
-        default_profile_image = element.get('default_profile_image', None)
-        profile_image_url_https = element.get('profile_image_url_https', None)
-        profile_banner_url = element.get('profile_banner_url', None)
+        if user == 'id':
+            user_index = element.get('id_str')
+        else:
+            user_index = element.get('screen_name')
 
-        data  = [
-            id_str,
-            screen_name,
-            name,
-            location,
-            created_at,
-            created_at_iso,
-            description,
-            url,
-            protected,
-            verified,
-            followers_count,
-            friends_count,
-            favourites_count,
-            listed_count,
-            statuses_count,
-            default_profile,
-            default_profile_image,
-            profile_image_url_https,
-            profile_banner_url
-        ]
+        getter = lambda element, key: element.get(key) if key != "created_at_iso" else datetime.strptime(element.get("created_at"), '%a %b %d %H:%M:%S +0000 %Y').isoformat()
+        data = [getter(element, key) for key in REPORT_HEADERS]
 
-        data_indexed[id_str] = data
+        data_indexed[user_index] = data
 
     return data_indexed
 
-def gen_chunks(column, enricher):
+
+def gen_chunks(column, enricher, length):
     chunk = []
 
     for row, user in enricher.cells(column, with_rows=True):
 
-        if len(chunk) == 100:
+        if len(chunk) == length:
             yield chunk
             chunk.clear()
 
@@ -126,7 +92,7 @@ def twitter_users_action(namespace, output_file):
 
     column = namespace.column
 
-    for chunk in gen_chunks(column, enricher):
+    for chunk in gen_chunks(column, enricher, 100):
 
         result = None
         clean_result = []
@@ -136,16 +102,23 @@ def twitter_users_action(namespace, output_file):
 
         if namespace.id:
             wrapper_args = {'user_id': list_user}
+            user = 'id'
         else:
             wrapper_args = {'screen_name': list_user}
+            user = 'screen_name'
 
         result = wrapper.call('users.lookup', wrapper_args)
 
         if result is not None:
-            data = get_data(result)
+            data = get_data(result, user)
+
             for item in chunk:
                 user, line = item
-                enricher.writerow(line, data[user])
+
+                if user in data.keys():
+                    enricher.writerow(line, data[user])
+                else:
+                    enricher.writerow(line)
 
         loading_bar.update(len(chunk))
 

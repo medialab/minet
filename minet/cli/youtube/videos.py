@@ -9,7 +9,7 @@ import time
 from tqdm import tqdm
 from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
 from minet.cli.utils import CSVEnricher, die
-from minet.utils import create_pool, request_json
+from minet.utils import create_pool, request_json, gen_chunks
 from ural.youtube import (
     extract_video_id_from_youtube_url,
     is_youtube_video_id,
@@ -108,7 +108,7 @@ def gen_chunks(enricher):
 
     yield chunk
 
-
+z
 def videos_action(namespace, output_file):
 
     enricher = CSVEnricher(
