@@ -383,6 +383,46 @@ MINET_COMMANDS = {
                 }
             ],
             'commands': {
+                'captions': {
+                    'title': 'Youtube captions',
+                    'description': 'Retrieve metadata about Youtube captions.',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the video\'s url or id.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the Youtube videos urls or ids.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).'
+                        },
+                        {
+                            'flag': '--language',
+                            'help': 'Language (ISO code like "fr") of captions to retrieve.',
+                            'default': 'en'
+                        },
+                    ]
+                },
+                'comments': {
+                    'title': 'Youtube comments',
+                    'description': 'Retrieve metadata about Youtube comments using the API.',
+                    'arguments': [
+                        {
+                            'name': 'id',
+                            'help': 'Youtube video\'s id.',
+                        },
+                        {
+                            'flags': ['-k', '--key'],
+                            'help': 'YouTube API Data dashboard API key.'
+                        }
+                    ]
+                },
                 'url-parse': {
                     'title': 'Parse Youtube URLs',
                     'description': 'Extract informations from Youtube URLs',
@@ -428,47 +468,8 @@ MINET_COMMANDS = {
                             'help': 'YouTube API Data dashboard API key.'
                         }
                     ]
-                },
-                'comments': {
-                    'title': 'Youtube comments',
-                    'description': 'Retrieve metadata about Youtube comments using the API.',
-                    'arguments': [
-                        {
-                            'name': 'id',
-                            'help': 'Youtube video\'s id.',
-                        },
-                        {
-                            'flags': ['-k', '--key'],
-                            'help': 'YouTube API Data dashboard API key.'
-                        }
-                    ]
-                },
-                'captions': {
-                    'title': 'Youtube captions',
-                    'description': 'Retrieve metadata about Youtube captions.',
-                    'arguments': [
-                        {
-                            'name': 'column',
-                            'help': 'Name of the column containing the video\'s url or id.'
-                        },
-                        {
-                            'name': 'file',
-                            'help': 'CSV file containing the Youtube videos urls or ids.',
-                            'type': FileType('r'),
-                            'default': sys.stdin,
-                            'nargs': '?'
-                        },
-                        {
-                            'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).'
-                        },
-                        {
-                            'flag': '--language',
-                            'help': 'Language (ISO code like "fr") of captions to retrieve.',
-                            'default': 'en'
-                        },
-                    ]
                 }
+
             }
         }
     },

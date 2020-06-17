@@ -5,31 +5,25 @@
 # Action reading an input CSV file line by line and retrieving caption about
 # the given Youtube videos.
 #
-import time
-from tqdm import tqdm
+import casanova
 from bs4 import BeautifulSoup
-from minet.cli.utils import CSVEnricher, die
-from minet.utils import create_pool, request_json, request
-from ural.youtube import (
-    extract_video_id_from_youtube_url,
-    is_youtube_video_id,
-    is_youtube_url
-)
+from tqdm import tqdm
+from minet.cli.utils import die, print_err
+from minet.utils import create_pool, request
 
 REPORT_HEADERS = [
     'caption_text'
 ]
 
-CAPTIONS_URL_TEMPLATE = 'https://www.youtube.com/api/timedtext?lang=%(lg)s&v=%(id)s'
+CAPTIONS_URL_TEMPLATE = 'https://www.youtube.com/api/timedtext?lang=%(lang)s&v=%(id)s'
 
 def captions_action(namespace, output_file):
 
-    enricher = CSVEnricher(
+    enricher = casanova.enricher(
         namespace.file,
-        namespace.column,
         output_file,
-        report_headers=REPORT_HEADERS,
-        select=namespace.select.split(',') if namespace.select else None
+        keep=namespace.select,
+        add=REPORT_HEADERS
     )
 
     loading_bar = tqdm(
@@ -40,30 +34,26 @@ def captions_action(namespace, output_file):
 
     http = create_pool()
 
-    for line in enricher:
+    for line, video_id in enricher.cells(namespace.column, with_rows=True):
 
-        video_id = line[enricher.pos]
         language = namespace.language
 
-        url_caption = CAPTIONS_URL_TEMPLATE % {'lg': language, 'id': video_id}
+        url_caption = CAPTIONS_URL_TEMPLATE % {'lang': language, 'id': video_id}
 
         err, result_caption = request(http, url_caption)
 
-        if err:
-            die(err)
+        if err is not None:
+            raise err
         elif result_caption.status >= 400:
+            print_err('request error %s' % result_caption.status)
             continue
         else:
             soup = BeautifulSoup(result_caption.data, 'lxml')
             full_text = []
 
-            for item in soup.find_all('text'):
-                full_text.append(item.get_text())
+            caption_text = " ".join([item.get_text() for item in soup.find_all('text')])
 
-            caption_text = " ".join(full_text)
-
-            enricher.write(line, [caption_text])
-
+            enricher.writerow(line, [caption_text])
 
         loading_bar.update()
 
