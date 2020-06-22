@@ -65,5 +65,4 @@ def make_twitter_action(method_name, csv_headers):
 
         loading_bar.close()
 
-
     return action

@@ -83,4 +83,3 @@ def clean_user_entities(user_data):
                         continue
                     if k in user_data:
                         user_data[k] = user_data[k].replace(url['url'], url['expanded_url'])
-

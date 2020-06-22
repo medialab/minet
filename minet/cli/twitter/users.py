@@ -6,6 +6,7 @@
 
 import casanova
 from minet.twitter.utils import TwitterWrapper, clean_user_entities, get_timestamp
+from minet.utils import gen_chunks
 from tqdm import tqdm
 from datetime import datetime
 
@@ -31,6 +32,7 @@ REPORT_HEADERS = [
     'profile_banner_url'
 ]
 
+
 def get_data(result, user):
 
     data_indexed = {}
@@ -49,20 +51,6 @@ def get_data(result, user):
         data_indexed[user_index] = data
 
     return data_indexed
-
-
-def gen_chunks(column, enricher, length):
-    chunk = []
-
-    for row, user in enricher.cells(column, with_rows=True):
-
-        if len(chunk) == length:
-            yield chunk
-            chunk.clear()
-
-        chunk.append((user, row))
-
-    yield chunk
 
 
 def twitter_users_action(namespace, output_file):
