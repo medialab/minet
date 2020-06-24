@@ -8,9 +8,8 @@
 import time
 from tqdm import tqdm
 from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
-from bs4 import BeautifulSoup
 from minet.cli.utils import CSVEnricher, die
-from minet.utils import create_pool, request_json, request
+from minet.utils import create_pool, request_json
 from ural.youtube import (
     extract_video_id_from_youtube_url,
     is_youtube_video_id,
@@ -38,6 +37,7 @@ REPORT_HEADERS = [
 ]
 
 http = create_pool()
+
 
 def get_data(data_json):
     data_indexed = {}
@@ -68,7 +68,6 @@ def get_data(data_json):
 
         if not like_count:
             no_stat_likes = '1'
-
 
         data = [
             video_id,
@@ -154,8 +153,6 @@ def videos_action(namespace, output_file):
         loading_bar.update(len(chunk))
 
         line_empty = []
-
-        break
 
         for item in chunk:
             video_id, line = item

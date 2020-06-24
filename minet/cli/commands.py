@@ -403,7 +403,7 @@ MINET_COMMANDS = {
                             'help': 'Columns to include in report (separated by `,`).'
                         },
                         {
-                            'flag': '--language',
+                            'flag': '--lang',
                             'help': 'Language (ISO code like "fr") of captions to retrieve.',
                             'default': 'en'
                         },

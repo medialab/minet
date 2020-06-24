@@ -8,7 +8,7 @@
 import casanova
 from bs4 import BeautifulSoup
 from tqdm import tqdm
-from minet.cli.utils import die, print_err
+from minet.cli.utils import print_err
 from minet.utils import create_pool, request
 
 REPORT_HEADERS = [
@@ -16,6 +16,7 @@ REPORT_HEADERS = [
 ]
 
 CAPTIONS_URL_TEMPLATE = 'https://www.youtube.com/api/timedtext?lang=%(lang)s&v=%(id)s'
+
 
 def captions_action(namespace, output_file):
 
@@ -36,7 +37,7 @@ def captions_action(namespace, output_file):
 
     for line, video_id in enricher.cells(namespace.column, with_rows=True):
 
-        language = namespace.language
+        language = namespace.lang
 
         url_caption = CAPTIONS_URL_TEMPLATE % {'lang': language, 'id': video_id}
 
@@ -46,7 +47,7 @@ def captions_action(namespace, output_file):
             raise err
         elif result_caption.status >= 400:
             print_err('request error %s' % result_caption.status)
-            continue
+            enricher.writerow(line)
         else:
             soup = BeautifulSoup(result_caption.data, 'lxml')
             full_text = []
@@ -56,7 +57,3 @@ def captions_action(namespace, output_file):
             enricher.writerow(line, [caption_text])
 
         loading_bar.update()
-
-
-
-
