@@ -16,7 +16,8 @@ from ural.youtube import (
     is_youtube_url
 )
 
-URL_TEMPLATE = 'https://www.googleapis.com/youtube/v3/videos?id=%(list_id)s&key=%(key)s&part=snippet,statistics'
+URL_TEMPLATE = 'https://www.googleapis.com/youtube/v3/videos?id=%(list_id)s&key=%(key)s&part=snippet,statistics,contentDetails'
+CAPTIONS_URL_TEMPLATE = 'https://www.youtube.com/api/timedtext?lang=fr&v=%(id)s'
 
 REPORT_HEADERS = [
     'video_id',
@@ -35,6 +36,8 @@ REPORT_HEADERS = [
     'caption'
 ]
 
+http = create_pool()
+
 
 def get_data(data_json):
     data_indexed = {}
@@ -42,10 +45,12 @@ def get_data(data_json):
     for element in data_json['items']:
 
         no_stat_likes = ''
+        text_caption = ''
         video_id = element['id']
         snippet = element['snippet']
         content_details = element['contentDetails']
         stat = element['statistics']
+        content_details = element['contentDetails']
 
         published_at = snippet['publishedAt']
         channel_id = snippet['channelId']
@@ -124,8 +129,6 @@ def videos_action(namespace, output_file):
         dynamic_ncols=True,
         unit=' videos',
     )
-
-    http = create_pool()
 
     for chunk in gen_chunks(enricher):
 
