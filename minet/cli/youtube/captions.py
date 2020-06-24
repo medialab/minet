@@ -36,10 +36,7 @@ def captions_action(namespace, output_file):
     http = create_pool()
 
     for line, video_id in enricher.cells(namespace.column, with_rows=True):
-
-        language = namespace.lang
-
-        url_caption = CAPTIONS_URL_TEMPLATE % {'lang': language, 'id': video_id}
+        url_caption = CAPTIONS_URL_TEMPLATE % {'lang': namespace.lang, 'id': video_id}
 
         err, result_caption = request(http, url_caption)
 
@@ -52,7 +49,7 @@ def captions_action(namespace, output_file):
             soup = BeautifulSoup(result_caption.data, 'lxml')
             full_text = []
 
-            caption_text = " ".join([item.get_text() for item in soup.find_all('text')])
+            caption_text = " ".join(item.get_text() for item in soup.find_all('text'))
 
             enricher.writerow(line, [caption_text])
 
