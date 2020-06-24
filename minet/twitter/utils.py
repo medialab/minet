@@ -7,6 +7,7 @@
 
 import json
 from time import time, sleep
+from pytz import timezone
 from datetime import datetime
 from twitter import Twitter, OAuth, OAuth2, TwitterHTTPError
 
@@ -63,3 +64,23 @@ class TwitterWrapper(object):
             else:
                 print_err("ERROR after %s tryouts for %s %s %s" % (self.MAX_TRYOUTS, route, auth, args))
                 print_err("%s: %s" % (type(e), e))
+
+
+def get_timestamp(t):
+    tim = datetime.strptime(t, '%a %b %d %H:%M:%S +0000 %Y')
+    # if locale:
+    #     utc_date = timezone('UTC').localize(tim)
+    #     locale_date = utc_date.astimezone(locale)
+    #     return time.mktime(locale_date.timetuple())
+    return tim.isoformat()
+
+
+def clean_user_entities(user_data):
+    if 'entities' in user_data:
+        for k in user_data['entities']:
+            if 'urls' in user_data['entities'][k]:
+                for url in user_data['entities'][k]['urls']:
+                    if not url['expanded_url']:
+                        continue
+                    if k in user_data:
+                        user_data[k] = user_data[k].replace(url['url'], url['expanded_url'])

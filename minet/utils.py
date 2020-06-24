@@ -910,3 +910,17 @@ def nested_get(path, o):
 def sleep_with_entropy(seconds, max_random_addendum):
     random_addendum = uniform(0, max_random_addendum)
     time.sleep(seconds + random_addendum)
+
+
+def gen_chunks(column, enricher, length):
+    chunk = []
+
+    for row, user in enricher.cells(column, with_rows=True):
+
+        if len(chunk) == length:
+            yield chunk
+            chunk.clear()
+
+        chunk.append(([user], row))
+
+    yield chunk
