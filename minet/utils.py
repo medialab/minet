@@ -912,15 +912,15 @@ def sleep_with_entropy(seconds, max_random_addendum):
     time.sleep(seconds + random_addendum)
 
 
-def gen_chunks(column, enricher, length):
+def chunks_iter(iterator, chunk_size):
     chunk = []
 
-    for row, user in enricher.cells(column, with_rows=True):
-
-        if len(chunk) == length:
+    for item in iterator:
+        if len(chunk) == chunk_size:
             yield chunk
-            chunk.clear()
+            chunk = []
 
-        chunk.append(([user], row))
+        chunk.append(item)
 
-    yield chunk
+    if chunk:
+        yield chunk
