@@ -5,9 +5,10 @@
 # Miscellaneous generic functions used throughout the twitter actions.
 #
 import casanova
-from minet.twitter.utils import TwitterWrapper
 from tqdm import tqdm
 from datetime import datetime
+
+from minet.twitter.utils import TwitterWrapper
 
 
 def make_twitter_action(method_name, csv_headers):

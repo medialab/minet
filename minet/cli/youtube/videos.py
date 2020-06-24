@@ -36,6 +36,8 @@ REPORT_HEADERS = [
     'caption'
 ]
 
+http = create_pool()
+
 
 def get_data(data_json):
     data_indexed = {}
@@ -43,10 +45,12 @@ def get_data(data_json):
     for element in data_json['items']:
 
         no_stat_likes = ''
+        text_caption = ''
         video_id = element['id']
         snippet = element['snippet']
         content_details = element['contentDetails']
         stat = element['statistics']
+        content_details = element['contentDetails']
 
         published_at = snippet['publishedAt']
         channel_id = snippet['channelId']
@@ -129,7 +133,6 @@ def videos_action(namespace, output_file):
     column = namespace.column
 
     for chunk in gen_chunks(column, enricher, 50):
-
         for row in chunk:
             ytb_data = row[0][0]
             video_id = None
