@@ -6,7 +6,7 @@
 
 import casanova
 from minet.twitter.utils import TwitterWrapper, clean_user_entities, get_timestamp
-from minet.utils import gen_chunks
+from minet.utils import chunks_iter
 from tqdm import tqdm
 from datetime import datetime
 
@@ -33,19 +33,21 @@ REPORT_HEADERS = [
 ]
 
 
-def get_data(result, user):
+def get_data(result, key):
 
     data_indexed = {}
 
     for element in result:
         clean_user_entities(element)
 
-        if user == 'id':
-            user_index = element.get('id_str')
-        else:
-            user_index = element.get('screen_name')
+        user_index = element.get(key)
 
-        getter = lambda element, key: element.get(key) if key != "created_at_iso" else datetime.strptime(element.get("created_at"), '%a %b %d %H:%M:%S +0000 %Y').isoformat()
+        def getter(element, k):
+            if key != 'created_at_iso':
+                return element.get(k)
+            else:
+                return datetime.strptime(element.get('created_at'), '%a %b %d %H:%M:%S +0000 %Y').isoformat()
+
         data = [getter(element, key) for key in REPORT_HEADERS]
 
         data_indexed[user_index] = data
@@ -78,35 +80,26 @@ def twitter_users_action(namespace, output_file):
         unit=' line'
     )
 
-    column = namespace.column
-
-    for chunk in gen_chunks(column, enricher, 100):
-
-        result = None
-        clean_result = []
-
-        all_users = [row[0] for row in chunk if row[0]]
-        list_user = ",".join(all_users)
+    for chunk in chunks_iter(enricher.cells(namespace.column, with_rows=True), 100):
+        users = ','.join(row[1] for row in chunk)
 
         if namespace.id:
-            wrapper_args = {'user_id': list_user}
-            user = 'id'
+            wrapper_args = {'user_id': users}
+            key = 'id_str'
         else:
-            wrapper_args = {'screen_name': list_user}
-            user = 'screen_name'
+            wrapper_args = {'screen_name': users}
+            key = 'screen_name'
 
         result = wrapper.call('users.lookup', wrapper_args)
 
         if result is not None:
-            data = get_data(result, user)
+            data = get_data(result, key)
 
-            for item in chunk:
-                user, line = item
-
+            for row, user in chunk:
                 if user in data.keys():
-                    enricher.writerow(line, data[user])
+                    enricher.writerow(row, data[user])
                 else:
-                    enricher.writerow(line)
+                    enricher.writerow(row)
 
         loading_bar.update(len(chunk))
 

@@ -96,11 +96,11 @@ examples:
 
 ```
 usage: minet fetch [-h] [--compress] [--contents-in-report] [-d OUTPUT_DIR]
-                   [-f FILENAME] [--filename-template FILENAME_TEMPLATE]
-                   [-g {firefox,chrome}] [-H HEADERS] [--resume]
-                   [--standardize-encoding] [-o OUTPUT] [-s SELECT] [-t THREADS]
-                   [--throttle THROTTLE] [--total TOTAL]
-                   [--url-template URL_TEMPLATE] [-X METHOD]
+                   [--domain-parallelism DOMAIN_PARALLELISM] [-f FILENAME]
+                   [--filename-template FILENAME_TEMPLATE] [-g {firefox,chrome}]
+                   [-H HEADERS] [--resume] [--standardize-encoding] [-o OUTPUT]
+                   [-s SELECT] [-t THREADS] [--throttle THROTTLE]
+                   [--total TOTAL] [--url-template URL_TEMPLATE] [-X METHOD]
                    column [file]
 
 Minet Fetch Command
@@ -122,6 +122,7 @@ optional arguments:
                                                   and avoid writing them in a separate folder. This requires to standardize
                                                   encoding and won't work on binary formats.
   -d OUTPUT_DIR, --output-dir OUTPUT_DIR          Directory where the fetched files will be written. Defaults to "content".
+  --domain-parallelism DOMAIN_PARALLELISM         Max number of urls per domain to hit at the same time. Defaults to 1
   -f FILENAME, --filename FILENAME                Name of the column used to build retrieved file names. Defaults to an uuid v4 with correct extension.
   --filename-template FILENAME_TEMPLATE           A template for the name of the fetched files.
   -g {firefox,chrome}, --grab-cookies {firefox,chrome}
@@ -564,7 +565,7 @@ examples:
 ```
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [--posts POSTS] [-s SELECT]
-                                 [--sort-by {total_interactions,date,subscriber_count}]
+                                 [--sort-by {total_interactions,subscriber_count,date}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -585,7 +586,7 @@ optional arguments:
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {total_interactions,date,subscriber_count}
+  --sort-by {total_interactions,subscriber_count,date}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.

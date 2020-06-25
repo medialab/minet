@@ -10,7 +10,7 @@ import casanova
 from tqdm import tqdm
 from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
 from minet.cli.utils import die
-from minet.utils import create_pool, request_json, gen_chunks
+from minet.utils import create_pool, request_json, chunks_iter
 from ural.youtube import (
     extract_video_id_from_youtube_url,
     is_youtube_video_id,
@@ -91,29 +91,6 @@ def get_data(data_json):
     return data_indexed
 
 
-# def gen_chunks(enricher):
-#     chunk = []
-
-#     for num, line in enumerate(enricher):
-
-#         url_data = line[enricher.pos]
-#         video_id = None
-
-#         if len(chunk) == 50:
-#             yield chunk
-#             chunk.clear()
-
-#         if is_youtube_video_id(url_data):
-#             video_id = url_data
-
-#         elif is_youtube_url(url_data):
-#             video_id = extract_video_id_from_youtube_url(url_data)
-
-#         chunk.append((video_id, line))
-
-#     yield chunk
-
-
 def videos_action(namespace, output_file):
 
     enricher = casanova.enricher(
@@ -132,18 +109,18 @@ def videos_action(namespace, output_file):
     http = create_pool()
     column = namespace.column
 
-    for chunk in gen_chunks(column, enricher, 50):
-        for row in chunk:
-            ytb_data = row[0][0]
+    for chunk in chunks_iter(enricher.cells(column, with_rows=True), 50):
+        for i, (row, ytb_data) in enumerate(chunk):
             video_id = None
+
             if is_youtube_video_id(ytb_data):
                 video_id = ytb_data
             elif is_youtube_url(ytb_data):
                 video_id = extract_video_id_from_youtube_url(ytb_data)
 
-            row[0][0] = video_id
+            chunk[i][1] = video_id
 
-        all_ids = [row[0][0] for row in chunk if row[0][0]]
+        all_ids = [video_id for _, video_id in chunk if video_id]
         list_id = ",".join(all_ids)
 
         url = URL_TEMPLATE % {'list_id': list_id, 'key': namespace.key}
@@ -168,17 +145,8 @@ def videos_action(namespace, output_file):
 
         line_empty = []
 
-        for item in chunk:
-            video_id, line = item
-
-            video_id = video_id[0]
-
-            if video_id is None:
-                enricher.writerow(line)
-
-            elif video_id in not_available:
-                line_empty = [video_id] + [''] * (len(REPORT_HEADERS) - 1)
-                enricher.writerow(line, line_empty)
-
+        for row, video_id in chunk:
+            if video_id is None or video_id in not_available:
+                enricher.writerow(row)
             else:
-                enricher.writerow(line, data[video_id])
+                enricher.writerow(row, data[video_id])
