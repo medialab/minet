@@ -111,16 +111,17 @@ def videos_action(namespace, output_file):
 
     for chunk in chunks_iter(enricher.cells(column, with_rows=True), 50):
         for i, (row, ytb_data) in enumerate(chunk):
-            video_id = None
+            video_id = ''
 
             if is_youtube_video_id(ytb_data):
                 video_id = ytb_data
             elif is_youtube_url(ytb_data):
                 video_id = extract_video_id_from_youtube_url(ytb_data)
 
-            chunk[i][1] = video_id
+            chunk[i] = chunk[i] + (video_id,)
 
-        all_ids = [video_id for _, video_id in chunk if video_id]
+
+        all_ids = [video_id for _, _, video_id in chunk if video_id]
         list_id = ",".join(all_ids)
 
         url = URL_TEMPLATE % {'list_id': list_id, 'key': namespace.key}
@@ -145,7 +146,7 @@ def videos_action(namespace, output_file):
 
         line_empty = []
 
-        for row, video_id in chunk:
+        for row, _, video_id in chunk:
             if video_id is None or video_id in not_available:
                 enricher.writerow(row)
             else:
