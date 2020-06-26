@@ -109,8 +109,9 @@ def videos_action(namespace, output_file):
     http = create_pool()
     column = namespace.column
 
-    for chunk in chunks_iter(enricher.cells(column, with_rows=True), 50):
-        for i, (row, ytb_data) in enumerate(chunk):
+    def rows_with_videos_id():
+
+        for row, ytb_data in enricher.cells(namespace.column, with_rows=True):
             video_id = None
 
             if is_youtube_video_id(ytb_data):
@@ -118,7 +119,9 @@ def videos_action(namespace, output_file):
             elif is_youtube_url(ytb_data):
                 video_id = extract_video_id_from_youtube_url(ytb_data)
 
-            chunk[i][1] = video_id
+            yield row, video_id
+
+    for chunk in chunks_iter(rows_with_videos_id(), 50):
 
         all_ids = [video_id for _, video_id in chunk if video_id]
         list_id = ",".join(all_ids)
