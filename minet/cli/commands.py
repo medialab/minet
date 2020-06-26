@@ -9,25 +9,18 @@ from argparse import FileType
 
 from minet.defaults import DEFAULT_THROTTLE
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
-from minet.cli.utils import BooleanAction, die
-
-from minet.cli.crowdtangle.constants import (
-    CROWDTANGLE_SORT_TYPES,
-    CROWDTANGLE_DEFAULT_RATE_LIMIT,
-    CROWDTANGLE_PARTITION_STRATEGIES
+from minet.cli.utils import die
+from minet.cli.argparse import (
+    BooleanAction,
+    CrowdtanglePartitionStrategyType,
+    SplitterType
 )
 
-
-def partition_strategy_type(string):
-    if string in CROWDTANGLE_PARTITION_STRATEGIES:
-        return string
-
-    try:
-        return int(string)
-    except ValueError:
-        choices = ' or '.join(CROWDTANGLE_PARTITION_STRATEGIES)
-
-        raise ArgumentTypeError('partition strategy should either be %s, or an number of posts.' % choices)
+from minet.crowdtangle.constants import (
+    CROWDTANGLE_SORT_TYPES,
+    CROWDTANGLE_SUMMARY_SORT_TYPES,
+    CROWDTANGLE_DEFAULT_RATE_LIMIT
+)
 
 
 def check_dragnet():
@@ -200,12 +193,13 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--list-ids',
-                            'help': 'Ids of the lists from which to retrieve posts, separated by commas.'
+                            'help': 'Ids of the lists from which to retrieve posts, separated by commas.',
+                            'type': SplitterType()
                         },
                         {
                             'flag': '--partition-strategy',
                             'help': 'Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts.',
-                            'type': partition_strategy_type
+                            'type': CrowdtanglePartitionStrategyType()
                         },
                         {
                             'flag': '--resume',
@@ -221,11 +215,49 @@ MINET_COMMANDS = {
                         {
                             'flag': '--start-date',
                             'help': 'The earliest date at which a post could be posted (UTC!).'
+                        }
+                    ]
+                },
+                'posts-by-id': {
+                    'title': 'Minet CrowdTangle Post By Id Command',
+                    'description': '''
+                        Retrieve metadata about batches of posts using Crowdtangle's API.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Retrieving information about a batch of posts:
+                            `minet ct posts-by-id post-url posts.csv --token YOUR_TOKEN > metadata.csv`
+
+                        . Retrieving information about a single post:
+                            `minet ct posts-by-id 1784333048289665 --token YOUR_TOKEN`
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the posts URL or id in the CSV file.'
                         },
                         {
-                            'flag': '--url-report',
-                            'help': 'Path to an optional report file to write about urls found in posts.',
-                            'type': FileType('w')
+                            'name': 'file',
+                            'help': 'CSV file containing the inquired URLs or ids.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--resume',
+                            'help': 'Whether to resume an aborted collection.',
+                            'action': 'store_true'
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of posts. Necessary if you want to display a finite progress indicator.',
+                            'type': int
                         }
                     ]
                 },
@@ -233,6 +265,9 @@ MINET_COMMANDS = {
                     'title': 'Minet CrowdTangle Search Command',
                     'description': '''
                         Search posts on the whole CrowdTangle platform.
+
+                        More on Crowdtangle API docs here:
+                        https://github.com/CrowdTangle/API/wiki/Search
                     ''',
                     'epilog': '''
                         examples:
@@ -246,6 +281,10 @@ MINET_COMMANDS = {
                             'help': 'The search query term or terms.'
                         },
                         {
+                            'flag': '--and',
+                            'help': 'AND clause to add to the query terms.'
+                        },
+                        {
                             'flag': '--end-date',
                             'help': 'The latest date at which a post could be posted (UTC!).'
                         },
@@ -254,6 +293,10 @@ MINET_COMMANDS = {
                             'help': 'Output format. Defaults to `csv`.',
                             'choices': ['csv', 'jsonl'],
                             'default': 'csv'
+                        },
+                        {
+                            'flag': '--language',
+                            'help': 'Language ISO code like "fr" or "zh-CN".'
                         },
                         {
                             'flags': ['-l', '--limit'],
@@ -273,11 +316,12 @@ MINET_COMMANDS = {
                         {
                             'flag': '--partition-strategy',
                             'help': 'Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts.',
-                            'type': partition_strategy_type
+                            'type': CrowdtanglePartitionStrategyType()
                         },
                         {
                             'flags': ['-p', '--platforms'],
-                            'help': 'The platforms, separated by comma from which to retrieve posts.'
+                            'help': 'The platforms, separated by comma from which to retrieve posts.',
+                            'type': SplitterType()
                         },
                         {
                             'flag': '--sort-by',
@@ -291,12 +335,8 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--types',
-                            'help': 'Types of post to include, separated by comma.'
-                        },
-                        {
-                            'flag': '--url-report',
-                            'help': 'Path to an optional report file to write about urls found in posts.',
-                            'type': FileType('w')
+                            'help': 'Types of post to include, separated by comma.',
+                            'type': SplitterType()
                         }
                     ]
                 },
@@ -325,6 +365,21 @@ MINET_COMMANDS = {
                             'nargs': '?'
                         },
                         {
+                            'name': '--posts',
+                            'help': 'Path to a file containing the retrieved posts.',
+                            'type': FileType('w')
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).'
+                        },
+                        {
+                            'flag': '--sort-by',
+                            'help': 'How to sort retrieved posts. Defaults to `date`.',
+                            'choices': CROWDTANGLE_SUMMARY_SORT_TYPES,
+                            'default': 'date'
+                        },
+                        {
                             'flag': '--start-date',
                             'help': 'The earliest date at which a post could be posted (UTC!).'
                         },
@@ -339,13 +394,13 @@ MINET_COMMANDS = {
         }
     },
 
-    # Crowdtangle action subparser
+    # Youtube action subparser
     # --------------------------------------------------------------------------
     'youtube': {
         'package': 'minet.cli.youtube',
         'action': 'youtube_action',
         'aliases': ['yt'],
-        'title': 'Minet Youtube parser command',
+        'title': 'Minet Youtube command',
         'description': '''
             Gather data from Youtube.
         ''',
@@ -360,6 +415,46 @@ MINET_COMMANDS = {
                 }
             ],
             'commands': {
+                'captions': {
+                    'title': 'Youtube captions',
+                    'description': 'Retrieve metadata about Youtube captions.',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the video\'s url or id.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the Youtube videos urls or ids.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).'
+                        },
+                        {
+                            'flag': '--lang',
+                            'help': 'Language (ISO code like "fr") of captions to retrieve.',
+                            'default': 'en'
+                        },
+                    ]
+                },
+                'comments': {
+                    'title': 'Youtube comments',
+                    'description': 'Retrieve metadata about Youtube comments using the API.',
+                    'arguments': [
+                        {
+                            'name': 'id',
+                            'help': 'Youtube video\'s id.',
+                        },
+                        {
+                            'flags': ['-k', '--key'],
+                            'help': 'YouTube API Data dashboard API key.'
+                        }
+                    ]
+                },
                 'url-parse': {
                     'title': 'Parse Youtube URLs',
                     'description': 'Extract informations from Youtube URLs',
@@ -406,6 +501,7 @@ MINET_COMMANDS = {
                         }
                     ]
                 }
+
             }
         }
     },
@@ -516,9 +612,8 @@ MINET_COMMANDS = {
                         }
                     ]
                 },
-
                 'post-stats': {
-                    'title': 'Minet Facebookk Post Stats Command',
+                    'title': 'Minet Facebook Post Stats Command',
                     'description': '''
                         Retrieve statistics about a given list of Facebook posts.
                     ''',
@@ -554,7 +649,33 @@ MINET_COMMANDS = {
                             'type': int
                         }
                     ]
-                }
+                },
+                'url-parse': {
+                    'title': 'Parse Facebook URLs',
+                    'description': 'Extract informations from Facebook URLs',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the URL in the CSV file.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the inquired URLs.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
+                        }
+                    ]
+                },
             }
         }
     },
@@ -586,7 +707,7 @@ MINET_COMMANDS = {
         'arguments': [
             {
                 'name': 'column',
-                'help': 'Column of the CSV file containing urls to fetch.'
+                'help': 'Column of the CSV file containing urls to fetch or a single url to fetch.'
             },
             {
                 'name': 'file',
@@ -610,6 +731,12 @@ MINET_COMMANDS = {
                 'flags': ['-d', '--output-dir'],
                 'help': 'Directory where the fetched files will be written. Defaults to "%s".' % DEFAULT_CONTENT_FOLDER,
                 'default': DEFAULT_CONTENT_FOLDER
+            },
+            {
+                'flag': '--domain-parallelism',
+                'help': 'Max number of urls per domain to hit at the same time. Defaults to 1',
+                'type': int,
+                'default': 1
             },
             {
                 'flags': ['-f', '--filename'],
@@ -753,6 +880,28 @@ MINET_COMMANDS = {
                 }
             ],
             'commands': {
+                'search': {
+                    'title': 'Minet Mediacloud Search Command',
+                    'description': '''
+                        Search stories on the Mediacloud platform.
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'query',
+                            'help': 'Search query.'
+                        },
+                        {
+                            'flags': ['-c', '--collections'],
+                            'help': 'List of searched collections separated by commas.',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--skip-count',
+                            'help': 'Whether to skip the first API call counting the number of posts for the progress bar.',
+                            'action': 'store_true'
+                        }
+                    ]
+                },
                 'topic': {
                     'title': 'Minet Mediacloud Topic Command',
                     'description': '''
@@ -861,6 +1010,247 @@ MINET_COMMANDS = {
         ]
     },
 
+    # Twitter action subparser
+    # -------------------------------------------------------------------------
+    'twitter': {
+        'package': 'minet.cli.twitter',
+        'action': 'twitter_action',
+        'aliases': ['tw'],
+        'title': 'Minet Twitter Command',
+        'description': '''
+            Gather data from Twitter.
+        ''',
+        'subparsers': {
+            'help': 'Action to perform using the Twitter API.',
+            'title': 'actions',
+            'dest': 'tw_action',
+            'common_arguments': [
+                {
+                    'flag': '--api-key',
+                    'help': 'Twitter API key.'
+                },
+                {
+                    'flag': '--api-secret-key',
+                    'help': 'Twitter API secret key.'
+                },
+                {
+                    'flag': '--access-token',
+                    'help': 'Twitter API access token.'
+                },
+                {
+                    'flag': '--access-token-secret',
+                    'help': 'Twitter API access token secret.'
+                }
+            ],
+            'commands': {
+                'friends': {
+                    'title': 'Minet Twitter Friends Command',
+                    'description': '''
+                        Retrieve friends, i.e. followed users, of given user.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Getting friends of a list of user:
+                            `minet tw friends screen_name users.csv > friends.csv`
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the Twitter account screen names.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the inquired Twitter users.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flag': '--id',
+                            'help': 'Whether to use Twitter user ids rather than screen names.',
+                            'action': 'store_true'
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'help': 'Path to the output file. By default, the result will be printed to stdout.'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--resume',
+                            'help': 'Whether to resume an aborted collection.',
+                            'action': 'store_true'
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of accounts. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
+                },
+                'followers': {
+                    'title': 'Minet Twitter Followers Command',
+                    'description': '''
+                        Retrieve followers of given user.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Getting followers of a list of user:
+                            `minet tw friends screen_name users.csv > followers.csv`
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the Twitter account screen names.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the inquired Twitter users.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flag': '--id',
+                            'help': 'Whether to use Twitter user ids rather than screen names.',
+                            'action': 'store_true'
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'help': 'Path to the output file. By default, the result will be printed to stdout.'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--resume',
+                            'help': 'Whether to resume an aborted collection.',
+                            'action': 'store_true'
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of accounts. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
+                },
+                'users': {
+                    'title': 'Minet Twitter Users Command',
+                    'description': '''
+                        Retrieve metadata from a given user.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Getting metadata from an user:
+                            `minet tw users screen_name users.csv > data_users.csv`
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the Twitter account screen names.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the inquired Twitter users.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flag': '--id',
+                            'help': 'Whether to use Twitter user ids rather than screen names.',
+                            'action': 'store_true'
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'help': 'Path to the output file. By default, the result will be printed to stdout.'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--resume',
+                            'help': 'Whether to resume an aborted collection.',
+                            'action': 'store_true'
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of accounts. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
+                }
+            }
+        }
+    },
+
+    # Url Extract action subparser
+    # -------------------------------------------------------------------------
+    'url-extract': {
+        'package': 'minet.cli.url_extract',
+        'action': 'url_extract_action',
+        'title': 'Minet Url Extract Command',
+        'description': '''
+            Extract urls from a CSV column containing either raw text or raw
+            HTML.
+        ''',
+        'epilog': '''
+            examples:
+
+            . Extracting urls from a text column:
+                `minet url-extract text posts.csv > urls.csv`
+
+            . Extracting urls from a html column:
+                `minet url-extract html --from html posts.csv > urls.csv`
+        ''',
+        'arguments': [
+            {
+                'name': 'column',
+                'help': 'Name of the column containing text or html.'
+            },
+            {
+                'name': 'file',
+                'help': 'Target CSV file.',
+                'type': FileType('r'),
+                'default': sys.stdin,
+                'nargs': '?'
+            },
+            {
+                'flag': '--base-url',
+                'help': 'Base url used to resolve relative urls.'
+            },
+            {
+                'flag': '--from',
+                'help': 'Extract urls from which kind of source?',
+                'choices': ['text', 'html'],
+                'default': 'text'
+            },
+            {
+                'flags': ['-o', '--output'],
+                'help': 'Path to the output file. By default, the result will be printed to stdout.'
+            },
+            {
+                'flags': ['-s', '--select'],
+                'help': 'Columns to keep in output, separated by comma.'
+            },
+            {
+                'flag': '--total',
+                'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
+                'type': int
+            }
+        ]
+    },
+
     # Url Join action subparser
     # -------------------------------------------------------------------------
     'url-join': {
@@ -951,11 +1341,19 @@ MINET_COMMANDS = {
             },
             {
                 'flags': ['-s', '--select'],
-                'help': 'Columns to keep in output, separated by comma.'
+                'help': 'Columns to keep in output, separated by comma.',
+                'type': SplitterType()
             },
             {
                 'flag': '--separator',
                 'help': 'Split url column by a separator?'
+            },
+            {
+                'flags': ['--strip-protocol', '--no-strip-protocol'],
+                'help': 'Whether or not to strip the protocol when normalizing the url. Defaults to strip protocol.',
+                'dest': 'strip_protocol',
+                'action': BooleanAction,
+                'default': True
             },
             {
                 'flag': '--total',

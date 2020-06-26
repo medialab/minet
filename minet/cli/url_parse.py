@@ -4,6 +4,7 @@
 #
 # Logic of the `url-parse` action.
 #
+import casanova
 from ural import (
     is_url,
     normalize_url,
@@ -13,7 +14,7 @@ from ural import (
 )
 from tqdm import tqdm
 
-from minet.cli.utils import CSVEnricher, open_output_file
+from minet.cli.utils import open_output_file
 
 REPORT_HEADERS = [
     'normalized_url',
@@ -27,40 +28,41 @@ def url_parse_action(namespace):
 
     output_file = open_output_file(namespace.output)
 
-    enricher = CSVEnricher(
+    enricher = casanova.enricher(
         namespace.file,
-        namespace.column,
         output_file,
-        report_headers=REPORT_HEADERS,
-        select=namespace.select.split(',') if namespace.select else None
+        add=REPORT_HEADERS,
+        keep=namespace.select
     )
 
     loading_bar = tqdm(
-        desc='Reporting',
+        desc='Parsing',
         dynamic_ncols=True,
-        unit=' lines',
+        unit=' rows',
         total=namespace.total
     )
 
-    for line in enricher:
-        url_data = line[enricher.pos].strip()
+    for row, url in enricher.cells(namespace.column, with_rows=True):
+        url = url.strip()
 
         loading_bar.update()
 
         if namespace.separator:
-            urls = url_data.split(namespace.separator)
+            urls = url.split(namespace.separator)
         else:
-            urls = [url_data]
+            urls = [url]
 
         for url in urls:
             if not is_url(url, allow_spaces_in_path=True):
-                enricher.write_empty(line)
+                enricher.writerow(row)
                 continue
 
-            normalized = normalize_url(url, strip_trailing_slash=True)
-
-            enricher.write(line, [
-                normalize_url(url, strip_trailing_slash=True),
+            enricher.writerow(row, [
+                normalize_url(
+                    url,
+                    strip_protocol=namespace.strip_protocol,
+                    strip_trailing_slash=True
+                ),
                 get_domain_name(url),
                 get_hostname(url),
                 get_normalized_hostname(url)

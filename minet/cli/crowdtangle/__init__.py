@@ -28,6 +28,11 @@ def crowdtangle_action(namespace):
 
         crowdtangle_posts_action(namespace, output_file)
 
+    elif namespace.ct_action == 'posts-by-id':
+        from minet.cli.crowdtangle.posts_by_id import crowdtangle_posts_by_id_action
+
+        crowdtangle_posts_by_id_action(namespace, output_file)
+
     elif namespace.ct_action == 'lists':
         from minet.cli.crowdtangle.lists import crowdtangle_lists_action
 

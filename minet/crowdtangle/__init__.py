@@ -1,8 +1,5 @@
 # =============================================================================
-# Minet Mediacloud Constants
+# Minet CrowdTangle Endpoint
 # =============================================================================
 #
-# Bunch of mediacloud-related constants.
-#
-
-MEDIACLOUD_API_BASE_URL = 'https://api.mediacloud.org/api/v2'
+from minet.crowdtangle.client import CrowdTangleClient

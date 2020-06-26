@@ -34,7 +34,7 @@ lint:
 	@echo
 
 readme:
-	python -m scripts.generate_readme > README.md
+	python -m scripts.generate_readme > docs/cli.md
 
 unit:
 	@echo Running unit tests...

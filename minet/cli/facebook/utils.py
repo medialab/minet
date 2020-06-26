@@ -8,8 +8,7 @@ from http.cookies import SimpleCookie
 
 from minet.utils import grab_cookies
 from minet.cli.utils import die
-
-FACEBOOK_URL = 'https://www.facebook.com/'
+from minet.facebook.constants import FACEBOOK_URL
 
 
 def fix_cookie(cookie_string):

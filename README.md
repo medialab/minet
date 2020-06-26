@@ -12,7 +12,7 @@ In addition, **minet** also exposes its high-level programmatic interface as a l
 * Multithreaded, scalable crawling using a comfy DSL.
 * Multiprocessed raw text content extraction from HTML pages.
 * Multiprocessed scraping from HTML pages using a comfy DSL.
-* URL-related heuristics utilities such as normalization and matching.
+* URL-related heuristics utilities such as extraction, normalization and matching.
 * Data collection from various APIs such as [CrowdTangle](https://www.crowdtangle.com/).
 
 ## Installation
@@ -29,77 +29,6 @@ To learn how to use `minet` and understand how it may fit your use cases, you sh
 
 ## Usage
 
-### CLI
-
-*Global utilities*
-
-* [-h/--help/help](#help-flag)
-* [--version](#version-flag)
-
-*Generic commands*
-
-* [crawl](#crawl)
-* [fetch](#fetch)
-* [extract](#extract)
-* [scrape](#scrape)
-* [url-join](#url-join)
-* [url-parse](#url-parse)
-
-*Platform-related commands*
-
-* [crowdtangle (ct)](#crowdtangle)
-  * [leaderboard](#leaderboard)
-  * [lists](#lists)
-  * [posts](#posts)
-  * [search](#search)
-  * [summary](#summary)
-* [facebook (fb)](#facebook)
-  * [comments](#comments)
-* [hyphe](#hyphe)
-  * [dump](#dump)
-* [mediacloud (mc)](#mediacloud)
-  * [topic](#topic)
-    * [stories](#stories)
-* [youtube (yt)](#youtube)
-  * [url-parse](#youtube-url-parse)
-
-### API
-
-* [multithreaded_fetch](#multithreaded_fetch)
-* [multithreaded_resolve](#multithreaded_resolve)
-
----
-
-## CLI
-
-<h2 id="help-flag">-h/--help</h2>
-
-If you need help about a command, don't hesitate to use the `-h/--help` flag or the `help` command:
-
-```
-minet ct posts -h
-# or:
-minet ct posts --help
-# or
-minet help ct posts
-```
-
-<h2 id="version-flag"></h2>
-
-To check the installed version of `minet`, you can use the `--version` flag:
-
-```
-minet --version
->>> minet x.x.x
-```
-
-## crawl
-
-```
-usage: minet crawl [-h] [-d OUTPUT_DIR] [--resume] [--throttle THROTTLE] crawler
-
-Minet Crawl Command
-===================
 
 Use multiple threads to crawl the web using minet crawling and
 scraping DSL.
@@ -798,3 +727,6 @@ A `ResolveWorkerResult` having the following attributes:
 * **error** *?Exception*: an error.
 * **stack** *?list*: the redirection stack.
 
+=======
+* [Using minet as a command line tool](./docs/cli.md)
+* [Using minet as a python library](./docs/lib.md)

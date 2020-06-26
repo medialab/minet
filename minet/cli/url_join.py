@@ -5,27 +5,35 @@
 # Logic of the `url-join` action.
 #
 import csv
+import casanova
+from casanova.reader import collect_column_indices
 from ural.lru import NormalizedLRUTrie
 from tqdm import tqdm
 
-from minet.cli.utils import custom_reader, open_output_file
+from minet.cli.utils import open_output_file
 
 
 def url_join_action(namespace):
+    right_reader = casanova.reader(namespace.file2)
+    left_reader = casanova.reader(
+        namespace.file1,
+        namespace.output
+    )
 
-    left_headers, left_pos, left_reader = custom_reader(namespace.file1, namespace.column1)
-    right_headers, right_pos, right_reader = custom_reader(namespace.file2, namespace.column2)
+    output_file = open_output_file(namespace.output)
+    output_writer = csv.writer(output_file)
 
-    if namespace.select:
-        left_headers = namespace.select.split(',')
-        selected_pos = [left_headers.index(h) for h in left_headers]
+    left_headers = left_reader.fieldnames
+    left_indices = None
+
+    if namespace.select is not None:
+        selected = namespace.select.split(',')
+        left_headers = [h for h in left_headers if h in selected]
+        left_indices = collect_column_indices(left_reader.pos, left_headers)
 
     empty = [''] * len(left_headers)
 
-    output_file = open_output_file(namespace.output)
-
-    output_writer = csv.writer(output_file)
-    output_writer.writerow(right_headers + left_headers)
+    output_writer.writerow(right_reader.fieldnames + left_headers)
 
     loading_bar = tqdm(
         desc='Indexing left file',
@@ -36,13 +44,13 @@ def url_join_action(namespace):
     # First step is to index left file
     trie = NormalizedLRUTrie(strip_trailing_slash=True)
 
-    for line in left_reader:
-        url = line[left_pos].strip()
+    for row, url in left_reader.cells(namespace.column1, with_rows=True):
+        url = url.strip()
 
-        if namespace.select:
-            line = [line[p] for p in selected_pos]
+        if left_indices is not None:
+            row = [row[i] for i in left_indices]
 
-        trie.set(url, line)
+        trie.set(url, row)
 
         loading_bar.update()
 
@@ -54,8 +62,8 @@ def url_join_action(namespace):
         unit=' lines'
     )
 
-    for line in right_reader:
-        url = line[right_pos].strip()
+    for row, url in right_reader.cells(namespace.column2, with_rows=True):
+        url = url.strip()
 
         match = None
 
@@ -65,10 +73,10 @@ def url_join_action(namespace):
         loading_bar.update()
 
         if match is None:
-            output_writer.writerow(line + empty)
+            output_writer.writerow(row + empty)
             continue
 
-        line.extend(match)
-        output_writer.writerow(line)
+        row.extend(match)
+        output_writer.writerow(row)
 
     output_file.close()

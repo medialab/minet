@@ -203,7 +203,8 @@ def fetch_action(namespace):
         key=url_key,
         request_args=request_args,
         threads=namespace.threads,
-        throttle=namespace.throttle
+        throttle=namespace.throttle,
+        domain_parallelism=namespace.domain_parallelism
     )
 
     for result in multithreaded_iterator:
@@ -265,7 +266,7 @@ def fetch_action(namespace):
 
             if data and namespace.standardize_encoding or namespace.contents_in_report:
                 if encoding is None or encoding != 'utf-8' or namespace.contents_in_report:
-                    data = data.decode(encoding, errors='replace')
+                    data = data.decode(encoding if encoding is not None else 'utf-8', errors='replace')
                     encoding = 'utf-8'
                     content_write_flag = 'w'
 

@@ -7,11 +7,10 @@
 #
 import time
 import casanova
-from pytz import timezone
-from datetime import date, datetime
 from tqdm import tqdm
+from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
 from minet.cli.utils import die
-from minet.utils import create_pool, request_json
+from minet.utils import create_pool, request_json, chunks_iter
 from ural.youtube import (
     extract_video_id_from_youtube_url,
     is_youtube_video_id,
@@ -37,25 +36,21 @@ REPORT_HEADERS = [
     'caption'
 ]
 
-
-def time_in_seconds():
-    now_utc = timezone('utc').localize(datetime.utcnow())
-    pacific_time = now_utc.astimezone(timezone('US/Pacific')).replace(tzinfo=None)
-    midnight_pacific = datetime.combine(pacific_time, datetime.min.time())
-    return (midnight_pacific - pacific_time).seconds
+http = create_pool()
 
 
 def get_data(data_json):
     data_indexed = {}
 
     for element in data_json['items']:
-        print(element)
 
         no_stat_likes = ''
+        text_caption = ''
         video_id = element['id']
         snippet = element['snippet']
         content_details = element['contentDetails']
         stat = element['statistics']
+        content_details = element['contentDetails']
 
         published_at = snippet['publishedAt']
         channel_id = snippet['channelId']
@@ -96,35 +91,13 @@ def get_data(data_json):
     return data_indexed
 
 
-def gen_chunks(enricher, column):
-    chunk = []
-
-    for row, url_data in enricher.cells(column, with_rows=True):
-
-        video_id = None
-
-        if len(chunk) == 50:
-            yield chunk
-            chunk.clear()
-
-        if is_youtube_video_id(url_data):
-            video_id = url_data
-
-        elif is_youtube_url(url_data):
-            video_id = extract_video_id_from_youtube_url(url_data)
-
-        chunk.append((video_id, row))
-
-    yield chunk
-
-
 def videos_action(namespace, output_file):
 
     enricher = casanova.enricher(
         namespace.file,
         output_file,
-        keep=namespace.select,
-        add=REPORT_HEADERS
+        add=REPORT_HEADERS,
+        keep=namespace.select
     )
 
     loading_bar = tqdm(
@@ -133,13 +106,21 @@ def videos_action(namespace, output_file):
         unit=' videos',
     )
 
+    http = create_pool()
     column = namespace.column
 
-    http = create_pool()
+    for chunk in chunks_iter(enricher.cells(column, with_rows=True), 50):
+        for i, (row, ytb_data) in enumerate(chunk):
+            video_id = None
 
-    for chunk in gen_chunks(enricher, column):
+            if is_youtube_video_id(ytb_data):
+                video_id = ytb_data
+            elif is_youtube_url(ytb_data):
+                video_id = extract_video_id_from_youtube_url(ytb_data)
 
-        all_ids = [row[0] for row in chunk if row[0]]
+            chunk[i][1] = video_id
+
+        all_ids = [video_id for _, video_id in chunk if video_id]
         list_id = ",".join(all_ids)
 
         url = URL_TEMPLATE % {'list_id': list_id, 'key': namespace.key}
@@ -148,11 +129,14 @@ def videos_action(namespace, output_file):
         if err:
             die(err)
         elif response.status == 403:
-            time.sleep(time_in_seconds())
+            time.sleep(seconds_to_midnight_pacific_time())
+            continue
         elif response.status >= 400:
             die(response.status)
 
         data = get_data(result)
+
+        not_available = []
 
         id_available = set(data)
         not_available = set(all_ids).difference(id_available)
@@ -161,15 +145,8 @@ def videos_action(namespace, output_file):
 
         line_empty = []
 
-        for item in chunk:
-            video_id, line = item
-
-            if video_id is None:
-                enricher.writerow(line)
-
-            elif video_id in not_available:
-                line_empty = [video_id] + [''] * (len(REPORT_HEADERS) - 1)
-                enricher.writerow(line, line_empty)
-
+        for row, video_id in chunk:
+            if video_id is None or video_id in not_available:
+                enricher.writerow(row)
             else:
-                enricher.writerow(line, data[video_id])
+                enricher.writerow(row, data[video_id])

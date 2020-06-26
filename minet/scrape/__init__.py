@@ -5,6 +5,8 @@
 # Module exposing utilities related to minet's scraping DSL.
 #
 from bs4 import BeautifulSoup
+
+from minet.utils import load_definition
 from minet.scrape.apply import apply_scraper, tabulate
 
 
@@ -49,3 +51,7 @@ class Scraper(object):
 
     def __call__(self, html, context=None):
         return scrape(self.definition, html, context=context)
+
+    @staticmethod
+    def from_file(target):
+        return Scraper(load_definition(target))

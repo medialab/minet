@@ -6,9 +6,7 @@
 #
 import csv
 import sys
-import json
 import codecs
-import argparse
 from glob import iglob
 from os.path import join
 from collections import namedtuple
@@ -128,13 +126,18 @@ class DummyTqdmFile(object):
 
     def __init__(self, file=sys.stdout):
         self.file = file
+        self.cursor = 0
 
     def write(self, x):
+        self.cursor += 1
         # Avoid print() second call (useless \n)
         tqdm.write(x, file=self.file, end='')
 
     def flush(self):
         return self.file.flush()
+
+    def tell(self):
+        return self.cursor
 
     def close(self):
         pass
@@ -145,27 +148,6 @@ def open_output_file(output, flag='w'):
         return DummyTqdmFile(sys.stdout)
 
     return open(output, flag)
-
-
-class BooleanAction(argparse.Action):
-    """
-    Custom argparse action to handle --no-* flags.
-    Taken from: https://thisdataguy.com/2017/07/03/no-options-with-argparse-and-python/
-    """
-    def __init__(self, option_strings, dest, nargs=None, **kwargs):
-        super(BooleanAction, self).__init__(option_strings, dest, nargs=0, **kwargs)
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, False if option_string.startswith('--no') else True)
-
-
-class JSONLWriter(object):
-    def __init__(self, file):
-        self.file = file
-
-    def writerow(self, item):
-        row = json.dumps(item, ensure_ascii=False)
-        self.file.write(row + '\n')
 
 
 WorkerPayload = namedtuple(
@@ -193,7 +175,7 @@ def create_report_iterator(namespace, args=None, loading_bar=None):
                 line=line,
                 headers=indexed_headers,
                 path=None,
-                encoding=None,
+                encoding=line[pos.encoding],
                 content=line[pos.raw_content],
                 args=args
             )
@@ -232,3 +214,16 @@ class LazyLineDict(object):
 
     def __getitem__(self, key):
         return self.line[self.headers[key]]
+
+
+class LoadingBarContext(object):
+    __slots__ = ('loading_bar',)
+
+    def __init__(self, loading_bar):
+        self.loading_bar = loading_bar
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        self.loading_bar.update()

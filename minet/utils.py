@@ -15,6 +15,7 @@ import yaml
 import time
 import string
 import mimetypes
+import functools
 import cchardet as chardet
 from random import uniform
 from collections import OrderedDict
@@ -630,9 +631,18 @@ def request_json(http, url, *args, **kwargs):
         return e, response, None
 
 
+def request_text(http, url, *args, encoding='utf-8', **kwargs):
+    err, response = request(http, url, *args, **kwargs)
+
+    if err:
+        return err, response, None
+
+    return None, response, response.data.decode(encoding)
+
+
 class RateLimiter(object):
     """
-    Naive rate limiter context manager with smooth output ().
+    Naive rate limiter context manager with smooth output.
 
     Note that it won't work in a multi-threaded environment.
 
@@ -650,8 +660,11 @@ class RateLimiter(object):
         self.last_entry = None
         self.with_budget = with_budget
 
-    def __enter__(self):
+    def enter(self):
         self.last_entry = time.perf_counter()
+
+    def __enter__(self):
+        return self.enter()
 
     def exit_with_budget(self):
         running_time = time.perf_counter() - self.last_entry
@@ -689,6 +702,154 @@ class RateLimiter(object):
             return self.exit_with_budget()
 
         return self.exit()
+
+
+class RetryableIterator(object):
+    """
+    Iterator exposing a #.retry method that will make sure the next item
+    is the same as the current one.
+    """
+
+    def __init__(self, iterator):
+        self.iterator = iter(iterator)
+        self.current_value = None
+        self.retried = False
+        self.retries = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.retried:
+            self.retried = False
+            return self.current_value
+
+        self.retries = 0
+        self.current_value = next(self.iterator)
+        return self.current_value
+
+    def retry(self):
+        self.retries += 1
+        self.retried = True
+
+
+class RateLimitedIterator(object):
+    """
+    Handy iterator wrapper that will yield its items while respecting a given
+    rate limit and that will not sleep needlessly when the iterator is
+    finally fully consumed.
+    """
+
+    def __init__(self, iterator, max_per_period, period=1.0):
+        self.iterator = RetryableIterator(iterator)
+        self.rate_limiter = RateLimiter(max_per_period, period)
+        self.empty = False
+
+        try:
+            self.next_value = next(self.iterator)
+        except StopIteration:
+            self.next_value = None
+            self.empty = True
+
+    @property
+    def retries(self):
+        return self.iterator.retries
+
+    def retry(self):
+        return self.iterator.retry()
+
+    def __iter__(self):
+        if self.empty:
+            return
+
+        while True:
+            self.rate_limiter.enter()
+
+            yield self.next_value
+
+            # NOTE: if the iterator is fully consumed, this will raise StopIteration
+            # and skip the exit part that could sleep needlessly
+            try:
+                self.next_value = next(self.iterator)
+            except StopIteration:
+                return
+
+            self.rate_limiter.exit()
+
+
+class RateLimiterState(object):
+    def __init__(self, max_per_period, period=1.0):
+        max_per_second = max_per_period / period
+        self.min_interval = 1.0 / max_per_second
+        self.last_entry = None
+
+    def wait_if_needed(self):
+        if self.last_entry is None:
+            return
+
+        running_time = time.perf_counter() - self.last_entry
+        delta = self.min_interval - running_time
+
+        if delta > 0:
+            time.sleep(delta)
+
+    def update(self):
+        self.last_entry = time.perf_counter()
+
+
+def rate_limited(max_per_period, period=1.0):
+    state = RateLimiterState(max_per_period, period)
+
+    def decorate(fn):
+
+        @functools.wraps(fn)
+        def decorated(*args, **kwargs):
+            state.wait_if_needed()
+            result = fn(*args, **kwargs)
+            state.update()
+
+            return result
+
+        return decorated
+
+    return decorate
+
+
+def rate_limited_from_state(state):
+    def decorate(fn):
+
+        @functools.wraps(fn)
+        def decorated(*args, **kwargs):
+            state.wait_if_needed()
+            result = fn(*args, **kwargs)
+            state.update()
+
+            return result
+
+        return decorated
+
+    return decorate
+
+
+def rate_limited_method(attr='rate_limiter_state'):
+    def decorate(fn):
+
+        @functools.wraps(fn)
+        def decorated(self, *args, **kwargs):
+            state = getattr(self, attr)
+
+            if not isinstance(state, RateLimiterState):
+                raise ValueError
+
+            state.wait_if_needed()
+            result = fn(self, *args, **kwargs)
+            state.update()
+
+            return result
+
+        return decorated
+
+    return decorate
 
 
 class PseudoFStringFormatter(string.Formatter):
@@ -749,3 +910,17 @@ def nested_get(path, o):
 def sleep_with_entropy(seconds, max_random_addendum):
     random_addendum = uniform(0, max_random_addendum)
     time.sleep(seconds + random_addendum)
+
+
+def chunks_iter(iterator, chunk_size):
+    chunk = []
+
+    for item in iterator:
+        if len(chunk) == chunk_size:
+            yield chunk
+            chunk = []
+
+        chunk.append(item)
+
+    if chunk:
+        yield chunk

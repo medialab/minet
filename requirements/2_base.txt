@@ -1,17 +1,20 @@
 # Dependencies
 beautifulsoup4==4.7.1
 browser-cookie3==0.7.6
+casanova==0.7.0
 cchardet==2.1.4
 cython==0.29.4
 dateparser==0.7.1
 json5==0.8.5
 keyring<19.3
 lxml==4.3.0
+ndjson==0.3.1
 numpy==1.16.1
 persist-queue==0.4.2
 pytz==2019.3
 pyyaml==5.1.2
 quenouille==0.6.0
 tqdm==4.31.1
-ural==0.20.0
+twitter==1.18.0
+ural==0.24.1
 urllib3[secure]==1.25.3
