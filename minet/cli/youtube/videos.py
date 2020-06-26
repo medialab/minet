@@ -113,13 +113,14 @@ def videos_action(namespace, output_file):
 
         iterator = []
         for row, ytb_data in enricher.cells(namespace.column, with_rows=True):
+            video_id = ''
+
             if is_youtube_video_id(ytb_data):
                 video_id = ytb_data
             elif is_youtube_url(ytb_data):
                 video_id = extract_video_id_from_youtube_url(ytb_data)
-                ytb_data = video_id
 
-            iterator.append((row, ytb_data))
+            iterator.append((row, video_id))
 
         return iterator
 
