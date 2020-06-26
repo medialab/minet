@@ -109,16 +109,22 @@ def videos_action(namespace, output_file):
     http = create_pool()
     column = namespace.column
 
-    for chunk in chunks_iter(enricher.cells(column, with_rows=True), 50):
-        for i, (row, ytb_data) in enumerate(chunk):
-            video_id = None
+    def iterator():
 
+        iterator = []
+        for row, ytb_data in enricher.cells(namespace.column, with_rows=True):
             if is_youtube_video_id(ytb_data):
                 video_id = ytb_data
             elif is_youtube_url(ytb_data):
                 video_id = extract_video_id_from_youtube_url(ytb_data)
+                ytb_data = video_id
 
-            chunk[i][1] = video_id
+            iterator.append((row, ytb_data))
+
+        return iterator
+
+
+    for chunk in chunks_iter(iterator(), 50):
 
         all_ids = [video_id for _, video_id in chunk if video_id]
         list_id = ",".join(all_ids)
