@@ -77,7 +77,7 @@ def crowdtangle_summary_action(namespace, output_file):
 
             if posts is not None:
                 for post in posts:
-                    posts_writer.writerow(post)
+                    posts_writer.writerow([url] + post)
 
         enricher.writerow(row, stats)
 
