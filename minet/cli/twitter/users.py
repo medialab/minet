@@ -8,15 +8,15 @@ import casanova
 from minet.twitter.utils import TwitterWrapper, clean_user_entities, get_timestamp
 from minet.utils import chunks_iter
 from tqdm import tqdm
-from datetime import datetime
+import datetime
 
 REPORT_HEADERS = [
     'id_str',
     'screen_name',
     'name',
     'location',
-    'created_at',
-    'created_at_iso',
+    'created_at_utc',
+    'created_at_iso_local',
     'description',
     'url',
     'protected',
@@ -36,6 +36,7 @@ REPORT_HEADERS = [
 def get_data(result, key):
 
     data_indexed = {}
+    locale = datetime.datetime.now(datetime.timezone(datetime.timedelta(0))).astimezone().tzinfo
 
     for element in result:
         clean_user_entities(element)
@@ -43,10 +44,10 @@ def get_data(result, key):
         user_index = element.get(key)
 
         def getter(element, k):
-            if key != 'created_at_iso':
+            if k != 'created_at_iso_local':
                 return element.get(k)
             else:
-                return datetime.strptime(element.get('created_at'), '%a %b %d %H:%M:%S +0000 %Y').isoformat()
+                return get_timestamp(element.get('created_at'), locale)
 
         data = [getter(element, key) for key in REPORT_HEADERS]
 
