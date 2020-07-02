@@ -6,11 +6,11 @@
 #
 
 import json
-from time import time, sleep
-from pytz import timezone
+import time
 from datetime import datetime
+from time import sleep
+from pytz import timezone
 from twitter import Twitter, OAuth, OAuth2, TwitterHTTPError
-
 from minet.cli.utils import print_err
 
 
@@ -66,12 +66,12 @@ class TwitterWrapper(object):
                 print_err("%s: %s" % (type(e), e))
 
 
-def get_timestamp(t):
+def get_timestamp(t, locale):
     tim = datetime.strptime(t, '%a %b %d %H:%M:%S +0000 %Y')
-    # if locale:
-    #     utc_date = timezone('UTC').localize(tim)
-    #     locale_date = utc_date.astimezone(locale)
-    #     return time.mktime(locale_date.timetuple())
+    if locale:
+        utc_date = timezone('UTC').localize(tim)
+        locale_date = utc_date.astimezone(locale)
+        return locale_date
     return tim.isoformat()
 
 

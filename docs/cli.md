@@ -38,7 +38,9 @@
 * [twitter](#twitter)
   * [followers](#followers)
   * [friends](#friends)
+  * [users](#users)
 * [youtube (yt)](#youtube)
+  * [captions](#captions)
   * [comments](#comments)
   * [url-parse](#youtube-url-parse)
   * [videos](#videos)
@@ -565,7 +567,7 @@ examples:
 ```
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [--posts POSTS] [-s SELECT]
-                                 [--sort-by {total_interactions,subscriber_count,date}]
+                                 [--sort-by {date,total_interactions,subscriber_count}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -586,7 +588,7 @@ optional arguments:
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {total_interactions,subscriber_count,date}
+  --sort-by {date,total_interactions,subscriber_count}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
@@ -823,7 +825,68 @@ examples:
 
 ```
 
+### users
+
+```
+usage: minet twitter users [-h] [--api-key API_KEY]
+                           [--api-secret-key API_SECRET_KEY]
+                           [--access-token ACCESS_TOKEN]
+                           [--access-token-secret ACCESS_TOKEN_SECRET] [--id]
+                           [-o OUTPUT] [-s SELECT] [--resume] [--total TOTAL]
+                           column [file]
+
+Minet Twitter Users Command
+===========================
+
+Retrieve metadata from a given user.
+
+positional arguments:
+  column                                     Name of the column containing the Twitter account screen names.
+  file                                       CSV file containing the inquired Twitter users.
+
+optional arguments:
+  -h, --help                                 show this help message and exit
+  --api-key API_KEY                          Twitter API key.
+  --api-secret-key API_SECRET_KEY            Twitter API secret key.
+  --access-token ACCESS_TOKEN                Twitter API access token.
+  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret.
+  --id                                       Whether to use Twitter user ids rather than screen names.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
+  -s SELECT, --select SELECT                 Columns to include in report (separated by `,`).
+  --resume                                   Whether to resume an aborted collection.
+  --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Getting metadata from an user:
+    `minet tw users screen_name users.csv > data_users.csv`
+
+```
+
 ## Youtube
+
+### captions
+
+```
+usage: minet youtube captions [-h] [-o OUTPUT] [-s SELECT] [--lang LANG]
+                              column [file]
+
+Youtube captions
+================
+
+Retrieve metadata about Youtube captions.
+
+positional arguments:
+  column                      Name of the column containing the video's url or id.
+  file                        CSV file containing the Youtube videos urls or ids.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+  --lang LANG                 Language (ISO code like "fr") of captions to retrieve.
+
+```
 
 ### comments
 
