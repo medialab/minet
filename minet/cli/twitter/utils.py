@@ -6,7 +6,6 @@
 #
 import casanova
 from tqdm import tqdm
-from datetime import datetime
 
 from minet.twitter.utils import TwitterWrapper
 
