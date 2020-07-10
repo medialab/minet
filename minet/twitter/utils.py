@@ -5,9 +5,8 @@
 # Miscellaneous utility functions to be used in the twitter packages.
 #
 import json
-import time
 from datetime import datetime
-from time import sleep
+from time import sleep, time
 from pytz import timezone
 from twitter import Twitter, OAuth, OAuth2, TwitterHTTPError
 from minet.cli.utils import print_err
