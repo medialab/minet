@@ -24,8 +24,7 @@ from minet.cli.facebook.utils import grab_facebook_cookie
 from minet.cli.facebook.constants import FACEBOOK_MOBILE_DEFAULT_THROTTLE
 
 BASE_URL = 'https://m.facebook.com'
-VALID_ID_RE = re.compile(r'^(?:see_prev_)?\d+$')
-#VALID_ID_RE = re.compile(r'^((?:see_next_)?\d+$)')
+VALID_ID_RE = re.compile(r'^((?:see_next_)?\d+$)')
 
 CSV_HEADERS = [
     'post_id',
@@ -57,7 +56,7 @@ def parse_formatted_date(formatted_date):
     try:
         return dateparser.parse(
             formatted_date,
-            languages=['fr']
+            languages=['en']
         )
     except ValueError:
         return None
@@ -118,11 +117,12 @@ def scrape_comments(html, in_reply_to=None):
         # TODO: this is baaaad
         data['post_id'] = post_id
 
-        reactions_item = item.find("a", class_="ea eb")
+        #reactions_item = item.find("a", class_="ea eb")
+        reactions_item = item.select('a[href^="/ufi/reaction"]')
         reactions = '0'
 
-        if reactions_item is not None:
-            reactions = reactions_item.get_text().strip()
+        if len(reactions_item) != 0:
+            reactions = reactions_item[0].get_text().strip()
 
         replies_items = item.select('a[href^="/comment/replies"]')
         replies = '0'
@@ -207,8 +207,6 @@ def facebook_comments_action(namespace):
 
         if data['next'] is not None:
             url_queue.append((data['next'], in_reply_to))
-
-        print(url_queue)
 
         for comment in data['comments']:
             loading_bar.update()
