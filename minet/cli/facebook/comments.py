@@ -86,7 +86,7 @@ def scrape_comments(html, in_reply_to=None):
         if item_id is None:
             continue
 
-        if item_id.startswith('see_prev'):
+        if item_id.startswith('see_next'):
             next_link = item.select_one('a')
             data['next'] = urljoin(BASE_URL, next_link.get('href'))
             break
@@ -117,7 +117,6 @@ def scrape_comments(html, in_reply_to=None):
         # TODO: this is baaaad
         data['post_id'] = post_id
 
-        #reactions_item = item.find("a", class_="ea eb")
         reactions_item = item.select('a[href^="/ufi/reaction"]')
         reactions = '0'
 
@@ -129,12 +128,11 @@ def scrape_comments(html, in_reply_to=None):
 
         if len(replies_items) > 0:
             replies_item = replies_items[-1]
-
             if replies_item is not None:
                 replies_text = replies_item.get_text()
 
                 if replies_text != 'Reply':
-                    replies = replies_text.split('·')[-1].split(' rép')[0].strip()
+                    replies = replies_text.split('·')[-1].split(' rep')[0].strip()
                     replies_url = replies_item.get('href')
                     data['replies'].append((urljoin(BASE_URL, replies_url), item_id))
 
@@ -175,7 +173,7 @@ def facebook_comments_action(namespace):
     http = create_pool()
 
     def request_page(target):
-        error, result = request(http, target, cookie=cookie)
+        error, result = request(http, target, cookie=cookie, headers={'Accept-Language' : 'en-US;q=0.5'})
 
         if error is not None:
             raise error
@@ -210,7 +208,7 @@ def facebook_comments_action(namespace):
 
         for comment in data['comments']:
             loading_bar.update()
-            writer.writerow(format_csv_row(comment))
+            #writer.writerow(format_csv_row(comment))
 
             if in_reply_to is not None:
                 replies_count += 1
