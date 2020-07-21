@@ -131,10 +131,13 @@ def scrape_comments(html, in_reply_to=None):
             if replies_item is not None:
                 replies_text = replies_item.get_text()
 
-                if replies_text != 'Reply':
-                    replies = replies_text.split('·')[-1].split(' rep')[0].strip()
-                    replies_url = replies_item.get('href')
-                    data['replies'].append((urljoin(BASE_URL, replies_url), item_id))
+                for word in replies_text.split():
+                    if word.isdigit():
+                        replies = word
+                        break
+
+                replies_url = replies_item.get('href')
+                data['replies'].append((urljoin(BASE_URL, replies_url), item_id))
 
         data['comments'].append({
             'post_id': post_id,
@@ -173,7 +176,7 @@ def facebook_comments_action(namespace):
     http = create_pool()
 
     def request_page(target):
-        error, result = request(http, target, cookie=cookie, headers={'Accept-Language' : 'en-US;q=0.5'})
+        error, result = request(http, target, cookie=cookie, headers={'Accept-Language' : 'en-US,en;q=0.5'})
 
         if error is not None:
             raise error
@@ -208,7 +211,7 @@ def facebook_comments_action(namespace):
 
         for comment in data['comments']:
             loading_bar.update()
-            #writer.writerow(format_csv_row(comment))
+            writer.writerow(format_csv_row(comment))
 
             if in_reply_to is not None:
                 replies_count += 1
