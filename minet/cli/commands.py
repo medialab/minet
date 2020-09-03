@@ -137,7 +137,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-l', '--limit'],
-                            'help': 'Maximum number of posts to retrieve. Will fetch every post by default.',
+                            'help': 'Maximum number of accounts to retrieve. Will fetch every account by default.',
                             'type': int
                         },
                         {
