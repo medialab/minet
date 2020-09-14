@@ -12,6 +12,7 @@ from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
 from minet.cli.utils import die
 from minet.cli.argparse import (
     BooleanAction,
+    ConfigAction,
     CrowdtanglePartitionStrategyType,
     SplitterType
 )
@@ -105,7 +106,9 @@ MINET_COMMANDS = {
                 },
                 {
                     'flags': ['-t', '--token'],
-                    'help': 'CrowdTangle dashboard API token.'
+                    'help': 'CrowdTangle dashboard API token.',
+                    'action': ConfigAction,
+                    'rc_key': ['crowdtangle', 'token']
                 }
             ],
             'commands': {

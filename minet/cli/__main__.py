@@ -19,6 +19,7 @@ from argparse import (
 
 from minet.__version__ import __version__
 from minet.cli.utils import die, get_rcfile
+from minet.cli.argparse import WrappedConfigValue
 
 from minet.cli.commands import MINET_COMMANDS
 
@@ -189,6 +190,13 @@ def main():
 
         # Loading config
         config = get_rcfile(args.rcfile)
+
+        # Bootstrapping config
+        for name in vars(args):
+            value = getattr(args, name)
+
+            if isinstance(value, WrappedConfigValue):
+                setattr(args, name, value.resolve(config))
 
         # Need to check something?
         if 'before' in action['command']:
