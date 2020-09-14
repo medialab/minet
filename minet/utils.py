@@ -891,7 +891,7 @@ def load_definition(f):
     return definition
 
 
-def nested_get(path, o):
+def nested_get(path, o, default=None):
     if isinstance(path, str):
         path = path.split('.')
 
@@ -902,7 +902,7 @@ def nested_get(path, o):
             else:
                 getattr(o, step)
         except (IndexError, KeyError, AttributeError):
-            return None
+            return default
 
     return o
 

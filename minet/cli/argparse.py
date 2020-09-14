@@ -44,21 +44,25 @@ class SplitterType(object):
 
 
 class WrappedConfigValue(object):
-    def __init__(self, key, value=None):
+    def __init__(self, key, default):
         self.key = key
-        self.value = value
+        self.default = default
 
     def resolve(self, config):
-        if self.value is not None:
-            return self.value
-
-        return nested_get(self.key, config)
+        return nested_get(self.key, config, self.default)
 
 
 class ConfigAction(Action):
-    def __init__(self, option_strings, dest, rc_key, **kwargs):
-        super(ConfigAction, self).__init__(option_strings, dest, default=WrappedConfigValue(rc_key), **kwargs)
-        self.rc_key = rc_key
+    def __init__(self, option_strings, dest, rc_key, default=None, **kwargs):
+        super(ConfigAction, self).__init__(
+            option_strings,
+            dest,
+            default=WrappedConfigValue(
+                rc_key,
+                default
+            ),
+            **kwargs
+        )
 
     def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, WrappedConfigValue(self.rc_key, values))
+        setattr(namespace, self.dest, values)

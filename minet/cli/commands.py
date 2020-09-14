@@ -96,9 +96,11 @@ MINET_COMMANDS = {
             'common_arguments': [
                 {
                     'flag': '--rate-limit',
-                    'help': 'Authorized number of hits by minutes. Defaults to %i.' % CROWDTANGLE_DEFAULT_RATE_LIMIT,
+                    'help': 'Authorized number of hits by minutes. Defaults to %i. Rcfile key: crowdtangle.rate_limit' % CROWDTANGLE_DEFAULT_RATE_LIMIT,
                     'type': int,
-                    'default': CROWDTANGLE_DEFAULT_RATE_LIMIT
+                    'default': CROWDTANGLE_DEFAULT_RATE_LIMIT,
+                    'rc_key': ['crowdtangle', 'rate_limit'],
+                    'action': ConfigAction
                 },
                 {
                     'flags': ['-o', '--output'],
@@ -106,7 +108,7 @@ MINET_COMMANDS = {
                 },
                 {
                     'flags': ['-t', '--token'],
-                    'help': 'CrowdTangle dashboard API token.',
+                    'help': 'CrowdTangle dashboard API token. Rcfile key: crowdtangle.token',
                     'action': ConfigAction,
                     'rc_key': ['crowdtangle', 'token']
                 }
