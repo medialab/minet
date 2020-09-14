@@ -18,7 +18,7 @@ from argparse import (
 )
 
 from minet.__version__ import __version__
-from minet.cli.utils import die
+from minet.cli.utils import die, get_rcfile
 
 from minet.cli.commands import MINET_COMMANDS
 
@@ -45,11 +45,11 @@ def custom_formatter(prog):
     )
 
 
-def omit(d, key_to_omit):
+def omit(d, keys_to_omit):
     nd = {}
 
     for k, v in d.items():
-        if k == key_to_omit:
+        if k in keys_to_omit:
             continue
 
         nd[k] = v
@@ -76,14 +76,20 @@ def get_subparser(o, keys):
     return parser
 
 
+ARGUMENT_KEYS_TO_OMIT = ['name', 'flag', 'flags']
+
+
 def add_arguments(subparser, arguments):
     for argument in arguments:
+
+        argument_kwargs = omit(argument, ARGUMENT_KEYS_TO_OMIT)
+
         if 'name' in argument:
-            subparser.add_argument(argument['name'], **omit(argument, 'name'))
+            subparser.add_argument(argument['name'], **argument_kwargs)
         elif 'flag' in argument:
-            subparser.add_argument(argument['flag'], **omit(argument, 'flag'))
+            subparser.add_argument(argument['flag'], **argument_kwargs)
         else:
-            subparser.add_argument(*argument['flags'], **omit(argument, 'flags'))
+            subparser.add_argument(*argument['flags'], **argument_kwargs)
 
 
 def build_description(command):
@@ -156,6 +162,7 @@ def build_parser(commands):
     parser = ArgumentParser(prog='minet')
 
     parser.add_argument('--version', action='version', version='minet %s' % __version__)
+    parser.add_argument('--rcfile', help='Custom path to a minet configuration file.')
 
     subparser_index = {}
 
@@ -179,6 +186,9 @@ def main():
     action = subparser_index.get(args.action)
 
     if action is not None:
+
+        # Loading config
+        config = get_rcfile(args.rcfile)
 
         # Need to check something?
         if 'before' in action['command']:
