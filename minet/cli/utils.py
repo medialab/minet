@@ -7,8 +7,9 @@
 import csv
 import sys
 import codecs
+import yaml
 from glob import iglob
-from os.path import join
+from os.path import join, expanduser, isfile
 from collections import namedtuple
 from tqdm import tqdm
 
@@ -227,3 +228,28 @@ class LoadingBarContext(object):
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
         self.loading_bar.update()
+
+
+def get_rcfile(rcfile_path=None):
+    home = expanduser('~')
+
+    files = [
+        rcfile_path,
+        '.minetrc',
+        '.minetrc.yml',
+        '.minetrc.yaml',
+        '.minetrc.json',
+        join(home, '.minetrc'),
+        join(home, '.minetrc.yml'),
+        join(home, '.minetrc.yaml'),
+        join(home, '.minetrc.json')
+    ]
+
+    for p in files:
+        if p is None or not isfile(p):
+            continue
+
+        with open(p) as f:
+            return yaml.load(f, Loader=yaml.Loader)
+
+    return None
