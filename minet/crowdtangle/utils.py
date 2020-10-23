@@ -35,6 +35,23 @@ def day_range(end):
         yield current_date.isoformat(), end_date.isoformat()
 
 
+def years_iter(start_date, end_date):
+    current_year = int(end_date[:4])
+    target_year = int(start_date[:4])
+
+    current_start_date = str(current_year) + '-01-01T00:00:00'
+    current_end_date = end_date
+
+    while current_year > target_year:
+        yield current_start_date, current_end_date
+
+        current_year -= 1
+        current_end_date = current_start_date[:4] + '-12-31T23:59:59'
+        current_start_date = str(current_year) + current_start_date[4:]
+
+    yield start_date, current_end_date
+
+
 def infer_end_date():
     return datetime.now().isoformat(timespec='seconds')
 
