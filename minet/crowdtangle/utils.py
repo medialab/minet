@@ -5,7 +5,7 @@
 # Miscellaneous generic functions used throughout the CrowdTangle namespace.
 #
 import json
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 from minet.utils import request, rate_limited_from_state
 from minet.crowdtangle.constants import (
@@ -33,6 +33,10 @@ def day_range(end):
         current_date -= day_delta
 
         yield current_date.isoformat(), end_date.isoformat()
+
+
+def infer_end_date():
+    return datetime.now().isoformat(timespec='seconds')
 
 
 # TODO: __call__ should receive a status to make finer decisions
@@ -166,6 +170,14 @@ def make_paginated_iterator(url_forge, item_key, formatter,
             kwargs = vars(namespace)
         else:
             kwargs['token'] = token
+
+        # Inferring end date to be now, this will be important later
+        if kwargs.get('end_date') is None:
+            kwargs['end_date'] = infer_end_date()
+
+        # "Fixing" end_date to go to before midnight to avoid common issues
+        if 'T' not in kwargs['end_date']:
+            kwargs['end_date'] += 'T23:59:59'
 
         if format not in CROWDTANGLE_OUTPUT_FORMATS:
             raise TypeError('minet.crowdtangle: unkown `format`.')
