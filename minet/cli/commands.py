@@ -203,7 +203,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--partition-strategy',
-                            'help': 'Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts.',
+                            'help': 'Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts. Will default to `500` if --sort-by is `date`.',
                             'type': CrowdtanglePartitionStrategyType()
                         },
                         {
@@ -320,7 +320,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--partition-strategy',
-                            'help': 'Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts.',
+                            'help': 'Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts. Will default to `500` if --sort-by is `date`.',
                             'type': CrowdtanglePartitionStrategyType()
                         },
                         {

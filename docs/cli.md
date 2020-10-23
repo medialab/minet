@@ -369,9 +369,9 @@ Gather data from the CrowdTangle APIs easily and efficiently.
 
 optional arguments:
   -h, --help                                      show this help message and exit
-  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6.
+  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
-  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
+  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
 
 actions:
   {leaderboard,lists,posts,posts-by-id,search,summary}
@@ -395,12 +395,12 @@ the designated dashboard (indicated by a given token).
 
 optional arguments:
   -h, --help                            show this help message and exit
-  --rate-limit RATE_LIMIT               Authorized number of hits by minutes. Defaults to 6.
+  --rate-limit RATE_LIMIT               Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
   -o OUTPUT, --output OUTPUT            Path to the output file. By default, everything will be printed to stdout.
-  -t TOKEN, --token TOKEN               CrowdTangle dashboard API token.
+  -t TOKEN, --token TOKEN               CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
   --no-breakdown                        Whether to skip statistics breakdown by post type in the CSV output.
   -f {csv,jsonl}, --format {csv,jsonl}  Output format. Defaults to `csv`.
-  -l LIMIT, --limit LIMIT               Maximum number of posts to retrieve. Will fetch every post by default.
+  -l LIMIT, --limit LIMIT               Maximum number of accounts to retrieve. Will fetch every account by default.
   --list-id LIST_ID                     Optional list id from which to retrieve accounts.
 
 examples:
@@ -424,9 +424,9 @@ given token).
 
 optional arguments:
   -h, --help                  show this help message and exit
-  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6.
+  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, everything will be printed to stdout.
-  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token.
+  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
 
 examples:
 
@@ -454,9 +454,9 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
-  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6.
+  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, everything will be printed to stdout.
-  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token.
+  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
   -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
   --resume                    Whether to resume an aborted collection.
   --total TOTAL               Total number of posts. Necessary if you want to display a finite progress indicator.
@@ -491,15 +491,15 @@ a given token).
 
 optional arguments:
   -h, --help                                      show this help message and exit
-  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6.
+  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
-  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
+  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
   --end-date END_DATE                             The latest date at which a post could be posted (UTC!).
   -f {csv,jsonl}, --format {csv,jsonl}            Output format. Defaults to `csv`.
   --language LANGUAGE                             Language of posts to retrieve.
   -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
   --list-ids LIST_IDS                             Ids of the lists from which to retrieve posts, separated by commas.
-  --partition-strategy PARTITION_STRATEGY         Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts.
+  --partition-strategy PARTITION_STRATEGY         Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts. Will default to `500` if --sort-by is `date`.
   --resume                                        Whether to resume an interrupted collection. Requires -o/--output & --sort-by date
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
@@ -538,9 +538,9 @@ positional arguments:
 
 optional arguments:
   -h, --help                                      show this help message and exit
-  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6.
+  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
-  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
+  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
   --and AND                                       AND clause to add to the query terms.
   --end-date END_DATE                             The latest date at which a post could be posted (UTC!).
   -f {csv,jsonl}, --format {csv,jsonl}            Output format. Defaults to `csv`.
@@ -548,7 +548,7 @@ optional arguments:
   -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
   --not-in-title                                  Whether to search terms in account titles also.
   --offset OFFSET                                 Count offset.
-  --partition-strategy PARTITION_STRATEGY         Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts.
+  --partition-strategy PARTITION_STRATEGY         Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts. Will default to `500` if --sort-by is `date`.
   -p PLATFORMS, --platforms PLATFORMS             The platforms, separated by comma from which to retrieve posts.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
@@ -567,7 +567,7 @@ examples:
 ```
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [--posts POSTS] [-s SELECT]
-                                 [--sort-by {date,total_interactions,subscriber_count}]
+                                 [--sort-by {date,subscriber_count,total_interactions}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -583,12 +583,12 @@ positional arguments:
 
 optional arguments:
   -h, --help                                      show this help message and exit
-  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6.
+  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
-  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token.
+  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {date,total_interactions,subscriber_count}
+  --sort-by {date,subscriber_count,total_interactions}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
