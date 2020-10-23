@@ -16,7 +16,8 @@ from minet.crowdtangle.exceptions import (
     CrowdTangleInvalidTokenError,
     CrowdTangleInvalidRequestError,
     CrowdTangleInvalidJSONError,
-    CrowdTangleExhaustedPagination
+    CrowdTangleExhaustedPaginationError,
+    CrowdTangleRateLimitExceeded
 )
 
 DAY_DELTA = timedelta(days=1)
@@ -46,7 +47,7 @@ def years_iter(start_date, end_date):
         yield current_start_date, current_end_date
 
         current_year -= 1
-        current_end_date = current_start_date[:4] + '-12-31T23:59:59'
+        current_end_date = str(current_year) + '-12-31T23:59:59'
         current_start_date = str(current_year) + current_start_date[4:]
 
     yield start_date, current_end_date
@@ -107,12 +108,35 @@ class PartitionStrategyLimit(PartitionStrategyNoop):
         self.seen = 0
         self.shifts = 0
         self.limit = limit
+        self.started = False
+
+        self.years = years_iter(self.kwargs['start_date'], self.kwargs['end_date'])
+        self.rotate_year()
+
+    def rotate_year(self):
+        try:
+            start_date, end_date = next(self.years)
+            self.kwargs['start_date'] = start_date
+            self.kwargs['end_date'] = end_date
+        except StopIteration:
+            return False
+
+        return True
 
     def __call__(self, items):
-        if self.last_item is not None:
-            if items is None:
+        if not self.started:
+            self.started = True
+            return self.url_forge(**self.kwargs)
+
+        if items is None:
+            could_rotate = self.rotate_year()
+
+            if not could_rotate:
                 return None
 
+            return self.url_forge(**self.kwargs)
+
+        if self.last_item is not None:
             self.kwargs['end_date'] = self.last_item['date'].replace(' ', 'T')
 
         return self.url_forge(**self.kwargs)
@@ -152,6 +176,9 @@ def step(http, url, item_key):
     if result.status == 401:
         raise CrowdTangleInvalidTokenError
 
+    elif result.status == 429:
+        raise CrowdTangleRateLimitExceeded
+
     # Bad params
     if result.status >= 400:
         data = json.loads(result.data.decode('utf-8'))
@@ -163,7 +190,7 @@ def step(http, url, item_key):
         raise CrowdTangleInvalidJSONError
 
     if item_key not in data or len(data[item_key]) == 0:
-        raise CrowdTangleExhaustedPagination
+        raise CrowdTangleExhaustedPaginationError
 
     # Extracting next link
     pagination = data['pagination']
@@ -200,12 +227,12 @@ def make_paginated_iterator(url_forge, item_key, formatter,
             raise TypeError('minet.crowdtangle: unkown `format`.')
 
         if partition_strategy is not None:
+            if kwargs.get('start_date') is None:
+                raise CrowdTangleMissingStartDateError
+
             if isinstance(partition_strategy, int):
                 partition_strategy = PartitionStrategyLimit(kwargs, url_forge, partition_strategy)
             else:
-                if partition_strategy == 'day' and kwargs.get('start_date') is None:
-                    raise CrowdTangleMissingStartDateError
-
                 partition_strategy = PARTITION_STRATEGIES[partition_strategy](kwargs, url_forge)
         else:
             partition_strategy = PartitionStrategyNoop(kwargs, url_forge)
@@ -226,7 +253,7 @@ def make_paginated_iterator(url_forge, item_key, formatter,
 
             try:
                 items, next_url = rate_limited_step(http, url, item_key)
-            except CrowdTangleExhaustedPagination:
+            except CrowdTangleExhaustedPaginationError:
                 url = partition_strategy(None)
                 continue
 
@@ -272,7 +299,7 @@ def make_paginated_iterator(url_forge, item_key, formatter,
 
             # Paginating
             if next_url is None:
-                url = partition_strategy(items)
+                url = partition_strategy(None)
                 continue
 
             if partition_strategy.should_go_next(items):
