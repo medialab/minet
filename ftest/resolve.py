@@ -14,6 +14,8 @@ URLS = [
 
     # Meta refresh & UA nonsense
     'http://bit.ly/2YupNmj',
+    'http://www.google.com/url?q=http%3A%2F%2Fwww.violenciadomestica.org.uy%2F&sa=D&sntz=1&usg=AFQjCNH5HZgs1Y1GcT6N1SuaiiYqw_rZtQ',
+    # 'https://www.google.com/url?q=https://www.facebook.com/Contaniunamenos/&sa=D&ust=1603455678482000&usg=AFQjCNFSANkezX4k8Fk4sY6xg30u6CHO2Q',
 
     # Invalid URL
     'http://www.outremersbeyou.com/talent-de-la-semaine-la-designer-comorienne-aisha-wadaane-je-suis-fiere-de-mes-origines/',

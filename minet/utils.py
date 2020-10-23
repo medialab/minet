@@ -147,7 +147,7 @@ def parse_http_refresh(value):
 
         duration, url = value.strip().split(';', 1)
 
-        if not url.lower().startswith('url='):
+        if not url.lower().strip().startswith('url='):
             return None
 
         return int(duration), str(url.split('=', 1)[1])
