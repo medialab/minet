@@ -18,7 +18,13 @@ class CrowdTangleInvalidTokenError(CrowdTangleError):
 
 
 class CrowdTangleInvalidRequestError(CrowdTangleError):
-    pass
+    def __init__(self, message=None, status=None, code=None):
+        super().__init__(message)
+        self.code = code
+        self.status = status
+
+    def __str__(self):
+        return super().__str__() + ', Code: %i, Status: %i' % (self.code, self.status)
 
 
 class CrowdTangleMissingStartDateError(CrowdTangleError):

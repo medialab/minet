@@ -133,7 +133,8 @@ def step(http, url, item_key):
 
     # Bad params
     if result.status >= 400:
-        raise CrowdTangleInvalidRequestError
+        data = json.loads(result.data.decode('utf-8'))
+        raise CrowdTangleInvalidRequestError(data['message'], code=data['code'], status=result.status)
 
     try:
         data = json.loads(result.data)['result']
