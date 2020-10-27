@@ -13,6 +13,8 @@ from os.path import join, expanduser, isfile
 from collections import namedtuple
 from tqdm import tqdm
 
+from minet.cli.exceptions import MissingColumnError
+
 
 def print_err(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
@@ -89,41 +91,50 @@ def open_output_file(output, flag='w'):
 
 WorkerPayload = namedtuple(
     'WorkerPayload',
-    ['line', 'headers', 'path', 'encoding', 'content', 'args']
+    ['row', 'headers', 'path', 'encoding', 'content', 'args']
 )
 
+REPORT_HEADERS = ['status', 'filename', 'encoding']
 
-def create_report_iterator(namespace, args=None, loading_bar=None):
-    input_headers, pos, reader = custom_reader(namespace.report, ('status', 'filename', 'encoding', 'raw_content'))
 
-    indexed_headers = {h: p for p, h in enumerate(input_headers)}
+def create_report_iterator(namespace, enricher, args=None, loading_bar=None):
+    for col in REPORT_HEADERS:
+        if col not in enricher.pos:
+            raise MissingColumnError(col)
 
-    for line in reader:
-        status = int(line[pos.status]) if line[pos.status] else None
-        filename = line[pos.filename]
+    status_pos = enricher.pos.status
+    filename_pos = enricher.pos.filename
+    encoding_pos = enricher.pos.encoding
+    raw_content_pos = enricher.pos.get('raw_content')
+
+    indexed_headers = {h: p for p, h in enumerate(enricher.fieldnames)}
+
+    for row in enricher:
+        status = int(row[status_pos]) if row[status_pos] else None
+        filename = row[filename_pos]
 
         if status is None or status >= 400 or not filename:
             if loading_bar is not None:
                 loading_bar.update()
             continue
 
-        if pos.raw_content is not None:
+        if raw_content_pos is not None:
             yield WorkerPayload(
-                line=line,
+                row=row,
                 headers=indexed_headers,
                 path=None,
-                encoding=line[pos.encoding],
-                content=line[pos.raw_content],
+                encoding=row[encoding_pos],
+                content=row[raw_content_pos],
                 args=args
             )
 
             continue
 
         path = join(namespace.input_directory, filename)
-        encoding = line[pos.encoding].strip() or 'utf-8'
+        encoding = row[encoding_pos].strip() or 'utf-8'
 
         yield WorkerPayload(
-            line=line,
+            row=row,
             headers=indexed_headers,
             path=path,
             encoding=encoding,
@@ -135,7 +146,7 @@ def create_report_iterator(namespace, args=None, loading_bar=None):
 def create_glob_iterator(namespace, args):
     for p in iglob(namespace.glob, recursive=True):
         yield WorkerPayload(
-            line=None,
+            row=None,
             headers=None,
             path=p,
             encoding='utf-8',

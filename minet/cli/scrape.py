@@ -8,6 +8,7 @@ import csv
 import gzip
 import codecs
 import ndjson
+import casanova
 from collections import namedtuple
 from os.path import basename
 from multiprocessing import Pool
@@ -30,7 +31,7 @@ ScrapeWorkerResult = namedtuple(
 
 
 def worker(payload):
-    line, headers, path, encoding, content, scraper = payload
+    row, headers, path, encoding, content, scraper = payload
 
     # Reading from file
     if content is None:
@@ -49,8 +50,8 @@ def worker(payload):
     # Building context
     context = {}
 
-    if line:
-        context['line'] = LazyLineDict(headers, line)
+    if row:
+        context['row'] = LazyLineDict(headers, row)
 
     if path:
         context['path'] = path
@@ -96,7 +97,8 @@ def scrape_action(namespace):
     if namespace.glob is not None:
         files = create_glob_iterator(namespace, scraper)
     else:
-        files = create_report_iterator(namespace, scraper, loading_bar)
+        reader = casanova.reader(namespace.report)
+        files = create_report_iterator(namespace, reader, scraper, loading_bar)
 
     with Pool(namespace.processes) as pool:
         for error, items in pool.imap_unordered(worker, files):

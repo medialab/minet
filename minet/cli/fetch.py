@@ -128,11 +128,12 @@ def fetch_action(namespace):
 
     url_pos = enricher.pos[namespace.column]
 
-    # TODO: use #.get when casanova#11 is implemented
-    filename_pos = None
+    if namespace.filename not in enricher.pos:
+        die([
+            'Could not find the "%s" containing the filenames in the given CSV file.' % namespace.filename
+        ])
 
-    if namespace.filename in enricher.pos:
-        filename_pos = enricher.pos[namespace.filename]
+    filename_pos = enricher.pos[namespace.filename]
 
     indexed_input_headers = {h: i for i, h in enumerate(enricher.fieldnames)}
 
