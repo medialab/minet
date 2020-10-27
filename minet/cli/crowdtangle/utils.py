@@ -23,11 +23,6 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None):
         # Do we need to resume?
         need_to_resume = False
 
-        # Default partition_strategy
-        if hasattr(namespace, 'partition_strategy'):
-            if namespace.sort_by == 'date' and namespace.partition_strategy is None:
-                namespace.partition_strategy = 500
-
         if getattr(namespace, 'resume', False):
             need_to_resume = True
 

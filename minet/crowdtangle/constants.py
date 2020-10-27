@@ -80,10 +80,6 @@ CROWDTANGLE_FULL_STATISTICS = STATISTICS = [
     ('threePlusMinuteVideoCount', 'three_plus_minute_video_count')
 ]
 
-CROWDTANGLE_PARTITION_STRATEGIES = {
-    'day'
-}
-
 CROWDTANGLE_PLATFORMS = {
     'facebook',
     'instagram',

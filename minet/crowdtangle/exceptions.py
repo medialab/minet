@@ -35,9 +35,5 @@ class CrowdTangleInvalidJSONError(CrowdTangleError):
     pass
 
 
-class CrowdTangleExhaustedPaginationError(CrowdTangleError):
-    pass
-
-
 class CrowdTangleRateLimitExceeded(CrowdTangleError):
     pass

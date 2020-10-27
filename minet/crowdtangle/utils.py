@@ -16,7 +16,6 @@ from minet.crowdtangle.exceptions import (
     CrowdTangleInvalidTokenError,
     CrowdTangleInvalidRequestError,
     CrowdTangleInvalidJSONError,
-    CrowdTangleExhaustedPaginationError,
     CrowdTangleRateLimitExceeded
 )
 
@@ -106,28 +105,6 @@ class PartitionStrategyNoop(object):
         return True
 
 
-class PartitionStrategyDay(PartitionStrategyNoop):
-    def __init__(self, kwargs, url_forge):
-        self.kwargs = kwargs
-        self.url_forge = url_forge
-
-        self.range = day_range(kwargs['start_date'])
-
-    def __call__(self, items):
-        start_date, end_date = next(self.range, (None, None))
-
-        if start_date is None:
-            return None
-
-        self.kwargs['start_date'] = start_date
-        self.kwargs['end_date'] = end_date
-
-        return self.url_forge(**self.kwargs)
-
-    def get_detail(self):
-        return {'day': self.kwargs['start_date']}
-
-
 class PartitionStrategyLimit(PartitionStrategyNoop):
     def __init__(self, kwargs, url_forge, limit):
         self.kwargs = kwargs
@@ -188,11 +165,6 @@ class PartitionStrategyLimit(PartitionStrategyNoop):
         return True
 
 
-PARTITION_STRATEGIES = {
-    'day': PartitionStrategyDay
-}
-
-
 def step(http, url, item_key):
     err, result = request(http, url)
 
@@ -217,14 +189,19 @@ def step(http, url, item_key):
     except:
         raise CrowdTangleInvalidJSONError
 
-    if item_key not in data or len(data[item_key]) == 0:
-        raise CrowdTangleExhaustedPaginationError
+    items = None
+
+    if item_key in data:
+        items = data[item_key]
+
+        if len(items) == 0:
+            items = None
 
     # Extracting next link
     pagination = data['pagination']
     next_page = pagination['nextPage'] if 'nextPage' in pagination else None
 
-    return data[item_key], next_page
+    return items, next_page
 
 
 def default_item_id_getter(item):
@@ -246,30 +223,25 @@ def make_paginated_iterator(url_forge, item_key, formatter,
         else:
             kwargs['token'] = token
 
-        # Inferring end date to be now, this will be important later
-        if kwargs.get('end_date') is None:
-            kwargs['end_date'] = infer_end_date()
+        # Checking we have the necessary dates
+        if kwargs.get('sort_by', 'date') == 'date':
+            if kwargs.get('start_date') is None:
+                raise CrowdTangleMissingStartDateError
+
+            # Inferring end date to be now, this will be important later
+            if kwargs.get('end_date') is None:
+                kwargs['end_date'] = infer_end_date()
 
         # Complementing dates
         if kwargs.get('start_date') is not None:
             kwargs['start_date'] = complement_date(kwargs['start_date'], 'start')
 
-        kwargs['end_date'] = complement_date(kwargs['end_date'], 'end')
-
-        if partition_strategy is not None:
-            if kwargs.get('start_date') is None:
-                raise CrowdTangleMissingStartDateError
-
-            if isinstance(partition_strategy, int):
-                partition_strategy = PartitionStrategyLimit(kwargs, url_forge, partition_strategy)
-            else:
-                partition_strategy = PARTITION_STRATEGIES[partition_strategy](kwargs, url_forge)
-        else:
-            partition_strategy = PartitionStrategyNoop(kwargs, url_forge)
+        if kwargs.get('end_date') is not None:
+            kwargs['end_date'] = complement_date(kwargs['end_date'], 'end')
 
         N = 0
         C = 0
-        url = partition_strategy(None)
+        url = url_forge(**kwargs)
         last_url = None
         last_items = set()
 
@@ -277,18 +249,17 @@ def make_paginated_iterator(url_forge, item_key, formatter,
 
         rate_limited_step = rate_limited_from_state(rate_limiter_state)(step)
 
-        # TODO: those conditions are a bit hacky. code could be clearer
-        while url is not None and url != last_url:
+        while True:
             C += 1
 
-            try:
-                items, next_url = rate_limited_step(http, url, item_key)
-            except CrowdTangleExhaustedPaginationError:
-                url = partition_strategy(None)
-                continue
+            items, next_url = rate_limited_step(http, url, item_key)
+
+            # We have exhausted the available data
+            if items is None:
+                # TODO: rotate
+                break
 
             enough_to_stop = False
-
             n = 0
 
             last_url = url
@@ -296,6 +267,8 @@ def make_paginated_iterator(url_forge, item_key, formatter,
             acc = []
 
             for item in items:
+
+                # Avoiding duplicating items due to race conditions
                 if item_id_getter(item) in last_items:
                     continue
 
@@ -315,7 +288,8 @@ def make_paginated_iterator(url_forge, item_key, formatter,
 
             if per_call:
                 if detailed:
-                    yield partition_strategy.get_detail(), acc
+                    # TODO: furbish
+                    yield None, acc
                 else:
                     yield acc
             else:
@@ -329,12 +303,9 @@ def make_paginated_iterator(url_forge, item_key, formatter,
 
             # Paginating
             if next_url is None:
-                url = partition_strategy(None)
-                continue
+                # TODO: rotate
+                break
 
-            if partition_strategy.should_go_next(items):
-                url = next_url
-            else:
-                url = partition_strategy(items)
+            url = next_url
 
     return create_iterator

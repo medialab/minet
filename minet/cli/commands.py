@@ -13,7 +13,6 @@ from minet.cli.utils import die
 from minet.cli.argparse import (
     BooleanAction,
     ConfigAction,
-    CrowdtanglePartitionStrategyType,
     SplitterType
 )
 
@@ -178,6 +177,12 @@ MINET_COMMANDS = {
                     ''',
                     'arguments': [
                         {
+                            'flag': '--chunk-size',
+                            'help': 'When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations.',
+                            'type': int,
+                            'default': 500
+                        },
+                        {
                             'flag': '--end-date',
                             'help': 'The latest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.'
                         },
@@ -200,11 +205,6 @@ MINET_COMMANDS = {
                             'flag': '--list-ids',
                             'help': 'Ids of the lists from which to retrieve posts, separated by commas.',
                             'type': SplitterType()
-                        },
-                        {
-                            'flag': '--partition-strategy',
-                            'help': 'Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts. Will default to `500` if --sort-by is `date`.',
-                            'type': CrowdtanglePartitionStrategyType()
                         },
                         {
                             'flag': '--resume',
@@ -290,6 +290,12 @@ MINET_COMMANDS = {
                             'help': 'AND clause to add to the query terms.'
                         },
                         {
+                            'flag': '--chunk-size',
+                            'help': 'When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations.',
+                            'type': int,
+                            'default': 500
+                        },
+                        {
                             'flag': '--end-date',
                             'help': 'The latest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.'
                         },
@@ -317,11 +323,6 @@ MINET_COMMANDS = {
                             'flag': '--offset',
                             'help': 'Count offset.',
                             'type': int
-                        },
-                        {
-                            'flag': '--partition-strategy',
-                            'help': 'Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts. Will default to `500` if --sort-by is `date`.',
-                            'type': CrowdtanglePartitionStrategyType()
                         },
                         {
                             'flags': ['-p', '--platforms'],

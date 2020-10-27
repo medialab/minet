@@ -6,7 +6,6 @@
 #
 from argparse import Action, ArgumentTypeError
 
-from minet.crowdtangle.constants import CROWDTANGLE_PARTITION_STRATEGIES
 from minet.utils import nested_get
 
 
@@ -20,19 +19,6 @@ class BooleanAction(Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, False if option_string.startswith('--no') else True)
-
-
-class CrowdtanglePartitionStrategyType(object):
-    def __call__(self, string):
-        if string in CROWDTANGLE_PARTITION_STRATEGIES:
-            return string
-
-        try:
-            return int(string)
-        except ValueError:
-            choices = ' or '.join(CROWDTANGLE_PARTITION_STRATEGIES)
-
-            raise ArgumentTypeError('partition strategy should either be %s, or an number of posts.' % choices)
 
 
 class SplitterType(object):
