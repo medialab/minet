@@ -9,7 +9,10 @@ from urllib3.exceptions import (
     ConnectTimeoutError,
     MaxRetryError,
     ReadTimeoutError,
-    ResponseError
+    ResponseError,
+    SSLError,
+    NewConnectionError,
+    ProtocolError
 )
 
 from minet.exceptions import (
@@ -31,11 +34,32 @@ def max_retry_error_reporter(error):
     return 'max-retries-exceeded'
 
 
+def new_connection_error_reporter(error):
+    msg = repr(error)
+
+    if 'Name or service not known' in msg:
+        return 'unknown-dns'
+
+    return msg
+
+
+def protocol_error_reporter(error):
+    msg = repr(error)
+
+    if 'Connection aborted' in msg:
+        return 'connection-aborted'
+
+    return msg
+
+
 ERROR_REPORTERS = {
     UnicodeDecodeError: 'wrong-encoding',
     UnknownEncodingError: 'unknown-encoding',
     MaxRetryError: max_retry_error_reporter,
-    InvalidURLError: 'invalid-url'
+    InvalidURLError: 'invalid-url',
+    SSLError: 'ssl',
+    NewConnectionError: new_connection_error_reporter,
+    ProtocolError: protocol_error_reporter
 }
 
 
