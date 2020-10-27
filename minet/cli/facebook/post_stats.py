@@ -14,7 +14,7 @@ from collections import OrderedDict
 from ural.facebook import is_facebook_url
 
 from minet.utils import create_pool, request, nested_get, sleep_with_entropy
-from minet.cli.utils import open_output_file, CSVEnricher, print_err, die
+from minet.cli.utils import open_output_file, print_err, die
 from minet.cli.facebook.constants import FACEBOOK_WEB_DEFAULT_THROTTLE
 
 META_EXTRACTOR_TEMPLATE = rb'\(function\(\)\{bigPipe\.onPageletArrive\((\{.+share_fbid:"%s".+\})\);\}\),"onPageletArrive'
@@ -254,15 +254,15 @@ def facebook_post_stats_action(namespace):
             not is_facebook_post_url(post_url) or
             not is_facebook_url(post_url)
         ):
-            enricher.write(row, format_err('not-facebook-post'))
+            enricher.writerow(row, format_err('not-facebook-post'))
             continue
 
         err, data = fetch_facebook_page_stats(post_url)
 
         if err:
-            enricher.write(row, format_err(err))
+            enricher.writerow(row, format_err(err))
         else:
-            enricher.write(row, format(data))
+            enricher.writerow(row, format(data))
 
         # Throttling
         sleep_with_entropy(FACEBOOK_WEB_DEFAULT_THROTTLE, 5.0)
