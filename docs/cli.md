@@ -6,6 +6,7 @@
 
 * [-h/--help/help](#help-flag)
 * [--version](#version-flag)
+* [minetrc config files](#minetrc)
 
 *Generic commands*
 
@@ -65,6 +66,24 @@ To check the installed version of `minet`, you can use the `--version` flag:
 ```
 minet --version
 >>> minet x.x.x
+```
+
+<h2 id="minetrc">minetrc config files</h2>
+
+Minet supports configuration files so you can skip some tedious command line arguments that you would need to provide each time else (such as `--token` for the crowdtangle commands).
+
+Those configuration files can be written in YAML or JSON and can either be passed to minet using the `--rcfile` argument or will be searched at the following paths (with this precedence):
+
+* `./.minetrc{,.yml,.yaml,.json}`
+* `~/.minetrc{,.yml,.yaml,.json}`
+
+*Configuration file*
+
+```yml
+---
+crowdtangle:
+  token: MY_CT_TOKEN # Used as --token for `minet ct` commands
+  rate_limit: 10 # Used as --rate-limit for `minet ct` commands
 ```
 
 ## crawl
@@ -566,7 +585,7 @@ examples:
 ```
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [--posts POSTS] [-s SELECT]
-                                 [--sort-by {subscriber_count,date,total_interactions}]
+                                 [--sort-by {date,subscriber_count,total_interactions}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -587,7 +606,7 @@ optional arguments:
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {subscriber_count,date,total_interactions}
+  --sort-by {date,subscriber_count,total_interactions}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.

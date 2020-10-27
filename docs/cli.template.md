@@ -6,6 +6,7 @@
 
 * [-h/--help/help](#help-flag)
 * [--version](#version-flag)
+* [minetrc config files](#minetrc)
 
 *Generic commands*
 
@@ -65,6 +66,24 @@ To check the installed version of `minet`, you can use the `--version` flag:
 ```
 minet --version
 >>> minet x.x.x
+```
+
+<h2 id="minetrc">minetrc config files</h2>
+
+Minet supports configuration files so you can skip some tedious command line arguments that you would need to provide each time else (such as `--token` for the crowdtangle commands).
+
+Those configuration files can be written in YAML or JSON and can either be passed to minet using the `--rcfile` argument or will be searched at the following paths (with this precedence):
+
+* `./.minetrc{,.yml,.yaml,.json}`
+* `~/.minetrc{,.yml,.yaml,.json}`
+
+*Configuration file*
+
+```yml
+---
+crowdtangle:
+  token: MY_CT_TOKEN # Used as --token for `minet ct` commands
+  rate_limit: 10 # Used as --rate-limit for `minet ct` commands
 ```
 
 ## crawl
