@@ -70,7 +70,7 @@ def get_last_day_of_month(year, month):
     raise TypeError('could not find last day of month')
 
 
-def complement_date(d, bound='start'):
+def complement_date(d, bound):
     if len(d) == 4:
         d += '-'
         d += '01' if bound == 'start' else '12'
@@ -238,6 +238,9 @@ def make_paginated_iterator(url_forge, item_key, formatter,
                         limit=None, format='csv_dict_row', per_call=False, detailed=False,
                         namespace=None, **kwargs):
 
+        if format not in CROWDTANGLE_OUTPUT_FORMATS:
+            raise TypeError('minet.crowdtangle: unkown `format`.')
+
         if namespace is not None:
             kwargs = vars(namespace)
         else:
@@ -247,12 +250,11 @@ def make_paginated_iterator(url_forge, item_key, formatter,
         if kwargs.get('end_date') is None:
             kwargs['end_date'] = infer_end_date()
 
-        # "Fixing" end_date to go to before midnight to avoid common issues
-        if 'T' not in kwargs['end_date']:
-            kwargs['end_date'] += 'T23:59:59'
+        # Complementing dates
+        if kwargs.get('start_date') is not None:
+            kwargs['start_date'] = complement_date(kwargs['start_date'], 'start')
 
-        if format not in CROWDTANGLE_OUTPUT_FORMATS:
-            raise TypeError('minet.crowdtangle: unkown `format`.')
+        kwargs['end_date'] = complement_date(kwargs['end_date'], 'end')
 
         if partition_strategy is not None:
             if kwargs.get('start_date') is None:
