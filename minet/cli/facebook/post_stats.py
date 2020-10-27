@@ -6,6 +6,7 @@
 #
 import re
 import json5
+import casanova
 from tqdm import tqdm
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -128,12 +129,11 @@ def facebook_post_stats_action(namespace):
     # Handling output
     output_file = open_output_file(namespace.output)
 
-    enricher = CSVEnricher(
+    enricher = casanova.enricher(
         namespace.file,
-        namespace.column,
         output_file,
-        REPORT_HEADERS,
-        select=namespace.select.split(',') if namespace.select else None
+        add=REPORT_HEADERS,
+        keep=namespace.select
     )
 
     http = create_pool()
@@ -246,8 +246,7 @@ def facebook_post_stats_action(namespace):
         total=namespace.total
     )
 
-    for line in enricher:
-        post_url = line[enricher.pos]
+    for row, post_url in enricher.cells(namespace.column, with_rows=True):
         loading_bar.update()
 
         if (
@@ -255,15 +254,15 @@ def facebook_post_stats_action(namespace):
             not is_facebook_post_url(post_url) or
             not is_facebook_url(post_url)
         ):
-            enricher.write(line, format_err('not-facebook-post'))
+            enricher.write(row, format_err('not-facebook-post'))
             continue
 
         err, data = fetch_facebook_page_stats(post_url)
 
         if err:
-            enricher.write(line, format_err(err))
+            enricher.write(row, format_err(err))
         else:
-            enricher.write(line, format(data))
+            enricher.write(row, format(data))
 
         # Throttling
         sleep_with_entropy(FACEBOOK_WEB_DEFAULT_THROTTLE, 5.0)
