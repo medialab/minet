@@ -780,7 +780,8 @@ MINET_COMMANDS = {
             },
             {
                 'flags': ['-s', '--select'],
-                'help': 'Columns to include in report (separated by `,`).'
+                'help': 'Columns to include in report (separated by `,`).',
+                'type': SplitterType()
             },
             {
                 'flags': ['-t', '--threads'],

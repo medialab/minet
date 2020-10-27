@@ -10,6 +10,7 @@ import os
 import csv
 import sys
 import gzip
+import casanova
 from io import StringIO
 from os.path import join, dirname, isfile
 from collections import Counter
@@ -34,7 +35,6 @@ from minet.cli.utils import (
 )
 
 OUTPUT_ADDITIONAL_HEADERS = [
-    'line',
     'resolved',
     'status',
     'error',
@@ -64,13 +64,6 @@ def fetch_action(namespace):
         if namespace.contents_in_report is None:
             namespace.contents_in_report = True
 
-    input_headers, pos, reader = custom_reader(namespace.file, namespace.column)
-    filename_pos = input_headers.index(namespace.filename) if namespace.filename else None
-    indexed_input_headers = {h: p for p, h in enumerate(input_headers)}
-
-    selected_fields = namespace.select.split(',') if namespace.select else None
-    selected_pos = [input_headers.index(h) for h in selected_fields] if selected_fields else None
-
     # HTTP method
     http_method = namespace.method
 
@@ -88,48 +81,67 @@ def fetch_action(namespace):
             k, v = parse_http_header(header)
             global_headers = v
 
-    # Reading output
-    output_headers = (list(input_headers) if not selected_pos else [input_headers[i] for i in selected_pos])
-    output_headers += OUTPUT_ADDITIONAL_HEADERS
-
-    if namespace.contents_in_report:
-        output_headers.append('raw_content')
-
     flag = 'w'
-
     if namespace.output is not None and resuming and isfile(namespace.output):
         flag = 'r+'
 
     output_file = open_output_file(namespace.output, flag=flag)
 
-    output_writer = csv.writer(output_file)
+    # Resume listener
+    listener = None
+    resuming_reader_loading = None
+    skipped = 0
 
-    if not resuming:
-        output_writer.writerow(output_headers)
-    else:
-
-        # Reading report to know what need to be done
-        _, rpos, resuming_reader = custom_reader(output_file, 'line')
-
+    if resuming:
         resuming_reader_loading = tqdm(
-            resuming_reader,
             desc='Resuming',
             dynamic_ncols=True,
             unit=' lines'
         )
 
-        already_done = ContiguousRangeSet()
+        def listener(event, row):
+            nonlocal skipped
 
-        for line in resuming_reader_loading:
-            index = line[rpos]
+            if event == 'resume.output':
+                resuming_reader_loading.update()
 
-            already_done.add(int(index))
+            if event == 'resume.input':
+                skipped += 1
+                loading_bar.set_postfix(skipped=skipped)
+                loading_bar.update()
+
+    # Enricher
+    enricher = casanova.threadsafe_enricher(
+        namespace.file,
+        output_file,
+        resumable=resuming,
+        auto_resume=False,
+        add=OUTPUT_ADDITIONAL_HEADERS + (['raw_contents'] if namespace.contents_in_report else []),
+        keep=namespace.select,
+        listener=listener
+    )
+
+    if namespace.column not in enricher.pos:
+        die([
+            'Could not find the "%s" containing the urls in the given CSV file.' % namespace.column
+        ])
+
+    url_pos = enricher.pos[namespace.column]
+
+    # TODO: use #.get when casanova#11 is implemented
+    filename_pos = None
+
+    if namespace.filename in enricher.pos:
+        filename_pos = enricher.pos[namespace.filename]
+
+    indexed_input_headers = {h: i for i, h in enumerate(enricher.fieldnames)}
+
+    if resuming:
+        enricher.resume()
+        resuming_reader_loading.close()
 
     # Loading bar
     total = namespace.total
-
-    if total is not None and resuming:
-        total -= len(already_done)
 
     loading_bar = tqdm(
         desc='Fetching pages',
@@ -139,8 +151,7 @@ def fetch_action(namespace):
     )
 
     def url_key(item):
-        line = item[1]
-        url = line[pos].strip()
+        url = item[1][url_pos].strip()
 
         if not url:
             return
@@ -170,36 +181,27 @@ def fetch_action(namespace):
             'headers': headers
         }
 
-    def write_output(index, line, resolved=None, status=None, error=None,
+    def write_output(index, row, resolved=None, status=None, error=None,
                      filename=None, encoding=None, data=None):
 
-        if selected_pos:
-            line = [line[p] for p in selected_pos]
-
-        line.extend([
-            index,
+        addendum = [
             resolved or '',
             status or '',
             error or '',
             filename or '',
             encoding or ''
-        ])
+        ]
 
         if namespace.contents_in_report:
-            line.append(data or '')
+            addendum.append(data or '')
 
-        output_writer.writerow(line)
+        enricher.writerow(index, row, addendum)
 
     errors = 0
     status_codes = Counter()
 
-    target_iterator = enumerate(reader)
-
-    if resuming:
-        target_iterator = (pair for pair in target_iterator if not already_done.stateful_contains(pair[0]))
-
     multithreaded_iterator = multithreaded_fetch(
-        target_iterator,
+        enricher,
         key=url_key,
         request_args=request_args,
         threads=namespace.threads,
@@ -208,13 +210,13 @@ def fetch_action(namespace):
     )
 
     for result in multithreaded_iterator:
-        line_index, line = result.item
+        index, row = result.item
 
         if not result.url:
 
             write_output(
-                line_index,
-                line
+                index,
+                row
             )
 
             loading_bar.update()
@@ -251,12 +253,12 @@ def fetch_action(namespace):
                     if namespace.filename_template:
                         filename = CUSTOM_FORMATTER.format(
                             namespace.filename_template,
-                            value=line[filename_pos] if filename_pos is not None else None,
+                            value=row[filename_pos] if filename_pos is not None else None,
                             ext=result.meta['ext'],
-                            line=LazyLineDict(indexed_input_headers, line)
+                            line=LazyLineDict(indexed_input_headers, row)
                         )
                     else:
-                        filename = line[filename_pos] + result.meta['ext']
+                        filename = row[filename_pos] + result.meta['ext']
                 else:
                     # NOTE: it would be nice to have an id that can be sorted by time
                     filename = str(uuid4()) + result.meta['ext']
@@ -290,8 +292,8 @@ def fetch_action(namespace):
             resolved_url = response.geturl()
 
             write_output(
-                line_index,
-                line,
+                index,
+                row,
                 resolved=resolved_url if resolved_url != result.url else None,
                 status=response.status,
                 filename=filename,
@@ -304,11 +306,10 @@ def fetch_action(namespace):
             error_code = report_error(result.error)
 
             write_output(
-                line_index,
-                line,
+                index,
+                row,
                 error=error_code
             )
 
     # Closing files
-    if namespace.output is not None:
-        output_file.close()
+    output_file.close()
