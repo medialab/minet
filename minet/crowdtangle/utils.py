@@ -84,87 +84,6 @@ def complement_date(d, bound):
     return d
 
 
-# TODO: __call__ should receive a status to make finer decisions
-class PartitionStrategyNoop(object):
-    def __init__(self, kwargs, url_forge):
-        self.kwargs = kwargs
-        self.url_forge = url_forge
-        self.started = False
-
-    def __call__(self, items):
-        if not self.started:
-            self.started = True
-            return self.url_forge(**self.kwargs)
-
-        return None
-
-    def get_detail(self):
-        return None
-
-    def should_go_next(self, items):
-        return True
-
-
-class PartitionStrategyLimit(PartitionStrategyNoop):
-    def __init__(self, kwargs, url_forge, limit):
-        self.kwargs = kwargs
-        self.url_forge = url_forge
-        self.last_item = None
-        self.seen = 0
-        self.shifts = 0
-        self.limit = limit
-        self.started = False
-
-        self.years = years_iter(self.kwargs['start_date'], self.kwargs['end_date'])
-        self.rotate_year()
-
-    def rotate_year(self):
-        try:
-            start_date, end_date = next(self.years)
-            self.kwargs['start_date'] = start_date
-            self.kwargs['end_date'] = end_date
-        except StopIteration:
-            return False
-
-        return True
-
-    def __call__(self, items):
-        if not self.started:
-            self.started = True
-            return self.url_forge(**self.kwargs)
-
-        if items is None:
-            could_rotate = self.rotate_year()
-
-            if not could_rotate:
-                return None
-
-            return self.url_forge(**self.kwargs)
-
-        if self.last_item is not None:
-            self.kwargs['end_date'] = self.last_item['date'].replace(' ', 'T')
-
-        return self.url_forge(**self.kwargs)
-
-    def get_detail(self):
-        if 'end_date' in self.kwargs:
-            return {'date': self.kwargs['end_date'], 'shifts': self.shifts}
-
-    def should_go_next(self, items):
-        n = len(items)
-
-        if n > 0:
-            self.last_item = items[-1]
-            self.seen += n
-
-        if self.seen >= self.limit:
-            self.seen = 0
-            self.shifts += 1
-            return False
-
-        return True
-
-
 def step(http, url, item_key):
     err, result = request(http, url)
 
@@ -241,13 +160,35 @@ def make_paginated_iterator(url_forge, item_key, formatter,
 
         N = 0
         C = 0
-        url = url_forge(**kwargs)
         last_url = None
         last_items = set()
 
         has_limit = limit is not None
 
         rate_limited_step = rate_limited_from_state(rate_limiter_state)(step)
+
+        # Chunking
+        need_to_chunk = kwargs.get('sort_by', 'date') == 'date'
+        chunk_size = kwargs.get('chunk_size', 500)
+        current_chunk_size = 0
+        shifts = 0
+        years = years_iter(kwargs['start_date'], kwargs['end_date']) if need_to_chunk else None
+
+        def rotate_year():
+            try:
+                start_date, end_date = next(years)
+                kwargs['start_date'] = start_date
+                kwargs['end_date'] = end_date
+            except StopIteration:
+                return False
+
+            return True
+
+        if need_to_chunk:
+            rotate_year()
+
+        # Starting url
+        url = url_forge(**kwargs)
 
         while True:
             C += 1
@@ -256,7 +197,14 @@ def make_paginated_iterator(url_forge, item_key, formatter,
 
             # We have exhausted the available data
             if items is None:
-                # TODO: rotate
+
+                if need_to_chunk:
+                    could_rotate = rotate_year()
+
+                    if could_rotate:
+                        url = url_forge(**kwargs)
+                        continue
+
                 break
 
             enough_to_stop = False
@@ -272,8 +220,11 @@ def make_paginated_iterator(url_forge, item_key, formatter,
                 if item_id_getter(item) in last_items:
                     continue
 
+                current_date = item['date']
+
                 n += 1
                 N += 1
+                current_chunk_size += 1
 
                 if format == 'csv_dict_row':
                     item = formatter(item, as_dict=True)
@@ -288,8 +239,15 @@ def make_paginated_iterator(url_forge, item_key, formatter,
 
             if per_call:
                 if detailed:
-                    # TODO: furbish
-                    yield None, acc
+                    details = None
+
+                    if need_to_chunk:
+                        details = {
+                            'date': current_date,
+                            'shifts': shifts
+                        }
+
+                    yield details, acc
                 else:
                     yield acc
             else:
@@ -303,8 +261,22 @@ def make_paginated_iterator(url_forge, item_key, formatter,
 
             # Paginating
             if next_url is None:
-                # TODO: rotate
+                if need_to_chunk:
+                    could_rotate = rotate_year()
+
+                    if could_rotate:
+                        url = url_forge(**kwargs)
+                        continue
+
                 break
+
+            # Handling chunking
+            if current_chunk_size >= chunk_size:
+                current_chunk_size = 0
+                shifts += 1
+                kwargs['end_date'] = items[-1]['date'].replace(' ', 'T')
+                url = url_forge(**kwargs)
+                continue
 
             url = next_url
 
