@@ -494,7 +494,7 @@ optional arguments:
   --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
-  --end-date END_DATE                             The latest date at which a post could be posted (UTC!).
+  --end-date END_DATE                             The latest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   -f {csv,jsonl}, --format {csv,jsonl}            Output format. Defaults to `csv`.
   --language LANGUAGE                             Language of posts to retrieve.
   -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
@@ -503,7 +503,7 @@ optional arguments:
   --resume                                        Whether to resume an interrupted collection. Requires -o/--output & --sort-by date
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
-  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
+  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
 
 examples:
 
@@ -542,7 +542,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
   --and AND                                       AND clause to add to the query terms.
-  --end-date END_DATE                             The latest date at which a post could be posted (UTC!).
+  --end-date END_DATE                             The latest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   -f {csv,jsonl}, --format {csv,jsonl}            Output format. Defaults to `csv`.
   --language LANGUAGE                             Language ISO code like "fr" or "zh-CN".
   -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
@@ -552,7 +552,7 @@ optional arguments:
   -p PLATFORMS, --platforms PLATFORMS             The platforms, separated by comma from which to retrieve posts.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
-  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
+  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --types TYPES                                   Types of post to include, separated by comma.
 
 examples:
@@ -567,7 +567,7 @@ examples:
 ```
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [--posts POSTS] [-s SELECT]
-                                 [--sort-by {date,subscriber_count,total_interactions}]
+                                 [--sort-by {subscriber_count,date,total_interactions}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -588,9 +588,9 @@ optional arguments:
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {date,subscriber_count,total_interactions}
+  --sort-by {subscriber_count,date,total_interactions}
                                                   How to sort retrieved posts. Defaults to `date`.
-  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!).
+  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
 
 examples:

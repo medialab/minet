@@ -179,7 +179,7 @@ MINET_COMMANDS = {
                     'arguments': [
                         {
                             'flag': '--end-date',
-                            'help': 'The latest date at which a post could be posted (UTC!).'
+                            'help': 'The latest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.'
                         },
                         {
                             'flags': ['-f', '--format'],
@@ -219,7 +219,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--start-date',
-                            'help': 'The earliest date at which a post could be posted (UTC!).'
+                            'help': 'The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.'
                         }
                     ]
                 },
@@ -291,7 +291,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--end-date',
-                            'help': 'The latest date at which a post could be posted (UTC!).'
+                            'help': 'The latest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.'
                         },
                         {
                             'flags': ['-f', '--format'],
@@ -336,7 +336,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--start-date',
-                            'help': 'The earliest date at which a post could be posted (UTC!).'
+                            'help': 'The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.'
                         },
                         {
                             'flag': '--types',
@@ -386,7 +386,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--start-date',
-                            'help': 'The earliest date at which a post could be posted (UTC!).'
+                            'help': 'The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.'
                         },
                         {
                             'flag': '--total',
