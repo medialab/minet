@@ -475,11 +475,10 @@ examples:
 
 ```
 usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
-                               [-t TOKEN] [--end-date END_DATE] [-f {csv,jsonl}]
+                               [-t TOKEN] [--chunk-size CHUNK_SIZE]
+                               [--end-date END_DATE] [-f {csv,jsonl}]
                                [--language LANGUAGE] [-l LIMIT]
-                               [--list-ids LIST_IDS]
-                               [--partition-strategy PARTITION_STRATEGY]
-                               [--resume]
+                               [--list-ids LIST_IDS] [--resume]
                                [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
                                [--start-date START_DATE]
 
@@ -494,12 +493,12 @@ optional arguments:
   --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
+  --chunk-size CHUNK_SIZE                         When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations. Defaults to 500.
   --end-date END_DATE                             The latest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   -f {csv,jsonl}, --format {csv,jsonl}            Output format. Defaults to `csv`.
   --language LANGUAGE                             Language of posts to retrieve.
   -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
   --list-ids LIST_IDS                             Ids of the lists from which to retrieve posts, separated by commas.
-  --partition-strategy PARTITION_STRATEGY         Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts. Will default to `500` if --sort-by is `date`.
   --resume                                        Whether to resume an interrupted collection. Requires -o/--output & --sort-by date
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
@@ -516,10 +515,10 @@ examples:
 
 ```
 usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
-                                [-t TOKEN] [--and AND] [--end-date END_DATE]
-                                [-f {csv,jsonl}] [--language LANGUAGE]
-                                [-l LIMIT] [--not-in-title] [--offset OFFSET]
-                                [--partition-strategy PARTITION_STRATEGY]
+                                [-t TOKEN] [--and AND] [--chunk-size CHUNK_SIZE]
+                                [--end-date END_DATE] [-f {csv,jsonl}]
+                                [--language LANGUAGE] [-l LIMIT]
+                                [--not-in-title] [--offset OFFSET]
                                 [-p PLATFORMS]
                                 [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
                                 [--start-date START_DATE] [--types TYPES]
@@ -542,13 +541,13 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
   --and AND                                       AND clause to add to the query terms.
+  --chunk-size CHUNK_SIZE                         When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations. Defaults to 500.
   --end-date END_DATE                             The latest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   -f {csv,jsonl}, --format {csv,jsonl}            Output format. Defaults to `csv`.
   --language LANGUAGE                             Language ISO code like "fr" or "zh-CN".
   -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
   --not-in-title                                  Whether to search terms in account titles also.
   --offset OFFSET                                 Count offset.
-  --partition-strategy PARTITION_STRATEGY         Query partition strategy to use to overcome the API search result limits. Should either be `day` or a number of posts. Will default to `500` if --sort-by is `date`.
   -p PLATFORMS, --platforms PLATFORMS             The platforms, separated by comma from which to retrieve posts.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
