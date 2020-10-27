@@ -57,6 +57,34 @@ def infer_end_date():
     return datetime.now().isoformat(timespec='seconds')
 
 
+def get_last_day_of_month(year, month):
+    d = 31
+
+    while d > 27:
+        try:
+            attempt = date(int(year), int(month), d)
+            return attempt.isoformat()[8:10]
+        except ValueError:
+            d -= 1
+
+    raise TypeError('could not find last day of month')
+
+
+def complement_date(d, bound='start'):
+    if len(d) == 4:
+        d += '-'
+        d += '01' if bound == 'start' else '12'
+
+    if len(d) == 7:
+        d += '-'
+        d += '01' if bound == 'start'else get_last_day_of_month(d[:4], d[5:7])
+
+    if len(d) == 10:
+        d += 'T00:00:00' if bound == 'start' else 'T23:59:59'
+
+    return d
+
+
 # TODO: __call__ should receive a status to make finer decisions
 class PartitionStrategyNoop(object):
     def __init__(self, kwargs, url_forge):
