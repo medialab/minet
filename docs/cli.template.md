@@ -70,7 +70,7 @@ minet --version
 
 <h2 id="minetrc">minetrc config files</h2>
 
-Minet supports configuration files so you can skip some tedious command line arguments that you would need to provide each time else (such as `--token` for the crowdtangle commands).
+Minet supports configuration files so you can skip some tedious command line arguments that you would need to provide each time you call `minet` otherwise (such as `--token` for crowdtangle commands).
 
 Those configuration files can be written in YAML or JSON and can either be passed to minet using the `--rcfile` argument or will be searched at the following paths (with this precedence):
 
@@ -82,7 +82,7 @@ Those configuration files can be written in YAML or JSON and can either be passe
 ```yml
 ---
 crowdtangle:
-  token: MY_CT_TOKEN # Used as --token for `minet ct` commands
+  token: "MY_CT_TOKEN" # Used as --token for `minet ct` commands
   rate_limit: 10 # Used as --rate-limit for `minet ct` commands
 ```
 
