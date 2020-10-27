@@ -53,24 +53,6 @@ def custom_reader(f, target_header):
     return headers, position, reader
 
 
-def url_parse_action(namespace):
-
-    headers, pos, reader = custom_reader(namespace.file, namespace.column)
-
-    if namespace.select:
-        selected_headers = namespace.select.split(',')
-        selected_pos = [headers.index(h) for h in selected_headers]
-        headers = selected_headers
-
-    if namespace.output is None:
-        output_file = DummyTqdmFile()
-    else:
-        output_file = open(namespace.output, 'w')
-
-    writer = csv.writer(output_file)
-    writer.writerow(headers + REPORT_HEADERS)
-
-
 class DummyTqdmFile(object):
     """
     Dummy file-like that will write to tqdm. Taken straight from the lib's
