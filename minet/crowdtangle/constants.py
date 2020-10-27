@@ -60,7 +60,8 @@ CROWDTANGLE_STATISTICS = [
     'haha',
     'sad',
     'angry',
-    'thankful'
+    'thankful',
+    'care'
 ]
 
 CROWDTANGLE_FULL_STATISTICS = STATISTICS = [
@@ -130,7 +131,10 @@ CROWDTANGLE_ACCOUNT_CSV_HEADERS = [
     'account_profile_image',
     'account_subscriber_count',
     'account_url',
-    'account_verified'
+    'account_verified',
+    'account_platform',
+    'account_type',
+    'account_page_admin_top_country'
 ]
 
 CROWDTANGLE_MEDIA_CSV_HEADERS = [

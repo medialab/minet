@@ -68,6 +68,7 @@ def format_post(post, as_dict=False, link=None):
         expanded_links = '|'.join(link['expanded'] for link in post['expandedLinks'])
 
     row.extend([
+        # Account
         account['id'],
         account.get('platformId', ''),
         account['platform'],
@@ -77,6 +78,11 @@ def format_post(post, as_dict=False, link=None):
         account['subscriberCount'],
         account['url'],
         '1' if account['verified'] else '',
+        account.get('platform', ''),
+        account.get('accountType', ''),
+        account.get('pageAdminTopCountry', ''),
+
+        # Remaining
         links,
         expanded_links,
         json.dumps(post['media'], ensure_ascii=False) if 'media' in post else ''
