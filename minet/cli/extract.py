@@ -4,7 +4,6 @@
 #
 # Logic of the extract action.
 #
-import csv
 import casanova
 import gzip
 import codecs
@@ -15,7 +14,6 @@ from dragnet import extract_content
 
 from minet.encodings import is_supported_encoding
 from minet.cli.utils import (
-    custom_reader,
     open_output_file,
     create_report_iterator
 )

@@ -4,9 +4,7 @@
 #
 # Miscellaneous helpers used by the CLI tools.
 #
-import csv
 import sys
-import codecs
 import yaml
 from glob import iglob
 from os.path import join, expanduser, isfile
@@ -35,24 +33,6 @@ def safe_index(l, e):
         return l.index(e)
     except ValueError:
         return None
-
-
-def custom_reader(f, target_header):
-
-    reader = csv.reader(f)
-
-    headers = next(reader, None)
-
-    if headers[0].startswith(codecs.BOM_UTF8.decode()):
-        headers[0] = headers[0][1:]
-
-    if isinstance(target_header, tuple):
-        HeaderPositions = namedtuple('HeaderPositions', target_header)
-        position = HeaderPositions(**{t: safe_index(headers, t) for t in target_header})
-    else:
-        position = safe_index(headers, target_header)
-
-    return headers, position, reader
 
 
 class DummyTqdmFile(object):

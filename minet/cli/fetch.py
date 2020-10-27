@@ -7,7 +7,6 @@
 # optimize both running time & memory.
 #
 import os
-import csv
 import sys
 import gzip
 import casanova
@@ -18,8 +17,6 @@ from tqdm import tqdm
 from uuid import uuid4
 from ural import is_url
 
-from minet.contiguous_range_set import ContiguousRangeSet
-
 from minet.fetch import multithreaded_fetch
 from minet.utils import (
     grab_cookies,
@@ -28,7 +25,6 @@ from minet.utils import (
 )
 from minet.cli.reporters import report_error
 from minet.cli.utils import (
-    custom_reader,
     open_output_file,
     die,
     LazyLineDict
