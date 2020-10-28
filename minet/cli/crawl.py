@@ -116,7 +116,7 @@ class ScraperReporterPool(object):
 
             if spider.scraper is not None:
                 path = join(output_dir, 'scraped.csv')
-                reporter = ScraperReporter(path, scraper, resume)
+                reporter = ScraperReporter(path, spider.scraper, resume)
                 self.reporters['default'][ScraperReporterPool.SINGLE_SCRAPER] = reporter
 
             for name, scraper in spider.scrapers.items():
@@ -130,7 +130,7 @@ class ScraperReporterPool(object):
 
                 if spider.scraper is not None:
                     path = join(output_dir, 'scraped', spider_name, 'scraped.csv')
-                    reporter = ScraperReporter(path, scraper, resume)
+                    reporter = ScraperReporter(path, spider.scraper, resume)
                     self.reporters[spider_name][ScraperReporterPool.SINGLE_SCRAPER] = reporter
 
                 for name, scraper in spider.scrapers.items():
@@ -143,7 +143,7 @@ class ScraperReporterPool(object):
         reporter = self.reporters[spider_name]
 
         if scraped['single'] is not None:
-            reporter[ScraperReporterPool.SINGLE_SCRAPER].writer(scraped['single'])
+            reporter[ScraperReporterPool.SINGLE_SCRAPER].write(scraped['single'])
 
         for name, items in scraped['multiple'].items():
             reporter[name].write(items)

@@ -396,6 +396,9 @@ class Crawler(object):
 
         # Enqueuing next jobs
         if next_jobs is not None:
+
+            # Consuming so that multiple agents may act on this
+            next_jobs = list(next_jobs)
             self.enqueue(next_jobs)
 
         self.state.jobs_done += 1
