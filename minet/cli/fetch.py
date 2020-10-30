@@ -52,7 +52,9 @@ def fetch_action(namespace):
         ])
 
     # Do we need to fetch only a single url?
-    if namespace.file is sys.stdin and is_url(namespace.column):
+    single_url = namespace.file is sys.stdin and is_url(namespace.column)
+
+    if single_url:
         namespace.file = StringIO('url\n%s' % namespace.column)
         namespace.column = 'url'
 
@@ -124,12 +126,14 @@ def fetch_action(namespace):
 
     url_pos = enricher.pos[namespace.column]
 
-    if namespace.filename not in enricher.pos:
+    filename_pos = None
+
+    if namespace.filename is not None and namespace.filename not in enricher.pos:
         die([
             'Could not find the "%s" containing the filenames in the given CSV file.' % namespace.filename
         ])
 
-    filename_pos = enricher.pos[namespace.filename]
+        filename_pos = enricher.pos[namespace.filename]
 
     indexed_input_headers = {h: i for i, h in enumerate(enricher.fieldnames)}
 
