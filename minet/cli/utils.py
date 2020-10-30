@@ -85,7 +85,7 @@ def create_report_iterator(namespace, enricher, args=None, loading_bar=None):
     status_pos = enricher.pos.status
     filename_pos = enricher.pos.filename
     encoding_pos = enricher.pos.encoding
-    raw_content_pos = enricher.pos.get('raw_content')
+    raw_content_pos = enricher.pos.get('raw_contents')
 
     indexed_headers = {h: p for p, h in enumerate(enricher.fieldnames)}
 
