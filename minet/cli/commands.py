@@ -881,7 +881,9 @@ MINET_COMMANDS = {
             'common_arguments': [
                 {
                     'flags': ['-t', '--token'],
-                    'help': 'Mediacloud API token (also called key).'
+                    'help': 'Mediacloud API token (also called key).',
+                    'rc_key': ['mediacloud', 'token'],
+                    'action': ConfigAction
                 },
                 {
                     'flags': ['-o', '--output'],

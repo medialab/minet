@@ -84,6 +84,8 @@ Those configuration files can be written in YAML or JSON and can either be passe
 crowdtangle:
   token: "MY_CT_TOKEN" # Used as --token for `minet ct` commands
   rate_limit: 10 # Used as --rate-limit for `minet ct` commands
+mediacloud:
+  token: "MY_MC_TOKEN" # Used as --token for `minet mc` commands
 ```
 
 ## crawl
