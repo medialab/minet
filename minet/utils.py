@@ -35,7 +35,7 @@ from minet.exceptions import (
     SelfRedirectError
 )
 
-from minet.defaults import (
+from minet.constants import (
     DEFAULT_CONNECT_TIMEOUT,
     DEFAULT_READ_TIMEOUT,
     DEFAULT_SPOOFED_UA

@@ -16,7 +16,7 @@ from minet.utils import (
     extract_response_meta
 )
 
-from minet.defaults import (
+from minet.constants import (
     DEFAULT_GROUP_PARALLELISM,
     DEFAULT_GROUP_BUFFER_SIZE,
     DEFAULT_THROTTLE

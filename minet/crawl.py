@@ -23,7 +23,7 @@ from minet.utils import (
 
 from minet.exceptions import UnknownSpiderError
 
-from minet.defaults import (
+from minet.constants import (
     DEFAULT_GROUP_PARALLELISM,
     DEFAULT_GROUP_BUFFER_SIZE,
     DEFAULT_THROTTLE
