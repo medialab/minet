@@ -175,7 +175,14 @@ def facebook_comments_action(namespace):
     http = create_pool()
 
     def request_page(target):
-        error, result = request(http, target, cookie=cookie, headers={'User-Agent': 'curl/7.68.0'})
+        error, result = request(
+            http,
+            target,
+            cookie=cookie,
+            headers={
+                'User-Agent': 'curl/7.68.0'
+            }
+        )
 
         if error is not None:
             raise error
