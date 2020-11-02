@@ -62,10 +62,11 @@ def parse_formatted_date(formatted_date):
         return None
 
 
-def scrape_comments(html, in_reply_to=None):
+def scrape_comments(html, direction=None, in_reply_to=None):
     soup = BeautifulSoup(html, 'lxml')
 
     data = {
+        'direction': direction,
         'post_id': None,
         'comments': [],
         'next': None,
@@ -80,16 +81,22 @@ def scrape_comments(html, in_reply_to=None):
         if VALID_ID_RE.match(item.get('id'))
     )
 
-    next_link = soup.select_one('[id^="see_next_"] > a')
+    next_link = soup.select_one('[id^="see_next_"] > a[href]')
 
-    if next_link:
+    if next_link and (direction is None or direction == 'forward'):
         data['next'] = urljoin(BASE_URL, next_link.get('href'))
 
-    # if in_reply_to:
-    #     next_link = soup.select_one('[id^="comment_replies_more"] > a')
+        if direction is None:
+            data['direction'] = 'forward'
 
-    #     if next_link:
-    #         data['next'] = urljoin(BASE_URL, next_link.get('href'))
+    if in_reply_to is not None and (direction is None or direction == 'backward'):
+        next_link = soup.select_one('[id^="comment_replies_more_1"] > a[href]')
+
+        if next_link:
+            data['next'] = urljoin(BASE_URL, next_link.get('href'))
+
+            if direction is None:
+                data['direction'] = 'backward'
 
     for item in valid_items:
         item_id = item.get('id')
@@ -199,16 +206,16 @@ def facebook_comments_action(namespace):
         unit=' comments'
     )
 
-    url_queue = deque([(url, None)])
+    url_queue = deque([(url, None, None)])
 
     url_count = 0
     replies_count = 0
 
     while len(url_queue) != 0:
-        current_url, in_reply_to = url_queue.popleft()
+        current_url, direction, in_reply_to = url_queue.popleft()
 
         html = request_page(current_url)
-        data = scrape_comments(html, in_reply_to)
+        data = scrape_comments(html, direction, in_reply_to)
 
         # with open('page.html', 'w') as of:
         #     of.write(html)
@@ -222,10 +229,10 @@ def facebook_comments_action(namespace):
         url_count += 1
 
         for reply_url, commented_id in data['replies']:
-            url_queue.append((reply_url, commented_id))
+            url_queue.append((reply_url, None, commented_id))
 
         if data['next'] is not None:
-            url_queue.append((data['next'], in_reply_to))
+            url_queue.append((data['next'], data['direction'], in_reply_to))
 
         for comment in data['comments']:
             loading_bar.update()
