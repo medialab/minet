@@ -59,7 +59,9 @@ ERROR_REPORTERS = {
     InvalidURLError: 'invalid-url',
     SSLError: 'ssl',
     NewConnectionError: new_connection_error_reporter,
-    ProtocolError: protocol_error_reporter
+    ProtocolError: protocol_error_reporter,
+    ConnectTimeoutError: 'connect-timeout',
+    ReadTimeoutError: 'read-timeout'
 }
 
 
