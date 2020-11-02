@@ -19,7 +19,8 @@ from minet.utils import (
 from minet.constants import (
     DEFAULT_GROUP_PARALLELISM,
     DEFAULT_GROUP_BUFFER_SIZE,
-    DEFAULT_THROTTLE
+    DEFAULT_THROTTLE,
+    DEFAULT_URLLIB3_TIMEOUT
 )
 
 FetchWorkerPayload = namedtuple(
@@ -56,7 +57,8 @@ ResolveWorkerResult = namedtuple(
 def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
                         throttle=DEFAULT_THROTTLE, guess_extension=True,
                         guess_encoding=True, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
-                        insecure=False, timeout=None, domain_parallelism=DEFAULT_GROUP_PARALLELISM):
+                        insecure=False, timeout=DEFAULT_URLLIB3_TIMEOUT,
+                        domain_parallelism=DEFAULT_GROUP_PARALLELISM):
     """
     Function returning a multithreaded iterator over fetched urls.
 
@@ -180,7 +182,7 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
                           throttle=DEFAULT_THROTTLE, max_redirects=5,
                           follow_refresh_header=True, follow_meta_refresh=False,
                           follow_js_relocation=False, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
-                          insecure=False, timeout=None):
+                          insecure=False, timeout=DEFAULT_URLLIB3_TIMEOUT):
     """
     Function returning a multithreaded iterator over resolved urls.
 

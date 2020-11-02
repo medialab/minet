@@ -36,9 +36,8 @@ from minet.exceptions import (
 )
 
 from minet.constants import (
-    DEFAULT_CONNECT_TIMEOUT,
-    DEFAULT_READ_TIMEOUT,
-    DEFAULT_SPOOFED_UA
+    DEFAULT_SPOOFED_UA,
+    DEFAULT_URLLIB3_TIMEOUT
 )
 
 # Fix for pyinstaller. Do not remove!
@@ -205,9 +204,6 @@ def grab_cookies(browser='firefox'):
 
 def dict_to_cookie_string(d):
     return '; '.join('%s=%s' % r for r in d.items())
-
-
-DEFAULT_URLLIB3_TIMEOUT = urllib3.Timeout(connect=DEFAULT_CONNECT_TIMEOUT, read=DEFAULT_READ_TIMEOUT)
 
 
 def create_pool(proxy=None, threads=None, insecure=False, **kwargs):
