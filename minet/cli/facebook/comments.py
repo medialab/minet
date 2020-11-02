@@ -81,22 +81,33 @@ def scrape_comments(html, direction=None, in_reply_to=None):
         if VALID_ID_RE.match(item.get('id'))
     )
 
-    next_link = soup.select_one('[id^="see_next_"] > a[href]')
+    if not in_reply_to:
+        if direction is None or direction == 'forward':
+            next_link = soup.select_one('[id^="see_next_"] > a[href]')
 
-    if next_link and (direction is None or direction == 'forward'):
-        data['next'] = urljoin(BASE_URL, next_link.get('href'))
+            if next_link:
+                data['next'] = urljoin(BASE_URL, next_link.get('href'))
 
-        if direction is None:
-            data['direction'] = 'forward'
+                if direction is None:
+                    data['direction'] = 'forward'
 
-    if in_reply_to is not None and (direction is None or direction == 'backward'):
-        next_link = soup.select_one('[id^="comment_replies_more_1"] > a[href]')
+        if direction is None or direction == 'backward':
+            next_link = soup.select_one('[id^="see_prev_"] > a[href]')
 
-        if next_link:
-            data['next'] = urljoin(BASE_URL, next_link.get('href'))
+            if next_link:
+                data['next'] = urljoin(BASE_URL, next_link.get('href'))
 
-            if direction is None:
-                data['direction'] = 'backward'
+                if direction is None:
+                    data['direction'] = 'backward'
+    else:
+        if direction is None or direction == 'backward':
+            next_link = soup.select_one('[id^="comment_replies_more_1"] > a[href]')
+
+            if next_link:
+                data['next'] = urljoin(BASE_URL, next_link.get('href'))
+
+                if direction is None:
+                    data['direction'] = 'backward'
 
     for item in valid_items:
         item_id = item.get('id')
