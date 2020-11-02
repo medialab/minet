@@ -242,10 +242,6 @@ def create_pool(proxy=None, threads=None, insecure=False, **kwargs):
     return urllib3.PoolManager(**manager_kwargs)
 
 
-def explain_request_error(error):
-    return error
-
-
 def raw_request(http, url, method='GET', headers=None,
                 preload_content=True, release_conn=True, timeout=None,
                 body=None):
@@ -277,7 +273,7 @@ def raw_request(http, url, method='GET', headers=None,
             **request_kwargs
         )
     except Exception as e:
-        return explain_request_error(e), None
+        return e, None
 
     return None, response
 
