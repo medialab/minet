@@ -117,7 +117,7 @@ def scrape_comments(html, in_reply_to=None):
         # TODO: this is baaaad
         data['post_id'] = post_id
 
-        reactions_item = item.select_one('[aria-label*=" reaction"]')
+        reactions_item = item.select_one('[href^="/ufi/reaction/"]')
         reactions = '0'
 
         if reactions_item is not None:
@@ -206,6 +206,15 @@ def facebook_comments_action(namespace):
 
         html = request_page(current_url)
         data = scrape_comments(html, in_reply_to)
+
+        # with open('page.html', 'w') as of:
+        #     of.write(html)
+
+        # from pprint import pprint
+        # pprint(data)
+
+        # from minet.cli.utils import die
+        # die('stop debug')
 
         url_count += 1
 
