@@ -121,7 +121,7 @@ def fetch_action(namespace):
 
     if namespace.column not in enricher.pos:
         die([
-            'Could not find the "%s" containing the urls in the given CSV file.' % namespace.column
+            'Could not find the "%s" column containing the urls in the given CSV file.' % namespace.column
         ])
 
     url_pos = enricher.pos[namespace.column]
@@ -130,7 +130,7 @@ def fetch_action(namespace):
 
     if namespace.filename is not None and namespace.filename not in enricher.pos:
         die([
-            'Could not find the "%s" containing the filenames in the given CSV file.' % namespace.filename
+            'Could not find the "%s" column containing the filenames in the given CSV file.' % namespace.filename
         ])
 
         filename_pos = enricher.pos[namespace.filename]
