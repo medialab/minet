@@ -129,16 +129,19 @@ def scrape_comments(html, direction=None, in_reply_to=None):
         # TODO: link to comment
         content_elements_candidates = item.select_one('h3').find_next_siblings('div')
         content_elements = []
+        content_elements_html = []
 
         for el in content_elements_candidates:
             if el.select_one('[id^=like_]'):
                 break
 
+            content_elements_html.append(el)
+
             if el.get_text().strip():
                 content_elements.append(el)
 
         comment_text = '\n\n'.join(el.get_text().strip() for el in content_elements)
-        comment_html = ''.join(str(el) for el in content_elements)
+        comment_html = ''.join(str(el) for el in content_elements_html)
 
         formatted_date = item.select_one('abbr').get_text().strip()
         parsed_date = parse_formatted_date(formatted_date)
