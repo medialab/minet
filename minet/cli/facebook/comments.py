@@ -109,22 +109,32 @@ def scrape_comments(html, direction=None, in_reply_to=None):
 
         # TODO: this should be fixed. Truncated comments are not correctly handled
         if not user_link:
-            continue
+            raise TypeError
 
         user_label = user_link.get_text().strip()
         user_href = user_link.get('href')
         user = parse_facebook_url(urljoin(BASE_URL, user_href))
 
         # TODO: link to comment
-        content_element = item.select_one('h3 + div')
-        comment_text = content_element.get_text().strip()
-        comment_html = str(content_element)
+        content_elements_candidates = item.select_one('h3').find_next_siblings('div')
+        content_elements = []
+
+        for el in content_elements_candidates:
+            if el.select_one('[id^=like_]'):
+                break
+
+            if el.get_text().strip():
+                content_elements.append(el)
+
+        comment_text = '\n\n'.join(el.get_text().strip() for el in content_elements)
+        comment_html = ''.join(str(el) for el in content_elements)
+
         formatted_date = item.select_one('abbr').get_text().strip()
         parsed_date = parse_formatted_date(formatted_date)
 
         post_id = item.select_one('[id^="like_"]').get('id').split('_')[1]
 
-        # TODO: this is baaaad
+        # NOTE: this could be better (we already know this beforehand)
         data['post_id'] = post_id
 
         reactions_item = item.select_one('[href^="/ufi/reaction/"]')
@@ -215,7 +225,12 @@ def facebook_comments_action(namespace):
         current_url, direction, in_reply_to = url_queue.popleft()
 
         html = request_page(current_url)
-        data = scrape_comments(html, direction, in_reply_to)
+
+        try:
+            data = scrape_comments(html, direction, in_reply_to)
+        except TypeError:
+            from minet.cli.utils import die
+            die(['stop', current_url])
 
         # with open('page.html', 'w') as of:
         #     of.write(html)
