@@ -24,7 +24,7 @@ from minet.cli.facebook.utils import grab_facebook_cookie
 from minet.cli.facebook.constants import FACEBOOK_MOBILE_DEFAULT_THROTTLE
 
 BASE_URL = 'https://m.facebook.com'
-VALID_ID_RE = re.compile(r'^(?:see_next_)?\d+$')
+VALID_ID_RE = re.compile(r'^\d+$')
 
 CSV_HEADERS = [
     'post_id',
@@ -80,16 +80,19 @@ def scrape_comments(html, in_reply_to=None):
         if VALID_ID_RE.match(item.get('id'))
     )
 
+    next_link = soup.select_one('[id^="see_next_"] > a')
+
+    if next_link:
+        data['next'] = urljoin(BASE_URL, next_link.get('href'))
+
+    # if in_reply_to:
+    #     next_link = soup.select_one('[id^="comment_replies_more"] > a')
+
+    #     if next_link:
+    #         data['next'] = urljoin(BASE_URL, next_link.get('href'))
+
     for item in valid_items:
         item_id = item.get('id')
-
-        if item_id is None:
-            continue
-
-        if item_id.startswith('see_next'):
-            next_link = item.select_one('a')
-            data['next'] = urljoin(BASE_URL, next_link.get('href'))
-            break
 
         # Skipping comment if same as commented
         if item_id == in_reply_to:
