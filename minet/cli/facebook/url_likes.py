@@ -6,56 +6,48 @@
 # likes count by scraping Facebook's like button plugin.
 #
 import casanova
+import re
 from tqdm import tqdm
 from urllib.parse import quote
-from minet.utils import create_pool, request
+from minet.utils import create_pool, request, RateLimitedIterator
 from minet.cli.utils import open_output_file, die
-import time
-import re
-from bs4 import BeautifulSoup
 
 REPORT_HEADERS = ['approx_likes', 'approx_likes_int']
-GET_LIKE_RE_FR = re.compile(r'[\d\.KM]*')
+GET_LIKE_RE = re.compile(r'<span>\d.{0,7}[KM\d]\sp')
 
-#### - my part -- ###
 
-### - encode url #### 
 def forge_url(url):
     url_base = "https://www.facebook.com/plugins/like.php?href=" + quote(url)
     return url_base
 
-### get the int approx : 
+
 def get_approx_number(nb):
     nb = nb.strip()
     final_nb = ""
-    is_comma = False
+    has_comma = False
     for x in nb:
-        if x ==".":
-            is_comma = True
+        if x == ".":
+            has_comma = True
             continue
-        if x =="K":
-            if is_comma:
-                final_nb = int(final_nb)*100
+        if x == "K":
+            if has_comma:
+                final_nb = int(final_nb) * 100
             else:
-                final_nb = int(final_nb)*1000
+                final_nb = int(final_nb) * 1000
             return final_nb
-        if x=="M":
-            if  is_comma:
-                final_nb = int(final_nb)*100000
+        if x == "M":
+            if has_comma:
+                final_nb = int(final_nb) * 100000
             else:
-                final_nb = int(final_nb)*1000000
+                final_nb = int(final_nb) * 1000000
             return final_nb
         else:
             final_nb += x
     return nb
 
-### Fetch approximations
 
-
-def make_request(http,url):
-    time.sleep(0.05)
-
-    err, response = request(http, forge_url(url),  headers={'Accept-Language': 'en'})
+def make_request(http, url, throttle_iterator):
+    err, response = request(http, forge_url(url), headers={'Accept-Language': 'en'})
 
     if err:
         return 'http-error', None
@@ -66,22 +58,32 @@ def make_request(http,url):
     if response.status >= 400:
         return 'http-error', None
 
-    return response.data
+    throttle_iterator.__iter__()
 
-def fetch_approxes(data):
+    return (err, response.data)
 
-    soup_page1 = BeautifulSoup(data, "lxml")
-    appr_likes = soup_page1.select_one("span#u_0_3 > span:first-child").string
+
+def fetch_approxes(err, data, url):
+    if err:
+        die('Request error : we could not get the number of likes for this url')
     try:
-        raw = GET_LIKE_RE_FR.search(appr_likes)
-        raw_approx = raw.group()
+        raw = GET_LIKE_RE.search(data.decode())
+        raw_fetch = raw.group()[6:]
+        raw_approx = ""
+        for charact in raw_fetch:
+            try:
+                nb_approx = int(charact)
+                raw_approx += charact
+            except:
+                if charact == "K" or charact == "M" or charact == ".":
+                    raw_approx += charact
+                else:
+                    pass
         precise_approx = get_approx_number(raw_approx)
     except:
-        die('could not get the number of likes for ' % url)
-    return raw_approx,precise_approx
+        die('Facebook error : could not get the number of likes for this url :' + url)
+    return raw_approx, precise_approx
 
-
-#### --------#####
 
 def facebook_url_likes_action(namespace):
     output_file = open_output_file(namespace.output)
@@ -105,15 +107,16 @@ def facebook_url_likes_action(namespace):
     )
 
     http = create_pool()
+    throttle_iterator = RateLimitedIterator(enricher.cells(namespace.column, with_rows=True), 5)
 
     for row, url in enricher.cells(namespace.column, with_rows=True):
 
         loading_bar.update()
 
         url_data = url.strip()
-      
-        data = make_request(http, url_data) 
 
-        results = fetch_approxes(data)
+        data = make_request(http, url_data, throttle_iterator)
+
+        results = fetch_approxes(data[0], data[1], url_data)
 
         enricher.writerow(row, [results[0], results[1]])
