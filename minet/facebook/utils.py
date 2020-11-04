@@ -7,7 +7,6 @@
 from http.cookies import SimpleCookie
 
 from minet.utils import grab_cookies
-from minet.cli.utils import die
 from minet.facebook.constants import FACEBOOK_URL
 
 
@@ -27,23 +26,19 @@ def fix_cookie(cookie_string):
     return '; '.join(key + '=' + morsel.coded_value for key, morsel in cookie.items())
 
 
-def grab_facebook_cookie(namespace):
-    if namespace.cookie == 'firefox' or namespace.cookie == 'chrome':
-        get_cookie_for_url = grab_cookies(namespace.cookie)
+def grab_facebook_cookie(source):
+    if source == 'firefox' or source == 'chrome':
+        get_cookie_for_url = grab_cookies(source)
 
         if get_cookie_for_url is None:
-            die('Could not extract cookies from %s.' % namespace.cookie)
+            return None
 
         cookie = get_cookie_for_url(FACEBOOK_URL + '/')
 
     else:
-        cookie = namespace.cookie.strip()
+        cookie = source.strip()
 
     if not cookie:
-        die([
-            'Relevant cookie not found.',
-            'A Facebook authentication cookie is necessary to be able to access Facebook pages.',
-            'Use the --cookie flag to choose a browser from which to extract the cookie or give your cookie directly.'
-        ])
+        return None
 
     return fix_cookie(cookie)

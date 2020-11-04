@@ -623,7 +623,7 @@ examples:
 ## Facebook
 
 ```
-usage: minet facebook [-h] {comments,post-stats,url-parse} ...
+usage: minet facebook [-h] {comments,post-stats,url-likes,url-parse} ...
 
 Minet Facebook Command
 ======================
@@ -631,10 +631,10 @@ Minet Facebook Command
 Collects data from Facebook.
 
 optional arguments:
-  -h, --help                       show this help message and exit
+  -h, --help                                 show this help message and exit
 
 actions:
-  {comments,post-stats,url-parse}  Action to perform to collect data on Facebook
+  {comments,post-stats,url-likes,url-parse}  Action to perform to collect data on Facebook
 
 ```
 
@@ -653,13 +653,13 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (support "firefox" and "chrome").
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (support "firefox" and "chrome"). Defaults to "firefox".
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
 
 examples:
 
-. Fetching a dashboard's lists:
-    `minet fb comments`
+. Fetching a post's comments:
+    `minet fb comments -c firefox https://www.facebook.com/page/posts/3601645349798293 > comments.csv`
 
 ```
 
@@ -671,7 +671,7 @@ usage: minet facebook url-parse [-h] [-o OUTPUT] [-s SELECT] column [file]
 Parse Facebook URLs
 ===================
 
-Extract informations from Facebook URLs
+Extract informations from Facebook URLs.
 
 positional arguments:
   column                      Name of the column containing the URL in the CSV file.

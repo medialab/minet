@@ -11,6 +11,11 @@ from minet.utils import RateLimiterState, create_pool
 FACEBOOK_URL = 'https://www.facebook.com'
 FACEBOOK_MOBILE_URL = 'https://m.facebook.com'
 
+FACEBOOK_OUTPUT_FORMATS = {
+    'raw',
+    'csv_row'
+}
+
 FACEBOOK_MOBILE_DEFAULT_THROTTLE = 0.5
 FACEBOOK_WEB_DEFAULT_THROTTLE = 20.0
 

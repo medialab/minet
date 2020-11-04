@@ -600,8 +600,8 @@ MINET_COMMANDS = {
                     'epilog': '''
                         examples:
 
-                        . Fetching a dashboard's lists:
-                            `minet fb comments`
+                        . Fetching a post's comments:
+                            `minet fb comments -c firefox https://www.facebook.com/page/posts/3601645349798293 > comments.csv`
                     ''',
                     'arguments': [
                         {
@@ -610,7 +610,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-c', '--cookie'],
-                            'help': 'Authenticated cookie to use or browser from which to extract it (support "firefox" and "chrome").',
+                            'help': 'Authenticated cookie to use or browser from which to extract it (support "firefox" and "chrome"). Defaults to "firefox".',
                             'default': 'firefox'
                         },
                         {

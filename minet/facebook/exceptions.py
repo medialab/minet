@@ -7,3 +7,11 @@ from minet.exceptions import MinetError
 
 class FacebookError(MinetError):
     pass
+
+
+class FacebookInvalidCookieError(FacebookError):
+    pass
+
+
+class FacebookInvalidUrlError(FacebookError):
+    pass
