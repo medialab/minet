@@ -71,7 +71,7 @@ def make_request(http,url):
 def fetch_approxes(data):
 
     soup_page1 = BeautifulSoup(data, "lxml")
-    appr_likes = soup_page1.select("span#u_0_3 > span:first-child")[0].string
+    appr_likes = soup_page1.select_one("span#u_0_3 > span:first-child").string
     try:
         raw = GET_LIKE_RE_FR.search(appr_likes)
         raw_approx = raw.group()
