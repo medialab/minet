@@ -6,14 +6,12 @@
 #
 import csv
 from tqdm import tqdm
+from ural.facebook import is_facebook_post_url
 
 from minet.cli.utils import open_output_file, die
-from minet.facebook.comments import scrape_comments
+from minet.facebook.comments import FacebookCommentScraper
 from minet.facebook.constants import FACEBOOK_COMMENT_CSV_HEADERS
-from minet.facebook.exceptions import (
-    FacebookInvalidCookieError,
-    FacebookInvalidUrlError
-)
+from minet.facebook.exceptions import FacebookInvalidCookieError
 
 
 def facebook_comments_action(namespace):
@@ -31,28 +29,12 @@ def facebook_comments_action(namespace):
         unit=' comments'
     )
 
-    batches = scrape_comments(
-        namespace.url,
-        namespace.cookie,
-        per_call=True,
-        detailed=True,
-        format='csv_row'
-    )
+    if not is_facebook_post_url(namespace.url):
+        die('Given url is not a Facebook post url: %s' % namespace.url)
 
     try:
-        for details, batch in batches:
-            for comment in batch:
-                writer.writerow(comment)
-
-            loading_bar.update(len(batch))
-            loading_bar.set_postfix(
-                calls=details['calls'],
-                replies=details['replies'],
-                q=details['queue_size']
-            )
+        scraper = FacebookCommentScraper(namespace.cookie)
     except FacebookInvalidCookieError:
-        loading_bar.close()
-
         if namespace.cookie in ['firefox', 'chrome']:
             die('Could not extract cookies from %s.' % namespace.cookie)
 
@@ -61,8 +43,24 @@ def facebook_comments_action(namespace):
             'A Facebook authentication cookie is necessary to be able to access Facebook post comments.',
             'Use the --cookie flag to choose a browser from which to extract the cookie or give your cookie directly.'
         ])
-    except FacebookInvalidUrlError:
-        loading_bar.close()
-        die('Given url is not a Facebook post url: %s' % namespace.url)
+
+    batches = scraper(
+        namespace.url,
+        per_call=True,
+        detailed=True,
+        format='csv_row'
+    )
+
+    for details, batch in batches:
+        for comment in batch:
+            writer.writerow(comment)
+
+        loading_bar.update(len(batch))
+        loading_bar.set_postfix(
+            calls=details['calls'],
+            replies=details['replies'],
+            q=details['queue_size'],
+            posts=1
+        )
 
     loading_bar.close()

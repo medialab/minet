@@ -11,7 +11,3 @@ class FacebookError(MinetError):
 
 class FacebookInvalidCookieError(FacebookError):
     pass
-
-
-class FacebookInvalidUrlError(FacebookError):
-    pass

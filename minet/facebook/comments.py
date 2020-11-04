@@ -13,17 +13,13 @@ from urllib.parse import urljoin
 from ural import force_protocol
 from ural.facebook import (
     parse_facebook_url,
-    is_facebook_post_url,
     convert_facebook_url_to_mobile
 )
 
 from minet.utils import create_pool, request, rate_limited_from_state
 from minet.facebook.utils import grab_facebook_cookie
 from minet.facebook.formatters import format_comment
-from minet.facebook.exceptions import (
-    FacebookInvalidCookieError,
-    FacebookInvalidUrlError
-)
+from minet.facebook.exceptions import FacebookInvalidCookieError
 from minet.facebook.constants import (
     FACEBOOK_OUTPUT_FORMATS,
     FACEBOOK_MOBILE_RATE_LIMITER_STATE,
@@ -47,7 +43,7 @@ def resolve_relative_url(url):
     return urljoin(FACEBOOK_MOBILE_URL, url)
 
 
-def scrape_page_for_comments(html, direction=None, in_reply_to=None):
+def scrape_comments(html, direction=None, in_reply_to=None):
     soup = BeautifulSoup(html, 'lxml')
 
     data = {
@@ -176,32 +172,24 @@ def scrape_page_for_comments(html, direction=None, in_reply_to=None):
     return data
 
 
-def scrape_comments(url, cookie, detailed=False, per_call=False, format='raw'):
+class FacebookCommentScraper(object):
+    def __init__(self, cookie):
 
-    if format not in FACEBOOK_OUTPUT_FORMATS:
-        raise TypeError('minet.facebook.scrape_comments: unkown `format`.')
+        # Grabbing cookie
+        cookie = grab_facebook_cookie(cookie)
 
-    if not is_facebook_post_url(url):
-        raise FacebookInvalidUrlError
+        if cookie is None:
+            raise FacebookInvalidCookieError
 
-    # Reformatting url to hit mobile website
-    url = force_protocol(url, 'https')
-    url = convert_facebook_url_to_mobile(url)
-
-    # Grabbing cookie
-    cookie = grab_facebook_cookie(cookie)
-
-    if cookie is None:
-        raise FacebookInvalidCookieError
-
-    http = create_pool()
+        self.cookie = cookie
+        self.http = create_pool()
 
     @rate_limited_from_state(FACEBOOK_MOBILE_RATE_LIMITER_STATE)
-    def request_page(target):
+    def request_page(self, url):
         error, result = request(
-            http,
-            target,
-            cookie=cookie,
+            self.http,
+            url,
+            cookie=self.cookie,
             headers={
                 'User-Agent': 'curl/7.68.0'
             }
@@ -212,51 +200,60 @@ def scrape_comments(url, cookie, detailed=False, per_call=False, format='raw'):
 
         return result.data.decode('utf-8')
 
-    url_queue = deque([(url, None, None)])
+    def __call__(self, url, detailed=False, per_call=False, format='raw'):
 
-    calls = 0
-    replies = 0
+        if format not in FACEBOOK_OUTPUT_FORMATS:
+            raise TypeError('minet.facebook.scrape_comments: unkown `format`.')
 
-    while len(url_queue) != 0:
-        current_url, direction, in_reply_to = url_queue.popleft()
+        # Reformatting url to hit mobile website
+        url = force_protocol(url, 'https')
+        url = convert_facebook_url_to_mobile(url)
 
-        html = request_page(current_url)
+        url_queue = deque([(url, None, None)])
 
-        try:
-            data = scrape_page_for_comments(html, direction, in_reply_to)
-        except TypeError:
-            print('Could not process comment in %s' % current_url)
-            sys.exit(1)
+        calls = 0
+        replies = 0
 
-        calls += 1
+        while len(url_queue) != 0:
+            current_url, direction, in_reply_to = url_queue.popleft()
 
-        for reply_url, commented_id in data['replies']:
-            url_queue.append((reply_url, None, commented_id))
+            html = self.request_page(current_url)
 
-        if data['next'] is not None:
-            url_queue.append((data['next'], data['direction'], in_reply_to))
+            try:
+                data = scrape_comments(html, direction, in_reply_to)
+            except TypeError:
+                print('Could not process comment in %s' % current_url)
+                sys.exit(1)
 
-        comments = []
+            calls += 1
 
-        for comment in data['comments']:
-            if in_reply_to is not None:
-                replies += 1
+            for reply_url, commented_id in data['replies']:
+                url_queue.append((reply_url, None, commented_id))
 
-            if format == 'csv_row':
-                comment = format_comment(comment)
+            if data['next'] is not None:
+                url_queue.append((data['next'], data['direction'], in_reply_to))
 
-            if per_call:
-                comments.append(comment)
+            comments = []
+
+            for comment in data['comments']:
+                if in_reply_to is not None:
+                    replies += 1
+
+                if format == 'csv_row':
+                    comment = format_comment(comment)
+
+                if per_call:
+                    comments.append(comment)
+                else:
+                    yield comment
+
+            if detailed:
+                details = {
+                    'calls': calls,
+                    'replies': replies,
+                    'queue_size': len(url_queue)
+                }
+
+                yield details, comments
             else:
-                yield comment
-
-        if detailed:
-            details = {
-                'calls': calls,
-                'replies': replies,
-                'queue_size': len(url_queue)
-            }
-
-            yield details, comments
-        else:
-            yield comments
+                yield comments
