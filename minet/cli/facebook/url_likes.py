@@ -9,11 +9,11 @@ import casanova
 import re
 from tqdm import tqdm
 from urllib.parse import quote
-from minet.utils import create_pool, request, RateLimitedIterator
+from minet.utils import create_pool, request, rate_limited
 from minet.cli.utils import open_output_file, die
 
 REPORT_HEADERS = ['approx_likes', 'approx_likes_int']
-GET_LIKE_RE = re.compile(r'<span>\d.{0,7}[KM\d]\sp')
+GET_LIKE_RE = re.compile(r'<span>\d.{0,7}[KM\d]\s+people')
 
 
 def forge_url(url):
@@ -45,8 +45,8 @@ def get_approx_number(nb):
             final_nb += x
     return nb
 
-
-def make_request(http, url, throttle_iterator):
+@rate_limited(5,1)
+def make_request(http, url):
     err, response = request(http, forge_url(url), headers={'Accept-Language': 'en'})
 
     if err:
@@ -57,8 +57,6 @@ def make_request(http, url, throttle_iterator):
 
     if response.status >= 400:
         return 'http-error', None
-
-    throttle_iterator.__iter__()
 
     return (err, response.data)
 
@@ -107,7 +105,6 @@ def facebook_url_likes_action(namespace):
     )
 
     http = create_pool()
-    throttle_iterator = RateLimitedIterator(enricher.cells(namespace.column, with_rows=True), 5)
 
     for row, url in enricher.cells(namespace.column, with_rows=True):
 
@@ -115,7 +112,7 @@ def facebook_url_likes_action(namespace):
 
         url_data = url.strip()
 
-        data = make_request(http, url_data, throttle_iterator)
+        data = make_request(http, url_data)
 
         results = fetch_approxes(data[0], data[1], url_data)
 
