@@ -4,8 +4,10 @@
 #
 # Logic of the `fb comments` action.
 #
-import csv
+import casanova
+from io import StringIO
 from tqdm import tqdm
+from ural import is_url
 from ural.facebook import is_facebook_post_url
 
 from minet.cli.utils import open_output_file, die
@@ -19,18 +21,10 @@ def facebook_comments_action(namespace):
     # Handling output
     output_file = open_output_file(namespace.output)
 
-    writer = csv.writer(output_file)
-    writer.writerow(FACEBOOK_COMMENT_CSV_HEADERS)
-
-    # Loading bar
-    loading_bar = tqdm(
-        desc='Scraping comments',
-        dynamic_ncols=True,
-        unit=' comments'
-    )
-
-    if not is_facebook_post_url(namespace.url):
-        die('Given url is not a Facebook post url: %s' % namespace.url)
+    # Handling input
+    if is_url(namespace.column):
+        namespace.file = StringIO('post_url\n%s' % namespace.column)
+        namespace.column = 'post_url'
 
     try:
         scraper = FacebookCommentScraper(namespace.cookie)
@@ -44,23 +38,44 @@ def facebook_comments_action(namespace):
             'Use the --cookie flag to choose a browser from which to extract the cookie or give your cookie directly.'
         ])
 
-    batches = scraper(
-        namespace.url,
-        per_call=True,
-        detailed=True,
-        format='csv_row'
+    # Enricher
+    enricher = casanova.enricher(
+        namespace.file,
+        output_file,
+        keep=namespace.select,
+        add=FACEBOOK_COMMENT_CSV_HEADERS
     )
 
-    for details, batch in batches:
-        for comment in batch:
-            writer.writerow(comment)
+    # Loading bar
+    loading_bar = tqdm(
+        desc='Scraping comments',
+        dynamic_ncols=True,
+        unit=' comments'
+    )
 
-        loading_bar.update(len(batch))
-        loading_bar.set_postfix(
-            calls=details['calls'],
-            replies=details['replies'],
-            q=details['queue_size'],
-            posts=1
+    for i, (row, url) in enumerate(enricher.cells(namespace.column, with_rows=True)):
+
+        if not is_facebook_post_url(url):
+            loading_bar.close()
+            die('Given url (line %i) is not a Facebook post url: %s' % (i + 1, url))
+
+        batches = scraper(
+            url,
+            per_call=True,
+            detailed=True,
+            format='csv_row'
         )
+
+        for details, batch in batches:
+            for comment in batch:
+                enricher.writerow(row, comment)
+
+            loading_bar.update(len(batch))
+            loading_bar.set_postfix(
+                calls=details['calls'],
+                replies=details['replies'],
+                q=details['queue_size'],
+                posts=i + 1
+            )
 
     loading_bar.close()

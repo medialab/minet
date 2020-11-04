@@ -605,8 +605,15 @@ MINET_COMMANDS = {
                     ''',
                     'arguments': [
                         {
-                            'name': 'url',
-                            'help': 'Url of the post from which to scrape comments.'
+                            'name': 'column',
+                            'help': 'Column of the CSV file containing post urls or a single post url to fetch.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the post urls.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
                         },
                         {
                             'flags': ['-c', '--cookie'],
@@ -616,6 +623,11 @@ MINET_COMMANDS = {
                         {
                             'flags': ['-o', '--output'],
                             'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
                         }
                     ]
                 },

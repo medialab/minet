@@ -641,7 +641,8 @@ actions:
 ### comments
 
 ```
-usage: minet facebook comments [-h] [-c COOKIE] [-o OUTPUT] url
+usage: minet facebook comments [-h] [-c COOKIE] [-o OUTPUT] [-s SELECT]
+                               column [file]
 
 Minet Facebook Comments Command
 ===============================
@@ -649,12 +650,14 @@ Minet Facebook Comments Command
 Scrape series of comments on Facebook.
 
 positional arguments:
-  url                         Url of the post from which to scrape comments.
+  column                      Column of the CSV file containing post urls or a single post url to fetch.
+  file                        CSV file containing the post urls.
 
 optional arguments:
   -h, --help                  show this help message and exit
   -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (support "firefox" and "chrome"). Defaults to "firefox".
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
 
 examples:
 
