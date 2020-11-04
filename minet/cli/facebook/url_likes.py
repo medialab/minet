@@ -15,11 +15,12 @@ import re
 from bs4 import BeautifulSoup
 
 REPORT_HEADERS = ['approx_likes', 'approx_likes_int']
+GET_LIKE_RE_FR = re.compile(r'[\d\.KM]*')
 
 #### - my part -- ###
 
 ### - encode url #### 
-def enc(url):
+def forge_url(url):
     url_base = "https://www.facebook.com/plugins/like.php?href=" + quote(url)
     return url_base
 
@@ -27,44 +28,34 @@ def enc(url):
 def get_approx_number(nb):
     nb = nb.strip()
     final_nb = ""
-    is_coma = False
-    if nb[-1]=="K":
-        for x in nb:
-            if x ==",":
-                is_coma = True
-                continue
-            if x =="K":
-                if is_coma:
-                    final_nb = int(final_nb)*100
-                else:
-                    final_nb = int(final_nb)*1000
-                return final_nb
+    is_comma = False
+    for x in nb:
+        if x ==".":
+            is_comma = True
+            continue
+        if x =="K":
+            if is_comma:
+                final_nb = int(final_nb)*100
             else:
-                final_nb += x
-
-    if nb[-1]=="M":
-        for x in nb:
-            if x ==",":
-                is_coma = True
-                continue
-            if x =="M":
-                if not is_coma:
-                    final_nb = int(final_nb)*100000
-                else:
-                    final_nb = int(final_nb)*1000000
-                return final_nb
+                final_nb = int(final_nb)*1000
+            return final_nb
+        if x=="M":
+            if  is_comma:
+                final_nb = int(final_nb)*100000
             else:
-                final_nb += x
+                final_nb = int(final_nb)*1000000
+            return final_nb
+        else:
+            final_nb += x
     return nb
 
 ### Fetch approximations
-http = create_pool()
 
-def Fetch_approxes(url):
-   
+
+def make_request(http,url):
     time.sleep(0.05)
 
-    err, response = request(http, enc(url))
+    err, response = request(http, forge_url(url),  headers={'Accept-Language': 'en'})
 
     if err:
         return 'http-error', None
@@ -75,16 +66,19 @@ def Fetch_approxes(url):
     if response.status >= 400:
         return 'http-error', None
 
-    html = response.data
-    soup_page1 = BeautifulSoup(html, "lxml")
-    appr_likes = soup_page1.select("span.hidden_elem")[0].string
+    return response.data
+
+def fetch_approxes(data):
+
+    soup_page1 = BeautifulSoup(data, "lxml")
+    appr_likes = soup_page1.select("span#u_0_3 > span:first-child")[0].string
     try:
-        approx1 = re.findall("(?<=et)(.*)(?=autres)",appr_likes)[0]
-        pre = get_approx_number(approx1)
+        raw = GET_LIKE_RE_FR.search(appr_likes)
+        raw_approx = raw.group()
+        precise_approx = get_approx_number(raw_approx)
     except:
-        approx1 = appr_likes
-        pre = appr_likes
-    return(approx1,pre)
+        die('could not get the number of likes for ' % url)
+    return raw_approx,precise_approx
 
 
 #### --------#####
@@ -110,12 +104,16 @@ def facebook_url_likes_action(namespace):
         unit=' urls',
     )
 
+    http = create_pool()
+
     for row, url in enricher.cells(namespace.column, with_rows=True):
 
         loading_bar.update()
 
         url_data = url.strip()
       
-        results = Fetch_approxes(url_data)
+        data = make_request(http, url_data) 
+
+        results = fetch_approxes(data)
 
         enricher.writerow(row, [results[0], results[1]])
