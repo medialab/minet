@@ -675,7 +675,7 @@ MINET_COMMANDS = {
                     'arguments': [
                         {
                             'name': 'column',
-                            'help': 'Name of the column containing the URL in the CSV file.'
+                            'help': 'Name of the column containing the URL in the CSV file or a single url.'
                         },
                         {
                             'name': 'file',

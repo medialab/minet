@@ -8,13 +8,16 @@
 import re
 import casanova
 from tqdm import tqdm
+from io import StringIO
 from urllib.parse import quote
+from ural import is_url
 
 from minet.utils import create_pool, request, rate_limited
 from minet.cli.utils import open_output_file, die
 
 REPORT_HEADERS = ['approx_likes', 'approx_likes_int']
-LIKES_RE = re.compile(rb'<span>([\d.KM]+)\s+people\s+like')
+NO_LIKES_RE = re.compile(rb'>\s*You like this\.', re.I)
+LIKES_RE = re.compile(rb'>\s*([\d.KM]+)\s+people\s+like', re.I)
 
 
 def forge_url(url):
@@ -44,10 +47,13 @@ def parse_approx_likes(approx_likes, unit='K'):
 
 
 def scrape(data):
+    if NO_LIKES_RE.search(data):
+        return ['0', '0']
+
     match = LIKES_RE.search(data)
 
     if match is None:
-        return None
+        return ['', '']
 
     approx_likes = match.group(1).decode()
     approx_likes_int = approx_likes
@@ -63,6 +69,10 @@ def scrape(data):
 
 def facebook_url_likes_action(namespace):
     output_file = open_output_file(namespace.output)
+
+    if is_url(namespace.column):
+        namespace.file = StringIO('url\n%s' % (namespace.column))
+        namespace.column = 'url'
 
     enricher = casanova.enricher(
         namespace.file,
@@ -93,11 +103,13 @@ def facebook_url_likes_action(namespace):
         err, html = make_request(http, url)
 
         if err is not None:
+            loading_bar.close()
             die('An error occurred while fetching like button for this url: %s' % url)
 
         scraped = scrape(html)
 
         if scraped is None:
+            loading_bar.close()
             die('Could not extract Facebook likes from this url\'s like button: %s' % url)
 
         enricher.writerow(row, scraped)
