@@ -29,6 +29,7 @@
   * [summary](#summary)
 * [facebook (fb)](#facebook)
   * [comments](#comments)
+  * [url-likes](#facebook-url-likes)
   * [url-parse](#facebook-url-parse)
 * [hyphe](#hyphe)
   * [dump](#dump)
@@ -587,7 +588,7 @@ examples:
 ```
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [--posts POSTS] [-s SELECT]
-                                 [--sort-by {subscriber_count,date,total_interactions}]
+                                 [--sort-by {subscriber_count,total_interactions,date}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -608,7 +609,7 @@ optional arguments:
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {subscriber_count,date,total_interactions}
+  --sort-by {subscriber_count,total_interactions,date}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
@@ -663,6 +664,27 @@ examples:
 
 . Fetching a post's comments:
     `minet fb comments -c firefox https://www.facebook.com/page/posts/3601645349798293 > comments.csv`
+
+```
+
+<h3 id="facebook-url-likes">url-likes</h3>
+
+```
+usage: minet facebook url-likes [-h] [-o OUTPUT] [-s SELECT] [--total TOTAL]
+                                column [file]
+
+Retrieve approximate number of likes for the given URLs.
+========================================================
+
+positional arguments:
+  column                      Name of the column containing the URL in the CSV file.
+  file                        CSV file containing the inquired URLs.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+  --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
 
 ```
 

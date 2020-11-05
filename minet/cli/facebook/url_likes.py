@@ -5,82 +5,60 @@
 # Action reading an input CSV file line by line and retrieving approximate
 # likes count by scraping Facebook's like button plugin.
 #
-import casanova
 import re
+import casanova
 from tqdm import tqdm
 from urllib.parse import quote
+
 from minet.utils import create_pool, request, rate_limited
 from minet.cli.utils import open_output_file, die
 
 REPORT_HEADERS = ['approx_likes', 'approx_likes_int']
-GET_LIKE_RE = re.compile(r'<span>\d.{0,7}[KM\d]\s+people')
+LIKES_RE = re.compile(rb'<span>([\d.KM]+)\s+people\s+like')
 
 
 def forge_url(url):
-    url_base = "https://www.facebook.com/plugins/like.php?href=" + quote(url)
-    return url_base
+    return 'https://www.facebook.com/plugins/like.php?href=%s' % quote(url)
 
 
-def get_approx_number(nb):
-    nb = nb.strip()
-    final_nb = ""
-    has_comma = False
-    for x in nb:
-        if x == ".":
-            has_comma = True
-            continue
-        if x == "K":
-            if has_comma:
-                final_nb = int(final_nb) * 100
-            else:
-                final_nb = int(final_nb) * 1000
-            return final_nb
-        if x == "M":
-            if has_comma:
-                final_nb = int(final_nb) * 100000
-            else:
-                final_nb = int(final_nb) * 1000000
-            return final_nb
-        else:
-            final_nb += x
-    return nb
-
-@rate_limited(5,1)
+@rate_limited(5)
 def make_request(http, url):
     err, response = request(http, forge_url(url), headers={'Accept-Language': 'en'})
-
-    if err:
-        return 'http-error', None
 
     if response.status == 404:
         return 'not-found', None
 
-    if response.status >= 400:
+    if err:
         return 'http-error', None
 
-    return (err, response.data)
+    return err, response.data
 
 
-def fetch_approxes(err, data, url):
-    if err:
-        die('Request error : we could not get the number of likes for this url')
-    try:
-        raw = GET_LIKE_RE.search(data.decode())
-        raw_fetch = raw.group()[6:]
-        raw_approx = ""
-        for charact in raw_fetch:
-            try:
-                nb_approx = int(charact)
-                raw_approx += charact
-            except:
-                if charact == "K" or charact == "M" or charact == ".":
-                    raw_approx += charact
-                else:
-                    pass
-        precise_approx = get_approx_number(raw_approx)
-    except:
-        die('Facebook error : could not get the number of likes for this url :' + url)
-    return raw_approx, precise_approx
+def parse_approx_likes(approx_likes, unit='K'):
+    multiplier = 1000
+
+    if unit == 'M':
+        multiplier = 1000000
+
+    return str(int(float(approx_likes[:-1]) * multiplier))
+
+
+def scrape(data):
+    match = LIKES_RE.search(data)
+
+    if match is None:
+        return None
+
+    approx_likes = match.group(1).decode()
+    approx_likes_int = approx_likes
+
+    if 'K' in approx_likes:
+        approx_likes_int = parse_approx_likes(approx_likes, unit='K')
+
+    elif 'M' in approx_likes:
+        approx_likes_int = parse_approx_likes(approx_likes, unit='M')
+
+    return [approx_likes, approx_likes_int]
 
 
 def facebook_url_likes_action(namespace):
@@ -102,18 +80,24 @@ def facebook_url_likes_action(namespace):
         desc='Retrieving likes',
         dynamic_ncols=True,
         unit=' urls',
+        total=namespace.total
     )
 
     http = create_pool()
 
     for row, url in enricher.cells(namespace.column, with_rows=True):
-
         loading_bar.update()
 
-        url_data = url.strip()
+        url = url.strip()
 
-        data = make_request(http, url_data)
+        err, html = make_request(http, url)
 
-        results = fetch_approxes(data[0], data[1], url_data)
+        if err is not None:
+            die('An error occurred while fetching like button for this url: %s' % url)
 
-        enricher.writerow(row, [results[0], results[1]])
+        scraped = scrape(html)
+
+        if scraped is None:
+            die('Could not extract Facebook likes from this url\'s like button: %s' % url)
+
+        enricher.writerow(row, scraped)

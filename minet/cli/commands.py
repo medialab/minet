@@ -692,6 +692,11 @@ MINET_COMMANDS = {
                             'flags': ['-s', '--select'],
                             'help': 'Columns to include in report (separated by `,`).',
                             'type': SplitterType()
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
+                            'type': int
                         }
                     ]
                 },
