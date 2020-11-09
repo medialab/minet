@@ -36,7 +36,7 @@ URL_TEMPLATE = (
 def url_forge(link, token, start_date, sort_by, include_posts=False):
     return URL_TEMPLATE % {
         'token': token,
-        'count': 1 if not include_posts else 100,
+        'count': 1 if not include_posts else 1000,
         'start_date': start_date,
         'link': quote(link, safe=''),
         'sort_by': sort_by
