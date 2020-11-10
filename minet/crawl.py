@@ -201,6 +201,9 @@ class DefinitionSpider(Spider):
         if self.next_scraper is not None:
             scraped = self.next_scraper(content)
 
+            if scraped is None:
+                return
+
             if isinstance(scraped, list):
                 yield from scraped
             else:
