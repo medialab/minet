@@ -326,7 +326,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-p', '--platforms'],
-                            'help': 'The platforms, separated by comma from which to retrieve posts.',
+                            'help': 'The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.',
                             'type': SplitterType()
                         },
                         {
@@ -369,6 +369,11 @@ MINET_COMMANDS = {
                             'type': FileType('r'),
                             'default': sys.stdin,
                             'nargs': '?'
+                        },
+                        {
+                            'flags': ['-p', '--platforms'],
+                            'help': 'The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.',
+                            'type': SplitterType()
                         },
                         {
                             'name': '--posts',
