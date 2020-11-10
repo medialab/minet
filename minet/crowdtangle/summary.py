@@ -33,8 +33,9 @@ URL_TEMPLATE = (
 )
 
 
-def url_forge(link, token, start_date, sort_by, include_posts=False):
-    return URL_TEMPLATE % {
+def url_forge(link, token, start_date, sort_by, platforms=None, include_posts=False):
+
+    base_url = URL_TEMPLATE % {
         'token': token,
         'count': 1 if not include_posts else 1000,
         'start_date': start_date,
@@ -42,9 +43,14 @@ def url_forge(link, token, start_date, sort_by, include_posts=False):
         'sort_by': sort_by
     }
 
+    if platforms:
+        base_url += '&platforms=%s' % ','.join(platforms)
+
+    return base_url
+
 
 def crowdtangle_summary(http, link, token=None, start_date=None, with_top_posts=False,
-                        sort_by=CROWDTANGLE_SUMMARY_DEFAULT_SORT_TYPE, format='csv_dict_row'):
+                        sort_by=CROWDTANGLE_SUMMARY_DEFAULT_SORT_TYPE, format='csv_dict_row', platforms=None):
 
     if token is None:
         raise CrowdTangleMissingTokenError
@@ -64,6 +70,7 @@ def crowdtangle_summary(http, link, token=None, start_date=None, with_top_posts=
         token,
         start_date,
         sort_by,
+        platforms,
         with_top_posts
     )
 

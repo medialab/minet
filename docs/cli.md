@@ -570,7 +570,7 @@ optional arguments:
   -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
   --not-in-title                                  Whether to search terms in account titles also.
   --offset OFFSET                                 Count offset.
-  -p PLATFORMS, --platforms PLATFORMS             The platforms, separated by comma from which to retrieve posts.
+  -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
@@ -587,8 +587,9 @@ examples:
 
 ```
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
-                                 [-t TOKEN] [--posts POSTS] [-s SELECT]
-                                 [--sort-by {subscriber_count,total_interactions,date}]
+                                 [-t TOKEN] [-p PLATFORMS] [--posts POSTS]
+                                 [-s SELECT]
+                                 [--sort-by {total_interactions,subscriber_count,date}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -607,9 +608,10 @@ optional arguments:
   --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
+  -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {subscriber_count,total_interactions,date}
+  --sort-by {total_interactions,subscriber_count,date}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
@@ -677,7 +679,7 @@ Retrieve approximate number of likes for the given URLs.
 ========================================================
 
 positional arguments:
-  column                      Name of the column containing the URL in the CSV file.
+  column                      Name of the column containing the URL in the CSV file or a single url.
   file                        CSV file containing the inquired URLs.
 
 optional arguments:

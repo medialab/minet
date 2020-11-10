@@ -60,7 +60,8 @@ def crowdtangle_summary_action(namespace, output_file):
                 start_date=namespace.start_date,
                 with_top_posts=namespace.posts is not None,
                 sort_by=namespace.sort_by,
-                format='csv_row'
+                format='csv_row',
+                platforms=namespace.platforms
             )
 
         except CrowdTangleInvalidTokenError:
