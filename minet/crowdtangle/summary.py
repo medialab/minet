@@ -71,7 +71,7 @@ def crowdtangle_summary(http, link, token=None, start_date=None, with_top_posts=
         start_date,
         sort_by,
         platforms,
-        with_top_posts 
+        with_top_posts
     )
 
     err, response, data = request_json(http, api_url)
