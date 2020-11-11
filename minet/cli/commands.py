@@ -844,6 +844,11 @@ MINET_COMMANDS = {
                 'default': DEFAULT_THROTTLE
             },
             {
+                'flag': '--timeout',
+                'help': 'Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.',
+                'type': float
+            },
+            {
                 'flag': '--total',
                 'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
                 'type': int

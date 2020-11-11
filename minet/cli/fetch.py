@@ -202,13 +202,20 @@ def fetch_action(namespace):
     errors = 0
     status_codes = Counter()
 
+    fetch_kwargs = {
+        'threads': namespace.threads,
+        'throttle': namespace.throttle,
+        'domain_parallelism': namespace.domain_parallelism
+    }
+
+    if namespace.timeout is not None:
+        fetch_kwargs['timeout'] = namespace.timeout
+
     multithreaded_iterator = multithreaded_fetch(
         enricher,
         key=url_key,
         request_args=request_args,
-        threads=namespace.threads,
-        throttle=namespace.throttle,
-        domain_parallelism=namespace.domain_parallelism
+        **fetch_kwargs
     )
 
     for result in multithreaded_iterator:

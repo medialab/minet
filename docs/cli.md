@@ -124,7 +124,8 @@ usage: minet fetch [-h] [--compress] [--contents-in-report] [-d OUTPUT_DIR]
                    [--filename-template FILENAME_TEMPLATE] [-g {firefox,chrome}]
                    [-H HEADERS] [--resume] [--standardize-encoding] [-o OUTPUT]
                    [-s SELECT] [-t THREADS] [--throttle THROTTLE]
-                   [--total TOTAL] [--url-template URL_TEMPLATE] [-X METHOD]
+                   [--timeout TIMEOUT] [--total TOTAL]
+                   [--url-template URL_TEMPLATE] [-X METHOD]
                    column [file]
 
 Minet Fetch Command
@@ -158,6 +159,7 @@ optional arguments:
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
   -t THREADS, --threads THREADS                   Number of threads to use. Defaults to 25.
   --throttle THROTTLE                             Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
+  --timeout TIMEOUT                               Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.
   --total TOTAL                                   Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
   --url-template URL_TEMPLATE                     A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.
   -X METHOD, --request METHOD                     The http method to use. Will default to GET.
@@ -589,7 +591,7 @@ examples:
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [-p PLATFORMS] [--posts POSTS]
                                  [-s SELECT]
-                                 [--sort-by {total_interactions,subscriber_count,date}]
+                                 [--sort-by {subscriber_count,date,total_interactions}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -611,7 +613,7 @@ optional arguments:
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {total_interactions,subscriber_count,date}
+  --sort-by {subscriber_count,date,total_interactions}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
