@@ -51,7 +51,7 @@ def worker(payload):
     context = {}
 
     if row:
-        context['row'] = LazyLineDict(headers, row)
+        context['line'] = LazyLineDict(headers, row)
 
     if path:
         context['path'] = path
