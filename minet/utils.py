@@ -557,15 +557,18 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
 def extract_response_meta(response, guess_encoding=True, guess_extension=True):
     meta = {}
 
-    # Guessing mime type
-    mimetype, _ = mimetypes.guess_type(response.geturl())
-
-    if mimetype is None:
-        mimetype = 'text/html'
-
     # Guessing extension
-    # TODO: maybe move to utils
     if guess_extension:
+
+        # Guessing mime type
+        mimetype, _ = mimetypes.guess_type(response.geturl())
+
+        if mimetype is None:
+            mimetype = 'text/html'
+
+        if 'Content-Type' in response.headers:
+            mimetype = response.headers['Content-Type']
+
         exts = mimetypes.guess_all_extensions(mimetype)
 
         if not exts:
