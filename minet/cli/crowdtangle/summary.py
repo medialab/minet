@@ -6,11 +6,10 @@
 #
 import csv
 import casanova
-from io import StringIO
 from tqdm import tqdm
 from ural import is_url
 
-from minet.cli.utils import die
+from minet.cli.utils import die, edit_namespace_with_csv_io
 from minet.crowdtangle.constants import (
     CROWDTANGLE_SUMMARY_CSV_HEADERS,
     CROWDTANGLE_POST_CSV_HEADERS_WITH_LINK
@@ -26,8 +25,7 @@ def crowdtangle_summary_action(namespace, output_file):
         die('Missing --start-date!')
 
     if is_url(namespace.column):
-        namespace.file = StringIO('url\n%s' % namespace.column)
-        namespace.column = 'url'
+        edit_namespace_with_csv_io(namespace, 'url')
 
     enricher = casanova.enricher(
         namespace.file,

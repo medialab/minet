@@ -5,12 +5,11 @@
 # Logic of the `fb comments` action.
 #
 import casanova
-from io import StringIO
 from tqdm import tqdm
 from ural import is_url
 from ural.facebook import is_facebook_post_url
 
-from minet.cli.utils import open_output_file, die
+from minet.cli.utils import open_output_file, die, edit_namespace_with_csv_io
 from minet.facebook.comments import FacebookCommentScraper
 from minet.facebook.constants import FACEBOOK_COMMENT_CSV_HEADERS
 from minet.facebook.exceptions import FacebookInvalidCookieError
@@ -23,8 +22,7 @@ def facebook_comments_action(namespace):
 
     # Handling input
     if is_url(namespace.column):
-        namespace.file = StringIO('post_url\n%s' % namespace.column)
-        namespace.column = 'post_url'
+        edit_namespace_with_csv_io(namespace, 'post_url')
 
     try:
         scraper = FacebookCommentScraper(namespace.cookie)

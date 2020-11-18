@@ -10,7 +10,6 @@ import os
 import sys
 import gzip
 import casanova
-from io import StringIO
 from os.path import join, dirname, isfile
 from collections import Counter
 from tqdm import tqdm
@@ -27,7 +26,8 @@ from minet.cli.reporters import report_error
 from minet.cli.utils import (
     open_output_file,
     die,
-    LazyLineDict
+    LazyLineDict,
+    edit_namespace_with_csv_io
 )
 
 OUTPUT_ADDITIONAL_HEADERS = [
@@ -55,8 +55,7 @@ def fetch_action(namespace):
     single_url = namespace.file is sys.stdin and is_url(namespace.column)
 
     if single_url:
-        namespace.file = StringIO('url\n%s' % namespace.column)
-        namespace.column = 'url'
+        edit_namespace_with_csv_io(namespace, 'url')
 
         # If we are hitting a single url we enable contents_in_report
         if namespace.contents_in_report is None:

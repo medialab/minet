@@ -6,6 +6,7 @@
 #
 import sys
 import yaml
+from io import StringIO
 from glob import iglob
 from os.path import join, expanduser, isfile
 from collections import namedtuple
@@ -33,6 +34,15 @@ def safe_index(l, e):
         return l.index(e)
     except ValueError:
         return None
+
+
+def CsvIO(column, value):
+    return StringIO('%s\n%s' % (column, value))
+
+
+def edit_namespace_with_csv_io(namespace, column):
+    namespace.file = CsvIO(column, namespace.column)
+    namespace.column = column
 
 
 class DummyTqdmFile(object):

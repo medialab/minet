@@ -8,12 +8,11 @@
 import re
 import casanova
 from tqdm import tqdm
-from io import StringIO
 from urllib.parse import quote
 from ural import is_url
 
 from minet.utils import create_pool, request, rate_limited
-from minet.cli.utils import open_output_file, die
+from minet.cli.utils import open_output_file, die, edit_namespace_with_csv_io
 
 REPORT_HEADERS = ['approx_likes', 'approx_likes_int']
 NO_LIKES_RE = re.compile(rb'>\s*You like this\.', re.I)
@@ -71,8 +70,7 @@ def facebook_url_likes_action(namespace):
     output_file = open_output_file(namespace.output)
 
     if is_url(namespace.column):
-        namespace.file = StringIO('url\n%s' % (namespace.column))
-        namespace.column = 'url'
+        edit_namespace_with_csv_io(namespace, 'url')
 
     enricher = casanova.enricher(
         namespace.file,
