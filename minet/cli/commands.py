@@ -457,13 +457,26 @@ MINET_COMMANDS = {
                     'description': 'Retrieve metadata about Youtube comments using the API.',
                     'arguments': [
                         {
-                            'name': 'id',
-                            'help': 'Youtube video\'s id.',
+                            'name': 'column',
+                            'help': 'Name of the column containing the video\'s id.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the Youtube videos ids.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
                         },
                         {
                             'flags': ['-k', '--key'],
                             'help': 'YouTube API Data dashboard API key.'
                         }
+                        
                     ]
                 },
                 'url-parse': {

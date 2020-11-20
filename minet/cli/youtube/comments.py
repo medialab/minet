@@ -6,15 +6,16 @@
 #
 import time
 import csv
+import casanova
 from tqdm import tqdm
+from ural.youtube import is_youtube_video_id
 from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
-from minet.cli.utils import die, open_output_file
+from minet.cli.utils import die, open_output_file, edit_namespace_with_csv_io
 from minet.utils import create_pool, request_json
 
 URL_TEMPLATE = 'https://www.googleapis.com/youtube/v3/commentThreads?videoId=%(id)s&key=%(key)s&part=snippet,replies&maxResults=100'
 
 CSV_HEADERS = [
-    'video_id',
     'comment_id',
     'author_name',
     'author_channel_url',
@@ -69,7 +70,6 @@ def get_data(data_json):
         reply_to = comment_data.get('parentId', None)
 
         data.append([
-            video_id,
             comment_id,
             author_name,
             author_channel_url,
@@ -87,10 +87,20 @@ def get_data(data_json):
 
 def comments_action(namespace, output_file):
 
+    # Handling output
     output_file = open_output_file(namespace.output)
 
-    writer = csv.writer(output_file)
-    writer.writerow(CSV_HEADERS)
+    # Handling input
+    if is_youtube_video_id(namespace.column):
+        edit_namespace_with_csv_io(namespace, 'video_id')
+
+    #Enricher
+    enricher = casanova.enricher(
+        namespace.file,
+        output_file,
+        keep=namespace.select,
+        add=CSV_HEADERS
+    )
 
     loading_bar = tqdm(
         desc='Retrieving',
@@ -100,28 +110,30 @@ def comments_action(namespace, output_file):
 
     http = create_pool()
 
-    url = URL_TEMPLATE % {'id': namespace.id, 'key': namespace.key}
-    next_page = True
-    all_data = []
+    for i, (row, url_id) in enumerate(enricher.cells(namespace.column, with_rows=True)):
+       
+        url = URL_TEMPLATE % {'id': url_id, 'key': namespace.key}
+        next_page = True
+        all_data = []
 
-    while next_page:
+        while next_page:
 
-        if next_page is True:
-            err, response, result = request_json(http, url)
-        else:
-            url_next = url + '&pageToken=' + next_page
-            err, response, result = request_json(http, url_next)
+            if next_page is True:
+                err, response, result = request_json(http, url)
+            else:
+                url_next = url + '&pageToken=' + next_page
+                err, response, result = request_json(http, url_next)
 
-        if err:
-            die(err)
-        elif response.status == 403:
-            time.sleep(seconds_to_midnight_pacific_time())
-            continue
-        elif response.status >= 400:
-            die(response.status)
-
-        next_page, data = get_data(result)
-
-        for comment in data:
-            loading_bar.update()
-            writer.writerow(comment)
+            if err:
+                die(err)
+            elif response.status == 403:
+                time.sleep(seconds_to_midnight_pacific_time())
+                continue
+            elif response.status >= 400:
+                die(response.status)
+            
+            next_page, data = get_data(result)
+        
+            for comment in data:
+                loading_bar.update()
+                enricher.writerow(row,comment)
