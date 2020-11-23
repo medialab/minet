@@ -14,7 +14,7 @@ In addition, **minet** also exposes its high-level programmatic interface as a p
 * Writing scrapers to extract structured data from HTML pages.
 * Writing crawlers to automatically browse the web.
 * Extract raw text content from HTML pages. ([example](./cookbook/compendium.md#extract-raw-text-content-from-html-pages))
-* Normalize batches of urls contained in a CSV file to perform relevant aggregations (dropping irrelevant query items, extracting domain name etc.)
+* Normalize batches of urls contained in a CSV file to perform relevant aggregations (dropping irrelevant query items, extracting domain name etc.) ([example](./cookbook/compendium.md#parsing-and-normalizing-urls))
 * Join two CSV files based on columns containing urls needing to be organized hierarchically.
 * Collecting data from [CrowdTangle](https://www.crowdtangle.com/) API (to collect and search posts mainly from [Facebook](https://www.facebook.com/) and [Instagram](https://www.instagram.com/)).
 * Collecting data from [Facebook](https://www.facebook.com/) (comments, likes etc.)
