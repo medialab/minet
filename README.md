@@ -36,17 +36,17 @@ In addition, **minet** also exposes its high-level programmatic interface as a p
 
 ## Installation
 
-`minet` can be installed using pip:
+**minet** can be installed using pip:
 
 ```shell
 pip install minet
 ```
 
-If you need more help to install and use `minet` from scratch, you can head toward [this](./docs/install.md) page.
+If you need more help to install and use **minet** from scratch, you can check those [installation documents](./docs/install.md).
 
 ## Cookbook
 
-To learn how to use `minet` and understand how it may fit your use cases, you should definitely check out our [Cookbook](./cookbook).
+To learn how to use **minet** and understand how it may fit your use cases, you should definitely check out our [Cookbook](./cookbook).
 
 ## Usage
 
