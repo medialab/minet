@@ -2,18 +2,11 @@
 
 ![Minet](img/minet.png)
 
-**minet** is a webmining CLI tool & library for python. It adopts a lo-fi approach to various webmining problems by letting you perform a variety of actions from the comfort of your command line. No database needed: raw data files will get you going.
+**minet** is a webmining CLI tool & library for python that can be used to collect and extract data from a large variety of web sources such as raw webpages, Facebook, CrowdTangle, YouTube, Twitter, Media Cloud etc.
 
-In addition, **minet** also exposes its high-level programmatic interface as a library so you can tweak its behavior at will.
+It adopts a lo-fi approach to various webmining problems by letting you perform a variety of actions from the comfort of your command line. No database needed: raw data files such as CSV should be sufficient to do the work.
 
-## Features
-
-* Multithreaded, memory-efficient fetching from the web.
-* Multithreaded, scalable crawling using a comfy DSL.
-* Multiprocessed raw text content extraction from HTML pages.
-* Multiprocessed scraping from HTML pages using a comfy DSL.
-* URL-related heuristics utilities such as extraction, normalization and matching.
-* Data collection from various APIs such as [CrowdTangle](https://www.crowdtangle.com/).
+In addition, **minet** also exposes its high-level programmatic interface as a python library so you can tweak its behavior at will.
 
 ## Use cases
 
@@ -31,6 +24,15 @@ In addition, **minet** also exposes its high-level programmatic interface as a l
 * Parsing [YouTube](https://www.youtube.com/) urls in a CSV file.
 * Dumping a [Hyphe](https://hyphe.medialab.sciences-po.fr/) corpus.
 * Collecting data from [Media Cloud](https://mediacloud.org/) (search stories, dump topics etc.).
+
+## Features (from a technical standpoint)
+
+* Multithreaded, memory-efficient fetching from the web.
+* Multithreaded, scalable crawling using a comfy DSL.
+* Multiprocessed raw text content extraction from HTML pages.
+* Multiprocessed scraping from HTML pages using a comfy DSL.
+* URL-related heuristics utilities such as extraction, normalization and matching.
+* Data collection from various APIs such as [CrowdTangle](https://www.crowdtangle.com/).
 
 ## Installation
 
