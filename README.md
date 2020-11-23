@@ -15,6 +15,23 @@ In addition, **minet** also exposes its high-level programmatic interface as a l
 * URL-related heuristics utilities such as extraction, normalization and matching.
 * Data collection from various APIs such as [CrowdTangle](https://www.crowdtangle.com/).
 
+## Use cases
+
+* Downloading large amount of urls very fast.
+* Writing scrapers to extract structured data from HTML pages.
+* Writing crawlers to automatically browse the web.
+* Extract raw textual content of HTML pages.
+* Normalize batches of urls to perform relevant aggregations (dropping irrelevant query items, extracting domain name etc.)
+* Join two CSV files based on columns containing urls needing to be organized hierarchically.
+* Collecting data from [CrowdTangle](https://www.crowdtangle.com/) API (to collect and search posts mainly from [Facebook](https://www.facebook.com/) and [Instagram](https://www.instagram.com/)).
+* Collecting data from [Facebook](https://www.facebook.com/) (comments, likes etc.)
+* Parsing [Facebook](https://www.facebook.com/) urls in a CSV file.
+* Collecting data from [Twitter](https://twitter.com) (users, followers, followees etc.)
+* Collecting data from [YouTube](https://www.youtube.com/) (captions, comments, video metadata etc.)
+* Parsing [YouTube](https://www.youtube.com/) urls in a CSV file.
+* Dumping a [Hyphe](https://hyphe.medialab.sciences-po.fr/) corpus.
+* Collecting data from [Media Cloud](https://mediacloud.org/) (search stories, dump topics etc.).
+
 ## Installation
 
 `minet` can be installed using pip:
