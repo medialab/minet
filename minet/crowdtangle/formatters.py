@@ -39,7 +39,7 @@ def format_post(post, as_dict=False, link=None):
         post['date'],
         post['updated'],
         post.get('link', ''),
-        post['postUrl'],
+        post.get('postUrl', ''),
         post['score'],
         post.get('videoLengthMS', ''),
         post.get('liveVideoStatus', '')
