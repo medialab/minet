@@ -458,7 +458,7 @@ MINET_COMMANDS = {
                     'arguments': [
                         {
                             'name': 'column',
-                            'help': 'Name of the column containing the video\'s id.'
+                            'help': 'This argument can either take the name of the column containing the video\'s id/url if a file is passed as an argument, or a single youtube video\'s id/url if there is no file '
                         },
                         {
                             'name': 'file',
@@ -476,7 +476,6 @@ MINET_COMMANDS = {
                             'flags': ['-k', '--key'],
                             'help': 'YouTube API Data dashboard API key.'
                         }
-                        
                     ]
                 },
                 'url-parse': {

@@ -4,11 +4,9 @@
 #
 # From a video id, action getting all commments' data using Google's APIs.
 #
-import time
-import csv
 import casanova
 from tqdm import tqdm
-from ural.youtube import is_youtube_video_id
+from ural.youtube import is_youtube_video_id, extract_video_id_from_youtube_url, is_youtube_url
 from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
 from minet.cli.utils import die, open_output_file, edit_namespace_with_csv_io
 from minet.utils import create_pool, request_json
@@ -91,10 +89,15 @@ def comments_action(namespace, output_file):
     output_file = open_output_file(namespace.output)
 
     # Handling input
+    is_url = False
+
     if is_youtube_video_id(namespace.column):
         edit_namespace_with_csv_io(namespace, 'video_id')
+    elif is_youtube_url(namespace.column):
+        edit_namespace_with_csv_io(namespace, 'video_url')
+        is_url = True
 
-    #Enricher
+    # Enricher
     enricher = casanova.enricher(
         namespace.file,
         output_file,
@@ -111,8 +114,12 @@ def comments_action(namespace, output_file):
     http = create_pool()
 
     for i, (row, url_id) in enumerate(enricher.cells(namespace.column, with_rows=True)):
-       
-        url = URL_TEMPLATE % {'id': url_id, 'key': namespace.key}
+
+        if is_youtube_url(url_id):
+            url = URL_TEMPLATE % {'id': extract_video_id_from_youtube_url(url_id), 'key': namespace.key}
+        else:
+            url = URL_TEMPLATE % {'id': url_id, 'key': namespace.key}
+
         next_page = True
         all_data = []
 
@@ -131,9 +138,9 @@ def comments_action(namespace, output_file):
                 continue
             elif response.status >= 400:
                 die(response.status)
-            
+
             next_page, data = get_data(result)
-        
+
             for comment in data:
                 loading_bar.update()
-                enricher.writerow(row,comment)
+                enricher.writerow(row, comment)
