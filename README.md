@@ -40,6 +40,8 @@ In addition, **minet** also exposes its high-level programmatic interface as a l
 pip install minet
 ```
 
+If you need more help to install and use `minet` from scratch, you can head toward [this](./docs/install.md) page.
+
 ## Cookbook
 
 To learn how to use `minet` and understand how it may fit your use cases, you should definitely check out our [Cookbook](./cookbook).
