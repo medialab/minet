@@ -113,7 +113,7 @@ def comments_action(namespace, output_file):
 
     http = create_pool()
 
-    for i, (row, url_id) in enumerate(enricher.cells(namespace.column, with_rows=True)):
+    for  (row, url_id) in enricher.cells(namespace.column, with_rows=True):
 
         if is_youtube_url(url_id):
             url = URL_TEMPLATE % {'id': extract_video_id_from_youtube_url(url_id), 'key': namespace.key}
