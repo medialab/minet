@@ -89,13 +89,10 @@ def comments_action(namespace, output_file):
     output_file = open_output_file(namespace.output)
 
     # Handling input
-    is_url = False
-
     if is_youtube_video_id(namespace.column):
         edit_namespace_with_csv_io(namespace, 'video_id')
     elif is_youtube_url(namespace.column):
         edit_namespace_with_csv_io(namespace, 'video_url')
-        is_url = True
 
     # Enricher
     enricher = casanova.enricher(
@@ -113,7 +110,7 @@ def comments_action(namespace, output_file):
 
     http = create_pool()
 
-    for  (row, url_id) in enricher.cells(namespace.column, with_rows=True):
+    for (row, url_id) in enricher.cells(namespace.column, with_rows=True):
 
         if is_youtube_url(url_id):
             url = URL_TEMPLATE % {'id': extract_video_id_from_youtube_url(url_id), 'key': namespace.key}
