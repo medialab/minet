@@ -8,7 +8,7 @@ with open('./README.md', 'r') as f:
 # Example: https://github.com/pypa/warehouse/blob/64ca42e42d5613c8339b3ec5e1cb7765c6b23083/warehouse/__about__.py
 meta_package = {}
 with open('./minet/__version__.py') as f:
-  exec(f.read(), meta_package)
+    exec(f.read(), meta_package)
 
 
 setup(name='minet',
