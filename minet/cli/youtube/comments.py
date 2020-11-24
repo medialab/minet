@@ -112,10 +112,11 @@ def comments_action(namespace, output_file):
 
     for (row, url_id) in enricher.cells(namespace.column, with_rows=True):
 
-        if is_youtube_url(url_id):
-            url = URL_TEMPLATE % {'id': extract_video_id_from_youtube_url(url_id), 'key': namespace.key}
-        else:
-            url = URL_TEMPLATE % {'id': url_id, 'key': namespace.key}
+        # TODO: will need to handle the case where we are not dealing with a valid video
+        if not is_youtube_video_id(url_id):
+            url_id = extract_video_id_from_youtube_url(url_id)
+
+        url = URL_TEMPLATE % {'id': url_id, 'key': namespace.key}
 
         next_page = True
         all_data = []

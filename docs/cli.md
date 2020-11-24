@@ -591,7 +591,7 @@ examples:
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [-p PLATFORMS] [--posts POSTS]
                                  [-s SELECT]
-                                 [--sort-by {subscriber_count,date,total_interactions}]
+                                 [--sort-by {total_interactions,subscriber_count,date}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -613,7 +613,7 @@ optional arguments:
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {subscriber_count,date,total_interactions}
+  --sort-by {total_interactions,subscriber_count,date}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
@@ -940,7 +940,8 @@ optional arguments:
 ### comments
 
 ```
-usage: minet youtube comments [-h] [-o OUTPUT] [-k KEY] id
+usage: minet youtube comments [-h] [-o OUTPUT] [-s SELECT] [-k KEY]
+                              column [file]
 
 Youtube comments
 ================
@@ -948,11 +949,13 @@ Youtube comments
 Retrieve metadata about Youtube comments using the API.
 
 positional arguments:
-  id                          Youtube video's id.
+  column                      This argument can either take the name of the column containing the video's id/url if a file is passed as an argument, or a single youtube video's id/url if there is no file 
+  file                        CSV file containing the Youtube videos ids.
 
 optional arguments:
   -h, --help                  show this help message and exit
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
   -k KEY, --key KEY           YouTube API Data dashboard API key.
 
 ```

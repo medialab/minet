@@ -21,7 +21,6 @@ def facebook_comments_action(namespace):
     output_file = open_output_file(namespace.output)
 
     # Handling input
-
     if is_url(namespace.column):
         edit_namespace_with_csv_io(namespace, 'post_url')
 
