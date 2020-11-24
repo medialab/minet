@@ -4,17 +4,16 @@
 #
 # From a video id, action getting all commments' data using Google's APIs.
 #
-import time
-import csv
+import casanova
 from tqdm import tqdm
+from ural.youtube import is_youtube_video_id, extract_video_id_from_youtube_url, is_youtube_url
 from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
-from minet.cli.utils import die, open_output_file
+from minet.cli.utils import die, open_output_file, edit_namespace_with_csv_io
 from minet.utils import create_pool, request_json
 
 URL_TEMPLATE = 'https://www.googleapis.com/youtube/v3/commentThreads?videoId=%(id)s&key=%(key)s&part=snippet,replies&maxResults=100'
 
 CSV_HEADERS = [
-    'video_id',
     'comment_id',
     'author_name',
     'author_channel_url',
@@ -69,7 +68,6 @@ def get_data(data_json):
         reply_to = comment_data.get('parentId', None)
 
         data.append([
-            video_id,
             comment_id,
             author_name,
             author_channel_url,
@@ -87,10 +85,22 @@ def get_data(data_json):
 
 def comments_action(namespace, output_file):
 
+    # Handling output
     output_file = open_output_file(namespace.output)
 
-    writer = csv.writer(output_file)
-    writer.writerow(CSV_HEADERS)
+    # Handling input
+    if is_youtube_video_id(namespace.column):
+        edit_namespace_with_csv_io(namespace, 'video_id')
+    elif is_youtube_url(namespace.column):
+        edit_namespace_with_csv_io(namespace, 'video_url')
+
+    # Enricher
+    enricher = casanova.enricher(
+        namespace.file,
+        output_file,
+        keep=namespace.select,
+        add=CSV_HEADERS
+    )
 
     loading_bar = tqdm(
         desc='Retrieving',
@@ -100,28 +110,34 @@ def comments_action(namespace, output_file):
 
     http = create_pool()
 
-    url = URL_TEMPLATE % {'id': namespace.id, 'key': namespace.key}
-    next_page = True
-    all_data = []
+    for (row, url_id) in enricher.cells(namespace.column, with_rows=True):
 
-    while next_page:
-
-        if next_page is True:
-            err, response, result = request_json(http, url)
+        if is_youtube_url(url_id):
+            url = URL_TEMPLATE % {'id': extract_video_id_from_youtube_url(url_id), 'key': namespace.key}
         else:
-            url_next = url + '&pageToken=' + next_page
-            err, response, result = request_json(http, url_next)
+            url = URL_TEMPLATE % {'id': url_id, 'key': namespace.key}
 
-        if err:
-            die(err)
-        elif response.status == 403:
-            time.sleep(seconds_to_midnight_pacific_time())
-            continue
-        elif response.status >= 400:
-            die(response.status)
+        next_page = True
+        all_data = []
 
-        next_page, data = get_data(result)
+        while next_page:
 
-        for comment in data:
-            loading_bar.update()
-            writer.writerow(comment)
+            if next_page is True:
+                err, response, result = request_json(http, url)
+            else:
+                url_next = url + '&pageToken=' + next_page
+                err, response, result = request_json(http, url_next)
+
+            if err:
+                die(err)
+            elif response.status == 403:
+                time.sleep(seconds_to_midnight_pacific_time())
+                continue
+            elif response.status >= 400:
+                die(response.status)
+
+            next_page, data = get_data(result)
+
+            for comment in data:
+                loading_bar.update()
+                enricher.writerow(row, comment)

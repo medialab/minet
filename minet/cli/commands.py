@@ -457,8 +457,20 @@ MINET_COMMANDS = {
                     'description': 'Retrieve metadata about Youtube comments using the API.',
                     'arguments': [
                         {
-                            'name': 'id',
-                            'help': 'Youtube video\'s id.',
+                            'name': 'column',
+                            'help': 'This argument can either take the name of the column containing the video\'s id/url if a file is passed as an argument, or a single youtube video\'s id/url if there is no file '
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the Youtube videos ids.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
                         },
                         {
                             'flags': ['-k', '--key'],
