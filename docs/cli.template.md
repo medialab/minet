@@ -87,6 +87,8 @@ crowdtangle:
   rate_limit: 10 # Used as --rate-limit for `minet ct` commands
 mediacloud:
   token: "MY_MC_TOKEN" # Used as --token for `minet mc` commands
+youtube:
+  key: "MY_YT_API_KEY" # Used as --key for `minet yt` commands
 ```
 
 ## crawl
