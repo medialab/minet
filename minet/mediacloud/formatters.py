@@ -83,7 +83,7 @@ def format_media(media, as_dict=False):
         media['media_id'],
         media['is_healthy'],
         media['is_monitored'],
-        media['public_notes'],
+        media.get('public_notes', ''),
         media['num_stories_90'],
         media['num_sentences_90'],
         media['start_date'],
@@ -102,7 +102,11 @@ def format_feed(feed, as_dict=False):
         feed['url'],
         feed['feeds_id'],
         feed['type'],
-        feed['media_id']
+        feed['media_id'],
+        feed['active'],
+        feed.get('last_attempted_download_time', ''),
+        feed.get('last_new_story_time', ''),
+        feed.get('last_successful_download_time', '')
     ]
 
     if as_dict:

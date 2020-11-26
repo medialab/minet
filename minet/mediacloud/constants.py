@@ -71,5 +71,9 @@ MEDIACLOUD_FEED_CSV_HEADER = [
     'url',
     'feeds_id',
     'type',
-    'media_id'
+    'media_id',
+    'active',
+    'last_attempted_download_time',
+    'last_new_story_time',
+    'last_successful_download_time'
 ]
