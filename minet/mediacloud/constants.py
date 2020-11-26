@@ -52,8 +52,9 @@ MEDIACLOUD_STORIES_CSV_HEADER = [
 ]
 
 MEDIACLOUD_MEDIA_CSV_HEADER = [
-    'media_url',
     'media_id',
+    'media_name',
+    'media_url',
     'is_healthy',
     'is_monitored',
     'public_notes',

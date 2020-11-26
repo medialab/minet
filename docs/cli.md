@@ -34,6 +34,7 @@
 * [hyphe](#hyphe)
   * [dump](#dump)
 * [mediacloud (mc)](#mediacloud)
+  * [medias](#mc-medias)
   * [search](#mc-search)
   * [topic](#topic)
     * [stories](#stories)
@@ -746,6 +747,31 @@ examples:
 
 ## Mediacloud
 
+<h3 id="mc-medias">medias</h3>
+
+```
+usage: minet mediacloud medias [-h] [-t TOKEN] [-o OUTPUT] [-s SELECT]
+                               [--total TOTAL]
+                               column [file]
+
+Minet Mediacloud Medias Command
+===============================
+
+Retrieve metadata about a list of Mediacloud medias.
+
+positional arguments:
+  column                      Name of the column containing the Mediacloud media ids.
+  file                        CSV file containing the searched Mediacloud media ids.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -t TOKEN, --token TOKEN     Mediacloud API token (also called key).
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the output will be printed to stdout.
+  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+  --total TOTAL               Total number of medias. Necessary if you want to display a finite progress indicator.
+
+```
+
 <h3 id="mc-search">search</h3>
 
 ```
@@ -764,7 +790,7 @@ positional arguments:
 optional arguments:
   -h, --help                                 show this help message and exit
   -t TOKEN, --token TOKEN                    Mediacloud API token (also called key).
-  -o OUTPUT, --output OUTPUT                 Path to the output report file. By default, the report will be printed to stdout.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the output will be printed to stdout.
   -c COLLECTIONS, --collections COLLECTIONS  List of searched collections separated by commas.
   --skip-count                               Whether to skip the first API call counting the number of posts for the progress bar.
 
@@ -791,7 +817,7 @@ positional arguments:
 optional arguments:
   -h, --help                     show this help message and exit
   -t TOKEN, --token TOKEN        Mediacloud API token (also called key).
-  -o OUTPUT, --output OUTPUT     Path to the output report file. By default, the report will be printed to stdout.
+  -o OUTPUT, --output OUTPUT     Path to the output file. By default, the output will be printed to stdout.
   --media-id MEDIA_ID            Return only stories belonging to the given media_ids.
   --from-media-id FROM_MEDIA_ID  Return only stories that are linked from stories in the given media_id.
 

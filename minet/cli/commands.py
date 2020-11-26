@@ -955,10 +955,39 @@ MINET_COMMANDS = {
                 },
                 {
                     'flags': ['-o', '--output'],
-                    'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+                    'help': 'Path to the output file. By default, the output will be printed to stdout.'
                 }
             ],
             'commands': {
+                'medias': {
+                    'title': 'Minet Mediacloud Medias Command',
+                    'description': '''
+                        Retrieve metadata about a list of Mediacloud medias.
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the Mediacloud media ids.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the searched Mediacloud media ids.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of medias. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
+                },
                 'search': {
                     'title': 'Minet Mediacloud Search Command',
                     'description': '''

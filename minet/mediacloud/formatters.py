@@ -76,13 +76,14 @@ def format_story(story, as_dict=False):
 
 
 def format_media(media, as_dict=False):
-    tags = story.get('media_source_tags')
+    tags = media.get('media_source_tags')
 
     row = [
-        media['media_url'],
         media['media_id'],
-        media['is_healthy'],
-        media['is_monitored'],
+        media['name'],
+        media['url'],
+        'true' if media['is_healthy'] else 'false',
+        'true' if media['is_monitored'] else 'false',
         media.get('public_notes', ''),
         media['num_stories_90'],
         media['num_sentences_90'],
@@ -103,7 +104,7 @@ def format_feed(feed, as_dict=False):
         feed['feeds_id'],
         feed['type'],
         feed['media_id'],
-        feed['active'],
+        'true' if feed['active'] else 'false',
         feed.get('last_attempted_download_time', ''),
         feed.get('last_new_story_time', ''),
         feed.get('last_successful_download_time', '')
