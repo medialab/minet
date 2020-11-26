@@ -977,6 +977,10 @@ MINET_COMMANDS = {
                             'nargs': '?'
                         },
                         {
+                            'flag': '--feeds',
+                            'help': 'If given, path of the CSV file listing media RSS feeds.'
+                        },
+                        {
                             'flags': ['-s', '--select'],
                             'help': 'Columns to include in report (separated by `,`).',
                             'type': SplitterType()

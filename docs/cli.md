@@ -750,8 +750,8 @@ examples:
 <h3 id="mc-medias">medias</h3>
 
 ```
-usage: minet mediacloud medias [-h] [-t TOKEN] [-o OUTPUT] [-s SELECT]
-                               [--total TOTAL]
+usage: minet mediacloud medias [-h] [-t TOKEN] [-o OUTPUT] [--feeds FEEDS]
+                               [-s SELECT] [--total TOTAL]
                                column [file]
 
 Minet Mediacloud Medias Command
@@ -767,6 +767,7 @@ optional arguments:
   -h, --help                  show this help message and exit
   -t TOKEN, --token TOKEN     Mediacloud API token (also called key).
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the output will be printed to stdout.
+  --feeds FEEDS               If given, path of the CSV file listing media RSS feeds.
   -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
   --total TOTAL               Total number of medias. Necessary if you want to display a finite progress indicator.
 

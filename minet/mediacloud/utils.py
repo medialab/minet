@@ -62,7 +62,7 @@ def make_simple_call(http, token, route, formatter, format='csv_dict_row',
     url += '?key=%s' % token
 
     if query is not None:
-        url += '&' + ('&'.join('%s=%s' % item for item in query.items()))
+        url += '&' + ('&'.join('%s=%s' % (str(k), str(v)) for k, v in query.items()))
 
     err, response, data = request_json(http, url)
 
