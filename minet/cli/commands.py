@@ -479,7 +479,7 @@ MINET_COMMANDS = {
                         {
                             'flags': ['-f', '--full'],
                             'help': 'YouTube API does not always return every comments as some replies can be omitted. By adding this flag, one ensures to make every needed API call to retrieve all the comments.',
-                            'nargs' : '?'
+                            'nargs': '?'
                         }
                     ]
                 },

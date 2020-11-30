@@ -29,6 +29,7 @@ CSV_HEADERS = [
     'parent_comment_id',
 ]
 
+
 def get_data_full(com, top):
     data = []
     snip = ''
@@ -88,7 +89,7 @@ def comments_action(namespace, output_file):
         else:
             url = URL_TEMPLATE % {'id': url_id, 'key': namespace.key}
         # FULL commentaries
-        #if namespace.full:
+        # if namespace.full:
         url_queue = deque([url])
 
         while len(url_queue) != 0:
@@ -123,7 +124,7 @@ def comments_action(namespace, output_file):
                             enricher.writerow(row, data)
                         else:
                             dataTop = get_data_full(snippet, True)
-                            enricher.writerow(row,dataTop)
+                            enricher.writerow(row, dataTop)
                             for rep in replies['comments']:
                                 enricher.writerow(row, get_data_full(rep, False))
                     else:
@@ -136,4 +137,3 @@ def comments_action(namespace, output_file):
                 for item in items:
                     data = get_data_full(item, False)
                     enricher.writerow(row, data)
-
