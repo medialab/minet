@@ -475,6 +475,10 @@ MINET_COMMANDS = {
                         {
                             'flags': ['-k', '--key'],
                             'help': 'YouTube API Data dashboard API key.'
+                        },
+                        {
+                            'flags': ['-full'],
+                            'help': 'Youtube Api do not always give all the comments, some replies may be ommited. By adding this flag, one make sure to get all comments'
                         }
                     ]
                 },
