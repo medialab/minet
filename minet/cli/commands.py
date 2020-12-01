@@ -468,15 +468,20 @@ MINET_COMMANDS = {
                             'nargs': '?'
                         },
                         {
-                            'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).',
-                            'type': SplitterType()
+                            'flags': ['-f', '--full'],
+                            'help': 'YouTube API does not always return every comments as some replies can be omitted. By adding this flag, one ensures to make every needed API call to retrieve all the comments.',
+                            'action': 'store_true'
                         },
                         {
                             'flags': ['-k', '--key'],
                             'help': 'YouTube API Data dashboard API key.',
                             'rc_key': ['youtube', 'key'],
                             'action': ConfigAction
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
                         }
                     ]
                 },
