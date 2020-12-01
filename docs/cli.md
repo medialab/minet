@@ -594,7 +594,7 @@ examples:
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [-p PLATFORMS] [--posts POSTS]
                                  [-s SELECT]
-                                 [--sort-by {total_interactions,subscriber_count,date}]
+                                 [--sort-by {total_interactions,date,subscriber_count}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -616,7 +616,7 @@ optional arguments:
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {total_interactions,subscriber_count,date}
+  --sort-by {total_interactions,date,subscriber_count}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
@@ -969,7 +969,7 @@ optional arguments:
 ### comments
 
 ```
-usage: minet youtube comments [-h] [-o OUTPUT] [-s SELECT] [-k KEY]
+usage: minet youtube comments [-h] [-o OUTPUT] [-f] [-k KEY] [-s SELECT]
                               column [file]
 
 Youtube comments
@@ -984,8 +984,9 @@ positional arguments:
 optional arguments:
   -h, --help                  show this help message and exit
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
-  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+  -f, --full                  YouTube API does not always return every comments as some replies can be omitted. By adding this flag, one ensures to make every needed API call to retrieve all the comments.
   -k KEY, --key KEY           YouTube API Data dashboard API key.
+  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
 
 ```
 
