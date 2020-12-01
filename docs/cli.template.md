@@ -34,6 +34,7 @@
 * [hyphe](#hyphe)
   * [dump](#dump)
 * [mediacloud (mc)](#mediacloud)
+  * [medias](#mc-medias)
   * [search](#mc-search)
   * [topic](#topic)
     * [stories](#stories)
@@ -87,6 +88,8 @@ crowdtangle:
   rate_limit: 10 # Used as --rate-limit for `minet ct` commands
 mediacloud:
   token: "MY_MC_TOKEN" # Used as --token for `minet mc` commands
+youtube:
+  key: "MY_YT_API_KEY" # Used as --key for `minet yt` commands
 ```
 
 ## crawl
@@ -179,6 +182,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 <% hyphe/dump %>
 
 ## Mediacloud
+
+<h3 id="mc-medias">medias</h3>
+
+<% mc/medias %>
 
 <h3 id="mc-search">search</h3>
 

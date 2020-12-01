@@ -468,18 +468,20 @@ MINET_COMMANDS = {
                             'nargs': '?'
                         },
                         {
-                            'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).',
-                            'type': SplitterType()
+                            'flags': ['-f', '--full'],
+                            'help': 'YouTube API does not always return every comments as some replies can be omitted. By adding this flag, one ensures to make every needed API call to retrieve all the comments.',
+                            'action': 'store_true'
                         },
                         {
                             'flags': ['-k', '--key'],
-                            'help': 'YouTube API Data dashboard API key.'
+                            'help': 'YouTube API Data dashboard API key.',
+                            'rc_key': ['youtube', 'key'],
+                            'action': ConfigAction
                         },
                         {
-                            'flags': ['-f', '--full'],
-                            'help': 'YouTube API does not always return every comments as some replies can be omitted. By adding this flag, one ensures to make every needed API call to retrieve all the comments.',
-                            'nargs': '?'
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
                         }
                     ]
                 },
@@ -525,7 +527,9 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-k', '--key'],
-                            'help': 'YouTube API Data dashboard API key.'
+                            'help': 'YouTube API Data dashboard API key.',
+                            'rc_key': ['youtube', 'key'],
+                            'action': ConfigAction
                         }
                     ]
                 }
@@ -956,10 +960,43 @@ MINET_COMMANDS = {
                 },
                 {
                     'flags': ['-o', '--output'],
-                    'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+                    'help': 'Path to the output file. By default, the output will be printed to stdout.'
                 }
             ],
             'commands': {
+                'medias': {
+                    'title': 'Minet Mediacloud Medias Command',
+                    'description': '''
+                        Retrieve metadata about a list of Mediacloud medias.
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the Mediacloud media ids.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the searched Mediacloud media ids.',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flag': '--feeds',
+                            'help': 'If given, path of the CSV file listing media RSS feeds.'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of medias. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
+                },
                 'search': {
                     'title': 'Minet Mediacloud Search Command',
                     'description': '''

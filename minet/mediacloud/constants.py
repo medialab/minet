@@ -50,3 +50,31 @@ MEDIACLOUD_STORIES_CSV_HEADER = [
     'tags_ids',
     'tag_sets_ids'
 ]
+
+MEDIACLOUD_MEDIA_CSV_HEADER = [
+    'media_id',
+    'media_name',
+    'media_url',
+    'is_healthy',
+    'is_monitored',
+    'public_notes',
+    'num_stories_90',
+    'num_sentences_90',
+    'start_date',
+    'tags',
+    'tag_sets',
+    'tags_ids',
+    'tag_sets_ids'
+]
+
+MEDIACLOUD_FEED_CSV_HEADER = [
+    'name',
+    'url',
+    'feeds_id',
+    'type',
+    'media_id',
+    'active',
+    'last_attempted_download_time',
+    'last_new_story_time',
+    'last_successful_download_time'
+]

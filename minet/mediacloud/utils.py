@@ -4,6 +4,11 @@
 #
 # Miscellaneous utility function used throughout the mediacloud package.
 #
+from minet.utils import request_json
+from minet.mediacloud.constants import (
+    MEDIACLOUD_API_BASE_URL
+)
+from minet.mediacloud.exceptions import MediacloudServerError
 
 
 def get_next_link_id(data):
@@ -45,3 +50,39 @@ def get_last_processed_stories_id(data):
         return None
 
     return data[-1]['processed_stories_id']
+
+
+def make_simple_call(http, token, route, formatter, format='csv_dict_row',
+                     arg=None, query=None, single=False):
+    url = MEDIACLOUD_API_BASE_URL + route
+
+    if arg is not None:
+        url += '/' + str(arg)
+
+    url += '?key=%s' % token
+
+    if query is not None:
+        url += '&' + ('&'.join('%s=%s' % (str(k), str(v)) for k, v in query.items()))
+
+    err, response, data = request_json(http, url)
+
+    if err:
+        raise err
+
+    if response.status >= 500:
+        raise MediacloudServerError(server_error=data.get('error'))
+
+    results = []
+
+    for item in data:
+        if format == 'csv_dict_row':
+            item = formatter(item, as_dict=True)
+        elif format == 'csv_row':
+            item = formatter(item)
+
+        results.append(item)
+
+    if single:
+        return results[0]
+
+    return results

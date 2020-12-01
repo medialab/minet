@@ -34,6 +34,7 @@
 * [hyphe](#hyphe)
   * [dump](#dump)
 * [mediacloud (mc)](#mediacloud)
+  * [medias](#mc-medias)
   * [search](#mc-search)
   * [topic](#topic)
     * [stories](#stories)
@@ -87,6 +88,8 @@ crowdtangle:
   rate_limit: 10 # Used as --rate-limit for `minet ct` commands
 mediacloud:
   token: "MY_MC_TOKEN" # Used as --token for `minet mc` commands
+youtube:
+  key: "MY_YT_API_KEY" # Used as --key for `minet yt` commands
 ```
 
 ## crawl
@@ -591,7 +594,7 @@ examples:
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [-p PLATFORMS] [--posts POSTS]
                                  [-s SELECT]
-                                 [--sort-by {subscriber_count,date,total_interactions}]
+                                 [--sort-by {total_interactions,subscriber_count,date}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -613,7 +616,7 @@ optional arguments:
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {subscriber_count,date,total_interactions}
+  --sort-by {total_interactions,subscriber_count,date}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
@@ -744,6 +747,32 @@ examples:
 
 ## Mediacloud
 
+<h3 id="mc-medias">medias</h3>
+
+```
+usage: minet mediacloud medias [-h] [-t TOKEN] [-o OUTPUT] [--feeds FEEDS]
+                               [-s SELECT] [--total TOTAL]
+                               column [file]
+
+Minet Mediacloud Medias Command
+===============================
+
+Retrieve metadata about a list of Mediacloud medias.
+
+positional arguments:
+  column                      Name of the column containing the Mediacloud media ids.
+  file                        CSV file containing the searched Mediacloud media ids.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -t TOKEN, --token TOKEN     Mediacloud API token (also called key).
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the output will be printed to stdout.
+  --feeds FEEDS               If given, path of the CSV file listing media RSS feeds.
+  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+  --total TOTAL               Total number of medias. Necessary if you want to display a finite progress indicator.
+
+```
+
 <h3 id="mc-search">search</h3>
 
 ```
@@ -762,7 +791,7 @@ positional arguments:
 optional arguments:
   -h, --help                                 show this help message and exit
   -t TOKEN, --token TOKEN                    Mediacloud API token (also called key).
-  -o OUTPUT, --output OUTPUT                 Path to the output report file. By default, the report will be printed to stdout.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the output will be printed to stdout.
   -c COLLECTIONS, --collections COLLECTIONS  List of searched collections separated by commas.
   --skip-count                               Whether to skip the first API call counting the number of posts for the progress bar.
 
@@ -789,7 +818,7 @@ positional arguments:
 optional arguments:
   -h, --help                     show this help message and exit
   -t TOKEN, --token TOKEN        Mediacloud API token (also called key).
-  -o OUTPUT, --output OUTPUT     Path to the output report file. By default, the report will be printed to stdout.
+  -o OUTPUT, --output OUTPUT     Path to the output file. By default, the output will be printed to stdout.
   --media-id MEDIA_ID            Return only stories belonging to the given media_ids.
   --from-media-id FROM_MEDIA_ID  Return only stories that are linked from stories in the given media_id.
 
@@ -940,7 +969,8 @@ optional arguments:
 ### comments
 
 ```
-usage: minet youtube comments [-h] [-o OUTPUT] [-k KEY] id
+usage: minet youtube comments [-h] [-o OUTPUT] [-s SELECT] [-k KEY]
+                              column [file]
 
 Youtube comments
 ================
@@ -948,11 +978,13 @@ Youtube comments
 Retrieve metadata about Youtube comments using the API.
 
 positional arguments:
-  id                          Youtube video's id.
+  column                      This argument can either take the name of the column containing the video's id/url if a file is passed as an argument, or a single youtube video's id/url if there is no file 
+  file                        CSV file containing the Youtube videos ids.
 
 optional arguments:
   -h, --help                  show this help message and exit
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
   -k KEY, --key KEY           YouTube API Data dashboard API key.
 
 ```
