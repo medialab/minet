@@ -5,13 +5,14 @@
 # From a video id, action getting all commments' data using Google's APIs.
 #
 import time
+import sys
 import casanova
 from tqdm import tqdm
 from collections import deque
 from ural.youtube import is_youtube_video_id, extract_video_id_from_youtube_url, is_youtube_url
 
 from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
-from minet.cli.utils import die, open_output_file, edit_namespace_with_csv_io
+from minet.cli.utils import die, open_output_file, edit_namespace_with_csv_io, DummyTqdmFile
 from minet.utils import create_pool, request_json
 
 URL_TEMPLATE = 'https://www.googleapis.com/youtube/v3/commentThreads?videoId=%(id)s&key=%(key)s&part=snippet,replies&maxResults=100'
@@ -82,11 +83,14 @@ def comments_action(namespace, output_file):
     )
 
     http = create_pool()
+    error_w = DummyTqdmFile(sys.stderr)
 
     for (row, url_id) in enricher.cells(namespace.column, with_rows=True):
 
         if is_youtube_url(url_id):
-            url = URL_TEMPLATE % {'id': extract_video_id_from_youtube_url(url_id), 'key': namespace.key}
+            yt_id = extract_video_id_from_youtube_url(url_id)
+            if yt_id:
+                url = URL_TEMPLATE % {'id': yt_id, 'key': namespace.key}
         elif is_youtube_video_id(url_id):
             url = URL_TEMPLATE % {'id': url_id, 'key': namespace.key}
         else:
@@ -99,17 +103,17 @@ def comments_action(namespace, output_file):
             current_url = url_queue.popleft()
             err, response, result = request_json(http, current_url)
             if err:
-                print(f'{err} for {current_url}')
+                error_w.write('{} for {}'.format(err,current_url))
                 continue
             elif response.status == 403 and result.get('error').get('errors')[0].get('reason') == 'commentsDisabled':
-                print(f'The comments for {current_url} have been disabled')
+                error_w.write('Disabled comments for {}'.format(current_url))
                 continue
             elif response.status == 403:
-                print('Running out of Api\'s points, you will have to wait!')
+                error_w.write('Running out of Api\'s points, you will have to wait!')
                 time.sleep(seconds_to_midnight_pacific_time())
                 continue
             elif response.status >= 400:
-                print(f'Error {response.status} for {current_url}')
+                error_w.write('Error {} for {}'.format(response.status, current_url))
                 continue
             kind = result.get('kind', None)
             next_page = result.get('nextPageToken', None)
