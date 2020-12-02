@@ -99,13 +99,17 @@ def comments_action(namespace, output_file):
             current_url = url_queue.popleft()
             err, response, result = request_json(http, current_url)
             if err:
-                print(err)
+                print(f'{err} for {current_url}')
+                continue
+            elif response.status == 403 and result.get('error').get('errors')[0].get('reason') == 'commentsDisabled':
+                print(f'The comments for {current_url} have been disabled')
                 continue
             elif response.status == 403:
+                print('Running out of Api\'s points, you will have to wait!')
                 time.sleep(seconds_to_midnight_pacific_time())
                 continue
             elif response.status >= 400:
-                print(response.status)
+                print(f'Error {response.status} for {current_url}')
                 continue
             kind = result.get('kind', None)
             next_page = result.get('nextPageToken', None)
