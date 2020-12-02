@@ -87,8 +87,10 @@ def comments_action(namespace, output_file):
 
         if is_youtube_url(url_id):
             url = URL_TEMPLATE % {'id': extract_video_id_from_youtube_url(url_id), 'key': namespace.key}
-        else:
+        elif is_youtube_video_id(url_id):
             url = URL_TEMPLATE % {'id': url_id, 'key': namespace.key}
+        else:
+            continue
         # FULL commentaries
         # if namespace.full:
         url_queue = deque([url])
@@ -97,19 +99,21 @@ def comments_action(namespace, output_file):
             current_url = url_queue.popleft()
             err, response, result = request_json(http, current_url)
             if err:
-                die(err)
+                print(err)
+                continue
             elif response.status == 403:
                 time.sleep(seconds_to_midnight_pacific_time())
                 continue
             elif response.status >= 400:
-                die(response.status)
+                print(response.status)
+                continue
             kind = result.get('kind', None)
+            next_page = result.get('nextPageToken', None)
+            if next_page:
+                url_next = current_url + '&pageToken=' + next_page
+                url_queue.append(url_next)
             if kind == 'youtube#commentThreadListResponse':
                 # Handling comments pagination
-                next_page = result.get('nextPageToken', None)
-                if next_page:
-                    url_next = current_url + '&pageToken=' + next_page
-                    url_queue.append(url_next)
                 items = result.get('items', None)
                 for item in items:
                     snippet = item['snippet']
