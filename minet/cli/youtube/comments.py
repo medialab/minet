@@ -12,7 +12,7 @@ from collections import deque
 from ural.youtube import is_youtube_video_id, extract_video_id_from_youtube_url, is_youtube_url
 
 from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
-from minet.cli.utils import die, open_output_file, edit_namespace_with_csv_io, DummyTqdmFile
+from minet.cli.utils import open_output_file, edit_namespace_with_csv_io, DummyTqdmFile
 from minet.utils import create_pool, request_json
 
 URL_TEMPLATE = 'https://www.googleapis.com/youtube/v3/commentThreads?videoId=%(id)s&key=%(key)s&part=snippet,replies&maxResults=100'
@@ -83,7 +83,7 @@ def comments_action(namespace, output_file):
     )
 
     http = create_pool()
-    error_w = DummyTqdmFile(sys.stderr)
+    error_file = DummyTqdmFile(sys.stderr)
 
     for (row, url_id) in enricher.cells(namespace.column, with_rows=True):
 
@@ -103,17 +103,17 @@ def comments_action(namespace, output_file):
             current_url = url_queue.popleft()
             err, response, result = request_json(http, current_url)
             if err:
-                error_w.write('{} for {}'.format(err,current_url))
+                error_file.write('{} for {}'.format(err, current_url))
                 continue
             elif response.status == 403 and result.get('error').get('errors')[0].get('reason') == 'commentsDisabled':
-                error_w.write('Disabled comments for {}'.format(current_url))
+                error_file.write('Comments are disabled for {}'.format(current_url))
                 continue
             elif response.status == 403:
-                error_w.write('Running out of Api\'s points, you will have to wait!')
+                error_file.write('Running out of API points. You will have to wait until midnight, Pacific time!')
                 time.sleep(seconds_to_midnight_pacific_time())
                 continue
             elif response.status >= 400:
-                error_w.write('Error {} for {}'.format(response.status, current_url))
+                error_file.write('Error {} for {}'.format(response.status, current_url))
                 continue
             kind = result.get('kind', None)
             next_page = result.get('nextPageToken', None)
