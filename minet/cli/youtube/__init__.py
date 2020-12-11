@@ -30,5 +30,9 @@ def youtube_action(namespace):
         from minet.cli.youtube.captions import captions_action
         captions_action(namespace, output_file)
 
+    elif namespace.yt_action == 'search':
+        from minet.cli.youtube.search import search_action
+        search_action(namespace, output_file)
+
     if namespace.output is not None:
         output_file.close()

@@ -532,6 +532,39 @@ MINET_COMMANDS = {
                             'action': ConfigAction
                         }
                     ]
+                },
+                'search': {
+                    'title': 'Youtube search',
+                    'description': 'Retrieve metadata about Youtube search field using the API.',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'This argument can either take the keyword on which we want to retrieve videos from the API or the name of the column containing that keyword'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the keyword for youtube Search',
+                            'type': FileType('r'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-k', '--key'],
+                            'help': 'YouTube API Data dashboard API key.',
+                            'rc_key': ['youtube', 'key'],
+                            'action': ConfigAction
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flags': ['-l', '--limit'],
+                            'help': 'Maximum number of videos to retrieve',
+                            'type': int
+                        }
+                    ]
                 }
 
             }
