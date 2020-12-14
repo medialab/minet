@@ -5,13 +5,6 @@
 # Action reading an input CSV file line by line and retrieving caption about
 # the given Youtube videos.
 #
-# =============================================================================
-# Minet Youtube Captions CLI Action
-# =============================================================================
-#
-# Action reading an input CSV file line by line and retrieving caption about
-# the given Youtube videos.
-#
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 from minet.cli.utils import print_err
