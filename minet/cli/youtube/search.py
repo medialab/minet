@@ -13,7 +13,7 @@ from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
 from minet.cli.utils import die, open_output_file, edit_namespace_with_csv_io, DummyTqdmFile
 from minet.utils import create_pool, request_json
 
-URL_template_accurate = 'https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=25&q=%(subject)s&type=video&key=%(key)s'
+URL_template_accurate = 'https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=100&q=%(subject)s&type=video&key=%(key)s'
 
 CSV_HEADERS = [
     'video_id',
