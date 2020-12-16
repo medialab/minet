@@ -45,6 +45,7 @@
 * [youtube (yt)](#youtube)
   * [captions](#captions)
   * [comments](#comments)
+  * [search](#youtube-search)
   * [url-parse](#youtube-url-parse)
   * [videos](#videos)
 
@@ -220,6 +221,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### comments
 
 <% yt/comments %>
+
+<h3 id="youtube-search">search</h3>
+
+<% yt/search %>
 
 <h3 id="youtube-url-parse">url-parse</h3>
 

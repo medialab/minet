@@ -45,6 +45,7 @@
 * [youtube (yt)](#youtube)
   * [captions](#captions)
   * [comments](#comments)
+  * [search](#youtube-search)
   * [url-parse](#youtube-url-parse)
   * [videos](#videos)
 
@@ -594,7 +595,7 @@ examples:
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [-p PLATFORMS] [--posts POSTS]
                                  [-s SELECT]
-                                 [--sort-by {total_interactions,date,subscriber_count}]
+                                 [--sort-by {total_interactions,subscriber_count,date}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -616,7 +617,7 @@ optional arguments:
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {total_interactions,date,subscriber_count}
+  --sort-by {total_interactions,subscriber_count,date}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
@@ -987,6 +988,30 @@ optional arguments:
   -f, --full                  YouTube API does not always return every comments as some replies can be omitted. By adding this flag, one ensures to make every needed API call to retrieve all the comments.
   -k KEY, --key KEY           YouTube API Data dashboard API key.
   -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+
+```
+
+<h3 id="youtube-search">search</h3>
+
+```
+usage: minet youtube search [-h] [-o OUTPUT] [-k KEY] [-s SELECT] [-l LIMIT]
+                            column [file]
+
+Youtube search
+==============
+
+Retrieve metadata about Youtube search field using the API.
+
+positional arguments:
+  column                      This argument can either take the keyword on which we want to retrieve videos from the API or the name of the column containing that keyword
+  file                        CSV file containing the keyword for youtube Search
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  -k KEY, --key KEY           YouTube API Data dashboard API key.
+  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+  -l LIMIT, --limit LIMIT     Maximum number of videos to retrieve
 
 ```
 
