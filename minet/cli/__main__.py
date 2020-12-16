@@ -7,6 +7,7 @@
 #
 import csv
 import sys
+import ctypes
 import signal
 import shutil
 import importlib
@@ -34,7 +35,7 @@ SUBPARSERS = {}
 terminal_size = shutil.get_terminal_size()
 
 # Increasing max CSV file limit to avoid pesky issues
-csv.field_size_limit(sys.maxsize)
+csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
 
 # Hiding stack traces on ctrl+c
 signal.signal(signal.SIGINT, lambda x, y: sys.exit(1))
