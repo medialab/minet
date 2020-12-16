@@ -24,7 +24,9 @@ from minet.cli.argparse import WrappedConfigValue
 from minet.cli.commands import MINET_COMMANDS
 
 # Handling pipes correctly
-signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+# NOTE: does not work in windows
+if hasattr(signal, 'SIGPIPE'):
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
 SUBPARSERS = {}
 
