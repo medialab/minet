@@ -7,7 +7,6 @@
 import casanova
 import gzip
 import codecs
-import warnings
 from multiprocessing import Pool
 from trafilatura.core import bare_extraction
 from tqdm import tqdm
@@ -21,7 +20,23 @@ from minet.cli.reporters import report_error
 
 from minet.exceptions import UnknownEncodingError
 
-OUTPUT_ADDITIONAL_HEADERS = ['extract_error', 'extracted_text']
+OUTPUT_ADDITIONAL_HEADERS = [
+    'extract_error',
+    'raw_content',
+    'author',
+    'categories'
+]
+
+PADDING = [''] * (len(OUTPUT_ADDITIONAL_HEADERS) - 1)
+
+
+def format_trafilatura_result(result):
+    return [
+        '',
+        result.get('text', ''),
+        result.get('author', ''),
+        '|'.join(result.get('categories', []))
+    ]
 
 
 def worker(payload):
@@ -81,9 +96,12 @@ def extract_action(namespace):
             loading_bar.update()
 
             if error is not None:
-                enricher.writerow(row, [report_error(error), ''])
+                enricher.writerow(row, [report_error(error)] + PADDING)
                 continue
 
-            enricher.writerow(row, ['', result['text']])
+            if result is None:
+                enricher.writerow(row, ['no-content'] + PADDING)
+
+            enricher.writerow(row, format_trafilatura_result(result))
 
     output_file.close()

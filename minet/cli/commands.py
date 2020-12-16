@@ -9,7 +9,6 @@ from argparse import FileType
 
 from minet.constants import DEFAULT_THROTTLE
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
-from minet.cli.utils import die
 from minet.cli.argparse import (
     BooleanAction,
     ConfigAction,
