@@ -22,9 +22,16 @@ from minet.exceptions import UnknownEncodingError
 
 OUTPUT_ADDITIONAL_HEADERS = [
     'extract_error',
+    'canonical_url',
+    'title',
+    'description',
     'raw_content',
+    'comments',
     'author',
-    'categories'
+    'categories',
+    'tags',
+    'date',
+    'sitename'
 ]
 
 PADDING = [''] * (len(OUTPUT_ADDITIONAL_HEADERS) - 1)
@@ -33,9 +40,16 @@ PADDING = [''] * (len(OUTPUT_ADDITIONAL_HEADERS) - 1)
 def format_trafilatura_result(result):
     return [
         '',
+        result.get('url', ''),
+        result.get('title', ''),
+        result.get('description', ''),
         result.get('text', ''),
+        result.get('comments', ''),
         result.get('author', ''),
-        '|'.join(result.get('categories', []))
+        '|'.join(result.get('categories', [])),
+        '|'.join(result.get('tags', [])),
+        result.get('date', ''),
+        result.get('sitename', '')
     ]
 
 
@@ -65,6 +79,7 @@ def worker(payload):
     try:
         # https://trafilatura.readthedocs.io/en/latest/corefunctions.html
         # TODO: discuss deduplication
+        # TODO: fallback options
         result = bare_extraction(raw_html)
     except BaseException as e:
         return e, row, None
