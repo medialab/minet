@@ -52,5 +52,5 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ./minet_${{ matrix.name }}.zip
-          asset_name: ${{ matrix.name }}
+          asset_name: ${{ matrix.name }}.zip
           tag: ${{ github.ref }}
