@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/medialab/minet/workflows/tests/badge.svg)](https://travis-ci.org/medialab/minet)
+[![Build Status](https://github.com/medialab/minet/workflows/Tests/badge.svg)](https://github.com/medialab/minet/actions)
 
 ![Minet](img/minet.png)
 
