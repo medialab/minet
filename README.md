@@ -36,7 +36,15 @@ In addition, **minet** also exposes its high-level programmatic interface as a p
 
 ## Installation
 
-**minet** can be installed using pip:
+**minet** can be installed as a standalone CLI tool (currently only on mac) by running the following command in your terminal:
+
+```shell
+curl https://raw.githubusercontent.com/medialab/minet/master/scripts/install.sh | bash
+```
+
+Don't trust us enough to pipe the result of a HTTP request into `bash`? We wouldn't either, so feel free to read the installation script [here](./scripts/install.sh) and run it on your end if you prefer.
+
+Else, **minet** can be installed directly as a python CLI tool and library using pip:
 
 ```shell
 pip install minet
