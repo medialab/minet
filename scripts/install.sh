@@ -28,10 +28,11 @@ if [[ $name == "Darwin" ]]; then
   unzip -qq /tmp/minet.zip -d /tmp/minet/
   rm /tmp/minet.zip
   mv /tmp/minet /usr/local/bin/minet-dist
-  printf "#!/bin/bash\\n/usr/local/bin/minet-dist/minet" > /usr/local/bin/minet
+  printf "#!/bin/bash\\n/usr/local/bin/minet-dist/minet \$@" > /usr/local/bin/minet
   chmod +x /usr/local/bin/minet
   chmod +x /usr/local/bin/minet-dist/minet
-  echo "minet is now correctly installed!"
+  echo "Now correctly installed for version:"
+  minet --version
 else
   echo "Installation not supported on $name yet."
 fi
