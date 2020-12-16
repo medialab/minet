@@ -569,6 +569,10 @@ MINET_COMMANDS = {
             from a batch of HTML files. This command can either work on a
             `minet fetch` report or on a bunch of files. It will output an
             augmented report with the extracted text.
+
+            Extraction is performed using the `trafilatura` library by Adrien
+            Barbaresi. More information about the library can be found here:
+            https://github.com/adbar/trafilatura
         ''',
         'epilog': '''
             examples:
