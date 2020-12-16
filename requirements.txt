@@ -1,20 +1,28 @@
+# Dev dependencies
+importchecker==2.0
+ipython
+pycodestyle==2.4.0
+PyInstaller==3.6
+pytest==3.5.1
+twine==1.11.0
+wheel
+
 # Dependencies
 beautifulsoup4==4.7.1
 browser-cookie3==0.7.6
 casanova==0.9.1
 cchardet==2.1.4
-cython==0.29.4
 dateparser==0.7.1
 json5==0.8.5
 keyring<19.3
-lxml==4.3.0
+lxml==4.6.2
 ndjson==0.3.1
-numpy==1.16.1
 persist-queue==0.4.2
 pytz==2019.3
 pyyaml==5.1.2
 quenouille==0.6.2
 tqdm==4.31.1
+trafilatura==0.6.1
 twitter==1.18.0
 ural==0.25.0
 urllib3[secure]==1.25.3

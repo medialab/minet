@@ -23,19 +23,6 @@ from minet.crowdtangle.constants import (
 )
 
 
-def check_dragnet():
-    try:
-        import dragnet
-    except:
-        die([
-            'The `dragnet` library is not installed. The `extract` command won\'t work.',
-            'To install it correctly, run the following commands in order:',
-            '',
-            '  pip install lxml numpy Cython',
-            '  pip install dragnet'
-        ])
-
-
 MINET_COMMANDS = {
 
     # Crawl action subparser
@@ -578,9 +565,10 @@ MINET_COMMANDS = {
         'action': 'extract_action',
         'title': 'Minet Extract Command',
         'description': '''
-            Use multiple processes to extract raw text from a batch of HTML files.
-            This command can either work on a `minet fetch` report or on a bunch
-            of files. It will output an augmented report with the extracted text.
+            Use multiple processes to extract raw content and various metadata
+            from a batch of HTML files. This command can either work on a
+            `minet fetch` report or on a bunch of files. It will output an
+            augmented report with the extracted text.
         ''',
         'epilog': '''
             examples:
@@ -594,7 +582,6 @@ MINET_COMMANDS = {
             . Extracting raw text from a bunch of files:
                 `minet extract --glob "./content/*.html" > extracted.csv`
         ''',
-        'before': check_dragnet,
         'arguments': [
             {
                 'name': 'report',
@@ -602,11 +589,6 @@ MINET_COMMANDS = {
                 'type': FileType('r'),
                 'default': sys.stdin,
                 'nargs': '?'
-            },
-            {
-                'flags': ['-e', '--extractor'],
-                'help': 'Extraction engine to use. Defaults to `dragnet`.',
-                'choices': ['dragnet', 'html2text']
             },
             {
                 'flags': ['-i', '--input-directory'],

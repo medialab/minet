@@ -1,18 +1,12 @@
 import re
 import tld
-import dragnet
 from glob import iglob
 from os.path import dirname, join
 from PyInstaller.utils.hooks import collect_submodules
 
 hiddenimports = [
     'lxml',
-    'lxml.etree',
-    'sklearn.neighbors.typedefs',
-    'sklearn.neighbors.quad_tree',
-    'sklearn.tree._utils',
-    'scipy.ndimage',
-    'dragnet'
+    'lxml.etree'
 ]
 
 for p in iglob('minet/cli/**/*.py', recursive=True):
@@ -32,10 +26,6 @@ datas = [
     (
         join(dirname(tld.__file__), 'res', 'effective_tld_names.dat.txt'),
         'tld/res'
-    ),
-    (
-        join(dirname(dragnet.__file__), 'pickled_models', 'py3_sklearn_0.18.0', 'kohlschuetter_readability_weninger_content_model.pkl.gz'),
-        'dragnet/pickled_models/py3_sklearn_0.18.0'
     )
 ]
 

@@ -9,8 +9,8 @@ import gzip
 import codecs
 import warnings
 from multiprocessing import Pool
+from trafilatura.core import bare_extraction
 from tqdm import tqdm
-from dragnet import extract_content
 
 from minet.encodings import is_supported_encoding
 from minet.cli.utils import (
@@ -48,13 +48,13 @@ def worker(payload):
 
     # Attempting extraction
     try:
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
-            content = extract_content(raw_html)
+        # https://trafilatura.readthedocs.io/en/latest/corefunctions.html
+        # TODO: discuss deduplication
+        result = bare_extraction(raw_html)
     except BaseException as e:
         return e, row, None
 
-    return None, row, content
+    return None, row, result
 
 
 def extract_action(namespace):
@@ -77,13 +77,13 @@ def extract_action(namespace):
     files = create_report_iterator(namespace, enricher, loading_bar=loading_bar)
 
     with Pool(namespace.processes) as pool:
-        for error, row, content in pool.imap_unordered(worker, files):
+        for error, row, result in pool.imap_unordered(worker, files):
             loading_bar.update()
 
             if error is not None:
                 enricher.writerow(row, [report_error(error), ''])
                 continue
 
-            enricher.writerow(row, ['', content])
+            enricher.writerow(row, ['', result['text']])
 
     output_file.close()

@@ -21,16 +21,14 @@ clean:
 
 deps:
 	pip3 install -U pip
-	pip3 install -r requirements/1_dev.txt
-	pip3 install -r requirements/2_base.txt
-	pip3 install -r requirements/3_dragnet.txt
+	pip3 install -r requirements.txt
 
 lint:
 	@echo Linting source code using pep8...
 	pycodestyle --ignore E501,E722,E741,W503,W504 $(SOURCE) test
 	@echo
 	@echo Searching for unused imports...
-	importchecker $(SOURCE) | grep -v __init__ | grep -v dragnet | grep -v encodings.idna || true
+	importchecker $(SOURCE) | grep -v __init__ | grep -v encodings.idna || true
 	@echo
 
 readme:

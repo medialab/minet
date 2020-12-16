@@ -14,5 +14,4 @@
 6. Create a virtualenv for your minet endeavors: `pyenv virtualenv 3.6.10 minet`.
 7. Activate it `pyenv activate minet`.
 8. Install `minet` using pip: `pip install minet`.
-9. If you need to use `minet extract` you will also need to install `dragnet` by running `pip install lxml numpy Cython` then `pip install dragnet`.
-10. Finally, test that everything went smoothly by testing `minet --version`.
+9.  Finally, test that everything went smoothly by testing `minet --version`.

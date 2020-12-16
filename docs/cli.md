@@ -183,34 +183,24 @@ examples:
 
 ## extract
 
-If you want to be able to use the `extract` command, you will need to install the [`dragnet`](https://github.com/dragnet-org/dragnet) library. Because it is a bit cumbersome to install, it's not included in `minet`'s dependencies yet.
-
-Just run the following & in the same order (`dragnet` needs to have specific deps installed before it can be able to compile its native files):
-
 ```
-pip install lxml numpy Cython
-pip install dragnet
-```
-
-```
-usage: minet extract [-h] [-e {dragnet,html2text}] [-i INPUT_DIRECTORY]
-                     [-o OUTPUT] [-p PROCESSES] [-s SELECT] [--total TOTAL]
+usage: minet extract [-h] [-i INPUT_DIRECTORY] [-o OUTPUT] [-p PROCESSES]
+                     [-s SELECT] [--total TOTAL]
                      [report]
 
 Minet Extract Command
 =====================
 
-Use multiple processes to extract raw text from a batch of HTML files.
-This command can either work on a `minet fetch` report or on a bunch
-of files. It will output an augmented report with the extracted text.
+Use multiple processes to extract raw content and various metadata
+from a batch of HTML files. This command can either work on a
+`minet fetch` report or on a bunch of files. It will output an
+augmented report with the extracted text.
 
 positional arguments:
   report                                          Input CSV fetch action report file.
 
 optional arguments:
   -h, --help                                      show this help message and exit
-  -e {dragnet,html2text}, --extractor {dragnet,html2text}
-                                                  Extraction engine to use. Defaults to `dragnet`.
   -i INPUT_DIRECTORY, --input-directory INPUT_DIRECTORY
                                                   Directory where the HTML files are stored. Defaults to "content".
   -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
@@ -595,7 +585,7 @@ examples:
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [-p PLATFORMS] [--posts POSTS]
                                  [-s SELECT]
-                                 [--sort-by {total_interactions,subscriber_count,date}]
+                                 [--sort-by {total_interactions,date,subscriber_count}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -617,7 +607,7 @@ optional arguments:
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {total_interactions,subscriber_count,date}
+  --sort-by {total_interactions,date,subscriber_count}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
