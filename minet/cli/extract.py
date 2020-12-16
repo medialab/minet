@@ -12,6 +12,7 @@ from trafilatura.core import bare_extraction
 from tqdm import tqdm
 
 from minet.encodings import is_supported_encoding
+from minet.utils import fix_ensure_ascii_json_string
 from minet.cli.utils import (
     open_output_file,
     create_report_iterator
@@ -37,19 +38,28 @@ OUTPUT_ADDITIONAL_HEADERS = [
 PADDING = [''] * (len(OUTPUT_ADDITIONAL_HEADERS) - 1)
 
 
+def singular(result, key, fix=False):
+    v = result.get(key, '') or ''
+
+    if fix:
+        return fix_ensure_ascii_json_string(v)
+
+    return v
+
+
 def format_trafilatura_result(result):
     return [
         '',
-        result.get('url', ''),
-        result.get('title', ''),
-        result.get('description', ''),
-        result.get('text', ''),
-        result.get('comments', ''),
-        result.get('author', ''),
+        singular(result, 'url'),
+        singular(result, 'title'),
+        singular(result, 'description'),
+        singular(result, 'text'),
+        singular(result, 'comments'),
+        singular(result, 'author', fix=True),
         '|'.join(result.get('categories', [])),
         '|'.join(result.get('tags', [])),
-        result.get('date', ''),
-        result.get('sitename', '')
+        singular(result, 'date'),
+        singular(result, 'sitename')
     ]
 
 
@@ -116,7 +126,10 @@ def extract_action(namespace):
 
             if result is None:
                 enricher.writerow(row, ['no-content'] + PADDING)
-
-            enricher.writerow(row, format_trafilatura_result(result))
+            try:
+                enricher.writerow(row, format_trafilatura_result(result))
+            except UnicodeError:
+                print(result)
+                raise
 
     output_file.close()

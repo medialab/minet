@@ -54,6 +54,7 @@ META_REFRESH_RE = re.compile(rb'''<meta\s+http-equiv=['"]?refresh['"]?\s+content
 JAVASCRIPT_LOCATION_RE = re.compile(rb'''(?:window\.)?location(?:\s*=\s*|\.replace\(\s*)['"`](.*?)['"`]''')
 ESCAPED_SLASH_RE = re.compile(rb'\\\/')
 ASCII_RE = re.compile(r'^[ -~]*$')
+DOUBLE_QUOTES_RE = re.compile(r'"')
 
 # Constants
 CHARDET_CONFIDENCE_THRESHOLD = 0.9
@@ -64,6 +65,13 @@ def md5(string):
     h = hashlib.md5()
     h.update(string.encode())
     return h.hexdigest()
+
+
+def fix_ensure_ascii_json_string(s):
+    try:
+        return json.loads('"%s"' % DOUBLE_QUOTES_RE.sub('\\"', s))
+    except:
+        return s
 
 
 # TODO: add a version that tallies the possibilities
