@@ -1,5 +1,6 @@
 import re
 import tld
+import justext
 from glob import iglob
 from os.path import dirname, join
 from PyInstaller.utils.hooks import collect_submodules
@@ -28,5 +29,8 @@ datas = [
         'tld/res'
     )
 ]
+
+for p in iglob(join(dirname(justext.__file__), 'stoplists', '*.txt')):
+    datas.append((p, 'justext/stoplists'))
 
 __all__ = ['datas', 'hiddenimports']
