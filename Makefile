@@ -48,5 +48,4 @@ pyinstaller: clean
 		--additional-hooks-dir=./hooks \
 		--name minet \
 		--clean \
-		--onefile \
 		minet/cli/__main__.py
