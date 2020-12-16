@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [master]
+    tags: '*'
 
 jobs:
   build:
@@ -47,5 +47,10 @@ jobs:
           files: ./dist/minet/
           dest: minet_${{ matrix.name }}.zip
 
-      - name: Temp ls
-        run: ls -alh
+      - name: Uploading release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./minet_${{ matrix.name }}.zip
+          asset_name: ${{ matrix.name }}
+          tag: ${{ github.ref }}
