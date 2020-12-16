@@ -11,7 +11,7 @@ wheel
 beautifulsoup4==4.7.1
 browser-cookie3==0.7.6
 casanova==0.9.1
-cchardet==2.1.4
+cchardet>=2.1.7
 dateparser==0.7.1
 json5==0.8.5
 keyring<19.3
