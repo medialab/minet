@@ -42,7 +42,10 @@ jobs:
         run: ./dist/minet/minet --version
 
       - name: Prepare release
-        run: zip -r minet_${{ matrix.name }}.zip ./dist/minet
+        uses: papeloto/action-zip@v1
+        with:
+          files: ./dist/minet/
+          dest: minet_${{ matrix.name }}.zip
 
       - name: Temp ls
         run: ls -alh
