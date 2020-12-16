@@ -47,6 +47,24 @@ def singular(result, key, fix=False):
     return v
 
 
+def plural(result, key):
+    l = result.get(key, []) or []
+
+    if not l:
+        return ''
+
+    items = []
+
+    for item in l:
+        for subitem in fix_ensure_ascii_json_string(item).split(','):
+            subitem = subitem.strip()
+
+            if subitem:
+                items.append(subitem)
+
+    return '|'.join(items)
+
+
 def format_trafilatura_result(result):
     return [
         '',
@@ -56,8 +74,8 @@ def format_trafilatura_result(result):
         singular(result, 'text'),
         singular(result, 'comments'),
         singular(result, 'author', fix=True),
-        '|'.join(result.get('categories', [])),
-        '|'.join(result.get('tags', [])),
+        plural(result, 'categories'),
+        plural(result, 'tags'),
         singular(result, 'date'),
         singular(result, 'sitename')
     ]
@@ -94,7 +112,10 @@ def worker(payload):
     except BaseException as e:
         return e, row, None
 
-    return None, row, result
+    if result is None:
+        return None, row, None
+
+    return None, row, format_trafilatura_result(result)
 
 
 def extract_action(namespace):
@@ -126,10 +147,8 @@ def extract_action(namespace):
 
             if result is None:
                 enricher.writerow(row, ['no-content'] + PADDING)
-            try:
-                enricher.writerow(row, format_trafilatura_result(result))
-            except UnicodeError:
-                print(result)
-                raise
+                continue
+
+            enricher.writerow(row, result)
 
     output_file.close()
