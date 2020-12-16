@@ -11,7 +11,7 @@ cleanup() {
   rm -rf /tmp/minet
   rm -f /tmp/minet.zip
   rm -rf /usr/local/bin/minet-dist
-  rm /usr/local/bin/minet
+  rm -f /usr/local/bin/minet
 }
 
 # Variables
