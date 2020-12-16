@@ -1,14 +1,26 @@
 name: Build
 
 on:
-  release:
-    types: [create]
   push:
     branches: [master]
 
 jobs:
-  build_xenial:
-    runs-on: ubuntu-16.04
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-16.04
+            name: ubuntu_16
+          - os: ubuntu-18.04
+            name: ubuntu_18
+          - os: ubuntu-20.04
+            name: ubuntu_20
+          - os: macos-10.15
+            name: macos
+          - os: windows-latest
+            name: windows
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v2
@@ -28,3 +40,9 @@ jobs:
 
       - name: Testing built executable
         run: ./dist/minet/minet --version
+
+      - name: Prepare release
+        run: zip -r minet_${{ matrix.name }}.zip ./dist/minet
+
+      - name: Temp ls
+        run: ls -alh
