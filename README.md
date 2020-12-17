@@ -36,7 +36,7 @@ In addition, **minet** also exposes its high-level programmatic interface as a p
 
 ## Installation
 
-**minet** can be installed as a standalone CLI tool (currently only on mac) by running the following command in your terminal:
+**minet** can be installed as a standalone CLI tool (currently only on mac & ubuntu) by running the following command in your terminal:
 
 ```shell
 curl https://raw.githubusercontent.com/medialab/minet/master/scripts/install.sh | bash
