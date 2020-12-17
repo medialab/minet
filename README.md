@@ -58,6 +58,8 @@ pip install minet
 
 If you need more help to install and use **minet** from scratch, you can check those [installation documents](./docs/install.md).
 
+Finally if you want to install the standalone binaries by yourself (even for windows) you can find them in each release [here](https://github.com/medialab/minet/releases).
+
 ## Upgrading
 
 To upgrade the standalone version, simply run the install script once again:
