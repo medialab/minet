@@ -1,8 +1,9 @@
 #!/bin/bash
+set -e
 
 # Functions
 get_latest_release() {
-  curl --silent "https://api.github.com/repos/$1/releases/latest" |
+  curl -S -s -L "https://api.github.com/repos/$1/releases/latest" |
     grep '"tag_name":' |
     sed -E 's/.*"([^"]+)".*/\1/'
 }
@@ -34,9 +35,9 @@ else
   ubuntu_version=$(get_ubuntu_version)
 
   if [[ $ubuntu_version != "unkown" ]]; then
-    echo "Installing minet for ubuntu..."
+    echo "Installing minet for ubuntu (or similar)..."
 
-    if [[ $ubuntu_version == "16" || $ubuntu_version == "15" ]]; then
+    if [ $ubuntu_version -le "16" ]; then
       os="ubuntu_16"
     elif [[ $ubuntu_version == "18" || $ubuntu_version == "17" ]]; then
       os="ubuntu_18"
@@ -53,9 +54,11 @@ latest=$(get_latest_release medialab/minet)
 
 # Generic install script
 cleanup
+
 echo "Downloading binaries..."
 mkdir /tmp/minet
-curl -L --silent "https://github.com/medialab/minet/releases/download/$latest/$os.zip" > /tmp/minet.zip
+curl -S -s -L  "https://github.com/medialab/minet/releases/download/$latest/$os.zip" > /tmp/minet.zip
+
 echo "Installing..."
 unzip -qq /tmp/minet.zip -d /tmp/minet/
 rm /tmp/minet.zip
@@ -64,5 +67,6 @@ printf "#!/bin/bash\\n/usr/local/bin/minet-dist/minet \$@" > /tmp/minet-exec
 sudo mv /tmp/minet-exec /usr/local/bin/minet
 sudo chmod +x /usr/local/bin/minet
 sudo chmod +x /usr/local/bin/minet-dist/minet
-echo "Now correctly installed for version:"
+
+echo "Installed:"
 minet --version
