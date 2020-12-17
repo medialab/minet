@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Asking for sudo right away
+sudo echo "test" > /dev/null
+
 # Functions
 get_latest_release() {
   curl -S -s -L "https://api.github.com/repos/$1/releases/latest" |
@@ -17,7 +20,7 @@ cleanup() {
 }
 
 get_ubuntu_version() {
-  (cat /etc/os-release | grep VERSION_ID | grep -Po "[0-9]{2}(?=\.)") || "unknown"
+  (cat /etc/os-release | grep VERSION_ID | grep -Po '[0-9]{2}(?=[\."])' | head -n 1) || echo "unknown"
 }
 
 fail_install() {
