@@ -63,7 +63,7 @@ echo "Installing..."
 unzip -qq /tmp/minet.zip -d /tmp/minet/
 rm /tmp/minet.zip
 sudo mv /tmp/minet /usr/local/bin/minet-dist
-printf "#!/bin/bash\\n/usr/local/bin/minet-dist/minet \$@" > /tmp/minet-exec
+printf '#!/bin/bash\n/usr/local/bin/minet-dist/minet $@' > /tmp/minet-exec
 sudo mv /tmp/minet-exec /usr/local/bin/minet
 sudo chmod +x /usr/local/bin/minet
 sudo chmod +x /usr/local/bin/minet-dist/minet
