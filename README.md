@@ -39,7 +39,7 @@ In addition, **minet** also exposes its high-level programmatic interface as a p
 **minet** can be installed as a standalone CLI tool (currently only on mac, ubuntu & similar) by running the following command in your terminal:
 
 ```shell
-curl https://raw.githubusercontent.com/medialab/minet/master/scripts/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/medialab/minet/master/scripts/install.sh | bash
 ```
 
 Don't trust us enough to pipe the result of a HTTP request into `bash`? We wouldn't either, so feel free to read the installation script [here](./scripts/install.sh) and run it on your end if you prefer.
@@ -65,7 +65,7 @@ Finally if you want to install the standalone binaries by yourself (even for win
 To upgrade the standalone version, simply run the install script once again:
 
 ```shell
-curl https://raw.githubusercontent.com/medialab/minet/master/scripts/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/medialab/minet/master/scripts/install.sh | bash
 ```
 
 To upgrade the python version you can use pip thusly:
@@ -79,7 +79,7 @@ pip install -U minet
 To uninstall the standalone version:
 
 ```shell
-curl https://raw.githubusercontent.com/medialab/minet/master/scripts/uninstall.sh | bash
+curl -sSL https://raw.githubusercontent.com/medialab/minet/master/scripts/uninstall.sh | bash
 ```
 
 To uninstall the python version:

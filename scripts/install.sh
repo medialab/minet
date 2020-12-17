@@ -6,7 +6,7 @@ sudo echo "test" > /dev/null
 
 # Functions
 get_latest_release() {
-  curl -S -s -L "https://api.github.com/repos/$1/releases/latest" |
+  curl -sSL "https://api.github.com/repos/$1/releases/latest" |
     grep '"tag_name":' |
     sed -E 's/.*"([^"]+)".*/\1/'
 }
@@ -60,7 +60,7 @@ cleanup
 
 echo "Downloading binaries..."
 mkdir /tmp/minet
-curl -S -s -L  "https://github.com/medialab/minet/releases/download/$latest/$os.zip" > /tmp/minet.zip
+curl -sSL  "https://github.com/medialab/minet/releases/download/$latest/$os.zip" > /tmp/minet.zip
 
 echo "Installing..."
 unzip -qq /tmp/minet.zip -d /tmp/minet/
