@@ -52,6 +52,34 @@ pip install minet
 
 If you need more help to install and use **minet** from scratch, you can check those [installation documents](./docs/install.md).
 
+## Upgrading
+
+To upgrade the standalone version, simply run the install script once again:
+
+```shell
+curl https://raw.githubusercontent.com/medialab/minet/master/scripts/install.sh | bash
+```
+
+To upgrade the python version you can use pip thusly:
+
+```shell
+pip install -U minet
+```
+
+## Uninstallation
+
+To uninstall the standalone version:
+
+```shell
+curl https://raw.githubusercontent.com/medialab/minet/master/scripts/uninstall.sh | bash
+```
+
+To uninstall the python version:
+
+```shell
+pip uninstall minet
+```
+
 ## Cookbook
 
 To learn how to use **minet** and understand how it may fit your use cases, you should definitely check out our [Cookbook](./cookbook).

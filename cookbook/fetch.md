@@ -23,7 +23,7 @@ Let's use the `minet fetch` command to do so!
 
 ## First steps
 
-Being a diligent researcher, you decided to store the found url in a very simple [CSV](https://en.wikipedia.org/wiki/Comma-separated_values) file containing more than 50k urls:
+Being a diligent researcher, you decided to store the found urls in a very simple [CSV](https://en.wikipedia.org/wiki/Comma-separated_values) file containing more than 50k urls:
 
 *urls.csv*
 
