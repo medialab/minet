@@ -19,6 +19,7 @@ jobs:
             python-version: "3.5"
           - os: ubuntu-latest
             python-version: "3.6"
+            pyinstaller: yes
           - os: ubuntu-latest
             python-version: "3.7"
           - os: ubuntu-latest
@@ -29,10 +30,12 @@ jobs:
           # Mac
           - os: macos-10.15
             python-version: "3.6"
+            pyinstaller: yes
 
           # Windows
           - os: windows-latest
             python-version: "3.6"
+            pyinstaller: yes
 
     runs-on: ${{ matrix.os }}
 
@@ -51,3 +54,9 @@ jobs:
 
       - name: Run linter & unit tests
         run: make
+
+      - name: Testing pyinstaller build
+        if: ${{ matrix.pyinstaller }}
+        run: |
+          make pyinstaller
+          ./dist/minet/minet --version
