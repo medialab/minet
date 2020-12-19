@@ -58,7 +58,7 @@ latest=$(get_latest_release medialab/minet)
 # Generic install script
 cleanup
 
-echo "Downloading binaries..."
+echo "Downloading binaries for $latest release..."
 mkdir /tmp/minet
 curl -sSL  "https://github.com/medialab/minet/releases/download/$latest/$os.zip" > /tmp/minet.zip
 
