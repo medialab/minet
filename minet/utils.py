@@ -40,9 +40,6 @@ from minet.constants import (
     DEFAULT_URLLIB3_TIMEOUT
 )
 
-# Fix for pyinstaller. Do not remove!
-import encodings.idna
-
 mimetypes.init()
 
 # Handy regexes
