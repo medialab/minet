@@ -2,6 +2,13 @@
 set -e
 
 # Asking for sudo right away
+echo
+echo "This install script will ask you for your password so it can move/copy"
+echo "things to '/usr/local/bin'. If you are not comfortable with this you can"
+echo "read the install script here:"
+echo "https://github.com/medialab/minet/blob/master/scripts/install.sh"
+echo ""
+
 sudo echo "test" > /dev/null
 
 # Functions
