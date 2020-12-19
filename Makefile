@@ -48,4 +48,5 @@ pyinstaller: clean
 		--additional-hooks-dir=./hooks \
 		--name minet \
 		--clean \
+		--exclude-module IPython \
 		minet/cli/__main__.py
