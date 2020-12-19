@@ -58,5 +58,8 @@ jobs:
       - name: Testing pyinstaller build
         if: ${{ matrix.pyinstaller }}
         run: |
-          make pyinstaller
-          ./dist/minet/minet --version
+          make pyinstaller &&
+          ./dist/minet/minet --version &&
+          ./dist/minet/minet fetch 'https://github.com/medialab/minet' | \
+          ./dist/minet/minet scrape ./ftest/scrapers/title.yml | \
+          grep 'A webmining CLI tool'
