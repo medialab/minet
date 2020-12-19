@@ -1,3 +1,4 @@
+import os
 import re
 import tld
 import justext
@@ -17,7 +18,7 @@ for p in iglob('minet/cli/**/*.py', recursive=True):
     if '__init__' in p:
         p = re.sub(r'/__init__.py$', '.py', p)
 
-    m = p.replace('/', '.')[:-3]
+    m = p.replace(os.sep, '.')[:-3]
 
     hiddenimports.append(m)
 
