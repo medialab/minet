@@ -28,7 +28,7 @@ lint:
 	pycodestyle --ignore E501,E722,E741,W503,W504 $(SOURCE) test
 	@echo
 	@echo Searching for unused imports...
-	importchecker $(SOURCE) | grep -v __init__ | grep -v encodings.idna || true
+	importchecker $(SOURCE) | grep -v __init__ || true
 	@echo
 
 readme:
