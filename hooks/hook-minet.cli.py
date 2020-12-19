@@ -6,10 +6,7 @@ from glob import iglob
 from os.path import dirname, join
 from PyInstaller.utils.hooks import collect_submodules
 
-hiddenimports = [
-    'lxml',
-    'lxml.etree'
-]
+hiddenimports = []
 
 for p in iglob('minet/cli/**/*.py', recursive=True):
     if '__main__' in p:
