@@ -1,4 +1,3 @@
-import os
 import re
 import tld
 import justext
@@ -6,6 +5,8 @@ import tldextract
 from glob import iglob
 from os.path import dirname, join
 from PyInstaller.utils.hooks import collect_submodules
+
+SLASH_RE = re.compile(r'[\/\\]')
 
 hiddenimports = [
     'encodings.idna'
@@ -18,7 +19,7 @@ for p in iglob('minet/cli/**/*.py', recursive=True):
     if '__init__' in p:
         p = re.sub(r'/__init__.py$', '.py', p)
 
-    m = p.replace(os.sep, '.')[:-3]
+    m = SLASH_RE.sub('.', p)[:-3]
 
     hiddenimports.append(m)
 
