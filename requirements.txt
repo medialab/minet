@@ -2,7 +2,7 @@
 importchecker==2.0
 ipython
 pycodestyle==2.4.0
-PyInstaller==3.6
+PyInstaller==4.1
 pytest==3.5.1
 twine==1.11.0
 wheel
