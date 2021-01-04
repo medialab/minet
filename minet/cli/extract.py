@@ -12,7 +12,6 @@ from trafilatura.core import bare_extraction
 from tqdm import tqdm
 
 from minet.encodings import is_supported_encoding
-from minet.utils import fix_ensure_ascii_json_string
 from minet.cli.utils import (
     open_output_file,
     create_report_iterator
@@ -51,7 +50,7 @@ def plural(result, key):
     items = []
 
     for item in l:
-        for subitem in fix_ensure_ascii_json_string(item).split(','):
+        for subitem in item.split(','):
             subitem = subitem.strip()
 
             if subitem:
