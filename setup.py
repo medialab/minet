@@ -37,7 +37,7 @@ setup(name='minet',
         'pyyaml',
         'quenouille>=0.6.3',
         'tqdm>=4.31.1',
-        'trafilatura>=0.6.1,<0.7',
+        'trafilatura>=0.7.0,<0.8',
         'twitter>=1.18.0',
         'ural>=0.25.0',
         'urllib3[secure]>=1.25.3'

@@ -38,13 +38,8 @@ OUTPUT_ADDITIONAL_HEADERS = [
 PADDING = [''] * (len(OUTPUT_ADDITIONAL_HEADERS) - 1)
 
 
-def singular(result, key, fix=False):
-    v = result.get(key, '') or ''
-
-    if fix:
-        return fix_ensure_ascii_json_string(v)
-
-    return v
+def singular(result, key):
+    return result.get(key, '') or ''
 
 
 def plural(result, key):
@@ -73,7 +68,7 @@ def format_trafilatura_result(result):
         singular(result, 'description'),
         singular(result, 'text'),
         singular(result, 'comments'),
-        singular(result, 'author', fix=True),
+        singular(result, 'author'),
         plural(result, 'categories'),
         plural(result, 'tags'),
         singular(result, 'date'),
