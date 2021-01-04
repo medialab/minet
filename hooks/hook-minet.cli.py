@@ -1,7 +1,6 @@
 import re
 import tld
 import justext
-import tldextract
 from glob import iglob
 from os.path import dirname, join
 from PyInstaller.utils.hooks import collect_submodules
@@ -29,10 +28,6 @@ datas = [
     (
         join(dirname(tld.__file__), 'res', 'effective_tld_names.dat.txt'),
         'tld/res'
-    ),
-    (
-        join(dirname(tldextract.__file__), '.tld_set_snapshot'),
-        'tldextract'
     )
 ]
 
