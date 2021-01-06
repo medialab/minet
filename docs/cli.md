@@ -528,8 +528,15 @@ optional arguments:
 
 examples:
 
-. Fetching the 500 most latest posts from a dashboard:
-    `minet ct posts --token YOUR_TOKEN --limit 500 > latest-posts.csv`
+. Fetching the 500 most latest posts from a dashboard (a start date must be precised):
+    `minet ct posts --token YOUR_TOKEN --limit 500 --start-date 2021-01-01 > latest-posts.csv`
+
+. If your collection is interrupted, it can be restarted from the last data collected with the --resume option:
+    `minet ct posts --token YOUR_TOKEN --limit 500 --start-date 2021-01-01 --resume --output latest-posts.csv`
+
+. Fetching all the posts from a specific list of groups or pages:
+    `lminet ct posts --token YOUR_TOKEN --start-date 2021-01-01 --list-ids YOUR_LIST_ID > posts_from_one_list.csv`
+(To know the different list ids associated with your dashboard: `minet ct lists --token YOUR_TOKEN`)
 
 ```
 
@@ -589,7 +596,7 @@ examples:
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [-p PLATFORMS] [--posts POSTS]
                                  [-s SELECT]
-                                 [--sort-by {date,total_interactions,subscriber_count}]
+                                 [--sort-by {total_interactions,subscriber_count,date}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -611,7 +618,7 @@ optional arguments:
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {date,total_interactions,subscriber_count}
+  --sort-by {total_interactions,subscriber_count,date}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
