@@ -96,3 +96,7 @@ To learn how to use **minet** and understand how it may fit your use cases, you 
 
 * [Using minet as a command line tool](./docs/cli.md)
 * [Using minet as a python library](./docs/lib.md)
+
+## Contributing
+
+To contribute to **minet** you can check out [this](./CONTRIBUTE.md) documentation.
