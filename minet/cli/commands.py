@@ -270,8 +270,8 @@ MINET_COMMANDS = {
                     'epilog': '''
                         examples:
 
-                        . Fetching a dashboard's lists:
-                            `minet ct search --token YOUR_TOKEN > posts.csv`
+                        . Fetching all the 2021 posts containing the words 'acetylsalicylic acid':
+                            `minet ct search 'acetylsalicylic acid' --start-date 2021-01-01 --token YOUR_TOKEN > posts.csv`
                     ''',
                     'arguments': [
                         {
