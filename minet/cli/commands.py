@@ -18,7 +18,8 @@ from minet.cli.argparse import (
 from minet.crowdtangle.constants import (
     CROWDTANGLE_SORT_TYPES,
     CROWDTANGLE_SUMMARY_SORT_TYPES,
-    CROWDTANGLE_DEFAULT_RATE_LIMIT
+    CROWDTANGLE_DEFAULT_RATE_LIMIT,
+    CROWDTANGLE_SEARCH_FIELDS
 )
 
 
@@ -321,6 +322,11 @@ MINET_COMMANDS = {
                             'flags': ['-p', '--platforms'],
                             'help': 'The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.',
                             'type': SplitterType()
+                        },
+                        {
+                            'flag': '--search-field',
+                            'help': 'In what to search the query. Defaults to `text_fields_and_image_text`.',
+                            'choices': CROWDTANGLE_SEARCH_FIELDS
                         },
                         {
                             'flag': '--sort-by',

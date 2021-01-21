@@ -43,6 +43,9 @@ def url_forge(**kwargs):
     if kwargs.get('language') is not None:
         base_url += '&language=%s' % kwargs['language']
 
+    if kwargs.get('search_field') is not None:
+        base_url += '&searchField=%s' % kwargs['search_field']
+
     return base_url
 
 

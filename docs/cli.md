@@ -549,6 +549,7 @@ usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                 [--language LANGUAGE] [-l LIMIT]
                                 [--not-in-title] [--offset OFFSET]
                                 [-p PLATFORMS]
+                                [--search-field {text_fields_and_image_text,text_fields_only,include_query_strings,image_text_only,account_name_only}]
                                 [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
                                 [--start-date START_DATE] [--types TYPES]
                                 terms
@@ -578,6 +579,8 @@ optional arguments:
   --not-in-title                                  Whether to search terms in account titles also.
   --offset OFFSET                                 Count offset.
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
+  --search-field {text_fields_and_image_text,text_fields_only,include_query_strings,image_text_only,account_name_only}
+                                                  In what to search the query. Defaults to `text_fields_and_image_text`.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
