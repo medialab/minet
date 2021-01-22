@@ -11,5 +11,6 @@ crowdtangle_search_action = make_paginated_action(
     method_name='search',
     item_name='posts',
     csv_headers=CROWDTANGLE_POST_CSV_HEADERS,
-    get_args=lambda namespace: [namespace.terms]
+    get_args=lambda namespace: [namespace.terms],
+    announce=lambda namespace: 'Searching for: "%s"' % namespace.terms
 )

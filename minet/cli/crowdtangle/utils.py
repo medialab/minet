@@ -16,7 +16,8 @@ from minet.crowdtangle.exceptions import (
 )
 
 
-def make_paginated_action(method_name, item_name, csv_headers, get_args=None):
+def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
+                          announce=None):
 
     def action(namespace, output_file):
 
@@ -54,6 +55,9 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None):
                     namespace.end_date = last_date
 
                     print_err('Resuming from: %s' % last_date)
+
+        if callable(announce):
+            print_err(announce(namespace))
 
         # Loading bar
         loading_bar = tqdm(
