@@ -107,16 +107,16 @@ def comments_action(namespace, output_file):
         url_queue = deque([url])
 
         while len(url_queue) != 0:
-            l = []
+            couche = []
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 time.sleep(0.01)
-                l = executor.map(make_requests, url_queue)
+                couche = executor.map(make_requests, url_queue)
             url_queue = deque()
-            for x in l:
-                err = x[0][0]
-                response = x[0][1]
-                result = x[0][2]
-                current_url = x[1]
+            for resp in couche:
+                err = resp[0][0]
+                response = resp[0][1]
+                result = resp[0][2]
+                current_url = resp[1]
                 if err:
                     error_file.write('{} for {}'.format(err, current_url))
                     continue
