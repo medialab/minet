@@ -66,7 +66,7 @@ def search_action(namespace, output_file):
     limit = namespace.limit
 
     for (row, keyword) in enricher.cells(namespace.column, with_rows=True):
-        url = URL_template_accurate % {'subject': keyword, 'key': namespace.key}
+        url = URL_TEMPLATE_ACCURATE % {'subject': keyword, 'key': namespace.key}
         next_page = True
         while next_page:
             if next_page is True:
