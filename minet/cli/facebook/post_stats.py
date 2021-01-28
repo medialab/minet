@@ -11,7 +11,7 @@ from tqdm import tqdm
 from bs4 import BeautifulSoup
 from datetime import datetime
 from collections import OrderedDict
-from ural.facebook import is_facebook_url, is_facebook_post_url
+from ural.facebook import is_facebook_post_url
 
 from minet.utils import create_pool, request, nested_get, sleep_with_entropy
 from minet.cli.utils import open_output_file, print_err, die
