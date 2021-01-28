@@ -102,21 +102,15 @@ def comments_action(namespace, output_file):
             url = URL_TEMPLATE % {'id': url_id, 'key': namespace.key}
         else:
             continue
-        # FULL commentaries
-        # if namespace.full:
         url_queue = deque([url])
-
         while len(url_queue) != 0:
             couche = []
-            with concurrent.futures.ThreadPoolExecutor() as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=25) as executor:
                 time.sleep(0.01)
                 couche = executor.map(make_requests, url_queue)
             url_queue = deque()
             for resp in couche:
-                err = resp[0][0]
-                response = resp[0][1]
-                result = resp[0][2]
-                current_url = resp[1]
+                ((err, response, result), current_url) = resp
                 if err:
                     error_file.write('{} for {}'.format(err, current_url))
                     continue
