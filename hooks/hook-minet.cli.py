@@ -1,18 +1,14 @@
 import re
 import tld
-import dragnet
+import justext
 from glob import iglob
 from os.path import dirname, join
 from PyInstaller.utils.hooks import collect_submodules
 
+SLASH_RE = re.compile(r'[\/\\]')
+
 hiddenimports = [
-    'lxml',
-    'lxml.etree',
-    'sklearn.neighbors.typedefs',
-    'sklearn.neighbors.quad_tree',
-    'sklearn.tree._utils',
-    'scipy.ndimage',
-    'dragnet'
+    'encodings.idna'
 ]
 
 for p in iglob('minet/cli/**/*.py', recursive=True):
@@ -22,7 +18,7 @@ for p in iglob('minet/cli/**/*.py', recursive=True):
     if '__init__' in p:
         p = re.sub(r'/__init__.py$', '.py', p)
 
-    m = p.replace('/', '.')[:-3]
+    m = SLASH_RE.sub('.', p)[:-3]
 
     hiddenimports.append(m)
 
@@ -32,11 +28,10 @@ datas = [
     (
         join(dirname(tld.__file__), 'res', 'effective_tld_names.dat.txt'),
         'tld/res'
-    ),
-    (
-        join(dirname(dragnet.__file__), 'pickled_models', 'py3_sklearn_0.18.0', 'kohlschuetter_readability_weninger_content_model.pkl.gz'),
-        'dragnet/pickled_models/py3_sklearn_0.18.0'
     )
 ]
+
+for p in iglob(join(dirname(justext.__file__), 'stoplists', '*.txt')):
+    datas.append((p, 'justext/stoplists'))
 
 __all__ = ['datas', 'hiddenimports']

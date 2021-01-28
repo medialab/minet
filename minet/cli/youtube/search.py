@@ -8,7 +8,6 @@ import time
 import sys
 import casanova
 from tqdm import tqdm
-from ural.youtube import is_youtube_video_id, extract_video_id_from_youtube_url, is_youtube_url
 from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
 from minet.cli.utils import die, open_output_file, edit_namespace_with_csv_io, DummyTqdmFile
 from minet.utils import create_pool, request_json
@@ -66,7 +65,7 @@ def search_action(namespace, output_file):
     limit = namespace.limit
 
     for (row, keyword) in enricher.cells(namespace.column, with_rows=True):
-        url = URL_TEMPLATE_ACCURATE % {'subject': keyword, 'key': namespace.key}
+        url = URL_template_accurate % {'subject': keyword, 'key': namespace.key}
         next_page = True
         while next_page:
             if next_page is True:

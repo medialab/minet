@@ -7,10 +7,9 @@
 import casanova
 import gzip
 import codecs
-import warnings
 from multiprocessing import Pool
+from trafilatura.core import bare_extraction
 from tqdm import tqdm
-from dragnet import extract_content
 
 from minet.encodings import is_supported_encoding
 from minet.cli.utils import (
@@ -21,7 +20,59 @@ from minet.cli.reporters import report_error
 
 from minet.exceptions import UnknownEncodingError
 
-OUTPUT_ADDITIONAL_HEADERS = ['extract_error', 'extracted_text']
+OUTPUT_ADDITIONAL_HEADERS = [
+    'extract_error',
+    'canonical_url',
+    'title',
+    'description',
+    'raw_content',
+    'comments',
+    'author',
+    'categories',
+    'tags',
+    'date',
+    'sitename'
+]
+
+PADDING = [''] * (len(OUTPUT_ADDITIONAL_HEADERS) - 1)
+
+
+def singular(result, key):
+    return result.get(key, '') or ''
+
+
+def plural(result, key):
+    l = result.get(key, []) or []
+
+    if not l:
+        return ''
+
+    items = []
+
+    for item in l:
+        for subitem in item.split(','):
+            subitem = subitem.strip()
+
+            if subitem:
+                items.append(subitem)
+
+    return '|'.join(items)
+
+
+def format_trafilatura_result(result):
+    return [
+        '',
+        singular(result, 'url'),
+        singular(result, 'title'),
+        singular(result, 'description'),
+        singular(result, 'text'),
+        singular(result, 'comments'),
+        singular(result, 'author'),
+        plural(result, 'categories'),
+        plural(result, 'tags'),
+        singular(result, 'date'),
+        singular(result, 'sitename')
+    ]
 
 
 def worker(payload):
@@ -48,13 +99,17 @@ def worker(payload):
 
     # Attempting extraction
     try:
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
-            content = extract_content(raw_html)
+        # https://trafilatura.readthedocs.io/en/latest/corefunctions.html
+        # TODO: discuss deduplication
+        # TODO: fallback options
+        result = bare_extraction(raw_html)
     except BaseException as e:
         return e, row, None
 
-    return None, row, content
+    if result is None:
+        return None, row, None
+
+    return None, row, format_trafilatura_result(result)
 
 
 def extract_action(namespace):
@@ -77,13 +132,17 @@ def extract_action(namespace):
     files = create_report_iterator(namespace, enricher, loading_bar=loading_bar)
 
     with Pool(namespace.processes) as pool:
-        for error, row, content in pool.imap_unordered(worker, files):
+        for error, row, result in pool.imap_unordered(worker, files):
             loading_bar.update()
 
             if error is not None:
-                enricher.writerow(row, [report_error(error), ''])
+                enricher.writerow(row, [report_error(error)] + PADDING)
                 continue
 
-            enricher.writerow(row, ['', content])
+            if result is None:
+                enricher.writerow(row, ['no-content'] + PADDING)
+                continue
+
+            enricher.writerow(row, result)
 
     output_file.close()

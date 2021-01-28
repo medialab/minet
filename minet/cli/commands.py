@@ -9,7 +9,6 @@ from argparse import FileType
 
 from minet.constants import DEFAULT_THROTTLE
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
-from minet.cli.utils import die
 from minet.cli.argparse import (
     BooleanAction,
     ConfigAction,
@@ -19,21 +18,9 @@ from minet.cli.argparse import (
 from minet.crowdtangle.constants import (
     CROWDTANGLE_SORT_TYPES,
     CROWDTANGLE_SUMMARY_SORT_TYPES,
-    CROWDTANGLE_DEFAULT_RATE_LIMIT
+    CROWDTANGLE_DEFAULT_RATE_LIMIT,
+    CROWDTANGLE_SEARCH_FIELDS
 )
-
-
-def check_dragnet():
-    try:
-        import dragnet
-    except:
-        die([
-            'The `dragnet` library is not installed. The `extract` command won\'t work.',
-            'To install it correctly, run the following commands in order:',
-            '',
-            '  pip install lxml numpy Cython',
-            '  pip install dragnet'
-        ])
 
 
 MINET_COMMANDS = {
@@ -172,8 +159,15 @@ MINET_COMMANDS = {
                     'epilog': '''
                         examples:
 
-                        . Fetching the 500 most latest posts from a dashboard:
-                            `minet ct posts --token YOUR_TOKEN --limit 500 > latest-posts.csv`
+                        . Fetching the 500 most latest posts from a dashboard (a start date must be precised):
+                            `minet ct posts --token YOUR_TOKEN --limit 500 --start-date 2021-01-01 > latest-posts.csv`
+
+                        . If your collection is interrupted, it can be restarted from the last data collected with the --resume option:
+                            `minet ct posts --token YOUR_TOKEN --limit 500 --start-date 2021-01-01 --resume --output latest-posts.csv`
+
+                        . Fetching all the posts from a specific list of groups or pages:
+                            `lminet ct posts --token YOUR_TOKEN --start-date 2021-01-01 --list-ids YOUR_LIST_ID > posts_from_one_list.csv`
+                        (To know the different list ids associated with your dashboard: `minet ct lists --token YOUR_TOKEN`)
                     ''',
                     'arguments': [
                         {
@@ -277,8 +271,8 @@ MINET_COMMANDS = {
                     'epilog': '''
                         examples:
 
-                        . Fetching a dashboard's lists:
-                            `minet ct search --token YOUR_TOKEN > posts.csv`
+                        . Fetching all the 2021 posts containing the words 'acetylsalicylic acid':
+                            `minet ct search 'acetylsalicylic acid' --start-date 2021-01-01 --token YOUR_TOKEN > posts.csv`
                     ''',
                     'arguments': [
                         {
@@ -328,6 +322,11 @@ MINET_COMMANDS = {
                             'flags': ['-p', '--platforms'],
                             'help': 'The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.',
                             'type': SplitterType()
+                        },
+                        {
+                            'flag': '--search-field',
+                            'help': 'In what to search the query. Defaults to `text_fields_and_image_text`.',
+                            'choices': CROWDTANGLE_SEARCH_FIELDS
                         },
                         {
                             'flag': '--sort-by',
@@ -578,9 +577,14 @@ MINET_COMMANDS = {
         'action': 'extract_action',
         'title': 'Minet Extract Command',
         'description': '''
-            Use multiple processes to extract raw text from a batch of HTML files.
-            This command can either work on a `minet fetch` report or on a bunch
-            of files. It will output an augmented report with the extracted text.
+            Use multiple processes to extract raw content and various metadata
+            from a batch of HTML files. This command can either work on a
+            `minet fetch` report or on a bunch of files. It will output an
+            augmented report with the extracted text.
+
+            Extraction is performed using the `trafilatura` library by Adrien
+            Barbaresi. More information about the library can be found here:
+            https://github.com/adbar/trafilatura
         ''',
         'epilog': '''
             examples:
@@ -594,7 +598,6 @@ MINET_COMMANDS = {
             . Extracting raw text from a bunch of files:
                 `minet extract --glob "./content/*.html" > extracted.csv`
         ''',
-        'before': check_dragnet,
         'arguments': [
             {
                 'name': 'report',
@@ -602,11 +605,6 @@ MINET_COMMANDS = {
                 'type': FileType('r'),
                 'default': sys.stdin,
                 'nargs': '?'
-            },
-            {
-                'flags': ['-e', '--extractor'],
-                'help': 'Extraction engine to use. Defaults to `dragnet`.',
-                'choices': ['dragnet', 'html2text']
             },
             {
                 'flags': ['-i', '--input-directory'],

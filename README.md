@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/medialab/minet.svg)](https://travis-ci.org/medialab/minet)
+[![Build Status](https://github.com/medialab/minet/workflows/Tests/badge.svg)](https://github.com/medialab/minet/actions)
 
 ![Minet](img/minet.png)
 
@@ -36,13 +36,57 @@ In addition, **minet** also exposes its high-level programmatic interface as a p
 
 ## Installation
 
-**minet** can be installed using pip:
+**minet** can be installed as a standalone CLI tool (currently only on mac, ubuntu & similar) by running the following command in your terminal:
+
+```shell
+curl -sSL https://raw.githubusercontent.com/medialab/minet/master/scripts/install.sh | bash
+```
+
+Don't trust us enough to pipe the result of a HTTP request into `bash`? We wouldn't either, so feel free to read the installation script [here](./scripts/install.sh) and run it on your end if you prefer.
+
+On ubuntu & similar you might need to install curl before running the installation script if you don't already have it:
+
+```shell
+sudo apt-get install curl
+```
+
+Else, **minet** can be installed directly as a python CLI tool and library using pip:
 
 ```shell
 pip install minet
 ```
 
 If you need more help to install and use **minet** from scratch, you can check those [installation documents](./docs/install.md).
+
+Finally if you want to install the standalone binaries by yourself (even for windows) you can find them in each release [here](https://github.com/medialab/minet/releases).
+
+## Upgrading
+
+To upgrade the standalone version, simply run the install script once again:
+
+```shell
+curl -sSL https://raw.githubusercontent.com/medialab/minet/master/scripts/install.sh | bash
+```
+
+To upgrade the python version you can use pip thusly:
+
+```shell
+pip install -U minet
+```
+
+## Uninstallation
+
+To uninstall the standalone version:
+
+```shell
+curl -sSL https://raw.githubusercontent.com/medialab/minet/master/scripts/uninstall.sh | bash
+```
+
+To uninstall the python version:
+
+```shell
+pip uninstall minet
+```
 
 ## Cookbook
 
@@ -52,3 +96,7 @@ To learn how to use **minet** and understand how it may fit your use cases, you 
 
 * [Using minet as a command line tool](./docs/cli.md)
 * [Using minet as a python library](./docs/lib.md)
+
+## Contributing
+
+To contribute to **minet** you can check out [this](./CONTRIBUTE.md) documentation.

@@ -45,6 +45,7 @@
 * [youtube (yt)](#youtube)
   * [captions](#captions)
   * [comments](#comments)
+  * [search](#youtube-search)
   * [url-parse](#youtube-url-parse)
   * [videos](#videos)
 
@@ -101,15 +102,6 @@ youtube:
 <% fetch %>
 
 ## extract
-
-If you want to be able to use the `extract` command, you will need to install the [`dragnet`](https://github.com/dragnet-org/dragnet) library. Because it is a bit cumbersome to install, it's not included in `minet`'s dependencies yet.
-
-Just run the following & in the same order (`dragnet` needs to have specific deps installed before it can be able to compile its native files):
-
-```
-pip install lxml numpy Cython
-pip install dragnet
-```
 
 <% extract %>
 
@@ -220,6 +212,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### comments
 
 <% yt/comments %>
+
+<h3 id="youtube-search">search</h3>
+
+<% yt/search %>
 
 <h3 id="youtube-url-parse">url-parse</h3>
 

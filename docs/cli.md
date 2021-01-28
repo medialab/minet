@@ -45,6 +45,7 @@
 * [youtube (yt)](#youtube)
   * [captions](#captions)
   * [comments](#comments)
+  * [search](#youtube-search)
   * [url-parse](#youtube-url-parse)
   * [videos](#videos)
 
@@ -182,34 +183,28 @@ examples:
 
 ## extract
 
-If you want to be able to use the `extract` command, you will need to install the [`dragnet`](https://github.com/dragnet-org/dragnet) library. Because it is a bit cumbersome to install, it's not included in `minet`'s dependencies yet.
-
-Just run the following & in the same order (`dragnet` needs to have specific deps installed before it can be able to compile its native files):
-
 ```
-pip install lxml numpy Cython
-pip install dragnet
-```
-
-```
-usage: minet extract [-h] [-e {dragnet,html2text}] [-i INPUT_DIRECTORY]
-                     [-o OUTPUT] [-p PROCESSES] [-s SELECT] [--total TOTAL]
+usage: minet extract [-h] [-i INPUT_DIRECTORY] [-o OUTPUT] [-p PROCESSES]
+                     [-s SELECT] [--total TOTAL]
                      [report]
 
 Minet Extract Command
 =====================
 
-Use multiple processes to extract raw text from a batch of HTML files.
-This command can either work on a `minet fetch` report or on a bunch
-of files. It will output an augmented report with the extracted text.
+Use multiple processes to extract raw content and various metadata
+from a batch of HTML files. This command can either work on a
+`minet fetch` report or on a bunch of files. It will output an
+augmented report with the extracted text.
+
+Extraction is performed using the `trafilatura` library by Adrien
+Barbaresi. More information about the library can be found here:
+https://github.com/adbar/trafilatura
 
 positional arguments:
   report                                          Input CSV fetch action report file.
 
 optional arguments:
   -h, --help                                      show this help message and exit
-  -e {dragnet,html2text}, --extractor {dragnet,html2text}
-                                                  Extraction engine to use. Defaults to `dragnet`.
   -i INPUT_DIRECTORY, --input-directory INPUT_DIRECTORY
                                                   Directory where the HTML files are stored. Defaults to "content".
   -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
@@ -533,8 +528,15 @@ optional arguments:
 
 examples:
 
-. Fetching the 500 most latest posts from a dashboard:
-    `minet ct posts --token YOUR_TOKEN --limit 500 > latest-posts.csv`
+. Fetching the 500 most latest posts from a dashboard (a start date must be precised):
+    `minet ct posts --token YOUR_TOKEN --limit 500 --start-date 2021-01-01 > latest-posts.csv`
+
+. If your collection is interrupted, it can be restarted from the last data collected with the --resume option:
+    `minet ct posts --token YOUR_TOKEN --limit 500 --start-date 2021-01-01 --resume --output latest-posts.csv`
+
+. Fetching all the posts from a specific list of groups or pages:
+    `lminet ct posts --token YOUR_TOKEN --start-date 2021-01-01 --list-ids YOUR_LIST_ID > posts_from_one_list.csv`
+(To know the different list ids associated with your dashboard: `minet ct lists --token YOUR_TOKEN`)
 
 ```
 
@@ -547,6 +549,7 @@ usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                 [--language LANGUAGE] [-l LIMIT]
                                 [--not-in-title] [--offset OFFSET]
                                 [-p PLATFORMS]
+                                [--search-field {text_fields_and_image_text,text_fields_only,include_query_strings,image_text_only,account_name_only}]
                                 [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
                                 [--start-date START_DATE] [--types TYPES]
                                 terms
@@ -576,6 +579,8 @@ optional arguments:
   --not-in-title                                  Whether to search terms in account titles also.
   --offset OFFSET                                 Count offset.
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
+  --search-field {text_fields_and_image_text,text_fields_only,include_query_strings,image_text_only,account_name_only}
+                                                  In what to search the query. Defaults to `text_fields_and_image_text`.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
@@ -583,8 +588,8 @@ optional arguments:
 
 examples:
 
-. Fetching a dashboard's lists:
-    `minet ct search --token YOUR_TOKEN > posts.csv`
+. Fetching all the 2021 posts containing the words 'acetylsalicylic acid':
+    `minet ct search 'acetylsalicylic acid' --start-date 2021-01-01 --token YOUR_TOKEN > posts.csv`
 
 ```
 
@@ -594,7 +599,7 @@ examples:
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [-p PLATFORMS] [--posts POSTS]
                                  [-s SELECT]
-                                 [--sort-by {total_interactions,date,subscriber_count}]
+                                 [--sort-by {date,subscriber_count,total_interactions}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -616,7 +621,7 @@ optional arguments:
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {total_interactions,date,subscriber_count}
+  --sort-by {date,subscriber_count,total_interactions}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
@@ -987,6 +992,30 @@ optional arguments:
   -f, --full                  YouTube API does not always return every comments as some replies can be omitted. By adding this flag, one ensures to make every needed API call to retrieve all the comments.
   -k KEY, --key KEY           YouTube API Data dashboard API key.
   -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+
+```
+
+<h3 id="youtube-search">search</h3>
+
+```
+usage: minet youtube search [-h] [-o OUTPUT] [-k KEY] [-s SELECT] [-l LIMIT]
+                            column [file]
+
+Youtube search
+==============
+
+Retrieve metadata about Youtube search field using the API.
+
+positional arguments:
+  column                      This argument can either take the keyword on which we want to retrieve videos from the API or the name of the column containing that keyword
+  file                        CSV file containing the keyword for youtube Search
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  -k KEY, --key KEY           YouTube API Data dashboard API key.
+  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+  -l LIMIT, --limit LIMIT     Maximum number of videos to retrieve
 
 ```
 

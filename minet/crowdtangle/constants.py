@@ -50,6 +50,16 @@ CROWDTANGLE_SUMMARY_SORT_TYPES = {
 
 CROWDTANGLE_SUMMARY_DEFAULT_SORT_TYPE = 'date'
 
+CROWDTANGLE_SEARCH_FIELDS = {
+    'text_fields_and_image_text',
+    'include_query_strings',
+    'text_fields_only',
+    'account_name_only',
+    'image_text_only'
+}
+
+CROWDTANGLE_DEFAULT_SEARCH_FIELD = 'text_fields_and_image_text'
+
 CROWDTANGLE_STATISTICS = [
     'like',
     'share',

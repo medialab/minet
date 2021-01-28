@@ -7,6 +7,7 @@
 #
 import csv
 import sys
+import ctypes
 import signal
 import shutil
 import importlib
@@ -24,7 +25,9 @@ from minet.cli.argparse import WrappedConfigValue
 from minet.cli.commands import MINET_COMMANDS
 
 # Handling pipes correctly
-signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+# NOTE: does not work in windows
+if hasattr(signal, 'SIGPIPE'):
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
 SUBPARSERS = {}
 
@@ -32,7 +35,7 @@ SUBPARSERS = {}
 terminal_size = shutil.get_terminal_size()
 
 # Increasing max CSV file limit to avoid pesky issues
-csv.field_size_limit(sys.maxsize)
+csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
 
 # Hiding stack traces on ctrl+c
 signal.signal(signal.SIGINT, lambda x, y: sys.exit(1))

@@ -24,7 +24,7 @@ REPORT_HEADERS = [
 
 INFO_URL_TEMPLATE = 'https://www.youtube.com/get_video_info?video_id=%(id)s'
 VIDEO_CALL_TEMPLATE = 'https://www.youtube.com/watch?v=%(id)s'
-SAFE = 'https://www.youtube.com/api/%(temp)s'
+API_BASE_URL = 'https://www.youtube.com/api/%(temp)s'
 
 
 def captions_action(namespace, output_file):
@@ -68,10 +68,10 @@ def captions_action(namespace, output_file):
             for x in timedtext:
                 proper_timed = x.replace("\\\\u0026", "&")
                 if proper_timed[-2:] == namespace.lang:
-                    url_caption = SAFE % {'temp': proper_timed}
+                    url_caption = API_BASE_URL % {'temp': proper_timed}
                     break
             if not(url_caption) and timedtext and not(namespace.lang):
-                url_caption = SAFE % {'temp': timedtext[1].replace("\\\\u0026", "&")}
+                url_caption = API_BASE_URL % {'temp': timedtext[1].replace("\\\\u0026", "&")}
         if not url_caption:
             print_err('no subtitles for {}'.format(video_id))
             continue

@@ -2,6 +2,7 @@
 # Minet Utils Unit Tests
 # =============================================================================
 from minet.utils import (
+    fix_ensure_ascii_json_string,
     nested_get,
     parse_http_refresh,
     find_meta_refresh,
@@ -89,3 +90,6 @@ class TestUtils(object):
         location = find_javascript_relocation(b'NOTHING')
 
         assert location is None
+
+    def test_fix_ensure_ascii_json_string(self):
+        assert fix_ensure_ascii_json_string('Marie-H\\u00e9l\\u00e8ne') == 'Marie-Hélène'
