@@ -12,16 +12,20 @@ from urllib.parse import urlencode, quote
 from minet.utils import (
     create_pool,
     request,
-    request_json
+    request_json,
+    nested_get
 )
 from minet.twitter.constants import (
     TWITTER_PUBLIC_API_DEFAULT_TIMEOUT,
     TWITTER_PUBLIC_API_AUTH_HEADER
 )
 from minet.twitter.exceptions import (
-    TwitterGuestTokenError
+    TwitterGuestTokenError,
+    TwitterPublicAPIRateLimitError,
+    TwitterPublicAPIRateInvalidResponseError
 )
 
+# TODO: for formatting https://github.com/medialab/gazouilloire/blob/elasticPy3-merge/gazouilloire/web/export.py#L11-L80
 # =============================================================================
 # Constants
 # =============================================================================
@@ -89,16 +93,59 @@ def forge_search_params(query, count=100, cursor=None):
     return urlencode(params, quote_via=quote)
 
 
+def payload_tweets_iter(payload):
+    for tweet in payload['globalObjects']['tweets'].values():
+        yield tweet
+
+
+CURSOR_FIRST_POSSIBLE_PATH = [
+    'timeline',
+    'instructions',
+    0,
+    'addEntries',
+    'entries',
+    -1,
+    'content',
+    'operation',
+    'cursor',
+    'value'
+]
+
+CURSOR_SECOND_POSSIBLE_PATH = [
+    'timeline',
+    'instructions',
+    -1,
+    'replaceEntry',
+    'entry',
+    'content',
+    'operation',
+    'cursor',
+    'value'
+]
+
+
+def extract_cursor_from_payload(payload):
+    found_cursor = nested_get(CURSOR_FIRST_POSSIBLE_PATH, payload)
+
+    if found_cursor is None:
+        found_cursor = nested_get(CURSOR_SECOND_POSSIBLE_PATH, payload)
+
+    return found_cursor
+
+
 # =============================================================================
 # Main class
 # =============================================================================
 class TwitterAPIScraper(object):
     def __init__(self):
         self.http = create_pool(timeout=TWITTER_PUBLIC_API_DEFAULT_TIMEOUT)
+        self.reset()
+
+    def reset(self):
         self.guest_token = None
         self.cookie = None
 
-    # TODO: tenacity
+    # TODO: tenacity + rate limited
     def request(self, url):
         return request(self.http, url, spoof_ua=True)
 
@@ -126,8 +173,8 @@ class TwitterAPIScraper(object):
         )
 
     @ensure_guest_token
-    def request_search(self, query):
-        params = forge_search_params(query)
+    def request_search(self, query, cursor=None):
+        params = forge_search_params(query, cursor=cursor)
         url = '%s?%s' % (TWITTER_PUBLIC_SEARCH_ENDPOINT, params)
 
         headers = {
@@ -138,6 +185,23 @@ class TwitterAPIScraper(object):
 
         err, response, data = self.request_json(url, headers=headers)
 
-        print(err)
-        print(response.status)
-        print(data)
+        if err:
+            raise err
+
+        if response.status == 429:
+            raise TwitterPublicAPIRateLimitError
+
+        if response.status >= 400:
+            raise TwitterPublicAPIRateInvalidResponseError
+
+        users_index = data['globalObjects']['users']
+        cursor = extract_cursor_from_payload(data)
+
+        # with open('dump.json', 'w') as w:
+        #     import json
+        #     json.dump(data, w, ensure_ascii=False)
+
+        for tweet in payload_tweets_iter(data):
+            print(tweet['id'])
+
+        print(cursor)

@@ -11,3 +11,11 @@ class TwitterError(MinetError):
 
 class TwitterGuestTokenError(TwitterError):
     pass
+
+
+class TwitterPublicAPIRateLimitError(TwitterError):
+    pass
+
+
+class TwitterPublicAPIRateInvalidResponseError(TwitterError):
+    pass
