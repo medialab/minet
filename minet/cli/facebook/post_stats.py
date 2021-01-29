@@ -15,7 +15,7 @@ from ural.facebook import is_facebook_post_url
 
 from minet.utils import create_pool, request, nested_get, sleep_with_entropy
 from minet.cli.utils import open_output_file, print_err, die
-from minet.cli.facebook.constants import FACEBOOK_WEB_DEFAULT_THROTTLE
+from minet.facebook.constants import FACEBOOK_WEB_DEFAULT_THROTTLE
 
 META_EXTRACTOR_TEMPLATE = rb'\(function\(\)\{bigPipe\.onPageletArrive\((\{.+share_fbid:"%s".+\})\);\}\),"onPageletArrive'
 HTML_EXTRACTOR_TEMPLATE = rb'<code[^>]*><!--(.+%s.+)--></code>'
