@@ -11,11 +11,11 @@ from tqdm import tqdm
 from bs4 import BeautifulSoup
 from datetime import datetime
 from collections import OrderedDict
-from ural.facebook import is_facebook_url
+from ural.facebook import is_facebook_post_url
 
 from minet.utils import create_pool, request, nested_get, sleep_with_entropy
 from minet.cli.utils import open_output_file, print_err, die
-from minet.cli.facebook.constants import FACEBOOK_WEB_DEFAULT_THROTTLE
+from minet.facebook.constants import FACEBOOK_WEB_DEFAULT_THROTTLE
 
 META_EXTRACTOR_TEMPLATE = rb'\(function\(\)\{bigPipe\.onPageletArrive\((\{.+share_fbid:"%s".+\})\);\}\),"onPageletArrive'
 HTML_EXTRACTOR_TEMPLATE = rb'<code[^>]*><!--(.+%s.+)--></code>'
@@ -54,11 +54,6 @@ for emotion_name in REACTION_KEYS.values():
     REPORT_HEADERS.append('%s_count' % emotion_name)
 
 ERROR_PADDING = [''] * (len(REPORT_HEADERS) - 1)
-
-
-# TODO: integrate to ural
-def is_facebook_post_url(url):
-    return '/posts/' in url or '/permalink/' in url
 
 
 def get_count(item):
@@ -251,8 +246,7 @@ def facebook_post_stats_action(namespace):
 
         if (
             not post_url or
-            not is_facebook_post_url(post_url) or
-            not is_facebook_url(post_url)
+            not is_facebook_post_url(post_url)
         ):
             enricher.writerow(row, format_err('not-facebook-post'))
             continue
