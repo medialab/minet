@@ -19,3 +19,7 @@ class TwitterPublicAPIRateLimitError(TwitterError):
 
 class TwitterPublicAPIRateInvalidResponseError(TwitterError):
     pass
+
+
+class TwitterPublicAPIParsingError(TwitterError):
+    pass

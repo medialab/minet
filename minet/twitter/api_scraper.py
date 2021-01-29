@@ -22,7 +22,8 @@ from minet.twitter.constants import (
 from minet.twitter.exceptions import (
     TwitterGuestTokenError,
     TwitterPublicAPIRateLimitError,
-    TwitterPublicAPIRateInvalidResponseError
+    TwitterPublicAPIRateInvalidResponseError,
+    TwitterPublicAPIParsingError
 )
 
 # TODO: for formatting https://github.com/medialab/gazouilloire/blob/elasticPy3-merge/gazouilloire/web/export.py#L11-L80
@@ -93,11 +94,6 @@ def forge_search_params(query, count=100, cursor=None):
     return urlencode(params, quote_via=quote)
 
 
-def payload_tweets_iter(payload):
-    for tweet in payload['globalObjects']['tweets'].values():
-        yield tweet
-
-
 CURSOR_FIRST_POSSIBLE_PATH = [
     'timeline',
     'instructions',
@@ -131,6 +127,52 @@ def extract_cursor_from_payload(payload):
         found_cursor = nested_get(CURSOR_SECOND_POSSIBLE_PATH, payload)
 
     return found_cursor
+
+
+def payload_tweets_iter(payload):
+    tweet_index = payload['globalObjects']['tweets']
+    user_index = payload['globalObjects']['users']
+
+    for instruction in payload['timeline']['instructions']:
+        if 'addEntries' in instruction:
+            entries = instruction['addEntries']['entries']
+        elif 'replaceEntry' in instruction:
+            entries = [instruction['replaceEntry']['entry']]
+        else:
+            continue
+
+        for entry in entries:
+            entry_id = entry['entryId']
+
+            # Filtering tweets
+            if (
+                not entry_id.startswith('sq-I-t-') and
+                not entry_id.startswith('tweet-')
+            ):
+                continue
+
+            tweet_id = None
+            tweet_info = nested_get(['content', 'item', 'content', 'tweet'], entry)
+
+            if tweet_info is not None:
+
+                # Skipping ads
+                if 'promotedMetadata' in tweet_info:
+                    continue
+
+                tweet_id = tweet_info['id']
+
+            else:
+                tweet_info = nested_get(['content', 'item', 'content', 'tombstone'], entry)
+                tweet_id = tweet_info['tweet']['id']
+
+            if tweet_id is None:
+                raise TwitterPublicAPIParsingError
+
+            tweet = tweet_index[tweet_id]
+            tweet['user'] = user_index[tweet['user_id_str']]
+
+            yield tweet
 
 
 # =============================================================================
@@ -197,11 +239,11 @@ class TwitterAPIScraper(object):
         users_index = data['globalObjects']['users']
         cursor = extract_cursor_from_payload(data)
 
-        # with open('dump.json', 'w') as w:
-        #     import json
-        #     json.dump(data, w, ensure_ascii=False)
+        with open('dump.json', 'w') as w:
+            import json
+            json.dump(data, w, ensure_ascii=False)
 
         for tweet in payload_tweets_iter(data):
-            print(tweet['id'])
+            print(tweet)
 
         print(cursor)
