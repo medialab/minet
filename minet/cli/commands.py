@@ -566,6 +566,7 @@ MINET_COMMANDS = {
                         {
                             'flags': ['--order'],
                             'help': 'set the order in which videos are retrieved. The default one is relevance',
+                            'default': 'relevance',
                             'choices': ['date', 'rating', 'viewCount', 'title', 'videoCount']
                         }
                     ]
