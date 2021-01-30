@@ -1249,7 +1249,7 @@ MINET_COMMANDS = {
                         examples:
 
                         . Getting followers of a list of user:
-                            `minet tw friends screen_name users.csv > followers.csv`
+                            `minet tw followers screen_name users.csv > followers.csv`
                     ''',
                     'arguments': [
                         {
