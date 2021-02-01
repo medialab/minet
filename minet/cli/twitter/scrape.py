@@ -17,6 +17,7 @@ def twitter_scrape_action(namespace, output_file):
     loading_bar = tqdm(
         desc='Collecting tweets',
         dynamic_ncols=True,
+        total=namespace.limit,
         unit=' tweet'
     )
 
