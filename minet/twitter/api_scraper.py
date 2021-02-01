@@ -236,12 +236,11 @@ class TwitterAPIScraper(object):
         if response.status >= 400:
             raise TwitterPublicAPIRateInvalidResponseError
 
-        users_index = data['globalObjects']['users']
         cursor = extract_cursor_from_payload(data)
 
-        with open('dump.json', 'w') as w:
-            import json
-            json.dump(data, w, ensure_ascii=False)
+        # with open('dump.json', 'w') as w:
+        #     import json
+        #     json.dump(data, w, ensure_ascii=False)
 
         for tweet in payload_tweets_iter(data):
             print(tweet)
