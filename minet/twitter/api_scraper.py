@@ -8,6 +8,7 @@ import re
 import time
 import datetime
 from urllib.parse import urlencode, quote
+from twitwi.utils import prepare_tweet
 
 from minet.utils import (
     create_pool,
@@ -26,11 +27,11 @@ from minet.twitter.exceptions import (
     TwitterPublicAPIParsingError
 )
 
-# TODO: for formatting https://github.com/medialab/gazouilloire/blob/elasticPy3-merge/gazouilloire/web/export.py#L11-L80
 # =============================================================================
 # Constants
 # =============================================================================
 TWITTER_PUBLIC_SEARCH_ENDPOINT = 'https://api.twitter.com/2/search/adaptive.json'
+DEFAULT_COUNT = 100
 GUEST_TOKEN_COOKIE_PATTERN = re.compile(rb'document\.cookie = decodeURIComponent\("gt=(\d+);')
 
 
@@ -56,7 +57,6 @@ def extract_guest_token(html):
 def ensure_guest_token(method):
     def wrapped(self, *args, **kwargs):
 
-        # TODO: handle expiry
         if self.guest_token is None:
             self.acquire_guest_token()
 
@@ -69,7 +69,7 @@ def create_cookie_expiration():
     return datetime.datetime.utcfromtimestamp(time.time() + 10800).strftime('%a, %d %b %Y %H:%M:%S GMT')
 
 
-def forge_search_params(query, count=100, cursor=None):
+def forge_search_params(query, count=DEFAULT_COUNT, cursor=None):
     params = {
         'include_can_media_tag': '1',
         'include_ext_alt_text': 'true',
@@ -230,6 +230,7 @@ class TwitterAPIScraper(object):
         if err:
             raise err
 
+        # TODO: rotate token
         if response.status == 429:
             raise TwitterPublicAPIRateLimitError
 
@@ -237,12 +238,33 @@ class TwitterAPIScraper(object):
             raise TwitterPublicAPIRateInvalidResponseError
 
         cursor = extract_cursor_from_payload(data)
-
-        # with open('dump.json', 'w') as w:
-        #     import json
-        #     json.dump(data, w, ensure_ascii=False)
+        tweets = []
 
         for tweet in payload_tweets_iter(data):
-            print(tweet)
 
-        print(cursor)
+            # TODO: this should be fixed in twitwi
+            tweet['gazouilloire_source'] = 'minet'
+
+            result = prepare_tweet(tweet)
+
+            tweets.append(next(t for t in result if t['id'] == tweet['id_str']))
+
+        return cursor, tweets
+
+    def search(self, query, limit=None):
+        cursor = None
+        i = 0
+
+        while True:
+            new_cursor, tweets = self.request_search(query, cursor)
+
+            for tweet in tweets:
+                yield tweet
+
+                i += 1
+
+                if limit is not None and i >= limit:
+                    return
+
+            if cursor is None or len(tweets) < DEFAULT_COUNT:
+                return

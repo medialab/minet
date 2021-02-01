@@ -39,6 +39,7 @@ setup(name='minet',
         'tqdm>=4.31.1',
         'trafilatura>=0.7.0,<0.8',
         'twitter>=1.18.0',
+        'twitwi>=0.0.1',
         'ural>=0.25.0',
         'urllib3[secure]>=1.25.3'
       ],
