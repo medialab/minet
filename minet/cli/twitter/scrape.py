@@ -28,9 +28,9 @@ def twitter_scrape_action(namespace, output_file):
     writer.writeheader()
 
     for tweet in scraper.search(namespace.query, limit=namespace.limit):
+        loading_bar.update()
+
         transform_tweet_into_csv_dict(tweet)
         writer.writerow(tweet)
-
-        loading_bar.update()
 
     loading_bar.close()
