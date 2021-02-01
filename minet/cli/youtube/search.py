@@ -12,7 +12,7 @@ from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
 from minet.cli.utils import die, open_output_file, edit_namespace_with_csv_io, DummyTqdmFile
 from minet.utils import create_pool, request_json
 
-URL_TEMPLATE_ACCURATE = 'https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=100&q=%(subject)s&type=video&order=%(order)s&key=%(key)s'
+URL_TEMPLATE = 'https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=100&q=%(subject)s&type=video&order=%(order)s&key=%(key)s'
 
 CSV_HEADERS = [
     'video_id',
@@ -65,7 +65,7 @@ def search_action(namespace, output_file):
     limit = namespace.limit
 
     for (row, keyword) in enricher.cells(namespace.column, with_rows=True):
-        url = URL_TEMPLATE_ACCURATE % {'subject': keyword, 'order': namespace.order, 'key': namespace.key}
+        url = URL_TEMPLATE % {'subject': keyword, 'order': namespace.order, 'key': namespace.key}
         next_page = True
         while next_page:
             if next_page is True:

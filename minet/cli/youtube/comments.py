@@ -9,8 +9,9 @@ import sys
 import casanova
 from tqdm import tqdm
 from collections import deque
+from concurrent.futures import ThreadPoolExecutor
 from ural.youtube import is_youtube_video_id, extract_video_id_from_youtube_url, is_youtube_url
-import concurrent.futures
+
 from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
 from minet.cli.utils import open_output_file, edit_namespace_with_csv_io, DummyTqdmFile
 from minet.utils import create_pool, request_json
@@ -54,7 +55,7 @@ def get_data_full(com, top):
     data.append(snip['updatedAt'])
     if top:
         data.append(com['totalReplyCount'])
-        data.append("")
+        data.append('')
     else:
         data.append(0)
         data.append(snip['parentId'])
@@ -105,7 +106,7 @@ def comments_action(namespace, output_file):
         url_queue = deque([url])
         while len(url_queue) != 0:
             couche = []
-            with concurrent.futures.ThreadPoolExecutor(max_workers=25) as executor:
+            with ThreadPoolExecutor(max_workers=25) as executor:
                 time.sleep(0.01)
                 couche = executor.map(make_requests, url_queue)
             url_queue = deque()

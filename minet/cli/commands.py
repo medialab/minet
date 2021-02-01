@@ -542,7 +542,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'name': 'file',
-                            'help': 'CSV file containing the keyword for youtube Search',
+                            'help': 'CSV file containing the keyword for youtube Search.',
                             'type': FileType('r'),
                             'default': sys.stdin,
                             'nargs': '?'
@@ -560,12 +560,12 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-l', '--limit'],
-                            'help': 'Maximum number of videos to retrieve',
+                            'help': 'Maximum number of videos to retrieve.',
                             'type': int
                         },
                         {
                             'flags': ['--order'],
-                            'help': 'set the order in which videos are retrieved. The default one is relevance',
+                            'help': 'Order in which videos are retrieved. The default one is relevance.',
                             'default': 'relevance',
                             'choices': ['relevance', 'date', 'rating', 'viewCount', 'title', 'videoCount']
                         }
