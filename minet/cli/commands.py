@@ -562,6 +562,12 @@ MINET_COMMANDS = {
                             'flags': ['-l', '--limit'],
                             'help': 'Maximum number of videos to retrieve',
                             'type': int
+                        },
+                        {
+                            'flags': ['--order'],
+                            'help': 'set the order in which videos are retrieved. The default one is relevance',
+                            'default': 'relevance',
+                            'choices': ['relevance', 'date', 'rating', 'viewCount', 'title', 'videoCount']
                         }
                     ]
                 }
