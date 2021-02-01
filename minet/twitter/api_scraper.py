@@ -206,12 +206,12 @@ class TwitterAPIScraper(object):
         err, response = self.request(base_url)
 
         if err or response.status >= 400:
-            raise TwitterGuestTokenError('call failed')
+            raise TwitterPublicAPIInvalidResponseError
 
         guest_token = extract_guest_token(response.data)
 
         if guest_token is None:
-            raise TwitterGuestTokenError('could not parse')
+            raise TwitterGuestTokenError
 
         self.guest_token = guest_token
         self.cookie = (
@@ -267,8 +267,7 @@ class TwitterAPIScraper(object):
             retry=retry_if_exception_type(
                 exception_types=(
                     TwitterPublicAPIRateLimitError,
-                    TwitterPublicAPIInvalidResponseError,
-                    TwitterGuestTokenError
+                    TwitterPublicAPIInvalidResponseError
                 )
             ),
             stop=stop_after_attempt(6)
