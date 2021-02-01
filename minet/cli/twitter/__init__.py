@@ -9,7 +9,7 @@ import sys
 from minet.cli.utils import open_output_file, die
 
 
-def twitter_action(namespace):
+def check_credentials(namespace):
 
     # Credentials are required to be able to access the API
     if not namespace.api_key or \
@@ -25,25 +25,36 @@ def twitter_action(namespace):
             '    --access-token-secret'
         ])
 
+
+def twitter_action(namespace):
+
     output_file = open_output_file(
         namespace.output,
         flag='a+' if getattr(namespace, 'resume', False) else 'w'
     )
 
-    if namespace.tw_action == 'friends':
-        from minet.cli.twitter.friends import twitter_friends_action
+    if namespace.tw_action == 'scrape':
+        from minet.cli.twitter.scrape import twitter_scrape_action
 
-        twitter_friends_action(namespace, output_file)
+        twitter_scrape_action(namespace, output_file)
 
-    elif namespace.tw_action == 'followers':
-        from minet.cli.twitter.followers import twitter_followers_action
+    else:
+        check_credentials()
 
-        twitter_followers_action(namespace, output_file)
+        if namespace.tw_action == 'friends':
+            from minet.cli.twitter.friends import twitter_friends_action
 
-    elif namespace.tw_action == 'users':
-        from minet.cli.twitter.users import twitter_users_action
+            twitter_friends_action(namespace, output_file)
 
-        twitter_users_action(namespace, output_file)
+        elif namespace.tw_action == 'followers':
+            from minet.cli.twitter.followers import twitter_followers_action
+
+            twitter_followers_action(namespace, output_file)
+
+        elif namespace.tw_action == 'users':
+            from minet.cli.twitter.users import twitter_users_action
+
+            twitter_users_action(namespace, output_file)
 
     # Cleanup
     if namespace.output is not None:

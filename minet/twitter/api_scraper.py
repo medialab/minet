@@ -8,6 +8,12 @@ import re
 import time
 import datetime
 from urllib.parse import urlencode, quote
+from tenacity import (
+    Retrying,
+    wait_random_exponential,
+    retry_if_exception_type,
+    stop_after_attempt
+)
 from twitwi.utils import prepare_tweet
 
 from minet.utils import (
@@ -230,8 +236,8 @@ class TwitterAPIScraper(object):
         if err:
             raise err
 
-        # TODO: rotate token
         if response.status == 429:
+            self.reset()
             raise TwitterPublicAPIRateLimitError
 
         if response.status >= 400:
@@ -255,8 +261,21 @@ class TwitterAPIScraper(object):
         cursor = None
         i = 0
 
+        # TODO: add before_sleep listener kwarg for logging purposes
+        retryer = Retrying(
+            wait=wait_random_exponential(max=60 * 3),
+            retry=retry_if_exception_type(
+                exception_types=[
+                    TwitterPublicAPIRateLimitError,
+                    TwitterPublicAPIRateInvalidResponseError,
+                    TwitterGuestTokenError
+                ]
+            ),
+            stop=stop_after_attempt(6)
+        )
+
         while True:
-            new_cursor, tweets = self.request_search(query, cursor)
+            new_cursor, tweets = retryer(self.request_search, query, cursor)
 
             for tweet in tweets:
                 yield tweet

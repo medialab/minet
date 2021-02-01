@@ -22,6 +22,25 @@ from minet.crowdtangle.constants import (
     CROWDTANGLE_SEARCH_FIELDS
 )
 
+TWITTER_API_COMMON_ARGUMENTS = [
+    {
+        'flag': '--api-key',
+        'help': 'Twitter API key.'
+    },
+    {
+        'flag': '--api-secret-key',
+        'help': 'Twitter API secret key.'
+    },
+    {
+        'flag': '--access-token',
+        'help': 'Twitter API access token.'
+    },
+    {
+        'flag': '--access-token-secret',
+        'help': 'Twitter API access token secret.'
+    }
+]
+
 
 MINET_COMMANDS = {
 
@@ -1178,24 +1197,6 @@ MINET_COMMANDS = {
             'help': 'Action to perform using the Twitter API.',
             'title': 'actions',
             'dest': 'tw_action',
-            'common_arguments': [
-                {
-                    'flag': '--api-key',
-                    'help': 'Twitter API key.'
-                },
-                {
-                    'flag': '--api-secret-key',
-                    'help': 'Twitter API secret key.'
-                },
-                {
-                    'flag': '--access-token',
-                    'help': 'Twitter API access token.'
-                },
-                {
-                    'flag': '--access-token-secret',
-                    'help': 'Twitter API access token secret.'
-                }
-            ],
             'commands': {
                 'friends': {
                     'title': 'Minet Twitter Friends Command',
@@ -1220,6 +1221,7 @@ MINET_COMMANDS = {
                             'default': sys.stdin,
                             'nargs': '?'
                         },
+                        *TWITTER_API_COMMON_ARGUMENTS,
                         {
                             'flag': '--id',
                             'help': 'Whether to use Twitter user ids rather than screen names.',
@@ -1269,6 +1271,7 @@ MINET_COMMANDS = {
                             'default': sys.stdin,
                             'nargs': '?'
                         },
+                        *TWITTER_API_COMMON_ARGUMENTS,
                         {
                             'flag': '--id',
                             'help': 'Whether to use Twitter user ids rather than screen names.',
@@ -1295,6 +1298,38 @@ MINET_COMMANDS = {
                         }
                     ]
                 },
+                'scrape': {
+                    'title': 'Minet Twitter Scrape Command',
+                    'description': '''
+                        Scrape Twitter's public facing search API to collect tweets etc.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Collecting the latest 500 tweets of a given Twitter user:
+                            `minet tw scrape tweets "from:@jack" --limit 500 > tweets.csv`
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'items',
+                            'help': 'What to scrape. Currently only `tweets` is possible.',
+                            'choices': ['tweets']
+                        },
+                        {
+                            'name': 'query',
+                            'help': 'Search query.'
+                        },
+                        {
+                            'flags': ['-l', '--limit'],
+                            'help': 'Maximum number of tweets to collect.',
+                            'type': int
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'help': 'Path to the output file. By default, the result will be printed to stdout.'
+                        }
+                    ]
+                },
                 'users': {
                     'title': 'Minet Twitter Users Command',
                     'description': '''
@@ -1318,6 +1353,7 @@ MINET_COMMANDS = {
                             'default': sys.stdin,
                             'nargs': '?'
                         },
+                        *TWITTER_API_COMMON_ARGUMENTS,
                         {
                             'flag': '--id',
                             'help': 'Whether to use Twitter user ids rather than screen names.',
