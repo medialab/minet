@@ -29,7 +29,7 @@ from minet.twitter.constants import (
 from minet.twitter.exceptions import (
     TwitterGuestTokenError,
     TwitterPublicAPIRateLimitError,
-    TwitterPublicAPIRateInvalidResponseError,
+    TwitterPublicAPIInvalidResponseError,
     TwitterPublicAPIParsingError
 )
 
@@ -241,7 +241,7 @@ class TwitterAPIScraper(object):
             raise TwitterPublicAPIRateLimitError
 
         if response.status >= 400:
-            raise TwitterPublicAPIRateInvalidResponseError
+            raise TwitterPublicAPIInvalidResponseError
 
         cursor = extract_cursor_from_payload(data)
         tweets = []
@@ -267,7 +267,7 @@ class TwitterAPIScraper(object):
             retry=retry_if_exception_type(
                 exception_types=(
                     TwitterPublicAPIRateLimitError,
-                    TwitterPublicAPIRateInvalidResponseError,
+                    TwitterPublicAPIInvalidResponseError,
                     TwitterGuestTokenError
                 )
             ),
