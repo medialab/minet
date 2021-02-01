@@ -265,11 +265,11 @@ class TwitterAPIScraper(object):
         retryer = Retrying(
             wait=wait_random_exponential(max=60 * 3),
             retry=retry_if_exception_type(
-                exception_types=[
+                exception_types=(
                     TwitterPublicAPIRateLimitError,
                     TwitterPublicAPIRateInvalidResponseError,
                     TwitterGuestTokenError
-                ]
+                )
             ),
             stop=stop_after_attempt(6)
         )
