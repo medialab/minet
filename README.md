@@ -20,6 +20,7 @@ In addition, **minet** also exposes its high-level programmatic interface as a p
 * Collecting data from [Facebook](https://www.facebook.com/) (comments, likes etc.)
 * Parsing [Facebook](https://www.facebook.com/) urls in a CSV file.
 * Collecting data from [Twitter](https://twitter.com) (users, followers, followees etc.)
+* Scraping data (tweets etc.) from [Twitter](https://twitter.com)'s website public facing search API.
 * Collecting data from [YouTube](https://www.youtube.com/) (captions, comments, video metadata etc.)
 * Parsing [YouTube](https://www.youtube.com/) urls in a CSV file.
 * Dumping a [Hyphe](https://hyphe.medialab.sciences-po.fr/) corpus.

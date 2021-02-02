@@ -41,6 +41,7 @@
 * [twitter](#twitter)
   * [followers](#followers)
   * [friends](#friends)
+  * [scrape](#twitter-scrape)
   * [users](#users)
 * [youtube (yt)](#youtube)
   * [captions](#captions)
@@ -549,7 +550,7 @@ usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                 [--language LANGUAGE] [-l LIMIT]
                                 [--not-in-title] [--offset OFFSET]
                                 [-p PLATFORMS]
-                                [--search-field {include_query_strings,image_text_only,text_fields_only,account_name_only,text_fields_and_image_text}]
+                                [--search-field {text_fields_only,account_name_only,image_text_only,include_query_strings,text_fields_and_image_text}]
                                 [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
                                 [--start-date START_DATE] [--types TYPES]
                                 terms
@@ -579,7 +580,7 @@ optional arguments:
   --not-in-title                                  Whether to search terms in account titles also.
   --offset OFFSET                                 Count offset.
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
-  --search-field {include_query_strings,image_text_only,text_fields_only,account_name_only,text_fields_and_image_text}
+  --search-field {text_fields_only,account_name_only,image_text_only,include_query_strings,text_fields_and_image_text}
                                                   In what to search the query. Defaults to `text_fields_and_image_text`.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
@@ -599,7 +600,7 @@ examples:
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [-p PLATFORMS] [--posts POSTS]
                                  [-s SELECT]
-                                 [--sort-by {subscriber_count,total_interactions,date}]
+                                 [--sort-by {subscriber_count,date,total_interactions}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -621,7 +622,7 @@ optional arguments:
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {subscriber_count,total_interactions,date}
+  --sort-by {subscriber_count,date,total_interactions}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
@@ -905,6 +906,32 @@ examples:
 
 . Getting friends of a list of user:
     `minet tw friends screen_name users.csv > friends.csv`
+
+```
+
+<h3 id="twitter-scrape">scrape</h3>
+
+```
+usage: minet twitter scrape [-h] [-l LIMIT] [-o OUTPUT] {tweets} query
+
+Minet Twitter Scrape Command
+============================
+
+Scrape Twitter's public facing search API to collect tweets etc.
+
+positional arguments:
+  {tweets}                    What to scrape. Currently only `tweets` is possible.
+  query                       Search query.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -l LIMIT, --limit LIMIT     Maximum number of tweets to collect.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the result will be printed to stdout.
+
+examples:
+
+. Collecting the latest 500 tweets of a given Twitter user:
+    `minet tw scrape tweets "from:@jack" --limit 500 > tweets.csv`
 
 ```
 
