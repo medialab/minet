@@ -1320,6 +1320,11 @@ MINET_COMMANDS = {
                             'help': 'Search query.'
                         },
                         {
+                            'flag': '--include-refs',
+                            'help': 'Whether to emit referenced tweets (quoted, retweeted & replied) in the CSV output. Note that it consumes a memory proportional to the total number of unique tweets retrieved.',
+                            'action': 'store_true'
+                        },
+                        {
                             'flags': ['-l', '--limit'],
                             'help': 'Maximum number of tweets to collect.',
                             'type': int

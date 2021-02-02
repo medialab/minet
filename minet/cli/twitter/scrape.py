@@ -54,7 +54,8 @@ def twitter_scrape_action(namespace, output_file):
     iterator = scraper.search(
         namespace.query,
         limit=namespace.limit,
-        before_sleep=before_sleep
+        before_sleep=before_sleep,
+        include_referenced_tweets=namespace.include_refs
     )
 
     for tweet in iterator:

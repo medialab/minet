@@ -234,7 +234,7 @@ class TwitterAPIScraper(object):
         )
 
     @ensure_guest_token
-    def request_search(self, query, cursor=None):
+    def request_search(self, query, cursor=None, refs=None):
         params = forge_search_params(query, cursor=cursor)
         url = '%s?%s' % (TWITTER_PUBLIC_SEARCH_ENDPOINT, params)
 
@@ -270,11 +270,24 @@ class TwitterAPIScraper(object):
 
             result = prepare_tweet(tweet)
 
-            tweets.append(next(t for t in result if t['id'] == tweet['id_str']))
+            if refs is not None:
+                for tweet in result:
+
+                    # Casting to int64 to save up memory
+                    id_int64 = int(tweet['id'])
+
+                    if id_int64 in refs:
+                        continue
+
+                    tweets.append(tweet)
+                    refs.add(id_int64)
+            else:
+                tweets.append(next(t for t in result if t['id'] == tweet['id_str']))
 
         return cursor, tweets
 
-    def search(self, query, limit=None, before_sleep=None):
+    def search(self, query, limit=None, before_sleep=None,
+               include_referenced_tweets=False):
         cursor = None
         i = 0
 
@@ -290,8 +303,10 @@ class TwitterAPIScraper(object):
             before_sleep=before_sleep if callable(before_sleep) else None
         )
 
+        refs = set() if include_referenced_tweets else None
+
         while True:
-            new_cursor, tweets = retryer(self.request_search, query, cursor)
+            new_cursor, tweets = retryer(self.request_search, query, cursor, refs=refs)
 
             for tweet in tweets:
                 yield tweet
