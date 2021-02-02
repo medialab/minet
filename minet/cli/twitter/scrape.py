@@ -45,7 +45,7 @@ def twitter_scrape_action(namespace, output_file):
 
         if isinstance(exc, TwitterPublicAPIRateLimitError):
             tokens += 1
-            loading_bar.set_postfix(token=token)
+            loading_bar.set_postfix(tokens=tokens)
 
         elif isinstance(exc, TwitterPublicAPIInvalidResponseError):
             failures += 1
