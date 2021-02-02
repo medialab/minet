@@ -257,11 +257,10 @@ class TwitterAPIScraper(object):
 
         return cursor, tweets
 
-    def search(self, query, limit=None):
+    def search(self, query, limit=None, before_sleep=None):
         cursor = None
         i = 0
 
-        # TODO: add before_sleep listener kwarg for logging purposes
         retryer = Retrying(
             wait=wait_random_exponential(max=60 * 3),
             retry=retry_if_exception_type(
@@ -270,7 +269,8 @@ class TwitterAPIScraper(object):
                     TwitterPublicAPIInvalidResponseError
                 )
             ),
-            stop=stop_after_attempt(6)
+            stop=stop_after_attempt(6),
+            before_sleep=before_sleep if callable(before_sleep) else None
         )
 
         while True:
