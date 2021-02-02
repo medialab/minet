@@ -135,6 +135,25 @@ def extract_cursor_from_payload(payload):
     return found_cursor
 
 
+def process_single_tweet(tweet_id, tweet_index, user_index):
+    tweet = tweet_index[tweet_id]
+    tweet['user'] = user_index[tweet['user_id_str']]
+
+    # Quoted?
+    quoted_id = tweet.get('quoted_status_id_str')
+
+    if quoted_id:
+        tweet['quoted_status'] = process_single_tweet(quoted_id, tweet_index, user_index)
+
+    # Retweeted?
+    retweeted_id = tweet.get('retweeted_status_id_str')
+
+    if retweeted_id:
+        tweet['retweeted_status'] = process_single_tweet(retweeted_id, tweet_index, user_index)
+
+    return tweet
+
+
 def payload_tweets_iter(payload):
     tweet_index = payload['globalObjects']['tweets']
     user_index = payload['globalObjects']['users']
@@ -157,28 +176,23 @@ def payload_tweets_iter(payload):
             ):
                 continue
 
-            tweet_id = None
-            tweet_info = nested_get(['content', 'item', 'content', 'tweet'], entry)
+            tweet_meta = nested_get(['content', 'item', 'content', 'tweet'], entry)
 
-            if tweet_info is not None:
+            if tweet_meta is None:
+                tweet_meta = nested_get(['content', 'item', 'content', 'tombstone', 'tweet'], entry)
 
-                # Skipping ads
-                if 'promotedMetadata' in tweet_info:
-                    continue
-
-                tweet_id = tweet_info['id']
-
-            else:
-                tweet_info = nested_get(['content', 'item', 'content', 'tombstone'], entry)
-                tweet_id = tweet_info['tweet']['id']
-
-            if tweet_id is None:
+            # Parsing error?
+            if tweet_meta is None:
                 raise TwitterPublicAPIParsingError
 
-            tweet = tweet_index[tweet_id]
-            tweet['user'] = user_index[tweet['user_id_str']]
+            # Skipping ads
+            if 'promotedMetadata' in tweet_meta:
+                continue
 
-            yield tweet
+            tweet = process_single_tweet(tweet_meta['id'], tweet_index, user_index)
+
+            if tweet is not None:
+                yield tweet
 
 
 # =============================================================================
@@ -244,6 +258,10 @@ class TwitterAPIScraper(object):
 
         cursor = extract_cursor_from_payload(data)
         tweets = []
+
+        # with open('dump.json', 'w') as w:
+        #     import json
+        #     json.dump(data, w, ensure_ascii=False, indent=2)
 
         for tweet in payload_tweets_iter(data):
 
