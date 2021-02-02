@@ -193,7 +193,6 @@ class TwitterAPIScraper(object):
         self.guest_token = None
         self.cookie = None
 
-    # TODO: tenacity + rate limited
     def request(self, url):
         return request(self.http, url, spoof_ua=True)
 
