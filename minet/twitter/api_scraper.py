@@ -142,13 +142,15 @@ def process_single_tweet(tweet_id, tweet_index, user_index):
     # Quoted?
     quoted_id = tweet.get('quoted_status_id_str')
 
-    if quoted_id:
+    # TODO: sometimes tweet is not present
+    if quoted_id and quoted_id in tweet_index:
         tweet['quoted_status'] = process_single_tweet(quoted_id, tweet_index, user_index)
 
     # Retweeted?
     retweeted_id = tweet.get('retweeted_status_id_str')
 
-    if retweeted_id:
+    # TODO: sometimes tweet is not present
+    if retweeted_id and retweeted_id in tweet_index:
         tweet['retweeted_status'] = process_single_tweet(retweeted_id, tweet_index, user_index)
 
     return tweet
