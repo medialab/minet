@@ -318,7 +318,7 @@ class TwitterAPIScraper(object):
                 if limit is not None and i >= limit:
                     return
 
-            if new_cursor is None or len(tweets) < DEFAULT_COUNT:
+            if new_cursor is None or len(tweets) == 0:
                 return
 
             cursor = new_cursor
