@@ -13,6 +13,10 @@ class TwitterGuestTokenError(TwitterError):
     pass
 
 
+class TwitterPublicAPIQueryTooLongError(TwitterError):
+    pass
+
+
 class TwitterPublicAPIRateLimitError(TwitterError):
     pass
 

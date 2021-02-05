@@ -30,13 +30,15 @@ from minet.twitter.exceptions import (
     TwitterGuestTokenError,
     TwitterPublicAPIRateLimitError,
     TwitterPublicAPIInvalidResponseError,
-    TwitterPublicAPIParsingError
+    TwitterPublicAPIParsingError,
+    TwitterPublicAPIQueryTooLongError
 )
 
 # =============================================================================
 # Constants
 # =============================================================================
 TWITTER_PUBLIC_SEARCH_ENDPOINT = 'https://api.twitter.com/2/search/adaptive.json'
+MAXIMUM_QUERY_LENGTH = 500
 DEFAULT_COUNT = 100
 GUEST_TOKEN_COOKIE_PATTERN = re.compile(rb'document\.cookie = decodeURIComponent\("gt=(\d+);')
 
@@ -290,6 +292,10 @@ class TwitterAPIScraper(object):
 
     def search(self, query, limit=None, before_sleep=None,
                include_referenced_tweets=False):
+
+        if len(query) > MAXIMUM_QUERY_LENGTH:
+            raise TwitterPublicAPIQueryTooLongError
+
         cursor = None
         i = 0
 
