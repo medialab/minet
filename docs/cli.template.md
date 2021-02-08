@@ -28,7 +28,7 @@
   * [search](#ct-search)
   * [summary](#summary)
 * [facebook (fb)](#facebook)
-  * [comments](#comments)
+  * [comments](#facebook-comments)
   * [url-likes](#facebook-url-likes)
   * [url-parse](#facebook-url-parse)
 * [hyphe](#hyphe)
@@ -45,7 +45,7 @@
   * [users](#users)
 * [youtube (yt)](#youtube)
   * [captions](#captions)
-  * [comments](#comments)
+  * [comments](#youtube-comments)
   * [search](#youtube-search)
   * [url-parse](#youtube-url-parse)
   * [videos](#videos)
@@ -156,7 +156,7 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% fb %>
 
-### comments
+<h3 id="facebook-comments">comments</h3>
 
 <% fb/comments %>
 
@@ -214,7 +214,7 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% yt/captions %>
 
-### comments
+<h3 id="youtube-comments">comments</h3>
 
 <% yt/comments %>
 
