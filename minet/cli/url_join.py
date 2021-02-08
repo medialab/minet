@@ -42,15 +42,23 @@ def url_join_action(namespace):
     )
 
     # First step is to index left file
-    trie = NormalizedLRUTrie(strip_trailing_slash=True)
+    trie = NormalizedLRUTrie()
+
+    def add_url(u, row):
+        u = u.strip()
+
+        if u:
+            trie.set(u, row)
 
     for row, url in left_reader.cells(namespace.column1, with_rows=True):
-        url = url.strip()
-
         if left_indices is not None:
             row = [row[i] for i in left_indices]
 
-        trie.set(url, row)
+        if namespace.separator is not None:
+            for u in url.split(namespace.separator):
+                add_url(u, row)
+        else:
+            add_url(u, row)
 
         loading_bar.update()
 

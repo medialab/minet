@@ -310,7 +310,8 @@ examples:
 ## url-join
 
 ```
-usage: minet url-join [-h] [-o OUTPUT] [-s SELECT] column1 file1 column2 file2
+usage: minet url-join [-h] [-o OUTPUT] [-s SELECT] [--separator SEPARATOR]
+                      column1 file1 column2 file2
 
 Minet Url Join Command
 ======================
@@ -329,6 +330,7 @@ optional arguments:
   -h, --help                  show this help message and exit
   -o OUTPUT, --output OUTPUT  Path to the output joined file. By default, the join will be printed to stdout.
   -s SELECT, --select SELECT  Columns from the first file to keep, separated by comma.
+  --separator SEPARATOR       Split indexed url column by a separator?
 
 examples:
 
@@ -550,7 +552,7 @@ usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                 [--language LANGUAGE] [-l LIMIT]
                                 [--not-in-title] [--offset OFFSET]
                                 [-p PLATFORMS]
-                                [--search-field {text_fields_only,account_name_only,image_text_only,include_query_strings,text_fields_and_image_text}]
+                                [--search-field {include_query_strings,text_fields_and_image_text,account_name_only,image_text_only,text_fields_only}]
                                 [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
                                 [--start-date START_DATE] [--types TYPES]
                                 terms
@@ -580,7 +582,7 @@ optional arguments:
   --not-in-title                                  Whether to search terms in account titles also.
   --offset OFFSET                                 Count offset.
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
-  --search-field {text_fields_only,account_name_only,image_text_only,include_query_strings,text_fields_and_image_text}
+  --search-field {include_query_strings,text_fields_and_image_text,account_name_only,image_text_only,text_fields_only}
                                                   In what to search the query. Defaults to `text_fields_and_image_text`.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
@@ -600,7 +602,7 @@ examples:
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [-p PLATFORMS] [--posts POSTS]
                                  [-s SELECT]
-                                 [--sort-by {subscriber_count,date,total_interactions}]
+                                 [--sort-by {subscriber_count,total_interactions,date}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -622,7 +624,7 @@ optional arguments:
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {subscriber_count,date,total_interactions}
+  --sort-by {subscriber_count,total_interactions,date}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
@@ -912,7 +914,8 @@ examples:
 <h3 id="twitter-scrape">scrape</h3>
 
 ```
-usage: minet twitter scrape [-h] [-l LIMIT] [-o OUTPUT] {tweets} query
+usage: minet twitter scrape [-h] [--include-refs] [-l LIMIT] [-o OUTPUT]
+                            {tweets} query
 
 Minet Twitter Scrape Command
 ============================
@@ -925,6 +928,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
+  --include-refs              Whether to emit referenced tweets (quoted, retweeted & replied) in the CSV output. Note that it consumes a memory proportional to the total number of unique tweets retrieved.
   -l LIMIT, --limit LIMIT     Maximum number of tweets to collect.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the result will be printed to stdout.
 

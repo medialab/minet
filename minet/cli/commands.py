@@ -1492,6 +1492,10 @@ MINET_COMMANDS = {
             {
                 'flags': ['-s', '--select'],
                 'help': 'Columns from the first file to keep, separated by comma.'
+            },
+            {
+                'flag': '--separator',
+                'help': 'Split indexed url column by a separator?'
             }
         ]
     },
