@@ -22,15 +22,7 @@ from minet.facebook.constants import (
 
 
 @rate_limited_from_state(FACEBOOK_MOBILE_RATE_LIMITER_STATE)
-def post_id_from_url(post_url):
-    parsed = parse_facebook_url(post_url)
-
-    if not isinstance(parsed, FacebookPost):
-        return
-
-    if parsed.full_id is not None:
-        return parsed.full_id
-
+def scrape_post_id(post_url):
     post_mobile_url = convert_facebook_url_to_mobile(post_url)
 
     err, response, html = request_text(FACEBOOK_DEFAULT_POOL, post_mobile_url)
@@ -82,3 +74,15 @@ def post_id_from_url(post_url):
         return
 
     return '%s_%s' % (content_owner_id_new, mf_story_key)
+
+
+def post_id_from_url(post_url):
+    parsed = parse_facebook_url(post_url)
+
+    if not isinstance(parsed, FacebookPost):
+        return
+
+    if parsed.full_id is not None:
+        return parsed.full_id
+
+    return scrape_post_id(post_url)
