@@ -39,7 +39,7 @@ def twitter_action(namespace):
         twitter_scrape_action(namespace, output_file)
 
     else:
-        check_credentials()
+        check_credentials(namespace)
 
         if namespace.tw_action == 'friends':
             from minet.cli.twitter.friends import twitter_friends_action
