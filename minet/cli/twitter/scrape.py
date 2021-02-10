@@ -6,7 +6,7 @@
 import csv
 from tqdm import tqdm
 from twitwi.constants import TWEET_FIELDS
-from twitwi.formatters import transform_tweet_into_csv_dict
+from twitwi import transform_tweet_into_csv_dict
 
 from minet.twitter import TwitterAPIScraper
 from minet.twitter.exceptions import (

@@ -14,7 +14,7 @@ from tenacity import (
     retry_if_exception_type,
     stop_after_attempt
 )
-from twitwi.utils import prepare_tweet
+from twitwi import normalize_tweet
 
 from minet.utils import (
     create_pool,
@@ -270,9 +270,9 @@ class TwitterAPIScraper(object):
         for tweet in payload_tweets_iter(data):
 
             # TODO: this should be fixed in twitwi
-            tweet['gazouilloire_source'] = 'minet'
+            tweet['collection_source'] = 'scraping'
 
-            result = prepare_tweet(tweet)
+            result = normalize_tweet(tweet, extract_referenced_tweets=refs is not None)
 
             if refs is not None:
                 for tweet in result:
@@ -286,7 +286,7 @@ class TwitterAPIScraper(object):
                     tweets.append(tweet)
                     refs.add(id_int64)
             else:
-                tweets.append(next(t for t in result if t['id'] == tweet['id_str']))
+                tweets.append(result)
 
         return cursor, tweets
 
