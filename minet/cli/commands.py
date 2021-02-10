@@ -25,19 +25,27 @@ from minet.crowdtangle.constants import (
 TWITTER_API_COMMON_ARGUMENTS = [
     {
         'flag': '--api-key',
-        'help': 'Twitter API key.'
+        'help': 'Twitter API key.',
+        'rc_key': ['twitter', 'api_key'],
+        'action': ConfigAction
     },
     {
         'flag': '--api-secret-key',
-        'help': 'Twitter API secret key.'
+        'help': 'Twitter API secret key.',
+        'rc_key': ['twitter', 'api_secret_key'],
+        'action': ConfigAction
     },
     {
         'flag': '--access-token',
-        'help': 'Twitter API access token.'
+        'help': 'Twitter API access token.',
+        'rc_key': ['twitter', 'access_token'],
+        'action': ConfigAction
     },
     {
         'flag': '--access-token-secret',
-        'help': 'Twitter API access token secret.'
+        'help': 'Twitter API access token secret.',
+        'rc_key': ['twitter', 'access_token_secret'],
+        'action': ConfigAction
     }
 ]
 

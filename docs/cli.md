@@ -90,6 +90,11 @@ crowdtangle:
   rate_limit: 10 # Used as --rate-limit for `minet ct` commands
 mediacloud:
   token: "MY_MC_TOKEN" # Used as --token for `minet mc` commands
+twitter:
+  api_key: "MY_API_KEY" # Used as --api-key for `minet tw` commands
+  api_secret_key: "MY_API_SECRET_KEY" # Used as --api-secret-key for `minet tw` commands
+  access_token: "MY_ACCESS_TOKEN" # Used as --access-token for `minet tw` commands
+  access_token_secret: "MY_ACCESS_TOKEN_SECRET" # Used as --access-token-secret for `minet tw` commands
 youtube:
   key: "MY_YT_API_KEY" # Used as --key for `minet yt` commands
 ```
@@ -552,7 +557,7 @@ usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                 [--language LANGUAGE] [-l LIMIT]
                                 [--not-in-title] [--offset OFFSET]
                                 [-p PLATFORMS]
-                                [--search-field {include_query_strings,image_text_only,text_fields_only,text_fields_and_image_text,account_name_only}]
+                                [--search-field {image_text_only,text_fields_and_image_text,account_name_only,include_query_strings,text_fields_only}]
                                 [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
                                 [--start-date START_DATE] [--types TYPES]
                                 terms
@@ -582,7 +587,7 @@ optional arguments:
   --not-in-title                                  Whether to search terms in account titles also.
   --offset OFFSET                                 Count offset.
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
-  --search-field {include_query_strings,image_text_only,text_fields_only,text_fields_and_image_text,account_name_only}
+  --search-field {image_text_only,text_fields_and_image_text,account_name_only,include_query_strings,text_fields_only}
                                                   In what to search the query. Defaults to `text_fields_and_image_text`.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
@@ -602,7 +607,7 @@ examples:
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [-p PLATFORMS] [--posts POSTS]
                                  [-s SELECT]
-                                 [--sort-by {total_interactions,subscriber_count,date}]
+                                 [--sort-by {subscriber_count,date,total_interactions}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -624,7 +629,7 @@ optional arguments:
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {total_interactions,subscriber_count,date}
+  --sort-by {subscriber_count,date,total_interactions}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.

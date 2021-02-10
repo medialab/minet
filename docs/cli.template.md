@@ -90,6 +90,11 @@ crowdtangle:
   rate_limit: 10 # Used as --rate-limit for `minet ct` commands
 mediacloud:
   token: "MY_MC_TOKEN" # Used as --token for `minet mc` commands
+twitter:
+  api_key: "MY_API_KEY" # Used as --api-key for `minet tw` commands
+  api_secret_key: "MY_API_SECRET_KEY" # Used as --api-secret-key for `minet tw` commands
+  access_token: "MY_ACCESS_TOKEN" # Used as --access-token for `minet tw` commands
+  access_token_secret: "MY_ACCESS_TOKEN_SECRET" # Used as --access-token-secret for `minet tw` commands
 youtube:
   key: "MY_YT_API_KEY" # Used as --key for `minet yt` commands
 ```
