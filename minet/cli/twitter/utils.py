@@ -14,8 +14,10 @@ def make_twitter_action(method_name, csv_headers):
 
     def action(namespace, output_file):
 
+        # TODO: this is temp debug
         def listener(event, data):
             tqdm.write(event, file=sys.stderr)
+            tqdm.write(repr(data), file=sys.stderr)
 
         wrapper = TwitterWrapper(
             namespace.access_token,
