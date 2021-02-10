@@ -7,7 +7,7 @@
 from minet.cli.twitter.utils import make_twitter_action
 
 REPORT_HEADERS = [
-    'followers_id'
+    'follower_id'
 ]
 
 twitter_followers_action = make_twitter_action(

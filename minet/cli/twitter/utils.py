@@ -36,8 +36,13 @@ def make_twitter_action(method_name, csv_headers):
             desc='Retrieving ids',
             dynamic_ncols=True,
             total=namespace.total,
-            unit=' line'
+            unit=' followers',
+            postfix={
+                'users': 0
+            }
         )
+
+        users_done = 0
 
         for row, user in enricher.cells(namespace.column, with_rows=True):
             all_ids = []
@@ -57,12 +62,15 @@ def make_twitter_action(method_name, csv_headers):
                     all_ids = result.get('ids', [])
                     next_cursor = result.get('next_cursor', 0)
 
+                    loading_bar.update(len(all_ids))
+
                     for user_id in all_ids:
                         enricher.writerow(row, [user_id])
                 else:
                     next_cursor = 0
 
-            loading_bar.update()
+            users_done += 1
+            loading_bar.set_postfix(users=users_done)
 
         loading_bar.close()
 
