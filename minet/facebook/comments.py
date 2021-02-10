@@ -222,7 +222,9 @@ class FacebookCommentScraper(object):
             try:
                 data = scrape_comments(html, direction, in_reply_to)
             except TypeError:
-                print('Could not process comment in %s' % current_url)
+                # with open('./dump.html', 'w') as f:
+                #     f.write(html)
+                print('Could not process comment in %s' % current_url, file=sys.stderr)
                 sys.exit(1)
 
             calls += 1
