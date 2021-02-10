@@ -268,11 +268,11 @@ class TwitterAPIScraper(object):
         #     json.dump(data, w, ensure_ascii=False, indent=2)
 
         for tweet in payload_tweets_iter(data):
-
-            # TODO: this should be fixed in twitwi
-            tweet['collection_source'] = 'scraping'
-
-            result = normalize_tweet(tweet, extract_referenced_tweets=refs is not None)
+            result = normalize_tweet(
+                tweet,
+                extract_referenced_tweets=refs is not None,
+                collection_source='scraping'
+            )
 
             if refs is not None:
                 for tweet in result:
