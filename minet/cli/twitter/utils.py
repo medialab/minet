@@ -5,23 +5,25 @@
 # Miscellaneous generic functions used throughout the twitter actions.
 #
 import casanova
+import sys
 from tqdm import tqdm
-
-from minet.twitter.utils import TwitterWrapper
+from twitwi import TwitterWrapper
 
 
 def make_twitter_action(method_name, csv_headers):
 
     def action(namespace, output_file):
 
-        TWITTER = {
-            'access_token': namespace.access_token,
-            'access_token_secret': namespace.access_token_secret,
-            'api_key': namespace.api_key,
-            'api_secret_key': namespace.api_secret_key
-        }
+        def listener(event, data):
+            tqdm.write(event, file=sys.stderr)
 
-        wrapper = TwitterWrapper(TWITTER)
+        wrapper = TwitterWrapper(
+            namespace.access_token,
+            namespace.access_token_secret,
+            namespace.api_key,
+            namespace.api_secret_key,
+            listener=listener
+        )
 
         enricher = casanova.enricher(
             namespace.file,
@@ -43,21 +45,20 @@ def make_twitter_action(method_name, csv_headers):
             result = None
 
             if namespace.id:
-                wrapper_args = {'user_id': user}
+                wrapper_kwargs = {'user_id': user}
             else:
-                wrapper_args = {'screen_name': user}
+                wrapper_kwargs = {'screen_name': user}
 
             while next_cursor != 0:
-                wrapper_args['cursor'] = next_cursor
-                method = '%(method_name)s.ids' % {'method_name': method_name}
-                result = wrapper.call(method, wrapper_args)
+                wrapper_kwargs['cursor'] = next_cursor
+                result = wrapper.call([method_name, 'ids'], **wrapper_kwargs)
 
                 if result is not None:
                     all_ids = result.get('ids', [])
                     next_cursor = result.get('next_cursor', 0)
 
-                    for friend_id in all_ids:
-                        enricher.writerow(row, [friend_id])
+                    for user_id in all_ids:
+                        enricher.writerow(row, [user_id])
                 else:
                     next_cursor = 0
 
