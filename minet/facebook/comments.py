@@ -55,13 +55,6 @@ def scrape_comments(html, direction=None, in_reply_to=None):
         'in_reply_to': in_reply_to
     }
 
-    valid_items = (
-        item
-        for item
-        in soup.select('[id]')
-        if VALID_ID_RE.match(item.get('id'))
-    )
-
     if not in_reply_to:
         if direction is None or direction == 'forward':
             next_link = soup.select_one('[id^="see_next_"] > a[href]')
@@ -90,6 +83,14 @@ def scrape_comments(html, direction=None, in_reply_to=None):
                 if direction is None:
                     data['direction'] = 'backward'
 
+    valid_items = (
+        item
+        for item
+        in soup.select('[id]')
+        if VALID_ID_RE.match(item.get('id'))
+        and not item.parent.get('id', '').startswith('comment_replies_more')
+    )
+
     for item in valid_items:
         item_id = item.get('id')
 
@@ -99,7 +100,7 @@ def scrape_comments(html, direction=None, in_reply_to=None):
 
         user_link = item.select_one('h3 > a')
 
-        # TODO: this should be fixed. Truncated comments are not correctly handled
+        # NOTE: this is a raise bomb
         if not user_link:
             raise TypeError
 
