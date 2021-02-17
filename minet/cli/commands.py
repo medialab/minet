@@ -481,6 +481,12 @@ MINET_COMMANDS = {
                 'comments': {
                     'title': 'Youtube comments',
                     'description': 'Retrieve metadata about Youtube comments using the API.',
+                    'epilog': '''
+                        example:
+
+                        . Fetching a video's comments:
+                            `minet yt comments https://www.youtube.com/watch?v=7JTb2vf1OQQ -k my-api-key --full -o comments.csv`
+                    ''',
                     'arguments': [
                         {
                             'name': 'column',
@@ -562,6 +568,12 @@ MINET_COMMANDS = {
                 'search': {
                     'title': 'Youtube search',
                     'description': 'Retrieve metadata about Youtube search field using the API.',
+                    'epilog': '''
+                        example:
+
+                        . Searching the bird-related videos:
+                            `minet youtube search bird -k my-api-key -o bird_videos.csv`
+                    ''',
                     'arguments': [
                         {
                             'name': 'column',
