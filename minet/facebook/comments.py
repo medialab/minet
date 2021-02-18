@@ -265,13 +265,14 @@ class FacebookCommentScraper(object):
                 else:
                     yield comment
 
-            if detailed:
-                details = {
-                    'calls': calls,
-                    'replies': replies,
-                    'queue_size': len(url_queue)
-                }
+            if per_call and len(comments) > 0:
+                if detailed:
+                    details = {
+                        'calls': calls,
+                        'replies': replies,
+                        'queue_size': len(url_queue)
+                    }
 
-                yield details, comments
-            else:
-                yield comments
+                    yield details, comments
+                else:
+                    yield comments
