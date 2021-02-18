@@ -26,7 +26,10 @@ URLS = [
     'https://www.facebook.com/SYNERGIEFRANCAISE/posts/1524581257625272',
     'https://www.facebook.com/croaplus/posts/1813907755590757',
     'https://www.facebook.com/dordognefn24/posts/1830473427026569',
-    'https://www.facebook.com/Debout.La.France.16/posts/459708937722519'
+    'https://www.facebook.com/Debout.La.France.16/posts/459708937722519',
+    'https://www.facebook.com/groups/US4MF/permalink/787216138752904/',
+    'https://www.facebook.com/groups/695576960543188/permalink/2072659646168239',
+    'https://www.facebook.com/DonaldDuck/posts/10158544709064277'
 ]
 
 def work(url):
