@@ -125,6 +125,7 @@ def scrape_post_id(post_url):
     return '%s_%s' % (content_owner_id_new, mf_story_key)
 
 
+# TODO: could easily cache some retrieved handles...
 def post_id_from_url(post_url):
     parsed = parse_facebook_url(post_url)
 

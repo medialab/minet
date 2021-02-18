@@ -5,9 +5,11 @@
 # Logic of the `fb comments` action.
 #
 import casanova
+import tqdm
+import sys
 from tqdm import tqdm
 from ural import is_url
-from ural.facebook import is_facebook_post_url
+from ural.facebook import has_facebook_comments
 
 from minet.cli.utils import open_output_file, die, edit_namespace_with_csv_io
 from minet.facebook.comments import FacebookCommentScraper
@@ -54,9 +56,9 @@ def facebook_comments_action(namespace):
 
     for i, (row, url) in enumerate(enricher.cells(namespace.column, with_rows=True)):
 
-        if not is_facebook_post_url(url):
-            loading_bar.close()
-            die('Given url (line %i) is not a Facebook post url: %s' % (i + 1, url))
+        if not has_facebook_comments(url):
+            tqdm.write('Given url (line %i) probably cannot have Facebook comments: %s' % (i + 1, url), file=sys.stderr)
+            continue
 
         batches = scraper(
             url,
