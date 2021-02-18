@@ -4,7 +4,17 @@
 #
 # Logic of the `yt` action.
 #
-from minet.cli.utils import open_output_file
+from minet.cli.utils import open_output_file, die
+
+
+def check_key(namespace):
+
+    # A key is required to used the API
+    if not namespace.key:
+        die([
+            'A key is required to access YouTube API.',
+            'You can provide it using the --key argument.'
+        ])
 
 
 def youtube_action(namespace):
@@ -17,22 +27,24 @@ def youtube_action(namespace):
     if namespace.yt_action == 'url-parse':
         from minet.cli.youtube.url_parse import url_parse_action
         url_parse_action(namespace, output_file)
+    else:
+        check_key(namespace)
 
-    elif namespace.yt_action == 'videos':
-        from minet.cli.youtube.videos import videos_action
-        videos_action(namespace, output_file)
+        if namespace.yt_action == 'videos':
+            from minet.cli.youtube.videos import videos_action
+            videos_action(namespace, output_file)
 
-    elif namespace.yt_action == 'comments':
-        from minet.cli.youtube.comments import comments_action
-        comments_action(namespace, output_file)
+        elif namespace.yt_action == 'comments':
+            from minet.cli.youtube.comments import comments_action
+            comments_action(namespace, output_file)
 
-    elif namespace.yt_action == 'captions':
-        from minet.cli.youtube.captions import captions_action
-        captions_action(namespace, output_file)
+        elif namespace.yt_action == 'captions':
+            from minet.cli.youtube.captions import captions_action
+            captions_action(namespace, output_file)
 
-    elif namespace.yt_action == 'search':
-        from minet.cli.youtube.search import search_action
-        search_action(namespace, output_file)
+        elif namespace.yt_action == 'search':
+            from minet.cli.youtube.search import search_action
+            search_action(namespace, output_file)
 
     if namespace.output is not None:
         output_file.close()
