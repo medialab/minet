@@ -55,6 +55,17 @@ def scrape_comments(html, direction=None, in_reply_to=None):
         'in_reply_to': in_reply_to
     }
 
+    # Detecting if we are in a video pagelet
+    video_pagelet = soup.select_one('#mobile_injected_video_feed_pagelet')
+
+    if video_pagelet is not None:
+        actual_comments_link = video_pagelet.select_one('a[href^="/story.php?"]')
+
+        if actual_comments_link:
+            data['next'] = resolve_relative_url(actual_comments_link.get('href'))
+
+        return data
+
     if not in_reply_to:
         if direction is None or direction == 'forward':
             next_link = soup.select_one('[id^="see_next_"] > a[href]')
