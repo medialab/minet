@@ -576,8 +576,8 @@ MINET_COMMANDS = {
                     'epilog': '''
                         example:
 
-                        . Searching the bird-related videos:
-                            `minet youtube search bird -k my-api-key -o bird_videos.csv`
+                        . Searching videos about birds:
+                            `minet youtube search bird -k my-api-key > bird_videos.csv`
                     ''',
                     'arguments': [
                         {

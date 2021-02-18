@@ -131,7 +131,7 @@ examples:
 ```
 usage: minet fetch [-h] [--compress] [--contents-in-report] [-d OUTPUT_DIR]
                    [--domain-parallelism DOMAIN_PARALLELISM] [-f FILENAME]
-                   [--filename-template FILENAME_TEMPLATE] [-g {firefox,chrome}]
+                   [--filename-template FILENAME_TEMPLATE] [-g {chrome,firefox}]
                    [-H HEADERS] [--resume] [--standardize-encoding] [-o OUTPUT]
                    [-s SELECT] [-t THREADS] [--throttle THROTTLE]
                    [--timeout TIMEOUT] [--total TOTAL]
@@ -160,7 +160,7 @@ optional arguments:
   --domain-parallelism DOMAIN_PARALLELISM         Max number of urls per domain to hit at the same time. Defaults to 1
   -f FILENAME, --filename FILENAME                Name of the column used to build retrieved file names. Defaults to an uuid v4 with correct extension.
   --filename-template FILENAME_TEMPLATE           A template for the name of the fetched files.
-  -g {firefox,chrome}, --grab-cookies {firefox,chrome}
+  -g {chrome,firefox}, --grab-cookies {chrome,firefox}
                                                   Whether to attempt to grab cookies from your computer's browser.
   -H HEADERS, --header HEADERS                    Custom headers used with every requests.
   --resume                                        Whether to resume from an aborted report.
@@ -280,7 +280,7 @@ examples:
 ## url-extract
 
 ```
-usage: minet url-extract [-h] [--base-url BASE_URL] [--from {text,html}]
+usage: minet url-extract [-h] [--base-url BASE_URL] [--from {html,text}]
                          [-o OUTPUT] [-s SELECT] [--total TOTAL]
                          column [file]
 
@@ -297,7 +297,7 @@ positional arguments:
 optional arguments:
   -h, --help                  show this help message and exit
   --base-url BASE_URL         Base url used to resolve relative urls.
-  --from {text,html}          Extract urls from which kind of source?
+  --from {html,text}          Extract urls from which kind of source?
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the result will be printed to stdout.
   -s SELECT, --select SELECT  Columns to keep in output, separated by comma.
   --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
@@ -562,7 +562,7 @@ usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                 [--language LANGUAGE] [-l LIMIT]
                                 [--not-in-title] [--offset OFFSET]
                                 [-p PLATFORMS]
-                                [--search-field {image_text_only,text_fields_and_image_text,text_fields_only,account_name_only,include_query_strings}]
+                                [--search-field {account_name_only,image_text_only,include_query_strings,text_fields_and_image_text,text_fields_only}]
                                 [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
                                 [--start-date START_DATE] [--types TYPES]
                                 terms
@@ -591,7 +591,7 @@ optional arguments:
   --not-in-title                                  Whether to search terms in account titles also.
   --offset OFFSET                                 Count offset.
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
-  --search-field {image_text_only,text_fields_and_image_text,text_fields_only,account_name_only,include_query_strings}
+  --search-field {account_name_only,image_text_only,include_query_strings,text_fields_and_image_text,text_fields_only}
                                                   In what to search the query. Defaults to `text_fields_and_image_text`.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
@@ -611,7 +611,7 @@ examples:
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [-p PLATFORMS] [--posts POSTS]
                                  [-s SELECT]
-                                 [--sort-by {total_interactions,date,subscriber_count}]
+                                 [--sort-by {date,subscriber_count,total_interactions}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -634,7 +634,7 @@ optional arguments:
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {total_interactions,date,subscriber_count}
+  --sort-by {date,subscriber_count,total_interactions}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
@@ -1045,7 +1045,7 @@ example:
 
 ```
 usage: minet youtube search [-h] [-o OUTPUT] [-k KEY] [-s SELECT] [-l LIMIT]
-                            [--order {relevance,date,rating,viewCount,title,videoCount}]
+                            [--order {date,rating,relevance,title,videoCount,viewCount}]
                             column [file]
 
 Youtube search
@@ -1063,13 +1063,13 @@ optional arguments:
   -k KEY, --key KEY                               YouTube API Data dashboard API key.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
   -l LIMIT, --limit LIMIT                         Maximum number of videos to retrieve.
-  --order {relevance,date,rating,viewCount,title,videoCount}
+  --order {date,rating,relevance,title,videoCount,viewCount}
                                                   Order in which videos are retrieved. The default one is relevance.
 
 example:
 
-. Searching the bird-related videos:
-    `minet youtube search bird -k my-api-key -o bird_videos.csv`
+. Searching videos about birds:
+    `minet youtube search bird -k my-api-key > bird_videos.csv`
 
 ```
 

@@ -88,6 +88,9 @@ def add_arguments(subparser, arguments):
 
         argument_kwargs = omit(argument, ARGUMENT_KEYS_TO_OMIT)
 
+        if 'choices' in argument_kwargs:
+            argument_kwargs['choices'] = sorted(argument_kwargs['choices'])
+
         if 'name' in argument:
             subparser.add_argument(argument['name'], **argument_kwargs)
         elif 'flag' in argument:
