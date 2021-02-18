@@ -611,7 +611,7 @@ examples:
 usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                  [-t TOKEN] [-p PLATFORMS] [--posts POSTS]
                                  [-s SELECT]
-                                 [--sort-by {date,subscriber_count,total_interactions}]
+                                 [--sort-by {total_interactions,date,subscriber_count}]
                                  [--start-date START_DATE] [--total TOTAL]
                                  column [file]
 
@@ -634,7 +634,7 @@ optional arguments:
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --sort-by {date,subscriber_count,total_interactions}
+  --sort-by {total_interactions,date,subscriber_count}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
@@ -1034,6 +1034,11 @@ optional arguments:
   -k KEY, --key KEY           YouTube API Data dashboard API key.
   -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
 
+example:
+
+. Fetching a video's comments:
+    `minet yt comments https://www.youtube.com/watch?v=7JTb2vf1OQQ -k my-api-key --full -o comments.csv`
+
 ```
 
 <h3 id="youtube-search">search</h3>
@@ -1060,6 +1065,11 @@ optional arguments:
   -l LIMIT, --limit LIMIT                         Maximum number of videos to retrieve.
   --order {relevance,date,rating,viewCount,title,videoCount}
                                                   Order in which videos are retrieved. The default one is relevance.
+
+example:
+
+. Searching the bird-related videos:
+    `minet youtube search bird -k my-api-key -o bird_videos.csv`
 
 ```
 
