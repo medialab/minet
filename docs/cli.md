@@ -420,8 +420,9 @@ usage: minet crowdtangle leaderboard [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
 Minet CrowdTangle Leaderboard Command
 =====================================
 
-Gather information and aggregated stats about pages and groups of
-the designated dashboard (indicated by a given token).
+Gather information and aggregated stats about pages and groups of the designated dashboard (indicated by a given token).
+
+For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Leaderboard.
 
 optional arguments:
   -h, --help                            show this help message and exit
@@ -449,8 +450,9 @@ usage: minet crowdtangle lists [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
 Minet CrowdTangle Lists Command
 ===============================
 
-Retrieve the lists from a CrowdTangle dashboard (indicated by a
-given token).
+Retrieve the lists from a CrowdTangle dashboard (indicated by a given token).
+
+For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Lists.
 
 optional arguments:
   -h, --help                  show this help message and exit
@@ -477,6 +479,8 @@ Minet CrowdTangle Post By Id Command
 ====================================
 
 Retrieve metadata about batches of posts using Crowdtangle's API.
+
+For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Posts#get-postid.
 
 positional arguments:
   column                      Name of the column containing the posts URL or id in the CSV file.
@@ -515,8 +519,9 @@ usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
 Minet CrowdTangle Posts Command
 ===============================
 
-Gather post data from the designated dashboard (indicated by
-a given token).
+Gather post data from the designated dashboard (indicated by a given token).
+
+For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Posts.
 
 optional arguments:
   -h, --help                                      show this help message and exit
@@ -557,7 +562,7 @@ usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                 [--language LANGUAGE] [-l LIMIT]
                                 [--not-in-title] [--offset OFFSET]
                                 [-p PLATFORMS]
-                                [--search-field {account_name_only,text_fields_only,image_text_only,include_query_strings,text_fields_and_image_text}]
+                                [--search-field {image_text_only,text_fields_and_image_text,text_fields_only,account_name_only,include_query_strings}]
                                 [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
                                 [--start-date START_DATE] [--types TYPES]
                                 terms
@@ -567,8 +572,7 @@ Minet CrowdTangle Search Command
 
 Search posts on the whole CrowdTangle platform.
 
-More on Crowdtangle API docs here:
-https://github.com/CrowdTangle/API/wiki/Search
+For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Search.
 
 positional arguments:
   terms                                           The search query term or terms.
@@ -587,7 +591,7 @@ optional arguments:
   --not-in-title                                  Whether to search terms in account titles also.
   --offset OFFSET                                 Count offset.
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
-  --search-field {account_name_only,text_fields_only,image_text_only,include_query_strings,text_fields_and_image_text}
+  --search-field {image_text_only,text_fields_and_image_text,text_fields_only,account_name_only,include_query_strings}
                                                   In what to search the query. Defaults to `text_fields_and_image_text`.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
@@ -614,8 +618,9 @@ usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
 Minet CrowdTangle Link Summary Command
 ======================================
 
-Retrieve aggregated statistics about link sharing
-on the Crowdtangle API and by platform.
+Retrieve aggregated statistics about link sharing on the Crowdtangle API and by platform.
+
+For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Links.
 
 positional arguments:
   column                                          Name of the column containing the URL in the CSV file.

@@ -130,8 +130,9 @@ MINET_COMMANDS = {
                 'leaderboard': {
                     'title': 'Minet CrowdTangle Leaderboard Command',
                     'description': '''
-                        Gather information and aggregated stats about pages and groups of
-                        the designated dashboard (indicated by a given token).
+                        Gather information and aggregated stats about pages and groups of the designated dashboard (indicated by a given token).
+
+                        For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Leaderboard.
                     ''',
                     'epilog': '''
                         examples:
@@ -167,8 +168,9 @@ MINET_COMMANDS = {
                 'lists': {
                     'title': 'Minet CrowdTangle Lists Command',
                     'description': '''
-                        Retrieve the lists from a CrowdTangle dashboard (indicated by a
-                        given token).
+                        Retrieve the lists from a CrowdTangle dashboard (indicated by a given token).
+
+                        For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Lists.
                     ''',
                     'epilog': '''
                         examples:
@@ -180,8 +182,9 @@ MINET_COMMANDS = {
                 'posts': {
                     'title': 'Minet CrowdTangle Posts Command',
                     'description': '''
-                        Gather post data from the designated dashboard (indicated by
-                        a given token).
+                        Gather post data from the designated dashboard (indicated by a given token).
+
+                        For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Posts.
                     ''',
                     'epilog': '''
                         examples:
@@ -248,6 +251,8 @@ MINET_COMMANDS = {
                     'title': 'Minet CrowdTangle Post By Id Command',
                     'description': '''
                         Retrieve metadata about batches of posts using Crowdtangle's API.
+
+                        For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Posts#get-postid.
                     ''',
                     'epilog': '''
                         examples:
@@ -292,8 +297,7 @@ MINET_COMMANDS = {
                     'description': '''
                         Search posts on the whole CrowdTangle platform.
 
-                        More on Crowdtangle API docs here:
-                        https://github.com/CrowdTangle/API/wiki/Search
+                        For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Search.
                     ''',
                     'epilog': '''
                         examples:
@@ -375,8 +379,9 @@ MINET_COMMANDS = {
                 'summary': {
                     'title': 'Minet CrowdTangle Link Summary Command',
                     'description': '''
-                        Retrieve aggregated statistics about link sharing
-                        on the Crowdtangle API and by platform.
+                        Retrieve aggregated statistics about link sharing on the Crowdtangle API and by platform.
+
+                        For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Links.
                     ''',
                     'epilog': '''
                         examples:
