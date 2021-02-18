@@ -134,4 +134,16 @@ def post_id_from_url(post_url):
     if parsed.full_id is not None:
         return parsed.full_id
 
+    if parsed.parent_handle is not None:
+        parent_id = page_id_from_handle(parsed.parent_handle)
+
+        if parent_id is not None:
+            return '%s_%s' % (parent_id, parsed.id)
+
+    elif parsed.group_handle is not None:
+        group_id = group_id_from_handle(parsed.group_handle)
+
+        if group_id is not None:
+            return '%s_%s' % (group_id, parsed.id)
+
     return scrape_post_id(post_url)
