@@ -4,6 +4,7 @@
 #
 # Helper used to retrieved a full facebook post id from the given post url.
 #
+import re
 import json
 from bs4 import BeautifulSoup
 from urllib.parse import urlsplit, parse_qsl, urljoin
@@ -16,9 +17,57 @@ from ural.facebook import (
 from minet.utils import rate_limited_from_state, request_text
 from minet.facebook.constants import (
     FACEBOOK_URL,
+    FACEBOOK_MOBILE_URL,
     FACEBOOK_MOBILE_RATE_LIMITER_STATE,
     FACEBOOK_DEFAULT_POOL
 )
+
+PAGE_ID_PATTERN = re.compile(r'&amp;rid=(\d+)&amp;')
+GROUP_ID_PATTERN = re.compile(r'fb://group/(\d+)')
+
+
+@rate_limited_from_state(FACEBOOK_MOBILE_RATE_LIMITER_STATE)
+def page_id_from_handle(handle):
+    url = urljoin(FACEBOOK_MOBILE_URL, handle)
+
+    err, response, html = request_text(FACEBOOK_DEFAULT_POOL, url, headers={
+        'User-Agent': 'curl/7.68.0'
+    })
+
+    if err:
+        raise err
+
+    if response.status >= 400:
+        return None
+
+    m = PAGE_ID_PATTERN.search(html)
+
+    if m is None:
+        return None
+
+    return m.group(1)
+
+
+@rate_limited_from_state(FACEBOOK_MOBILE_RATE_LIMITER_STATE)
+def group_id_from_handle(handle):
+    url = urljoin(FACEBOOK_MOBILE_URL, 'groups/%s' % handle)
+
+    err, response, html = request_text(FACEBOOK_DEFAULT_POOL, url, headers={
+        'User-Agent': 'curl/7.68.0'
+    })
+
+    if err:
+        raise err
+
+    if response.status >= 400:
+        return None
+
+    m = GROUP_ID_PATTERN.search(html)
+
+    if m is None:
+        return None
+
+    return m.group(1)
 
 
 @rate_limited_from_state(FACEBOOK_MOBILE_RATE_LIMITER_STATE)
