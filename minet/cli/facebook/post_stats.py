@@ -17,7 +17,7 @@ from minet.utils import create_pool, request, nested_get, sleep_with_entropy
 from minet.cli.utils import open_output_file, print_err, die
 from minet.facebook.constants import FACEBOOK_WEB_DEFAULT_THROTTLE
 
-META_EXTRACTOR_TEMPLATE = rb'\(function\(\)\{bigPipe\.onPageletArrive\((\{.+share_fbid:"%s".+\})\);\}\),"onPageletArrive'
+META_EXTRACTOR_TEMPLATE = rb'bigPipe\.onPageletArrive\((\{.+share_fbid:"%s".+\})\);\}\)'
 HTML_EXTRACTOR_TEMPLATE = rb'<code[^>]*><!--(.+%s.+)--></code>'
 CURRENT_AVAILABILITY_DISCLAIMER = b'The link you followed may have expired, or the page may only be visible to an audience'
 AVAILABILITY_DISCLAIMER = b'The link you followed may be broken, or the page may have been removed'
