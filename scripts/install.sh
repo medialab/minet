@@ -47,7 +47,7 @@ else
   if [[ $ubuntu_version != "unkown" ]]; then
     echo "Installing minet for ubuntu (or similar)..."
 
-    if [ $ubuntu_version -le "16" ]; then
+    if [[ $ubuntu_version -le "16" ]]; then
       os="ubuntu_16"
     elif [[ $ubuntu_version == "18" || $ubuntu_version == "17" ]]; then
       os="ubuntu_18"
@@ -65,7 +65,7 @@ latest=$(get_latest_release medialab/minet)
 # Generic install script
 cleanup
 
-echo "Downloading binaries for $latest release..."
+echo "Downloading $os binaries for $latest release..."
 mkdir /tmp/minet
 curl -sSL  "https://github.com/medialab/minet/releases/download/$latest/$os.zip" > /tmp/minet.zip
 
