@@ -76,7 +76,7 @@ def fetch_action(namespace):
 
         for header in namespace.headers:
             k, v = parse_http_header(header)
-            global_headers = v
+            global_headers[k] = v
 
     flag = 'w'
     if namespace.output is not None and resuming and isfile(namespace.output):
