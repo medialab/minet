@@ -15,3 +15,11 @@ DEFAULT_CONNECT_TIMEOUT = 5
 DEFAULT_READ_TIMEOUT = 25
 DEFAULT_URLLIB3_TIMEOUT = Timeout(connect=DEFAULT_CONNECT_TIMEOUT, read=DEFAULT_READ_TIMEOUT)
 DEFAULT_SPOOFED_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:84.0) Gecko/20100101 Firefox/84.0'
+
+COOKIE_BROWSERS = {
+    'chrome',
+    'chromium',
+    'firefox',
+    'opera',
+    'edge'
+}

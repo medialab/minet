@@ -37,7 +37,8 @@ from minet.exceptions import (
 
 from minet.constants import (
     DEFAULT_SPOOFED_UA,
-    DEFAULT_URLLIB3_TIMEOUT
+    DEFAULT_URLLIB3_TIMEOUT,
+    COOKIE_BROWSERS
 )
 
 mimetypes.init()
@@ -192,19 +193,13 @@ class CookieResolver(object):
 
 
 def grab_cookies(browser='firefox'):
-    if browser == 'firefox':
-        try:
-            return CookieResolver(browser_cookie3.firefox())
-        except:
-            return None
+    if browser not in COOKIE_BROWSERS:
+        raise TypeError('minet.utils.grab_cookies: unknown "%s" browser.' % browser)
 
-    if browser == 'chrome':
-        try:
-            return CookieResolver(browser_cookie3.chrome())
-        except:
-            return None
-
-    raise Exception('minet.utils.grab_cookies: unknown "%s" browser.' % browser)
+    try:
+        return CookieResolver(getattr(browser_cookie3, browser)())
+    except browser_cookie3.BrowserCookieError:
+        return None
 
 
 def dict_to_cookie_string(d):

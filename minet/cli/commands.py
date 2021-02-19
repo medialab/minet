@@ -15,6 +15,8 @@ from minet.cli.argparse import (
     SplitterType
 )
 
+from minet.constants import COOKIE_BROWSERS
+
 from minet.crowdtangle.constants import (
     CROWDTANGLE_SORT_TYPES,
     CROWDTANGLE_SUMMARY_SORT_TYPES,
@@ -724,7 +726,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-c', '--cookie'],
-                            'help': 'Authenticated cookie to use or browser from which to extract it (support "firefox" and "chrome"). Defaults to "firefox".',
+                            'help': 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".',
                             'default': 'firefox'
                         },
                         {
@@ -905,8 +907,8 @@ MINET_COMMANDS = {
             },
             {
                 'flags': ['-g', '--grab-cookies'],
-                'help': 'Whether to attempt to grab cookies from your computer\'s browser.',
-                'choices': ['firefox', 'chrome']
+                'help': 'Whether to attempt to grab cookies from your computer\'s browser (supports "firefox", "chrome", "chromium", "opera" and "edge").',
+                'choices': COOKIE_BROWSERS
             },
             {
                 'flags': ['-H', '--header'],

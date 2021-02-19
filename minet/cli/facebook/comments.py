@@ -11,6 +11,7 @@ from tqdm import tqdm
 from ural import is_url
 from ural.facebook import has_facebook_comments
 
+from minet.constants import COOKIE_BROWSERS
 from minet.cli.utils import open_output_file, die, edit_namespace_with_csv_io
 from minet.facebook.comments import FacebookCommentScraper
 from minet.facebook.constants import FACEBOOK_COMMENT_CSV_HEADERS
@@ -30,7 +31,7 @@ def facebook_comments_action(namespace):
     try:
         scraper = FacebookCommentScraper(namespace.cookie)
     except FacebookInvalidCookieError:
-        if namespace.cookie in ['firefox', 'chrome']:
+        if namespace.cookie in COOKIE_BROWSERS:
             die('Could not extract cookies from %s.' % namespace.cookie)
 
         die([
