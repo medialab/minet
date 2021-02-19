@@ -39,7 +39,7 @@ def grab_facebook_cookie(source):
     else:
         cookie = source.strip()
 
-    if not cookie:
+    if not cookie or 'c_user=' not in cookie.lower():
         return None
 
     return fix_cookie(cookie)

@@ -32,7 +32,11 @@ def facebook_comments_action(namespace):
         scraper = FacebookCommentScraper(namespace.cookie)
     except FacebookInvalidCookieError:
         if namespace.cookie in COOKIE_BROWSERS:
-            die('Could not extract cookies from %s.' % namespace.cookie)
+            die([
+                'Could not extract relevant cookie from "%s".' % namespace.cookie,
+                'Note that on Firefox, your Facebook cookie cannot be grabbed if you are',
+                'using the "Facebook Container" extension by Mozilla, sorry :('
+            ])
 
         die([
             'Relevant cookie not found.',
