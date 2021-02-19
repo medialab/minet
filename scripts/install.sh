@@ -63,7 +63,7 @@ os="unknown"
 if [[ $(uname -s) == "Darwin" ]]; then
   os="macos"
   echo "Installing minet for mac..."
-elif cat /etc/os-release | grep -q debian; then
+elif cat /etc/os-release | grep -q "Debian GNU/Linux"; then
   os="ubuntu_16"
   echo "Installing minet for debian..."
 else
