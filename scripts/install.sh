@@ -1,6 +1,23 @@
 #!/bin/bash
 set -e
 
+# Checking for necessary commands
+fail_deps() {
+  echo
+  echo "Missing required dependencies for this script to work."
+  echo "Please install \"curl\" and \"unzip\" before running the script again."
+  echo ""
+  echo "On ubuntu, debian etc. you can do so by running:"
+  echo "  $ sudo apt install curl unzip"
+  exit 1
+}
+
+if ! command -v unzip &> /dev/null; then
+  fail_deps
+elif ! command -v curl &> /dev/null; then
+  fail_deps
+fi
+
 # Asking for sudo right away
 echo
 echo "This install script will ask you for your password so it can move/copy"
