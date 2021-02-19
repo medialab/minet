@@ -50,6 +50,10 @@ get_ubuntu_version() {
 
 fail_install() {
   echo "Installation not supported on this OS, sorry :("
+  echo
+  echo "You can still install minet through python:"
+  echo "  $ pip install minet"
+  echo
   exit 1
 }
 
@@ -59,6 +63,9 @@ os="unknown"
 if [[ $(uname -s) == "Darwin" ]]; then
   os="macos"
   echo "Installing minet for mac..."
+elif cat /etc/os-release | grep -q debian; then
+  os="ubuntu_16"
+  echo "Installing minet for debian..."
 else
   ubuntu_version=$(get_ubuntu_version)
 
