@@ -9,6 +9,7 @@ fail_deps() {
   echo ""
   echo "On ubuntu, debian etc. you can do so by running:"
   echo "  $ sudo apt install curl unzip"
+  echo
   exit 1
 }
 
@@ -24,7 +25,7 @@ echo "This install script will ask you for your password so it can move/copy"
 echo "things to '/usr/local/bin'. If you are not comfortable with this you can"
 echo "read the install script here:"
 echo "https://github.com/medialab/minet/blob/master/scripts/install.sh"
-echo ""
+echo
 
 sudo echo "test" > /dev/null
 
@@ -62,7 +63,7 @@ else
   ubuntu_version=$(get_ubuntu_version)
 
   if [[ $ubuntu_version != "unkown" ]]; then
-    echo "Installing minet for ubuntu (or similar)..."
+    echo "Installing minet for ubuntu $ubuntu_version (or similar)..."
 
     if [[ $ubuntu_version -le "16" ]]; then
       os="ubuntu_16"
