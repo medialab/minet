@@ -88,6 +88,8 @@ Those configuration files can be written in YAML or JSON and can either be passe
 crowdtangle:
   token: "MY_CT_TOKEN" # Used as --token for `minet ct` commands
   rate_limit: 10 # Used as --rate-limit for `minet ct` commands
+facebook:
+  cookie: "MY_FACEBOOK_COOKIE" # Used as --cookie for `minet fb` commands
 mediacloud:
   token: "MY_MC_TOKEN" # Used as --token for `minet mc` commands
 twitter:

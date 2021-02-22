@@ -727,7 +727,9 @@ MINET_COMMANDS = {
                         {
                             'flags': ['-c', '--cookie'],
                             'help': 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".',
-                            'default': 'firefox'
+                            'default': 'firefox',
+                            'rc_key': ['facebook', 'cookie'],
+                            'action': ConfigAction
                         },
                         {
                             'flags': ['-o', '--output'],
