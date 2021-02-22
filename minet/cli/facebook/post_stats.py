@@ -47,7 +47,8 @@ REACTION_KEYS = OrderedDict({
     7: 'sad',
     8: 'angry',
     11: 'thankful',
-    12: 'pride'
+    12: 'pride',
+    16: 'care'
 })
 
 for emotion_name in REACTION_KEYS.values():
