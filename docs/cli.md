@@ -88,6 +88,8 @@ Those configuration files can be written in YAML or JSON and can either be passe
 crowdtangle:
   token: "MY_CT_TOKEN" # Used as --token for `minet ct` commands
   rate_limit: 10 # Used as --rate-limit for `minet ct` commands
+facebook:
+  cookie: "MY_FACEBOOK_COOKIE" # Used as --cookie for `minet fb` commands
 mediacloud:
   token: "MY_MC_TOKEN" # Used as --token for `minet mc` commands
 twitter:
@@ -131,11 +133,11 @@ examples:
 ```
 usage: minet fetch [-h] [--compress] [--contents-in-report] [-d OUTPUT_DIR]
                    [--domain-parallelism DOMAIN_PARALLELISM] [-f FILENAME]
-                   [--filename-template FILENAME_TEMPLATE] [-g {chrome,firefox}]
-                   [-H HEADERS] [--resume] [--standardize-encoding] [-o OUTPUT]
-                   [-s SELECT] [-t THREADS] [--throttle THROTTLE]
-                   [--timeout TIMEOUT] [--total TOTAL]
-                   [--url-template URL_TEMPLATE] [-X METHOD]
+                   [--filename-template FILENAME_TEMPLATE]
+                   [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
+                   [--resume] [--standardize-encoding] [-o OUTPUT] [-s SELECT]
+                   [-t THREADS] [--throttle THROTTLE] [--timeout TIMEOUT]
+                   [--total TOTAL] [--url-template URL_TEMPLATE] [-X METHOD]
                    column [file]
 
 Minet Fetch Command
@@ -160,8 +162,8 @@ optional arguments:
   --domain-parallelism DOMAIN_PARALLELISM         Max number of urls per domain to hit at the same time. Defaults to 1
   -f FILENAME, --filename FILENAME                Name of the column used to build retrieved file names. Defaults to an uuid v4 with correct extension.
   --filename-template FILENAME_TEMPLATE           A template for the name of the fetched files.
-  -g {chrome,firefox}, --grab-cookies {chrome,firefox}
-                                                  Whether to attempt to grab cookies from your computer's browser.
+  -g {chrome,chromium,edge,firefox,opera}, --grab-cookies {chrome,chromium,edge,firefox,opera}
+                                                  Whether to attempt to grab cookies from your computer's browser (supports "firefox", "chrome", "chromium", "opera" and "edge").
   -H HEADERS, --header HEADERS                    Custom headers used with every requests.
   --resume                                        Whether to resume from an aborted report.
   --standardize-encoding                          Whether to systematically convert retrieved text to UTF-8.
@@ -681,7 +683,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (support "firefox" and "chrome"). Defaults to "firefox".
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
   -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
 
