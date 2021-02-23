@@ -9,5 +9,6 @@ But learning a new tool is never an easy thing and this is why this cookbook tri
 ## Summary
 
 * [Fetching a large amount of urls](./fetch.md)
+* [Joining 2 CSV files by urls](./url-join.md)
 * [Scraping DSL Tutorial](./scraping_dsl.md)
 * [Examples Compendium](./compendium.md)
