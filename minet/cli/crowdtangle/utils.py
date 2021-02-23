@@ -5,14 +5,17 @@
 # Miscellaneous generic functions used throughout the CrowdTangle actions.
 #
 import csv
+import sys
 import casanova
 import ndjson
 from tqdm import tqdm
 
+from minet.utils import prettyprint_seconds
 from minet.cli.utils import print_err, die
 from minet.crowdtangle import CrowdTangleClient
 from minet.crowdtangle.exceptions import (
-    CrowdTangleInvalidTokenError
+    CrowdTangleInvalidTokenError,
+    CrowdTangleRateLimitExceeded
 )
 
 
@@ -82,6 +85,22 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
         if callable(get_args):
             args = get_args(namespace)
 
+        def before_sleep(retry_state):
+            exc = retry_state.outcome.exception()
+
+            reason = 'Call failed because of rate limit!\n'
+
+            if not isinstance(exc, CrowdTangleRateLimitExceeded):
+                reason = 'Call failed because of server timeout!\n'
+
+            tqdm.write(
+                '%sWill wait for %s before attempting again.' % (
+                    reason,
+                    prettyprint_seconds(retry_state.idle_for, granularity=2)
+                ),
+                file=sys.stderr
+            )
+
         create_iterator = getattr(client, method_name)
         iterator = create_iterator(
             *args,
@@ -90,7 +109,8 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
             format='csv_row' if namespace.format == 'csv' else 'raw',
             per_call=True,
             detailed=True,
-            namespace=namespace
+            namespace=namespace,
+            before_sleep=before_sleep
         )
 
         try:

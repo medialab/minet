@@ -5,7 +5,14 @@
 # Miscellaneous generic functions used throughout the CrowdTangle namespace.
 #
 import json
+import urllib3
 from datetime import date, datetime, timedelta
+from tenacity import (
+    Retrying,
+    wait_random_exponential,
+    retry_if_exception_type,
+    stop_after_attempt
+)
 
 from minet.utils import request, rate_limited_from_state
 from minet.crowdtangle.constants import (
@@ -132,7 +139,7 @@ def make_paginated_iterator(url_forge, item_key, formatter,
 
     def create_iterator(http, token, rate_limiter_state, partition_strategy=None,
                         limit=None, format='csv_dict_row', per_call=False, detailed=False,
-                        namespace=None, **kwargs):
+                        namespace=None, before_sleep=None, **kwargs):
 
         if format not in CROWDTANGLE_OUTPUT_FORMATS:
             raise TypeError('minet.crowdtangle: unkown `format`.')
@@ -167,6 +174,18 @@ def make_paginated_iterator(url_forge, item_key, formatter,
 
         rate_limited_step = rate_limited_from_state(rate_limiter_state)(step)
 
+        retryer = Retrying(
+            wait=wait_random_exponential(exp_base=6, min=10, max=3 * 60 * 60),
+            retry=retry_if_exception_type(
+                exception_types=(
+                    urllib3.exceptions.TimeoutError,
+                    CrowdTangleRateLimitExceeded
+                )
+            ),
+            stop=stop_after_attempt(8),
+            before_sleep=before_sleep if callable(before_sleep) else None
+        )
+
         # Chunking
         need_to_chunk = kwargs.get('sort_by', 'date') == 'date'
         chunk_size = kwargs.get('chunk_size', 500)
@@ -193,7 +212,7 @@ def make_paginated_iterator(url_forge, item_key, formatter,
         while True:
             C += 1
 
-            items, next_url = rate_limited_step(http, url, item_key)
+            items, next_url = retryer(rate_limited_step, http, url, item_key)
 
             # We have exhausted the available data
             if items is None:
