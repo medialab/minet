@@ -1,8 +1,14 @@
 # Joining 2 CSV files by urls
 
+* [Use case](#use-case)
+* [The difficulty of joining files using urls](#the-difficulty-of-joining-files-using-urls)
+* [Basic minet url-join usage](#basic-minet-url-join-usage)
+* [Keeping only certain columns from first file in final output](#keeping-only-certain-columns-from-first-file-in-final-output)
+* [What to do when entities are symbolized by multiple urls](#what-to-do-when-entities-are-symbolized-by-multiple-urls)
+
 ## Use case
 
-In this guide I will show you how to use `minet`'s command line interface to "join" (i.e. match lines from both files based on some condition) two CSV files containing urls.
+In this guide I will show you how to use `minet`'s command line interface to "join" (i.e. match lines from both files) two CSV files containing urls.
 
 The usecase is the following: let's say on the one hand you are interested by online media websites and that you have a CSV file listing those medias along with some useful metadata:
 
@@ -13,7 +19,7 @@ The usecase is the following: let's say on the one hand you are interested by on
 | 3     | https://www.liberation.fr    | liberation | left     |
 | ...   | ...                          | ...        | ...      |
 
-And on the other hand, you collected many tweets and sometimes those tweets may mention urls. As such, to see how users will reference online medias, you created a second CSV file such as each line is describing one Twitter user mentioning a given url in one of their tweets. It would look like this:
+On the other hand, you collected many tweets whil researching some subject. And sometimes those tweets may mention urls. As such, to study how Twitter users are referencing your list of online medias, you created a second CSV file such as each line is representing one Twitter user mentioning a given url in one of their tweets. It would look something like this:
 
 | tweet_id | twitter_user | url                                                             |
 |----------|--------------|-----------------------------------------------------------------|
@@ -22,18 +28,20 @@ And on the other hand, you collected many tweets and sometimes those tweets may 
 | 3        | @mary        | https://www.liberation.fr/societe/sante/apres-la-vaccination... |
 | ...      | ...          | ...                                                             |
 
-Now, to be able to answer how users are sharing links from specific medias, you will need to match those two files so that your urls can be associated to the relevant media and its metadata as described by the first file.
+Now, to be able to answer how users are sharing links from specific medias, you will need to match those two files so that urls found in your tweets can be associated to the correct media and the relevant metadata.
 
 ## The difficulty of joining files using urls
 
-An sensible approach would be to join both files based on the urls' domain name, but as you will quickly discover when working with web data and more specifically urls, it's not as easy as this. Indeed, urls are a messy way of conveying a sense of content hierarchy and you might quickly stumble upon issues (what about subdomains, what about a media living on more than one domain etc.).
+An sensible approach would be to join both files based on the urls' domain name, but as you will quickly discover when working with web data and more specifically urls, nothing is as easy as it seems.
 
-So, in order to correctly match your urls and your media, what you really need is first to reorder urls as meaningful hierarchical sequences of tokens such as the url's domain, path, query etc. (which we personally chose to call LRUs as a pun, more about this [here](https://github.com/medialab/ural#lru-explanation)). Then you need to pair the urls of the second file with the ones "symbolizing" your medias in the first one so that this second url is the longest matching prefix of the first one.
+Indeed, urls are an incredibly messy way of conveying a sense of content hierarchy and you might quickly stumble upon various issues (what about subdomains, what about a media living on more than one domain etc.).
+
+So, in order to correctly match your urls and your media, what you really need is first to reorder urls as meaningful hierarchical sequences of parts such as the url's domain, path, query etc. (which we personally chose to call LRUs as a pun, more about this [here](https://github.com/medialab/ural#lru-explanation)). Then you need to pair the urls of the second file with the ones "symbolizing" your medias in the first one so that this second url is the longest matching prefix of the first one.
 
 For instance, let's say we have 3 "medias":
 
 1. Le Monde: https://www.lemonde.fr
-2. Le Monde business section (because we want to keep it as a separate entity in our aggregations): https://www.lemonde.fr/economie/
+2. Le Monde business section: https://www.lemonde.fr/economie/ (because we want to keep it as a separate entity in our aggregations)
 3. Le Figaro: https://www.lefigaro.fr
 
 Then this url: https://www.lefigaro.fr/flash-actu/le-zoo-de-lille-accueille-un-jeune-panda-roux-male-pour-tenter-la-reproduction-20210223 should of course match `Le Figaro`
@@ -44,7 +52,7 @@ But this last url: https://www.lemonde.fr/economie/article/2021/02/23/les-lits-i
 
 Finally, note that in our current example, the https://www.liberation.fr/societe/sante/pour-les-soignants-deja-piques-le-vaccin-est-une-precaution-en-plus-de-la-ceinture-et-des-bretelles-20210223_WO3XQZJLB5AYDDYVPCI5RS6QUA/ url should not match anything.
 
-On top of this, you can sprinkle other issues related to url having parts which are not useful to determine whether they point to the same resource or not (such as `www` as a subdomain, the `http` vs. `https` or those pesky `xtor` like queries you can easily find attached to urls found on the web so SEO people can track what you do and where you come from...) and you have yourself quite a challenge if you want to reliably join two files such as ours, by the urls they contain.
+On top of this, you can sprinkle other issues related to url having parts which are not useful to determine whether they point to the same resource or not (such as `www` as a subdomain, `http` vs. `https` or those pesky `?xtor` etc. query items you can easily find attached to urls found on the web so SEO people can track what you do and where you come from...) and you have yourself quite a challenge if you want to reliably join two files such as ours, by the urls they contain.
 
 ## Basic minet url-join usage
 
@@ -54,9 +62,9 @@ That's when `minet` enters the stage to help you do so from the comfort of the c
 minet url-join homepage medias.csv url tweets.csv > joined.csv
 ```
 
-Do so and you will get a `joined.csv` file having one line per line in `tweet.csv` with 4 new columns `id`, `media`, `homepage` and `politics`, that will be filled with relevant info from the `medias.csv` file.
+Do so and you will get a `joined.csv` file having one line per line in `tweet.csv` with 4 new columns `id`, `media`, `homepage` and `politics`, filled with relevant info from the `medias.csv` file.
 
-The order in which the arguments are to be given can be hard to remember so be sure to try `minet`'s help before inverting things:
+The order in which the arguments are to be given can be hard to remember, so be sure to try `minet`'s help before doing things in reverse:
 
 ```bash
 minet url-join -h
@@ -71,7 +79,7 @@ and it will remind you that you need to provide:
 
 ## Keeping only certain columns from first file in final output
 
-In some case, you may want to avoid copying all the columns from the first file into the second one when matching. If so, you can use the `-s/--select` flag to indicate which column to keep from first file in the final output:
+In some cases, you may want to avoid copying all the columns from the first file into the second one when matching. If so, you can use the `-s/--select` flag to indicate which columns to keep from first file in the final output:
 
 ```bash
 minet url-join homepage medias.csv url tweets.csv -s id,media > joined.csv
@@ -86,7 +94,7 @@ will produce:
 | 3        | @mary        | https://www.liberation.fr/societe/sante/apres-la-vaccination... | 3   | liberation |
 | ...      | ...          | ...                                                             | ... | ...        |
 
-or if you are only interested to aggregate based on those media's politics only:
+or if you are only interested on those media's politics:
 
 ```bash
 minet url-join homepage medias.csv url tweets.csv -s politics > joined.csv
@@ -103,10 +111,7 @@ and you will get:
 
 ## What to do when entities are symbolized by multiple urls
 
-Often you will find that a single url is not enough to delimit an interesting "entity" you would want to study as a whole. For instance, you may want to assert that any url of a tweet posted by Le Monde's Twitter account should be associated to the media, as well as any article. But doing so, Le Monde's homepage is not sufficient enough as you will now require at least two url prefix to symbolize the borders of your entity:
-
-* https://www.lemonde.fr/
-* https://twitter.com/lemondefr
+Often you will find that a single url is not enough to delimit an interesting "entity" you would want to study as a whole. For instance, you may want to assert that any url of a tweet posted by Le Monde's Twitter account should be associated to the media, as well as any article. But to do so, Le Monde's homepage is not sufficient as you will now require at least two urls to symbolize the borders of your entity: https://www.lemonde.fr/ and https://twitter.com/lemondefr.
 
 So that both those urls:
 
@@ -119,13 +124,13 @@ This is not an uncommon approach and multiple tools, such as our web crawler [Hy
 
 To handle this, `minet` can be told to consider a CSV column as separated by a special character (people typically use a space or `|` for urls) so that you can represent your entities thusly:
 
-| id  | homepage                                             | media   | politics |
+| id  | prefixes                                             | media   | politics |
 |-----|------------------------------------------------------|---------|----------|
 | 1   | https://www.lemonde.fr https://twitter.com/lemondefr | lemonde | center   |
 | ... | ...                                                  | ...     | ...      |
 
-Just use the `--separator` flag to do so:
+You can then use the `--separator` flag to do indicate to `minet` to consider the `prefixes` column as potentially containing multiple values:
 
 ```bash
-minet url-join homepage medias.csv url tweets.csv --separator " " > joined.csv
+minet url-join prefixes medias.csv url tweets.csv --separator " " > joined.csv
 ```
