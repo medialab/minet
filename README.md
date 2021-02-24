@@ -47,10 +47,10 @@ curl -sSL https://raw.githubusercontent.com/medialab/minet/master/scripts/instal
 
 Don't trust us enough to pipe the result of a HTTP request into `bash`? We wouldn't either, so feel free to read the installation script [here](./scripts/install.sh) and run it on your end if you prefer.
 
-On ubuntu & similar you might need to install curl before running the installation script if you don't already have it:
+On ubuntu & similar you might need to install `curl` and `unzip` before running the installation script if you don't already have it:
 
 ```shell
-sudo apt-get install curl
+sudo apt-get install curl unzip
 ```
 
 Else, **minet** can be installed directly as a python CLI tool and library using pip:
