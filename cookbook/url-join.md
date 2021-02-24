@@ -19,7 +19,7 @@ The usecase is the following: let's say on the one hand you are interested by on
 | 3     | https://www.liberation.fr    | liberation | left     |
 | ...   | ...                          | ...        | ...      |
 
-On the other hand, you collected many tweets whil researching some subject. And sometimes those tweets may mention urls. As such, to study how Twitter users are referencing your list of online medias, you created a second CSV file such as each line is representing one Twitter user mentioning a given url in one of their tweets. It would look something like this:
+On the other hand, you collected many tweets while researching some subject. And sometimes those tweets may mention urls. As such, to study how Twitter users are referencing your list of online medias, you created a second CSV file such as each line is representing one Twitter user mentioning a given url in one of their tweets. It would look something like this:
 
 | tweet_id | twitter_user | url                                                             |
 |----------|--------------|-----------------------------------------------------------------|
@@ -32,7 +32,7 @@ Now, to be able to answer how users are sharing links from specific medias, you 
 
 ## The difficulty of joining files using urls
 
-An sensible approach would be to join both files based on the urls' domain name, but as you will quickly discover when working with web data and more specifically urls, nothing is as easy as it seems.
+A sensible approach would be to join both files based on the urls' domain name, but as you will quickly discover when working with web data and more specifically urls, nothing is as easy as it seems.
 
 Indeed, urls are an incredibly messy way of conveying a sense of content hierarchy and you might quickly stumble upon various issues (what about subdomains, what about a media living on more than one domain etc.).
 
