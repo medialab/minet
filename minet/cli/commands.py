@@ -1519,6 +1519,11 @@ MINET_COMMANDS = {
                 'help': 'Path to the output joined file. By default, the join will be printed to stdout.'
             },
             {
+                'flags': ['-p', '--match-column-prefix'],
+                'help': 'Optional prefix to add to the first file\'s column names to avoid conflicts.',
+                'default': ''
+            },
+            {
                 'flags': ['-s', '--select'],
                 'help': 'Columns from the first file to keep, separated by comma.'
             },

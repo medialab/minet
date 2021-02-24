@@ -317,7 +317,8 @@ examples:
 ## url-join
 
 ```
-usage: minet url-join [-h] [-o OUTPUT] [-s SELECT] [--separator SEPARATOR]
+usage: minet url-join [-h] [-o OUTPUT] [-p MATCH_COLUMN_PREFIX] [-s SELECT]
+                      [--separator SEPARATOR]
                       column1 file1 column2 file2
 
 Minet Url Join Command
@@ -328,16 +329,18 @@ fact, the command will index the first file's urls into a
 hierchical trie before attempting to match the second file's ones.
 
 positional arguments:
-  column1                     Name of the url column in the first file.
-  file1                       Path to the first file.
-  column2                     Name of the url column in the second file.
-  file2                       Path to the second file.
+  column1                                         Name of the url column in the first file.
+  file1                                           Path to the first file.
+  column2                                         Name of the url column in the second file.
+  file2                                           Path to the second file.
 
 optional arguments:
-  -h, --help                  show this help message and exit
-  -o OUTPUT, --output OUTPUT  Path to the output joined file. By default, the join will be printed to stdout.
-  -s SELECT, --select SELECT  Columns from the first file to keep, separated by comma.
-  --separator SEPARATOR       Split indexed url column by a separator?
+  -h, --help                                      show this help message and exit
+  -o OUTPUT, --output OUTPUT                      Path to the output joined file. By default, the join will be printed to stdout.
+  -p MATCH_COLUMN_PREFIX, --match-column-prefix MATCH_COLUMN_PREFIX
+                                                  Optional prefix to add to the first file's column names to avoid conflicts.
+  -s SELECT, --select SELECT                      Columns from the first file to keep, separated by comma.
+  --separator SEPARATOR                           Split indexed url column by a separator?
 
 examples:
 

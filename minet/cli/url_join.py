@@ -33,6 +33,9 @@ def url_join_action(namespace):
 
     empty = [''] * len(left_headers)
 
+    # Applying column prefix now
+    left_headers = [namespace.match_column_prefix + h for h in left_headers]
+
     output_writer.writerow(right_reader.fieldnames + left_headers)
 
     loading_bar = tqdm(
@@ -58,7 +61,7 @@ def url_join_action(namespace):
             for u in url.split(namespace.separator):
                 add_url(u, row)
         else:
-            add_url(u, row)
+            add_url(url, row)
 
         loading_bar.update()
 
