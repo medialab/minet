@@ -72,11 +72,11 @@ class DummyTqdmFile(object):
         pass
 
 
-def open_output_file(output, flag='w'):
+def open_output_file(output, flag='w', encoding='utf-8'):
     if output is None:
         return DummyTqdmFile(sys.stdout)
 
-    return open(output, flag)
+    return open(output, flag, encoding=encoding)
 
 
 WorkerPayload = namedtuple(
@@ -186,7 +186,7 @@ def get_rcfile(rcfile_path=None):
         if p is None or not isfile(p):
             continue
 
-        with open(p) as f:
+        with open(p, encoding='utf-8') as f:
             return yaml.load(f, Loader=yaml.Loader)
 
     return None

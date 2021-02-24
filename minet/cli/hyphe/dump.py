@@ -217,7 +217,7 @@ def hyphe_dump_action(namespace):
     err, stats = jsonrpc('get_status')
 
     # Then we fetch webentities
-    webentities_file = open(webentities_output_path, 'w')
+    webentities_file = open(webentities_output_path, 'w', encoding='utf-8')
     webentities_writer = csv.writer(webentities_file)
     webentities_writer.writerow(WEBENTITY_HEADERS)
 
@@ -239,7 +239,7 @@ def hyphe_dump_action(namespace):
     loading_bar.close()
 
     # Finally we paginate pages
-    pages_file = open(pages_output_path, 'w')
+    pages_file = open(pages_output_path, 'w', encoding='utf-8')
     pages_writer = csv.writer(pages_file)
     pages_writer.writerow(PAGE_HEADERS + (ADDITIONAL_PAGE_HEADERS if namespace.body else []))
 

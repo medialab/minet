@@ -65,7 +65,7 @@ def open_report(path, headers, resume=False):
 
     os.makedirs(dirname(path), exist_ok=True)
 
-    f = open(path, flag)
+    f = open(path, flag, encoding='utf-8')
     writer = csv.writer(f)
 
     if flag == 'w':

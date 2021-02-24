@@ -273,7 +273,7 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the inquired URLs or ids.',
-                            'type': FileType('r'),
+                            'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
                         },
@@ -399,7 +399,7 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the inquired URLs.',
-                            'type': FileType('r'),
+                            'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
                         },
@@ -411,7 +411,7 @@ MINET_COMMANDS = {
                         {
                             'name': '--posts',
                             'help': 'Path to a file containing the retrieved posts.',
-                            'type': FileType('w')
+                            'type': FileType('w', encoding='utf-8')
                         },
                         {
                             'flags': ['-s', '--select'],
@@ -470,7 +470,7 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the Youtube videos urls or ids.',
-                            'type': FileType('r'),
+                            'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
                         },
@@ -502,7 +502,7 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the Youtube videos ids.',
-                            'type': FileType('r'),
+                            'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
                         },
@@ -535,7 +535,7 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the inquired URLs.',
-                            'type': FileType('r'),
+                            'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
                         },
@@ -556,7 +556,7 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the Youtube videos urls or ids.',
-                            'type': FileType('r'),
+                            'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
                         },
@@ -589,7 +589,7 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the keyword for youtube Search.',
-                            'type': FileType('r'),
+                            'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
                         },
@@ -654,7 +654,7 @@ MINET_COMMANDS = {
             {
                 'name': 'report',
                 'help': 'Input CSV fetch action report file.',
-                'type': FileType('r'),
+                'type': FileType('r', encoding='utf-8'),
                 'default': sys.stdin,
                 'nargs': '?'
             },
@@ -720,7 +720,7 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the post urls.',
-                            'type': FileType('r'),
+                            'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
                         },
@@ -761,7 +761,7 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the posts.',
-                            'type': FileType('r'),
+                            'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
                         },
@@ -791,7 +791,7 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the inquired URLs.',
-                            'type': FileType('r'),
+                            'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
                         },
@@ -822,7 +822,7 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the inquired URLs.',
-                            'type': FileType('r'),
+                            'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
                         },
@@ -873,7 +873,7 @@ MINET_COMMANDS = {
             {
                 'name': 'file',
                 'help': 'CSV file containing the urls to fetch.',
-                'type': FileType('r'),
+                'type': FileType('r', encoding='utf-8'),
                 'default': sys.stdin,
                 'nargs': '?'
             },
@@ -1062,7 +1062,7 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the searched Mediacloud media ids.',
-                            'type': FileType('r'),
+                            'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
                         },
@@ -1170,12 +1170,12 @@ MINET_COMMANDS = {
             {
                 'name': 'scraper',
                 'help': 'Path to a scraper definition file.',
-                'type': FileType('r')
+                'type': FileType('r', encoding='utf-8')
             },
             {
                 'name': 'report',
                 'help': 'Input CSV fetch action report file.',
-                'type': FileType('r'),
+                'type': FileType('r', encoding='utf-8'),
                 'default': sys.stdin,
                 'nargs': '?'
             },
@@ -1246,7 +1246,7 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the inquired Twitter users.',
-                            'type': FileType('r'),
+                            'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
                         },
@@ -1296,7 +1296,7 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the inquired Twitter users.',
-                            'type': FileType('r'),
+                            'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
                         },
@@ -1383,7 +1383,7 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the inquired Twitter users.',
-                            'type': FileType('r'),
+                            'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
                         },
@@ -1445,7 +1445,7 @@ MINET_COMMANDS = {
             {
                 'name': 'file',
                 'help': 'Target CSV file.',
-                'type': FileType('r'),
+                'type': FileType('r', encoding='utf-8'),
                 'default': sys.stdin,
                 'nargs': '?'
             },
@@ -1503,7 +1503,7 @@ MINET_COMMANDS = {
             {
                 'name': 'file1',
                 'help': 'Path to the first file.',
-                'type': FileType('r')
+                'type': FileType('r', encoding='utf-8')
             },
             {
                 'name': 'column2',
@@ -1512,7 +1512,7 @@ MINET_COMMANDS = {
             {
                 'name': 'file2',
                 'help': 'Path to the second file.',
-                'type': FileType('r')
+                'type': FileType('r', encoding='utf-8')
             },
             {
                 'flags': ['-o', '--output'],
@@ -1559,7 +1559,7 @@ MINET_COMMANDS = {
             {
                 'name': 'file',
                 'help': 'Target CSV file.',
-                'type': FileType('r'),
+                'type': FileType('r', encoding='utf-8'),
                 'default': sys.stdin,
                 'nargs': '?'
             },

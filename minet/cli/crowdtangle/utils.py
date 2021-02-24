@@ -41,7 +41,7 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
             if namespace.format != 'csv':
                 die('Cannot --resume jsonl format yet.')
 
-            with open(namespace.output, 'r') as f:
+            with open(namespace.output, 'r', encoding='utf-8') as f:
                 resume_reader = casanova.reader(f)
 
                 last_cell = None

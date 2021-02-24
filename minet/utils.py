@@ -862,12 +862,12 @@ def fstring_eval(template, **kwargs):
     )
 
 
-def load_definition(f):
+def load_definition(f, encoding='utf-8'):
     string_path = isinstance(f, str)
 
     if string_path:
         path = f
-        f = open(path)
+        f = open(path, encoding=encoding)
     else:
         path = f.name
 

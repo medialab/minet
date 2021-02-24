@@ -25,7 +25,7 @@ def mediacloud_medias_action(namespace, output_file):
 
     if namespace.feeds:
         added_headers.append('feeds')
-        feeds_file = open(namespace.feeds, 'w')
+        feeds_file = open(namespace.feeds, 'w', encoding='utf-8')
         feeds_writer = csv.writer(feeds_file)
         feeds_writer.writerow(MEDIACLOUD_FEED_CSV_HEADER)
 
