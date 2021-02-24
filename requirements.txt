@@ -25,4 +25,4 @@ tqdm==4.31.1
 trafilatura==0.7.0
 twitwi==0.2.3
 ural==0.26.0
-urllib3[secure]==1.25.3
+urllib3[secure]==1.26.3
