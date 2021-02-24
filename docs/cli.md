@@ -149,6 +149,7 @@ examples:
 usage: minet fetch [-h] [--compress] [--contents-in-report] [-d OUTPUT_DIR]
                    [--domain-parallelism DOMAIN_PARALLELISM] [-f FILENAME]
                    [--filename-template FILENAME_TEMPLATE]
+                   [--folder-strategy FOLDER_STRATEGY]
                    [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
                    [--resume] [--standardize-encoding] [-o OUTPUT] [-s SELECT]
                    [-t THREADS] [--throttle THROTTLE] [--timeout TIMEOUT]
@@ -177,6 +178,7 @@ optional arguments:
   --domain-parallelism DOMAIN_PARALLELISM         Max number of urls per domain to hit at the same time. Defaults to 1
   -f FILENAME, --filename FILENAME                Name of the column used to build retrieved file names. Defaults to an uuid v4 with correct extension.
   --filename-template FILENAME_TEMPLATE           A template for the name of the fetched files.
+  --folder-strategy FOLDER_STRATEGY               Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. Defaults to "flat". All of the strategies are described at the end of this help.
   -g {chrome,chromium,edge,firefox,opera}, --grab-cookies {chrome,chromium,edge,firefox,opera}
                                                   Whether to attempt to grab cookies from your computer's browser (supports "firefox", "chrome", "chromium", "opera" and "edge").
   -H HEADERS, --header HEADERS                    Custom headers used with every requests.
@@ -190,6 +192,24 @@ optional arguments:
   --total TOTAL                                   Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
   --url-template URL_TEMPLATE                     A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.
   -X METHOD, --request METHOD                     The http method to use. Will default to GET.
+
+--folder-strategy options:
+
+. "flat": default choice, all files will be written in the indicated
+  content folder.
+
+. "prefix-x": e.g. "prefix-4", files will be written in folders
+  having a name that is the first x characters of the file's name.
+  This is an efficient way to partition content into folders containing
+  roughly the same number of files if the file names are random (which
+  is the case by default since uuids will be used).
+
+. "hostname": files will be written in folders based on their url's
+  full host name.
+
+. "normalized-hostname": files will be written in folders based on
+  their url's hostname stripped of some undesirable parts (such as
+  "www.", or "m." or "fr.", for instance).
 
 examples:
 

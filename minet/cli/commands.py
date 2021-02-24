@@ -865,6 +865,13 @@ MINET_COMMANDS = {
               roughly the same number of files if the file names are random (which
               is the case by default since uuids will be used).
 
+            . "hostname": files will be written in folders based on their url's
+              full host name.
+
+            . "normalized-hostname": files will be written in folders based on
+              their url's hostname stripped of some undesirable parts (such as
+              "www.", or "m." or "fr.", for instance).
+
             examples:
 
             . Fetching a batch of url from existing CSV file:

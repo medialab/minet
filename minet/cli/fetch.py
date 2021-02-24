@@ -14,7 +14,7 @@ from os.path import join, dirname, isfile
 from collections import Counter
 from tqdm import tqdm
 from uuid import uuid4
-from ural import is_url
+from ural import is_url, get_hostname, get_normalized_hostname
 
 from minet.fetch import multithreaded_fetch
 from minet.utils import (
@@ -58,9 +58,40 @@ class PrefixFolderStrategy(FolderStrategy):
         return join(filename[:self.length], filename)
 
 
+class HostnameFolderStrategy(FolderStrategy):
+    def get(self, filename, url, **kwargs):
+        hostname = get_hostname(url)
+
+        if not hostname:
+            hostname = 'unknown-host'
+
+        return join(hostname, filename)
+
+
+class NormalizedHostnameFolderStrategy(FolderStrategy):
+    def get(self, filename, url, **kwargs):
+        hostname = get_normalized_hostname(
+            url,
+            normalize_amp=True,
+            strip_lang_subdomains=True,
+            infer_redirection=True
+        )
+
+        if not hostname:
+            hostname = 'unknown-host'
+
+        return join(hostname, filename)
+
+
 def parse_folder_strategy(name):
     if name == 'flat':
         return FlatFolderStrategy()
+
+    if name == 'hostname':
+        return HostnameFolderStrategy()
+
+    if name == 'normalized-hostname':
+        return NormalizedHostnameFolderStrategy()
 
     if name.startswith('prefix-'):
         length = name.split('prefix-')[-1]
