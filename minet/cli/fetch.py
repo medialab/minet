@@ -41,6 +41,22 @@ OUTPUT_ADDITIONAL_HEADERS = [
 CUSTOM_FORMATTER = PseudoFStringFormatter()
 
 
+class FolderStrategy(object):
+    pass
+
+
+class FlatFolderStrategy(FolderStrategy):
+    def get(self, filename, **kwargs):
+        return filename
+
+
+def parse_folder_strategy(name):
+    if name == 'flat':
+        return FlatFolderStrategy()
+
+    raise None
+
+
 def fetch_action(namespace):
 
     # Are we resuming
@@ -60,6 +76,16 @@ def fetch_action(namespace):
         # If we are hitting a single url we enable contents_in_report
         if namespace.contents_in_report is None:
             namespace.contents_in_report = True
+
+    # Trying to instantiate the folder strategy
+    folder_strategy = parse_folder_strategy(namespace.folder_strategy)
+
+    if folder_strategy is None:
+        die([
+            'Invalid "%s" --folder-strategy!' % namespace.folder_strategy,
+            'Check the list at the end of the command help:',
+            '  $ minet fetch -h'
+        ])
 
     # HTTP method
     http_method = namespace.method
@@ -270,6 +296,9 @@ def fetch_action(namespace):
                 else:
                     # NOTE: it would be nice to have an id that can be sorted by time
                     filename = str(uuid4()) + result.meta['ext']
+
+                # Applying folder strategy
+                filename = folder_strategy.get(filename, url=result.url)
 
             # Standardize encoding?
             encoding = result.meta['encoding']

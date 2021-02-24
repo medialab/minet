@@ -854,6 +854,17 @@ MINET_COMMANDS = {
             given by the user.
         ''',
         'epilog': '''
+            --folder-strategy options:
+
+            . "flat": default choice, all files will be written in the indicated
+              content folder.
+
+            . "prefix-x": e.g. "prefix-4", files will be written in folders
+              having a name that is the first x characters of the file's name.
+              This is an efficient way to partition content into folders containing
+              roughly the same number of files if the file names are random (which
+              is the case by default since uuids will be used).
+
             examples:
 
             . Fetching a batch of url from existing CSV file:
@@ -906,6 +917,11 @@ MINET_COMMANDS = {
             {
                 'flag': '--filename-template',
                 'help': 'A template for the name of the fetched files.'
+            },
+            {
+                'flag': '--folder-strategy',
+                'help': 'Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. Defaults to "flat". All of the strategies are described at the end of this help.',
+                'default': 'flat'
             },
             {
                 'flags': ['-g', '--grab-cookies'],
