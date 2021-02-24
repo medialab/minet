@@ -37,8 +37,8 @@ def max_retry_error_reporter(error):
 def new_connection_error_reporter(error):
     msg = repr(error)
 
-    if 'Name or service not known' in msg:
-        return 'unknown-dns'
+    if 'Name or service not known' in msg or 'Errno 8' in msg:
+        return 'unknown-host'
 
     return msg
 
