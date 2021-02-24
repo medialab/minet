@@ -50,9 +50,30 @@ class FlatFolderStrategy(FolderStrategy):
         return filename
 
 
+class PrefixFolderStrategy(FolderStrategy):
+    def __init__(self, length):
+        self.length = length
+
+    def get(self, filename, **kwargs):
+        return join(filename[:self.length], filename)
+
+
 def parse_folder_strategy(name):
     if name == 'flat':
         return FlatFolderStrategy()
+
+    if name.startswith('prefix-'):
+        length = name.split('prefix-')[-1]
+
+        try:
+            length = int(length)
+        except ValueError:
+            return None
+
+        if length <= 0:
+            return None
+
+        return PrefixFolderStrategy(length)
 
     raise None
 
