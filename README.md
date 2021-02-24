@@ -8,6 +8,8 @@ It adopts a lo-fi approach to various webmining problems by letting you perform 
 
 In addition, **minet** also exposes its high-level programmatic interface as a python library so you can tweak its behavior at will.
 
+**Shortcuts**: [Cookbook](./cookbook), [CLI Docs](./docs/cli.md), [Lib Docs](./docs/lib.md).
+
 ## Use cases
 
 * Downloading large amount of urls very fast. ([example](./cookbook/fetch.md))
