@@ -136,7 +136,11 @@ It is not a good idea to store hundreds of thousands files in a single directory
 
 ```bash
 minet fetch url urls.csv --filename-template '{value[:4]}/{value}{ext}' > report.csv
+# Which is basically the same as
+minet fetch url urls.csv --folder-strategy prefix-4 > report.csv
 ```
+
+Be sure to read everything about so called "folder strategies" in the command's help to see how you can leverage the different available strategies (such as putting files in folders by url hostname for instance).
 
 ### Throttling & Threading
 
