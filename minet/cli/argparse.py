@@ -4,6 +4,7 @@
 #
 # Miscellaneous helpers related to CLI argument parsing.
 #
+import os
 from argparse import Action, ArgumentTypeError
 
 from minet.utils import nested_get
@@ -29,12 +30,25 @@ class SplitterType(object):
         return string.split(self.splitchar)
 
 
+def rc_key_to_env_var(key):
+    return 'MINET_%s' % '_'.join(token.upper() for token in key)
+
+
 class WrappedConfigValue(object):
-    def __init__(self, key, default):
+    def __init__(self, key, default, _type):
         self.key = key
         self.default = default
+        self.type = _type
 
     def resolve(self, config):
+
+        # Attempting to resolve env variable
+        env_var = rc_key_to_env_var(self.key)
+        env_value = os.environ.get(env_var, '').strip()
+
+        if env_value:
+            return self.type(env_value)
+
         return nested_get(self.key, config, self.default)
 
 
@@ -45,7 +59,8 @@ class ConfigAction(Action):
             dest,
             default=WrappedConfigValue(
                 rc_key,
-                default
+                default,
+                kwargs.get('type', str)
             ),
             **kwargs
         )

@@ -7,6 +7,7 @@
 * [-h/--help/help](#help-flag)
 * [--version](#version-flag)
 * [minetrc config files](#minetrc)
+* [minet environment variables](#envvars)
 
 *Generic commands*
 
@@ -100,6 +101,20 @@ twitter:
 youtube:
   key: "MY_YT_API_KEY" # Used as --key for `minet yt` commands
 ```
+
+<h2 id="envvars">minet environment variables</h2>
+
+Alternatively you can also set some command line arguments using environment variables whose name starts with `MINET_` and followed by a proper key.
+
+To build the name of the variable, first check what can be configured in a minet [rcfile](#minetrc) and add build your variable name by joining its path using an underscore:
+
+For instance, to override `facebook.cookie`, the variable will be `MINET_FACEBOOK_COOKIE`.
+
+If one of the path's key already contains underscore, it will work all the same, so to overried `twitter.api_key`, the variable will be `MINET_TWITTER_API_KEY`.
+
+Note that the given variable will be cast to the proper type as if it was passed as a command line argument (for instance, `MINET_CROWDTANGLE_RATE_LIMIT` will correctly be cast as an integer).
+
+Finally note that command line arguments and flags will take precedence over environment variables, and that environment variables will take precedence over a rcfile configuration.
 
 ## crawl
 
