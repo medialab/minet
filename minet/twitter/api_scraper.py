@@ -7,6 +7,7 @@
 import re
 import time
 import datetime
+import urllib3
 from urllib.parse import urlencode, quote
 from tenacity import (
     Retrying,
@@ -300,14 +301,15 @@ class TwitterAPIScraper(object):
         i = 0
 
         retryer = Retrying(
-            wait=wait_random_exponential(max=60 * 3),
+            wait=wait_random_exponential(min=2, max=60 * 3, exp_base=5),
             retry=retry_if_exception_type(
                 exception_types=(
                     TwitterPublicAPIRateLimitError,
-                    TwitterPublicAPIInvalidResponseError
+                    TwitterPublicAPIInvalidResponseError,
+                    urllib3.exceptions.TimeoutError
                 )
             ),
-            stop=stop_after_attempt(6),
+            stop=stop_after_attempt(8),
             before_sleep=before_sleep if callable(before_sleep) else None
         )
 

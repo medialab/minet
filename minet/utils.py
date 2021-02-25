@@ -926,7 +926,7 @@ INTERVALS = [
     ('days', 60 * 60 * 24),    # 60 * 60 * 24
     ('hours', 60 * 60),    # 60 * 60
     ('minutes', 60),
-    ('seconds', 1),
+    ('seconds', 1)
 ]
 
 
@@ -943,6 +943,9 @@ def prettyprint_seconds(seconds, granularity=None):
                 name = name.rstrip('s')
 
             result.append('%i %s' % (value, name))
+
+    if not result:
+        return '0 seconds'
 
     if granularity is not None:
         result = result[:granularity]

@@ -4,15 +4,14 @@
 #
 # Logic of the `tw scrape` action.
 import csv
+import sys
 from tqdm import tqdm
 from twitwi.constants import TWEET_FIELDS
 from twitwi import transform_tweet_into_csv_dict
 
+from minet.utils import prettyprint_seconds
 from minet.twitter import TwitterAPIScraper
-from minet.twitter.exceptions import (
-    TwitterPublicAPIRateLimitError,
-    TwitterPublicAPIInvalidResponseError
-)
+from minet.twitter.exceptions import TwitterPublicAPIRateLimitError
 
 
 def twitter_scrape_action(namespace, output_file):
@@ -47,9 +46,13 @@ def twitter_scrape_action(namespace, output_file):
             tokens += 1
             loading_bar.set_postfix(tokens=tokens)
 
-        elif isinstance(exc, TwitterPublicAPIInvalidResponseError):
+        else:
             failures += 1
             loading_bar.set_postfix(failures=failures)
+            loading_bar.write(
+                'Failed to call Twitter search. Will retry in %s' % prettyprint_seconds(retry_state.idle_for),
+                file=sys.stderr
+            )
 
     iterator = scraper.search(
         namespace.query,
