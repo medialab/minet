@@ -40,9 +40,9 @@ def CsvIO(column, value):
     return StringIO('%s\n%s' % (column, value))
 
 
-def edit_namespace_with_csv_io(namespace, column):
-    namespace.file = CsvIO(column, namespace.column)
-    namespace.column = column
+def edit_namespace_with_csv_io(namespace, column, attr_name='column'):
+    namespace.file = CsvIO(column, getattr(namespace, attr_name))
+    setattr(namespace, attr_name, column)
 
 
 class DummyTqdmFile(object):
