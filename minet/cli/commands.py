@@ -1361,10 +1361,10 @@ MINET_COMMANDS = {
                         . Collecting the latest 500 tweets of a given Twitter user:
                             `minet tw scrape tweets "from:@jack" --limit 500 > tweets.csv`
 
-                        . Collecting the tweets from Twitter user listed in CSV file:
-                            `minet tw scrape tweets user users.csv > tweets.csv`
+                        . Collecting the tweets from multiple Twitter queries listed in a CSV file:
+                            `minet tw scrape tweets query queries.csv > tweets.csv`
 
-                        . Templating the given CSV column:
+                        . Templating the given CSV column to query tweets by users:
                             `minet tw scrape tweets user users.csv --query-template 'from:@{value}' > tweets.csv`
                     ''',
                     'arguments': [
