@@ -965,7 +965,8 @@ examples:
 
 ```
 usage: minet twitter scrape [-h] [--include-refs] [-l LIMIT] [-o OUTPUT]
-                            {tweets} query
+                            [--query-template QUERY_TEMPLATE] [-s SELECT]
+                            {tweets} query [file]
 
 Minet Twitter Scrape Command
 ============================
@@ -973,19 +974,28 @@ Minet Twitter Scrape Command
 Scrape Twitter's public facing search API to collect tweets etc.
 
 positional arguments:
-  {tweets}                    What to scrape. Currently only `tweets` is possible.
-  query                       Search query.
+  {tweets}                         What to scrape. Currently only `tweets` is possible.
+  query                            Search query or name of the column containing queries to run in given CSV file.
+  file                             Optional CSV file containing the queries to be run.
 
 optional arguments:
-  -h, --help                  show this help message and exit
-  --include-refs              Whether to emit referenced tweets (quoted, retweeted & replied) in the CSV output. Note that it consumes a memory proportional to the total number of unique tweets retrieved.
-  -l LIMIT, --limit LIMIT     Maximum number of tweets to collect.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the result will be printed to stdout.
+  -h, --help                       show this help message and exit
+  --include-refs                   Whether to emit referenced tweets (quoted, retweeted & replied) in the CSV output. Note that it consumes a memory proportional to the total number of unique tweets retrieved.
+  -l LIMIT, --limit LIMIT          Maximum number of tweets to collect per query.
+  -o OUTPUT, --output OUTPUT       Path to the output file. By default, the result will be printed to stdout.
+  --query-template QUERY_TEMPLATE  Query template. Can be useful for instance to change a column of twitter user screen names into from:@user queries.
+  -s SELECT, --select SELECT       Columns to include in report (separated by `,`).
 
 examples:
 
 . Collecting the latest 500 tweets of a given Twitter user:
     `minet tw scrape tweets "from:@jack" --limit 500 > tweets.csv`
+
+. Collecting the tweets from Twitter user listed in CSV file:
+    `minet tw scrape tweets user users.csv > tweets.csv`
+
+. Templating the given CSV column:
+    `minet tw scrape tweets user users.csv --query-template 'from:@{value}' > tweets.csv`
 
 ```
 

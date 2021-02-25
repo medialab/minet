@@ -44,6 +44,9 @@ def edit_namespace_with_csv_io(namespace, column, attr_name='column'):
     namespace.file = CsvIO(column, getattr(namespace, attr_name))
     setattr(namespace, attr_name, column)
 
+    if hasattr(namespace, 'select'):
+        namespace.select = [attr_name]
+
 
 class DummyTqdmFile(object):
     """

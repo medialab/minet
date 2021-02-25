@@ -1360,6 +1360,12 @@ MINET_COMMANDS = {
 
                         . Collecting the latest 500 tweets of a given Twitter user:
                             `minet tw scrape tweets "from:@jack" --limit 500 > tweets.csv`
+
+                        . Collecting the tweets from Twitter user listed in CSV file:
+                            `minet tw scrape tweets user users.csv > tweets.csv`
+
+                        . Templating the given CSV column:
+                            `minet tw scrape tweets user users.csv --query-template 'from:@{value}' > tweets.csv`
                     ''',
                     'arguments': [
                         {
@@ -1369,7 +1375,14 @@ MINET_COMMANDS = {
                         },
                         {
                             'name': 'query',
-                            'help': 'Search query.'
+                            'help': 'Search query or name of the column containing queries to run in given CSV file.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'Optional CSV file containing the queries to be run.',
+                            'type': FileType('r', encoding='utf-8'),
+                            'default': sys.stdin,
+                            'nargs': '?'
                         },
                         {
                             'flag': '--include-refs',
@@ -1378,12 +1391,21 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-l', '--limit'],
-                            'help': 'Maximum number of tweets to collect.',
+                            'help': 'Maximum number of tweets to collect per query.',
                             'type': int
                         },
                         {
                             'flags': ['-o', '--output'],
                             'help': 'Path to the output file. By default, the result will be printed to stdout.'
+                        },
+                        {
+                            'flag': '--query-template',
+                            'help': 'Query template. Can be useful for instance to change a column of twitter user screen names into from:@user queries.'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
                         }
                     ]
                 },
