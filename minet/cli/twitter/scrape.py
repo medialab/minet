@@ -31,7 +31,7 @@ def twitter_scrape_action(namespace, output_file):
 
     writer = csv.DictWriter(
         output_file,
-        fieldnames=TWEET_FIELDS,
+        fieldnames=['query'] + TWEET_FIELDS,
         extrasaction='ignore'
     )
     writer.writeheader()
@@ -65,6 +65,7 @@ def twitter_scrape_action(namespace, output_file):
         loading_bar.update()
 
         transform_tweet_into_csv_dict(tweet)
+        tweet['query'] = namespace.query
         writer.writerow(tweet)
 
     loading_bar.close()
