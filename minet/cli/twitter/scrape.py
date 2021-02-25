@@ -7,7 +7,7 @@ import csv
 import sys
 from tqdm import tqdm
 from twitwi.constants import TWEET_FIELDS
-from twitwi import transform_tweet_into_csv_dict
+from twitwi import format_tweet_as_csv_row
 
 from minet.utils import prettyprint_seconds
 from minet.twitter import TwitterAPIScraper
@@ -29,12 +29,8 @@ def twitter_scrape_action(namespace, output_file):
         postfix={'tokens': tokens}
     )
 
-    writer = csv.DictWriter(
-        output_file,
-        fieldnames=['query'] + TWEET_FIELDS,
-        extrasaction='ignore'
-    )
-    writer.writeheader()
+    writer = csv.writer(output_file)
+    writer.writerow(['query'] + TWEET_FIELDS)
 
     def before_sleep(retry_state):
         nonlocal tokens
@@ -64,8 +60,7 @@ def twitter_scrape_action(namespace, output_file):
     for tweet in iterator:
         loading_bar.update()
 
-        transform_tweet_into_csv_dict(tweet)
-        tweet['query'] = namespace.query
-        writer.writerow(tweet)
+        row = format_tweet_as_csv_row(tweet)
+        writer.writerow([namespace.query] + row)
 
     loading_bar.close()
