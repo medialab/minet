@@ -16,6 +16,7 @@ from minet.cli.utils import open_output_file, die, edit_namespace_with_csv_io
 
 REPORT_HEADERS = ['approx_likes', 'approx_likes_int']
 NO_LIKES_RE = re.compile(rb'>\s*You like this\.', re.I)
+ONE_LIKE_RE = re.compile(rb'>\s*One person likes this\.', re.I)
 LIKES_RE = re.compile(rb'>\s*([\d.KM]+)\s+people\s+like', re.I)
 
 
@@ -48,6 +49,9 @@ def parse_approx_likes(approx_likes, unit='K'):
 def scrape(data):
     if NO_LIKES_RE.search(data):
         return ['0', '0']
+
+    if ONE_LIKE_RE.search(data):
+        return ['1', '1']
 
     match = LIKES_RE.search(data)
 
