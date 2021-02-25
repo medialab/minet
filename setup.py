@@ -38,7 +38,7 @@ setup(name='minet',
         'tenacity>=6.3.1',
         'tqdm>=4.31.1',
         'trafilatura>=0.7.0,<0.8',
-        'twitwi>=0.2.3',
+        'twitwi>=0.4.0',
         'ural>=0.26.0',
         'urllib3[secure]>=1.26.3'
       ],
