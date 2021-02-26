@@ -388,7 +388,7 @@ class Crawler(object):
         content = spider.process_content(job, response, meta)
 
         if isinstance(spider, FunctionSpider):
-            next_jobs, scraped = spider.process(job, response, content, meta)
+            scraped, next_jobs = spider.process(job, response, content, meta)
         else:
 
             # Scraping items
