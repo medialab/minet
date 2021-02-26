@@ -341,7 +341,7 @@ class TestScrape(object):
 
         assert result == ['one', 'two']
 
-    def test_context(self):
+    def test_eval(self):
         result = scrape({
             'iterator': 'li',
             'fields': {
@@ -361,6 +361,7 @@ class TestScrape(object):
 
         assert result == 'Exemple'
 
+    def test_context(self):
         result = scrape({
             'iterator': 'li',
             'fields': {
