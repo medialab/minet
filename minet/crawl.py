@@ -12,6 +12,7 @@ from ural import get_domain_name
 from collections import namedtuple
 from urllib.parse import urljoin
 from shutil import rmtree
+from threading import Lock
 
 from minet.scrape import Scraper
 from minet.utils import (
@@ -88,21 +89,43 @@ def ensure_job(url_or_job):
 
 
 class CrawlerState(object):
-    __slots__ = ('jobs_done', 'jobs_queued')
-
     def __init__(self):
+        self.__lock = Lock()
+
         self.jobs_done = 0
+        self.jobs_doing = 0
         self.jobs_queued = 0
+
+    def inc_queued(self):
+        with self.__lock:
+            self.jobs_queued += 1
+
+    def dec_queued(self):
+        with self.__lock:
+            self.jobs_queued -= 1
+
+    def inc_done(self):
+        with self.__lock:
+            self.jobs_done += 1
+
+    def inc_doing(self):
+        with self.__lock:
+            self.jobs_doing += 1
+
+    def dec_doing(self):
+        with self.__lock:
+            self.jobs_doing -= 1
 
     def __repr__(self):
         class_name = self.__class__.__name__
 
         return (
-            '<%(class_name)s done=%(jobs_done)s queued=%(jobs_queued)s>'
+            '<%(class_name)s queued=%(jobs_queued)i doing=%(jobs_doing)i done=%(jobs_done)i>'
         ) % {
             'class_name': class_name,
             'jobs_done': self.jobs_done,
-            'jobs_queued': self.jobs_queued
+            'jobs_queued': self.jobs_queued,
+            'jobs_doing': self.jobs_doing
         }
 
 
@@ -348,10 +371,10 @@ class Crawler(object):
             for job in job_or_jobs:
                 assert isinstance(job, (CrawlJob, str))
                 self.queue.put(ensure_job(job))
+                self.state.inc_queued()
         else:
             self.queue.put(ensure_job(job_or_jobs))
-
-        self.state.jobs_queued = self.queue.qsize()
+            self.state.inc_queued()
 
     def start(self):
 
@@ -376,7 +399,8 @@ class Crawler(object):
         self.started = True
 
     def work(self, job):
-        self.state.jobs_queued = self.queue.qsize()
+        self.state.dec_queued()
+        self.state.inc_doing()
 
         spider = self.spiders.get(job.spider)
 
@@ -418,7 +442,8 @@ class Crawler(object):
             next_jobs = list(next_jobs)
             self.enqueue(next_jobs)
 
-        self.state.jobs_done += 1
+        self.state.inc_done()
+        self.state.dec_doing()
 
         return CrawlWorkerResult(
             job=job,

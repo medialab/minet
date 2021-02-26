@@ -198,7 +198,11 @@ def crawl_action(namespace):
     def update_loading_bar(result):
         state = crawler.state
 
-        loading_bar.set_postfix(queue=state.jobs_queued, spider=result.job.spider)
+        loading_bar.set_postfix(
+            queued=state.jobs_queued,
+            doing=state.jobs_doing + 1,
+            spider=result.job.spider
+        )
         loading_bar.update()
 
     # Starting crawler
