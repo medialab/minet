@@ -895,13 +895,8 @@ MINET_COMMANDS = {
                 'dest': 'headers'
             },
             {
-                'flag': '--resume',
-                'help': 'Whether to resume from an aborted report.',
-                'action': 'store_true'
-            },
-            {
-                'flag': '--standardize-encoding',
-                'help': 'Whether to systematically convert retrieved text to UTF-8.',
+                'flag': '--insecure',
+                'help': 'Whether to allow ssl errors when performing requests or not.',
                 'action': 'store_true'
             },
             {
@@ -909,9 +904,19 @@ MINET_COMMANDS = {
                 'help': 'Path to the output report file. By default, the report will be printed to stdout.'
             },
             {
+                'flag': '--resume',
+                'help': 'Whether to resume from an aborted report.',
+                'action': 'store_true'
+            },
+            {
                 'flags': ['-s', '--select'],
                 'help': 'Columns to include in report (separated by `,`).',
                 'type': SplitterType()
+            },
+            {
+                'flag': '--standardize-encoding',
+                'help': 'Whether to systematically convert retrieved text to UTF-8.',
+                'action': 'store_true'
             },
             {
                 'flags': ['-t', '--threads'],

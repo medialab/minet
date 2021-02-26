@@ -292,6 +292,7 @@ def fetch_action(namespace):
         enricher,
         key=url_key,
         request_args=request_args,
+        insecure=namespace.insecure,
         **fetch_kwargs
     )
 
