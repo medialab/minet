@@ -31,7 +31,6 @@
 * [facebook (fb)](#facebook)
   * [comments](#facebook-comments)
   * [url-likes](#facebook-url-likes)
-  * [url-parse](#facebook-url-parse)
 * [hyphe](#hyphe)
   * [dump](#dump)
 * [mediacloud (mc)](#mediacloud)
@@ -48,7 +47,6 @@
   * [captions](#captions)
   * [comments](#youtube-comments)
   * [search](#youtube-search)
-  * [url-parse](#youtube-url-parse)
   * [videos](#videos)
 
 
@@ -390,8 +388,9 @@ examples:
 ## url-parse
 
 ```
-usage: minet url-parse [-h] [-o OUTPUT] [-s SELECT] [--separator SEPARATOR]
-                       [--strip-protocol] [--total TOTAL]
+usage: minet url-parse [-h] [--facebook] [-o OUTPUT] [-s SELECT]
+                       [--separator SEPARATOR] [--strip-protocol]
+                       [--total TOTAL] [--youtube]
                        column [file]
 
 Minet Url Parse Command
@@ -406,22 +405,30 @@ positional arguments:
 
 optional arguments:
   -h, --help                             show this help message and exit
+  --facebook                             Whether to consider and parse the given urls as coming from Facebook.
   -o OUTPUT, --output OUTPUT             Path to the output file. By default, the result will be printed to stdout.
   -s SELECT, --select SELECT             Columns to keep in output, separated by comma.
   --separator SEPARATOR                  Split url column by a separator?
   --strip-protocol, --no-strip-protocol  Whether or not to strip the protocol when normalizing the url. Defaults to strip protocol.
   --total TOTAL                          Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
+  --youtube                              Whether to consider and parse the given urls as coming from YouTube.
 
 examples:
 
 . Creating a report about a file's urls:
-    `minet url-report url posts.csv > report.csv`
+    `minet url-parse url posts.csv > report.csv`
 
 . Keeping only selected columns from the input file:
-    `minet url-report url posts.csv -s id,url,title > report.csv`
+    `minet url-parse url posts.csv -s id,url,title > report.csv`
 
 . Multiple urls joined by separator:
-    `minet url-report urls posts.csv --separator "|" > report.csv`
+    `minet url-parse urls posts.csv --separator "|" > report.csv`
+
+. Parsing Facebook urls:
+    `minet url-parse url fbposts.csv --facebook > report.csv`
+
+. Parsing YouTube urls:
+    `minet url-parse url ytvideos.csv --youtube > report.csv`
 
 ```
 
@@ -689,7 +696,7 @@ examples:
 ## Facebook
 
 ```
-usage: minet facebook [-h] {comments,post-stats,url-likes,url-parse} ...
+usage: minet facebook [-h] {comments,post-stats,url-likes} ...
 
 Minet Facebook Command
 ======================
@@ -697,10 +704,10 @@ Minet Facebook Command
 Collects data from Facebook.
 
 optional arguments:
-  -h, --help                                 show this help message and exit
+  -h, --help                       show this help message and exit
 
 actions:
-  {comments,post-stats,url-likes,url-parse}  Action to perform to collect data on Facebook
+  {comments,post-stats,url-likes}  Action to perform to collect data on Facebook
 
 ```
 
@@ -750,27 +757,6 @@ optional arguments:
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
   -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
   --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
-
-```
-
-<h3 id="facebook-url-parse">url-parse</h3>
-
-```
-usage: minet facebook url-parse [-h] [-o OUTPUT] [-s SELECT] column [file]
-
-Parse Facebook URLs
-===================
-
-Extract informations from Facebook URLs.
-
-positional arguments:
-  column                      Name of the column containing the URL in the CSV file.
-  file                        CSV file containing the inquired URLs.
-
-optional arguments:
-  -h, --help                  show this help message and exit
-  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
-  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
 
 ```
 
@@ -1120,27 +1106,6 @@ example:
 
 . Searching videos about birds:
     `minet youtube search bird -k my-api-key > bird_videos.csv`
-
-```
-
-<h3 id="youtube-url-parse">url-parse</h3>
-
-```
-usage: minet youtube url-parse [-h] [-o OUTPUT] [-s SELECT] column [file]
-
-Parse Youtube URLs
-==================
-
-Extract informations from Youtube URLs
-
-positional arguments:
-  column                      Name of the column containing the URL in the CSV file.
-  file                        CSV file containing the inquired URLs.
-
-optional arguments:
-  -h, --help                  show this help message and exit
-  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
-  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
 
 ```
 

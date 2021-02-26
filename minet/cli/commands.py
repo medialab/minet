@@ -524,27 +524,6 @@ MINET_COMMANDS = {
                         }
                     ]
                 },
-                'url-parse': {
-                    'title': 'Parse Youtube URLs',
-                    'description': 'Extract informations from Youtube URLs',
-                    'arguments': [
-                        {
-                            'name': 'column',
-                            'help': 'Name of the column containing the URL in the CSV file.'
-                        },
-                        {
-                            'name': 'file',
-                            'help': 'CSV file containing the inquired URLs.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
-                        },
-                        {
-                            'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).'
-                        }
-                    ]
-                },
                 'videos': {
                     'title': 'Youtube videos',
                     'description': 'Retrieve metadata about Youtube videos using the API.',
@@ -810,33 +789,7 @@ MINET_COMMANDS = {
                             'type': int
                         }
                     ]
-                },
-                'url-parse': {
-                    'title': 'Parse Facebook URLs',
-                    'description': 'Extract informations from Facebook URLs.',
-                    'arguments': [
-                        {
-                            'name': 'column',
-                            'help': 'Name of the column containing the URL in the CSV file.'
-                        },
-                        {
-                            'name': 'file',
-                            'help': 'CSV file containing the inquired URLs.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
-                        },
-                        {
-                            'flags': ['-o', '--output'],
-                            'help': 'Path to the output report file. By default, the report will be printed to stdout.'
-                        },
-                        {
-                            'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).',
-                            'type': SplitterType()
-                        }
-                    ]
-                },
+                }
             }
         }
     },
@@ -1593,13 +1546,19 @@ MINET_COMMANDS = {
             examples:
 
             . Creating a report about a file's urls:
-                `minet url-report url posts.csv > report.csv`
+                `minet url-parse url posts.csv > report.csv`
 
             . Keeping only selected columns from the input file:
-                `minet url-report url posts.csv -s id,url,title > report.csv`
+                `minet url-parse url posts.csv -s id,url,title > report.csv`
 
             . Multiple urls joined by separator:
-                `minet url-report urls posts.csv --separator "|" > report.csv`
+                `minet url-parse urls posts.csv --separator "|" > report.csv`
+
+            . Parsing Facebook urls:
+                `minet url-parse url fbposts.csv --facebook > report.csv`
+
+            . Parsing YouTube urls:
+                `minet url-parse url ytvideos.csv --youtube > report.csv`
         ''',
         'arguments': [
             {
@@ -1612,6 +1571,11 @@ MINET_COMMANDS = {
                 'type': FileType('r', encoding='utf-8'),
                 'default': sys.stdin,
                 'nargs': '?'
+            },
+            {
+                'flag': '--facebook',
+                'help': 'Whether to consider and parse the given urls as coming from Facebook.',
+                'action': 'store_true'
             },
             {
                 'flags': ['-o', '--output'],
@@ -1637,6 +1601,11 @@ MINET_COMMANDS = {
                 'flag': '--total',
                 'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
                 'type': int
+            },
+            {
+                'flag': '--youtube',
+                'help': 'Whether to consider and parse the given urls as coming from YouTube.',
+                'action': 'store_true'
             }
         ]
     }

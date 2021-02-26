@@ -22,8 +22,3 @@ def facebook_action(namespace):
         from minet.cli.facebook.url_likes import facebook_url_likes_action
 
         facebook_url_likes_action(namespace)
-
-    elif namespace.fb_action == 'url-parse':
-        from minet.cli.facebook.url_parse import facebook_url_parse_action
-
-        facebook_url_parse_action(namespace)

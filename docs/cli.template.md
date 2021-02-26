@@ -31,7 +31,6 @@
 * [facebook (fb)](#facebook)
   * [comments](#facebook-comments)
   * [url-likes](#facebook-url-likes)
-  * [url-parse](#facebook-url-parse)
 * [hyphe](#hyphe)
   * [dump](#dump)
 * [mediacloud (mc)](#mediacloud)
@@ -48,7 +47,6 @@
   * [captions](#captions)
   * [comments](#youtube-comments)
   * [search](#youtube-search)
-  * [url-parse](#youtube-url-parse)
   * [videos](#videos)
 
 
@@ -186,10 +184,6 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% fb/url-likes %>
 
-<h3 id="facebook-url-parse">url-parse</h3>
-
-<% fb/url-parse %>
-
 ## Hyphe
 
 ### dump
@@ -243,10 +237,6 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 <h3 id="youtube-search">search</h3>
 
 <% yt/search %>
-
-<h3 id="youtube-url-parse">url-parse</h3>
-
-<% yt/url-parse %>
 
 ### videos
 
