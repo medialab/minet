@@ -30,7 +30,7 @@ from minet.cli.utils import (
     edit_namespace_with_csv_io
 )
 
-OUTPUT_ADDITIONAL_HEADERS = [
+FETCH_ADDITIONAL_HEADERS = [
     'resolved',
     'status',
     'error',
@@ -109,7 +109,7 @@ def parse_folder_strategy(name):
     raise None
 
 
-def fetch_action(namespace):
+def fetch_action(namespace, resolve=False):
 
     # Are we resuming
     resuming = namespace.resume
@@ -191,7 +191,7 @@ def fetch_action(namespace):
         output_file,
         resumable=resuming,
         auto_resume=False,
-        add=OUTPUT_ADDITIONAL_HEADERS + (['raw_contents'] if namespace.contents_in_report else []),
+        add=FETCH_ADDITIONAL_HEADERS + (['raw_contents'] if namespace.contents_in_report else []),
         keep=namespace.select,
         listener=listener
     )
@@ -260,8 +260,8 @@ def fetch_action(namespace):
             'headers': headers
         }
 
-    def write_output(index, row, resolved=None, status=None, error=None,
-                     filename=None, encoding=None, data=None):
+    def write_fetch_output(index, row, resolved=None, status=None, error=None,
+                           filename=None, encoding=None, data=None):
 
         addendum = [
             resolved or '',
@@ -301,7 +301,7 @@ def fetch_action(namespace):
 
         if not result.url:
 
-            write_output(
+            write_fetch_output(
                 index,
                 row
             )
@@ -381,7 +381,7 @@ def fetch_action(namespace):
             # Reporting in output
             resolved_url = response.geturl()
 
-            write_output(
+            write_fetch_output(
                 index,
                 row,
                 resolved=resolved_url if resolved_url != result.url else None,
@@ -395,7 +395,7 @@ def fetch_action(namespace):
         else:
             error_code = report_error(result.error)
 
-            write_output(
+            write_fetch_output(
                 index,
                 row,
                 error=error_code
