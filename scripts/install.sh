@@ -39,7 +39,6 @@ get_latest_release() {
 cleanup() {
   rm -rf /tmp/minet
   rm -f /tmp/minet.zip
-  rm -f /tmp/minet-exec
   sudo rm -rf /usr/local/bin/minet-dist
   sudo rm -f /usr/local/bin/minet
 }
@@ -98,10 +97,8 @@ echo "Installing..."
 unzip -qq /tmp/minet.zip -d /tmp/minet/
 rm /tmp/minet.zip
 sudo mv /tmp/minet /usr/local/bin/minet-dist
-printf '#!/bin/bash\n/usr/local/bin/minet-dist/minet $@' > /tmp/minet-exec
-sudo mv /tmp/minet-exec /usr/local/bin/minet
-sudo chmod +x /usr/local/bin/minet
 sudo chmod +x /usr/local/bin/minet-dist/minet
+sudo ln -s /usr/local/bin/minet-dist/minet /usr/local/bin/minet
 
 echo "Installed:"
 minet --version
