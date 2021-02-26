@@ -109,7 +109,7 @@ def parse_folder_strategy(name):
     raise None
 
 
-def fetch_action(namespace, resolve=False):
+def fetch_action(namespace):
 
     # Are we resuming
     resuming = namespace.resume
