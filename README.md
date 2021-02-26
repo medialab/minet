@@ -103,3 +103,11 @@ To learn how to use **minet** and understand how it may fit your use cases, you 
 ## Contributing
 
 To contribute to **minet** you can check out [this](./CONTRIBUTE.md) documentation.
+
+## How to cite
+
+**minet** is published on [Zenodo](https://zenodo.org/) as [![DOI](https://zenodo.org/badge/169059797.svg)](https://zenodo.org/badge/latestdoi/169059797)
+
+You can cite it thusly:
+
+> Guillaume Plique, Pauline Breteau, Jules Farjas, Héloïse Théro, & Jean Descamps. (2019, October 14). Minet, a webmining CLI tool & library for python. (Version 0.44.0-zenodo). Zenodo. http://doi.org/10.5281/zenodo.4564400
