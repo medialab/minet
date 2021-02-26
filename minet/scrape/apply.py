@@ -112,7 +112,7 @@ def tabulate(element, headers_inference='th', headers=None):
 
 def apply_scraper(scraper, element, root=None, html=None, context=None):
 
-    # Is this a tail call of item
+    # Is this a tail call of item?
     if isinstance(scraper, str):
         if scraper in EXTRACTOR_NAMES:
             return extract(element, scraper)
@@ -136,6 +136,9 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
             html=html,
             root=root
         )
+
+    if element is None:
+        return None
 
     # Then we need to solve iterator
     single_value = True

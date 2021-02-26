@@ -473,3 +473,13 @@ class TestScrape(object):
         assert headers == ['id']
 
         headers = headers_from_definition({'sel': 'table', 'tabulate': True})
+
+    def test_absent_tail_call(self):
+        item = scrape({
+            'sel': 'quote',
+            'fields': {
+                'url': 'href'
+            }
+        }, BASIC_HTML)
+
+        assert item is None
