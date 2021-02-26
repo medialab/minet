@@ -7,6 +7,7 @@
 import casanova
 from ural import (
     is_url,
+    is_shortened_url,
     normalize_url,
     get_hostname,
     get_domain_name,
@@ -20,7 +21,8 @@ REPORT_HEADERS = [
     'normalized_url',
     'domain_name',
     'hostname',
-    'normalized_hostname'
+    'normalized_hostname',
+    'probably_shortened'
 ]
 
 
@@ -65,7 +67,8 @@ def url_parse_action(namespace):
                 ),
                 get_domain_name(url),
                 get_hostname(url),
-                get_normalized_hostname(url)
+                get_normalized_hostname(url),
+                'yes' if is_shortened_url(url) else ''
             ])
 
     output_file.close()
