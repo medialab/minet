@@ -173,6 +173,7 @@ class DefinitionSpider(Spider):
         self.scraper = None
         self.scrapers = {}
         self.next_scraper = None
+        self.next_scrapers = {}
 
         if 'scraper' in definition:
             self.scraper = Scraper(definition['scraper'])
@@ -181,8 +182,13 @@ class DefinitionSpider(Spider):
             for name, scraper in definition['scrapers'].items():
                 self.scrapers[name] = Scraper(scraper)
 
-        if self.next_definition is not None and 'scraper' in self.next_definition:
-            self.next_scraper = Scraper(self.next_definition['scraper'])
+        if self.next_definition is not None:
+            if 'scraper' in self.next_definition:
+                self.next_scraper = Scraper(self.next_definition['scraper'])
+
+            if 'scrapers' in self.next_definition:
+                for name, scraper in self.next_definition['scrapers'].items():
+                    self.next_scrapers[name] = Scraper(scraper)
 
     def start_jobs(self):
 
@@ -201,16 +207,24 @@ class DefinitionSpider(Spider):
         if self.next_scraper is not None:
             scraped = self.next_scraper(content)
 
-            if scraped is None:
-                return
+            if scraped is not None:
+                if isinstance(scraped, list):
+                    yield from scraped
+                else:
+                    yield scraped
 
-            if isinstance(scraped, list):
-                yield from scraped
-            else:
-                yield scraped
+        if self.next_scrapers:
+            for scraper in self.next_scrapers.values():
+                scraped = scraper(content)
+
+                if scraped is not None:
+                    if isinstance(scraped, list):
+                        yield from scraped
+                    else:
+                        yield scraped
 
         # Formatting next url
-        elif 'format' in self.next_definition:
+        if 'format' in self.next_definition:
             yield FORMATTER.format(
                 self.next_definition['format'],
                 level=next_level
