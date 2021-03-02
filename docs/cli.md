@@ -745,8 +745,15 @@ examples:
 usage: minet facebook url-likes [-h] [-o OUTPUT] [-s SELECT] [--total TOTAL]
                                 column [file]
 
-Retrieve approximate number of likes for the given URLs.
-========================================================
+Minet Facebook Url Likes Command
+================================
+
+Retrieve the approximate number of Facebook 'likes' about a given list of URLs.
+It is obtained by scraping Facebook's like button, but it is approximate:
+"1.2K people like this."
+The number does not actually correspond to the number of like reactions, but rather to
+the sum of like, love, 'ahah', angry, etc, reactions plus the number of comments and shares
+that the URL generated on Facebook.
 
 positional arguments:
   column                      Name of the column containing the URL in the CSV file or a single url.
@@ -758,6 +765,8 @@ optional arguments:
   -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
   --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
 
+example:
+. `minet fb url-likes url url.csv > url_likes.csv`
 ```
 
 ## Hyphe
