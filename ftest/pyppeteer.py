@@ -12,17 +12,15 @@ class ThreadContext(object):
     def __init__(self, endpoint):
         self.loop = asyncio.new_event_loop()
         self.endpoint = endpoint
-        self.browser = None
+
+        self.browser = self.run_until_complete(
+            connect(browserWSEndpoint=self.endpoint, loop=self.loop)
+        )
+
+        CONTEXT_POOL.append(self)
 
     def run_until_complete(self, task):
         return self.loop.run_until_complete(task)
-
-    def connect(self):
-        async def fn():
-            self.browser = await connect(browserWSEndpoint=self.endpoint, loop=self.loop)
-            CONTEXT_POOL.append(self)
-
-        self.run_until_complete(fn())
 
 local_data = threading.local()
 
@@ -81,7 +79,6 @@ async def work_with_connection(browser, url):
 def threaded_work(url):
     if not hasattr(local_data, 'context'):
         context = ThreadContext(ENDPOINT)
-        context.connect()
         local_data.context = context
 
     context = local_data.context
