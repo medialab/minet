@@ -761,7 +761,19 @@ MINET_COMMANDS = {
                     ]
                 },
                 'url-likes': {
-                    'title': 'Retrieve approximate number of likes for the given URLs.',
+                    'title': 'Minet Facebook Url Likes Command',
+                    'description': '''
+                        Retrieve the approximate number of Facebook 'likes' about a given list of URLs.
+                        It is obtained by scraping Facebook's like button, but it is approximate:
+                        "1.2K people like this."
+                        The number does not actually correspond to the number of like reactions, but rather to
+                        the sum of like, love, 'ahah', angry, etc, reactions plus the number of comments and shares
+                        that the URL generated on Facebook.
+                    ''',
+                    'epilog': '''
+                        example:
+                        . `minet fb url-likes url url.csv > url_likes.csv`
+                    ''',
                     'arguments': [
                         {
                             'name': 'column',
