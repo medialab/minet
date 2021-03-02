@@ -149,9 +149,10 @@ usage: minet fetch [-h] [--compress] [--contents-in-report] [-d OUTPUT_DIR]
                    [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY]
                    [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
-                   [--resume] [--standardize-encoding] [-o OUTPUT] [-s SELECT]
-                   [-t THREADS] [--throttle THROTTLE] [--timeout TIMEOUT]
-                   [--total TOTAL] [--url-template URL_TEMPLATE] [-X METHOD]
+                   [--insecure] [-o OUTPUT] [--resume] [-s SELECT]
+                   [--standardize-encoding] [-t THREADS] [--throttle THROTTLE]
+                   [--timeout TIMEOUT] [--total TOTAL]
+                   [--url-template URL_TEMPLATE] [-X METHOD]
                    column [file]
 
 Minet Fetch Command
@@ -180,10 +181,11 @@ optional arguments:
   -g {chrome,chromium,edge,firefox,opera}, --grab-cookies {chrome,chromium,edge,firefox,opera}
                                                   Whether to attempt to grab cookies from your computer's browser (supports "firefox", "chrome", "chromium", "opera" and "edge").
   -H HEADERS, --header HEADERS                    Custom headers used with every requests.
-  --resume                                        Whether to resume from an aborted report.
-  --standardize-encoding                          Whether to systematically convert retrieved text to UTF-8.
+  --insecure                                      Whether to allow ssl errors when performing requests or not.
   -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
+  --resume                                        Whether to resume from an aborted report.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
+  --standardize-encoding                          Whether to systematically convert retrieved text to UTF-8.
   -t THREADS, --threads THREADS                   Number of threads to use. Defaults to 25.
   --throttle THROTTLE                             Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
   --timeout TIMEOUT                               Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.
@@ -748,12 +750,15 @@ usage: minet facebook url-likes [-h] [-o OUTPUT] [-s SELECT] [--total TOTAL]
 Minet Facebook Url Likes Command
 ================================
 
-Retrieve the approximate number of Facebook 'likes' about a given list of URLs.
-It is obtained by scraping Facebook's like button, but it is approximate:
-"1.2K people like this."
-The number does not actually correspond to the number of like reactions, but rather to
-the sum of like, love, 'ahah', angry, etc, reactions plus the number of comments and shares
-that the URL generated on Facebook.
+Retrieve the approximate number of "likes" each url of
+a CSV file has on Facebook.
+
+It is found by scraping Facebook's like button, which only give a
+rough estimation of the real number like so: "1.2K people like this."
+
+Note that the number does not actually only correspond to the number of
+like reactions, but rather to the sum of like, love, ahah, angry, etc.
+reactions plus the number of comments and shares that the URL generated on Facebook.
 
 positional arguments:
   column                      Name of the column containing the URL in the CSV file or a single url.
@@ -767,6 +772,7 @@ optional arguments:
 
 example:
 . `minet fb url-likes url url.csv > url_likes.csv`
+
 ```
 
 ## Hyphe
