@@ -6,7 +6,7 @@ from functools import partial
 
 # TODO: add async delete to drop connexion
 # TODO: try to give loop to connexion? asyncio.ensure_future
-CONNECTION_POOL = []
+CONTEXT_POOL = []
 
 class ThreadContext(object):
     def __init__(self, endpoint):
@@ -20,7 +20,7 @@ class ThreadContext(object):
     def connect(self):
         async def fn():
             self.browser = await connect(browserWSEndpoint=self.endpoint, loop=self.loop)
-            CONNECTION_POOL.append(self.browser)
+            CONTEXT_POOL.append(self)
 
         self.run_until_complete(fn())
 
@@ -46,6 +46,7 @@ async def boot():
 LOOP = asyncio.get_event_loop()
 MASTER, ENDPOINT = LOOP.run_until_complete(boot())
 
+# TODO: use incognito browser context?
 async def work(url):
     browser = await connect(browserWSEndpoint=ENDPOINT)
     page = await browser.newPage()
@@ -93,11 +94,22 @@ def dummy_work(url):
 for title in imap_unordered(URLS, threaded_work, 3):
     print(title)
 
-# async def cleanup():
-#     for browser in CONNECTION_POOL:
-#         await browser.disconnect()
+def cleanup():
+    global local_data
+    global CONTEXT_POOL
 
-# LOOP.run_until_complete(cleanup())
+    print('cleanup')
+    for context in CONTEXT_POOL:
+        context.run_until_complete(context.browser.disconnect())
+        context.loop.close()
+        del context
+
+    del local_data
+    del CONTEXT_POOL
+
+    LOOP.run_until_complete(MASTER.close())
+
+cleanup()
 
 
 # TODO: thread local + page closing + browser closing
