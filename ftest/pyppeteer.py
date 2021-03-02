@@ -1,5 +1,5 @@
 import asyncio
-from pyppeteer import launch
+from pyppeteer import launch, connect
 from quenouille import imap_unordered
 from functools import partial
 
@@ -9,12 +9,27 @@ URLS = [
     'https://www.liberation.fr/'
 ]
 
-async def work(url):
+async def boot():
     browser = await launch(
         handleSIGINT=False,
         handleSIGTERM=False,
         handleSIGHUP=False
     )
+
+    endpoint = browser.wsEndpoint
+
+    return endpoint
+
+LOOP = asyncio.get_event_loop()
+ENDPOINT = LOOP.run_until_complete(boot())
+
+async def work(url):
+    # browser = await launch(
+    #     handleSIGINT=False,
+    #     handleSIGTERM=False,
+    #     handleSIGHUP=False
+    # )
+    browser = await connect(browserWSEndpoint=ENDPOINT)
     page = await browser.newPage()
     await page.goto(url)
 
@@ -24,7 +39,7 @@ async def work(url):
         }
     ''')
 
-    await browser.close()
+    await browser.disconnect()
 
     return title
 
