@@ -1,0 +1,39 @@
+{
+  "language": "eng",
+  "license": "GPL-3.0",
+  "title": "Minet, a webmining CLI tool & library for python.",
+  "version": "0.44.0-zenodo",
+  "upload_type": "software",
+  "keywords": [
+    "webmining",
+    "scraping",
+    "crawling"
+  ],
+  "publication_date": "2019-10-14",
+  "creators": [
+    {
+      "orcid": "0000-0003-4916-8472",
+      "affiliation": "médialab - Sciences Po",
+      "name": "Guillaume Plique"
+    },
+    {
+      "affiliation": "médialab - Sciences Po",
+      "name": "Pauline Breteau"
+    },
+    {
+      "affiliation": "médialab - Sciences Po",
+      "name": "Jules Farjas"
+    },
+    {
+      "orcid": "0000-0002-7593-3548",
+      "affiliation": "médialab - Sciences Po",
+      "name": "Héloïse Théro"
+    },
+    {
+      "affiliation": "médialab - Sciences Po",
+      "name": "Jean Descamps"
+    }
+  ],
+  "access_right": "open",
+  "description": "<p>A webmining CLI tool &amp; library for python.</p>"
+}
