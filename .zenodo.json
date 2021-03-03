@@ -2,7 +2,6 @@
   "language": "eng",
   "license": "GPL-3.0",
   "title": "Minet, a webmining CLI tool & library for python.",
-  "version": "0.44.0-zenodo",
   "upload_type": "software",
   "keywords": [
     "webmining",
