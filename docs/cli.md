@@ -136,8 +136,8 @@ optional arguments:
 
 examples:
 
-. TODO:
-    `minet crawl`
+. Running a crawler definition:
+    `minet crawl crawler.yml -d crawl-data`
 
 ```
 
