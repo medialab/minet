@@ -54,6 +54,77 @@ TWITTER_API_COMMON_ARGUMENTS = [
     }
 ]
 
+FETCH_COMMON_ARGUMENTS = [
+    {
+        'flag': '--domain-parallelism',
+        'help': 'Max number of urls per domain to hit at the same time. Defaults to 1',
+        'type': int,
+        'default': 1
+    },
+    {
+        'flags': ['-g', '--grab-cookies'],
+        'help': 'Whether to attempt to grab cookies from your computer\'s browser (supports "firefox", "chrome", "chromium", "opera" and "edge").',
+        'choices': COOKIE_BROWSERS
+    },
+    {
+        'flags': ['-H', '--header'],
+        'help': 'Custom headers used with every requests.',
+        'action': 'append',
+        'dest': 'headers'
+    },
+    {
+        'flag': '--insecure',
+        'help': 'Whether to allow ssl errors when performing requests or not.',
+        'action': 'store_true'
+    },
+    {
+        'flags': ['-o', '--output'],
+        'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+    },
+    {
+        'flag': '--resume',
+        'help': 'Whether to resume from an aborted report.',
+        'action': 'store_true'
+    },
+    {
+        'flags': ['-s', '--select'],
+        'help': 'Columns to include in report (separated by `,`).',
+        'type': SplitterType()
+    },
+    {
+        'flags': ['-t', '--threads'],
+        'help': 'Number of threads to use. Defaults to 25.',
+        'type': int,
+        'default': 25
+    },
+    {
+        'flag': '--throttle',
+        'help': 'Time to wait - in seconds - between 2 calls to the same domain. Defaults to %s.' % DEFAULT_THROTTLE,
+        'type': float,
+        'default': DEFAULT_THROTTLE
+    },
+    {
+        'flag': '--timeout',
+        'help': 'Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.',
+        'type': float
+    },
+    {
+        'flag': '--total',
+        'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
+        'type': int
+    },
+    {
+        'flag': '--url-template',
+        'help': 'A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.'
+    },
+    {
+        'flags': ['-X', '--request'],
+        'help': 'The http method to use. Will default to GET.',
+        'dest': 'method',
+        'default': 'GET'
+    }
+]
+
 
 MINET_COMMANDS = {
 
@@ -877,6 +948,7 @@ MINET_COMMANDS = {
                 'default': sys.stdin,
                 'nargs': '?'
             },
+            *FETCH_COMMON_ARGUMENTS,
             {
                 'flag': '--compress',
                 'help': 'Whether to compress the contents.',
@@ -894,12 +966,6 @@ MINET_COMMANDS = {
                 'default': DEFAULT_CONTENT_FOLDER
             },
             {
-                'flag': '--domain-parallelism',
-                'help': 'Max number of urls per domain to hit at the same time. Defaults to 1',
-                'type': int,
-                'default': 1
-            },
-            {
                 'flags': ['-f', '--filename'],
                 'help': 'Name of the column used to build retrieved file names. Defaults to an uuid v4 with correct extension.'
             },
@@ -913,71 +979,9 @@ MINET_COMMANDS = {
                 'default': 'flat'
             },
             {
-                'flags': ['-g', '--grab-cookies'],
-                'help': 'Whether to attempt to grab cookies from your computer\'s browser (supports "firefox", "chrome", "chromium", "opera" and "edge").',
-                'choices': COOKIE_BROWSERS
-            },
-            {
-                'flags': ['-H', '--header'],
-                'help': 'Custom headers used with every requests.',
-                'action': 'append',
-                'dest': 'headers'
-            },
-            {
-                'flag': '--insecure',
-                'help': 'Whether to allow ssl errors when performing requests or not.',
-                'action': 'store_true'
-            },
-            {
-                'flags': ['-o', '--output'],
-                'help': 'Path to the output report file. By default, the report will be printed to stdout.'
-            },
-            {
-                'flag': '--resume',
-                'help': 'Whether to resume from an aborted report.',
-                'action': 'store_true'
-            },
-            {
-                'flags': ['-s', '--select'],
-                'help': 'Columns to include in report (separated by `,`).',
-                'type': SplitterType()
-            },
-            {
                 'flag': '--standardize-encoding',
                 'help': 'Whether to systematically convert retrieved text to UTF-8.',
                 'action': 'store_true'
-            },
-            {
-                'flags': ['-t', '--threads'],
-                'help': 'Number of threads to use. Defaults to 25.',
-                'type': int,
-                'default': 25
-            },
-            {
-                'flag': '--throttle',
-                'help': 'Time to wait - in seconds - between 2 calls to the same domain. Defaults to %s.' % DEFAULT_THROTTLE,
-                'type': float,
-                'default': DEFAULT_THROTTLE
-            },
-            {
-                'flag': '--timeout',
-                'help': 'Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.',
-                'type': float
-            },
-            {
-                'flag': '--total',
-                'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
-                'type': int
-            },
-            {
-                'flag': '--url-template',
-                'help': 'A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.'
-            },
-            {
-                'flags': ['-X', '--request'],
-                'help': 'The http method to use. Will default to GET.',
-                'dest': 'method',
-                'default': 'GET'
             }
         ]
     },

@@ -144,15 +144,14 @@ examples:
 ## fetch
 
 ```
-usage: minet fetch [-h] [--compress] [--contents-in-report] [-d OUTPUT_DIR]
-                   [--domain-parallelism DOMAIN_PARALLELISM] [-f FILENAME]
-                   [--filename-template FILENAME_TEMPLATE]
-                   [--folder-strategy FOLDER_STRATEGY]
+usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM]
                    [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
-                   [--insecure] [-o OUTPUT] [--resume] [-s SELECT]
-                   [--standardize-encoding] [-t THREADS] [--throttle THROTTLE]
-                   [--timeout TIMEOUT] [--total TOTAL]
-                   [--url-template URL_TEMPLATE] [-X METHOD]
+                   [--insecure] [-o OUTPUT] [--resume] [-s SELECT] [-t THREADS]
+                   [--throttle THROTTLE] [--timeout TIMEOUT] [--total TOTAL]
+                   [--url-template URL_TEMPLATE] [-X METHOD] [--compress]
+                   [--contents-in-report] [-d OUTPUT_DIR] [-f FILENAME]
+                   [--filename-template FILENAME_TEMPLATE]
+                   [--folder-strategy FOLDER_STRATEGY] [--standardize-encoding]
                    column [file]
 
 Minet Fetch Command
@@ -169,15 +168,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                      show this help message and exit
-  --compress                                      Whether to compress the contents.
-  --contents-in-report, --no-contents-in-report   Whether to include retrieved contents, e.g. html, directly in the report
-                                                  and avoid writing them in a separate folder. This requires to standardize
-                                                  encoding and won't work on binary formats.
-  -d OUTPUT_DIR, --output-dir OUTPUT_DIR          Directory where the fetched files will be written. Defaults to "content".
   --domain-parallelism DOMAIN_PARALLELISM         Max number of urls per domain to hit at the same time. Defaults to 1
-  -f FILENAME, --filename FILENAME                Name of the column used to build retrieved file names. Defaults to an uuid v4 with correct extension.
-  --filename-template FILENAME_TEMPLATE           A template for the name of the fetched files.
-  --folder-strategy FOLDER_STRATEGY               Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. Defaults to "flat". All of the strategies are described at the end of this help.
   -g {chrome,chromium,edge,firefox,opera}, --grab-cookies {chrome,chromium,edge,firefox,opera}
                                                   Whether to attempt to grab cookies from your computer's browser (supports "firefox", "chrome", "chromium", "opera" and "edge").
   -H HEADERS, --header HEADERS                    Custom headers used with every requests.
@@ -185,13 +176,21 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
   --resume                                        Whether to resume from an aborted report.
   -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
-  --standardize-encoding                          Whether to systematically convert retrieved text to UTF-8.
   -t THREADS, --threads THREADS                   Number of threads to use. Defaults to 25.
   --throttle THROTTLE                             Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
   --timeout TIMEOUT                               Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.
   --total TOTAL                                   Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
   --url-template URL_TEMPLATE                     A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.
   -X METHOD, --request METHOD                     The http method to use. Will default to GET.
+  --compress                                      Whether to compress the contents.
+  --contents-in-report, --no-contents-in-report   Whether to include retrieved contents, e.g. html, directly in the report
+                                                  and avoid writing them in a separate folder. This requires to standardize
+                                                  encoding and won't work on binary formats.
+  -d OUTPUT_DIR, --output-dir OUTPUT_DIR          Directory where the fetched files will be written. Defaults to "content".
+  -f FILENAME, --filename FILENAME                Name of the column used to build retrieved file names. Defaults to an uuid v4 with correct extension.
+  --filename-template FILENAME_TEMPLATE           A template for the name of the fetched files.
+  --folder-strategy FOLDER_STRATEGY               Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. Defaults to "flat". All of the strategies are described at the end of this help.
+  --standardize-encoding                          Whether to systematically convert retrieved text to UTF-8.
 
 --folder-strategy options:
 
