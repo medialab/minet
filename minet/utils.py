@@ -24,6 +24,12 @@ from ural import is_url
 from urllib.parse import urljoin
 from urllib3 import HTTPResponse
 from urllib.request import Request
+from tenacity import (
+    Retrying,
+    wait_random_exponential,
+    retry_if_exception_type,
+    stop_after_attempt
+)
 
 from minet.encodings import is_supported_encoding
 
@@ -951,3 +957,25 @@ def prettyprint_seconds(seconds, granularity=None):
         result = result[:granularity]
 
     return ', '.join(result)
+
+
+THREE_HOURS = 3 * 60 * 60
+
+
+def create_request_retryer(min=10, max=THREE_HOURS, max_attempts=9, before_sleep=None,
+                           additional_exceptions=None):
+
+    retry_for = [urllib3.exceptions.TimeoutError]
+
+    if additional_exceptions:
+        for exc in additional_exceptions:
+            retry_for.append(exc)
+
+    return Retrying(
+        wait=wait_random_exponential(exp_base=6, min=min, max=max),
+        retry=retry_if_exception_type(
+            exception_types=tuple(retry_for)
+        ),
+        stop=stop_after_attempt(max_attempts),
+        before_sleep=before_sleep if callable(before_sleep) else None
+    )

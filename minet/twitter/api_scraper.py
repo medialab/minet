@@ -7,21 +7,15 @@
 import re
 import time
 import datetime
-import urllib3
 from urllib.parse import urlencode, quote
-from tenacity import (
-    Retrying,
-    wait_random_exponential,
-    retry_if_exception_type,
-    stop_after_attempt
-)
 from twitwi import normalize_tweet
 
 from minet.utils import (
     create_pool,
     request,
     request_json,
-    nested_get
+    nested_get,
+    create_request_retryer
 )
 from minet.twitter.constants import (
     TWITTER_PUBLIC_API_DEFAULT_TIMEOUT,
@@ -300,17 +294,13 @@ class TwitterAPIScraper(object):
         cursor = None
         i = 0
 
-        retryer = Retrying(
-            wait=wait_random_exponential(min=2, max=60 * 3, exp_base=5),
-            retry=retry_if_exception_type(
-                exception_types=(
-                    TwitterPublicAPIRateLimitError,
-                    TwitterPublicAPIInvalidResponseError,
-                    urllib3.exceptions.TimeoutError
-                )
-            ),
-            stop=stop_after_attempt(8),
-            before_sleep=before_sleep if callable(before_sleep) else None
+        retryer = create_request_retryer(
+            min=1,
+            additional_exceptions=[
+                TwitterPublicAPIRateLimitError,
+                TwitterPublicAPIInvalidResponseError
+            ],
+            before_sleep=before_sleep
         )
 
         refs = set() if include_referenced_tweets else None

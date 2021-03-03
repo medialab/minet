@@ -5,16 +5,9 @@
 # Miscellaneous generic functions used throughout the CrowdTangle namespace.
 #
 import json
-import urllib3
 from datetime import date, datetime, timedelta
-from tenacity import (
-    Retrying,
-    wait_random_exponential,
-    retry_if_exception_type,
-    stop_after_attempt
-)
 
-from minet.utils import request, rate_limited_from_state
+from minet.utils import request, rate_limited_from_state, create_request_retryer
 from minet.crowdtangle.constants import (
     CROWDTANGLE_OUTPUT_FORMATS
 )
@@ -174,16 +167,9 @@ def make_paginated_iterator(url_forge, item_key, formatter,
 
         rate_limited_step = rate_limited_from_state(rate_limiter_state)(step)
 
-        retryer = Retrying(
-            wait=wait_random_exponential(exp_base=6, min=10, max=3 * 60 * 60),
-            retry=retry_if_exception_type(
-                exception_types=(
-                    urllib3.exceptions.TimeoutError,
-                    CrowdTangleRateLimitExceeded
-                )
-            ),
-            stop=stop_after_attempt(8),
-            before_sleep=before_sleep if callable(before_sleep) else None
+        retryer = create_request_retryer(
+            additional_exceptions=[CrowdTangleRateLimitExceeded],
+            before_sleep=before_sleep
         )
 
         # Chunking
