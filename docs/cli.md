@@ -14,6 +14,7 @@
 * [crawl](#crawl)
 * [fetch](#fetch)
 * [extract](#extract)
+* [resolve](#resolve)
 * [scrape](#scrape)
 * [url-extract](#url-extract)
 * [url-join](#url-join)
@@ -264,6 +265,57 @@ examples:
 
 . Extracting raw text from a bunch of files:
     `minet extract --glob "./content/*.html" > extracted.csv`
+
+```
+
+## resolve
+
+```
+usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM]
+                     [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
+                     [--insecure] [-o OUTPUT] [--resume] [-s SELECT]
+                     [-t THREADS] [--throttle THROTTLE] [--timeout TIMEOUT]
+                     [--total TOTAL] [--url-template URL_TEMPLATE] [-X METHOD]
+                     column [file]
+
+Minet Resolve Command
+=====================
+
+Use multiple threads to resolve batches of urls from a CSV file. The
+command outputs a CSV report with additional metadata about the
+HTTP calls and the followed redirections.
+
+positional arguments:
+  column                                          Column of the CSV file containing urls to resolve or a single url to resolve.
+  file                                            CSV file containing the urls to resolve.
+
+optional arguments:
+  -h, --help                                      show this help message and exit
+  --domain-parallelism DOMAIN_PARALLELISM         Max number of urls per domain to hit at the same time. Defaults to 1
+  -g {chrome,chromium,edge,firefox,opera}, --grab-cookies {chrome,chromium,edge,firefox,opera}
+                                                  Whether to attempt to grab cookies from your computer's browser (supports "firefox", "chrome", "chromium", "opera" and "edge").
+  -H HEADERS, --header HEADERS                    Custom headers used with every requests.
+  --insecure                                      Whether to allow ssl errors when performing requests or not.
+  -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
+  --resume                                        Whether to resume from an aborted report.
+  -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
+  -t THREADS, --threads THREADS                   Number of threads to use. Defaults to 25.
+  --throttle THROTTLE                             Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
+  --timeout TIMEOUT                               Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.
+  --total TOTAL                                   Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
+  --url-template URL_TEMPLATE                     A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.
+  -X METHOD, --request METHOD                     The http method to use. Will default to GET.
+
+examples:
+
+. Resolving a batch of url from existing CSV file:
+    `minet resolve url_column file.csv > report.csv`
+
+. CSV input from stdin:
+    `xsv select url_column file.csv | minet resolve url_column > report.csv`
+
+. Resolving a single url:
+    `minet resolve https://lemonde.fr`
 
 ```
 

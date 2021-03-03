@@ -14,6 +14,7 @@
 * [crawl](#crawl)
 * [fetch](#fetch)
 * [extract](#extract)
+* [resolve](#resolve)
 * [scrape](#scrape)
 * [url-extract](#url-extract)
 * [url-join](#url-join)
@@ -125,6 +126,10 @@ Finally note that command line arguments and flags will take precedence over env
 ## extract
 
 <% extract %>
+
+## resolve
+
+<% resolve %>
 
 ## scrape
 
