@@ -16,13 +16,18 @@ from ural.facebook import (
     convert_facebook_url_to_mobile
 )
 
-from minet.utils import create_pool, request, rate_limited_from_state
+from minet.utils import (
+    create_pool,
+    request,
+    rate_limited_method,
+    RateLimiterState
+)
 from minet.facebook.utils import grab_facebook_cookie
 from minet.facebook.formatters import format_comment
 from minet.facebook.exceptions import FacebookInvalidCookieError
 from minet.facebook.constants import (
     FACEBOOK_OUTPUT_FORMATS,
-    FACEBOOK_MOBILE_RATE_LIMITER_STATE,
+    FACEBOOK_MOBILE_DEFAULT_THROTTLE,
     FACEBOOK_MOBILE_URL
 )
 
@@ -189,7 +194,7 @@ def scrape_comments(html, direction=None, in_reply_to=None):
 
 
 class FacebookCommentScraper(object):
-    def __init__(self, cookie):
+    def __init__(self, cookie, throttle=FACEBOOK_MOBILE_DEFAULT_THROTTLE):
 
         # Grabbing cookie
         cookie = grab_facebook_cookie(cookie)
@@ -200,7 +205,9 @@ class FacebookCommentScraper(object):
         self.cookie = cookie
         self.http = create_pool()
 
-    @rate_limited_from_state(FACEBOOK_MOBILE_RATE_LIMITER_STATE)
+        self.rate_limiter_state = RateLimiterState(1, throttle)
+
+    @rate_limited_method()
     def request_page(self, url):
         error, result = request(
             self.http,
