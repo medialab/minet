@@ -717,6 +717,7 @@ actions:
 
 ```
 usage: minet facebook comments [-h] [-c COOKIE] [-o OUTPUT] [-s SELECT]
+                               [--throttle THROTTLE]
                                column [file]
 
 Minet Facebook Comments Command
@@ -733,6 +734,7 @@ optional arguments:
   -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
   -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+  --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
 
 examples:
 

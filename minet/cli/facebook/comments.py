@@ -29,7 +29,7 @@ def facebook_comments_action(namespace):
         edit_namespace_with_csv_io(namespace, 'post_url')
 
     try:
-        scraper = FacebookCommentScraper(namespace.cookie)
+        scraper = FacebookCommentScraper(namespace.cookie, throttle=namespace.throttle)
     except FacebookInvalidCookieError:
         if namespace.cookie in COOKIE_BROWSERS:
             die([

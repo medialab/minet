@@ -23,6 +23,9 @@ from minet.crowdtangle.constants import (
     CROWDTANGLE_DEFAULT_RATE_LIMIT,
     CROWDTANGLE_SEARCH_FIELDS
 )
+from minet.facebook.constants import (
+    FACEBOOK_MOBILE_DEFAULT_THROTTLE
+)
 
 TWITTER_API_COMMON_ARGUMENTS = [
     {
@@ -718,6 +721,12 @@ MINET_COMMANDS = {
                             'flags': ['-s', '--select'],
                             'help': 'Columns to include in report (separated by `,`).',
                             'type': SplitterType()
+                        },
+                        {
+                            'flag': '--throttle',
+                            'help': 'Throttling time, in seconds, to wait between each request.',
+                            'type': float,
+                            'default': FACEBOOK_MOBILE_DEFAULT_THROTTLE
                         }
                     ]
                 },
