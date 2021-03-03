@@ -182,7 +182,8 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
                           throttle=DEFAULT_THROTTLE, max_redirects=5,
                           follow_refresh_header=True, follow_meta_refresh=False,
                           follow_js_relocation=False, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
-                          insecure=False, timeout=DEFAULT_URLLIB3_TIMEOUT):
+                          insecure=False, timeout=DEFAULT_URLLIB3_TIMEOUT,
+                          domain_parallelism=DEFAULT_GROUP_PARALLELISM):
     """
     Function returning a multithreaded iterator over resolved urls.
 
@@ -207,6 +208,8 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
             when performing requests. Defaults to False.
         timeout (float or urllib3.Timeout, optional): Custom timeout for every
             request.
+        domain_parallelism (int, optional): Max number of urls per domain to
+            hit at the same time. Defaults to 1.
 
     Yields:
         ResolveWorkerResult
@@ -282,7 +285,7 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
         worker,
         threads,
         group=grouper,
-        group_parallelism=DEFAULT_GROUP_PARALLELISM,
+        group_parallelism=domain_parallelism,
         group_buffer_size=buffer_size,
         group_throttle=throttle
     )

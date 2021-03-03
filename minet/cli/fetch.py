@@ -16,7 +16,7 @@ from tqdm import tqdm
 from uuid import uuid4
 from ural import is_url, get_hostname, get_normalized_hostname
 
-from minet.fetch import multithreaded_fetch
+from minet.fetch import multithreaded_fetch, multithreaded_resolve
 from minet.utils import (
     grab_cookies,
     parse_http_header,
@@ -133,7 +133,7 @@ def fetch_action(namespace, resolve=False):
         edit_namespace_with_csv_io(namespace, 'url')
 
         # If we are hitting a single url we enable contents_in_report
-        if namespace.contents_in_report is None:
+        if not resolve and namespace.contents_in_report is None:
             namespace.contents_in_report = True
 
     # Trying to instantiate the folder strategy
@@ -245,6 +245,28 @@ def fetch_action(namespace, resolve=False):
         unit=' urls'
     )
 
+    def update_loading_bar(result):
+        nonlocal errors
+
+        if result.error is not None:
+            errors += 1
+        else:
+            if resolve:
+                status = result.stack[-1].status
+            else:
+                status = result.response.status
+
+            if status >= 400:
+                status_codes[status] += 1
+
+        postfix = {'errors': errors}
+
+        for code, count in status_codes.most_common(1):
+            postfix[str(code)] = count
+
+        loading_bar.set_postfix(**postfix)
+        loading_bar.update()
+
     def url_key(item):
         url = item[1][url_pos].strip()
 
@@ -308,7 +330,6 @@ def fetch_action(namespace, resolve=False):
 
     common_kwargs = {
         'key': url_key,
-        'request_args': request_args,
         'insecure': namespace.insecure,
         'threads': namespace.threads,
         'throttle': namespace.throttle,
@@ -320,6 +341,8 @@ def fetch_action(namespace, resolve=False):
 
     # Normal fetch
     if not resolve:
+
+        common_kwargs['request_args'] = request_args
 
         multithreaded_iterator = multithreaded_fetch(
             enricher,
@@ -345,19 +368,7 @@ def fetch_action(namespace, resolve=False):
             content_write_flag = 'wb'
 
             # Updating stats
-            if result.error is not None:
-                errors += 1
-            else:
-                if response.status >= 400:
-                    status_codes[response.status] += 1
-
-            postfix = {'errors': errors}
-
-            for code, count in status_codes.most_common(1):
-                postfix[str(code)] = count
-
-            loading_bar.set_postfix(**postfix)
-            loading_bar.update()
+            update_loading_bar(result)
 
             # No error
             if result.error is None:
@@ -433,7 +444,56 @@ def fetch_action(namespace, resolve=False):
 
     # Resolve
     else:
-        pass
+
+        common_kwargs['resolve_args'] = request_args
+
+        multithreaded_iterator = multithreaded_resolve(
+            enricher,
+            **common_kwargs
+        )
+
+        for result in multithreaded_iterator:
+            index, row = result.item
+
+            print(result)
+
+            if not result.url:
+
+                write_resolve_output(
+                    index,
+                    row
+                )
+
+                loading_bar.update()
+                continue
+
+            # Updating stats
+            update_loading_bar(result)
+
+            # No error
+            if result.error is None:
+                pass
+                # Reporting in output
+
+                # write_fetch_output(
+                #     index,
+                #     row,
+                #     resolved=resolved_url if resolved_url != result.url else None,
+                #     status=response.status,
+                #     filename=filename,
+                #     encoding=encoding,
+                #     data=data
+                # )
+
+            # Handling potential errors
+            else:
+                error_code = report_error(result.error)
+
+                # write_fetch_output(
+                #     index,
+                #     row,
+                #     error=error_code
+                # )
 
     # Closing files
     output_file.close()

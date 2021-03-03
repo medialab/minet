@@ -17,7 +17,11 @@ from urllib3.exceptions import (
 
 from minet.exceptions import (
     UnknownEncodingError,
-    InvalidURLError
+    InvalidURLError,
+    MaxRedirectsError,
+    InfiniteRedirectsError,
+    SelfRedirectError,
+    InvalidRedirectError
 )
 
 
@@ -61,7 +65,11 @@ ERROR_REPORTERS = {
     NewConnectionError: new_connection_error_reporter,
     ProtocolError: protocol_error_reporter,
     ConnectTimeoutError: 'connect-timeout',
-    ReadTimeoutError: 'read-timeout'
+    ReadTimeoutError: 'read-timeout',
+    MaxRedirectsError: 'max-redirects',
+    InfiniteRedirectsError: 'infinite-redirects',
+    SelfRedirectError: 'self-redirect',
+    InvalidRedirectError: 'invalid-redirect'
 }
 
 

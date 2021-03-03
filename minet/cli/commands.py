@@ -125,7 +125,6 @@ FETCH_COMMON_ARGUMENTS = [
     }
 ]
 
-
 MINET_COMMANDS = {
 
     # Crawl action subparser
@@ -1152,6 +1151,45 @@ MINET_COMMANDS = {
                 }
             }
         }
+    },
+
+    # Resolve action subparser
+    # --------------------------------------------------------------------------
+    'resolve': {
+        'package': 'minet.cli.resolve',
+        'action': 'resolve_action',
+        'title': 'Minet Resolve Command',
+        'description': '''
+            Use multiple threads to resolve batches of urls from a CSV file. The
+            command outputs a CSV report with additional metadata about the
+            HTTP calls and the followed redirections.
+        ''',
+        'epilog': '''
+            examples:
+
+            . Resolving a batch of url from existing CSV file:
+                `minet resolve url_column file.csv > report.csv`
+
+            . CSV input from stdin:
+                `xsv select url_column file.csv | minet resolve url_column > report.csv`
+
+            . Resolving a single url:
+                `minet resolve https://lemonde.fr`
+        ''',
+        'arguments': [
+            {
+                'name': 'column',
+                'help': 'Column of the CSV file containing urls to resolve or a single url to resolve.'
+            },
+            {
+                'name': 'file',
+                'help': 'CSV file containing the urls to resolve.',
+                'type': FileType('r', encoding='utf-8'),
+                'default': sys.stdin,
+                'nargs': '?'
+            },
+            *FETCH_COMMON_ARGUMENTS
+        ]
     },
 
     # Scrape action subparser
