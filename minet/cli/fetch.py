@@ -455,8 +455,6 @@ def fetch_action(namespace, resolve=False):
         for result in multithreaded_iterator:
             index, row = result.item
 
-            print(result)
-
             if not result.url:
 
                 write_resolve_output(
@@ -472,28 +470,27 @@ def fetch_action(namespace, resolve=False):
 
             # No error
             if result.error is None:
-                pass
-                # Reporting in output
 
-                # write_fetch_output(
-                #     index,
-                #     row,
-                #     resolved=resolved_url if resolved_url != result.url else None,
-                #     status=response.status,
-                #     filename=filename,
-                #     encoding=encoding,
-                #     data=data
-                # )
+                # Reporting in output
+                last = result.stack[-1]
+
+                write_resolve_output(
+                    index,
+                    row,
+                    resolved=last.url,
+                    status=last.status,
+                    redirects=len(result.stack) - 1
+                )
 
             # Handling potential errors
             else:
                 error_code = report_error(result.error)
 
-                # write_fetch_output(
-                #     index,
-                #     row,
-                #     error=error_code
-                # )
+                write_resolve_output(
+                    index,
+                    row,
+                    error=error_code
+                )
 
     # Closing files
     output_file.close()
