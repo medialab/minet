@@ -38,6 +38,13 @@ FETCH_ADDITIONAL_HEADERS = [
     'encoding'
 ]
 
+RESOLVE_ADDITIONAL_HEADERS = [
+    'resolved',
+    'status',
+    'error',
+    'redirects'
+]
+
 CUSTOM_FORMATTER = PseudoFStringFormatter()
 
 
@@ -109,7 +116,7 @@ def parse_folder_strategy(name):
     raise None
 
 
-def fetch_action(namespace):
+def fetch_action(namespace, resolve=False):
 
     # Are we resuming
     resuming = namespace.resume
@@ -130,14 +137,15 @@ def fetch_action(namespace):
             namespace.contents_in_report = True
 
     # Trying to instantiate the folder strategy
-    folder_strategy = parse_folder_strategy(namespace.folder_strategy)
+    if not resolve:
+        folder_strategy = parse_folder_strategy(namespace.folder_strategy)
 
-    if folder_strategy is None:
-        die([
-            'Invalid "%s" --folder-strategy!' % namespace.folder_strategy,
-            'Check the list at the end of the command help:',
-            '  $ minet fetch -h'
-        ])
+        if folder_strategy is None:
+            die([
+                'Invalid "%s" --folder-strategy!' % namespace.folder_strategy,
+                'Check the list at the end of the command help:',
+                '  $ minet fetch -h'
+            ])
 
     # HTTP method
     http_method = namespace.method
@@ -185,13 +193,21 @@ def fetch_action(namespace):
                 loading_bar.set_postfix(skipped=skipped)
                 loading_bar.update()
 
+    if resolve:
+        additional_headers = RESOLVE_ADDITIONAL_HEADERS
+    else:
+        additional_headers = FETCH_ADDITIONAL_HEADERS
+
+        if namespace.contents_in_report:
+            additional_headers = additional_headers + ['raw_contents']
+
     # Enricher
     enricher = casanova.threadsafe_enricher(
         namespace.file,
         output_file,
         resumable=resuming,
         auto_resume=False,
-        add=FETCH_ADDITIONAL_HEADERS + (['raw_contents'] if namespace.contents_in_report else []),
+        add=additional_headers,
         keep=namespace.select,
         listener=listener
     )
@@ -205,7 +221,7 @@ def fetch_action(namespace):
 
     filename_pos = None
 
-    if namespace.filename is not None:
+    if not resolve and namespace.filename is not None:
         if namespace.filename not in enricher.pos:
             die([
                 'Could not find the "%s" column containing the filenames in the given CSV file.' % namespace.filename
@@ -276,130 +292,148 @@ def fetch_action(namespace):
 
         enricher.writerow(index, row, addendum)
 
+    def write_resolve_output(index, row, resolved=None, status=None, error=None,
+                             redirects=None):
+        addendum = [
+            resolved or '',
+            status or '',
+            error or '',
+            redirects or ''
+        ]
+
+        enricher.writerow(index, row, addendum)
+
     errors = 0
     status_codes = Counter()
 
-    fetch_kwargs = {
+    common_kwargs = {
+        'key': url_key,
+        'request_args': request_args,
+        'insecure': namespace.insecure,
         'threads': namespace.threads,
         'throttle': namespace.throttle,
         'domain_parallelism': namespace.domain_parallelism
     }
 
     if namespace.timeout is not None:
-        fetch_kwargs['timeout'] = namespace.timeout
+        common_kwargs['timeout'] = namespace.timeout
 
-    multithreaded_iterator = multithreaded_fetch(
-        enricher,
-        key=url_key,
-        request_args=request_args,
-        insecure=namespace.insecure,
-        **fetch_kwargs
-    )
+    # Normal fetch
+    if not resolve:
 
-    for result in multithreaded_iterator:
-        index, row = result.item
+        multithreaded_iterator = multithreaded_fetch(
+            enricher,
+            **common_kwargs
+        )
 
-        if not result.url:
+        for result in multithreaded_iterator:
+            index, row = result.item
 
-            write_fetch_output(
-                index,
-                row
-            )
+            if not result.url:
 
+                write_fetch_output(
+                    index,
+                    row
+                )
+
+                loading_bar.update()
+                continue
+
+            response = result.response
+            data = response.data if response is not None else None
+
+            content_write_flag = 'wb'
+
+            # Updating stats
+            if result.error is not None:
+                errors += 1
+            else:
+                if response.status >= 400:
+                    status_codes[response.status] += 1
+
+            postfix = {'errors': errors}
+
+            for code, count in status_codes.most_common(1):
+                postfix[str(code)] = count
+
+            loading_bar.set_postfix(**postfix)
             loading_bar.update()
-            continue
 
-        response = result.response
-        data = response.data if response is not None else None
+            # No error
+            if result.error is None:
 
-        content_write_flag = 'wb'
+                filename = None
 
-        # Updating stats
-        if result.error is not None:
-            errors += 1
-        else:
-            if response.status >= 400:
-                status_codes[response.status] += 1
-
-        postfix = {'errors': errors}
-
-        for code, count in status_codes.most_common(1):
-            postfix[str(code)] = count
-
-        loading_bar.set_postfix(**postfix)
-        loading_bar.update()
-
-        # No error
-        if result.error is None:
-
-            filename = None
-
-            # Building filename
-            if data:
-                if filename_pos is not None or namespace.filename_template:
-                    if namespace.filename_template:
-                        filename = CUSTOM_FORMATTER.format(
-                            namespace.filename_template,
-                            value=row[filename_pos] if filename_pos is not None else None,
-                            ext=result.meta['ext'],
-                            line=LazyLineDict(indexed_input_headers, row)
-                        )
+                # Building filename
+                if data:
+                    if filename_pos is not None or namespace.filename_template:
+                        if namespace.filename_template:
+                            filename = CUSTOM_FORMATTER.format(
+                                namespace.filename_template,
+                                value=row[filename_pos] if filename_pos is not None else None,
+                                ext=result.meta['ext'],
+                                line=LazyLineDict(indexed_input_headers, row)
+                            )
+                        else:
+                            filename = row[filename_pos] + result.meta['ext']
                     else:
-                        filename = row[filename_pos] + result.meta['ext']
-                else:
-                    # NOTE: it would be nice to have an id that can be sorted by time
-                    filename = str(uuid4()) + result.meta['ext']
+                        # NOTE: it would be nice to have an id that can be sorted by time
+                        filename = str(uuid4()) + result.meta['ext']
 
-                # Applying folder strategy
-                filename = folder_strategy.get(filename, url=result.url)
+                    # Applying folder strategy
+                    filename = folder_strategy.get(filename, url=result.url)
 
-            # Standardize encoding?
-            encoding = result.meta['encoding']
+                # Standardize encoding?
+                encoding = result.meta['encoding']
 
-            if data and namespace.standardize_encoding or namespace.contents_in_report:
-                if encoding is None or encoding != 'utf-8' or namespace.contents_in_report:
-                    data = data.decode(encoding if encoding is not None else 'utf-8', errors='replace')
-                    encoding = 'utf-8'
-                    content_write_flag = 'w'
+                if data and namespace.standardize_encoding or namespace.contents_in_report:
+                    if encoding is None or encoding != 'utf-8' or namespace.contents_in_report:
+                        data = data.decode(encoding if encoding is not None else 'utf-8', errors='replace')
+                        encoding = 'utf-8'
+                        content_write_flag = 'w'
 
-            # Writing file on disk
-            if data and not namespace.contents_in_report:
+                # Writing file on disk
+                if data and not namespace.contents_in_report:
 
-                if namespace.compress:
-                    filename += '.gz'
+                    if namespace.compress:
+                        filename += '.gz'
 
-                resource_path = join(namespace.output_dir, filename)
-                resource_dir = dirname(resource_path)
+                    resource_path = join(namespace.output_dir, filename)
+                    resource_dir = dirname(resource_path)
 
-                os.makedirs(resource_dir, exist_ok=True)
+                    os.makedirs(resource_dir, exist_ok=True)
 
-                with open(resource_path, content_write_flag) as f:
+                    with open(resource_path, content_write_flag) as f:
 
-                    # TODO: what if standardize_encoding + compress?
-                    f.write(gzip.compress(data) if namespace.compress else data)
+                        # TODO: what if standardize_encoding + compress?
+                        f.write(gzip.compress(data) if namespace.compress else data)
 
-            # Reporting in output
-            resolved_url = response.geturl()
+                # Reporting in output
+                resolved_url = response.geturl()
 
-            write_fetch_output(
-                index,
-                row,
-                resolved=resolved_url if resolved_url != result.url else None,
-                status=response.status,
-                filename=filename,
-                encoding=encoding,
-                data=data
-            )
+                write_fetch_output(
+                    index,
+                    row,
+                    resolved=resolved_url if resolved_url != result.url else None,
+                    status=response.status,
+                    filename=filename,
+                    encoding=encoding,
+                    data=data
+                )
 
-        # Handling potential errors
-        else:
-            error_code = report_error(result.error)
+            # Handling potential errors
+            else:
+                error_code = report_error(result.error)
 
-            write_fetch_output(
-                index,
-                row,
-                error=error_code
-            )
+                write_fetch_output(
+                    index,
+                    row,
+                    error=error_code
+                )
+
+    # Resolve
+    else:
+        pass
 
     # Closing files
     output_file.close()
