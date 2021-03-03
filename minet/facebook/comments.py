@@ -20,7 +20,8 @@ from minet.utils import (
     create_pool,
     request,
     rate_limited_method,
-    RateLimiterState
+    RateLimiterState,
+    create_request_retryer
 )
 from minet.facebook.utils import grab_facebook_cookie
 from minet.facebook.formatters import format_comment
@@ -237,10 +238,12 @@ class FacebookCommentScraper(object):
         calls = 0
         replies = 0
 
+        retryer = create_request_retryer()
+
         while len(url_queue) != 0:
             current_url, direction, in_reply_to = url_queue.popleft()
 
-            html = self.request_page(current_url)
+            html = retryer(self.request_page, current_url)
 
             try:
                 data = scrape_comments(html, direction, in_reply_to)
