@@ -46,6 +46,9 @@ def url_forge(**kwargs):
     if kwargs.get('search_field') is not None:
         base_url += '&searchField=%s' % kwargs['search_field']
 
+    if kwargs.get('in_list_ids') is not None:
+        base_url += '&inListIds=%s' % (','.join(kwargs['in_list_ids']))
+
     return base_url
 
 

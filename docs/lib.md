@@ -288,6 +288,7 @@ for post in client.search('tree'):
 
 * **terms** *str*: search query.
 * **and** *?str*: and component of the query.
+* **in_list_ids** *?iterable<str>*: ids of lists in which to search.
 * **language** *?str*: filter posts by language.
 * **not_in_title** *?bool* [`False`]: whether to search account titles or not.
 * **platforms** *?iterable<str>*: only return posts from the given platforms.

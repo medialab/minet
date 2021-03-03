@@ -608,6 +608,7 @@ examples:
 usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                 [-t TOKEN] [--and AND] [--chunk-size CHUNK_SIZE]
                                 [--end-date END_DATE] [-f {csv,jsonl}]
+                                [--in-list-ids IN_LIST_IDS]
                                 [--language LANGUAGE] [-l LIMIT]
                                 [--not-in-title] [--offset OFFSET]
                                 [-p PLATFORMS]
@@ -635,6 +636,7 @@ optional arguments:
   --chunk-size CHUNK_SIZE                         When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations. Defaults to 500.
   --end-date END_DATE                             The latest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   -f {csv,jsonl}, --format {csv,jsonl}            Output format. Defaults to `csv`.
+  --in-list-ids IN_LIST_IDS                       Ids of the lists in which to search, separated by commas.
   --language LANGUAGE                             Language ISO code like "fr" or "zh-CN".
   -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
   --not-in-title                                  Whether to search terms in account titles also.

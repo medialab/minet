@@ -336,6 +336,11 @@ MINET_COMMANDS = {
                             'default': 'csv'
                         },
                         {
+                            'flag': '--in-list-ids',
+                            'help': 'Ids of the lists in which to search, separated by commas.',
+                            'type': SplitterType()
+                        },
+                        {
                             'flag': '--language',
                             'help': 'Language ISO code like "fr" or "zh-CN".'
                         },
