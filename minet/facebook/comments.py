@@ -103,7 +103,7 @@ def scrape_comments(html, direction=None, in_reply_to=None):
     valid_items = (
         item
         for item
-        in soup.select('[id]')
+        in soup.select('[id]:has(h3 > a)')
         if VALID_ID_RE.match(item.get('id'))
         and not item.parent.get('id', '').startswith('comment_replies_more')
     )
@@ -116,11 +116,6 @@ def scrape_comments(html, direction=None, in_reply_to=None):
             continue
 
         user_link = item.select_one('h3 > a')
-
-        # NOTE: this is a raise bomb
-        if not user_link:
-            raise TypeError
-
         user_label = user_link.get_text().strip()
         user_href = user_link.get('href')
         user = parse_facebook_url(resolve_relative_url(user_href))
