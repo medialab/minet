@@ -15,7 +15,8 @@ from minet.cli.utils import print_err, die
 from minet.crowdtangle import CrowdTangleClient
 from minet.crowdtangle.exceptions import (
     CrowdTangleInvalidTokenError,
-    CrowdTangleRateLimitExceeded
+    CrowdTangleRateLimitExceeded,
+    CrowdTangleInvalidJSONError
 )
 
 
@@ -88,13 +89,17 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
         def before_sleep(retry_state):
             exc = retry_state.outcome.exception()
 
-            reason = 'Call failed because of rate limit!\n'
+            if isinstance(exc, CrowdTangleRateLimitExceeded):
+                reason = 'Call failed because of rate limit!'
 
-            if not isinstance(exc, CrowdTangleRateLimitExceeded):
-                reason = 'Call failed because of server timeout!\n'
+            elif isinstance(exc, CrowdTangleInvalidJSONError):
+                reason = 'Call failed because of invalid JSON payload!'
+
+            else:
+                reason = 'Call failed because of server timeout!'
 
             tqdm.write(
-                '%sWill wait for %s before attempting again.' % (
+                '%s\nWill wait for %s before attempting again.' % (
                     reason,
                     prettyprint_seconds(retry_state.idle_for, granularity=2)
                 ),

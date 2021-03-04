@@ -105,7 +105,7 @@ def step(http, url, item_key):
 
     try:
         data = json.loads(result.data)['result']
-    except:
+    except (json.decoder.JSONDecodeError, TypeError, KeyError):
         raise CrowdTangleInvalidJSONError
 
     items = None
@@ -168,7 +168,7 @@ def make_paginated_iterator(url_forge, item_key, formatter,
         rate_limited_step = rate_limited_from_state(rate_limiter_state)(step)
 
         retryer = create_request_retryer(
-            additional_exceptions=[CrowdTangleRateLimitExceeded],
+            additional_exceptions=[CrowdTangleRateLimitExceeded, CrowdTangleInvalidJSONError],
             before_sleep=before_sleep
         )
 
