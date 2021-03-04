@@ -58,7 +58,8 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
                         throttle=DEFAULT_THROTTLE, guess_extension=True,
                         guess_encoding=True, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
                         insecure=False, timeout=DEFAULT_URLLIB3_TIMEOUT,
-                        domain_parallelism=DEFAULT_GROUP_PARALLELISM):
+                        domain_parallelism=DEFAULT_GROUP_PARALLELISM,
+                        max_redirects=5):
     """
     Function returning a multithreaded iterator over fetched urls.
 
@@ -71,6 +72,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
         throttle (float or callable, optional): Per-domain throttle in seconds.
             Or a function taking domain name and item and returning the
             throttle to apply. Defaults to 0.2.
+        max_redirects (int, optional): Max number of redirections to follow.
         guess_extension (bool, optional): Attempt to guess the resource's
             extension? Defaults to True.
         guess_encoding (bool, optional): Attempt to guess the resource's
@@ -108,7 +110,12 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
 
         kwargs = request_args(url, item) if request_args is not None else {}
 
-        error, response = request(http, url, **kwargs)
+        error, response = request(
+            http,
+            url,
+            max_redirects=max_redirects,
+            **kwargs
+        )
 
         if error:
             return FetchWorkerResult(
