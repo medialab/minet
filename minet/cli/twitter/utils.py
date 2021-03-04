@@ -8,6 +8,7 @@ import casanova
 import sys
 from tqdm import tqdm
 from twitwi import TwitterWrapper
+from twitter import TwitterHTTPError
 
 
 def make_twitter_action(method_name, csv_headers):
@@ -45,6 +46,17 @@ def make_twitter_action(method_name, csv_headers):
         )
 
         users_done = 0
+        users_not_found = 0
+
+        def update_stats():
+            kwargs = {
+                'users': users_done
+            }
+
+            if users_not_found:
+                kwargs['not_found'] = users_not_found
+
+            loading_bar.set_postfix(**kwargs)
 
         for row, user in enricher.cells(namespace.column, with_rows=True):
             all_ids = []
@@ -58,7 +70,15 @@ def make_twitter_action(method_name, csv_headers):
 
             while next_cursor != 0:
                 wrapper_kwargs['cursor'] = next_cursor
-                result = wrapper.call([method_name, 'ids'], **wrapper_kwargs)
+
+                try:
+                    result = wrapper.call([method_name, 'ids'], **wrapper_kwargs)
+                except TwitterHTTPError as e:
+
+                    # The user does not exist
+                    users_not_found += 1
+                    update_stats()
+                    break
 
                 if result is not None:
                     all_ids = result.get('ids', [])
@@ -72,7 +92,7 @@ def make_twitter_action(method_name, csv_headers):
                     next_cursor = 0
 
             users_done += 1
-            loading_bar.set_postfix(users=users_done)
+            update_stats()
 
         loading_bar.close()
 
