@@ -20,6 +20,8 @@ Note that if you are interested in the url cleaning, extraction and join methods
   * [#.posts](#posts)
   * [#.search](#ct-search)
   * [#.summary](#summary)
+* [FacebookMobileScraper](#facebookmobilescraper)
+  * [#.comments](#facebookmobilescraper-comments)
 * [MediacloudClient](#mediacloudclient)
   * [#.count](#count)
   * [#.search](#mc-search)
@@ -326,6 +328,41 @@ stats, posts = client.summary(
 * **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
 * **sort_by** *?str* [`date`]: how to sort posts. Can be `date`, `subscriber_count` or `total_interactions`.
 * **with_top_posts** *?bool*: whether to also return top 100 posts.
+
+
+## FacebookMobileScraper
+
+Scraper able to work on Facebook's oldest mobile version.
+
+```python
+from minet.facebook import FacebookMobileScraper
+
+scraper = FacebookMobileScraper(cookie='chrome')
+
+# If you want to be easier on the site to avoid soft bans
+scraper = FacebookMobileScraper(cookie='chrome', throttle=2)
+```
+
+*Arguments*
+
+* **cookie** *str*: Either the name of a browser you want to extract the relevant Facebook cookie from (example: `firefox`, `chrome`) or the string containing your Facebook cookie so the scraper can authenticate on the mobile website to be able to get the relevant pages to scrape.
+* **throttle** *?float* [`0.5`]: time, in seconds, to wait between each call to the mobile website.
+
+<h3 id="facebookmobilescraper-comments">#.comments</h3>
+
+Method used to retrieve a post's comments.
+
+```python
+for comment in scraper.comments(post_url):
+  print(comment)
+```
+
+*Arguments*
+
+* **url** *str*: url of the post whose comments you want to scrape.
+* **detailed** *?bool* [`False`]: whether to yield a detailed output containing some stats.
+* **per_call** *?bool* [`False`]: whether to yield the list of comments retrieved per call to the website.
+* **format** *?str* [`raw`]: either `raw` or `csv_row`.
 
 ## MediacloudClient
 
