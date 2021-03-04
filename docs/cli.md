@@ -149,7 +149,8 @@ usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM]
                    [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
                    [--insecure] [-o OUTPUT] [--resume] [-s SELECT] [-t THREADS]
                    [--throttle THROTTLE] [--timeout TIMEOUT] [--total TOTAL]
-                   [--url-template URL_TEMPLATE] [-X METHOD] [--compress]
+                   [--url-template URL_TEMPLATE] [-X METHOD]
+                   [--max-redirects MAX_REDIRECTS] [--compress]
                    [--contents-in-report] [-d OUTPUT_DIR] [-f FILENAME]
                    [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [--standardize-encoding]
@@ -183,6 +184,7 @@ optional arguments:
   --total TOTAL                                   Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
   --url-template URL_TEMPLATE                     A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.
   -X METHOD, --request METHOD                     The http method to use. Will default to GET.
+  --max-redirects MAX_REDIRECTS                   Maximum number of redirections to follow before breaking. Defaults to 5.
   --compress                                      Whether to compress the contents.
   --contents-in-report, --no-contents-in-report   Whether to include retrieved contents, e.g. html, directly in the report
                                                   and avoid writing them in a separate folder. This requires to standardize
@@ -276,6 +278,8 @@ usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM]
                      [--insecure] [-o OUTPUT] [--resume] [-s SELECT]
                      [-t THREADS] [--throttle THROTTLE] [--timeout TIMEOUT]
                      [--total TOTAL] [--url-template URL_TEMPLATE] [-X METHOD]
+                     [--max-redirects MAX_REDIRECTS] [--follow-meta-refresh]
+                     [--follow-js-relocation]
                      column [file]
 
 Minet Resolve Command
@@ -305,6 +309,9 @@ optional arguments:
   --total TOTAL                                   Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
   --url-template URL_TEMPLATE                     A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.
   -X METHOD, --request METHOD                     The http method to use. Will default to GET.
+  --max-redirects MAX_REDIRECTS                   Maximum number of redirections to follow before breaking. Defaults to 20.
+  --follow-meta-refresh                           Whether to follow meta refresh tags. Requires to buffer a bit of the response body, so it will slow things down.
+  --follow-js-relocation                          Whether to follow typical JavaScript window relocation. Requires to buffer a bit of the response body, so it will slow things down.
 
 examples:
 

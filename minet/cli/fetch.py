@@ -447,6 +447,8 @@ def fetch_action(namespace, resolve=False):
     else:
 
         common_kwargs['resolve_args'] = request_args
+        common_kwargs['follow_meta_refresh'] = namespace.follow_meta_refresh
+        common_kwargs['follow_js_relocation'] = namespace.follow_js_relocation
 
         multithreaded_iterator = multithreaded_resolve(
             enricher,

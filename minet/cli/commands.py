@@ -1200,6 +1200,16 @@ MINET_COMMANDS = {
                 'help': 'Maximum number of redirections to follow before breaking. Defaults to 20.',
                 'type': int,
                 'default': 20
+            },
+            {
+                'flag': '--follow-meta-refresh',
+                'help': 'Whether to follow meta refresh tags. Requires to buffer a bit of the response body, so it will slow things down.',
+                'action': 'store_true'
+            },
+            {
+                'flag': '--follow-js-relocation',
+                'help': 'Whether to follow typical JavaScript window relocation. Requires to buffer a bit of the response body, so it will slow things down.',
+                'action': 'store_true'
             }
         ]
     },
