@@ -189,7 +189,7 @@ def scrape_comments(html, direction=None, in_reply_to=None):
     return data
 
 
-class FacebookCommentScraper(object):
+class FacebookMobileScraper(object):
     def __init__(self, cookie, throttle=FACEBOOK_MOBILE_DEFAULT_THROTTLE):
 
         # Grabbing cookie
@@ -219,7 +219,7 @@ class FacebookCommentScraper(object):
 
         return result.data.decode('utf-8')
 
-    def __call__(self, url, detailed=False, per_call=False, format='raw'):
+    def comments(self, url, detailed=False, per_call=False, format='raw'):
 
         if format not in FACEBOOK_OUTPUT_FORMATS:
             raise TypeError('minet.facebook.scrape_comments: unkown `format`.')

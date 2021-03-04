@@ -13,7 +13,7 @@ from ural.facebook import has_facebook_comments
 
 from minet.constants import COOKIE_BROWSERS
 from minet.cli.utils import open_output_file, die, edit_namespace_with_csv_io
-from minet.facebook.comments import FacebookCommentScraper
+from minet.facebook import FacebookMobileScraper
 from minet.facebook.constants import FACEBOOK_COMMENT_CSV_HEADERS
 from minet.facebook.exceptions import FacebookInvalidCookieError
 
@@ -29,7 +29,7 @@ def facebook_comments_action(namespace):
         edit_namespace_with_csv_io(namespace, 'post_url')
 
     try:
-        scraper = FacebookCommentScraper(namespace.cookie, throttle=namespace.throttle)
+        scraper = FacebookMobileScraper(namespace.cookie, throttle=namespace.throttle)
     except FacebookInvalidCookieError:
         if namespace.cookie in COOKIE_BROWSERS:
             die([
@@ -65,7 +65,7 @@ def facebook_comments_action(namespace):
             tqdm.write('Given url (line %i) probably cannot have Facebook comments: %s' % (i + 1, url), file=sys.stderr)
             continue
 
-        batches = scraper(
+        batches = scraper.comments(
             url,
             per_call=True,
             detailed=True,
