@@ -1315,7 +1315,7 @@ MINET_COMMANDS = {
                     'arguments': [
                         {
                             'name': 'column',
-                            'help': 'Name of the column containing the Twitter account screen names.'
+                            'help': 'Name of the column containing the Twitter account screen names or ids.'
                         },
                         {
                             'name': 'file',
@@ -1326,8 +1326,8 @@ MINET_COMMANDS = {
                         },
                         *TWITTER_API_COMMON_ARGUMENTS,
                         {
-                            'flag': '--id',
-                            'help': 'Whether to use Twitter user ids rather than screen names.',
+                            'flag': '--ids',
+                            'help': 'Whether the your users are given as ids rather than screen names.',
                             'action': 'store_true'
                         },
                         {
@@ -1360,7 +1360,7 @@ MINET_COMMANDS = {
                     'arguments': [
                         {
                             'name': 'column',
-                            'help': 'Name of the column containing the Twitter account screen names.'
+                            'help': 'Name of the column containing the Twitter account screen names or ids.'
                         },
                         {
                             'name': 'file',
@@ -1371,8 +1371,8 @@ MINET_COMMANDS = {
                         },
                         *TWITTER_API_COMMON_ARGUMENTS,
                         {
-                            'flag': '--id',
-                            'help': 'Whether to use Twitter user ids rather than screen names.',
+                            'flag': '--ids',
+                            'help': 'Whether the your users are given as ids rather than screen names.',
                             'action': 'store_true'
                         },
                         {
@@ -1464,7 +1464,7 @@ MINET_COMMANDS = {
                     'arguments': [
                         {
                             'name': 'column',
-                            'help': 'Name of the column containing the Twitter account screen names.'
+                            'help': 'Name of the column containing the Twitter account screen names or ids.'
                         },
                         {
                             'name': 'file',
@@ -1475,8 +1475,8 @@ MINET_COMMANDS = {
                         },
                         *TWITTER_API_COMMON_ARGUMENTS,
                         {
-                            'flag': '--id',
-                            'help': 'Whether to use Twitter user ids rather than screen names.',
+                            'flag': '--ids',
+                            'help': 'Whether the your users are given as ids rather than screen names.',
                             'action': 'store_true'
                         },
                         {

@@ -84,7 +84,7 @@ def twitter_users_action(namespace, output_file):
     for chunk in chunks_iter(enricher.cells(namespace.column, with_rows=True), 100):
         users = ','.join(row[1] for row in chunk)
 
-        if namespace.id:
+        if namespace.ids:
             wrapper_args = {'user_id': users}
             key = 'id_str'
         else:

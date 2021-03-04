@@ -51,7 +51,7 @@ def make_twitter_action(method_name, csv_headers):
             next_cursor = -1
             result = None
 
-            if namespace.id:
+            if namespace.ids:
                 wrapper_kwargs = {'user_id': user}
             else:
                 wrapper_kwargs = {'screen_name': user}
