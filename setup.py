@@ -40,7 +40,7 @@ setup(name='minet',
         'trafilatura>=0.7.0,<0.8',
         'twitwi>=0.5.0',
         'ural>=0.27.0',
-        'urllib3[secure]>=1.26.3'
+        'urllib3[secure]>=1.25.3'
       ],
       entry_points={
         'console_scripts': ['minet=minet.cli.__main__:main']
