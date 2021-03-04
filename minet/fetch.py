@@ -174,6 +174,12 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
                 url=url
             )
 
+    def get_throttle(group, job):
+        if group is None:
+            return 0
+
+        return throttle
+
     return imap_unordered(
         payloads(),
         worker,
@@ -181,7 +187,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
         group=grouper,
         group_parallelism=domain_parallelism,
         group_buffer_size=buffer_size,
-        group_throttle=throttle
+        group_throttle=get_throttle
     )
 
 
@@ -291,6 +297,12 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
                 url=url
             )
 
+    def get_throttle(group, job):
+        if group is None:
+            return 0
+
+        return throttle
+
     return imap_unordered(
         payloads(),
         worker,
@@ -298,5 +310,5 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
         group=grouper,
         group_parallelism=domain_parallelism,
         group_buffer_size=buffer_size,
-        group_throttle=throttle
+        group_throttle=get_throttle
     )
