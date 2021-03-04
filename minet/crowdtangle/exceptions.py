@@ -24,6 +24,9 @@ class CrowdTangleInvalidRequestError(CrowdTangleError):
         self.status = status
 
     def __str__(self):
+        if self.status is None:
+            return super().__str__()
+
         return super().__str__() + ', Code: %i, Status: %i' % (self.code, self.status)
 
 

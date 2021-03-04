@@ -624,7 +624,7 @@ usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                [--language LANGUAGE] [-l LIMIT]
                                [--list-ids LIST_IDS] [--resume]
                                [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
-                               [--start-date START_DATE]
+                               --start-date START_DATE
 
 Minet CrowdTangle Posts Command
 ===============================
@@ -659,7 +659,8 @@ examples:
 
 . Fetching all the posts from a specific list of groups or pages:
     `lminet ct posts --token YOUR_TOKEN --start-date 2021-01-01 --list-ids YOUR_LIST_ID > posts_from_one_list.csv`
-(To know the different list ids associated with your dashboard: `minet ct lists --token YOUR_TOKEN`)
+
+To know the different list ids associated with your dashboard: `minet ct lists --token YOUR_TOKEN`
 
 ```
 
@@ -675,7 +676,7 @@ usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
                                 [-p PLATFORMS]
                                 [--search-field {account_name_only,image_text_only,include_query_strings,text_fields_and_image_text,text_fields_only}]
                                 [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
-                                [--start-date START_DATE] [--types TYPES]
+                                --start-date START_DATE [--types TYPES]
                                 terms
 
 Minet CrowdTangle Search Command

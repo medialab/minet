@@ -272,7 +272,8 @@ MINET_COMMANDS = {
 
                         . Fetching all the posts from a specific list of groups or pages:
                             `lminet ct posts --token YOUR_TOKEN --start-date 2021-01-01 --list-ids YOUR_LIST_ID > posts_from_one_list.csv`
-                        (To know the different list ids associated with your dashboard: `minet ct lists --token YOUR_TOKEN`)
+
+                        To know the different list ids associated with your dashboard: `minet ct lists --token YOUR_TOKEN`
                     ''',
                     'arguments': [
                         {
@@ -318,7 +319,8 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--start-date',
-                            'help': 'The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.'
+                            'help': 'The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.',
+                            'required': True
                         }
                     ]
                 },
@@ -447,7 +449,8 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--start-date',
-                            'help': 'The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.'
+                            'help': 'The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.',
+                            'required': True
                         },
                         {
                             'flag': '--types',
