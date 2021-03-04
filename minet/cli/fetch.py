@@ -14,7 +14,12 @@ from os.path import join, dirname, isfile
 from collections import Counter
 from tqdm import tqdm
 from uuid import uuid4
-from ural import is_url, get_hostname, get_normalized_hostname
+from ural import (
+    is_url,
+    get_hostname,
+    get_normalized_hostname,
+    is_shortened_url
+)
 
 from minet.fetch import multithreaded_fetch, multithreaded_resolve
 from minet.utils import (
@@ -268,10 +273,15 @@ def fetch_action(namespace, resolve=False):
         loading_bar.set_postfix(**postfix)
         loading_bar.update()
 
+    only_shortened = getattr(namespace, 'only_shortened', False)
+
     def url_key(item):
         url = item[1][url_pos].strip()
 
         if not url:
+            return
+
+        if only_shortened and not is_shortened_url(url):
             return
 
         # Url templating

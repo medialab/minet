@@ -1215,6 +1215,11 @@ MINET_COMMANDS = {
                 'flag': '--infer-redirection',
                 'help': 'Whether to try to heuristically infer redirections from the urls themselves, without requiring a HTTP call.',
                 'action': 'store_true'
+            },
+            {
+                'flag': '--only-shortened',
+                'help': 'Whether to only attempt to resolve urls that are probably shortened.',
+                'action': 'store_true'
             }
         ]
     },
