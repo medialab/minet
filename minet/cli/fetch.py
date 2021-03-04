@@ -333,7 +333,8 @@ def fetch_action(namespace, resolve=False):
         'insecure': namespace.insecure,
         'threads': namespace.threads,
         'throttle': namespace.throttle,
-        'domain_parallelism': namespace.domain_parallelism
+        'domain_parallelism': namespace.domain_parallelism,
+        'max_redirects': namespace.max_redirects
     }
 
     if namespace.timeout is not None:

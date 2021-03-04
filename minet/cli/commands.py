@@ -949,6 +949,12 @@ MINET_COMMANDS = {
             },
             *FETCH_COMMON_ARGUMENTS,
             {
+                'flag': '--max-redirects',
+                'help': 'Maximum number of redirections to follow before breaking. Defaults to 5.',
+                'type': int,
+                'default': 5
+            },
+            {
                 'flag': '--compress',
                 'help': 'Whether to compress the contents.',
                 'action': 'store_true'
@@ -1188,7 +1194,13 @@ MINET_COMMANDS = {
                 'default': sys.stdin,
                 'nargs': '?'
             },
-            *FETCH_COMMON_ARGUMENTS
+            *FETCH_COMMON_ARGUMENTS,
+            {
+                'flag': '--max-redirects',
+                'help': 'Maximum number of redirections to follow before breaking. Defaults to 20.',
+                'type': int,
+                'default': 20
+            }
         ]
     },
 
