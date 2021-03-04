@@ -1210,6 +1210,11 @@ MINET_COMMANDS = {
                 'flag': '--follow-js-relocation',
                 'help': 'Whether to follow typical JavaScript window relocation. Requires to buffer a bit of the response body, so it will slow things down.',
                 'action': 'store_true'
+            },
+            {
+                'flag': '--infer-redirection',
+                'help': 'Whether to try to heuristically infer redirections from the urls themselves, without requiring a HTTP call.',
+                'action': 'store_true'
             }
         ]
     },

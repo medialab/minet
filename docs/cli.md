@@ -279,7 +279,7 @@ usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM]
                      [-t THREADS] [--throttle THROTTLE] [--timeout TIMEOUT]
                      [--total TOTAL] [--url-template URL_TEMPLATE] [-X METHOD]
                      [--max-redirects MAX_REDIRECTS] [--follow-meta-refresh]
-                     [--follow-js-relocation]
+                     [--follow-js-relocation] [--infer-redirection]
                      column [file]
 
 Minet Resolve Command
@@ -312,6 +312,7 @@ optional arguments:
   --max-redirects MAX_REDIRECTS                   Maximum number of redirections to follow before breaking. Defaults to 20.
   --follow-meta-refresh                           Whether to follow meta refresh tags. Requires to buffer a bit of the response body, so it will slow things down.
   --follow-js-relocation                          Whether to follow typical JavaScript window relocation. Requires to buffer a bit of the response body, so it will slow things down.
+  --infer-redirection                             Whether to try to heuristically infer redirections from the urls themselves, without requiring a HTTP call.
 
 examples:
 

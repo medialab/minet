@@ -345,10 +345,9 @@ def fetch_action(namespace, resolve=False):
     # Normal fetch
     if not resolve:
 
-        common_kwargs['request_args'] = request_args
-
         multithreaded_iterator = multithreaded_fetch(
             enricher,
+            request_args=request_args,
             **common_kwargs
         )
 
@@ -448,12 +447,12 @@ def fetch_action(namespace, resolve=False):
     # Resolve
     else:
 
-        common_kwargs['resolve_args'] = request_args
-        common_kwargs['follow_meta_refresh'] = namespace.follow_meta_refresh
-        common_kwargs['follow_js_relocation'] = namespace.follow_js_relocation
-
         multithreaded_iterator = multithreaded_resolve(
             enricher,
+            resolve_args=request_args,
+            follow_meta_refresh=namespace.follow_meta_refresh,
+            follow_js_relocation=namespace.follow_js_relocation,
+            infer_redirection=namespace.infer_redirection,
             **common_kwargs
         )
 
@@ -495,7 +494,9 @@ def fetch_action(namespace, resolve=False):
                 write_resolve_output(
                     index,
                     row,
-                    error=error_code
+                    error=error_code,
+                    redirects=(len(result.stack) - 1) if result.stack else None,
+                    chain='|'.join(step.type for step in result.stack) if result.stack else None
                 )
 
     # Closing files
