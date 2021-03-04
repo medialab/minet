@@ -1076,7 +1076,7 @@ usage: minet twitter users [-h] [--api-key API_KEY]
 Minet Twitter Users Command
 ===========================
 
-Retrieve metadata from a given user.
+Retrieve Twitter user metadata.
 
 positional arguments:
   column                                     Name of the column containing the Twitter account screen names or ids.

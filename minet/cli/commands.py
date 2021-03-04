@@ -1466,7 +1466,7 @@ MINET_COMMANDS = {
                 'users': {
                     'title': 'Minet Twitter Users Command',
                     'description': '''
-                        Retrieve metadata from a given user.
+                        Retrieve Twitter user metadata.
                     ''',
                     'epilog': '''
                         examples:
