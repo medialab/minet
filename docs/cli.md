@@ -954,8 +954,7 @@ usage: minet twitter followers [-h] [--api-key API_KEY]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
-                               [--id] [-o OUTPUT] [-s SELECT] [--resume]
-                               [--total TOTAL]
+                               [--id] [-o OUTPUT] [-s SELECT] [--total TOTAL]
                                column [file]
 
 Minet Twitter Followers Command
@@ -976,7 +975,6 @@ optional arguments:
   --id                                       Whether to use Twitter user ids rather than screen names.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
   -s SELECT, --select SELECT                 Columns to include in report (separated by `,`).
-  --resume                                   Whether to resume an aborted collection.
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
 
 examples:
@@ -993,7 +991,7 @@ usage: minet twitter friends [-h] [--api-key API_KEY]
                              [--api-secret-key API_SECRET_KEY]
                              [--access-token ACCESS_TOKEN]
                              [--access-token-secret ACCESS_TOKEN_SECRET] [--id]
-                             [-o OUTPUT] [-s SELECT] [--resume] [--total TOTAL]
+                             [-o OUTPUT] [-s SELECT] [--total TOTAL]
                              column [file]
 
 Minet Twitter Friends Command
@@ -1014,7 +1012,6 @@ optional arguments:
   --id                                       Whether to use Twitter user ids rather than screen names.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
   -s SELECT, --select SELECT                 Columns to include in report (separated by `,`).
-  --resume                                   Whether to resume an aborted collection.
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
 
 examples:
@@ -1069,7 +1066,7 @@ usage: minet twitter users [-h] [--api-key API_KEY]
                            [--api-secret-key API_SECRET_KEY]
                            [--access-token ACCESS_TOKEN]
                            [--access-token-secret ACCESS_TOKEN_SECRET] [--id]
-                           [-o OUTPUT] [-s SELECT] [--resume] [--total TOTAL]
+                           [-o OUTPUT] [-s SELECT] [--total TOTAL]
                            column [file]
 
 Minet Twitter Users Command
@@ -1090,7 +1087,6 @@ optional arguments:
   --id                                       Whether to use Twitter user ids rather than screen names.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
   -s SELECT, --select SELECT                 Columns to include in report (separated by `,`).
-  --resume                                   Whether to resume an aborted collection.
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
 
 examples:

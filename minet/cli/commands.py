@@ -1340,11 +1340,6 @@ MINET_COMMANDS = {
                             'type': SplitterType()
                         },
                         {
-                            'flag': '--resume',
-                            'help': 'Whether to resume an aborted collection.',
-                            'action': 'store_true'
-                        },
-                        {
                             'flag': '--total',
                             'help': 'Total number of accounts. Necessary if you want to display a finite progress indicator.',
                             'type': int
@@ -1388,11 +1383,6 @@ MINET_COMMANDS = {
                             'flags': ['-s', '--select'],
                             'help': 'Columns to include in report (separated by `,`).',
                             'type': SplitterType()
-                        },
-                        {
-                            'flag': '--resume',
-                            'help': 'Whether to resume an aborted collection.',
-                            'action': 'store_true'
                         },
                         {
                             'flag': '--total',
@@ -1497,11 +1487,6 @@ MINET_COMMANDS = {
                             'flags': ['-s', '--select'],
                             'help': 'Columns to include in report (separated by `,`).',
                             'type': SplitterType()
-                        },
-                        {
-                            'flag': '--resume',
-                            'help': 'Whether to resume an aborted collection.',
-                            'action': 'store_true'
                         },
                         {
                             'flag': '--total',
