@@ -85,9 +85,9 @@ class NormalizedHostnameFolderStrategy(FolderStrategy):
     def get(self, filename, url, **kwargs):
         hostname = get_normalized_hostname(
             url,
-            normalize_amp=True,
+            normalize_amp=False,
             strip_lang_subdomains=True,
-            infer_redirection=True
+            infer_redirection=False
         )
 
         if not hostname:
@@ -404,7 +404,7 @@ def fetch_action(namespace, resolve=False):
                         filename = str(uuid4()) + result.meta['ext']
 
                     # Applying folder strategy
-                    filename = folder_strategy.get(filename, url=result.url)
+                    filename = folder_strategy.get(filename, url=result.response.geturl())
 
                 # Standardize encoding?
                 encoding = result.meta['encoding']
