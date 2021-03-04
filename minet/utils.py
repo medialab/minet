@@ -233,7 +233,7 @@ def create_pool(proxy=None, threads=None, insecure=False, **kwargs):
     if threads is not None:
 
         # TODO: maxsize should increase with group_parallelism
-        manager_kwargs['maxsize'] = 1
+        manager_kwargs['maxsize'] = 10
         manager_kwargs['num_pools'] = threads * 2
 
     manager_kwargs.update(kwargs)
