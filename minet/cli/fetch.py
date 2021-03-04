@@ -42,7 +42,8 @@ RESOLVE_ADDITIONAL_HEADERS = [
     'resolved',
     'status',
     'error',
-    'redirects'
+    'redirects',
+    'chain'
 ]
 
 CUSTOM_FORMATTER = PseudoFStringFormatter()
@@ -315,12 +316,13 @@ def fetch_action(namespace, resolve=False):
         enricher.writerow(index, row, addendum)
 
     def write_resolve_output(index, row, resolved=None, status=None, error=None,
-                             redirects=None):
+                             redirects=None, chain=None):
         addendum = [
             resolved or '',
             status or '',
             error or '',
-            redirects or ''
+            redirects or '',
+            chain or ''
         ]
 
         enricher.writerow(index, row, addendum)
@@ -482,7 +484,8 @@ def fetch_action(namespace, resolve=False):
                     row,
                     resolved=last.url,
                     status=last.status,
-                    redirects=len(result.stack) - 1
+                    redirects=len(result.stack) - 1,
+                    chain='|'.join(step.type for step in result.stack)
                 )
 
             # Handling potential errors
