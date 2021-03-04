@@ -188,7 +188,8 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
 def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
                           throttle=DEFAULT_THROTTLE, max_redirects=5,
                           follow_refresh_header=True, follow_meta_refresh=False,
-                          follow_js_relocation=False, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
+                          follow_js_relocation=False, infer_redirection=False,
+                          buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
                           insecure=False, timeout=DEFAULT_URLLIB3_TIMEOUT,
                           domain_parallelism=DEFAULT_GROUP_PARALLELISM):
     """
@@ -208,6 +209,8 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
             headers. Defaults to True.
         follow_meta_refresh (bool, optional): Whether to follow meta refresh.
             Defaults to False.
+        infer_redirection (bool, optional): Whether to infer redirections
+            heuristically from urls. Defaults to False.
         buffer_size (int, optional): Max number of items per domain to enqueue
             into memory in hope of finding a new domain that can be processed
             immediately. Defaults to 1.

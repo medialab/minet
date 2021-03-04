@@ -10,6 +10,7 @@ import certifi
 import browser_cookie3
 import hashlib
 import urllib3
+import ural
 import json
 import yaml
 import time
@@ -20,7 +21,6 @@ import cchardet as chardet
 from random import uniform
 from collections import OrderedDict
 from json.decoder import JSONDecodeError
-from ural import is_url
 from urllib.parse import urljoin
 from urllib3 import HTTPResponse
 from urllib.request import Request
@@ -252,7 +252,7 @@ def raw_request(http, url, method='GET', headers=None,
     """
 
     # Validating URL
-    if not is_url(url, require_protocol=True, tld_aware=True, allow_spaces_in_path=True):
+    if not ural.is_url(url, require_protocol=True, tld_aware=True, allow_spaces_in_path=True):
         return InvalidURLError('Invalid URL'), None
 
     # Performing request
@@ -283,10 +283,10 @@ def raw_request(http, url, method='GET', headers=None,
 class Redirection(object):
     __slots__ = ('status', 'type', 'url')
 
-    def __init__(self, url):
+    def __init__(self, url, _type='hit'):
         self.status = None
         self.url = url
-        self.type = 'hit'
+        self.type = _type
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -303,8 +303,8 @@ class Redirection(object):
 
 def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
                 follow_refresh_header=True, follow_meta_refresh=False,
-                follow_js_relocation=False, return_response=False, timeout=None,
-                body=None):
+                follow_js_relocation=False, return_response=False,
+                infer_redirection=False, timeout=None, body=None,):
     """
     Helper function attempting to resolve the given url.
     """
@@ -314,6 +314,13 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
     response = None
 
     for _ in range(max_redirects):
+        if infer_redirection:
+            target = ural.infer_redirection(url, recursive=False)
+
+            if target != url:
+                url_stack[url] = Redirection(url, 'infer')
+                url = target
+                continue
 
         if response:
             response.release_conn()
@@ -539,7 +546,8 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
 
 def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
             follow_redirects=True, max_redirects=5, follow_refresh_header=True,
-            follow_meta_refresh=False, follow_js_relocation=False, timeout=None):
+            follow_meta_refresh=False, follow_js_relocation=False,
+            infer_redirection=False, timeout=None):
 
     final_headers = build_request_headers(
         headers=headers,
@@ -556,6 +564,7 @@ def resolve(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
         follow_refresh_header=follow_refresh_header,
         follow_meta_refresh=follow_meta_refresh,
         follow_js_relocation=follow_js_relocation,
+        infer_redirection=infer_redirection,
         timeout=timeout
     )
 
