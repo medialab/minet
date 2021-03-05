@@ -4,7 +4,6 @@
 #
 # Logic of the `tw users` action.
 import casanova
-import datetime
 from twitwi import (
     TwitterWrapper,
     normalize_user,
@@ -12,8 +11,7 @@ from twitwi import (
 )
 from twitwi.constants import USER_FIELDS
 from tqdm import tqdm
-
-from minet.utils import chunks_iter
+from ebbe import as_chunks
 
 
 def twitter_users_action(namespace, output_file):
@@ -39,7 +37,7 @@ def twitter_users_action(namespace, output_file):
         unit=' user'
     )
 
-    for chunk in chunks_iter(enricher.cells(namespace.column, with_rows=True), 100):
+    for chunk in as_chunks(enricher.cells(100, namespace.column, with_rows=True)):
         users = ','.join(row[1] for row in chunk)
 
         if namespace.ids:

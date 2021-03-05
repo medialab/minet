@@ -8,9 +8,11 @@
 import time
 import casanova
 from tqdm import tqdm
+from ebbe import as_chunks
+
 from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
 from minet.cli.utils import die
-from minet.utils import create_pool, request_json, chunks_iter
+from minet.utils import create_pool, request_json
 from ural.youtube import (
     extract_video_id_from_youtube_url,
     is_youtube_video_id,
@@ -121,10 +123,10 @@ def videos_action(namespace, output_file):
 
             yield row, video_id
 
-    for chunk in chunks_iter(rows_with_videos_id(), 50):
+    for chunk in as_chunks(50, rows_with_videos_id()):
 
         all_ids = [video_id for _, video_id in chunk if video_id]
-        list_id = ",".join(all_ids)
+        list_id = ','.join(all_ids)
 
         url = URL_TEMPLATE % {'list_id': list_id, 'key': namespace.key}
         err, response, result = request_json(http, url)

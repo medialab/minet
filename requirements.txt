@@ -13,6 +13,7 @@ browser-cookie3==0.12.0
 casanova==0.9.1
 cchardet>=2.1.7
 dateparser==1.0.0
+ebbe==1.1.0
 json5==0.8.5
 keyring<19.3
 lxml==4.6.2

@@ -922,20 +922,6 @@ def sleep_with_entropy(seconds, max_random_addendum):
     time.sleep(seconds + random_addendum)
 
 
-def chunks_iter(iterator, chunk_size):
-    chunk = []
-
-    for item in iterator:
-        if len(chunk) == chunk_size:
-            yield chunk
-            chunk = []
-
-        chunk.append(item)
-
-    if chunk:
-        yield chunk
-
-
 INTERVALS = [
     ('weeks', 60 * 60 * 24 * 7),  # 60 * 60 * 24 * 7
     ('days', 60 * 60 * 24),    # 60 * 60 * 24
