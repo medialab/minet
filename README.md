@@ -102,7 +102,7 @@ To learn how to use **minet** and understand how it may fit your use cases, you 
 
 ## Contributing
 
-To contribute to **minet** you can check out [this](./CONTRIBUTE.md) documentation.
+To contribute to **minet** you can check out [this](./CONTRIBUTING.md) documentation.
 
 ## How to cite
 
