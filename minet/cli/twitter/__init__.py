@@ -33,6 +33,11 @@ def twitter_action(namespace):
         flag='a+' if getattr(namespace, 'resume', False) else 'w'
     )
 
+    if getattr(namespace, 'resume', False) and not namespace.output:
+        die(
+            'Cannot --resume if -o/--output is not set!'
+        )
+
     if namespace.tw_action == 'scrape':
         from minet.cli.twitter.scrape import twitter_scrape_action
 

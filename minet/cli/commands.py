@@ -1348,6 +1348,11 @@ MINET_COMMANDS = {
                             'help': 'Path to the output file. By default, the result will be printed to stdout.'
                         },
                         {
+                            'flag': '--resume',
+                            'help': 'Whether to resume from an aborted collection. Need -o to be set.',
+                            'action': 'store_true'
+                        },
+                        {
                             'flags': ['-s', '--select'],
                             'help': 'Columns to include in report (separated by `,`).',
                             'type': SplitterType()
@@ -1391,6 +1396,11 @@ MINET_COMMANDS = {
                         {
                             'flags': ['-o', '--output'],
                             'help': 'Path to the output file. By default, the result will be printed to stdout.'
+                        },
+                        {
+                            'flag': '--resume',
+                            'help': 'Whether to resume from an aborted collection. Need -o to be set.',
+                            'action': 'store_true'
                         },
                         {
                             'flags': ['-s', '--select'],

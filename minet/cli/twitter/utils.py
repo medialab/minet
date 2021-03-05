@@ -6,6 +6,7 @@
 #
 import casanova
 import sys
+from ebbe import with_is_last
 from tqdm import tqdm
 from twitwi import TwitterWrapper
 from twitter import TwitterHTTPError
@@ -32,7 +33,7 @@ def make_twitter_action(method_name, csv_headers):
             namespace.file,
             output_file,
             keep=namespace.select,
-            add=csv_headers
+            add=csv_headers + ['cursor']
         )
 
         loading_bar = tqdm(
@@ -86,8 +87,13 @@ def make_twitter_action(method_name, csv_headers):
 
                     loading_bar.update(len(all_ids))
 
-                    for user_id in all_ids:
-                        enricher.writerow(row, [user_id])
+                    for is_last, user_id in with_is_last(all_ids):
+                        if is_last:
+                            addendum = [user_id, next_cursor or 'end']
+                        else:
+                            addendum = [user_id, '']
+
+                        enricher.writerow(row, addendum)
                 else:
                     next_cursor = 0
 
