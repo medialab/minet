@@ -958,7 +958,8 @@ usage: minet twitter followers [-h] [--api-key API_KEY]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
-                               [--ids] [-o OUTPUT] [-s SELECT] [--total TOTAL]
+                               [--ids] [-o OUTPUT] [--resume] [-s SELECT]
+                               [--total TOTAL]
                                column [file]
 
 Minet Twitter Followers Command
@@ -978,6 +979,7 @@ optional arguments:
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret.
   --ids                                      Whether the your users are given as ids rather than screen names.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
+  --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns to include in report (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
 
@@ -995,7 +997,7 @@ usage: minet twitter friends [-h] [--api-key API_KEY]
                              [--api-secret-key API_SECRET_KEY]
                              [--access-token ACCESS_TOKEN]
                              [--access-token-secret ACCESS_TOKEN_SECRET] [--ids]
-                             [-o OUTPUT] [-s SELECT] [--total TOTAL]
+                             [-o OUTPUT] [--resume] [-s SELECT] [--total TOTAL]
                              column [file]
 
 Minet Twitter Friends Command
@@ -1015,6 +1017,7 @@ optional arguments:
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret.
   --ids                                      Whether the your users are given as ids rather than screen names.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
+  --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns to include in report (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
 
