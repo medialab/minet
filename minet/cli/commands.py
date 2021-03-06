@@ -1037,6 +1037,15 @@ MINET_COMMANDS = {
                             'flag': '--body',
                             'help': 'Whether to download pages body.',
                             'action': 'store_true'
+                        },
+                        {
+                            'flag': '--password',
+                            'help': 'The corpus\'s password if required.'
+                        },
+                        {
+                            'flag': '--statuses',
+                            'help': 'Webentity statuses to dump, separated by comma. Possible statuses being "IN", "OUT", "UNDECIDED" and "DISCOVERED".',
+                            'type': SplitterType()
                         }
                     ]
                 }

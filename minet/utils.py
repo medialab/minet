@@ -603,7 +603,7 @@ def extract_response_meta(response, guess_encoding=True, guess_extension=True):
     return meta
 
 
-def jsonrpc(http, url, method, *args, **kwargs):
+def request_jsonrpc(http, url, method, *args, **kwargs):
     params = []
 
     if len(args) > 0:

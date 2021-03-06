@@ -11,172 +11,18 @@ import zlib
 import gzip
 from os.path import join, dirname
 from tqdm import tqdm
-from datetime import datetime
 
-from minet.utils import create_pool, md5
-from minet.cli.hyphe.constants import WEBENTITY_STATUSES
-from minet.cli.hyphe.utils import (
-    create_corpus_jsonrpc,
-    ensure_corpus_is_started
+from minet.utils import md5
+from minet.cli.utils import die
+from minet.hyphe import HypheAPIClient
+from minet.hyphe.formatters import format_webentity_for_csv, format_page_for_csv
+from minet.hyphe.constants import (
+    WEBENTITY_CSV_HEADERS,
+    PAGE_CSV_HEADERS
 )
+from minet.hyphe.exceptions import HypheCorpusAuthenticationError
 
-# Constants
-BATCH_SIZE = 100
-
-
-# Helpers
-def count_total_webentities(stats, statuses=WEBENTITY_STATUSES):
-    counts = stats['result']['corpus']['traph']['webentities']
-
-    total = 0
-
-    for status in statuses:
-        total += counts[status]
-
-    return total
-
-
-def count_total_pages(stats):
-    counts = stats['result']['corpus']['crawler']
-
-    return counts['pages_found']
-
-
-def webentities_by_status_iter(jsonrpc, status):
-    token = None
-    next_page = None
-
-    while True:
-        if token is None:
-            err, result = jsonrpc(
-                'store.get_webentities_by_status',
-                status=status,
-                count=BATCH_SIZE
-            )
-        else:
-            err, result = jsonrpc(
-                'store.get_webentities_page',
-                pagination_token=token,
-                n_page=next_page
-            )
-
-        result = result['result']
-
-        for webentity in result['webentities']:
-            yield webentity
-
-        if 'next_page' in result and result['next_page']:
-            token = result['token']
-            next_page = result['next_page']
-        else:
-            break
-
-
-def webentities_iter(jsonrpc, statuses=WEBENTITY_STATUSES):
-    for status in statuses:
-        yield from webentities_by_status_iter(jsonrpc, status)
-
-
-def webentity_pages_iter(jsonrpc, webentity, body=False):
-    token = None
-
-    while True:
-        err, result = jsonrpc(
-            'store.paginate_webentity_pages',
-            webentity_id=webentity['id'],
-            count=BATCH_SIZE,
-            pagination_token=token,
-            include_page_metas=True,
-            include_page_body=body
-        )
-
-        result = result['result']
-
-        for page in result['pages']:
-            yield webentity, page
-
-        if 'token' in result and result['token']:
-            token = result['token']
-        else:
-            break
-
-
-def pages_iter(jsonrpc, webentities, body=False):
-    for webentity in webentities.values():
-        yield from webentity_pages_iter(jsonrpc, webentity, body=body)
-
-
-WEBENTITY_HEADERS = [
-    'id',
-    'name',
-    'status',
-    'pages',
-    'homepage',
-    'prefixes',
-    'degree',
-    'undirected_degree',
-    'indegree',
-    'outdegree'
-]
-
-
-def format_webentity_for_csv(webentity):
-    return [
-        webentity['id'],
-        webentity['name'],
-        webentity['status'],
-        webentity['pages_total'],
-        webentity['homepage'],
-        ' '.join(webentity['prefixes']),
-        webentity['indegree'] + webentity['outdegree'],
-        webentity['undirected_degree'],
-        webentity['indegree'],
-        webentity['outdegree'],
-    ]
-
-
-PAGE_HEADERS = [
-    'url',
-    'lru',
-    'webentity',
-    'webentity_status',
-    'status',
-    'crawled',
-    'encoding',
-    'content_type',
-    'crawl_timestamp',
-    'crawl_datetime',
-    'size',
-    'error'
-]
-
-ADDITIONAL_PAGE_HEADERS = [
-    'filename'
-]
-
-
-def format_page_for_csv(webentity, page, filename=None, body=False):
-    row = [
-        page['url'],
-        page['lru'],
-        webentity['id'],
-        webentity['status'],
-        page.get('status', ''),
-        '1' if page['crawled'] else '0',
-        page.get('encoding', ''),
-        page.get('content_type', ''),
-        page['crawl_timestamp'] if 'crawl_timestamp' in page else '',
-        datetime.fromtimestamp(int(page['crawl_timestamp']) / 1000).isoformat(timespec='seconds') if 'crawl_timestamp' in page else '',
-        page.get('size', '') or '',
-        page.get('error', '')
-    ]
-
-    if filename:
-        row.append(filename)
-    elif body:
-        row.append('')
-
-    return row
+ADDITIONAL_PAGE_HEADERS = ['filename']
 
 
 def format_page_filename(webentity, page):
@@ -203,34 +49,35 @@ def hyphe_dump_action(namespace):
         body_output_dir = join(output_dir, 'content')
         os.makedirs(body_output_dir, exist_ok=True)
 
-    # Fixing trailing slash
-    if not namespace.url.endswith('/'):
-        namespace.url += '/'
+    client = HypheAPIClient(namespace.url)
+    corpus = client.corpus(namespace.corpus, password=namespace.password)
 
-    http = create_pool()
-    jsonrpc = create_corpus_jsonrpc(http, namespace.url, namespace.corpus)
-
-    # First we need to start the corpus
-    ensure_corpus_is_started(jsonrpc)
+    try:
+        corpus.ensure_is_started()
+    except HypheCorpusAuthenticationError:
+        die([
+            'Wrong password for the "%s" corpus!' % namespace.corpus,
+            'Don\'t forget to provide a password for this corpus using --password'
+        ])
 
     # Then we gather some handy statistics
-    err, stats = jsonrpc('get_status')
+    counts = corpus.count(statuses=namespace.statuses)
 
     # Then we fetch webentities
     webentities_file = open(webentities_output_path, 'w', encoding='utf-8')
     webentities_writer = csv.writer(webentities_file)
-    webentities_writer.writerow(WEBENTITY_HEADERS)
+    webentities_writer.writerow(WEBENTITY_CSV_HEADERS)
 
     loading_bar = tqdm(
         desc='Paginating web entities',
         unit=' webentities',
         dynamic_ncols=True,
-        total=count_total_webentities(stats)
+        total=counts['webentities']
     )
 
     webentities = {}
 
-    for webentity in webentities_iter(jsonrpc):
+    for webentity in corpus.webentities(statuses=namespace.statuses):
         loading_bar.update()
         webentities[webentity['id']] = webentity
         webentities_writer.writerow(format_webentity_for_csv(webentity))
@@ -241,29 +88,37 @@ def hyphe_dump_action(namespace):
     # Finally we paginate pages
     pages_file = open(pages_output_path, 'w', encoding='utf-8')
     pages_writer = csv.writer(pages_file)
-    pages_writer.writerow(PAGE_HEADERS + (ADDITIONAL_PAGE_HEADERS if namespace.body else []))
+    pages_writer.writerow(PAGE_CSV_HEADERS + (ADDITIONAL_PAGE_HEADERS if namespace.body else []))
 
     loading_bar = tqdm(
-        desc='Dumping pages',
+        desc='Fetching pages',
         unit=' pages',
         dynamic_ncols=True,
-        total=count_total_pages(stats)
+        total=counts['pages']
     )
 
-    for webentity, page in pages_iter(jsonrpc, webentities, body=namespace.body):
-        loading_bar.update()
-        filename = None
+    for webentity in webentities.values():
+        for page in corpus.webentity_pages(webentity['id'], include_body=namespace.body):
+            loading_bar.update()
 
-        if namespace.body and 'body' in page:
-            filename = format_page_filename(webentity, page)
-            filepath = join(body_output_dir, filename)
-            os.makedirs(dirname(filepath), exist_ok=True)
+            filename = None
 
-            with open(filepath, 'wb') as f:
-                binary = base64.b64decode(page['body'])
-                binary = zlib.decompress(binary)
-                binary = gzip.compress(binary)
+            if namespace.body and 'body' in page:
+                filename = format_page_filename(webentity, page)
+                filepath = join(body_output_dir, filename)
+                os.makedirs(dirname(filepath), exist_ok=True)
 
-                f.write(binary)
+                with open(filter, 'wb') as f:
+                    binary = base64.b64decode(page['body'])
+                    binary = zlib.decompress(binary)
+                    binary = gzip.compress(binary)
 
-        pages_writer.writerow(format_page_for_csv(webentity, page, filename=filename, body=namespace.body))
+                    f.write(binary)
+
+            pages_writer.writerow(
+                format_page_for_csv(
+                    webentity,
+                    page,
+                    filename=filename
+                )
+            )

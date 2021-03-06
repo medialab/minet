@@ -1,8 +1,5 @@
 # =============================================================================
-# Minet Hyphe Constants
+# Minet Hyphe Enpoint
 # =============================================================================
 #
-# Bunch of Hyphe-related constants.
-#
-
-WEBENTITY_STATUSES = set(['IN', 'OUT', 'UNDECIDED', 'DISCOVERED'])
+from minet.hyphe.client import HypheAPIClient

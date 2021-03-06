@@ -846,7 +846,9 @@ example:
 ### dump
 
 ```
-usage: minet hyphe dump [-h] [-d OUTPUT_DIR] [--body] url corpus
+usage: minet hyphe dump [-h] [-d OUTPUT_DIR] [--body] [--password PASSWORD]
+                        [--statuses STATUSES]
+                        url corpus
 
 Minet Hyphe Dump Command
 ========================
@@ -862,6 +864,8 @@ optional arguments:
   -h, --help                              show this help message and exit
   -d OUTPUT_DIR, --output-dir OUTPUT_DIR  Output directory for dumped files. Will default to some name based on corpus name.
   --body                                  Whether to download pages body.
+  --password PASSWORD                     The corpus's password if required.
+  --statuses STATUSES                     Webentity statuses to dump, separated by comma. Possible statuses being "IN", "OUT", "UNDECIDED" and "DISCOVERED".
 
 examples:
 
