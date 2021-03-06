@@ -25,7 +25,7 @@ setup(name='minet',
       install_requires=[
         'beautifulsoup4>=4.7.1',
         'browser-cookie3==0.12.0',
-        'casanova==0.10.0',
+        'casanova==0.10.1',
         'cchardet>=2.1.7',
         'dateparser>=1.0.0',
         'ebbe>=1.0.0',
