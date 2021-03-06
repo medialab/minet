@@ -140,6 +140,11 @@ def scrape_comments(html, direction=None, in_reply_to=None):
         formatted_date = item.select_one('abbr').get_text().strip()
         parsed_date = parse_formatted_date(formatted_date)
 
+        post_id_item = item.select_one('[id^="like_"]')
+
+        if post_id_item is None:
+            raise TypeError
+
         post_id = item.select_one('[id^="like_"]').get('id').split('_')[1]
 
         # NOTE: this could be better (we already know this beforehand)
@@ -246,7 +251,7 @@ class FacebookMobileScraper(object):
                 # with open('./dump.html', 'w') as f:
                 #     f.write(html)
                 print('Could not process comment in %s' % current_url, file=sys.stderr)
-                sys.exit(1)
+                return
 
             calls += 1
 
