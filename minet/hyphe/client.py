@@ -142,6 +142,9 @@ class HypheAPIClientCorpus(object):
                         n_page=next_page
                     )
 
+                if err:
+                    raise err
+
                 result = result['result']
 
                 for webentity in result['webentities']:
@@ -165,6 +168,9 @@ class HypheAPIClientCorpus(object):
                 include_page_metas=True,
                 include_page_body=include_body
             )
+
+            if err:
+                raise err
 
             result = result['result']
 
