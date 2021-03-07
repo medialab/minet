@@ -9,7 +9,7 @@ import sys
 import casanova
 from tqdm import tqdm
 from minet.cli.youtube.utils import seconds_to_midnight_pacific_time
-from minet.cli.utils import die, open_output_file, edit_namespace_with_csv_io, DummyTqdmFile
+from minet.cli.utils import die, open_output_file, edit_namespace_with_csv_io
 from minet.utils import create_pool, request_json
 
 URL_TEMPLATE = 'https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=100&q=%(subject)s&type=video&order=%(order)s&key=%(key)s'
@@ -58,11 +58,14 @@ def search_action(namespace, output_file):
     loading_bar = tqdm(
         desc='Retrieving',
         dynamic_ncols=True,
-        unit='videos',
+        unit=' videos',
+        total=namespace.limit
     )
+
     http = create_pool()
-    error_file = DummyTqdmFile(sys.stderr)
     limit = namespace.limit
+
+    C = 0
 
     for (row, keyword) in enricher.cells(namespace.column, with_rows=True):
         url = URL_TEMPLATE % {'subject': keyword, 'order': namespace.order, 'key': namespace.key}
@@ -74,20 +77,33 @@ def search_action(namespace, output_file):
                 url_next = url + '&pageToken=' + next_page
                 err, response, result = request_json(http, url_next)
             if err:
+                loading_bar.close()
                 die(err)
             elif response.status == 403:
-                error_file.write('Running out of API points. You will have to wait until midnight, Pacific time!')
+                tqdm.write('Running out of API points. You will have to wait until midnight, Pacific time!', file=sys.stderr)
                 time.sleep(seconds_to_midnight_pacific_time())
                 continue
             elif response.status >= 400:
+                loading_bar.close()
                 die(response.status)
+
             next_page, data_l = get_data(result)
+
+            should_stop = False
+
             for data in data_l:
-                if limit is not(None):
-                    if limit == 0:
-                        return True
-                    else:
-                        limit -= 1
-                        enricher.writerow(row, data)
-                else:
-                    enricher.writerow(row, data)
+                C += 1
+                loading_bar.update()
+                enricher.writerow(row, data)
+
+                if limit is not None and C >= limit:
+                    should_stop = True
+                    break
+
+            if should_stop:
+                break
+
+    loading_bar.close()
+
+    if output_file:
+        output_file.close()
