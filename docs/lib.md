@@ -13,7 +13,7 @@ Note that if you are interested in the url cleaning, extraction and join methods
 
 *Platform-related commands*
 
-* [CrowdTangleClient](#crowdtangleclient)
+* [CrowdTangleAPIClient](#crowdtangleapiclient)
   * [#.leaderboard](#leaderboard)
   * [#.lists](#lists)
   * [#.post](#crowdtangle-post)
@@ -192,19 +192,19 @@ A `ResolveWorkerResult` having the following attributes:
 * **error** *?Exception*: an error.
 * **stack** *?list*: the redirection stack.
 
-## CrowdTangleClient
+## CrowdTangleAPIClient
 
 Client that can be used to access [CrowdTangle](https://www.crowdtangle.com/)'s APIs while ensuring you respect rate limits.
 
 For more details about the CrowdTangle API, be sure to check their [documentation](https://github.com/CrowdTangle/API/wiki).
 
 ```python
-from minet.crowdtangle import CrowdTangleClient
+from minet.crowdtangle import CrowdTangleAPIClient
 
-client = CrowdTangleClient(token='MYTOKEN')
+client = CrowdTangleAPIClient(token='MYTOKEN')
 
 # If you want to use a custom rate limit:
-client = CrowdTangleClient(token='MYTOKEN', rate_limit=50)
+client = CrowdTangleAPIClient(token='MYTOKEN', rate_limit=50)
 ```
 
 *Arguments*

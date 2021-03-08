@@ -17,7 +17,7 @@ from minet.crowdtangle.constants import (
 from minet.crowdtangle.exceptions import (
     CrowdTangleInvalidTokenError
 )
-from minet.crowdtangle import CrowdTangleClient
+from minet.crowdtangle import CrowdTangleAPIClient
 
 
 def crowdtangle_summary_action(namespace, output_file):
@@ -47,7 +47,7 @@ def crowdtangle_summary_action(namespace, output_file):
         unit=' urls'
     )
 
-    client = CrowdTangleClient(namespace.token, rate_limit=namespace.rate_limit)
+    client = CrowdTangleAPIClient(namespace.token, rate_limit=namespace.rate_limit)
 
     for row, url in enricher.cells(namespace.column, with_rows=True):
         url = url.strip()

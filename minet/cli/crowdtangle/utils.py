@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from minet.utils import prettyprint_seconds
 from minet.cli.utils import print_err, die
-from minet.crowdtangle import CrowdTangleClient
+from minet.crowdtangle import CrowdTangleAPIClient
 from minet.crowdtangle.exceptions import (
     CrowdTangleInvalidTokenError,
     CrowdTangleRateLimitExceeded,
@@ -79,7 +79,7 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
         else:
             writer = ndjson.writer(output_file)
 
-        client = CrowdTangleClient(namespace.token, rate_limit=namespace.rate_limit)
+        client = CrowdTangleAPIClient(namespace.token, rate_limit=namespace.rate_limit)
 
         args = []
 

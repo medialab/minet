@@ -23,7 +23,7 @@ from minet.crowdtangle.search import crowdtangle_search
 from minet.crowdtangle.summary import crowdtangle_summary
 
 
-class CrowdTangleClient(object):
+class CrowdTangleAPIClient(object):
     def __init__(self, token, rate_limit=None):
         if rate_limit is None:
             rate_limit = CROWDTANGLE_DEFAULT_RATE_LIMIT
