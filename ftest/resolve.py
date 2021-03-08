@@ -37,8 +37,9 @@ URLS = [
     # 'https://bit.ly/2ANzJNW',
 
     # Inference
-    'https://test.com?url=http%3A%2F%2Flemonde.fr%3Fnext%3Dhttp%253A%252F%252Ftarget.fr',
-    'http://lemonde.fr?url=http%3A%2F%2Flemonde.fr'
+    # 'https://test.com?url=http%3A%2F%2Flemonde.fr%3Fnext%3Dhttp%253A%252F%252Ftarget.fr',
+    # 'http://lemonde.fr?url=http%3A%2F%2Flemonde.fr',
+    'https://www.ohaime-passion.com/fil-info/11291-soutien-total-aux-supporters-interpellees.html'
 ]
 
 http = create_pool()
@@ -46,6 +47,6 @@ http = create_pool()
 for url in URLS:
     print()
     error, stack = resolve(http, url, follow_meta_refresh=True, infer_redirection=True)
-    print(error)
+    print(type(error), error)
     for item in stack:
         print(item)

@@ -373,7 +373,7 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
                     try:
                         response._body = response.read(1024)
                     except Exception as e:
-                        error = explain_request_error(e)
+                        error = e
                         redirection.type = 'error'
                         break
 
@@ -389,7 +389,7 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
                         if response._body is None:
                             response._body = response.read(1024)
                     except Exception as e:
-                        error = explain_request_error(e)
+                        error = e
                         redirection.type = 'error'
                         break
 
@@ -535,7 +535,7 @@ def request(http, url, method='GET', headers=None, cookie=None, spoof_ua=True,
         try:
             response._body = (response._body or b'') + response.read()
         except Exception as e:
-            return explain_request_error(e), response
+            return e, response
         finally:
             if response is not None:
                 response.close()
