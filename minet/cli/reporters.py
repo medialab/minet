@@ -12,7 +12,8 @@ from urllib3.exceptions import (
     ResponseError,
     SSLError,
     NewConnectionError,
-    ProtocolError
+    ProtocolError,
+    DecodeError
 )
 
 from minet.exceptions import (
@@ -56,6 +57,15 @@ def protocol_error_reporter(error):
     return msg
 
 
+def decode_error_reporter(error):
+    msg = repr(error)
+
+    if 'gzip' in msg:
+        return 'invalid-gzip'
+
+    return 'invalid-encoding'
+
+
 ERROR_REPORTERS = {
     UnicodeDecodeError: 'wrong-encoding',
     UnknownEncodingError: 'unknown-encoding',
@@ -69,7 +79,8 @@ ERROR_REPORTERS = {
     MaxRedirectsError: 'max-redirects',
     InfiniteRedirectsError: 'infinite-redirects',
     SelfRedirectError: 'self-redirect',
-    InvalidRedirectError: 'invalid-redirect'
+    InvalidRedirectError: 'invalid-redirect',
+    DecodeError: decode_error_reporter
 }
 
 
