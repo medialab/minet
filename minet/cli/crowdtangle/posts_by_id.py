@@ -10,7 +10,7 @@ from ural import ensure_protocol
 from ural.facebook import is_facebook_post_url
 
 import minet.facebook as facebook
-from minet.cli.utils import die, LoadingBarContext
+from minet.cli.utils import die
 from minet.crowdtangle.constants import CROWDTANGLE_POST_CSV_HEADERS
 from minet.crowdtangle.client import CrowdTangleClient
 from minet.crowdtangle.exceptions import CrowdTangleInvalidTokenError
@@ -45,11 +45,10 @@ def crowdtangle_posts_by_id_action(namespace, output_file):
     )
 
     loading_bar.update(already_done)
-    loading_bar_context = LoadingBarContext(loading_bar)
 
     try:
         for row, url in enricher.cells(namespace.column, with_rows=True):
-            with loading_bar_context:
+            with loading_bar:
                 url = url.strip()
 
                 if not url:

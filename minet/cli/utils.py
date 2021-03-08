@@ -154,19 +154,6 @@ class LazyLineDict(object):
         return self.line[self.headers[key]]
 
 
-class LoadingBarContext(object):
-    __slots__ = ('loading_bar',)
-
-    def __init__(self, loading_bar):
-        self.loading_bar = loading_bar
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self, exc_type, exc_value, exc_traceback):
-        self.loading_bar.update()
-
-
 def get_rcfile(rcfile_path=None):
     home = expanduser('~')
 
