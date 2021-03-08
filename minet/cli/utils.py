@@ -72,6 +72,60 @@ class DummyTqdmFile(object):
         pass
 
 
+class LoadingBar(object):
+    __slots__ = ('bar', 'stats')
+
+    def __init__(self, desc, total=None, stats=None, unit=None):
+        if unit is not None and total is None:
+            unit = ' ' + unit + 's'
+
+        self.stats = stats or {}
+
+        self.bar = tqdm(
+            desc=desc,
+            dynamic_ncols=True,
+            total=total,
+            postfix=stats,
+            unit=unit
+        )
+
+    def set_description(self, desc):
+        return self.bar.set_description(desc)
+
+    def update_stats(self, **kwargs):
+        for key, value in kwargs.items():
+            self.stats[key] = value
+
+        return self.bar.set_postfix(**self.stats)
+
+    def inc(self, name):
+        if name not in self.stats:
+            self.stats[name] = 0
+
+        self.stats[name] += 1
+        return self.update_stats()
+
+    def update(self, n=1):
+        return self.bar.update(n)
+
+    def close(self):
+        return self.bar.close()
+
+    def print(self, *args):
+        msg = ' '.join(str(arg) for arg in args)
+        self.bar.write(msg, file=sys.stderr)
+
+    def die(self, msg):
+        self.bar.close()
+        die(msg)
+
+    def __enter__(self):
+        return self.bar.__enter__()
+
+    def __exit__(self, *args):
+        return self.bar.__exit__(*args)
+
+
 def open_output_file(output, flag='w', encoding='utf-8'):
     if output is None:
         return DummyTqdmFile(sys.stdout)

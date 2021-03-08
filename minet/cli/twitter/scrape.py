@@ -5,12 +5,11 @@
 # Logic of the `tw scrape` action.
 import sys
 import casanova
-from tqdm import tqdm
 from twitwi.constants import TWEET_FIELDS
 from twitwi import format_tweet_as_csv_row
 
 from minet.utils import prettyprint_seconds, PseudoFStringFormatter
-from minet.cli.utils import edit_namespace_with_csv_io
+from minet.cli.utils import edit_namespace_with_csv_io, LoadingBar
 from minet.twitter import TwitterAPIScraper
 from minet.twitter.exceptions import TwitterPublicAPIRateLimitError
 
@@ -26,16 +25,11 @@ def twitter_scrape_action(namespace, output_file):
     scraper = TwitterAPIScraper()
 
     # Stats
-    tokens = 1
-    failures = 0
-    queries = 0
-
-    loading_bar = tqdm(
-        desc='Collecting tweets',
-        dynamic_ncols=True,
+    loading_bar = LoadingBar(
+        'Collecting tweets',
         total=namespace.limit,
-        unit=' tweet',
-        postfix={'tokens': tokens, 'queries': queries}
+        unit='tweet',
+        stats={'tokens': 1, 'queries': 0}
     )
 
     enricher = casanova.enricher(
@@ -46,21 +40,15 @@ def twitter_scrape_action(namespace, output_file):
     )
 
     def before_sleep(retry_state):
-        nonlocal tokens
-        nonlocal failures
-
         exc = retry_state.outcome.exception()
 
         if isinstance(exc, TwitterPublicAPIRateLimitError):
-            tokens += 1
-            loading_bar.set_postfix(tokens=tokens)
+            loading_bar.inc('tokens')
 
         else:
-            failures += 1
-            loading_bar.set_postfix(failures=failures)
-            loading_bar.write(
-                'Failed to call Twitter search. Will retry in %s' % prettyprint_seconds(retry_state.idle_for),
-                file=sys.stderr
+            loading_bar.inc('failures')
+            loading_bar.print(
+                'Failed to call Twitter search. Will retry in %s' % prettyprint_seconds(retry_state.idle_for)
             )
 
     for row, query in enricher.cells(namespace.query, with_rows=True):
@@ -72,10 +60,8 @@ def twitter_scrape_action(namespace, output_file):
                 value=query
             )
 
-        loading_bar.write('Searching for "%s"' % query, file=sys.stderr)
-        queries += 1
-
-        loading_bar.set_postfix(queries=queries)
+        loading_bar.print('Searching for "%s"' % query)
+        loading_bar.inc('queries')
 
         iterator = scraper.search(
             query,
