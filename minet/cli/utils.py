@@ -75,9 +75,12 @@ class DummyTqdmFile(object):
 class LoadingBar(object):
     __slots__ = ('bar', 'stats')
 
-    def __init__(self, desc, total=None, stats=None, unit=None):
+    def __init__(self, desc, total=None, stats=None, unit=None, unit_plural=None):
         if unit is not None and total is None:
-            unit = ' ' + unit + 's'
+            if unit_plural is not None:
+                unit = ' ' + unit_plural
+            else:
+                unit = ' ' + unit + 's'
 
         self.stats = stats or {}
 
@@ -88,6 +91,9 @@ class LoadingBar(object):
             postfix=stats,
             unit=unit
         )
+
+    def update_total(self, total):
+        self.bar.total = total
 
     def set_description(self, desc):
         return self.bar.set_description(desc)

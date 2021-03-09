@@ -26,14 +26,17 @@ def create_plural_query_component(field, values):
     return query
 
 
-def query_additions(query, collections=None):
+def query_additions(query, collections=None, medias=None):
     if collections is not None:
         query += create_plural_query_component('tags_id_media', collections)
+
+    if medias is not None:
+        query += create_plural_query_component('media_id', medias)
 
     return query
 
 
-def url_forge(token, query, collections=None, count=False,
+def url_forge(token, query, collections=None, medias=None, count=False,
               last_processed_stories_id=None):
 
     url = '%s/stories_public/%s?key=%s' % (
@@ -42,7 +45,7 @@ def url_forge(token, query, collections=None, count=False,
         token
     )
 
-    query = query_additions(query, collections=collections)
+    query = query_additions(query, collections=collections, medias=medias)
 
     url += '&q=%s' % quote_plus(query)
 
@@ -55,7 +58,8 @@ def url_forge(token, query, collections=None, count=False,
     return url
 
 
-def mediacloud_search(http, token, query, count=False, collections=None, format='csv_dict_row'):
+def mediacloud_search(http, token, query, count=False, collections=None,
+                      medias=None, format='csv_dict_row'):
 
     def generator():
         last_processed_stories_id = None
@@ -65,6 +69,7 @@ def mediacloud_search(http, token, query, count=False, collections=None, format=
                 token,
                 query,
                 collections=collections,
+                medias=medias,
                 count=count,
                 last_processed_stories_id=last_processed_stories_id
             )

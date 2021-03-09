@@ -5,9 +5,8 @@
 # Logic of the `mc search` action.
 #
 import csv
-from tqdm import tqdm
 
-from minet.cli.utils import die
+from minet.cli.utils import LoadingBar
 from minet.mediacloud import MediacloudClient
 from minet.mediacloud.constants import MEDIACLOUD_STORIES_CSV_HEADER
 from minet.mediacloud.exceptions import MediacloudServerError
@@ -20,13 +19,14 @@ def mediacloud_search_action(namespace, output_file):
     client = MediacloudClient(namespace.token)
 
     kwargs = {
-        'collections': namespace.collections
+        'collections': namespace.collections,
+        'medias': namespace.medias
     }
 
-    loading_bar = tqdm(
-        desc='Searching stories',
-        dynamic_ncols=True,
-        unit=' stories'
+    loading_bar = LoadingBar(
+        'Searching stories',
+        unit='story',
+        unit_plural='stories'
     )
 
     try:
@@ -36,7 +36,7 @@ def mediacloud_search_action(namespace, output_file):
                 **kwargs
             )
 
-            loading_bar.total = count
+            loading_bar.update_total(count)
 
         iterator = client.search(
             namespace.query,
@@ -49,8 +49,7 @@ def mediacloud_search_action(namespace, output_file):
             loading_bar.update()
 
     except MediacloudServerError as e:
-        loading_bar.close()
-        die([
+        loading_bar.die([
             'Aborted due to a mediacloud server error:',
             e.server_error
         ])

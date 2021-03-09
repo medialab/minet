@@ -906,7 +906,7 @@ optional arguments:
 
 ```
 usage: minet mediacloud search [-h] [-t TOKEN] [-o OUTPUT] [-c COLLECTIONS]
-                               [--skip-count]
+                               [-m MEDIAS] [--skip-count]
                                query
 
 Minet Mediacloud Search Command
@@ -923,7 +923,8 @@ optional arguments:
   -h, --help                                 show this help message and exit
   -t TOKEN, --token TOKEN                    Mediacloud API token (also called key).
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the output will be printed to stdout.
-  -c COLLECTIONS, --collections COLLECTIONS  List of searched collections separated by commas.
+  -c COLLECTIONS, --collections COLLECTIONS  List of collection ids to search, separated by commas.
+  -m MEDIAS, --medias MEDIAS                 List of media ids to search, separated by commas.
   --skip-count                               Whether to skip the first API call counting the number of posts for the progress bar.
 
 ```

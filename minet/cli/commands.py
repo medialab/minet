@@ -1127,7 +1127,12 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-c', '--collections'],
-                            'help': 'List of searched collections separated by commas.',
+                            'help': 'List of collection ids to search, separated by commas.',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flags': ['-m', '--medias'],
+                            'help': 'List of media ids to search, separated by commas.',
                             'type': SplitterType()
                         },
                         {
