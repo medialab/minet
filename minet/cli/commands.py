@@ -1117,6 +1117,8 @@ MINET_COMMANDS = {
                     'title': 'Minet Mediacloud Search Command',
                     'description': '''
                         Search stories on the Mediacloud platform.
+                        To learn how to compose more relevant queries, check out this guide:
+                        https://mediacloud.org/support/query-guide
                     ''',
                     'arguments': [
                         {

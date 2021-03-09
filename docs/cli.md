@@ -913,6 +913,8 @@ Minet Mediacloud Search Command
 ===============================
 
 Search stories on the Mediacloud platform.
+To learn how to compose more relevant queries, check out this guide:
+https://mediacloud.org/support/query-guide
 
 positional arguments:
   query                                      Search query.
@@ -1083,7 +1085,7 @@ usage: minet twitter users [-h] [--api-key API_KEY]
 Minet Twitter Users Command
 ===========================
 
-Retrieve Twitter user metadata.
+Retrieve Twitter user metadata using the API.
 
 positional arguments:
   column                                     Name of the column containing the Twitter account screen names or ids.
