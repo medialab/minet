@@ -1577,6 +1577,11 @@ MINET_COMMANDS = {
                             'action': 'store_true'
                         },
                         {
+                            'flag': '--include-retweets',
+                            'help': 'Whether to include retweets.',
+                            'action': 'store_true'
+                        },
+                        {
                             'flags': ['-o', '--output'],
                             'help': 'Path to the output file. By default, the result will be printed to stdout.'
                         },

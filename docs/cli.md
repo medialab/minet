@@ -44,6 +44,7 @@
   * [friends](#friends)
   * [scrape](#twitter-scrape)
   * [users](#users)
+  * [user-tweets](#user-tweets)
 * [youtube (yt)](#youtube)
   * [captions](#captions)
   * [comments](#youtube-comments)
@@ -1112,6 +1113,46 @@ examples:
 
 . Getting metadata from an user:
     `minet tw users screen_name users.csv > data_users.csv`
+
+```
+
+### user-tweets
+
+```
+usage: minet twitter user-tweets [-h] [--api-key API_KEY]
+                                 [--api-secret-key API_SECRET_KEY]
+                                 [--access-token ACCESS_TOKEN]
+                                 [--access-token-secret ACCESS_TOKEN_SECRET]
+                                 [--ids] [--include-retweets] [-o OUTPUT]
+                                 [-s SELECT] [--total TOTAL]
+                                 column [file]
+
+Minet Twitter User Tweets Command
+=================================
+
+Retrieve the last 3200 tweets (potentially including
+retweets) from the given Twitter users, using the API.
+
+positional arguments:
+  column                                     Name of the column containing the Twitter account screen names or ids.
+  file                                       CSV file containing the inquired Twitter users.
+
+optional arguments:
+  -h, --help                                 show this help message and exit
+  --api-key API_KEY                          Twitter API key.
+  --api-secret-key API_SECRET_KEY            Twitter API secret key.
+  --access-token ACCESS_TOKEN                Twitter API access token.
+  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret.
+  --ids                                      Whether the your users are given as ids rather than screen names.
+  --include-retweets                         Whether to include retweets.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
+  -s SELECT, --select SELECT                 Columns to include in report (separated by `,`).
+  --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Getting tweets from users in a CSV file:
+    `minet tw user-tweets screen_name users.csv > tweets.csv`
 
 ```
 

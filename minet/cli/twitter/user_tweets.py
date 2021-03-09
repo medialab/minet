@@ -7,13 +7,13 @@
 import casanova
 from twitwi import (
     TwitterWrapper,
-    # normalize_tweet,
-    # format_tweet_as_csv_row
+    normalize_tweet,
+    format_tweet_as_csv_row
 )
 from twitwi.constants import TWEET_FIELDS
-# from ebbe import as_chunks
 
 from minet.cli.utils import LoadingBar
+from minet.twitter.constants import TWITTER_API_MAX_STATUSES_COUNT
 
 
 def twitter_user_tweets_action(namespace, output_file):
@@ -39,33 +39,42 @@ def twitter_user_tweets_action(namespace, output_file):
     )
 
     for row, user in enricher.cells(namespace.column, with_rows=True):
-        print(user)
+        max_id = None
 
-    # for chunk in as_chunks(enricher.cells(100, namespace.column, with_rows=True)):
-    #     users = ','.join(row[1] for row in chunk)
+        while True:
+            if namespace.ids:
+                kwargs = {'user_id': user}
+            else:
+                kwargs = {'screen_name': user}
 
-    #     if namespace.ids:
-    #         wrapper_args = {'user_id': users}
-    #         key = 'id'
-    #     else:
-    #         wrapper_args = {'screen_name': users}
-    #         key = 'screen_name'
+            if namespace.include_retweets:
+                kwargs['include_rts'] = True
 
-    #     result = wrapper.call(['users', 'lookup'], **wrapper_args)
+            kwargs['count'] = TWITTER_API_MAX_STATUSES_COUNT
 
-    #     if result is not None:
-    #         indexed_result = {}
+            if max_id is not None:
+                kwargs['max_id'] = max_id
 
-    #         for user in result:
-    #             user = normalize_user(user)
-    #             user_row = format_user_as_csv_row(user)
-    #             indexed_result[user[key]] = user_row
+            tweets = wrapper.call(['statuses', 'user_timeline'], **kwargs)
+            loading_bar.inc('calls')
 
-    #         for row, user in chunk:
-    #             user_row = indexed_result.get(user)
+            if not tweets:
+                break
 
-    #             enricher.writerow(row, user_row)
+            loading_bar.update(len(tweets))
 
-    #     loading_bar.update(len(chunk))
+            tweet_ids = [int(tweet['id_str']) for tweet in tweets]
+            max_id = min(tweet_ids) - 1
 
-    # loading_bar.close()
+            for tweet in tweets:
+                tweet = normalize_tweet(
+                    tweet,
+                    collection_source='api'
+                )
+                addendum = format_tweet_as_csv_row(tweet)
+
+                enricher.writerow(row, addendum)
+
+        loading_bar.inc('users')
+
+    loading_bar.close()
