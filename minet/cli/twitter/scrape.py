@@ -3,6 +3,7 @@
 # =============================================================================
 #
 # Logic of the `tw scrape` action.
+#
 import sys
 import casanova
 from twitwi.constants import TWEET_FIELDS

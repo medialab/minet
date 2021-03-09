@@ -1485,13 +1485,59 @@ MINET_COMMANDS = {
                 'users': {
                     'title': 'Minet Twitter Users Command',
                     'description': '''
-                        Retrieve Twitter user metadata.
+                        Retrieve Twitter user metadata using the API.
                     ''',
                     'epilog': '''
                         examples:
 
                         . Getting metadata from an user:
                             `minet tw users screen_name users.csv > data_users.csv`
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the Twitter account screen names or ids.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the inquired Twitter users.',
+                            'type': FileType('r', encoding='utf-8'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        *TWITTER_API_COMMON_ARGUMENTS,
+                        {
+                            'flag': '--ids',
+                            'help': 'Whether the your users are given as ids rather than screen names.',
+                            'action': 'store_true'
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'help': 'Path to the output file. By default, the result will be printed to stdout.'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of accounts. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
+                },
+                'user-tweets': {
+                    'title': 'Minet Twitter User Tweets Command',
+                    'description': '''
+                        Retrieve the last 3200 tweets (potentially including
+                        retweets) from the given Twitter users, using the API.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Getting tweets from users in a CSV file:
+                            `minet tw user-tweets screen_name users.csv > tweets.csv`
                     ''',
                     'arguments': [
                         {

@@ -61,6 +61,14 @@ def twitter_action(namespace):
 
             twitter_users_action(namespace, output_file)
 
+        elif namespace.tw_action == 'user-tweets':
+            from minet.cli.twitter.user_tweets import twitter_user_tweets_action
+
+            twitter_user_tweets_action(namespace, output_file)
+
+        else:
+            raise TypeError('unkown tw_action "%s"' % namespace.tw_action)
+
     # Cleanup
     if namespace.output is not None:
         output_file.close()
