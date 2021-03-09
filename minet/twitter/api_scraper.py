@@ -233,7 +233,7 @@ class TwitterAPIScraper(object):
         )
 
     @ensure_guest_token
-    def request_search(self, query, cursor=None, refs=None):
+    def request_search(self, query, cursor=None, refs=None, dump=False):
         params = forge_search_params(query, cursor=cursor)
         url = '%s?%s' % (TWITTER_PUBLIC_SEARCH_ENDPOINT, params)
 
@@ -258,9 +258,8 @@ class TwitterAPIScraper(object):
         cursor = extract_cursor_from_payload(data)
         tweets = []
 
-        # with open('dump.json', 'w') as w:
-        #     import json
-        #     json.dump(data, w, ensure_ascii=False, indent=2)
+        if dump:
+            return data
 
         for tweet in payload_tweets_iter(data):
             result = normalize_tweet(
