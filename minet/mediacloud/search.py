@@ -18,11 +18,17 @@ from minet.mediacloud.formatters import format_story
 from minet.mediacloud.utils import get_last_processed_stories_id
 
 
+def create_plural_query_component(field, values):
+    query = ' AND ('
+    query += ' OR '.join(('%s:%s' % (field, str(value))) for value in values)
+    query += ')'
+
+    return query
+
+
 def query_additions(query, collections=None):
     if collections is not None:
-        query += ' AND ('
-        query += ' OR '.join('tags_id_media:%s' % str(collection) for collection in collections)
-        query += ')'
+        query += create_plural_query_component('tags_id_media', collections)
 
     return query
 
