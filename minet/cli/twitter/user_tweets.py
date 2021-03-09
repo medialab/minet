@@ -63,8 +63,7 @@ def twitter_user_tweets_action(namespace, output_file):
 
             loading_bar.update(len(tweets))
 
-            tweet_ids = [int(tweet['id_str']) for tweet in tweets]
-            max_id = min(tweet_ids) - 1
+            max_id = min(int(tweet['id_str']) for tweet in tweets) - 1
 
             for tweet in tweets:
                 tweet = normalize_tweet(
