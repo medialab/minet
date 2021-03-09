@@ -1319,7 +1319,7 @@ MINET_COMMANDS = {
             Gather data from Twitter.
         ''',
         'subparsers': {
-            'help': 'Action to perform using the Twitter API.',
+            'help': 'Action to perform.',
             'title': 'actions',
             'dest': 'tw_action',
             'commands': {
