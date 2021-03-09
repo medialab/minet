@@ -906,7 +906,9 @@ optional arguments:
 
 ```
 usage: minet mediacloud search [-h] [-t TOKEN] [-o OUTPUT] [-c COLLECTIONS]
-                               [-m MEDIAS] [--skip-count]
+                               [-m MEDIAS] [--publish-day PUBLISH_DAY]
+                               [--publish-month PUBLISH_MONTH]
+                               [--publish-year PUBLISH_YEAR] [--skip-count]
                                query
 
 Minet Mediacloud Search Command
@@ -925,6 +927,9 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the output will be printed to stdout.
   -c COLLECTIONS, --collections COLLECTIONS  List of collection ids to search, separated by commas.
   -m MEDIAS, --medias MEDIAS                 List of media ids to search, separated by commas.
+  --publish-day PUBLISH_DAY                  Only search stories published on provided day (iso format, e.g. "2018-03-24").
+  --publish-month PUBLISH_MONTH              Only search stories published on provided month (iso format, e.g. "2018-03").
+  --publish-year PUBLISH_YEAR                Only search stories published on provided year (iso format, e.g. "2018").
   --skip-count                               Whether to skip the first API call counting the number of posts for the progress bar.
 
 ```

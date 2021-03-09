@@ -26,18 +26,45 @@ def create_plural_query_component(field, values):
     return query
 
 
-def query_additions(query, collections=None, medias=None):
+def pad_date(string):
+    if len(string) == 4:
+        return string + '-01-01T00:00:00Z'
+
+    if len(string) == 7:
+        return string + '-01T00:00:00Z'
+
+    if 'T' not in string:
+        return string + 'T00:00:00Z'
+
+    return string
+
+
+def query_additions(query, collections=None, medias=None,
+                    publish_day=None, publish_month=None, publish_year=None):
+
     if collections is not None:
         query += create_plural_query_component('tags_id_media', collections)
 
     if medias is not None:
         query += create_plural_query_component('media_id', medias)
 
+    if publish_day is not None:
+        query += ' AND publish_day:"%s"' % pad_date(publish_day)
+
+    if publish_month is not None:
+        query += ' AND publish_month:"%s"' % pad_date(publish_month)
+
+    if publish_year is not None:
+        query += ' AND publish_year:"%s"' % pad_date(publish_year)
+
+    # NOTE: range queries can be made with [from_date TO to_date] but must appear in filter
+
     return query
 
 
-def url_forge(token, query, collections=None, medias=None, count=False,
-              last_processed_stories_id=None):
+def url_forge(token, query, collections=None, medias=None,
+              publish_day=None, publish_month=None, publish_year=None,
+              count=False, last_processed_stories_id=None):
 
     url = '%s/stories_public/%s?key=%s' % (
         MEDIACLOUD_API_BASE_URL,
@@ -45,7 +72,14 @@ def url_forge(token, query, collections=None, medias=None, count=False,
         token
     )
 
-    query = query_additions(query, collections=collections, medias=medias)
+    query = query_additions(
+        query,
+        collections=collections,
+        medias=medias,
+        publish_day=publish_day,
+        publish_month=publish_month,
+        publish_year=publish_year
+    )
 
     url += '&q=%s' % quote_plus(query)
 
@@ -59,7 +93,8 @@ def url_forge(token, query, collections=None, medias=None, count=False,
 
 
 def mediacloud_search(http, token, query, count=False, collections=None,
-                      medias=None, format='csv_dict_row'):
+                      medias=None, publish_day=None, publish_month=None,
+                      publish_year=None, format='csv_dict_row',):
 
     def generator():
         last_processed_stories_id = None
@@ -70,6 +105,9 @@ def mediacloud_search(http, token, query, count=False, collections=None,
                 query,
                 collections=collections,
                 medias=medias,
+                publish_day=publish_day,
+                publish_month=publish_month,
+                publish_year=publish_year,
                 count=count,
                 last_processed_stories_id=last_processed_stories_id
             )

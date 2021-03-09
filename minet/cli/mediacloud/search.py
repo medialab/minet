@@ -20,7 +20,10 @@ def mediacloud_search_action(namespace, output_file):
 
     kwargs = {
         'collections': namespace.collections,
-        'medias': namespace.medias
+        'medias': namespace.medias,
+        'publish_day': namespace.publish_day,
+        'publish_month': namespace.publish_month,
+        'publish_year': namespace.publish_year
     }
 
     loading_bar = LoadingBar(

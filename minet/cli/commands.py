@@ -1136,6 +1136,18 @@ MINET_COMMANDS = {
                             'type': SplitterType()
                         },
                         {
+                            'flag': '--publish-day',
+                            'help': 'Only search stories published on provided day (iso format, e.g. "2018-03-24").'
+                        },
+                        {
+                            'flag': '--publish-month',
+                            'help': 'Only search stories published on provided month (iso format, e.g. "2018-03").'
+                        },
+                        {
+                            'flag': '--publish-year',
+                            'help': 'Only search stories published on provided year (iso format, e.g. "2018").'
+                        },
+                        {
                             'flag': '--skip-count',
                             'help': 'Whether to skip the first API call counting the number of posts for the progress bar.',
                             'action': 'store_true'
