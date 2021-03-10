@@ -659,7 +659,7 @@ examples:
     `minet ct posts --token YOUR_TOKEN --limit 500 --start-date 2021-01-01 --resume --output latest-posts.csv`
 
 . Fetching all the posts from a specific list of groups or pages:
-    `lminet ct posts --token YOUR_TOKEN --start-date 2021-01-01 --list-ids YOUR_LIST_ID > posts_from_one_list.csv`
+    `minet ct posts --token YOUR_TOKEN --start-date 2021-01-01 --list-ids YOUR_LIST_ID > posts_from_one_list.csv`
 
 To know the different list ids associated with your dashboard: `minet ct lists --token YOUR_TOKEN`
 
