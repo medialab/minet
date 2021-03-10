@@ -9,7 +9,7 @@ QUERIES = [
   'from:EmmanuelMacron'
 ]
 
-data = scraper.request_search(QUERIES[-1], dump=True)
+data = scraper.request_search(QUERIES[0], dump=False)
 
-with open('./dump.json', 'w') as f:
-    json.dump(data, f, ensure_ascii=False, indent=2)
+# with open('./dump.json', 'w') as f:
+#     json.dump(data, f, ensure_ascii=False, indent=2)

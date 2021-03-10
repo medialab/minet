@@ -190,6 +190,12 @@ def payload_tweets_iter(payload):
 
             tweet = process_single_tweet(tweet_meta['id'], tweet_index, user_index)
 
+            # Additional metadata
+            if 'forwardPivot' in tweet_meta:
+
+                # TODO: format here
+                pass
+
             if tweet is not None:
                 yield tweet
 
@@ -240,7 +246,8 @@ class TwitterAPIScraper(object):
         headers = {
             'Authorization': TWITTER_PUBLIC_API_AUTH_HEADER,
             'X-Guest-Token': self.guest_token,
-            'Cookie': self.cookie
+            'Cookie': self.cookie,
+            'Accept-Language': 'en'
         }
 
         err, response, data = self.request_json(url, headers=headers)
