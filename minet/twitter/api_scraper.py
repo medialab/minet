@@ -7,6 +7,7 @@
 import re
 import time
 import datetime
+from ebbe import with_is_first
 from urllib.parse import urlencode, quote
 from twitwi import normalize_tweet
 
@@ -275,7 +276,7 @@ class TwitterAPIScraper(object):
         if dump:
             return data
 
-        for tweet, _ in payload_tweets_iter(data):
+        for tweet, meta in payload_tweets_iter(data):
             result = normalize_tweet(
                 tweet,
                 extract_referenced_tweets=refs is not None,
@@ -283,23 +284,27 @@ class TwitterAPIScraper(object):
             )
 
             if refs is not None:
-                for tweet in result:
+                for is_first, extracted_tweet in with_is_first(result):
 
                     # Casting to int64 to save up memory
-                    id_int64 = int(tweet['id'])
+                    id_int64 = int(extracted_tweet['id'])
 
                     if id_int64 in refs:
                         continue
 
-                    tweets.append(tweet)
+                    if is_first:
+                        extracted_tweets.append((extracted_tweet, meta))
+                    else:
+                        extracted_tweets.append((extracted_tweet, None))
+
                     refs.add(id_int64)
             else:
-                tweets.append(result)
+                tweets.append((result, meta))
 
         return cursor, tweets
 
     def search(self, query, limit=None, before_sleep=None,
-               include_referenced_tweets=False):
+               include_referenced_tweets=False, with_meta=False):
 
         if len(query) > MAXIMUM_QUERY_LENGTH:
             raise TwitterPublicAPIQueryTooLongError
@@ -321,8 +326,12 @@ class TwitterAPIScraper(object):
         while True:
             new_cursor, tweets = retryer(self.request_search, query, cursor, refs=refs)
 
-            for tweet in tweets:
-                yield tweet
+            for tweet, meta in tweets:
+                if with_meta:
+                    yield tweet, meta
+
+                else:
+                    yield tweet
 
                 i += 1
 
