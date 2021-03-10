@@ -484,3 +484,44 @@ class TestScrape(object):
         }, BASIC_HTML)
 
         assert item is None
+
+    def test_inexistent_selection(self):
+        expected = [{'id': 'li1', 'empty': None}, {'id': 'li2', 'empty': None}]
+
+        items = scrape({
+            'it': 'li',
+            'fields': {
+                'id': 'id',
+                'empty': {
+                    'sel': 'blockquote'
+                }
+            }
+        }, BASIC_HTML)
+
+        assert items == expected
+
+        items = scrape({
+            'it': 'li',
+            'fields': {
+                'id': 'id',
+                'empty': {
+                    'sel': 'blockquote',
+                    'item': 'text'
+                }
+            }
+        }, BASIC_HTML)
+
+        assert items == expected
+
+        item = scrape({
+            'sel': 'li',
+            'fields': {
+                'id': 'id',
+                'empty': {
+                    'sel': 'blockquote',
+                    'item': 'text'
+                }
+            }
+        }, BASIC_HTML)
+
+        assert item == expected[0]
