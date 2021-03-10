@@ -191,13 +191,20 @@ def payload_tweets_iter(payload):
             tweet = process_single_tweet(tweet_meta['id'], tweet_index, user_index)
 
             # Additional metadata
-            if 'forwardPivot' in tweet_meta:
-
-                # TODO: format here
-                pass
+            meta = None
 
             if tweet is not None:
-                yield tweet
+
+                if 'forwardPivot' in tweet_meta:
+                    pivot = tweet_meta['forwardPivot']
+
+                    meta = {
+                        'intervention_text': nested_get(['text', 'text'], pivot),
+                        'intervention_type': pivot.get('displayType'),
+                        'intervention_url': nested_get(['landingUrl', 'url'], pivot)
+                    }
+
+                yield tweet, meta
 
 
 # =============================================================================
@@ -268,7 +275,7 @@ class TwitterAPIScraper(object):
         if dump:
             return data
 
-        for tweet in payload_tweets_iter(data):
+        for tweet, _ in payload_tweets_iter(data):
             result = normalize_tweet(
                 tweet,
                 extract_referenced_tweets=refs is not None,
