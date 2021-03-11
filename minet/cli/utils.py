@@ -4,6 +4,7 @@
 #
 # Miscellaneous helpers used by the CLI tools.
 #
+import csv
 import sys
 import yaml
 from io import StringIO
@@ -37,7 +38,14 @@ def safe_index(l, e):
 
 
 def CsvIO(column, value):
-    return StringIO('%s\n%s' % (column, value))
+    buf = StringIO()
+    writer = csv.writer(buf, dialect=csv.unix_dialect, quoting=csv.QUOTE_MINIMAL)
+    writer.writerow([column])
+    writer.writerow([value])
+
+    buf.seek(0)
+
+    return buf
 
 
 def edit_namespace_with_csv_io(namespace, column, attr_name='column'):
