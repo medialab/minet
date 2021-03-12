@@ -23,7 +23,7 @@ pyyaml==5.1.2
 quenouille==0.6.6
 tenacity==6.3.1
 tqdm==4.31.1
-trafilatura==0.7.0
+trafilatura==0.8.1
 twitwi==0.5.0
 ural==0.27.1
 urllib3[secure]==1.25.3
