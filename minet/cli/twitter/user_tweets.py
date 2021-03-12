@@ -49,6 +49,7 @@ def twitter_user_tweets_action(namespace, output_file):
 
             kwargs['include_rts'] = not namespace.exclude_retweets
             kwargs['count'] = TWITTER_API_MAX_STATUSES_COUNT
+            kwargs['tweet_mode'] = 'extended'
 
             if max_id is not None:
                 kwargs['max_id'] = max_id
