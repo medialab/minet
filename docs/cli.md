@@ -510,9 +510,9 @@ Gather data from the CrowdTangle APIs easily and efficiently.
 
 optional arguments:
   -h, --help                                      show this help message and exit
-  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
+  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
-  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
+  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
 
 actions:
   {leaderboard,lists,posts,posts-by-id,search,summary}
@@ -537,9 +537,9 @@ For more information, see the API endpoint documentation: https://github.com/Cro
 
 optional arguments:
   -h, --help                            show this help message and exit
-  --rate-limit RATE_LIMIT               Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
+  --rate-limit RATE_LIMIT               Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -o OUTPUT, --output OUTPUT            Path to the output file. By default, everything will be printed to stdout.
-  -t TOKEN, --token TOKEN               CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
+  -t TOKEN, --token TOKEN               CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   --no-breakdown                        Whether to skip statistics breakdown by post type in the CSV output.
   -f {csv,jsonl}, --format {csv,jsonl}  Output format. Defaults to `csv`.
   -l LIMIT, --limit LIMIT               Maximum number of accounts to retrieve. Will fetch every account by default.
@@ -567,9 +567,9 @@ For more information, see the API endpoint documentation: https://github.com/Cro
 
 optional arguments:
   -h, --help                  show this help message and exit
-  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
+  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, everything will be printed to stdout.
-  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
+  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
 
 examples:
 
@@ -599,9 +599,9 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
-  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
+  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, everything will be printed to stdout.
-  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
+  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --resume                    Whether to resume an aborted collection.
   --total TOTAL               Total number of posts. Necessary if you want to display a finite progress indicator.
@@ -636,9 +636,9 @@ For more information, see the API endpoint documentation: https://github.com/Cro
 
 optional arguments:
   -h, --help                                      show this help message and exit
-  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
+  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
-  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
+  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   --chunk-size CHUNK_SIZE                         When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations. Defaults to 500.
   --end-date END_DATE                             The latest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   -f {csv,jsonl}, --format {csv,jsonl}            Output format. Defaults to `csv`.
@@ -692,9 +692,9 @@ positional arguments:
 
 optional arguments:
   -h, --help                                      show this help message and exit
-  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
+  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
-  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
+  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   --and AND                                       AND clause to add to the query terms.
   --chunk-size CHUNK_SIZE                         When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations. Defaults to 500.
   --end-date END_DATE                             The latest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
@@ -742,9 +742,9 @@ positional arguments:
 
 optional arguments:
   -h, --help                                      show this help message and exit
-  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
+  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
-  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
+  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
@@ -796,7 +796,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "facebook.cookie" or read from the MINET_FACEBOOK_COOKIE env variable.
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
@@ -895,7 +895,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
-  -t TOKEN, --token TOKEN     Mediacloud API token (also called key).
+  -t TOKEN, --token TOKEN     Mediacloud API token (also called key). Can also be configured in a .minetrc file as "mediacloud.token" or read from the MINET_MEDIACLOUD_TOKEN env variable.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the output will be printed to stdout.
   --feeds FEEDS               If given, path of the CSV file listing media RSS feeds.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
@@ -924,7 +924,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                 show this help message and exit
-  -t TOKEN, --token TOKEN                    Mediacloud API token (also called key).
+  -t TOKEN, --token TOKEN                    Mediacloud API token (also called key). Can also be configured in a .minetrc file as "mediacloud.token" or read from the MINET_MEDIACLOUD_TOKEN env variable.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the output will be printed to stdout.
   -c COLLECTIONS, --collections COLLECTIONS  List of collection ids to search, separated by commas.
   -m MEDIAS, --medias MEDIAS                 List of media ids to search, separated by commas.
@@ -955,7 +955,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                     show this help message and exit
-  -t TOKEN, --token TOKEN        Mediacloud API token (also called key).
+  -t TOKEN, --token TOKEN        Mediacloud API token (also called key). Can also be configured in a .minetrc file as "mediacloud.token" or read from the MINET_MEDIACLOUD_TOKEN env variable.
   -o OUTPUT, --output OUTPUT     Path to the output file. By default, the output will be printed to stdout.
   --media-id MEDIA_ID            Return only stories belonging to the given media_ids.
   --from-media-id FROM_MEDIA_ID  Return only stories that are linked from stories in the given media_id.
@@ -986,10 +986,10 @@ positional arguments:
 
 optional arguments:
   -h, --help                                 show this help message and exit
-  --api-key API_KEY                          Twitter API key.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key.
-  --access-token ACCESS_TOKEN                Twitter API access token.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret.
+  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
+  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
+  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
   --ids                                      Whether your users are given as ids rather than screen names.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
@@ -1024,10 +1024,10 @@ positional arguments:
 
 optional arguments:
   -h, --help                                 show this help message and exit
-  --api-key API_KEY                          Twitter API key.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key.
-  --access-token ACCESS_TOKEN                Twitter API access token.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret.
+  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
+  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
+  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
   --ids                                      Whether your users are given as ids rather than screen names.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
@@ -1100,10 +1100,10 @@ positional arguments:
 
 optional arguments:
   -h, --help                                 show this help message and exit
-  --api-key API_KEY                          Twitter API key.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key.
-  --access-token ACCESS_TOKEN                Twitter API access token.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret.
+  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
+  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
+  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
   --ids                                      Whether your users are given as ids rather than screen names.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
@@ -1139,10 +1139,10 @@ positional arguments:
 
 optional arguments:
   -h, --help                                 show this help message and exit
-  --api-key API_KEY                          Twitter API key.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key.
-  --access-token ACCESS_TOKEN                Twitter API access token.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret.
+  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
+  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
+  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
   --ids                                      Whether your users are given as ids rather than screen names.
   --exclude-retweets                         Whether to exclude retweets from the output.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
@@ -1200,7 +1200,7 @@ optional arguments:
   -h, --help                  show this help message and exit
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
   -f, --full                  YouTube API does not always return every comments as some replies can be omitted. By adding this flag, one ensures to make every needed API call to retrieve all the comments.
-  -k KEY, --key KEY           YouTube API Data dashboard API key.
+  -k KEY, --key KEY           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
 
 example:
@@ -1229,7 +1229,7 @@ positional arguments:
 optional arguments:
   -h, --help                                      show this help message and exit
   -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
-  -k KEY, --key KEY                               YouTube API Data dashboard API key.
+  -k KEY, --key KEY                               YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   -l LIMIT, --limit LIMIT                         Maximum number of videos to retrieve.
   --order {date,rating,relevance,title,videoCount,viewCount}
@@ -1261,7 +1261,7 @@ positional arguments:
 optional arguments:
   -h, --help                  show this help message and exit
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
-  -k KEY, --key KEY           YouTube API Data dashboard API key.
+  -k KEY, --key KEY           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of videos. Necessary if you want to display a finite progress indicator.
 
