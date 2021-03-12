@@ -41,6 +41,8 @@ def twitter_user_tweets_action(namespace, output_file):
     for row, user in enricher.cells(namespace.column, with_rows=True):
         max_id = None
 
+        loading_bar.update_stats(user=user)
+
         while True:
             if namespace.ids:
                 kwargs = {'user_id': user}
@@ -73,6 +75,6 @@ def twitter_user_tweets_action(namespace, output_file):
 
                 enricher.writerow(row, addendum)
 
-        loading_bar.inc('users')
+        loading_bar.inc('done')
 
     loading_bar.close()
