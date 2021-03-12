@@ -1123,15 +1123,15 @@ usage: minet twitter user-tweets [-h] [--api-key API_KEY]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
-                                 [--ids] [--include-retweets] [-o OUTPUT]
+                                 [--ids] [--exclude-retweets] [-o OUTPUT]
                                  [-s SELECT] [--total TOTAL]
                                  column [file]
 
 Minet Twitter User Tweets Command
 =================================
 
-Retrieve the last 3200 tweets (potentially including
-retweets) from the given Twitter users, using the API.
+Retrieve the last ~3200 tweets, including retweets from
+the given Twitter users, using the API.
 
 positional arguments:
   column                                     Name of the column containing the Twitter account screen names or ids.
@@ -1144,7 +1144,7 @@ optional arguments:
   --access-token ACCESS_TOKEN                Twitter API access token.
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret.
   --ids                                      Whether your users are given as ids rather than screen names.
-  --include-retweets                         Whether to include retweets.
+  --exclude-retweets                         Whether to exclude retweets from the output.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.

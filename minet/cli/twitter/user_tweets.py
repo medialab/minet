@@ -47,9 +47,7 @@ def twitter_user_tweets_action(namespace, output_file):
             else:
                 kwargs = {'screen_name': user}
 
-            if namespace.include_retweets:
-                kwargs['include_rts'] = True
-
+            kwargs['include_rts'] = not namespace.exclude_retweets
             kwargs['count'] = TWITTER_API_MAX_STATUSES_COUNT
 
             if max_id is not None:

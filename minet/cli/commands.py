@@ -1554,8 +1554,8 @@ MINET_COMMANDS = {
                 'user-tweets': {
                     'title': 'Minet Twitter User Tweets Command',
                     'description': '''
-                        Retrieve the last 3200 tweets (potentially including
-                        retweets) from the given Twitter users, using the API.
+                        Retrieve the last ~3200 tweets, including retweets from
+                        the given Twitter users, using the API.
                     ''',
                     'epilog': '''
                         examples:
@@ -1582,8 +1582,8 @@ MINET_COMMANDS = {
                             'action': 'store_true'
                         },
                         {
-                            'flag': '--include-retweets',
-                            'help': 'Whether to include retweets.',
+                            'flag': '--exclude-retweets',
+                            'help': 'Whether to exclude retweets from the output.',
                             'action': 'store_true'
                         },
                         {
