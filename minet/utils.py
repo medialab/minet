@@ -19,7 +19,7 @@ import mimetypes
 import functools
 import cchardet as chardet
 from random import uniform
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 from json.decoder import JSONDecodeError
 from urllib.parse import urljoin
 from urllib3 import HTTPResponse
@@ -974,3 +974,27 @@ def create_request_retryer(min=10, max=THREE_HOURS, max_attempts=9, before_sleep
         stop=stop_after_attempt(max_attempts),
         before_sleep=before_sleep if callable(before_sleep) else None
     )
+
+
+def namedrecord(name, fields):
+    mapping = {k: i for i, k in enumerate(fields)}
+
+    class Record(namedtuple(name, fields)):
+        def __getitem__(self, key):
+            if isinstance(key, str):
+                idx = mapping.get(key)
+
+                if idx is None:
+                    raise KeyError
+
+                return super().__getitem__(idx)
+
+            return super().__getitem__(key)
+
+        def get(self, key, default=None):
+            try:
+                return self.__getitem__(key)
+            except (IndexError, KeyError):
+                return default
+
+    return Record
