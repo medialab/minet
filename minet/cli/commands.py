@@ -88,7 +88,7 @@ FETCH_COMMON_ARGUMENTS = [
     },
     {
         'flags': ['-s', '--select'],
-        'help': 'Columns to include in report (separated by `,`).',
+        'help': 'Columns of input CSV file to include in the output (separated by `,`).',
         'type': SplitterType()
     },
     {
@@ -354,7 +354,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).',
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
                             'type': SplitterType()
                         },
                         {
@@ -496,7 +496,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).'
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).'
                         },
                         {
                             'flag': '--sort-by',
@@ -557,7 +557,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).'
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).'
                         },
                         {
                             'flag': '--lang',
@@ -600,7 +600,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).',
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
                             'type': SplitterType()
                         }
                     ]
@@ -628,7 +628,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).'
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).'
                         },
                         {
                             'flag': '--total',
@@ -666,7 +666,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).',
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
                             'type': SplitterType()
                         },
                         {
@@ -740,7 +740,7 @@ MINET_COMMANDS = {
             },
             {
                 'flags': ['-s', '--select'],
-                'help': 'Columns to include in report (separated by `,`).',
+                'help': 'Columns of input CSV file to include in the output (separated by `,`).',
                 'type': SplitterType()
             },
             {
@@ -802,7 +802,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).',
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
                             'type': SplitterType()
                         },
                         {
@@ -842,7 +842,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).',
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
                             'type': SplitterType()
                         },
                         {
@@ -887,7 +887,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).',
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
                             'type': SplitterType()
                         },
                         {
@@ -1108,7 +1108,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).',
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
                             'type': SplitterType()
                         },
                         {
@@ -1387,7 +1387,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).',
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
                             'type': SplitterType()
                         },
                         {
@@ -1437,7 +1437,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).',
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
                             'type': SplitterType()
                         },
                         {
@@ -1501,7 +1501,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).',
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
                             'type': SplitterType()
                         }
                     ]
@@ -1541,7 +1541,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).',
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
                             'type': SplitterType()
                         },
                         {
@@ -1592,7 +1592,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).',
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
                             'type': SplitterType()
                         },
                         {

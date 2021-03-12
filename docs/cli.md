@@ -178,7 +178,7 @@ optional arguments:
   --insecure                                      Whether to allow ssl errors when performing requests or not.
   -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
   --resume                                        Whether to resume from an aborted report.
-  -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
+  -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   -t THREADS, --threads THREADS                   Number of threads to use. Defaults to 25.
   --throttle THROTTLE                             Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
   --timeout TIMEOUT                               Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.
@@ -255,7 +255,7 @@ optional arguments:
                                                   Directory where the HTML files are stored. Defaults to "content".
   -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
   -p PROCESSES, --processes PROCESSES             Number of processes to use. Defaults to 4.
-  -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
+  -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
 
 examples:
@@ -304,7 +304,7 @@ optional arguments:
   --insecure                                      Whether to allow ssl errors when performing requests or not.
   -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
   --resume                                        Whether to resume from an aborted report.
-  -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
+  -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   -t THREADS, --threads THREADS                   Number of threads to use. Defaults to 25.
   --throttle THROTTLE                             Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
   --timeout TIMEOUT                               Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.
@@ -602,7 +602,7 @@ optional arguments:
   --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
-  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --resume                    Whether to resume an aborted collection.
   --total TOTAL               Total number of posts. Necessary if you want to display a finite progress indicator.
 
@@ -747,7 +747,7 @@ optional arguments:
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --posts POSTS                                   Path to a file containing the retrieved posts.
-  -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
+  -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   --sort-by {date,subscriber_count,total_interactions}
                                                   How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
@@ -798,7 +798,7 @@ optional arguments:
   -h, --help                  show this help message and exit
   -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
-  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
 
 examples:
@@ -834,7 +834,7 @@ positional arguments:
 optional arguments:
   -h, --help                  show this help message and exit
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
-  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
 
 example:
@@ -898,7 +898,7 @@ optional arguments:
   -t TOKEN, --token TOKEN     Mediacloud API token (also called key).
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the output will be printed to stdout.
   --feeds FEEDS               If given, path of the CSV file listing media RSS feeds.
-  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of medias. Necessary if you want to display a finite progress indicator.
 
 ```
@@ -993,7 +993,7 @@ optional arguments:
   --ids                                      Whether your users are given as ids rather than screen names.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
-  -s SELECT, --select SELECT                 Columns to include in report (separated by `,`).
+  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
 
 examples:
@@ -1031,7 +1031,7 @@ optional arguments:
   --ids                                      Whether your users are given as ids rather than screen names.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
-  -s SELECT, --select SELECT                 Columns to include in report (separated by `,`).
+  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
 
 examples:
@@ -1064,7 +1064,7 @@ optional arguments:
   -l LIMIT, --limit LIMIT          Maximum number of tweets to collect per query.
   -o OUTPUT, --output OUTPUT       Path to the output file. By default, the result will be printed to stdout.
   --query-template QUERY_TEMPLATE  Query template. Can be useful for instance to change a column of twitter user screen names into from:@user queries.
-  -s SELECT, --select SELECT       Columns to include in report (separated by `,`).
+  -s SELECT, --select SELECT       Columns of input CSV file to include in the output (separated by `,`).
 
 examples:
 
@@ -1106,7 +1106,7 @@ optional arguments:
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret.
   --ids                                      Whether your users are given as ids rather than screen names.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
-  -s SELECT, --select SELECT                 Columns to include in report (separated by `,`).
+  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
 
 examples:
@@ -1146,7 +1146,7 @@ optional arguments:
   --ids                                      Whether your users are given as ids rather than screen names.
   --include-retweets                         Whether to include retweets.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
-  -s SELECT, --select SELECT                 Columns to include in report (separated by `,`).
+  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
 
 examples:
@@ -1176,7 +1176,7 @@ positional arguments:
 optional arguments:
   -h, --help                  show this help message and exit
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
-  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --lang LANG                 Language (ISO code like "fr") of captions to retrieve.
 
 ```
@@ -1201,7 +1201,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
   -f, --full                  YouTube API does not always return every comments as some replies can be omitted. By adding this flag, one ensures to make every needed API call to retrieve all the comments.
   -k KEY, --key KEY           YouTube API Data dashboard API key.
-  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
 
 example:
 
@@ -1230,7 +1230,7 @@ optional arguments:
   -h, --help                                      show this help message and exit
   -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
   -k KEY, --key KEY                               YouTube API Data dashboard API key.
-  -s SELECT, --select SELECT                      Columns to include in report (separated by `,`).
+  -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   -l LIMIT, --limit LIMIT                         Maximum number of videos to retrieve.
   --order {date,rating,relevance,title,videoCount,viewCount}
                                                   Order in which videos are retrieved. The default one is relevance.
@@ -1262,7 +1262,7 @@ optional arguments:
   -h, --help                  show this help message and exit
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
   -k KEY, --key KEY           YouTube API Data dashboard API key.
-  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of videos. Necessary if you want to display a finite progress indicator.
 
 ```
