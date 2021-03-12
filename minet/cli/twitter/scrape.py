@@ -12,7 +12,10 @@ from twitwi import format_tweet_as_csv_row
 from minet.utils import prettyprint_seconds, PseudoFStringFormatter
 from minet.cli.utils import edit_namespace_with_csv_io, LoadingBar
 from minet.twitter import TwitterAPIScraper
-from minet.twitter.exceptions import TwitterPublicAPIRateLimitError
+from minet.twitter.exceptions import (
+    TwitterPublicAPIRateLimitError,
+    TwitterPublicAPIOverCapacityError
+)
 from minet.twitter.constants import ADDITIONAL_TWEET_FIELDS
 
 CUSTOM_FORMATTER = PseudoFStringFormatter()
@@ -84,10 +87,13 @@ def twitter_scrape_action(namespace, output_file):
             with_meta=True
         )
 
-        for tweet, meta in iterator:
-            loading_bar.update()
+        try:
+            for tweet, meta in iterator:
+                loading_bar.update()
 
-            tweet_row = format_tweet_as_csv_row(tweet)
-            enricher.writerow(row, tweet_row + format_meta_row(meta))
+                tweet_row = format_tweet_as_csv_row(tweet)
+                enricher.writerow(row, tweet_row + format_meta_row(meta))
+        except TwitterPublicAPIOverCapacityError:
+            loading_bar.die('Got an "Over Capacity" error. Shutting down...')
 
     loading_bar.close()

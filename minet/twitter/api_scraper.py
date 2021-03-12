@@ -27,7 +27,8 @@ from minet.twitter.exceptions import (
     TwitterPublicAPIRateLimitError,
     TwitterPublicAPIInvalidResponseError,
     TwitterPublicAPIParsingError,
-    TwitterPublicAPIQueryTooLongError
+    TwitterPublicAPIQueryTooLongError,
+    TwitterPublicAPIOverCapacityError
 )
 
 # =============================================================================
@@ -268,6 +269,11 @@ class TwitterAPIScraper(object):
             raise TwitterPublicAPIRateLimitError
 
         if response.status >= 400:
+            error = nested_get(['errors', 0], data)
+
+            if error is not None and error.get('code') == 130:
+                raise TwitterPublicAPIOverCapacityError
+
             raise TwitterPublicAPIInvalidResponseError
 
         cursor = extract_cursor_from_payload(data)
