@@ -1245,7 +1245,9 @@ example:
 ### videos
 
 ```
-usage: minet youtube videos [-h] [-o OUTPUT] [-s SELECT] [-k KEY] column [file]
+usage: minet youtube videos [-h] [-o OUTPUT] [-k KEY] [-s SELECT]
+                            [--total TOTAL]
+                            column [file]
 
 Youtube videos
 ==============
@@ -1253,14 +1255,15 @@ Youtube videos
 Retrieve metadata about Youtube videos using the API.
 
 positional arguments:
-  column                      Name of the column containing the video's url or id.
+  column                      Name of the column containing the video's urls or ids.
   file                        CSV file containing the Youtube videos urls or ids.
 
 optional arguments:
   -h, --help                  show this help message and exit
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
-  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
   -k KEY, --key KEY           YouTube API Data dashboard API key.
+  -s SELECT, --select SELECT  Columns to include in report (separated by `,`).
+  --total TOTAL               Total number of videos. Necessary if you want to display a finite progress indicator.
 
 ```
 

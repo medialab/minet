@@ -611,7 +611,7 @@ MINET_COMMANDS = {
                     'arguments': [
                         {
                             'name': 'column',
-                            'help': 'Name of the column containing the video\'s url or id.'
+                            'help': 'Name of the column containing the video\'s urls or ids.'
                         },
                         {
                             'name': 'file',
@@ -621,14 +621,19 @@ MINET_COMMANDS = {
                             'nargs': '?'
                         },
                         {
-                            'flags': ['-s', '--select'],
-                            'help': 'Columns to include in report (separated by `,`).'
-                        },
-                        {
                             'flags': ['-k', '--key'],
                             'help': 'YouTube API Data dashboard API key.',
                             'rc_key': ['youtube', 'key'],
                             'action': ConfigAction
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns to include in report (separated by `,`).'
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of videos. Necessary if you want to display a finite progress indicator.',
+                            'type': int
                         }
                     ]
                 },

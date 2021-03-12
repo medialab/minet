@@ -12,4 +12,5 @@ VIDEOS = [
 
 client = YouTubeAPIClient(config['youtube']['key'])
 
-client.videos(VIDEOS)
+for item, video in client.videos(VIDEOS):
+    print(item, video)
