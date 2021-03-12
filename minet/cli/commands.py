@@ -1373,7 +1373,7 @@ MINET_COMMANDS = {
                         *TWITTER_API_COMMON_ARGUMENTS,
                         {
                             'flag': '--ids',
-                            'help': 'Whether the your users are given as ids rather than screen names.',
+                            'help': 'Whether your users are given as ids rather than screen names.',
                             'action': 'store_true'
                         },
                         {
@@ -1423,7 +1423,7 @@ MINET_COMMANDS = {
                         *TWITTER_API_COMMON_ARGUMENTS,
                         {
                             'flag': '--ids',
-                            'help': 'Whether the your users are given as ids rather than screen names.',
+                            'help': 'Whether your users are given as ids rather than screen names.',
                             'action': 'store_true'
                         },
                         {
@@ -1532,7 +1532,7 @@ MINET_COMMANDS = {
                         *TWITTER_API_COMMON_ARGUMENTS,
                         {
                             'flag': '--ids',
-                            'help': 'Whether the your users are given as ids rather than screen names.',
+                            'help': 'Whether your users are given as ids rather than screen names.',
                             'action': 'store_true'
                         },
                         {
@@ -1578,7 +1578,7 @@ MINET_COMMANDS = {
                         *TWITTER_API_COMMON_ARGUMENTS,
                         {
                             'flag': '--ids',
-                            'help': 'Whether the your users are given as ids rather than screen names.',
+                            'help': 'Whether your users are given as ids rather than screen names.',
                             'action': 'store_true'
                         },
                         {

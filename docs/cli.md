@@ -990,7 +990,7 @@ optional arguments:
   --api-secret-key API_SECRET_KEY            Twitter API secret key.
   --access-token ACCESS_TOKEN                Twitter API access token.
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret.
-  --ids                                      Whether the your users are given as ids rather than screen names.
+  --ids                                      Whether your users are given as ids rather than screen names.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns to include in report (separated by `,`).
@@ -1028,7 +1028,7 @@ optional arguments:
   --api-secret-key API_SECRET_KEY            Twitter API secret key.
   --access-token ACCESS_TOKEN                Twitter API access token.
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret.
-  --ids                                      Whether the your users are given as ids rather than screen names.
+  --ids                                      Whether your users are given as ids rather than screen names.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns to include in report (separated by `,`).
@@ -1104,7 +1104,7 @@ optional arguments:
   --api-secret-key API_SECRET_KEY            Twitter API secret key.
   --access-token ACCESS_TOKEN                Twitter API access token.
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret.
-  --ids                                      Whether the your users are given as ids rather than screen names.
+  --ids                                      Whether your users are given as ids rather than screen names.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
   -s SELECT, --select SELECT                 Columns to include in report (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
@@ -1143,7 +1143,7 @@ optional arguments:
   --api-secret-key API_SECRET_KEY            Twitter API secret key.
   --access-token ACCESS_TOKEN                Twitter API access token.
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret.
-  --ids                                      Whether the your users are given as ids rather than screen names.
+  --ids                                      Whether your users are given as ids rather than screen names.
   --include-retweets                         Whether to include retweets.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
   -s SELECT, --select SELECT                 Columns to include in report (separated by `,`).
