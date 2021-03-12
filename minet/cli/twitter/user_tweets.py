@@ -11,6 +11,7 @@ from twitwi import (
     format_tweet_as_csv_row
 )
 from twitwi.constants import TWEET_FIELDS
+from twitter import TwitterHTTPError
 
 from minet.cli.utils import LoadingBar
 from minet.twitter.constants import TWITTER_API_MAX_STATUSES_COUNT
@@ -56,8 +57,19 @@ def twitter_user_tweets_action(namespace, output_file):
             if max_id is not None:
                 kwargs['max_id'] = max_id
 
-            tweets = wrapper.call(['statuses', 'user_timeline'], **kwargs)
             loading_bar.inc('calls')
+
+            try:
+                tweets = wrapper.call(['statuses', 'user_timeline'], **kwargs)
+            except TwitterHTTPError as e:
+                loading_bar.inc('errors')
+
+                if e.e.code == 404:
+                    loading_bar.print('Could not find user "%s"' % user)
+                else:
+                    loading_bar.print('An error happened when attempting to retrieve tweets from "%s"' % user)
+
+                break
 
             if not tweets:
                 break
