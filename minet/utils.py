@@ -978,7 +978,7 @@ def create_request_retryer(min=10, max=THREE_HOURS, max_attempts=9, before_sleep
 
 
 def namedrecord(name, fields, boolean=None, plural=None):
-    mapping = {k: i for i, k in enumerate(fields)}
+    mapping = OrderedDict((k, i) for i, k in enumerate(fields))
 
     mask = []
 
@@ -1026,6 +1026,9 @@ def namedrecord(name, fields, boolean=None, plural=None):
             )
 
             return row
+
+        def as_dict(self):
+            return {fields[i]: v for i, v in enumerate(self)}
 
         def __repr__(self):
             class_name = self.__class__.__name__

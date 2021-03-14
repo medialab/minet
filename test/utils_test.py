@@ -126,3 +126,8 @@ class TestUtils(object):
         v = Video('Super video', True, ['film', 'pop'])
 
         assert v.as_csv_row() == ['Super video', 'true', 'film|pop']
+        assert v.as_dict() == {
+            'title': 'Super video',
+            'has_captions': True,
+            'tags': ['film', 'pop']
+        }
