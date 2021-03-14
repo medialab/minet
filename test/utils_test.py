@@ -115,3 +115,14 @@ class TestUtils(object):
         assert r.get(0) == 34
         assert r.get(54) is None
         assert r.get('z') is None
+
+        Video = namedrecord(
+            'Video',
+            ['title', 'has_captions', 'tags'],
+            boolean=['has_captions'],
+            plural=['tags']
+        )
+
+        v = Video('Super video', True, ['film', 'pop'])
+
+        assert v.as_csv_row() == ['Super video', 'true', 'film|pop']

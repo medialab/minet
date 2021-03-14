@@ -4,6 +4,23 @@
 #
 # Various data formatters for YouTube data.
 #
+from minet.utils import namedrecord
+from minet.youtube.constants import YOUTUBE_VIDEO_CSV_HEADERS
+
+YouTubeVideo = namedrecord(
+    'YouTubeVideo',
+    YOUTUBE_VIDEO_CSV_HEADERS,
+    boolean=['has_caption']
+)
+
+
+def get_int(item, key):
+    nb = item.get(key)
+
+    if nb is not None:
+        return int(nb)
+
+    return nb
 
 
 def format_video(item):
@@ -11,20 +28,20 @@ def format_video(item):
     stats = item['statistics']
     details = item['contentDetails']
 
-    row = [
+    row = YouTubeVideo(
         item['id'],
         snippet['publishedAt'],
         snippet['channelId'],
         snippet['title'],
         snippet['description'],
         snippet['channelTitle'],
-        stats.get('viewCount', None),
-        stats.get('likeCount', None),
-        stats.get('dislikeCount', None),
-        stats.get('favoriteCount', None),
-        stats.get('commentCount', None),
+        get_int(stats, 'viewCount'),
+        get_int(stats, 'likeCount'),
+        get_int(stats, 'dislikeCount'),
+        get_int(stats, 'favoriteCount'),
+        get_int(stats, 'commentCount'),
         details['duration'],
-        details['caption']
-    ]
+        details['caption'] == 'true'
+    )
 
     return row

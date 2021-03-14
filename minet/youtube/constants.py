@@ -5,11 +5,6 @@
 # General constants used throughout the YouTube functions.
 #
 
-YOUTUBE_OUTPUT_FORMATS = {
-    'raw',
-    'csv_row'
-}
-
 YOUTUBE_API_BASE_URL = 'https://www.googleapis.com/youtube/v3'
 YOUTUBE_API_MAX_VIDEOS_PER_CALL = 50
 
@@ -26,5 +21,5 @@ YOUTUBE_VIDEO_CSV_HEADERS = [
     'favorite_count',
     'comment_count',
     'duration',
-    'caption'
+    'has_caption'
 ]

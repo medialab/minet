@@ -15,6 +15,7 @@ import json
 import yaml
 import time
 import string
+import textwrap
 import mimetypes
 import functools
 import cchardet as chardet
@@ -976,8 +977,29 @@ def create_request_retryer(min=10, max=THREE_HOURS, max_attempts=9, before_sleep
     )
 
 
-def namedrecord(name, fields):
+def namedrecord(name, fields, boolean=None, plural=None):
     mapping = {k: i for i, k in enumerate(fields)}
+
+    mask = []
+
+    for k in mapping.keys():
+        if boolean and k in boolean:
+            mask.append(1)
+        elif plural and k in plural:
+            mask.append(2)
+        else:
+            mask.append(0)
+
+    def cast_for_csv(i, v, plural_separator='|'):
+        m = mask[i]
+
+        if m == 1:
+            return 'true' if v else 'false'
+
+        if m == 2:
+            return plural_separator.join(v)
+
+        return v
 
     class Record(namedtuple(name, fields)):
         def __getitem__(self, key):
@@ -996,5 +1018,33 @@ def namedrecord(name, fields):
                 return self.__getitem__(key)
             except (IndexError, KeyError):
                 return default
+
+        def as_csv_row(self, plural_separator='|'):
+            row = list(
+                cast_for_csv(i, v, plural_separator=plural_separator)
+                for i, v in enumerate(self)
+            )
+
+            return row
+
+        def __repr__(self):
+            class_name = self.__class__.__name__
+
+            representation = '<' + class_name
+
+            for key, i in mapping.items():
+                v = super().__getitem__(i)
+
+                if isinstance(v, str):
+                    v = textwrap.shorten(v, width=30, placeholder='…')
+
+                if isinstance(v, str) and ' ' in v:
+                    representation += ' %s="%s"' % (key, v)
+                else:
+                    representation += ' %s=%s' % (key, v)
+
+            representation += '>'
+
+            return representation
 
     return Record

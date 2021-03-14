@@ -10,7 +10,6 @@ from ebbe import as_chunks
 from minet.utils import create_pool, request_json, nested_get
 from minet.youtube.utils import ensure_video_id, seconds_to_midnight_pacific_time
 from minet.youtube.constants import (
-    YOUTUBE_OUTPUT_FORMATS,
     YOUTUBE_API_BASE_URL,
     YOUTUBE_API_MAX_VIDEOS_PER_CALL
 )
@@ -63,10 +62,7 @@ class YouTubeAPIClient(object):
 
         return data
 
-    def videos(self, videos, key=None, format='raw'):
-        if format not in YOUTUBE_OUTPUT_FORMATS:
-            raise TypeError
-
+    def videos(self, videos, key=None, raw=False):
         for group in as_chunks(YOUTUBE_API_MAX_VIDEOS_PER_CALL, videos):
             group_data = []
 
@@ -86,7 +82,7 @@ class YouTubeAPIClient(object):
             for item in result['items']:
                 video_id = item['id']
 
-                if format == 'csv_row':
+                if not raw:
                     item = format_video(item)
 
                 indexed_result[video_id] = item

@@ -38,8 +38,8 @@ def videos_action(namespace, output_file):
 
     iterator = enricher.cells(namespace.column, with_rows=True)
 
-    for (row, _), video in client.videos(iterator, key=itemgetter(1), format='csv_row'):
+    for (row, _), video in client.videos(iterator, key=itemgetter(1)):
         loading_bar.update()
-        enricher.writerow(row, video)
+        enricher.writerow(row, video.as_csv_row() if video else None)
 
     loading_bar.close()
