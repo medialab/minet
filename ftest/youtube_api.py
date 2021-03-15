@@ -19,5 +19,9 @@ client = YouTubeAPIClient(config['youtube']['key'])
 # for video in islice(client.search('"white rabbit tyto alba"'), 103):
 #     print(video)
 
+count = 0
 for comment in client.comments('DPzAvAlUJ24'):
     print(comment)
+    count += 1
+
+print('Found %i comments.' % count)

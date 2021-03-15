@@ -96,20 +96,20 @@ def format_comment(item):
     return row
 
 
-# def format_reply(item):
-#     snippet = item['topLevelComment']['snippet']
+def format_reply(item):
+    snippet = item['snippet']
 
-#     row = YouTubeComment(
-#         item['topLevelComment']['id'],
-#         snippet['authorDisplayName'],
-#         snippet['authorChannelUrl'],
-#         nested_get(['authorChannelId', 'value'], snippet),
-#         snippet['textOriginal'],
-#         int(snippet['likeCount']),
-#         snippet['publishedAt'],
-#         snippet['updatedAt'],
-#         None,
-#         snippet['parentId']
-#     )
+    row = YouTubeComment(
+        snippet['videoId'],
+        item['id'],
+        snippet['authorDisplayName'],
+        nested_get(['authorChannelId', 'value'], snippet),
+        snippet['textOriginal'],
+        int(snippet['likeCount']),
+        snippet['publishedAt'],
+        snippet['updatedAt'],
+        None,
+        snippet['parentId']
+    )
 
-#     return row
+    return row

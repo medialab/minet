@@ -20,12 +20,14 @@ from minet.youtube.constants import (
 )
 from minet.youtube.exceptions import (
     YouTubeInvalidAPIKeyError,
-    YouTubeInvalidAPICall
+    YouTubeInvalidAPICall,
+    YouTubeInvalidVideoId
 )
 from minet.youtube.formatters import (
     format_video,
     format_video_snippet,
-    format_comment
+    format_comment,
+    format_reply
 )
 
 
@@ -174,11 +176,11 @@ class YouTubeAPIClient(object):
             if token is None or len(result['items']) == 0:
                 break
 
-    def comments(self, video_target, raw=False):
+    def comments(self, video_target, raw=False, full_replies=False):
         video_id = ensure_video_id(video_target)
 
         if video_id is None:
-            raise TypeError('given argument is not a YouTube video id')
+            raise YouTubeInvalidVideoId
 
         starting_url = forge_comments_url(
             self.key,
@@ -193,7 +195,30 @@ class YouTubeAPIClient(object):
             result = self.request_json(url)
 
             for item in result['items']:
+                replies = nested_get(['replies', 'comments'], item, [])
+
                 if not raw:
                     item = format_comment(item)
 
                 yield item
+
+                for reply in replies:
+                    if not raw:
+                        reply = format_reply(reply)
+
+                    yield reply
+
+            if len(result['items']) == 0:
+                break
+
+            # Next page
+            token = result.get('nextPageToken')
+
+            if token is not None:
+                next_url = forge_comments_url(
+                    self.key,
+                    video_id,
+                    token=token
+                )
+
+                queue.append((False, next_url))
