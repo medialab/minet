@@ -154,27 +154,30 @@ class YouTubeAPIClient(object):
         if order not in YOUTUBE_API_SEARCH_ORDERS:
             raise TypeError('unkown search order "%s"' % order)
 
-        token = None
+        def generator():
+            token = None
 
-        while True:
-            url = forge_search_url(
-                self.key,
-                query,
-                order=order
-            )
+            while True:
+                url = forge_search_url(
+                    self.key,
+                    query,
+                    order=order
+                )
 
-            result = self.request_json(url)
+                result = self.request_json(url)
 
-            token = result.get('nextPageToken')
+                token = result.get('nextPageToken')
 
-            for item in result['items']:
-                if not raw:
-                    item = format_video_snippet(item)
+                for item in result['items']:
+                    if not raw:
+                        item = format_video_snippet(item)
 
-                yield item
+                    yield item
 
-            if token is None or len(result['items']) == 0:
-                break
+                if token is None or len(result['items']) == 0:
+                    break
+
+        return generator()
 
     def comments(self, video_target, raw=False, full_replies=False):
         video_id = ensure_video_id(video_target)
@@ -182,43 +185,62 @@ class YouTubeAPIClient(object):
         if video_id is None:
             raise YouTubeInvalidVideoId
 
-        starting_url = forge_comments_url(
-            self.key,
-            video_id
-        )
+        def generator():
+            starting_url = forge_comments_url(
+                self.key,
+                video_id
+            )
 
-        queue = deque([(False, starting_url)])
+            queue = deque([(False, video_id, starting_url)])
 
-        while len(queue) != 0:
-            is_reply, url = queue.popleft()
+            while len(queue) != 0:
+                is_reply, item_id, url = queue.popleft()
 
-            result = self.request_json(url)
+                result = self.request_json(url)
 
-            for item in result['items']:
-                replies = nested_get(['replies', 'comments'], item, [])
+                for item in result['items']:
+                    comment_id = item['id']
+                    replies = nested_get(['replies', 'comments'], item, [])
+                    total_reply_count = nested_get(['snippet', 'totalReplyCount'], item, 0)
 
-                if not raw:
-                    item = format_comment(item)
-
-                yield item
-
-                for reply in replies:
                     if not raw:
-                        reply = format_reply(reply)
+                        item = format_comment(item)
 
-                    yield reply
+                    yield item
 
-            if len(result['items']) == 0:
-                break
+                    if is_reply:
+                        continue
 
-            # Next page
-            token = result.get('nextPageToken')
+                    # Getting replies
+                    if not full_replies or len(replies) >= total_reply_count:
+                        for reply in replies:
+                            if not raw:
+                                reply = format_reply(reply)
 
-            if token is not None:
-                next_url = forge_comments_url(
-                    self.key,
-                    video_id,
-                    token=token
-                )
+                            yield reply
+                    elif total_reply_count > 0:
+                        replies_url = forge_replies_url(
+                            self.key,
+                            comment_id
+                        )
 
-                queue.append((False, next_url))
+                        queue.append((True, comment_id, replies_url))
+
+                if len(result['items']) == 0:
+                    break
+
+                # Next page
+                token = result.get('nextPageToken')
+
+                if token is not None:
+                    forge = forge_replies_url if is_reply else forge_comments_url
+
+                    next_url = forge(
+                        self.key,
+                        item_id,
+                        token=token
+                    )
+
+                    queue.append((is_reply, item_id, next_url))
+
+        return generator()

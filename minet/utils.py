@@ -15,7 +15,6 @@ import json
 import yaml
 import time
 import string
-import textwrap
 import mimetypes
 import functools
 import cchardet as chardet
@@ -1036,8 +1035,8 @@ def namedrecord(name, fields, boolean=None, plural=None):
             for key, i in mapping.items():
                 v = super().__getitem__(i)
 
-                if isinstance(v, str):
-                    v = textwrap.shorten(v, width=30, placeholder='…')
+                if isinstance(v, str) and len(v) > 30:
+                    v = v[:29] + '…'
 
                 if isinstance(v, str) and ' ' in v:
                     representation += ' %s="%s"' % (key, v)

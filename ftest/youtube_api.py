@@ -1,4 +1,5 @@
 from itertools import islice
+from collections import Counter
 from minet.cli.utils import get_rcfile
 from minet.youtube import YouTubeAPIClient
 
@@ -19,9 +20,17 @@ client = YouTubeAPIClient(config['youtube']['key'])
 # for video in islice(client.search('"white rabbit tyto alba"'), 103):
 #     print(video)
 
+KROCK = 'DPzAvAlUJ24'
+SCILABUS = 'https://www.youtube.com/watch?v=ARAQUgkdIvQ'
+
 count = 0
-for comment in client.comments('DPzAvAlUJ24'):
+ids = Counter()
+for comment in client.comments(SCILABUS, full_replies=True):
     print(comment)
     count += 1
+    ids[comment.comment_id] += 1
 
 print('Found %i comments.' % count)
+
+if ids.most_common(1)[0][1] > 1:
+    print('Found duplicated ids')
