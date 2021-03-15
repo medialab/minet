@@ -546,15 +546,24 @@ MINET_COMMANDS = {
             'commands': {
                 'captions': {
                     'title': 'Youtube captions',
-                    'description': 'Retrieve metadata about Youtube captions.',
+                    'description': 'Retrieve captions for the given YouTube videos.',
+                    'epilog': '''
+                        examples:
+
+                        . Fetching captions for a list of videos:
+                            `minet yt captions video_id videos.csv > captions.csv`
+
+                        . Fetching French captions with a fallback to English:
+                            `minet yt captions video_id videos.csv --lang fr,en > captions.csv`
+                    ''',
                     'arguments': [
                         {
                             'name': 'column',
-                            'help': 'Name of the column containing the video\'s url or id.'
+                            'help': 'Name of the column containing the video urls or ids.'
                         },
                         {
                             'name': 'file',
-                            'help': 'CSV file containing the Youtube videos urls or ids.',
+                            'help': 'CSV file containing the Youtube video urls or ids.',
                             'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
@@ -565,8 +574,9 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--lang',
-                            'help': 'Language (ISO code like "fr") of captions to retrieve.',
-                            'default': 'en'
+                            'help': 'Language (ISO code like "en") of captions to retrieve. You can specify several languages by preferred order separated by commas. Defaults to "en".',
+                            'default': ['en'],
+                            'type': SplitterType()
                         },
                     ]
                 },

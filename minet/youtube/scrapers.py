@@ -84,6 +84,9 @@ def get_video_captions(video_target, langs):
 
     tracks = get_caption_tracks(video_id)
 
+    if not tracks:
+        return
+
     best_track = select_caption_track(tracks, langs=langs)
 
     if best_track is None:
@@ -105,4 +108,4 @@ def get_video_captions(video_target, langs):
             unescape(item.get_text().strip())
         ))
 
-    return captions
+    return best_track, captions

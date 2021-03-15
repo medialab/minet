@@ -24,13 +24,15 @@ def youtube_action(namespace):
         flag='w'
     )
 
-    check_key(namespace)
-
     if namespace.yt_action == 'videos':
+        check_key(namespace)
+
         from minet.cli.youtube.videos import videos_action
         videos_action(namespace, output_file)
 
     elif namespace.yt_action == 'comments':
+        check_key(namespace)
+
         from minet.cli.youtube.comments import comments_action
         comments_action(namespace, output_file)
 
@@ -39,6 +41,8 @@ def youtube_action(namespace):
         captions_action(namespace, output_file)
 
     elif namespace.yt_action == 'search':
+        check_key(namespace)
+
         from minet.cli.youtube.search import search_action
         search_action(namespace, output_file)
 

@@ -1167,17 +1167,25 @@ usage: minet youtube captions [-h] [-o OUTPUT] [-s SELECT] [--lang LANG]
 Youtube captions
 ================
 
-Retrieve metadata about Youtube captions.
+Retrieve captions for the given YouTube videos.
 
 positional arguments:
-  column                      Name of the column containing the video's url or id.
-  file                        CSV file containing the Youtube videos urls or ids.
+  column                      Name of the column containing the video urls or ids.
+  file                        CSV file containing the Youtube video urls or ids.
 
 optional arguments:
   -h, --help                  show this help message and exit
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  --lang LANG                 Language (ISO code like "fr") of captions to retrieve.
+  --lang LANG                 Language (ISO code like "en") of captions to retrieve. You can specify several languages by preferred order separated by commas. Defaults to "en".
+
+examples:
+
+. Fetching captions for a list of videos:
+    `minet yt captions video_id videos.csv > captions.csv`
+
+. Fetching French captions with a fallback to English:
+    `minet yt captions video_id videos.csv --lang fr,en > captions.csv`
 
 ```
 
@@ -1205,7 +1213,7 @@ optional arguments:
 example:
 
 . Fetching a video's comments:
-    `minet yt comments https://www.youtube.com/watch?v=7JTb2vf1OQQ -k my-api-key --full -o comments.csv`
+    `minet yt comments https://www.youtube.com/watch?v=7JTb2vf1OQQ -k my-api-key > comments.csv`
 
 ```
 

@@ -39,7 +39,6 @@ YOUTUBE_VIDEO_CSV_HEADERS = YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS + [
     'has_caption'
 ]
 
-# TODO: amend (dislike, reply -> count)
 YOUTUBE_COMMENT_CSV_HEADERS = [
     'video_id',
     'comment_id',
@@ -51,4 +50,12 @@ YOUTUBE_COMMENT_CSV_HEADERS = [
     'updated_at',
     'reply_count',
     'parent_comment_id'
+]
+
+YOUTUBE_CAPTIONS_CSV_HEADERS = [
+    'lang',
+    'generated',
+    'start',
+    'duration',
+    'text'
 ]
