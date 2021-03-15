@@ -1,5 +1,6 @@
 import re
 import tld
+import trafilatura
 import justext
 from glob import iglob
 from os.path import dirname, join
@@ -28,6 +29,10 @@ datas = [
     (
         join(dirname(tld.__file__), 'res', 'effective_tld_names.dat.txt'),
         'tld/res'
+    ),
+    (
+        join(dirname(trafilatura.__file__), 'settings.cfg'),
+        'trafilatura'
     )
 ]
 
