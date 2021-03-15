@@ -96,11 +96,11 @@ def format_comment(item):
     return row
 
 
-def format_reply(item):
+def format_reply(item, video_id=None):
     snippet = item['snippet']
 
     row = YouTubeComment(
-        snippet['videoId'],
+        video_id if video_id is not None else snippet['videoId'],
         item['id'],
         snippet['authorDisplayName'],
         nested_get(['authorChannelId', 'value'], snippet),

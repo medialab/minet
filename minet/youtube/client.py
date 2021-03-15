@@ -204,7 +204,7 @@ class YouTubeAPIClient(object):
                     total_reply_count = nested_get(['snippet', 'totalReplyCount'], item, 0)
 
                     if not raw:
-                        item = format_comment(item)
+                        item = format_comment(item) if not is_reply else format_reply(item, video_id=video_id)
 
                     yield item
 

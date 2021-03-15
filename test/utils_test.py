@@ -131,3 +131,5 @@ class TestUtils(object):
             'has_captions': True,
             'tags': ['film', 'pop']
         }
+
+        v = Video('Test ok\nwala', False, ['ok'])
