@@ -2,7 +2,11 @@ from itertools import islice
 from collections import Counter
 from minet.cli.utils import get_rcfile
 from minet.youtube import YouTubeAPIClient
-from minet.youtube.scrapers import get_caption_tracks, select_caption_track
+from minet.youtube.scrapers import (
+    get_caption_tracks,
+    select_caption_track,
+    get_video_captions
+)
 
 config = get_rcfile()
 
@@ -39,7 +43,11 @@ SCILABUS = 'https://www.youtube.com/watch?v=ARAQUgkdIvQ'
 # xB-puVmmlg4
 # eTiWhKcGpjw
 # JaS8W3HMKY8
-tracks = get_caption_tracks('https://www.youtube.com/watch?v=jsiY6s8-SJ8')
-print([(t.lang, t.generated) for t in tracks])
+# tracks = get_caption_tracks('https://www.youtube.com/watch?v=jsiY6s8-SJ8')
+# print([(t.lang, t.generated) for t in tracks])
 
-print(select_caption_track(tracks, langs=['da', 'pt']))
+# print(select_caption_track(tracks, langs=['da'], strict=False))
+
+captions = get_video_captions('https://www.youtube.com/watch?v=jsiY6s8-SJ8', langs=['fr', 'en'])
+
+print(captions)

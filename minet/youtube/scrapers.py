@@ -6,6 +6,8 @@
 #
 import re
 import json
+from bs4 import BeautifulSoup
+from html import unescape
 from urllib.parse import unquote
 from collections import namedtuple
 
@@ -21,11 +23,7 @@ TIMEDTEXT_RE = re.compile(rb'timedtext?[^"]+')
 YouTubeCaptionTrack = namedtuple('YouTubeCaptionTrack', ['lang', 'url', 'generated'])
 
 
-def get_caption_tracks(video_target):
-    video_id = ensure_video_id(video_target)
-
-    if video_id is None:
-        raise YouTubeInvalidVideoId
+def get_caption_tracks(video_id):
 
     # First we try to retrieve it from video info
     url = 'https://www.youtube.com/get_video_info?video_id=%s' % video_id
@@ -73,3 +71,38 @@ def select_caption_track(tracks, langs=None, strict=True):
         return None
 
     return best
+
+
+def get_video_captions(video_target, langs):
+    if not isinstance(langs, list):
+        raise TypeError
+
+    video_id = ensure_video_id(video_target)
+
+    if video_id is None:
+        raise YouTubeInvalidVideoId
+
+    tracks = get_caption_tracks(video_id)
+
+    best_track = select_caption_track(tracks, langs=langs)
+
+    if best_track is None:
+        return
+
+    err, response = request(YOUTUBE_SCRAPER_POOL, best_track.url)
+
+    if err:
+        raise err
+
+    soup = BeautifulSoup(response.data.decode('utf-8'), 'lxml')
+
+    captions = []
+
+    for item in soup.select('text'):
+        captions.append((
+            item.get('start'),
+            item.get('dur'),
+            unescape(item.get_text().strip())
+        ))
+
+    return captions
