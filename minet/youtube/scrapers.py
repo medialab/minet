@@ -58,3 +58,18 @@ def get_caption_tracks(video_target):
     # timedtexts = TIMEDTEXT_RE.findall(response.data)
 
     return []
+
+
+def select_caption_track(tracks, langs=None, strict=True):
+    def key(t):
+        try:
+            return (langs.index(t.lang), int(t.generated), t.lang)
+        except ValueError:
+            return (len(langs), int(t.generated), t.lang)
+
+    best = min(tracks, key=key)
+
+    if strict and best.lang not in langs:
+        return None
+
+    return best
