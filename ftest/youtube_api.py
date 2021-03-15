@@ -16,5 +16,8 @@ client = YouTubeAPIClient(config['youtube']['key'])
 # for item, video in client.videos(VIDEOS):
 #     print(item, video)
 
-for video in islice(client.search('"white rabbit tyto alba"'), 103):
-    print(video)
+# for video in islice(client.search('"white rabbit tyto alba"'), 103):
+#     print(video)
+
+for comment in client.comments('DPzAvAlUJ24'):
+    print(comment)

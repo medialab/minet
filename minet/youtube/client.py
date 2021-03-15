@@ -6,6 +6,7 @@
 #
 import time
 from ebbe import as_chunks
+from collections import deque
 from urllib.parse import quote
 
 from minet.utils import create_pool, request_json, nested_get
@@ -23,7 +24,8 @@ from minet.youtube.exceptions import (
 )
 from minet.youtube.formatters import (
     format_video,
-    format_video_snippet
+    format_video_snippet,
+    format_comment
 )
 
 
@@ -54,7 +56,7 @@ def forge_search_url(key, query, order, token=None):
     return url
 
 
-def forge_comments_url(key, video_id):
+def forge_comments_url(key, video_id, token=None):
     data = {
         'base': YOUTUBE_API_BASE_URL,
         'key': key,
@@ -62,10 +64,15 @@ def forge_comments_url(key, video_id):
         'video_id': video_id
     }
 
-    return '%(base)s/commentThreads?videoId=%(video_id)s&key=%(key)s&part=snippet,replies&maxResults=%(count)s' % data
+    url = '%(base)s/commentThreads?videoId=%(video_id)s&key=%(key)s&part=snippet,replies&maxResults=%(count)s' % data
+
+    if token is not None:
+        url += '&pageToken=%s' % token
+
+    return url
 
 
-def forge_replies_url(key, comment_id):
+def forge_replies_url(key, comment_id, token=None):
     data = {
         'base': YOUTUBE_API_BASE_URL,
         'key': key,
@@ -73,7 +80,12 @@ def forge_replies_url(key, comment_id):
         'count': YOUTUBE_API_MAX_COMMENTS_PER_CALL
     }
 
-    return '%(base)s/comments?part=snippet&parentId=%(comment_id)s&key=%(key)s&maxResults=%(count)s' % data
+    url = '%(base)s/comments?part=snippet&parentId=%(comment_id)s&key=%(key)s&maxResults=%(count)s' % data
+
+    if token is not None:
+        url += '&pageToken=%s' % token
+
+    return url
 
 
 class YouTubeAPIClient(object):
@@ -161,3 +173,27 @@ class YouTubeAPIClient(object):
 
             if token is None or len(result['items']) == 0:
                 break
+
+    def comments(self, video_target, raw=False):
+        video_id = ensure_video_id(video_target)
+
+        if video_id is None:
+            raise TypeError('given argument is not a YouTube video id')
+
+        starting_url = forge_comments_url(
+            self.key,
+            video_id
+        )
+
+        queue = deque([(False, starting_url)])
+
+        while len(queue) != 0:
+            is_reply, url = queue.popleft()
+
+            result = self.request_json(url)
+
+            for item in result['items']:
+                if not raw:
+                    item = format_comment(item)
+
+                yield item

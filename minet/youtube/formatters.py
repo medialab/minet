@@ -4,10 +4,11 @@
 #
 # Various data formatters for YouTube data.
 #
-from minet.utils import namedrecord
+from minet.utils import namedrecord, nested_get
 from minet.youtube.constants import (
     YOUTUBE_VIDEO_CSV_HEADERS,
-    YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS
+    YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS,
+    YOUTUBE_COMMENT_CSV_HEADERS
 )
 
 YouTubeVideo = namedrecord(
@@ -19,6 +20,11 @@ YouTubeVideo = namedrecord(
 YouTubeVideoSnippet = namedrecord(
     'YouTubeVideoSnippet',
     YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS
+)
+
+YouTubeComment = namedrecord(
+    'YoutubeComment',
+    YOUTUBE_COMMENT_CSV_HEADERS
 )
 
 
@@ -68,3 +74,42 @@ def format_video_snippet(item):
     )
 
     return row
+
+
+def format_comment(item):
+    meta = item['snippet']
+    snippet = nested_get(['snippet', 'topLevelComment', 'snippet'], item)
+
+    row = YouTubeComment(
+        meta['videoId'],
+        item['id'],
+        snippet['authorDisplayName'],
+        nested_get(['authorChannelId', 'value'], snippet),
+        snippet['textOriginal'],
+        int(snippet['likeCount']),
+        snippet['publishedAt'],
+        snippet['updatedAt'],
+        int(meta['totalReplyCount']),
+        None
+    )
+
+    return row
+
+
+# def format_reply(item):
+#     snippet = item['topLevelComment']['snippet']
+
+#     row = YouTubeComment(
+#         item['topLevelComment']['id'],
+#         snippet['authorDisplayName'],
+#         snippet['authorChannelUrl'],
+#         nested_get(['authorChannelId', 'value'], snippet),
+#         snippet['textOriginal'],
+#         int(snippet['likeCount']),
+#         snippet['publishedAt'],
+#         snippet['updatedAt'],
+#         None,
+#         snippet['parentId']
+#     )
+
+#     return row
