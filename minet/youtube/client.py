@@ -179,7 +179,7 @@ class YouTubeAPIClient(object):
 
         return generator()
 
-    def comments(self, video_target, raw=False, full_replies=False):
+    def comments(self, video_target, raw=False, full_replies=True):
         video_id = ensure_video_id(video_target)
 
         if video_id is None:

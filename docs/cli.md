@@ -1184,7 +1184,7 @@ optional arguments:
 <h3 id="youtube-comments">comments</h3>
 
 ```
-usage: minet youtube comments [-h] [-o OUTPUT] [-f] [-k KEY] [-s SELECT]
+usage: minet youtube comments [-h] [-o OUTPUT] [-k KEY] [-s SELECT]
                               column [file]
 
 Youtube comments
@@ -1199,7 +1199,6 @@ positional arguments:
 optional arguments:
   -h, --help                  show this help message and exit
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
-  -f, --full                  YouTube API does not always return every comments as some replies can be omitted. By adding this flag, one ensures to make every needed API call to retrieve all the comments.
   -k KEY, --key KEY           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
 

@@ -577,7 +577,7 @@ MINET_COMMANDS = {
                         example:
 
                         . Fetching a video's comments:
-                            `minet yt comments https://www.youtube.com/watch?v=7JTb2vf1OQQ -k my-api-key --full -o comments.csv`
+                            `minet yt comments https://www.youtube.com/watch?v=7JTb2vf1OQQ -k my-api-key > comments.csv`
                     ''',
                     'arguments': [
                         {
@@ -590,11 +590,6 @@ MINET_COMMANDS = {
                             'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
-                        },
-                        {
-                            'flags': ['-f', '--full'],
-                            'help': 'YouTube API does not always return every comments as some replies can be omitted. By adding this flag, one ensures to make every needed API call to retrieve all the comments.',
-                            'action': 'store_true'
                         },
                         {
                             'flags': ['-k', '--key'],

@@ -2,13 +2,13 @@
 # Minet Youtube Search CLI Action
 # =============================================================================
 #
-# From a key-word, action getting all video's related to that keyword data using Google's APIs.
+# Action searching videos using YouTube's API.
 #
 import sys
 import casanova
 from itertools import islice
 
-from minet.cli.utils import LoadingBar, open_output_file, edit_namespace_with_csv_io
+from minet.cli.utils import LoadingBar, edit_namespace_with_csv_io
 from minet.youtube import YouTubeAPIClient
 from minet.youtube.constants import YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS
 
@@ -16,8 +16,6 @@ from minet.youtube.constants import YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS
 def search_action(namespace, output_file):
 
     # Handling output
-    output_file = open_output_file(namespace.output)
-
     single_query = namespace.file is sys.stdin and sys.stdin.isatty()
 
     if single_query:
