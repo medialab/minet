@@ -6,19 +6,23 @@
 #
 import time
 from ebbe import as_chunks
+from urllib.parse import quote
 
 from minet.utils import create_pool, request_json, nested_get
 from minet.youtube.utils import ensure_video_id, seconds_to_midnight_pacific_time
 from minet.youtube.constants import (
     YOUTUBE_API_BASE_URL,
-    YOUTUBE_API_MAX_VIDEOS_PER_CALL
+    YOUTUBE_API_MAX_VIDEOS_PER_CALL,
+    YOUTUBE_API_DEFAULT_SEARCH_ORDER,
+    YOUTUBE_API_SEARCH_ORDERS
 )
 from minet.youtube.exceptions import (
     YouTubeInvalidAPIKeyError,
     YouTubeInvalidAPICall
 )
 from minet.youtube.formatters import (
-    format_video
+    format_video,
+    format_video_snippet
 )
 
 
@@ -30,6 +34,23 @@ def forge_videos_url(key, ids):
     }
 
     return '%(base)s/videos?id=%(ids)s&key=%(key)s&part=snippet,statistics,contentDetails' % data
+
+
+def forge_search_url(key, query, order, token=None):
+    data = {
+        'base': YOUTUBE_API_BASE_URL,
+        'order': YOUTUBE_API_DEFAULT_SEARCH_ORDER,
+        'query': quote(query),
+        'key': key,
+        'count': YOUTUBE_API_MAX_VIDEOS_PER_CALL
+    }
+
+    url = '%(base)s/search?part=snippet&maxResults=%(count)i&q=%(query)s&type=video&order=%(order)s&key=%(key)s' % data
+
+    if token is not None:
+        url += '&pageToken=%s' % token
+
+    return url
 
 
 class YouTubeAPIClient(object):
@@ -89,3 +110,29 @@ class YouTubeAPIClient(object):
 
             for video_id, item in group_data:
                 yield item, indexed_result.get(video_id)
+
+    def search(self, query, order=YOUTUBE_API_DEFAULT_SEARCH_ORDER, raw=False):
+        if order not in YOUTUBE_API_SEARCH_ORDERS:
+            raise TypeError('unkown search order "%s"' % order)
+
+        token = None
+
+        while True:
+            url = forge_search_url(
+                self.key,
+                query,
+                order=order
+            )
+
+            result = self.request_json(url)
+
+            token = result.get('nextPageToken')
+
+            for item in result['items']:
+                if not raw:
+                    item = format_video_snippet(item)
+
+                yield item
+
+            if token is None or len(result['items']) == 0:
+                break

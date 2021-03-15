@@ -26,6 +26,10 @@ from minet.crowdtangle.constants import (
 from minet.facebook.constants import (
     FACEBOOK_MOBILE_DEFAULT_THROTTLE
 )
+from minet.youtube.constants import (
+    YOUTUBE_API_DEFAULT_SEARCH_ORDER,
+    YOUTUBE_API_SEARCH_ORDERS
+)
 
 TWITTER_API_COMMON_ARGUMENTS = [
     {
@@ -677,8 +681,8 @@ MINET_COMMANDS = {
                         {
                             'flags': ['--order'],
                             'help': 'Order in which videos are retrieved. The default one is relevance.',
-                            'default': 'relevance',
-                            'choices': ['relevance', 'date', 'rating', 'viewCount', 'title', 'videoCount']
+                            'default': YOUTUBE_API_DEFAULT_SEARCH_ORDER,
+                            'choices': YOUTUBE_API_SEARCH_ORDERS
                         }
                     ]
                 }

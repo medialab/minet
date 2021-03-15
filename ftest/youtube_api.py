@@ -1,3 +1,4 @@
+from itertools import islice
 from minet.cli.utils import get_rcfile
 from minet.youtube import YouTubeAPIClient
 
@@ -12,5 +13,8 @@ VIDEOS = [
 
 client = YouTubeAPIClient(config['youtube']['key'])
 
-for item, video in client.videos(VIDEOS):
-    print(item, video)
+# for item, video in client.videos(VIDEOS):
+#     print(item, video)
+
+for video in islice(client.search('"white rabbit tyto alba"'), 103):
+    print(video)
