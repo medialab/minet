@@ -7,6 +7,7 @@
 import re
 import json
 from urllib.parse import unquote
+from collections import namedtuple
 
 from minet.utils import create_pool, request
 from minet.youtube.utils import ensure_video_id
@@ -17,8 +18,10 @@ YOUTUBE_SCRAPER_POOL = create_pool()
 CAPTION_TRACKS_RE = re.compile(r'({"captionTracks":.*isTranslatable":(true|false)}])')
 TIMEDTEXT_RE = re.compile(rb'timedtext?[^"]+')
 
+YouTubeCaptionTrack = namedtuple('YouTubeCaptionTrack', ['lang', 'url', 'generated'])
 
-def get_caption_track_url(video_target, lang=None):
+
+def get_caption_tracks(video_target):
     video_id = ensure_video_id(video_target)
 
     if video_id is None:
@@ -39,13 +42,10 @@ def get_caption_track_url(video_target, lang=None):
     if m is not None:
         data = json.loads(m.group(0) + '}')['captionTracks']
 
-        if lang is not None:
-            track = next((item['baseUrl'] for item in data if item['languageCode'] == lang), None)
-        else:
-            track = data[0]['baseUrl']
-
-        if track:
-            return track
+        return [
+            YouTubeCaptionTrack(item['languageCode'], item['baseUrl'], item.get('kind') == 'asr')
+            for item in data
+        ]
 
     # Then we try to scrape it directly from the video page
     # url = 'https://www.youtube.com/watch?v=%s' % video_id
@@ -57,4 +57,4 @@ def get_caption_track_url(video_target, lang=None):
 
     # timedtexts = TIMEDTEXT_RE.findall(response.data)
 
-    return None
+    return []
