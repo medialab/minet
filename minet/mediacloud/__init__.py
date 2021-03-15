@@ -2,4 +2,4 @@
 # Minet Mediacloud Endpoint
 # =============================================================================
 #
-from minet.mediacloud.client import MediacloudClient
+from minet.mediacloud.client import MediacloudAPIClient

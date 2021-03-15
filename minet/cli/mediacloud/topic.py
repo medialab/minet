@@ -7,7 +7,7 @@
 import csv
 from tqdm import tqdm
 
-from minet.mediacloud import MediacloudClient
+from minet.mediacloud import MediacloudAPIClient
 from minet.mediacloud.constants import MEDIACLOUD_TOPIC_STORIES_CSV_HEADERS
 
 
@@ -21,7 +21,7 @@ def mediacloud_topic_action(namespace, output_file):
         unit=' stories'
     )
 
-    client = MediacloudClient(namespace.token)
+    client = MediacloudAPIClient(namespace.token)
 
     iterator = client.topic_stories(
         namespace.topic_id,

@@ -22,7 +22,7 @@ Note that if you are interested in the url cleaning, extraction and join methods
   * [#.summary](#summary)
 * [FacebookMobileScraper](#facebookmobilescraper)
   * [#.comments](#facebookmobilescraper-comments)
-* [MediacloudClient](#mediacloudclient)
+* [MediacloudAPIClient](#mediacloudapiclient)
   * [#.count](#count)
   * [#.search](#mc-search)
   * [#.topic_stories](#topic_stories)
@@ -364,16 +364,16 @@ for comment in scraper.comments(post_url):
 * **per_call** *?bool* [`False`]: whether to yield the list of comments retrieved per call to the website.
 * **format** *?str* [`raw`]: either `raw` or `csv_row`.
 
-## MediacloudClient
+## MediacloudAPIClient
 
 Client that can be used to access [Mediacloud](https://mediacloud.org/) APIs.
 
 For more information about their API, check out their [documentation](https://github.com/berkmancenter/mediacloud/blob/master/doc/api_2_0_spec/api_2_0_spec.md) (for [topics](https://github.com/berkmancenter/mediacloud/blob/master/doc/api_2_0_spec/topics_api_2_0_spec.md) and for [admin](https://github.com/berkmancenter/mediacloud/blob/master/doc/api_2_0_spec/admin_api_2_0_spec.md)).
 
 ```python
-from minet.mediacloud import MediacloudClient
+from minet.mediacloud import MediacloudAPIClient
 
-client = MediacloudClient(token='MYAPIKEY')
+client = MediacloudAPIClient(token='MYAPIKEY')
 ```
 
 ### #.count

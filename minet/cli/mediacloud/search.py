@@ -7,7 +7,7 @@
 import csv
 
 from minet.cli.utils import LoadingBar
-from minet.mediacloud import MediacloudClient
+from minet.mediacloud import MediacloudAPIClient
 from minet.mediacloud.constants import MEDIACLOUD_STORIES_CSV_HEADER
 from minet.mediacloud.exceptions import MediacloudServerError
 
@@ -16,7 +16,7 @@ def mediacloud_search_action(namespace, output_file):
     writer = csv.writer(output_file)
     writer.writerow(MEDIACLOUD_STORIES_CSV_HEADER)
 
-    client = MediacloudClient(namespace.token)
+    client = MediacloudAPIClient(namespace.token)
 
     kwargs = {
         'collections': namespace.collections,

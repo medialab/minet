@@ -9,7 +9,7 @@ import casanova
 from tqdm import tqdm
 
 from minet.cli.utils import die
-from minet.mediacloud import MediacloudClient
+from minet.mediacloud import MediacloudAPIClient
 from minet.mediacloud.constants import (
     MEDIACLOUD_MEDIA_CSV_HEADER,
     MEDIACLOUD_FEED_CSV_HEADER
@@ -43,7 +43,7 @@ def mediacloud_medias_action(namespace, output_file):
         total=namespace.total
     )
 
-    client = MediacloudClient(namespace.token)
+    client = MediacloudAPIClient(namespace.token)
 
     for row, media_id in enricher.cells(namespace.column, with_rows=True):
 

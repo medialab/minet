@@ -16,7 +16,7 @@ from minet.mediacloud.formatters import (
 )
 
 
-class MediacloudClient(object):
+class MediacloudAPIClient(object):
     def __init__(self, token):
         self.token = token
         self.http = create_pool(timeout=MEDIACLOUD_DEFAULT_TIMEOUT)
