@@ -7,6 +7,7 @@
 
 YOUTUBE_API_BASE_URL = 'https://www.googleapis.com/youtube/v3'
 YOUTUBE_API_MAX_VIDEOS_PER_CALL = 50
+YOUTUBE_API_MAX_COMMENTS_PER_CALL = 100
 
 YOUTUBE_API_SEARCH_ORDERS = {
     'relevance',
@@ -36,4 +37,18 @@ YOUTUBE_VIDEO_CSV_HEADERS = YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS + [
     'comment_count',
     'duration',
     'has_caption'
+]
+
+# TODO: amend (dislike, reply -> count)
+YOUTUBE_COMMENT_CSV_HEADERS = [
+    'comment_id',
+    'author_name',
+    'author_channel_url',
+    'author_channel_id',
+    'text',
+    'like_count',
+    'published_at',
+    'updated_at',
+    'total_reply',
+    'parent_comment_id'
 ]
