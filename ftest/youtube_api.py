@@ -2,6 +2,7 @@ from itertools import islice
 from collections import Counter
 from minet.cli.utils import get_rcfile
 from minet.youtube import YouTubeAPIClient
+from minet.youtube.scrapers import get_caption_track_url
 
 config = get_rcfile()
 
@@ -23,14 +24,20 @@ client = YouTubeAPIClient(config['youtube']['key'])
 KROCK = 'DPzAvAlUJ24'
 SCILABUS = 'https://www.youtube.com/watch?v=ARAQUgkdIvQ'
 
-count = 0
-ids = Counter()
-for comment in client.comments(SCILABUS, full_replies=True):
-    print(comment)
-    count += 1
-    ids[comment.comment_id] += 1
+# count = 0
+# ids = Counter()
+# for comment in client.comments(SCILABUS, full_replies=True):
+#     print(comment)
+#     count += 1
+#     ids[comment.comment_id] += 1
 
-print('Found %i comments.' % count)
+# print('Found %i comments.' % count)
 
-if ids.most_common(1)[0][1] > 1:
-    print('Found duplicated ids')
+# if ids.most_common(1)[0][1] > 1:
+#     print('Found duplicated ids')
+
+# xB-puVmmlg4
+# eTiWhKcGpjw
+# JaS8W3HMKY8
+url = get_caption_track_url('JaS8W3HMKY8')
+print(url)
