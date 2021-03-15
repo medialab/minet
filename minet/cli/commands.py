@@ -653,11 +653,11 @@ MINET_COMMANDS = {
                     'arguments': [
                         {
                             'name': 'column',
-                            'help': 'This argument can either take the keyword on which we want to retrieve videos from the API or the name of the column containing that keyword'
+                            'help': 'This argument can either take the query on which we want to retrieve videos from the API or the name of the column containing that query'
                         },
                         {
                             'name': 'file',
-                            'help': 'CSV file containing the keyword for youtube Search.',
+                            'help': 'CSV file containing the query for youtube Search.',
                             'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
@@ -675,7 +675,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-l', '--limit'],
-                            'help': 'Maximum number of videos to retrieve.',
+                            'help': 'Maximum number of videos to retrieve per query.',
                             'type': int
                         },
                         {

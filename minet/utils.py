@@ -1031,9 +1031,7 @@ def namedrecord(name, fields, boolean=None, plural=None):
             return {fields[i]: v for i, v in enumerate(self)}
 
         def __repr__(self):
-            class_name = self.__class__.__name__
-
-            representation = '<' + class_name
+            representation = '<' + name
 
             for key, i in mapping.items():
                 v = super().__getitem__(i)

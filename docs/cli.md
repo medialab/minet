@@ -1223,15 +1223,15 @@ Youtube search
 Retrieve metadata about Youtube search field using the API.
 
 positional arguments:
-  column                                          This argument can either take the keyword on which we want to retrieve videos from the API or the name of the column containing that keyword
-  file                                            CSV file containing the keyword for youtube Search.
+  column                                          This argument can either take the query on which we want to retrieve videos from the API or the name of the column containing that query
+  file                                            CSV file containing the query for youtube Search.
 
 optional arguments:
   -h, --help                                      show this help message and exit
   -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
   -k KEY, --key KEY                               YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
-  -l LIMIT, --limit LIMIT                         Maximum number of videos to retrieve.
+  -l LIMIT, --limit LIMIT                         Maximum number of videos to retrieve per query.
   --order {date,rating,relevance,title,videoCount,viewCount}
                                                   Order in which videos are retrieved. The default one is relevance.
 
