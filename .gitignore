@@ -1,10 +1,12 @@
 .DS_Store
+.ipynb_checkpoints
 .minetrc
 .pytest_cache
 .python-version
 .vscode
 __pycache__
 build
+cookbook/notebooks/*.csv
 data
 dist
 ftest/content

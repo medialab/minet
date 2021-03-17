@@ -8,7 +8,13 @@ But learning a new tool is never an easy thing and this is why this cookbook tri
 
 ## Summary
 
+*Guides*
+
 * [Fetching a large amount of urls](./fetch.md)
 * [Joining 2 CSV files by urls](./url_join.md)
 * [Scraping DSL Tutorial](./scraping_dsl.md)
 * [Examples Compendium](./compendium.md)
+
+*Notebooks*
+
+* [Using minet from a Jupyter notebook](./notebooks/Minet%20in%20a%20Jupyter%20notebook.ipynb) (very useful to experiment with the tool or teach students)
