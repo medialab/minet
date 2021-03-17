@@ -17,4 +17,4 @@ But learning a new tool is never an easy thing and this is why this cookbook tri
 
 *Notebooks*
 
-* [Using minet from a Jupyter notebook](./notebooks/Minet%20in%20a%20Jupyter%20notebook.ipynb) (*very useful to experiment with the tool or teach students*)
+* [Using minet from a Jupyter notebook](./notebooks/Minet%20in%20a%20Jupyter%20notebook.html) (*very useful to experiment with the tool or teach students*)
