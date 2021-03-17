@@ -26,6 +26,8 @@ Note that if you are interested in the url cleaning, extraction and join methods
   * [#.count](#count)
   * [#.search](#mc-search)
   * [#.topic_stories](#topic_stories)
+* [TwitterAPIScraper](#twitterapiscraper)
+  * [#.search](#twitterscrapersearch)
 
 ## scrape
 
@@ -410,3 +412,29 @@ for story in client.topic_stories(4536):
 * **from_media_id** *?str*: return only stories linked from a media having this id.
 * **media_id** *?str*: return only stories coming from a media having this id.
 * **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
+
+## TwitterAPIScraper
+
+Scraper that can be used to collect tweets from Twitter's public facing search.
+
+To be able to compose complex queries and for more details about Twitter search operators, check out their advanced search widget [here](https://twitter.com/search-advanced?f=live).
+
+```python
+from minet.twitter import TwitterAPIScraper
+
+scraper = TwitterAPIScraper()
+```
+
+<h3 id="twitterscrapersearch">#.search</h3>
+
+Method yielding tweets matched by the given query.
+
+```python
+for tweet in scraper.search('from:medialab_ScPo'):
+  print(tweet)
+```
+
+*Arguments*
+
+* **query** *str*: the query to search.
+* **limit** *?int*: maximum number of tweets to retrieve.
