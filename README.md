@@ -95,10 +95,10 @@ pip uninstall minet
 
 To learn how to use **minet** and understand how it may fit your use cases, you should definitely check out our [Cookbook](./cookbook).
 
-## Usage
+## Documentation
 
-* [Using minet as a command line tool](./docs/cli.md)
-* [Using minet as a python library](./docs/lib.md)
+* [minet as a command line tool](./docs/cli.md)
+* [minet as a python library](./docs/lib.md)
 
 ## Contributing
 
