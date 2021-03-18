@@ -4,6 +4,7 @@
 * [Basic minet url-join usage](#basic-minet-url-join-usage)
 * [Keeping only certain columns from first file in final output](#keeping-only-certain-columns-from-first-file-in-final-output)
 * [What to do when entities are symbolized by multiple urls](#what-to-do-when-entities-are-symbolized-by-multiple-urls)
+* [How to do the same thing in python](#how-to-do-the-same-thing-in-python)
 * [The difficulty of joining files by urls](#the-difficulty-of-joining-files-by-urls)
 
 ## Use case
@@ -145,6 +146,36 @@ You can then use the `--separator` flag to do tell `minet` to consider the `pref
 ```bash
 minet url-join prefixes medias.csv url tweets.csv --separator " " > joined.csv
 ```
+
+## How to do the same thing in python
+
+To join two files based on url, `minet` uses its sister library [`ural`](https://github.com/medialab/ural) under the hood.
+
+The first thing you need to do is "index" your first file's lines in a [`LRUTrie`](https://github.com/medialab/ural#LRUTrie) or [`NormalizedLRUTrie`](https://github.com/medialab/ural#NormalizedLRUTrie), before using it to match the second file's lines like so:
+
+```python
+import csv
+from ural.lru import NormalizedLRUTrie
+
+# 1. Indexing our medias by url in a trie
+trie = NormalizedLRUTrie()
+
+with open('medias.csv') as f:
+  for line in csv.DictReader(f):
+    trie.set(line['homepage'], line)
+
+# 2. Matching our url shares
+with open('shares.csv') as f:
+  for line in csv.DictReader(f):
+    matched_line = trie.match(line['url'])
+
+    if matched_line is None:
+      print('Could not match %s' % line['url'])
+    else:
+      print('%s matched %s' % (line['url'], matched_line['media']))
+```
+
+Of course `minet` does a lot more things to handle some tricky cases and wrap this in a convenient package but the above logic remains the core of this whole operation.
 
 ---
 
