@@ -421,14 +421,14 @@ usage: minet url-join [-h] [-o OUTPUT] [-p MATCH_COLUMN_PREFIX] [-s SELECT]
 Minet Url Join Command
 ======================
 
-Join two CSV files by matching them on columns containing urls. In
-fact, the command will index the first file's urls into a
-hierchical trie before attempting to match the second file's ones.
+Join two CSV files by matching them on columns containing urls. It
+works by indexing the first file's urls in a specialized
+URL trie to match them with the second file's urls.
 
 positional arguments:
-  column1                                         Name of the url column in the first file.
-  file1                                           Path to the first file.
-  column2                                         Name of the url column in the second file.
+  column1                                         Name of the column containing urls in the indexed file.
+  file1                                           Path to the file to index.
+  column2                                         Name of the column containing urls in the second file.
   file2                                           Path to the second file.
 
 optional arguments:

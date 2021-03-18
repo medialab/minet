@@ -1679,9 +1679,9 @@ MINET_COMMANDS = {
         'action': 'url_join_action',
         'title': 'Minet Url Join Command',
         'description': '''
-            Join two CSV files by matching them on columns containing urls. In
-            fact, the command will index the first file's urls into a
-            hierchical trie before attempting to match the second file's ones.
+            Join two CSV files by matching them on columns containing urls. It
+            works by indexing the first file's urls in a specialized
+            URL trie to match them with the second file's urls.
         ''',
         'epilog': '''
             examples:
@@ -1695,16 +1695,16 @@ MINET_COMMANDS = {
         'arguments': [
             {
                 'name': 'column1',
-                'help': 'Name of the url column in the first file.'
+                'help': 'Name of the column containing urls in the indexed file.'
             },
             {
                 'name': 'file1',
-                'help': 'Path to the first file.',
+                'help': 'Path to the file to index.',
                 'type': FileType('r', encoding='utf-8')
             },
             {
                 'name': 'column2',
-                'help': 'Name of the url column in the second file.'
+                'help': 'Name of the column containing urls in the second file.'
             },
             {
                 'name': 'file2',
