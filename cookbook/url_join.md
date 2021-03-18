@@ -151,7 +151,7 @@ minet url-join prefixes medias.csv url tweets.csv --separator " " > joined.csv
 
 To join two files based on url, `minet` uses its sister library [`ural`](https://github.com/medialab/ural) under the hood.
 
-The first thing you need to do is "index" your first file's lines in a [`LRUTrie`](https://github.com/medialab/ural#LRUTrie) or [`NormalizedLRUTrie`](https://github.com/medialab/ural#NormalizedLRUTrie), before using it to match the second file's lines like so:
+The first thing you need to do is to index your first file's lines in a [`LRUTrie`](https://github.com/medialab/ural#LRUTrie) or [`NormalizedLRUTrie`](https://github.com/medialab/ural#NormalizedLRUTrie), before using it to match the second file's lines like so:
 
 ```python
 import csv
