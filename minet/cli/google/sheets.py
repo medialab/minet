@@ -14,7 +14,7 @@ from minet.cli.utils import die, open_output_file
 def google_sheets_action(namespace):
     output_file = open_output_file(namespace.output)
 
-    if is_url:
+    if is_url(namespace.url):
         drive_id = extract_id_from_google_drive_url(namespace.url)
     else:
         drive_id = namespace.url
