@@ -852,7 +852,7 @@ MINET_COMMANDS = {
                 'sheets': {
                     'title': 'Minet Google Sheets Command',
                     'description': '''
-                        Export the given google spreadsheet as a CSV file from
+                        Grab the given google spreadsheet as a CSV file from
                         its url or id.
                     ''',
                     'epilog': '''
@@ -871,6 +871,10 @@ MINET_COMMANDS = {
                             'help': 'Browser from which to extract a google drive cookie (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".',
                             'default': 'firefox'
                         },
+                        {
+                            'flags': ['-o', '--output'],
+                            'help': 'Path to the output file. By default, the report will be printed to stdout.'
+                        }
                     ]
                 }
             }

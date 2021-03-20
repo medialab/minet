@@ -865,12 +865,12 @@ actions:
 <h3 id="google-sheets">sheets</h3>
 
 ```
-usage: minet google sheets [-h] [-c COOKIE] url
+usage: minet google sheets [-h] [-c COOKIE] [-o OUTPUT] url
 
 Minet Google Sheets Command
 ===========================
 
-Export the given google spreadsheet as a CSV file from
+Grab the given google spreadsheet as a CSV file from
 its url or id.
 
 positional arguments:
@@ -879,6 +879,7 @@ positional arguments:
 optional arguments:
   -h, --help                  show this help message and exit
   -c COOKIE, --cookie COOKIE  Browser from which to extract a google drive cookie (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the report will be printed to stdout.
 
 examples:
 
