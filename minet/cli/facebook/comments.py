@@ -33,9 +33,7 @@ def facebook_comments_action(namespace):
     except FacebookInvalidCookieError:
         if namespace.cookie in COOKIE_BROWSERS:
             die([
-                'Could not extract relevant cookie from "%s".' % namespace.cookie,
-                'Note that on Firefox, your Facebook cookie cannot be grabbed if you are',
-                'using the "Facebook Container" extension by Mozilla, sorry :('
+                'Could not extract relevant cookie from "%s".' % namespace.cookie
             ])
 
         die([
