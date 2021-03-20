@@ -32,6 +32,8 @@
 * [facebook (fb)](#facebook)
   * [comments](#facebook-comments)
   * [url-likes](#facebook-url-likes)
+* [google](#google)
+  * [sheets](#google-sheets)
 * [hyphe](#hyphe)
   * [dump](#dump)
 * [mediacloud (mc)](#mediacloud)
@@ -839,6 +841,49 @@ optional arguments:
 
 example:
 . `minet fb url-likes url url.csv > url_likes.csv`
+
+```
+
+## Google
+
+```
+usage: minet google [-h] {sheets} ...
+
+Minet Google Command
+====================
+
+Commands related to Google and Google Drive.
+
+optional arguments:
+  -h, --help  show this help message and exit
+
+actions:
+  {sheets}    Action to perform.
+
+```
+
+<h3 id="google-sheets">sheets</h3>
+
+```
+usage: minet google sheets [-h] [-c COOKIE] url
+
+Minet Google Sheets Command
+===========================
+
+Export the given google spreadsheet as a CSV file from
+its url or id.
+
+positional arguments:
+  url                         Url or id of the spreadsheet to export.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -c COOKIE, --cookie COOKIE  Browser from which to extract a google drive cookie (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".
+
+examples:
+
+. Exporting from the spreadsheet id:
+    `minet google sheets 1QXQ1yaNYrVUlMt6LQ4jrLGt_PvZI9goozYiBTgaC4RI > file.csv`
 
 ```
 

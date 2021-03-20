@@ -32,6 +32,8 @@
 * [facebook (fb)](#facebook)
   * [comments](#facebook-comments)
   * [url-likes](#facebook-url-likes)
+* [google](#google)
+  * [sheets](#google-sheets)
 * [hyphe](#hyphe)
   * [dump](#dump)
 * [mediacloud (mc)](#mediacloud)
@@ -189,6 +191,14 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 <h3 id="facebook-url-likes">url-likes</h3>
 
 <% fb/url-likes %>
+
+## Google
+
+<% google %>
+
+<h3 id="google-sheets">sheets</h3>
+
+<% google/sheets %>
 
 ## Hyphe
 

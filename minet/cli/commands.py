@@ -523,179 +523,6 @@ MINET_COMMANDS = {
         }
     },
 
-    # Youtube action subparser
-    # --------------------------------------------------------------------------
-    'youtube': {
-        'package': 'minet.cli.youtube',
-        'action': 'youtube_action',
-        'aliases': ['yt'],
-        'title': 'Minet Youtube command',
-        'description': '''
-            Gather data from Youtube.
-        ''',
-        'subparsers': {
-            'help': 'Actions to perform on Youtube.',
-            'title': 'actions',
-            'dest': 'yt_action',
-            'common_arguments': [
-                {
-                    'flags': ['-o', '--output'],
-                    'help': 'Path to the output report file. By default, the report will be printed to stdout.'
-                }
-            ],
-            'commands': {
-                'captions': {
-                    'title': 'Youtube captions',
-                    'description': 'Retrieve captions for the given YouTube videos.',
-                    'epilog': '''
-                        examples:
-
-                        . Fetching captions for a list of videos:
-                            `minet yt captions video_id videos.csv > captions.csv`
-
-                        . Fetching French captions with a fallback to English:
-                            `minet yt captions video_id videos.csv --lang fr,en > captions.csv`
-                    ''',
-                    'arguments': [
-                        {
-                            'name': 'column',
-                            'help': 'Name of the column containing the video urls or ids.'
-                        },
-                        {
-                            'name': 'file',
-                            'help': 'CSV file containing the Youtube video urls or ids.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
-                        },
-                        {
-                            'flags': ['-s', '--select'],
-                            'help': 'Columns of input CSV file to include in the output (separated by `,`).'
-                        },
-                        {
-                            'flag': '--lang',
-                            'help': 'Language (ISO code like "en") of captions to retrieve. You can specify several languages by preferred order separated by commas. Defaults to "en".',
-                            'default': ['en'],
-                            'type': SplitterType()
-                        },
-                    ]
-                },
-                'comments': {
-                    'title': 'Youtube comments',
-                    'description': 'Retrieve metadata about Youtube comments using the API.',
-                    'epilog': '''
-                        example:
-
-                        . Fetching a video's comments:
-                            `minet yt comments https://www.youtube.com/watch?v=7JTb2vf1OQQ -k my-api-key > comments.csv`
-                    ''',
-                    'arguments': [
-                        {
-                            'name': 'column',
-                            'help': 'This argument can either take the name of the column containing the video\'s id/url if a file is passed as an argument, or a single youtube video\'s id/url if there is no file '
-                        },
-                        {
-                            'name': 'file',
-                            'help': 'CSV file containing the Youtube videos ids.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
-                        },
-                        {
-                            'flags': ['-k', '--key'],
-                            'help': 'YouTube API Data dashboard API key.',
-                            'rc_key': ['youtube', 'key'],
-                            'action': ConfigAction
-                        },
-                        {
-                            'flags': ['-s', '--select'],
-                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
-                            'type': SplitterType()
-                        }
-                    ]
-                },
-                'videos': {
-                    'title': 'Youtube videos',
-                    'description': 'Retrieve metadata about Youtube videos using the API.',
-                    'arguments': [
-                        {
-                            'name': 'column',
-                            'help': 'Name of the column containing the video\'s urls or ids.'
-                        },
-                        {
-                            'name': 'file',
-                            'help': 'CSV file containing the Youtube videos urls or ids.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
-                        },
-                        {
-                            'flags': ['-k', '--key'],
-                            'help': 'YouTube API Data dashboard API key.',
-                            'rc_key': ['youtube', 'key'],
-                            'action': ConfigAction
-                        },
-                        {
-                            'flags': ['-s', '--select'],
-                            'help': 'Columns of input CSV file to include in the output (separated by `,`).'
-                        },
-                        {
-                            'flag': '--total',
-                            'help': 'Total number of videos. Necessary if you want to display a finite progress indicator.',
-                            'type': int
-                        }
-                    ]
-                },
-                'search': {
-                    'title': 'Youtube search',
-                    'description': 'Retrieve metadata about Youtube search field using the API.',
-                    'epilog': '''
-                        example:
-
-                        . Searching videos about birds:
-                            `minet youtube search bird -k my-api-key > bird_videos.csv`
-                    ''',
-                    'arguments': [
-                        {
-                            'name': 'column',
-                            'help': 'This argument can either take the query on which we want to retrieve videos from the API or the name of the column containing that query'
-                        },
-                        {
-                            'name': 'file',
-                            'help': 'CSV file containing the query for youtube Search.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
-                        },
-                        {
-                            'flags': ['-k', '--key'],
-                            'help': 'YouTube API Data dashboard API key.',
-                            'rc_key': ['youtube', 'key'],
-                            'action': ConfigAction
-                        },
-                        {
-                            'flags': ['-s', '--select'],
-                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
-                            'type': SplitterType()
-                        },
-                        {
-                            'flags': ['-l', '--limit'],
-                            'help': 'Maximum number of videos to retrieve per query.',
-                            'type': int
-                        },
-                        {
-                            'flags': ['--order'],
-                            'help': 'Order in which videos are retrieved. The default one is relevance.',
-                            'default': YOUTUBE_API_DEFAULT_SEARCH_ORDER,
-                            'choices': YOUTUBE_API_SEARCH_ORDERS
-                        }
-                    ]
-                }
-
-            }
-        }
-    },
-
     # Extract action subparser
     # -------------------------------------------------------------------------
     'extract': {
@@ -1006,6 +833,48 @@ MINET_COMMANDS = {
                 'action': 'store_true'
             }
         ]
+    },
+
+    # Google action subparser
+    # --------------------------------------------------------------------------
+    'google': {
+        'package': 'minet.cli.google',
+        'action': 'google_action',
+        'title': 'Minet Google Command',
+        'description': '''
+            Commands related to Google and Google Drive.
+        ''',
+        'subparsers': {
+            'help': 'Action to perform.',
+            'title': 'actions',
+            'dest': 'google_action',
+            'commands': {
+                'sheets': {
+                    'title': 'Minet Google Sheets Command',
+                    'description': '''
+                        Export the given google spreadsheet as a CSV file from
+                        its url or id.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Exporting from the spreadsheet id:
+                            `minet google sheets 1QXQ1yaNYrVUlMt6LQ4jrLGt_PvZI9goozYiBTgaC4RI > file.csv`
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'url',
+                            'help': 'Url or id of the spreadsheet to export.'
+                        },
+                        {
+                            'flags': ['-c', '--cookie'],
+                            'help': 'Browser from which to extract a google drive cookie (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".',
+                            'default': 'firefox'
+                        },
+                    ]
+                }
+            }
+        }
     },
 
     # Hyphe action subparser
@@ -1807,5 +1676,178 @@ MINET_COMMANDS = {
                 'action': 'store_true'
             }
         ]
+    },
+
+    # Youtube action subparser
+    # --------------------------------------------------------------------------
+    'youtube': {
+        'package': 'minet.cli.youtube',
+        'action': 'youtube_action',
+        'aliases': ['yt'],
+        'title': 'Minet Youtube command',
+        'description': '''
+            Gather data from Youtube.
+        ''',
+        'subparsers': {
+            'help': 'Actions to perform on Youtube.',
+            'title': 'actions',
+            'dest': 'yt_action',
+            'common_arguments': [
+                {
+                    'flags': ['-o', '--output'],
+                    'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+                }
+            ],
+            'commands': {
+                'captions': {
+                    'title': 'Youtube captions',
+                    'description': 'Retrieve captions for the given YouTube videos.',
+                    'epilog': '''
+                        examples:
+
+                        . Fetching captions for a list of videos:
+                            `minet yt captions video_id videos.csv > captions.csv`
+
+                        . Fetching French captions with a fallback to English:
+                            `minet yt captions video_id videos.csv --lang fr,en > captions.csv`
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the video urls or ids.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the Youtube video urls or ids.',
+                            'type': FileType('r', encoding='utf-8'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).'
+                        },
+                        {
+                            'flag': '--lang',
+                            'help': 'Language (ISO code like "en") of captions to retrieve. You can specify several languages by preferred order separated by commas. Defaults to "en".',
+                            'default': ['en'],
+                            'type': SplitterType()
+                        },
+                    ]
+                },
+                'comments': {
+                    'title': 'Youtube comments',
+                    'description': 'Retrieve metadata about Youtube comments using the API.',
+                    'epilog': '''
+                        example:
+
+                        . Fetching a video's comments:
+                            `minet yt comments https://www.youtube.com/watch?v=7JTb2vf1OQQ -k my-api-key > comments.csv`
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'This argument can either take the name of the column containing the video\'s id/url if a file is passed as an argument, or a single youtube video\'s id/url if there is no file '
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the Youtube videos ids.',
+                            'type': FileType('r', encoding='utf-8'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-k', '--key'],
+                            'help': 'YouTube API Data dashboard API key.',
+                            'rc_key': ['youtube', 'key'],
+                            'action': ConfigAction
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
+                        }
+                    ]
+                },
+                'videos': {
+                    'title': 'Youtube videos',
+                    'description': 'Retrieve metadata about Youtube videos using the API.',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the video\'s urls or ids.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the Youtube videos urls or ids.',
+                            'type': FileType('r', encoding='utf-8'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-k', '--key'],
+                            'help': 'YouTube API Data dashboard API key.',
+                            'rc_key': ['youtube', 'key'],
+                            'action': ConfigAction
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).'
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of videos. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
+                },
+                'search': {
+                    'title': 'Youtube search',
+                    'description': 'Retrieve metadata about Youtube search field using the API.',
+                    'epilog': '''
+                        example:
+
+                        . Searching videos about birds:
+                            `minet youtube search bird -k my-api-key > bird_videos.csv`
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'This argument can either take the query on which we want to retrieve videos from the API or the name of the column containing that query'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the query for youtube Search.',
+                            'type': FileType('r', encoding='utf-8'),
+                            'default': sys.stdin,
+                            'nargs': '?'
+                        },
+                        {
+                            'flags': ['-k', '--key'],
+                            'help': 'YouTube API Data dashboard API key.',
+                            'rc_key': ['youtube', 'key'],
+                            'action': ConfigAction
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flags': ['-l', '--limit'],
+                            'help': 'Maximum number of videos to retrieve per query.',
+                            'type': int
+                        },
+                        {
+                            'flags': ['--order'],
+                            'help': 'Order in which videos are retrieved. The default one is relevance.',
+                            'default': YOUTUBE_API_DEFAULT_SEARCH_ORDER,
+                            'choices': YOUTUBE_API_SEARCH_ORDERS
+                        }
+                    ]
+                }
+
+            }
+        }
     }
 }
