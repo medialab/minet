@@ -274,8 +274,4 @@ def interpret_scraper(scraper, element, root=None, html=None, context=None):
 
             acc.append(value)
 
-    # NOTE: this opens a way for reducers
-    if not single_value and 'join' in scraper:
-        acc = scraper['join'].join(acc)
-
     return acc

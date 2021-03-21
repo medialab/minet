@@ -267,29 +267,6 @@ class TestScrape(object):
 
         assert result == [{'id': 'li1'}, {'id': 'li3'}]
 
-    def test_join(self):
-        result = scrape({
-            'iterator': 'td',
-            'join': '|'
-        }, TABLE_TH_HTML)
-
-        assert result == 'John|Mayall|Mary|Susan'
-
-        result = scrape({
-            'iterator': 'tbody > tr',
-            'fields': {
-                'name': {
-                    'sel': 'td'
-                },
-                'joined': {
-                    'iterator': 'td',
-                    'join': '|'
-                }
-            }
-        }, TABLE_TH_HTML)
-
-        assert result == [{'name': 'John', 'joined': 'John|Mayall'}, {'name': 'Mary', 'joined': 'Mary|Susan'}]
-
     def test_recursive(self):
         result = scrape({
             'iterator': 'li',
