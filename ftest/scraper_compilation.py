@@ -113,3 +113,53 @@ test({
         }
     }
 }, RECURSIVE_HTML)
+
+# from timeit import default_timer as timer
+
+# class Timer(object):
+#     def __init__(self, name='Timer'):
+#         self.name = name
+
+#     def __enter__(self):
+#         self.start = timer()
+
+#     def __exit__(self, *args):
+#         self.end = timer()
+#         self.duration = self.end - self.start
+#         print('%s:' % self.name, self.duration)
+
+# RECURSIVE_SCRAPER_DEFINITION = {
+#     'iterator': 'div',
+#     'fields': {
+#         'align': 'align',
+#         'items': {
+#             'iterator': 'ul',
+#             'fields': {
+#                 'id': 'id',
+#                 'items': {
+#                     'iterator': 'li',
+#                     'fields': {
+#                         'text': 'text',
+#                         'color': 'color'
+#                     }
+#                 }
+#             }
+#         }
+#     }
+# }
+
+# N = 10_000
+
+# with Timer('runtime'):
+#     scraper = Scraper(RECURSIVE_SCRAPER_DEFINITION)
+#     soup = BeautifulSoup(RECURSIVE_HTML, 'lxml')
+
+#     for _ in range(N):
+#         scraper(soup)
+
+# with Timer('compilation'):
+#     scraper = compile_scraper(RECURSIVE_SCRAPER_DEFINITION)
+#     soup = BeautifulSoup(RECURSIVE_HTML, 'lxml')
+
+#     for _ in range(N):
+#         scraper(soup)
