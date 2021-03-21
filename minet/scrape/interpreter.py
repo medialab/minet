@@ -46,26 +46,30 @@ def extract(element, extractor_name):
     raise TypeError('Unknown "%s" extractor' % extractor_name)
 
 
+EVAL_CONTEXT = {
+
+    # Dependencies
+    'json': json,
+    'urljoin': urljoin,
+    're': re,
+}
+
+
+# NOTE: this is not threadsafe, but it does not have to be
 def eval_expression(expression, element=None, elements=None, value=None,
                     context=None, html=None, root=None):
 
-    return eval(expression, None, {
+    # Local variables
+    EVAL_CONTEXT['element'] = element
+    EVAL_CONTEXT['elements'] = elements
+    EVAL_CONTEXT['value'] = value
 
-        # Dependencies
-        'json': json,
-        'urljoin': urljoin,
-        're': re,
+    # Context
+    EVAL_CONTEXT['context'] = context
+    EVAL_CONTEXT['html'] = html
+    EVAL_CONTEXT['root'] = root
 
-        # Local values
-        'element': element,
-        'elements': elements,
-        'value': value,
-
-        # Context
-        'context': context or DEFAULT_CONTEXT,
-        'html': html,
-        'root': root
-    })
+    return eval(expression, None, EVAL_CONTEXT)
 
 
 def tabulate(element, headers_inference='th', headers=None):
