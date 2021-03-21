@@ -13,7 +13,6 @@ from urllib.parse import urljoin
 from minet.utils import PseudoFStringFormatter, nested_get
 from minet.scrape.constants import EXTRACTOR_NAMES
 
-FORMATTER = PseudoFStringFormatter()
 DEFAULT_CONTEXT = {}
 
 
@@ -202,14 +201,6 @@ def interpret_scraper(scraper, element, root=None, html=None, context=None):
 
                     # Default value is text
                     value = extract(element, 'text')
-
-                # Format?
-                if 'format' in scraper:
-                    value = FORMATTER.format(
-                        scraper['format'],
-                        value=value,
-                        context=context
-                    )
 
                 # Eval?
                 if 'eval' in scraper:
