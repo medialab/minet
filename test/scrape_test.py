@@ -492,3 +492,16 @@ class TestScrape(object):
         item = scrape({}, BASIC_HTML)
 
         assert item == 'One\nTwo'
+
+    def test_dumb_recursive(self):
+        item = scrape({
+            'sel': 'ul',
+            'item': {
+                'sel': 'li',
+                'item': {
+                    'sel': 'span'
+                }
+            }
+        }, NESTED_HTML)
+
+        assert item == 'One'
