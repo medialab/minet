@@ -1,7 +1,7 @@
 from pprint import pprint
 from bs4 import BeautifulSoup
 from minet import Scraper
-from minet.scrape.compilation import compile_scraper
+from minet.scrape.compiler import compile_scraper
 
 BASIC_HTML = """
     <ul>

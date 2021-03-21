@@ -7,19 +7,14 @@
 #
 import re
 import json
+import soupsieve
 from urllib.parse import urljoin
 
 from minet.utils import PseudoFStringFormatter, nested_get
+from minet.scrape.constants import EXTRACTOR_NAMES
 
 FORMATTER = PseudoFStringFormatter()
 DEFAULT_CONTEXT = {}
-EXTRACTOR_NAMES = set(['text', 'html', 'inner_html', 'outer_html'])
-
-TRANSFORMERS = {
-    'lower': lambda x: x.lower(),
-    'strip': lambda x: x.strip(),
-    'upper': lambda x: x.upper()
-}
 
 
 def get_aliases(o, aliases):
@@ -74,21 +69,6 @@ def eval_expression(expression, element=None, elements=None, value=None,
     })
 
 
-def apply_transform_chain(chain, value):
-    if not isinstance(chain, list):
-        chain = [chain]
-
-    for transform in chain:
-        fn = TRANSFORMERS.get(transform)
-
-        if fn is None:
-            raise TypeError('Unknown "%s" transformer' % transform)
-
-        value = fn(value)
-
-    return value
-
-
 def tabulate(element, headers_inference='th', headers=None):
     body = element.find('tbody', recursive=False)
     head = element.find('thead', recursive=False)
@@ -110,7 +90,7 @@ def tabulate(element, headers_inference='th', headers=None):
         yield {headers[i]: td.get_text() for i, td in enumerate(tr.find_all('td', recursive=False))}
 
 
-def apply_scraper(scraper, element, root=None, html=None, context=None):
+def interpret_scraper(scraper, element, root=None, html=None, context=None):
 
     # Is this a tail call of item?
     if isinstance(scraper, str):
@@ -124,7 +104,7 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
 
     # First we need to solve local selection
     if sel is not None:
-        element = element.select_one(sel)
+        element = soupsieve.select_one(sel, element)
     elif 'sel_eval' in scraper:
 
         # TODO: validate
@@ -144,7 +124,7 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
     single_value = True
 
     if iterator is not None:
-        elements = element.select(iterator)
+        elements = soupsieve.select(iterator, element)
         single_value = False
     elif 'iterator_eval' in scraper:
         elements = eval_expression(
@@ -164,7 +144,7 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
         local_context = {}
 
         for k, field_scraper in scraper['context'].items():
-            local_context[k] = apply_scraper(
+            local_context[k] = interpret_scraper(
                 field_scraper,
                 element,
                 root=root,
@@ -187,7 +167,7 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
             value = {}
 
             for k, field_scraper in scraper['fields'].items():
-                value[k] = apply_scraper(
+                value[k] = interpret_scraper(
                     field_scraper,
                     element,
                     root=root,
@@ -199,7 +179,7 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
         elif 'item' in scraper:
 
             # Default value is text
-            value = apply_scraper(
+            value = interpret_scraper(
                 scraper['item'],
                 element,
                 root=root,
@@ -244,10 +224,6 @@ def apply_scraper(scraper, element, root=None, html=None, context=None):
                     )
             except:
                 value = None
-
-        # Transform
-        if 'transform' in scraper and value is not None:
-            value = apply_transform_chain(scraper['transform'], value)
 
         # Default value?
         if 'default' in scraper and value is None:

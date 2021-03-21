@@ -7,7 +7,7 @@
 from bs4 import BeautifulSoup
 
 from minet.utils import load_definition
-from minet.scrape.apply import apply_scraper, tabulate
+from minet.scrape.interpreter import interpret_scraper, tabulate
 
 
 def scrape(scraper, html, engine='lxml', context=None):
@@ -18,7 +18,7 @@ def scrape(scraper, html, engine='lxml', context=None):
     else:
         soup = html
 
-    return apply_scraper(
+    return interpret_scraper(
         scraper,
         soup,
         root=soup,

@@ -320,27 +320,6 @@ class TestScrape(object):
 
         assert result == [['li'], ['li'], ['first'], ['second'], ['first'], ['second']]
 
-    def test_transform(self):
-        result = scrape({
-            'iterator': 'li',
-            'item': {
-                'extract': 'text',
-                'transform': 'upper'
-            }
-        }, BASIC_HTML)
-
-        assert result == ['ONE', 'TWO']
-
-        result = scrape({
-            'iterator': 'li',
-            'item': {
-                'extract': 'text',
-                'transform': ['upper', 'lower']
-            }
-        }, BASIC_HTML)
-
-        assert result == ['one', 'two']
-
     def test_eval(self):
         result = scrape({
             'iterator': 'li',
