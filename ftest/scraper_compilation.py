@@ -12,24 +12,24 @@ BASIC_HTML = """
 
 RECURSIVE_HTML = """
     <main>
-        <div>
+        <div align="left">
             <ul id="fruits">
                 <li color="red">Apple</li>
                 <li color="orange">Orange</li>
             </ul>
             <ul id="days">
-                <li color="red">Monday</li>
-                <li color="red">Saturday</li>
+                <li color="yellow">Monday</li>
+                <li color="blue">Saturday</li>
             </ul>
         </div>
-        <div>
+        <div align="right">
             <ul id="names">
-                <li color="red">John</li>
-                <li color="red">Mary</li>
+                <li color="brown">John</li>
+                <li color="cyan">Mary</li>
             </ul>
             <ul id="animals">
-                <li color="red">Dog</li>
-                <li color="red">Cat</li>
+                <li color="gray">Dog</li>
+                <li color="black">Cat</li>
             </ul>
         </div>
     </main>
@@ -88,6 +88,26 @@ test({
                 'fields': {
                     'text': 'text',
                     'color': 'color'
+                }
+            }
+        }
+    }
+}, RECURSIVE_HTML)
+
+test({
+    'iterator': 'div',
+    'fields': {
+        'align': 'align',
+        'items': {
+            'iterator': 'ul',
+            'fields': {
+                'id': 'id',
+                'items': {
+                    'iterator': 'li',
+                    'fields': {
+                        'text': 'text',
+                        'color': 'color'
+                    }
                 }
             }
         }

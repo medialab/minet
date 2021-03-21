@@ -4,10 +4,20 @@
 #
 # Schemes related to scraper definition "compilation".
 #
+import re
 import itertools
 from io import StringIO
 
 from minet.scrape.constants import EXTRACTOR_NAMES
+
+
+def escape_string_as_literal(string):
+    double_quotes = string.count('"')
+    single_quotes = string.count('\'')
+
+    quote = '"' if single_quotes > double_quotes else '\''
+
+    return quote + string.replace(quote, '\\' + quote) + quote
 
 
 class CompilerContext(object):
@@ -61,7 +71,7 @@ class CompilerContext(object):
         if self.parent.container_type == 'list':
             self.print('value_{parent}.append(%s)' % expr, **kwargs)
         elif self.parent.container_type == 'dict':
-            self.print('value_{parent}["""%s"""] = %s' % (self.parent.container_key, expr), **kwargs)
+            self.print('value_{parent}[%s] = %s' % (escape_string_as_literal(self.parent.container_key), expr), **kwargs)
         else:
             self.print('value_{parent} = %s' % expr, **kwargs)
 
@@ -74,8 +84,6 @@ class FieldsNode(object):
         return self.definition
 
 
-# TODO: escape strings to make them literals or access them through scope?
-# https://github.com/cvbge/vscode-escape-string/blob/master/src/extension.ts
 def compile_scraper(definition, as_string=False):
     output = StringIO()
 
@@ -107,7 +115,7 @@ def compile_scraper(definition, as_string=False):
 
         # Attribute
         if isinstance(node, str):
-            context.yield_to_parent('element_{id}.get("""{attr}""")', attr=node)
+            context.yield_to_parent('element_{id}.get({attr})', attr=escape_string_as_literal(node))
             return
 
         # Fields
@@ -131,7 +139,7 @@ def compile_scraper(definition, as_string=False):
         if 'iterator' in node:
             context.container_type = 'list'
 
-            context.print('elements_{id} = element_{id}.select("""{selector}""")', selector=node['iterator'])
+            context.print('elements_{id} = element_{id}.select({selector})', selector=escape_string_as_literal(node['iterator']))
             context.print('value_{id} = []')
 
             context.print('for element_{next} in elements_{id}:')
