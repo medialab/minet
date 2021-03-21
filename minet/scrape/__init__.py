@@ -10,19 +10,23 @@ from minet.utils import load_definition
 from minet.scrape.interpreter import interpret_scraper, tabulate
 
 
-def scrape(scraper, html, engine='lxml', context=None):
-    is_already_soup = isinstance(html, BeautifulSoup)
+def ensure_soup(html_or_soup, engine='lxml'):
+    is_already_soup = isinstance(html_or_soup, BeautifulSoup)
 
     if not is_already_soup:
-        soup = BeautifulSoup(html, engine)
-    else:
-        soup = html
+        return BeautifulSoup(html_or_soup, engine)
+
+    return html_or_soup
+
+
+def scrape(scraper, html, engine='lxml', context=None):
+    soup = ensure_soup(html)
 
     return interpret_scraper(
         scraper,
         soup,
         root=soup,
-        html=str(soup) if is_already_soup else html,
+        html=None if soup is html else html,
         context=context
     )
 
