@@ -4,8 +4,8 @@
 #
 # Schemes related to scraper definition "compilation".
 #
-import re
 import itertools
+import soupsieve
 from io import StringIO
 
 from minet.scrape.constants import EXTRACTOR_NAMES
@@ -97,7 +97,9 @@ def compile_scraper(definition, as_string=False):
 
         print(string, file=output)
 
-    scope = {}
+    scope = {
+        'soupsieve': soupsieve
+    }
 
     printer('def scrape(root, context={}):')
     printer('  value_0 = None')
@@ -139,7 +141,7 @@ def compile_scraper(definition, as_string=False):
         if 'iterator' in node:
             context.container_type = 'list'
 
-            context.print('elements_{id} = element_{id}.select({selector})', selector=escape_string_as_literal(node['iterator']))
+            context.print('elements_{id} = soupsieve.select({selector}, element_{id})', selector=escape_string_as_literal(node['iterator']))
             context.print('value_{id} = []')
 
             context.print('for element_{next} in elements_{id}:')
