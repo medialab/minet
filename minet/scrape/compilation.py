@@ -10,10 +10,6 @@ from io import StringIO
 from minet.scrape.constants import EXTRACTOR_NAMES
 
 
-def keys_to_literal_list(keys):
-    return '[' + ', '.join('"""%s"""' % k for k in keys) + ']'
-
-
 class CompilerContext(object):
     def __init__(self, printer, counter=None, level=0, var='root', container='main_value',
                  parent=None):
@@ -48,8 +44,6 @@ class CompilerContext(object):
             container='value_%i' % self.identifier,
             parent=self
         )
-
-        context.identifier = self.identifier
 
         return context
 
@@ -125,7 +119,9 @@ def compile_scraper(definition, as_string=False):
 
             for k, spec in fields.items():
                 context.container_key = k
-                recurse(spec, context.linger())
+                next_context = context.linger()
+                context.print('element_{target} = element_{id}', target=next_context.identifier)
+                recurse(spec, next_context)
 
             context.yield_to_parent('value_{id}')
 

@@ -1,6 +1,7 @@
+from pprint import pprint
 from bs4 import BeautifulSoup
 from minet import Scraper
-from minet.scrape.compilation import compile_scraper, keys_to_literal_list
+from minet.scrape.compilation import compile_scraper
 
 BASIC_HTML = """
     <ul>
@@ -49,7 +50,7 @@ def test(definition, target):
 
     print('Output:')
     print('-------')
-    print(scraper(soup))
+    pprint(scraper(soup))
     print()
     print()
 
@@ -75,3 +76,20 @@ test({
         'text': 'text'
     }
 }, BASIC_HTML)
+
+test({
+    'iterator': 'div',
+    'item': {
+        'iterator': 'ul',
+        'fields': {
+            'id': 'id',
+            'items': {
+                'iterator': 'li',
+                'fields': {
+                    'text': 'text',
+                    'color': 'color'
+                }
+            }
+        }
+    }
+}, RECURSIVE_HTML)
