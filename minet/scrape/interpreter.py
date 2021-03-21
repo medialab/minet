@@ -10,7 +10,7 @@ import json
 import soupsieve
 from urllib.parse import urljoin
 
-from minet.utils import PseudoFStringFormatter, nested_get
+from minet.utils import nested_get
 from minet.scrape.constants import EXTRACTOR_NAMES
 
 DEFAULT_CONTEXT = {}
@@ -139,10 +139,10 @@ def interpret_scraper(scraper, element, root=None, html=None, context=None):
         elements = [element]
 
     # Handling local context
-    if 'context' in scraper:
+    if 'set_context' in scraper:
         local_context = {}
 
-        for k, field_scraper in scraper['context'].items():
+        for k, field_scraper in scraper['set_context'].items():
             local_context[k] = interpret_scraper(
                 field_scraper,
                 element,
@@ -193,8 +193,8 @@ def interpret_scraper(scraper, element, root=None, html=None, context=None):
                     value = element.get(scraper['attr'])
                 elif 'extract' in scraper:
                     value = extract(element, scraper['extract'])
-                elif 'get' in scraper:
-                    value = nested_get(scraper['get'], context)
+                elif 'get_context' in scraper:
+                    value = nested_get(scraper['get_context'], context)
                 elif 'default' in scraper:
                     value = scraper['default']
                 else:

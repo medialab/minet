@@ -332,7 +332,7 @@ class TestScrape(object):
                     'method': 'text'
                 },
                 'context': {
-                    'get': 'value'
+                    'get_context': 'value'
                 }
             }
         }, BASIC_HTML, context={'value': 1})
@@ -343,7 +343,7 @@ class TestScrape(object):
         ]
 
         result = scrape({
-            'context': {
+            'set_context': {
                 'divid': {
                     '$': '#ok',
                     'attr': 'id'
@@ -352,7 +352,7 @@ class TestScrape(object):
             'iterator': 'li',
             'fields': {
                 'context': {
-                    'get': 'divid'
+                    'get_context': 'divid'
                 },
                 'value': 'text'
             }
@@ -361,7 +361,7 @@ class TestScrape(object):
         assert result == [{'context': 'ok', 'value': 'One'}, {'context': 'ok', 'value': 'Two'}]
 
         result = scrape({
-            'context': {
+            'set_context': {
                 'title': {
                     'default': 'Scrape'
                 }
@@ -369,18 +369,18 @@ class TestScrape(object):
             'iterator': 'li',
             'fields': {
                 'local': {
-                    'context': {
+                    'set_context': {
                         'divid': {
                             'eval': 'root.select_one("#ok").get("id")'
                         }
                     },
-                    'get': 'divid'
+                    'get_context': 'divid'
                 },
                 'global': {
-                    'get': 'divid'
+                    'get_context': 'divid'
                 },
                 'title': {
-                    'get': 'title'
+                    'get_context': 'title'
                 }
             }
         }, META_HTML, context={'divid': 'notok'})

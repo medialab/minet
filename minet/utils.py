@@ -869,14 +869,6 @@ class PseudoFStringFormatter(string.Formatter):
         return result, None
 
 
-def fstring_eval(template, **kwargs):
-    return eval(
-        'f"""%s"""' % template,
-        None,
-        kwargs
-    )
-
-
 def load_definition(f, encoding='utf-8'):
     string_path = isinstance(f, str)
 
