@@ -47,10 +47,10 @@ def test(definition, target):
 
     soup = BeautifulSoup(target, 'lxml')
 
-    print()
     print('Output:')
     print('-------')
     print(scraper(soup))
+    print()
     print()
 
 test({
@@ -67,3 +67,29 @@ test({
         }
     }
 }, RECURSIVE_HTML)
+
+# def scrape(root, context={}):
+#   main_value = None
+#   elements_0 = root.select("""ul > li""")
+#   value_0 = []
+#   for element_0 in elements_0:
+#     value_0.append(element_0.get("""id"""))
+#   main_value = value_0
+#   return main_value
+
+# def scrape_rec(root, context={}):
+#   main_value = None
+#   elements_0 = root.select("""div""")
+#   value_0 = []
+#   for element_0 in elements_0:
+#     elements_1 = element_0.select("""ul""")
+#     value_1 = []
+#     for element_1 in elements_1:
+#       elements_2 = element_1.select("""li""")
+#       value_2 = []
+#       for element_2 in elements_2:
+#         value_2.append(element_2.get_text().strip())
+#       value_1.append(value_2)
+#     value_0.append(value_1)
+#   main_value = value_0
+#   return main_value

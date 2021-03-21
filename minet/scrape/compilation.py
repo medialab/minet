@@ -10,120 +10,53 @@ from io import StringIO
 from minet.scrape.constants import EXTRACTOR_NAMES
 
 
-class CompilerStackItem(object):
-    def __init__(self, printer, node, parent_var, container_var, parent,
-                 identifier, level, plural=False):
+class CompilerContext(object):
+    def __init__(self, printer, counter=None, level=0, var='root', container='main_value',
+                 parent=None):
         self.printer = printer
-        self.node = node
-        self.parent_var = parent_var
-        self.container_var = container_var
-        self.parent = parent
-        self.identifier = identifier
+        self.counter = counter if counter is not None else itertools.count(0)
+
         self.level = level
-        self.plural = plural
+        self.identifier = next(self.counter)
+        self.container = container
+        self.var = var
+        self.parent = parent
 
-    def close(self):
-        grandparent = self.parent.parent
+        self.plural = False
 
-        if grandparent is None:
-            return
-
-        if not grandparent.plural:
-            self.printer(
-                '{parent_container} = {container}',
-                level=self.level - 1,
-                parent_container=grandparent.container_var,
-                container=self.container_var
-            )
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *args):
-        self.close()
+    def descend(self):
+        return CompilerContext(
+            printer=self.printer,
+            counter=self.counter,
+            level=self.level + 1,
+            var='element_%i' % self.identifier,
+            container='value_%i' % self.identifier,
+            parent=self
+        )
 
     def print(self, string, **kwargs):
-        return self.printer(
+        self.printer(
             string,
             level=self.level,
+            parent=self.parent.identifier,
             id=self.identifier,
-            parent=self.parent_var,
-            container=self.container_var,
+            next=self.identifier + 1,
             **kwargs
         )
 
-    def format(self, string, **kwargs):
-        return string.format(
-            id=self.identifier,
-            parent=self.parent_var,
-            container=self.container_var,
-            **kwargs
-        )
+    def yield_to_parent(self, expr, **kwargs):
+        if self.parent.plural:
+            self.print('value_{parent}.append(%s)' % expr, **kwargs)
+        else:
+            self.print('value_{parent} = %s' % expr, **kwargs)
 
 
-class CompilerStack(object):
-    def __init__(self, printer):
-        self.inner = []
-        self.printer = printer
-        self.counter = itertools.count()
-
-        self.last_seen_item = None
-
-    def pop(self):
-        item = self.inner.pop()
-        self.last_seen_item = item
-
-        return item
-
-    def empty(self):
-        return len(self.inner) == 0
-
-    def append(self, node, plural=False):
-        item = CompilerStackItem(
-            printer=self.printer,
-            node=node,
-            parent_var=self.last_seen_item.format('element_{id}'),
-            container_var=self.last_seen_item.format('value_{id}'),
-            parent=self.last_seen_item,
-            identifier=next(self.counter),
-            level=self.last_seen_item.level + 1,
-            plural=plural
-        )
-
-        self.inner.append(item)
-
-    @staticmethod
-    def from_definition(definition, printer):
-        stack = CompilerStack(printer)
-
-        parent = CompilerStackItem(
-            printer,
-            None,
-            None,
-            'main_value',
-            None,
-            None,
-            0,
-            False
-        )
-
-        stack.inner.append(CompilerStackItem(
-            printer=printer,
-            node=definition,
-            parent_var='root',
-            container_var=None,
-            parent=parent,
-            identifier=next(stack.counter),
-            level=1
-        ))
-
-        return stack
-
-
+# TODO: escape strings to make them literals or access them through scope?
+# https://github.com/cvbge/vscode-escape-string/blob/master/src/extension.ts
 def compile_scraper(definition, as_string=False):
     output = StringIO()
 
-    def p(string, level=0, **kwargs):
+    def printer(string, level=0, **kwargs):
         if kwargs:
             string = string.format(**kwargs)
 
@@ -135,47 +68,41 @@ def compile_scraper(definition, as_string=False):
 
     scope = {}
 
-    p('def scrape(root, context={}):')
-    p('  main_value = None')
+    printer('def scrape(root, context={}):')
+    printer('  value_0 = None')
+    printer('  element_1 = root')
 
-    counter = itertools.count()
+    root_context = CompilerContext(printer)
+    initial_context = root_context.descend()
 
-    stack = CompilerStack.from_definition(definition, p)
+    def recurse(node, context):
 
-    while not stack.empty():
-        item = stack.pop()
+        # Default extraction
+        if node is None or (isinstance(node, str) and node in EXTRACTOR_NAMES):
+            context.yield_to_parent('element_{id}.get_text().strip()')
+            return
 
-        with item:
-            node = item.node
+        # Attribute
+        if isinstance(node, str):
+            context.yield_to_parent('element_{id}.get("""{attr}""")', attr=node)
+            return
 
-            if node is None or (isinstance(node, str) and node in EXTRACTOR_NAMES):
-                item.print('{container}.append({parent}.get_text().strip())')
-                continue
+        # Iterating
+        if 'iterator' in node:
+            context.plural = True
 
-            if isinstance(node, str):
-                item.print('{container}.append({parent}.get("""{attr}"""))', attr=node)
-                continue
+            context.print('elements_{id} = element_{id}.select("""{selector}""")', selector=node['iterator'])
+            context.print('value_{id} = []')
 
-            if 'iterator' in node:
-                item.print(
-                    'elements_{id} = {parent}.select("""{selector}""")',
-                    selector=node['iterator']
-                )
-                item.print('value_{id} = []')
-                item.print('for element_{id} in elements_{id}:')
+            context.print('for element_{next} in elements_{id}:')
 
-                if 'item' in node:
-                    stack.append(
-                        node=node['item'],
-                        plural=True
-                    )
-                else:
-                    stack.append(
-                        node=None,
-                        plural=True
-                    )
+            recurse(node.get('item'), context.descend())
 
-    p('  return main_value')
+            context.yield_to_parent('value_{id}')
+
+    recurse(definition, initial_context)
+
+    printer('  return value_0')
 
     # Only return string
     if as_string:
