@@ -32,6 +32,14 @@ alias lminet="python -m minet.cli"
 
 You can now run the commands using `lminet` instead of `minet` to test your changes locally without clashing with the global command if installed.
 
+You can also install `minet` as a package in your curent environment like so:
+
+```bash
+pip install -e .
+```
+
+But be sure not to conflict with a standalone install of the tool.
+
 ## Linting & unit tests
 
 To lint the code and run the unit tests you can use the following command:
