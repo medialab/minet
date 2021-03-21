@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 
 from minet.utils import load_definition
 from minet.scrape.interpreter import interpret_scraper, tabulate
+from minet.scrape.analysis import headers_from_definition
 
 
 def ensure_soup(html_or_soup, engine='lxml'):
@@ -31,23 +32,6 @@ def scrape(scraper, html, engine='lxml', context=None):
     )
 
 
-def headers_from_definition(scraper):
-    tabulate = scraper.get('tabulate')
-
-    if tabulate is not None:
-        if not isinstance(tabulate, dict):
-            return
-
-        return tabulate.get('headers')
-
-    fields = scraper.get('fields')
-
-    if fields is None:
-        return ['value']
-
-    return list(scraper['fields'].keys())
-
-
 class Scraper(object):
     def __init__(self, definition):
         self.definition = definition
@@ -59,3 +43,6 @@ class Scraper(object):
     @staticmethod
     def from_file(target):
         return Scraper(load_definition(target))
+
+
+__all__ = ['scrape', 'Scraper']

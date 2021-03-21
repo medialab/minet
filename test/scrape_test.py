@@ -2,7 +2,9 @@
 # Minet Scrape Unit Tests
 # =============================================================================
 from bs4 import BeautifulSoup
-from minet.scrape import scrape, headers_from_definition, tabulate
+from minet.scrape import scrape
+from minet.scrape.analysis import headers_from_definition
+from minet.scrape.interpreter import tabulate
 
 BASIC_HTML = """
     <ul>
