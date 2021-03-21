@@ -1,7 +1,8 @@
 ---
 fields:
+    id:
+        get_context: ['line', 'id']
     file:
-        get: basename
+        get_context: basename
     title:
         sel: title
-        transform: strip
