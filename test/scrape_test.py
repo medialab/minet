@@ -471,3 +471,14 @@ class TestScrape(object):
         }, BASIC_HTML)
 
         assert item == expected[0]
+
+    def test_leaf(self):
+        item = scrape({
+            'sel': 'li'
+        }, BASIC_HTML)
+
+        assert item == 'One'
+
+        item = scrape({}, BASIC_HTML)
+
+        assert item == 'One\nTwo'
