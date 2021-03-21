@@ -196,8 +196,8 @@ def interpret_scraper(scraper, element, root=None, html=None, context=None):
                     value = extract(element, scraper['extract'])
                 elif 'get' in scraper:
                     value = nested_get(scraper['get'], context)
-                elif 'constant' in scraper:
-                    value = scraper['constant']
+                elif 'default' in scraper:
+                    value = scraper['default']
                 else:
 
                     # Default value is text
@@ -225,7 +225,7 @@ def interpret_scraper(scraper, element, root=None, html=None, context=None):
             except:
                 value = None
 
-        # Default value?
+        # Default value after all?
         if 'default' in scraper and value is None:
             value = scraper['default']
 

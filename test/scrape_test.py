@@ -177,7 +177,7 @@ class TestScrape(object):
             'fields': {
                 'value': 'text',
                 'constant': {
-                    'constant': 'Same'
+                    'default': 'Same'
                 }
             }
         }, BASIC_HTML)
@@ -396,7 +396,7 @@ class TestScrape(object):
         result = scrape({
             'context': {
                 'title': {
-                    'constant': 'Scrape'
+                    'default': 'Scrape'
                 }
             },
             'iterator': 'li',
