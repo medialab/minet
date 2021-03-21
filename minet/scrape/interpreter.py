@@ -38,7 +38,7 @@ def extract(element, extractor_name):
         return element.get_text().strip()
 
     if extractor_name == 'html' or extractor_name == 'inner_html':
-        return element.encode_contents().decode().strip()
+        return element.decode_contents().strip()
 
     if extractor_name == 'outer_html':
         return str(element).strip()
