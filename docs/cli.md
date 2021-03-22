@@ -122,7 +122,7 @@ Finally note that command line arguments and flags will take precedence over env
 ## cookies
 
 ```
-usage: minet cookies [-h] [-o OUTPUT] [--url URL]
+usage: minet cookies [-h] [--csv] [-o OUTPUT] [--url URL]
                      {chrome,chromium,edge,firefox,opera}
 
 Minet Cookies Command
@@ -136,6 +136,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                            show this help message and exit
+  --csv                                 Whether to format the output as CSV. If --url is set, will output the cookie's morsels as CSV.
   -o OUTPUT, --output OUTPUT            Path to the output report file. By default, the report will be printed to stdout.
   --url URL                             If given, only returns full cookie header value for this url.
 

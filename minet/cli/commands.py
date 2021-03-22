@@ -193,6 +193,11 @@ MINET_COMMANDS = {
                 'choices': COOKIE_BROWSERS
             },
             {
+                'flag': '--csv',
+                'help': 'Whether to format the output as CSV. If --url is set, will output the cookie\'s morsels as CSV.',
+                'action': 'store_true'
+            },
+            {
                 'flags': ['-o', '--output'],
                 'help': 'Path to the output report file. By default, the report will be printed to stdout.'
             },
