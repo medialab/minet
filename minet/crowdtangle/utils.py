@@ -136,8 +136,8 @@ def default_item_id_getter(item):
 def make_paginated_iterator(url_forge, item_key, formatter,
                             item_id_getter=default_item_id_getter):
 
-    def create_iterator(http, token, rate_limiter_state, partition_strategy=None,
-                        limit=None, format='csv_dict_row', per_call=False, detailed=False,
+    def create_iterator(http, token, rate_limiter_state, limit=None,
+                        format='csv_dict_row', per_call=False, detailed=False,
                         namespace=None, before_sleep=None, **kwargs):
 
         if format not in CROWDTANGLE_OUTPUT_FORMATS:

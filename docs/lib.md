@@ -232,7 +232,6 @@ for account_stats in client.leaderboard(list_id=9457):
 * **list_id** *?str*: whether to return only accounts from the given list.
 * **limit** *?int*: max number of accounts to return.
 * **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
-* **partition_strategy** *?str|int*: query partition strategy to use to mitigate the APIs issues regarding pagination. Can be either `day` or a number of results before rolling the query. `500` seems to be a good compromise.
 * **per_call** *?bool* [`False`]: whether to yield once per API call or once per retrieved item.
 
 ### #.lists
@@ -278,7 +277,6 @@ for post in client.posts():
 * **start_date** *?str*: start date.
 * **limit** *?int*: max number of posts to return.
 * **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
-* **partition_strategy** *?str|int*: query partition strategy to use to mitigate the APIs issues regarding pagination. Can be either `day` or a number of results before rolling the query. `500` seems to be a good compromise.
 * **per_call** *?bool* [`False`]: whether to yield once per API call or once per retrieved item.
 
 <h3 id="ct-search">#.search</h3>
@@ -304,7 +302,6 @@ for post in client.search('tree'):
 * **types** *?iterable<str>*: only return those post types.
 * **limit** *?int*: max number of posts to return.
 * **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
-* **partition_strategy** *?str|int*: query partition strategy to use to mitigate the APIs issues regarding pagination. Can be either `day` or a number of results before rolling the query. `500` seems to be a good compromise.
 * **per_call** *?bool* [`False`]: whether to yield once per API call or once per retrieved item.
 
 
