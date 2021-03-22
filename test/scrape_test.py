@@ -9,7 +9,8 @@ from minet.scrape.analysis import (
 )
 from minet.scrape.interpreter import tabulate
 from minet.scrape.exceptions import (
-    ScrapeEvalSyntaxError
+    ScrapeEvalSyntaxError,
+    ScrapeValidationConflictError
 )
 
 BASIC_HTML = """
@@ -517,11 +518,13 @@ class TestScrape(object):
             'sel': 'li',
             'item': {
                 'eval': '"ok'
-            }
+            },
+            'fields': {}
         })
 
-        errors = [(p, type(e)) for p, e in errors]
+        errors = [(e.path, type(e)) for e in errors]
 
         assert errors == [
+            ([], ScrapeValidationConflictError),
             (['item', 'eval'], ScrapeEvalSyntaxError)
         ]

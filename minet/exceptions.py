@@ -22,6 +22,9 @@ class MinetError(Exception):
 
             v = getattr(self, k)
 
+            if v is None:
+                continue
+
             if isinstance(v, BaseException):
                 representation += ' %s=<%s>' % (k, v.__class__.__name__)
                 continue

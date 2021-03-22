@@ -9,14 +9,7 @@ class ScrapeError(MinetError):
     pass
 
 
-class ScrapeEvalError(ScrapeError):
-    def __init__(self, msg=None, reason=None, expression=None):
-        super().__init__(msg)
-        self.reason = reason
-        self.expression = expression
-
-
-class ScrapeEvalSyntaxError(ScrapeError):
+class BaseScrapeRuntimeError(ScrapeError):
     def __init__(self, msg=None, reason=None, expression=None, path=None):
         super().__init__(msg)
         self.reason = reason
@@ -24,5 +17,23 @@ class ScrapeEvalSyntaxError(ScrapeError):
         self.path = path
 
 
-class ScrapeEvalTypeError(ScrapeError):
+class ScrapeEvalError(BaseScrapeRuntimeError):
+    pass
+
+
+class ScrapeEvalSyntaxError(BaseScrapeRuntimeError):
+    pass
+
+
+class ScrapeValidationError(BaseScrapeRuntimeError):
+    pass
+
+
+class ScrapeValidationConflictError(BaseScrapeRuntimeError):
+    def __init__(self, msg=None, keys=[], **kwargs):
+        super().__init__(msg, **kwargs)
+        self.keys = keys
+
+
+class ScrapeEvalTypeError(BaseScrapeRuntimeError):
     pass

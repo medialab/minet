@@ -7,7 +7,8 @@
 import ast
 
 from minet.scrape.exceptions import (
-    ScrapeEvalSyntaxError
+    ScrapeEvalSyntaxError,
+    ScrapeValidationConflictError
 )
 
 
@@ -33,27 +34,44 @@ def validate(scraper):
     errors = []
 
     def recurse(node, path=[]):
+
+        # Checking conflicts
+        c = []
+
+        if 'item' in node:
+            c.append('item')
+        if 'fields' in node:
+            c.append('fields')
+        if 'tabulate' in node:
+            c.append('tabulate')
+
+        if len(c) > 1:
+            validation_error = ScrapeValidationConflictError(
+                path=path,
+                keys=c
+            )
+
+            errors.append(validation_error)
+
         for k, v in node.items():
             p = path + [k]
 
+            # Validating python syntax
             if k == 'eval' or k.endswith('_eval'):
                 try:
                     ast.parse(v)
                 except SyntaxError as e:
-                    raise ScrapeEvalSyntaxError(
+                    validation_error = ScrapeEvalSyntaxError(
                         reason=e,
                         expression=v,
                         path=p
                     )
 
+                    errors.append(validation_error)
+
             if isinstance(v, dict):
                 recurse(v, p)
 
-    try:
-        recurse(scraper)
-    except ScrapeEvalSyntaxError as e:
-        errors.append(
-            (e.path, e)
-        )
+    recurse(scraper)
 
     return errors
