@@ -142,7 +142,17 @@ optional arguments:
 
 examples:
 
-. TODO...
+. Dumping cookie jar from firefox:
+    `minet cookies firefox > jar.txt`
+
+. Dumping cookies as CSV:
+    `minet cookies firefox --csv > cookies.csv`
+
+. Print cookie for lemonde.fr:
+    `minet cookie firefox --url https://www.lemonde.fr`
+
+. Dump cookie morsels for lemonde.fr as CSV:
+    `minet cookie firefox --url https://www.lemonde.fr --csv > morsels.csv`
 
 ```
 
