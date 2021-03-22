@@ -47,7 +47,7 @@ Fortunately `minet` can help you to do all this from the comfort of the command 
 minet url-join homepage medias.csv url tweets.csv > joined.csv
 ```
 
-Do so and you will get a `joined.csv` file having one line per line in `tweet.csv` with 4 new columns `id`, `media`, `homepage` and `politics`, filled with relevant info from the `medias.csv` file.
+Do so and you will get a `joined.csv` file with as many lines as `tweet.csv` but with 4 new columns `id`, `media`, `homepage` and `politics`, filled with relevant info from the `medias.csv` file. As such this can be thought as a `RIGHT JOIN` where the "right" table is `tweet.csv`.
 
 The order in which the arguments are to be given can be hard to remember, so be sure to try `minet`'s help before doing things in reverse:
 
