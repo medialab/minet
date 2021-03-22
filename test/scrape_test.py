@@ -505,3 +505,13 @@ class TestScrape(object):
         }, NESTED_HTML)
 
         assert item == 'One'
+
+    # def test_eval_exceptions(self):
+    #     item = scrape({
+    #         'iterator': 'li',
+    #         'item': {
+    #             'eval': '"ok'
+    #         }
+    #     }, BASIC_HTML)
+
+    #     print(item)
