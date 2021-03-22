@@ -26,6 +26,13 @@ class ScrapeEvalSyntaxError(BaseScrapeRuntimeError):
 
 
 class ScrapeEvalTypeError(BaseScrapeRuntimeError):
+    def __init__(self, msg=None, expected=None, got=None, **kwargs):
+        super().__init__(msg, **kwargs)
+        self.expected = expected
+        self.got = got
+
+
+class ScrapeEvalNoneError(BaseScrapeRuntimeError):
     pass
 
 

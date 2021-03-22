@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 from minet.utils import load_definition
 from minet.scrape.interpreter import interpret_scraper, tabulate
-from minet.scrape.analysis import headers_from_definition
+from minet.scrape.analysis import headers_from_definition, validate
 
 
 def ensure_soup(html_or_soup, engine='lxml'):
@@ -44,4 +44,4 @@ class Scraper(object):
         return Scraper(load_definition(target))
 
 
-__all__ = ['scrape', 'Scraper']
+__all__ = ['scrape', 'Scraper', 'validate']

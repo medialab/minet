@@ -8,15 +8,19 @@
 import re
 import json
 import soupsieve
+from bs4 import Tag
 from urllib.parse import urljoin
 
 from minet.utils import nested_get
 from minet.scrape.constants import EXTRACTOR_NAMES
 from minet.scrape.exceptions import (
-    ScrapeEvalError
+    ScrapeEvalError,
+    ScrapeEvalTypeError,
+    ScrapeEvalNoneError
 )
 
 DEFAULT_CONTEXT = {}
+DATA_TYPES = (str, int, float, bool, list, dict)
 
 
 def get_aliases(o, aliases):
@@ -54,13 +58,13 @@ EVAL_CONTEXT = {
     # Dependencies
     'json': json,
     'urljoin': urljoin,
-    're': re,
+    're': re
 }
 
 
 # NOTE: this is not threadsafe, but it does not have to be
 def eval_expression(expression, element=None, elements=None, value=None,
-                    context=None, root=None, path=None):
+                    context=None, root=None, path=None, expect=None, allow_none=False):
 
     # Local variables
     EVAL_CONTEXT['element'] = element
@@ -78,6 +82,20 @@ def eval_expression(expression, element=None, elements=None, value=None,
             reason=e,
             path=path,
             expression=expression
+        )
+
+    if not allow_none and result is None:
+        raise ScrapeEvalNoneError(
+            path=path,
+            expression=expression
+        )
+
+    if expect is not None and not isinstance(result, expect):
+        raise ScrapeEvalTypeError(
+            path=path,
+            expression=expression,
+            expected=expect,
+            got=result
         )
 
     return result
@@ -121,14 +139,15 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
         element = soupsieve.select_one(sel, element)
     elif 'sel_eval' in scraper:
 
-        # TODO: validate
         element = eval_expression(
             scraper['sel_eval'],
             element=element,
             elements=[],
             context=context,
             root=root,
-            path=path + ['sel_eval']
+            path=path + ['sel_eval'],
+            expect=Tag,
+            allow_none=True
         )
 
     if element is None:
@@ -147,7 +166,8 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
             elements=[],
             context=context,
             root=root,
-            path=path + ['iterator_eval']
+            path=path + ['iterator_eval'],
+            expect=list
         )
         single_value = False
     else:
@@ -223,7 +243,9 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
                     value=value,
                     context=context,
                     root=root,
-                    path=path + ['eval']
+                    path=path + ['eval'],
+                    expect=DATA_TYPES,
+                    allow_none=True
                 )
 
         # Default value after all?
@@ -243,7 +265,8 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
                     value=value,
                     context=context,
                     root=root,
-                    path=path + ['filter_eval']
+                    path=path + ['filter_eval'],
+                    expect=bool
                 )
 
                 if not passed_filter:

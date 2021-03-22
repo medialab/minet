@@ -2,7 +2,7 @@
 # Minet Scrape Unit Tests
 # =============================================================================
 import pytest
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 from minet.scrape import scrape
 from minet.scrape.analysis import (
@@ -13,7 +13,9 @@ from minet.scrape.interpreter import tabulate
 from minet.scrape.exceptions import (
     ScrapeEvalSyntaxError,
     ScrapeValidationConflictError,
-    ScrapeEvalError
+    ScrapeEvalError,
+    ScrapeEvalTypeError,
+    ScrapeEvalNoneError
 )
 
 BASIC_HTML = """
@@ -517,19 +519,29 @@ class TestScrape(object):
         ]
 
     def test_eval_errors(self):
-        raised = False
-
-        try:
+        with pytest.raises(ScrapeEvalError) as info:
             scrape({
                 'iterator': 'li',
                 'item': {
                     'eval': 'item.split()'
                 }
             }, BASIC_HTML)
-        except ScrapeEvalError as e:
-            raised = True
 
-            assert isinstance(e.reason, NameError)
-            assert e.path == ['item', 'eval']
+        assert isinstance(info.value.reason, NameError)
+        assert info.value.path == ['item', 'eval']
 
-        assert raised
+        with pytest.raises(ScrapeEvalTypeError) as info:
+            scrape({
+                'sel_eval': '45'
+            }, BASIC_HTML)
+
+        assert info.value.expected == Tag
+        assert info.value.got == 45
+        assert info.value.path == ['sel_eval']
+
+        with pytest.raises(ScrapeEvalNoneError) as info:
+            scrape({
+                'iterator_eval': 'None'
+            }, BASIC_HTML)
+
+        assert info.value.path == ['iterator_eval']
