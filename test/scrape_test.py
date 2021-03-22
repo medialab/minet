@@ -313,6 +313,15 @@ class TestScrape(object):
 
         assert result == [{'root_id': 'ok'}, {'root_id': 'ok'}]
 
+        result = scrape({
+            'sel': 'li',
+            'item': {
+                'eval': 'a = 45\na + 10'
+            }
+        }, BASIC_HTML)
+
+        assert result == 55
+
     def test_context(self):
         result = scrape({
             'iterator': 'li',

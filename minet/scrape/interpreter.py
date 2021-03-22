@@ -75,14 +75,35 @@ def eval_expression(expression, element=None, elements=None, value=None,
     EVAL_CONTEXT['context'] = context
     EVAL_CONTEXT['root'] = root
 
-    try:
-        result = eval(expression, None, EVAL_CONTEXT)
-    except BaseException as e:
-        raise ScrapeEvalError(
-            reason=e,
-            path=path,
-            expression=expression
-        )
+    if '\n' in expression:
+
+        # Multiline expression
+        scope = {}
+
+        wrapped_expression = expression.strip().split('\n')
+        wrapped_expression[-1] = '__return_value__ = ' + wrapped_expression[-1]
+        wrapped_expression = '\n'.join(wrapped_expression)
+
+        try:
+            exec(wrapped_expression, EVAL_CONTEXT, scope)
+            result = scope['__return_value__']
+        except BaseException as e:
+            raise ScrapeEvalError(
+                reason=e,
+                path=path,
+                expression=expression
+            )
+    else:
+
+        # Simple expression
+        try:
+            result = eval(expression, EVAL_CONTEXT, None)
+        except BaseException as e:
+            raise ScrapeEvalError(
+                reason=e,
+                path=path,
+                expression=expression
+            )
 
     if not allow_none and result is None:
         raise ScrapeEvalNoneError(

@@ -1,0 +1,8 @@
+---
+fields:
+  url:
+    get_context: ['line', 'url']
+  title:
+    eval: |
+      title = root.select_one("title")
+      title.get_text().strip()
