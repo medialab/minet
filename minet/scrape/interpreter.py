@@ -192,33 +192,30 @@ def interpret_scraper(scraper, element, root=None, html=None, context=None):
 
         else:
 
-            try:
-                if 'attr' in scraper:
-                    value = element.get(scraper['attr'])
-                elif 'extract' in scraper:
-                    value = extract(element, scraper['extract'])
-                elif 'get_context' in scraper:
-                    value = nested_get(scraper['get_context'], context)
-                elif 'default' in scraper:
-                    value = scraper['default']
-                else:
+            if 'attr' in scraper:
+                value = element.get(scraper['attr'])
+            elif 'extract' in scraper:
+                value = extract(element, scraper['extract'])
+            elif 'get_context' in scraper:
+                value = nested_get(scraper['get_context'], context)
+            elif 'default' in scraper:
+                value = scraper['default']
+            else:
 
-                    # Default value is text
-                    value = extract(element, 'text')
+                # Default value is text
+                value = extract(element, 'text')
 
-                # Eval?
-                if 'eval' in scraper:
-                    value = eval_expression(
-                        scraper['eval'],
-                        element=element,
-                        elements=elements,
-                        value=value,
-                        context=context,
-                        html=html,
-                        root=root
-                    )
-            except:
-                value = None
+            # Eval?
+            if 'eval' in scraper:
+                value = eval_expression(
+                    scraper['eval'],
+                    element=element,
+                    elements=elements,
+                    value=value,
+                    context=context,
+                    html=html,
+                    root=root
+                )
 
         # Default value after all?
         if 'default' in scraper and value is None:
