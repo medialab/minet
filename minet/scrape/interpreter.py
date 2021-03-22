@@ -57,7 +57,7 @@ EVAL_CONTEXT = {
 
 # NOTE: this is not threadsafe, but it does not have to be
 def eval_expression(expression, element=None, elements=None, value=None,
-                    context=None, html=None, root=None):
+                    context=None, root=None):
 
     # Local variables
     EVAL_CONTEXT['element'] = element
@@ -66,7 +66,6 @@ def eval_expression(expression, element=None, elements=None, value=None,
 
     # Context
     EVAL_CONTEXT['context'] = context
-    EVAL_CONTEXT['html'] = html
     EVAL_CONTEXT['root'] = root
 
     return eval(expression, None, EVAL_CONTEXT)
@@ -93,7 +92,7 @@ def tabulate(element, headers_inference='th', headers=None):
         yield {headers[i]: td.get_text() for i, td in enumerate(tr.find_all('td', recursive=False))}
 
 
-def interpret_scraper(scraper, element, root=None, html=None, context=None):
+def interpret_scraper(scraper, element, root=None, context=None):
 
     # Is this a tail call of item?
     if isinstance(scraper, str):
@@ -116,7 +115,6 @@ def interpret_scraper(scraper, element, root=None, html=None, context=None):
             element=element,
             elements=[],
             context=context,
-            html=html,
             root=root
         )
 
@@ -135,7 +133,6 @@ def interpret_scraper(scraper, element, root=None, html=None, context=None):
             element=element,
             elements=[],
             context=context,
-            html=html,
             root=root
         )
         single_value = False
@@ -151,7 +148,6 @@ def interpret_scraper(scraper, element, root=None, html=None, context=None):
                 field_scraper,
                 element,
                 root=root,
-                html=html,
                 context=context
             )
 
@@ -174,7 +170,6 @@ def interpret_scraper(scraper, element, root=None, html=None, context=None):
                     field_scraper,
                     element,
                     root=root,
-                    html=html,
                     context=context
                 )
 
@@ -186,7 +181,6 @@ def interpret_scraper(scraper, element, root=None, html=None, context=None):
                 scraper['item'],
                 element,
                 root=root,
-                html=html,
                 context=context
             )
 
@@ -211,7 +205,6 @@ def interpret_scraper(scraper, element, root=None, html=None, context=None):
                     elements=elements,
                     value=value,
                     context=context,
-                    html=html,
                     root=root
                 )
 
@@ -231,7 +224,6 @@ def interpret_scraper(scraper, element, root=None, html=None, context=None):
                     elements=elements,
                     value=value,
                     context=context,
-                    html=html,
                     root=root
                 )
 

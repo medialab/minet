@@ -27,7 +27,6 @@ def scrape(scraper, html, engine='lxml', context=None):
         scraper,
         soup,
         root=soup,
-        html=None if soup is html else html,
         context=context
     )
 

@@ -308,22 +308,6 @@ class TestScrape(object):
 
         assert result == [{'root_id': 'ok'}, {'root_id': 'ok'}]
 
-        result = scrape({
-            'item': {
-                'eval': 'html.split("<div", 1)[0].strip()'
-            }
-        }, META_HTML)
-
-        assert result == 'Exemple'
-
-        # result = scrape({
-        #     'item': {
-        #         'eval': 'html.split("<div", 1)[0].strip()'
-        #     }
-        # }, BeautifulSoup(META_HTML, 'lxml'))
-
-        # assert result == 'Exemple'
-
     def test_context(self):
         result = scrape({
             'iterator': 'li',
