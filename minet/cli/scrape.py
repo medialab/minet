@@ -12,7 +12,6 @@ import casanova
 from collections import namedtuple
 from os.path import basename
 from multiprocessing import Pool
-from tqdm import tqdm
 
 from minet.utils import load_definition
 from minet.scrape import scrape, headers_from_definition
@@ -21,7 +20,8 @@ from minet.cli.utils import (
     die,
     create_glob_iterator,
     create_report_iterator,
-    LazyLineDict
+    LazyLineDict,
+    LoadingBar
 )
 
 ScrapeWorkerResult = namedtuple(
@@ -85,20 +85,25 @@ def scrape_action(namespace):
     else:
         output_writer = ndjson.writer(output_file)
 
-    loading_bar = tqdm(
+    loading_bar = LoadingBar(
         desc='Scraping pages',
         total=namespace.total,
-        dynamic_ncols=True,
-        unit=' pages'
+        unit='page',
+        stats={'p': namespace.processes}
     )
-
-    loading_bar.set_postfix(p=namespace.processes)
 
     if namespace.glob is not None:
         files = create_glob_iterator(namespace, scraper)
     else:
         reader = casanova.reader(namespace.report)
-        files = create_report_iterator(namespace, reader, scraper, loading_bar)
+
+        try:
+            files = create_report_iterator(namespace, reader, scraper, loading_bar)
+        except NotADirectoryError:
+            loading_bar.die([
+                'Could not find the "%s" directory!' % namespace.input_dir,
+                'Did you forget to specify it with -i/--input-dir?'
+            ])
 
     with Pool(namespace.processes) as pool:
         for error, items in pool.imap_unordered(worker, files):
@@ -113,4 +118,5 @@ def scrape_action(namespace):
 
                 output_writer.writerow(item)
 
+    loading_bar.close()
     output_file.close()

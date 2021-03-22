@@ -9,12 +9,12 @@ import gzip
 import codecs
 from multiprocessing import Pool
 from trafilatura.core import bare_extraction
-from tqdm import tqdm
 
 from minet.encodings import is_supported_encoding
 from minet.cli.utils import (
     open_output_file,
-    create_report_iterator
+    create_report_iterator,
+    LoadingBar
 )
 from minet.cli.reporters import report_error
 
@@ -122,14 +122,19 @@ def extract_action(namespace):
         add=OUTPUT_ADDITIONAL_HEADERS
     )
 
-    loading_bar = tqdm(
+    loading_bar = LoadingBar(
         desc='Extracting content',
         total=namespace.total,
-        dynamic_ncols=True,
-        unit=' docs'
+        unit='doc'
     )
 
-    files = create_report_iterator(namespace, enricher, loading_bar=loading_bar)
+    try:
+        files = create_report_iterator(namespace, enricher, loading_bar=loading_bar)
+    except NotADirectoryError:
+        loading_bar.die([
+            'Could not find the "%s" directory!' % namespace.input_dir,
+            'Did you forget to specify it with -i/--input-dir?'
+        ])
 
     with Pool(namespace.processes) as pool:
         for error, row, result in pool.imap_unordered(worker, files):
@@ -145,4 +150,5 @@ def extract_action(namespace):
 
             enricher.writerow(row, result)
 
+    loading_bar.close()
     output_file.close()

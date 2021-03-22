@@ -232,8 +232,8 @@ examples:
 ## extract
 
 ```
-usage: minet extract [-h] [-i INPUT_DIRECTORY] [-o OUTPUT] [-p PROCESSES]
-                     [-s SELECT] [--total TOTAL]
+usage: minet extract [-h] [-i INPUT_DIR] [-o OUTPUT] [-p PROCESSES] [-s SELECT]
+                     [--total TOTAL]
                      [report]
 
 Minet Extract Command
@@ -249,16 +249,15 @@ Barbaresi. More information about the library can be found here:
 https://github.com/adbar/trafilatura
 
 positional arguments:
-  report                                          Input CSV fetch action report file.
+  report                               Input CSV fetch action report file.
 
 optional arguments:
-  -h, --help                                      show this help message and exit
-  -i INPUT_DIRECTORY, --input-directory INPUT_DIRECTORY
-                                                  Directory where the HTML files are stored. Defaults to "content".
-  -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
-  -p PROCESSES, --processes PROCESSES             Number of processes to use. Defaults to 4.
-  -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
+  -h, --help                           show this help message and exit
+  -i INPUT_DIR, --input-dir INPUT_DIR  Directory where the HTML files are stored. Defaults to "content".
+  -o OUTPUT, --output OUTPUT           Path to the output report file. By default, the report will be printed to stdout.
+  -p PROCESSES, --processes PROCESSES  Number of processes to use. Defaults to 4.
+  -s SELECT, --select SELECT           Columns of input CSV file to include in the output (separated by `,`).
+  --total TOTAL                        Total number of HTML documents. Necessary if you want to display a finite progress indicator.
 
 examples:
 
@@ -267,9 +266,6 @@ examples:
 
 . Working on a report from stdin:
     `minet fetch url_column file.csv | minet extract > extracted.csv`
-
-. Extracting raw text from a bunch of files:
-    `minet extract --glob "./content/*.html" > extracted.csv`
 
 ```
 
@@ -337,8 +333,8 @@ examples:
 For more documentation about minet's scraping DSL check this [page](../cookbook/scraping_dsl.md) from the Cookbook.
 
 ```
-usage: minet scrape [-h] [-f {csv,jsonl}] [-g GLOB] [-i INPUT_DIRECTORY]
-                    [-o OUTPUT] [-p PROCESSES] [--total TOTAL]
+usage: minet scrape [-h] [-f {csv,jsonl}] [-g GLOB] [-i INPUT_DIR] [-o OUTPUT]
+                    [-p PROCESSES] [--total TOTAL]
                     scraper [report]
 
 Minet Scrape Command
@@ -349,18 +345,17 @@ This command can either work on a `minet fetch` report or on a bunch
 of files. It will output the scraped items.
 
 positional arguments:
-  scraper                                         Path to a scraper definition file.
-  report                                          Input CSV fetch action report file.
+  scraper                               Path to a scraper definition file.
+  report                                Input CSV fetch action report file.
 
 optional arguments:
-  -h, --help                                      show this help message and exit
-  -f {csv,jsonl}, --format {csv,jsonl}            Output format.
-  -g GLOB, --glob GLOB                            Whether to scrape a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.
-  -i INPUT_DIRECTORY, --input-directory INPUT_DIRECTORY
-                                                  Directory where the HTML files are stored. Defaults to "content".
-  -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
-  -p PROCESSES, --processes PROCESSES             Number of processes to use. Defaults to 4.
-  --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
+  -h, --help                            show this help message and exit
+  -f {csv,jsonl}, --format {csv,jsonl}  Output format.
+  -g GLOB, --glob GLOB                  Whether to scrape a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.
+  -i INPUT_DIR, --input-dir INPUT_DIR   Directory where the HTML files are stored. Defaults to "content".
+  -o OUTPUT, --output OUTPUT            Path to the output report file. By default, the report will be printed to stdout.
+  -p PROCESSES, --processes PROCESSES   Number of processes to use. Defaults to 4.
+  --total TOTAL                         Total number of HTML documents. Necessary if you want to display a finite progress indicator.
 
 examples:
 

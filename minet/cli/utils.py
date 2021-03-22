@@ -9,7 +9,7 @@ import sys
 import yaml
 from io import StringIO
 from glob import iglob
-from os.path import join, expanduser, isfile
+from os.path import join, expanduser, isfile, isdir
 from collections import namedtuple
 from tqdm import tqdm
 
@@ -165,40 +165,46 @@ def create_report_iterator(namespace, enricher, args=None, loading_bar=None):
     encoding_pos = enricher.pos.encoding
     raw_content_pos = enricher.pos.get('raw_contents')
 
+    if raw_content_pos is None and not isdir(namespace.input_dir):
+        raise NotADirectoryError
+
     indexed_headers = {h: p for p, h in enumerate(enricher.fieldnames)}
 
-    for row in enricher:
-        status = int(row[status_pos]) if row[status_pos] else None
-        filename = row[filename_pos]
+    def generator():
+        for row in enricher:
+            status = int(row[status_pos]) if row[status_pos] else None
+            filename = row[filename_pos]
 
-        if status is None or status >= 400 or not filename:
-            if loading_bar is not None:
-                loading_bar.update()
-            continue
+            if status is None or status >= 400 or not filename:
+                if loading_bar is not None:
+                    loading_bar.update()
+                continue
 
-        if raw_content_pos is not None:
+            if raw_content_pos is not None:
+                yield WorkerPayload(
+                    row=row,
+                    headers=indexed_headers,
+                    path=None,
+                    encoding=row[encoding_pos],
+                    content=row[raw_content_pos],
+                    args=args
+                )
+
+                continue
+
+            path = join(namespace.input_dir, filename)
+            encoding = row[encoding_pos].strip() or 'utf-8'
+
             yield WorkerPayload(
                 row=row,
                 headers=indexed_headers,
-                path=None,
-                encoding=row[encoding_pos],
-                content=row[raw_content_pos],
+                path=path,
+                encoding=encoding,
+                content=None,
                 args=args
             )
 
-            continue
-
-        path = join(namespace.input_directory, filename)
-        encoding = row[encoding_pos].strip() or 'utf-8'
-
-        yield WorkerPayload(
-            row=row,
-            headers=indexed_headers,
-            path=path,
-            encoding=encoding,
-            content=None,
-            args=args
-        )
+    return generator()
 
 
 def create_glob_iterator(namespace, args):

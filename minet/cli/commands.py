@@ -547,9 +547,6 @@ MINET_COMMANDS = {
 
             . Working on a report from stdin:
                 `minet fetch url_column file.csv | minet extract > extracted.csv`
-
-            . Extracting raw text from a bunch of files:
-                `minet extract --glob "./content/*.html" > extracted.csv`
         ''',
         'arguments': [
             {
@@ -560,7 +557,7 @@ MINET_COMMANDS = {
                 'nargs': '?'
             },
             {
-                'flags': ['-i', '--input-directory'],
+                'flags': ['-i', '--input-dir'],
                 'help': 'Directory where the HTML files are stored. Defaults to "%s".' % DEFAULT_CONTENT_FOLDER,
                 'default': DEFAULT_CONTENT_FOLDER
             },
@@ -1192,7 +1189,7 @@ MINET_COMMANDS = {
                 'help': 'Whether to scrape a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.'
             },
             {
-                'flags': ['-i', '--input-directory'],
+                'flags': ['-i', '--input-dir'],
                 'help': 'Directory where the HTML files are stored. Defaults to "%s".' % DEFAULT_CONTENT_FOLDER,
                 'default': DEFAULT_CONTENT_FOLDER
             },
