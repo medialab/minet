@@ -1,7 +1,9 @@
 # =============================================================================
 # Minet Scrape Unit Tests
 # =============================================================================
+import pytest
 from bs4 import BeautifulSoup
+
 from minet.scrape import scrape
 from minet.scrape.analysis import (
     headers_from_definition,
@@ -10,7 +12,8 @@ from minet.scrape.analysis import (
 from minet.scrape.interpreter import tabulate
 from minet.scrape.exceptions import (
     ScrapeEvalSyntaxError,
-    ScrapeValidationConflictError
+    ScrapeValidationConflictError,
+    ScrapeEvalError
 )
 
 BASIC_HTML = """
@@ -512,3 +515,21 @@ class TestScrape(object):
             ([], ScrapeValidationConflictError),
             (['item', 'eval'], ScrapeEvalSyntaxError)
         ]
+
+    def test_eval_errors(self):
+        raised = False
+
+        try:
+            scrape({
+                'iterator': 'li',
+                'item': {
+                    'eval': 'item.split()'
+                }
+            }, BASIC_HTML)
+        except ScrapeEvalError as e:
+            raised = True
+
+            assert isinstance(e.reason, NameError)
+            assert e.path == ['item', 'eval']
+
+        assert raised

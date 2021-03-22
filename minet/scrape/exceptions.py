@@ -25,6 +25,10 @@ class ScrapeEvalSyntaxError(BaseScrapeRuntimeError):
     pass
 
 
+class ScrapeEvalTypeError(BaseScrapeRuntimeError):
+    pass
+
+
 class ScrapeValidationError(BaseScrapeRuntimeError):
     pass
 
@@ -33,7 +37,3 @@ class ScrapeValidationConflictError(BaseScrapeRuntimeError):
     def __init__(self, msg=None, keys=[], **kwargs):
         super().__init__(msg, **kwargs)
         self.keys = keys
-
-
-class ScrapeEvalTypeError(BaseScrapeRuntimeError):
-    pass

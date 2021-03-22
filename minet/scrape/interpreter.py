@@ -12,6 +12,9 @@ from urllib.parse import urljoin
 
 from minet.utils import nested_get
 from minet.scrape.constants import EXTRACTOR_NAMES
+from minet.scrape.exceptions import (
+    ScrapeEvalError
+)
 
 DEFAULT_CONTEXT = {}
 
@@ -57,7 +60,7 @@ EVAL_CONTEXT = {
 
 # NOTE: this is not threadsafe, but it does not have to be
 def eval_expression(expression, element=None, elements=None, value=None,
-                    context=None, root=None):
+                    context=None, root=None, path=None):
 
     # Local variables
     EVAL_CONTEXT['element'] = element
@@ -68,7 +71,16 @@ def eval_expression(expression, element=None, elements=None, value=None,
     EVAL_CONTEXT['context'] = context
     EVAL_CONTEXT['root'] = root
 
-    return eval(expression, None, EVAL_CONTEXT)
+    try:
+        result = eval(expression, None, EVAL_CONTEXT)
+    except BaseException as e:
+        raise ScrapeEvalError(
+            reason=e,
+            path=path,
+            expression=expression
+        )
+
+    return result
 
 
 def tabulate(element, headers_inference='th', headers=None):
@@ -92,7 +104,7 @@ def tabulate(element, headers_inference='th', headers=None):
         yield {headers[i]: td.get_text() for i, td in enumerate(tr.find_all('td', recursive=False))}
 
 
-def interpret_scraper(scraper, element, root=None, context=None):
+def interpret_scraper(scraper, element, root=None, context=None, path=[]):
 
     # Is this a tail call of item?
     if isinstance(scraper, str):
@@ -115,7 +127,8 @@ def interpret_scraper(scraper, element, root=None, context=None):
             element=element,
             elements=[],
             context=context,
-            root=root
+            root=root,
+            path=path + ['sel_eval']
         )
 
     if element is None:
@@ -133,7 +146,8 @@ def interpret_scraper(scraper, element, root=None, context=None):
             element=element,
             elements=[],
             context=context,
-            root=root
+            root=root,
+            path=path + ['iterator_eval']
         )
         single_value = False
     else:
@@ -148,7 +162,8 @@ def interpret_scraper(scraper, element, root=None, context=None):
                 field_scraper,
                 element,
                 root=root,
-                context=context
+                context=context,
+                path=path + ['set_context', k]
             )
 
         context = merge_contexts(context, local_context)
@@ -170,7 +185,8 @@ def interpret_scraper(scraper, element, root=None, context=None):
                     field_scraper,
                     element,
                     root=root,
-                    context=context
+                    context=context,
+                    path=path + ['fields', k]
                 )
 
         # Do we have a scalar?
@@ -181,7 +197,8 @@ def interpret_scraper(scraper, element, root=None, context=None):
                 scraper['item'],
                 element,
                 root=root,
-                context=context
+                context=context,
+                path=path + ['item']
             )
 
         else:
@@ -205,7 +222,8 @@ def interpret_scraper(scraper, element, root=None, context=None):
                     elements=elements,
                     value=value,
                     context=context,
-                    root=root
+                    root=root,
+                    path=path + ['eval']
                 )
 
         # Default value after all?
@@ -224,7 +242,8 @@ def interpret_scraper(scraper, element, root=None, context=None):
                     elements=elements,
                     value=value,
                     context=context,
-                    root=root
+                    root=root,
+                    path=path + ['filter_eval']
                 )
 
                 if not passed_filter:
