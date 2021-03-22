@@ -286,7 +286,8 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
                     context=context,
                     root=root,
                     path=path + ['filter_eval'],
-                    expect=bool
+                    expect=bool,
+                    allow_none=True
                 )
 
                 if not passed_filter:

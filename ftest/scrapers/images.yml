@@ -2,9 +2,18 @@
 iterator: img
 fields:
     url:
-        get: line.url
+        get_context: line.url
     src:
         attr: src
         eval: urljoin(context['line']['url'], value) if value else ''
-filter: src
+filter_eval: |
+    src = value['src']
+
+    if not src:
+        return False
+
+    if value['src'].startswith('data:'):
+        return False
+
+    return True
 uniq: src

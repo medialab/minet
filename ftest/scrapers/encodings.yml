@@ -1,8 +1,7 @@
-iterator: '#standard-encodings tbody[valign=top] > tr'
+iterator: '#standard-encodings tbody > tr'
 item:
-    eval: '
-        "|".join(
+    eval: |
+        return "|".join(
             [element.select_one("td:nth-child(1)").get_text()] +
             element.select_one("td:nth-child(2)").get_text().replace("\n", " ").split(", ")
         ).strip().rstrip("|")
-    '
