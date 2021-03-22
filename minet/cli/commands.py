@@ -171,6 +171,38 @@ MINET_COMMANDS = {
         ]
     },
 
+    # Cookies action subparser
+    # --------------------------------------------------------------------------
+    'cookies': {
+        'package': 'minet.cli.cookies',
+        'action': 'cookies_action',
+        'title': 'Minet Cookies Command',
+        'description': '''
+            Grab cookies directly from your browsers to use them easily later
+            in python scripts, for instance.
+        ''',
+        'epilog': '''
+            examples:
+
+            . TODO...
+        ''',
+        'arguments': [
+            {
+                'name': 'browser',
+                'help': 'Name of the browser from which to grab cookies.',
+                'choices': COOKIE_BROWSERS
+            },
+            {
+                'flags': ['-o', '--output'],
+                'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+            },
+            {
+                'flag': '--url',
+                'help': 'If given, only returns full cookie header value for this url.'
+            }
+        ]
+    },
+
     # Crowdtangle action subparser
     # --------------------------------------------------------------------------
     'crowdtangle': {

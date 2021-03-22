@@ -11,6 +11,7 @@
 
 *Generic commands*
 
+* [cookies](#cookies)
 * [crawl](#crawl)
 * [fetch](#fetch)
 * [extract](#extract)
@@ -117,6 +118,10 @@ If one of the path's key already contains underscore, it will work all the same.
 Note that the given variable will be cast to the proper type as if it was passed as a command line argument (for instance, `MINET_CROWDTANGLE_RATE_LIMIT` will correctly be cast as an integer).
 
 Finally note that command line arguments and flags will take precedence over environment variables, and that environment variables will take precedence over any rcfile configuration, but you can of course mix and match.
+
+## cookies
+
+<% cookies %>
 
 ## crawl
 

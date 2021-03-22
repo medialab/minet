@@ -11,6 +11,7 @@
 
 *Generic commands*
 
+* [cookies](#cookies)
 * [crawl](#crawl)
 * [fetch](#fetch)
 * [extract](#extract)
@@ -117,6 +118,32 @@ If one of the path's key already contains underscore, it will work all the same.
 Note that the given variable will be cast to the proper type as if it was passed as a command line argument (for instance, `MINET_CROWDTANGLE_RATE_LIMIT` will correctly be cast as an integer).
 
 Finally note that command line arguments and flags will take precedence over environment variables, and that environment variables will take precedence over any rcfile configuration, but you can of course mix and match.
+
+## cookies
+
+```
+usage: minet cookies [-h] [-o OUTPUT] [--url URL]
+                     {chrome,chromium,edge,firefox,opera}
+
+Minet Cookies Command
+=====================
+
+Grab cookies directly from your browsers to use them easily later
+in python scripts, for instance.
+
+positional arguments:
+  {chrome,chromium,edge,firefox,opera}  Name of the browser from which to grab cookies.
+
+optional arguments:
+  -h, --help                            show this help message and exit
+  -o OUTPUT, --output OUTPUT            Path to the output report file. By default, the report will be printed to stdout.
+  --url URL                             If given, only returns full cookie header value for this url.
+
+examples:
+
+. TODO...
+
+```
 
 ## crawl
 
