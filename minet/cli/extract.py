@@ -5,8 +5,6 @@
 # Logic of the extract action.
 #
 import casanova
-import gzip
-import codecs
 from multiprocessing import Pool
 from trafilatura.core import bare_extraction
 
@@ -14,7 +12,8 @@ from minet.encodings import is_supported_encoding
 from minet.cli.utils import (
     open_output_file,
     create_report_iterator,
-    LoadingBar
+    LoadingBar,
+    read_potentially_gzipped_path
 )
 from minet.cli.reporters import report_error
 
@@ -84,14 +83,7 @@ def worker(payload):
     # Reading file
     if content is None:
         try:
-            if path.endswith('.gz'):
-                with open(path, 'rb') as f:
-                    raw_html_bytes = gzip.decompress(f.read())
-
-                raw_html = raw_html_bytes.decode(encoding, errors='replace')
-            else:
-                with codecs.open(path, 'r', encoding=encoding, errors='replace') as f:
-                    raw_html = f.read()
+            raw_html = read_potentially_gzipped_path(path, encoding=encoding)
         except UnicodeDecodeError as e:
             return e, row, None
     else:

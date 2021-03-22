@@ -5,8 +5,6 @@
 # Logic of the scrape action.
 #
 import csv
-import gzip
-import codecs
 import ndjson
 import casanova
 from collections import namedtuple
@@ -21,7 +19,8 @@ from minet.cli.utils import (
     create_glob_iterator,
     create_report_iterator,
     LazyLineDict,
-    LoadingBar
+    LoadingBar,
+    read_potentially_gzipped_path
 )
 
 ScrapeWorkerResult = namedtuple(
@@ -36,14 +35,7 @@ def worker(payload):
     # Reading from file
     if content is None:
         try:
-            if path.endswith('.gz'):
-                with open(path, 'rb') as f:
-                    content_bytes = gzip.decompress(f.read())
-
-                content = content_bytes.decode(encoding, errors='replace')
-            else:
-                with codecs.open(path, 'r', encoding=encoding, errors='replace') as f:
-                    content = f.read()
+            content = read_potentially_gzipped_path(path, encoding=encoding)
         except UnicodeDecodeError as e:
             return ScrapeWorkerResult(e, None)
 

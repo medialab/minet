@@ -6,6 +6,7 @@
 #
 import csv
 import sys
+import gzip
 import yaml
 from io import StringIO
 from glob import iglob
@@ -145,6 +146,19 @@ def open_output_file(output, flag='w', encoding='utf-8'):
         return DummyTqdmFile(sys.stdout)
 
     return open(output, flag, encoding=encoding)
+
+
+def read_potentially_gzipped_path(path, encoding='utf-8'):
+    if path.endswith('.gz'):
+        with open(path, 'rb') as f:
+            raw_bytes = gzip.decompress(f.read())
+
+        raw = raw_bytes.decode(encoding, errors='replace')
+    else:
+        with codecs.open(path, 'r', encoding=encoding, errors='replace') as f:
+            raw = f.read()
+
+    return raw
 
 
 WorkerPayload = namedtuple(
