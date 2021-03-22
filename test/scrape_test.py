@@ -3,8 +3,14 @@
 # =============================================================================
 from bs4 import BeautifulSoup
 from minet.scrape import scrape
-from minet.scrape.analysis import headers_from_definition
+from minet.scrape.analysis import (
+    headers_from_definition,
+    validate
+)
 from minet.scrape.interpreter import tabulate
+from minet.scrape.exceptions import (
+    ScrapeEvalSyntaxError
+)
 
 BASIC_HTML = """
     <ul>
@@ -506,12 +512,16 @@ class TestScrape(object):
 
         assert item == 'One'
 
-    # def test_eval_exceptions(self):
-    #     item = scrape({
-    #         'iterator': 'li',
-    #         'item': {
-    #             'eval': '"ok'
-    #         }
-    #     }, BASIC_HTML)
+    def test_validate(self):
+        errors = validate({
+            'sel': 'li',
+            'item': {
+                'eval': '"ok'
+            }
+        })
 
-    #     print(item)
+        errors = [(p, type(e)) for p, e in errors]
+
+        assert errors == [
+            (['item', 'eval'], ScrapeEvalSyntaxError)
+        ]

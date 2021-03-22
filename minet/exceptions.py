@@ -7,7 +7,35 @@
 
 
 class MinetError(Exception):
-    pass
+    def __repr__(self):
+        representation = '<' + self.__class__.__name__
+
+        for k in dir(self):
+            if (
+                k.startswith('_') or
+                k == 'message' or
+                k == 'msg' or
+                k == 'args' or
+                'traceback' in k
+            ):
+                continue
+
+            v = getattr(self, k)
+
+            if isinstance(v, BaseException):
+                representation += ' %s=<%s>' % (k, v.__class__.__name__)
+                continue
+
+            if isinstance(v, str):
+                if len(v) > 30:
+                    v = v[:29] + '…'
+                v = v.replace('\n', '\\n')
+
+            representation += ' %s="%s"' % (k, v)
+
+        representation += '>'
+
+        return representation
 
 
 # General errors
