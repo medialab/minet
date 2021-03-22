@@ -111,7 +111,7 @@ and you will get:
 
 ## What to do when entities are symbolized by multiple urls
 
-Often you will find that a single url is not enough to delimit an interesting "entity" you would want to study as a whole. For instance, you may want to assert that any url of a tweet posted by Le Monde's Twitter account should be associated to the media, as well as any article. But to do so, Le Monde's homepage is not sufficient as you will now require at least two urls to symbolize the borders of your entity: https://www.lemonde.fr/ and https://twitter.com/lemondefr.
+Often you will find that a single url is not enough to delimit an interesting "entity" you would want to study as a whole. For instance, you may want to assert that any url of a tweet posted by Le Monde's Twitter account should be associated to the media, as well as any article on their website. But to do so, Le Monde's homepage is not sufficient to symbolize it since you now require at least two urls to define the boundaries of your entity: https://www.lemonde.fr/ and https://twitter.com/lemondefr.
 
 So that both those urls:
 
@@ -132,9 +132,9 @@ The most natural way to handle this is of course to have multiple lines per medi
 
 As such, the same metadata can be accessed through different urls.
 
-But you may also prefer keeping both urls in the same CSV line and to do so, people often tend to keep them in a single cell, separated by a specific character such as `|`, `,` or just a simple space, for instance.
+But you may also prefer keeping both urls in the same CSV line and to do so, people often keep them in a single cell, separated by a specific character such as `|`, `,` or just a simple whitespace, for instance.
 
-To handle this, `minet` can be told to consider a CSV column as separated by this special character so that you can represent your entities thusly:
+To handle this, `minet` can be told to consider a CSV column as separated by this special character so you can represent your entities thusly:
 
 | id  | prefixes                                             | media   | politics |
 |-----|------------------------------------------------------|---------|----------|
