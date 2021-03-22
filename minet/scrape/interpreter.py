@@ -8,6 +8,7 @@
 import re
 import json
 import soupsieve
+import textwrap
 from bs4 import Tag
 from urllib.parse import urljoin
 
@@ -80,9 +81,7 @@ def eval_expression(expression, element=None, elements=None, value=None,
         # Multiline expression
         scope = {}
 
-        wrapped_expression = expression.strip().split('\n')
-        wrapped_expression[-1] = '__return_value__ = ' + wrapped_expression[-1]
-        wrapped_expression = '\n'.join(wrapped_expression)
+        wrapped_expression = 'def __run__():\n%s\n__return_value__ = __run__()' % textwrap.indent(expression, '  ')
 
         try:
             exec(wrapped_expression, EVAL_CONTEXT, scope)

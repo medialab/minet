@@ -5,4 +5,4 @@ fields:
   title:
     eval: |
       title = root.select_one("title")
-      title.get_text().strip()
+      return title.get_text().strip()

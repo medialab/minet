@@ -316,11 +316,19 @@ class TestScrape(object):
         result = scrape({
             'sel': 'li',
             'item': {
-                'eval': 'a = 45\na + 10'
+                'eval': 'a = 45\nreturn a + 10'
             }
         }, BASIC_HTML)
 
         assert result == 55
+
+        result = scrape({
+            'item': {
+                'eval': 'el = element.select_one("li")\nreturn el.get_text().strip()'
+            }
+        }, BASIC_HTML)
+
+        assert result == 'One'
 
     def test_context(self):
         result = scrape({
