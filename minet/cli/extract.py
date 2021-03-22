@@ -84,7 +84,7 @@ def worker(payload):
     if content is None:
         try:
             raw_html = read_potentially_gzipped_path(path, encoding=encoding)
-        except UnicodeDecodeError as e:
+        except (FileNotFoundError, UnicodeDecodeError) as e:
             return e, row, None
     else:
         raw_html = content

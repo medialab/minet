@@ -8,6 +8,7 @@ import csv
 import sys
 import gzip
 import yaml
+import codecs
 from io import StringIO
 from glob import iglob
 from os.path import join, expanduser, isfile, isdir

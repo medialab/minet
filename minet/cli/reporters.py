@@ -69,6 +69,7 @@ def decode_error_reporter(error):
 ERROR_REPORTERS = {
     UnicodeDecodeError: 'wrong-encoding',
     UnknownEncodingError: 'unknown-encoding',
+    FileNotFoundError: 'file-not-found',
     MaxRetryError: max_retry_error_reporter,
     InvalidURLError: 'invalid-url',
     SSLError: 'ssl',

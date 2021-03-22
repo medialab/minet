@@ -36,7 +36,7 @@ def worker(payload):
     if content is None:
         try:
             content = read_potentially_gzipped_path(path, encoding=encoding)
-        except UnicodeDecodeError as e:
+        except (FileNotFoundError, UnicodeDecodeError) as e:
             return ScrapeWorkerResult(e, None)
 
     # Building context
@@ -100,6 +100,10 @@ def scrape_action(namespace):
     with Pool(namespace.processes) as pool:
         for error, items in pool.imap_unordered(worker, files):
             loading_bar.update()
+
+            if error is not None:
+                loading_bar.inc('errors')
+                continue
 
             if not isinstance(items, list):
                 items = [items]
