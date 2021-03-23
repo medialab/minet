@@ -613,8 +613,8 @@ class TestScrape(object):
 
         assert isinstance(strainer, SoupStrainer)
 
-        def test_strainer(css, input_html, output_html):
-            parse_only = strainer_from_css(css)
+        def test_strainer(css, input_html, output_html, **kwargs):
+            parse_only = strainer_from_css(css, **kwargs)
             input_soup = BeautifulSoup(
                 '<main>%s</main>' % input_html,
                 'lxml',
@@ -645,4 +645,59 @@ class TestScrape(object):
             '*',
             '<div><p>ok</p><p id="important">whatever</p></div><div>Hello</div>',
             '<html><body><main><div><p>ok</p><p id="important">whatever</p></div><div>Hello</div></main></body></html>'
+        )
+
+        test_strainer(
+            'li > span',
+            '<ul><li>1. <span>One</span></li><li>2. Two</li></ul><div>Hello</div>',
+            '<li>1. <span>One</span></li><li>2. Two</li>',
+            ignore_relations=True
+        )
+
+        test_strainer(
+            '.number',
+            '<ul><li>1. <span class="number">One</span></li><li>2. Two</li></ul><div class="  yellow  number">Hello</div>',
+            '<span class="number">One</span><div class="yellow number">Hello</div>'
+        )
+
+        test_strainer(
+            'span.number',
+            '<ul><li>1. <span class="number">One</span></li><li>2. Two</li></ul><div class="  yellow  number">Hello</div>',
+            '<span class="number">One</span>'
+        )
+
+        test_strainer(
+            '[color]',
+            '<ul><li>1. <span color="blue">One</span></li><li>2. Two</li></ul><div>Hello</div>',
+            '<span color="blue">One</span>'
+        )
+
+        test_strainer(
+            'span[color]',
+            '<ul color="red"><li>1. <span color="blue">One</span></li><li>2. Two</li></ul><div>Hello</div>',
+            '<span color="blue">One</span>'
+        )
+
+        test_strainer(
+            '[color=blue]',
+            '<ul color="red"><li>1. <span color="blue">One</span></li><li>2. Two</li></ul><div>Hello</div>',
+            '<span color="blue">One</span>'
+        )
+
+        test_strainer(
+            '[color*=u]',
+            '<ul color="red"><li>1. <span color="blue">One</span></li><li>2. Two</li></ul><div>Hello</div>',
+            '<span color="blue">One</span>'
+        )
+
+        test_strainer(
+            '[color^=bl]',
+            '<ul color="red"><li>1. <span color="blue">One</span></li><li>2. Two</li></ul><div>Hello</div>',
+            '<span color="blue">One</span>'
+        )
+
+        test_strainer(
+            '[color$=ue]',
+            '<ul color="red"><li>1. <span color="blue">One</span></li><li>2. Two</li></ul><div>Hello</div>',
+            '<span color="blue">One</span>'
         )
