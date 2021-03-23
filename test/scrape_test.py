@@ -657,6 +657,13 @@ class TestScrape(object):
         )
 
         test_strainer(
+            'ul span',
+            '<ul><li>1. <span>One</span></li><li>2. Two</li></ul><div>Hello</div>',
+            '<ul><li>1. <span>One</span></li><li>2. Two</li></ul>',
+            ignore_relations=True
+        )
+
+        test_strainer(
             '.number',
             '<ul><li>1. <span class="number">One</span></li><li>2. Two</li></ul><div class="  yellow  number">Hello</div>',
             '<span class="number">One</span><div class="yellow number">Hello</div>'
