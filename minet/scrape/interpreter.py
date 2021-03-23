@@ -159,16 +159,21 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
         element = soupsieve.select_one(sel, element)
     elif 'sel_eval' in scraper:
 
-        element = eval_expression(
+        evaluated_sel = eval_expression(
             scraper['sel_eval'],
             element=element,
             elements=[],
             context=context,
             root=root,
             path=path + ['sel_eval'],
-            expect=Tag,
+            expect=(Tag, str),
             allow_none=True
         )
+
+        if isinstance(evaluated_sel, str):
+            element = soupsieve.select_one(evaluated_sel, element)
+        else:
+            element = evaluated_sel
 
     if element is None:
         return None

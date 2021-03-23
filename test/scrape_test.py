@@ -301,6 +301,15 @@ class TestScrape(object):
 
         assert result == [['li'], ['li'], ['first'], ['second'], ['first'], ['second']]
 
+        result = scrape({
+            'iterator': 'li',
+            'item': {
+                'sel_eval': '"span"'
+            }
+        }, NESTED_HTML)
+
+        assert result == ['One', 'Two']
+
     def test_eval(self):
         result = scrape({
             'iterator': 'li',
@@ -552,7 +561,7 @@ class TestScrape(object):
                 'sel_eval': '45'
             }, BASIC_HTML)
 
-        assert info.value.expected == Tag
+        assert info.value.expected == (Tag, str)
         assert info.value.got == 45
         assert info.value.path == ['sel_eval']
 
