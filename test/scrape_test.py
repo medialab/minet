@@ -310,6 +310,15 @@ class TestScrape(object):
 
         assert result == ['One', 'Two']
 
+        result = scrape({
+            'iterator_eval': '"li, span"',
+            'item': {
+                'attr': 'class'
+            }
+        }, NESTED_HTML)
+
+        assert result == [['li'], ['first'], ['second'], ['li'], ['first'], ['second']]
+
     def test_eval(self):
         result = scrape({
             'iterator': 'li',

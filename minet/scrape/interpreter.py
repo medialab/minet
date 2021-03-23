@@ -182,19 +182,24 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
     single_value = True
 
     if iterator is not None:
-        elements = soupsieve.select(iterator, element)
         single_value = False
+        elements = soupsieve.select(iterator, element)
     elif 'iterator_eval' in scraper:
-        elements = eval_expression(
+        single_value = False
+        evaluated_elements = eval_expression(
             scraper['iterator_eval'],
             element=element,
             elements=[],
             context=context,
             root=root,
             path=path + ['iterator_eval'],
-            expect=list
+            expect=(list, str)
         )
-        single_value = False
+
+        if isinstance(evaluated_elements, str):
+            elements = soupsieve.select(evaluated_elements, element)
+        else:
+            elements = evaluated_elements
     else:
         elements = [element]
 
