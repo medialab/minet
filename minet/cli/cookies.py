@@ -90,7 +90,10 @@ def cookies_action(namespace):
     if namespace.csv:
         output_writer = csv.writer(output_file)
 
-    jar = getattr(browser_cookie3, namespace.browser)()
+    try:
+        jar = getattr(browser_cookie3, namespace.browser)()
+    except browser_cookie3.BrowserCookieError:
+        die('Could not extract cookies from %s!' % namespace.browser)
 
     if namespace.url is not None:
         resolver = CookieResolver(jar)
@@ -109,7 +112,7 @@ def cookies_action(namespace):
             else:
                 print(cookie, file=output_file)
         else:
-            die('Could not find relevant cookie for %s in %s' % (namespace.url, namespace.browser))
+            die('Could not find relevant cookie for %s in %s!' % (namespace.url, namespace.browser))
     else:
         if namespace.csv:
             output_writer.writerow(COOKIE_CSV_HEADER)
