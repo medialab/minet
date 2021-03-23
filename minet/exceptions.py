@@ -7,6 +7,9 @@
 
 
 class MinetError(Exception):
+    def __init__(self, message=None):
+        super().__init__('' if message is None else message)
+
     def __repr__(self):
         representation = '<' + self.__class__.__name__
 
