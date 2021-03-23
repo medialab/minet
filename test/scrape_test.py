@@ -596,7 +596,8 @@ class TestScrape(object):
             'ul > li',
             'ul>li',
             'ul li',
-            'ul ~ li'
+            'ul ~ li',
+            ':is(span, div)'
         ]
 
         for css in too_complex:

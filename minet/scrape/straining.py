@@ -52,6 +52,9 @@ def strainer_from_css(css, ignore_relations=False):
     usable_selectors = []
 
     for selector in selector_list:
+        if selector.selectors:
+            raise ScrapeCSSSelectorTooComplex
+
         if not ignore_relations:
             if len(selector.relation) != 0:
                 raise ScrapeCSSSelectorTooComplex
