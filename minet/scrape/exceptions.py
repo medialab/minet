@@ -9,11 +9,11 @@ class ScrapeError(MinetError):
     pass
 
 
-class ScrapeCSSSelectorTooComplex(ScrapeError):
+class CSSSelectorTooComplex(ScrapeError):
     pass
 
 
-class BaseScrapeRuntimeError(ScrapeError):
+class ScraperRuntimeError(ScrapeError):
     def __init__(self, msg=None, reason=None, expression=None, path=None):
         super().__init__(msg)
         self.reason = reason
@@ -21,38 +21,38 @@ class BaseScrapeRuntimeError(ScrapeError):
         self.path = path
 
 
-class ScrapeEvalError(BaseScrapeRuntimeError):
+class ScraperEvalError(ScraperRuntimeError):
     pass
 
 
-class ScrapeNotATableError(BaseScrapeRuntimeError):
+class NotATableError(ScraperRuntimeError):
     pass
 
 
-class ScrapeEvalSyntaxError(BaseScrapeRuntimeError):
+class ScraperEvalSyntaxError(ScraperRuntimeError):
     pass
 
 
-class ScrapeEvalTypeError(BaseScrapeRuntimeError):
+class ScraperEvalTypeError(ScraperRuntimeError):
     def __init__(self, msg=None, expected=None, got=None, **kwargs):
         super().__init__(msg, **kwargs)
         self.expected = expected
         self.got = got
 
 
-class ScrapeEvalNoneError(BaseScrapeRuntimeError):
+class ScraperEvalNoneError(ScraperRuntimeError):
     pass
 
 
-class ScrapeValidationError(BaseScrapeRuntimeError):
+class ScraperValidationError(ScraperRuntimeError):
     pass
 
 
-class ScrapeValidationConflictError(BaseScrapeRuntimeError):
+class ScraperValidationConflictError(ScraperRuntimeError):
     def __init__(self, msg=None, keys=[], **kwargs):
         super().__init__(msg, **kwargs)
         self.keys = keys
 
 
-class ScrapeInvalidCSSSelectorError(BaseScrapeRuntimeError):
+class InvalidCSSSelectorError(ScraperRuntimeError):
     pass

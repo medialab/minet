@@ -10,7 +10,7 @@ from bs4 import SoupStrainer
 from soupsieve import SelectorSyntaxError
 from soupsieve.css_parser import CSSParser
 
-from minet.scrape.exceptions import ScrapeCSSSelectorTooComplex, ScrapeInvalidCSSSelectorError
+from minet.scrape.exceptions import CSSSelectorTooComplex, InvalidCSSSelectorError
 
 WHITESPACE_RE = re.compile(r'\s+')
 
@@ -49,17 +49,17 @@ def strainer_from_css(css, ignore_relations=False):
     try:
         selector_list = CSSParser(css).process_selectors()
     except (SelectorSyntaxError, NotImplementedError) as e:
-        raise ScrapeInvalidCSSSelectorError(reason=e)
+        raise InvalidCSSSelectorError(reason=e)
 
     usable_selectors = []
 
     for selector in selector_list:
         if selector.selectors or selector.nth:
-            raise ScrapeCSSSelectorTooComplex
+            raise CSSSelectorTooComplex
 
         if not ignore_relations:
             if len(selector.relation) != 0:
-                raise ScrapeCSSSelectorTooComplex
+                raise CSSSelectorTooComplex
 
             usable_selectors.append(selector)
         else:

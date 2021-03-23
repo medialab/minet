@@ -12,14 +12,14 @@ from minet.scrape.analysis import (
 from minet.scrape.interpreter import tabulate
 from minet.scrape.straining import strainer_from_css
 from minet.scrape.exceptions import (
-    ScrapeEvalSyntaxError,
-    ScrapeValidationConflictError,
-    ScrapeEvalError,
-    ScrapeEvalTypeError,
-    ScrapeEvalNoneError,
-    ScrapeNotATableError,
-    ScrapeCSSSelectorTooComplex,
-    ScrapeInvalidCSSSelectorError
+    ScraperEvalSyntaxError,
+    ScraperValidationConflictError,
+    ScraperEvalError,
+    ScraperEvalTypeError,
+    ScraperEvalNoneError,
+    NotATableError,
+    CSSSelectorTooComplex,
+    InvalidCSSSelectorError
 )
 
 BASIC_HTML = """
@@ -451,7 +451,7 @@ class TestScrape(object):
 
         assert result == [['John', 'Mayall'], ['Mary', 'Susan']]
 
-        with pytest.raises(ScrapeNotATableError):
+        with pytest.raises(NotATableError):
             tabulate(soup.select_one('tr'))
 
     def test_headers(self):
@@ -565,14 +565,14 @@ class TestScrape(object):
         errors = [(e.path, type(e)) for e in errors]
 
         assert errors == [
-            ([], ScrapeValidationConflictError),
-            (['item', 'sel'], ScrapeInvalidCSSSelectorError),
-            (['item', 'eval'], ScrapeEvalSyntaxError),
-            (['fields', 'url', 'iterator'], ScrapeInvalidCSSSelectorError)
+            ([], ScraperValidationConflictError),
+            (['item', 'sel'], InvalidCSSSelectorError),
+            (['item', 'eval'], ScraperEvalSyntaxError),
+            (['fields', 'url', 'iterator'], InvalidCSSSelectorError)
         ]
 
     def test_eval_errors(self):
-        with pytest.raises(ScrapeEvalError) as info:
+        with pytest.raises(ScraperEvalError) as info:
             scrape({
                 'iterator': 'li',
                 'item': {
@@ -583,7 +583,7 @@ class TestScrape(object):
         assert isinstance(info.value.reason, NameError)
         assert info.value.path == ['item', 'eval']
 
-        with pytest.raises(ScrapeEvalTypeError) as info:
+        with pytest.raises(ScraperEvalTypeError) as info:
             scrape({
                 'sel_eval': '45'
             }, BASIC_HTML)
@@ -592,7 +592,7 @@ class TestScrape(object):
         assert info.value.got == 45
         assert info.value.path == ['sel_eval']
 
-        with pytest.raises(ScrapeEvalNoneError) as info:
+        with pytest.raises(ScraperEvalNoneError) as info:
             scrape({
                 'iterator_eval': 'None'
             }, BASIC_HTML)
@@ -610,13 +610,13 @@ class TestScrape(object):
         ]
 
         for css in too_complex:
-            with pytest.raises(ScrapeCSSSelectorTooComplex):
+            with pytest.raises(CSSSelectorTooComplex):
                 strainer_from_css(css)
 
-        with pytest.raises(ScrapeInvalidCSSSelectorError):
+        with pytest.raises(InvalidCSSSelectorError):
             strainer_from_css('')
 
-        with pytest.raises(ScrapeInvalidCSSSelectorError):
+        with pytest.raises(InvalidCSSSelectorError):
             strainer_from_css('a[')
 
         strainer = strainer_from_css('td')

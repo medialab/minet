@@ -10,9 +10,9 @@ from soupsieve import SelectorSyntaxError
 
 from minet.scrape.utils import get_sel, get_iterator
 from minet.scrape.exceptions import (
-    ScrapeEvalSyntaxError,
-    ScrapeValidationConflictError,
-    ScrapeInvalidCSSSelectorError
+    ScraperEvalSyntaxError,
+    ScraperValidationConflictError,
+    InvalidCSSSelectorError
 )
 
 
@@ -50,7 +50,7 @@ def validate(scraper):
             c.append('tabulate')
 
         if len(c) > 1:
-            validation_error = ScrapeValidationConflictError(
+            validation_error = ScraperValidationConflictError(
                 path=path,
                 keys=c
             )
@@ -65,7 +65,7 @@ def validate(scraper):
             try:
                 soupsieve.compile(sel)
             except (SelectorSyntaxError, NotImplementedError) as e:
-                errors.append(ScrapeInvalidCSSSelectorError(path=path + [k], reason=e))
+                errors.append(InvalidCSSSelectorError(path=path + [k], reason=e))
 
         k, iterator = get_iterator(node, with_key=True)
 
@@ -73,7 +73,7 @@ def validate(scraper):
             try:
                 soupsieve.compile(iterator)
             except (SelectorSyntaxError, NotImplementedError) as e:
-                errors.append(ScrapeInvalidCSSSelectorError(path=path + [k], reason=e))
+                errors.append(InvalidCSSSelectorError(path=path + [k], reason=e))
 
         for k, v in node.items():
             p = path + [k]
@@ -83,7 +83,7 @@ def validate(scraper):
                 try:
                     ast.parse(v)
                 except SyntaxError as e:
-                    validation_error = ScrapeEvalSyntaxError(
+                    validation_error = ScraperEvalSyntaxError(
                         reason=e,
                         expression=v,
                         path=p

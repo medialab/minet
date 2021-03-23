@@ -16,10 +16,10 @@ from minet.utils import nested_get
 from minet.scrape.constants import EXTRACTOR_NAMES
 from minet.scrape.utils import get_sel, get_iterator
 from minet.scrape.exceptions import (
-    ScrapeEvalError,
-    ScrapeEvalTypeError,
-    ScrapeEvalNoneError,
-    ScrapeNotATableError
+    ScraperEvalError,
+    ScraperEvalTypeError,
+    ScraperEvalNoneError,
+    NotATableError
 )
 
 DEFAULT_CONTEXT = {}
@@ -83,7 +83,7 @@ def eval_expression(expression, element=None, elements=None, value=None,
             exec(wrapped_expression, EVAL_CONTEXT, scope)
             result = scope['__return_value__']
         except BaseException as e:
-            raise ScrapeEvalError(
+            raise ScraperEvalError(
                 reason=e,
                 path=path,
                 expression=expression
@@ -94,20 +94,20 @@ def eval_expression(expression, element=None, elements=None, value=None,
         try:
             result = eval(expression, EVAL_CONTEXT, None)
         except BaseException as e:
-            raise ScrapeEvalError(
+            raise ScraperEvalError(
                 reason=e,
                 path=path,
                 expression=expression
             )
 
     if not allow_none and result is None:
-        raise ScrapeEvalNoneError(
+        raise ScraperEvalNoneError(
             path=path,
             expression=expression
         )
 
     if expect is not None and not isinstance(result, expect):
-        raise ScrapeEvalTypeError(
+        raise ScraperEvalTypeError(
             path=path,
             expression=expression,
             expected=expect,
@@ -119,7 +119,7 @@ def eval_expression(expression, element=None, elements=None, value=None,
 
 def tabulate(element, headers_inference='th', headers=None, path=None):
     if element.name != 'table':
-        raise ScrapeNotATableError(path=path)
+        raise NotATableError(path=path)
 
     def generator():
         nonlocal headers
