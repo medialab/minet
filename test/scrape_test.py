@@ -592,8 +592,22 @@ class TestScrape(object):
         assert info.value.path == ['iterator_eval']
 
     def test_straining(self):
-        with pytest.raises(ScrapeCSSSelectorTooComplex):
-            strainer_from_css('ul > li')
+        too_complex = [
+            'ul > li',
+            'ul>li',
+            'ul li',
+            'ul ~ li'
+        ]
+
+        for css in too_complex:
+            with pytest.raises(ScrapeCSSSelectorTooComplex):
+                strainer_from_css(css)
+
+        with pytest.raises(TypeError):
+            strainer_from_css('')
+
+        with pytest.raises(TypeError):
+            strainer_from_css(None)
 
         strainer = strainer_from_css('td')
 
@@ -601,8 +615,34 @@ class TestScrape(object):
 
         def test_strainer(css, input_html, output_html):
             parse_only = strainer_from_css(css)
-            input_soup = BeautifulSoup('<main>%s</main>' % input_html, 'lxml', parse_only=parse_only)
+            input_soup = BeautifulSoup(
+                '<main>%s</main>' % input_html,
+                'lxml',
+                parse_only=parse_only
+            )
 
             assert input_soup.decode_contents().strip() == output_html
 
-        test_strainer('td', TABLE_TH_HTML, '<td>John</td><td>Mayall</td><td>Mary</td><td>Susan</td>')
+        test_strainer(
+            'td',
+            TABLE_TH_HTML,
+            '<td>John</td><td>Mayall</td><td>Mary</td><td>Susan</td>'
+        )
+
+        test_strainer(
+            '#important',
+            '<div><p>ok</p><p id="important">whatever</p></div><div>Hello</div>',
+            '<p id="important">whatever</p>'
+        )
+
+        test_strainer(
+            'em, strong',
+            '<div>Hello this is <em>horse</em> and <strong>chicken</strong></div><div>Hello</div>',
+            '<em>horse</em><strong>chicken</strong>'
+        )
+
+        test_strainer(
+            '*',
+            '<div><p>ok</p><p id="important">whatever</p></div><div>Hello</div>',
+            '<html><body><main><div><p>ok</p><p id="important">whatever</p></div><div>Hello</div></main></body></html>'
+        )
