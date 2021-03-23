@@ -54,5 +54,9 @@ class ScraperValidationConflictError(ScraperRuntimeError):
         self.keys = keys
 
 
+class ScraperValidationPluralModifierError(ScraperRuntimeError):
+    pass
+
+
 class InvalidCSSSelectorError(ScraperRuntimeError):
     pass

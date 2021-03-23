@@ -19,7 +19,8 @@ from minet.scrape.exceptions import (
     ScraperEvalNoneError,
     NotATableError,
     CSSSelectorTooComplex,
-    InvalidCSSSelectorError
+    InvalidCSSSelectorError,
+    ScraperValidationPluralModifierError
 )
 
 BASIC_HTML = """
@@ -555,6 +556,7 @@ class TestScrape(object):
                 'sel': 'a[',
                 'eval': '"ok'
             },
+            'filter': True,
             'fields': {
                 'url': {
                     'iterator': ':first'
@@ -571,7 +573,8 @@ class TestScrape(object):
             ([], ScraperValidationConflictError),
             (['item', 'sel'], InvalidCSSSelectorError),
             (['item', 'eval'], ScraperEvalSyntaxError),
-            (['fields', 'url', 'iterator'], InvalidCSSSelectorError)
+            (['fields', 'url', 'iterator'], InvalidCSSSelectorError),
+            ([], ScraperValidationPluralModifierError)
         ], key=key)
 
     def test_eval_errors(self):

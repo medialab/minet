@@ -12,7 +12,8 @@ from minet.scrape.utils import get_sel, get_iterator
 from minet.scrape.exceptions import (
     ScraperEvalSyntaxError,
     ScraperValidationConflictError,
-    InvalidCSSSelectorError
+    InvalidCSSSelectorError,
+    ScraperValidationPluralModifierError
 )
 
 
@@ -74,6 +75,11 @@ def validate(scraper):
                 soupsieve.compile(iterator)
             except (SelectorSyntaxError, NotImplementedError) as e:
                 errors.append(InvalidCSSSelectorError(path=path + [k], reason=e))
+
+        # Checking plural modifiers
+        if iterator is None and 'iterator_eval' not in node:
+            if 'filter' in node or 'filter_eval' in node or 'uniq' in node:
+                errors.append(ScraperValidationPluralModifierError(path=path))
 
         for k, v in node.items():
             p = path + [k]
