@@ -7,9 +7,10 @@
 #
 import re
 from bs4 import SoupStrainer
+from soupsieve import SelectorSyntaxError
 from soupsieve.css_parser import CSSParser
 
-from minet.scrape.exceptions import ScrapeCSSSelectorTooComplex
+from minet.scrape.exceptions import ScrapeCSSSelectorTooComplex, ScrapeInvalidCSSSelectorError
 
 WHITESPACE_RE = re.compile(r'\s+')
 
@@ -45,10 +46,11 @@ def match_selector(selector, tag, attrs):
 
 
 def strainer_from_css(css, ignore_relations=False):
-    if not css:
-        raise TypeError('expecting a css selector but got empty value or string')
+    try:
+        selector_list = CSSParser(css).process_selectors()
+    except (SelectorSyntaxError, NotImplementedError) as e:
+        raise ScrapeInvalidCSSSelectorError(reason=e)
 
-    selector_list = CSSParser(css).process_selectors()
     usable_selectors = []
 
     for selector in selector_list:

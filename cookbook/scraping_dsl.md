@@ -426,6 +426,6 @@ Harnessing recursivity will return:
 Know that some of the DSL keys have aliases for convenience:
 
 * `sel` can also be written as `$` (which is reminiscent of web development)
-* `iterator` can also be written as `it` or `$$`
+* `iterator` can also be written as `$$`
 
 So don't be surprised if you see them appear in people code's sometimes and don't be afraid to use them if they fit your mindset better.

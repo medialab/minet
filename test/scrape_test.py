@@ -18,7 +18,8 @@ from minet.scrape.exceptions import (
     ScrapeEvalTypeError,
     ScrapeEvalNoneError,
     ScrapeNotATableError,
-    ScrapeCSSSelectorTooComplex
+    ScrapeCSSSelectorTooComplex,
+    ScrapeInvalidCSSSelectorError
 )
 
 BASIC_HTML = """
@@ -190,7 +191,7 @@ class TestScrape(object):
         ]
 
         result = scrape({
-            'it': 'li',
+            'iterator': 'li',
             'fields': {
                 'value': 'text',
                 'constant': {
@@ -486,7 +487,7 @@ class TestScrape(object):
         expected = [{'id': 'li1', 'empty': None}, {'id': 'li2', 'empty': None}]
 
         items = scrape({
-            'it': 'li',
+            'iterator': 'li',
             'fields': {
                 'id': 'id',
                 'empty': {
@@ -498,7 +499,7 @@ class TestScrape(object):
         assert items == expected
 
         items = scrape({
-            'it': 'li',
+            'iterator': 'li',
             'fields': {
                 'id': 'id',
                 'empty': {
@@ -551,16 +552,23 @@ class TestScrape(object):
         errors = validate({
             'sel': 'li',
             'item': {
+                'sel': 'a[',
                 'eval': '"ok'
             },
-            'fields': {}
+            'fields': {
+                'url': {
+                    'iterator': ':first'
+                }
+            }
         })
 
         errors = [(e.path, type(e)) for e in errors]
 
         assert errors == [
             ([], ScrapeValidationConflictError),
-            (['item', 'eval'], ScrapeEvalSyntaxError)
+            (['item', 'sel'], ScrapeInvalidCSSSelectorError),
+            (['item', 'eval'], ScrapeEvalSyntaxError),
+            (['fields', 'url', 'iterator'], ScrapeInvalidCSSSelectorError)
         ]
 
     def test_eval_errors(self):
@@ -605,11 +613,11 @@ class TestScrape(object):
             with pytest.raises(ScrapeCSSSelectorTooComplex):
                 strainer_from_css(css)
 
-        with pytest.raises(TypeError):
+        with pytest.raises(ScrapeInvalidCSSSelectorError):
             strainer_from_css('')
 
-        with pytest.raises(TypeError):
-            strainer_from_css(None)
+        with pytest.raises(ScrapeInvalidCSSSelectorError):
+            strainer_from_css('a[')
 
         strainer = strainer_from_css('td')
 

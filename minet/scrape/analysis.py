@@ -5,10 +5,14 @@
 # Functions performing analysis of scraper definitions.
 #
 import ast
+import soupsieve
+from soupsieve import SelectorSyntaxError
 
+from minet.scrape.utils import get_sel, get_iterator
 from minet.scrape.exceptions import (
     ScrapeEvalSyntaxError,
-    ScrapeValidationConflictError
+    ScrapeValidationConflictError,
+    ScrapeInvalidCSSSelectorError
 )
 
 
@@ -52,6 +56,24 @@ def validate(scraper):
             )
 
             errors.append(validation_error)
+
+        # Validating selectors
+        # NOTE: this has the beneficial side effect of precompiling selectors
+        k, sel = get_sel(node, with_key=True)
+
+        if sel is not None:
+            try:
+                soupsieve.compile(sel)
+            except (SelectorSyntaxError, NotImplementedError) as e:
+                errors.append(ScrapeInvalidCSSSelectorError(path=path + [k], reason=e))
+
+        k, iterator = get_iterator(node, with_key=True)
+
+        if iterator is not None:
+            try:
+                soupsieve.compile(iterator)
+            except (SelectorSyntaxError, NotImplementedError) as e:
+                errors.append(ScrapeInvalidCSSSelectorError(path=path + [k], reason=e))
 
         for k, v in node.items():
             p = path + [k]

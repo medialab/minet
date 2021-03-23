@@ -52,3 +52,7 @@ class ScrapeValidationConflictError(BaseScrapeRuntimeError):
     def __init__(self, msg=None, keys=[], **kwargs):
         super().__init__(msg, **kwargs)
         self.keys = keys
+
+
+class ScrapeInvalidCSSSelectorError(BaseScrapeRuntimeError):
+    pass

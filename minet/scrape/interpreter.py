@@ -14,6 +14,7 @@ from urllib.parse import urljoin
 
 from minet.utils import nested_get
 from minet.scrape.constants import EXTRACTOR_NAMES
+from minet.scrape.utils import get_sel, get_iterator
 from minet.scrape.exceptions import (
     ScrapeEvalError,
     ScrapeEvalTypeError,
@@ -23,12 +24,6 @@ from minet.scrape.exceptions import (
 
 DEFAULT_CONTEXT = {}
 DATA_TYPES = (str, int, float, bool, list, dict)
-
-
-def get_aliases(o, aliases):
-    for alias in aliases:
-        if alias in o:
-            return o[alias]
 
 
 def merge_contexts(global_context, local_context):
@@ -164,8 +159,8 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
 
         return element.get(scraper)
 
-    sel = get_aliases(scraper, ['sel', '$'])
-    iterator = get_aliases(scraper, ['iterator', 'it', '$$'])
+    sel = get_sel(scraper)
+    iterator = get_iterator(scraper)
 
     # First we need to solve local selection
     if sel is not None:
