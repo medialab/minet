@@ -562,14 +562,17 @@ class TestScrape(object):
             }
         })
 
-        errors = [(e.path, type(e)) for e in errors]
+        def key(t):
+            return ('.'.join(t[0]), t[1].__name__)
 
-        assert errors == [
+        errors = sorted([(e.path, type(e)) for e in errors], key=key)
+
+        assert errors == sorted([
             ([], ScraperValidationConflictError),
             (['item', 'sel'], InvalidCSSSelectorError),
             (['item', 'eval'], ScraperEvalSyntaxError),
             (['fields', 'url', 'iterator'], InvalidCSSSelectorError)
-        ]
+        ], key=key)
 
     def test_eval_errors(self):
         with pytest.raises(ScraperEvalError) as info:
