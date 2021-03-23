@@ -701,3 +701,9 @@ class TestScrape(object):
             '<ul color="red"><li>1. <span color="blue">One</span></li><li>2. Two</li></ul><div>Hello</div>',
             '<span color="blue">One</span>'
         )
+
+        test_strainer(
+            '[color=blue]',
+            '<ul color="red"><li>1. <span COLOR="blue">One</span></li><li>2. Two</li></ul><div>Hello</div>',
+            '<span color="blue">One</span>'
+        )
