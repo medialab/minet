@@ -9,6 +9,10 @@ class ScrapeError(MinetError):
     pass
 
 
+class ScrapeCSSSelectorTooComplex(ScrapeError):
+    pass
+
+
 class BaseScrapeRuntimeError(ScrapeError):
     def __init__(self, msg=None, reason=None, expression=None, path=None):
         super().__init__(msg)

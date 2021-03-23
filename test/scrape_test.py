@@ -2,7 +2,7 @@
 # Minet Scrape Unit Tests
 # =============================================================================
 import pytest
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup, Tag, SoupStrainer
 
 from minet.scrape import scrape
 from minet.scrape.analysis import (
@@ -10,13 +10,15 @@ from minet.scrape.analysis import (
     validate
 )
 from minet.scrape.interpreter import tabulate
+from minet.scrape.straining import strainer_from_css
 from minet.scrape.exceptions import (
     ScrapeEvalSyntaxError,
     ScrapeValidationConflictError,
     ScrapeEvalError,
     ScrapeEvalTypeError,
     ScrapeEvalNoneError,
-    ScrapeNotATableError
+    ScrapeNotATableError,
+    ScrapeCSSSelectorTooComplex
 )
 
 BASIC_HTML = """
@@ -588,3 +590,19 @@ class TestScrape(object):
             }, BASIC_HTML)
 
         assert info.value.path == ['iterator_eval']
+
+    def test_straining(self):
+        with pytest.raises(ScrapeCSSSelectorTooComplex):
+            strainer_from_css('ul > li')
+
+        strainer = strainer_from_css('td')
+
+        assert isinstance(strainer, SoupStrainer)
+
+        def test_strainer(css, input_html, output_html):
+            parse_only = strainer_from_css(css)
+            input_soup = BeautifulSoup('<main>%s</main>' % input_html, 'lxml', parse_only=parse_only)
+
+            assert input_soup.decode_contents().strip() == output_html
+
+        test_strainer('td', TABLE_TH_HTML, '<td>John</td><td>Mayall</td><td>Mary</td><td>Susan</td>')
