@@ -444,6 +444,10 @@ class TestScrape(object):
 
         assert result == [{'name': 'John', 'surname': 'Mayall'}, {'name': 'Mary', 'surname': 'Susan'}]
 
+        result = list(tabulate(table, headers_inference=None))
+
+        assert result == [['John', 'Mayall'], ['Mary', 'Susan']]
+
         with pytest.raises(ScrapeNotATableError):
             tabulate(soup.select_one('tr'))
 

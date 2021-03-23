@@ -145,8 +145,12 @@ def tabulate(element, headers_inference='th', headers=None, path=None):
             if headers_inference == 'th':
                 headers = [th.get_text() for th in ths]
 
-        for tr in trs:
-            yield {headers[i]: td.get_text() for i, td in enumerate(tr.find_all('td', recursive=False))}
+        if headers is not None:
+            for tr in trs:
+                yield {headers[i]: td.get_text() for i, td in enumerate(tr.find_all('td', recursive=False))}
+        else:
+            for tr in trs:
+                yield [td.get_text() for td in tr.find_all('td', recursive=False)]
 
     return generator()
 
