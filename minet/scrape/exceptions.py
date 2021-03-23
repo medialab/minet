@@ -21,6 +21,10 @@ class ScrapeEvalError(BaseScrapeRuntimeError):
     pass
 
 
+class ScrapeNotATableError(BaseScrapeRuntimeError):
+    pass
+
+
 class ScrapeEvalSyntaxError(BaseScrapeRuntimeError):
     pass
 

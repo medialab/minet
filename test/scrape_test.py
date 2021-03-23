@@ -15,7 +15,8 @@ from minet.scrape.exceptions import (
     ScrapeValidationConflictError,
     ScrapeEvalError,
     ScrapeEvalTypeError,
-    ScrapeEvalNoneError
+    ScrapeEvalNoneError,
+    ScrapeNotATableError
 )
 
 BASIC_HTML = """
@@ -442,6 +443,9 @@ class TestScrape(object):
         result = list(tabulate(table, headers=['name', 'surname']))
 
         assert result == [{'name': 'John', 'surname': 'Mayall'}, {'name': 'Mary', 'surname': 'Susan'}]
+
+        with pytest.raises(ScrapeNotATableError):
+            tabulate(soup.select_one('tr'))
 
     def test_headers(self):
         headers = headers_from_definition({'iterator': 'li'})

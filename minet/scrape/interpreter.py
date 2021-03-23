@@ -17,7 +17,8 @@ from minet.scrape.constants import EXTRACTOR_NAMES
 from minet.scrape.exceptions import (
     ScrapeEvalError,
     ScrapeEvalTypeError,
-    ScrapeEvalNoneError
+    ScrapeEvalNoneError,
+    ScrapeNotATableError
 )
 
 DEFAULT_CONTEXT = {}
@@ -121,25 +122,33 @@ def eval_expression(expression, element=None, elements=None, value=None,
     return result
 
 
-def tabulate(element, headers_inference='th', headers=None):
-    body = element.find('tbody', recursive=False)
-    head = element.find('thead', recursive=False)
+def tabulate(element, headers_inference='th', headers=None, path=None):
+    if element.name != 'table':
+        raise ScrapeNotATableError(path=path)
 
-    if body is None:
-        body = element
+    def generator():
+        nonlocal headers
 
-    if head is None:
-        head = element
+        body = element.find('tbody', recursive=False)
+        head = element.find('thead', recursive=False)
 
-    trs = body.select('tr:has(td)', recursive=False)
-    ths = head.select('tr > th', recursive=False)
+        if body is None:
+            body = element
 
-    if headers is None:
-        if headers_inference == 'th':
-            headers = [th.get_text() for th in ths]
+        if head is None:
+            head = element
 
-    for tr in trs:
-        yield {headers[i]: td.get_text() for i, td in enumerate(tr.find_all('td', recursive=False))}
+        trs = body.select('tr:has(td)', recursive=False)
+        ths = head.select('tr > th', recursive=False)
+
+        if headers is None:
+            if headers_inference == 'th':
+                headers = [th.get_text() for th in ths]
+
+        for tr in trs:
+            yield {headers[i]: td.get_text() for i, td in enumerate(tr.find_all('td', recursive=False))}
+
+    return generator()
 
 
 def interpret_scraper(scraper, element, root=None, context=None, path=[]):
