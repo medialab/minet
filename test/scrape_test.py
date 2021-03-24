@@ -7,7 +7,9 @@ from bs4 import BeautifulSoup, Tag, SoupStrainer
 from minet.scrape import scrape
 from minet.scrape.analysis import (
     headers_from_definition,
-    validate
+    validate,
+    analyse,
+    ScraperAnalysis
 )
 from minet.scrape.interpreter import tabulate
 from minet.scrape.straining import strainer_from_css
@@ -473,6 +475,32 @@ class TestScrape(object):
         assert headers == ['id']
 
         headers = headers_from_definition({'sel': 'table', 'tabulate': True})
+
+    def test_analysis(self):
+        analysis = analyse({
+            'item': 'href'
+        })
+
+        assert analysis == ScraperAnalysis(plural=False, headers=['value'], output_type='scalar')
+
+        analysis = analyse({
+            'fields': {
+                'url': 'href',
+                'title': 'text'
+            }
+        })
+
+        assert analysis == ScraperAnalysis(plural=False, headers=['url', 'title'], output_type='dict')
+
+        analysis = analyse({
+            'iterator': 'li',
+            'fields': {
+                'url': 'href',
+                'title': 'text'
+            }
+        })
+
+        assert analysis == ScraperAnalysis(plural=True, headers=['url', 'title'], output_type='collection')
 
     def test_absent_tail_call(self):
         item = scrape({

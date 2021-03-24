@@ -17,6 +17,26 @@ from minet.scrape.exceptions import (
 )
 
 
+class ScraperAnalysis(object):
+    __slots__ = ('headers', 'plural', 'output_type')
+
+    def __init__(self, headers=None, plural=False, output_type='scalar'):
+        self.headers = headers
+        self.plural = plural
+        self.output_type = output_type
+
+    def __eq__(self, other):
+        return all(getattr(self, k) == getattr(other, k) for k in self.__slots__)
+
+    def __repr__(self):
+        return '<{name} headers={headers!r} plural={plural} output_type={output_type}>'.format(
+            name=self.__class__.__name__,
+            headers=self.headers,
+            plural=self.plural,
+            output_type=self.output_type
+        )
+
+
 def headers_from_definition(scraper):
     tabulate = scraper.get('tabulate')
 
@@ -31,7 +51,30 @@ def headers_from_definition(scraper):
     if fields is None:
         return ['value']
 
-    return list(scraper['fields'].keys())
+    return list(fields.keys())
+
+
+def analyse(scraper):
+    analysis = ScraperAnalysis()
+
+    analysis.headers = headers_from_definition(scraper)
+
+    iterator = get_iterator(scraper)
+
+    if iterator is not None or 'iterator_eval' in scraper:
+        analysis.plural = True
+        analysis.output_type = 'list'
+
+    if 'fields' in scraper:
+        if analysis.plural:
+            analysis.output_type = 'collection'
+        else:
+            analysis.output_type = 'dict'
+
+    elif 'eval' in scraper:
+        analysis.output_type = 'unknown'
+
+    return analysis
 
 
 def validate(scraper):
