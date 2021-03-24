@@ -16,7 +16,7 @@ dateparser==1.0.0
 ebbe==1.1.0
 json5==0.8.5
 keyring<19.3
-lxml==4.6.2
+lxml==4.6.3
 ndjson==0.3.1
 persist-queue==0.4.2
 pyyaml==5.1.2
