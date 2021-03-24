@@ -22,7 +22,7 @@ from minet.scrape.exceptions import (
     NotATableError,
     CSSSelectorTooComplex,
     InvalidCSSSelectorError,
-    ScraperValidationPluralModifierError
+    ScraperValidationIrrelevantPluralModifierError
 )
 
 BASIC_HTML = """
@@ -602,7 +602,7 @@ class TestScrape(object):
             (['item', 'sel'], InvalidCSSSelectorError),
             (['item', 'eval'], ScraperEvalSyntaxError),
             (['fields', 'url', 'iterator'], InvalidCSSSelectorError),
-            ([], ScraperValidationPluralModifierError)
+            ([], ScraperValidationIrrelevantPluralModifierError)
         ], key=key)
 
     def test_eval_errors(self):
