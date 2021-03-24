@@ -26,7 +26,11 @@ class ScraperAnalysis(object):
         self.output_type = output_type
 
     def __eq__(self, other):
-        return all(getattr(self, k) == getattr(other, k) for k in self.__slots__)
+        return (
+            self.plural == other.plural and
+            self.output_type == other.output_type and
+            set(self.headers) == set(other.headers)
+        )
 
     def __repr__(self):
         return '<{name} headers={headers!r} plural={plural} output_type={output_type}>'.format(
