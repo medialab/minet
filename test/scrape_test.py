@@ -587,7 +587,8 @@ class TestScrape(object):
             'filter': True,
             'fields': {
                 'url': {
-                    'iterator': ':first'
+                    'iterator': ':first',
+                    'iterator_eval': '"span"'
                 }
             }
         })
@@ -602,7 +603,8 @@ class TestScrape(object):
             (['item', 'sel'], InvalidCSSSelectorError),
             (['item', 'eval'], ScraperEvalSyntaxError),
             (['fields', 'url', 'iterator'], InvalidCSSSelectorError),
-            ([], ScraperValidationIrrelevantPluralModifierError)
+            ([], ScraperValidationIrrelevantPluralModifierError),
+            (['fields', 'url'], ScraperValidationConflictError)
         ], key=key)
 
     def test_eval_errors(self):

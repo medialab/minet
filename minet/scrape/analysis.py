@@ -145,6 +145,16 @@ def validate(scraper):
                     )
 
                     errors.append(validation_error)
+            else:
+                k_eval = '%s_eval' % k
+
+                if k_eval in node:
+                    validation_error = ScraperValidationConflictError(
+                        path=path,
+                        keys=[k, k_eval]
+                    )
+
+                    errors.append(validation_error)
 
             if isinstance(v, dict):
                 recurse(v, p)
