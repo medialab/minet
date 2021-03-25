@@ -69,6 +69,8 @@ scraper = Scraper(declaration)
 title = scraper(html)
 ```
 
+For more information, be sure to read the relevant library usage documentation [here](../docs/lib.md#scraper).
+
 ### From the command line
 
 To use a scraper from the command line, you can use the `scrape` command thusly:
@@ -80,6 +82,8 @@ minet scrape scraper.yml report.csv > scraped.csv
 # To scrape html file found by glob:
 minet scrape scraper.yml --glob 'files/**/*.html' > scraped.csv
 ```
+
+For more information, be sure to read the relevant CLI usage documentation [here](../docs/cli.md#scrape).
 
 ## Scraping a single item
 
