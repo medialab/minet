@@ -6,6 +6,8 @@
 #
 import ast
 import soupsieve
+from io import StringIO
+from functools import partial
 from soupsieve import SelectorSyntaxError
 
 from minet.scrape.utils import get_sel, get_iterator
@@ -87,6 +89,19 @@ def analyse(scraper):
     return analysis
 
 
+ERRORS_PRIORITY = {
+    InvalidCSSSelectorError: 0,
+    ScraperEvalSyntaxError: 1,
+    ScraperValidationConflictError: 2,
+    ScraperValidationMixedConcernError: 3,
+    ScraperValidationIrrelevantPluralModifierError: 4
+}
+
+
+def errors_sorting_key(error):
+    return (tuple(error.path), ERRORS_PRIORITY[type(error)])
+
+
 def validate(scraper):
 
     errors = []
@@ -119,7 +134,7 @@ def validate(scraper):
             try:
                 soupsieve.compile(sel)
             except (SelectorSyntaxError, NotImplementedError) as e:
-                errors.append(InvalidCSSSelectorError(path=path + [k], reason=e))
+                errors.append(InvalidCSSSelectorError(path=path + [k], reason=e, expression=sel))
 
         k, iterator = get_iterator(node, with_key=True)
 
@@ -127,7 +142,7 @@ def validate(scraper):
             try:
                 soupsieve.compile(iterator)
             except (SelectorSyntaxError, NotImplementedError) as e:
-                errors.append(InvalidCSSSelectorError(path=path + [k], reason=e))
+                errors.append(InvalidCSSSelectorError(path=path + [k], reason=e, expression=iterator))
 
         # Checking plural modifiers
         if iterator is None and 'iterator_eval' not in node:
@@ -184,4 +199,46 @@ def validate(scraper):
 
     recurse(scraper)
 
-    return errors
+    return sorted(errors, key=errors_sorting_key)
+
+
+def and_join(strings):
+    strings = ['"%s"' % s for s in strings]
+
+    if len(strings) < 2:
+        return strings[0]
+
+    return (', '.join(strings[:-1])) + ' and ' + strings[-1]
+
+
+def report_validation_errors(errors):
+    output = StringIO()
+
+    p = partial(print, file=output)
+
+    for n, error in enumerate(errors, 1):
+        path = '.' + ('.'.join(error.path))
+
+        p('> Error n°{n} at path "{path}":'.format(n=n, path=path))
+
+        if isinstance(error, ScraperValidationConflictError):
+            p('  the {keys} keys are conflicting and should not be found at the same level!'.format(keys=and_join(error.keys)))
+
+        if isinstance(error, ScraperValidationIrrelevantPluralModifierError):
+            p('  the "{modifier}" modifier should not be found at a non-plural level (i.e. without iterator)!'.format(modifier=error.modifier))
+
+        if isinstance(error, ScraperValidationMixedConcernError):
+            p('  mixed concerns could not be interpreted (i.e. the {burrowing} keys should not be found alongside the {leaf} ones)!'.format(burrowing=and_join(BURROWING_KEYS), leaf=and_join(LEAF_KEYS)))
+
+        if isinstance(error, InvalidCSSSelectorError):
+            p('  invalid CSS selector "{css}"!'.format(css=error.expression))
+
+        if isinstance(error, ScraperEvalSyntaxError):
+            p('  invalid python code was found:')
+
+            for line in error.expression.split('\n'):
+                p('    | {line}'.format(line=line))
+
+        p()
+
+    return output.getvalue()

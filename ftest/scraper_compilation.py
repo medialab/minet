@@ -2,6 +2,7 @@ from pprint import pprint
 from bs4 import BeautifulSoup
 from minet import Scraper
 from minet.scrape.compiler import compile_scraper
+from minet.scrape.analysis import validate, report_validation_errors
 
 BASIC_HTML = """
     <ul>
@@ -36,83 +37,83 @@ RECURSIVE_HTML = """
 """
 
 
-def test(definition, target):
-    compiled = compile_scraper(definition, as_string=True)
+# def test(definition, target):
+#     compiled = compile_scraper(definition, as_string=True)
 
-    print('Scraper:')
-    print('--------')
-    print()
-    print(compiled)
+#     print('Scraper:')
+#     print('--------')
+#     print()
+#     print(compiled)
 
-    scraper = compile_scraper(definition)
+#     scraper = compile_scraper(definition)
 
-    soup = BeautifulSoup(target, 'lxml')
+#     soup = BeautifulSoup(target, 'lxml')
 
-    print('Output:')
-    print('-------')
-    pprint(scraper(soup))
-    print()
-    print()
+#     print('Output:')
+#     print('-------')
+#     pprint(scraper(soup))
+#     print()
+#     print()
 
-test({
-    'iterator': 'ul > li',
-    'item': 'id'
-}, BASIC_HTML)
+# test({
+#     'iterator': 'ul > li',
+#     'item': 'id'
+# }, BASIC_HTML)
 
-test({
-    'iterator': 'div',
-    'item': {
-        'iterator': 'ul',
-        'item': {
-            'iterator': 'li'
-        }
-    }
-}, RECURSIVE_HTML)
+# test({
+#     'iterator': 'div',
+#     'item': {
+#         'iterator': 'ul',
+#         'item': {
+#             'iterator': 'li'
+#         }
+#     }
+# }, RECURSIVE_HTML)
 
-test({
-    'iterator': 'ul > li',
-    'fields': {
-        'id': 'id',
-        'text': 'text'
-    }
-}, BASIC_HTML)
+# test({
+#     'iterator': 'ul > li',
+#     'fields': {
+#         'id': 'id',
+#         'text': 'text'
+#     }
+# }, BASIC_HTML)
 
-test({
-    'iterator': 'div',
-    'item': {
-        'iterator': 'ul',
-        'fields': {
-            'id': 'id',
-            'items': {
-                'iterator': 'li',
-                'fields': {
-                    'text': 'text',
-                    'color': 'color'
-                }
-            }
-        }
-    }
-}, RECURSIVE_HTML)
+# test({
+#     'iterator': 'div',
+#     'item': {
+#         'iterator': 'ul',
+#         'fields': {
+#             'id': 'id',
+#             'items': {
+#                 'iterator': 'li',
+#                 'fields': {
+#                     'text': 'text',
+#                     'color': 'color'
+#                 }
+#             }
+#         }
+#     }
+# }, RECURSIVE_HTML)
 
-test({
-    'iterator': 'div',
-    'fields': {
-        'align': 'align',
-        'items': {
-            'iterator': 'ul',
-            'fields': {
-                'id': 'id',
-                'items': {
-                    'iterator': 'li',
-                    'fields': {
-                        'text': 'text',
-                        'color': 'color'
-                    }
-                }
-            }
-        }
-    }
-}, RECURSIVE_HTML)
+# test({
+#     'iterator': 'div',
+#     'fields': {
+#         'align': 'align',
+#         'items': {
+#             'iterator': 'ul',
+#             'fields': {
+#                 'id': 'id',
+#                 'items': {
+#                     'iterator': 'li',
+#                     'fields': {
+#                         'text': 'text',
+#                         'color': 'color'
+#                     }
+#                 }
+#             }
+#         }
+#     }
+# }, RECURSIVE_HTML)
 
 # from timeit import default_timer as timer
 
@@ -163,3 +164,39 @@ test({
 
 #     for _ in range(N):
 #         scraper(soup)
+
+THE_WORST_SCRAPER_EVER = {
+    'sel': 'li',
+    'item': {
+        'sel': 'a[',
+        'eval': '"ok'
+    },
+    'filter': True,
+    'fields': {
+        'url': {
+            'iterator': ':first',
+            'iterator_eval': '"span"'
+        },
+        'name': {
+            'attr': 'id',
+            'extract': 'text'
+        },
+        'id': {
+            'attr': 'id',
+            'item': 'href'
+        },
+        'code': {
+            'eval': 'a = 45\nif a == 34:\n  return a\nif'
+        }
+    }
+}
+
+errors = validate(THE_WORST_SCRAPER_EVER)
+
+for error in errors:
+    print(repr(error))
+
+report = report_validation_errors(errors)
+
+print()
+print(report)
