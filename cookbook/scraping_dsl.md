@@ -1082,6 +1082,18 @@ So don't be surprised if you see them appear in people code's sometimes and don'
 
 ## Scraper execution outline
 
+1. Selection of a single element is made using `sel`, `$` or `sel_eval`.
+2. Selection of iteratees is made if `iterator` or `iterator_eval` is present, in which case the scraper output will be a list at this level.
+3. `set_context` runs to create a local context.
+  1. If we find that we are collecting `fields`, we recurse for each key.
+  2. Else we collect our `item` by recursing and finally resolving a leaf directive (i.e. if no sub `iterator`, `iterator_eval`, `item` nor `fields` were given):
+     1. If nothing is given, we collect the current html element's text, if a `default` value was not provided instead.
+     2. We apply `attr`, or `extract` or `get_context`.
+     3. We run `eval`.
+     4. If the result is `None`, we set it to the `default` value if provided.
+4. If working on a list, we filter values through `filter` or `filter_eval`.
+5. If working on a list, we only keep unique items through `uniq`.
+
 ## Various useful examples
 
 ### Going up the tree
