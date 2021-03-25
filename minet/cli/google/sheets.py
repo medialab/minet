@@ -6,7 +6,7 @@
 #
 from browser_cookie3 import BrowserCookieError
 
-from minet.cli.utils import open_output_file
+from minet.cli.utils import open_output_file, die
 from minet.google import export_google_sheets_as_csv
 from minet.google.exceptions import (
     GoogleSheetsInvalidTargetError,
@@ -24,7 +24,7 @@ def google_sheets_action(namespace):
             cookie=namespace.cookie
         )
     except GoogleSheetsInvalidTargetError:
-        die('Could not extract a valid google drive id from provided argument!')
+        die('Could not extract a valid google sheets id from provided argument!')
     except BrowserCookieError:
         die('Could not extract cookie from %s!' % namespace.cookie)
     except GoogleSheetsMissingCookieError:

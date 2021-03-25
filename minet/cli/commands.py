@@ -897,7 +897,7 @@ MINET_COMMANDS = {
                     'title': 'Minet Google Sheets Command',
                     'description': '''
                         Grab the given google spreadsheet as a CSV file from
-                        its url or id.
+                        its url, its share url or id.
                     ''',
                     'epilog': '''
                         examples:

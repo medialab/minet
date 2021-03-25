@@ -6,7 +6,11 @@
 #
 import browser_cookie3
 from ural import is_url
-from ural.google import extract_id_from_google_drive_url
+from ural.google import (
+    parse_google_drive_url,
+    GoogleDriveFile,
+    GoogleDrivePublicLink
+)
 
 from minet.utils import CookieResolver, create_pool, request
 from minet.constants import COOKIE_BROWSERS
@@ -19,26 +23,21 @@ from minet.google.exceptions import (
 POOL = create_pool()
 
 
-def forge_export_url(drive_id, authuser=None):
-    url = 'https://docs.google.com/spreadsheets/d/%s/export?exportFormat=csv' % drive_id
-
-    if authuser is not None:
-        url += '&authuser=%i' % authuser
-
+def append_authuser(url, authuser):
+    url += '&authuser=%i' % authuser
     return url
 
 
 def export_google_sheets_as_csv(url, cookie=None):
     if is_url(url):
-        drive_id = extract_id_from_google_drive_url(url)
+        parsed = parse_google_drive_url(url)
+
+        if parsed is None or parsed.type != 'spreadsheets':
+            raise GoogleSheetsInvalidTargetError
     else:
-        drive_id = url
+        parsed = GoogleDriveFile('spreadsheets', url)
 
-    if drive_id is None:
-        raise GoogleSheetsInvalidTargetError
-
-    authuser = 0
-    export_url = forge_export_url(drive_id, authuser)
+    export_url = parsed.get_export_url()
 
     if cookie is not None and cookie in COOKIE_BROWSERS:
         jar = getattr(browser_cookie3, cookie)
