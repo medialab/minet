@@ -130,6 +130,19 @@ def validate(scraper):
                 if modifier in node:
                     errors.append(ScraperValidationIrrelevantPluralModifierError(path=path, modifier=modifier))
 
+        # Conflicting leaf keys
+        conflicting_leaf_keys = []
+
+        if 'attr' in node:
+            conflicting_leaf_keys.append('attr')
+        if 'extract' in node:
+            conflicting_leaf_keys.append('extract')
+        if 'get_context' in node:
+            conflicting_leaf_keys.append('get_context')
+
+        if len(conflicting_leaf_keys) > 1:
+            errors.append(ScraperValidationConflictError(path=path, keys=conflicting_leaf_keys))
+
         for k, v in node.items():
             p = path + [k]
 
