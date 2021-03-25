@@ -801,6 +801,40 @@ and, as expected, this will return:
 
 ### Using functions from within python
 
+If you build your scraper declaration directly in python, you can replace all the evaluation keys by functions. So, reusing this html from a previous example:
+
+```html
+<div id="colors">
+  <p>Red</p>
+  <p>Blue</p>
+  <p>YELLOW</p>
+  <p>orange</p>
+</div>
+```
+
+You could build your scraper thusly:
+
+```python
+from minet import Scraper
+
+# the `**kwargs` part is necessary because many arguments will always be given
+# so just pick the one you are interested in
+def process_value(value, **kwargs):
+  return value.upper()
+
+scraper = Scraper({
+  'iterator': 'p',
+  'item': {
+    'eval': process_value
+  }
+})
+
+scraper(html)
+>>> ['RED', 'BLUE', 'YELLOW', 'ORANGE']
+```
+
+Keyword arguments given to the function replacing `eval` directives are listed in [next](#complete-list-of-exposed-variables) section (minus the dependencies part, which does not make sense if you can work in python directly since you can import them yourself).
+
 ### Complete list of exposed variables
 
 *Dependencies*
