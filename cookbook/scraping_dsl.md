@@ -10,7 +10,7 @@ Note that all examples will be presented in YAML format, even if any JSON-like f
 
 Also, if you ever need to read some real examples of scrapers written using the DSL you can check out [this](/ftest/scrapers) folder of the repository.
 
-Finally, this tutorial is fairly long and I encourage you to bail out as soon as you deem you know enough to fit your use-case.
+Finally, this tutorial is fairly long so I encourage you to bail out as soon as you deem you know enough to fit your use-case.
 
 ## Summary
 
@@ -31,6 +31,8 @@ Finally, this tutorial is fairly long and I encourage you to bail out as soon as
   * [Evaluating selections](#evaluating-selections)
   * [Evaluating extractions](#evaluating-extractions)
   * [Evaluating filters](#evaluating-filters)
+  * [Using functions from within python](#using-functions-from-within-python)
+  * [Complete list of exposed variables](#complete-list-of-exposed-variables)
 * [Accessing global context](#accessing-global-context)
 * [Defining local context](#defining-local-context)
 * [Aliases](#aliases)
@@ -608,11 +610,130 @@ will return:
 
 ## Using evaluation when declarative is not enough
 
+Sometimes, declaring your scraping intentions will not be enough as you may need to perform arbitrarily complex things with your data.
+
+In this case, someone with more sense than I would tell you that it is time to start scripting in python directly to cover your use case. But if you still want to benefit from `minet`'s integration, tools and ecosystem, you can still write strings to evaluate directly.
+
+**Warning!**: every time someone mention things like "evaluating" or "executing" arbitrary code, you should hear clearly in your mind: "I will never expose this to users I cannot trust, inside or outside my system", because this clearly is a security breach.
+
+Now that this is clear, let's learn how to sprinkle some python code on top of our declarative scrapers!
+
 ### Evaluating selections
+
+Let's consider the following html:
+
+```html
+<main>
+  <div id="colors">
+    <p>Red</p>
+    <p>Blue</p>
+  </div>
+  <div id="animals">
+    <ul>
+      <li>Tiger</li>
+      <li>Dog</li>
+    </ul>
+  </div>
+</main>
+```
+
+If you want to select the items found under each `div` using a condition (yes I know we can get away with some CSS wizardy here, this is a toy example, bear with me please), you will need to evaluate an expression like so:
+
+```yml
+---
+iterator: div
+fields:
+  kind: id
+  items:
+    iterator_eval: "element.select('p') if element.get('id') == 'colors' else element.select('li')"
+```
+
+and you will get:
+
+```json
+[
+  {
+    "kind": "colors",
+    "items": ["Red", "Blue"]
+  },
+  {
+    "kind": "animals",
+    "items": ["Tiger", "Dog"]
+  }
+]
+```
+
+In this example, the local variable `element` is the current html element being iterated on (a `div`, in our case) as represented by [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/bs4/doc/), a very popular python html representation used by most of scrapers. To get a list of all exposed variables you may use, you can check [this](#complete-list-of-exposed-variables) list.
+
+Note that evaluated strings can either be a single python expression, or more code expressed on multiple lines that should `return` a result at some point. Here is an example of the same logic written on multiple lines in a YAML scraper:
+
+```yml
+iterator: div
+fields:
+  kind: id
+  items:
+    # Mind the "|" char, it means the followed indented strings will preserve line-returns
+    iterator_eval: |
+      if element.get('id') == 'color':
+        return element.select('p')
+
+      return element.select('li')
+```
+
+Of course, the syntax of the evaluated strings will be checked beforehand and any `minet.Scraper` built using bad code will be reported before you can even attempt to use it.
+
+You should also note that an evaluated expression's results will be typed-checked at runtime to ensure it returned a valid thing. As such `iterator_eval` will yell at you if you make it return something other than a `list` of `bs4.Tag`.
+
+Now, here is another example where we evaluate `sel` instead of `iterator`:
+
+```yml
+iterator: div
+fields:
+  kind: id
+  first_item:
+    sel_eval: |
+      if element.get('id') == 'color':
+        return element.select_one('p')
+
+      return element.select_one('li')
+```
+
+this will return:
+
+```json
+[
+  {
+    "kind": "colors",
+    "first_item": "Red"
+  },
+  {
+    "kind": "animals",
+    "first_item": "Tiger"
+  }
+]
+```
+
+Finally, note that both `sel_eval` or `iterator_eval` may also return a single string that will subsquently be used a CSS selector. As such, this example has the same behavior as the previous one:
+
+```yml
+iterator: div
+fields:
+  kind: id
+  first_item:
+    sel_eval: |
+      if element.get('id') == 'color':
+        return 'p'
+
+      return 'li'
+```
 
 ### Evaluating extractions
 
 ### Evaluating filters
+
+### Using functions from within python
+
+### Complete list of exposed variables
 
 ## Accessing global context
 

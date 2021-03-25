@@ -577,6 +577,37 @@ class TestScrape(object):
 
         assert item == 'One'
 
+    def test_conditional_eval(self):
+        html = '''
+            <main>
+                <div id="colors">
+                    <p>Red</p>
+                    <p>Blue</p>
+                </div>
+                <div id="animals">
+                    <ul>
+                        <li>Tiger</li>
+                        <li>Dog</li>
+                    </ul>
+                </div>
+            </main>
+        '''
+
+        result = scrape({
+            'iterator': 'div',
+            'fields': {
+                'kind': 'id',
+                'items': {
+                    'iterator_eval': 'element.select("p") if element.get("id") == "colors" else element.select("li")'
+                }
+            }
+        }, html)
+
+        assert result == [
+            {'kind': 'colors', 'items': ['Red', 'Blue']},
+            {'kind': 'animals', 'items': ['Tiger', 'Dog']}
+        ]
+
     def test_validate(self):
         errors = validate({
             'sel': 'li',
