@@ -14,6 +14,9 @@ Finally, this tutorial is fairly long and I encourage you to bail out as soon as
 
 ## Summary
 
+* [Applying a minet scraper](#applying-a-minet-scraper)
+  * [From python](#from-python)
+  * [From the command line](#from-the-command-line)
 * [Scraping a single item](#scraping-a-single-item)
 * [Declaring what to extract](#declaring-what-to-extract)
 * [Declaring multiple fields to extract](#declaring-multiple-fields-to-extract)
@@ -21,22 +24,61 @@ Finally, this tutorial is fairly long and I encourage you to bail out as soon as
 * [Subselection](#subselection)
 * [Item-level subselection](#item-level-subselection)
 * [Recursivity](#recursivity)
-* [Constant values](#constant-values)
+* [Default values](#default-values)
 * [Filtering](#filtering)
 * [Keeping only unique items](#keeping-only-unique-items)
-* [Formatting values](#formatting-values)
-* [Joining results](#joining-results)
-* [Tabulating](#tabulating)
-* [When declarative is not enough](#when-declarative-is-not-enough)
+* [Using evaluation when declarative is not enough](#using-evaluation-when-declarative-is-not-enough)
   * [Evaluating selections](#evaluating-selections)
   * [Evaluating extractions](#evaluating-extractions)
+  * [Evaluating filters](#evaluating-filters)
 * [Accessing global context](#accessing-global-context)
 * [Defining local context](#defining-local-context)
 * [Aliases](#aliases)
 
+## Applying a minet scraper
+
+Before learning how to write a `minet` scraper on your own, here is what a scraper extracting a page's `<title>` tag content would look like in YAML format:
+
+```yaml
+---
+sel: title
+```
+
+But how would one actually use it?
+
+### From python
+
+From python you will need to use the `minet.Scraper` class to build your scraper utility like so:
+
+```python
+from minet import Scraper
+
+# Creating a scraper from a json declaration file:
+scraper = Scraper('scraper.yml')
+
+# Creating a scraper directly from a declaration variable:
+declaration = {'sel': 'title'}
+scraper = Scraper(declaration)
+
+# You can now apply your scraper on arbitrary html thusly:
+title = scraper(html)
+```
+
+### From the command line
+
+To use a scraper from the command line, you can use the `scrape` command thusly:
+
+```bash
+# To scrape html files recorded in a minet fetch report:
+minet scrape scraper.yml report.csv > scraped.csv
+
+# To scrape html file found by glob:
+minet scrape scraper.yml --glob 'files/**/*.html' > scraped.csv
+```
+
 ## Scraping a single item
 
-Let's start easy, we only need to scrape a single thing from our HTML page: its title. The title is usually the text contained in the `<title>` tag:
+Let's start easy and let's imagine we only need to scrape a single thing from our HTML page: its title. The title is usually the text contained in the `<title>` tag:
 
 ```html
 <html>
@@ -399,23 +441,21 @@ Harnessing recursivity will return:
 ]
 ```
 
-## Constant values
+## Default values
+
+TODO: constant side of the coin
 
 ## Filtering
 
 ## Keeping only unique items
 
-## Formatting values
-
-## Joining results
-
-## Tabulating
-
-## When declarative is not enough
+## Using evaluation when declarative is not enough
 
 ### Evaluating selections
 
 ### Evaluating extractions
+
+### Evaluating filters
 
 ## Accessing global context
 

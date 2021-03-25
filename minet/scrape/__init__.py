@@ -33,15 +33,14 @@ def scrape(scraper, html, engine='lxml', context=None):
 
 class Scraper(object):
     def __init__(self, definition):
+        if not isinstance(definition, dict):
+            definition = load_definition(definition)
+
         self.definition = definition
         self.headers = headers_from_definition(definition)
 
     def __call__(self, html, context=None):
         return scrape(self.definition, html, context=context)
-
-    @staticmethod
-    def from_file(target):
-        return Scraper(load_definition(target))
 
 
 __all__ = ['scrape', 'Scraper', 'validate']

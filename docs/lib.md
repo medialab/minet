@@ -56,10 +56,10 @@ scraper = Scraper(scraper_definition)
 data = scraper(some_html)
 
 # You can also create a scraper from a JSON or YML file
-scraper = Scraper.from_file('./scraper.yml')
+scraper = Scraper('./scraper.yml')
 
 with open('./scraper.json') as f:
-  scraper = Scraper.from_file(f)
+  scraper = Scraper(f)
 ```
 
 *Arguments*
