@@ -13,7 +13,8 @@ from minet.google.exceptions import (
     GoogleSheetsInvalidContentTypeError,
     GoogleSheetsMissingCookieError,
     GoogleSheetsNotFoundError,
-    GoogleSheetsUnauthorizedError
+    GoogleSheetsUnauthorizedError,
+    GoogleSheetsMaxAttemptsExceeded
 )
 
 
@@ -38,6 +39,8 @@ def google_sheets_action(namespace):
         die('Could not find spreadsheet (404)!')
     except GoogleSheetsUnauthorizedError:
         die('You don\'t have access to this spreadsheet. Did you forget to set --cookie?')
+    except GoogleSheetsMaxAttemptsExceeded:
+        die('Maximum number of attempts exceeded! You can still set --authuser if you logged in numerous google accounts at once.')
 
     output_file.write(data)
     output_file.close()

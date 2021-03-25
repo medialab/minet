@@ -19,7 +19,8 @@ from minet.google.exceptions import (
     GoogleSheetsInvalidContentTypeError,
     GoogleSheetsMissingCookieError,
     GoogleSheetsNotFoundError,
-    GoogleSheetsUnauthorizedError
+    GoogleSheetsUnauthorizedError,
+    GoogleSheetsMaxAttemptsExceeded
 )
 
 POOL = create_pool()
@@ -30,7 +31,7 @@ def append_authuser(url, authuser):
     return url
 
 
-def export_google_sheets_as_csv(url, cookie=None, authuser=None):
+def export_google_sheets_as_csv(url, cookie=None, authuser=None, max_authuser_attempts=4):
     if is_url(url):
         parsed = parse_google_drive_url(url)
 
@@ -39,13 +40,17 @@ def export_google_sheets_as_csv(url, cookie=None, authuser=None):
     else:
         parsed = GoogleDriveFile('spreadsheets', url)
 
-    export_url = parsed.get_export_url()
+    base_export_url = parsed.get_export_url()
+    export_url = base_export_url
 
     if authuser is not None:
         if not isinstance(authuser, int) or authuser < 0:
             raise TypeError('authuser should be an int >= 0')
 
         export_url = append_authuser(export_url, authuser)
+        max_authuser_attempts = 1
+    else:
+        authuser = 0
 
     if cookie is not None and cookie in COOKIE_BROWSERS:
         jar = getattr(browser_cookie3, cookie)()
@@ -55,18 +60,34 @@ def export_google_sheets_as_csv(url, cookie=None, authuser=None):
         if cookie is None:
             raise GoogleSheetsMissingCookieError
 
-    err, response = request(POOL, export_url, cookie=cookie)
+    attempts = max_authuser_attempts
 
-    if err:
-        raise err
+    while True:
+        attempts -= 1
 
-    if response.status == 404:
-        raise GoogleSheetsNotFoundError
+        err, response = request(POOL, export_url, cookie=cookie)
 
-    if response.status == 401:
-        raise GoogleSheetsUnauthorizedError
+        if err:
+            raise err
 
-    if 'csv' not in response.headers.get('Content-Type', '').lower():
-        raise GoogleSheetsInvalidContentTypeError
+        if response.status == 404:
+            raise GoogleSheetsNotFoundError
+
+        if response.status == 401:
+            raise GoogleSheetsUnauthorizedError
+
+        if response.status == 403:
+            authuser += 1
+
+            if attempts != 0:
+                export_url = append_authuser(base_export_url, authuser)
+                continue
+
+            raise GoogleSheetsMaxAttemptsExceeded
+
+        if 'csv' not in response.headers.get('Content-Type', '').lower():
+            raise GoogleSheetsInvalidContentTypeError
+
+        break
 
     return response.data.decode('utf-8')
