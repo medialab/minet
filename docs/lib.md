@@ -15,6 +15,7 @@ Note that if you are interested in the url cleaning, extraction and join methods
 
 * [CrowdTangle](./crowdtangle.md)
 * [Facebook](./facebook.md)
+* [Google](./google.md)
 * [Mediacloud](./mediacloud.md)
 * [Twitter](./twitter.md)
 
