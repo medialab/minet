@@ -963,7 +963,7 @@ fields:
     sel: em
 ```
 
-<!-- Finally, note that `set_context` can be used at any level of the scraper's tree so that this html:
+Finally, note that `set_context` can be used at any level of the scraper's declaration so that this html:
 
 ```html
 <div data-topic="science">
@@ -1000,10 +1000,14 @@ could be scraped as:
 
 ```json
 [
-  {"topic": "science", "post": "1", "author": "Allan"},
-  {"topic": "science", "post": "2", "author": "Susan"},
-  {"topic": "arts", "post": "3", "author": "Josephine"},
-  {"topic": "arts", "post": "4", "author": "Peter"}
+  [
+    {"topic": "science", "post": "1", "author": "Allan"},
+    {"topic": "science", "post": "2", "author": "Susan"},
+  ],
+  [
+    {"topic": "arts", "post": "3", "author": "Josephine"},
+    {"topic": "arts", "post": "4", "author": "Peter"}
+  ]
 ]
 ```
 
@@ -1015,10 +1019,15 @@ iterator: div
 item:
   set_context:
     topic: data-topic
+  iterator: li > p
   fields:
     topic:
       get_context: topic
-``` -->
+    post:
+      sel: strong
+    author:
+      sel: em
+```
 
 ## Aliases
 
