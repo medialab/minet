@@ -9,12 +9,17 @@ import soupsieve
 from soupsieve import SelectorSyntaxError
 
 from minet.scrape.utils import get_sel, get_iterator
-from minet.scrape.constants import PLURAL_MODIFIERS
+from minet.scrape.constants import (
+    PLURAL_MODIFIERS,
+    BURROWING_KEYS,
+    LEAF_KEYS
+)
 from minet.scrape.exceptions import (
     ScraperEvalSyntaxError,
     ScraperValidationConflictError,
     InvalidCSSSelectorError,
-    ScraperValidationIrrelevantPluralModifierError
+    ScraperValidationIrrelevantPluralModifierError,
+    ScraperValidationMixedConcernError
 )
 
 
@@ -142,6 +147,10 @@ def validate(scraper):
 
         if len(conflicting_leaf_keys) > 1:
             errors.append(ScraperValidationConflictError(path=path, keys=conflicting_leaf_keys))
+
+        # Conflicting burrowing/leaf
+        if any(k in node for k in BURROWING_KEYS) and any(k in node for k in LEAF_KEYS):
+            errors.append(ScraperValidationMixedConcernError(path=path))
 
         for k, v in node.items():
             p = path + [k]

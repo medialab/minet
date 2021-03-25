@@ -48,6 +48,10 @@ class ScraperValidationError(ScraperRuntimeError):
     pass
 
 
+class ScraperValidationMixedConcernError(ScraperRuntimeError):
+    pass
+
+
 class ScraperValidationConflictError(ScraperRuntimeError):
     def __init__(self, msg=None, keys=[], **kwargs):
         super().__init__(msg, **kwargs)

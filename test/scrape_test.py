@@ -22,7 +22,8 @@ from minet.scrape.exceptions import (
     NotATableError,
     CSSSelectorTooComplex,
     InvalidCSSSelectorError,
-    ScraperValidationIrrelevantPluralModifierError
+    ScraperValidationIrrelevantPluralModifierError,
+    ScraperValidationMixedConcernError
 )
 
 BASIC_HTML = """
@@ -701,6 +702,10 @@ class TestScrape(object):
                 'name': {
                     'attr': 'id',
                     'extract': 'text'
+                },
+                'id': {
+                    'attr': 'id',
+                    'item': 'href'
                 }
             }
         })
@@ -717,7 +722,8 @@ class TestScrape(object):
             (['fields', 'url', 'iterator'], InvalidCSSSelectorError),
             ([], ScraperValidationIrrelevantPluralModifierError),
             (['fields', 'url'], ScraperValidationConflictError),
-            (['fields', 'name'], ScraperValidationConflictError)
+            (['fields', 'name'], ScraperValidationConflictError),
+            (['fields', 'id'], ScraperValidationMixedConcernError)
         ], key=key)
 
     def test_eval_errors(self):
