@@ -13,7 +13,7 @@ In addition, **minet** also exposes its high-level programmatic interface as a p
 ## Use cases
 
 * Downloading large amount of urls very fast. ([guide](./cookbook/fetch.md))
-* Writing scrapers to extract structured data from HTML pages.
+* Writing scrapers to extract structured data from HTML pages. ([guide](./cookbook/scraping_dsl.md))
 * Writing crawlers to automatically browse the web.
 * Extract raw text content from HTML pages. ([example](./cookbook/compendium.md#extract-raw-text-content-from-html-pages))
 * Normalize batches of urls contained in a CSV file to perform relevant aggregations (dropping irrelevant query items, extracting domain name etc.) ([example](./cookbook/compendium.md#parsing-and-normalizing-urls))
