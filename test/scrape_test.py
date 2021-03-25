@@ -608,6 +608,70 @@ class TestScrape(object):
             {'kind': 'animals', 'items': ['Tiger', 'Dog']}
         ]
 
+    def test_nested_local_context(self):
+        html = '''
+            <div data-topic="science">
+                <ul>
+                    <li>
+                        <p>
+                            Post n°<strong>1</strong> by <em>Allan</em>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Post n°<strong>2</strong> by <em>Susan</em>
+                        </p>
+                    </li>
+                </ul>
+            </div>
+            <div data-topic="arts">
+                <ul>
+                    <li>
+                        <p>
+                            Post n°<strong>3</strong> by <em>Josephine</em>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Post n°<strong>4</strong> by <em>Peter</em>
+                        </p>
+                    </li>
+                </ul>
+            </div>
+        '''
+
+        result = scrape({
+            'iterator': 'div',
+            'item': {
+                'set_context': {
+                    'topic': 'data-topic'
+                },
+                'iterator': 'li > p',
+                'fields': {
+                    'topic': {
+                        'get_context': 'topic'
+                    },
+                    'post': {
+                        'sel': 'strong'
+                    },
+                    'author': {
+                        'sel': 'em'
+                    }
+                }
+            }
+        }, html)
+
+        assert result == [
+            [
+                {'topic': 'science', 'post': '1', 'author': 'Allan'},
+                {'topic': 'science', 'post': '2', 'author': 'Susan'},
+            ],
+            [
+                {'topic': 'arts', 'post': '3', 'author': 'Josephine'},
+                {'topic': 'arts', 'post': '4', 'author': 'Peter'}
+            ]
+        ]
+
     def test_validate(self):
         errors = validate({
             'sel': 'li',
