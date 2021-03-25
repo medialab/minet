@@ -8,8 +8,7 @@ import browser_cookie3
 from ural import is_url
 from ural.google import (
     parse_google_drive_url,
-    GoogleDriveFile,
-    GoogleDrivePublicLink
+    GoogleDriveFile
 )
 
 from minet.utils import CookieResolver, create_pool, request

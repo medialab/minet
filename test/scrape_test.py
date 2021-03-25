@@ -355,6 +355,19 @@ class TestScrape(object):
 
         assert result == 'One'
 
+    def test_callable_eval(self):
+        def process(value, **kwargs):
+            return value.upper()
+
+        result = scrape({
+            'iterator': 'li',
+            'item': {
+                'eval': process
+            }
+        }, BASIC_HTML)
+
+        assert result == ['ONE', 'TWO']
+
     def test_context(self):
         result = scrape({
             'iterator': 'li',
@@ -712,6 +725,20 @@ class TestScrape(object):
             }, BASIC_HTML)
 
         assert isinstance(info.value.reason, NameError)
+        assert info.value.path == ['item', 'eval']
+
+        with pytest.raises(ScraperEvalError) as info:
+            def hellraiser(**kwargs):
+                raise RuntimeError
+
+            scrape({
+                'iterator': 'li',
+                'item': {
+                    'eval': hellraiser
+                }
+            }, BASIC_HTML)
+
+        assert isinstance(info.value.reason, RuntimeError)
         assert info.value.path == ['item', 'eval']
 
         with pytest.raises(ScraperEvalTypeError) as info:

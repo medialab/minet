@@ -63,25 +63,15 @@ EVAL_CONTEXT = {
 def eval_expression(expression, element=None, elements=None, value=None,
                     context=None, root=None, path=None, expect=None, allow_none=False):
 
-    # Local variables
-    EVAL_CONTEXT['element'] = element
-    EVAL_CONTEXT['elements'] = elements
-    EVAL_CONTEXT['value'] = value
-
-    # Context
-    EVAL_CONTEXT['context'] = context
-    EVAL_CONTEXT['root'] = root
-
-    if '\n' in expression:
-
-        # Multiline expression
-        scope = {}
-
-        wrapped_expression = 'def __run__():\n%s\n__return_value__ = __run__()' % textwrap.indent(expression, '  ')
-
+    if callable(expression):
         try:
-            exec(wrapped_expression, EVAL_CONTEXT, scope)
-            result = scope['__return_value__']
+            result = expression(
+                element=element,
+                elements=elements,
+                value=value,
+                context=context,
+                root=root
+            )
         except BaseException as e:
             raise ScraperEvalError(
                 reason=e,
@@ -90,15 +80,42 @@ def eval_expression(expression, element=None, elements=None, value=None,
             )
     else:
 
-        # Simple expression
-        try:
-            result = eval(expression, EVAL_CONTEXT, None)
-        except BaseException as e:
-            raise ScraperEvalError(
-                reason=e,
-                path=path,
-                expression=expression
-            )
+        # Local variables
+        EVAL_CONTEXT['element'] = element
+        EVAL_CONTEXT['elements'] = elements
+        EVAL_CONTEXT['value'] = value
+
+        # Context
+        EVAL_CONTEXT['context'] = context
+        EVAL_CONTEXT['root'] = root
+
+        if '\n' in expression:
+
+            # Multiline expression
+            scope = {}
+
+            wrapped_expression = 'def __run__():\n%s\n__return_value__ = __run__()' % textwrap.indent(expression, '  ')
+
+            try:
+                exec(wrapped_expression, EVAL_CONTEXT, scope)
+                result = scope['__return_value__']
+            except BaseException as e:
+                raise ScraperEvalError(
+                    reason=e,
+                    path=path,
+                    expression=expression
+                )
+        else:
+
+            # Simple expression
+            try:
+                result = eval(expression, EVAL_CONTEXT, None)
+            except BaseException as e:
+                raise ScraperEvalError(
+                    reason=e,
+                    path=path,
+                    expression=expression
+                )
 
     if not allow_none and result is None:
         raise ScraperEvalNoneError(

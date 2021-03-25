@@ -135,16 +135,17 @@ def validate(scraper):
 
             # Validating python syntax
             if k == 'eval' or k.endswith('_eval'):
-                try:
-                    ast.parse(v)
-                except SyntaxError as e:
-                    validation_error = ScraperEvalSyntaxError(
-                        reason=e,
-                        expression=v,
-                        path=p
-                    )
+                if isinstance(v, str):
+                    try:
+                        ast.parse(v)
+                    except SyntaxError as e:
+                        validation_error = ScraperEvalSyntaxError(
+                            reason=e,
+                            expression=v,
+                            path=p
+                        )
 
-                    errors.append(validation_error)
+                        errors.append(validation_error)
             else:
                 k_eval = '%s_eval' % k
 
