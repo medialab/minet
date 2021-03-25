@@ -757,6 +757,16 @@ class TestScrape(object):
 
         assert info.value.path == ['iterator_eval']
 
+        with pytest.raises(ScraperEvalTypeError) as info:
+            def iterator(element, **kwargs):
+                return [element.select_one('li'), 45]
+
+            scrape({
+                'iterator_eval': iterator
+            }, BASIC_HTML)
+
+        assert info.value.path == ['iterator_eval']
+
     def test_straining(self):
         too_complex = [
             'ul > li',

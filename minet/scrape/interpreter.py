@@ -26,6 +26,17 @@ DEFAULT_CONTEXT = {}
 DATA_TYPES = (str, int, float, bool, list, dict)
 
 
+def is_list_of_tags(value):
+    if not isinstance(value, list):
+        return False
+
+    return all(isinstance(tag, Tag) for tag in value)
+
+
+def is_valid_iterator_eval_output(value):
+    return isinstance(value, str) or is_list_of_tags(value)
+
+
 def merge_contexts(global_context, local_context):
     if global_context is None:
         return local_context
@@ -61,7 +72,8 @@ EVAL_CONTEXT = {
 
 # NOTE: this is not threadsafe, but it does not have to be
 def eval_expression(expression, element=None, elements=None, value=None,
-                    context=None, root=None, path=None, expect=None, allow_none=False):
+                    context=None, root=None, path=None, expect=None, check=None,
+                    allow_none=False):
 
     if callable(expression):
         try:
@@ -123,13 +135,14 @@ def eval_expression(expression, element=None, elements=None, value=None,
             expression=expression
         )
 
-    if expect is not None and not isinstance(result, expect):
-        raise ScraperEvalTypeError(
-            path=path,
-            expression=expression,
-            expected=expect,
-            got=result
-        )
+    if expect is not None or check is not None:
+        if not (check(result) if check else isinstance(result, expect)):
+            raise ScraperEvalTypeError(
+                path=path,
+                expression=expression,
+                expected=expect,
+                got=result
+            )
 
     return result
 
@@ -218,7 +231,7 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
             context=context,
             root=root,
             path=path + ['iterator_eval'],
-            expect=(list, str)
+            check=is_valid_iterator_eval_output
         )
 
         if isinstance(evaluated_elements, str):
@@ -334,7 +347,7 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
                 if filtering_clause is True and not value:
                     continue
 
-                if isinstance(filtering_clause, str) and not value.get(filtering_clause):
+                if isinstance(filtering_clause, str) and not nested_get(filtering_clause, value):
                     continue
 
             if 'uniq' in scraper:
@@ -345,7 +358,7 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
                     continue
 
                 if isinstance(uniq_clause, str):
-                    k = value.get(uniq_clause)
+                    k = nested_get(uniq_clause, value)
 
                     if k in already_seen:
                         continue
