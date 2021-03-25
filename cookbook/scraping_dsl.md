@@ -23,7 +23,7 @@ Finally, this tutorial is fairly long and I encourage you to bail out as soon as
 * [Iterating over multiple nodes](#iterating-over-multiple-nodes)
 * [Subselection](#subselection)
 * [Item-level subselection](#item-level-subselection)
-* [Recursivity](#recursivity)
+* [Nesting data](#nesting-data)
 * [Default values](#default-values)
 * [Filtering](#filtering)
 * [Keeping only unique items](#keeping-only-unique-items)
@@ -88,7 +88,7 @@ Let's start easy and let's imagine we only need to scrape a single thing from ou
     </title>
   </head>
   <body>
-    <div id="main" title="hello">Hello World!</div>
+    <div id="main" data-message="hello">Hello World!</div>
   </body>
 </html>
 ```
@@ -110,12 +110,12 @@ Applying this scraper on the beforementioned HTML will yield the following resul
 
 Two things should be noted here:
 
-1. In the absence of any additional information, the scraper will fallback to extract the node's text.
+1. In the absence of any additional information, the scraper will always fallback to extract the node's text if not instructed otherwise.
 2. Extracted text is always stripped of its leading and trailing whitespace for convenience.
 
 ## Declaring what to extract
 
-But maybe we want something more than a selected node's text. What if we want its inner html? Or one of its attribute? Then we need to say so using the `item` key:
+But maybe we want something different than a selected node's text. What if we want its inner html? Or one of its attribute? Then we need to say so using the `item` key:
 
 ```yml
 ---
@@ -144,7 +144,7 @@ But what if we want to extract a node's attribute? Well it's as simple as:
 # Note that here I wrap the selector in quotes so that YAML
 # does not interpret this as a comment
 sel: '#main'
-item: title
+item: data-message
 ```
 
 This will naturally yield:
@@ -155,7 +155,7 @@ This will naturally yield:
 
 So, to recap, here is what `item` can be:
 
-1. `text` to extract the selected node's text (this is the same as not declaring `item`)
+1. `text` to extract the selected node's text (this is the same as not declaring an `item`)
 2. `html` or `inner_html` to extract the selected node's inner html
 3. `outer_html` to extract the selected node's outer html
 4. the name of any of the selected node's attributes
@@ -169,7 +169,7 @@ Now we might want to extract several pieces of informations from our selected no
 sel: '#main'
 fields: # Here we declare a dictionary of fields to output
   content: text # Each key is now its own `item`
-  title: title
+  message: data-message
 ```
 
 This will yield:
@@ -177,7 +177,7 @@ This will yield:
 ```json
 {
   "content": "Hello World!",
-  "title": "hello"
+  "message": "hello"
 }
 ```
 
@@ -185,7 +185,7 @@ This will yield:
 
 So far, we now how to select a single node and extract information about it. But oftentimes, we want to iterate over a selection of nodes and extract information about each of them.
 
-Let's consider the following page:
+Let's consider the following html:
 
 ```html
 <main>
@@ -196,7 +196,7 @@ Let's consider the following page:
       </a>
     </h2>
     <div>
-      Posted by <span>George</span>
+      Posted by <strong>George</strong>
     </div>
   </article>
   <article>
@@ -206,7 +206,7 @@ Let's consider the following page:
       </a>
     </h2>
     <div>
-      Posted by <span>Mary</span>
+      Posted by <strong>Mary</strong>
     </div>
   </article>
 </main>
@@ -269,7 +269,7 @@ will yield:
 
 ## Subselection
 
-Sometimes, it might be useful to be able to perform subselections. For instance, if we consider the following page:
+Sometimes, it might be useful to be able to perform subselections. For instance, if we consider the following html:
 
 ```html
 <ul id="fruits">
@@ -309,14 +309,16 @@ This basically means than `sel` is applied before the `iterator` selection and t
 
 ## Item-level subselection
 
-Now it might also be useful to define subselections at `item` or `fields` level. But before being able to do so, we need to understand that `item` can also be defined as an object rather than a simple string for when things become complicated:
+Now it might also be useful to define subselections at `item` or `fields` level. But before being able to do so, we need to understand that `item` can also be defined as an object rather than a simple string for when things need to be more complex:
 
 ```yml
 ---
 iterator: '#fruits li'
 item:
   extract: text # this is the same as `item: text` or no `item`
+```
 
+```yml
 ---
 iterator: '#fruits li'
 item:
@@ -326,7 +328,7 @@ item:
 So now we've learn the following sub keys:
 
 * `extract` can be `text`, `html`, `inner_html` and `outer_html` and does what you expect
-* `attr` returns the designated attribute
+* `attr` returns the designated attribute (this means you can also use it if you have the disfortune of needing to extract an attribute named `title` or `html`, for instance).
 
 This of course also works with `fields`:
 
@@ -341,7 +343,7 @@ fields:
 
 But now that we have a more expressive way to declare what we want to extract, we can also spice things up with item-level subselections.
 
-Remember this html page:
+Remember this html:
 
 ```html
 <main>
@@ -352,7 +354,7 @@ Remember this html page:
       </a>
     </h2>
     <div>
-      Posted by <span>George</span>
+      Posted by <strong>George</strong>
     </div>
   </article>
   <article>
@@ -362,7 +364,7 @@ Remember this html page:
       </a>
     </h2>
     <div>
-      Posted by <span>Mary</span>
+      Posted by <strong>Mary</strong>
     </div>
   </article>
 </main>
@@ -370,7 +372,7 @@ Remember this html page:
 
 What if we want to extract both the article's url and the user which posted it?
 
-We can do so by using `sel` in an item declaration:
+We can do so by using `sel` in a field declaration:
 
 ```yml
 ---
@@ -398,11 +400,11 @@ And this will yield:
 ]
 ```
 
-## Recursivity
+## Nesting data
 
 The next thing to understand is that this scraping DSL is completely recursive. Which should let you describe any kind of JSON-like structure to output.
 
-Let's check this html page again for instance:
+Let's check this html  again for instance:
 
 ```html
 <main>
@@ -426,7 +428,7 @@ item:
   iterator: li
 ```
 
-Harnessing recursivity will return:
+Harnessing recursivity will return a nested result:
 
 ```json
 [
