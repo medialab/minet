@@ -4,7 +4,7 @@
 
 So, in order to enable efficient scraping, `minet` uses a custom declarative [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) (**D**omain **S**pecific **L**anguage), typically written in [JSON](https://en.wikipedia.org/wiki/JSON) or [YAML](https://en.wikipedia.org/wiki/YAML) and reminiscent of [artoo.js](https://medialab.github.io/artoo/), a JavaScript webmining tool, scraping utilities.
 
-Here is therefore a full tutorial about the capabilities of this DSL.
+The present document is therefore a full tutorial about the capabilities of this DSL.
 
 Note that all examples will be presented in YAML format, even if any JSON-like format would also do the trick just fine. But YAML being somewhat the python of JSON, is somewhat quicker to write, which is always a nice in this context. Also, YAML has comments and it makes it easier to explain what's happening throughout the tutorial.
 
@@ -37,6 +37,8 @@ Finally, this tutorial is fairly long so I encourage you to bail out as soon as 
 * [Defining local context](#defining-local-context)
 * [Aliases](#aliases)
 * [Scraper execution outline](#scraper-execution-outline)
+* [Various useful examples](#various-useful-examples)
+  * [Going up the tree](#going-up-the-tree)
 
 ## Applying a minet scraper
 
@@ -105,7 +107,9 @@ sel: title # Here we use CSS selection to target the first <title> tag
 
 If you are a bit shaky about CSS selection and want to refresh your memory or simply learn, I can't recommand you [this](https://flukeout.github.io/) wonderful tutorial enough.
 
-Applying this scraper on the beforementioned HTML will yield the following result:
+Note that `minet` uses the popular [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/bs4/doc/) library to parse and traverse html documents and relies on the [soupsieve](https://facelessuser.github.io/soupsieve/) library for CSS selection.
+
+This said, applying this scraper on the beforementioned HTML will yield the following result:
 
 ```json
 "My Awesome Web Page"
@@ -1039,3 +1043,67 @@ Know that some of the DSL keys have aliases for convenience:
 So don't be surprised if you see them appear in people code's sometimes and don't be afraid to use them if they fit your mindset better.
 
 ## Scraper execution outline
+
+## Various useful examples
+
+### Going up the tree
+
+Sometimes it can be useful to move up the tree when selecting elements. Unfortunately, CSS has no mechanism for doing so and I recommend to use evaluation to do so, for the time being.
+
+So considering the following html:
+
+```html
+<div data-topic="science">
+  <ul>
+    <li>
+      <p>
+        Post n°<strong>1</strong> by <em>Allan</em>
+      </p>
+    </li>
+    <li>
+      <p>
+        Post n°<strong>2</strong> by <em>Susan</em>
+      </p>
+    </li>
+  </ul>
+</div>
+<div data-topic="arts">
+  <ul>
+    <li>
+      <p>
+        Post n°<strong>3</strong> by <em>Josephine</em>
+      </p>
+    </li>
+    <li>
+      <p>
+        Post n°<strong>4</strong> by <em>Peter</em>
+      </p>
+    </li>
+  </ul>
+</div>
+```
+
+you could obtain:
+
+```json
+[
+  {"topic": "science", "post": "1", "author": "Allan"},
+  {"topic": "science", "post": "2", "author": "Susan"},
+  {"topic": "arts", "post": "3", "author": "Josephine"},
+  {"topic": "arts", "post": "4", "author": "Peter"}
+]
+```
+
+by using the following scraper:
+
+```yml
+iterator: li
+fields:
+  topic:
+    sel_eval: "element.find_parent('div')"
+    attr: data-topic
+  post:
+    sel: p > strong
+  author:
+    sel: p > em
+```
