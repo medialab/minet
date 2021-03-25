@@ -4,44 +4,33 @@
 #
 # Logic of the `google sheets` action.
 #
-from ural import is_url
-from ural.google import extract_id_from_google_drive_url
+from browser_cookie3 import BrowserCookieError
 
-from minet.utils import grab_cookies, create_pool, request
-from minet.cli.utils import die, open_output_file
+from minet.cli.utils import open_output_file
+from minet.google import export_google_sheets_as_csv
+from minet.google.exceptions import (
+    GoogleSheetsInvalidTargetError,
+    GoogleSheetsInvalidContentTypeError,
+    GoogleSheetsMissingCookieError
+)
 
 
 def google_sheets_action(namespace):
-    output_file = open_output_file(namespace.output)
+    output_file = open_output_file(namespace.output, flag='w')
 
-    if is_url(namespace.url):
-        drive_id = extract_id_from_google_drive_url(namespace.url)
-    else:
-        drive_id = namespace.url
-
-    if not drive_id:
+    try:
+        data = export_google_sheets_as_csv(
+            namespace.url,
+            cookie=namespace.cookie
+        )
+    except GoogleSheetsInvalidTargetError:
         die('Could not extract a valid google drive id from provided argument!')
-
-    get_cookie = grab_cookies(namespace.cookie)
-
-    if get_cookie is None:
-        die('Could not grab cookies from %s!' % namespace.cookie)
-
-    export_url = 'https://docs.google.com/spreadsheets/d/%s/export?exportFormat=csv' % drive_id
-
-    cookie = get_cookie(export_url)
-
-    if not cookie:
-        die('Could not extract relevant cookie from %s!' % namespace.cookie)
-
-    http = create_pool()
-    err, response = request(http, export_url, cookie=cookie)
-
-    if err:
-        raise err
-
-    if 'csv' not in response.headers['Content-Type']:
+    except BrowserCookieError:
+        die('Could not extract cookie from %s!' % namespace.cookie)
+    except GoogleSheetsMissingCookieError:
+        die('Did not find a relevant cookie!')
+    except GoogleSheetsInvalidContentTypeError:
         die('Could not export spreadsheet as CSV!')
 
-    output_file.write(response.data.decode('utf-8'))
+    output_file.write(data)
     output_file.close()

@@ -898,7 +898,7 @@ actions:
 <h3 id="google-sheets">sheets</h3>
 
 ```
-usage: minet google sheets [-h] [-c COOKIE] [-o OUTPUT] url
+usage: minet google sheets [-h] [-a AUTHUSER] [-c COOKIE] [-o OUTPUT] url
 
 Minet Google Sheets Command
 ===========================
@@ -907,12 +907,13 @@ Grab the given google spreadsheet as a CSV file from
 its url or id.
 
 positional arguments:
-  url                         Url or id of the spreadsheet to export.
+  url                               Url or id of the spreadsheet to export.
 
 optional arguments:
-  -h, --help                  show this help message and exit
-  -c COOKIE, --cookie COOKIE  Browser from which to extract a google drive cookie (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the report will be printed to stdout.
+  -h, --help                        show this help message and exit
+  -a AUTHUSER, --authuser AUTHUSER  Connected google account number to use.
+  -c COOKIE, --cookie COOKIE        Google Drive cookie or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge").
+  -o OUTPUT, --output OUTPUT        Path to the output file. By default, the report will be printed to stdout.
 
 examples:
 

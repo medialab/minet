@@ -911,9 +911,13 @@ MINET_COMMANDS = {
                             'help': 'Url or id of the spreadsheet to export.'
                         },
                         {
+                            'flags': ['-a', '--authuser'],
+                            'help': 'Connected google account number to use.',
+                            'type': int
+                        },
+                        {
                             'flags': ['-c', '--cookie'],
-                            'help': 'Browser from which to extract a google drive cookie (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".',
-                            'default': 'firefox'
+                            'help': 'Google Drive cookie or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge").'
                         },
                         {
                             'flags': ['-o', '--output'],

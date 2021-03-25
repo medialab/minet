@@ -19,3 +19,7 @@ class GoogleSheetsInvalidTargetError(GoogleSheetsError):
 
 class GoogleSheetsInvalidContentTypeError(GoogleSheetsError):
     pass
+
+
+class GoogleSheetsMissingCookieError(GoogleSheetsError):
+    pass
