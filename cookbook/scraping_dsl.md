@@ -29,13 +29,14 @@ Finally, this tutorial is fairly long so I encourage you to bail out as soon as 
 * [Keeping only unique items](#keeping-only-unique-items)
 * [Using evaluation when declarative is not enough](#using-evaluation-when-declarative-is-not-enough)
   * [Evaluating selections](#evaluating-selections)
-  * [Evaluating extractions](#evaluating-extractions)
+  * [Evaluating value extraction](#evaluating-value-extraction)
   * [Evaluating filters](#evaluating-filters)
   * [Using functions from within python](#using-functions-from-within-python)
   * [Complete list of exposed variables](#complete-list-of-exposed-variables)
 * [Accessing global context](#accessing-global-context)
 * [Defining local context](#defining-local-context)
 * [Aliases](#aliases)
+* [Scraper execution outline](#scraper-execution-outline)
 
 ## Applying a minet scraper
 
@@ -727,17 +728,297 @@ fields:
       return 'li'
 ```
 
-### Evaluating extractions
+### Evaluating value extraction
+
+The most useful kind of evaluation is probably the one you can use to process the scraped data to make it fit your needs. Let's consider the following html with case variations so ugly it hurts the eyes:
+
+```html
+<div id="colors">
+  <p>Red</p>
+  <p>Blue</p>
+  <p>YELLOW</p>
+  <p>orange</p>
+  <p>ReD</p>
+</div>
+```
+
+Being a diligent data wrangler, you might want to lowercase all those strings to normalize them. This is where the `eval` key will be able to help you:
+
+```yml
+---
+iterator: p
+item:
+  eval: value.lower()
+uniq: yes
+```
+
+and you will get:
+
+```json
+["red", "blue", "yellow", "orange"]
+```
+
+In this expression, the `value` variable represent the current value that will be returned and is by default (unless you gave a `default` key) the current html element's text.
+
+And notice how the `uniq` key applies after your transformation.
+
+Finally, keep in mind that `eval` is the last thing that gets executed. So if you declared an `attr` key, for instance, then the `value` variable will be this attribute's value when the `eval` is run.
+
+To finely understand in which order operations are applied, be sure to read [this](#scraper-execution-outline) part of the tutorial.
 
 ### Evaluating filters
+
+The last thing one can "evaluate" is filtering. Let's consider this html:
+
+```html
+<ul>
+  <li data-status="active">John</li>
+  <li data-status="inactive">Mary</li>
+  <li data-status="active">Susan</li>
+</ul>
+```
+
+Now let's imagine you need to filter out `inactive` items. We could do so using the `filter_eval` key (once again, I perfectly know that a finely tuned CSS selector could do the job just fine, but I need an example so let this be a cautionary tale that evaluation is seldom necessary):
+
+```yml
+iterator: li
+filter_eval: "value != 'inactive'"
+```
+
+and, as expected, this will return:
+
+```json
+["John", "Mary"]
+```
 
 ### Using functions from within python
 
 ### Complete list of exposed variables
 
+*Dependencies*
+
+* **json**: python's `json` module.
+* **urljoin**: python's `urllib.parse.urljoin`.
+* **re**: python's `re` module.
+
+*Local variables*
+
+* **element** *bs4.Tag*: currently selected html element.
+* **elements** *list<bs4.Tag>*: html elements being currently iterated over.
+* **value** *any*: current output value.
+
+*Context*
+
+* **context** *dict*: local context object (more about this in the next part of this documentation).
+* **root** *bs4.Tag*: root element of the html tree.
+
 ## Accessing global context
 
+When calling a scraper on some html, it is also possible to give the scraper some context, as a `dict`, so that the scraper can use it.
+
+Here is how someone would pass this context in python:
+
+```python
+from minet import Scraper
+
+scraper = Scraper('scraper.yml')
+
+scraper(html, context={'important_id': 123, 'nested': {'value': 'hello'}})
+```
+
+So, considering this html:
+
+```html
+<ul>
+  <li>John</li>
+  <li>Susan</li>
+</ul>
+```
+
+You would be able to access the given context by using the `get_context` key, like so:
+
+```yml
+---
+iterator: li
+fields:
+  id:
+    get_context: important_id
+  name: text
+```
+
+to return:
+
+```json
+[
+  {"id": 123, "name": "John"},
+  {"id": 123, "name": "Mary"}
+]
+```
+
+Note that you can give a path instead of a single string to access nested information:
+
+```yml
+iterator: li
+fields:
+  id:
+    get_context: important_id
+  value:
+    get_context: ['nested', 'value'] # could also be written as "nested.value"
+  name: text
+```
+
+to obtain:
+
+```json
+[
+  {"id": 123, "value": "hello", "name": "John"},
+  {"id": 123, "value": "hello", "name": "Mary"}
+]
+```
+
+This can be very useful to give access to some extraneous data to the scraper if required. As such when using the `minet scrape` command, useful information is always given to the scraper through context:
+
+* **line** *dict*: the CSV line representing a line in a `minet fetch` report.
+* **path** *str*: the path to the html file currently being scraped.
+* **basename** *str*: the html file path's base name.
+
+Here is an example where the scraped file's url is added to the output using context:
+
+```yml
+---
+fields:
+  url:
+    get_context: line.url
+  title:
+    sel: title
+```
+
 ## Defining local context
+
+Sometimes, for clarity or performance, you might want to override global context with some local one, through scraping. Let's consider the following html:
+
+```html
+<html>
+  <head>
+    <title>Last week's posts</title>
+  </head>
+  <body>
+    <ul>
+      <li>
+        <p>
+          Post n°<strong>1</strong> by <em>Allan</em>
+        </p>
+      </li>
+      <li>
+        <p>
+          Post n°<strong>2</strong> by <em>Susan</em>
+        </p>
+      </li>
+    </ul>
+  </body>
+</html>
+```
+
+If you want to return a list of dicts repeating the title of the document along with each post, you might do it like so:
+
+```yml
+---
+iterator: li > p
+fields:
+  title:
+    eval: "root.select_one('title').get_text()"
+  post:
+    sel: strong
+  author:
+    sel: em
+```
+
+and you would obtain:
+
+```json
+[
+  {"title": "Last week's posts", "post": "1", "author": "Allan"},
+  {"title": "Last week's posts", "post": "2", "author": "Susan"},
+]
+```
+
+but this is not 1. elegant (because you used evaluation) and 2. performant (because you will need to select the `title` tag for each post).
+
+This is when the `set_context` key can be used to alleviate both issues. This key can take a recursive scraper definition and will set keys in a "local" context that will be merged with the global one given to the scraper, at each relevant level.
+
+Here is how we could refactor the previous scraper:
+
+```yml
+---
+set_context:
+  title:
+    sel: title
+iterator: li > p
+fields:
+  title:
+    get_context: title
+  post:
+    sel: strong
+  author:
+    sel: em
+```
+
+<!-- Finally, note that `set_context` can be used at any level of the scraper's tree so that this html:
+
+```html
+<div data-topic="science">
+  <ul>
+    <li>
+      <p>
+        Post n°<strong>1</strong> by <em>Allan</em>
+      </p>
+    </li>
+    <li>
+      <p>
+        Post n°<strong>2</strong> by <em>Susan</em>
+      </p>
+    </li>
+  </ul>
+</div>
+<div data-topic="arts">
+  <ul>
+    <li>
+      <p>
+        Post n°<strong>3</strong> by <em>Josephine</em>
+      </p>
+    </li>
+    <li>
+      <p>
+        Post n°<strong>4</strong> by <em>Peter</em>
+      </p>
+    </li>
+  </ul>
+</div>
+```
+
+could be scraped as:
+
+```json
+[
+  {"topic": "science", "post": "1", "author": "Allan"},
+  {"topic": "science", "post": "2", "author": "Susan"},
+  {"topic": "arts", "post": "3", "author": "Josephine"},
+  {"topic": "arts", "post": "4", "author": "Peter"}
+]
+```
+
+by using the following declaration:
+
+```yml
+---
+iterator: div
+item:
+  set_context:
+    topic: data-topic
+  fields:
+    topic:
+      get_context: topic
+``` -->
 
 ## Aliases
 
@@ -747,3 +1028,5 @@ Know that some of the DSL keys have aliases for convenience:
 * `iterator` can also be written as `$$`
 
 So don't be surprised if you see them appear in people code's sometimes and don't be afraid to use them if they fit your mindset better.
+
+## Scraper execution outline
