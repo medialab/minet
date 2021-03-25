@@ -17,7 +17,9 @@ from minet.constants import COOKIE_BROWSERS
 from minet.google.exceptions import (
     GoogleSheetsInvalidTargetError,
     GoogleSheetsInvalidContentTypeError,
-    GoogleSheetsMissingCookieError
+    GoogleSheetsMissingCookieError,
+    GoogleSheetsNotFoundError,
+    GoogleSheetsUnauthorizedError
 )
 
 POOL = create_pool()
@@ -40,7 +42,7 @@ def export_google_sheets_as_csv(url, cookie=None):
     export_url = parsed.get_export_url()
 
     if cookie is not None and cookie in COOKIE_BROWSERS:
-        jar = getattr(browser_cookie3, cookie)
+        jar = getattr(browser_cookie3, cookie)()
         resolver = CookieResolver(jar)
         cookie = resolver(export_url)
 
@@ -51,6 +53,12 @@ def export_google_sheets_as_csv(url, cookie=None):
 
     if err:
         raise err
+
+    if response.status == 404:
+        raise GoogleSheetsNotFoundError
+
+    if response.status == 401:
+        raise GoogleSheetsUnauthorizedError
 
     if 'csv' not in response.headers.get('Content-Type', '').lower():
         raise GoogleSheetsInvalidContentTypeError

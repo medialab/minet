@@ -11,7 +11,9 @@ from minet.google import export_google_sheets_as_csv
 from minet.google.exceptions import (
     GoogleSheetsInvalidTargetError,
     GoogleSheetsInvalidContentTypeError,
-    GoogleSheetsMissingCookieError
+    GoogleSheetsMissingCookieError,
+    GoogleSheetsNotFoundError,
+    GoogleSheetsUnauthorizedError
 )
 
 
@@ -31,6 +33,10 @@ def google_sheets_action(namespace):
         die('Did not find a relevant cookie!')
     except GoogleSheetsInvalidContentTypeError:
         die('Could not export spreadsheet as CSV!')
+    except GoogleSheetsNotFoundError:
+        die('Could not find spreadsheet (404)!')
+    except GoogleSheetsUnauthorizedError:
+        die('You don\'t have access to this spreadsheet. Did you forget to set --cookie?')
 
     output_file.write(data)
     output_file.close()

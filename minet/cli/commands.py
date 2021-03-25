@@ -904,6 +904,9 @@ MINET_COMMANDS = {
 
                         . Exporting from the spreadsheet id:
                             `minet google sheets 1QXQ1yaNYrVUlMt6LQ4jrLGt_PvZI9goozYiBTgaC4RI > file.csv`
+
+                        . Using your Firefox authentication cookies:
+                            `minet google sheets --cookie firefox 1QXQ1yaNYrVUlMt6LQ4jrLGt_PvZI9goozYiBTgaC4RI > file.csv`
                     ''',
                     'arguments': [
                         {

@@ -23,3 +23,11 @@ class GoogleSheetsInvalidContentTypeError(GoogleSheetsError):
 
 class GoogleSheetsMissingCookieError(GoogleSheetsError):
     pass
+
+
+class GoogleSheetsNotFoundError(GoogleSheetsError):
+    pass
+
+
+class GoogleSheetsUnauthorizedError(GoogleSheetsError):
+    pass

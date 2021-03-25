@@ -904,7 +904,7 @@ Minet Google Sheets Command
 ===========================
 
 Grab the given google spreadsheet as a CSV file from
-its url or id.
+its url, its share url or id.
 
 positional arguments:
   url                               Url or id of the spreadsheet to export.
@@ -919,6 +919,9 @@ examples:
 
 . Exporting from the spreadsheet id:
     `minet google sheets 1QXQ1yaNYrVUlMt6LQ4jrLGt_PvZI9goozYiBTgaC4RI > file.csv`
+
+. Using your Firefox authentication cookies:
+    `minet google sheets --cookie firefox 1QXQ1yaNYrVUlMt6LQ4jrLGt_PvZI9goozYiBTgaC4RI > file.csv`
 
 ```
 
