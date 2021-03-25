@@ -23,7 +23,8 @@ def google_sheets_action(namespace):
     try:
         data = export_google_sheets_as_csv(
             namespace.url,
-            cookie=namespace.cookie
+            cookie=namespace.cookie,
+            authuser=namespace.authuser
         )
     except GoogleSheetsInvalidTargetError:
         die('Could not extract a valid google sheets id from provided argument!')

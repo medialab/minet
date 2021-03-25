@@ -30,7 +30,7 @@ def append_authuser(url, authuser):
     return url
 
 
-def export_google_sheets_as_csv(url, cookie=None):
+def export_google_sheets_as_csv(url, cookie=None, authuser=None):
     if is_url(url):
         parsed = parse_google_drive_url(url)
 
@@ -40,6 +40,12 @@ def export_google_sheets_as_csv(url, cookie=None):
         parsed = GoogleDriveFile('spreadsheets', url)
 
     export_url = parsed.get_export_url()
+
+    if authuser is not None:
+        if not isinstance(authuser, int) or authuser < 0:
+            raise TypeError('authuser should be an int >= 0')
+
+        export_url = append_authuser(export_url, authuser)
 
     if cookie is not None and cookie in COOKIE_BROWSERS:
         jar = getattr(browser_cookie3, cookie)()

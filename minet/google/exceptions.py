@@ -31,3 +31,7 @@ class GoogleSheetsNotFoundError(GoogleSheetsError):
 
 class GoogleSheetsUnauthorizedError(GoogleSheetsError):
     pass
+
+
+class GoogleSheetsMaxAttemptsExceeded(GoogleSheetsError):
+    pass
