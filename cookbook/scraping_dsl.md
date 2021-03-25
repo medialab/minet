@@ -2,11 +2,11 @@
 
 [Scraping](https://en.wikipedia.org/wiki/Web_scraping) is a web mining task that is usually done using some kind of script language such as `python`. However, since `minet` is first and foremost a CLI tool, we need to find another way to declare our scraping intentions.
 
-So, in order to facilitate scraping, `minet` uses a custom declarative [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) (**D**omain **S**pecific **L**anguage), typically written in [JSON](https://en.wikipedia.org/wiki/JSON) or [YAML](https://en.wikipedia.org/wiki/YAML).
+So, in order to enable efficient scraping, `minet` uses a custom declarative [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) (**D**omain **S**pecific **L**anguage), typically written in [JSON](https://en.wikipedia.org/wiki/JSON) or [YAML](https://en.wikipedia.org/wiki/YAML) and reminiscent of [artoo.js](https://medialab.github.io/artoo/), a JavaScript webmining tool, scraping utilities.
 
 Here is therefore a full tutorial about the capabilities of this DSL.
 
-Note that all examples will be presented in YAML format, even if any JSON-like format would also do the trick just fine. It's just that YAML is kind of the python of JSON and is somewhat quicker to write, which is always a nice in this context. Also, YAML has comments and it makes it easier to explain what's happening throughout the tutorial.
+Note that all examples will be presented in YAML format, even if any JSON-like format would also do the trick just fine. But YAML being somewhat the python of JSON, is somewhat quicker to write, which is always a nice in this context. Also, YAML has comments and it makes it easier to explain what's happening throughout the tutorial.
 
 Also, if you ever need to read some real examples of scrapers written using the DSL you can check out [this](/ftest/scrapers) folder of the repository.
 
@@ -445,11 +445,166 @@ Harnessing recursivity will return a nested result:
 
 ## Default values
 
-TODO: constant side of the coin
+Usually, a scraper will return `None` if a selection cannot be found or if the desired attribute does not exists. If so, you might want to return a default value instead. If we consider the following html for instance:
+
+```html
+<ul>
+  <li color="blue">John</li>
+  <li>Mary</li>
+</ul>
+```
+
+You could declare a default value thusly:
+
+```yml
+---
+iterator: li
+item:
+  attr: color
+  default: black
+```
+
+And this would return:
+
+```python
+["blue", "black"]
+```
+
+instead of:
+
+```python
+["blue", None]
+```
+
+This `default` key can also be thought as a constant value if you ever need one (this could be useful with `minet` crawlers for instance, of if you use several scrapers to track from which one a result came from):
+
+```yml
+iterator: li
+fields:
+  scraper:
+    default: 'My scraper'
+  name: text
+```
+
+would return:
+
+```json
+[
+  {"scraper": "My Scraper", "name": "John"},
+  {"scraper": "My Scraper", "name": "Mary"}
+]
+```
 
 ## Filtering
 
+When iterating on a selection, it might be useful to filter out some empty or invalid results. If we consider the following html:
+
+```html
+<ul>
+  <li color="blue">John</li>
+  <li>Mary</li>
+  <li color="purple">Susan</li>
+</ul>
+```
+
+We can filter out empty values for the `color` attribute using the `filter` key in our scraper:
+
+```yml
+---
+iterator: li
+item: color
+filter: yes # yes is just one of the multiple ways to say `true` in YAML
+```
+
+This should return:
+
+```json
+["blue", "purple"]
+```
+
+and not:
+
+```python
+["blue", None, "purple"]
+```
+
+Note that this `filter` key can also take a path to the value to actually test for filtering when using, for instance, `fields` like so:
+
+```yml
+---
+iterator: li
+fields:
+  name: text
+  color: color
+filter: color
+```
+
+will return:
+
+```json
+[
+  {"name": "John", "color": "blue"},
+  {"name": "Susan", "color": "purple"}
+]
+```
+
+Note that the path given to `filter` can be an array or keys separated by a point if you need to test nested values.
+
+Finally, if you need more complex filtering, you can still read about `filter_eval` [here](#evaluating-filters).
+
 ## Keeping only unique items
+
+When iterating on a selection to return multiple items, you might get the same one multiple times and you might want to avoid that.
+
+If we, for instance, consider the following html:
+
+```html
+<ul>
+  <li color="blue">John</li>
+  <li color="red">Mary</li>
+  <li color="blue">Susan</li>
+</ul>
+```
+
+You can use the `uniq` key to be sure scraping the `color` attributes will only yield `"blue"` once:
+
+```yml
+---
+iterator: li
+item: color
+uniq: yes
+```
+
+and you will get:
+
+```json
+["blue", "red"]
+```
+
+instead of:
+
+```json
+["blue", "red", "blue"]
+```
+
+If you only want to keep a single item based on one of its fields, you can give a path to the `uniq` key, the same way you would with `filter`. Just note that the item that will be kept is the first occurring one having a given value at the given path so that the following scraper:
+
+```yml
+iterator: li
+fields:
+  name: text
+  color: color
+uniq: color
+```
+
+will return:
+
+```json
+[
+  {"name": "John", "color": "blue"},
+  {"name": "Mary", "color": "red"}
+]
+```
 
 ## Using evaluation when declarative is not enough
 
