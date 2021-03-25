@@ -9,6 +9,7 @@ import soupsieve
 from io import StringIO
 from functools import partial
 from soupsieve import SelectorSyntaxError
+from termcolor import colored
 
 from minet.scrape.utils import get_sel, get_iterator
 from minet.scrape.constants import (
@@ -203,7 +204,7 @@ def validate(scraper):
 
 
 def and_join(strings):
-    strings = ['"%s"' % s for s in strings]
+    strings = [colored(s, 'green') for s in strings]
 
     if len(strings) < 2:
         return strings[0]
@@ -216,28 +217,30 @@ def report_validation_errors(errors):
 
     p = partial(print, file=output)
 
+    red_alert = colored('Error', 'red')
+
     for n, error in enumerate(errors, 1):
         path = '.' + ('.'.join(error.path))
 
-        p('> Error n°{n} at path "{path}":'.format(n=n, path=path))
+        p('> {error} n°{n} at path {path}{root}'.format(error=red_alert, n=n, path=colored(path, 'blue'), root=(' (root)' if not error.path else '')))
 
         if isinstance(error, ScraperValidationConflictError):
             p('  the {keys} keys are conflicting and should not be found at the same level!'.format(keys=and_join(error.keys)))
 
         if isinstance(error, ScraperValidationIrrelevantPluralModifierError):
-            p('  the "{modifier}" modifier should not be found at a non-plural level (i.e. without iterator)!'.format(modifier=error.modifier))
+            p('  the {modifier} modifier should not be found at a non-plural level (i.e. without iterator)!'.format(modifier=colored(error.modifier, 'green')))
 
         if isinstance(error, ScraperValidationMixedConcernError):
             p('  mixed concerns could not be interpreted (i.e. the {burrowing} keys should not be found alongside the {leaf} ones)!'.format(burrowing=and_join(BURROWING_KEYS), leaf=and_join(LEAF_KEYS)))
 
         if isinstance(error, InvalidCSSSelectorError):
-            p('  invalid CSS selector "{css}"!'.format(css=error.expression))
+            p('  invalid CSS selector {css}'.format(css=colored(error.expression, 'cyan')))
 
         if isinstance(error, ScraperEvalSyntaxError):
             p('  invalid python code was found:')
 
             for line in error.expression.split('\n'):
-                p('    | {line}'.format(line=line))
+                p(colored('    | {line}'.format(line=line), 'cyan'))
 
         p()
 

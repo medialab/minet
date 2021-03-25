@@ -17,12 +17,16 @@ from argparse import (
     ArgumentParser,
     RawTextHelpFormatter
 )
+from colorama import init as colorama_init
 
 from minet.__version__ import __version__
 from minet.cli.utils import die, get_rcfile
 from minet.cli.argparse import WrappedConfigValue
 
 from minet.cli.commands import MINET_COMMANDS
+
+# Colorama
+colorama_init()
 
 # Handling pipes correctly
 # NOTE: does not work in windows

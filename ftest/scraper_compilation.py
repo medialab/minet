@@ -193,8 +193,8 @@ THE_WORST_SCRAPER_EVER = {
 
 errors = validate(THE_WORST_SCRAPER_EVER)
 
-for error in errors:
-    print(repr(error))
+# for error in errors:
+#     print(repr(error))
 
 report = report_validation_errors(errors)
 
