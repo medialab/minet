@@ -897,7 +897,20 @@ MINET_COMMANDS = {
                     'title': 'Minet Google Sheets Command',
                     'description': '''
                         Grab the given google spreadsheet as a CSV file from
-                        its url, its share url or id.
+                        its url, its sharing url or id.
+
+                        It can access public spreadsheets without issues, but to
+                        you will need to tell the command how to retrieve Google
+                        drive authentication cookies to also be able to access
+                        private ones.
+
+                        Also note that by default, the command will try to access
+                        your spreadsheet using your first 4 connected Google
+                        accounts.
+
+                        If you have more connected accounts or know beforehand
+                        to which account some spreadsheets are tied to, be sure
+                        to give --authuser.
                     ''',
                     'epilog': '''
                         examples:
@@ -911,7 +924,7 @@ MINET_COMMANDS = {
                     'arguments': [
                         {
                             'name': 'url',
-                            'help': 'Url or id of the spreadsheet to export.'
+                            'help': 'Url, sharing url or id of the spreadsheet to export.'
                         },
                         {
                             'flags': ['-a', '--authuser'],
