@@ -1239,6 +1239,9 @@ MINET_COMMANDS = {
 
             . Only validating the scraper definition and exit:
                 `minet scraper --validate scraper.yml`
+
+            . Using a strainer to optimize performance:
+                `minet scraper links-scraper.yml --strain "a[href]" report.csv > links.csv`
         ''',
         'arguments': [
             {
@@ -1281,6 +1284,10 @@ MINET_COMMANDS = {
             {
                 'flag': '--separator',
                 'help': 'Separator use to join lists of values when output format is CSV. Defaults to "|".'
+            },
+            {
+                'flag': '--strain',
+                'help': 'Optional CSS selector used to strain, i.e. only parse matched tags in the parsed html files in order to optimize performance.'
             },
             {
                 'flag': '--total',

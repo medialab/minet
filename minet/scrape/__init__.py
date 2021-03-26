@@ -81,7 +81,10 @@ class Scraper(object):
 
         def generator():
 
-            result = scrape(self.definition, html, context=context)
+            result = self.__call__(html, context=context)
+
+            if result is None:
+                return
 
             if not self.plural:
                 result = [result]
@@ -98,7 +101,10 @@ class Scraper(object):
         return generator()
 
     def as_records(self, html, context=None):
-        result = scrape(self.definition, html, context=context)
+        result = self.__call__(html, context=context)
+
+        if result is None:
+            return
 
         if not self.plural:
             result = [result]

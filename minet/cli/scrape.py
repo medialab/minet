@@ -8,6 +8,7 @@ import csv
 import sys
 import ndjson
 import casanova
+from termcolor import colored
 from collections import namedtuple
 from os.path import basename
 from multiprocessing import Pool
@@ -17,7 +18,8 @@ from minet.exceptions import (
     DefinitionInvalidFormatError,
 )
 from minet.scrape.exceptions import (
-    InvalidScraperError
+    InvalidScraperError,
+    CSSSelectorTooComplex
 )
 from minet.scrape.analysis import report_validation_errors
 from minet.cli.utils import (
@@ -38,10 +40,10 @@ ScrapeWorkerResult = namedtuple(
 PROCESS_SCRAPER = None
 
 
-def init_process(definition):
+def init_process(definition, strain):
     global PROCESS_SCRAPER
 
-    PROCESS_SCRAPER = Scraper(definition)
+    PROCESS_SCRAPER = Scraper(definition, strain=strain)
 
 
 def worker(payload):
@@ -82,7 +84,7 @@ def scrape_action(namespace):
 
     # Parsing scraper definition
     try:
-        scraper = Scraper(namespace.scraper)
+        scraper = Scraper(namespace.scraper, strain=namespace.strain)
     except DefinitionInvalidFormatError:
         die([
             'Unknown scraper format!',
@@ -95,6 +97,12 @@ def scrape_action(namespace):
         print(file=sys.stderr)
         sys.stderr.write(report_validation_errors(error.validation_errors))
         die()
+    except CSSSelectorTooComplex:
+        die([
+            'Your strainer\'s CSS selector %s is too complex.' % colored(namespace.strain, 'blue'),
+            'You cannot use relations to create a strainer.',
+            'Try to simplify the selector you passed to --strain.'
+        ])
 
     if namespace.validate:
         print('You scraper is valid.', file=sys.stderr)
@@ -141,7 +149,7 @@ def scrape_action(namespace):
     pool = Pool(
         namespace.processes,
         initializer=init_process,
-        initargs=(scraper.definition, )
+        initargs=(scraper.definition, namespace.strain)
     )
 
     with pool:
