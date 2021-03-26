@@ -887,6 +887,7 @@ Keyword arguments given to the function replacing `eval` directives are listed i
 * **json**: python's `json` module.
 * **urljoin**: python's `urllib.parse.urljoin`.
 * **re**: python's `re` module.
+* **soupsieve**: the `soupsieve` module.
 
 *Local variables*
 

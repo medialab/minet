@@ -66,7 +66,8 @@ EVAL_CONTEXT = {
     # Dependencies
     'json': json,
     'urljoin': urljoin,
-    're': re
+    're': re,
+    'soupsieve': soupsieve
 }
 
 
