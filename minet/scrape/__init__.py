@@ -97,5 +97,13 @@ class Scraper(object):
 
         return generator()
 
+    def as_records(self, html, context=None):
+        result = scrape(self.definition, html, context=context)
+
+        if not self.plural:
+            result = [result]
+
+        yield from result
+
 
 __all__ = ['Scraper', 'validate']

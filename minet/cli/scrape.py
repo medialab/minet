@@ -45,7 +45,8 @@ def init_process(definition):
 
 
 def worker(payload):
-    row, headers, path, encoding, content, scraper = payload
+    row, headers, path, encoding, content, args = payload
+    output_format, plural_separator = args
 
     # Reading from file
     if content is None:
@@ -65,7 +66,12 @@ def worker(payload):
         context['basename'] = basename(path)
 
     # Attempting to scrape
-    items = PROCESS_SCRAPER(content, context=context)
+    if output_format == 'csv':
+        items = PROCESS_SCRAPER.as_csv_dict_rows(content, context=context, plural_separator=plural_separator)
+    else:
+        items = PROCESS_SCRAPER.as_records(content, context=context)
+
+    items = list(items)
 
     return ScrapeWorkerResult(None, items)
 
@@ -94,6 +100,12 @@ def scrape_action(namespace):
         print('You scraper is valid.', file=sys.stderr)
         sys.exit(0)
 
+    if scraper.headers is None and namespace.format == 'csv':
+        die([
+            'Your scraper does not yield tabular data.',
+            'Try changing it or setting --format to "jsonl".'
+        ])
+
     loading_bar = LoadingBar(
         desc='Scraping pages',
         total=namespace.total,
@@ -102,13 +114,18 @@ def scrape_action(namespace):
         delay=0.5
     )
 
+    proc_args = (
+        namespace.format,
+        namespace.separator
+    )
+
     if namespace.glob is not None:
-        files = create_glob_iterator(namespace, scraper)
+        files = create_glob_iterator(namespace, proc_args)
     else:
         reader = casanova.reader(namespace.report)
 
         try:
-            files = create_report_iterator(namespace, reader, scraper, loading_bar)
+            files = create_report_iterator(namespace, reader, proc_args, loading_bar)
         except NotADirectoryError:
             loading_bar.die([
                 'Could not find the "%s" directory!' % namespace.input_dir,
@@ -116,8 +133,7 @@ def scrape_action(namespace):
             ])
 
     if namespace.format == 'csv':
-        output_headers = scraper.headers
-        output_writer = csv.DictWriter(output_file, fieldnames=output_headers)
+        output_writer = csv.DictWriter(output_file, fieldnames=scraper.headers)
         output_writer.writeheader()
     else:
         output_writer = ndjson.writer(output_file)
@@ -136,13 +152,7 @@ def scrape_action(namespace):
                 loading_bar.inc('errors')
                 continue
 
-            if not isinstance(items, list):
-                items = [items]
-
             for item in items:
-                if not isinstance(item, dict):
-                    item = {'value': item}
-
                 output_writer.writerow(item)
 
     loading_bar.close()

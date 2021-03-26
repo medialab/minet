@@ -13,7 +13,6 @@ import signal
 import shutil
 import importlib
 import multiprocessing
-from tqdm import tqdm
 from textwrap import dedent
 from argparse import (
     ArgumentParser,

@@ -1235,7 +1235,7 @@ MINET_COMMANDS = {
                 `minet scrape scraper.yml --glob "./content/**/*.html" > scraped.csv`
 
             . Yielding items as newline-delimited JSON (jsonl):
-                `minet scrape scraper.yml report.csv > scraped.jsonl
+                `minet scrape scraper.yml report.csv --format jsonl > scraped.jsonl
 
             . Only validating the scraper definition and exit:
                 `minet scraper --validate scraper.yml`
@@ -1277,6 +1277,10 @@ MINET_COMMANDS = {
                 'help': 'Number of processes to use. Defaults to 4.',
                 'type': int,
                 'default': 4
+            },
+            {
+                'flag': '--separator',
+                'help': 'Separator use to join lists of values when output format is CSV. Defaults to "|".'
             },
             {
                 'flag': '--total',
