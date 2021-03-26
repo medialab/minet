@@ -5,6 +5,7 @@
 #
 # CLI enpoint of the Minet library.
 #
+import os
 import csv
 import sys
 import ctypes
@@ -12,6 +13,7 @@ import signal
 import shutil
 import importlib
 import multiprocessing
+from tqdm import tqdm
 from textwrap import dedent
 from argparse import (
     ArgumentParser,
@@ -27,11 +29,6 @@ from minet.cli.commands import MINET_COMMANDS
 
 # Colorama
 colorama_init()
-
-# Handling pipes correctly
-# NOTE: does not work in windows
-if hasattr(signal, 'SIGPIPE'):
-    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
 SUBPARSERS = {}
 
@@ -237,4 +234,12 @@ def main():
 
 if __name__ == '__main__':
     multiprocessing.freeze_support()
-    main()
+
+    try:
+        main()
+    except BrokenPipeError:
+
+        # Taken from: https://docs.python.org/3/library/signal.html
+        devnull = os.open(os.devnull, os.O_WRONLY)
+        os.dup2(devnull, sys.stdout.fileno())
+        sys.exit(1)
