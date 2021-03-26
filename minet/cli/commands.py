@@ -1215,22 +1215,30 @@ MINET_COMMANDS = {
         'description': '''
             Use multiple processes to scrape data from a batch of HTML files.
             This command can either work on a `minet fetch` report or on a bunch
-            of files. It will output the scraped items.
+            of files filtered using a glob pattern.
+
+            It will output the scraped items as a CSV file.
         ''',
         'epilog': '''
             examples:
 
             . Scraping item from a `minet fetch` report:
-                `minet scrape scraper.json report.csv > scraped.csv`
+                `minet scrape scraper.yml report.csv > scraped.csv`
 
             . Working on a report from stdin:
-                `minet fetch url_column file.csv | minet scrape scraper.json > scraped.csv`
+                `minet fetch url_column file.csv | minet scrape scraper.yml > scraped.csv`
 
             . Scraping a single page from the web:
-                `minet fetch https://news.ycombinator.com/ | minet scrape scraper.json > scraped.csv`
+                `minet fetch https://news.ycombinator.com/ | minet scrape scraper.yml > scraped.csv`
 
             . Scraping items from a bunch of files:
-                `minet scrape scraper.json --glob "./content/*.html" > scraped.csv`
+                `minet scrape scraper.yml --glob "./content/**/*.html" > scraped.csv`
+
+            . Yielding items as newline-delimited JSON (jsonl):
+                `minet scrape scraper.yml report.csv > scraped.jsonl
+
+            . Only validating the scraper definition and exit:
+                `minet scraper --validate scraper.yml`
         ''',
         'arguments': [
             {
@@ -1274,6 +1282,11 @@ MINET_COMMANDS = {
                 'flag': '--total',
                 'help': 'Total number of HTML documents. Necessary if you want to display a finite progress indicator.',
                 'type': int
+            },
+            {
+                'flag': '--validate',
+                'help': 'Just validate the given scraper then exit.',
+                'action': 'store_true'
             }
         ]
     },

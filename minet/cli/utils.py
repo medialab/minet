@@ -22,12 +22,13 @@ def print_err(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
 
-def die(msg):
-    if not isinstance(msg, list):
-        msg = [msg]
+def die(msg=None):
+    if msg is not None:
+        if not isinstance(msg, list):
+            msg = [msg]
 
-    for m in msg:
-        print_err(m)
+        for m in msg:
+            print_err(m)
 
     sys.exit(1)
 
@@ -85,7 +86,8 @@ class DummyTqdmFile(object):
 class LoadingBar(object):
     __slots__ = ('bar', 'stats')
 
-    def __init__(self, desc, total=None, stats=None, unit=None, unit_plural=None):
+    def __init__(self, desc, total=None, stats=None, unit=None, unit_plural=None,
+                 delay=None):
         if unit is not None and total is None:
             if unit_plural is not None:
                 unit = ' ' + unit_plural
@@ -99,7 +101,8 @@ class LoadingBar(object):
             dynamic_ncols=True,
             total=total,
             postfix=stats,
-            unit=unit
+            unit=unit,
+            delay=delay
         )
 
     def update_total(self, total):

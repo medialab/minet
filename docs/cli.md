@@ -372,7 +372,7 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 ```
 usage: minet scrape [-h] [-f {csv,jsonl}] [-g GLOB] [-i INPUT_DIR] [-o OUTPUT]
-                    [-p PROCESSES] [--total TOTAL]
+                    [-p PROCESSES] [--total TOTAL] [--validate]
                     scraper [report]
 
 Minet Scrape Command
@@ -380,7 +380,9 @@ Minet Scrape Command
 
 Use multiple processes to scrape data from a batch of HTML files.
 This command can either work on a `minet fetch` report or on a bunch
-of files. It will output the scraped items.
+of files filtered using a glob pattern.
+
+It will output the scraped items as a CSV file.
 
 positional arguments:
   scraper                               Path to a scraper definition file.
@@ -394,20 +396,27 @@ optional arguments:
   -o OUTPUT, --output OUTPUT            Path to the output report file. By default, the report will be printed to stdout.
   -p PROCESSES, --processes PROCESSES   Number of processes to use. Defaults to 4.
   --total TOTAL                         Total number of HTML documents. Necessary if you want to display a finite progress indicator.
+  --validate                            Just validate the given scraper then exit.
 
 examples:
 
 . Scraping item from a `minet fetch` report:
-    `minet scrape scraper.json report.csv > scraped.csv`
+    `minet scrape scraper.yml report.csv > scraped.csv`
 
 . Working on a report from stdin:
-    `minet fetch url_column file.csv | minet scrape scraper.json > scraped.csv`
+    `minet fetch url_column file.csv | minet scrape scraper.yml > scraped.csv`
 
 . Scraping a single page from the web:
-    `minet fetch https://news.ycombinator.com/ | minet scrape scraper.json > scraped.csv`
+    `minet fetch https://news.ycombinator.com/ | minet scrape scraper.yml > scraped.csv`
 
 . Scraping items from a bunch of files:
-    `minet scrape scraper.json --glob "./content/*.html" > scraped.csv`
+    `minet scrape scraper.yml --glob "./content/**/*.html" > scraped.csv`
+
+. Yielding items as newline-delimited JSON (jsonl):
+    `minet scrape scraper.yml report.csv > scraped.jsonl
+
+. Only validating the scraper definition and exit:
+    `minet scraper --validate scraper.yml`
 
 ```
 

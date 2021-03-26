@@ -5,6 +5,7 @@
 # Logic of the scrape action.
 #
 import csv
+import sys
 import ndjson
 import casanova
 from collections import namedtuple
@@ -13,8 +14,12 @@ from multiprocessing import Pool
 
 from minet import Scraper
 from minet.exceptions import (
-    DefinitionInvalidFormatError
+    DefinitionInvalidFormatError,
 )
+from minet.scrape.exceptions import (
+    InvalidScraperError
+)
+from minet.scrape.analysis import report_validation_errors
 from minet.cli.utils import (
     open_output_file,
     die,
@@ -79,19 +84,22 @@ def scrape_action(namespace):
         ])
     except FileNotFoundError:
         die('Could not find scraper file!')
+    except InvalidScraperError as error:
+        print('Your scraper is invalid! Check the following errors:', file=sys.stderr)
+        print(file=sys.stderr)
+        sys.stderr.write(report_validation_errors(error.validation_errors))
+        die()
 
-    if namespace.format == 'csv':
-        output_headers = scraper.headers
-        output_writer = csv.DictWriter(output_file, fieldnames=output_headers)
-        output_writer.writeheader()
-    else:
-        output_writer = ndjson.writer(output_file)
+    if namespace.validate:
+        print('You scraper is valid.', file=sys.stderr)
+        sys.exit(0)
 
     loading_bar = LoadingBar(
         desc='Scraping pages',
         total=namespace.total,
         unit='page',
-        stats={'p': namespace.processes}
+        stats={'p': namespace.processes},
+        delay=0.5
     )
 
     if namespace.glob is not None:
@@ -106,6 +114,13 @@ def scrape_action(namespace):
                 'Could not find the "%s" directory!' % namespace.input_dir,
                 'Did you forget to specify it with -i/--input-dir?'
             ])
+
+    if namespace.format == 'csv':
+        output_headers = scraper.headers
+        output_writer = csv.DictWriter(output_file, fieldnames=output_headers)
+        output_writer.writeheader()
+    else:
+        output_writer = ndjson.writer(output_file)
 
     pool = Pool(
         namespace.processes,
