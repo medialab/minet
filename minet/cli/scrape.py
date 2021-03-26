@@ -19,7 +19,10 @@ from minet.exceptions import (
 )
 from minet.scrape.exceptions import (
     InvalidScraperError,
-    CSSSelectorTooComplex
+    CSSSelectorTooComplex,
+    ScraperEvalError,
+    ScraperEvalTypeError,
+    ScraperEvalNoneError
 )
 from minet.scrape.analysis import report_validation_errors
 from minet.cli.utils import (
@@ -73,7 +76,11 @@ def worker(payload):
     else:
         items = PROCESS_SCRAPER.as_records(content, context=context)
 
-    items = list(items)
+    # NOTE: errors will only be raised when we consume the generators created above
+    try:
+        items = list(items)
+    except (ScraperEvalError, ScraperEvalTypeError, ScraperEvalNoneError) as error:
+        return ScrapeWorkerResult(error, None)
 
     return ScrapeWorkerResult(None, items)
 
