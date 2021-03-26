@@ -260,6 +260,33 @@ class TestScrape(object):
 
         assert result == [{'id': 'li1'}, {'id': 'li3'}]
 
+        target_html = '''
+            <ul>
+                <li color="blue" age="34">John</li>
+                <li age="45">Mary</li>
+                <li color="purple" age="23">Susan    </li>
+            </ul>
+        '''
+
+        result = scrape({
+            'iterator': 'li',
+            'fields': {
+                'name': 'text',
+                'attributes': {
+                    'fields': {
+                        'color': 'color',
+                        'age': 'age'
+                    }
+                }
+            },
+            'filter': 'attributes.color'
+        }, target_html)
+
+        assert result == [
+            {'name': 'John', 'attributes': {'color': 'blue', 'age': '34'}},
+            {'name': 'Susan', 'attributes': {'color': 'purple', 'age': '23'}}
+        ]
+
     def test_uniq(self):
         result = scrape({
             'iterator': 'li',

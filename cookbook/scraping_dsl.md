@@ -2,11 +2,9 @@
 
 [Scraping](https://en.wikipedia.org/wiki/Web_scraping) is a web mining task that is usually done using some kind of script language such as `python`. However, since `minet` is first and foremost a CLI tool, we need to find another way to declare our scraping intentions.
 
-So, in order to enable efficient scraping, `minet` uses a custom declarative [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) (**D**omain **S**pecific **L**anguage), typically written in [JSON](https://en.wikipedia.org/wiki/JSON) or [YAML](https://en.wikipedia.org/wiki/YAML) and reminiscent of [artoo.js](https://medialab.github.io/artoo/), a JavaScript webmining tool, scraping utilities.
+So, in order to enable efficient scraping, `minet` uses a custom declarative [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) (**D**omain **S**pecific **L**anguage), typically written in [JSON](https://en.wikipedia.org/wiki/JSON) or [YAML](https://en.wikipedia.org/wiki/YAML) and reminiscent of [artoo.js](https://medialab.github.io/artoo/) scraping [functions](https://medialab.github.io/artoo/scrape/).
 
 The present document is therefore a full tutorial about the capabilities of this DSL.
-
-Note that all examples will be presented in YAML format, even if any JSON-like format would also do the trick just fine. But YAML being somewhat the python of JSON, is somewhat quicker to write, which is always a nice in this context. Also, YAML has comments and it makes it easier to explain what's happening throughout the tutorial.
 
 Also, if you ever need to read some real examples of scrapers written using the DSL you can check out [this](/ftest/scrapers) folder of the repository.
 
@@ -58,7 +56,7 @@ From python you will need to use the `minet.Scraper` class to build your scraper
 ```python
 from minet import Scraper
 
-# Creating a scraper from a json declaration file:
+# Creating a scraper from a yaml declaration file:
 scraper = Scraper('scraper.yml')
 
 # Creating a scraper directly from a declaration variable:
@@ -69,7 +67,7 @@ scraper = Scraper(declaration)
 title = scraper(html)
 ```
 
-For more information, be sure to read the relevant library usage documentation [here](../docs/lib.md#scraper).
+For more information about `minet.Scraper`, be sure to read the relevant documentation [here](../docs/lib.md#scraper).
 
 ### From the command line
 
@@ -79,11 +77,13 @@ To use a scraper from the command line, you can use the `scrape` command thusly:
 # To scrape html files recorded in a minet fetch report:
 minet scrape scraper.yml report.csv > scraped.csv
 
-# To scrape html file found by glob:
+# To scrape html file found by using a glob pattern:
 minet scrape scraper.yml --glob 'files/**/*.html' > scraped.csv
 ```
 
-For more information, be sure to read the relevant CLI usage documentation [here](../docs/cli.md#scrape).
+If you want to learn about glob patterns, [this](https://en.wikipedia.org/wiki/Glob_(programming)) wikipedia page can teach you how to build them. In our example `files/**/*.html` basically means we are searching for any file having the `.html` extension in any recursive subfolder found under `files/`.
+
+For more information about the `minet scrape` command, be sure to read the relevant documentation [here](../docs/cli.md#scrape).
 
 ## Scraping a single item
 
@@ -109,7 +109,7 @@ So, here is the simplest scraper ever:
 sel: title # Here we use CSS selection to target the first <title> tag
 ```
 
-If you are a bit shaky about CSS selection and want to refresh your memory or simply learn, I can't recommand you [this](https://flukeout.github.io/) wonderful tutorial enough.
+If you are a bit shaky about CSS selection and want to refresh your memory or simply learn, I can't recommend [this](https://flukeout.github.io/) wonderful tutorial enough.
 
 Note that `minet` uses the popular [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/bs4/doc/) library to parse and traverse html documents and relies on the [soupsieve](https://facelessuser.github.io/soupsieve/) library for CSS selection.
 
@@ -126,7 +126,7 @@ Two things should be noted here:
 
 ## Declaring what to extract
 
-But maybe we want something different than a selected node's text. What if we want its inner html? Or one of its attribute? Then we need to say so using the `item` key:
+But maybe we want something different than a selected node's text. What if we want its inner html? Or one of its attributes? Then we need to say so using the `item` key:
 
 ```yml
 ---
@@ -173,7 +173,7 @@ So, to recap, here is what `item` can be:
 
 ## Declaring multiple fields to extract
 
-Now we might want to extract several pieces of informations from our selected node rather than a single one. To do so, we can use the `field` key, **instead** of `item` to structure the output:
+Now we might want to extract several pieces of information from our selected node rather than a single one. To do so, we can use the `field` key, **instead** of `item` to structure the output:
 
 ```yml
 ---
@@ -487,7 +487,7 @@ instead of:
 ["blue", None]
 ```
 
-This `default` key can also be thought as a constant value if you ever need one (this could be useful with `minet` crawlers for instance, of if you use several scrapers to track from which one a result came from):
+This `default` key can also be thought as a constant value if you ever need one (this could be useful with `minet` crawlers for instance, or if you use several scrapers to track from which one a result came from):
 
 ```yml
 iterator: li
@@ -512,9 +512,9 @@ When iterating on a selection, it might be useful to filter out some empty or in
 
 ```html
 <ul>
-  <li color="blue">John</li>
-  <li>Mary</li>
-  <li color="purple">Susan</li>
+  <li color="blue" age="34">John</li>
+  <li age="45">Mary</li>
+  <li color="purple" age="23">Susan</li>
 </ul>
 ```
 
@@ -539,7 +539,7 @@ and not:
 ["blue", None, "purple"]
 ```
 
-Note that this `filter` key can also take a path to the value to actually test for filtering when using, for instance, `fields` like so:
+The `filter` key can also take a field to filter on if `fields` is given, like so:
 
 ```yml
 ---
@@ -550,7 +550,7 @@ fields:
 filter: color
 ```
 
-will return:
+and this should return:
 
 ```json
 [
@@ -559,7 +559,28 @@ will return:
 ]
 ```
 
-Note that the path given to `filter` can be an array or keys separated by a point if you need to test nested values.
+Note that the path given to `filter` can be also an array or keys joined by a dot to test nested values. Here is such an example:
+
+```yml
+---
+iterator: li:
+fields:
+  name: text
+  attributes:
+    fields:
+      color: color
+      age: age
+filter: attributes.age
+```
+
+and you will get:
+
+```json
+[
+  {"name": "John", "attributes": {"color": "blue", "age": "34"}},
+  {"name": "Susan", "attributes": {"color": "purple", "age": "23"}}
+]
+```
 
 Finally, if you need more complex filtering, you can still read about `filter_eval` [here](#evaluating-filters).
 
@@ -598,7 +619,9 @@ instead of:
 ["blue", "red", "blue"]
 ```
 
-If you only want to keep a single item based on one of its fields, you can give a path to the `uniq` key, the same way you would with `filter`. Just note that the item that will be kept is the first occurring one having a given value at the given path so that the following scraper:
+If you only want to keep a single item based on one of its `fields`, you can also give a field to the `uniq` key, the same way you would with `filter`.
+
+In this case, only the first item having a given value for the chosen field will be kept so that the following scraper:
 
 ```yml
 iterator: li
@@ -619,11 +642,11 @@ will return:
 
 ## Using evaluation when declarative is not enough
 
-Sometimes, declaring your scraping intentions will not be enough as you may need to perform arbitrarily complex things with your data.
+Sometimes, the DSL will not be enough as you may need to perform complex things with your data that the declaration language does not implement.
 
-In this case, someone with more sense than I would tell you that it is time to start scripting in python directly to cover your use case. But if you still want to benefit from `minet`'s integration, tools and ecosystem, you can still write strings to evaluate directly.
+In this case, someone with more sense than I would tell you that it is time to start scripting in python directly to cover your use case. But if you still want to benefit from `minet` integration, craft and ecosystem, you can still give scrapers python code as strings to evaluate.
 
-**Warning!**: every time someone mention things like "evaluating" or "executing" arbitrary code, you should hear clearly in your mind: "I will never expose this to users I cannot trust, inside or outside my system", because this clearly is a security breach.
+**Warning!**: the `minet` commands have not been designed as anything else than a tool for personal use. As such, as with anything able to execute arbitrary code, you should never trust potential user inputs as safe if you intend to use them as scrapers. This is clearly a security breach! We might add options to toggle off evaluation capabilities of scrapers in the future, but this does not exist as of today.
 
 Now that this is clear, let's learn how to sprinkle some python code on top of our declarative scrapers!
 
@@ -689,7 +712,29 @@ fields:
       return element.select('li')
 ```
 
-Of course, the syntax of the evaluated strings will be checked beforehand and any `minet.Scraper` built using bad code will be reported before you can even attempt to use it.
+Of course, the syntax of the evaluated strings will be checked beforehand to check if they are valid python code and any `minet.Scraper` built using bad code will raise validation errors before you can even attempt to use it:
+
+```python
+from minet import Scraper
+from minet.scrape.exceptions import InvalidScraperError
+
+definition = {
+  'iterator': 'div',
+  'item': {
+    'eval': 'element.get_text() + '
+  }
+}
+
+try:
+  scraper = Scraper(definition)
+except InvalidScraperError as e:
+  # This error will be raised because "item.eval" is not valid python code!
+  # You can check the specific validation error like so:
+  for error in e.validation_errors:
+    print(repr(error))
+
+  # Note that the command line will report errors for you so you can fix them
+```
 
 You should also note that an evaluated expression's results will be typed-checked at runtime to ensure it returned a valid thing. As such `iterator_eval` will yell at you if you make it return something other than a `list` of `bs4.Tag`.
 
@@ -722,7 +767,7 @@ this will return:
 ]
 ```
 
-Finally, note that both `sel_eval` or `iterator_eval` may also return a single string that will subsquently be used a CSS selector. As such, this example has the same behavior as the previous one:
+Finally, note that both `sel_eval` or `iterator_eval` may also return a single string that will subsquently be used as a CSS selector. As such, this example has the same behavior as the previous one:
 
 ```yml
 iterator: div
@@ -738,7 +783,7 @@ fields:
 
 ### Evaluating value extraction
 
-The most useful kind of evaluation is probably the one you can use to process the scraped data to make it fit your needs. Let's consider the following html with case variations so ugly it hurts the eyes:
+You can also evaluate python code to process and transform the scraped data to make it fit your needs. Let's consider the following html with case variations so ugly it hurts the eyes:
 
 ```html
 <div id="colors">
@@ -766,7 +811,7 @@ and you will get:
 ["red", "blue", "yellow", "orange"]
 ```
 
-In this expression, the `value` variable represent the current value that will be returned and is by default (unless you gave a `default` key) the current html element's text.
+In this expression, the `value` variable represents the current value that will be returned and is by default (unless you gave a `default` key) the text of the current html element.
 
 And notice how the `uniq` key applies after your transformation.
 

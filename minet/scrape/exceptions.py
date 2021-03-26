@@ -9,6 +9,12 @@ class ScrapeError(MinetError):
     pass
 
 
+class InvalidScraperError(ScrapeError):
+    def __init__(self, msg=None, validation_errors=[]):
+        super().__init__(msg)
+        self.validation_errors = validation_errors
+
+
 class CSSSelectorTooComplex(ScrapeError):
     pass
 
