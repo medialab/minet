@@ -75,6 +75,11 @@ class InvalidRedirectError(RedirectError):
     pass
 
 
+# Definition errors
+class DefinitionInvalidFormatError(MinetError):
+    pass
+
+
 # Crawling errors
 class CrawlError(MinetError):
     pass

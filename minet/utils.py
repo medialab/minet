@@ -38,7 +38,8 @@ from minet.exceptions import (
     InfiniteRedirectsError,
     InvalidRedirectError,
     InvalidURLError,
-    SelfRedirectError
+    SelfRedirectError,
+    DefinitionInvalidFormatError
 )
 
 from minet.constants import (
@@ -885,7 +886,7 @@ def load_definition(f, encoding='utf-8'):
         definition = yaml.load(f, Loader=yaml.Loader)
 
     else:
-        raise TypeError('Unsupported definition file format')
+        raise DefinitionInvalidFormatError
 
     if string_path:
         f.close()

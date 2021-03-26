@@ -12,6 +12,9 @@ from os.path import basename
 from multiprocessing import Pool
 
 from minet import Scraper
+from minet.exceptions import (
+    DefinitionInvalidFormatError
+)
 from minet.cli.utils import (
     open_output_file,
     die,
@@ -69,13 +72,13 @@ def scrape_action(namespace):
     # Parsing scraper definition
     try:
         scraper = Scraper(namespace.scraper)
-    except TypeError:
+    except DefinitionInvalidFormatError:
         die([
-            'Unknown scraper format.',
-            'Expecting a JSON or YAML file.'
+            'Unknown scraper format!',
+            'It should be a JSON or YAML file.'
         ])
-    except:
-        die('Invalid scraper file.')
+    except FileNotFoundError:
+        die('Could not find scraper file!')
 
     if namespace.format == 'csv':
         output_headers = scraper.headers
