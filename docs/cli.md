@@ -372,8 +372,8 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 ```
 usage: minet scrape [-h] [-f {csv,jsonl}] [-g GLOB] [-i INPUT_DIR] [-o OUTPUT]
-                    [-p PROCESSES] [--separator SEPARATOR] [--total TOTAL]
-                    [--validate]
+                    [-p PROCESSES] [--separator SEPARATOR] [--strain STRAIN]
+                    [--total TOTAL] [--validate]
                     scraper [report]
 
 Minet Scrape Command
@@ -397,6 +397,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT            Path to the output report file. By default, the report will be printed to stdout.
   -p PROCESSES, --processes PROCESSES   Number of processes to use. Defaults to 4.
   --separator SEPARATOR                 Separator use to join lists of values when output format is CSV. Defaults to "|".
+  --strain STRAIN                       Optional CSS selector used to strain, i.e. only parse matched tags in the parsed html files in order to optimize performance.
   --total TOTAL                         Total number of HTML documents. Necessary if you want to display a finite progress indicator.
   --validate                            Just validate the given scraper then exit.
 
@@ -419,6 +420,9 @@ examples:
 
 . Only validating the scraper definition and exit:
     `minet scraper --validate scraper.yml`
+
+. Using a strainer to optimize performance:
+    `minet scraper links-scraper.yml --strain "a[href]" report.csv > links.csv`
 
 ```
 
