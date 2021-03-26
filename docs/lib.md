@@ -6,7 +6,6 @@ Note that if you are interested in the url cleaning, extraction and join methods
 
 *Generic utilities*
 
-* [scrape](#scrape)
 * [Scraper](#scraper)
 * [multithreaded_fetch](#multithreaded_fetch)
 * [multithreaded_resolve](#multithreaded_resolve)
@@ -19,30 +18,11 @@ Note that if you are interested in the url cleaning, extraction and join methods
 * [Mediacloud](./mediacloud.md)
 * [Twitter](./twitter.md)
 
-## scrape
-
-Apply a minet scraper definition (described [here](../cookbook/scraping_dsl.md)) to some html or soup and get the extracted data.
-
-```python
-from minet import scrape
-
-scraper_definition = {
-  'iterator': 'p'
-}
-
-data = scrape(scraper_definition, some_html)
-```
-
-*Arguments*
-
-* **definition** *dict*: scraper definition written using minet's DSL.
-* **html** *str|soup*: either a HTML string or bs4 soup to scrape.
-* **engine** *?str* [`lxml`]: bs4 engine to use to parse html.
-* **context** *?dict*: optional context to use.
-
 ## Scraper
 
-Tiny abstraction built over [#.scrape](#scrape) to "compile" the given definition and apply it easily on multiple html documents.
+Scraper class taking a scraper definition (as defined [here](../cookbook/scraping_dsl.md)) and able to extract the declared items from any given piece of html.
+
+Note that upon instantiation, a scraper will 1. validate its definition and raise an error if invalid and 2. perform analysis of its definition to extract some information about it.
 
 ```python
 from minet import Scraper
@@ -53,6 +33,7 @@ scraper_definition = {
 
 scraper = Scraper(scraper_definition)
 
+# Using your scraper on some html
 data = scraper(some_html)
 
 # You can also create a scraper from a JSON or YML file
@@ -65,11 +46,14 @@ with open('./scraper.json') as f:
 *Arguments*
 
 * **definition** *dict*: scraper definition written using minet's DSL.
+* **strain** *?str*: optional CSS selector to be used to build a [`bs4.SoupStrainer`](https://www.crummy.com/software/BeautifulSoup/bs4/doc/#parsing-only-part-of-a-document) that will be used on any html to filter out some unnecessary parts as an optimization mechanism.
 
 *Attributes*
 
 * **definition** *dict*: definition used by the scraper.
 * **headers** *list*: CSV headers if they could be statically inferred from the scraper's definition.
+* **plural** *bool*: whether the scraper was analyzed to yield single items or a list of items.
+* **output_type** *str*: the kind of data the scraper will output. Can be `scalar`, `dict`, `list`, `collection` or `unknown`.
 
 ## multithreaded_fetch
 
