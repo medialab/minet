@@ -11,8 +11,7 @@ from collections import namedtuple
 from os.path import basename
 from multiprocessing import Pool
 
-from minet.utils import load_definition
-from minet.scrape import scrape, headers_from_definition
+from minet import Scraper
 from minet.cli.utils import (
     open_output_file,
     die,
@@ -27,6 +26,14 @@ ScrapeWorkerResult = namedtuple(
     'ScrapeWorkerResult',
     ['error', 'items']
 )
+
+PROCESS_SCRAPER = None
+
+
+def init_process(definition):
+    global PROCESS_SCRAPER
+
+    PROCESS_SCRAPER = Scraper(definition)
 
 
 def worker(payload):
@@ -50,7 +57,7 @@ def worker(payload):
         context['basename'] = basename(path)
 
     # Attempting to scrape
-    items = scrape(scraper, content, context=context)
+    items = PROCESS_SCRAPER(content, context=context)
 
     return ScrapeWorkerResult(None, items)
 
@@ -61,7 +68,7 @@ def scrape_action(namespace):
 
     # Parsing scraper definition
     try:
-        scraper = load_definition(namespace.scraper)
+        scraper = Scraper(namespace.scraper)
     except TypeError:
         die([
             'Unknown scraper format.',
@@ -71,7 +78,7 @@ def scrape_action(namespace):
         die('Invalid scraper file.')
 
     if namespace.format == 'csv':
-        output_headers = headers_from_definition(scraper)
+        output_headers = scraper.headers
         output_writer = csv.DictWriter(output_file, fieldnames=output_headers)
         output_writer.writeheader()
     else:
@@ -97,7 +104,13 @@ def scrape_action(namespace):
                 'Did you forget to specify it with -i/--input-dir?'
             ])
 
-    with Pool(namespace.processes) as pool:
+    pool = Pool(
+        namespace.processes,
+        initializer=init_process,
+        initargs=(scraper.definition, )
+    )
+
+    with pool:
         for error, items in pool.imap_unordered(worker, files):
             loading_bar.update()
 
