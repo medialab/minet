@@ -4,7 +4,7 @@
 import pytest
 from bs4 import BeautifulSoup, Tag, SoupStrainer
 
-from minet.scrape import scrape
+from minet.scrape import scrape, Scraper
 from minet.scrape.analysis import (
     headers_from_definition,
     validate,
@@ -22,6 +22,7 @@ from minet.scrape.exceptions import (
     NotATableError,
     CSSSelectorTooComplex,
     InvalidCSSSelectorError,
+    InvalidScraperError,
     ScraperValidationIrrelevantPluralModifierError,
     ScraperValidationInvalidPluralModifierError,
     ScraperValidationMixedConcernError
@@ -518,6 +519,10 @@ class TestScrape(object):
 
         headers = headers_from_definition({'sel': 'table', 'tabulate': True})
 
+        scraper = Scraper({'iterator': 'li', 'fields': {'id': 'id'}})
+
+        assert scraper.headers == ['id']
+
     def test_analysis(self):
         analysis = analyse({
             'item': 'href'
@@ -715,7 +720,7 @@ class TestScrape(object):
         ]
 
     def test_validate(self):
-        errors = validate({
+        bad_definition = {
             'sel': 'li',
             'item': {
                 'sel': 'a[',
@@ -747,14 +752,16 @@ class TestScrape(object):
                     }
                 }
             }
-        })
+        }
+
+        errors = validate(bad_definition)
 
         def key(t):
             return ('.'.join(t[0]), t[1].__name__)
 
         errors = sorted([(e.path, type(e)) for e in errors], key=key)
 
-        assert errors == sorted([
+        expecting = sorted([
             ([], ScraperValidationConflictError),
             ([], ScraperValidationInvalidPluralModifierError),
             (['item', 'sel'], InvalidCSSSelectorError),
@@ -767,6 +774,15 @@ class TestScrape(object):
             (['fields', 'invalid_filter1'], ScraperValidationInvalidPluralModifierError),
             (['fields', 'invalid_filter2'], ScraperValidationInvalidPluralModifierError)
         ], key=key)
+
+        assert errors == expecting
+
+        with pytest.raises(InvalidScraperError) as info:
+            Scraper(bad_definition)
+
+        errors = sorted([(e.path, type(e)) for e in info.value.validation_errors], key=key)
+
+        assert errors == expecting
 
     def test_eval_errors(self):
         with pytest.raises(ScraperEvalError) as info:
