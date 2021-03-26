@@ -9,23 +9,24 @@ from bs4 import BeautifulSoup
 from minet.utils import load_definition
 from minet.scrape.interpreter import interpret_scraper, tabulate
 from minet.scrape.analysis import analyse, validate
+from minet.scrape.straining import strainer_from_css
 from minet.scrape.exceptions import (
     ScraperNotTabularError,
     InvalidScraperError
 )
 
 
-def ensure_soup(html_or_soup, engine='lxml'):
+def ensure_soup(html_or_soup, engine='lxml', strainer=None):
     is_already_soup = isinstance(html_or_soup, BeautifulSoup)
 
     if not is_already_soup:
-        return BeautifulSoup(html_or_soup, engine)
+        return BeautifulSoup(html_or_soup, engine, parse_only=strainer)
 
     return html_or_soup
 
 
-def scrape(scraper, html, engine='lxml', context=None):
-    soup = ensure_soup(html)
+def scrape(scraper, html, engine='lxml', context=None, strainer=None):
+    soup = ensure_soup(html, strainer=strainer)
 
     return interpret_scraper(
         scraper,
@@ -46,7 +47,7 @@ def format_value_for_csv(value, plural_separator='|'):
 
 
 class Scraper(object):
-    def __init__(self, definition):
+    def __init__(self, definition, strain=None):
         if not isinstance(definition, dict):
             definition = load_definition(definition)
 
@@ -65,8 +66,14 @@ class Scraper(object):
         self.plural = analysis.plural
         self.output_type = analysis.output_type
 
+        # Strainer
+        self.strainer = None
+
+        if strain is not None:
+            self.strainer = strainer_from_css(strain)
+
     def __call__(self, html, context=None):
-        return scrape(self.definition, html, context=context)
+        return scrape(self.definition, html, context=context, strainer=self.strainer)
 
     def as_csv_dict_rows(self, html, context=None, plural_separator='|'):
         if self.headers is None:

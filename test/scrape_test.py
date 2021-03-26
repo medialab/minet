@@ -963,6 +963,14 @@ class TestScrape(object):
             '<span color="blue">One</span>'
         )
 
+        scraper = Scraper({
+            'iterator': 'li'
+        }, strain='div')
+
+        html = '<div>Hello</div><ul><li>ok</li>'
+
+        assert scraper(html) == []
+
     def test_as_csv_row(self):
         with pytest.raises(ScraperNotTabularError):
             scraper = Scraper({
