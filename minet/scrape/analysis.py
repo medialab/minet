@@ -56,7 +56,7 @@ def headers_from_definition(scraper):
 
     if tabulate is not None:
         if not isinstance(tabulate, dict):
-            return
+            return None
 
         return tabulate.get('headers')
 
@@ -64,6 +64,10 @@ def headers_from_definition(scraper):
 
     if fields is None:
         return ['value']
+    else:
+        for node in fields.values():
+            if 'fields' in node:
+                return None
 
     return list(fields.keys())
 

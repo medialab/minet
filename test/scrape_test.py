@@ -25,7 +25,8 @@ from minet.scrape.exceptions import (
     InvalidScraperError,
     ScraperValidationIrrelevantPluralModifierError,
     ScraperValidationInvalidPluralModifierError,
-    ScraperValidationMixedConcernError
+    ScraperValidationMixedConcernError,
+    ScraperNotTabularError
 )
 
 BASIC_HTML = """
@@ -961,3 +962,56 @@ class TestScrape(object):
             '<ul color="red"><li>1. <span COLOR="blue">One</span></li><li>2. Two</li></ul><div>Hello</div>',
             '<span color="blue">One</span>'
         )
+
+    def test_as_csv_row(self):
+        with pytest.raises(ScraperNotTabularError):
+            scraper = Scraper({
+                'iterator': 'li',
+                'fields': {
+                    'nested': {
+                        'fields': {
+                            'text': 'text'
+                        }
+                    }
+                }
+            })
+
+            scraper.as_csv_dict_rows(BASIC_HTML)
+
+        scraper = Scraper({
+            'iterator': 'li'
+        })
+
+        rows = list(scraper.as_csv_dict_rows(BASIC_HTML))
+
+        assert rows == [{'value': 'One'}, {'value': 'Two'}]
+
+        scraper = Scraper({
+            'iterator': 'li',
+            'fields': {
+                'text': 'text',
+                'list': {
+                    'default': [1, 2]
+                },
+                'false': {
+                    'default': False
+                },
+                'true': {
+                    'default': True
+                }
+            }
+        })
+
+        rows = list(scraper.as_csv_dict_rows(BASIC_HTML))
+
+        assert rows == [
+            {'text': 'One', 'list': '1|2', 'false': 'false', 'true': 'true'},
+            {'text': 'Two', 'list': '1|2', 'false': 'false', 'true': 'true'}
+        ]
+
+        rows = list(scraper.as_csv_dict_rows(BASIC_HTML, plural_separator='§'))
+
+        assert rows == [
+            {'text': 'One', 'list': '1§2', 'false': 'false', 'true': 'true'},
+            {'text': 'Two', 'list': '1§2', 'false': 'false', 'true': 'true'}
+        ]

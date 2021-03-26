@@ -35,6 +35,16 @@ def scrape(scraper, html, engine='lxml', context=None):
     )
 
 
+def format_value_for_csv(value, plural_separator='|'):
+    if isinstance(value, list):
+        return plural_separator.join(str(v) for v in value)
+
+    if isinstance(value, bool):
+        return 'true' if value else 'false'
+
+    return value
+
+
 class Scraper(object):
     def __init__(self, definition):
         if not isinstance(definition, dict):
@@ -57,6 +67,28 @@ class Scraper(object):
 
     def __call__(self, html, context=None):
         return scrape(self.definition, html, context=context)
+
+    def as_csv_dict_rows(self, html, context=None, plural_separator='|'):
+        if self.headers is None:
+            raise ScraperNotTabularError
+
+        def generator():
+
+            result = scrape(self.definition, html, context=context)
+
+            if not self.plural:
+                result = [result]
+
+            for item in result:
+                if isinstance(item, dict):
+                    for k, v in item.items():
+                        item[k] = format_value_for_csv(v, plural_separator=plural_separator)
+                else:
+                    item = {'value': format_value_for_csv(item, plural_separator=plural_separator)}
+
+                yield item
+
+        return generator()
 
 
 __all__ = ['Scraper', 'validate']
