@@ -43,4 +43,4 @@ class Scraper(object):
         return scrape(self.definition, html, context=context)
 
 
-__all__ = ['scrape', 'Scraper', 'validate']
+__all__ = ['Scraper', 'validate']

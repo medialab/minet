@@ -9,4 +9,4 @@ from minet.crawl import (
     DefinitionSpider
 )
 from minet.fetch import multithreaded_fetch, multithreaded_resolve
-from minet.scrape import scrape, Scraper
+from minet.scrape import Scraper
