@@ -22,7 +22,8 @@ from minet.scrape.exceptions import (
     ScraperValidationConflictError,
     InvalidCSSSelectorError,
     ScraperValidationIrrelevantPluralModifierError,
-    ScraperValidationMixedConcernError
+    ScraperValidationMixedConcernError,
+    ScraperValidationInvalidPluralModifierError
 )
 
 
@@ -95,7 +96,8 @@ ERRORS_PRIORITY = {
     ScraperEvalSyntaxError: 1,
     ScraperValidationConflictError: 2,
     ScraperValidationMixedConcernError: 3,
-    ScraperValidationIrrelevantPluralModifierError: 4
+    ScraperValidationIrrelevantPluralModifierError: 4,
+    ScraperValidationInvalidPluralModifierError: 5
 }
 
 
@@ -150,6 +152,17 @@ def validate(scraper):
             for modifier in PLURAL_MODIFIERS:
                 if modifier in node:
                     errors.append(ScraperValidationIrrelevantPluralModifierError(path=path, modifier=modifier))
+
+        for modifier in PLURAL_MODIFIERS:
+            if modifier not in node:
+                continue
+
+            if isinstance(node[modifier], bool):
+                if 'fields' in node:
+                    errors.append(ScraperValidationInvalidPluralModifierError(path=path, modifier=modifier))
+            else:
+                if 'fields' not in node:
+                    errors.append(ScraperValidationInvalidPluralModifierError(path=path, modifier=modifier))
 
         # Conflicting leaf keys
         conflicting_leaf_keys = []
@@ -229,6 +242,9 @@ def report_validation_errors(errors):
 
         if isinstance(error, ScraperValidationIrrelevantPluralModifierError):
             p('  the {modifier} modifier should not be found at a non-plural level (i.e. without iterator)!'.format(modifier=colored(error.modifier, 'green')))
+
+        if isinstance(error, ScraperValidationInvalidPluralModifierError):
+            p('  the {modifier} modifier cannot be a boolean without {fields} and cannot be a key/path with {fields}!'.format(modifier=colored(error.modifier, 'green'), fields=colored('fields', 'green')))
 
         if isinstance(error, ScraperValidationMixedConcernError):
             p('  mixed concerns could not be interpreted (i.e. the {burrowing} keys should not be found alongside the {leaf} ones)!'.format(burrowing=and_join(BURROWING_KEYS), leaf=and_join(LEAF_KEYS)))

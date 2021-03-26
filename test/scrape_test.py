@@ -23,6 +23,7 @@ from minet.scrape.exceptions import (
     CSSSelectorTooComplex,
     InvalidCSSSelectorError,
     ScraperValidationIrrelevantPluralModifierError,
+    ScraperValidationInvalidPluralModifierError,
     ScraperValidationMixedConcernError
 )
 
@@ -733,6 +734,17 @@ class TestScrape(object):
                 'id': {
                     'attr': 'id',
                     'item': 'href'
+                },
+                'invalid_filter1': {
+                    'iterator': 'div',
+                    'filter': 'guacamole'
+                },
+                'invalid_filter2': {
+                    'iterator': 'div',
+                    'filter': True,
+                    'fields': {
+                        'id': 'text'
+                    }
                 }
             }
         })
@@ -744,13 +756,16 @@ class TestScrape(object):
 
         assert errors == sorted([
             ([], ScraperValidationConflictError),
+            ([], ScraperValidationInvalidPluralModifierError),
             (['item', 'sel'], InvalidCSSSelectorError),
             (['item', 'eval'], ScraperEvalSyntaxError),
             (['fields', 'url', 'iterator'], InvalidCSSSelectorError),
             ([], ScraperValidationIrrelevantPluralModifierError),
             (['fields', 'url'], ScraperValidationConflictError),
             (['fields', 'name'], ScraperValidationConflictError),
-            (['fields', 'id'], ScraperValidationMixedConcernError)
+            (['fields', 'id'], ScraperValidationMixedConcernError),
+            (['fields', 'invalid_filter1'], ScraperValidationInvalidPluralModifierError),
+            (['fields', 'invalid_filter2'], ScraperValidationInvalidPluralModifierError)
         ], key=key)
 
     def test_eval_errors(self):
