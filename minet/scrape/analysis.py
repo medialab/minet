@@ -23,7 +23,8 @@ from minet.scrape.exceptions import (
     InvalidCSSSelectorError,
     ScraperValidationIrrelevantPluralModifierError,
     ScraperValidationMixedConcernError,
-    ScraperValidationInvalidPluralModifierError
+    ScraperValidationInvalidPluralModifierError,
+    ScraperEvalError
 )
 
 
@@ -263,5 +264,27 @@ def report_validation_errors(errors):
                 p(colored('    | {line}'.format(line=line), 'cyan'))
 
         p()
+
+    return output.getvalue()
+
+
+def report_evaluation_error(error):
+    output = StringIO()
+
+    p = partial(print, file=output)
+
+    red_alert = colored('Scraper error', 'red')
+
+    path = '.' + ('.'.join(error.path))
+
+    p('> {error} at path {path}{root}'.format(error=red_alert, path=colored(path, 'blue'), root=(' (root)' if not error.path else '')))
+
+    if isinstance(error, ScraperEvalError):
+        p('  evaluated code raised {error}!'.format(error=colored(error.reason.__class__.__name__, 'green')))
+
+        for line in error.expression.split('\n'):
+            p(colored('    | {line}'.format(line=line), 'cyan'))
+
+    p()
 
     return output.getvalue()

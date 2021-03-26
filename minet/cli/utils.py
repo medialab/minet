@@ -130,9 +130,9 @@ class LoadingBar(object):
     def close(self):
         return self.bar.close()
 
-    def print(self, *args):
+    def print(self, *args, end='\n'):
         msg = ' '.join(str(arg) for arg in args)
-        self.bar.write(msg, file=sys.stderr)
+        self.bar.write(msg, file=sys.stderr, end=end)
 
     def die(self, msg):
         self.bar.close()
