@@ -72,6 +72,15 @@ class Scraper(object):
         if strain is not None:
             self.strainer = strainer_from_css(strain)
 
+    def __repr__(self):
+        return '<{name} plural={plural} output_type={output_type} strain={strain} headers={headers!r}>'.format(
+            name=self.__class__.__name__,
+            plural=self.plural,
+            strain=self.strainer.css if self.strainer else None,
+            output_type=self.output_type,
+            headers=self.headers
+        )
+
     def __call__(self, html, context=None):
         return scrape(self.definition, html, context=context, strainer=self.strainer)
 

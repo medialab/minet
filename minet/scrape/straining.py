@@ -74,4 +74,8 @@ def strainer_from_css(css, ignore_relations=False):
             for selector in usable_selectors
         )
 
-    return SoupStrainer(strainer_function)
+    strainer = SoupStrainer(strainer_function)
+
+    setattr(strainer, 'css', css)
+
+    return strainer
