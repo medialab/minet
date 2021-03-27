@@ -96,14 +96,18 @@ class LoadingBar(object):
 
         self.stats = stats or {}
 
-        self.bar = tqdm(
-            desc=desc,
-            dynamic_ncols=True,
-            total=total,
-            postfix=stats,
-            unit=unit,
-            delay=delay
-        )
+        bar_kwargs = {
+            'desc': desc,
+            'dynamic_ncols': True,
+            'total': total,
+            'postfix': stats,
+            'unit': unit
+        }
+
+        if delay is not None:
+            bar_kwargs['delay'] = delay
+
+        self.bar = tqdm(**bar_kwargs)
 
     def update_total(self, total):
         self.bar.total = total
