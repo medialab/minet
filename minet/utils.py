@@ -883,7 +883,7 @@ def load_definition(f, encoding='utf-8'):
         definition = json.load(f)
 
     elif path.endswith('.yml') or path.endswith('.yaml'):
-        definition = yaml.load(f, Loader=yaml.Loader)
+        definition = yaml.safe_load(f)
 
     else:
         raise DefinitionInvalidFormatError

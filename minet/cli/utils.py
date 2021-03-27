@@ -266,6 +266,6 @@ def get_rcfile(rcfile_path=None):
             continue
 
         with open(p, encoding='utf-8') as f:
-            return yaml.load(f, Loader=yaml.Loader)
+            return yaml.safe_load(f)
 
     return None
