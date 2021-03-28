@@ -727,6 +727,29 @@ class TestScrape(object):
             ]
         ]
 
+        result = scrape({
+            'iterator': 'li',
+            'fields': {
+                'topic': {
+                    'sel_eval': 'element.find_parent("div")',
+                    'attr': 'data-topic'
+                },
+                'post': {
+                    'sel': 'strong'
+                },
+                'author': {
+                    'sel': 'em'
+                }
+            }
+        }, html)
+
+        assert result == [
+            {'topic': 'science', 'post': '1', 'author': 'Allan'},
+            {'topic': 'science', 'post': '2', 'author': 'Susan'},
+            {'topic': 'arts', 'post': '3', 'author': 'Josephine'},
+            {'topic': 'arts', 'post': '4', 'author': 'Peter'}
+        ]
+
     def test_validate(self):
         bad_definition = {
             'sel': 'li',
