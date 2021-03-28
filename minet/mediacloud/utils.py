@@ -4,7 +4,7 @@
 #
 # Miscellaneous utility function used throughout the mediacloud package.
 #
-from minet.utils import request_json
+from minet.web import request_json
 from minet.mediacloud.constants import (
     MEDIACLOUD_API_BASE_URL
 )
@@ -52,7 +52,7 @@ def get_last_processed_stories_id(data):
     return data[-1]['processed_stories_id']
 
 
-def make_simple_call(http, token, route, formatter, format='csv_dict_row',
+def make_simple_call(pool, token, route, formatter, format='csv_dict_row',
                      arg=None, query=None, single=False):
     url = MEDIACLOUD_API_BASE_URL + route
 
@@ -64,7 +64,7 @@ def make_simple_call(http, token, route, formatter, format='csv_dict_row',
     if query is not None:
         url += '&' + ('&'.join('%s=%s' % (str(k), str(v)) for k, v in query.items()))
 
-    err, response, data = request_json(http, url)
+    err, response, data = request_json(url, pool=pool)
 
     if err:
         raise err

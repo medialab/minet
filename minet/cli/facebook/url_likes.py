@@ -11,7 +11,8 @@ from tqdm import tqdm
 from urllib.parse import quote
 from ural import is_url
 
-from minet.utils import create_pool, request, rate_limited
+from minet.utils import rate_limited
+from minet.web import request
 from minet.cli.utils import open_output_file, die, edit_namespace_with_csv_io
 
 REPORT_HEADERS = ['approx_likes', 'approx_likes_int']
@@ -24,8 +25,8 @@ def forge_url(url):
 
 
 @rate_limited(5)
-def make_request(http, url):
-    err, response = request(http, forge_url(url), headers={'Accept-Language': 'en'})
+def make_request(url):
+    err, response = request(forge_url(url), headers={'Accept-Language': 'en'})
 
     if response.status == 404:
         return 'not-found', None
@@ -92,14 +93,12 @@ def facebook_url_likes_action(namespace):
         total=namespace.total
     )
 
-    http = create_pool()
-
     for row, url in enricher.cells(namespace.column, with_rows=True):
         loading_bar.update()
 
         url = url.strip()
 
-        err, html = make_request(http, url)
+        err, html = make_request(url)
 
         if err is not None:
             loading_bar.close()

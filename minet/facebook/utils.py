@@ -6,7 +6,7 @@
 #
 from http.cookies import SimpleCookie
 
-from minet.utils import grab_cookies
+from minet.web import grab_cookies
 from minet.constants import COOKIE_BROWSERS
 from minet.facebook.constants import FACEBOOK_URL
 

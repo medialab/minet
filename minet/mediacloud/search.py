@@ -6,7 +6,7 @@
 #
 from urllib.parse import quote_plus
 
-from minet.utils import request_json
+from minet.web import request_json
 from minet.mediacloud.constants import (
     MEDIACLOUD_API_BASE_URL,
     MEDIACLOUD_DEFAULT_BATCH
@@ -92,7 +92,7 @@ def url_forge(token, query, collections=None, medias=None,
     return url
 
 
-def mediacloud_search(http, token, query, count=False, collections=None,
+def mediacloud_search(pool, token, query, count=False, collections=None,
                       medias=None, publish_day=None, publish_month=None,
                       publish_year=None, format='csv_dict_row',):
 
@@ -112,7 +112,7 @@ def mediacloud_search(http, token, query, count=False, collections=None,
                 last_processed_stories_id=last_processed_stories_id
             )
 
-            err, response, data = request_json(http, url)
+            err, response, data = request_json(url, pool=pool)
 
             if err:
                 raise err

@@ -9,7 +9,7 @@ from collections import namedtuple
 from quenouille import imap_unordered
 from ural import get_domain_name, ensure_protocol
 
-from minet.utils import (
+from minet.web import (
     create_pool,
     request,
     resolve,
@@ -26,7 +26,6 @@ from minet.constants import (
 FetchWorkerPayload = namedtuple(
     'FetchWorkerPayload',
     [
-        'http',
         'item',
         'url'
     ]
@@ -93,11 +92,11 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
     """
 
     # Creating the http pool manager
-    http = create_pool(threads=threads, insecure=insecure, timeout=timeout)
+    pool = create_pool(threads=threads, insecure=insecure, timeout=timeout)
 
     # Thread worker
     def worker(payload):
-        http, item, url = payload
+        item, url = payload
 
         if url is None:
             return FetchWorkerResult(
@@ -111,8 +110,8 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
         kwargs = request_args(url, item) if request_args is not None else {}
 
         error, response = request(
-            http,
             url,
+            pool=pool,
             max_redirects=max_redirects,
             **kwargs
         )
@@ -158,7 +157,6 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
 
             if not url:
                 yield FetchWorkerPayload(
-                    http=http,
                     item=item,
                     url=None
                 )
@@ -169,7 +167,6 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
             url = ensure_protocol(url.strip())
 
             yield FetchWorkerPayload(
-                http=http,
                 item=item,
                 url=url
             )
@@ -233,11 +230,11 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
     """
 
     # Creating the http pool manager
-    http = create_pool(threads=threads, insecure=insecure, timeout=timeout)
+    pool = create_pool(threads=threads, insecure=insecure, timeout=timeout)
 
     # Thread worker
     def worker(payload):
-        http, item, url = payload
+        item, url = payload
 
         if url is None:
             return ResolveWorkerResult(
@@ -250,8 +247,8 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
         kwargs = resolve_args(url, item) if resolve_args is not None else {}
 
         error, stack = resolve(
-            http,
             url,
+            pool=pool,
             max_redirects=max_redirects,
             follow_refresh_header=follow_refresh_header,
             follow_meta_refresh=follow_meta_refresh,
@@ -281,7 +278,6 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
 
             if not url:
                 yield FetchWorkerPayload(
-                    http=http,
                     item=item,
                     url=None
                 )
@@ -292,7 +288,6 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
             url = ensure_protocol(url.strip())
 
             yield FetchWorkerPayload(
-                http=http,
                 item=item,
                 url=url
             )

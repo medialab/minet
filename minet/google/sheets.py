@@ -11,7 +11,7 @@ from ural.google import (
     GoogleDriveFile
 )
 
-from minet.utils import CookieResolver, create_pool, request
+from minet.web import CookieResolver, request
 from minet.constants import COOKIE_BROWSERS
 from minet.google.exceptions import (
     GoogleSheetsInvalidTargetError,
@@ -21,8 +21,6 @@ from minet.google.exceptions import (
     GoogleSheetsUnauthorizedError,
     GoogleSheetsMaxAttemptsExceeded
 )
-
-POOL = create_pool()
 
 
 def append_authuser(url, authuser):
@@ -64,7 +62,7 @@ def export_google_sheets_as_csv(url, cookie=None, authuser=None, max_authuser_at
     while True:
         attempts -= 1
 
-        err, response = request(POOL, export_url, cookie=cookie)
+        err, response = request(export_url, cookie=cookie)
 
         if err:
             raise err

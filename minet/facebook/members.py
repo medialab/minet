@@ -14,7 +14,8 @@ from ural.facebook import (
     convert_facebook_url_to_mobile
 )
 
-from minet.utils import create_pool, request, rate_limited_from_state
+from minet.utils import rate_limited_from_state
+from minet.web import request
 from minet.facebook.utils import grab_facebook_cookie
 from minet.facebook.exceptions import FacebookInvalidCookieError
 from minet.facebook.constants import (
@@ -110,12 +111,10 @@ class FacebookMemberScraper(object):
             raise FacebookInvalidCookieError
 
         self.cookie = cookie
-        self.http = create_pool()
 
     @rate_limited_from_state(FACEBOOK_MOBILE_RATE_LIMITER_STATE)
     def request_page(self, url):
         error, result = request(
-            self.http,
             url,
             cookie=self.cookie,
             headers={

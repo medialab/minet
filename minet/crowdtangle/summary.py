@@ -11,7 +11,8 @@ from minet.crowdtangle.exceptions import (
     CrowdTangleInvalidTokenError,
     CrowdTangleInvalidRequestError
 )
-from minet.utils import request_json, nested_get
+from minet.utils import nested_get
+from minet.web import request_json
 from minet.crowdtangle.constants import (
     CROWDTANGLE_SUMMARY_DEFAULT_SORT_TYPE,
     CROWDTANGLE_SUMMARY_SORT_TYPES,
@@ -49,7 +50,7 @@ def url_forge(link, token, start_date, sort_by, platforms=None, include_posts=Fa
     return base_url
 
 
-def crowdtangle_summary(http, link, token=None, start_date=None, with_top_posts=False,
+def crowdtangle_summary(pool, link, token=None, start_date=None, with_top_posts=False,
                         sort_by=CROWDTANGLE_SUMMARY_DEFAULT_SORT_TYPE, format='csv_dict_row', platforms=None):
 
     if token is None:
@@ -74,7 +75,7 @@ def crowdtangle_summary(http, link, token=None, start_date=None, with_top_posts=
         with_top_posts
     )
 
-    err, response, data = request_json(http, api_url)
+    err, response, data = request_json(api_url, pool=pool)
 
     if err is not None:
         raise err

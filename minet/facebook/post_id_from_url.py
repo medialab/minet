@@ -14,12 +14,12 @@ from ural.facebook import (
     FacebookPost
 )
 
-from minet.utils import rate_limited_from_state, request_text
+from minet.utils import rate_limited_from_state
+from minet.web import request_text
 from minet.facebook.constants import (
     FACEBOOK_URL,
     FACEBOOK_MOBILE_URL,
-    FACEBOOK_MOBILE_RATE_LIMITER_STATE,
-    FACEBOOK_DEFAULT_POOL
+    FACEBOOK_MOBILE_RATE_LIMITER_STATE
 )
 
 PAGE_ID_PATTERN = re.compile(r'&amp;rid=(\d+)&amp;')
@@ -30,7 +30,7 @@ GROUP_ID_PATTERN = re.compile(r'fb://group/(\d+)')
 def page_id_from_handle(handle):
     url = urljoin(FACEBOOK_MOBILE_URL, handle)
 
-    err, response, html = request_text(FACEBOOK_DEFAULT_POOL, url, headers={
+    err, response, html = request_text(url, headers={
         'User-Agent': 'curl/7.68.0'
     })
 

@@ -9,7 +9,8 @@ from ebbe import as_chunks
 from collections import deque
 from urllib.parse import quote
 
-from minet.utils import create_pool, request_json, nested_get
+from minet.utils import nested_get
+from minet.web import create_pool, request_json
 from minet.youtube.utils import ensure_video_id, seconds_to_midnight_pacific_time
 from minet.youtube.constants import (
     YOUTUBE_API_BASE_URL,
@@ -93,11 +94,11 @@ def forge_replies_url(key, comment_id, token=None):
 class YouTubeAPIClient(object):
     def __init__(self, key, before_sleep_until_midnight=None):
         self.key = key
-        self.http = create_pool()
+        self.pool = create_pool()
         self.before_sleep = before_sleep_until_midnight
 
     def request_json(self, url):
-        err, response, data = request_json(self.http, url)
+        err, response, data = request_json(url, pool=self.pool)
 
         if err:
             raise err

@@ -13,7 +13,8 @@ from datetime import datetime
 from collections import OrderedDict
 from ural.facebook import is_facebook_post_url
 
-from minet.utils import create_pool, request, nested_get, sleep_with_entropy
+from minet.utils import nested_get, sleep_with_entropy
+from minet.web import request
 from minet.cli.utils import open_output_file, print_err, die
 from minet.facebook.constants import FACEBOOK_WEB_DEFAULT_THROTTLE
 
@@ -132,10 +133,8 @@ def facebook_post_stats_action(namespace):
         keep=namespace.select
     )
 
-    http = create_pool()
-
     def fetch_facebook_page_stats(url):
-        err, response = request(http, url, cookie='locale=en_US')
+        err, response = request(url, cookie='locale=en_US')
 
         if err:
             return 'http-error', None

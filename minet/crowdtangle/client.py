@@ -6,10 +6,10 @@
 # rate limit and the used token etc.
 #
 from minet.utils import (
-    create_pool,
     RateLimiterState,
     rate_limited_method
 )
+from minet.web import create_pool
 from minet.crowdtangle.constants import (
     CROWDTANGLE_DEFAULT_TIMEOUT,
     CROWDTANGLE_DEFAULT_RATE_LIMIT,
@@ -35,11 +35,11 @@ class CrowdTangleAPIClient(object):
         self.token = token
         self.rate_limiter_state = RateLimiterState(rate_limit, period=60)
         self.summary_rate_limiter_state = RateLimiterState(summary_rate_limit, period=60)
-        self.http = create_pool(timeout=CROWDTANGLE_DEFAULT_TIMEOUT)
+        self.pool = create_pool(timeout=CROWDTANGLE_DEFAULT_TIMEOUT)
 
     def leaderboard(self, **kwargs):
         return crowdtangle_leaderboard(
-            self.http,
+            self.pool,
             token=self.token,
             rate_limiter_state=self.rate_limiter_state,
             **kwargs
@@ -48,7 +48,7 @@ class CrowdTangleAPIClient(object):
     @rate_limited_method('rate_limiter_state')
     def lists(self, **kwargs):
         return crowdtangle_lists(
-            self.http,
+            self.pool,
             token=self.token,
             **kwargs
         )
@@ -56,7 +56,7 @@ class CrowdTangleAPIClient(object):
     @rate_limited_method('rate_limiter_state')
     def post(self, post_id, **kwargs):
         return crowdtangle_post(
-            self.http,
+            self.pool,
             post_id,
             token=self.token,
             **kwargs
@@ -64,7 +64,7 @@ class CrowdTangleAPIClient(object):
 
     def posts(self, **kwargs):
         return crowdtangle_posts(
-            self.http,
+            self.pool,
             token=self.token,
             rate_limiter_state=self.rate_limiter_state,
             **kwargs
@@ -72,7 +72,7 @@ class CrowdTangleAPIClient(object):
 
     def search(self, terms, **kwargs):
         return crowdtangle_search(
-            self.http,
+            self.pool,
             token=self.token,
             rate_limiter_state=self.rate_limiter_state,
             terms=terms,
@@ -82,7 +82,7 @@ class CrowdTangleAPIClient(object):
     @rate_limited_method('summary_rate_limiter_state')
     def summary(self, link, **kwargs):
         return crowdtangle_summary(
-            self.http,
+            self.pool,
             link,
             token=self.token,
             **kwargs

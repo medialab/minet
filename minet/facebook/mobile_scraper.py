@@ -17,12 +17,10 @@ from ural.facebook import (
 )
 
 from minet.utils import (
-    create_pool,
-    request,
     rate_limited_method,
-    RateLimiterState,
-    create_request_retryer
+    RateLimiterState
 )
+from minet.web import create_pool, request, create_request_retryer
 from minet.facebook.utils import grab_facebook_cookie
 from minet.facebook.formatters import format_comment
 from minet.facebook.exceptions import FacebookInvalidCookieError
@@ -204,15 +202,15 @@ class FacebookMobileScraper(object):
             raise FacebookInvalidCookieError
 
         self.cookie = cookie
-        self.http = create_pool()
+        self.pool = create_pool()
 
         self.rate_limiter_state = RateLimiterState(1, throttle)
 
     @rate_limited_method()
     def request_page(self, url):
         error, result = request(
-            self.http,
             url,
+            pool=self.pool,
             cookie=self.cookie,
             headers={
                 'User-Agent': 'curl/7.68.0'

@@ -8,7 +8,8 @@ import json
 from urllib.parse import quote
 
 from minet.constants import COOKIE_BROWSERS
-from minet.utils import create_pool, request_json, nested_get, grab_cookies
+from minet.utils import nested_get
+from minet.web import create_pool, request_json, grab_cookies
 from minet.instagram.constants import (
     INSTAGRAM_URL,
     INSTAGRAM_PUBLIC_API_DEFAULT_TIMEOUT
@@ -41,7 +42,7 @@ def forge_hashtag_search_url(name, cursor=None, count=50):
 
 class InstagramAPIScraper(object):
     def __init__(self, cookie='firefox'):
-        self.http = create_pool(timeout=INSTAGRAM_PUBLIC_API_DEFAULT_TIMEOUT)
+        self.pool = create_pool(timeout=INSTAGRAM_PUBLIC_API_DEFAULT_TIMEOUT)
 
         if cookie in COOKIE_BROWSERS:
             get_cookie_for_url = grab_cookies(cookie)
@@ -54,8 +55,8 @@ class InstagramAPIScraper(object):
 
     def request_json(self, url):
         err, response, data = request_json(
-            self.http,
             url,
+            pool=self.pool,
             spoof_ua=True,
             headers={'Cookie': self.cookie}
         )

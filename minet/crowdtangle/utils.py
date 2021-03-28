@@ -7,7 +7,8 @@
 import json
 from datetime import date, datetime, timedelta
 
-from minet.utils import request, rate_limited_from_state, create_request_retryer
+from minet.utils import rate_limited_from_state
+from minet.web import request, create_request_retryer
 from minet.crowdtangle.constants import (
     CROWDTANGLE_OUTPUT_FORMATS
 )
@@ -84,8 +85,8 @@ def complement_date(d, bound):
     return d
 
 
-def step(http, url, item_key):
-    err, result = request(http, url)
+def step(pool, url, item_key):
+    err, result = request(url, pool=pool)
 
     # Debug
     if err:
@@ -136,7 +137,7 @@ def default_item_id_getter(item):
 def make_paginated_iterator(url_forge, item_key, formatter,
                             item_id_getter=default_item_id_getter):
 
-    def create_iterator(http, token, rate_limiter_state, limit=None,
+    def create_iterator(pool, token, rate_limiter_state, limit=None,
                         format='csv_dict_row', per_call=False, detailed=False,
                         namespace=None, before_sleep=None, **kwargs):
 
@@ -204,7 +205,7 @@ def make_paginated_iterator(url_forge, item_key, formatter,
         while True:
             C += 1
 
-            items, next_url = retryer(rate_limited_step, http, url, item_key)
+            items, next_url = retryer(rate_limited_step, pool, url, item_key)
 
             # We have exhausted the available data
             if items is None:

@@ -11,11 +11,11 @@ from ebbe import with_is_first
 from urllib.parse import urlencode, quote
 from twitwi import normalize_tweet
 
+from minet.utils import nested_get
 from minet.utils import (
     create_pool,
     request,
     request_json,
-    nested_get,
     create_request_retryer
 )
 from minet.twitter.constants import (
@@ -34,7 +34,7 @@ from minet.twitter.exceptions import (
 # =============================================================================
 # Constants
 # =============================================================================
-TWITTER_PUBLIC_SEARCH_ENDPOINT = 'https://api.twitter.com/2/search/adaptive.json'
+TWITTER_PUBLIC_SEARCH_ENDPOINT = 'pools://api.twitter.com/2/search/adaptive.json'
 MAXIMUM_QUERY_LENGTH = 500
 DEFAULT_COUNT = 100
 GUEST_TOKEN_COOKIE_PATTERN = re.compile(rb'document\.cookie = decodeURIComponent\("gt=(\d+);')
@@ -45,7 +45,7 @@ GUEST_TOKEN_COOKIE_PATTERN = re.compile(rb'document\.cookie = decodeURIComponent
 # =============================================================================
 def forge_search_url(query):
     return (
-        'https://twitter.com/search?f=live&type=spelling_expansion_revert_click&q=%s' %
+        'pools://twitter.com/search?f=live&type=spelling_expansion_revert_click&q=%s' %
         quote(query)
     )
 
@@ -214,7 +214,7 @@ def payload_tweets_iter(payload):
 # =============================================================================
 class TwitterAPIScraper(object):
     def __init__(self):
-        self.http = create_pool(timeout=TWITTER_PUBLIC_API_DEFAULT_TIMEOUT)
+        self.pool = create_pool(timeout=TWITTER_PUBLIC_API_DEFAULT_TIMEOUT)
         self.reset()
 
     def reset(self):
@@ -222,10 +222,10 @@ class TwitterAPIScraper(object):
         self.cookie = None
 
     def request(self, url):
-        return request(self.http, url, spoof_ua=True)
+        return request(url, pool=self.pool, spoof_ua=True)
 
     def request_json(self, url, headers=None):
-        return request_json(self.http, url, spoof_ua=True, headers=headers)
+        return request_json(url, pool=self.pool, spoof_ua=True, headers=headers)
 
     def acquire_guest_token(self):
         base_url = forge_search_url('test')

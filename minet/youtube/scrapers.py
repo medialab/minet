@@ -11,11 +11,9 @@ from html import unescape
 from urllib.parse import unquote
 from collections import namedtuple
 
-from minet.utils import create_pool, request
+from minet.web import request
 from minet.youtube.utils import ensure_video_id
 from minet.youtube.exceptions import YouTubeInvalidVideoId
-
-YOUTUBE_SCRAPER_POOL = create_pool()
 
 CAPTION_TRACKS_RE = re.compile(r'({"captionTracks":.*isTranslatable":(true|false)}])')
 TIMEDTEXT_RE = re.compile(rb'timedtext?[^"]+')
@@ -28,7 +26,7 @@ def get_caption_tracks(video_id):
     # First we try to retrieve it from video info
     url = 'https://www.youtube.com/get_video_info?video_id=%s' % video_id
 
-    err, response = request(YOUTUBE_SCRAPER_POOL, url)
+    err, response = request(url)
 
     if err:
         raise err
@@ -48,7 +46,7 @@ def get_caption_tracks(video_id):
     # Then we try to scrape it directly from the video page
     # url = 'https://www.youtube.com/watch?v=%s' % video_id
 
-    # err, response = request(YOUTUBE_SCRAPER_POOL, url)
+    # err, response = request(url)
 
     # if err:
     #     raise err

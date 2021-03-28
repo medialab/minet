@@ -9,7 +9,8 @@ from minet.crowdtangle.exceptions import (
     CrowdTangleInvalidTokenError,
     CrowdTangleInvalidRequestError
 )
-from minet.utils import request_json, nested_get
+from minet.utils import nested_get
+from minet.web import request_json
 from minet.crowdtangle.constants import (
     CROWDTANGLE_OUTPUT_FORMATS
 )
@@ -20,7 +21,7 @@ from minet.crowdtangle.formatters import (
 URL_TEMPLATE = 'https://api.crowdtangle.com/post/%s?token=%s'
 
 
-def crowdtangle_post(http, post_id, token=None, format='csv_dict_row'):
+def crowdtangle_post(pool, post_id, token=None, format='csv_dict_row'):
 
     if token is None:
         raise CrowdTangleMissingTokenError
@@ -31,7 +32,7 @@ def crowdtangle_post(http, post_id, token=None, format='csv_dict_row'):
     # Fetching
     api_url = URL_TEMPLATE % (post_id, token)
 
-    err, response, data = request_json(http, api_url)
+    err, response, data = request_json(api_url, pool=pool)
 
     if err is not None:
         raise err

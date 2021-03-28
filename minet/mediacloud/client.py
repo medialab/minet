@@ -5,7 +5,7 @@
 # A unified mediacloud API client that can be used to keep an eye on the
 # rate limit and the used token etc.
 #
-from minet.utils import create_pool
+from minet.web import create_pool
 from minet.mediacloud.constants import MEDIACLOUD_DEFAULT_TIMEOUT
 from minet.mediacloud.utils import make_simple_call
 from minet.mediacloud.search import mediacloud_search
@@ -19,11 +19,11 @@ from minet.mediacloud.formatters import (
 class MediacloudAPIClient(object):
     def __init__(self, token):
         self.token = token
-        self.http = create_pool(timeout=MEDIACLOUD_DEFAULT_TIMEOUT)
+        self.pool = create_pool(timeout=MEDIACLOUD_DEFAULT_TIMEOUT)
 
     def count(self, query, **kwargs):
         return mediacloud_search(
-            self.http,
+            self.pool,
             self.token,
             query,
             count=True,
@@ -32,7 +32,7 @@ class MediacloudAPIClient(object):
 
     def search(self, query, **kwargs):
         return mediacloud_search(
-            self.http,
+            self.pool,
             self.token,
             query,
             count=False,
@@ -41,7 +41,7 @@ class MediacloudAPIClient(object):
 
     def topic_stories(self, topic_id, **kwargs):
         return mediacloud_topic_stories(
-            self.http,
+            self.pool,
             self.token,
             topic_id,
             **kwargs
@@ -49,7 +49,7 @@ class MediacloudAPIClient(object):
 
     def media(self, media_id, format=None):
         return make_simple_call(
-            self.http,
+            self.pool,
             self.token,
             '/media/single',
             format_media,
@@ -60,7 +60,7 @@ class MediacloudAPIClient(object):
 
     def feeds(self, media_id, format=None):
         return make_simple_call(
-            self.http,
+            self.pool,
             self.token,
             '/feeds/list',
             format_feed,
