@@ -166,7 +166,8 @@ def report_scraper_evaluation_error(error):
     p('> {error} at path {path}{root}'.format(error=red_alert, path=colored(path, 'blue'), root=(' (root)' if not error.path else '')))
 
     if isinstance(error, ScraperEvalError):
-        p('  evaluated code raised {error}!'.format(error=colored(error.reason.__class__.__name__, 'green')))
+        msg = str(error.reason)
+        p('  evaluated code raised {error}{msg}!'.format(error=colored(error.reason.__class__.__name__, 'green'), msg=(' with message: ' + colored(msg, 'magenta')) if msg else ''))
 
         for line in error.expression.split('\n'):
             p(colored('    | {line}'.format(line=line), 'cyan'))

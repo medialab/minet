@@ -136,7 +136,7 @@ def eval_expression(expression, element=None, elements=None, value=None,
             expression=expression
         )
 
-    if expect is not None or check is not None:
+    if (expect is not None or check is not None) and result is not None:
         if not (check(result) if check else isinstance(result, expect)):
             raise ScraperEvalTypeError(
                 path=path,

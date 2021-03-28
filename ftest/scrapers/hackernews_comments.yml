@@ -26,3 +26,14 @@ fields:
     sel: .ind > img
     attr: width
     eval: int(value) // 40
+  parent_comment_id:
+    sel_eval: |
+      w = int(element.select_one('.ind > img').get('width'))
+
+      if w == 0:
+        return
+
+      for sibling in element.find_previous_siblings('tr'):
+        if int(sibling.select_one('.ind > img').get('width')) < w:
+          return sibling
+    attr: id

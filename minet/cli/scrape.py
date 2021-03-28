@@ -115,7 +115,7 @@ def scrape_action(namespace):
         ])
 
     if namespace.validate:
-        print('You scraper is valid.', file=sys.stderr)
+        print('Your scraper is valid.', file=sys.stderr)
         sys.exit(0)
 
     if scraper.headers is None and namespace.format == 'csv':
