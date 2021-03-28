@@ -1028,15 +1028,10 @@ def namedrecord(name, fields, boolean=None, plural=None):
             for key, i in mapping.items():
                 v = super().__getitem__(i)
 
-                if isinstance(v, str):
-                    if len(v) > 30:
-                        v = v[:29] + '…'
-                    v = v.replace('\n', '\\n')
+                if isinstance(v, str) and len(v) > 30:
+                    v = v[:29] + '…'
 
-                if isinstance(v, str) and ' ' in v:
-                    representation += ' %s="%s"' % (key, v)
-                else:
-                    representation += ' %s=%s' % (key, v)
+                representation += ' {k}={v!r}'.format(k=key, v=v)
 
             representation += '>'
 
