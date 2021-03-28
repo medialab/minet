@@ -15,6 +15,7 @@ class BooleanAction(Action):
     Custom argparse action to handle --no-* flags.
     Taken from: https://thisdataguy.com/2017/07/03/no-options-with-argparse-and-python/
     """
+
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         super(BooleanAction, self).__init__(option_strings, dest, nargs=0, **kwargs)
 

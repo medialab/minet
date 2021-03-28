@@ -1,4 +1,5 @@
 # Dev dependencies
+autopep8==1.5.6
 importchecker==2.0
 ipython
 pycodestyle==2.4.0

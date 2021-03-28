@@ -1,5 +1,6 @@
 # Variables
 SOURCE = minet
+PEP8_IGNORE = E501,E722,E741,W503,W504
 
 # Functions
 define clean
@@ -26,10 +27,15 @@ deps:
 
 lint:
 	@echo Linting source code using pep8...
-	pycodestyle --ignore E501,E722,E741,W503,W504 $(SOURCE) test hooks
+	pycodestyle --ignore $(PEP8_IGNORE) $(SOURCE) test hooks
 	@echo
 	@echo Searching for unused imports...
 	importchecker $(SOURCE) | grep -v __init__ || true
+	@echo
+
+format:
+	@echo Formatting source code using autopep8
+	autopep8 --in-place minet/**/*.py --ignore $(PEP8_IGNORE)
 	@echo
 
 readme:
