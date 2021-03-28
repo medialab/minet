@@ -321,7 +321,7 @@ def prettyprint_seconds(seconds, granularity=None):
             result.append('%i %s' % (value, name))
 
     if not result:
-        return '0 seconds'
+        return '%.2f seconds' % seconds
 
     if granularity is not None:
         result = result[:granularity]

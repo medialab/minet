@@ -9,7 +9,7 @@ import time
 import browser_cookie3
 from http.cookies import SimpleCookie
 
-from minet.utils import CookieResolver
+from minet.web import CookieResolver
 from minet.cli.utils import open_output_file, die
 
 

@@ -128,8 +128,7 @@ def scrape_action(namespace):
         desc='Scraping pages',
         total=namespace.total,
         unit='page',
-        stats={'p': namespace.processes},
-        delay=0.5
+        stats={'p': namespace.processes}
     )
 
     proc_args = (

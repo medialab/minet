@@ -612,7 +612,7 @@ def request_jsonrpc(url, method, pool=DEFAULT_POOL, *args, **kwargs):
     return None, data
 
 
-def request_json(http, url, pool=DEFAULT_POOL, *args, **kwargs):
+def request_json(url, pool=DEFAULT_POOL, *args, **kwargs):
     err, response = request(url, pool=pool, *args, **kwargs)
 
     if err:
@@ -624,7 +624,7 @@ def request_json(http, url, pool=DEFAULT_POOL, *args, **kwargs):
         return e, response, None
 
 
-def request_text(http, url, pool=DEFAULT_POOL, *args, encoding='utf-8', **kwargs):
+def request_text(url, pool=DEFAULT_POOL, *args, encoding='utf-8', **kwargs):
     err, response = request(url, pool=pool, *args, **kwargs)
 
     if err:

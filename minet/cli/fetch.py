@@ -22,10 +22,10 @@ from ural import (
 )
 
 from minet.fetch import multithreaded_fetch, multithreaded_resolve
-from minet.utils import (
+from minet.utils import PseudoFStringFormatter
+from minet.web import (
     grab_cookies,
-    parse_http_header,
-    PseudoFStringFormatter
+    parse_http_header
 )
 from minet.cli.reporters import report_error
 from minet.cli.utils import (

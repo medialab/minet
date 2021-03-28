@@ -12,7 +12,7 @@ from urllib.parse import urlencode, quote
 from twitwi import normalize_tweet
 
 from minet.utils import nested_get
-from minet.utils import (
+from minet.web import (
     create_pool,
     request,
     request_json,
@@ -34,7 +34,7 @@ from minet.twitter.exceptions import (
 # =============================================================================
 # Constants
 # =============================================================================
-TWITTER_PUBLIC_SEARCH_ENDPOINT = 'pools://api.twitter.com/2/search/adaptive.json'
+TWITTER_PUBLIC_SEARCH_ENDPOINT = 'https://api.twitter.com/2/search/adaptive.json'
 MAXIMUM_QUERY_LENGTH = 500
 DEFAULT_COUNT = 100
 GUEST_TOKEN_COOKIE_PATTERN = re.compile(rb'document\.cookie = decodeURIComponent\("gt=(\d+);')
@@ -45,7 +45,7 @@ GUEST_TOKEN_COOKIE_PATTERN = re.compile(rb'document\.cookie = decodeURIComponent
 # =============================================================================
 def forge_search_url(query):
     return (
-        'pools://twitter.com/search?f=live&type=spelling_expansion_revert_click&q=%s' %
+        'https://twitter.com/search?f=live&type=spelling_expansion_revert_click&q=%s' %
         quote(query)
     )
 
