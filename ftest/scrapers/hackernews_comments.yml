@@ -22,3 +22,7 @@ fields:
   date:
     sel: .age
     eval: parse_date(value)
+  level:
+    sel: .ind > img
+    attr: width
+    eval: int(value) // 40
