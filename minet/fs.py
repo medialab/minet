@@ -4,7 +4,9 @@
 #
 # Multiple helper functions related to reading and writing files.
 #
+import os
 import gzip
+from threading import Lock
 
 
 def read_potentially_gzipped_path(path, encoding='utf-8'):
@@ -18,3 +20,11 @@ def read_potentially_gzipped_path(path, encoding='utf-8'):
             raw = f.read()
 
     return raw
+
+
+MAKEDIRS_LOCK = Lock()
+
+
+def threadsafe_makedirs(path):
+    with MAKEDIRS_LOCK:
+        os.makedirs(path, exist_ok=True)
