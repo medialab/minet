@@ -1,7 +1,6 @@
-from minet.crawl import crawl
-from minet.utils import load_definition
+from minet import Crawler
 
-spider = load_definition('./ftest/crawlers/echojs_multiple.yml')
+crawler = Crawler('./ftest/crawlers/echojs_multiple.yml', throttle=2)
 
-for result in crawl(spider, throttle=2):
+for result in crawler:
     print(result.job)

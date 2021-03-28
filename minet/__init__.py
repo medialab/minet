@@ -1,7 +1,6 @@
 from minet.__version__ import __version__
 
 from minet.crawl import (
-    crawl,
     Crawler,
     CrawlJob,
     Spider,

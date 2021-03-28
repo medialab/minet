@@ -11,7 +11,6 @@ from tqdm import tqdm
 from shutil import rmtree
 
 from minet.crawl import Crawler
-from minet.utils import load_definition
 from minet.cli.reporters import report_error
 from minet.cli.utils import print_err
 
@@ -158,7 +157,6 @@ def crawl_action(namespace):
 
     # Loading crawler definition
     queue_path = join(namespace.output_dir, 'queue')
-    definition = load_definition(namespace.crawler)
 
     if namespace.resume:
         print_err('Resuming crawl...')
@@ -177,7 +175,7 @@ def crawl_action(namespace):
 
     # Creating crawler
     crawler = Crawler(
-        definition,
+        namespace.crawler,
         throttle=namespace.throttle,
         queue_path=queue_path
     )

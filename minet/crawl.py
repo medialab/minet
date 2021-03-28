@@ -15,6 +15,7 @@ from shutil import rmtree
 from threading import Lock
 
 from minet.scrape import Scraper
+from minet.utils import load_definition
 from minet.web import (
     create_pool,
     request,
@@ -355,6 +356,9 @@ class Crawler(object):
 
         # Creating spiders
         if spec is not None:
+            if not isinstance(spec, dict):
+                spec = load_definition(spec)
+
             if 'spiders' in spec:
                 spiders = {name: DefinitionSpider(s, name=name) for name, s in spec['spiders'].items()}
                 self.single_spider = False
@@ -495,11 +499,3 @@ class Crawler(object):
         if self.using_persistent_queue:
             del self.queue
             rmtree(self.queue_path, ignore_errors=True)
-
-
-# Transfer __doc__
-def crawl(*args, **kwargs):
-
-    crawler = Crawler(*args, **kwargs)
-
-    yield from crawler
