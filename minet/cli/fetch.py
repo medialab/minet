@@ -16,8 +16,6 @@ from tqdm import tqdm
 from uuid import uuid4
 from ural import (
     is_url,
-    get_hostname,
-    get_normalized_hostname,
     is_shortened_url
 )
 

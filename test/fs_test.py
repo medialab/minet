@@ -1,7 +1,9 @@
 # =============================================================================
 # Minet FS Unit Tests
 # =============================================================================
+import os
 import pytest
+
 from minet.fs import (
     FolderStrategy,
     FlatFolderStrategy,
@@ -13,6 +15,11 @@ from minet.fs import (
 
 class TestFS(object):
     def test_folder_strategy(self):
+
+        # Don't test on windows yet
+        if os.sep != '/':
+            return
+
         flat = FolderStrategy.from_name('flat')
 
         assert isinstance(flat, FlatFolderStrategy)
