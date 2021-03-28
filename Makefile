@@ -35,7 +35,7 @@ lint:
 
 format:
 	@echo Formatting source code using autopep8
-	autopep8 --in-place minet/**/*.py --ignore $(PEP8_IGNORE)
+	autopep8 --in-place minet/*.py minet/**/*.py test/*.py test/**/*.py --ignore $(PEP8_IGNORE)
 	@echo
 
 readme:
