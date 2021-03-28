@@ -2,7 +2,8 @@ from pprint import pprint
 from bs4 import BeautifulSoup
 from minet import Scraper
 from minet.scrape.compiler import compile_scraper
-from minet.scrape.analysis import validate, report_validation_errors
+from minet.scrape.analysis import validate
+from minet.cli.reporters import report_scraper_validation_errors
 
 BASIC_HTML = """
     <ul>
@@ -196,7 +197,7 @@ errors = validate(THE_WORST_SCRAPER_EVER)
 # for error in errors:
 #     print(repr(error))
 
-report = report_validation_errors(errors)
+report = report_scraper_validation_errors(errors)
 
 print()
 print(report)

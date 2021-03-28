@@ -24,7 +24,10 @@ from minet.scrape.exceptions import (
     ScraperEvalTypeError,
     ScraperEvalNoneError
 )
-from minet.scrape.analysis import report_validation_errors, report_evaluation_error
+from minet.cli.reporters import (
+    report_scraper_validation_errors,
+    report_scraper_evaluation_error
+)
 from minet.cli.utils import (
     open_output_file,
     die,
@@ -100,9 +103,9 @@ def scrape_action(namespace):
     except FileNotFoundError:
         die('Could not find scraper file!')
     except InvalidScraperError as error:
-        print('Your scraper is invalid! Check the following errors:', file=sys.stderr)
+        print('Your scraper is invalid! You need to fix the following errors:', file=sys.stderr)
         print(file=sys.stderr)
-        sys.stderr.write(report_validation_errors(error.validation_errors))
+        sys.stderr.write(report_scraper_validation_errors(error.validation_errors))
         die()
     except CSSSelectorTooComplex:
         die([
@@ -165,7 +168,7 @@ def scrape_action(namespace):
 
             if error is not None:
                 if isinstance(error, (ScraperEvalError, ScraperEvalTypeError, ScraperEvalNoneError)):
-                    loading_bar.print(report_evaluation_error(error), end='')
+                    loading_bar.print(report_scraper_evaluation_error(error), end='')
                 loading_bar.inc('errors')
                 continue
 

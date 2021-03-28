@@ -6,10 +6,7 @@
 #
 import ast
 import soupsieve
-from io import StringIO
-from functools import partial
 from soupsieve import SelectorSyntaxError
-from termcolor import colored
 
 from minet.scrape.utils import get_sel, get_iterator
 from minet.scrape.constants import (
@@ -23,8 +20,7 @@ from minet.scrape.exceptions import (
     InvalidCSSSelectorError,
     ScraperValidationIrrelevantPluralModifierError,
     ScraperValidationMixedConcernError,
-    ScraperValidationInvalidPluralModifierError,
-    ScraperEvalError
+    ScraperValidationInvalidPluralModifierError
 )
 
 
@@ -219,72 +215,3 @@ def validate(scraper):
     recurse(scraper)
 
     return sorted(errors, key=errors_sorting_key)
-
-
-def and_join(strings):
-    strings = [colored(s, 'green') for s in strings]
-
-    if len(strings) < 2:
-        return strings[0]
-
-    return (', '.join(strings[:-1])) + ' and ' + strings[-1]
-
-
-def report_validation_errors(errors):
-    output = StringIO()
-
-    p = partial(print, file=output)
-
-    red_alert = colored('Error', 'red')
-
-    for n, error in enumerate(errors, 1):
-        path = '.' + ('.'.join(error.path))
-
-        p('> {error} n°{n} at path {path}{root}'.format(error=red_alert, n=n, path=colored(path, 'blue'), root=(' (root)' if not error.path else '')))
-
-        if isinstance(error, ScraperValidationConflictError):
-            p('  the {keys} keys are conflicting and should not be found at the same level!'.format(keys=and_join(error.keys)))
-
-        if isinstance(error, ScraperValidationIrrelevantPluralModifierError):
-            p('  the {modifier} modifier should not be found at a non-plural level (i.e. without iterator)!'.format(modifier=colored(error.modifier, 'green')))
-
-        if isinstance(error, ScraperValidationInvalidPluralModifierError):
-            p('  the {modifier} modifier cannot be a boolean without {fields} and cannot be a key/path with {fields}!'.format(modifier=colored(error.modifier, 'green'), fields=colored('fields', 'green')))
-
-        if isinstance(error, ScraperValidationMixedConcernError):
-            p('  mixed concerns could not be interpreted (i.e. the {burrowing} keys should not be found alongside the {leaf} ones)!'.format(burrowing=and_join(BURROWING_KEYS), leaf=and_join(LEAF_KEYS)))
-
-        if isinstance(error, InvalidCSSSelectorError):
-            p('  invalid CSS selector {css}'.format(css=colored(error.expression, 'cyan')))
-
-        if isinstance(error, ScraperEvalSyntaxError):
-            p('  invalid python code was found:')
-
-            for line in error.expression.split('\n'):
-                p(colored('    | {line}'.format(line=line), 'cyan'))
-
-        p()
-
-    return output.getvalue()
-
-
-def report_evaluation_error(error):
-    output = StringIO()
-
-    p = partial(print, file=output)
-
-    red_alert = colored('Scraper error', 'red')
-
-    path = '.' + ('.'.join(error.path))
-
-    p('> {error} at path {path}{root}'.format(error=red_alert, path=colored(path, 'blue'), root=(' (root)' if not error.path else '')))
-
-    if isinstance(error, ScraperEvalError):
-        p('  evaluated code raised {error}!'.format(error=colored(error.reason.__class__.__name__, 'green')))
-
-        for line in error.expression.split('\n'):
-            p(colored('    | {line}'.format(line=line), 'cyan'))
-
-    p()
-
-    return output.getvalue()
