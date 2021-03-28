@@ -23,6 +23,7 @@ from ural import (
 
 from minet.fetch import multithreaded_fetch, multithreaded_resolve
 from minet.utils import PseudoFStringFormatter
+from minet.fs import FolderStrategy
 from minet.web import (
     grab_cookies,
     parse_http_header
@@ -54,74 +55,6 @@ RESOLVE_ADDITIONAL_HEADERS = [
 CUSTOM_FORMATTER = PseudoFStringFormatter()
 
 
-class FolderStrategy(object):
-    pass
-
-
-class FlatFolderStrategy(FolderStrategy):
-    def get(self, filename, **kwargs):
-        return filename
-
-
-class PrefixFolderStrategy(FolderStrategy):
-    def __init__(self, length):
-        self.length = length
-
-    def get(self, filename, **kwargs):
-        return join(filename[:self.length], filename)
-
-
-class HostnameFolderStrategy(FolderStrategy):
-    def get(self, filename, url, **kwargs):
-        hostname = get_hostname(url)
-
-        if not hostname:
-            hostname = 'unknown-host'
-
-        return join(hostname, filename)
-
-
-class NormalizedHostnameFolderStrategy(FolderStrategy):
-    def get(self, filename, url, **kwargs):
-        hostname = get_normalized_hostname(
-            url,
-            normalize_amp=False,
-            strip_lang_subdomains=True,
-            infer_redirection=False
-        )
-
-        if not hostname:
-            hostname = 'unknown-host'
-
-        return join(hostname, filename)
-
-
-def parse_folder_strategy(name):
-    if name == 'flat':
-        return FlatFolderStrategy()
-
-    if name == 'hostname':
-        return HostnameFolderStrategy()
-
-    if name == 'normalized-hostname':
-        return NormalizedHostnameFolderStrategy()
-
-    if name.startswith('prefix-'):
-        length = name.split('prefix-')[-1]
-
-        try:
-            length = int(length)
-        except ValueError:
-            return None
-
-        if length <= 0:
-            return None
-
-        return PrefixFolderStrategy(length)
-
-    raise None
-
-
 def fetch_action(namespace, resolve=False):
 
     # Are we resuming
@@ -144,7 +77,7 @@ def fetch_action(namespace, resolve=False):
 
     # Trying to instantiate the folder strategy
     if not resolve:
-        folder_strategy = parse_folder_strategy(namespace.folder_strategy)
+        folder_strategy = FolderStrategy.from_name(namespace.folder_strategy)
 
         if folder_strategy is None:
             die([
@@ -404,7 +337,10 @@ def fetch_action(namespace, resolve=False):
                         filename = str(uuid4()) + result.meta['ext']
 
                     # Applying folder strategy
-                    filename = folder_strategy.get(filename, url=result.response.geturl())
+                    filename = folder_strategy.apply(
+                        filename=filename,
+                        url=result.response.geturl()
+                    )
 
                 # Standardize encoding?
                 encoding = result.meta['encoding']
