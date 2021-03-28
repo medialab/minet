@@ -1,0 +1,21 @@
+---
+set_context:
+  title:
+    sel: .fatitem .storylink
+    extract: text
+  id:
+    sel: .fatitem .athing
+    attr: id
+iterator: .athing.comtr
+fields:
+  article_id:
+    get_context: id
+  article_title:
+    get_context: title
+  comment_id: id
+  author:
+    sel: .hnuser
+  text:
+    sel: .commtext
+  when:
+    sel: .age
