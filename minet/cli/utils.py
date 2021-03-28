@@ -6,9 +6,7 @@
 #
 import csv
 import sys
-import gzip
 import yaml
-import codecs
 from io import StringIO
 from glob import iglob
 from os.path import join, expanduser, isfile, isdir
@@ -156,19 +154,6 @@ def open_output_file(output, flag='w', encoding='utf-8'):
     return open(output, flag, encoding=encoding)
 
 
-def read_potentially_gzipped_path(path, encoding='utf-8'):
-    if path.endswith('.gz'):
-        with open(path, 'rb') as f:
-            raw_bytes = gzip.decompress(f.read())
-
-        raw = raw_bytes.decode(encoding, errors='replace')
-    else:
-        with codecs.open(path, 'r', encoding=encoding, errors='replace') as f:
-            raw = f.read()
-
-    return raw
-
-
 WorkerPayload = namedtuple(
     'WorkerPayload',
     ['row', 'headers', 'path', 'encoding', 'content', 'args']
@@ -242,6 +227,8 @@ def create_glob_iterator(namespace, args):
 
 
 class LazyLineDict(object):
+    __slots__ = ('headers', 'line')
+
     def __init__(self, headers, line):
         self.headers = headers
         self.line = line

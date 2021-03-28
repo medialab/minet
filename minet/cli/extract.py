@@ -9,11 +9,11 @@ from multiprocessing import Pool
 from trafilatura.core import bare_extraction
 
 from minet.encodings import is_supported_encoding
+from minet.fs import read_potentially_gzipped_path
 from minet.cli.utils import (
     open_output_file,
     create_report_iterator,
-    LoadingBar,
-    read_potentially_gzipped_path
+    LoadingBar
 )
 from minet.cli.reporters import report_error
 

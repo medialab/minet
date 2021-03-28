@@ -28,14 +28,14 @@ from minet.cli.reporters import (
     report_scraper_validation_errors,
     report_scraper_evaluation_error
 )
+from minet.fs import read_potentially_gzipped_path
 from minet.cli.utils import (
     open_output_file,
     die,
     create_glob_iterator,
     create_report_iterator,
     LazyLineDict,
-    LoadingBar,
-    read_potentially_gzipped_path
+    LoadingBar
 )
 
 ScrapeWorkerResult = namedtuple(
