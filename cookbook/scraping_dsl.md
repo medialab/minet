@@ -889,6 +889,10 @@ Keyword arguments given to the function replacing `eval` directives are listed i
 * **re**: python's `re` module.
 * **soupsieve**: the `soupsieve` module.
 
+*Helpers*
+
+* **parse_date**: function parsing dates (even relative ones such as `53 minutes ago`) and returning them formatted as ISO datetime. Can take a `lang` kwarg if required.
+
 *Local variables*
 
 * **element** *bs4.Tag*: currently selected html element.

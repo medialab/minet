@@ -5,14 +5,12 @@
 # Function taking a scraper definition and applying its logic recursively
 # to yield its result.
 #
-import re
-import json
-import soupsieve
 import textwrap
+import soupsieve
 from bs4 import Tag
-from urllib.parse import urljoin
 
 from minet.utils import nested_get
+from minet.scrape.std import get_default_evaluation_context
 from minet.scrape.constants import EXTRACTOR_NAMES
 from minet.scrape.utils import get_sel, get_iterator
 from minet.scrape.exceptions import (
@@ -61,14 +59,7 @@ def extract(element, extractor_name):
     raise TypeError('Unknown "%s" extractor' % extractor_name)
 
 
-EVAL_CONTEXT = {
-
-    # Dependencies
-    'json': json,
-    'urljoin': urljoin,
-    're': re,
-    'soupsieve': soupsieve
-}
+EVAL_CONTEXT = get_default_evaluation_context()
 
 
 # NOTE: this is not threadsafe, but it does not have to be
