@@ -219,6 +219,13 @@ class TestScrape(object):
 
         assert result == ['no-class', 'no-class']
 
+    def test_stripped_extraction(self):
+        text = scrape({
+            'sel': 'div'
+        }, '<div>    Hello world        </div>')
+
+        assert text == 'Hello world'
+
     def test_filter(self):
         result = scrape({
             'iterator': 'li',
