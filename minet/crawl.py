@@ -116,6 +116,16 @@ class CrawlerState(object):
         with self.__lock:
             self.jobs_doing -= 1
 
+    def inc_working(self):
+        with self.__lock:
+            self.jobs_queued -= 1
+            self.jobs_doing += 1
+
+    def dec_working(self):
+        with self.__lock:
+            self.jobs_done += 1
+            self.jobs_doing -= 1
+
     def __repr__(self):
         class_name = self.__class__.__name__
 
@@ -399,8 +409,7 @@ class Crawler(object):
         self.started = True
 
     def work(self, job):
-        self.state.dec_queued()
-        self.state.inc_doing()
+        self.state.inc_working()
 
         spider = self.spiders.get(job.spider)
 
@@ -442,8 +451,7 @@ class Crawler(object):
             next_jobs = list(next_jobs)
             self.enqueue(next_jobs)
 
-        self.state.inc_done()
-        self.state.dec_doing()
+        self.state.dec_working()
 
         return CrawlWorkerResult(
             job=job,
