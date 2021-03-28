@@ -750,6 +750,16 @@ class TestScrape(object):
             {'topic': 'arts', 'post': '4', 'author': 'Peter'}
         ]
 
+    def test_scope(self):
+        result = scrape({
+            'iterator': 'li',
+            'item': {
+                'eval': 'x = scope.x or 0\nscope.x = x + 1\nreturn scope.x'
+            }
+        }, REPETITIVE_HTML)
+
+        assert [1, 2, 3]
+
     def test_validate(self):
         bad_definition = {
             'sel': 'li',

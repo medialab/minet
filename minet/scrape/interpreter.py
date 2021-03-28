@@ -59,13 +59,21 @@ def extract(element, extractor_name):
     raise TypeError('Unknown "%s" extractor' % extractor_name)
 
 
+class EvaluationScope(object):
+    def __setattr__(self, key, value):
+        self.__dict__[key] = value
+
+    def __getattr__(self, key):
+        return self.__dict__.get(key)
+
+
 EVAL_CONTEXT = get_default_evaluation_context()
 
 
 # NOTE: this is not threadsafe, but it does not have to be
 def eval_expression(expression, element=None, elements=None, value=None,
-                    context=None, root=None, path=None, expect=None, check=None,
-                    allow_none=False):
+                    context=None, root=None, scope=None,
+                    path=None, expect=None, check=None, allow_none=False):
 
     if callable(expression):
         try:
@@ -92,6 +100,7 @@ def eval_expression(expression, element=None, elements=None, value=None,
         # Context
         EVAL_CONTEXT['context'] = context
         EVAL_CONTEXT['root'] = root
+        EVAL_CONTEXT['scope'] = scope
 
         if '\n' in expression:
 
@@ -172,7 +181,9 @@ def tabulate(element, headers_inference='th', headers=None, path=None):
     return generator()
 
 
-def interpret_scraper(scraper, element, root=None, context=None, path=[]):
+def interpret_scraper(scraper, element, root=None, context=None, path=[], scope=None):
+    if scope is None:
+        scope = EvaluationScope()
 
     # Is this a tail call of item?
     if isinstance(scraper, str):
@@ -197,7 +208,8 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
             root=root,
             path=path + ['sel_eval'],
             expect=(Tag, str),
-            allow_none=True
+            allow_none=True,
+            scope=scope
         )
 
         if isinstance(evaluated_sel, str):
@@ -223,7 +235,8 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
             context=context,
             root=root,
             path=path + ['iterator_eval'],
-            check=is_valid_iterator_eval_output
+            check=is_valid_iterator_eval_output,
+            scope=scope
         )
 
         if isinstance(evaluated_elements, str):
@@ -243,7 +256,8 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
                 element,
                 root=root,
                 context=context,
-                path=path + ['set_context', k]
+                path=path + ['set_context', k],
+                scope=scope
             )
 
         context = merge_contexts(context, local_context)
@@ -266,7 +280,8 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
                     element,
                     root=root,
                     context=context,
-                    path=path + ['fields', k]
+                    path=path + ['fields', k],
+                    scope=scope
                 )
 
         # Do we have a scalar?
@@ -278,7 +293,8 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
                 element,
                 root=root,
                 context=context,
-                path=path + ['item']
+                path=path + ['item'],
+                scope=scope
             )
 
         else:
@@ -305,7 +321,8 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
                     root=root,
                     path=path + ['eval'],
                     expect=DATA_TYPES,
-                    allow_none=True
+                    allow_none=True,
+                    scope=scope
                 )
 
         # Default value after all?
@@ -327,7 +344,8 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[]):
                     root=root,
                     path=path + ['filter_eval'],
                     expect=bool,
-                    allow_none=True
+                    allow_none=True,
+                    scope=scope
                 )
 
                 if not passed_filter:

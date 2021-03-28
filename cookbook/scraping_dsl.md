@@ -903,6 +903,7 @@ Keyword arguments given to the function replacing `eval` directives are listed i
 
 * **context** *dict*: local context object (more about this in the next part of this documentation).
 * **root** *bs4.Tag*: root element of the html tree.
+* **scope** *scope*: a scraper-level global scope object that can be used to track state.
 
 ## Accessing global context
 
