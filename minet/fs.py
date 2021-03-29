@@ -6,6 +6,7 @@
 #
 import os
 import gzip
+import codecs
 from threading import Lock
 from os.path import basename, join
 from ural import get_hostname, get_normalized_hostname
