@@ -15,6 +15,7 @@ from collections import namedtuple
 from tqdm import tqdm
 
 from minet.cli.exceptions import MissingColumnError
+from minet.utils import fuzzy_int
 
 
 def print_err(*args, **kwargs):
@@ -197,7 +198,7 @@ def create_report_iterator(namespace, enricher, args=None, loading_bar=None):
 
     def generator():
         for row in enricher:
-            status = int(row[status_pos]) if row[status_pos] else None
+            status = fuzzy_int(row[status_pos]) if row[status_pos] else None
             filename = row[filename_pos]
 
             if status is None or status >= 400 or not filename:

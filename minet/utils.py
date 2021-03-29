@@ -17,6 +17,13 @@ from collections import OrderedDict, namedtuple
 from minet.exceptions import DefinitionInvalidFormatError
 
 
+def fuzzy_int(value):
+    try:
+        return int(value)
+    except ValueError:
+        return int(float(value))
+
+
 def md5(string):
     h = hashlib.md5()
     h.update(string.encode())
