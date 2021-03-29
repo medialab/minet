@@ -7,6 +7,7 @@
 import csv
 import sys
 import yaml
+import platform
 from io import StringIO
 from glob import iglob
 from os.path import join, expanduser, isfile, isdir
@@ -148,10 +149,27 @@ class LoadingBar(object):
 
 
 def open_output_file(output, flag='w', encoding='utf-8'):
-    if output is None:
-        return DummyTqdmFile(sys.stdout)
+    stdout = sys.stdout
 
-    return open(output, flag, encoding=encoding)
+    # As per #254: stdout need to be wrapped so that windows get a correct csv
+    # stream output
+    if 'windows' in platform.system().lower():
+        stdout = open(
+            sys.__stdout__.fileno(),
+            mode=sys.__stdout__.mode,
+            buffering=1,
+            encoding=sys.__stdout__.encoding,
+            errors=sys.__stdout__.errors,
+            newline='',
+            closefd=False
+        )
+
+    if output is None:
+        return DummyTqdmFile(stdout)
+
+    # As per #254: newline='' is necessary for CSV output on windows to avoid
+    # outputting extra lines because of a '\r\r\n' end of line...
+    return open(output, flag, encoding=encoding, newline='')
 
 
 WorkerPayload = namedtuple(
