@@ -614,9 +614,8 @@ MINET_COMMANDS = {
             },
             {
                 'flags': ['-p', '--processes'],
-                'help': 'Number of processes to use. Defaults to 4.',
-                'type': int,
-                'default': 4
+                'help': 'Number of processes to use. Defaults to roughly half of the available CPUs.',
+                'type': int
             },
             {
                 'flags': ['-s', '--select'],
@@ -1277,9 +1276,8 @@ MINET_COMMANDS = {
             },
             {
                 'flags': ['-p', '--processes'],
-                'help': 'Number of processes to use. Defaults to 4.',
-                'type': int,
-                'default': 4
+                'help': 'Number of processes to use. Defaults to roughly half of the available CPUs.',
+                'type': int
             },
             {
                 'flag': '--separator',

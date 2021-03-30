@@ -11,9 +11,9 @@ import casanova
 from termcolor import colored
 from collections import namedtuple
 from os.path import basename
-from multiprocessing import Pool
 
 from minet import Scraper
+from minet.multiprocessing import LazyPool
 from minet.exceptions import (
     DefinitionInvalidFormatError,
 )
@@ -127,8 +127,7 @@ def scrape_action(namespace):
     loading_bar = LoadingBar(
         desc='Scraping pages',
         total=namespace.total,
-        unit='page',
-        stats={'p': namespace.processes}
+        unit='page'
     )
 
     proc_args = (
@@ -155,11 +154,13 @@ def scrape_action(namespace):
     else:
         output_writer = ndjson.writer(output_file)
 
-    pool = Pool(
+    pool = LazyPool(
         namespace.processes,
         initializer=init_process,
         initargs=(scraper.definition, namespace.strain)
     )
+
+    loading_bar.update_stats(p=pool.processes)
 
     with pool:
         for error, items in pool.imap_unordered(worker, files):

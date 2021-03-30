@@ -293,7 +293,7 @@ optional arguments:
   -h, --help                           show this help message and exit
   -i INPUT_DIR, --input-dir INPUT_DIR  Directory where the HTML files are stored. Defaults to "content".
   -o OUTPUT, --output OUTPUT           Path to the output report file. By default, the report will be printed to stdout.
-  -p PROCESSES, --processes PROCESSES  Number of processes to use. Defaults to 4.
+  -p PROCESSES, --processes PROCESSES  Number of processes to use. Defaults to roughly half of the available CPUs.
   -s SELECT, --select SELECT           Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                        Total number of HTML documents. Necessary if you want to display a finite progress indicator.
 
@@ -395,7 +395,7 @@ optional arguments:
   -g GLOB, --glob GLOB                  Whether to scrape a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.
   -i INPUT_DIR, --input-dir INPUT_DIR   Directory where the HTML files are stored. Defaults to "content".
   -o OUTPUT, --output OUTPUT            Path to the output report file. By default, the report will be printed to stdout.
-  -p PROCESSES, --processes PROCESSES   Number of processes to use. Defaults to 4.
+  -p PROCESSES, --processes PROCESSES   Number of processes to use. Defaults to roughly half of the available CPUs.
   --separator SEPARATOR                 Separator use to join lists of values when output format is CSV. Defaults to "|".
   --strain STRAIN                       Optional CSS selector used to strain, i.e. only parse matched tags in the parsed html files in order to optimize performance.
   --total TOTAL                         Total number of HTML documents. Necessary if you want to display a finite progress indicator.

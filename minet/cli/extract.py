@@ -5,9 +5,9 @@
 # Logic of the extract action.
 #
 import casanova
-from multiprocessing import Pool
 from trafilatura.core import bare_extraction
 
+from minet.multiprocessing import LazyPool
 from minet.encodings import is_supported_encoding
 from minet.fs import read_potentially_gzipped_path
 from minet.cli.utils import (
@@ -128,7 +128,11 @@ def extract_action(namespace):
             'Did you forget to specify it with -i/--input-dir?'
         ])
 
-    with Pool(namespace.processes) as pool:
+    pool = LazyPool(namespace.processes)
+
+    loading_bar.update_stats(p=pool.processes)
+
+    with pool:
         for error, row, result in pool.imap_unordered(worker, files):
             loading_bar.update()
 
