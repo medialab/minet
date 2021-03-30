@@ -321,15 +321,17 @@ def fetch_action(namespace, resolve=False):
                 # Building filename
                 if data:
                     if filename_pos is not None or namespace.filename_template:
+                        root, ext = os.path.splitext(row[filename_pos]) if filename_pos is not None else (None, '')
+                        ext = ext if ext else result.meta['ext']
                         if namespace.filename_template:
                             filename = CUSTOM_FORMATTER.format(
                                 namespace.filename_template,
-                                value=row[filename_pos] if filename_pos is not None else None,
-                                ext=result.meta['ext'],
+                                value=root,
+                                ext=ext,
                                 line=LazyLineDict(indexed_input_headers, row)
                             )
                         else:
-                            filename = row[filename_pos] + result.meta['ext']
+                            filename = root + ext
                     else:
                         # NOTE: it would be nice to have an id that can be sorted by time
                         filename = str(uuid4()) + result.meta['ext']
