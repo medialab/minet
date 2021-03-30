@@ -70,7 +70,10 @@ def protocol_error_reporter(error):
     if 'Connection aborted' in msg:
         return 'connection-aborted'
 
-    return msg
+    if 'Connection refused' in msg:
+        return 'connection-refused'
+
+    return 'connection-error'
 
 
 def decode_error_reporter(error):
