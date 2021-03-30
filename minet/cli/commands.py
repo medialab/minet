@@ -793,6 +793,20 @@ MINET_COMMANDS = {
             given by the user.
         ''',
         'epilog': '''
+            columns being added to the output:
+
+            . "index": index of the line in the original file (the output will be
+              arbitrarily ordered since multiple requests are performed concurrently).
+            . "resolved": final resolved url (after solving redirects) if different
+              from requested url.
+            . "status": HTTP status code of the request, e.g. 200, 404, 503 etc.
+            . "error": an error code if anything went wrong when performing the request.
+            . "filename": path to the downloaded file, relative to the folder given
+              through -d/--output-dir.
+            . "encoding": detected encoding of the requested file if relevant.
+            . "raw_contents": if --contents-in-report is set, will contain the
+              downloaded text and the file won't be written.
+
             --folder-strategy options:
 
             . "flat": default choice, all files will be written in the indicated
