@@ -52,6 +52,7 @@ META_REFRESH_RE = re.compile(rb'''<meta\s+http-equiv=['"]?refresh['"]?\s+content
 JAVASCRIPT_LOCATION_RE = re.compile(rb'''(?:window\.)?location(?:\s*=\s*|\.replace\(\s*)['"`](.*?)['"`]''')
 ESCAPED_SLASH_RE = re.compile(rb'\\\/')
 ASCII_RE = re.compile(r'^[ -~]*$')
+HTML_RE = re.compile(rb'^<(?:html|head|body|title|meta|link|span|div|img|ul|ol|[ap!?])', flags=re.I)
 
 # Constants
 CHARDET_CONFIDENCE_THRESHOLD = 0.9
@@ -122,6 +123,10 @@ def guess_response_encoding(response, is_xml=False, use_chardet=False):
             return chardet_result['encoding'].lower()
 
     return suboptimal_charset
+
+
+def looks_like_html(html_chunk):
+    return HTML_RE.match(html_chunk) is not None
 
 
 def parse_http_header(header):
@@ -575,15 +580,16 @@ def extract_response_meta(response, guess_encoding=True, guess_extension=True):
             if parsed_header and parsed_header[0].strip():
                 mimetype = parsed_header[0].strip()
 
-        if mimetype is not None:
-            exts = mimetypes.guess_all_extensions(mimetype)
+        if mimetype is None and looks_like_html(response.data[:CONTENT_CHUNK_SIZE]):
+            mimetype = 'text/html'
 
-            if not exts:
+        if mimetype is not None:
+            ext = mimetypes.guess_extension(mimetype)
+
+            if ext == '.htm':
                 ext = '.html'
-            elif '.html' in exts:
-                ext = '.html'
-            else:
-                ext = max(exts, key=len)
+            elif ext == '.jpe':
+                ext = '.jpg'
 
             meta['mime'] = mimetype
             meta['ext'] = ext
