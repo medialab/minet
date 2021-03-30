@@ -84,7 +84,7 @@ def eval_expression(expression, element=None, elements=None, value=None,
                 context=context,
                 root=root
             )
-        except BaseException as e:
+        except Exception as e:
             raise ScraperEvalError(
                 reason=e,
                 path=path,
@@ -112,7 +112,7 @@ def eval_expression(expression, element=None, elements=None, value=None,
             try:
                 exec(wrapped_expression, EVAL_CONTEXT, scope)
                 result = scope['__return_value__']
-            except BaseException as e:
+            except Exception as e:
                 raise ScraperEvalError(
                     reason=e,
                     path=path,
@@ -123,7 +123,7 @@ def eval_expression(expression, element=None, elements=None, value=None,
             # Simple expression
             try:
                 result = eval(expression, EVAL_CONTEXT, None)
-            except BaseException as e:
+            except Exception as e:
                 raise ScraperEvalError(
                     reason=e,
                     path=path,

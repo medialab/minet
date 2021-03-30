@@ -95,7 +95,7 @@ def worker(payload):
         # TODO: discuss deduplication
         # TODO: fallback options
         result = bare_extraction(raw_html)
-    except BaseException as e:
+    except Exception as e:
         return e, row, None
 
     if result is None:
