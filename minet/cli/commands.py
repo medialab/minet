@@ -145,7 +145,7 @@ MINET_COMMANDS = {
             examples:
 
             . Running a crawler definition:
-                `minet crawl crawler.yml -d crawl-data`
+                $ minet crawl crawler.yml -d crawl-data
         ''',
         'arguments': [
             {
@@ -185,16 +185,16 @@ MINET_COMMANDS = {
             examples:
 
             . Dumping cookie jar from firefox:
-                `minet cookies firefox > jar.txt`
+                $ minet cookies firefox > jar.txt
 
             . Dumping cookies as CSV:
-                `minet cookies firefox --csv > cookies.csv`
+                $ minet cookies firefox --csv > cookies.csv
 
             . Print cookie for lemonde.fr:
-                `minet cookie firefox --url https://www.lemonde.fr`
+                $ minet cookie firefox --url https://www.lemonde.fr
 
             . Dump cookie morsels for lemonde.fr as CSV:
-                `minet cookie firefox --url https://www.lemonde.fr --csv > morsels.csv`
+                $ minet cookie firefox --url https://www.lemonde.fr --csv > morsels.csv
         ''',
         'arguments': [
             {
@@ -264,7 +264,7 @@ MINET_COMMANDS = {
                         examples:
 
                         . Fetching accounts statistics for every account in your dashboard:
-                            `minet ct leaderboard --token YOUR_TOKEN > accounts-stats.csv`
+                            $ minet ct leaderboard --token YOUR_TOKEN > accounts-stats.csv
                     ''',
                     'arguments': [
                         {
@@ -302,7 +302,7 @@ MINET_COMMANDS = {
                         examples:
 
                         . Fetching a dashboard's lists:
-                            `minet ct lists --token YOUR_TOKEN > lists.csv`
+                            $ minet ct lists --token YOUR_TOKEN > lists.csv
                     '''
                 },
                 'posts': {
@@ -316,15 +316,16 @@ MINET_COMMANDS = {
                         examples:
 
                         . Fetching the 500 most latest posts from a dashboard (a start date must be precised):
-                            `minet ct posts --token YOUR_TOKEN --limit 500 --start-date 2021-01-01 > latest-posts.csv`
+                            $ minet ct posts --token YOUR_TOKEN --limit 500 --start-date 2021-01-01 > latest-posts.csv
 
                         . If your collection is interrupted, it can be restarted from the last data collected with the --resume option:
-                            `minet ct posts --token YOUR_TOKEN --limit 500 --start-date 2021-01-01 --resume --output latest-posts.csv`
+                            $ minet ct posts --token YOUR_TOKEN --limit 500 --start-date 2021-01-01 --resume --output latest-posts.csv
 
                         . Fetching all the posts from a specific list of groups or pages:
-                            `minet ct posts --token YOUR_TOKEN --start-date 2021-01-01 --list-ids YOUR_LIST_ID > posts_from_one_list.csv`
+                            $ minet ct posts --token YOUR_TOKEN --start-date 2021-01-01 --list-ids YOUR_LIST_ID > posts_from_one_list.csv
 
-                        To know the different list ids associated with your dashboard: `minet ct lists --token YOUR_TOKEN`
+                        To know the different list ids associated with your dashboard:
+                            $ minet ct lists --token YOUR_TOKEN
                     ''',
                     'arguments': [
                         {
@@ -386,10 +387,10 @@ MINET_COMMANDS = {
                         examples:
 
                         . Retrieving information about a batch of posts:
-                            `minet ct posts-by-id post-url posts.csv --token YOUR_TOKEN > metadata.csv`
+                            $ minet ct posts-by-id post-url posts.csv --token YOUR_TOKEN > metadata.csv
 
                         . Retrieving information about a single post:
-                            `minet ct posts-by-id 1784333048289665 --token YOUR_TOKEN`
+                            $ minet ct posts-by-id 1784333048289665 --token YOUR_TOKEN
                     ''',
                     'arguments': [
                         {
@@ -431,7 +432,7 @@ MINET_COMMANDS = {
                         examples:
 
                         . Fetching all the 2021 posts containing the words 'acetylsalicylic acid':
-                            `minet ct search 'acetylsalicylic acid' --start-date 2021-01-01 --token YOUR_TOKEN > posts.csv`
+                            $ minet ct search 'acetylsalicylic acid' --start-date 2021-01-01 --token YOUR_TOKEN > posts.csv
                     ''',
                     'arguments': [
                         {
@@ -521,7 +522,7 @@ MINET_COMMANDS = {
                         examples:
 
                         . Computing a summary of aggregated stats for urls contained in a CSV row:
-                            `minet ct summary url urls.csv --token YOUR_TOKEN --start-date 2019-01-01 > summary.csv`
+                            $ minet ct summary url urls.csv --token YOUR_TOKEN --start-date 2019-01-01 > summary.csv
                     ''',
                     'arguments': [
                         {
@@ -579,7 +580,7 @@ MINET_COMMANDS = {
         'description': '''
             Use multiple processes to extract raw content and various metadata
             from a batch of HTML files. This command can either work on a
-            `minet fetch` report or on a bunch of files. It will output an
+            $ minet fetch report or on a bunch of files. It will output an
             augmented report with the extracted text.
 
             Extraction is performed using the `trafilatura` library by Adrien
@@ -590,10 +591,10 @@ MINET_COMMANDS = {
             examples:
 
             . Extracting raw text from a `minet fetch` report:
-                `minet extract report.csv > extracted.csv`
+                $ minet extract report.csv > extracted.csv
 
             . Working on a report from stdin:
-                `minet fetch url_column file.csv | minet extract > extracted.csv`
+                $ minet fetch url_column file.csv | minet extract > extracted.csv
         ''',
         'arguments': [
             {
@@ -654,7 +655,7 @@ MINET_COMMANDS = {
                         examples:
 
                         . Fetching a post's comments:
-                            `minet fb comments -c firefox https://www.facebook.com/page/posts/3601645349798293 > comments.csv`
+                            $ minet fb comments -c firefox https://www.facebook.com/page/posts/3601645349798293 > comments.csv
                     ''',
                     'arguments': [
                         {
@@ -701,7 +702,7 @@ MINET_COMMANDS = {
                         examples:
 
                         . Fetching stats about lists of posts in a CSV file:
-                            `minet fb post-stats post_url fb-posts.csv`
+                            $ minet fb post-stats post_url fb-posts.csv
                     ''',
                     'arguments': [
                         {
@@ -746,7 +747,9 @@ MINET_COMMANDS = {
                     ''',
                     'epilog': '''
                         example:
-                        . `minet fb url-likes url url.csv > url_likes.csv`
+
+                        . Retrieving likes for the urls listed in a CSV file:
+                            $ minet fb url-likes url url.csv > url_likes.csv
                     ''',
                     'arguments': [
                         {
@@ -828,13 +831,13 @@ MINET_COMMANDS = {
             examples:
 
             . Fetching a batch of url from existing CSV file:
-                `minet fetch url_column file.csv > report.csv`
+                $ minet fetch url_column file.csv > report.csv
 
             . CSV input from stdin:
-                `xsv select url_column file.csv | minet fetch url_column > report.csv`
+                $ xsv select url_column file.csv | minet fetch url_column > report.csv
 
             . Fetching a single url, useful to pipe into `minet scrape`:
-                `minet fetch http://google.com | minet scrape ./scrape.json > scraped.csv`
+                $ minet fetch http://google.com | minet scrape ./scrape.json > scraped.csv
         ''',
         'arguments': [
             {
@@ -929,10 +932,10 @@ MINET_COMMANDS = {
                         examples:
 
                         . Exporting from the spreadsheet id:
-                            `minet google sheets 1QXQ1yaNYrVUlMt6LQ4jrLGt_PvZI9goozYiBTgaC4RI > file.csv`
+                            $ minet google sheets 1QXQ1yaNYrVUlMt6LQ4jrLGt_PvZI9goozYiBTgaC4RI > file.csv
 
                         . Using your Firefox authentication cookies:
-                            `minet google sheets --cookie firefox 1QXQ1yaNYrVUlMt6LQ4jrLGt_PvZI9goozYiBTgaC4RI > file.csv`
+                            $ minet google sheets --cookie firefox 1QXQ1yaNYrVUlMt6LQ4jrLGt_PvZI9goozYiBTgaC4RI > file.csv
                     ''',
                     'arguments': [
                         {
@@ -982,7 +985,7 @@ MINET_COMMANDS = {
                         examples:
 
                         . Dumping a corpus into the ./corpus directory:
-                            `minet hyphe dump http://myhyphe.com/api/ corpus-name -d corpus`
+                            $ minet hyphe dump http://myhyphe.com/api/ corpus-name -d corpus
                     ''',
                     'arguments': [
                         {
@@ -1169,13 +1172,13 @@ MINET_COMMANDS = {
             examples:
 
             . Resolving a batch of url from existing CSV file:
-                `minet resolve url_column file.csv > report.csv`
+                $ minet resolve url_column file.csv > report.csv
 
             . CSV input from stdin:
-                `xsv select url_column file.csv | minet resolve url_column > report.csv`
+                $ xsv select url_column file.csv | minet resolve url_column > report.csv
 
             . Resolving a single url:
-                `minet resolve https://lemonde.fr`
+                $ minet resolve https://lemonde.fr
         ''',
         'arguments': [
             {
@@ -1236,25 +1239,25 @@ MINET_COMMANDS = {
             examples:
 
             . Scraping item from a `minet fetch` report:
-                `minet scrape scraper.yml report.csv > scraped.csv`
+                $ minet scrape scraper.yml report.csv > scraped.csv
 
             . Working on a report from stdin:
-                `minet fetch url_column file.csv | minet scrape scraper.yml > scraped.csv`
+                $ minet fetch url_column file.csv | minet scrape scraper.yml > scraped.csv
 
             . Scraping a single page from the web:
-                `minet fetch https://news.ycombinator.com/ | minet scrape scraper.yml > scraped.csv`
+                $ minet fetch https://news.ycombinator.com/ | minet scrape scraper.yml > scraped.csv
 
             . Scraping items from a bunch of files:
-                `minet scrape scraper.yml --glob "./content/**/*.html" > scraped.csv`
+                $ minet scrape scraper.yml --glob "./content/**/*.html" > scraped.csv
 
             . Yielding items as newline-delimited JSON (jsonl):
-                `minet scrape scraper.yml report.csv --format jsonl > scraped.jsonl
+                $ minet scrape scraper.yml report.csv --format jsonl > scraped.jsonl
 
             . Only validating the scraper definition and exit:
-                `minet scraper --validate scraper.yml`
+                $ minet scraper --validate scraper.yml
 
             . Using a strainer to optimize performance:
-                `minet scraper links-scraper.yml --strain "a[href]" report.csv > links.csv`
+                $ minet scraper links-scraper.yml --strain "a[href]" report.csv > links.csv
         ''',
         'arguments': [
             {
@@ -1338,7 +1341,7 @@ MINET_COMMANDS = {
                         examples:
 
                         . Getting friends of a list of user:
-                            `minet tw friends screen_name users.csv > friends.csv`
+                            $ minet tw friends screen_name users.csv > friends.csv
                     ''',
                     'arguments': [
                         {
@@ -1388,7 +1391,7 @@ MINET_COMMANDS = {
                         examples:
 
                         . Getting followers of a list of user:
-                            `minet tw followers screen_name users.csv > followers.csv`
+                            $ minet tw followers screen_name users.csv > followers.csv
                     ''',
                     'arguments': [
                         {
@@ -1438,13 +1441,13 @@ MINET_COMMANDS = {
                         examples:
 
                         . Collecting the latest 500 tweets of a given Twitter user:
-                            `minet tw scrape tweets "from:@jack" --limit 500 > tweets.csv`
+                            $ minet tw scrape tweets "from:@jack" --limit 500 > tweets.csv
 
                         . Collecting the tweets from multiple Twitter queries listed in a CSV file:
-                            `minet tw scrape tweets query queries.csv > tweets.csv`
+                            $ minet tw scrape tweets query queries.csv > tweets.csv
 
                         . Templating the given CSV column to query tweets by users:
-                            `minet tw scrape tweets user users.csv --query-template 'from:@{value}' > tweets.csv`
+                            $ minet tw scrape tweets user users.csv --query-template 'from:@{value}' > tweets.csv
                     ''',
                     'arguments': [
                         {
@@ -1497,7 +1500,7 @@ MINET_COMMANDS = {
                         examples:
 
                         . Getting metadata from an user:
-                            `minet tw users screen_name users.csv > data_users.csv`
+                            $ minet tw users screen_name users.csv > data_users.csv
                     ''',
                     'arguments': [
                         {
@@ -1543,7 +1546,7 @@ MINET_COMMANDS = {
                         examples:
 
                         . Getting tweets from users in a CSV file:
-                            `minet tw user-tweets screen_name users.csv > tweets.csv`
+                            $ minet tw user-tweets screen_name users.csv > tweets.csv
                     ''',
                     'arguments': [
                         {
@@ -1602,10 +1605,10 @@ MINET_COMMANDS = {
             examples:
 
             . Extracting urls from a text column:
-                `minet url-extract text posts.csv > urls.csv`
+                $ minet url-extract text posts.csv > urls.csv
 
             . Extracting urls from a html column:
-                `minet url-extract html --from html posts.csv > urls.csv`
+                $ minet url-extract html --from html posts.csv > urls.csv
         ''',
         'arguments': [
             {
@@ -1660,10 +1663,10 @@ MINET_COMMANDS = {
             examples:
 
             . Joining two files:
-                `minet url-join url webentities.csv post_url posts.csv > joined.csv`
+                $ minet url-join url webentities.csv post_url posts.csv > joined.csv
 
             . Keeping only some columns from first file:
-                `minet url-join url webentities.csv post_url posts.csv -s url,id > joined.csv`
+                $ minet url-join url webentities.csv post_url posts.csv -s url,id > joined.csv
         ''',
         'arguments': [
             {
@@ -1718,19 +1721,19 @@ MINET_COMMANDS = {
             examples:
 
             . Creating a report about a file's urls:
-                `minet url-parse url posts.csv > report.csv`
+                $ minet url-parse url posts.csv > report.csv
 
             . Keeping only selected columns from the input file:
-                `minet url-parse url posts.csv -s id,url,title > report.csv`
+                $ minet url-parse url posts.csv -s id,url,title > report.csv
 
             . Multiple urls joined by separator:
-                `minet url-parse urls posts.csv --separator "|" > report.csv`
+                $ minet url-parse urls posts.csv --separator "|" > report.csv
 
             . Parsing Facebook urls:
-                `minet url-parse url fbposts.csv --facebook > report.csv`
+                $ minet url-parse url fbposts.csv --facebook > report.csv
 
             . Parsing YouTube urls:
-                `minet url-parse url ytvideos.csv --youtube > report.csv`
+                $ minet url-parse url ytvideos.csv --youtube > report.csv
         ''',
         'arguments': [
             {
@@ -1810,10 +1813,10 @@ MINET_COMMANDS = {
                         examples:
 
                         . Fetching captions for a list of videos:
-                            `minet yt captions video_id videos.csv > captions.csv`
+                            $ minet yt captions video_id videos.csv > captions.csv
 
                         . Fetching French captions with a fallback to English:
-                            `minet yt captions video_id videos.csv --lang fr,en > captions.csv`
+                            $ minet yt captions video_id videos.csv --lang fr,en > captions.csv
                     ''',
                     'arguments': [
                         {
@@ -1846,7 +1849,7 @@ MINET_COMMANDS = {
                         example:
 
                         . Fetching a video's comments:
-                            `minet yt comments https://www.youtube.com/watch?v=7JTb2vf1OQQ -k my-api-key > comments.csv`
+                            $ minet yt comments https://www.youtube.com/watch?v=7JTb2vf1OQQ -k my-api-key > comments.csv
                     ''',
                     'arguments': [
                         {
@@ -1912,7 +1915,7 @@ MINET_COMMANDS = {
                         example:
 
                         . Searching videos about birds:
-                            `minet youtube search bird -k my-api-key > bird_videos.csv`
+                            $ minet youtube search bird -k my-api-key > bird_videos.csv
                     ''',
                     'arguments': [
                         {
