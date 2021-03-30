@@ -56,6 +56,7 @@ ASCII_RE = re.compile(r'^[ -~]*$')
 # Constants
 CHARDET_CONFIDENCE_THRESHOLD = 0.9
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
+CONTENT_CHUNK_SIZE = 1024
 
 
 # TODO: add a version that tallies the possibilities
@@ -81,20 +82,21 @@ def guess_response_encoding(response, is_xml=False, use_chardet=False):
                     suboptimal_charset = charset
 
     data = response.data
+    chunk = data[:CONTENT_CHUNK_SIZE]
 
     # Data is empty
-    if not data.strip():
+    if not chunk.strip():
         return None
 
     # TODO: use re.search to go faster!
     if is_xml:
-        matches = re.findall(CHARSET_RE, data)
+        matches = re.findall(CHARSET_RE, chunk)
 
         if len(matches) == 0:
-            matches = re.findall(PRAGMA_RE, data)
+            matches = re.findall(PRAGMA_RE, chunk)
 
         if len(matches) == 0:
-            matches = re.findall(XML_RE, data)
+            matches = re.findall(XML_RE, chunk)
 
         # NOTE: here we are returning the last one, but we could also use
         # frequency at the expense of performance
@@ -354,7 +356,7 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
 
                 if location is None and follow_meta_refresh:
                     try:
-                        response._body = response.read(1024)
+                        response._body = response.read(CONTENT_CHUNK_SIZE)
                     except Exception as e:
                         error = e
                         redirection.type = 'error'
@@ -370,7 +372,7 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
                 if location is None and follow_js_relocation:
                     try:
                         if response._body is None:
-                            response._body = response.read(1024)
+                            response._body = response.read(CONTENT_CHUNK_SIZE)
                     except Exception as e:
                         error = e
                         redirection.type = 'error'
