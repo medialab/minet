@@ -553,31 +553,38 @@ def resolve(url, pool=DEFAULT_POOL, method='GET', headers=None, cookie=None, spo
 
 
 def extract_response_meta(response, guess_encoding=True, guess_extension=True):
-    meta = {}
+    meta = {
+        'ext': None,
+        'mime': None,
+        'encoding': None
+    }
 
     # Guessing extension
     if guess_extension:
 
         # Guessing mime type
+        # TODO: validate mime type string?
         mimetype, _ = mimetypes.guess_type(response.geturl())
 
-        if mimetype is None:
-            mimetype = 'text/html'
-
         if 'Content-Type' in response.headers:
-            mimetype = response.headers['Content-Type']
+            content_type = response.headers['Content-Type']
+            parsed_header = cgi.parse_header(content_type)
 
-        exts = mimetypes.guess_all_extensions(mimetype)
+            if parsed_header and parsed_header[0].strip():
+                mimetype = parsed_header[0].strip()
 
-        if not exts:
-            ext = '.html'
-        elif '.html' in exts:
-            ext = '.html'
-        else:
-            ext = max(exts, key=len)
+        if mimetype is not None:
+            exts = mimetypes.guess_all_extensions(mimetype)
 
-        meta['mime'] = mimetype
-        meta['ext'] = ext
+            if not exts:
+                ext = '.html'
+            elif '.html' in exts:
+                ext = '.html'
+            else:
+                ext = max(exts, key=len)
+
+            meta['mime'] = mimetype
+            meta['ext'] = ext
 
     # Guessing encoding
     if guess_encoding:
