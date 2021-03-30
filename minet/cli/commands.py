@@ -580,14 +580,39 @@ MINET_COMMANDS = {
         'description': '''
             Use multiple processes to extract raw content and various metadata
             from a batch of HTML files. This command can either work on a
-            $ minet fetch report or on a bunch of files. It will output an
+            `minet fetch` report or on a bunch of files. It will output an
             augmented report with the extracted text.
 
             Extraction is performed using the `trafilatura` library by Adrien
             Barbaresi. More information about the library can be found here:
             https://github.com/adbar/trafilatura
+
+            Note that this methodology mainly targets news article and may fail
+            to extract relevant content from other kind of web pages.
         ''',
         'epilog': '''
+
+            columns being added to the output:
+
+            . "extract_error": any error that happened when extracting content.
+            . "canonical_url": canonical url of target html, extracted from
+              link[rel=canonical].
+            . "title": title of the web page, from <title> usually.
+            . "description": description of the web page, as found in its
+              metadata.
+            . "raw_content": main content of the web page as extracted.
+            . "comments": comment text whenever the heuristics succeeds in
+              identifying them.
+            . "author": inferred author of the web page article when found in
+              its metadata.
+            . "categories": list of categories extracted from the web page's
+              metadata, separated by "|".
+            . "tags": list of tags extracted from the web page's metadata,
+              separated by "|".
+            . "date": date of publication of the web page article when found in
+              its metadata.
+            . "sitename": canonical name as declared by the website.
+
             examples:
 
             . Extracting raw text from a `minet fetch` report:
