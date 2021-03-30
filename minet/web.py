@@ -562,7 +562,7 @@ def resolve(url, pool=DEFAULT_POOL, method='GET', headers=None, cookie=None, spo
 def extract_response_meta(response, guess_encoding=True, guess_extension=True):
     meta = {
         'ext': None,
-        'mime': None,
+        'mimetype': None,
         'encoding': None
     }
 
@@ -591,7 +591,7 @@ def extract_response_meta(response, guess_encoding=True, guess_extension=True):
             elif ext == '.jpe':
                 ext = '.jpg'
 
-            meta['mime'] = mimetype
+            meta['mimetype'] = mimetype
             meta['ext'] = ext
 
     # Guessing encoding

@@ -39,6 +39,7 @@ FETCH_ADDITIONAL_HEADERS = [
     'status',
     'error',
     'filename',
+    'mimetype',
     'encoding'
 ]
 
@@ -241,13 +242,14 @@ def fetch_action(namespace, resolve=False):
         }
 
     def write_fetch_output(index, row, resolved=None, status=None, error=None,
-                           filename=None, encoding=None, data=None):
+                           filename=None, encoding=None, mimetype=None, data=None):
 
         addendum = [
             resolved or '',
             status or '',
             error or '',
             filename or '',
+            mimetype or '',
             encoding or ''
         ]
 
@@ -377,6 +379,7 @@ def fetch_action(namespace, resolve=False):
                     status=response.status,
                     filename=filename,
                     encoding=encoding,
+                    mimetype=result.meta['mimetype'],
                     data=data
                 )
 

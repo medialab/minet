@@ -831,6 +831,7 @@ MINET_COMMANDS = {
             . "error": an error code if anything went wrong when performing the request.
             . "filename": path to the downloaded file, relative to the folder given
               through -d/--output-dir.
+            . "mimetype": detected mimetype of the requested file.
             . "encoding": detected encoding of the requested file if relevant.
             . "raw_contents": if --contents-in-report is set, will contain the
               downloaded text and the file won't be written.
