@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 MINET="python -m minet.cli"
 
 echo "Minet version:"

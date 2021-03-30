@@ -52,10 +52,12 @@ META_REFRESH_RE = re.compile(rb'''<meta\s+http-equiv=['"]?refresh['"]?\s+content
 JAVASCRIPT_LOCATION_RE = re.compile(rb'''(?:window\.)?location(?:\s*=\s*|\.replace\(\s*)['"`](.*?)['"`]''')
 ESCAPED_SLASH_RE = re.compile(rb'\\\/')
 ASCII_RE = re.compile(r'^[ -~]*$')
+HTML_RE = re.compile(rb'^<(?:html|head|body|title|meta|link|span|div|img|ul|ol|[ap!?])', flags=re.I)
 
 # Constants
 CHARDET_CONFIDENCE_THRESHOLD = 0.9
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
+CONTENT_CHUNK_SIZE = 1024
 
 
 # TODO: add a version that tallies the possibilities
@@ -81,20 +83,21 @@ def guess_response_encoding(response, is_xml=False, use_chardet=False):
                     suboptimal_charset = charset
 
     data = response.data
+    chunk = data[:CONTENT_CHUNK_SIZE]
 
     # Data is empty
-    if not data.strip():
+    if not chunk.strip():
         return None
 
     # TODO: use re.search to go faster!
     if is_xml:
-        matches = re.findall(CHARSET_RE, data)
+        matches = re.findall(CHARSET_RE, chunk)
 
         if len(matches) == 0:
-            matches = re.findall(PRAGMA_RE, data)
+            matches = re.findall(PRAGMA_RE, chunk)
 
         if len(matches) == 0:
-            matches = re.findall(XML_RE, data)
+            matches = re.findall(XML_RE, chunk)
 
         # NOTE: here we are returning the last one, but we could also use
         # frequency at the expense of performance
@@ -120,6 +123,10 @@ def guess_response_encoding(response, is_xml=False, use_chardet=False):
             return chardet_result['encoding'].lower()
 
     return suboptimal_charset
+
+
+def looks_like_html(html_chunk):
+    return HTML_RE.match(html_chunk) is not None
 
 
 def parse_http_header(header):
@@ -354,7 +361,7 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
 
                 if location is None and follow_meta_refresh:
                     try:
-                        response._body = response.read(1024)
+                        response._body = response.read(CONTENT_CHUNK_SIZE)
                     except Exception as e:
                         error = e
                         redirection.type = 'error'
@@ -370,7 +377,7 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
                 if location is None and follow_js_relocation:
                     try:
                         if response._body is None:
-                            response._body = response.read(1024)
+                            response._body = response.read(CONTENT_CHUNK_SIZE)
                     except Exception as e:
                         error = e
                         redirection.type = 'error'
@@ -553,31 +560,39 @@ def resolve(url, pool=DEFAULT_POOL, method='GET', headers=None, cookie=None, spo
 
 
 def extract_response_meta(response, guess_encoding=True, guess_extension=True):
-    meta = {}
+    meta = {
+        'ext': None,
+        'mime': None,
+        'encoding': None
+    }
 
     # Guessing extension
     if guess_extension:
 
         # Guessing mime type
+        # TODO: validate mime type string?
         mimetype, _ = mimetypes.guess_type(response.geturl())
 
-        if mimetype is None:
+        if 'Content-Type' in response.headers:
+            content_type = response.headers['Content-Type']
+            parsed_header = cgi.parse_header(content_type)
+
+            if parsed_header and parsed_header[0].strip():
+                mimetype = parsed_header[0].strip()
+
+        if mimetype is None and looks_like_html(response.data[:CONTENT_CHUNK_SIZE]):
             mimetype = 'text/html'
 
-        if 'Content-Type' in response.headers:
-            mimetype = response.headers['Content-Type']
+        if mimetype is not None:
+            ext = mimetypes.guess_extension(mimetype)
 
-        exts = mimetypes.guess_all_extensions(mimetype)
+            if ext == '.htm':
+                ext = '.html'
+            elif ext == '.jpe':
+                ext = '.jpg'
 
-        if not exts:
-            ext = '.html'
-        elif '.html' in exts:
-            ext = '.html'
-        else:
-            ext = max(exts, key=len)
-
-        meta['mime'] = mimetype
-        meta['ext'] = ext
+            meta['mime'] = mimetype
+            meta['ext'] = ext
 
     # Guessing encoding
     if guess_encoding:

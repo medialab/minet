@@ -126,6 +126,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
             )
 
         # Forcing urllib3 to read data in thread
+        # TODO: this is probably useless and should be replaced by preload_content at the right place
         data = response.data
 
         # Meta
