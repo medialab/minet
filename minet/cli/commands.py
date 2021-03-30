@@ -1194,6 +1194,14 @@ MINET_COMMANDS = {
             HTTP calls and the followed redirections.
         ''',
         'epilog': '''
+            columns being added to the output:
+
+            . "resolved": final resolved url (after solving redirects).
+            . "status": HTTP status code of the request, e.g. 200, 404, 503 etc.
+            . "error": an error code if anything went wrong when performing the request.
+            . "redirects": total number of redirections to reach the final url.
+            . "chain": list of redirection types separated by "|".
+
             examples:
 
             . Resolving a batch of url from existing CSV file:
