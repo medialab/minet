@@ -1714,10 +1714,40 @@ MINET_COMMANDS = {
         'action': 'url_parse_action',
         'title': 'Minet Url Parse Command',
         'description': '''
-            Overload a CSV file containing urls with a selection of additional
-            metadata such as their normalized version, domain name etc.
+            Parse the urls contained in a CSV file using the python `ural`
+            library to extract useful information about them such as their
+            normalized version, domain name, etc.
         ''',
         'epilog': '''
+            columns being added to the output:
+
+            . "normalized_url": urls aggressively normalized by removing any part
+              that is not useful to determine which resource it is actually
+              pointing at.
+            . "inferred_redirection": redirection directly inferred from the
+              url without needing to make any HTTP request.
+            . "domain_name": TLD-aware domain name of the url.
+            . "hostname": full hostname of the url.
+            . "normalized_hostname": normalized hostname, i.e. stripped of "www",
+              "m" or some language subdomains etc., of the url.
+            . "probably_shortened": whether the url is probably shortened or
+              not (bit.ly, t.co etc.).
+
+            columns being added with --facebook:
+
+            . "facebook_type": the type of Facebook resource symbolized by the
+              parsed url (post, video etc.).
+            . "facebook_id": Facebook resource id.
+            . "facebook_full_id": Facebook full resource id.
+            . "facebook_handle": Facebook handle for people, pages etc.
+            . "facebook_normalized_url": normalized Facebook url.
+
+            columns being added with --youtube:
+
+            . "youtube_type": YouTube resource type (video, channel etc.).
+            . "youtube_id": YouTube resource id.
+            . "youtube_name": YouTube resource name.
+
             examples:
 
             . Creating a report about a file's urls:
