@@ -6,7 +6,8 @@ import pytest
 from minet.utils import (
     fix_ensure_ascii_json_string,
     nested_get,
-    namedrecord
+    namedrecord,
+    PseudoFStringFormatter
 )
 
 NESTED_OBJECT = {
@@ -28,6 +29,11 @@ class TestUtils(object):
 
     def test_fix_ensure_ascii_json_string(self):
         assert fix_ensure_ascii_json_string('Marie-H\\u00e9l\\u00e8ne') == 'Marie-Hélène'
+
+    def test_pseudo_fstring_formatter(self):
+        formatter = PseudoFStringFormatter()
+
+        result = formatter.format('{line["test"]}', line={'test': 'hello'})
 
     def test_namedrecord(self):
         Record = namedrecord('Record', ['x', 'y'])
