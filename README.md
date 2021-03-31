@@ -10,6 +10,31 @@ In addition, **minet** also exposes its high-level programmatic interface as a p
 
 **Shortcuts**: [Cookbook](./cookbook), [Command line documentation](./docs/cli.md), [Python library documentation](./docs/lib.md).
 
+## What it does
+
+Minet can single-handedly:
+* Extract URLs from a text file (or a table)
+* Parse URLs (get useful information, with Facebook- and Youtube-specific stuff)
+* Join two CSV files by matching the columns containing URLs
+* From a list of URLs, resolve their redirections
+	* ...and check their HTTP status
+	* ...and download the HTML
+	* ...and extract hyperlinks
+	* ...and extract the text content and other metadata (title...)
+	* ...and scrape structured data (using a declarative language to define your heuristics)
+* Crawl (using a declarative language to define a browsing behavior, and what to harvest)
+* Mine or search:
+	* *Crowdtangle* (requires access)
+	* *Mediacloud* (access is free)
+	* *Twitter* (requires access)
+	* *Youtube* (requires access)
+* Scrape (no access):
+	* *Facebook*
+	* *Twitter*
+	* *Google Drive* and *Spreadsheet* docs
+* Get the cookies from your browser
+* Dump *Hyphe* data
+
 ## Use cases
 
 * Downloading large amount of urls very fast. ([guide](./cookbook/fetch.md))
