@@ -902,7 +902,7 @@ MINET_COMMANDS = {
             },
             {
                 'flags': ['-f', '--filename'],
-                'help': 'Name of the column used to build retrieved file names. Defaults to an uuid v4 with correct extension.'
+                'help': 'Name of the column used to build retrieved file names. Defaults to an uuid v4. If the provided file names have no extension (e.g. ".jpg", ".pdf", etc.) the correct extension will be added depending on the file type.'
             },
             {
                 'flag': '--filename-template',
