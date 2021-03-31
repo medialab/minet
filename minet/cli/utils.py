@@ -181,29 +181,30 @@ WorkerPayload = namedtuple(
 REPORT_HEADERS = ['status', 'filename', 'encoding']
 
 
-def create_report_iterator(namespace, enricher, args=None, loading_bar=None):
+def create_report_iterator(namespace, reader, args=None, on_irrelevant_row=None):
     for col in REPORT_HEADERS:
-        if col not in enricher.pos:
+        if col not in reader.pos:
             raise MissingColumnError(col)
 
-    status_pos = enricher.pos.status
-    filename_pos = enricher.pos.filename
-    encoding_pos = enricher.pos.encoding
-    raw_content_pos = enricher.pos.get('raw_contents')
+    status_pos = reader.pos.status
+    filename_pos = reader.pos.filename
+    encoding_pos = reader.pos.encoding
+    raw_content_pos = reader.pos.get('raw_contents')
 
     if raw_content_pos is None and not isdir(namespace.input_dir):
         raise NotADirectoryError
 
-    indexed_headers = {h: p for p, h in enumerate(enricher.fieldnames)}
+    indexed_headers = {h: p for p, h in enumerate(reader.fieldnames)}
 
     def generator():
-        for row in enricher:
+        for row in reader:
             status = fuzzy_int(row[status_pos]) if row[status_pos] else None
             filename = row[filename_pos]
 
             if status is None or status >= 400 or not filename:
-                if loading_bar is not None:
-                    loading_bar.update()
+                if callable(on_irrelevant_row):
+                    on_irrelevant_row(row)
+
                 continue
 
             if raw_content_pos is not None:

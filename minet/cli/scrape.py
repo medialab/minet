@@ -135,13 +135,21 @@ def scrape_action(namespace):
         namespace.separator
     )
 
+    def on_irrelevant_row(row):
+        loading_bar.update()
+
     if namespace.glob is not None:
         files = create_glob_iterator(namespace, proc_args)
     else:
         reader = casanova.reader(namespace.report)
 
         try:
-            files = create_report_iterator(namespace, reader, proc_args, loading_bar)
+            files = create_report_iterator(
+                namespace,
+                reader,
+                args=proc_args,
+                on_irrelevant_row=on_irrelevant_row
+            )
         except NotADirectoryError:
             loading_bar.die([
                 'Could not find the "%s" directory!' % namespace.input_dir,

@@ -120,8 +120,15 @@ def extract_action(namespace):
         unit='doc'
     )
 
+    def on_irrelevant_row(row):
+        loading_bar.update()
+
     try:
-        files = create_report_iterator(namespace, enricher, loading_bar=loading_bar)
+        files = create_report_iterator(
+            namespace,
+            enricher,
+            on_irrelevant_row=on_irrelevant_row
+        )
     except NotADirectoryError:
         loading_bar.die([
             'Could not find the "%s" directory!' % namespace.input_dir,
