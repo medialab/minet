@@ -35,6 +35,8 @@ class TestUtils(object):
 
         result = formatter.format('{line["test"]}', line={'test': 'hello'})
 
+        assert result == 'hello'
+
     def test_namedrecord(self):
         Record = namedrecord('Record', ['x', 'y'])
 
