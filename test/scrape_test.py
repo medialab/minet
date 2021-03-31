@@ -128,6 +128,10 @@ THE_WORST_HTML = """
             </ol>
             <p>
             <![CDATA[some very interesting stuff]]></p>
+            <p>
+                This is      <span>a large span  </span>
+                    with something else over <strong>here</strong>.
+            </p>
         </div>
         <p>
             Hello <span>gorgeous!</span></p>

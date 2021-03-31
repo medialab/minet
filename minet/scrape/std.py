@@ -10,6 +10,7 @@ import soupsieve
 import dateparser
 from urllib.parse import urljoin
 from bs4 import NavigableString
+from ebbe import with_next
 
 from minet.utils import squeeze
 from minet.scrape.constants import BLOCK_ELEMENTS
@@ -41,22 +42,12 @@ def get_block_parent(element):
         parent = parent.parent
 
 
-def iter_descendants_with_parent(element):
-    for descendant in element.descendants:
-        yield descendant.parent, descendant
-
-
 def get_display_text(element):
+
     def accumulator():
         previous_block_parent = None
 
-        for parent, descendant in iter_descendants_with_parent(element):
-            # print(
-            #     parent_display,
-            #     'string' if isinstance(descendant, NavigableString) else descendant.name,
-            #     str(descendant).replace('\n', '\\n') if isinstance(descendant, NavigableString) else None
-            # )
-
+        for descendant, next_descendant in with_next(element.descendants):
             if not isinstance(descendant, NavigableString):
 
                 if descendant.name == 'br' or descendant.name == 'hr':
@@ -78,9 +69,7 @@ def get_display_text(element):
             if string:
                 yield string
 
-            if parent == block_parent:
-                if descendant.rstrip(' ').endswith('\n'):
-                    yield ' '
+            # TODO: if before or after inline element with space around, should add a whitespace
 
     return (''.join(accumulator())).strip()
 
