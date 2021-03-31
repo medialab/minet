@@ -44,6 +44,13 @@ def fix_ensure_ascii_json_string(s):
         return s
 
 
+SQUEEZE_RE = re.compile(r'\s{2,}')
+
+
+def squeeze(s):
+    return SQUEEZE_RE.sub(' ', s)
+
+
 class RateLimiter(object):
     """
     Naive rate limiter context manager with smooth output.

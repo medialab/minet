@@ -12,6 +12,7 @@ from minet.scrape.analysis import (
     ScraperAnalysis
 )
 from minet.scrape.interpreter import tabulate
+from minet.scrape.std import get_display_text
 from minet.scrape.straining import strainer_from_css
 from minet.scrape.exceptions import (
     ScraperEvalSyntaxError,
@@ -89,6 +90,48 @@ TABLE_TH_HTML = """
             </tr>
         </tbody>
     </table>
+"""
+
+THE_WORST_HTML = """
+    <div>Some text isn't
+    it?
+        <div>
+            Hello <strong>Mr. Bond</strong>, How
+            are you?
+
+            This is
+            <em>italic</em>
+            isn't it?
+            <h2>This is a title</h2>
+            <p>
+                This is a good question
+            </p>
+            <p>
+                Isn't it?
+            </p>
+            <span> Whatever   </span> is&nbsp;incredible!
+            <br>
+            Hello!<br>Good morning!
+            <hr>
+            Is this another line?
+            <ul>
+                <li>Hello</li>
+                <li>Whatever</li>
+            </ul>
+
+
+
+
+            <ol>
+                <li>Other</li>
+                <li>Again</li>
+            </ol>
+            <p>
+            <![CDATA[some very interesting stuff]]></p>
+        </div>
+        <p>
+            Hello <span>gorgeous!</span></p>
+    </div>
 """
 
 
@@ -1063,3 +1106,12 @@ class TestScrape(object):
             {'text': 'One', 'list': '1§2', 'false': 'false', 'true': 'true'},
             {'text': 'Two', 'list': '1§2', 'false': 'false', 'true': 'true'}
         ]
+
+    def test_get_display_test(self):
+        soup = BeautifulSoup(THE_WORST_HTML, 'lxml')
+
+        text = get_display_text(soup)
+        # print()
+        # print('------------------')
+        # print(text)
+        # print('------------------')
