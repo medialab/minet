@@ -30,6 +30,17 @@ def get_element_display(element):
     return 'block' if is_block_element(element) else 'inline'
 
 
+# NOTE: could be optimized?
+def get_block_parent(element):
+    parent = element.parent
+
+    while True:
+        if parent is not None and is_block_element(parent):
+            return parent
+
+        parent = parent.parent
+
+
 def iter_descendants_with_parent(element):
     for descendant in element.descendants:
         yield descendant.parent, descendant
@@ -37,9 +48,9 @@ def iter_descendants_with_parent(element):
 
 def get_display_text(element):
     def accumulator():
-        for parent, descendant in iter_descendants_with_parent(element):
-            parent_display = get_element_display(parent)
+        previous_block_parent = None
 
+        for parent, descendant in iter_descendants_with_parent(element):
             # print(
             #     parent_display,
             #     'string' if isinstance(descendant, NavigableString) else descendant.name,
@@ -47,15 +58,29 @@ def get_display_text(element):
             # )
 
             if not isinstance(descendant, NavigableString):
+
+                if descendant.name == 'br' or descendant.name == 'hr':
+                    yield '\n'
+
                 continue
 
             string = squeeze(descendant.strip())
 
+            if not string:
+                continue
+
+            block_parent = get_block_parent(descendant)
+
+            if block_parent != previous_block_parent:
+                previous_block_parent = block_parent
+                yield '\n'
+
             if string:
-                if parent_display == 'block':
-                    yield '\n' + string
-                else:
-                    yield ' ' + string
+                yield string
+
+            if parent == block_parent:
+                if descendant.rstrip(' ').endswith('\n'):
+                    yield ' '
 
     return (''.join(accumulator())).strip()
 

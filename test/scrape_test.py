@@ -109,7 +109,7 @@ THE_WORST_HTML = """
             <p>
                 Isn't it?
             </p>
-            <span> Whatever   </span> is&nbsp;incredible!
+            <span> Whatever   </span> it is&nbsp;incredible!
             <br>
             Hello!<br>Good morning!
             <hr>
