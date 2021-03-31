@@ -15,7 +15,7 @@ from collections import namedtuple
 from tqdm import tqdm
 
 from minet.cli.exceptions import MissingColumnError
-from minet.utils import fuzzy_int
+from minet.utils import fuzzy_int, noop
 
 
 def print_err(*args, **kwargs):
@@ -181,7 +181,7 @@ WorkerPayload = namedtuple(
 REPORT_HEADERS = ['status', 'filename', 'encoding']
 
 
-def create_report_iterator(namespace, reader, args=None, on_irrelevant_row=None):
+def create_report_iterator(namespace, reader, args=None, on_irrelevant_row=noop):
     for col in REPORT_HEADERS:
         if col not in reader.pos:
             raise MissingColumnError(col)
@@ -201,10 +201,16 @@ def create_report_iterator(namespace, reader, args=None, on_irrelevant_row=None)
             status = fuzzy_int(row[status_pos]) if row[status_pos] else None
             filename = row[filename_pos]
 
-            if status is None or status >= 400 or not filename:
-                if callable(on_irrelevant_row):
-                    on_irrelevant_row(row)
+            if status is None:
+                on_irrelevant_row('no-status', row)
+                continue
 
+            if status != 200:
+                on_irrelevant_row('invalid-status', row)
+                continue
+
+            if not filename:
+                on_irrelevant_row('no-filename', row)
                 continue
 
             if raw_content_pos is not None:

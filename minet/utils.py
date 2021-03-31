@@ -17,6 +17,10 @@ from collections import OrderedDict, namedtuple
 from minet.exceptions import DefinitionInvalidFormatError
 
 
+def noop(*args, **kwargs):
+    pass
+
+
 def fuzzy_int(value):
     try:
         return int(value)

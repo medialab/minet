@@ -135,7 +135,7 @@ def scrape_action(namespace):
         namespace.separator
     )
 
-    def on_irrelevant_row(row):
+    def on_irrelevant_row(reason, row):
         loading_bar.update()
 
     if namespace.glob is not None:

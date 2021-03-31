@@ -74,6 +74,10 @@ def format_trafilatura_result(result):
     ]
 
 
+def format_error(error):
+    return [error] + PADDING
+
+
 def worker(payload):
     row, _, path, encoding, content, _ = payload
 
@@ -120,8 +124,9 @@ def extract_action(namespace):
         unit='doc'
     )
 
-    def on_irrelevant_row(row):
+    def on_irrelevant_row(reason, row):
         loading_bar.update()
+        enricher.writerow(row, format_error(reason))
 
     try:
         files = create_report_iterator(
@@ -144,11 +149,11 @@ def extract_action(namespace):
             loading_bar.update()
 
             if error is not None:
-                enricher.writerow(row, [report_error(error)] + PADDING)
+                enricher.writerow(row, format_error(report_error(error)))
                 continue
 
             if result is None:
-                enricher.writerow(row, ['no-content'] + PADDING)
+                enricher.writerow(row, format_error('no-content'))
                 continue
 
             enricher.writerow(row, result)
