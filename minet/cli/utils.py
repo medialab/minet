@@ -178,7 +178,7 @@ WorkerPayload = namedtuple(
     ['row', 'headers', 'path', 'encoding', 'content', 'args']
 )
 
-REPORT_HEADERS = ['status', 'filename', 'encoding']
+REPORT_HEADERS = ['status', 'filename', 'encoding', 'mimetype']
 
 
 def create_report_iterator(namespace, reader, args=None, on_irrelevant_row=noop):
@@ -189,6 +189,7 @@ def create_report_iterator(namespace, reader, args=None, on_irrelevant_row=noop)
     status_pos = reader.pos.status
     filename_pos = reader.pos.filename
     encoding_pos = reader.pos.encoding
+    mimetype_pos = reader.pos.mimetype
     raw_content_pos = reader.pos.get('raw_contents')
 
     if raw_content_pos is None and not isdir(namespace.input_dir):
@@ -199,6 +200,7 @@ def create_report_iterator(namespace, reader, args=None, on_irrelevant_row=noop)
     def generator():
         for row in reader:
             status = fuzzy_int(row[status_pos]) if row[status_pos] else None
+            mimetype = row[mimetype_pos]
             filename = row[filename_pos]
 
             if status is None:
@@ -211,6 +213,10 @@ def create_report_iterator(namespace, reader, args=None, on_irrelevant_row=noop)
 
             if not filename:
                 on_irrelevant_row('no-filename', row)
+                continue
+
+            if '/htm' not in mimetype:
+                on_irrelevant_row('invalid-mimetype', row)
                 continue
 
             if raw_content_pos is not None:
