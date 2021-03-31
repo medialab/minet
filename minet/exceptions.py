@@ -83,3 +83,10 @@ class CrawlError(MinetError):
 
 class UnknownSpiderError(CrawlError):
     pass
+
+
+# Extraction errors
+class TrafilaturaError(MinetError):
+    def __init__(self, msg=None, reason=None):
+        super().__init__(msg)
+        self.reason = reason

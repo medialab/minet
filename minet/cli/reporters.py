@@ -25,7 +25,8 @@ from minet.exceptions import (
     MaxRedirectsError,
     InfiniteRedirectsError,
     SelfRedirectError,
-    InvalidRedirectError
+    InvalidRedirectError,
+    TrafilaturaError
 )
 from minet.scrape.constants import (
     BURROWING_KEYS,
@@ -100,7 +101,8 @@ ERROR_REPORTERS = {
     InfiniteRedirectsError: 'infinite-redirects',
     SelfRedirectError: 'self-redirect',
     InvalidRedirectError: 'invalid-redirect',
-    DecodeError: decode_error_reporter
+    DecodeError: decode_error_reporter,
+    TrafilaturaError: 'trafilatura-error'
 }
 
 

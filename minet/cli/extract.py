@@ -16,6 +16,7 @@ from minet.cli.utils import (
     LoadingBar
 )
 from minet.cli.reporters import report_error
+from minet.exceptions import TrafilaturaError
 
 from minet.exceptions import UnknownEncodingError
 
@@ -100,7 +101,7 @@ def worker(payload):
         # TODO: fallback options
         result = bare_extraction(raw_html)
     except Exception as e:
-        return e, row, None
+        return TrafilaturaError(reason=e), row, None
 
     if result is None:
         return None, row, None
