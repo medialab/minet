@@ -16,6 +16,18 @@ from minet.utils import squeeze
 from minet.scrape.constants import BLOCK_ELEMENTS
 
 
+LEADING_WHITESPACE_RE = re.compile(r'^\s')
+TRAILING_WHITESPACE_RE = re.compile(r'\s$')
+
+
+def has_leading_whitespace(string):
+    return LEADING_WHITESPACE_RE.match(string) is not None
+
+
+def has_trailing_whitespace(string):
+    return LEADING_WHITESPACE_RE.search(string) is not None
+
+
 def is_block_element(element):
     if isinstance(element, NavigableString):
         return False
@@ -25,6 +37,10 @@ def is_block_element(element):
         element.name == 'html' or
         element.name == '[document]'
     )
+
+
+def is_inline_element(element):
+    return not is_block_element(element)
 
 
 def get_element_display(element):
@@ -68,6 +84,9 @@ def get_display_text(element):
 
             if string:
                 yield string
+
+            if has_trailing_whitespace(descendant) and is_inline_element(next_descendant):
+                yield ' '
 
             # TODO: if before or after inline element with space around, should add a whitespace
 
