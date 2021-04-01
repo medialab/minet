@@ -167,9 +167,10 @@ This will naturally yield:
 So, to recap, here is what `item` can be:
 
 1. `text` to extract the selected node's text (this is the same as not declaring an `item`)
-2. `html` or `inner_html` to extract the selected node's inner html
-3. `outer_html` to extract the selected node's outer html
-4. the name of any of the selected node's attributes
+2. `display_text`: to extract the selected node's text while attempting to render its whitespaces the same way a browser would.
+3. `html` or `inner_html` to extract the selected node's inner html
+4. `outer_html` to extract the selected node's outer html
+5. the name of any of the selected node's attributes
 
 ## Declaring multiple fields to extract
 
@@ -338,7 +339,7 @@ item:
 
 So now we've learn the following sub keys:
 
-* `extract` can be `text`, `html`, `inner_html` and `outer_html` and does what you expect
+* `extract` can be `text`, `display_text`, `html`, `inner_html` and `outer_html` and does what you expect
 * `attr` returns the designated attribute (this means you can also use it if you have the disfortune of needing to extract an attribute named `title` or `html`, for instance).
 
 This of course also works with `fields`:
@@ -891,6 +892,7 @@ Keyword arguments given to the function replacing `eval` directives are listed i
 
 *Helpers*
 
+* **get_display_text**: function extracting the text of the given html element while attempting to render its whitespaces the same way a browser would.
 * **parse_date**: function parsing dates (even relative ones such as `53 minutes ago`) and returning them formatted as ISO datetime. Can take a `lang` kwarg if required.
 
 *Local variables*

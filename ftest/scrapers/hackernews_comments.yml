@@ -17,6 +17,7 @@ fields:
     sel: .hnuser
   text:
     sel: .commtext
+    extract: display_text
   when:
     sel: .age
   date:

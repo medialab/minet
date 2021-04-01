@@ -10,7 +10,7 @@ import soupsieve
 from bs4 import Tag
 
 from minet.utils import nested_get
-from minet.scrape.std import get_default_evaluation_context
+from minet.scrape.std import get_default_evaluation_context, get_display_text
 from minet.scrape.constants import EXTRACTOR_NAMES
 from minet.scrape.utils import get_sel, get_iterator
 from minet.scrape.exceptions import (
@@ -49,6 +49,9 @@ def merge_contexts(global_context, local_context):
 def extract(element, extractor_name):
     if extractor_name == 'text':
         return element.get_text().strip()
+
+    if extractor_name == 'display_text':
+        return get_display_text(element)
 
     if extractor_name == 'html' or extractor_name == 'inner_html':
         return element.decode_contents().strip()

@@ -144,5 +144,6 @@ def get_default_evaluation_context():
         'soupsieve': soupsieve,
 
         # Helpers
+        'get_display_text': get_display_text,
         'parse_date': parse_date
     }

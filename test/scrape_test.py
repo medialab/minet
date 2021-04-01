@@ -248,6 +248,9 @@ class TestScrape(object):
                 'outer': '<li class="li" id="li2"><span class="first">Two</span> <span class="second">2</span></li>'
             }
         ]
+        result = scrape({'item': {'extract': 'display_text'}}, '<p>Hello</p><p>World</p>')
+
+        assert result == 'Hello\n\nWorld'
 
         result = scrape({
             'iterator': 'li',
