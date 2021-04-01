@@ -138,6 +138,7 @@ THE_WORST_HTML = """
             Hello <span>gorgeous!</span></p>
         <p>
             This will be in<em>credible</em>
+            <p>No? <p>Yes!</p></p>
         </p>
     </div>
 """
@@ -1149,4 +1150,8 @@ class TestScrape(object):
             Hello gorgeous!
 
             This will be incredible
+
+            No?
+
+            Yes!
         ''').strip()
