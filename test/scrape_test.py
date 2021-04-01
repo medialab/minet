@@ -3,6 +3,7 @@
 # =============================================================================
 import pytest
 from bs4 import BeautifulSoup, Tag, SoupStrainer
+from textwrap import dedent
 
 from minet.scrape import scrape, Scraper
 from minet.scrape.analysis import (
@@ -108,7 +109,7 @@ THE_WORST_HTML = """
             </p>
             <p>
                 Isn't it?
-            </p>
+            </p><p>Bingo</p>
             <span> Whatever   </span> it is&nbsp;incredible!
             <br>
             Hello!<br>Good morning!
@@ -1118,7 +1119,34 @@ class TestScrape(object):
         soup = BeautifulSoup(THE_WORST_HTML, 'lxml')
 
         text = get_display_text(soup)
-        # print()
-        # print('------------------')
-        # print(text)
-        # print('------------------')
+
+        assert text == dedent('''
+            Some text isn't it?
+            Hello Mr. Bond, How are you? This is italic isn't it?
+
+            This is a title
+
+            This is a good question
+
+            Isn't it?
+
+            Bingo
+
+            Whatever it is incredible!
+            Hello!
+            Good morning!
+
+            Is this another line?
+
+            Hello
+            Whatever
+
+            Other
+            Again
+
+            This is a large span with something else over here.
+
+            Hello gorgeous!
+
+            This will be incredible
+        ''').strip()

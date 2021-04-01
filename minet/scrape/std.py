@@ -9,7 +9,7 @@ import json
 import soupsieve
 import dateparser
 from urllib.parse import urljoin
-from bs4 import NavigableString
+from bs4 import Tag, NavigableString
 
 from minet.utils import squeeze
 from minet.scrape.constants import BLOCK_ELEMENTS, CONTENT_BLOCK_ELEMENTS
@@ -17,7 +17,8 @@ from minet.scrape.constants import BLOCK_ELEMENTS, CONTENT_BLOCK_ELEMENTS
 
 LEADING_WHITESPACE_RE = re.compile(r'^\s')
 TRAILING_WHITESPACE_RE = re.compile(r'\s$')
-LINE_STRIPPER_RE = re.compile(r'\n +')
+LINE_STRIPPER_RE = re.compile(r'\n +| +\n')
+PARAGRAPH_NORMALIZER_RE = re.compile(r'\n{3,}')
 
 
 def has_leading_whitespace(string):
@@ -58,6 +59,16 @@ def get_block_parent(element):
         parent = parent.parent
 
 
+def get_previous_sibling(element):
+    while element.previous_sibling is not None:
+        if isinstance(element.previous_sibling, Tag):
+            return element.previous_sibling
+
+        element = element.previous_sibling
+
+    return None
+
+
 def get_display_text(element):
 
     def accumulator():
@@ -72,6 +83,15 @@ def get_display_text(element):
 
                 elif descendant.name == 'hr':
                     yield '\n\n'
+
+                elif descendant.name in CONTENT_BLOCK_ELEMENTS:
+                    yield '\n'
+
+                else:
+                    sibling = get_previous_sibling(descendant)
+
+                    if sibling and sibling.name in CONTENT_BLOCK_ELEMENTS:
+                        yield '\n'
 
                 continue
 
@@ -95,8 +115,9 @@ def get_display_text(element):
             last_string = string
 
     result = ''.join(accumulator())
-    result = result.strip()
     result = LINE_STRIPPER_RE.sub('\n', result)
+    result = PARAGRAPH_NORMALIZER_RE.sub('\n\n', result)
+    result = result.strip()
 
     return result
 
