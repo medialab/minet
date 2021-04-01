@@ -60,3 +60,17 @@ BLOCK_ELEMENTS = {
     'ul',
     'video'
 }
+
+CONTENT_BLOCK_ELEMENTS = {
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'p',
+    'ul',
+    'ol',
+    'pre',
+    'blockquote'
+}

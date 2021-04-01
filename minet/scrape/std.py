@@ -10,14 +10,14 @@ import soupsieve
 import dateparser
 from urllib.parse import urljoin
 from bs4 import NavigableString
-from ebbe import with_next
 
 from minet.utils import squeeze
-from minet.scrape.constants import BLOCK_ELEMENTS
+from minet.scrape.constants import BLOCK_ELEMENTS, CONTENT_BLOCK_ELEMENTS
 
 
 LEADING_WHITESPACE_RE = re.compile(r'^\s')
 TRAILING_WHITESPACE_RE = re.compile(r'\s$')
+LINE_STRIPPER_RE = re.compile(r'\n +')
 
 
 def has_leading_whitespace(string):
@@ -25,7 +25,7 @@ def has_leading_whitespace(string):
 
 
 def has_trailing_whitespace(string):
-    return LEADING_WHITESPACE_RE.search(string) is not None
+    return TRAILING_WHITESPACE_RE.search(string) is not None
 
 
 def is_block_element(element):
@@ -62,35 +62,43 @@ def get_display_text(element):
 
     def accumulator():
         previous_block_parent = None
+        last_string = None
 
-        for descendant, next_descendant in with_next(element.descendants):
+        for descendant in element.descendants:
             if not isinstance(descendant, NavigableString):
 
-                if descendant.name == 'br' or descendant.name == 'hr':
+                if descendant.name == 'br':
                     yield '\n'
+
+                elif descendant.name == 'hr':
+                    yield '\n\n'
 
                 continue
 
-            string = squeeze(descendant.strip())
+            string = squeeze(descendant.strip('\n'))
 
             if not string:
                 continue
 
             block_parent = get_block_parent(descendant)
 
-            if block_parent != previous_block_parent:
+            if block_parent is not previous_block_parent:
                 previous_block_parent = block_parent
                 yield '\n'
+
+            if last_string and last_string.endswith(' '):
+                string = string.lstrip()
 
             if string:
                 yield string
 
-            if has_trailing_whitespace(descendant) and is_inline_element(next_descendant):
-                yield ' '
+            last_string = string
 
-            # TODO: if before or after inline element with space around, should add a whitespace
+    result = ''.join(accumulator())
+    result = result.strip()
+    result = LINE_STRIPPER_RE.sub('\n', result)
 
-    return (''.join(accumulator())).strip()
+    return result
 
 
 def parse_date(formatted_date, lang='en'):

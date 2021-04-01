@@ -135,6 +135,9 @@ THE_WORST_HTML = """
         </div>
         <p>
             Hello <span>gorgeous!</span></p>
+        <p>
+            This will be in<em>credible</em>
+        </p>
     </div>
 """
 
