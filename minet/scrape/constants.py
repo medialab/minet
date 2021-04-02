@@ -54,7 +54,6 @@ BLOCK_ELEMENTS = {
     'tbody',
     'textarea',
     'tfoot',
-    'th',
     'thead',
     'tr',
     'ul',

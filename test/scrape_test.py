@@ -115,6 +115,11 @@ THE_WORST_HTML = """
             Hello!<br>Good morning!
             <hr>
             Is this another line?
+            <pre>This is it!
+                    So many tabs
+                Very pretty?
+            Indeed.
+            Catastrophe!</pre>
             <ul>
                 <li>Hello</li>
                 <li>Whatever</li>
@@ -140,6 +145,12 @@ THE_WORST_HTML = """
             This will be in<em>credible</em>
             <p>No? <p>Yes!</p></p>
         </p>
+        <div>
+            <span>This should be</span>
+            <span>on the same line!</span><blockquote>
+    Inspiring citation.
+    </blockquote>
+        </div>
     </div>
 """
 
@@ -1124,7 +1135,10 @@ class TestScrape(object):
 
         text = get_display_text(soup)
 
-        assert text == dedent('''
+        def clean(t):
+            return dedent(t).strip()
+
+        assert text == clean('''
             Some text isn't it?
             Hello Mr. Bond, How are you? This is italic isn't it?
 
@@ -1142,6 +1156,12 @@ class TestScrape(object):
 
             Is this another line?
 
+            This is it!
+            So many tabs
+            Very pretty?
+            Indeed.
+            Catastrophe!
+
             Hello
             Whatever
 
@@ -1157,4 +1177,16 @@ class TestScrape(object):
             No?
 
             Yes!
-        ''').strip()
+
+            This should be on the same line!
+
+            Inspiring citation.
+        ''')
+
+        text = get_display_text(BeautifulSoup(TABLE_TH_HTML, 'lxml'))
+
+        assert text == clean('''
+            Name Surname
+            John Mayall
+            Mary Susan
+        ''')

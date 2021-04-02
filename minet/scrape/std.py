@@ -99,6 +99,10 @@ def get_display_text(element):
 
                 continue
 
+            if descendant.parent.name == 'pre':
+                yield '\n' + str(descendant)
+                continue
+
             string = WHITESPACE_SQUEEZER_RE.sub(' ', descendant.strip('\n'))
 
             if not string:
