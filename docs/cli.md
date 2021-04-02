@@ -194,7 +194,8 @@ usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM]
                    [--max-redirects MAX_REDIRECTS] [--compress]
                    [--contents-in-report] [-d OUTPUT_DIR] [-f FILENAME]
                    [--filename-template FILENAME_TEMPLATE]
-                   [--folder-strategy FOLDER_STRATEGY] [--standardize-encoding]
+                   [--folder-strategy FOLDER_STRATEGY] [--keep-failed-contents]
+                   [--standardize-encoding]
                    column [file]
 
 Minet Fetch Command
@@ -234,6 +235,7 @@ optional arguments:
   -f FILENAME, --filename FILENAME                Name of the column used to build retrieved file names. Defaults to an uuid v4. If the provided file names have no extension (e.g. ".jpg", ".pdf", etc.) the correct extension will be added depending on the file type.
   --filename-template FILENAME_TEMPLATE           A template for the name of the fetched files.
   --folder-strategy FOLDER_STRATEGY               Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. Defaults to "flat". All of the strategies are described at the end of this help.
+  --keep-failed-contents                          Whether to keep & write contents for failed (i.e. non-200) http requests.
   --standardize-encoding                          Whether to systematically convert retrieved text to UTF-8.
 
 columns being added to the output:

@@ -318,6 +318,22 @@ def fetch_action(namespace, resolve=False):
             # No error
             if result.error is None:
 
+                # Final url target
+                resolved_url = response.geturl()
+
+                if resolved_url == result.url:
+                    resolved_url = None
+
+                # Should we keep downloaded content?
+                if not namespace.keep_failed_contents and response.status != 200:
+                    write_fetch_output(
+                        index,
+                        row,
+                        resolved=resolved_url,
+                        status=response.status
+                    )
+                    continue
+
                 filename = None
 
                 # Building filename
@@ -370,12 +386,10 @@ def fetch_action(namespace, resolve=False):
                         f.write(gzip.compress(data) if namespace.compress else data)
 
                 # Reporting in output
-                resolved_url = response.geturl()
-
                 write_fetch_output(
                     index,
                     row,
-                    resolved=resolved_url if resolved_url != result.url else None,
+                    resolved=resolved_url,
                     status=response.status,
                     filename=filename,
                     encoding=encoding,

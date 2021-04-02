@@ -914,6 +914,11 @@ MINET_COMMANDS = {
                 'default': 'flat'
             },
             {
+                'flag': '--keep-failed-contents',
+                'help': 'Whether to keep & write contents for failed (i.e. non-200) http requests.',
+                'action': 'store_true'
+            },
+            {
                 'flag': '--standardize-encoding',
                 'help': 'Whether to systematically convert retrieved text to UTF-8.',
                 'action': 'store_true'
