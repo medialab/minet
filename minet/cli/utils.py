@@ -195,7 +195,7 @@ def create_report_iterator(namespace, reader, args=None, on_irrelevant_row=noop)
     if raw_content_pos is None and not isdir(namespace.input_dir):
         raise NotADirectoryError
 
-    indexed_headers = {h: p for p, h in enumerate(reader.fieldnames)}
+    indexed_headers = reader.pos.as_dict()
 
     def generator():
         for row in reader:
@@ -256,20 +256,6 @@ def create_glob_iterator(namespace, args):
             content=None,
             args=args
         )
-
-
-class LazyLineDict(object):
-    __slots__ = ('headers', 'line')
-
-    def __init__(self, headers, line):
-        self.headers = headers
-        self.line = line
-
-    def __getitem__(self, key):
-        return self.line[self.headers[key]]
-
-    def __getattr__(self, key):
-        return self.__getitem__(key)
 
 
 def get_rcfile(rcfile_path=None):

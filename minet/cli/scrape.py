@@ -8,6 +8,7 @@ import csv
 import sys
 import ndjson
 import casanova
+from casanova import DictLikeRow
 from termcolor import colored
 from collections import namedtuple
 from os.path import basename
@@ -34,7 +35,6 @@ from minet.cli.utils import (
     die,
     create_glob_iterator,
     create_report_iterator,
-    LazyLineDict,
     LoadingBar
 )
 
@@ -67,7 +67,7 @@ def worker(payload):
     context = {}
 
     if row:
-        context['line'] = LazyLineDict(headers, row)
+        context['line'] = DictLikeRow(headers, row)
 
     if path:
         context['path'] = path
