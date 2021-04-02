@@ -37,6 +37,7 @@ Finally, this tutorial is fairly long so I encourage you to bail out as soon as 
 * [Scraper execution outline](#scraper-execution-outline)
 * [Various useful examples](#various-useful-examples)
   * [Going up the tree](#going-up-the-tree)
+  * [Difference between text and display_text](#difference-between-text-and-display_text)
 
 ## Applying a minet scraper
 
@@ -167,7 +168,7 @@ This will naturally yield:
 So, to recap, here is what `item` can be:
 
 1. `text` to extract the selected node's text (this is the same as not declaring an `item`)
-2. `display_text`: to extract the selected node's text while attempting to render its whitespaces the same way a browser would.
+2. `display_text`: to extract the selected node's text while attempting to render its whitespaces the same way a browser would (for more information check [this](#difference-between-text-and-display_text)).
 3. `html` or `inner_html` to extract the selected node's inner html
 4. `outer_html` to extract the selected node's outer html
 5. the name of any of the selected node's attributes
@@ -1210,3 +1211,31 @@ fields:
   author:
     sel: p > em
 ```
+
+### Difference between text and display_text
+
+Let's consider the following html:
+
+```html
+<div>
+  <span>Hello</span>
+  <span>world!</span>
+</div>
+```
+
+using `item: text` when scraping this will yield the following text:
+
+```
+Hello
+world!
+```
+
+Notice how the content is on two different lines, mimicking how the html was written. But this is not how a web browser would display this html. Rather, a web browser would display this html thusly (CSS, notwithstanding):
+
+```
+Hello world!
+```
+
+So if you need to extract raw text from complex html constructions, you should probably use `item: display_text` instead, so that the scraper will try to render the html's whitespace the same way a web browser would.
+
+This can be very important if you want to perform typical NLP tasks on the result, for instance.

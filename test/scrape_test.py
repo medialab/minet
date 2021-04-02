@@ -151,6 +151,10 @@ THE_WORST_HTML = """
     Inspiring citation.
     </blockquote>
         </div>
+        <p>
+            <span>Same
+                line!</span>
+        </p>
     </div>
 """
 
@@ -1181,6 +1185,8 @@ class TestScrape(object):
             This should be on the same line!
 
             Inspiring citation.
+
+            Same line!
         ''')
 
         text = get_display_text(BeautifulSoup(TABLE_TH_HTML, 'lxml'))
