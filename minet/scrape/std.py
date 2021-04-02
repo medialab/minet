@@ -11,7 +11,6 @@ import dateparser
 from urllib.parse import urljoin
 from bs4 import Tag, NavigableString
 
-from minet.utils import squeeze
 from minet.scrape.constants import BLOCK_ELEMENTS, CONTENT_BLOCK_ELEMENTS
 
 
@@ -19,6 +18,8 @@ LEADING_WHITESPACE_RE = re.compile(r'^\s')
 TRAILING_WHITESPACE_RE = re.compile(r'\s$')
 LINE_STRIPPER_RE = re.compile(r'\n +| +\n')
 PARAGRAPH_NORMALIZER_RE = re.compile(r'\n{3,}')
+SPACE_SQUEEZER_RE = re.compile(r' {2,}')
+WHITESPACE_SQUEEZER_RE = re.compile(r'\s{2,}')
 
 
 def has_leading_whitespace(string):
@@ -90,12 +91,15 @@ def get_display_text(element):
                 else:
                     sibling = get_previous_sibling(descendant)
 
-                    if sibling and sibling.name in CONTENT_BLOCK_ELEMENTS:
-                        yield '\n'
+                    if sibling:
+                        if sibling.name in CONTENT_BLOCK_ELEMENTS:
+                            yield '\n'
+                        else:
+                            yield ' '
 
                 continue
 
-            string = squeeze(descendant.strip('\n'))
+            string = WHITESPACE_SQUEEZER_RE.sub(' ', descendant.strip('\n'))
 
             if not string:
                 continue
@@ -117,6 +121,7 @@ def get_display_text(element):
     result = ''.join(accumulator())
     result = LINE_STRIPPER_RE.sub('\n', result)
     result = PARAGRAPH_NORMALIZER_RE.sub('\n\n', result)
+    result = SPACE_SQUEEZER_RE.sub(' ', result)
     result = result.strip()
 
     return result
