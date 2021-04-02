@@ -30,7 +30,6 @@ from minet.cli.reporters import report_error
 from minet.cli.utils import (
     open_output_file,
     die,
-    LazyLineDict,
     edit_namespace_with_csv_io
 )
 
@@ -346,7 +345,7 @@ def fetch_action(namespace, resolve=False):
                                 namespace.filename_template,
                                 value=root,
                                 ext=ext,
-                                line=LazyLineDict(indexed_input_headers, row)
+                                line=enricher.wrap(row)
                             )
                         else:
                             filename = root + ext
