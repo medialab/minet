@@ -268,6 +268,9 @@ class LazyLineDict(object):
     def __getitem__(self, key):
         return self.line[self.headers[key]]
 
+    def __getattr__(self, key):
+        return self.__getitem__(key)
+
 
 def get_rcfile(rcfile_path=None):
     home = expanduser('~')
