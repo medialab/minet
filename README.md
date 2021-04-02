@@ -8,7 +8,19 @@ It adopts a very simple approach to various webmining problems by letting you pe
 
 In addition, **minet** also exposes its high-level programmatic interface as a python library so you can tweak its behavior at will.
 
-**Shortcuts**: [Cookbook](./cookbook), [Command line documentation](./docs/cli.md), [Python library documentation](./docs/lib.md).
+**Shortcuts**: [Command line documentation](./docs/cli.md), [Python library documentation](./docs/lib.md).
+
+## Summary
+
+* [What it does](#what-it-does)
+* [Documented use cases](#documented-use-cases)
+* [Features (from a technical standpoint)](#features-from-a-technical-standpoint)
+* [Installation](#installation)
+* [Upgrading](#upgrading)
+* [Uninstallation](#uninstallation)
+* [Documentation](#documentation)
+* [Contributing](#contributing)
+* [How to cite](#how-to-cite)
 
 ## What it does
 
@@ -24,34 +36,23 @@ Minet can single-handedly:
 	* ...and scrape structured data (using a declarative language to define your heuristics)
 * Crawl (using a declarative language to define a browsing behavior, and what to harvest)
 * Mine or search:
-	* *Crowdtangle* (requires access)
-	* *Mediacloud* (access is free)
-	* *Twitter* (requires access)
-	* *Youtube* (requires access)
-* Scrape (no access):
-	* *Facebook*
-	* *Twitter*
-	* *Google Drive* and *Spreadsheet* docs
-* Get the cookies from your browser
-* Dump *Hyphe* data
+	* *[Crowdtangle](https://www.crowdtangle.com/)* (requires API access)
+	* *[Mediacloud](https://mediacloud.org/)* (requires free API access)
+	* *[Twitter](https://twitter.com)* (requires free API access)
+	* *[Youtube](https://www.youtube.com/)* (requires free API access)
+* Scrape (without requiring special access):
+	* *[Facebook](https://www.facebook.com/)*
+	* *[Twitter](https://twitter.com)*
+	* *[Google Drive](https://drive.google.com)* (spreadsheets etc.)
+* Grab & dump cookies from your browser
+* Dump *[Hyphe](https://hyphe.medialab.sciences-po.fr/)* data
 
-## Use cases
+## Documented use cases
 
-* Downloading large amount of urls very fast. ([guide](./cookbook/fetch.md))
-* Writing scrapers to extract structured data from HTML pages. ([guide](./cookbook/scraping_dsl.md))
-* Writing crawlers to automatically browse the web.
-* Extract raw text content from HTML pages. ([example](./cookbook/compendium.md#extract-raw-text-content-from-html-pages))
-* Normalize batches of urls contained in a CSV file to perform relevant aggregations (dropping irrelevant query items, extracting domain name etc.) ([example](./cookbook/compendium.md#parsing-and-normalizing-urls))
-* Join two CSV files based on columns containing urls that need to be matched ([guide](./cookbook/url_join.md)).
-* Collecting data from [CrowdTangle](https://www.crowdtangle.com/) API (to collect and search posts mainly from [Facebook](https://www.facebook.com/) and [Instagram](https://www.instagram.com/)).
-* Collecting data from [Facebook](https://www.facebook.com/) (comments, likes etc.)
-* Parsing [Facebook](https://www.facebook.com/) urls in a CSV file.
-* Collecting data from [Twitter](https://twitter.com) (users, followers, followees etc.)
-* Scraping data (tweets etc.) from [Twitter](https://twitter.com)'s website public facing search API.
-* Collecting data from [YouTube](https://www.youtube.com/) (captions, comments, video metadata etc.)
-* Parsing [YouTube](https://www.youtube.com/) urls in a CSV file.
-* Dumping a [Hyphe](https://hyphe.medialab.sciences-po.fr/) corpus.
-* Collecting data from [Media Cloud](https://mediacloud.org/) (search stories, dump topics etc.).
+* [Fetching a large amount of urls](./cookbook/fetch.md)
+* [Joining 2 CSV files by urls](./cookbook/url_join.md)
+* [Using minet from a Jupyter notebook](./cookbook/notebooks/Minet%20in%20a%20Jupyter%20notebook.ipynb) (*very useful to experiment with the tool or teach students*)
+* [Scraping DSL Tutorial](./cookbook/scraping_dsl.md)
 
 ## Features (from a technical standpoint)
 
@@ -115,10 +116,6 @@ To uninstall the python version:
 ```shell
 pip uninstall minet
 ```
-
-## Cookbook
-
-To learn how to use **minet** and understand how it may fit your use cases, you should definitely check out our [Cookbook](./cookbook).
 
 ## Documentation
 
