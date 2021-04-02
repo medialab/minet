@@ -80,5 +80,11 @@ class ScraperValidationInvalidPluralModifierError(ScraperRuntimeError):
         self.modifier = modifier
 
 
+class ScraperValidationInvalidExtractorError(ScraperRuntimeError):
+    def __init__(self, msg=None, extractor=None, **kwargs):
+        super().__init__(msg, **kwargs)
+        self.extractor = extractor
+
+
 class InvalidCSSSelectorError(ScraperRuntimeError):
     pass

@@ -27,6 +27,7 @@ from minet.scrape.exceptions import (
     InvalidScraperError,
     ScraperValidationIrrelevantPluralModifierError,
     ScraperValidationInvalidPluralModifierError,
+    ScraperValidationInvalidExtractorError,
     ScraperValidationMixedConcernError,
     ScraperNotTabularError
 )
@@ -847,6 +848,9 @@ class TestScrape(object):
                     'attr': 'id',
                     'extract': 'text'
                 },
+                'extractor': {
+                    'extract': 'blabla'
+                },
                 'id': {
                     'attr': 'id',
                     'item': 'href'
@@ -883,7 +887,8 @@ class TestScrape(object):
             (['fields', 'name'], ScraperValidationConflictError),
             (['fields', 'id'], ScraperValidationMixedConcernError),
             (['fields', 'invalid_filter1'], ScraperValidationInvalidPluralModifierError),
-            (['fields', 'invalid_filter2'], ScraperValidationInvalidPluralModifierError)
+            (['fields', 'invalid_filter2'], ScraperValidationInvalidPluralModifierError),
+            (['fields', 'extractor'], ScraperValidationInvalidExtractorError)
         ], key=key)
 
         assert errors == expecting

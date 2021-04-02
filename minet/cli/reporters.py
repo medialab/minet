@@ -39,6 +39,7 @@ from minet.scrape.exceptions import (
     ScraperValidationIrrelevantPluralModifierError,
     ScraperValidationMixedConcernError,
     ScraperValidationInvalidPluralModifierError,
+    ScraperValidationInvalidExtractorError,
     ScraperEvalError
 )
 
@@ -141,6 +142,9 @@ def report_scraper_validation_errors(errors):
 
         if isinstance(error, ScraperValidationInvalidPluralModifierError):
             p('  the {modifier} modifier cannot be a boolean without {fields} and cannot be a key/path with {fields}!'.format(modifier=colored(error.modifier, 'green'), fields=colored('fields', 'green')))
+
+        if isinstance(error, ScraperValidationInvalidExtractorError):
+            p('  unknown {extractor} extractor!'.format(extractor=colored(error.extractor, 'green')))
 
         if isinstance(error, ScraperValidationMixedConcernError):
             p('  mixed concerns could not be interpreted (i.e. the {burrowing} keys should not be found alongside the {leaf} ones)!'.format(burrowing=and_join(BURROWING_KEYS), leaf=and_join(LEAF_KEYS)))

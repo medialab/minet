@@ -12,7 +12,8 @@ from minet.scrape.utils import get_sel, get_iterator
 from minet.scrape.constants import (
     PLURAL_MODIFIERS,
     BURROWING_KEYS,
-    LEAF_KEYS
+    LEAF_KEYS,
+    EXTRACTOR_NAMES
 )
 from minet.scrape.exceptions import (
     ScraperEvalSyntaxError,
@@ -20,7 +21,8 @@ from minet.scrape.exceptions import (
     InvalidCSSSelectorError,
     ScraperValidationIrrelevantPluralModifierError,
     ScraperValidationMixedConcernError,
-    ScraperValidationInvalidPluralModifierError
+    ScraperValidationInvalidPluralModifierError,
+    ScraperValidationInvalidExtractorError
 )
 
 
@@ -98,7 +100,8 @@ ERRORS_PRIORITY = {
     ScraperValidationConflictError: 2,
     ScraperValidationMixedConcernError: 3,
     ScraperValidationIrrelevantPluralModifierError: 4,
-    ScraperValidationInvalidPluralModifierError: 5
+    ScraperValidationInvalidPluralModifierError: 5,
+    ScraperValidationInvalidExtractorError: 6
 }
 
 
@@ -129,6 +132,13 @@ def validate(scraper):
             )
 
             errors.append(validation_error)
+
+        # Validating extractors
+        if 'extract' in node and node['extract'] not in EXTRACTOR_NAMES:
+            errors.append(ScraperValidationInvalidExtractorError(
+                path=path,
+                extractor=node['extract']
+            ))
 
         # Validating selectors
         # NOTE: this has the beneficial side effect of precompiling selectors
