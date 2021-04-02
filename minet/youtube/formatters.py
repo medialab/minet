@@ -4,7 +4,9 @@
 #
 # Various data formatters for YouTube data.
 #
-from minet.utils import namedrecord, nested_get
+from casanova import namedrecord
+
+from minet.utils import nested_get
 from minet.youtube.constants import (
     YOUTUBE_VIDEO_CSV_HEADERS,
     YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS,
