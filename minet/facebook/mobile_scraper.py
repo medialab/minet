@@ -216,12 +216,34 @@ def scrape_posts(html):
 
         user_label, user = extract_user_information_from_link(el.select_one('h3 a'))
 
+        formatted_date = el.select_one('abbr').get_text().strip()
+        parsed_date = parse_date(formatted_date)
+
+        reactions_item = el.select_one('[id^="like_"]')
+        reactions = '0'
+
+        if reactions_item:
+            reactions_text = reactions_item.get_text()
+
+            if '·' in reactions_text:
+                reactions = reactions_text.split('·', 1)[0].strip()
+
+        comments_item = soupsieve.select_one('a:-soup-contains(" Comment")', el)
+        comments = '0'
+
+        if comments_item:
+            comments = comments_item.get_text().split('Comment', 1)[0].strip()
+
         post = FacebookPost(
             url=post_url,
             user_id=getattr(user, 'id', ''),
             user_handle=getattr(user, 'handle', ''),
             user_url=getattr(user, 'url', ''),
-            user_label=user_label
+            user_label=user_label,
+            formatted_date=formatted_date,
+            date=parsed_date,
+            reactions=reactions,
+            comments=comments
         )
 
         posts.append(post)
