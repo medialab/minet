@@ -127,7 +127,7 @@ def scrape_comments(html, direction=None, in_reply_to=None):
             if el.get_text().strip():
                 content_elements.append(el)
 
-        comment_text = '\n\n'.join(get_display_text(el) for el in content_elements)
+        comment_text = get_display_text(content_elements)
         comment_html = ''.join(str(el) for el in content_elements_html)
 
         formatted_date = item.select_one('abbr').get_text().strip()
