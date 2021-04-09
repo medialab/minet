@@ -33,6 +33,10 @@ FACEBOOK_COMMENT_CSV_HEADERS = [
     'in_reply_to'
 ]
 
+FACEBOOK_POST_CSV_HEADERS = [
+    'url'
+]
+
 FACEBOOK_POST_STATS_CSV_HEADERS = [
     'error',
     'canonical',

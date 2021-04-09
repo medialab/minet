@@ -6,6 +6,7 @@
 #
 import re
 import sys
+import soupsieve
 from bs4 import BeautifulSoup
 from collections import deque
 from urllib.parse import urljoin
@@ -23,7 +24,7 @@ from minet.utils import (
 from minet.web import create_pool, request, create_request_retryer
 from minet.scrape.std import get_display_text
 from minet.facebook.utils import grab_facebook_cookie
-from minet.facebook.formatters import FacebookComment
+from minet.facebook.formatters import FacebookComment, FacebookPost
 from minet.facebook.exceptions import FacebookInvalidCookieError
 from minet.facebook.constants import (
     FACEBOOK_MOBILE_DEFAULT_THROTTLE,
@@ -36,6 +37,12 @@ VALID_ID_RE = re.compile(r'^\d+$')
 def convert_url_to_mobile(url):
     url = force_protocol(url, 'https')
     return convert_facebook_url_to_mobile(url)
+
+
+def cleanup_post_link(url):
+    url = url.replace('//m.', '//www.')
+
+    return url.split('?', 1)[0]
 
 
 def resolve_relative_url(url):
@@ -187,6 +194,30 @@ def scrape_comments(html, direction=None, in_reply_to=None):
     return data
 
 
+def scrape_posts(html):
+    soup = BeautifulSoup(html, 'lxml')
+
+    next_link = soup.select_one('a[href*="?bacr="], a[href*="&bacr="]')
+
+    if next_link is not None:
+        next_link = resolve_relative_url(next_link.get('href'))
+
+    posts = []
+    post_elements = soup.select('#m_group_stories_container > div > [data-ft]')
+
+    for el in post_elements:
+        full_story_link = soupsieve.select_one('a:-soup-contains("Full Story")', el)
+        post_url = cleanup_post_link(full_story_link.get('href'))
+
+        post = FacebookPost(
+            url=post_url
+        )
+
+        posts.append(post)
+
+    return next_link, posts
+
+
 class FacebookMobileScraper(object):
     def __init__(self, cookie, throttle=FACEBOOK_MOBILE_DEFAULT_THROTTLE):
 
@@ -208,7 +239,8 @@ class FacebookMobileScraper(object):
             pool=self.pool,
             cookie=self.cookie,
             headers={
-                'User-Agent': 'curl/7.68.0'
+                'User-Agent': 'curl/7.68.0',
+                'Accept-Language': 'en'
             }
         )
 
@@ -270,3 +302,21 @@ class FacebookMobileScraper(object):
                     yield details, comments
                 else:
                     yield comments
+
+    def posts(self, url):
+        retryer = create_request_retryer()
+
+        current_url = convert_url_to_mobile(url)
+
+        while True:
+            html = retryer(self.request_page, current_url)
+
+            next_url, posts = scrape_posts(html)
+
+            for post in posts:
+                yield post
+
+            if next_url is None or len(posts) == 0:
+                break
+
+            current_url = next_url
