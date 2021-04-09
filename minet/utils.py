@@ -11,6 +11,7 @@ import yaml
 import time
 import string
 import functools
+import dateparser
 from random import uniform
 
 from minet.exceptions import DefinitionInvalidFormatError
@@ -337,3 +338,15 @@ def prettyprint_seconds(seconds, granularity=None):
         result = result[:granularity]
 
     return ', '.join(result)
+
+
+def parse_date(formatted_date, lang='en'):
+    try:
+        parsed = dateparser.parse(
+            formatted_date,
+            languages=[lang]
+        )
+    except ValueError:
+        return None
+
+    return parsed.isoformat().split('.', 1)[0]

@@ -6,7 +6,6 @@
 #
 import re
 import sys
-import dateparser
 from bs4 import BeautifulSoup
 from collections import deque
 from urllib.parse import urljoin
@@ -18,9 +17,11 @@ from ural.facebook import (
 
 from minet.utils import (
     rate_limited_method,
-    RateLimiterState
+    RateLimiterState,
+    parse_date
 )
 from minet.web import create_pool, request, create_request_retryer
+from minet.scrape.std import get_display_text
 from minet.facebook.utils import grab_facebook_cookie
 from minet.facebook.formatters import FacebookComment
 from minet.facebook.exceptions import FacebookInvalidCookieError
@@ -35,16 +36,6 @@ VALID_ID_RE = re.compile(r'^\d+$')
 def convert_url_to_mobile(url):
     url = force_protocol(url, 'https')
     return convert_facebook_url_to_mobile(url)
-
-
-def parse_formatted_date(formatted_date):
-    try:
-        return dateparser.parse(
-            formatted_date,
-            languages=['en']
-        )
-    except ValueError:
-        return None
 
 
 def resolve_relative_url(url):
@@ -136,11 +127,11 @@ def scrape_comments(html, direction=None, in_reply_to=None):
             if el.get_text().strip():
                 content_elements.append(el)
 
-        comment_text = '\n'.join(el.get_text().strip() for el in content_elements)
+        comment_text = '\n\n'.join(get_display_text(el) for el in content_elements)
         comment_html = ''.join(str(el) for el in content_elements_html)
 
         formatted_date = item.select_one('abbr').get_text().strip()
-        parsed_date = parse_formatted_date(formatted_date)
+        parsed_date = parse_date(formatted_date)
 
         post_id_item = item.select_one('[id^="like_"]')
 
@@ -179,15 +170,15 @@ def scrape_comments(html, direction=None, in_reply_to=None):
 
         data['comments'].append(FacebookComment(
             post_id=post_id,
-            comment_id=item_id,
+            id=item_id,
             user_id=getattr(user, 'id', ''),
             user_handle=getattr(user, 'handle', ''),
             user_url=getattr(user, 'url', ''),
             user_label=user_label,
-            comment_text=comment_text,
-            comment_html=comment_html,
+            text=comment_text,
+            html=comment_html,
             formatted_date=formatted_date,
-            date=parsed_date.isoformat() if parsed_date else '',
+            date=parsed_date,
             reactions=reactions,
             replies=replies,
             in_reply_to=in_reply_to

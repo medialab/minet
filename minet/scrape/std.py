@@ -7,10 +7,10 @@
 import re
 import json
 import soupsieve
-import dateparser
 from urllib.parse import urljoin
 from bs4 import Tag, NavigableString
 
+from minet.utils import parse_date
 from minet.scrape.constants import BLOCK_ELEMENTS, CONTENT_BLOCK_ELEMENTS
 
 
@@ -129,18 +129,6 @@ def get_display_text(element):
     result = result.strip()
 
     return result
-
-
-def parse_date(formatted_date, lang='en'):
-    try:
-        parsed = dateparser.parse(
-            formatted_date,
-            languages=[lang]
-        )
-    except ValueError:
-        return None
-
-    return parsed.isoformat().split('.', 1)[0]
 
 
 def get_default_evaluation_context():

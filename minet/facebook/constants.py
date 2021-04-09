@@ -19,13 +19,13 @@ FACEBOOK_WEB_RATE_LIMITER_STATE = RateLimiterState(1, FACEBOOK_WEB_DEFAULT_THROT
 
 FACEBOOK_COMMENT_CSV_HEADERS = [
     'post_id',
-    'comment_id',
+    'id',
     'user_id',
     'user_handle',
     'user_url',
     'user_label',
-    'comment_text',
-    'comment_html',
+    'text',
+    'html',
     'formatted_date',
     'date',
     'reactions',
