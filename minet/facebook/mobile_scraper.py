@@ -45,6 +45,14 @@ def cleanup_post_link(url):
     return url.split('?', 1)[0]
 
 
+def extract_user_information_from_link(element):
+    user_label = element.get_text().strip()
+    user_href = element.get('href')
+    user = parse_facebook_url(resolve_relative_url(user_href))
+
+    return user_label, user
+
+
 def resolve_relative_url(url):
     return urljoin(FACEBOOK_MOBILE_URL, url)
 
@@ -115,10 +123,7 @@ def scrape_comments(html, direction=None, in_reply_to=None):
         if item_id == in_reply_to:
             continue
 
-        user_link = item.select_one('h3 > a')
-        user_label = user_link.get_text().strip()
-        user_href = user_link.get('href')
-        user = parse_facebook_url(resolve_relative_url(user_href))
+        user_label, user = extract_user_information_from_link(item.select_one('h3 > a'))
 
         # TODO: link to comment
         content_elements_candidates = item.select_one('h3').find_next_siblings('div')
@@ -209,8 +214,14 @@ def scrape_posts(html):
         full_story_link = soupsieve.select_one('a:-soup-contains("Full Story")', el)
         post_url = cleanup_post_link(full_story_link.get('href'))
 
+        user_label, user = extract_user_information_from_link(el.select_one('h3 a'))
+
         post = FacebookPost(
-            url=post_url
+            url=post_url,
+            user_id=getattr(user, 'id', ''),
+            user_handle=getattr(user, 'handle', ''),
+            user_url=getattr(user, 'url', ''),
+            user_label=user_label
         )
 
         posts.append(post)

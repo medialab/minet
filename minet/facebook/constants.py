@@ -34,7 +34,11 @@ FACEBOOK_COMMENT_CSV_HEADERS = [
 ]
 
 FACEBOOK_POST_CSV_HEADERS = [
-    'url'
+    'url',
+    'user_id',
+    'user_handle',
+    'user_url',
+    'user_label'
 ]
 
 FACEBOOK_POST_STATS_CSV_HEADERS = [
