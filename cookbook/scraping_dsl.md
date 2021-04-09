@@ -38,6 +38,7 @@ Finally, this tutorial is fairly long so I encourage you to bail out as soon as 
 * [Various useful examples](#various-useful-examples)
   * [Going up the tree](#going-up-the-tree)
   * [Difference between text and display_text](#difference-between-text-and-display_text)
+  * [Selecting elements based on their contents](#selecting-elements-based-on-their-contents)
 
 ## Applying a minet scraper
 
@@ -1239,3 +1240,19 @@ Hello world!
 So if you need to extract raw text from complex html constructions, you should probably use `item: display_text` instead, so that the scraper will try to render the html's whitespace the same way a web browser would.
 
 This can be very important if you want to perform typical NLP tasks on the result, for instance.
+
+### Selecting elements based on their contents
+
+CSS used to have a draft `:contains()` pseudo-selector that was finally dropped but can still be used in `jQuery` for instance.
+
+Fortunately, as `minet` relies on `soupsieve` for CSS selection, you remain free to use the equivalent `:-soup-contains()` documented [here](https://facelessuser.github.io/soupsieve/selectors/pseudo-classes/#:-soup-contains):
+
+```yml
+iterator: li
+fields:
+  title:
+    sel: strong
+  url:
+    sel: 'a:-soup-contains("Full Story")'
+    attr: href
+```
