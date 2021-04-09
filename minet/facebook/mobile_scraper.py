@@ -212,6 +212,10 @@ def scrape_posts(html):
 
     for el in post_elements:
         full_story_link = soupsieve.select_one('a:-soup-contains("Full Story")', el)
+
+        if not full_story_link:
+            continue
+
         post_url = cleanup_post_link(full_story_link.get('href'))
 
         user_label, user = extract_user_information_from_link(el.select_one('h3 a'))
@@ -225,7 +229,7 @@ def scrape_posts(html):
         if reactions_item:
             reactions_text = reactions_item.get_text()
 
-            if '·' in reactions_text:
+            if reactions_text.count('·') < 2:
                 reactions = reactions_text.split('·', 1)[0].strip()
 
         comments_item = soupsieve.select_one('a:-soup-contains(" Comment")', el)
@@ -234,12 +238,20 @@ def scrape_posts(html):
         if comments_item:
             comments = comments_item.get_text().split('Comment', 1)[0].strip()
 
+        text_root = el.select_one('[data-ft=\'{"tn":"*s"}\']')
+
+        text_elements = text_root.find_all('div')
+        comment_text = get_display_text(text_elements)
+        comment_html = ''.join(str(el) for el in text_elements)
+
         post = FacebookPost(
             url=post_url,
             user_id=getattr(user, 'id', ''),
             user_handle=getattr(user, 'handle', ''),
             user_url=getattr(user, 'url', ''),
             user_label=user_label,
+            text=comment_text,
+            html=comment_html,
             formatted_date=formatted_date,
             date=parsed_date,
             reactions=reactions,
@@ -343,6 +355,9 @@ class FacebookMobileScraper(object):
 
         while True:
             html = retryer(self.request_page, current_url)
+
+            # with open('./dump.html', 'w') as f:
+            #     f.write(html)
 
             next_url, posts = scrape_posts(html)
 
