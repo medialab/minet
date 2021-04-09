@@ -229,7 +229,7 @@ def scrape_posts(html):
         if reactions_item:
             reactions_text = reactions_item.get_text()
 
-            if reactions_text.count('·') < 2:
+            if reactions_text.count('·') > 1:
                 reactions = reactions_text.split('·', 1)[0].strip()
 
         comments_item = soupsieve.select_one('a:-soup-contains(" Comment")', el)
@@ -240,9 +240,26 @@ def scrape_posts(html):
 
         text_root = el.select_one('[data-ft=\'{"tn":"*s"}\']')
 
-        text_elements = text_root.find_all('div')
+        all_text_elements = text_root.find_all('div', recursive=False)
+
+        text_elements = []
+        translated_text_elements = []
+        translation_link = None
+
+        for text_el in all_text_elements:
+            translation_link = text_el.select_one('a[href^="/basic/translation_preferences/"]')
+            if translation_link is None:
+                text_elements.append(text_el)
+            else:
+                translation_link.extract()
+                translated_text_elements.append(text_el)
+
         comment_text = get_display_text(text_elements)
         comment_html = ''.join(str(el) for el in text_elements)
+
+        translated_comment_text = get_display_text(translated_text_elements)
+        translated_comment_html = ''.join(str(el) for el in translated_text_elements)
+        translated_from = translation_link.get_text().rsplit('from ', 1)[-1].strip() if translation_link else None
 
         post = FacebookPost(
             url=post_url,
@@ -252,6 +269,9 @@ def scrape_posts(html):
             user_label=user_label,
             text=comment_text,
             html=comment_html,
+            translated_text=translated_comment_text,
+            translated_html=translated_comment_html,
+            translated_from=translated_from,
             formatted_date=formatted_date,
             date=parsed_date,
             reactions=reactions,
