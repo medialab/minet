@@ -1201,3 +1201,23 @@ class TestScrape(object):
             John Mayall
             Mary Susan
         ''')
+
+        piecewise_html = clean('''
+            <main>
+                <div></div>
+                <div>
+
+                </div>
+                <div>Hello</div>
+                <div>   </div>
+
+                <div>World!</div>
+            </main>
+        ''')
+
+        soup = BeautifulSoup(piecewise_html, 'lxml')
+        elements = soup.select('div')
+
+        text = get_display_text(elements)
+
+        assert text == 'Hello\n\nWorld!'

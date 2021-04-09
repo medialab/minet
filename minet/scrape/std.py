@@ -71,6 +71,10 @@ def get_previous_sibling(element):
 
 
 def get_display_text(element):
+    if isinstance(element, list):
+        pieces = (get_display_text(el) for el in element)
+
+        return '\n\n'.join(piece for piece in pieces if piece.strip())
 
     def accumulator():
         previous_block_parent = None
