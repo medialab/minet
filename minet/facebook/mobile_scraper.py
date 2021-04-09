@@ -22,15 +22,19 @@ from minet.utils import (
 )
 from minet.web import create_pool, request, create_request_retryer
 from minet.facebook.utils import grab_facebook_cookie
-from minet.facebook.formatters import format_comment
+from minet.facebook.formatters import FacebookComment
 from minet.facebook.exceptions import FacebookInvalidCookieError
 from minet.facebook.constants import (
-    FACEBOOK_OUTPUT_FORMATS,
     FACEBOOK_MOBILE_DEFAULT_THROTTLE,
     FACEBOOK_MOBILE_URL
 )
 
 VALID_ID_RE = re.compile(r'^\d+$')
+
+
+def convert_url_to_mobile(url):
+    url = force_protocol(url, 'https')
+    return convert_facebook_url_to_mobile(url)
 
 
 def parse_formatted_date(formatted_date):
@@ -173,21 +177,21 @@ def scrape_comments(html, direction=None, in_reply_to=None):
                     replies_url = replies_item.get('href')
                     data['replies'].append((resolve_relative_url(replies_url), item_id))
 
-        data['comments'].append({
-            'post_id': post_id,
-            'comment_id': item_id,
-            'user_id': getattr(user, 'id', ''),
-            'user_handle': getattr(user, 'handle', ''),
-            'user_url': getattr(user, 'url', ''),
-            'user_label': user_label,
-            'comment_text': comment_text,
-            'comment_html': comment_html,
-            'formatted_date': formatted_date,
-            'date': parsed_date.isoformat() if parsed_date else '',
-            'reactions': reactions,
-            'replies': replies,
-            'in_reply_to': in_reply_to
-        })
+        data['comments'].append(FacebookComment(
+            post_id=post_id,
+            comment_id=item_id,
+            user_id=getattr(user, 'id', ''),
+            user_handle=getattr(user, 'handle', ''),
+            user_url=getattr(user, 'url', ''),
+            user_label=user_label,
+            comment_text=comment_text,
+            comment_html=comment_html,
+            formatted_date=formatted_date,
+            date=parsed_date.isoformat() if parsed_date else '',
+            reactions=reactions,
+            replies=replies,
+            in_reply_to=in_reply_to
+        ))
 
     return data
 
@@ -222,14 +226,10 @@ class FacebookMobileScraper(object):
 
         return result.data.decode('utf-8')
 
-    def comments(self, url, detailed=False, per_call=False, format='raw'):
-
-        if format not in FACEBOOK_OUTPUT_FORMATS:
-            raise TypeError('minet.facebook.scrape_comments: unkown `format`.')
+    def comments(self, url, detailed=False, per_call=False):
 
         # Reformatting url to hit mobile website
-        url = force_protocol(url, 'https')
-        url = convert_facebook_url_to_mobile(url)
+        url = convert_url_to_mobile(url)
 
         url_queue = deque([(url, None, None)])
 
@@ -259,18 +259,13 @@ class FacebookMobileScraper(object):
             if data['next'] is not None:
                 url_queue.append((data['next'], data['direction'], in_reply_to))
 
-            comments = []
+            comments = data['comments']
 
             for comment in data['comments']:
                 if in_reply_to is not None:
                     replies += 1
 
-                if format == 'csv_row':
-                    comment = format_comment(comment)
-
-                if per_call:
-                    comments.append(comment)
-                else:
+                if not per_call:
                     yield comment
 
             if per_call and len(comments) > 0:

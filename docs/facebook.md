@@ -39,4 +39,3 @@ for comment in scraper.comments(post_url):
 * **url** *str*: url of the post whose comments you want to scrape.
 * **detailed** *?bool* [`False`]: whether to yield a detailed output containing some stats.
 * **per_call** *?bool* [`False`]: whether to yield the list of comments retrieved per call to the website.
-* **format** *?str* [`raw`]: either `raw` or `csv_row`.

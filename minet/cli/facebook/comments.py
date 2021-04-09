@@ -66,13 +66,12 @@ def facebook_comments_action(namespace):
         batches = scraper.comments(
             url,
             per_call=True,
-            detailed=True,
-            format='csv_row'
+            detailed=True
         )
 
         for details, batch in batches:
             for comment in batch:
-                enricher.writerow(row, comment)
+                enricher.writerow(row, comment.as_csv_row())
 
             loading_bar.update(len(batch))
             loading_bar.set_postfix(
