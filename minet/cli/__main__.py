@@ -13,7 +13,9 @@ import signal
 import shutil
 import importlib
 import multiprocessing
+from io import TextIOBase
 from textwrap import dedent
+from contextlib import ExitStack
 from argparse import (
     ArgumentParser,
     RawTextHelpFormatter
@@ -208,7 +210,12 @@ def main():
         m = importlib.import_module(action['command']['package'])
         fn = getattr(m, action['command']['action'])
 
-        fn(cli_args)
+        with ExitStack() as stack:
+            for v in vars(cli_args).values():
+                if isinstance(v, TextIOBase) and v is not sys.stdin and v is not sys.stdout:
+                    stack.callback(v.close)
+
+            fn(cli_args)
 
     elif cli_args.action == 'help':
 
