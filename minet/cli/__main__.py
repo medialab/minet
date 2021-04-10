@@ -204,10 +204,6 @@ def main():
             if isinstance(value, WrappedConfigValue):
                 setattr(args, name, value.resolve(config))
 
-        # Need to check something?
-        if 'before' in action['command']:
-            action['command']['before']()
-
         # Lazy loading module for faster startup
         m = importlib.import_module(action['command']['package'])
         fn = getattr(m, action['command']['action'])
