@@ -152,13 +152,12 @@ class LoadingBar(object):
         self.bar.close()
 
 
-def open_output_file(output, flag='w', encoding='utf-8'):
-    stdout = sys.stdout
+def acquire_cross_platform_stdout():
 
     # As per #254: stdout need to be wrapped so that windows get a correct csv
     # stream output
     if 'windows' in platform.system().lower():
-        stdout = open(
+        return open(
             sys.__stdout__.fileno(),
             mode=sys.__stdout__.mode,
             buffering=1,
@@ -168,8 +167,12 @@ def open_output_file(output, flag='w', encoding='utf-8'):
             closefd=False
         )
 
+    return sys.stdout
+
+
+def open_output_file(output, flag='w', encoding='utf-8'):
     if output is None:
-        return DummyTqdmFile(stdout)
+        return DummyTqdmFile(acquire_cross_platform_stdout())
 
     # As per #254: newline='' is necessary for CSV output on windows to avoid
     # outputting extra lines because of a '\r\r\n' end of line...

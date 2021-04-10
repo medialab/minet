@@ -8,6 +8,15 @@ import os
 from argparse import Action, ArgumentTypeError
 
 from minet.utils import nested_get
+from minet.cli.utils import acquire_cross_platform_stdout
+
+
+class SplitterType(object):
+    def __init__(self, splitchar=','):
+        self.splitchar = splitchar
+
+    def __call__(self, string):
+        return string.split(self.splitchar)
 
 
 class BooleanAction(Action):
@@ -23,12 +32,23 @@ class BooleanAction(Action):
         setattr(cli_args, self.dest, False if option_string.startswith('--no') else True)
 
 
-class SplitterType(object):
-    def __init__(self, splitchar=','):
-        self.splitchar = splitchar
+class OutputFileAction(Action):
+    def __init__(self, option_strings, dest, **kwargs):
+        super().__init__(
+            option_strings,
+            dest,
+            help='Path to the output file. By default, the results will be printed to stdout.',
+            default=acquire_cross_platform_stdout(),
+            **kwargs
+        )
 
-    def __call__(self, string):
-        return string.split(self.splitchar)
+    def __call__(self, parser, cli_args, value, option_string=None):
+
+        # As per #254: newline='' is necessary for CSV output on windows to avoid
+        # outputting extra lines because of a '\r\r\n' end of line...
+        f = open(value, 'w', encoding='utf-8', newline='')
+
+        setattr(cli_args, self.dest, f)
 
 
 def rc_key_to_env_var(key):

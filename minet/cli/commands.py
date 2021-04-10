@@ -12,6 +12,7 @@ from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
 from minet.cli.argparse import (
     BooleanAction,
     ConfigAction,
+    OutputFileAction,
     SplitterType
 )
 
@@ -706,7 +707,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-o', '--output'],
-                            'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+                            'action': OutputFileAction
                         },
                         {
                             'flags': ['-s', '--select'],

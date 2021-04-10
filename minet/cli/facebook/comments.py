@@ -8,7 +8,7 @@ import casanova
 from ural import is_url
 
 from minet.constants import COOKIE_BROWSERS
-from minet.cli.utils import open_output_file, die, edit_cli_args_with_csv_io, LoadingBar
+from minet.cli.utils import die, edit_cli_args_with_csv_io, LoadingBar
 from minet.facebook import FacebookMobileScraper
 from minet.facebook.constants import FACEBOOK_COMMENT_CSV_HEADERS
 from minet.facebook.exceptions import (
@@ -18,9 +18,6 @@ from minet.facebook.exceptions import (
 
 
 def facebook_comments_action(cli_args):
-
-    # Handling output
-    output_file = open_output_file(cli_args.output)
 
     # Handling input
     if is_url(cli_args.column):
@@ -43,7 +40,7 @@ def facebook_comments_action(cli_args):
     # Enricher
     enricher = casanova.enricher(
         cli_args.file,
-        output_file,
+        cli_args.output,
         keep=cli_args.select,
         add=FACEBOOK_COMMENT_CSV_HEADERS
     )
