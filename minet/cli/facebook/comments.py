@@ -9,13 +9,15 @@ import tqdm
 import sys
 from tqdm import tqdm
 from ural import is_url
-from ural.facebook import has_facebook_comments
 
 from minet.constants import COOKIE_BROWSERS
 from minet.cli.utils import open_output_file, die, edit_namespace_with_csv_io
 from minet.facebook import FacebookMobileScraper
 from minet.facebook.constants import FACEBOOK_COMMENT_CSV_HEADERS
-from minet.facebook.exceptions import FacebookInvalidCookieError
+from minet.facebook.exceptions import (
+    FacebookInvalidCookieError,
+    FacebookInvalidTargetError
+)
 
 
 def facebook_comments_action(namespace):
@@ -24,7 +26,6 @@ def facebook_comments_action(namespace):
     output_file = open_output_file(namespace.output)
 
     # Handling input
-
     if is_url(namespace.column):
         edit_namespace_with_csv_io(namespace, 'post_url')
 
@@ -57,17 +58,16 @@ def facebook_comments_action(namespace):
         unit=' comments'
     )
 
-    for i, (row, url) in enumerate(enricher.cells(namespace.column, with_rows=True)):
-
-        if not has_facebook_comments(url):
-            tqdm.write('Given url (line %i) probably cannot have Facebook comments: %s' % (i + 1, url), file=sys.stderr)
+    for i, (row, url) in enumerate(enricher.cells(namespace.column, with_rows=True), 1):
+        try:
+            batches = scraper.comments(
+                url,
+                per_call=True,
+                detailed=True
+            )
+        except FacebookInvalidTargetError:
+            tqdm.write('Given url (line %i) is probably not a Facebook resource having comments: %s' % (i, url), file=sys.stderr)
             continue
-
-        batches = scraper.comments(
-            url,
-            per_call=True,
-            detailed=True
-        )
 
         for details, batch in batches:
             for comment in batch:
@@ -78,7 +78,7 @@ def facebook_comments_action(namespace):
                 calls=details['calls'],
                 replies=details['replies'],
                 q=details['queue_size'],
-                posts=i + 1
+                posts=i
             )
 
     loading_bar.close()

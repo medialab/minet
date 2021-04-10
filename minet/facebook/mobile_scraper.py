@@ -13,7 +13,8 @@ from urllib.parse import urljoin
 from ural import force_protocol
 from ural.facebook import (
     parse_facebook_url,
-    convert_facebook_url_to_mobile
+    convert_facebook_url_to_mobile,
+    has_facebook_comments
 )
 
 from minet.utils import (
@@ -25,7 +26,10 @@ from minet.web import create_pool, request, create_request_retryer
 from minet.scrape.std import get_display_text
 from minet.facebook.utils import grab_facebook_cookie
 from minet.facebook.formatters import FacebookComment, FacebookPost
-from minet.facebook.exceptions import FacebookInvalidCookieError
+from minet.facebook.exceptions import (
+    FacebookInvalidCookieError,
+    FacebookInvalidTargetError
+)
 from minet.facebook.constants import (
     FACEBOOK_MOBILE_DEFAULT_THROTTLE,
     FACEBOOK_MOBILE_URL
@@ -316,57 +320,63 @@ class FacebookMobileScraper(object):
 
     def comments(self, url, detailed=False, per_call=False):
 
+        if not has_facebook_comments(url):
+            raise FacebookInvalidTargetError
+
         # Reformatting url to hit mobile website
         url = convert_url_to_mobile(url)
 
-        url_queue = deque([(url, None, None)])
+        def generator():
+            url_queue = deque([(url, None, None)])
 
-        calls = 0
-        replies = 0
+            calls = 0
+            replies = 0
 
-        retryer = create_request_retryer()
+            retryer = create_request_retryer()
 
-        while len(url_queue) != 0:
-            current_url, direction, in_reply_to = url_queue.popleft()
+            while len(url_queue) != 0:
+                current_url, direction, in_reply_to = url_queue.popleft()
 
-            html = retryer(self.request_page, current_url)
+                html = retryer(self.request_page, current_url)
 
-            try:
-                data = scrape_comments(html, direction, in_reply_to)
-            except TypeError:
-                # with open('./dump.html', 'w') as f:
-                #     f.write(html)
-                print('Could not process comment in %s' % current_url, file=sys.stderr)
-                return
+                try:
+                    data = scrape_comments(html, direction, in_reply_to)
+                except TypeError:
+                    # with open('./dump.html', 'w') as f:
+                    #     f.write(html)
+                    print('Could not process comment in %s' % current_url, file=sys.stderr)
+                    return
 
-            calls += 1
+                calls += 1
 
-            for reply_url, commented_id in data['replies']:
-                url_queue.append((reply_url, None, commented_id))
+                for reply_url, commented_id in data['replies']:
+                    url_queue.append((reply_url, None, commented_id))
 
-            if data['next'] is not None:
-                url_queue.append((data['next'], data['direction'], in_reply_to))
+                if data['next'] is not None:
+                    url_queue.append((data['next'], data['direction'], in_reply_to))
 
-            comments = data['comments']
+                comments = data['comments']
 
-            for comment in data['comments']:
-                if in_reply_to is not None:
-                    replies += 1
+                for comment in data['comments']:
+                    if in_reply_to is not None:
+                        replies += 1
 
-                if not per_call:
-                    yield comment
+                    if not per_call:
+                        yield comment
 
-            if per_call and len(comments) > 0:
-                if detailed:
-                    details = {
-                        'calls': calls,
-                        'replies': replies,
-                        'queue_size': len(url_queue)
-                    }
+                if per_call and len(comments) > 0:
+                    if detailed:
+                        details = {
+                            'calls': calls,
+                            'replies': replies,
+                            'queue_size': len(url_queue)
+                        }
 
-                    yield details, comments
-                else:
-                    yield comments
+                        yield details, comments
+                    else:
+                        yield comments
+
+        return generator()
 
     def posts(self, url):
         retryer = create_request_retryer()
