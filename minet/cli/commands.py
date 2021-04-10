@@ -674,13 +674,16 @@ MINET_COMMANDS = {
                 'comments': {
                     'title': 'Minet Facebook Comments Command',
                     'description': '''
-                        Scrape series of comments on Facebook.
+                        Scrape a Facebook post's comments.
                     ''',
                     'epilog': '''
                         examples:
 
                         . Fetching a post's comments:
                             $ minet fb comments -c firefox https://www.facebook.com/page/posts/3601645349798293 > comments.csv
+
+                        . Fetching a series of posts comments:
+                            $ minet fb comments post_url posts.csv -c firefox > comments.csv
                     ''',
                     'arguments': [
                         {

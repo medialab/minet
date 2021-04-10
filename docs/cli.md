@@ -918,7 +918,7 @@ usage: minet facebook comments [-h] [-c COOKIE] [-o OUTPUT] [-s SELECT]
 Minet Facebook Comments Command
 ===============================
 
-Scrape series of comments on Facebook.
+Scrape a Facebook post's comments.
 
 positional arguments:
   column                      Column of the CSV file containing post urls or a single post url to fetch.
@@ -935,6 +935,9 @@ examples:
 
 . Fetching a post's comments:
     $ minet fb comments -c firefox https://www.facebook.com/page/posts/3601645349798293 > comments.csv
+
+. Fetching a series of posts comments:
+    $ minet fb comments post_url posts.csv -c firefox > comments.csv
 
 ```
 
