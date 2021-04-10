@@ -17,7 +17,7 @@ class BooleanAction(Action):
     """
 
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
-        super(BooleanAction, self).__init__(option_strings, dest, nargs=0, **kwargs)
+        super().__init__(option_strings, dest, nargs=0, **kwargs)
 
     def __call__(self, parser, cli_args, values, option_string=None):
         setattr(cli_args, self.dest, False if option_string.startswith('--no') else True)
@@ -61,7 +61,7 @@ class ConfigAction(Action):
                 rc_key_to_env_var(rc_key)
             )
 
-        super(ConfigAction, self).__init__(
+        super().__init__(
             option_strings,
             dest,
             default=WrappedConfigValue(
