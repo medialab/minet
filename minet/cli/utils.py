@@ -148,6 +148,9 @@ class LoadingBar(object):
     def __exit__(self, *args):
         return self.bar.__exit__(*args)
 
+    def __del__(self):
+        self.bar.close()
+
 
 def open_output_file(output, flag='w', encoding='utf-8'):
     stdout = sys.stdout

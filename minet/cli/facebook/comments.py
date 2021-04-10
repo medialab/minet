@@ -5,8 +5,6 @@
 # Logic of the `fb comments` action.
 #
 import casanova
-import tqdm
-import sys
 from ural import is_url
 
 from minet.constants import COOKIE_BROWSERS
@@ -64,7 +62,7 @@ def facebook_comments_action(cli_args):
                 detailed=True
             )
         except FacebookInvalidTargetError:
-            tqdm.write('Given url (line %i) is probably not a Facebook resource having comments: %s' % (i, url), file=sys.stderr)
+            loading_bar.print('Given url (line %i) is probably not a Facebook resource having comments: %s' % (i, url))
             continue
 
         for details, batch in batches:
@@ -78,5 +76,3 @@ def facebook_comments_action(cli_args):
                 q=details['queue_size'],
                 posts=i
             )
-
-    loading_bar.close()
