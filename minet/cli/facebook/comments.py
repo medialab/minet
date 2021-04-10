@@ -7,11 +7,10 @@
 import casanova
 import tqdm
 import sys
-from tqdm import tqdm
 from ural import is_url
 
 from minet.constants import COOKIE_BROWSERS
-from minet.cli.utils import open_output_file, die, edit_cli_args_with_csv_io
+from minet.cli.utils import open_output_file, die, edit_cli_args_with_csv_io, LoadingBar
 from minet.facebook import FacebookMobileScraper
 from minet.facebook.constants import FACEBOOK_COMMENT_CSV_HEADERS
 from minet.facebook.exceptions import (
@@ -52,10 +51,9 @@ def facebook_comments_action(cli_args):
     )
 
     # Loading bar
-    loading_bar = tqdm(
+    loading_bar = LoadingBar(
         desc='Scraping comments',
-        dynamic_ncols=True,
-        unit=' comments'
+        unit='comment'
     )
 
     for i, (row, url) in enumerate(enricher.cells(cli_args.column, with_rows=True), 1):
@@ -74,7 +72,7 @@ def facebook_comments_action(cli_args):
                 enricher.writerow(row, comment.as_csv_row())
 
             loading_bar.update(len(batch))
-            loading_bar.set_postfix(
+            loading_bar.update_stats(
                 calls=details['calls'],
                 replies=details['replies'],
                 q=details['queue_size'],
