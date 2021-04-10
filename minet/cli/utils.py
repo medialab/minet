@@ -181,7 +181,7 @@ WorkerPayload = namedtuple(
 REPORT_HEADERS = ['status', 'filename', 'encoding', 'mimetype']
 
 
-def create_report_iterator(namespace, reader, args=None, on_irrelevant_row=noop):
+def create_report_iterator(namespace, reader, worker_args=None, on_irrelevant_row=noop):
     for col in REPORT_HEADERS:
         if col not in reader.pos:
             raise MissingColumnError(col)
@@ -226,7 +226,7 @@ def create_report_iterator(namespace, reader, args=None, on_irrelevant_row=noop)
                     path=None,
                     encoding=row[encoding_pos],
                     content=row[raw_content_pos],
-                    args=args
+                    args=worker_args
                 )
 
                 continue
@@ -240,13 +240,13 @@ def create_report_iterator(namespace, reader, args=None, on_irrelevant_row=noop)
                 path=path,
                 encoding=encoding,
                 content=None,
-                args=args
+                args=worker_args
             )
 
     return generator()
 
 
-def create_glob_iterator(namespace, args):
+def create_glob_iterator(namespace, worker_args):
     for p in iglob(namespace.glob, recursive=True):
         yield WorkerPayload(
             row=None,
@@ -254,7 +254,7 @@ def create_glob_iterator(namespace, args):
             path=p,
             encoding='utf-8',
             content=None,
-            args=args
+            args=worker_args
         )
 
 
