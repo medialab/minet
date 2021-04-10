@@ -18,19 +18,19 @@ from minet.google.exceptions import (
 )
 
 
-def google_sheets_action(namespace):
-    output_file = open_output_file(namespace.output, flag='w')
+def google_sheets_action(cli_args):
+    output_file = open_output_file(cli_args.output, flag='w')
 
     try:
         data = export_google_sheets_as_csv(
-            namespace.url,
-            cookie=namespace.cookie,
-            authuser=namespace.authuser
+            cli_args.url,
+            cookie=cli_args.cookie,
+            authuser=cli_args.authuser
         )
     except GoogleSheetsInvalidTargetError:
         die('Could not extract a valid google sheets id from provided argument!')
     except BrowserCookieError:
-        die('Could not extract cookie from %s!' % namespace.cookie)
+        die('Could not extract cookie from %s!' % cli_args.cookie)
     except GoogleSheetsMissingCookieError:
         die('Did not find a relevant cookie!')
     except GoogleSheetsInvalidContentTypeError:

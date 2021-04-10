@@ -7,24 +7,24 @@
 import sys
 import casanova
 
-from minet.cli.utils import LoadingBar, edit_namespace_with_csv_io
+from minet.cli.utils import LoadingBar, edit_cli_args_with_csv_io
 from minet.youtube import get_video_captions
 from minet.youtube.constants import YOUTUBE_CAPTIONS_CSV_HEADERS
 
 
-def captions_action(namespace, output_file):
+def captions_action(cli_args, output_file):
 
     # Handling output
-    single_video = namespace.file is sys.stdin and sys.stdin.isatty()
+    single_video = cli_args.file is sys.stdin and sys.stdin.isatty()
 
     if single_video:
-        edit_namespace_with_csv_io(namespace, 'video')
+        edit_cli_args_with_csv_io(cli_args, 'video')
 
     enricher = casanova.enricher(
-        namespace.file,
+        cli_args.file,
         output_file,
         add=YOUTUBE_CAPTIONS_CSV_HEADERS,
-        keep=namespace.select
+        keep=cli_args.select
     )
 
     loading_bar = LoadingBar(
@@ -32,8 +32,8 @@ def captions_action(namespace, output_file):
         unit='video'
     )
 
-    for row, video in enricher.cells(namespace.column, with_rows=True):
-        result = get_video_captions(video, langs=namespace.lang)
+    for row, video in enricher.cells(cli_args.column, with_rows=True):
+        result = get_video_captions(video, langs=cli_args.lang)
         loading_bar.update()
 
         if result is None:

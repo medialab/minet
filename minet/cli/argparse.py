@@ -19,8 +19,8 @@ class BooleanAction(Action):
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         super(BooleanAction, self).__init__(option_strings, dest, nargs=0, **kwargs)
 
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, False if option_string.startswith('--no') else True)
+    def __call__(self, parser, cli_args, values, option_string=None):
+        setattr(cli_args, self.dest, False if option_string.startswith('--no') else True)
 
 
 class SplitterType(object):
@@ -72,5 +72,5 @@ class ConfigAction(Action):
             **kwargs
         )
 
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, values)
+    def __call__(self, parser, cli_args, values, option_string=None):
+        setattr(cli_args, self.dest, values)

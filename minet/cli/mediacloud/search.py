@@ -12,18 +12,18 @@ from minet.mediacloud.constants import MEDIACLOUD_STORIES_CSV_HEADER
 from minet.mediacloud.exceptions import MediacloudServerError
 
 
-def mediacloud_search_action(namespace, output_file):
+def mediacloud_search_action(cli_args, output_file):
     writer = csv.writer(output_file)
     writer.writerow(MEDIACLOUD_STORIES_CSV_HEADER)
 
-    client = MediacloudAPIClient(namespace.token)
+    client = MediacloudAPIClient(cli_args.token)
 
     kwargs = {
-        'collections': namespace.collections,
-        'medias': namespace.medias,
-        'publish_day': namespace.publish_day,
-        'publish_month': namespace.publish_month,
-        'publish_year': namespace.publish_year
+        'collections': cli_args.collections,
+        'medias': cli_args.medias,
+        'publish_day': cli_args.publish_day,
+        'publish_month': cli_args.publish_month,
+        'publish_year': cli_args.publish_year
     }
 
     loading_bar = LoadingBar(
@@ -33,16 +33,16 @@ def mediacloud_search_action(namespace, output_file):
     )
 
     try:
-        if not namespace.skip_count:
+        if not cli_args.skip_count:
             count = client.count(
-                namespace.query,
+                cli_args.query,
                 **kwargs
             )
 
             loading_bar.update_total(count)
 
         iterator = client.search(
-            namespace.query,
+            cli_args.query,
             format='csv_row',
             **kwargs
         )

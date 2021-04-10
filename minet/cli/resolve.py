@@ -5,5 +5,5 @@
 from minet.cli.fetch import fetch_action
 
 
-def resolve_action(namespace):
-    return fetch_action(namespace, resolve=True)
+def resolve_action(cli_args):
+    return fetch_action(cli_args, resolve=True)

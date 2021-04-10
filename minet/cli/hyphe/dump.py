@@ -32,36 +32,36 @@ def format_page_filename(webentity, page):
     return '%s/%s/%s.html.gz' % (webentity['id'], h[:2], h)
 
 
-def hyphe_dump_action(namespace):
+def hyphe_dump_action(cli_args):
 
     # Paths
-    output_dir = 'hyphe_corpus_%s' % namespace.corpus
+    output_dir = 'hyphe_corpus_%s' % cli_args.corpus
 
-    if namespace.output_dir is not None:
-        output_dir = namespace.output_dir
+    if cli_args.output_dir is not None:
+        output_dir = cli_args.output_dir
 
     os.makedirs(output_dir, exist_ok=True)
 
     webentities_output_path = join(output_dir, 'webentities.csv')
     pages_output_path = join(output_dir, 'pages.csv')
 
-    if namespace.body:
+    if cli_args.body:
         body_output_dir = join(output_dir, 'content')
         os.makedirs(body_output_dir, exist_ok=True)
 
-    client = HypheAPIClient(namespace.url)
-    corpus = client.corpus(namespace.corpus, password=namespace.password)
+    client = HypheAPIClient(cli_args.url)
+    corpus = client.corpus(cli_args.corpus, password=cli_args.password)
 
     try:
         corpus.ensure_is_started()
     except HypheCorpusAuthenticationError:
         die([
-            'Wrong password for the "%s" corpus!' % namespace.corpus,
+            'Wrong password for the "%s" corpus!' % cli_args.corpus,
             'Don\'t forget to provide a password for this corpus using --password'
         ])
 
     # Then we gather some handy statistics
-    counts = corpus.count(statuses=namespace.statuses)
+    counts = corpus.count(statuses=cli_args.statuses)
 
     # Then we fetch webentities
     webentities_file = open(webentities_output_path, 'w', encoding='utf-8')
@@ -77,7 +77,7 @@ def hyphe_dump_action(namespace):
 
     webentities = {}
 
-    for webentity in corpus.webentities(statuses=namespace.statuses):
+    for webentity in corpus.webentities(statuses=cli_args.statuses):
         loading_bar.update()
         webentities[webentity['id']] = webentity
         webentities_writer.writerow(format_webentity_for_csv(webentity))
@@ -88,7 +88,7 @@ def hyphe_dump_action(namespace):
     # Finally we paginate pages
     pages_file = open(pages_output_path, 'w', encoding='utf-8')
     pages_writer = csv.writer(pages_file)
-    pages_writer.writerow(PAGE_CSV_HEADERS + (ADDITIONAL_PAGE_HEADERS if namespace.body else []))
+    pages_writer.writerow(PAGE_CSV_HEADERS + (ADDITIONAL_PAGE_HEADERS if cli_args.body else []))
 
     loading_bar = tqdm(
         desc='Fetching pages',
@@ -98,12 +98,12 @@ def hyphe_dump_action(namespace):
     )
 
     for webentity in webentities.values():
-        for page in corpus.webentity_pages(webentity['id'], include_body=namespace.body):
+        for page in corpus.webentity_pages(webentity['id'], include_body=cli_args.body):
             loading_bar.update()
 
             filename = None
 
-            if namespace.body and 'body' in page:
+            if cli_args.body and 'body' in page:
                 filename = format_page_filename(webentity, page)
                 filepath = join(body_output_dir, filename)
                 os.makedirs(dirname(filepath), exist_ok=True)

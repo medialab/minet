@@ -17,40 +17,40 @@ from minet.cli.utils import LoadingBar
 from minet.twitter.constants import TWITTER_API_MAX_STATUSES_COUNT
 
 
-def twitter_user_tweets_action(namespace, output_file):
+def twitter_user_tweets_action(cli_args, output_file):
 
     wrapper = TwitterWrapper(
-        namespace.access_token,
-        namespace.access_token_secret,
-        namespace.api_key,
-        namespace.api_secret_key
+        cli_args.access_token,
+        cli_args.access_token_secret,
+        cli_args.api_key,
+        cli_args.api_secret_key
     )
 
     enricher = casanova.enricher(
-        namespace.file,
+        cli_args.file,
         output_file,
-        keep=namespace.select,
+        keep=cli_args.select,
         add=TWEET_FIELDS
     )
 
     loading_bar = LoadingBar(
         'Retrieving tweets',
-        total=namespace.total,
+        total=cli_args.total,
         unit='tweet'
     )
 
-    for row, user in enricher.cells(namespace.column, with_rows=True):
+    for row, user in enricher.cells(cli_args.column, with_rows=True):
         max_id = None
 
         loading_bar.update_stats(user=user)
 
         while True:
-            if namespace.ids:
+            if cli_args.ids:
                 kwargs = {'user_id': user}
             else:
                 kwargs = {'screen_name': user}
 
-            kwargs['include_rts'] = not namespace.exclude_retweets
+            kwargs['include_rts'] = not cli_args.exclude_retweets
             kwargs['count'] = TWITTER_API_MAX_STATUSES_COUNT
             kwargs['tweet_mode'] = 'extended'
 

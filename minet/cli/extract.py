@@ -109,19 +109,19 @@ def worker(payload):
     return None, row, format_trafilatura_result(result)
 
 
-def extract_action(namespace):
-    output_file = open_output_file(namespace.output)
+def extract_action(cli_args):
+    output_file = open_output_file(cli_args.output)
 
     enricher = casanova.enricher(
-        namespace.report,
+        cli_args.report,
         output_file,
-        keep=namespace.select,
+        keep=cli_args.select,
         add=OUTPUT_ADDITIONAL_HEADERS
     )
 
     loading_bar = LoadingBar(
         desc='Extracting content',
-        total=namespace.total,
+        total=cli_args.total,
         unit='doc'
     )
 
@@ -131,17 +131,17 @@ def extract_action(namespace):
 
     try:
         files = create_report_iterator(
-            namespace,
+            cli_args,
             enricher,
             on_irrelevant_row=on_irrelevant_row
         )
     except NotADirectoryError:
         loading_bar.die([
-            'Could not find the "%s" directory!' % namespace.input_dir,
+            'Could not find the "%s" directory!' % cli_args.input_dir,
             'Did you forget to specify it with -i/--input-dir?'
         ])
 
-    pool = LazyPool(namespace.processes)
+    pool = LazyPool(cli_args.processes)
 
     loading_bar.update_stats(p=pool.processes)
 

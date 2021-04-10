@@ -10,7 +10,7 @@ from twitwi.constants import TWEET_FIELDS
 from twitwi import format_tweet_as_csv_row
 
 from minet.utils import prettyprint_seconds, PseudoFStringFormatter
-from minet.cli.utils import edit_namespace_with_csv_io, LoadingBar
+from minet.cli.utils import edit_cli_args_with_csv_io, LoadingBar
 from minet.twitter import TwitterAPIScraper
 from minet.twitter.exceptions import (
     TwitterPublicAPIRateLimitError,
@@ -32,27 +32,27 @@ def format_meta_row(meta):
     ]
 
 
-def twitter_scrape_action(namespace, output_file):
-    single_query = namespace.file is sys.stdin and sys.stdin.isatty()
+def twitter_scrape_action(cli_args, output_file):
+    single_query = cli_args.file is sys.stdin and sys.stdin.isatty()
 
     if single_query:
-        edit_namespace_with_csv_io(namespace, 'query', attr_name='query')
+        edit_cli_args_with_csv_io(cli_args, 'query', attr_name='query')
 
     scraper = TwitterAPIScraper()
 
     # Stats
     loading_bar = LoadingBar(
         'Collecting tweets',
-        total=namespace.limit,
+        total=cli_args.limit,
         unit='tweet',
         stats={'tokens': 1, 'queries': 0}
     )
 
     enricher = casanova.enricher(
-        namespace.file,
+        cli_args.file,
         output_file,
         add=TWEET_FIELDS + ADDITIONAL_TWEET_FIELDS,
-        keep=namespace.select
+        keep=cli_args.select
     )
 
     def before_sleep(retry_state):
@@ -67,12 +67,12 @@ def twitter_scrape_action(namespace, output_file):
                 'Failed to call Twitter search. Will retry in %s' % prettyprint_seconds(retry_state.idle_for)
             )
 
-    for row, query in enricher.cells(namespace.query, with_rows=True):
+    for row, query in enricher.cells(cli_args.query, with_rows=True):
 
         # Templating?
-        if namespace.query_template is not None:
+        if cli_args.query_template is not None:
             query = CUSTOM_FORMATTER.format(
-                namespace.query_template,
+                cli_args.query_template,
                 value=query
             )
 
@@ -81,9 +81,9 @@ def twitter_scrape_action(namespace, output_file):
 
         iterator = scraper.search(
             query,
-            limit=namespace.limit,
+            limit=cli_args.limit,
             before_sleep=before_sleep,
-            include_referenced_tweets=namespace.include_refs,
+            include_referenced_tweets=cli_args.include_refs,
             with_meta=True
         )
 

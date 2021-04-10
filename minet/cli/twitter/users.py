@@ -15,33 +15,33 @@ from tqdm import tqdm
 from ebbe import as_chunks
 
 
-def twitter_users_action(namespace, output_file):
+def twitter_users_action(cli_args, output_file):
 
     wrapper = TwitterWrapper(
-        namespace.access_token,
-        namespace.access_token_secret,
-        namespace.api_key,
-        namespace.api_secret_key
+        cli_args.access_token,
+        cli_args.access_token_secret,
+        cli_args.api_key,
+        cli_args.api_secret_key
     )
 
     enricher = casanova.enricher(
-        namespace.file,
+        cli_args.file,
         output_file,
-        keep=namespace.select,
+        keep=cli_args.select,
         add=USER_FIELDS
     )
 
     loading_bar = tqdm(
         desc='Retrieving users',
         dynamic_ncols=True,
-        total=namespace.total,
+        total=cli_args.total,
         unit=' user'
     )
 
-    for chunk in as_chunks(enricher.cells(100, namespace.column, with_rows=True)):
+    for chunk in as_chunks(enricher.cells(100, cli_args.column, with_rows=True)):
         users = ','.join(row[1] for row in chunk)
 
-        if namespace.ids:
+        if cli_args.ids:
             wrapper_args = {'user_id': users}
             key = 'id'
         else:

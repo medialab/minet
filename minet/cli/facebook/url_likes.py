@@ -13,7 +13,7 @@ from ural import is_url
 
 from minet.utils import rate_limited
 from minet.web import request
-from minet.cli.utils import open_output_file, die, edit_namespace_with_csv_io
+from minet.cli.utils import open_output_file, die, edit_cli_args_with_csv_io
 
 REPORT_HEADERS = ['approx_likes', 'approx_likes_int']
 ONE_LIKE_RE = re.compile(rb'>\s*One person likes this\.', re.I)
@@ -68,32 +68,32 @@ def scrape(data):
     return [approx_likes, approx_likes_int]
 
 
-def facebook_url_likes_action(namespace):
-    output_file = open_output_file(namespace.output)
+def facebook_url_likes_action(cli_args):
+    output_file = open_output_file(cli_args.output)
 
-    if is_url(namespace.column):
-        edit_namespace_with_csv_io(namespace, 'url')
+    if is_url(cli_args.column):
+        edit_cli_args_with_csv_io(cli_args, 'url')
 
     enricher = casanova.enricher(
-        namespace.file,
+        cli_args.file,
         output_file,
-        keep=namespace.select,
+        keep=cli_args.select,
         add=REPORT_HEADERS
     )
 
-    if namespace.column not in enricher.pos:
+    if cli_args.column not in enricher.pos:
         die([
-            'Could not find the "%s" column containing the urls in the given CSV file.' % namespace.column
+            'Could not find the "%s" column containing the urls in the given CSV file.' % cli_args.column
         ])
 
     loading_bar = tqdm(
         desc='Retrieving likes',
         dynamic_ncols=True,
         unit=' urls',
-        total=namespace.total
+        total=cli_args.total
     )
 
-    for row, url in enricher.cells(namespace.column, with_rows=True):
+    for row, url in enricher.cells(cli_args.column, with_rows=True):
         loading_bar.update()
 
         url = url.strip()

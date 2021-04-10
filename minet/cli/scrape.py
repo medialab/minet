@@ -88,13 +88,13 @@ def worker(payload):
     return ScrapeWorkerResult(None, items)
 
 
-def scrape_action(namespace):
+def scrape_action(cli_args):
 
-    output_file = open_output_file(namespace.output)
+    output_file = open_output_file(cli_args.output)
 
     # Parsing scraper definition
     try:
-        scraper = Scraper(namespace.scraper, strain=namespace.strain)
+        scraper = Scraper(cli_args.scraper, strain=cli_args.strain)
     except DefinitionInvalidFormatError:
         die([
             'Unknown scraper format!',
@@ -109,16 +109,16 @@ def scrape_action(namespace):
         die()
     except CSSSelectorTooComplex:
         die([
-            'Your strainer\'s CSS selector %s is too complex.' % colored(namespace.strain, 'blue'),
+            'Your strainer\'s CSS selector %s is too complex.' % colored(cli_args.strain, 'blue'),
             'You cannot use relations to create a strainer.',
             'Try to simplify the selector you passed to --strain.'
         ])
 
-    if namespace.validate:
+    if cli_args.validate:
         print('Your scraper is valid.', file=sys.stderr)
         sys.exit(0)
 
-    if scraper.headers is None and namespace.format == 'csv':
+    if scraper.headers is None and cli_args.format == 'csv':
         die([
             'Your scraper does not yield tabular data.',
             'Try changing it or setting --format to "jsonl".'
@@ -126,46 +126,46 @@ def scrape_action(namespace):
 
     loading_bar = LoadingBar(
         desc='Scraping pages',
-        total=namespace.total,
+        total=cli_args.total,
         unit='page'
     )
 
     worker_args = (
-        namespace.format,
-        namespace.separator
+        cli_args.format,
+        cli_args.separator
     )
 
     def on_irrelevant_row(reason, row):
         loading_bar.update()
 
-    if namespace.glob is not None:
-        files = create_glob_iterator(namespace, worker_args)
+    if cli_args.glob is not None:
+        files = create_glob_iterator(cli_args, worker_args)
     else:
-        reader = casanova.reader(namespace.report)
+        reader = casanova.reader(cli_args.report)
 
         try:
             files = create_report_iterator(
-                namespace,
+                cli_args,
                 reader,
                 worker_args=worker_args,
                 on_irrelevant_row=on_irrelevant_row
             )
         except NotADirectoryError:
             loading_bar.die([
-                'Could not find the "%s" directory!' % namespace.input_dir,
+                'Could not find the "%s" directory!' % cli_args.input_dir,
                 'Did you forget to specify it with -i/--input-dir?'
             ])
 
-    if namespace.format == 'csv':
+    if cli_args.format == 'csv':
         output_writer = csv.DictWriter(output_file, fieldnames=scraper.headers)
         output_writer.writeheader()
     else:
         output_writer = ndjson.writer(output_file)
 
     pool = LazyPool(
-        namespace.processes,
+        cli_args.processes,
         initializer=init_process,
-        initargs=(scraper.definition, namespace.strain)
+        initargs=(scraper.definition, cli_args.strain)
     )
 
     loading_bar.update_stats(p=pool.processes)

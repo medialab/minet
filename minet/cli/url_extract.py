@@ -21,26 +21,26 @@ EXTRACTORS = {
 }
 
 
-def url_extract_action(namespace):
-    output_file = open_output_file(namespace.output)
+def url_extract_action(cli_args):
+    output_file = open_output_file(cli_args.output)
 
     enricher = casanova.enricher(
-        namespace.file,
+        cli_args.file,
         output_file,
         add=REPORT_HEADERS,
-        keep=namespace.select.split(',') if namespace.select else None
+        keep=cli_args.select.split(',') if cli_args.select else None
     )
 
-    extract = EXTRACTORS[getattr(namespace, 'from')]
+    extract = EXTRACTORS[getattr(cli_args, 'from')]
 
     loading_bar = tqdm(
         desc='Extracting',
         dynamic_ncols=True,
         unit=' rows',
-        total=namespace.total
+        total=cli_args.total
     )
 
-    for row, content in enricher.cells(namespace.column, with_rows=True):
+    for row, content in enricher.cells(cli_args.column, with_rows=True):
         loading_bar.update()
 
         content = content.strip()
@@ -49,8 +49,8 @@ def url_extract_action(namespace):
             continue
 
         for url in extract(content):
-            if namespace.base_url is not None:
-                url = urljoin(namespace.base_url, url)
+            if cli_args.base_url is not None:
+                url = urljoin(cli_args.base_url, url)
 
             enricher.writerow(row, [url])
 

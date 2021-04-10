@@ -188,38 +188,38 @@ def main():
     parser, subparser_index = build_parser(MINET_COMMANDS)
 
     # Parsing arguments and triggering commands
-    args = parser.parse_args()
+    cli_args = parser.parse_args()
 
-    action = subparser_index.get(args.action)
+    action = subparser_index.get(cli_args.action)
 
     if action is not None:
 
         # Loading config
-        config = get_rcfile(args.rcfile)
+        config = get_rcfile(cli_args.rcfile)
 
         # Bootstrapping config
-        for name in vars(args):
-            value = getattr(args, name)
+        for name in vars(cli_args):
+            value = getattr(cli_args, name)
 
             if isinstance(value, WrappedConfigValue):
-                setattr(args, name, value.resolve(config))
+                setattr(cli_args, name, value.resolve(config))
 
         # Lazy loading module for faster startup
         m = importlib.import_module(action['command']['package'])
         fn = getattr(m, action['command']['action'])
 
-        fn(args)
+        fn(cli_args)
 
-    elif args.action == 'help':
+    elif cli_args.action == 'help':
 
-        if len(args.subcommand) == 0:
+        if len(cli_args.subcommand) == 0:
             parser.print_help()
             return
 
-        target = get_subparser(subparser_index, args.subcommand)
+        target = get_subparser(subparser_index, cli_args.subcommand)
 
         if target is None:
-            die('Unknow command "%s"' % ' '.join(args.subcommand))
+            die('Unknow command "%s"' % ' '.join(cli_args.subcommand))
         else:
             target.print_help()
 

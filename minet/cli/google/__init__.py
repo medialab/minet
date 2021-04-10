@@ -7,8 +7,8 @@
 from minet.cli.utils import die, open_output_file
 
 
-def google_action(namespace):
+def google_action(cli_args):
 
-    if namespace.google_action == 'sheets':
+    if cli_args.google_action == 'sheets':
         from minet.cli.google.sheets import google_sheets_action
-        google_sheets_action(namespace)
+        google_sheets_action(cli_args)

@@ -153,37 +153,37 @@ class ScraperReporterPool(object):
                 reporter.close()
 
 
-def crawl_action(namespace):
+def crawl_action(cli_args):
 
     # Loading crawler definition
-    queue_path = join(namespace.output_dir, 'queue')
+    queue_path = join(cli_args.output_dir, 'queue')
 
-    if namespace.resume:
+    if cli_args.resume:
         print_err('Resuming crawl...')
     else:
         rmtree(queue_path, ignore_errors=True)
 
     # Scaffolding output directory
-    os.makedirs(namespace.output_dir, exist_ok=True)
+    os.makedirs(cli_args.output_dir, exist_ok=True)
 
-    jobs_output_path = join(namespace.output_dir, 'jobs.csv')
+    jobs_output_path = join(cli_args.output_dir, 'jobs.csv')
     jobs_output, jobs_writer = open_report(
         jobs_output_path,
         JOBS_HEADERS,
-        resume=namespace.resume
+        resume=cli_args.resume
     )
 
     # Creating crawler
     crawler = Crawler(
-        namespace.crawler,
-        throttle=namespace.throttle,
+        cli_args.crawler,
+        throttle=cli_args.throttle,
         queue_path=queue_path
     )
 
     reporter_pool = ScraperReporterPool(
         crawler,
-        namespace.output_dir,
-        resume=namespace.resume
+        cli_args.output_dir,
+        resume=cli_args.resume
     )
 
     # Loading bar

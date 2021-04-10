@@ -30,7 +30,7 @@ from minet.cli.reporters import report_error
 from minet.cli.utils import (
     open_output_file,
     die,
-    edit_namespace_with_csv_io
+    edit_cli_args_with_csv_io
 )
 
 FETCH_ADDITIONAL_HEADERS = [
@@ -53,59 +53,59 @@ RESOLVE_ADDITIONAL_HEADERS = [
 CUSTOM_FORMATTER = PseudoFStringFormatter()
 
 
-def fetch_action(namespace, resolve=False):
+def fetch_action(cli_args, resolve=False):
 
     # Are we resuming
-    resuming = namespace.resume
+    resuming = cli_args.resume
 
-    if resuming and not namespace.output:
+    if resuming and not cli_args.output:
         die([
             'Cannot --resume without specifying -o/--output.'
         ])
 
     # Do we need to fetch only a single url?
-    single_url = namespace.file is sys.stdin and is_url(namespace.column)
+    single_url = cli_args.file is sys.stdin and is_url(cli_args.column)
 
     if single_url:
-        edit_namespace_with_csv_io(namespace, 'url')
+        edit_cli_args_with_csv_io(cli_args, 'url')
 
         # If we are hitting a single url we enable contents_in_report
-        if not resolve and namespace.contents_in_report is None:
-            namespace.contents_in_report = True
+        if not resolve and cli_args.contents_in_report is None:
+            cli_args.contents_in_report = True
 
     # Trying to instantiate the folder strategy
     if not resolve:
-        folder_strategy = FolderStrategy.from_name(namespace.folder_strategy)
+        folder_strategy = FolderStrategy.from_name(cli_args.folder_strategy)
 
         if folder_strategy is None:
             die([
-                'Invalid "%s" --folder-strategy!' % namespace.folder_strategy,
+                'Invalid "%s" --folder-strategy!' % cli_args.folder_strategy,
                 'Check the list at the end of the command help:',
                 '  $ minet fetch -h'
             ])
 
     # HTTP method
-    http_method = namespace.method
+    http_method = cli_args.method
 
     # Cookie grabber
     get_cookie = None
-    if namespace.grab_cookies:
-        get_cookie = grab_cookies(namespace.grab_cookies)
+    if cli_args.grab_cookies:
+        get_cookie = grab_cookies(cli_args.grab_cookies)
 
     # Global headers
     global_headers = None
-    if namespace.headers:
+    if cli_args.headers:
         global_headers = {}
 
-        for header in namespace.headers:
+        for header in cli_args.headers:
             k, v = parse_http_header(header)
             global_headers[k] = v
 
     flag = 'w'
-    if namespace.output is not None and resuming and isfile(namespace.output):
+    if cli_args.output is not None and resuming and isfile(cli_args.output):
         flag = 'r+'
 
-    output_file = open_output_file(namespace.output, flag=flag)
+    output_file = open_output_file(cli_args.output, flag=flag)
 
     # Resume listener
     listener = None
@@ -135,36 +135,36 @@ def fetch_action(namespace, resolve=False):
     else:
         additional_headers = FETCH_ADDITIONAL_HEADERS
 
-        if namespace.contents_in_report:
+        if cli_args.contents_in_report:
             additional_headers = additional_headers + ['raw_contents']
 
     # Enricher
     enricher = casanova.threadsafe_enricher(
-        namespace.file,
+        cli_args.file,
         output_file,
         resumable=resuming,
         auto_resume=False,
         add=additional_headers,
-        keep=namespace.select,
+        keep=cli_args.select,
         listener=listener
     )
 
-    if namespace.column not in enricher.pos:
+    if cli_args.column not in enricher.pos:
         die([
-            'Could not find the "%s" column containing the urls in the given CSV file.' % namespace.column
+            'Could not find the "%s" column containing the urls in the given CSV file.' % cli_args.column
         ])
 
-    url_pos = enricher.pos[namespace.column]
+    url_pos = enricher.pos[cli_args.column]
 
     filename_pos = None
 
-    if not resolve and namespace.filename is not None:
-        if namespace.filename not in enricher.pos:
+    if not resolve and cli_args.filename is not None:
+        if cli_args.filename not in enricher.pos:
             die([
-                'Could not find the "%s" column containing the filenames in the given CSV file.' % namespace.filename
+                'Could not find the "%s" column containing the filenames in the given CSV file.' % cli_args.filename
             ])
 
-        filename_pos = enricher.pos[namespace.filename]
+        filename_pos = enricher.pos[cli_args.filename]
 
     indexed_input_headers = {h: i for i, h in enumerate(enricher.fieldnames)}
 
@@ -173,7 +173,7 @@ def fetch_action(namespace, resolve=False):
         resuming_reader_loading.close()
 
     # Loading bar
-    total = namespace.total
+    total = cli_args.total
 
     loading_bar = tqdm(
         desc='Fetching pages',
@@ -204,7 +204,7 @@ def fetch_action(namespace, resolve=False):
         loading_bar.set_postfix(**postfix)
         loading_bar.update()
 
-    only_shortened = getattr(namespace, 'only_shortened', False)
+    only_shortened = getattr(cli_args, 'only_shortened', False)
 
     def url_key(item):
         url = item[1][url_pos].strip()
@@ -216,8 +216,8 @@ def fetch_action(namespace, resolve=False):
             return
 
         # Url templating
-        if namespace.url_template:
-            return namespace.url_template.format(value=url)
+        if cli_args.url_template:
+            return cli_args.url_template.format(value=url)
 
         return url
 
@@ -252,7 +252,7 @@ def fetch_action(namespace, resolve=False):
             encoding or ''
         ]
 
-        if namespace.contents_in_report:
+        if cli_args.contents_in_report:
             addendum.append(data or '')
 
         enricher.writerow(index, row, addendum)
@@ -274,15 +274,15 @@ def fetch_action(namespace, resolve=False):
 
     common_kwargs = {
         'key': url_key,
-        'insecure': namespace.insecure,
-        'threads': namespace.threads,
-        'throttle': namespace.throttle,
-        'domain_parallelism': namespace.domain_parallelism,
-        'max_redirects': namespace.max_redirects
+        'insecure': cli_args.insecure,
+        'threads': cli_args.threads,
+        'throttle': cli_args.throttle,
+        'domain_parallelism': cli_args.domain_parallelism,
+        'max_redirects': cli_args.max_redirects
     }
 
-    if namespace.timeout is not None:
-        common_kwargs['timeout'] = namespace.timeout
+    if cli_args.timeout is not None:
+        common_kwargs['timeout'] = cli_args.timeout
 
     # Normal fetch
     if not resolve:
@@ -324,7 +324,7 @@ def fetch_action(namespace, resolve=False):
                     resolved_url = None
 
                 # Should we keep downloaded content?
-                if not namespace.keep_failed_contents and response.status != 200:
+                if not cli_args.keep_failed_contents and response.status != 200:
                     write_fetch_output(
                         index,
                         row,
@@ -337,12 +337,12 @@ def fetch_action(namespace, resolve=False):
 
                 # Building filename
                 if data:
-                    if filename_pos is not None or namespace.filename_template:
+                    if filename_pos is not None or cli_args.filename_template:
                         root, ext = os.path.splitext(row[filename_pos]) if filename_pos is not None else (None, '')
                         ext = ext if ext else result.meta['ext']
-                        if namespace.filename_template:
+                        if cli_args.filename_template:
                             filename = CUSTOM_FORMATTER.format(
-                                namespace.filename_template,
+                                cli_args.filename_template,
                                 value=root,
                                 ext=ext,
                                 line=enricher.wrap(row)
@@ -362,19 +362,19 @@ def fetch_action(namespace, resolve=False):
                 # Standardize encoding?
                 encoding = result.meta['encoding']
 
-                if data and namespace.standardize_encoding or namespace.contents_in_report:
-                    if encoding is None or encoding != 'utf-8' or namespace.contents_in_report:
+                if data and cli_args.standardize_encoding or cli_args.contents_in_report:
+                    if encoding is None or encoding != 'utf-8' or cli_args.contents_in_report:
                         data = data.decode(encoding if encoding is not None else 'utf-8', errors='replace')
                         encoding = 'utf-8'
                         content_write_flag = 'w'
 
                 # Writing file on disk
-                if data and not namespace.contents_in_report:
+                if data and not cli_args.contents_in_report:
 
-                    if namespace.compress:
+                    if cli_args.compress:
                         filename += '.gz'
 
-                    resource_path = join(namespace.output_dir, filename)
+                    resource_path = join(cli_args.output_dir, filename)
                     resource_dir = dirname(resource_path)
 
                     os.makedirs(resource_dir, exist_ok=True)
@@ -382,7 +382,7 @@ def fetch_action(namespace, resolve=False):
                     with open(resource_path, content_write_flag) as f:
 
                         # TODO: what if standardize_encoding + compress?
-                        f.write(gzip.compress(data) if namespace.compress else data)
+                        f.write(gzip.compress(data) if cli_args.compress else data)
 
                 # Reporting in output
                 write_fetch_output(
@@ -412,9 +412,9 @@ def fetch_action(namespace, resolve=False):
         multithreaded_iterator = multithreaded_resolve(
             enricher,
             resolve_args=request_args,
-            follow_meta_refresh=namespace.follow_meta_refresh,
-            follow_js_relocation=namespace.follow_js_relocation,
-            infer_redirection=namespace.infer_redirection,
+            follow_meta_refresh=cli_args.follow_meta_refresh,
+            follow_js_relocation=cli_args.follow_js_relocation,
+            infer_redirection=cli_args.infer_redirection,
             **common_kwargs
         )
 

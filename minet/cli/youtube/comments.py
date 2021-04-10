@@ -7,24 +7,24 @@
 import sys
 import casanova
 
-from minet.cli.utils import LoadingBar, edit_namespace_with_csv_io
+from minet.cli.utils import LoadingBar, edit_cli_args_with_csv_io
 from minet.youtube import YouTubeAPIClient
 from minet.youtube.constants import YOUTUBE_COMMENT_CSV_HEADERS
 
 
-def comments_action(namespace, output_file):
+def comments_action(cli_args, output_file):
 
     # Handling output
-    single_video = namespace.file is sys.stdin and sys.stdin.isatty()
+    single_video = cli_args.file is sys.stdin and sys.stdin.isatty()
 
     if single_video:
-        edit_namespace_with_csv_io(namespace, 'video')
+        edit_cli_args_with_csv_io(cli_args, 'video')
 
     enricher = casanova.enricher(
-        namespace.file,
+        cli_args.file,
         output_file,
         add=YOUTUBE_COMMENT_CSV_HEADERS,
-        keep=namespace.select
+        keep=cli_args.select
     )
 
     loading_bar = LoadingBar(
@@ -37,11 +37,11 @@ def comments_action(namespace, output_file):
         loading_bar.print('API limits reached. Will now wait until midnight Pacific time!')
 
     client = YouTubeAPIClient(
-        namespace.key,
+        cli_args.key,
         before_sleep_until_midnight=before_sleep_until_midnight
     )
 
-    for row, video in enricher.cells(namespace.column, with_rows=True):
+    for row, video in enricher.cells(cli_args.column, with_rows=True):
         generator = client.comments(video)
 
         for comment in generator:

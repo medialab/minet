@@ -17,22 +17,22 @@ from minet.mediacloud.constants import (
 from minet.mediacloud.exceptions import MediacloudServerError
 
 
-def mediacloud_medias_action(namespace, output_file):
+def mediacloud_medias_action(cli_args, output_file):
     added_headers = MEDIACLOUD_MEDIA_CSV_HEADER[1:]
 
     feeds_file = None
     feeds_writer = None
 
-    if namespace.feeds:
+    if cli_args.feeds:
         added_headers.append('feeds')
-        feeds_file = open(namespace.feeds, 'w', encoding='utf-8')
+        feeds_file = open(cli_args.feeds, 'w', encoding='utf-8')
         feeds_writer = csv.writer(feeds_file)
         feeds_writer.writerow(MEDIACLOUD_FEED_CSV_HEADER)
 
     enricher = casanova.enricher(
-        namespace.file,
+        cli_args.file,
         output_file,
-        keep=namespace.select,
+        keep=cli_args.select,
         add=added_headers
     )
 
@@ -40,17 +40,17 @@ def mediacloud_medias_action(namespace, output_file):
         desc='Fetching medias',
         dynamic_ncols=True,
         unit=' medias',
-        total=namespace.total
+        total=cli_args.total
     )
 
-    client = MediacloudAPIClient(namespace.token)
+    client = MediacloudAPIClient(cli_args.token)
 
-    for row, media_id in enricher.cells(namespace.column, with_rows=True):
+    for row, media_id in enricher.cells(cli_args.column, with_rows=True):
 
         try:
             result = client.media(media_id, format='csv_row')
 
-            if namespace.feeds:
+            if cli_args.feeds:
                 feeds = client.feeds(media_id, format='csv_row')
 
                 enricher.writerow(row, result[1:] + [len(feeds)])

@@ -12,9 +12,9 @@ from minet.crowdtangle.client import CrowdTangleAPIClient
 from minet.crowdtangle.exceptions import CrowdTangleInvalidTokenError
 
 
-def crowdtangle_lists_action(namespace, output_file):
+def crowdtangle_lists_action(cli_args, output_file):
 
-    client = CrowdTangleAPIClient(namespace.token, rate_limit=namespace.rate_limit)
+    client = CrowdTangleAPIClient(cli_args.token, rate_limit=cli_args.rate_limit)
     writer = csv.writer(output_file)
     writer.writerow(CROWDTANGLE_LIST_CSV_HEADERS)
 

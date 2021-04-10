@@ -6,9 +6,9 @@
 #
 
 
-def hyphe_action(namespace):
+def hyphe_action(cli_args):
 
-    if namespace.hyphe_action == 'dump':
+    if cli_args.hyphe_action == 'dump':
         from minet.cli.hyphe.dump import hyphe_dump_action
 
-        hyphe_dump_action(namespace)
+        hyphe_dump_action(cli_args)

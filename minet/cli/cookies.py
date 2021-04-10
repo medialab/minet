@@ -84,25 +84,25 @@ def format_morsel_for_csv(morsel):
     ]
 
 
-def cookies_action(namespace):
-    output_file = open_output_file(namespace.output)
+def cookies_action(cli_args):
+    output_file = open_output_file(cli_args.output)
 
-    if namespace.csv:
+    if cli_args.csv:
         output_writer = csv.writer(output_file)
 
     try:
-        jar = getattr(browser_cookie3, namespace.browser)()
+        jar = getattr(browser_cookie3, cli_args.browser)()
     except browser_cookie3.BrowserCookieError:
-        die('Could not extract cookies from %s!' % namespace.browser)
+        die('Could not extract cookies from %s!' % cli_args.browser)
 
-    if namespace.url is not None:
+    if cli_args.url is not None:
         resolver = CookieResolver(jar)
 
-        cookie = resolver(namespace.url)
+        cookie = resolver(cli_args.url)
 
         if cookie is not None:
 
-            if namespace.csv:
+            if cli_args.csv:
                 output_writer.writerow(MORSEL_CSV_HEADER)
 
                 parsed = SimpleCookie(cookie)
@@ -112,9 +112,9 @@ def cookies_action(namespace):
             else:
                 print(cookie, file=output_file)
         else:
-            die('Could not find relevant cookie for %s in %s!' % (namespace.url, namespace.browser))
+            die('Could not find relevant cookie for %s in %s!' % (cli_args.url, cli_args.browser))
     else:
-        if namespace.csv:
+        if cli_args.csv:
             output_writer.writerow(COOKIE_CSV_HEADER)
 
             for cookie in jar:

@@ -51,9 +51,9 @@ def CsvIO(column, value):
     return buf
 
 
-def edit_namespace_with_csv_io(namespace, column, attr_name='column'):
-    namespace.file = CsvIO(column, getattr(namespace, attr_name))
-    setattr(namespace, attr_name, column)
+def edit_cli_args_with_csv_io(cli_args, column, attr_name='column'):
+    cli_args.file = CsvIO(column, getattr(cli_args, attr_name))
+    setattr(cli_args, attr_name, column)
 
 
 class DummyTqdmFile(object):
@@ -181,7 +181,7 @@ WorkerPayload = namedtuple(
 REPORT_HEADERS = ['status', 'filename', 'encoding', 'mimetype']
 
 
-def create_report_iterator(namespace, reader, worker_args=None, on_irrelevant_row=noop):
+def create_report_iterator(cli_args, reader, worker_args=None, on_irrelevant_row=noop):
     for col in REPORT_HEADERS:
         if col not in reader.pos:
             raise MissingColumnError(col)
@@ -192,7 +192,7 @@ def create_report_iterator(namespace, reader, worker_args=None, on_irrelevant_ro
     mimetype_pos = reader.pos.mimetype
     raw_content_pos = reader.pos.get('raw_contents')
 
-    if raw_content_pos is None and not isdir(namespace.input_dir):
+    if raw_content_pos is None and not isdir(cli_args.input_dir):
         raise NotADirectoryError
 
     indexed_headers = reader.pos.as_dict()
@@ -231,7 +231,7 @@ def create_report_iterator(namespace, reader, worker_args=None, on_irrelevant_ro
 
                 continue
 
-            path = join(namespace.input_dir, filename)
+            path = join(cli_args.input_dir, filename)
             encoding = row[encoding_pos].strip() or 'utf-8'
 
             yield WorkerPayload(
@@ -246,8 +246,8 @@ def create_report_iterator(namespace, reader, worker_args=None, on_irrelevant_ro
     return generator()
 
 
-def create_glob_iterator(namespace, worker_args):
-    for p in iglob(namespace.glob, recursive=True):
+def create_glob_iterator(cli_args, worker_args):
+    for p in iglob(cli_args.glob, recursive=True):
         yield WorkerPayload(
             row=None,
             headers=None,

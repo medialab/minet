@@ -23,26 +23,26 @@ from minet.crowdtangle.exceptions import (
 def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
                           announce=None):
 
-    def action(namespace, output_file):
+    def action(cli_args, output_file):
 
         # Do we need to resume?
         need_to_resume = False
 
-        if getattr(namespace, 'resume', False):
+        if getattr(cli_args, 'resume', False):
             need_to_resume = True
 
-            if namespace.output is None:
+            if cli_args.output is None:
                 die(
                     'Cannot --resume without knowing the output (use -o/--output rather stdout).',
                 )
 
-            if namespace.sort_by != 'date':
+            if cli_args.sort_by != 'date':
                 die('Cannot --resume if --sort_by is not `date`.')
 
-            if namespace.format != 'csv':
+            if cli_args.format != 'csv':
                 die('Cannot --resume jsonl format yet.')
 
-            with open(namespace.output, 'r', encoding='utf-8') as f:
+            with open(cli_args.output, 'r', encoding='utf-8') as f:
                 resume_reader = casanova.reader(f)
 
                 last_cell = None
@@ -56,35 +56,35 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
 
                 if last_cell is not None:
                     last_date = last_cell.replace(' ', 'T')
-                    namespace.end_date = last_date
+                    cli_args.end_date = last_date
 
                     print_err('Resuming from: %s' % last_date)
 
         if callable(announce):
-            print_err(announce(namespace))
+            print_err(announce(cli_args))
 
         # Loading bar
         loading_bar = tqdm(
             desc='Fetching %s' % item_name,
             dynamic_ncols=True,
             unit=' %s' % item_name,
-            total=namespace.limit
+            total=cli_args.limit
         )
 
-        if namespace.format == 'csv':
+        if cli_args.format == 'csv':
             writer = csv.writer(output_file)
 
             if not need_to_resume:
-                writer.writerow(csv_headers(namespace) if callable(csv_headers) else csv_headers)
+                writer.writerow(csv_headers(cli_args) if callable(csv_headers) else csv_headers)
         else:
             writer = ndjson.writer(output_file)
 
-        client = CrowdTangleAPIClient(namespace.token, rate_limit=namespace.rate_limit)
+        client = CrowdTangleAPIClient(cli_args.token, rate_limit=cli_args.rate_limit)
 
         args = []
 
         if callable(get_args):
-            args = get_args(namespace)
+            args = get_args(cli_args)
 
         def before_sleep(retry_state):
             exc = retry_state.outcome.exception()
@@ -109,12 +109,12 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
         create_iterator = getattr(client, method_name)
         iterator = create_iterator(
             *args,
-            partition_strategy=getattr(namespace, 'partition_strategy', None),
-            limit=namespace.limit,
-            format='csv_row' if namespace.format == 'csv' else 'raw',
+            partition_strategy=getattr(cli_args, 'partition_strategy', None),
+            limit=cli_args.limit,
+            format='csv_row' if cli_args.format == 'csv' else 'raw',
             per_call=True,
             detailed=True,
-            namespace=namespace,
+            namespace=cli_args,
             before_sleep=before_sleep
         )
 

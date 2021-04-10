@@ -14,7 +14,7 @@ from twitter import TwitterHTTPError
 
 def make_twitter_action(method_name, csv_headers):
 
-    def action(namespace, output_file):
+    def action(cli_args, output_file):
 
         # TODO: this is temp debug
         def listener(event, data):
@@ -22,26 +22,26 @@ def make_twitter_action(method_name, csv_headers):
             tqdm.write(repr(data), file=sys.stderr)
 
         wrapper = TwitterWrapper(
-            namespace.access_token,
-            namespace.access_token_secret,
-            namespace.api_key,
-            namespace.api_secret_key,
+            cli_args.access_token,
+            cli_args.access_token_secret,
+            cli_args.api_key,
+            cli_args.api_secret_key,
             listener=listener
         )
 
         enricher = casanova.enricher(
-            namespace.file,
+            cli_args.file,
             output_file,
-            keep=namespace.select,
+            keep=cli_args.select,
             add=csv_headers + ['cursor'],
-            resumable=namespace.resume,
+            resumable=cli_args.resume,
             auto_resume=False
         )
 
         loading_bar = tqdm(
             desc='Retrieving ids',
             dynamic_ncols=True,
-            total=namespace.total,
+            total=cli_args.total,
             unit=' followers',
             postfix={
                 'users': 0
@@ -67,16 +67,16 @@ def make_twitter_action(method_name, csv_headers):
 
         last_batch = None
 
-        if namespace.resume:
+        if cli_args.resume:
             # TODO: sacralize this in specialized casanova enricher
             last_batch = casanova.reverse_reader.last_batch(
                 output_file.name,
-                batch_value=namespace.column,
+                batch_value=cli_args.column,
                 batch_cursor='cursor',
                 end_symbol='end'
             )
 
-        for row, user in enricher.cells(namespace.column, with_rows=True):
+        for row, user in enricher.cells(cli_args.column, with_rows=True):
             if last_batch:
                 if user != last_batch.value:
                     skipped += 1
@@ -96,7 +96,7 @@ def make_twitter_action(method_name, csv_headers):
             if last_batch and last_batch.cursor:
                 next_cursor = last_batch.cursor
 
-            if namespace.ids:
+            if cli_args.ids:
                 wrapper_kwargs = {'user_id': user}
             else:
                 wrapper_kwargs = {'screen_name': user}

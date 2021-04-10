@@ -16,9 +16,9 @@ from minet.crowdtangle.client import CrowdTangleAPIClient
 from minet.crowdtangle.exceptions import CrowdTangleInvalidTokenError
 
 
-def crowdtangle_posts_by_id_action(namespace, output_file):
+def crowdtangle_posts_by_id_action(cli_args, output_file):
 
-    client = CrowdTangleAPIClient(namespace.token, rate_limit=namespace.rate_limit)
+    client = CrowdTangleAPIClient(cli_args.token, rate_limit=cli_args.rate_limit)
 
     already_done = 0
 
@@ -29,25 +29,25 @@ def crowdtangle_posts_by_id_action(namespace, output_file):
             already_done += 1
 
     enricher = casanova.enricher(
-        namespace.file,
+        cli_args.file,
         output_file,
-        keep=namespace.select,
+        keep=cli_args.select,
         add=CROWDTANGLE_POST_CSV_HEADERS,
-        resumable=namespace.resume,
+        resumable=cli_args.resume,
         listener=listener
     )
 
     loading_bar = tqdm(
         desc='Retrieving posts',
         dynamic_ncols=True,
-        total=namespace.total,
+        total=cli_args.total,
         unit=' posts'
     )
 
     loading_bar.update(already_done)
 
     try:
-        for row, url in enricher.cells(namespace.column, with_rows=True):
+        for row, url in enricher.cells(cli_args.column, with_rows=True):
             with loading_bar:
                 url = url.strip()
 

@@ -11,7 +11,7 @@ from tqdm import tqdm
 from ural import is_url
 
 from minet.constants import COOKIE_BROWSERS
-from minet.cli.utils import open_output_file, die, edit_namespace_with_csv_io
+from minet.cli.utils import open_output_file, die, edit_cli_args_with_csv_io
 from minet.facebook import FacebookMobileScraper
 from minet.facebook.constants import FACEBOOK_COMMENT_CSV_HEADERS
 from minet.facebook.exceptions import (
@@ -20,21 +20,21 @@ from minet.facebook.exceptions import (
 )
 
 
-def facebook_comments_action(namespace):
+def facebook_comments_action(cli_args):
 
     # Handling output
-    output_file = open_output_file(namespace.output)
+    output_file = open_output_file(cli_args.output)
 
     # Handling input
-    if is_url(namespace.column):
-        edit_namespace_with_csv_io(namespace, 'post_url')
+    if is_url(cli_args.column):
+        edit_cli_args_with_csv_io(cli_args, 'post_url')
 
     try:
-        scraper = FacebookMobileScraper(namespace.cookie, throttle=namespace.throttle)
+        scraper = FacebookMobileScraper(cli_args.cookie, throttle=cli_args.throttle)
     except FacebookInvalidCookieError:
-        if namespace.cookie in COOKIE_BROWSERS:
+        if cli_args.cookie in COOKIE_BROWSERS:
             die([
-                'Could not extract relevant cookie from "%s".' % namespace.cookie
+                'Could not extract relevant cookie from "%s".' % cli_args.cookie
             ])
 
         die([
@@ -45,9 +45,9 @@ def facebook_comments_action(namespace):
 
     # Enricher
     enricher = casanova.enricher(
-        namespace.file,
+        cli_args.file,
         output_file,
-        keep=namespace.select,
+        keep=cli_args.select,
         add=FACEBOOK_COMMENT_CSV_HEADERS
     )
 
@@ -58,7 +58,7 @@ def facebook_comments_action(namespace):
         unit=' comments'
     )
 
-    for i, (row, url) in enumerate(enricher.cells(namespace.column, with_rows=True), 1):
+    for i, (row, url) in enumerate(enricher.cells(cli_args.column, with_rows=True), 1):
         try:
             batches = scraper.comments(
                 url,

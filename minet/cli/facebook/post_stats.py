@@ -121,16 +121,16 @@ def format(data):
     return row
 
 
-def facebook_post_stats_action(namespace):
+def facebook_post_stats_action(cli_args):
 
     # Handling output
-    output_file = open_output_file(namespace.output)
+    output_file = open_output_file(cli_args.output)
 
     enricher = casanova.enricher(
-        namespace.file,
+        cli_args.file,
         output_file,
         add=REPORT_HEADERS,
-        keep=namespace.select
+        keep=cli_args.select
     )
 
     def fetch_facebook_page_stats(url):
@@ -238,10 +238,10 @@ def facebook_post_stats_action(namespace):
         desc='Fetching post stats',
         dynamic_ncols=True,
         unit=' posts',
-        total=namespace.total
+        total=cli_args.total
     )
 
-    for row, post_url in enricher.cells(namespace.column, with_rows=True):
+    for row, post_url in enricher.cells(cli_args.column, with_rows=True):
         loading_bar.update()
 
         if (

@@ -57,13 +57,13 @@ YOUTUBE_REPORT_HEADERS = [
 ]
 
 
-def extract_standard_addendum(namespace, url):
+def extract_standard_addendum(cli_args, url):
     inferred_redirection = infer_redirection(url)
 
     return [
         normalize_url(
             url,
-            strip_protocol=namespace.strip_protocol,
+            strip_protocol=cli_args.strip_protocol,
             strip_trailing_slash=True
         ),
         inferred_redirection if inferred_redirection != url else '',
@@ -122,38 +122,38 @@ def extract_facebook_addendum(url):
         raise TypeError('unknown facebook parse result type!')
 
 
-def url_parse_action(namespace):
+def url_parse_action(cli_args):
 
-    output_file = open_output_file(namespace.output)
+    output_file = open_output_file(cli_args.output)
 
     headers = REPORT_HEADERS
 
-    if namespace.facebook:
+    if cli_args.facebook:
         headers = FACEBOOK_REPORT_HEADERS
-    elif namespace.youtube:
+    elif cli_args.youtube:
         headers = YOUTUBE_REPORT_HEADERS
 
     enricher = casanova.enricher(
-        namespace.file,
+        cli_args.file,
         output_file,
         add=headers,
-        keep=namespace.select
+        keep=cli_args.select
     )
 
     loading_bar = tqdm(
         desc='Parsing',
         dynamic_ncols=True,
         unit=' rows',
-        total=namespace.total
+        total=cli_args.total
     )
 
-    for row, url in enricher.cells(namespace.column, with_rows=True):
+    for row, url in enricher.cells(cli_args.column, with_rows=True):
         url = url.strip()
 
         loading_bar.update()
 
-        if namespace.separator:
-            urls = url.split(namespace.separator)
+        if cli_args.separator:
+            urls = url.split(cli_args.separator)
         else:
             urls = [url]
 
@@ -162,12 +162,12 @@ def url_parse_action(namespace):
                 enricher.writerow(row)
                 continue
 
-            if namespace.facebook:
+            if cli_args.facebook:
                 addendum = extract_facebook_addendum(url)
-            elif namespace.youtube:
+            elif cli_args.youtube:
                 addendum = extract_youtube_addendum(url)
             else:
-                addendum = extract_standard_addendum(namespace, url)
+                addendum = extract_standard_addendum(cli_args, url)
 
             if addendum is None:
                 enricher.writerow(row)
