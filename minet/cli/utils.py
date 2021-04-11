@@ -56,33 +56,6 @@ def edit_cli_args_with_csv_io(cli_args, column, attr_name='column'):
     setattr(cli_args, attr_name, column)
 
 
-class DummyTqdmFile(object):
-    """
-    Dummy file-like that will write to tqdm. Taken straight from the lib's
-    documentation: https://github.com/tqdm/tqdm but modified for minet use
-    case regarding stdout piping.
-    """
-    file = None
-
-    def __init__(self, file=sys.stdout):
-        self.file = file
-        self.cursor = 0
-
-    def write(self, x):
-        self.cursor += 1
-        # Avoid print() second call (useless \n)
-        tqdm.write(x, file=self.file, end='')
-
-    def flush(self):
-        return self.file.flush()
-
-    def tell(self):
-        return self.cursor
-
-    def close(self):
-        pass
-
-
 class LoadingBar(object):
     __slots__ = ('bar', 'stats')
 
@@ -172,7 +145,7 @@ def acquire_cross_platform_stdout():
 
 def open_output_file(output, flag='w', encoding='utf-8'):
     if output is None:
-        return DummyTqdmFile(acquire_cross_platform_stdout())
+        return acquire_cross_platform_stdout()
 
     # As per #254: newline='' is necessary for CSV output on windows to avoid
     # outputting extra lines because of a '\r\r\n' end of line...
