@@ -45,6 +45,8 @@ def facebook_posts_action(cli_args):
         unit='post'
     )
 
+    translated_langs = set()
+
     for i, (row, url) in enumerate(enricher.cells(cli_args.column, with_rows=True), 1):
         loading_bar.inc('groups')
 
@@ -55,5 +57,20 @@ def facebook_posts_action(cli_args):
             continue
 
         for post in posts:
+            if post.translated_text and post.translated_from not in translated_langs:
+                translated_langs.add(post.translated_from)
+                lines = [
+                    'Found text translated from %s!' % post.translated_from,
+                    'Since it means original text may not be entirely retrieved you might want',
+                    'to edit your Facebook language settings to add "%s" to' % post.translated_from,
+                    'the "Languages you don\'t want to be offered translations for" list here:',
+                    'https://www.facebook.com/settings/?tab=language'
+                ]
+
+                for line in lines:
+                    loading_bar.print(line)
+
+                loading_bar.print()
+
             loading_bar.update()
             enricher.writerow(row, post.as_csv_row())
