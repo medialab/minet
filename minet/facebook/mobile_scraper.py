@@ -14,7 +14,8 @@ from ural import force_protocol
 from ural.facebook import (
     parse_facebook_url,
     convert_facebook_url_to_mobile,
-    has_facebook_comments
+    has_facebook_comments,
+    FacebookGroup as ParsedFacebookGroup
 )
 
 from minet.utils import (
@@ -379,22 +380,32 @@ class FacebookMobileScraper(object):
         return generator()
 
     def posts(self, url):
-        retryer = create_request_retryer()
+        parsed = parse_facebook_url(url)
 
-        current_url = convert_url_to_mobile(url)
+        if not isinstance(parsed, ParsedFacebookGroup):
+            raise FacebookInvalidTargetError
 
-        while True:
-            html = retryer(self.request_page, current_url)
+        url = convert_url_to_mobile(parsed.url)
 
-            # with open('./dump.html', 'w') as f:
-            #     f.write(html)
+        def generator():
 
-            next_url, posts = scrape_posts(html)
+            retryer = create_request_retryer()
+            current_url = url
 
-            for post in posts:
-                yield post
+            while True:
+                html = retryer(self.request_page, current_url)
 
-            if next_url is None or len(posts) == 0:
-                break
+                # with open('./dump.html', 'w') as f:
+                #     f.write(html)
 
-            current_url = next_url
+                next_url, posts = scrape_posts(html)
+
+                for post in posts:
+                    yield post
+
+                if next_url is None or len(posts) == 0:
+                    break
+
+                current_url = next_url
+
+        return generator()
