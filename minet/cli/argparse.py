@@ -10,7 +10,10 @@ from argparse import Action, ArgumentError
 from gettext import gettext
 
 from minet.utils import nested_get
-from minet.cli.utils import acquire_cross_platform_stdout, CsvIO
+from minet.cli.utils import (
+    acquire_cross_platform_stdout,
+    CsvIO
+)
 
 
 class SplitterType(object):
