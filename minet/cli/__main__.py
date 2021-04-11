@@ -47,7 +47,7 @@ def custom_formatter(prog):
     return RawTextHelpFormatter(
         prog,
         max_help_position=50,
-        width=terminal_size.columns,
+        width=terminal_size.columns
     )
 
 
@@ -104,7 +104,8 @@ def add_arguments(subparser, arguments):
 def build_description(command):
     description = command['title'] + '\n' + ('=' * len(command['title']))
 
-    description += '\n\n' + dedent(command.get('description', ''))
+    text = dedent(command.get('description', ''))
+    description += '\n\n' + text
 
     return description
 
