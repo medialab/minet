@@ -32,6 +32,7 @@
   * [summary](#summary)
 * [facebook (fb)](#facebook)
   * [comments](#facebook-comments)
+  * [posts](#facebook-posts)
   * [url-likes](#facebook-url-likes)
 * [google](#google)
   * [sheets](#google-sheets)
@@ -893,7 +894,7 @@ examples:
 ## Facebook
 
 ```
-usage: minet facebook [-h] {comments,post-stats,url-likes} ...
+usage: minet facebook [-h] {comments,posts,post-stats,url-likes} ...
 
 Minet Facebook Command
 ======================
@@ -901,10 +902,10 @@ Minet Facebook Command
 Collects data from Facebook.
 
 optional arguments:
-  -h, --help                       show this help message and exit
+  -h, --help                             show this help message and exit
 
 actions:
-  {comments,post-stats,url-likes}  Action to perform to collect data on Facebook
+  {comments,posts,post-stats,url-likes}  Action to perform to collect data on Facebook
 
 ```
 
@@ -920,24 +921,99 @@ Minet Facebook Comments Command
 
 Scrape a Facebook post's comments.
 
+This requires to be logged in to a Facebook account, so
+by default this command will attempt to grab the relevant
+authentication cookies from a local Firefox browser.
+
+If you want to grab cookies from another browser or want
+to directly pass the cookie as a string, check out the
+-c/--cookie flag.
+
 positional arguments:
-  column                      Column of the CSV file containing post urls or a single post url to fetch.
+  column                      Column of the CSV file containing post urls or a single post url.
   file                        CSV file containing the post urls.
 
 optional arguments:
   -h, --help                  show this help message and exit
   -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "facebook.cookie" or read from the MINET_FACEBOOK_COOKIE env variable.
-  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
 
 examples:
 
-. Fetching a post's comments:
-    $ minet fb comments -c firefox https://www.facebook.com/page/posts/3601645349798293 > comments.csv
+. Scraping a post's comments:
+    $ minet fb comments https://www.facebook.com/groups/186982532676569/permalink/4096995827030341/ > comments.csv
 
-. Fetching a series of posts comments:
-    $ minet fb comments post_url posts.csv -c firefox > comments.csv
+. Grabbing cookies from chrome:
+    $ minet fb comments -c chrome https://www.facebook.com/groups/186982532676569/permalink/4096995827030341/ > comments.csv
+
+. Scraping comments from multiple posts listed in a CSV file:
+    $ minet fb comments post_url posts.csv > comments.csv
+
+```
+
+<h3 id="facebook-posts">posts</h3>
+
+```
+usage: minet facebook posts [-h] [-c COOKIE] [-o OUTPUT] [-s SELECT]
+                            [--throttle THROTTLE]
+                            column [file]
+
+Minet Facebook Posts Command
+============================
+
+Scrape Facebook posts.
+
+This requires to be logged in to a Facebook account, so
+by default this command will attempt to grab the relevant
+authentication cookies from a local Firefox browser.
+
+If you want to grab cookies from another browser or want
+to directly pass the cookie as a string, check out the
+-c/--cookie flag.
+
+Scraping posts currently only works for Facebook groups.
+
+Note that, by default, Facebook will translate post text
+when they are not written in a language whitelisted here:
+https://www.facebook.com/settings/?tab=language
+
+In this case, minet will output both the original text and
+the translated one. But be aware that original text may be
+truncated, so you might want to edit your Facebook settings
+using the url above to make sure text won't be translated
+for posts you are interested in.
+
+Of course, the CLI will warn you when translated text is
+found so you can choose to edit your settings early as
+as possible.
+
+Finally, some post text is always truncated on Facebook
+when displayed in lists. This text is not yet entirely
+scraped by minet at this time.
+
+positional arguments:
+  column                      Column of the CSV file containing group urls or a single group url.
+  file                        CSV file containing the group urls.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "facebook.cookie" or read from the MINET_FACEBOOK_COOKIE env variable.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
+
+examples:
+
+. Scraping a group's posts:
+    $ minet fb posts https://www.facebook.com/groups/444175323127747 > posts.csv
+
+. Grabbing cookies from chrome:
+    $ minet fb posts -c chrome https://www.facebook.com/groups/444175323127747 > posts.csv
+
+. Scraping posts from multiple groups listed in a CSV file:
+    $ minet fb posts group_url groups.csv > posts.csv
 
 ```
 

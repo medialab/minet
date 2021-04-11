@@ -13,6 +13,11 @@ def facebook_action(cli_args):
 
         facebook_comments_action(cli_args)
 
+    if cli_args.fb_action == 'posts':
+        from minet.cli.facebook.posts import facebook_posts_action
+
+        facebook_posts_action(cli_args)
+
     elif cli_args.fb_action == 'post-stats':
         from minet.cli.facebook.post_stats import facebook_post_stats_action
 

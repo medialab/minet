@@ -677,26 +677,117 @@ MINET_COMMANDS = {
                     'title': 'Minet Facebook Comments Command',
                     'description': '''
                         Scrape a Facebook post's comments.
+
+                        This requires to be logged in to a Facebook account, so
+                        by default this command will attempt to grab the relevant
+                        authentication cookies from a local Firefox browser.
+
+                        If you want to grab cookies from another browser or want
+                        to directly pass the cookie as a string, check out the
+                        -c/--cookie flag.
                     ''',
                     'epilog': '''
                         examples:
 
-                        . Fetching a post's comments:
-                            $ minet fb comments -c firefox https://www.facebook.com/page/posts/3601645349798293 > comments.csv
+                        . Scraping a post's comments:
+                            $ minet fb comments https://www.facebook.com/groups/186982532676569/permalink/4096995827030341/ > comments.csv
 
-                        . Fetching a series of posts comments:
-                            $ minet fb comments post_url posts.csv -c firefox > comments.csv
+                        . Grabbing cookies from chrome:
+                            $ minet fb comments -c chrome https://www.facebook.com/groups/186982532676569/permalink/4096995827030341/ > comments.csv
+
+                        . Scraping comments from multiple posts listed in a CSV file:
+                            $ minet fb comments post_url posts.csv > comments.csv
                     ''',
                     'arguments': [
                         {
                             'name': 'column',
-                            'help': 'Column of the CSV file containing post urls or a single post url to fetch.'
+                            'help': 'Column of the CSV file containing post urls or a single post url.'
                         },
                         {
                             'name': 'file',
                             'help': 'CSV file containing the post urls.',
                             'action': InputFileAction,
                             'dummy_csv_column': 'post_url'
+                        },
+                        {
+                            'flags': ['-c', '--cookie'],
+                            'help': 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".',
+                            'default': 'firefox',
+                            'rc_key': ['facebook', 'cookie'],
+                            'action': ConfigAction
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--throttle',
+                            'help': 'Throttling time, in seconds, to wait between each request.',
+                            'type': float,
+                            'default': FACEBOOK_MOBILE_DEFAULT_THROTTLE
+                        }
+                    ]
+                },
+                'posts': {
+                    'title': 'Minet Facebook Posts Command',
+                    'description': '''
+                        Scrape Facebook posts.
+
+                        This requires to be logged in to a Facebook account, so
+                        by default this command will attempt to grab the relevant
+                        authentication cookies from a local Firefox browser.
+
+                        If you want to grab cookies from another browser or want
+                        to directly pass the cookie as a string, check out the
+                        -c/--cookie flag.
+
+                        Scraping posts currently only works for Facebook groups.
+
+                        Note that, by default, Facebook will translate post text
+                        when they are not written in a language whitelisted here:
+                        https://www.facebook.com/settings/?tab=language
+
+                        In this case, minet will output both the original text and
+                        the translated one. But be aware that original text may be
+                        truncated, so you might want to edit your Facebook settings
+                        using the url above to make sure text won't be translated
+                        for posts you are interested in.
+
+                        Of course, the CLI will warn you when translated text is
+                        found so you can choose to edit your settings early as
+                        as possible.
+
+                        Finally, some post text is always truncated on Facebook
+                        when displayed in lists. This text is not yet entirely
+                        scraped by minet at this time.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Scraping a group's posts:
+                            $ minet fb posts https://www.facebook.com/groups/444175323127747 > posts.csv
+
+                        . Grabbing cookies from chrome:
+                            $ minet fb posts -c chrome https://www.facebook.com/groups/444175323127747 > posts.csv
+
+                        . Scraping posts from multiple groups listed in a CSV file:
+                            $ minet fb posts group_url groups.csv > posts.csv
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Column of the CSV file containing group urls or a single group url.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the group urls.',
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'group_url'
                         },
                         {
                             'flags': ['-c', '--cookie'],
