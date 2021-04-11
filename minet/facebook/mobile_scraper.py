@@ -244,6 +244,12 @@ def scrape_posts(html):
             comments = comments_item.get_text().split('Comment', 1)[0].strip()
 
         text_root = el.select_one('[data-ft=\'{"tn":"*s"}\']')
+        additional_html_roots = []
+
+        img_root = el.select_one('[data-ft=\'{"tn":"H"}\']')
+
+        if img_root:
+            additional_html_roots.append(img_root)
 
         all_text_elements = text_root.find_all('div', recursive=False)
 
@@ -259,8 +265,10 @@ def scrape_posts(html):
                 translation_link.extract()
                 translated_text_elements.append(text_el)
 
+        html_elements = text_elements + additional_html_roots
+
         comment_text = get_display_text(text_elements)
-        comment_html = ''.join(str(el) for el in text_elements)
+        comment_html = ''.join(str(el) for el in html_elements)
 
         translated_comment_text = get_display_text(translated_text_elements)
         translated_comment_html = ''.join(str(el) for el in translated_text_elements)
