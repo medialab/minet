@@ -12,6 +12,7 @@ from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
 from minet.cli.argparse import (
     BooleanAction,
     ConfigAction,
+    InputFileAction,
     OutputFileAction,
     SplitterType
 )
@@ -694,9 +695,8 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the post urls.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'post_url'
                         },
                         {
                             'flags': ['-c', '--cookie'],

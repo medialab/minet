@@ -5,10 +5,12 @@
 # Miscellaneous helpers related to CLI argument parsing.
 #
 import os
-from argparse import Action, ArgumentTypeError
+import sys
+from argparse import Action, ArgumentError
+from gettext import gettext
 
 from minet.utils import nested_get
-from minet.cli.utils import acquire_cross_platform_stdout
+from minet.cli.utils import acquire_cross_platform_stdout, CsvIO
 
 
 class SplitterType(object):
@@ -32,6 +34,42 @@ class BooleanAction(Action):
         setattr(cli_args, self.dest, False if option_string.startswith('--no') else True)
 
 
+class InputFileAction(Action):
+    def __init__(self, option_strings, dest, dummy_csv_column=None,
+                 column_dest='column', **kwargs):
+
+        self.dummy_csv_column = dummy_csv_column
+        self.column_dest = column_dest
+
+        super().__init__(
+            option_strings,
+            dest,
+            default=None,
+            nargs='?',
+            **kwargs
+        )
+
+    def __call__(self, parser, cli_args, value, option_string=None):
+        if value is None:
+            f = sys.stdin
+
+            if self.dummy_csv_column is not None:
+
+                # No stdin was piped
+                if sys.stdin.isatty():
+                    f = CsvIO(self.dummy_csv_column, getattr(cli_args, self.column_dest))
+                    setattr(cli_args, self.column_dest, self.dummy_csv_column)
+        else:
+            try:
+                f = open(value, 'r', encoding='utf-8')
+            except OSError as e:
+                args = {'filename': value, 'error': e}
+                message = gettext('can\'t open \'%(filename)s\': %(error)s')
+                raise ArgumentError(self, message % args)
+
+        setattr(cli_args, self.dest, f)
+
+
 class OutputFileAction(Action):
     def __init__(self, option_strings, dest, **kwargs):
         super().__init__(
@@ -46,7 +84,12 @@ class OutputFileAction(Action):
 
         # As per #254: newline='' is necessary for CSV output on windows to avoid
         # outputting extra lines because of a '\r\r\n' end of line...
-        f = open(value, 'w', encoding='utf-8', newline='')
+        try:
+            f = open(value, 'w', encoding='utf-8', newline='')
+        except OSError as e:
+            args = {'filename': value, 'error': e}
+            message = gettext('can\'t open \'%(filename)s\': %(error)s')
+            raise ArgumentError(self, message % args)
 
         setattr(cli_args, self.dest, f)
 

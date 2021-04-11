@@ -5,10 +5,9 @@
 # Logic of the `fb comments` action.
 #
 import casanova
-from ural import is_url
 
 from minet.constants import COOKIE_BROWSERS
-from minet.cli.utils import die, edit_cli_args_with_csv_io, LoadingBar
+from minet.cli.utils import die, LoadingBar
 from minet.facebook import FacebookMobileScraper
 from minet.facebook.constants import FACEBOOK_COMMENT_CSV_HEADERS
 from minet.facebook.exceptions import (
@@ -18,11 +17,6 @@ from minet.facebook.exceptions import (
 
 
 def facebook_comments_action(cli_args):
-
-    # Handling input
-    if is_url(cli_args.column):
-        edit_cli_args_with_csv_io(cli_args, 'post_url')
-
     try:
         scraper = FacebookMobileScraper(cli_args.cookie, throttle=cli_args.throttle)
     except FacebookInvalidCookieError:
