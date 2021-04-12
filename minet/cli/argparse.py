@@ -8,6 +8,7 @@ import os
 import sys
 from argparse import Action, ArgumentError
 from gettext import gettext
+from tqdm.contrib import DummyTqdmFile
 
 from minet.utils import nested_get
 from minet.cli.utils import (
@@ -79,7 +80,7 @@ class OutputFileAction(Action):
             option_strings,
             dest,
             help='Path to the output file. By default, the results will be printed to stdout.',
-            default=acquire_cross_platform_stdout(),
+            default=DummyTqdmFile(acquire_cross_platform_stdout()),
             **kwargs
         )
 

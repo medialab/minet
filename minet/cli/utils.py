@@ -13,6 +13,7 @@ from glob import iglob
 from os.path import join, expanduser, isfile, isdir
 from collections import namedtuple
 from tqdm import tqdm
+from tqdm.contrib import DummyTqdmFile
 
 from minet.cli.exceptions import MissingColumnError
 from minet.utils import fuzzy_int, noop
@@ -145,7 +146,7 @@ def acquire_cross_platform_stdout():
 
 def open_output_file(output, flag='w', encoding='utf-8'):
     if output is None:
-        return acquire_cross_platform_stdout()
+        return DummyTqdmFile(acquire_cross_platform_stdout())
 
     # As per #254: newline='' is necessary for CSV output on windows to avoid
     # outputting extra lines because of a '\r\r\n' end of line...
