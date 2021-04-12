@@ -23,7 +23,8 @@ def mediacloud_search_action(cli_args, output_file):
         'medias': cli_args.medias,
         'publish_day': cli_args.publish_day,
         'publish_month': cli_args.publish_month,
-        'publish_year': cli_args.publish_year
+        'publish_year': cli_args.publish_year,
+        'filter_query': cli_args.filter_query
     }
 
     loading_bar = LoadingBar(

@@ -1179,7 +1179,8 @@ optional arguments:
 
 ```
 usage: minet mediacloud search [-h] [-t TOKEN] [-o OUTPUT] [-c COLLECTIONS]
-                               [-m MEDIAS] [--publish-day PUBLISH_DAY]
+                               [--filter-query FILTER_QUERY] [-m MEDIAS]
+                               [--publish-day PUBLISH_DAY]
                                [--publish-month PUBLISH_MONTH]
                                [--publish-year PUBLISH_YEAR] [--skip-count]
                                query
@@ -1199,6 +1200,7 @@ optional arguments:
   -t TOKEN, --token TOKEN                    Mediacloud API token (also called key). Can also be configured in a .minetrc file as "mediacloud.token" or read from the MINET_MEDIACLOUD_TOKEN env variable.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the output will be printed to stdout.
   -c COLLECTIONS, --collections COLLECTIONS  List of collection ids to search, separated by commas.
+  --filter-query FILTER_QUERY                Solr filter query `fq` to use. Can be used to optimize some parts of the query.
   -m MEDIAS, --medias MEDIAS                 List of media ids to search, separated by commas.
   --publish-day PUBLISH_DAY                  Only search stories published on provided day (iso format, e.g. "2018-03-24").
   --publish-month PUBLISH_MONTH              Only search stories published on provided month (iso format, e.g. "2018-03").

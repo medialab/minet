@@ -1224,6 +1224,10 @@ MINET_COMMANDS = {
                             'type': SplitterType()
                         },
                         {
+                            'flags': ['--filter-query'],
+                            'help': 'Solr filter query `fq` to use. Can be used to optimize some parts of the query.'
+                        },
+                        {
                             'flags': ['-m', '--medias'],
                             'help': 'List of media ids to search, separated by commas.',
                             'type': SplitterType()

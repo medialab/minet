@@ -62,7 +62,7 @@ def query_additions(query, collections=None, medias=None,
     return query
 
 
-def url_forge(token, query, collections=None, medias=None,
+def url_forge(token, query, filter_query=None, collections=None, medias=None,
               publish_day=None, publish_month=None, publish_year=None,
               count=False, last_processed_stories_id=None):
 
@@ -83,6 +83,9 @@ def url_forge(token, query, collections=None, medias=None,
 
     url += '&q=%s' % quote_plus(query)
 
+    if filter_query is not None:
+        url += '&fq=%s' % quote_plus(filter_query)
+
     if not count:
         url += '&rows=%i' % MEDIACLOUD_DEFAULT_BATCH
 
@@ -92,9 +95,9 @@ def url_forge(token, query, collections=None, medias=None,
     return url
 
 
-def mediacloud_search(pool, token, query, count=False, collections=None,
-                      medias=None, publish_day=None, publish_month=None,
-                      publish_year=None, format='csv_dict_row',):
+def mediacloud_search(pool, token, query, filter_query=None, count=False,
+                      collections=None, medias=None, publish_day=None,
+                      publish_month=None, publish_year=None, format='csv_dict_row',):
 
     def generator():
         last_processed_stories_id = None
@@ -103,6 +106,7 @@ def mediacloud_search(pool, token, query, count=False, collections=None,
             url = url_forge(
                 token,
                 query,
+                filter_query=filter_query,
                 collections=collections,
                 medias=medias,
                 publish_day=publish_day,
