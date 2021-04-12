@@ -6,6 +6,7 @@ Documentation for the utilities found in the `minet.facebook` subpackage.
 
 * [FacebookMobileScraper](#facebookmobilescraper)
   * [#.comments](#comments)
+  * [#.posts](#posts)
 
 ## FacebookMobileScraper
 
@@ -39,3 +40,16 @@ for comment in scraper.comments(post_url):
 * **url** *str*: url of the post whose comments you want to scrape.
 * **detailed** *?bool* [`False`]: whether to yield a detailed output containing some stats.
 * **per_call** *?bool* [`False`]: whether to yield the list of comments retrieved per call to the website.
+
+### #.posts
+
+Method used to retrieve a group's posts.
+
+```python
+for post in scraper.posts(group_url):
+  print(post)
+```
+
+*Arguments*
+
+* **url** *str*: url of the group whose posts you want to scrape.
