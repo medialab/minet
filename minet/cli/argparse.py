@@ -6,6 +6,7 @@
 #
 import os
 import sys
+from io import TextIOBase
 from argparse import Action, ArgumentError
 from gettext import gettext
 from tqdm.contrib import DummyTqdmFile
@@ -141,3 +142,25 @@ class ConfigAction(Action):
 
     def __call__(self, parser, cli_args, values, option_string=None):
         setattr(cli_args, self.dest, values)
+
+
+def resolve_arg_dependencies(cli_args, config):
+    to_close = []
+
+    for name in vars(cli_args):
+        value = getattr(cli_args, name)
+
+        # Solving wrapped config values
+        if isinstance(value, WrappedConfigValue):
+            setattr(cli_args, name, value.resolve(config))
+
+        # Finding buffers to close eventually
+        if (
+            isinstance(value, TextIOBase) and
+            value is not sys.stdin and
+            value is not sys.stdout and
+            value is not sys.stderr
+        ):
+            to_close.append(value)
+
+    return to_close

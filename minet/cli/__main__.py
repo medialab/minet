@@ -13,7 +13,6 @@ import signal
 import shutil
 import importlib
 import multiprocessing
-from io import TextIOBase
 from textwrap import dedent
 from contextlib import ExitStack
 from argparse import (
@@ -24,7 +23,7 @@ from colorama import init as colorama_init
 
 from minet.__version__ import __version__
 from minet.cli.utils import die, get_rcfile
-from minet.cli.argparse import WrappedConfigValue
+from minet.cli.argparse import resolve_arg_dependencies
 
 from minet.cli.commands import MINET_COMMANDS
 
@@ -200,21 +199,16 @@ def main():
         # Loading config
         config = get_rcfile(cli_args.rcfile)
 
-        # Bootstrapping config
-        for name in vars(cli_args):
-            value = getattr(cli_args, name)
-
-            if isinstance(value, WrappedConfigValue):
-                setattr(cli_args, name, value.resolve(config))
+        # Resolving namespace dependencies
+        to_close = resolve_arg_dependencies(cli_args, config)
 
         # Lazy loading module for faster startup
         m = importlib.import_module(action['command']['package'])
         fn = getattr(m, action['command']['action'])
 
         with ExitStack() as stack:
-            for v in vars(cli_args).values():
-                if isinstance(v, TextIOBase) and v is not sys.stdin and v is not sys.stdout:
-                    stack.callback(v.close)
+            for buffer in to_close:
+                stack.callback(buffer.close)
 
             fn(cli_args)
 
