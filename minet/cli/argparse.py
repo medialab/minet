@@ -12,6 +12,7 @@ from gettext import gettext
 from tqdm.contrib import DummyTqdmFile
 
 from minet.utils import nested_get
+from minet.cli.exceptions import NotResumable
 from minet.cli.utils import (
     acquire_cross_platform_stdout,
     CsvIO
@@ -153,9 +154,15 @@ class ConfigAction(Action):
 def resolve_arg_dependencies(cli_args, config):
     to_close = []
 
+    # Helpers
     if hasattr(cli_args, 'output') and not hasattr(cli_args, 'output_is_file'):
         setattr(cli_args, 'output_is_file', False)
 
+    # Validation
+    if getattr(cli_args, 'resume', False) and not cli_args.output_is_file:
+        raise NotResumable
+
+    # Unwrapping values
     for name in vars(cli_args):
         value = getattr(cli_args, name)
 

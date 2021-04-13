@@ -15,3 +15,7 @@ class MissingColumnError(MinetCLIError):
     def __init__(self, message, column):
         super().__init__(message)
         self.column = column
+
+
+class NotResumable(MinetCLIError):
+    pass

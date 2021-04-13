@@ -24,6 +24,7 @@ from colorama import init as colorama_init
 from minet.__version__ import __version__
 from minet.cli.utils import die, get_rcfile
 from minet.cli.argparse import resolve_arg_dependencies
+from minet.cli.exceptions import NotResumable
 
 from minet.cli.commands import MINET_COMMANDS
 
@@ -204,6 +205,8 @@ def main():
             to_close = resolve_arg_dependencies(cli_args, config)
         except OSError as e:
             parser.error('Could not open output file (-o/--output): %s' % str(e))
+        except NotResumable:
+            parser.error('Cannot --resume without knowing where the output will be written (use -o/--output)')
 
         # Lazy loading module for faster startup
         m = importlib.import_module(action['command']['package'])

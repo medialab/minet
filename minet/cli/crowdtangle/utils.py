@@ -29,11 +29,6 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
         if getattr(cli_args, 'resume', False):
             need_to_resume = True
 
-            if not cli_args.output_is_file:
-                die(
-                    'Cannot --resume without knowing where the output will be written (use -o/--output).',
-                )
-
             if cli_args.sort_by != 'date':
                 die('Cannot --resume if --sort_by is not `date`.')
 
