@@ -10,6 +10,7 @@ from twitwi import (
     normalize_user,
     format_user_as_csv_row
 )
+from twitter import TwitterHTTPError
 from twitwi.constants import USER_FIELDS
 from tqdm import tqdm
 from ebbe import as_chunks
@@ -48,7 +49,14 @@ def twitter_users_action(cli_args, output_file):
             wrapper_args = {'screen_name': users}
             key = 'screen_name'
 
-        result = wrapper.call(['users', 'lookup'], **wrapper_args)
+        try:
+            result = wrapper.call(['users', 'lookup'], **wrapper_args)
+        except TwitterHTTPError as e:
+            if e.e.code == 404:
+                for row, user in chunk:
+                    enricher.writerow(row, user_row)
+            else:
+                raise e
 
         if result is not None:
             indexed_result = {}
