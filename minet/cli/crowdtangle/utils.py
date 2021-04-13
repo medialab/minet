@@ -5,13 +5,11 @@
 # Miscellaneous generic functions used throughout the CrowdTangle actions.
 #
 import csv
-import sys
 import casanova
 import ndjson
-from tqdm import tqdm
 
 from minet.utils import prettyprint_seconds
-from minet.cli.utils import print_err, die
+from minet.cli.utils import print_err, die, LoadingBar
 from minet.crowdtangle import CrowdTangleAPIClient
 from minet.crowdtangle.exceptions import (
     CrowdTangleInvalidTokenError,
@@ -23,7 +21,7 @@ from minet.crowdtangle.exceptions import (
 def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
                           announce=None):
 
-    def action(cli_args, output_file):
+    def action(cli_args):
 
         # Do we need to resume?
         need_to_resume = False
@@ -31,9 +29,9 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
         if getattr(cli_args, 'resume', False):
             need_to_resume = True
 
-            if cli_args.output is None:
+            if not cli_args.output_is_file:
                 die(
-                    'Cannot --resume without knowing the output (use -o/--output rather stdout).',
+                    'Cannot --resume without knowing where the output will be written (use -o/--output).',
                 )
 
             if cli_args.sort_by != 'date':
@@ -42,42 +40,31 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
             if cli_args.format != 'csv':
                 die('Cannot --resume jsonl format yet.')
 
-            with open(cli_args.output, 'r', encoding='utf-8') as f:
-                resume_reader = casanova.reader(f)
+            last_cell = casanova.reverse_reader.last_cell(cli_args.output.name, 'datetime')
 
-                last_cell = None
-                resume_loader = tqdm(desc='Resuming', unit=' lines')
+            if last_cell is not None:
+                last_date = last_cell.replace(' ', 'T')
+                cli_args.end_date = last_date
 
-                for cell in resume_reader.cells('datetime'):
-                    resume_loader.update()
-                    last_cell = cell
-
-                resume_loader.close()
-
-                if last_cell is not None:
-                    last_date = last_cell.replace(' ', 'T')
-                    cli_args.end_date = last_date
-
-                    print_err('Resuming from: %s' % last_date)
+                print_err('Resuming from: %s' % last_date)
 
         if callable(announce):
             print_err(announce(cli_args))
 
         # Loading bar
-        loading_bar = tqdm(
+        loading_bar = LoadingBar(
             desc='Fetching %s' % item_name,
-            dynamic_ncols=True,
-            unit=' %s' % item_name,
+            unit=item_name,
             total=cli_args.limit
         )
 
         if cli_args.format == 'csv':
-            writer = csv.writer(output_file)
+            writer = csv.writer(cli_args.output)
 
             if not need_to_resume:
                 writer.writerow(csv_headers(cli_args) if callable(csv_headers) else csv_headers)
         else:
-            writer = ndjson.writer(output_file)
+            writer = ndjson.writer(cli_args.output)
 
         client = CrowdTangleAPIClient(cli_args.token, rate_limit=cli_args.rate_limit)
 
@@ -98,18 +85,16 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
             else:
                 reason = 'Call failed because of server timeout!'
 
-            tqdm.write(
+            loading_bar.print(
                 '%s\nWill wait for %s before attempting again.' % (
                     reason,
                     prettyprint_seconds(retry_state.idle_for, granularity=2)
-                ),
-                file=sys.stderr
+                )
             )
 
         create_iterator = getattr(client, method_name)
         iterator = create_iterator(
             *args,
-            partition_strategy=getattr(cli_args, 'partition_strategy', None),
             limit=cli_args.limit,
             format='csv_row' if cli_args.format == 'csv' else 'raw',
             per_call=True,
@@ -120,21 +105,18 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
 
         try:
             for details, items in iterator:
+                loading_bar.update(len(items))
+
                 if details is not None:
-                    loading_bar.set_postfix(**details)
+                    loading_bar.update_stats(**details)
 
                 for item in items:
                     writer.writerow(item)
 
-                loading_bar.update(len(items))
-
         except CrowdTangleInvalidTokenError:
-            loading_bar.close()
-            die([
+            loading_bar.die([
                 'Your API token is invalid.',
                 'Check that you indicated a valid one using the `--token` argument.'
             ])
-
-        loading_bar.close()
 
     return action

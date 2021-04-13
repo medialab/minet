@@ -244,10 +244,6 @@ MINET_COMMANDS = {
                     'action': ConfigAction
                 },
                 {
-                    'flags': ['-o', '--output'],
-                    'help': 'Path to the output file. By default, everything will be printed to stdout.'
-                },
-                {
                     'flags': ['-t', '--token'],
                     'help': 'CrowdTangle dashboard API token. Rcfile key: crowdtangle.token',
                     'action': ConfigAction,
@@ -290,6 +286,10 @@ MINET_COMMANDS = {
                         {
                             'flag': '--list-id',
                             'help': 'Optional list id from which to retrieve accounts.'
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
                         }
                     ]
                 },
@@ -305,7 +305,13 @@ MINET_COMMANDS = {
 
                         . Fetching a dashboard's lists:
                             $ minet ct lists --token YOUR_TOKEN > lists.csv
-                    '''
+                    ''',
+                    'arguments': [
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
+                        }
+                    ]
                 },
                 'posts': {
                     'title': 'Minet CrowdTangle Posts Command',
@@ -361,6 +367,10 @@ MINET_COMMANDS = {
                             'type': SplitterType()
                         },
                         {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
+                        },
+                        {
                             'flag': '--resume',
                             'help': 'Whether to resume an interrupted collection. Requires -o/--output & --sort-by date',
                             'action': 'store_true'
@@ -405,6 +415,10 @@ MINET_COMMANDS = {
                             'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
                         },
                         {
                             'flags': ['-s', '--select'],
@@ -486,6 +500,10 @@ MINET_COMMANDS = {
                             'type': int
                         },
                         {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
+                        },
+                        {
                             'flags': ['-p', '--platforms'],
                             'help': 'The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.',
                             'type': SplitterType()
@@ -537,6 +555,10 @@ MINET_COMMANDS = {
                             'type': FileType('r', encoding='utf-8'),
                             'default': sys.stdin,
                             'nargs': '?'
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
                         },
                         {
                             'flags': ['-p', '--platforms'],

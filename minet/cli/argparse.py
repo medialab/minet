@@ -79,13 +79,15 @@ class OutputFileOpener(object):
     def __init__(self, path=None):
         self.path = path
 
-    def open(self):
+    def open(self, resume=False):
         if self.path is None:
             return DummyTqdmFile(acquire_cross_platform_stdout())
 
+        mode = 'a' if resume else 'w'
+
         # As per #254: newline='' is necessary for CSV output on windows to avoid
         # outputting extra lines because of a '\r\r\n' end of line...
-        return open(self.path, 'w', encoding='utf-8', newline='')
+        return open(self.path, mode, encoding='utf-8', newline='')
 
 
 class OutputFileAction(Action):
@@ -100,6 +102,7 @@ class OutputFileAction(Action):
 
     def __call__(self, parser, cli_args, value, option_string=None):
         setattr(cli_args, self.dest, OutputFileOpener(value))
+        setattr(cli_args, 'output_is_file', True)
 
 
 def rc_key_to_env_var(key):
@@ -150,6 +153,9 @@ class ConfigAction(Action):
 def resolve_arg_dependencies(cli_args, config):
     to_close = []
 
+    if hasattr(cli_args, 'output') and not hasattr(cli_args, 'output_is_file'):
+        setattr(cli_args, 'output_is_file', False)
+
     for name in vars(cli_args):
         value = getattr(cli_args, name)
 
@@ -159,7 +165,7 @@ def resolve_arg_dependencies(cli_args, config):
 
         # Opening output files
         if isinstance(value, OutputFileOpener):
-            value = value.open()
+            value = value.open(resume=getattr(cli_args, 'resume', False))
             setattr(cli_args, name, value)
 
         # Finding buffers to close eventually

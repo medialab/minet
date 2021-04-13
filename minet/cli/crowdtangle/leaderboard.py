@@ -20,6 +20,6 @@ def select_csv_headers(cli_args):
 
 crowdtangle_leaderboard_action = make_paginated_action(
     method_name='leaderboard',
-    item_name='accounts',
+    item_name='account',
     csv_headers=select_csv_headers
 )
