@@ -38,7 +38,7 @@ def twitter_users_action(cli_args, output_file):
         unit=' user'
     )
 
-    for chunk in as_chunks(enricher.cells(100, cli_args.column, with_rows=True)):
+    for chunk in as_chunks(100, enricher.cells(cli_args.column, with_rows=True)):
         users = ','.join(row[1] for row in chunk)
 
         if cli_args.ids:
