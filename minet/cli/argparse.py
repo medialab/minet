@@ -75,28 +75,31 @@ class InputFileAction(Action):
         setattr(cli_args, self.dest, f)
 
 
+class OutputFileOpener(object):
+    def __init__(self, path=None):
+        self.path = path
+
+    def open(self):
+        if self.path is None:
+            return DummyTqdmFile(acquire_cross_platform_stdout())
+
+        # As per #254: newline='' is necessary for CSV output on windows to avoid
+        # outputting extra lines because of a '\r\r\n' end of line...
+        return open(self.path, 'w', encoding='utf-8', newline='')
+
+
 class OutputFileAction(Action):
     def __init__(self, option_strings, dest, **kwargs):
         super().__init__(
             option_strings,
             dest,
             help='Path to the output file. By default, the results will be printed to stdout.',
-            default=DummyTqdmFile(acquire_cross_platform_stdout()),
+            default=OutputFileOpener(),
             **kwargs
         )
 
     def __call__(self, parser, cli_args, value, option_string=None):
-
-        # As per #254: newline='' is necessary for CSV output on windows to avoid
-        # outputting extra lines because of a '\r\r\n' end of line...
-        try:
-            f = open(value, 'w', encoding='utf-8', newline='')
-        except OSError as e:
-            args = {'filename': value, 'error': e}
-            message = gettext('can\'t open \'%(filename)s\': %(error)s')
-            raise ArgumentError(self, message % args)
-
-        setattr(cli_args, self.dest, f)
+        setattr(cli_args, self.dest, OutputFileOpener(value))
 
 
 def rc_key_to_env_var(key):
@@ -153,6 +156,11 @@ def resolve_arg_dependencies(cli_args, config):
         # Solving wrapped config values
         if isinstance(value, WrappedConfigValue):
             setattr(cli_args, name, value.resolve(config))
+
+        # Opening output files
+        if isinstance(value, OutputFileOpener):
+            value = value.open()
+            setattr(cli_args, name, value)
 
         # Finding buffers to close eventually
         if (
