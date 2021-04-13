@@ -203,7 +203,7 @@ def main():
         try:
             to_close = resolve_arg_dependencies(cli_args, config)
         except OSError as e:
-            die('Could not open output file (-o/--output): %s' % str(e))
+            parser.error('Could not open output file (-o/--output): %s' % str(e))
 
         # Lazy loading module for faster startup
         m = importlib.import_module(action['command']['package'])

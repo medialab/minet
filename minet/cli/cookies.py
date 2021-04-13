@@ -10,7 +10,7 @@ import browser_cookie3
 from http.cookies import SimpleCookie
 
 from minet.web import CookieResolver
-from minet.cli.utils import open_output_file, die
+from minet.cli.utils import die
 
 
 # Taken from: https://github.com/python/cpython/blob/3.9/Lib/http/cookiejar.py
@@ -85,10 +85,8 @@ def format_morsel_for_csv(morsel):
 
 
 def cookies_action(cli_args):
-    output_file = open_output_file(cli_args.output)
-
     if cli_args.csv:
-        output_writer = csv.writer(output_file)
+        output_writer = csv.writer(cli_args.output)
 
     try:
         jar = getattr(browser_cookie3, cli_args.browser)()
@@ -110,7 +108,7 @@ def cookies_action(cli_args):
                 for morsel in parsed.values():
                     output_writer.writerow(format_morsel_for_csv(morsel))
             else:
-                print(cookie, file=output_file)
+                print(cookie, file=cli_args.output)
         else:
             die('Could not find relevant cookie for %s in %s!' % (cli_args.url, cli_args.browser))
     else:
@@ -120,4 +118,4 @@ def cookies_action(cli_args):
             for cookie in jar:
                 output_writer.writerow(format_cookie_for_csv(cookie))
         else:
-            write_jar_as_text_mozilla(jar, output_file)
+            write_jar_as_text_mozilla(jar, cli_args.output)
