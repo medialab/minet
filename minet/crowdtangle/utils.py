@@ -150,7 +150,7 @@ def make_paginated_iterator(url_forge, item_key, formatter,
             kwargs['token'] = token
 
         # Checking we have the necessary dates
-        if kwargs.get('sort_by', 'date') == 'date':
+        if kwargs.get('sort_by') == 'date':
             if kwargs.get('start_date') is None:
                 raise CrowdTangleMissingStartDateError
 
@@ -180,7 +180,7 @@ def make_paginated_iterator(url_forge, item_key, formatter,
         )
 
         # Chunking
-        need_to_chunk = kwargs.get('sort_by', 'date') == 'date'
+        need_to_chunk = kwargs.get('sort_by') == 'date'
         chunk_size = kwargs.get('chunk_size', 500)
         current_chunk_size = 0
         shifts = 0
@@ -232,7 +232,7 @@ def make_paginated_iterator(url_forge, item_key, formatter,
                 if item_id_getter(item) in last_items:
                     continue
 
-                current_date = item['date']
+                current_date = item.get('date')
 
                 n += 1
                 N += 1
@@ -283,7 +283,7 @@ def make_paginated_iterator(url_forge, item_key, formatter,
                 break
 
             # Handling chunking
-            if current_chunk_size >= chunk_size:
+            if need_to_chunk and current_chunk_size >= chunk_size:
                 current_chunk_size = 0
                 shifts += 1
                 kwargs['end_date'] = items[-1]['date'].replace(' ', 'T')

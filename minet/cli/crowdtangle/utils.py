@@ -4,7 +4,6 @@
 #
 # Miscellaneous generic functions used throughout the CrowdTangle actions.
 #
-import csv
 import casanova
 import ndjson
 
@@ -23,12 +22,8 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
 
     def action(cli_args):
 
-        # Do we need to resume?
-        need_to_resume = False
-
+        # Validation
         if getattr(cli_args, 'resume', False):
-            need_to_resume = True
-
             if cli_args.sort_by != 'date':
                 die('Cannot --resume if --sort_by is not `date`.')
 
@@ -54,10 +49,8 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
         )
 
         if cli_args.format == 'csv':
-            writer = csv.writer(cli_args.output)
-
-            if not need_to_resume:
-                writer.writerow(csv_headers(cli_args) if callable(csv_headers) else csv_headers)
+            fieldnames = csv_headers(cli_args) if callable(csv_headers) else csv_headers
+            writer = casanova.writer(cli_args.output, fieldnames)
         else:
             writer = ndjson.writer(cli_args.output)
 

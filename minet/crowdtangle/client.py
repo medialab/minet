@@ -62,20 +62,22 @@ class CrowdTangleAPIClient(object):
             **kwargs
         )
 
-    def posts(self, **kwargs):
+    def posts(self, sort_by='date', **kwargs):
         return crowdtangle_posts(
             self.pool,
             token=self.token,
             rate_limiter_state=self.rate_limiter_state,
+            sort_by=sort_by,
             **kwargs
         )
 
-    def search(self, terms, **kwargs):
+    def search(self, terms, sort_by='date', **kwargs):
         return crowdtangle_search(
             self.pool,
             token=self.token,
             rate_limiter_state=self.rate_limiter_state,
             terms=terms,
+            sort_by=sort_by,
             **kwargs
         )
 
