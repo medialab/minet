@@ -6,10 +6,8 @@
 #
 import csv
 import casanova
-from tqdm import tqdm
-from ural import is_url
 
-from minet.cli.utils import die, edit_cli_args_with_csv_io
+from minet.cli.utils import die, LoadingBar
 from minet.crowdtangle.constants import (
     CROWDTANGLE_SUMMARY_CSV_HEADERS,
     CROWDTANGLE_POST_CSV_HEADERS_WITH_LINK
@@ -20,17 +18,14 @@ from minet.crowdtangle.exceptions import (
 from minet.crowdtangle import CrowdTangleAPIClient
 
 
-def crowdtangle_summary_action(cli_args, output_file):
+def crowdtangle_summary_action(cli_args):
     if not cli_args.start_date:
         die('Missing --start-date!')
 
-    if is_url(cli_args.column):
-        edit_cli_args_with_csv_io(cli_args, 'url')
-
     enricher = casanova.enricher(
         cli_args.file,
-        output_file,
-        keep=cli_args.select.split(',') if cli_args.select else None,
+        cli_args.output,
+        keep=cli_args.select,
         add=CROWDTANGLE_SUMMARY_CSV_HEADERS
     )
 
@@ -40,11 +35,10 @@ def crowdtangle_summary_action(cli_args, output_file):
         posts_writer = csv.writer(cli_args.posts)
         posts_writer.writerow(CROWDTANGLE_POST_CSV_HEADERS_WITH_LINK)
 
-    loading_bar = tqdm(
+    loading_bar = LoadingBar(
         desc='Collecting data',
-        dynamic_ncols=True,
         total=cli_args.total,
-        unit=' urls'
+        unit='url'
     )
 
     client = CrowdTangleAPIClient(cli_args.token, rate_limit=cli_args.rate_limit)
@@ -67,9 +61,6 @@ def crowdtangle_summary_action(cli_args, output_file):
                 'Your API token is invalid.',
                 'Check that you indicated a valid one using the `--token` argument.'
             ])
-
-        except Exception as err:
-            raise err
 
         if cli_args.posts is not None:
             stats, posts = stats

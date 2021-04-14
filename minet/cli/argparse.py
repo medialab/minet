@@ -100,14 +100,18 @@ class OutputFileOpener(object):
         return open(self.path, mode, encoding='utf-8', newline='')
 
 
+DEFAULT_OUTPUT_FILE_HELP = 'Path to the output file. By default, the results will be printed to stdout.'
+
+
 class OutputFileAction(Action):
-    def __init__(self, option_strings, dest, resumer=None, resumer_kwargs={}, **kwargs):
+    def __init__(self, option_strings, dest, resumer=None, resumer_kwargs={},
+                 help=DEFAULT_OUTPUT_FILE_HELP, **kwargs):
         self.resumer = resumer
         self.resumer_kwargs = resumer_kwargs
         super().__init__(
             option_strings,
             dest,
-            help='Path to the output file. By default, the results will be printed to stdout.',
+            help=help,
             default=OutputFileOpener(
                 resumer_class=resumer,
                 resumer_kwargs=resumer_kwargs
@@ -122,7 +126,6 @@ class OutputFileAction(Action):
             resumer_kwargs=self.resumer_kwargs
         )
         setattr(cli_args, self.dest, opener)
-        setattr(cli_args, 'output_is_file', True)
 
 
 def rc_key_to_env_var(key):
@@ -173,12 +176,8 @@ class ConfigAction(Action):
 def resolve_arg_dependencies(cli_args, config):
     to_close = []
 
-    # Helpers
-    if hasattr(cli_args, 'output') and not hasattr(cli_args, 'output_is_file'):
-        setattr(cli_args, 'output_is_file', False)
-
     # Validation
-    if getattr(cli_args, 'resume', False) and not cli_args.output_is_file:
+    if getattr(cli_args, 'resume', False) and cli_args.output.path is None:
         raise NotResumable
 
     # Unwrapping values

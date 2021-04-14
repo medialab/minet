@@ -557,9 +557,8 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the inquired URLs.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'url'
                         },
                         {
                             'flags': ['-o', '--output'],
@@ -573,11 +572,12 @@ MINET_COMMANDS = {
                         {
                             'name': '--posts',
                             'help': 'Path to a file containing the retrieved posts.',
-                            'type': FileType('w', encoding='utf-8')
+                            'action': OutputFileAction
                         },
                         {
                             'flags': ['-s', '--select'],
-                            'help': 'Columns of input CSV file to include in the output (separated by `,`).'
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
                         },
                         {
                             'flag': '--sort-by',
