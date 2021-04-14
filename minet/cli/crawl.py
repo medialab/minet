@@ -10,6 +10,7 @@ from os.path import join, isfile, dirname
 from shutil import rmtree
 
 from minet.crawl import Crawler
+from minet.utils import with_defer
 from minet.cli.reporters import report_error
 from minet.cli.utils import print_err, LoadingBar
 
@@ -152,7 +153,8 @@ class ScraperReporterPool(object):
                 reporter.close()
 
 
-def crawl_action(cli_args):
+@with_defer
+def crawl_action(cli_args, defer):
 
     # Loading crawler definition
     queue_path = join(cli_args.output_dir, 'queue')
@@ -171,6 +173,7 @@ def crawl_action(cli_args):
         JOBS_HEADERS,
         resume=cli_args.resume
     )
+    defer(jobs_output.close)
 
     # Creating crawler
     crawler = Crawler(
@@ -184,6 +187,7 @@ def crawl_action(cli_args):
         cli_args.output_dir,
         resume=cli_args.resume
     )
+    defer(reporter_pool.close)
 
     # Loading bar
     loading_bar = LoadingBar(
@@ -213,6 +217,3 @@ def crawl_action(cli_args):
             continue
 
         reporter_pool.write(result.job.spider, result.scraped)
-
-    jobs_output.close()
-    reporter_pool.close()
