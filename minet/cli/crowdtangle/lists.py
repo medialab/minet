@@ -1,8 +1,8 @@
 # =============================================================================
-# Minet CrowdTangle Posts CLI Action
+# Minet CrowdTangle Lists CLI Action
 # =============================================================================
 #
-# Logic of the `ct posts` action.
+# Logic of the `ct lists` action.
 #
 import csv
 

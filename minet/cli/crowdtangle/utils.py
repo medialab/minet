@@ -22,21 +22,29 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
 
     def action(cli_args):
 
+        resume = getattr(cli_args, 'resume', False)
+
         # Validation
-        if getattr(cli_args, 'resume', False):
+        if resume:
             if cli_args.sort_by != 'date':
                 die('Cannot --resume if --sort_by is not `date`.')
 
             if cli_args.format != 'csv':
                 die('Cannot --resume jsonl format yet.')
 
-            last_cell = casanova.reverse_reader.last_cell(cli_args.output.name, 'datetime')
+        if cli_args.format == 'csv':
+            fieldnames = csv_headers(cli_args) if callable(csv_headers) else csv_headers
+            writer = casanova.writer(cli_args.output, fieldnames)
+        else:
+            writer = ndjson.writer(cli_args.output)
 
-            if last_cell is not None:
-                last_date = last_cell.replace(' ', 'T')
-                cli_args.end_date = last_date
+        # Acquiring state from resumer
+        if getattr(cli_args, 'resume', False):
+            last_date = cli_args.output.pop_state()
 
-                print_err('Resuming from: %s' % last_date)
+            if last_date is not None:
+                cli_args.end_date = last_date.replace(' ', 'T')
+                print_err('Resuming from: %s' % cli_args.end_date)
 
         if callable(announce):
             print_err(announce(cli_args))
@@ -44,15 +52,9 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
         # Loading bar
         loading_bar = LoadingBar(
             desc='Fetching %s' % item_name,
-            unit=item_name,
+            unit=item_name[:-1],
             total=cli_args.limit
         )
-
-        if cli_args.format == 'csv':
-            fieldnames = csv_headers(cli_args) if callable(csv_headers) else csv_headers
-            writer = casanova.writer(cli_args.output, fieldnames)
-        else:
-            writer = ndjson.writer(cli_args.output)
 
         client = CrowdTangleAPIClient(cli_args.token, rate_limit=cli_args.rate_limit)
 

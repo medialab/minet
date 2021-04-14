@@ -6,6 +6,7 @@
 #
 import sys
 from argparse import FileType
+from casanova import LastCellResumer
 
 from minet.constants import DEFAULT_THROTTLE
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
@@ -368,7 +369,11 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-o', '--output'],
-                            'action': OutputFileAction
+                            'action': OutputFileAction,
+                            'resumer': LastCellResumer,
+                            'resumer_kwargs': {
+                                'value_column': 'datetime'
+                            }
                         },
                         {
                             'flag': '--resume',

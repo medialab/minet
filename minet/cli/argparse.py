@@ -10,6 +10,7 @@ from io import TextIOBase
 from argparse import Action, ArgumentError
 from gettext import gettext
 from tqdm.contrib import DummyTqdmFile
+from casanova import Resumer
 
 from minet.utils import nested_get
 from minet.cli.exceptions import NotResumable
@@ -77,12 +78,20 @@ class InputFileAction(Action):
 
 
 class OutputFileOpener(object):
-    def __init__(self, path=None):
+    def __init__(self, path=None, resumer_class=None, resumer_kwargs={}):
         self.path = path
+        self.resumer_class = resumer_class
+        self.resumer_kwargs = resumer_kwargs
 
     def open(self, resume=False):
         if self.path is None:
+            if resume:
+                raise RuntimeError
+
             return DummyTqdmFile(acquire_cross_platform_stdout())
+
+        if resume and self.resumer_class is not None:
+            return self.resumer_class(self.path, **self.resumer_kwargs)
 
         mode = 'a' if resume else 'w'
 
@@ -92,17 +101,27 @@ class OutputFileOpener(object):
 
 
 class OutputFileAction(Action):
-    def __init__(self, option_strings, dest, **kwargs):
+    def __init__(self, option_strings, dest, resumer=None, resumer_kwargs={}, **kwargs):
+        self.resumer = resumer
+        self.resumer_kwargs = resumer_kwargs
         super().__init__(
             option_strings,
             dest,
             help='Path to the output file. By default, the results will be printed to stdout.',
-            default=OutputFileOpener(),
+            default=OutputFileOpener(
+                resumer_class=resumer,
+                resumer_kwargs=resumer_kwargs
+            ),
             **kwargs
         )
 
     def __call__(self, parser, cli_args, value, option_string=None):
-        setattr(cli_args, self.dest, OutputFileOpener(value))
+        opener = OutputFileOpener(
+            value,
+            resumer_class=self.resumer,
+            resumer_kwargs=self.resumer_kwargs
+        )
+        setattr(cli_args, self.dest, opener)
         setattr(cli_args, 'output_is_file', True)
 
 
@@ -177,10 +196,13 @@ def resolve_arg_dependencies(cli_args, config):
 
         # Finding buffers to close eventually
         if (
-            isinstance(value, TextIOBase) and
-            value is not sys.stdin and
-            value is not sys.stdout and
-            value is not sys.stderr
+            (
+                isinstance(value, TextIOBase) and
+                value is not sys.stdin and
+                value is not sys.stdout and
+                value is not sys.stderr
+            ) or
+            isinstance(value, Resumer)
         ):
             to_close.append(value)
 
