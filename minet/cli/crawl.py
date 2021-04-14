@@ -7,12 +7,11 @@
 import os
 import csv
 from os.path import join, isfile, dirname
-from tqdm import tqdm
 from shutil import rmtree
 
 from minet.crawl import Crawler
 from minet.cli.reporters import report_error
-from minet.cli.utils import print_err
+from minet.cli.utils import print_err, LoadingBar
 
 JOBS_HEADERS = [
     'spider',
@@ -187,16 +186,15 @@ def crawl_action(cli_args):
     )
 
     # Loading bar
-    loading_bar = tqdm(
+    loading_bar = LoadingBar(
         desc='Crawling',
-        unit=' pages',
-        dynamic_ncols=True
+        unit='page'
     )
 
     def update_loading_bar(result):
         state = crawler.state
 
-        loading_bar.set_postfix(
+        loading_bar.update_stats(
             queued=state.jobs_queued,
             doing=state.jobs_doing + 1,
             spider=result.job.spider
@@ -216,6 +214,5 @@ def crawl_action(cli_args):
 
         reporter_pool.write(result.job.spider, result.scraped)
 
-    loading_bar.close()
     jobs_output.close()
     reporter_pool.close()
