@@ -6,6 +6,7 @@ PEP8_IGNORE = E501,E722,E741,W503,W504
 define clean
 	rm -rf *.egg-info .pytest_cache build dist
 	find . -name "*.pyc" | xargs rm -f
+	find . -name "*.pyo" | xargs rm -f
 	find . -name __pycache__ | xargs rm -rf
 	find . -name .ipynb_checkpoints | xargs rm -rf
 	rm -f *.spec
@@ -30,7 +31,7 @@ lint:
 	pycodestyle --ignore $(PEP8_IGNORE) $(SOURCE) test hooks
 	@echo
 	@echo Searching for unused imports...
-	importchecker $(SOURCE) | grep -v __init__ || true
+	importchecker $(SOURCE) | grep -v __init__ | grep -v idna || true
 	@echo
 
 format:

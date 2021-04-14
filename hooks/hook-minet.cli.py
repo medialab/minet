@@ -8,9 +8,7 @@ from PyInstaller.utils.hooks import collect_submodules
 
 SLASH_RE = re.compile(r'[\/\\]')
 
-hiddenimports = [
-    'encodings.idna'
-]
+hiddenimports = []
 
 for p in iglob('minet/cli/**/*.py', recursive=True):
     if '__main__' in p:

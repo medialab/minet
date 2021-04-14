@@ -20,6 +20,7 @@ from argparse import (
     RawTextHelpFormatter
 )
 from colorama import init as colorama_init
+from encodings import idna  # NOTE: this is necessary for pyinstaller build
 
 from minet.__version__ import __version__
 from minet.cli.utils import die, get_rcfile
