@@ -30,7 +30,7 @@ lint:
 	pycodestyle --ignore $(PEP8_IGNORE) $(SOURCE) test hooks
 	@echo
 	@echo Searching for unused imports...
-	importchecker $(SOURCE) | grep -v __init__ || true
+	importchecker $(SOURCE) | grep -v __init__ | grep -v idna || true
 	@echo
 
 format:
