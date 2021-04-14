@@ -339,7 +339,7 @@ def fetch_action(cli_args, resolve=False):
                 if data:
                     if filename_pos is not None or cli_args.filename_template:
                         root, ext = os.path.splitext(row[filename_pos]) if filename_pos is not None else (None, '')
-                        ext = ext if ext else result.meta['ext']
+                        ext = ext if ext else result.meta.get('ext', '')
                         if cli_args.filename_template:
                             filename = CUSTOM_FORMATTER.format(
                                 cli_args.filename_template,
@@ -351,7 +351,7 @@ def fetch_action(cli_args, resolve=False):
                             filename = root + ext
                     else:
                         # NOTE: it would be nice to have an id that can be sorted by time
-                        filename = str(uuid4()) + result.meta['ext']
+                        filename = str(uuid4()) + result.meta.get('ext', '')
 
                     # Applying folder strategy
                     filename = folder_strategy.apply(
