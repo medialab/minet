@@ -118,7 +118,7 @@ FETCH_COMMON_ARGUMENTS = [
     },
     {
         'flag': '--total',
-        'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
+        'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.',
         'type': int
     },
     {
@@ -875,7 +875,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--total',
-                            'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
+                            'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.',
                             'type': int
                         }
                     ]
@@ -922,7 +922,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--total',
-                            'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
+                            'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.',
                             'type': int
                         }
                     ]
@@ -1806,7 +1806,7 @@ MINET_COMMANDS = {
             },
             {
                 'flag': '--total',
-                'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
+                'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.',
                 'type': int
             }
         ]
@@ -1968,7 +1968,7 @@ MINET_COMMANDS = {
             },
             {
                 'flag': '--total',
-                'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.',
+                'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.',
                 'type': int
             },
             {

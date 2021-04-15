@@ -138,7 +138,7 @@ positional arguments:
 optional arguments:
   -h, --help                            show this help message and exit
   --csv                                 Whether to format the output as CSV. If --url is set, will output the cookie's morsels as CSV.
-  -o OUTPUT, --output OUTPUT            Path to the output report file. By default, the report will be printed to stdout.
+  -o OUTPUT, --output OUTPUT            Path to the output file. By default, the results will be printed to stdout.
   --url URL                             If given, only returns full cookie header value for this url.
 
 examples:
@@ -218,13 +218,13 @@ optional arguments:
                                                   Whether to attempt to grab cookies from your computer's browser (supports "firefox", "chrome", "chromium", "opera" and "edge").
   -H HEADERS, --header HEADERS                    Custom headers used with every requests.
   --insecure                                      Whether to allow ssl errors when performing requests or not.
-  -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
+  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
   --resume                                        Whether to resume from an aborted report.
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   -t THREADS, --threads THREADS                   Number of threads to use. Defaults to 25.
   --throttle THROTTLE                             Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
   --timeout TIMEOUT                               Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.
-  --total TOTAL                                   Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
+  --total TOTAL                                   Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.
   --url-template URL_TEMPLATE                     A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.
   -X METHOD, --request METHOD                     The http method to use. Will default to GET.
   --max-redirects MAX_REDIRECTS                   Maximum number of redirections to follow before breaking. Defaults to 5.
@@ -380,13 +380,13 @@ optional arguments:
                                                   Whether to attempt to grab cookies from your computer's browser (supports "firefox", "chrome", "chromium", "opera" and "edge").
   -H HEADERS, --header HEADERS                    Custom headers used with every requests.
   --insecure                                      Whether to allow ssl errors when performing requests or not.
-  -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
+  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
   --resume                                        Whether to resume from an aborted report.
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   -t THREADS, --threads THREADS                   Number of threads to use. Defaults to 25.
   --throttle THROTTLE                             Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
   --timeout TIMEOUT                               Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.
-  --total TOTAL                                   Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
+  --total TOTAL                                   Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.
   --url-template URL_TEMPLATE                     A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.
   -X METHOD, --request METHOD                     The http method to use. Will default to GET.
   --max-redirects MAX_REDIRECTS                   Maximum number of redirections to follow before breaking. Defaults to 20.
@@ -499,7 +499,7 @@ optional arguments:
   --from {html,text}          Extract urls from which kind of source?
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the result will be printed to stdout.
   -s SELECT, --select SELECT  Columns to keep in output, separated by comma.
-  --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
+  --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.
 
 examples:
 
@@ -575,7 +575,7 @@ optional arguments:
   -s SELECT, --select SELECT             Columns to keep in output, separated by comma.
   --separator SEPARATOR                  Split url column by a separator?
   --strip-protocol, --no-strip-protocol  Whether or not to strip the protocol when normalizing the url. Defaults to strip protocol.
-  --total TOTAL                          Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
+  --total TOTAL                          Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.
   --youtube                              Whether to consider and parse the given urls as coming from YouTube.
 
 columns being added to the output:
@@ -629,7 +629,7 @@ examples:
 ## CrowdTangle
 
 ```
-usage: minet crowdtangle [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT] [-t TOKEN]
+usage: minet crowdtangle [-h] [--rate-limit RATE_LIMIT] [-t TOKEN]
                          {leaderboard,lists,posts,posts-by-id,search,summary}
                          ...
 
@@ -641,7 +641,6 @@ Gather data from the CrowdTangle APIs easily and efficiently.
 optional arguments:
   -h, --help                                      show this help message and exit
   --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
 
 actions:
@@ -653,10 +652,9 @@ actions:
 ### leaderboard
 
 ```
-usage: minet crowdtangle leaderboard [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
-                                     [-t TOKEN] [--no-breakdown]
-                                     [-f {csv,jsonl}] [-l LIMIT]
-                                     [--list-id LIST_ID]
+usage: minet crowdtangle leaderboard [-h] [--rate-limit RATE_LIMIT] [-t TOKEN]
+                                     [--no-breakdown] [-f {csv,jsonl}]
+                                     [-l LIMIT] [--list-id LIST_ID] [-o OUTPUT]
 
 Minet CrowdTangle Leaderboard Command
 =====================================
@@ -668,12 +666,12 @@ For more information, see the API endpoint documentation: https://github.com/Cro
 optional arguments:
   -h, --help                            show this help message and exit
   --rate-limit RATE_LIMIT               Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  -o OUTPUT, --output OUTPUT            Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN               CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   --no-breakdown                        Whether to skip statistics breakdown by post type in the CSV output.
   -f {csv,jsonl}, --format {csv,jsonl}  Output format. Defaults to `csv`.
   -l LIMIT, --limit LIMIT               Maximum number of accounts to retrieve. Will fetch every account by default.
   --list-id LIST_ID                     Optional list id from which to retrieve accounts.
+  -o OUTPUT, --output OUTPUT            Path to the output file. By default, the results will be printed to stdout.
 
 examples:
 
@@ -685,8 +683,8 @@ examples:
 ### lists
 
 ```
-usage: minet crowdtangle lists [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
-                               [-t TOKEN]
+usage: minet crowdtangle lists [-h] [--rate-limit RATE_LIMIT] [-t TOKEN]
+                               [-o OUTPUT]
 
 Minet CrowdTangle Lists Command
 ===============================
@@ -698,8 +696,8 @@ For more information, see the API endpoint documentation: https://github.com/Cro
 optional arguments:
   -h, --help                  show this help message and exit
   --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
 
 examples:
 
@@ -711,8 +709,8 @@ examples:
 ### posts-by-id
 
 ```
-usage: minet crowdtangle posts-by-id [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
-                                     [-t TOKEN] [-s SELECT] [--resume]
+usage: minet crowdtangle posts-by-id [-h] [--rate-limit RATE_LIMIT] [-t TOKEN]
+                                     [-o OUTPUT] [-s SELECT] [--resume]
                                      [--total TOTAL]
                                      column [file]
 
@@ -730,8 +728,8 @@ positional arguments:
 optional arguments:
   -h, --help                  show this help message and exit
   --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --resume                    Whether to resume an aborted collection.
   --total TOTAL               Total number of posts. Necessary if you want to display a finite progress indicator.
@@ -749,11 +747,10 @@ examples:
 ### posts
 
 ```
-usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
-                               [-t TOKEN] [--chunk-size CHUNK_SIZE]
-                               [--end-date END_DATE] [-f {csv,jsonl}]
-                               [--language LANGUAGE] [-l LIMIT]
-                               [--list-ids LIST_IDS] [--resume]
+usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [-t TOKEN]
+                               [--chunk-size CHUNK_SIZE] [--end-date END_DATE]
+                               [-f {csv,jsonl}] [--language LANGUAGE] [-l LIMIT]
+                               [--list-ids LIST_IDS] [-o OUTPUT] [--resume]
                                [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
                                --start-date START_DATE
 
@@ -767,7 +764,6 @@ For more information, see the API endpoint documentation: https://github.com/Cro
 optional arguments:
   -h, --help                                      show this help message and exit
   --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   --chunk-size CHUNK_SIZE                         When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations. Defaults to 500.
   --end-date END_DATE                             The latest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
@@ -775,6 +771,7 @@ optional arguments:
   --language LANGUAGE                             Language of posts to retrieve.
   -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
   --list-ids LIST_IDS                             Ids of the lists from which to retrieve posts, separated by commas.
+  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
   --resume                                        Whether to resume an interrupted collection. Requires -o/--output & --sort-by date
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
@@ -799,12 +796,12 @@ To know the different list ids associated with your dashboard:
 <h3 id="ct-search">search</h3>
 
 ```
-usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
-                                [-t TOKEN] [--and AND] [--chunk-size CHUNK_SIZE]
+usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [-t TOKEN]
+                                [--and AND] [--chunk-size CHUNK_SIZE]
                                 [--end-date END_DATE] [-f {csv,jsonl}]
                                 [--in-list-ids IN_LIST_IDS]
                                 [--language LANGUAGE] [-l LIMIT]
-                                [--not-in-title] [--offset OFFSET]
+                                [--not-in-title] [--offset OFFSET] [-o OUTPUT]
                                 [-p PLATFORMS]
                                 [--search-field {account_name_only,image_text_only,include_query_strings,text_fields_and_image_text,text_fields_only}]
                                 [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
@@ -824,7 +821,6 @@ positional arguments:
 optional arguments:
   -h, --help                                      show this help message and exit
   --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   --and AND                                       AND clause to add to the query terms.
   --chunk-size CHUNK_SIZE                         When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations. Defaults to 500.
@@ -835,6 +831,7 @@ optional arguments:
   -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
   --not-in-title                                  Whether to search terms in account titles also.
   --offset OFFSET                                 Count offset.
+  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --search-field {account_name_only,image_text_only,include_query_strings,text_fields_and_image_text,text_fields_only}
                                                   In what to search the query. Defaults to `text_fields_and_image_text`.
@@ -853,8 +850,8 @@ examples:
 ### summary
 
 ```
-usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-o OUTPUT]
-                                 [-t TOKEN] [-p PLATFORMS] [--posts POSTS]
+usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-t TOKEN]
+                                 [-o OUTPUT] [-p PLATFORMS] [--posts POSTS]
                                  [-s SELECT]
                                  [--sort-by {date,subscriber_count,total_interactions}]
                                  [--start-date START_DATE] [--total TOTAL]
@@ -874,8 +871,8 @@ positional arguments:
 optional arguments:
   -h, --help                                      show this help message and exit
   --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, everything will be printed to stdout.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
+  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
   -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
   --posts POSTS                                   Path to a file containing the retrieved posts.
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
@@ -1044,7 +1041,7 @@ optional arguments:
   -h, --help                  show this help message and exit
   -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator.
+  --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.
 
 example:
 
