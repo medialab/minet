@@ -1446,7 +1446,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
-  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --lang LANG                 Language (ISO code like "en") of captions to retrieve. You can specify several languages by preferred order separated by commas. Defaults to "en".
 
@@ -1477,7 +1477,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
-  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -k KEY, --key KEY           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
 
@@ -1506,7 +1506,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                      show this help message and exit
-  -o OUTPUT, --output OUTPUT                      Path to the output report file. By default, the report will be printed to stdout.
+  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
   -k KEY, --key KEY                               YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   -l LIMIT, --limit LIMIT                         Maximum number of videos to retrieve per query.
@@ -1538,7 +1538,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
-  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -k KEY, --key KEY           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of videos. Necessary if you want to display a finite progress indicator.

@@ -4,7 +4,7 @@
 #
 # Logic of the `yt` action.
 #
-from minet.cli.utils import open_output_file, die
+from minet.cli.utils import die
 
 
 def check_key(cli_args):
@@ -19,32 +19,24 @@ def check_key(cli_args):
 
 def youtube_action(cli_args):
 
-    output_file = open_output_file(
-        cli_args.output,
-        flag='w'
-    )
-
     if cli_args.yt_action == 'videos':
         check_key(cli_args)
 
         from minet.cli.youtube.videos import videos_action
-        videos_action(cli_args, output_file)
+        videos_action(cli_args)
 
     elif cli_args.yt_action == 'comments':
         check_key(cli_args)
 
         from minet.cli.youtube.comments import comments_action
-        comments_action(cli_args, output_file)
+        comments_action(cli_args)
 
     elif cli_args.yt_action == 'captions':
         from minet.cli.youtube.captions import captions_action
-        captions_action(cli_args, output_file)
+        captions_action(cli_args)
 
     elif cli_args.yt_action == 'search':
         check_key(cli_args)
 
         from minet.cli.youtube.search import search_action
-        search_action(cli_args, output_file)
-
-    if cli_args.output is not None:
-        output_file.close()
+        search_action(cli_args)

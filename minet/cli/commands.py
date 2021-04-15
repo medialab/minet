@@ -1992,7 +1992,7 @@ MINET_COMMANDS = {
             'common_arguments': [
                 {
                     'flags': ['-o', '--output'],
-                    'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+                    'action': OutputFileAction
                 }
             ],
             'commands': {
@@ -2016,13 +2016,13 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the Youtube video urls or ids.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'video'
                         },
                         {
                             'flags': ['-s', '--select'],
-                            'help': 'Columns of input CSV file to include in the output (separated by `,`).'
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
                         },
                         {
                             'flag': '--lang',
@@ -2049,9 +2049,8 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the Youtube videos ids.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'video'
                         },
                         {
                             'flags': ['-k', '--key'],
@@ -2063,38 +2062,6 @@ MINET_COMMANDS = {
                             'flags': ['-s', '--select'],
                             'help': 'Columns of input CSV file to include in the output (separated by `,`).',
                             'type': SplitterType()
-                        }
-                    ]
-                },
-                'videos': {
-                    'title': 'Youtube videos',
-                    'description': 'Retrieve metadata about Youtube videos using the API.',
-                    'arguments': [
-                        {
-                            'name': 'column',
-                            'help': 'Name of the column containing the video\'s urls or ids.'
-                        },
-                        {
-                            'name': 'file',
-                            'help': 'CSV file containing the Youtube videos urls or ids.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
-                        },
-                        {
-                            'flags': ['-k', '--key'],
-                            'help': 'YouTube API Data dashboard API key.',
-                            'rc_key': ['youtube', 'key'],
-                            'action': ConfigAction
-                        },
-                        {
-                            'flags': ['-s', '--select'],
-                            'help': 'Columns of input CSV file to include in the output (separated by `,`).'
-                        },
-                        {
-                            'flag': '--total',
-                            'help': 'Total number of videos. Necessary if you want to display a finite progress indicator.',
-                            'type': int
                         }
                     ]
                 },
@@ -2115,9 +2082,8 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the query for youtube Search.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'query'
                         },
                         {
                             'flags': ['-k', '--key'],
@@ -2142,8 +2108,39 @@ MINET_COMMANDS = {
                             'choices': YOUTUBE_API_SEARCH_ORDERS
                         }
                     ]
+                },
+                'videos': {
+                    'title': 'Youtube videos',
+                    'description': 'Retrieve metadata about Youtube videos using the API.',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the video\'s urls or ids.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the Youtube videos urls or ids.',
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'video'
+                        },
+                        {
+                            'flags': ['-k', '--key'],
+                            'help': 'YouTube API Data dashboard API key.',
+                            'rc_key': ['youtube', 'key'],
+                            'action': ConfigAction
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of videos. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
                 }
-
             }
         }
     }

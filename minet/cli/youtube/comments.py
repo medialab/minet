@@ -4,25 +4,17 @@
 #
 # Action retrieving the comments of YouTube videos using the API.
 #
-import sys
 import casanova
 
-from minet.cli.utils import LoadingBar, edit_cli_args_with_csv_io
+from minet.cli.utils import LoadingBar
 from minet.youtube import YouTubeAPIClient
 from minet.youtube.constants import YOUTUBE_COMMENT_CSV_HEADERS
 
 
-def comments_action(cli_args, output_file):
-
-    # Handling output
-    single_video = cli_args.file is sys.stdin and sys.stdin.isatty()
-
-    if single_video:
-        edit_cli_args_with_csv_io(cli_args, 'video')
-
+def comments_action(cli_args):
     enricher = casanova.enricher(
         cli_args.file,
-        output_file,
+        cli_args.output,
         add=YOUTUBE_COMMENT_CSV_HEADERS,
         keep=cli_args.select
     )
@@ -49,5 +41,3 @@ def comments_action(cli_args, output_file):
             enricher.writerow(row, comment.as_csv_row())
 
         loading_bar.inc('videos')
-
-    loading_bar.close()

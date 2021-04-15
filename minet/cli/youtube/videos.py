@@ -13,11 +13,10 @@ from minet.youtube import YouTubeAPIClient
 from minet.youtube.constants import YOUTUBE_VIDEO_CSV_HEADERS
 
 
-def videos_action(cli_args, output_file):
-
+def videos_action(cli_args):
     enricher = casanova.enricher(
         cli_args.file,
-        output_file,
+        cli_args.output,
         add=YOUTUBE_VIDEO_CSV_HEADERS,
         keep=cli_args.select
     )
@@ -41,5 +40,3 @@ def videos_action(cli_args, output_file):
     for (row, _), video in client.videos(iterator, key=itemgetter(1)):
         loading_bar.update()
         enricher.writerow(row, video.as_csv_row() if video else None)
-
-    loading_bar.close()
