@@ -1105,7 +1105,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-o', '--output'],
-                            'help': 'Path to the output file. By default, the report will be printed to stdout.'
+                            'action': OutputFileAction
                         }
                     ]
                 }

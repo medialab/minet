@@ -6,7 +6,7 @@
 #
 from browser_cookie3 import BrowserCookieError
 
-from minet.cli.utils import open_output_file, die
+from minet.cli.utils import die
 from minet.google import export_google_sheets_as_csv
 from minet.google.exceptions import (
     GoogleSheetsInvalidTargetError,
@@ -19,8 +19,6 @@ from minet.google.exceptions import (
 
 
 def google_sheets_action(cli_args):
-    output_file = open_output_file(cli_args.output, flag='w')
-
     try:
         data = export_google_sheets_as_csv(
             cli_args.url,
@@ -42,5 +40,4 @@ def google_sheets_action(cli_args):
     except GoogleSheetsMaxAttemptsExceeded:
         die('Maximum number of attempts exceeded! You can still set --authuser if you logged in numerous google accounts at once.')
 
-    output_file.write(data)
-    output_file.close()
+    cli_args.output.write(data)
