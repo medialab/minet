@@ -9,6 +9,7 @@
 import os
 import gzip
 import casanova
+from io import StringIO
 from os.path import join, dirname
 from collections import Counter
 from uuid import uuid4
@@ -49,7 +50,7 @@ CUSTOM_FORMATTER = PseudoFStringFormatter()
 def fetch_action(cli_args, resolve=False):
 
     # If we are hitting a single url we enable contents_in_report by default
-    if not resolve and cli_args.input_is_dummy_csv and cli_args.contents_in_report is None:
+    if not resolve and isinstance(cli_args.file, StringIO) and cli_args.contents_in_report is None:
         cli_args.contents_in_report = True
 
     # Trying to instantiate the folder strategy

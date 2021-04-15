@@ -313,7 +313,7 @@ positional arguments:
 optional arguments:
   -h, --help                           show this help message and exit
   -i INPUT_DIR, --input-dir INPUT_DIR  Directory where the HTML files are stored. Defaults to "content".
-  -o OUTPUT, --output OUTPUT           Path to the output report file. By default, the report will be printed to stdout.
+  -o OUTPUT, --output OUTPUT           Path to the output file. By default, the results will be printed to stdout.
   -p PROCESSES, --processes PROCESSES  Number of processes to use. Defaults to roughly half of the available CPUs.
   -s SELECT, --select SELECT           Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                        Total number of HTML documents. Necessary if you want to display a finite progress indicator.
@@ -444,7 +444,7 @@ optional arguments:
   -f {csv,jsonl}, --format {csv,jsonl}  Output format.
   -g GLOB, --glob GLOB                  Whether to scrape a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.
   -i INPUT_DIR, --input-dir INPUT_DIR   Directory where the HTML files are stored. Defaults to "content".
-  -o OUTPUT, --output OUTPUT            Path to the output report file. By default, the report will be printed to stdout.
+  -o OUTPUT, --output OUTPUT            Path to the output file. By default, the results will be printed to stdout.
   -p PROCESSES, --processes PROCESSES   Number of processes to use. Defaults to roughly half of the available CPUs.
   --separator SEPARATOR                 Separator use to join lists of values when output format is CSV. Defaults to "|".
   --strain STRAIN                       Optional CSS selector used to strain, i.e. only parse matched tags in the parsed html files in order to optimize performance.
@@ -497,7 +497,7 @@ optional arguments:
   -h, --help                  show this help message and exit
   --base-url BASE_URL         Base url used to resolve relative urls.
   --from {html,text}          Extract urls from which kind of source?
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the result will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns to keep in output, separated by comma.
   --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.
 
@@ -533,7 +533,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                      show this help message and exit
-  -o OUTPUT, --output OUTPUT                      Path to the output joined file. By default, the join will be printed to stdout.
+  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
   -p MATCH_COLUMN_PREFIX, --match-column-prefix MATCH_COLUMN_PREFIX
                                                   Optional prefix to add to the first file's column names to avoid conflicts.
   -s SELECT, --select SELECT                      Columns from the first file to keep, separated by comma.
@@ -571,7 +571,7 @@ positional arguments:
 optional arguments:
   -h, --help                             show this help message and exit
   --facebook                             Whether to consider and parse the given urls as coming from Facebook.
-  -o OUTPUT, --output OUTPUT             Path to the output file. By default, the result will be printed to stdout.
+  -o OUTPUT, --output OUTPUT             Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT             Columns to keep in output, separated by comma.
   --separator SEPARATOR                  Split url column by a separator?
   --strip-protocol, --no-strip-protocol  Whether or not to strip the protocol when normalizing the url. Defaults to strip protocol.
@@ -1039,7 +1039,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
-  -o OUTPUT, --output OUTPUT  Path to the output report file. By default, the report will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.
 
@@ -1099,7 +1099,7 @@ optional arguments:
   -h, --help                        show this help message and exit
   -a AUTHUSER, --authuser AUTHUSER  Connected google account number to use.
   -c COOKIE, --cookie COOKIE        Google Drive cookie or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge").
-  -o OUTPUT, --output OUTPUT        Path to the output file. By default, the report will be printed to stdout.
+  -o OUTPUT, --output OUTPUT        Path to the output file. By default, the results will be printed to stdout.
 
 examples:
 
@@ -1165,7 +1165,7 @@ positional arguments:
 optional arguments:
   -h, --help                  show this help message and exit
   -t TOKEN, --token TOKEN     Mediacloud API token (also called key). Can also be configured in a .minetrc file as "mediacloud.token" or read from the MINET_MEDIACLOUD_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the output will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   --feeds FEEDS               If given, path of the CSV file listing media RSS feeds.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of medias. Necessary if you want to display a finite progress indicator.
@@ -1195,7 +1195,7 @@ positional arguments:
 optional arguments:
   -h, --help                                 show this help message and exit
   -t TOKEN, --token TOKEN                    Mediacloud API token (also called key). Can also be configured in a .minetrc file as "mediacloud.token" or read from the MINET_MEDIACLOUD_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the output will be printed to stdout.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   -c COLLECTIONS, --collections COLLECTIONS  List of collection ids to search, separated by commas.
   --filter-query FILTER_QUERY                Solr filter query `fq` to use. Can be used to optimize some parts of the query.
   -m MEDIAS, --medias MEDIAS                 List of media ids to search, separated by commas.
@@ -1227,7 +1227,7 @@ positional arguments:
 optional arguments:
   -h, --help                     show this help message and exit
   -t TOKEN, --token TOKEN        Mediacloud API token (also called key). Can also be configured in a .minetrc file as "mediacloud.token" or read from the MINET_MEDIACLOUD_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT     Path to the output file. By default, the output will be printed to stdout.
+  -o OUTPUT, --output OUTPUT     Path to the output file. By default, the results will be printed to stdout.
   --media-id MEDIA_ID            Return only stories belonging to the given media_ids.
   --from-media-id FROM_MEDIA_ID  Return only stories that are linked from stories in the given media_id.
 
@@ -1262,7 +1262,7 @@ optional arguments:
   --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
   --ids                                      Whether your users are given as ids rather than screen names.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
@@ -1300,7 +1300,7 @@ optional arguments:
   --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
   --ids                                      Whether your users are given as ids rather than screen names.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
@@ -1333,7 +1333,7 @@ optional arguments:
   -h, --help                       show this help message and exit
   --include-refs                   Whether to emit referenced tweets (quoted, retweeted & replied) in the CSV output. Note that it consumes a memory proportional to the total number of unique tweets retrieved.
   -l LIMIT, --limit LIMIT          Maximum number of tweets to collect per query.
-  -o OUTPUT, --output OUTPUT       Path to the output file. By default, the result will be printed to stdout.
+  -o OUTPUT, --output OUTPUT       Path to the output file. By default, the results will be printed to stdout.
   --query-template QUERY_TEMPLATE  Query template. Can be useful for instance to change a column of twitter user screen names into from:@user queries.
   -s SELECT, --select SELECT       Columns of input CSV file to include in the output (separated by `,`).
 
@@ -1376,7 +1376,7 @@ optional arguments:
   --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
   --ids                                      Whether your users are given as ids rather than screen names.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
 
@@ -1416,7 +1416,7 @@ optional arguments:
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
   --ids                                      Whether your users are given as ids rather than screen names.
   --exclude-retweets                         Whether to exclude retweets from the output.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the result will be printed to stdout.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
 

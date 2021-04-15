@@ -1779,9 +1779,7 @@ MINET_COMMANDS = {
             {
                 'name': 'file',
                 'help': 'Target CSV file.',
-                'type': FileType('r', encoding='utf-8'),
-                'default': sys.stdin,
-                'nargs': '?'
+                'action': InputFileAction
             },
             {
                 'flag': '--base-url',
@@ -1795,11 +1793,12 @@ MINET_COMMANDS = {
             },
             {
                 'flags': ['-o', '--output'],
-                'help': 'Path to the output file. By default, the result will be printed to stdout.'
+                'action': OutputFileAction
             },
             {
                 'flags': ['-s', '--select'],
-                'help': 'Columns to keep in output, separated by comma.'
+                'help': 'Columns to keep in output, separated by comma.',
+                'type': SplitterType()
             },
             {
                 'flag': '--total',
@@ -1837,7 +1836,8 @@ MINET_COMMANDS = {
             {
                 'name': 'file1',
                 'help': 'Path to the file to index.',
-                'type': FileType('r', encoding='utf-8')
+                'action': InputFileAction,
+                'nargs': None
             },
             {
                 'name': 'column2',
@@ -1846,11 +1846,12 @@ MINET_COMMANDS = {
             {
                 'name': 'file2',
                 'help': 'Path to the second file.',
-                'type': FileType('r', encoding='utf-8')
+                'action': InputFileAction,
+                'nargs': None
             },
             {
                 'flags': ['-o', '--output'],
-                'help': 'Path to the output joined file. By default, the join will be printed to stdout.'
+                'action': OutputFileAction
             },
             {
                 'flags': ['-p', '--match-column-prefix'],
@@ -1934,9 +1935,7 @@ MINET_COMMANDS = {
             {
                 'name': 'file',
                 'help': 'Target CSV file.',
-                'type': FileType('r', encoding='utf-8'),
-                'default': sys.stdin,
-                'nargs': '?'
+                'action': InputFileAction
             },
             {
                 'flag': '--facebook',
@@ -1945,7 +1944,7 @@ MINET_COMMANDS = {
             },
             {
                 'flags': ['-o', '--output'],
-                'help': 'Path to the output file. By default, the result will be printed to stdout.'
+                'action': OutputFileAction
             },
             {
                 'flags': ['-s', '--select'],

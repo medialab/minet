@@ -5,14 +5,13 @@
 # Logic of the `url-extract` action.
 #
 import casanova
-from tqdm import tqdm
 from ural import urls_from_text, urls_from_html
 from urllib.parse import urljoin
 
-from minet.cli.utils import open_output_file
+from minet.cli.utils import LoadingBar
 
 REPORT_HEADERS = [
-    'url'
+    'extracted_url'
 ]
 
 EXTRACTORS = {
@@ -22,21 +21,18 @@ EXTRACTORS = {
 
 
 def url_extract_action(cli_args):
-    output_file = open_output_file(cli_args.output)
-
     enricher = casanova.enricher(
         cli_args.file,
-        output_file,
+        cli_args.output,
         add=REPORT_HEADERS,
-        keep=cli_args.select.split(',') if cli_args.select else None
+        keep=cli_args.select
     )
 
     extract = EXTRACTORS[getattr(cli_args, 'from')]
 
-    loading_bar = tqdm(
+    loading_bar = LoadingBar(
         desc='Extracting',
-        dynamic_ncols=True,
-        unit=' rows',
+        unit='row',
         total=cli_args.total
     )
 
@@ -53,5 +49,3 @@ def url_extract_action(cli_args):
                 url = urljoin(cli_args.base_url, url)
 
             enricher.writerow(row, [url])
-
-    output_file.close()

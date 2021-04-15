@@ -29,9 +29,8 @@ from ural.youtube import (
     YoutubeUser,
     YoutubeChannel
 )
-from tqdm import tqdm
 
-from minet.cli.utils import open_output_file
+from minet.cli.utils import LoadingBar
 
 REPORT_HEADERS = [
     'normalized_url',
@@ -123,9 +122,6 @@ def extract_facebook_addendum(url):
 
 
 def url_parse_action(cli_args):
-
-    output_file = open_output_file(cli_args.output)
-
     headers = REPORT_HEADERS
 
     if cli_args.facebook:
@@ -135,29 +131,28 @@ def url_parse_action(cli_args):
 
     enricher = casanova.enricher(
         cli_args.file,
-        output_file,
+        cli_args.output,
         add=headers,
         keep=cli_args.select
     )
 
-    loading_bar = tqdm(
+    loading_bar = LoadingBar(
         desc='Parsing',
-        dynamic_ncols=True,
-        unit=' rows',
+        unit='row',
         total=cli_args.total
     )
 
-    for row, url in enricher.cells(cli_args.column, with_rows=True):
-        url = url.strip()
-
+    for row, cell in enricher.cells(cli_args.column, with_rows=True):
         loading_bar.update()
 
         if cli_args.separator:
-            urls = url.split(cli_args.separator)
+            urls = cell.split(cli_args.separator)
         else:
-            urls = [url]
+            urls = [cell]
 
         for url in urls:
+            url = url.strip()
+
             if not is_url(url, allow_spaces_in_path=True, require_protocol=False):
                 enricher.writerow(row)
                 continue
@@ -174,5 +169,3 @@ def url_parse_action(cli_args):
                 continue
 
             enricher.writerow(row, addendum)
-
-    output_file.close()

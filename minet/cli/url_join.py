@@ -4,90 +4,76 @@
 #
 # Logic of the `url-join` action.
 #
-import csv
 import casanova
-from casanova.reader import collect_column_indices
 from ural.lru import NormalizedLRUTrie
-from tqdm import tqdm
 
-from minet.cli.utils import open_output_file
+from minet.cli.utils import LoadingBar
 
 
 def url_join_action(cli_args):
-    right_reader = casanova.reader(cli_args.file2)
-    left_reader = casanova.reader(
-        cli_args.file1,
-        cli_args.output
-    )
-
-    output_file = open_output_file(cli_args.output)
-    output_writer = csv.writer(output_file)
-
+    left_reader = casanova.reader(cli_args.file1)
     left_headers = left_reader.fieldnames
-    left_indices = None
+    left_idx = None
 
-    if cli_args.select is not None:
-        selected = cli_args.select.split(',')
-        left_headers = [h for h in left_headers if h in selected]
-        left_indices = collect_column_indices(left_reader.pos, left_headers)
-
-    empty = [''] * len(left_headers)
+    if cli_args.select:
+        left_idx = left_reader.pos.collect(cli_args.select)
+        left_headers = list(cli_args.select)
 
     # Applying column prefix now
     left_headers = [cli_args.match_column_prefix + h for h in left_headers]
 
-    output_writer.writerow(right_reader.fieldnames + left_headers)
+    right_enricher = casanova.enricher(
+        cli_args.file2,
+        cli_args.output,
+        add=left_headers
+    )
 
-    loading_bar = tqdm(
+    loading_bar = LoadingBar(
         desc='Indexing left file',
-        dynamic_ncols=True,
-        unit=' lines'
+        unit='line'
     )
 
     # First step is to index left file
     trie = NormalizedLRUTrie()
 
-    def add_url(u, row):
-        u = u.strip()
+    for row, cell in left_reader.cells(cli_args.column1, with_rows=True):
+        loading_bar.update()
 
-        if u:
-            trie.set(u, row)
+        if left_idx is not None:
+            row = [row[i] for i in left_idx]
 
-    for row, url in left_reader.cells(cli_args.column1, with_rows=True):
-        if left_indices is not None:
-            row = [row[i] for i in left_indices]
+        urls = [cell]
 
         if cli_args.separator is not None:
-            for u in url.split(cli_args.separator):
-                add_url(u, row)
-        else:
-            add_url(url, row)
+            urls = cell.split(cli_args.separator)
 
-        loading_bar.update()
+        for url in urls:
+            url = url.strip()
+
+            # NOTE: should we filter invalid urls here?
+            if url:
+                trie.set(url, row)
 
     loading_bar.close()
 
-    loading_bar = tqdm(
+    loading_bar = LoadingBar(
         desc='Matching right file',
-        dynamic_ncols=True,
-        unit=' lines'
+        unit='line'
     )
 
-    for row, url in right_reader.cells(cli_args.column2, with_rows=True):
+    for row, url in right_enricher.cells(cli_args.column2, with_rows=True):
+        loading_bar.update()
+
         url = url.strip()
 
         match = None
 
+        # NOTE: should we filter invalid urls here?
         if url:
             match = trie.match(url)
 
-        loading_bar.update()
-
         if match is None:
-            output_writer.writerow(row + empty)
+            right_enricher.writerow(row)
             continue
 
-        row.extend(match)
-        output_writer.writerow(row)
-
-    output_file.close()
+        right_enricher.writerow(row, match)
