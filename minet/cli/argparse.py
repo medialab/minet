@@ -6,8 +6,9 @@
 #
 import os
 import sys
+from os.path import isdir
 from io import TextIOBase
-from argparse import Action, ArgumentError
+from argparse import Action, ArgumentError, ArgumentTypeError
 from gettext import gettext
 from tqdm.contrib import DummyTqdmFile
 from casanova import Resumer
@@ -26,6 +27,12 @@ class SplitterType(object):
 
     def __call__(self, string):
         return string.split(self.splitchar)
+
+
+class ExistingDirectoryType(object):
+    def __call__(self, string):
+        if not isdir(string):
+            raise ArgumentTypeError('Could not find the "%s" directory!' % string)
 
 
 class BooleanAction(Action):

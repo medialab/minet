@@ -11,7 +11,6 @@ from minet.multiprocessing import LazyPool
 from minet.encodings import is_supported_encoding
 from minet.fs import read_potentially_gzipped_path
 from minet.cli.utils import (
-    open_output_file,
     create_report_iterator,
     LoadingBar
 )
@@ -110,11 +109,9 @@ def worker(payload):
 
 
 def extract_action(cli_args):
-    output_file = open_output_file(cli_args.output)
-
     enricher = casanova.enricher(
         cli_args.report,
-        output_file,
+        cli_args.output,
         keep=cli_args.select,
         add=OUTPUT_ADDITIONAL_HEADERS
     )
@@ -158,6 +155,3 @@ def extract_action(cli_args):
                 continue
 
             enricher.writerow(row, result)
-
-    loading_bar.close()
-    output_file.close()

@@ -655,9 +655,7 @@ MINET_COMMANDS = {
             {
                 'name': 'report',
                 'help': 'Input CSV fetch action report file.',
-                'type': FileType('r', encoding='utf-8'),
-                'default': sys.stdin,
-                'nargs': '?'
+                'action': InputFileAction
             },
             {
                 'flags': ['-i', '--input-dir'],
@@ -666,7 +664,7 @@ MINET_COMMANDS = {
             },
             {
                 'flags': ['-o', '--output'],
-                'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+                'action': OutputFileAction
             },
             {
                 'flags': ['-p', '--processes'],
@@ -1432,9 +1430,7 @@ MINET_COMMANDS = {
             {
                 'name': 'report',
                 'help': 'Input CSV fetch action report file.',
-                'type': FileType('r', encoding='utf-8'),
-                'default': sys.stdin,
-                'nargs': '?'
+                'action': InputFileAction
             },
             {
                 'flags': ['-f', '--format'],
@@ -1453,7 +1449,7 @@ MINET_COMMANDS = {
             },
             {
                 'flags': ['-o', '--output'],
-                'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+                'action': OutputFileAction
             },
             {
                 'flags': ['-p', '--processes'],

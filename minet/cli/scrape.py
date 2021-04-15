@@ -31,7 +31,6 @@ from minet.cli.reporters import (
 )
 from minet.fs import read_potentially_gzipped_path
 from minet.cli.utils import (
-    open_output_file,
     die,
     create_glob_iterator,
     create_report_iterator,
@@ -89,8 +88,6 @@ def worker(payload):
 
 
 def scrape_action(cli_args):
-
-    output_file = open_output_file(cli_args.output)
 
     # Parsing scraper definition
     try:
@@ -157,10 +154,10 @@ def scrape_action(cli_args):
             ])
 
     if cli_args.format == 'csv':
-        output_writer = csv.DictWriter(output_file, fieldnames=scraper.headers)
+        output_writer = csv.DictWriter(cli_args.output, fieldnames=scraper.headers)
         output_writer.writeheader()
     else:
-        output_writer = ndjson.writer(output_file)
+        output_writer = ndjson.writer(cli_args.output)
 
     pool = LazyPool(
         cli_args.processes,
@@ -182,6 +179,3 @@ def scrape_action(cli_args):
 
             for item in items:
                 output_writer.writerow(item)
-
-    loading_bar.close()
-    output_file.close()
