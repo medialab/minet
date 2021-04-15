@@ -7,13 +7,13 @@
 #
 import re
 import casanova
-from tqdm import tqdm
 from urllib.parse import quote
 from ural import is_url
 
 from minet.utils import rate_limited
 from minet.web import request
-from minet.cli.utils import open_output_file, die, edit_cli_args_with_csv_io
+from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
+from minet.cli.utils import die, LoadingBar
 
 REPORT_HEADERS = ['approx_likes', 'approx_likes_int']
 ONE_LIKE_RE = re.compile(rb'>\s*One person likes this\.', re.I)
@@ -69,16 +69,13 @@ def scrape(data):
 
 
 def facebook_url_likes_action(cli_args):
-    output_file = open_output_file(cli_args.output)
-
-    if is_url(cli_args.column):
-        edit_cli_args_with_csv_io(cli_args, 'url')
-
     enricher = casanova.enricher(
         cli_args.file,
-        output_file,
+        cli_args.output,
         keep=cli_args.select,
-        add=REPORT_HEADERS
+        add=REPORT_HEADERS,
+        total=cli_args.total,
+        prebuffer_bytes=DEFAULT_PREBUFFER_BYTES
     )
 
     if cli_args.column not in enricher.pos:
@@ -86,11 +83,10 @@ def facebook_url_likes_action(cli_args):
             'Could not find the "%s" column containing the urls in the given CSV file.' % cli_args.column
         ])
 
-    loading_bar = tqdm(
+    loading_bar = LoadingBar(
         desc='Retrieving likes',
-        dynamic_ncols=True,
-        unit=' urls',
-        total=cli_args.total
+        unit='url',
+        total=enricher.total
     )
 
     for row, url in enricher.cells(cli_args.column, with_rows=True):
@@ -98,16 +94,18 @@ def facebook_url_likes_action(cli_args):
 
         url = url.strip()
 
+        if not url or not is_url(url, require_protocol=False):
+            enricher.writerow(row)
+            continue
+
         err, html = make_request(url)
 
         if err is not None:
-            loading_bar.close()
-            die('An error occurred while fetching like button for this url: %s' % url)
+            loading_bar.die('An error occurred while fetching like button for this url: %s' % url)
 
         scraped = scrape(html)
 
         if scraped is None:
-            loading_bar.close()
-            die('Could not extract Facebook likes from this url\'s like button: %s' % url)
+            loading_bar.die('Could not extract Facebook likes from this url\'s like button: %s' % url)
 
         enricher.writerow(row, scraped)

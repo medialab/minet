@@ -7,7 +7,6 @@
 import re
 import json5
 import casanova
-from tqdm import tqdm
 from bs4 import BeautifulSoup
 from datetime import datetime
 from collections import OrderedDict
@@ -15,7 +14,7 @@ from ural.facebook import is_facebook_post_url
 
 from minet.utils import nested_get, sleep_with_entropy
 from minet.web import request
-from minet.cli.utils import open_output_file, print_err, die
+from minet.cli.utils import print_err, die, LoadingBar
 from minet.facebook.constants import FACEBOOK_WEB_DEFAULT_THROTTLE
 
 META_EXTRACTOR_TEMPLATE = rb'bigPipe\.onPageletArrive\((\{.+share_fbid:"%s".+\})\);\}\)'
@@ -122,13 +121,9 @@ def format(data):
 
 
 def facebook_post_stats_action(cli_args):
-
-    # Handling output
-    output_file = open_output_file(cli_args.output)
-
     enricher = casanova.enricher(
         cli_args.file,
-        output_file,
+        cli_args.output,
         add=REPORT_HEADERS,
         keep=cli_args.select
     )
@@ -234,10 +229,9 @@ def facebook_post_stats_action(cli_args):
         return None, data
 
     # Loading bar
-    loading_bar = tqdm(
+    loading_bar = LoadingBar(
         desc='Fetching post stats',
-        dynamic_ncols=True,
-        unit=' posts',
+        unit='post',
         total=cli_args.total
     )
 

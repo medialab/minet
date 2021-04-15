@@ -858,13 +858,11 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the posts.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
+                            'action': InputFileAction
                         },
                         {
                             'flags': ['-o', '--output'],
-                            'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+                            'action': OutputFileAction
                         },
                         {
                             'flags': ['-s', '--select'],
@@ -905,13 +903,12 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the inquired URLs.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'url'
                         },
                         {
                             'flags': ['-o', '--output'],
-                            'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+                            'action': OutputFileAction
                         },
                         {
                             'flags': ['-s', '--select'],
