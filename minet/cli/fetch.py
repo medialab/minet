@@ -21,6 +21,7 @@ from minet.web import (
     grab_cookies,
     parse_http_header
 )
+from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
 from minet.cli.reporters import report_error
 from minet.cli.utils import LoadingBar, die
 
@@ -113,7 +114,9 @@ def fetch_action(cli_args, resolve=False):
         cli_args.file,
         cli_args.output,
         add=additional_headers,
-        keep=cli_args.select
+        keep=cli_args.select,
+        total=cli_args.total,
+        prebuffer_bytes=DEFAULT_PREBUFFER_BYTES
     )
 
     if resuming_reader_loading is not None:
@@ -137,11 +140,9 @@ def fetch_action(cli_args, resolve=False):
         filename_pos = enricher.pos[cli_args.filename]
 
     # Loading bar
-    total = cli_args.total
-
     loading_bar = LoadingBar(
         desc='Fetching pages',
-        total=total,
+        total=enricher.total,
         unit='url',
         initial=skipped_rows
     )
