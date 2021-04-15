@@ -57,6 +57,8 @@ class InputFileAction(Action):
         )
 
     def __call__(self, parser, cli_args, value, option_string=None):
+        input_is_dummy_csv = False
+
         if value is None:
             f = sys.stdin
 
@@ -66,6 +68,7 @@ class InputFileAction(Action):
                 if sys.stdin.isatty():
                     f = CsvIO(self.dummy_csv_column, getattr(cli_args, self.column_dest))
                     setattr(cli_args, self.column_dest, self.dummy_csv_column)
+                    input_is_dummy_csv = True
         else:
             try:
                 f = open(value, 'r', encoding='utf-8')
@@ -75,6 +78,7 @@ class InputFileAction(Action):
                 raise ArgumentError(self, message % args)
 
         setattr(cli_args, self.dest, f)
+        setattr(cli_args, 'input_is_dummy_csv', input_is_dummy_csv)
 
 
 class OutputFileOpener(object):

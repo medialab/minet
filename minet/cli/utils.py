@@ -61,7 +61,7 @@ class LoadingBar(object):
     __slots__ = ('bar', 'stats')
 
     def __init__(self, desc, total=None, stats=None, unit=None, unit_plural=None,
-                 delay=None):
+                 delay=None, initial=None):
         if unit is not None and total is None:
             if unit_plural is not None:
                 unit = ' ' + unit_plural
@@ -80,6 +80,9 @@ class LoadingBar(object):
 
         if delay is not None:
             bar_kwargs['delay'] = delay
+
+        if initial is not None:
+            bar_kwargs['initial'] = initial
 
         self.bar = tqdm(**bar_kwargs)
 

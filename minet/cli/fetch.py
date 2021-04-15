@@ -7,17 +7,12 @@
 # optimize both running time & memory.
 #
 import os
-import sys
 import gzip
 import casanova
-from os.path import join, dirname, isfile
+from os.path import join, dirname
 from collections import Counter
-from tqdm import tqdm
 from uuid import uuid4
-from ural import (
-    is_url,
-    is_shortened_url
-)
+from ural import is_shortened_url
 
 from minet.fetch import multithreaded_fetch, multithreaded_resolve
 from minet.utils import PseudoFStringFormatter
@@ -27,11 +22,8 @@ from minet.web import (
     parse_http_header
 )
 from minet.cli.reporters import report_error
-from minet.cli.utils import (
-    open_output_file,
-    die,
-    edit_cli_args_with_csv_io
-)
+from minet.cli.utils import LoadingBar, die
+
 
 FETCH_ADDITIONAL_HEADERS = [
     'resolved',
@@ -55,23 +47,9 @@ CUSTOM_FORMATTER = PseudoFStringFormatter()
 
 def fetch_action(cli_args, resolve=False):
 
-    # Are we resuming
-    resuming = cli_args.resume
-
-    if resuming and not cli_args.output:
-        die([
-            'Cannot --resume without specifying -o/--output.'
-        ])
-
-    # Do we need to fetch only a single url?
-    single_url = cli_args.file is sys.stdin and is_url(cli_args.column)
-
-    if single_url:
-        edit_cli_args_with_csv_io(cli_args, 'url')
-
-        # If we are hitting a single url we enable contents_in_report
-        if not resolve and cli_args.contents_in_report is None:
-            cli_args.contents_in_report = True
+    # If we are hitting a single url we enable contents_in_report by default
+    if not resolve and cli_args.input_is_dummy_csv and cli_args.contents_in_report is None:
+        cli_args.contents_in_report = True
 
     # Trying to instantiate the folder strategy
     if not resolve:
@@ -101,34 +79,26 @@ def fetch_action(cli_args, resolve=False):
             k, v = parse_http_header(header)
             global_headers[k] = v
 
-    flag = 'w'
-    if cli_args.output is not None and resuming and isfile(cli_args.output):
-        flag = 'r+'
-
-    output_file = open_output_file(cli_args.output, flag=flag)
-
     # Resume listener
-    listener = None
+    skipped_rows = 0
     resuming_reader_loading = None
-    skipped = 0
 
-    if resuming:
-        resuming_reader_loading = tqdm(
+    if cli_args.resume and cli_args.output.can_resume():
+        resuming_reader_loading = LoadingBar(
             desc='Resuming',
-            dynamic_ncols=True,
-            unit=' lines'
+            unit='line'
         )
 
-        def listener(event, row):
-            nonlocal skipped
+        def output_read_listener(event, row):
+            nonlocal skipped_rows
 
-            if event == 'resume.output':
-                resuming_reader_loading.update()
+            if event != 'output.row':
+                return
 
-            if event == 'resume.input':
-                skipped += 1
-                loading_bar.set_postfix(skipped=skipped)
-                loading_bar.update()
+            skipped_rows += 1
+            resuming_reader_loading.update()
+
+        cli_args.output.listener = output_read_listener
 
     if resolve:
         additional_headers = RESOLVE_ADDITIONAL_HEADERS
@@ -141,13 +111,13 @@ def fetch_action(cli_args, resolve=False):
     # Enricher
     enricher = casanova.threadsafe_enricher(
         cli_args.file,
-        output_file,
-        resumable=resuming,
-        auto_resume=False,
+        cli_args.output,
         add=additional_headers,
-        keep=cli_args.select,
-        listener=listener
+        keep=cli_args.select
     )
+
+    if resuming_reader_loading is not None:
+        resuming_reader_loading.close()
 
     if cli_args.column not in enricher.pos:
         die([
@@ -166,20 +136,14 @@ def fetch_action(cli_args, resolve=False):
 
         filename_pos = enricher.pos[cli_args.filename]
 
-    indexed_input_headers = {h: i for i, h in enumerate(enricher.fieldnames)}
-
-    if resuming:
-        enricher.resume()
-        resuming_reader_loading.close()
-
     # Loading bar
     total = cli_args.total
 
-    loading_bar = tqdm(
+    loading_bar = LoadingBar(
         desc='Fetching pages',
         total=total,
-        dynamic_ncols=True,
-        unit=' urls'
+        unit='url',
+        initial=skipped_rows
     )
 
     def update_loading_bar(result):
@@ -196,12 +160,12 @@ def fetch_action(cli_args, resolve=False):
             if status >= 400:
                 status_codes[status] += 1
 
-        postfix = {'errors': errors}
+        stats = {'errors': errors}
 
         for code, count in status_codes.most_common(1):
-            postfix[str(code)] = count
+            stats[str(code)] = count
 
-        loading_bar.set_postfix(**postfix)
+        loading_bar.update_stats(**stats)
         loading_bar.update()
 
     only_shortened = getattr(cli_args, 'only_shortened', False)
@@ -460,6 +424,3 @@ def fetch_action(cli_args, resolve=False):
                     redirects=(len(result.stack) - 1) if result.stack else None,
                     chain='|'.join(step.type for step in result.stack) if result.stack else None
                 )
-
-    # Closing files
-    output_file.close()

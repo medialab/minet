@@ -6,7 +6,7 @@
 #
 import sys
 from argparse import FileType
-from casanova import LastCellResumer
+from casanova import LastCellResumer, ThreadSafeResumer
 
 from minet.constants import DEFAULT_THROTTLE
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
@@ -86,7 +86,8 @@ FETCH_COMMON_ARGUMENTS = [
     },
     {
         'flags': ['-o', '--output'],
-        'help': 'Path to the output report file. By default, the report will be printed to stdout.'
+        'action': OutputFileAction,
+        'resumer': ThreadSafeResumer
     },
     {
         'flag': '--resume',
@@ -995,9 +996,8 @@ MINET_COMMANDS = {
             {
                 'name': 'file',
                 'help': 'CSV file containing the urls to fetch.',
-                'type': FileType('r', encoding='utf-8'),
-                'default': sys.stdin,
-                'nargs': '?'
+                'action': InputFileAction,
+                'dummy_csv_column': 'url'
             },
             *FETCH_COMMON_ARGUMENTS,
             {
@@ -1353,9 +1353,8 @@ MINET_COMMANDS = {
             {
                 'name': 'file',
                 'help': 'CSV file containing the urls to resolve.',
-                'type': FileType('r', encoding='utf-8'),
-                'default': sys.stdin,
-                'nargs': '?'
+                'action': InputFileAction,
+                'dummy_csv_column': 'url'
             },
             *FETCH_COMMON_ARGUMENTS,
             {
