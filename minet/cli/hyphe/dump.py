@@ -10,10 +10,9 @@ import base64
 import zlib
 import gzip
 from os.path import join, dirname
-from tqdm import tqdm
 
 from minet.utils import md5
-from minet.cli.utils import die
+from minet.cli.utils import die, LoadingBar
 from minet.hyphe import HypheAPIClient
 from minet.hyphe.formatters import format_webentity_for_csv, format_page_for_csv
 from minet.hyphe.constants import (
@@ -68,10 +67,10 @@ def hyphe_dump_action(cli_args):
     webentities_writer = csv.writer(webentities_file)
     webentities_writer.writerow(WEBENTITY_CSV_HEADERS)
 
-    loading_bar = tqdm(
+    loading_bar = LoadingBar(
         desc='Paginating web entities',
-        unit=' webentities',
-        dynamic_ncols=True,
+        unit='webentity',
+        unit_plural='webentities',
         total=counts['webentities']
     )
 
@@ -90,10 +89,9 @@ def hyphe_dump_action(cli_args):
     pages_writer = csv.writer(pages_file)
     pages_writer.writerow(PAGE_CSV_HEADERS + (ADDITIONAL_PAGE_HEADERS if cli_args.body else []))
 
-    loading_bar = tqdm(
+    loading_bar = LoadingBar(
         desc='Fetching pages',
-        unit=' pages',
-        dynamic_ncols=True,
+        unit='page',
         total=counts['pages']
     )
 
