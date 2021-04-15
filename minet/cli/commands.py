@@ -6,7 +6,11 @@
 #
 import sys
 from argparse import FileType
-from casanova import LastCellResumer, ThreadSafeResumer
+from casanova import (
+    LastCellResumer,
+    ThreadSafeResumer,
+    BatchResumer
+)
 
 from minet.constants import DEFAULT_THROTTLE
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
@@ -1508,9 +1512,8 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the inquired Twitter users.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'user'
                         },
                         *TWITTER_API_COMMON_ARGUMENTS,
                         {
@@ -1520,7 +1523,9 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-o', '--output'],
-                            'help': 'Path to the output file. By default, the result will be printed to stdout.'
+                            'action': OutputFileAction,
+                            'resumer': BatchResumer,
+                            'resumer_kwargs': lambda args: ({'value_column': args.column})
                         },
                         {
                             'flag': '--resume',
@@ -1558,9 +1563,8 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the inquired Twitter users.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'user'
                         },
                         *TWITTER_API_COMMON_ARGUMENTS,
                         {
@@ -1570,7 +1574,9 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-o', '--output'],
-                            'help': 'Path to the output file. By default, the result will be printed to stdout.'
+                            'action': OutputFileAction,
+                            'resumer': BatchResumer,
+                            'resumer_kwargs': lambda args: ({'value_column': args.column})
                         },
                         {
                             'flag': '--resume',

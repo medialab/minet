@@ -6,7 +6,7 @@
 #
 import sys
 
-from minet.cli.utils import open_output_file, die
+from minet.cli.utils import die
 
 
 def check_credentials(cli_args):
@@ -27,21 +27,10 @@ def check_credentials(cli_args):
 
 
 def twitter_action(cli_args):
-
-    output_file = open_output_file(
-        cli_args.output,
-        flag='a+' if getattr(cli_args, 'resume', False) else 'w'
-    )
-
-    if getattr(cli_args, 'resume', False) and not cli_args.output:
-        die(
-            'Cannot --resume if -o/--output is not set!'
-        )
-
     if cli_args.tw_action == 'scrape':
         from minet.cli.twitter.scrape import twitter_scrape_action
 
-        twitter_scrape_action(cli_args, output_file)
+        twitter_scrape_action(cli_args)
 
     else:
         check_credentials(cli_args)
@@ -49,26 +38,22 @@ def twitter_action(cli_args):
         if cli_args.tw_action == 'friends':
             from minet.cli.twitter.friends import twitter_friends_action
 
-            twitter_friends_action(cli_args, output_file)
+            twitter_friends_action(cli_args)
 
         elif cli_args.tw_action == 'followers':
             from minet.cli.twitter.followers import twitter_followers_action
 
-            twitter_followers_action(cli_args, output_file)
+            twitter_followers_action(cli_args)
 
         elif cli_args.tw_action == 'users':
             from minet.cli.twitter.users import twitter_users_action
 
-            twitter_users_action(cli_args, output_file)
+            twitter_users_action(cli_args)
 
         elif cli_args.tw_action == 'user-tweets':
             from minet.cli.twitter.user_tweets import twitter_user_tweets_action
 
-            twitter_user_tweets_action(cli_args, output_file)
+            twitter_user_tweets_action(cli_args)
 
         else:
             raise TypeError('unkown tw_action "%s"' % cli_args.tw_action)
-
-    # Cleanup
-    if cli_args.output is not None:
-        output_file.close()

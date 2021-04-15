@@ -94,7 +94,7 @@ class OutputFileOpener(object):
         self.resumer_class = resumer_class
         self.resumer_kwargs = resumer_kwargs
 
-    def open(self, resume=False):
+    def open(self, cli_args, resume=False):
         if self.path is None:
             if resume:
                 raise RuntimeError
@@ -102,7 +102,12 @@ class OutputFileOpener(object):
             return DummyTqdmFile(acquire_cross_platform_stdout())
 
         if resume and self.resumer_class is not None:
-            return self.resumer_class(self.path, **self.resumer_kwargs)
+            resumer_kwargs = self.resumer_kwargs
+
+            if callable(self.resumer_kwargs):
+                resumer_kwargs = self.resumer_kwargs(cli_args)
+
+            return self.resumer_class(self.path, **resumer_kwargs)
 
         mode = 'a' if resume else 'w'
 
@@ -201,7 +206,7 @@ def resolve_arg_dependencies(cli_args, config):
 
         # Opening output files
         if isinstance(value, OutputFileOpener):
-            value = value.open(resume=getattr(cli_args, 'resume', False))
+            value = value.open(cli_args, resume=getattr(cli_args, 'resume', False))
             setattr(cli_args, name, value)
 
         # Finding buffers to close eventually
