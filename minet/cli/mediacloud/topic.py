@@ -5,20 +5,20 @@
 # Logic of the `mc topic` action.
 #
 import csv
-from tqdm import tqdm
 
+from minet.cli.utils import LoadingBar
 from minet.mediacloud import MediacloudAPIClient
 from minet.mediacloud.constants import MEDIACLOUD_TOPIC_STORIES_CSV_HEADERS
 
 
-def mediacloud_topic_action(cli_args, output_file):
-    writer = csv.writer(output_file)
+def mediacloud_topic_action(cli_args):
+    writer = csv.writer(cli_args.output)
     writer.writerow(MEDIACLOUD_TOPIC_STORIES_CSV_HEADERS)
 
-    loading_bar = tqdm(
+    loading_bar = LoadingBar(
         desc='Fetching stories',
-        dynamic_ncols=True,
-        unit=' stories'
+        unit='story',
+        unit_plural='stories'
     )
 
     client = MediacloudAPIClient(cli_args.token)

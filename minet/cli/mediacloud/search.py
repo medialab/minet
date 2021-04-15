@@ -12,8 +12,8 @@ from minet.mediacloud.constants import MEDIACLOUD_STORIES_CSV_HEADER
 from minet.mediacloud.exceptions import MediacloudServerError
 
 
-def mediacloud_search_action(cli_args, output_file):
-    writer = csv.writer(output_file)
+def mediacloud_search_action(cli_args):
+    writer = csv.writer(cli_args.output)
     writer.writerow(MEDIACLOUD_STORIES_CSV_HEADER)
 
     client = MediacloudAPIClient(cli_args.token)
