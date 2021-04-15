@@ -17,7 +17,7 @@ from minet.cli.utils import LoadingBar
 from minet.twitter.constants import TWITTER_API_MAX_STATUSES_COUNT
 
 
-def twitter_user_tweets_action(cli_args, output_file):
+def twitter_user_tweets_action(cli_args):
 
     wrapper = TwitterWrapper(
         cli_args.access_token,
@@ -28,7 +28,7 @@ def twitter_user_tweets_action(cli_args, output_file):
 
     enricher = casanova.enricher(
         cli_args.file,
-        output_file,
+        cli_args.output,
         keep=cli_args.select,
         add=TWEET_FIELDS
     )
@@ -88,5 +88,3 @@ def twitter_user_tweets_action(cli_args, output_file):
                 enricher.writerow(row, addendum)
 
         loading_bar.inc('done')
-
-    loading_bar.close()

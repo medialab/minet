@@ -12,11 +12,12 @@ from twitwi import (
 )
 from twitter import TwitterHTTPError
 from twitwi.constants import USER_FIELDS
-from tqdm import tqdm
 from ebbe import as_chunks
 
+from minet.cli.utils import LoadingBar
 
-def twitter_users_action(cli_args, output_file):
+
+def twitter_users_action(cli_args):
 
     wrapper = TwitterWrapper(
         cli_args.access_token,
@@ -27,16 +28,15 @@ def twitter_users_action(cli_args, output_file):
 
     enricher = casanova.enricher(
         cli_args.file,
-        output_file,
+        cli_args.output,
         keep=cli_args.select,
         add=USER_FIELDS
     )
 
-    loading_bar = tqdm(
+    loading_bar = LoadingBar(
         desc='Retrieving users',
-        dynamic_ncols=True,
         total=cli_args.total,
-        unit=' user'
+        unit='user'
     )
 
     for chunk in as_chunks(100, enricher.cells(cli_args.column, with_rows=True)):
@@ -72,5 +72,3 @@ def twitter_users_action(cli_args, output_file):
                 enricher.writerow(row, user_row)
 
         loading_bar.update(len(chunk))
-
-    loading_bar.close()

@@ -4,13 +4,12 @@
 #
 # Logic of the `tw scrape` action.
 #
-import sys
 import casanova
 from twitwi.constants import TWEET_FIELDS
 from twitwi import format_tweet_as_csv_row
 
 from minet.utils import prettyprint_seconds, PseudoFStringFormatter
-from minet.cli.utils import edit_cli_args_with_csv_io, LoadingBar
+from minet.cli.utils import LoadingBar
 from minet.twitter import TwitterAPIScraper
 from minet.twitter.exceptions import (
     TwitterPublicAPIRateLimitError,
@@ -32,12 +31,7 @@ def format_meta_row(meta):
     ]
 
 
-def twitter_scrape_action(cli_args, output_file):
-    single_query = cli_args.file is sys.stdin and sys.stdin.isatty()
-
-    if single_query:
-        edit_cli_args_with_csv_io(cli_args, 'query', attr_name='query')
-
+def twitter_scrape_action(cli_args):
     scraper = TwitterAPIScraper()
 
     # Stats
@@ -50,7 +44,7 @@ def twitter_scrape_action(cli_args, output_file):
 
     enricher = casanova.enricher(
         cli_args.file,
-        output_file,
+        cli_args.output,
         add=TWEET_FIELDS + ADDITIONAL_TWEET_FIELDS,
         keep=cli_args.select
     )
@@ -95,5 +89,3 @@ def twitter_scrape_action(cli_args, output_file):
                 enricher.writerow(row, tweet_row + format_meta_row(meta))
         except TwitterPublicAPIOverCapacityError:
             loading_bar.die('Got an "Over Capacity" error. Shutting down...')
-
-    loading_bar.close()

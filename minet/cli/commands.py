@@ -1625,9 +1625,9 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'Optional CSV file containing the queries to be run.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'query',
+                            'column_dest': 'query'
                         },
                         {
                             'flag': '--include-refs',
@@ -1641,7 +1641,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-o', '--output'],
-                            'help': 'Path to the output file. By default, the result will be printed to stdout.'
+                            'action': OutputFileAction
                         },
                         {
                             'flag': '--query-template',
@@ -1673,9 +1673,8 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the inquired Twitter users.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'user'
                         },
                         *TWITTER_API_COMMON_ARGUMENTS,
                         {
@@ -1685,7 +1684,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-o', '--output'],
-                            'help': 'Path to the output file. By default, the result will be printed to stdout.'
+                            'action': OutputFileAction
                         },
                         {
                             'flags': ['-s', '--select'],
@@ -1719,9 +1718,8 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the inquired Twitter users.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'user'
                         },
                         *TWITTER_API_COMMON_ARGUMENTS,
                         {
@@ -1736,7 +1734,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-o', '--output'],
-                            'help': 'Path to the output file. By default, the result will be printed to stdout.'
+                            'action': OutputFileAction
                         },
                         {
                             'flags': ['-s', '--select'],
