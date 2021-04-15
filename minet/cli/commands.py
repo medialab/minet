@@ -1195,7 +1195,7 @@ MINET_COMMANDS = {
                 },
                 {
                     'flags': ['-o', '--output'],
-                    'help': 'Path to the output file. By default, the output will be printed to stdout.'
+                    'action': OutputFileAction
                 }
             ],
             'commands': {
@@ -1212,13 +1212,13 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the searched Mediacloud media ids.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'media'
                         },
                         {
                             'flag': '--feeds',
-                            'help': 'If given, path of the CSV file listing media RSS feeds.'
+                            'help': 'If given, path of the CSV file listing media RSS feeds.',
+                            'action': OutputFileAction
                         },
                         {
                             'flags': ['-s', '--select'],

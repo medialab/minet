@@ -4,7 +4,7 @@
 #
 # Logic of the `mc` action.
 #
-from minet.cli.utils import die, open_output_file
+from minet.cli.utils import die
 
 
 def mediacloud_action(cli_args):
@@ -16,18 +16,14 @@ def mediacloud_action(cli_args):
             'You can provide one using the `--token` argument.'
         ])
 
-    output_file = open_output_file(cli_args.output)
-
     if cli_args.mc_action == 'medias':
         from minet.cli.mediacloud.medias import mediacloud_medias_action
-        mediacloud_medias_action(cli_args, output_file)
+        mediacloud_medias_action(cli_args)
 
     if cli_args.mc_action == 'topic':
         from minet.cli.mediacloud.topic import mediacloud_topic_action
-        mediacloud_topic_action(cli_args, output_file)
+        mediacloud_topic_action(cli_args)
 
     elif cli_args.mc_action == 'search':
         from minet.cli.mediacloud.search import mediacloud_search_action
-        mediacloud_search_action(cli_args, output_file)
-
-    output_file.close()
+        mediacloud_search_action(cli_args)

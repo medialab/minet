@@ -6,9 +6,8 @@
 #
 import csv
 import casanova
-from tqdm import tqdm
 
-from minet.cli.utils import die
+from minet.cli.utils import LoadingBar
 from minet.mediacloud import MediacloudAPIClient
 from minet.mediacloud.constants import (
     MEDIACLOUD_MEDIA_CSV_HEADER,
@@ -17,29 +16,26 @@ from minet.mediacloud.constants import (
 from minet.mediacloud.exceptions import MediacloudServerError
 
 
-def mediacloud_medias_action(cli_args, output_file):
+def mediacloud_medias_action(cli_args):
     added_headers = MEDIACLOUD_MEDIA_CSV_HEADER[1:]
 
-    feeds_file = None
     feeds_writer = None
 
     if cli_args.feeds:
         added_headers.append('feeds')
-        feeds_file = open(cli_args.feeds, 'w', encoding='utf-8')
-        feeds_writer = csv.writer(feeds_file)
+        feeds_writer = csv.writer(cli_args.feeds)
         feeds_writer.writerow(MEDIACLOUD_FEED_CSV_HEADER)
 
     enricher = casanova.enricher(
         cli_args.file,
-        output_file,
+        cli_args.output,
         keep=cli_args.select,
         add=added_headers
     )
 
-    loading_bar = tqdm(
+    loading_bar = LoadingBar(
         desc='Fetching medias',
-        dynamic_ncols=True,
-        unit=' medias',
+        unit='media',
         total=cli_args.total
     )
 
@@ -60,12 +56,9 @@ def mediacloud_medias_action(cli_args, output_file):
             else:
                 enricher.writerow(row, result[1:])
         except MediacloudServerError as e:
-            loading_bar.close()
-            die([
+            loading_bar.die([
                 'Aborted due to a mediacloud server error:',
                 e.server_error
             ])
 
         loading_bar.update()
-
-    feeds_file.close()
