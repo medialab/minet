@@ -26,7 +26,7 @@ from tenacity import (
 )
 
 from minet.encodings import is_supported_encoding
-
+from minet.utils import is_binary_mimetype
 from minet.exceptions import (
     MaxRedirectsError,
     InfiniteRedirectsError,
@@ -34,7 +34,6 @@ from minet.exceptions import (
     InvalidURLError,
     SelfRedirectError
 )
-
 from minet.constants import (
     DEFAULT_SPOOFED_UA,
     DEFAULT_URLLIB3_TIMEOUT,
@@ -593,6 +592,9 @@ def extract_response_meta(response, guess_encoding=True, guess_extension=True):
 
             meta['mimetype'] = mimetype
             meta['ext'] = ext
+
+    if meta['mimetype'] is not None and is_binary_mimetype(meta['mimetype']):
+        guess_encoding = False
 
     # Guessing encoding
     if guess_encoding:

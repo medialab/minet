@@ -6,7 +6,8 @@ import pytest
 from minet.utils import (
     fix_ensure_ascii_json_string,
     nested_get,
-    PseudoFStringFormatter
+    PseudoFStringFormatter,
+    is_binary_mimetype
 )
 
 NESTED_OBJECT = {
@@ -17,6 +18,12 @@ NESTED_OBJECT = {
         }
     }
 }
+
+MIMETYPES = [
+    ('text/html', False),
+    ('application/json', False),
+    ('image/png', True)
+]
 
 
 class TestUtils(object):
@@ -35,3 +42,7 @@ class TestUtils(object):
         result = formatter.format('{line["test"]}', line={'test': 'hello'})
 
         assert result == 'hello'
+
+    def test_is_binary_mimetype(self):
+        for mimetype, result in MIMETYPES:
+            assert is_binary_mimetype(mimetype) is result

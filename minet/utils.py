@@ -361,3 +361,22 @@ def with_defer(fn):
             fn(*args)
 
     return wrapped
+
+
+def is_binary_mimetype(m: str) -> bool:
+    if m.startswith('text/'):
+        return False
+
+    if not m.startswith('application/'):
+        return True
+
+    second_part = m.split('/', 1)[-1]
+
+    return not (
+        'json' in second_part or
+        'html' in second_part or
+        'xml' in second_part or
+        'yaml' in second_part or
+        'yml' in second_part or
+        second_part == 'x-httpd-php'
+    )
