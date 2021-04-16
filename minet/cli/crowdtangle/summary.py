@@ -52,7 +52,6 @@ def crowdtangle_summary_action(cli_args):
                 start_date=cli_args.start_date,
                 with_top_posts=cli_args.posts is not None,
                 sort_by=cli_args.sort_by,
-                format='csv_row',
                 platforms=cli_args.platforms
             )
 
@@ -67,8 +66,8 @@ def crowdtangle_summary_action(cli_args):
 
             if posts is not None:
                 for post in posts:
-                    posts_writer.writerow([url] + post)
+                    posts_writer.writerow(post.as_csv_row())
 
-        enricher.writerow(row, stats)
+        enricher.writerow(row, stats.as_csv_row())
 
         loading_bar.update()

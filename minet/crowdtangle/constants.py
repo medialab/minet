@@ -6,12 +6,6 @@
 #
 from urllib3 import Timeout
 
-CROWDTANGLE_OUTPUT_FORMATS = {
-    'raw',
-    'csv_row',
-    'csv_dict_row'
-}
-
 CROWDTANGLE_DEFAULT_RATE_LIMIT = 6  # Number of hits per minute
 CROWDTANGLE_LINKS_DEFAULT_RATE_LIMIT = 2
 
@@ -142,7 +136,6 @@ CROWDTANGLE_ACCOUNT_CSV_HEADERS = [
     'account_subscriber_count',
     'account_url',
     'account_verified',
-    'account_platform',
     'account_type',
     'account_page_admin_top_country'
 ]

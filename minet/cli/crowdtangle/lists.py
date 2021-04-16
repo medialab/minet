@@ -19,7 +19,7 @@ def crowdtangle_lists_action(cli_args):
     writer.writerow(CROWDTANGLE_LIST_CSV_HEADERS)
 
     try:
-        lists = client.lists(format='csv_row')
+        lists = client.lists()
 
         for l in lists:
             writer.writerow(l)

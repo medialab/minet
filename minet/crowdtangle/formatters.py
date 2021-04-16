@@ -4,8 +4,7 @@
 #
 # Various data formatters for CrowdTangle API data.
 #
-import json
-from collections import OrderedDict
+from casanova import namedrecord
 
 from minet.crowdtangle.constants import (
     CROWDTANGLE_POST_TYPES,
@@ -20,29 +19,67 @@ from minet.crowdtangle.constants import (
     CROWDTANGLE_FULL_STATISTICS
 )
 
+CrowdTanglePost = namedrecord(
+    'CrowdTanglePost',
+    CROWDTANGLE_POST_CSV_HEADERS,
+    boolean=['account_verified'],
+    plural=['links', 'expanded_links'],
+    json=['media']
+)
 
-def row_to_ordered_dict(headers, row):
-    return OrderedDict(zip(headers, row))
+CrowdTanglePostWithLink = namedrecord(
+    'CrowdTanglePostWithLink',
+    CROWDTANGLE_POST_CSV_HEADERS_WITH_LINK,
+    boolean=['account_verified'],
+    plural=['links', 'expanded_links'],
+    json=['media']
+)
+
+CrowdTangleSummary = namedrecord(
+    'CrowdTangleSummary',
+    CROWDTANGLE_SUMMARY_CSV_HEADERS
+)
+
+CrowdTangleLeaderboard = namedrecord(
+    'CrowdTangleLeaderboard',
+    CROWDTANGLE_LEADERBOARD_CSV_HEADERS,
+    boolean=['verified']
+)
+
+CrowdTangleLeaderboardWithBreakdown = namedrecord(
+    'CrowdTangleLeaderboardWithBreakdown',
+    CROWDTANGLE_LEADERBOARD_CSV_HEADERS_WITH_BREAKDOWN,
+    boolean=['verified']
+)
+
+CrowdTangleList = namedrecord(
+    'CrowdTangleList',
+    CROWDTANGLE_LIST_CSV_HEADERS
+)
 
 
-def format_post(post, as_dict=False, link=None):
+def map_key(key, target):
+    return [item[key] for item in target]
+
+
+def format_post(post, link=None):
     row = [
         post['id'],
         post['platformId'],
         post['platform'],
         post['type'],
-        post.get('title', ''),
-        post.get('caption', ''),
-        post.get('message', ''),
-        post.get('description', ''),
+        post.get('title'),
+        post.get('caption'),
+        post.get('message'),
+        post.get('description'),
         post['date'].split(' ', 1)[0],
         post['date'],
         post['updated'],
-        post.get('link', ''),
-        post.get('postUrl', ''),
+        post.get('link'),
+        post.get('postUrl'),
         post['score'],
-        post.get('videoLengthMS', ''),
-        post.get('liveVideoStatus', '')
+        post.get('videoLengthMS'),
+        post.get('liveVideoStatus')
     ]
 
     if link:
@@ -60,75 +97,58 @@ def format_post(post, as_dict=False, link=None):
 
     account = post['account']
 
-    links = ''
-    expanded_links = ''
-
-    if 'expandedLinks' in post:
-        links = '|'.join(link['original'] for link in post['expandedLinks'])
-        expanded_links = '|'.join(link['expanded'] for link in post['expandedLinks'])
-
     row.extend([
         # Account
         account['id'],
-        account.get('platformId', ''),
-        account['platform'],
+        account.get('platformId'),
+        account.get('platform'),
         account['name'],
-        account.get('handle', ''),
-        account.get('profileImage', ''),
+        account.get('handle'),
+        account.get('profileImage'),
         account['subscriberCount'],
         account['url'],
-        '1' if account['verified'] else '',
-        account.get('platform', ''),
-        account.get('accountType', ''),
-        account.get('pageAdminTopCountry', ''),
+        account['verified'],
+        account.get('accountType'),
+        account.get('pageAdminTopCountry'),
 
         # Remaining
-        links,
-        expanded_links,
-        json.dumps(post['media'], ensure_ascii=False) if 'media' in post else ''
+        map_key('original', post.get('expandedLinks', [])),
+        map_key('expanded', post.get('expandedLinks', [])),
+        post.get('media')
     ])
 
-    if as_dict:
-        headers = CROWDTANGLE_POST_CSV_HEADERS
+    if link is not None:
+        return CrowdTanglePostWithLink(*row)
 
-        if link is not None:
-            headers = CROWDTANGLE_POST_CSV_HEADERS_WITH_LINK
-
-        return row_to_ordered_dict(headers, row)
-
-    return row
+    return CrowdTanglePost(*row)
 
 
-def format_summary(stats, as_dict=False):
-    row = [stats['%sCount' % t] for t in CROWDTANGLE_REACTION_TYPES]
-
-    if as_dict:
-        return row_to_ordered_dict(CROWDTANGLE_SUMMARY_CSV_HEADERS, row)
-
-    return row
+def format_summary(stats):
+    row = (stats['%sCount' % t] for t in CROWDTANGLE_REACTION_TYPES)
+    return CrowdTangleSummary(*row)
 
 
-def format_leaderboard(item, with_breakdown=False, as_dict=False):
+def format_leaderboard(item, with_breakdown=False):
     account = item['account']
     subscriber_data = item['subscriberData']
 
     row = [
         account['id'],
         account['name'],
-        account.get('handle', ''),
-        account.get('profileImage', ''),
+        account.get('handle'),
+        account.get('profileImage'),
         account['subscriberCount'],
         account['url'],
-        '1' if account['verified'] else '',
+        account['verified'],
         subscriber_data['initialCount'],
         subscriber_data['finalCount'],
-        subscriber_data.get('notes', '')
+        subscriber_data.get('notes')
     ]
 
     summary = item['summary']
 
     for key, _ in CROWDTANGLE_FULL_STATISTICS:
-        row.append(summary.get(key, ''))
+        row.append(summary.get(key))
 
     if with_breakdown:
         breakdown = item['breakdown']
@@ -138,27 +158,17 @@ def format_leaderboard(item, with_breakdown=False, as_dict=False):
             data = breakdown.get(post_type)
 
             for key, _ in CROWDTANGLE_FULL_STATISTICS:
-                row.append(data.get(key, '') if data else '')
+                row.append(data.get(key) if data else None)
 
-    if as_dict:
-        headers = CROWDTANGLE_LEADERBOARD_CSV_HEADERS
+    if with_breakdown:
+        return CrowdTangleLeaderboardWithBreakdown(*row)
 
-        if with_breakdown:
-            headers = CROWDTANGLE_LEADERBOARD_CSV_HEADERS_WITH_BREAKDOWN
-
-        return row_to_ordered_dict(headers, row)
-
-    return row
+    return CrowdTangleLeaderboard(*row)
 
 
-def format_list(item, as_dict=False):
-    row = [
+def format_list(item):
+    return CrowdTangleList(
         item['id'],
         item['title'],
         item['type']
-    ]
-
-    if as_dict:
-        row = row_to_ordered_dict(CROWDTANGLE_LIST_CSV_HEADERS, row)
-
-    return row
+    )

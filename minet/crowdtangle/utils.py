@@ -9,9 +9,6 @@ from datetime import date, datetime, timedelta
 
 from minet.utils import rate_limited_from_state
 from minet.web import request, create_request_retryer
-from minet.crowdtangle.constants import (
-    CROWDTANGLE_OUTPUT_FORMATS
-)
 from minet.crowdtangle.exceptions import (
     CrowdTangleMissingStartDateError,
     CrowdTangleInvalidTokenError,
@@ -138,11 +135,8 @@ def make_paginated_iterator(url_forge, item_key, formatter,
                             item_id_getter=default_item_id_getter):
 
     def create_iterator(pool, token, rate_limiter_state, limit=None,
-                        format='csv_dict_row', per_call=False, detailed=False,
+                        raw=False, per_call=False, detailed=False,
                         namespace=None, before_sleep=None, **kwargs):
-
-        if format not in CROWDTANGLE_OUTPUT_FORMATS:
-            raise TypeError('minet.crowdtangle: unkown `format`.')
 
         if namespace is not None:
             kwargs = vars(namespace)
@@ -238,9 +232,7 @@ def make_paginated_iterator(url_forge, item_key, formatter,
                 N += 1
                 current_chunk_size += 1
 
-                if format == 'csv_dict_row':
-                    item = formatter(item, as_dict=True)
-                elif format == 'csv_row':
+                if not raw:
                     item = formatter(item)
 
                 acc.append(item)

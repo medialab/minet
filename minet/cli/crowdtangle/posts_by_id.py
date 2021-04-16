@@ -67,7 +67,7 @@ def crowdtangle_posts_by_id_action(cli_args, output_file):
                     enricher.writerow(row)
                     continue
 
-                post = client.post(post_id, format='csv_row')
+                post = client.post(post_id)
                 enricher.writerow(row, post)
 
     except CrowdTangleInvalidTokenError:

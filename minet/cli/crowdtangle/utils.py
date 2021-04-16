@@ -86,7 +86,7 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
         iterator = create_iterator(
             *args,
             limit=cli_args.limit,
-            format='csv_row' if cli_args.format == 'csv' else 'raw',
+            raw=cli_args.format != 'csv',
             per_call=True,
             detailed=True,
             namespace=cli_args,
@@ -101,6 +101,9 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
                     loading_bar.update_stats(**details)
 
                 for item in items:
+                    if cli_args.format == 'csv':
+                        item = item.as_csv_row()
+
                     writer.writerow(item)
 
         except CrowdTangleInvalidTokenError:

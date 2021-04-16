@@ -15,8 +15,7 @@ from minet.utils import nested_get
 from minet.web import request_json
 from minet.crowdtangle.constants import (
     CROWDTANGLE_SUMMARY_DEFAULT_SORT_TYPE,
-    CROWDTANGLE_SUMMARY_SORT_TYPES,
-    CROWDTANGLE_OUTPUT_FORMATS
+    CROWDTANGLE_SUMMARY_SORT_TYPES
 )
 from minet.crowdtangle.formatters import (
     format_post,
@@ -51,13 +50,10 @@ def url_forge(link, token, start_date, sort_by, platforms=None, include_posts=Fa
 
 
 def crowdtangle_summary(pool, link, token=None, start_date=None, with_top_posts=False,
-                        sort_by=CROWDTANGLE_SUMMARY_DEFAULT_SORT_TYPE, format='csv_dict_row', platforms=None):
+                        sort_by=CROWDTANGLE_SUMMARY_DEFAULT_SORT_TYPE, raw=False, platforms=None):
 
     if token is None:
         raise CrowdTangleMissingTokenError
-
-    if format not in CROWDTANGLE_OUTPUT_FORMATS:
-        raise TypeError('minet.crowdtangle.summary: unkown `format`.')
 
     if not isinstance(start_date, str):
         raise TypeError('minet.crowdtangle.summary: expecting a `start_date` kwarg.')
@@ -90,19 +86,14 @@ def crowdtangle_summary(pool, link, token=None, start_date=None, with_top_posts=
     posts = nested_get(['result', 'posts'], data) if with_top_posts else None
 
     if stats is not None:
-        if format == 'csv_dict_row':
-            stats = format_summary(stats, as_dict=True)
-        elif format == 'csv_row':
+        if not raw:
             stats = format_summary(stats)
 
     if not with_top_posts:
         return stats
 
     else:
-        if posts is not None:
-            if format == 'csv_dict_row':
-                posts = [format_post(post, as_dict=True) for post in posts]
-            elif format == 'csv_row':
-                posts = [format_post(post) for post in posts]
+        if not raw:
+            posts = [format_post(post, link=link) for post in posts]
 
         return stats, posts

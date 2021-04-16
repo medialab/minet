@@ -94,13 +94,17 @@ class InputFileAction(Action):
 
 
 class OutputFileOpener(object):
-    def __init__(self, path=None, resumer_class=None, resumer_kwargs={}):
+    def __init__(self, path=None, resumer_class=None, resumer_kwargs={}, stdout_fallback=True):
         self.path = path
         self.resumer_class = resumer_class
         self.resumer_kwargs = resumer_kwargs
+        self.stdout_fallback = stdout_fallback
 
     def open(self, cli_args, resume=False):
         if self.path is None:
+            if not self.stdout_fallback:
+                return None
+
             if resume:
                 raise RuntimeError
 
@@ -126,16 +130,18 @@ DEFAULT_OUTPUT_FILE_HELP = 'Path to the output file. By default, the results wil
 
 class OutputFileAction(Action):
     def __init__(self, option_strings, dest, resumer=None, resumer_kwargs={},
-                 help=DEFAULT_OUTPUT_FILE_HELP, **kwargs):
+                 help=DEFAULT_OUTPUT_FILE_HELP, stdout_fallback=True, **kwargs):
         self.resumer = resumer
         self.resumer_kwargs = resumer_kwargs
+        self.stdout_fallback = stdout_fallback
         super().__init__(
             option_strings,
             dest,
             help=help,
             default=OutputFileOpener(
                 resumer_class=resumer,
-                resumer_kwargs=resumer_kwargs
+                resumer_kwargs=resumer_kwargs,
+                stdout_fallback=stdout_fallback
             ),
             **kwargs
         )
@@ -144,7 +150,8 @@ class OutputFileAction(Action):
         opener = OutputFileOpener(
             value,
             resumer_class=self.resumer,
-            resumer_kwargs=self.resumer_kwargs
+            resumer_kwargs=self.resumer_kwargs,
+            stdout_fallback=self.stdout_fallback
         )
         setattr(cli_args, self.dest, opener)
 

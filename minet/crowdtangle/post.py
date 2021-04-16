@@ -11,9 +11,6 @@ from minet.crowdtangle.exceptions import (
 )
 from minet.utils import nested_get
 from minet.web import request_json
-from minet.crowdtangle.constants import (
-    CROWDTANGLE_OUTPUT_FORMATS
-)
 from minet.crowdtangle.formatters import (
     format_post
 )
@@ -21,13 +18,10 @@ from minet.crowdtangle.formatters import (
 URL_TEMPLATE = 'https://api.crowdtangle.com/post/%s?token=%s'
 
 
-def crowdtangle_post(pool, post_id, token=None, format='csv_dict_row'):
+def crowdtangle_post(pool, post_id, token=None, raw=False):
 
     if token is None:
         raise CrowdTangleMissingTokenError
-
-    if format not in CROWDTANGLE_OUTPUT_FORMATS:
-        raise TypeError('minet.crowdtangle.post: unkown `format`.')
 
     # Fetching
     api_url = URL_TEMPLATE % (post_id, token)
@@ -48,9 +42,7 @@ def crowdtangle_post(pool, post_id, token=None, format='csv_dict_row'):
     if post is None:
         return
 
-    if format == 'csv_dict_row':
-        return format_post(post, as_dict=True)
-    elif format == 'csv_row':
+    if not raw:
         return format_post(post)
 
     return post

@@ -578,7 +578,8 @@ MINET_COMMANDS = {
                         {
                             'name': '--posts',
                             'help': 'Path to a file containing the retrieved posts.',
-                            'action': OutputFileAction
+                            'action': OutputFileAction,
+                            'stdout_fallback': False
                         },
                         {
                             'flags': ['-s', '--select'],

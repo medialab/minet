@@ -49,7 +49,6 @@ for account_stats in client.leaderboard(list_id=9457):
 
 * **list_id** *?str*: whether to return only accounts from the given list.
 * **limit** *?int*: max number of accounts to return.
-* **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
 * **per_call** *?bool* [`False`]: whether to yield once per API call or once per retrieved item.
 
 ### #.lists
@@ -59,10 +58,6 @@ Method returning your dashboard's lists.
 ```python
 lists = client.lists()
 ```
-
-*Arguments*
-
-* **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
 
 ### #.post
 
@@ -75,7 +70,6 @@ post = client.post()
 *Arguments*
 
 * **post_id** *int|str*: id of post to get.
-* **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
 
 ### #.posts
 
@@ -94,7 +88,6 @@ for post in client.posts():
 * **end_date** *?str*: end date.
 * **start_date** *?str*: start date.
 * **limit** *?int*: max number of posts to return.
-* **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
 * **per_call** *?bool* [`False`]: whether to yield once per API call or once per retrieved item.
 
 ### #.search
@@ -119,7 +112,6 @@ for post in client.search('tree'):
 * **start_date** *?str*: start date.
 * **types** *?iterable<str>*: only return those post types.
 * **limit** *?int*: max number of posts to return.
-* **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
 * **per_call** *?bool* [`False`]: whether to yield once per API call or once per retrieved item.
 
 
@@ -142,7 +134,6 @@ stats, posts = client.summary(
 
 * **link** *str*: url to query.
 * **start_date** *str*: start date for the agregation.
-* **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
 * **sort_by** *?str* [`date`]: how to sort posts. Can be `date`, `subscriber_count` or `total_interactions`.
 * **with_top_posts** *?bool*: whether to also return top 100 posts.
 
