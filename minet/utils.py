@@ -13,7 +13,6 @@ import string
 import functools
 import dateparser
 from random import uniform
-from contextlib import ExitStack
 
 from minet.exceptions import DefinitionInvalidFormatError
 
@@ -351,16 +350,6 @@ def parse_date(formatted_date, lang='en'):
         return None
 
     return parsed.isoformat().split('.', 1)[0]
-
-
-def with_defer(fn):
-    def wrapped(*args):
-        with ExitStack() as stack:
-            defer = stack.callback
-            args = args + (defer,)
-            fn(*args)
-
-    return wrapped
 
 
 def is_binary_mimetype(m: str) -> bool:

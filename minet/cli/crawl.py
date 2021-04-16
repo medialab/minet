@@ -8,9 +8,9 @@ import os
 import csv
 from os.path import join, isfile, dirname
 from shutil import rmtree
+from ebbe.decorators import with_defer
 
 from minet.crawl import Crawler
-from minet.utils import with_defer
 from minet.cli.reporters import report_error
 from minet.cli.utils import print_err, LoadingBar
 
@@ -153,7 +153,7 @@ class ScraperReporterPool(object):
                 reporter.close()
 
 
-@with_defer
+@with_defer()
 def crawl_action(cli_args, defer):
 
     # Loading crawler definition
