@@ -11,9 +11,10 @@ from glob import iglob
 from os.path import join, expanduser, isfile, isdir
 from collections import namedtuple
 from tqdm import tqdm
+from ebbe import noop
 
 from minet.cli.exceptions import MissingColumnError
-from minet.utils import fuzzy_int, noop
+from minet.utils import fuzzy_int
 
 
 def print_err(*args, **kwargs):
