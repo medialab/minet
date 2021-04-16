@@ -151,7 +151,7 @@ def extract_action(cli_args):
                 continue
 
             if result is None:
-                enricher.writerow(row, format_error('no-content'))
+                enricher.writerow(row, format_error('no-result'))
                 continue
 
             enricher.writerow(row, result)
