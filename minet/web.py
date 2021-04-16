@@ -243,7 +243,7 @@ def raw_request(http, url, method='GET', headers=None,
 
     # Validating URL
     if not ural.is_url(url, require_protocol=True, tld_aware=True, allow_spaces_in_path=True):
-        return InvalidURLError('Invalid URL'), None
+        return InvalidURLError(url=url), None
 
     # Performing request
     request_kwargs = {

@@ -47,7 +47,9 @@ class UnknownEncodingError(MinetError):
 
 # Miscellaneous HTTP errors
 class InvalidURLError(MinetError):
-    pass
+    def __init__(self, message=None, url=None):
+        self.url = url
+        super().__init__(message)
 
 
 # Redirection errors

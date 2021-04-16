@@ -22,6 +22,7 @@ from minet.web import (
     grab_cookies,
     parse_http_header
 )
+from minet.exceptions import InvalidURLError
 from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
 from minet.cli.reporters import report_error
 from minet.cli.utils import LoadingBar, die
@@ -366,10 +367,16 @@ def fetch_action(cli_args, resolve=False):
             else:
                 error_code = report_error(result.error)
 
+                resolved = None
+
+                if isinstance(result.error, InvalidURLError):
+                    resolved = result.error.url
+
                 write_fetch_output(
                     index,
                     row,
-                    error=error_code
+                    error=error_code,
+                    resolved=resolved
                 )
 
     # Resolve
