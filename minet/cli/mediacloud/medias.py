@@ -44,17 +44,18 @@ def mediacloud_medias_action(cli_args):
     for row, media_id in enricher.cells(cli_args.column, with_rows=True):
 
         try:
-            result = client.media(media_id, format='csv_row')
+            result = client.media(media_id)
+            result = result.as_csv_row()[1:]
 
             if cli_args.feeds:
-                feeds = client.feeds(media_id, format='csv_row')
+                feeds = client.feeds(media_id)
 
-                enricher.writerow(row, result[1:] + [len(feeds)])
+                enricher.writerow(row, result + [len(feeds)])
 
                 for feed in feeds:
-                    feeds_writer.writerow(feed)
+                    feeds_writer.writerow(feed.as_csv_row())
             else:
-                enricher.writerow(row, result[1:])
+                enricher.writerow(row, result)
         except MediacloudServerError as e:
             loading_bar.die([
                 'Aborted due to a mediacloud server error:',

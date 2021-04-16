@@ -24,7 +24,7 @@ def get_next_link_id(data):
     return pagination['next']
 
 
-def explode_tags(data, join_char=None):
+def explode_tags(data):
     tags = []
     tag_sets = []
     tags_ids = []
@@ -36,12 +36,6 @@ def explode_tags(data, join_char=None):
         tags_ids.append(tag['tags_id'])
         tag_sets_ids.append(tag['tag_sets_id'])
 
-    if join_char is not None:
-        tags = join_char.join(tags)
-        tag_sets = join_char.join(tag_sets)
-        tags_ids = join_char.join(str(i) for i in tags_ids)
-        tag_sets_ids = join_char.join(str(i) for i in tag_sets_ids)
-
     return tags, tag_sets, tags_ids, tag_sets_ids
 
 
@@ -52,8 +46,8 @@ def get_last_processed_stories_id(data):
     return data[-1]['processed_stories_id']
 
 
-def make_simple_call(pool, token, route, formatter, format='csv_dict_row',
-                     arg=None, query=None, single=False):
+def make_simple_call(pool, token, route, formatter, raw=False, arg=None,
+                     query=None, single=False):
     url = MEDIACLOUD_API_BASE_URL + route
 
     if arg is not None:
@@ -75,9 +69,7 @@ def make_simple_call(pool, token, route, formatter, format='csv_dict_row',
     results = []
 
     for item in data:
-        if format == 'csv_dict_row':
-            item = formatter(item, as_dict=True)
-        elif format == 'csv_row':
+        if not raw:
             item = formatter(item)
 
         results.append(item)

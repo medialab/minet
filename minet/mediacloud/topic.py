@@ -36,7 +36,7 @@ def url_forge(token=None, topic_id=None, link_id=None, media_id=None,
 
 
 def mediacloud_topic_stories(pool, token, topic_id, link_id=None, media_id=None,
-                             from_media_id=None, format='csv_dict_row'):
+                             from_media_id=None, raw=False):
 
     while True:
         url = url_forge(
@@ -58,12 +58,10 @@ def mediacloud_topic_stories(pool, token, topic_id, link_id=None, media_id=None,
         next_link_id = get_next_link_id(data)
 
         for story in data['stories']:
-            if format == 'csv_dict_row':
-                yield format_topic_story(story, next_link_id, as_dict=True)
-            elif format == 'csv_row':
-                yield format_topic_story(story, next_link_id)
-            else:
-                yield story
+            if not raw:
+                story = format_topic_story(story, next_link_id)
+
+            yield story
 
         if next_link_id is None:
             return

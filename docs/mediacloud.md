@@ -38,7 +38,6 @@ for story in client.search('andropov'):
 
 * **query** *str*: SOLR search query. To see how to query efficiently, check out those [docs](https://mediacloud.org/support/query-guide/) for more information.
 * **collections** *?list<int|str>*: a list of collections where stories should be searched.
-* **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.
 
 ### #.topic_stories
 
@@ -54,4 +53,3 @@ for story in client.topic_stories(4536):
 * **topic_id** *str*: id of target topic.
 * **from_media_id** *?str*: return only stories linked from a media having this id.
 * **media_id** *?str*: return only stories coming from a media having this id.
-* **format** *?str* [`csv_dict_row`]: output format. Can be either `raw` to return raw JSON output from the API, `csv_dict_row` to return items as `OrderedDict` or finally `csv_row` to return plain lists.

@@ -47,26 +47,26 @@ class MediacloudAPIClient(object):
             **kwargs
         )
 
-    def media(self, media_id, format=None):
+    def media(self, media_id, **kwargs):
         return make_simple_call(
             self.pool,
             self.token,
             '/media/single',
             format_media,
-            format=format,
             arg=media_id,
-            single=True
+            single=True,
+            **kwargs
         )
 
-    def feeds(self, media_id, format=None):
+    def feeds(self, media_id, **kwargs):
         return make_simple_call(
             self.pool,
             self.token,
             '/feeds/list',
             format_feed,
-            format=format,
             query={
                 'media_id': media_id,
                 'rows': 100
-            }
+            },
+            **kwargs
         )

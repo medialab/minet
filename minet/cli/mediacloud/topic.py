@@ -26,10 +26,9 @@ def mediacloud_topic_action(cli_args):
     iterator = client.topic_stories(
         cli_args.topic_id,
         media_id=cli_args.media_id,
-        from_media_id=cli_args.from_media_id,
-        format='csv_row'
+        from_media_id=cli_args.from_media_id
     )
 
     for story in iterator:
-        writer.writerow(story)
+        writer.writerow(story.as_csv_row())
         loading_bar.update()

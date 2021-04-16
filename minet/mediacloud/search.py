@@ -97,7 +97,7 @@ def url_forge(token, query, filter_query=None, collections=None, medias=None,
 
 def mediacloud_search(pool, token, query, filter_query=None, count=False,
                       collections=None, medias=None, publish_day=None,
-                      publish_month=None, publish_year=None, format='csv_dict_row',):
+                      publish_month=None, publish_year=None, raw=False):
 
     def generator():
         last_processed_stories_id = None
@@ -129,12 +129,10 @@ def mediacloud_search(pool, token, query, filter_query=None, count=False,
                 return
 
             for story in data:
-                if format == 'csv_dict_row':
-                    yield format_story(story, as_dict=True)
-                elif format == 'csv_row':
-                    yield format_story(story)
-                else:
-                    yield story
+                if not raw:
+                    story = format_story(story)
+
+                yield story
 
             last_processed_stories_id = get_last_processed_stories_id(data)
 

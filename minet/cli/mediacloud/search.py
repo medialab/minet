@@ -44,12 +44,11 @@ def mediacloud_search_action(cli_args):
 
         iterator = client.search(
             cli_args.query,
-            format='csv_row',
             **kwargs
         )
 
         for story in iterator:
-            writer.writerow(story)
+            writer.writerow(story.as_csv_row())
             loading_bar.update()
 
     except MediacloudServerError as e:
