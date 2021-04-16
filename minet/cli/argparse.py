@@ -73,16 +73,15 @@ class InputFileAction(Action):
         if value is None:
             f = sys.stdin
 
-            if self.dummy_csv_column is not None:
+            # No stdin was piped and we have a "dummy" csv file to build
+            if self.dummy_csv_column is not None and sys.stdin.isatty():
                 value = getattr(cli_args, self.column_dest)
 
                 if self.dummy_csv_guard is not None and not self.dummy_csv_guard(value):
                     raise ArgumentError(self, self.dummy_csv_error + (' Got "%s"' % value))
 
-                # No stdin was piped
-                if sys.stdin.isatty():
-                    f = CsvIO(self.dummy_csv_column, value)
-                    setattr(cli_args, self.column_dest, self.dummy_csv_column)
+                f = CsvIO(self.dummy_csv_column, value)
+                setattr(cli_args, self.column_dest, self.dummy_csv_column)
         else:
             try:
                 f = open(value, 'r', encoding='utf-8')
