@@ -50,9 +50,15 @@ class BooleanAction(Action):
 
 class InputFileAction(Action):
     def __init__(self, option_strings, dest, dummy_csv_column=None,
-                 column_dest='column', nargs='?', **kwargs):
+                 dummy_csv_guard=None, dummy_csv_error='', column_dest='column',
+                 nargs='?', **kwargs):
+
+        if dummy_csv_guard is not None and not callable(dummy_csv_guard):
+            raise TypeError
 
         self.dummy_csv_column = dummy_csv_column
+        self.dummy_csv_guard = dummy_csv_guard
+        self.dummy_csv_error = dummy_csv_error
         self.column_dest = column_dest
 
         super().__init__(
@@ -68,10 +74,14 @@ class InputFileAction(Action):
             f = sys.stdin
 
             if self.dummy_csv_column is not None:
+                value = getattr(cli_args, self.column_dest)
+
+                if self.dummy_csv_guard is not None and not self.dummy_csv_guard(value):
+                    raise ArgumentError(self, self.dummy_csv_error + (' Got "%s"' % value))
 
                 # No stdin was piped
                 if sys.stdin.isatty():
-                    f = CsvIO(self.dummy_csv_column, getattr(cli_args, self.column_dest))
+                    f = CsvIO(self.dummy_csv_column, value)
                     setattr(cli_args, self.column_dest, self.dummy_csv_column)
         else:
             try:

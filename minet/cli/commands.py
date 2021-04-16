@@ -11,6 +11,7 @@ from casanova import (
     ThreadSafeResumer,
     BatchResumer
 )
+from ural import is_url
 
 from minet.constants import DEFAULT_THROTTLE
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
@@ -996,7 +997,9 @@ MINET_COMMANDS = {
                 'name': 'file',
                 'help': 'CSV file containing the urls to fetch.',
                 'action': InputFileAction,
-                'dummy_csv_column': 'url'
+                'dummy_csv_column': 'url',
+                'dummy_csv_guard': is_url,
+                'dummy_csv_error': 'single argument is expected to be a valid url!'
             },
             *FETCH_COMMON_ARGUMENTS,
             {
