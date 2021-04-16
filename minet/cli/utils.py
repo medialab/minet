@@ -4,16 +4,13 @@
 #
 # Miscellaneous helpers used by the CLI tools.
 #
-import csv
 import sys
 import yaml
 import platform
-from io import StringIO
 from glob import iglob
 from os.path import join, expanduser, isfile, isdir
 from collections import namedtuple
 from tqdm import tqdm
-from tqdm.contrib import DummyTqdmFile
 
 from minet.cli.exceptions import MissingColumnError
 from minet.utils import fuzzy_int, noop
@@ -39,17 +36,6 @@ def safe_index(l, e):
         return l.index(e)
     except ValueError:
         return None
-
-
-def CsvIO(column, value):
-    buf = StringIO()
-    writer = csv.writer(buf, dialect=csv.unix_dialect, quoting=csv.QUOTE_MINIMAL)
-    writer.writerow([column])
-    writer.writerow([value])
-
-    buf.seek(0)
-
-    return buf
 
 
 class LoadingBar(object):

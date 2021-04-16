@@ -11,14 +11,11 @@ from io import TextIOBase
 from argparse import Action, ArgumentError, ArgumentTypeError
 from gettext import gettext
 from tqdm.contrib import DummyTqdmFile
-from casanova import Resumer
+from casanova import Resumer, CsvCellIO
 
 from minet.utils import nested_get
 from minet.cli.exceptions import NotResumable
-from minet.cli.utils import (
-    acquire_cross_platform_stdout,
-    CsvIO
-)
+from minet.cli.utils import acquire_cross_platform_stdout
 
 
 class SplitterType(object):
@@ -80,7 +77,7 @@ class InputFileAction(Action):
                 if self.dummy_csv_guard is not None and not self.dummy_csv_guard(value):
                     raise ArgumentError(self, self.dummy_csv_error + (' Got "%s"' % value))
 
-                f = CsvIO(self.dummy_csv_column, value)
+                f = CsvCellIO(self.dummy_csv_column, value)
                 setattr(cli_args, self.column_dest, self.dummy_csv_column)
         else:
             try:
