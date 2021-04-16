@@ -58,21 +58,24 @@ def max_retry_error_reporter(error):
 
 
 def new_connection_error_reporter(error):
-    msg = repr(error)
+    msg = repr(error).lower()
 
-    if 'Name or service not known' in msg or 'Errno 8' in msg:
+    if 'name or service not known' in msg or 'Errno 8' in msg:
         return 'unknown-host'
+
+    if 'connection refused' in msg:
+        return 'connection-refused'
 
     return msg
 
 
 def protocol_error_reporter(error):
-    msg = repr(error)
+    msg = repr(error).lower()
 
-    if 'Connection aborted' in msg:
+    if 'connection aborted' in msg:
         return 'connection-aborted'
 
-    if 'Connection refused' in msg:
+    if 'connection refused' in msg:
         return 'connection-refused'
 
     return 'connection-error'
