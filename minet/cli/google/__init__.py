@@ -4,7 +4,7 @@
 #
 # Logic of the `google` action.
 #
-from minet.cli.utils import die, open_output_file
+from minet.cli.utils import die
 
 
 def google_action(cli_args):

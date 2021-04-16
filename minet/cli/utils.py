@@ -52,11 +52,6 @@ def CsvIO(column, value):
     return buf
 
 
-def edit_cli_args_with_csv_io(cli_args, column, attr_name='column'):
-    cli_args.file = CsvIO(column, getattr(cli_args, attr_name))
-    setattr(cli_args, attr_name, column)
-
-
 class LoadingBar(object):
     __slots__ = ('bar', 'stats')
 
@@ -145,15 +140,6 @@ def acquire_cross_platform_stdout():
         )
 
     return sys.stdout
-
-
-def open_output_file(output, flag='w', encoding='utf-8'):
-    if output is None:
-        return DummyTqdmFile(acquire_cross_platform_stdout())
-
-    # As per #254: newline='' is necessary for CSV output on windows to avoid
-    # outputting extra lines because of a '\r\r\n' end of line...
-    return open(output, flag, encoding=encoding, newline='')
 
 
 WorkerPayload = namedtuple(
