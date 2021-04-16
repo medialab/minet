@@ -4,12 +4,13 @@
 #
 # Function used to retrieve information per post by id.
 #
+from ebbe import getpath
+
 from minet.crowdtangle.exceptions import (
     CrowdTangleMissingTokenError,
     CrowdTangleInvalidTokenError,
     CrowdTangleInvalidRequestError
 )
-from minet.utils import nested_get
 from minet.web import request_json
 from minet.crowdtangle.formatters import (
     format_post
@@ -37,7 +38,7 @@ def crowdtangle_post(pool, post_id, token=None, raw=False):
     if response.status >= 400:
         raise CrowdTangleInvalidRequestError(api_url)
 
-    post = nested_get(['result', 'posts', 0], data)
+    post = getpath(data, ['result', 'posts', 0])
 
     if post is None:
         return

@@ -8,8 +8,8 @@ import time
 from ebbe import as_chunks
 from collections import deque
 from urllib.parse import quote
+from ebbe import getpath
 
-from minet.utils import nested_get
 from minet.web import create_pool, request_json
 from minet.youtube.utils import ensure_video_id, seconds_to_midnight_pacific_time
 from minet.youtube.constants import (
@@ -114,7 +114,7 @@ class YouTubeAPIClient(object):
             return self.request_json(url)
 
         if response.status >= 400:
-            if data is not None and 'API key not valid' in nested_get(['error', 'message'], data, ''):
+            if data is not None and 'API key not valid' in getpath(data, ['error', 'message'], ''):
                 raise YouTubeInvalidAPIKeyError
 
             raise YouTubeInvalidAPICall(url, response.status, data)
@@ -201,8 +201,8 @@ class YouTubeAPIClient(object):
 
                 for item in result['items']:
                     comment_id = item['id']
-                    replies = nested_get(['replies', 'comments'], item, [])
-                    total_reply_count = nested_get(['snippet', 'totalReplyCount'], item, 0)
+                    replies = getpath(item, ['replies', 'comments'], [])
+                    total_reply_count = getpath(item, ['snippet', 'totalReplyCount'], 0)
 
                     if not raw:
                         item = format_comment(item) if not is_reply else format_reply(item, video_id=video_id)

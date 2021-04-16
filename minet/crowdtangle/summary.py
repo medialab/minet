@@ -4,6 +4,7 @@
 #
 # Function related to link summary using CrowdTangle's APIs.
 #
+from ebbe import getpath
 from urllib.parse import quote
 
 from minet.crowdtangle.exceptions import (
@@ -11,7 +12,6 @@ from minet.crowdtangle.exceptions import (
     CrowdTangleInvalidTokenError,
     CrowdTangleInvalidRequestError
 )
-from minet.utils import nested_get
 from minet.web import request_json
 from minet.crowdtangle.constants import (
     CROWDTANGLE_SUMMARY_DEFAULT_SORT_TYPE,
@@ -82,8 +82,8 @@ def crowdtangle_summary(pool, link, token=None, start_date=None, with_top_posts=
     if response.status >= 400:
         raise CrowdTangleInvalidRequestError(api_url)
 
-    stats = nested_get(['result', 'summary', 'facebook'], data)
-    posts = nested_get(['result', 'posts'], data) if with_top_posts else None
+    stats = getpath(data, ['result', 'summary', 'facebook'])
+    posts = getpath(data, ['result', 'posts']) if with_top_posts else None
 
     if stats is not None:
         if not raw:

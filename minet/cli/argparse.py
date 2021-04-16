@@ -12,8 +12,8 @@ from argparse import Action, ArgumentError, ArgumentTypeError
 from gettext import gettext
 from tqdm.contrib import DummyTqdmFile
 from casanova import Resumer, CsvCellIO
+from ebbe import getpath
 
-from minet.utils import nested_get
 from minet.cli.exceptions import NotResumable
 from minet.cli.utils import acquire_cross_platform_stdout
 
@@ -172,7 +172,7 @@ class WrappedConfigValue(object):
         if env_value:
             return self.type(env_value)
 
-        return nested_get(self.key, config, self.default)
+        return getpath(config, self.key, self.default)
 
 
 class ConfigAction(Action):

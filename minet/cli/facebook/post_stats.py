@@ -11,8 +11,9 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from collections import OrderedDict
 from ural.facebook import is_facebook_post_url
+from ebbe import getpath
 
-from minet.utils import nested_get, sleep_with_entropy
+from minet.utils import sleep_with_entropy
 from minet.web import request
 from minet.cli.utils import print_err, die, LoadingBar
 from minet.facebook.constants import FACEBOOK_WEB_DEFAULT_THROTTLE
@@ -70,7 +71,7 @@ def get_count(item):
 
 
 def collect_top_reactions(data):
-    edges = nested_get(['top_reactions', 'edges'], data)
+    edges = getpath(data, ['top_reactions', 'edges'])
 
     if edges is None:
         return
@@ -169,9 +170,9 @@ def facebook_post_stats_action(cli_args):
             return 'extraction-failed', None
 
         data = json5.loads(match.group(1).decode())
-        data = nested_get(
-            ['jsmods', 'pre_display_requires', 0, 3, 1, '__bbox', 'result', 'data', 'feedback'],
-            data
+        data = getpath(
+            data,
+            ['jsmods', 'pre_display_requires', 0, 3, 1, '__bbox', 'result', 'data', 'feedback']
         )
 
         if data is None:

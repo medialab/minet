@@ -10,8 +10,8 @@ import datetime
 from ebbe import with_is_first
 from urllib.parse import urlencode, quote
 from twitwi import normalize_tweet
+from ebbe import getpath, pathgetter
 
-from minet.utils import nested_get
 from minet.web import (
     create_pool,
     request,
@@ -99,7 +99,7 @@ def forge_search_params(query, count=DEFAULT_COUNT, cursor=None):
     return urlencode(params, quote_via=quote)
 
 
-CURSOR_FIRST_POSSIBLE_PATH = [
+CURSOR_FIRST_POSSIBLE_PATH_GETTER = pathgetter([
     'timeline',
     'instructions',
     0,
@@ -110,9 +110,9 @@ CURSOR_FIRST_POSSIBLE_PATH = [
     'operation',
     'cursor',
     'value'
-]
+])
 
-CURSOR_SECOND_POSSIBLE_PATH = [
+CURSOR_SECOND_POSSIBLE_PATH_GETTER = pathgetter([
     'timeline',
     'instructions',
     -1,
@@ -122,14 +122,14 @@ CURSOR_SECOND_POSSIBLE_PATH = [
     'operation',
     'cursor',
     'value'
-]
+])
 
 
 def extract_cursor_from_payload(payload):
-    found_cursor = nested_get(CURSOR_FIRST_POSSIBLE_PATH, payload)
+    found_cursor = CURSOR_FIRST_POSSIBLE_PATH_GETTER(payload)
 
     if found_cursor is None:
-        found_cursor = nested_get(CURSOR_SECOND_POSSIBLE_PATH, payload)
+        found_cursor = CURSOR_SECOND_POSSIBLE_PATH_GETTER(payload)
 
     return found_cursor
 
@@ -177,10 +177,10 @@ def payload_tweets_iter(payload):
             ):
                 continue
 
-            tweet_meta = nested_get(['content', 'item', 'content', 'tweet'], entry)
+            tweet_meta = getpath(entry, ['content', 'item', 'content', 'tweet'])
 
             if tweet_meta is None:
-                tweet_meta = nested_get(['content', 'item', 'content', 'tombstone', 'tweet'], entry)
+                tweet_meta = getpath(entry, ['content', 'item', 'content', 'tombstone', 'tweet'])
 
             # Parsing error?
             if tweet_meta is None:
@@ -201,9 +201,9 @@ def payload_tweets_iter(payload):
                     pivot = tweet_meta['forwardPivot']
 
                     meta = {
-                        'intervention_text': nested_get(['text', 'text'], pivot),
+                        'intervention_text': getpath(pivot, ['text', 'text']),
                         'intervention_type': pivot.get('displayType'),
-                        'intervention_url': nested_get(['landingUrl', 'url'], pivot)
+                        'intervention_url': getpath(pivot, ['landingUrl', 'url'])
                     }
 
                 yield tweet, meta
@@ -269,7 +269,7 @@ class TwitterAPIScraper(object):
             raise TwitterPublicAPIRateLimitError
 
         if response.status >= 400:
-            error = nested_get(['errors', 0], data)
+            error = getpath(data, ['errors', 0])
 
             if error is not None and error.get('code') == 130:
                 raise TwitterPublicAPIOverCapacityError

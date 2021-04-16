@@ -283,22 +283,6 @@ def load_definition(f, encoding='utf-8'):
     return definition
 
 
-def nested_get(path, o, default=None):
-    if isinstance(path, str):
-        path = path.split('.')
-
-    for step in path:
-        try:
-            if callable(getattr(o, '__getitem__')):
-                o = o[step]
-            else:
-                getattr(o, step)
-        except (IndexError, KeyError, AttributeError):
-            return default
-
-    return o
-
-
 def sleep_with_entropy(seconds, max_random_addendum):
     random_addendum = uniform(0, max_random_addendum)
     time.sleep(seconds + random_addendum)

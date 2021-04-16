@@ -8,8 +8,9 @@
 import textwrap
 import soupsieve
 from bs4 import Tag
+from ebbe import getpath
+from functools import partial
 
-from minet.utils import nested_get
 from minet.scrape.std import get_default_evaluation_context, get_display_text
 from minet.scrape.constants import EXTRACTOR_NAMES
 from minet.scrape.utils import get_sel, get_iterator
@@ -22,6 +23,8 @@ from minet.scrape.exceptions import (
 
 DEFAULT_CONTEXT = {}
 DATA_TYPES = (str, int, float, bool, list, dict)
+
+nested_getter = partial(getpath, split_char='.', parse_indices=True, attributes=True)
 
 
 def is_list_of_tags(value):
@@ -307,7 +310,7 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[], scope=
             elif 'extract' in scraper:
                 value = extract(element, scraper['extract'])
             elif 'get_context' in scraper:
-                value = nested_get(scraper['get_context'], context)
+                value = nested_getter(context, scraper['get_context'])
             elif 'default' not in scraper:
 
                 # Default value is text
@@ -360,7 +363,7 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[], scope=
                 if filtering_clause is True and not value:
                     continue
 
-                if isinstance(filtering_clause, str) and not nested_get(filtering_clause, value):
+                if isinstance(filtering_clause, str) and not nested_getter(value, filtering_clause):
                     continue
 
             if 'uniq' in scraper:
@@ -371,7 +374,7 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[], scope=
                     continue
 
                 if isinstance(uniq_clause, str):
-                    k = nested_get(uniq_clause, value)
+                    k = nested_getter(value, uniq_clause)
 
                     if k in already_seen:
                         continue

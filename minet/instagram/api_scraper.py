@@ -6,9 +6,9 @@
 #
 import json
 from urllib.parse import quote
+from ebbe import getpath
 
 from minet.constants import COOKIE_BROWSERS
-from minet.utils import nested_get
 from minet.web import create_pool, request_json, grab_cookies
 from minet.instagram.constants import (
     INSTAGRAM_URL,
@@ -79,7 +79,7 @@ class InstagramAPIScraper(object):
 
             data = self.request_json(url)
 
-            data = nested_get(['data', 'hashtag', 'edge_hashtag_to_media'], data)
+            data = getpath(data, ['data', 'hashtag', 'edge_hashtag_to_media'])
             edges = data.get('edges')
 
             for edge in edges:
@@ -87,9 +87,9 @@ class InstagramAPIScraper(object):
 
             print('Found %i posts' % len(edges))
 
-            has_next_page = nested_get(['page_info', 'has_next_page'], data)
+            has_next_page = getpath(data, ['page_info', 'has_next_page'])
 
             if not has_next_page:
                 break
 
-            cursor = nested_get(['page_info', 'end_cursor'], data)
+            cursor = getpath(data, ['page_info', 'end_cursor'])

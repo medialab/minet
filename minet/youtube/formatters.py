@@ -5,8 +5,8 @@
 # Various data formatters for YouTube data.
 #
 from casanova import namedrecord
+from ebbe import getpath
 
-from minet.utils import nested_get
 from minet.youtube.constants import (
     YOUTUBE_VIDEO_CSV_HEADERS,
     YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS,
@@ -80,13 +80,13 @@ def format_video_snippet(item):
 
 def format_comment(item):
     meta = item['snippet']
-    snippet = nested_get(['snippet', 'topLevelComment', 'snippet'], item)
+    snippet = getpath(item, ['snippet', 'topLevelComment', 'snippet'])
 
     row = YouTubeComment(
         meta['videoId'],
         item['id'],
         snippet['authorDisplayName'],
-        nested_get(['authorChannelId', 'value'], snippet),
+        getpath(snippet, ['authorChannelId', 'value']),
         snippet['textOriginal'],
         int(snippet['likeCount']),
         snippet['publishedAt'],
@@ -105,7 +105,7 @@ def format_reply(item, video_id=None):
         video_id if video_id is not None else snippet['videoId'],
         item['id'],
         snippet['authorDisplayName'],
-        nested_get(['authorChannelId', 'value'], snippet),
+        getpath(snippet, ['authorChannelId', 'value']),
         snippet['textOriginal'],
         int(snippet['likeCount']),
         snippet['publishedAt'],

@@ -4,12 +4,13 @@
 #
 # Function used to retrieved lists from a given dashboard.
 #
+from ebbe import getpath
+
 from minet.crowdtangle.exceptions import (
     CrowdTangleMissingTokenError,
     CrowdTangleInvalidTokenError,
     CrowdTangleInvalidRequestError
 )
-from minet.utils import nested_get
 from minet.web import request_json
 from minet.crowdtangle.formatters import (
     format_list
@@ -37,7 +38,7 @@ def crowdtangle_lists(pool, token=None, raw=False):
     if response.status >= 400:
         raise CrowdTangleInvalidRequestError(api_url)
 
-    lists = nested_get(['result', 'lists'], data)
+    lists = getpath(data, ['result', 'lists'])
 
     if not raw:
         return [format_list(l) for l in lists]
