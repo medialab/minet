@@ -11,12 +11,14 @@ from html import unescape
 from urllib.parse import unquote
 from collections import namedtuple
 
-from minet.web import request
+from minet.web import request, create_pool
 from minet.youtube.utils import ensure_video_id
 from minet.youtube.exceptions import YouTubeInvalidVideoId
 
 CAPTION_TRACKS_RE = re.compile(r'({"captionTracks":.*isTranslatable":(true|false)}])')
 TIMEDTEXT_RE = re.compile(rb'timedtext?[^"]+')
+
+YOUTUBE_SCRAPER_POOL = create_pool()
 
 YouTubeCaptionTrack = namedtuple('YouTubeCaptionTrack', ['lang', 'url', 'generated'])
 
@@ -90,7 +92,7 @@ def get_video_captions(video_target, langs):
     if best_track is None:
         return
 
-    err, response = request(YOUTUBE_SCRAPER_POOL, best_track.url)
+    err, response = request(best_track.url, pool=YOUTUBE_SCRAPER_POOL)
 
     if err:
         raise err
