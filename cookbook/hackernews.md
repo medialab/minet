@@ -12,7 +12,7 @@ TODO...
 
 To enable its users to quickly write scrapers and to apply them using a command line tool, `minet` uses its own declarative language that can be written in JSON or YAML.
 
-A full description of this language can be found on [this](./scraping_dsl.md) other cookbook document, but since Hacker News cannot be describe as a complicated website, you should be able to understand what our scraper does without needing to read this document yet.
+A full description of this language can be found on [this](./scraping_dsl.md) other cookbook document, but since Hacker News cannot be described as a complicated website, you should be able to understand what our scraper does without needing to read this document yet.
 
 ## Testing our scraper
 
