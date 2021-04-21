@@ -17,8 +17,8 @@ from minet.web import (
 )
 
 from minet.constants import (
-    DEFAULT_GROUP_PARALLELISM,
-    DEFAULT_GROUP_BUFFER_SIZE,
+    DEFAULT_DOMAIN_PARALLELISM,
+    DEFAULT_IMAP_BUFFER_SIZE,
     DEFAULT_THROTTLE,
     DEFAULT_URLLIB3_TIMEOUT
 )
@@ -55,9 +55,9 @@ ResolveWorkerResult = namedtuple(
 
 def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
                         throttle=DEFAULT_THROTTLE, guess_extension=True,
-                        guess_encoding=True, buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
+                        guess_encoding=True, buffer_size=DEFAULT_IMAP_BUFFER_SIZE,
                         insecure=False, timeout=DEFAULT_URLLIB3_TIMEOUT,
-                        domain_parallelism=DEFAULT_GROUP_PARALLELISM,
+                        domain_parallelism=DEFAULT_DOMAIN_PARALLELISM,
                         max_redirects=5):
     """
     Function returning a multithreaded iterator over fetched urls.
@@ -107,6 +107,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
                 meta=None
             )
 
+        # NOTE: request_args must be threadsafe
         kwargs = request_args(url, item) if request_args is not None else {}
 
         error, response = request(
@@ -147,7 +148,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
     # Group resolver
     def grouper(payload):
         if payload.url is None:
-            return
+            return None
 
         return get_domain_name(payload.url)
 
@@ -172,20 +173,14 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
                 url=url
             )
 
-    def get_throttle(group, job):
-        if group is None:
-            return 0
-
-        return throttle
-
     return imap_unordered(
         payloads(),
         worker,
         threads,
-        group=grouper,
-        group_parallelism=domain_parallelism,
-        group_buffer_size=buffer_size,
-        group_throttle=get_throttle
+        key=grouper,
+        parallelism=domain_parallelism,
+        buffer_size=buffer_size,
+        throttle=throttle
     )
 
 
@@ -193,9 +188,9 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
                           throttle=DEFAULT_THROTTLE, max_redirects=5,
                           follow_refresh_header=True, follow_meta_refresh=False,
                           follow_js_relocation=False, infer_redirection=False,
-                          buffer_size=DEFAULT_GROUP_BUFFER_SIZE,
+                          buffer_size=DEFAULT_IMAP_BUFFER_SIZE,
                           insecure=False, timeout=DEFAULT_URLLIB3_TIMEOUT,
-                          domain_parallelism=DEFAULT_GROUP_PARALLELISM):
+                          domain_parallelism=DEFAULT_DOMAIN_PARALLELISM):
     """
     Function returning a multithreaded iterator over resolved urls.
 
@@ -245,6 +240,7 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
                 stack=None
             )
 
+        # NOTE: resolve_args must be threadsafe
         kwargs = resolve_args(url, item) if resolve_args is not None else {}
 
         error, stack = resolve(
@@ -268,7 +264,7 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
     # Group resolver
     def grouper(payload):
         if payload.url is None:
-            return
+            return None
 
         return get_domain_name(payload.url)
 
@@ -293,18 +289,12 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
                 url=url
             )
 
-    def get_throttle(group, job):
-        if group is None:
-            return 0
-
-        return throttle
-
     return imap_unordered(
         payloads(),
         worker,
         threads,
-        group=grouper,
-        group_parallelism=domain_parallelism,
-        group_buffer_size=buffer_size,
-        group_throttle=get_throttle
+        key=grouper,
+        parallelism=domain_parallelism,
+        buffer_size=buffer_size,
+        throttle=throttle
     )

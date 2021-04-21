@@ -6,7 +6,7 @@
 #
 from queue import Queue
 from persistqueue import SQLiteQueue
-from quenouille import imap_unordered, QueueIterator
+from quenouille import imap_unordered
 from bs4 import BeautifulSoup
 from ural import get_domain_name
 from collections import namedtuple
@@ -26,8 +26,8 @@ from minet.utils import PseudoFStringFormatter
 from minet.exceptions import UnknownSpiderError
 
 from minet.constants import (
-    DEFAULT_GROUP_PARALLELISM,
-    DEFAULT_GROUP_BUFFER_SIZE,
+    DEFAULT_DOMAIN_PARALLELISM,
+    DEFAULT_IMAP_BUFFER_SIZE,
     DEFAULT_THROTTLE
 )
 
@@ -311,25 +311,12 @@ class DefinitionSpider(Spider):
         return scraped
 
 
-class TaskContext(object):
-    def __init__(self, queue, queue_iterator):
-        self.queue = queue
-        self.queue_iterator = queue_iterator
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.queue.task_done()
-        self.queue_iterator.task_done()
-
-
 class Crawler(object):
 
     # TODO: start_jobs with multiple spiders
     def __init__(self, spec=None, spider=None, spiders=None, start_jobs=None,
                  queue_path=None, threads=25,
-                 buffer_size=DEFAULT_GROUP_BUFFER_SIZE, throttle=DEFAULT_THROTTLE):
+                 buffer_size=DEFAULT_IMAP_BUFFER_SIZE, throttle=DEFAULT_THROTTLE):
 
         # NOTE: crawling could work depth-first but:
         # buffer_size should be 0 (requires to fix quenouille issue #1)
@@ -471,23 +458,20 @@ class Crawler(object):
 
         self.start()
 
-        queue_iterator = QueueIterator(self.queue)
-        task_context = TaskContext(self.queue, queue_iterator)
-
         multithreaded_iterator = imap_unordered(
-            queue_iterator,
+            self.queue,
             self.work,
             self.threads,
-            group=CrawlJob.grouper,
-            group_parallelism=DEFAULT_GROUP_PARALLELISM,
-            group_buffer_size=self.buffer_size,
-            group_throttle=self.throttle
+            key=CrawlJob.grouper,
+            parallelism=DEFAULT_DOMAIN_PARALLELISM,
+            buffer_size=self.buffer_size,
+            throttle=self.throttle
         )
 
         def generator():
             for result in multithreaded_iterator:
-                with task_context:
-                    yield result
+                yield result
+                self.queue.task_done()
 
             self.cleanup()
 

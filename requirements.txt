@@ -22,7 +22,7 @@ lxml==4.6.3
 ndjson==0.3.1
 persist-queue==0.4.2
 pyyaml==5.4.1
-quenouille==0.6.6
+quenouille==1.1.0
 soupsieve>=2.1
 tenacity==7.0.0
 termcolor==1.1.0
