@@ -9,7 +9,6 @@ import os
 import csv
 import sys
 import ctypes
-import signal
 import shutil
 import importlib
 import multiprocessing
@@ -39,9 +38,6 @@ terminal_size = shutil.get_terminal_size()
 
 # Increasing max CSV file limit to avoid pesky issues
 csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
-
-# Hiding stack traces on ctrl+c
-signal.signal(signal.SIGINT, lambda x, y: sys.exit(1))
 
 
 def custom_formatter(prog):
@@ -246,4 +242,7 @@ if __name__ == '__main__':
         # Taken from: https://docs.python.org/3/library/signal.html
         devnull = os.open(os.devnull, os.O_WRONLY)
         os.dup2(devnull, sys.stdout.fileno())
+        sys.exit(1)
+
+    except KeyboardInterrupt:
         sys.exit(1)
