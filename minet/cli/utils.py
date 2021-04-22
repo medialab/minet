@@ -39,78 +39,46 @@ def safe_index(l, e):
         return None
 
 
-class LoadingBar(object):
-    __slots__ = ('bar', 'stats')
+class LoadingBar(tqdm):
+    def __init__(self, desc, stats=None, unit=None, unit_plural=None,
+                 total=None, **kwargs):
 
-    def __init__(self, desc, total=None, stats=None, unit=None, unit_plural=None,
-                 delay=None, initial=None):
         if unit is not None and total is None:
             if unit_plural is not None:
                 unit = ' ' + unit_plural
             else:
                 unit = ' ' + unit + 's'
 
-        self.stats = stats or {}
-
-        bar_kwargs = {
-            'desc': desc,
-            'dynamic_ncols': True,
-            'total': total,
-            'postfix': stats
-        }
-
-        if delay is not None:
-            bar_kwargs['delay'] = delay
-
-        if initial is not None:
-            bar_kwargs['initial'] = initial
+        self.__stats = stats or {}
 
         if unit is not None:
-            bar_kwargs['unit'] = unit
+            kwargs['unit'] = unit
 
-        self.bar = tqdm(**bar_kwargs)
+        super().__init__(desc=desc, total=total, **kwargs)
 
     def update_total(self, total):
-        self.bar.total = total
-
-    def set_description(self, desc):
-        return self.bar.set_description(desc)
+        self.total = total
 
     def update_stats(self, **kwargs):
         for key, value in kwargs.items():
-            self.stats[key] = value
+            self.__stats[key] = value
 
-        return self.bar.set_postfix(**self.stats)
+        return self.set_postfix(**self.__stats)
 
     def inc(self, name):
-        if name not in self.stats:
-            self.stats[name] = 0
+        if name not in self.__stats:
+            self.__stats[name] = 0
 
-        self.stats[name] += 1
+        self.__stats[name] += 1
         return self.update_stats()
-
-    def update(self, n=1):
-        return self.bar.update(n)
-
-    def close(self):
-        return self.bar.close()
 
     def print(self, *args, end='\n'):
         msg = ' '.join(str(arg) for arg in args)
-        self.bar.write(msg, file=sys.stderr, end=end)
+        self.write(msg, file=sys.stderr, end=end)
 
     def die(self, msg):
-        self.bar.close()
-        die(msg)
-
-    def __enter__(self):
-        return self.bar.__enter__()
-
-    def __exit__(self, *args):
-        return self.bar.__exit__(*args)
-
-    def __del__(self):
         self.close()
+        die(msg)
 
 
 def acquire_cross_platform_stdout():
