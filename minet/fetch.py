@@ -58,7 +58,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
                         guess_encoding=True, buffer_size=DEFAULT_IMAP_BUFFER_SIZE,
                         insecure=False, timeout=DEFAULT_URLLIB3_TIMEOUT,
                         domain_parallelism=DEFAULT_DOMAIN_PARALLELISM,
-                        max_redirects=5):
+                        max_redirects=5, join=True, daemonic=False):
     """
     Function returning a multithreaded iterator over fetched urls.
 
@@ -180,7 +180,9 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
         key=grouper,
         parallelism=domain_parallelism,
         buffer_size=buffer_size,
-        throttle=throttle
+        throttle=throttle,
+        join=join,
+        daemonic=daemonic
     )
 
 
@@ -190,7 +192,8 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
                           follow_js_relocation=False, infer_redirection=False,
                           buffer_size=DEFAULT_IMAP_BUFFER_SIZE,
                           insecure=False, timeout=DEFAULT_URLLIB3_TIMEOUT,
-                          domain_parallelism=DEFAULT_DOMAIN_PARALLELISM):
+                          domain_parallelism=DEFAULT_DOMAIN_PARALLELISM,
+                          join=True, daemonic=False):
     """
     Function returning a multithreaded iterator over resolved urls.
 
@@ -296,5 +299,7 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
         key=grouper,
         parallelism=domain_parallelism,
         buffer_size=buffer_size,
-        throttle=throttle
+        throttle=throttle,
+        join=join,
+        daemonic=daemonic
     )

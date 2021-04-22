@@ -316,7 +316,8 @@ class Crawler(object):
     # TODO: start_jobs with multiple spiders
     def __init__(self, spec=None, spider=None, spiders=None, start_jobs=None,
                  queue_path=None, threads=25,
-                 buffer_size=DEFAULT_IMAP_BUFFER_SIZE, throttle=DEFAULT_THROTTLE):
+                 buffer_size=DEFAULT_IMAP_BUFFER_SIZE, throttle=DEFAULT_THROTTLE,
+                 join=True, daemonic=False):
 
         # NOTE: crawling could work depth-first but:
         # buffer_size should be 0 (requires to fix quenouille issue #1)
@@ -327,6 +328,8 @@ class Crawler(object):
         self.threads = threads
         self.buffer_size = buffer_size
         self.throttle = throttle
+        self.join = join
+        self.daemonic = daemonic
 
         self.using_persistent_queue = queue_path is not None
         self.pool = create_pool(threads=threads)
@@ -465,7 +468,9 @@ class Crawler(object):
             key=CrawlJob.grouper,
             parallelism=DEFAULT_DOMAIN_PARALLELISM,
             buffer_size=self.buffer_size,
-            throttle=self.throttle
+            throttle=self.throttle,
+            join=self.join,
+            daemonic=self.daemonic
         )
 
         def generator():
