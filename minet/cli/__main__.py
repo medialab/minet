@@ -13,6 +13,7 @@ import shutil
 import importlib
 import multiprocessing
 from textwrap import dedent
+from tqdm import tqdm
 from contextlib import ExitStack
 from argparse import (
     ArgumentParser,
@@ -245,4 +246,10 @@ if __name__ == '__main__':
         sys.exit(1)
 
     except KeyboardInterrupt:
+
+        # Cleaning up tqdm loading bar nicely on keyboard interrupts
+        for bar in list(tqdm._instances):
+            bar.leave = False
+            bar.close()
+
         sys.exit(1)

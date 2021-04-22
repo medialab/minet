@@ -18,5 +18,7 @@ try:
         bar.update()
         time.sleep(1)
 except KeyboardInterrupt:
-    print(tqdm._instances)
+    for ref in list(tqdm._instances):
+        ref.leave = False
+        ref.close()
     sys.exit(0)
