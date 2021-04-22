@@ -110,7 +110,7 @@ class LoadingBar(object):
         return self.bar.__exit__(*args)
 
     def __del__(self):
-        self.bar.close()
+        self.close()
 
 
 def acquire_cross_platform_stdout():
