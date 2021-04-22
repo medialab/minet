@@ -1,8 +1,6 @@
 # =============================================================================
 # Minet Utils Unit Tests
 # =============================================================================
-import pytest
-
 from minet.utils import (
     fix_ensure_ascii_json_string,
     PseudoFStringFormatter,

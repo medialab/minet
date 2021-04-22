@@ -2,7 +2,6 @@
 # Minet FS Unit Tests
 # =============================================================================
 import os
-import pytest
 
 from minet.fs import (
     FolderStrategy,
@@ -34,8 +33,12 @@ class TestFS(object):
 
         hostname = FolderStrategy.from_name('hostname')
 
+        assert isinstance(hostname, HostnameFolderStrategy)
+
         assert hostname.apply(filename='test.html', url='https://www.lemonde.fr/test.html') == 'www.lemonde.fr/test.html'
 
         normalized_hostname = FolderStrategy.from_name('normalized-hostname')
+
+        assert isinstance(normalized_hostname, NormalizedHostnameFolderStrategy)
 
         assert normalized_hostname.apply(filename='test.html', url='https://www.lemonde.fr/test.html') == 'lemonde.fr/test.html'

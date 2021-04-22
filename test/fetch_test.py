@@ -1,7 +1,6 @@
 # =============================================================================
 # Minet Fetch Unit Tests
 # =============================================================================
-import pytest
 from minet.web import request
 from minet.exceptions import InvalidURLError
 

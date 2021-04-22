@@ -1,8 +1,6 @@
 # =============================================================================
 # Minet Web Utils Unit Tests
 # =============================================================================
-import pytest
-
 from minet.web import (
     parse_http_refresh,
     find_meta_refresh,
