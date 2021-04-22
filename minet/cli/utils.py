@@ -56,8 +56,7 @@ class LoadingBar(object):
             'desc': desc,
             'dynamic_ncols': True,
             'total': total,
-            'postfix': stats,
-            'unit': unit
+            'postfix': stats
         }
 
         if delay is not None:
@@ -65,6 +64,9 @@ class LoadingBar(object):
 
         if initial is not None:
             bar_kwargs['initial'] = initial
+
+        if unit is not None:
+            bar_kwargs['unit'] = unit
 
         self.bar = tqdm(**bar_kwargs)
 
