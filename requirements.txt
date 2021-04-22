@@ -26,7 +26,7 @@ quenouille==1.2.0
 soupsieve>=2.1
 tenacity==7.0.0
 termcolor==1.1.0
-tqdm==4.59.0
+tqdm==4.60.0
 trafilatura==0.8.1
 twitwi==0.6.0
 ural==0.29.3
