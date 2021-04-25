@@ -246,7 +246,7 @@ def fetch_action(cli_args, resolve=False):
         'throttle': cli_args.throttle,
         'domain_parallelism': cli_args.domain_parallelism,
         'max_redirects': cli_args.max_redirects,
-        'join': False,
+        'wait': False,
         'daemonic': True
     }
 
