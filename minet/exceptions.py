@@ -6,6 +6,7 @@
 #
 
 
+# Base minet error
 class MinetError(Exception):
     def __init__(self, message=None):
         super().__init__('' if message is None else message)

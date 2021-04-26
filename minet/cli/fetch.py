@@ -56,9 +56,9 @@ def fetch_action(cli_args, resolve=False):
 
     # Trying to instantiate the folder strategy
     if not resolve:
-        folder_strategy = FolderStrategy.from_name(cli_args.folder_strategy)
-
-        if folder_strategy is None:
+        try:
+            folder_strategy = FolderStrategy.from_name(cli_args.folder_strategy)
+        except TypeError:
             die([
                 'Invalid "%s" --folder-strategy!' % cli_args.folder_strategy,
                 'Check the list at the end of the command help:',

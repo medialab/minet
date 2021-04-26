@@ -44,14 +44,14 @@ class FolderStrategy(object):
             try:
                 length = int(length)
             except ValueError:
-                return None
+                raise TypeError
 
             if length <= 0:
-                return None
+                raise TypeError
 
             return PrefixFolderStrategy(length)
 
-        raise None
+        raise TypeError
 
 
 class FlatFolderStrategy(FolderStrategy):
