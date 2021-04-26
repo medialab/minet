@@ -30,6 +30,7 @@ class TestFS(object):
         assert isinstance(prefix, PrefixFolderStrategy)
 
         assert prefix.apply(filename='test/ok/whatever.html') == 'whate/test/ok/whatever.html'
+        assert prefix.apply(filename='a.html') == 'a/a.html'
 
         hostname = FolderStrategy.from_name('hostname')
 

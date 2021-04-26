@@ -4,10 +4,8 @@
 #
 # Multiple helper functions related to reading and writing files.
 #
-import os
 import gzip
 import codecs
-from threading import Lock
 from os.path import basename, join
 from ural import get_hostname, get_normalized_hostname
 
@@ -23,14 +21,6 @@ def read_potentially_gzipped_path(path, encoding='utf-8'):
             raw = f.read()
 
     return raw
-
-
-MAKEDIRS_LOCK = Lock()
-
-
-def threadsafe_makedirs(path):
-    with MAKEDIRS_LOCK:
-        os.makedirs(path, exist_ok=True)
 
 
 class FolderStrategy(object):
