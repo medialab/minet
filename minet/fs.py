@@ -6,9 +6,11 @@
 #
 import gzip
 import codecs
-from os.path import basename, join, splitext
+from os import makedirs
+from os.path import basename, join, splitext, abspath, normpath, dirname
 from ural import get_hostname, get_normalized_hostname
 from functools import partial
+from quenouille import NamedLocks
 
 from minet.exceptions import FilenameFormattingError
 from minet.utils import md5, PseudoFStringFormatter
@@ -111,7 +113,8 @@ class FilenameBuilder(object):
         if template is not None:
             self.template = partial(self.formatter.format, template)
 
-    def __call__(self, url=None, filename=None, ext=None, formatter_kwargs={}):
+    def __call__(self, url=None, filename=None, ext=None, formatter_kwargs={},
+                 compressed=False):
         original_ext = None
 
         if filename is None:
@@ -138,4 +141,32 @@ class FilenameBuilder(object):
         if self.folder_strategy:
             filename = self.folder_strategy(filename)
 
+        if compressed:
+            filename += '.gz'
+
         return filename
+
+
+class ThreadSafeFilesWriter(object):
+    def __init__(self, root_directory=''):
+        self.root_directory = root_directory
+        self.folder_locks = NamedLocks()
+        self.file_locks = NamedLocks()
+
+    def resolve(self, filename, relative=False):
+        full_path = join(self.root_directory, filename)
+
+        if relative:
+            return normpath(full_path)
+
+        return abspath(full_path)
+
+    def write(self, filename):
+        filename = self.resolve(filename)
+        directory = dirname(filename)
+
+        with self.folder_locks[directory]:
+            makedirs(directory, exist_ok=True)
+
+        with self.file_locks[filename]:
+            pass

@@ -11,7 +11,8 @@ from minet.fs import (
     PrefixFolderStrategy,
     HostnameFolderStrategy,
     NormalizedHostnameFolderStrategy,
-    FilenameBuilder
+    FilenameBuilder,
+    ThreadSafeFilesWriter
 )
 from minet.exceptions import FilenameFormattingError
 
@@ -49,6 +50,11 @@ class TestFS(object):
         assert normalized_hostname(filename='test.html', url='https://www.lemonde.fr/test.html') == 'lemonde.fr/test.html'
 
     def test_filename_builder(self):
+
+        # Don't test on windows yet
+        if os.sep != '/':
+            return
+
         builder = FilenameBuilder()
 
         assert builder('https://www.lemonde.fr') == 'f8bceab28da05bf9ed8678be4690bf64'
@@ -57,6 +63,7 @@ class TestFS(object):
         assert builder('https://www.lemonde.fr', filename='lemonde.txt') == 'lemonde.txt'
         assert builder('https://www.lemonde.fr', filename='lemonde.txt', ext='.html') == 'lemonde.txt'
         assert builder('https://www.lemonde.fr', filename='folder/lemonde.txt', ext='.html') == 'folder/lemonde.txt'
+        assert builder('https://www.lemonde.fr', filename='lemonde.txt', ext='.html', compressed=True) == 'lemonde.txt.gz'
 
         builder = FilenameBuilder(template='prefix-{value}{ext}.bak')
 
@@ -82,3 +89,20 @@ class TestFS(object):
 
         assert builder('https://www.liberation.fr') == '9bd3/9bd303edd0b0aaa5b210d0ddf63779ef'
         assert builder('https://www.liberation.fr', filename='liberation.html') == 'libe/liberation.html'
+
+    def test_thread_safe_files_writer(self):
+
+        # Don't test on windows yet
+        if os.sep != '/':
+            return
+
+        writer = ThreadSafeFilesWriter()
+
+        assert writer.resolve('test.html', relative=True) == 'test.html'
+        assert writer.resolve('test/test.html', relative=True) == 'test/test.html'
+
+        writer = ThreadSafeFilesWriter('downloaded')
+
+        assert writer.resolve('test.html', relative=True) == 'downloaded/test.html'
+        assert writer.resolve('test/test.html', relative=True) == 'downloaded/test/test.html'
+        assert writer.resolve('test/../test.html', relative=True) == 'downloaded/test.html'
