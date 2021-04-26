@@ -139,7 +139,7 @@ class FilenameBuilder(object):
             filename = base + ext
 
         if self.folder_strategy:
-            filename = self.folder_strategy(filename)
+            filename = self.folder_strategy(filename, url=url)
 
         if compressed:
             filename += '.gz'
