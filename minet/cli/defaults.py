@@ -6,4 +6,4 @@
 #
 
 # Miscellaneous
-DEFAULT_CONTENT_FOLDER = 'content'
+DEFAULT_CONTENT_FOLDER = 'downloaded'
