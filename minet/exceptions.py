@@ -93,3 +93,8 @@ class TrafilaturaError(MinetError):
     def __init__(self, msg=None, reason=None):
         super().__init__(msg)
         self.reason = reason
+
+
+# Filesystem errors
+class FilenameFormattingError(MinetError):
+    pass

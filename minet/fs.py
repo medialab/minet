@@ -6,8 +6,12 @@
 #
 import gzip
 import codecs
-from os.path import basename, join
+from os.path import basename, join, splitext
 from ural import get_hostname, get_normalized_hostname
+from functools import partial
+
+from minet.exceptions import FilenameFormattingError
+from minet.utils import md5, PseudoFStringFormatter
 
 
 def read_potentially_gzipped_path(path, encoding='utf-8'):
@@ -24,7 +28,7 @@ def read_potentially_gzipped_path(path, encoding='utf-8'):
 
 
 class FolderStrategy(object):
-    def apply(self):
+    def __call__(self):
         raise NotImplementedError
 
     @staticmethod
@@ -55,7 +59,7 @@ class FolderStrategy(object):
 
 
 class FlatFolderStrategy(FolderStrategy):
-    def apply(self, filename, **kwargs):
+    def __call__(self, filename, **kwargs):
         return filename
 
 
@@ -63,14 +67,14 @@ class PrefixFolderStrategy(FolderStrategy):
     def __init__(self, length):
         self.length = length
 
-    def apply(self, filename, **kwargs):
+    def __call__(self, filename, **kwargs):
         base = basename(filename).split('.', 1)[0]
 
         return join(base[:self.length], filename)
 
 
 class HostnameFolderStrategy(FolderStrategy):
-    def apply(self, filename, url, **kwargs):
+    def __call__(self, filename, url, **kwargs):
         hostname = get_hostname(url)
 
         if not hostname:
@@ -80,7 +84,7 @@ class HostnameFolderStrategy(FolderStrategy):
 
 
 class NormalizedHostnameFolderStrategy(FolderStrategy):
-    def apply(self, filename, url, **kwargs):
+    def __call__(self, filename, url, **kwargs):
         hostname = get_normalized_hostname(
             url,
             normalize_amp=False,
@@ -92,3 +96,46 @@ class NormalizedHostnameFolderStrategy(FolderStrategy):
             hostname = 'unknown-host'
 
         return join(hostname, filename)
+
+
+class FilenameBuilder(object):
+    def __init__(self, folder_strategy=None, template=None):
+        self.folder_strategy = None
+
+        if folder_strategy is not None:
+            self.folder_strategy = FolderStrategy.from_name(folder_strategy)
+
+        self.formatter = PseudoFStringFormatter()
+        self.template = None
+
+        if template is not None:
+            self.template = partial(self.formatter.format, template)
+
+    def __call__(self, url=None, filename=None, ext=None, formatter_kwargs={}):
+        original_ext = None
+
+        if filename is None:
+            base = md5(url)
+        else:
+            base, original_ext = splitext(filename)
+
+        # We favor the extension found in given filename, else we fallback
+        # on the provided one if any (usually inferred from http response)
+        ext = original_ext if original_ext else (ext or '')
+
+        if self.template is not None:
+            try:
+                filename = self.template(
+                    value=base,
+                    ext=ext,
+                    **formatter_kwargs
+                )
+            except Exception:
+                raise FilenameFormattingError
+        else:
+            filename = base + ext
+
+        if self.folder_strategy:
+            filename = self.folder_strategy(filename)
+
+        return filename

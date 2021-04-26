@@ -323,7 +323,7 @@ def fetch_action(cli_args, resolve=False):
                         filename = str(uuid4()) + (result.meta.get('ext') or '')
 
                     # Applying folder strategy
-                    filename = folder_strategy.apply(
+                    filename = folder_strategy(
                         filename=filename,
                         url=result.response.geturl()
                     )
