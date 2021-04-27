@@ -10,6 +10,7 @@ import casanova
 from io import StringIO
 from collections import Counter
 from ural import is_shortened_url
+from ebbe.decorators import with_defer
 
 from minet.fetch import multithreaded_fetch, multithreaded_resolve
 from minet.fs import FilenameBuilder, ThreadSafeFilesWriter
@@ -41,7 +42,8 @@ RESOLVE_ADDITIONAL_HEADERS = [
 ]
 
 
-def fetch_action(cli_args, resolve=False):
+@with_defer()
+def fetch_action(cli_args, resolve=False, defer=None):
 
     # If we are hitting a single url we enable contents_in_report by default
     if not resolve and isinstance(cli_args.file, StringIO) and cli_args.contents_in_report is None:
@@ -130,6 +132,7 @@ def fetch_action(cli_args, resolve=False):
         unit='url',
         initial=skipped_rows
     )
+    defer(loading_bar.close)  # NOTE: it could be dangerous with multithreaded execution, not to close it ourselves
 
     def update_loading_bar(result):
         nonlocal errors
@@ -222,7 +225,7 @@ def fetch_action(cli_args, resolve=False):
 
         formatter_kwargs = {}
 
-        if cli_args.filename_template and '{line}' in cli_args.filename_template:
+        if cli_args.filename_template and 'line' in cli_args.filename_template:
             formatter_kwargs['line'] = enricher.wrap(row)
 
         filename = filename_builder(
