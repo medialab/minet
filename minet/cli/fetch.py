@@ -245,7 +245,7 @@ def fetch_action(cli_args, resolve=False, defer=None):
         data = response.data
         binary = True
 
-        if is_text and cli_args.standardize_encoding or cli_args.contents_in_report:
+        if is_text and (cli_args.standardize_encoding or cli_args.contents_in_report):
             data = data.decode(original_encoding, errors='replace')
             binary = False
 
