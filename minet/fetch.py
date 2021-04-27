@@ -15,7 +15,7 @@ from minet.web import (
     resolve,
     extract_response_meta
 )
-
+from minet.heuristics import should_spoof_ua_when_resolving
 from minet.constants import (
     DEFAULT_DOMAIN_PARALLELISM,
     DEFAULT_IMAP_BUFFER_SIZE,
@@ -196,6 +196,10 @@ class ResolveWorker(object):
 
         if self.resolve_args is not None:
             kwargs = self.resolve_args(domain, url, item)
+
+        # NOTE: should it be just in the CLI?
+        if 'spoof_ua' not in kwargs:
+            kwargs['spoof_ua'] = should_spoof_ua_when_resolving(domain)
 
         error, stack = resolve(
             url,
