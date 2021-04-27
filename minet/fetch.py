@@ -62,7 +62,7 @@ class FetchResult(object):
         )
 
     @property
-    def final_url(self):
+    def resolved(self):
         if self.response is None:
             return None
 
@@ -122,10 +122,12 @@ def payloads_iter(iterator, key=None):
 
 
 class FetchWorker(object):
-    def __init__(self, pool, *, request_args=None, max_redirects=DEFAULT_FETCH_MAX_REDIRECTS):
+    def __init__(self, pool, *, request_args=None, max_redirects=DEFAULT_FETCH_MAX_REDIRECTS,
+                 callback=None):
         self.pool = pool
         self.request_args = request_args
         self.max_redirects = max_redirects
+        self.callback = callback
 
     def __call__(self, payload):
         item, domain, url = payload
@@ -161,6 +163,9 @@ class FetchWorker(object):
 
             result.response = response
             result.meta = meta
+
+            if self.callback is not None:
+                self.callback(result)
 
         return result
 
@@ -222,14 +227,15 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
 class FetchThreadPoolExecutor(HTTPThreadPoolExecutor):
     def imap_unordered(self, iterator, *, key=None, throttle=DEFAULT_THROTTLE, request_args=None,
                        buffer_size=DEFAULT_IMAP_BUFFER_SIZE, domain_parallelism=DEFAULT_DOMAIN_PARALLELISM,
-                       max_redirects=DEFAULT_FETCH_MAX_REDIRECTS):
+                       max_redirects=DEFAULT_FETCH_MAX_REDIRECTS, callback=None):
 
         # TODO: validate
         iterator = payloads_iter(iterator, key=key)
         worker = FetchWorker(
             self.pool,
             request_args=request_args,
-            max_redirects=max_redirects
+            max_redirects=max_redirects,
+            callback=callback
         )
 
         return super().imap_unordered(
@@ -274,7 +280,7 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
                         throttle=DEFAULT_THROTTLE, buffer_size=DEFAULT_IMAP_BUFFER_SIZE,
                         insecure=False, timeout=DEFAULT_URLLIB3_TIMEOUT,
                         domain_parallelism=DEFAULT_DOMAIN_PARALLELISM,
-                        max_redirects=5, wait=True, daemonic=False):
+                        max_redirects=5, wait=True, daemonic=False, callback=None):
     """
     Function returning a multithreaded iterator over fetched urls.
 
@@ -318,7 +324,8 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
                 request_args=request_args,
                 buffer_size=buffer_size,
                 domain_parallelism=domain_parallelism,
-                max_redirects=max_redirects
+                max_redirects=max_redirects,
+                callback=callback
             )
 
     return generator()
