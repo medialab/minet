@@ -6,18 +6,13 @@
 # in the given column. This is done in a respectful multithreaded fashion to
 # optimize both running time & memory.
 #
-import os
-import gzip
 import casanova
 from io import StringIO
-from os.path import join, dirname
 from collections import Counter
-from uuid import uuid4
 from ural import is_shortened_url
 
 from minet.fetch import multithreaded_fetch, multithreaded_resolve
-from minet.utils import PseudoFStringFormatter
-from minet.fs import FolderStrategy
+from minet.fs import FilenameBuilder, ThreadSafeFilesWriter
 from minet.web import (
     grab_cookies,
     parse_http_header
@@ -45,25 +40,12 @@ RESOLVE_ADDITIONAL_HEADERS = [
     'chain'
 ]
 
-CUSTOM_FORMATTER = PseudoFStringFormatter()
-
 
 def fetch_action(cli_args, resolve=False):
 
     # If we are hitting a single url we enable contents_in_report by default
     if not resolve and isinstance(cli_args.file, StringIO) and cli_args.contents_in_report is None:
         cli_args.contents_in_report = True
-
-    # Trying to instantiate the folder strategy
-    if not resolve:
-        try:
-            folder_strategy = FolderStrategy.from_name(cli_args.folder_strategy)
-        except TypeError:
-            die([
-                'Invalid "%s" --folder-strategy!' % cli_args.folder_strategy,
-                'Check the list at the end of the command help:',
-                '  $ minet fetch -h'
-            ])
 
     # HTTP method
     http_method = cli_args.method
@@ -207,6 +189,76 @@ def fetch_action(cli_args, resolve=False):
             'headers': headers
         }
 
+    # Worker callback internals
+    filename_builder = None
+    files_writer = None
+
+    if not resolve:
+        try:
+            filename_builder = FilenameBuilder(
+                folder_strategy=cli_args.folder_strategy,
+                template=cli_args.filename_template
+            )
+        except TypeError:
+            die([
+                'Invalid "%s" --folder-strategy!' % cli_args.folder_strategy,
+                'Check the list at the end of the command help:',
+                '  $ minet fetch -h'
+            ])
+
+        files_writer = ThreadSafeFilesWriter(cli_args.output_dir)
+
+    def worker_callback(result):
+        # NOTE: at this point the callback is only fired on success
+        row = result.item[1]
+        response = result.response
+        meta = result.meta
+
+        if cli_args.keep_failed_contents and response.status != 200:
+            return
+
+        # First we need to build a filename
+        filename_cell = row[filename_pos] if filename_pos else None
+
+        formatter_kwargs = {}
+
+        if cli_args.filename_template and '{line}' in cli_args.filename_template:
+            formatter_kwargs['line'] = enricher.wrap(row)
+
+        filename = filename_builder(
+            result.resolved,
+            filename=filename_cell,
+            ext=meta.get('ext'),
+            formatter_kwargs=formatter_kwargs,
+            compressed=cli_args.compress
+        )
+
+        meta['filename'] = filename
+
+        # Decoding the response data?
+        is_text = meta.get('is_text', False)
+        original_encoding = meta.get('encoding', 'utf-8')
+
+        data = response.data
+        binary = True
+
+        if is_text and cli_args.standardize_encoding or cli_args.contents_in_report:
+            data = data.decode(original_encoding, errors='replace')
+            binary = False
+
+            if cli_args.contents_in_report:
+                meta['decoded_contents'] = data
+
+        # Writing the file?
+        # TODO: specify what should happen when contents are empty (e.g. POST queries)
+        if data and not cli_args.contents_in_report:
+            files_writer.write(
+                filename,
+                data,
+                binary=binary,
+                compress=cli_args.compress
+            )
+
     def write_fetch_output(index, row, resolved=None, status=None, error=None,
                            filename=None, encoding=None, mimetype=None, data=None):
 
@@ -259,6 +311,7 @@ def fetch_action(cli_args, resolve=False):
         multithreaded_iterator = multithreaded_fetch(
             enricher,
             request_args=request_args,
+            callback=worker_callback,
             **common_kwargs
         )
 
@@ -275,94 +328,29 @@ def fetch_action(cli_args, resolve=False):
                 loading_bar.update()
                 continue
 
-            response = result.response
-            data = response.data if response is not None else None
-
-            content_write_flag = 'wb'
-
             # Updating stats
             update_loading_bar(result)
 
             # No error
             if result.error is None:
+                meta = result.meta
 
                 # Final url target
-                resolved_url = response.geturl()
+                resolved_url = result.resolved
 
                 if resolved_url == result.url:
                     resolved_url = None
-
-                # Should we keep downloaded content?
-                if not cli_args.keep_failed_contents and response.status != 200:
-                    write_fetch_output(
-                        index,
-                        row,
-                        resolved=resolved_url,
-                        status=response.status
-                    )
-                    continue
-
-                filename = None
-
-                # Building filename
-                if data:
-                    if filename_pos is not None or cli_args.filename_template:
-                        root, ext = os.path.splitext(row[filename_pos]) if filename_pos is not None else (None, '')
-                        ext = ext if ext else (result.meta.get('ext') or '')
-                        if cli_args.filename_template:
-                            filename = CUSTOM_FORMATTER.format(
-                                cli_args.filename_template,
-                                value=root,
-                                ext=ext,
-                                line=enricher.wrap(row)
-                            )
-                        else:
-                            filename = root + ext
-                    else:
-                        # NOTE: it would be nice to have an id that can be sorted by time
-                        filename = str(uuid4()) + (result.meta.get('ext') or '')
-
-                    # Applying folder strategy
-                    filename = folder_strategy(
-                        filename=filename,
-                        url=result.response.geturl()
-                    )
-
-                # Standardize encoding?
-                encoding = result.meta['encoding']
-
-                if data and cli_args.standardize_encoding or cli_args.contents_in_report:
-                    if encoding is None or encoding != 'utf-8' or cli_args.contents_in_report:
-                        data = data.decode(encoding if encoding is not None else 'utf-8', errors='replace')
-                        encoding = 'utf-8'
-                        content_write_flag = 'w'
-
-                # Writing file on disk
-                if data and not cli_args.contents_in_report:
-
-                    if cli_args.compress:
-                        filename += '.gz'
-
-                    resource_path = join(cli_args.output_dir, filename)
-                    resource_dir = dirname(resource_path)
-
-                    os.makedirs(resource_dir, exist_ok=True)
-
-                    with open(resource_path, content_write_flag) as f:
-
-                        # TODO: what if standardize_encoding + compress?
-                        f.write(gzip.compress(data) if cli_args.compress else data)
 
                 # Reporting in output
                 write_fetch_output(
                     index,
                     row,
                     resolved=resolved_url,
-                    status=response.status,
-                    filename=filename,
-                    encoding=encoding,
-                    mimetype=result.meta['mimetype'],
-                    data=data
+                    status=result.response.status,
+                    filename=meta.get('filename'),
+                    encoding=meta.get('encoding'),
+                    mimetype=meta.get('mimetype'),
+                    data=meta.get('decoded_contents')
                 )
 
             # Handling potential errors

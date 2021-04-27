@@ -9,7 +9,7 @@ import codecs
 from os import makedirs
 from os.path import basename, join, splitext, abspath, normpath, dirname
 from ural import get_hostname, get_normalized_hostname
-from functools import partial, lru_cache
+from functools import partial
 from quenouille import NamedLocks
 
 from minet.exceptions import FilenameFormattingError
@@ -162,18 +162,39 @@ class ThreadSafeFilesWriter(object):
         return abspath(full_path)
 
     def makedirs(self, directory):
+        if not directory:
+            return
 
         # TODO: cache
         with self.folder_locks[directory]:
             makedirs(directory, exist_ok=True)
 
-    def write(self, filename, contents, mode='wb'):
+    def write(self, filename, contents, binary=True, compress=False):
+        if binary and not isinstance(contents, bytes):
+            raise TypeError('contents must be bytes if binary=True')
+
+        if not binary and not isinstance(contents, str):
+            raise TypeError('contents must be str if binary=False')
+
+        if compress and not binary:
+            raise NotImplementedError
+
         filename = self.resolve(filename)
         directory = dirname(filename)
 
         # NOTE: Could have prefix-free locking as a bonus...
         self.makedirs(directory)
 
+        open_kwargs = {
+            'mode': 'wb' if binary else 'w'
+        }
+
+        if not binary:
+            open_kwargs['encoding'] = 'utf-8'
+
+        if compress:
+            contents = gzip.compress(contents)
+
         with self.file_locks[filename]:
-            with open(filename, mode) as f:
+            with open(filename, **open_kwargs) as f:
                 f.write(contents)

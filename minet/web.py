@@ -562,7 +562,8 @@ def extract_response_meta(response, guess_encoding=True, guess_extension=True):
     meta = {
         'ext': None,
         'mimetype': None,
-        'encoding': None
+        'encoding': None,
+        'is_text': None
     }
 
     # Guessing extension
@@ -593,8 +594,11 @@ def extract_response_meta(response, guess_encoding=True, guess_extension=True):
             meta['mimetype'] = mimetype
             meta['ext'] = ext
 
-    if meta['mimetype'] is not None and is_binary_mimetype(meta['mimetype']):
-        guess_encoding = False
+    if meta['mimetype'] is not None:
+        meta['is_text'] = not is_binary_mimetype(meta['mimetype'])
+
+        if not meta['is_text']:
+            guess_encoding = False
 
     # Guessing encoding
     if guess_encoding:
