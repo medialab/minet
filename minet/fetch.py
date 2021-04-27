@@ -34,28 +34,64 @@ FetchWorkerPayload = namedtuple(
     ]
 )
 
-FetchWorkerResult = namedtuple(
-    'FetchWorkerResult',
-    [
-        'domain',
-        'url',
-        'item',
-        'error',
-        'response',
-        'meta'
-    ]
-)
 
-ResolveWorkerResult = namedtuple(
-    'ResolveWorkerResult',
-    [
-        'domain',
-        'url',
-        'item',
-        'error',
-        'stack'
-    ]
-)
+class FetchResult(object):
+    __slots__ = ('item', 'domain', 'url', 'error', 'response', 'meta')
+
+    def __init__(self, item, domain, url):
+        self.item = item
+        self.domain = domain
+        self.url = url
+        self.error = None
+        self.response = None
+        self.meta = {}
+
+    def __repr__(self):
+        name = self.__class__.__name__
+
+        if not self.url:
+            return '<{name} empty!>'.format(name=name)
+
+        return '<{name}{errored} url={url!r} status={status!r} ext={ext!r} encoding={encoding!r}>'.format(
+            name=name,
+            url=self.url,
+            status=self.response.status if self.response else None,
+            ext=self.meta.get('ext'),
+            encoding=self.meta.get('encoding'),
+            errored=' errored!' if self.error else ''
+        )
+
+    @property
+    def final_url(self):
+        if self.response is None:
+            return None
+
+        return self.response.geturl()
+
+
+class ResolveResult(object):
+    __slots__ = ('item', 'domain', 'url', 'error', 'stack')
+
+    def __init__(self, item, domain, url):
+        self.item = item
+        self.domain = domain
+        self.url = url
+        self.error = None
+        self.stack = None
+
+    def __repr__(self):
+        name = self.__class__.__name__
+
+        if not self.url:
+            return '<{name} empty!>'.format(name=name)
+
+        return '<{name}{errored} url={url!r} status={status!r} redirects={redirects!r}>'.format(
+            name=name,
+            url=self.url,
+            status=self.stack[-1].status if self.stack else None,
+            redirects=(len(self.stack) - 1) if self.stack else 0,
+            errored=' errored!' if self.error else ''
+        )
 
 
 def key_by_domain_name(payload):
@@ -94,15 +130,10 @@ class FetchWorker(object):
     def __call__(self, payload):
         item, domain, url = payload
 
+        result = FetchResult(*payload)
+
         if url is None:
-            return FetchWorkerResult(
-                domain=None,
-                url=None,
-                item=item,
-                response=None,
-                error=None,
-                meta=None
-            )
+            return result
 
         # NOTE: request_args must be threadsafe
         kwargs = {}
@@ -118,30 +149,20 @@ class FetchWorker(object):
         )
 
         if error:
-            return FetchWorkerResult(
-                domain=domain,
-                url=url,
-                item=item,
-                response=response,
-                error=error,
-                meta=None
-            )
+            result.error = error
+        else:
 
-        # Forcing urllib3 to read data in thread
-        # TODO: this is probably useless and should be replaced by preload_content at the right place
-        data = response.data
+            # Forcing urllib3 to read data in thread
+            # TODO: this is probably useless and should be replaced by preload_content at the right place
+            data = response.data
 
-        # Meta
-        meta = extract_response_meta(response)
+            # Meta
+            meta = extract_response_meta(response)
 
-        return FetchWorkerResult(
-            domain=domain,
-            url=url,
-            item=item,
-            response=response,
-            error=error,
-            meta=meta
-        )
+            result.response = response
+            result.meta = meta
+
+        return result
 
 
 class ResolveWorker(object):
@@ -160,14 +181,10 @@ class ResolveWorker(object):
     def __call__(self, payload):
         item, domain, url = payload
 
+        result = ResolveResult(*payload)
+
         if url is None:
-            return ResolveWorkerResult(
-                domain=None,
-                url=None,
-                item=item,
-                error=None,
-                stack=None
-            )
+            return result
 
         # NOTE: resolve_args must be threadsafe
         kwargs = {}
@@ -186,13 +203,10 @@ class ResolveWorker(object):
             **kwargs
         )
 
-        return ResolveWorkerResult(
-            domain=domain,
-            url=url,
-            item=item,
-            error=error,
-            stack=stack
-        )
+        result.error = error
+        result.stack = stack
+
+        return result
 
 
 class HTTPThreadPoolExecutor(ThreadPoolExecutor):

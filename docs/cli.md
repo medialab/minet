@@ -232,7 +232,7 @@ optional arguments:
   --contents-in-report, --no-contents-in-report   Whether to include retrieved contents, e.g. html, directly in the report
                                                   and avoid writing them in a separate folder. This requires to standardize
                                                   encoding and won't work on binary formats.
-  -d OUTPUT_DIR, --output-dir OUTPUT_DIR          Directory where the fetched files will be written. Defaults to "content".
+  -d OUTPUT_DIR, --output-dir OUTPUT_DIR          Directory where the fetched files will be written. Defaults to "downloaded".
   -f FILENAME, --filename FILENAME                Name of the column used to build retrieved file names. Defaults to an uuid v4. If the provided file names have no extension (e.g. ".jpg", ".pdf", etc.) the correct extension will be added depending on the file type.
   --filename-template FILENAME_TEMPLATE           A template for the name of the fetched files.
   --folder-strategy FOLDER_STRATEGY               Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. Defaults to "flat". All of the strategies are described at the end of this help.
@@ -312,7 +312,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                           show this help message and exit
-  -i INPUT_DIR, --input-dir INPUT_DIR  Directory where the HTML files are stored. Defaults to "content".
+  -i INPUT_DIR, --input-dir INPUT_DIR  Directory where the HTML files are stored. Defaults to "downloaded".
   -o OUTPUT, --output OUTPUT           Path to the output file. By default, the results will be printed to stdout.
   -p PROCESSES, --processes PROCESSES  Number of processes to use. Defaults to roughly half of the available CPUs.
   -s SELECT, --select SELECT           Columns of input CSV file to include in the output (separated by `,`).
@@ -443,7 +443,7 @@ optional arguments:
   -h, --help                            show this help message and exit
   -f {csv,jsonl}, --format {csv,jsonl}  Output format.
   -g GLOB, --glob GLOB                  Whether to scrape a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.
-  -i INPUT_DIR, --input-dir INPUT_DIR   Directory where the HTML files are stored. Defaults to "content".
+  -i INPUT_DIR, --input-dir INPUT_DIR   Directory where the HTML files are stored. Defaults to "downloaded".
   -o OUTPUT, --output OUTPUT            Path to the output file. By default, the results will be printed to stdout.
   -p PROCESSES, --processes PROCESSES   Number of processes to use. Defaults to roughly half of the available CPUs.
   --separator SEPARATOR                 Separator use to join lists of values when output format is CSV. Defaults to "|".

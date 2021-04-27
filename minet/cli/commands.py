@@ -13,7 +13,11 @@ from casanova import (
 )
 from ural import is_url
 
-from minet.constants import DEFAULT_THROTTLE
+from minet.constants import (
+    DEFAULT_THROTTLE,
+    DEFAULT_FETCH_MAX_REDIRECTS,
+    DEFAULT_RESOLVE_MAX_REDIRECTS
+)
 from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
 from minet.cli.argparse import (
     BooleanAction,
@@ -1007,7 +1011,7 @@ MINET_COMMANDS = {
                 'flag': '--max-redirects',
                 'help': 'Maximum number of redirections to follow before breaking. Defaults to 5.',
                 'type': int,
-                'default': 5
+                'default': DEFAULT_FETCH_MAX_REDIRECTS
             },
             {
                 'flag': '--compress',
@@ -1364,7 +1368,7 @@ MINET_COMMANDS = {
                 'flag': '--max-redirects',
                 'help': 'Maximum number of redirections to follow before breaking. Defaults to 20.',
                 'type': int,
-                'default': 20
+                'default': DEFAULT_RESOLVE_MAX_REDIRECTS
             },
             {
                 'flag': '--follow-meta-refresh',

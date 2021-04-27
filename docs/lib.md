@@ -100,7 +100,7 @@ for result in multithreaded_fetch(urls, key=lambda x: x['url']):
 
 *Yields*:
 
-A `FetchWorkerResult` having the following attributes:
+A `FetchResult` having the following attributes:
 
 * **url** *?string*: the fetched url.
 * **item** *any*: original item from the iterator.
@@ -159,7 +159,7 @@ for result in multithreaded_resolve(urls, key=lambda x: x['url']):
 
 *Yields*:
 
-A `ResolveWorkerResult` having the following attributes:
+A `ResolveResult` having the following attributes:
 
 * **url** *?string*: the fetched url.
 * **item** *any*: original item from the iterator.
