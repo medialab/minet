@@ -233,7 +233,7 @@ optional arguments:
                                                   and avoid writing them in a separate folder. This requires to standardize
                                                   encoding and won't work on binary formats.
   -d OUTPUT_DIR, --output-dir OUTPUT_DIR          Directory where the fetched files will be written. Defaults to "downloaded".
-  -f FILENAME, --filename FILENAME                Name of the column used to build retrieved file names. Defaults to an uuid v4. If the provided file names have no extension (e.g. ".jpg", ".pdf", etc.) the correct extension will be added depending on the file type.
+  -f FILENAME, --filename FILENAME                Name of the column used to build retrieved file names. Defaults to a md5 hash of final url. If the provided file names have no extension (e.g. ".jpg", ".pdf", etc.) the correct extension will be added depending on the file type.
   --filename-template FILENAME_TEMPLATE           A template for the name of the fetched files.
   --folder-strategy FOLDER_STRATEGY               Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. Defaults to "flat". All of the strategies are described at the end of this help.
   --keep-failed-contents                          Whether to keep & write contents for failed (i.e. non-200) http requests.
