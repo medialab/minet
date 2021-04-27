@@ -188,7 +188,7 @@ def fetch_action(cli_args, resolve=False):
 
         return url
 
-    def request_args(url, item):
+    def request_args(domain, url, item):
         cookie = None
 
         # Cookie

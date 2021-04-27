@@ -6,7 +6,7 @@
 # web in a multithreaded fashion.
 #
 from collections import namedtuple
-from quenouille import imap_unordered
+from quenouille import ThreadPoolExecutor
 from ural import get_domain_name, ensure_protocol
 
 from minet.web import (
@@ -20,13 +20,16 @@ from minet.constants import (
     DEFAULT_DOMAIN_PARALLELISM,
     DEFAULT_IMAP_BUFFER_SIZE,
     DEFAULT_THROTTLE,
-    DEFAULT_URLLIB3_TIMEOUT
+    DEFAULT_URLLIB3_TIMEOUT,
+    DEFAULT_FETCH_MAX_REDIRECTS,
+    DEFAULT_RESOLVE_MAX_REDIRECTS
 )
 
 FetchWorkerPayload = namedtuple(
     'FetchWorkerPayload',
     [
         'item',
+        'domain',
         'url'
     ]
 )
@@ -34,6 +37,7 @@ FetchWorkerPayload = namedtuple(
 FetchWorkerResult = namedtuple(
     'FetchWorkerResult',
     [
+        'domain',
         'url',
         'item',
         'error',
@@ -45,6 +49,7 @@ FetchWorkerResult = namedtuple(
 ResolveWorkerResult = namedtuple(
     'ResolveWorkerResult',
     [
+        'domain',
         'url',
         'item',
         'error',
@@ -53,9 +58,206 @@ ResolveWorkerResult = namedtuple(
 )
 
 
+def key_by_domain_name(payload):
+    return payload.domain
+
+
+def payloads_iter(iterator, key=None):
+    for item in iterator:
+        url = item if key is None else key(item)
+
+        if not url:
+            yield FetchWorkerPayload(
+                item=item,
+                domain=None,
+                url=None
+            )
+
+            continue
+
+        # Url cleanup
+        url = ensure_protocol(url.strip())
+
+        yield FetchWorkerPayload(
+            item=item,
+            domain=get_domain_name(url),
+            url=url
+        )
+
+
+class FetchWorker(object):
+    def __init__(self, pool, *, request_args=None, max_redirects=DEFAULT_FETCH_MAX_REDIRECTS):
+        self.pool = pool
+        self.request_args = request_args
+        self.max_redirects = max_redirects
+
+    def __call__(self, payload):
+        item, domain, url = payload
+
+        if url is None:
+            return FetchWorkerResult(
+                domain=None,
+                url=None,
+                item=item,
+                response=None,
+                error=None,
+                meta=None
+            )
+
+        # NOTE: request_args must be threadsafe
+        kwargs = {}
+
+        if self.request_args is not None:
+            kwargs = self.request_args(domain, url, item)
+
+        error, response = request(
+            url,
+            pool=self.pool,
+            max_redirects=self.max_redirects,
+            **kwargs
+        )
+
+        if error:
+            return FetchWorkerResult(
+                domain=domain,
+                url=url,
+                item=item,
+                response=response,
+                error=error,
+                meta=None
+            )
+
+        # Forcing urllib3 to read data in thread
+        # TODO: this is probably useless and should be replaced by preload_content at the right place
+        data = response.data
+
+        # Meta
+        meta = extract_response_meta(response)
+
+        return FetchWorkerResult(
+            domain=domain,
+            url=url,
+            item=item,
+            response=response,
+            error=error,
+            meta=meta
+        )
+
+
+class ResolveWorker(object):
+    def __init__(self, pool, *, resolve_args=None, max_redirects=DEFAULT_RESOLVE_MAX_REDIRECTS,
+                 follow_refresh_header=True, follow_meta_refresh=False, follow_js_relocation=False,
+                 infer_redirection=False):
+
+        self.pool = pool
+        self.resolve_args = resolve_args
+        self.max_redirects = max_redirects
+        self.follow_refresh_header = follow_refresh_header
+        self.follow_meta_refresh = follow_meta_refresh
+        self.follow_js_relocation = follow_js_relocation
+        self.infer_redirection = infer_redirection
+
+    def __call__(self, payload):
+        item, domain, url = payload
+
+        if url is None:
+            return ResolveWorkerResult(
+                domain=None,
+                url=None,
+                item=item,
+                error=None,
+                stack=None
+            )
+
+        # NOTE: resolve_args must be threadsafe
+        kwargs = {}
+
+        if self.resolve_args is not None:
+            kwargs = self.resolve_args(domain, url, item)
+
+        error, stack = resolve(
+            url,
+            pool=self.pool,
+            max_redirects=self.max_redirects,
+            follow_refresh_header=self.follow_refresh_header,
+            follow_meta_refresh=self.follow_meta_refresh,
+            follow_js_relocation=self.follow_js_relocation,
+            infer_redirection=self.infer_redirection,
+            **kwargs
+        )
+
+        return ResolveWorkerResult(
+            domain=domain,
+            url=url,
+            item=item,
+            error=error,
+            stack=stack
+        )
+
+
+class HTTPThreadPoolExecutor(ThreadPoolExecutor):
+    def __init__(self, max_workers=None, insecure=False, timeout=DEFAULT_URLLIB3_TIMEOUT,
+                 **kwargs):
+        super().__init__(max_workers, **kwargs)
+        self.pool = create_pool(threads=max_workers, insecure=insecure, timeout=timeout)
+
+    def imap(self, *args, **kwargs):
+        raise NotImplementedError
+
+
+class FetchThreadPoolExecutor(HTTPThreadPoolExecutor):
+    def imap_unordered(self, iterator, *, key=None, throttle=DEFAULT_THROTTLE, request_args=None,
+                       buffer_size=DEFAULT_IMAP_BUFFER_SIZE, domain_parallelism=DEFAULT_DOMAIN_PARALLELISM,
+                       max_redirects=DEFAULT_FETCH_MAX_REDIRECTS):
+
+        # TODO: validate
+        iterator = payloads_iter(iterator, key=key)
+        worker = FetchWorker(
+            self.pool,
+            request_args=request_args,
+            max_redirects=max_redirects
+        )
+
+        return super().imap_unordered(
+            iterator,
+            worker,
+            key=key_by_domain_name,
+            parallelism=domain_parallelism,
+            buffer_size=buffer_size,
+            throttle=throttle
+        )
+
+
+class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor):
+    def imap_unordered(self, iterator, *, key=None, throttle=DEFAULT_THROTTLE, resolve_args=None,
+                       buffer_size=DEFAULT_IMAP_BUFFER_SIZE, domain_parallelism=DEFAULT_DOMAIN_PARALLELISM,
+                       max_redirects=DEFAULT_FETCH_MAX_REDIRECTS, follow_refresh_header=True,
+                       follow_meta_refresh=False, follow_js_relocation=False, infer_redirection=False):
+
+        # TODO: validate
+        iterator = payloads_iter(iterator, key=key)
+        worker = ResolveWorker(
+            self.pool,
+            resolve_args=resolve_args,
+            max_redirects=max_redirects,
+            follow_refresh_header=follow_refresh_header,
+            follow_meta_refresh=follow_meta_refresh,
+            follow_js_relocation=follow_js_relocation,
+            infer_redirection=infer_redirection
+        )
+
+        return super().imap_unordered(
+            iterator,
+            worker,
+            key=key_by_domain_name,
+            parallelism=domain_parallelism,
+            buffer_size=buffer_size,
+            throttle=throttle
+        )
+
+
 def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
-                        throttle=DEFAULT_THROTTLE, guess_extension=True,
-                        guess_encoding=True, buffer_size=DEFAULT_IMAP_BUFFER_SIZE,
+                        throttle=DEFAULT_THROTTLE, buffer_size=DEFAULT_IMAP_BUFFER_SIZE,
                         insecure=False, timeout=DEFAULT_URLLIB3_TIMEOUT,
                         domain_parallelism=DEFAULT_DOMAIN_PARALLELISM,
                         max_redirects=5, wait=True, daemonic=False):
@@ -72,10 +274,6 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
             Or a function taking domain name and item and returning the
             throttle to apply. Defaults to 0.2.
         max_redirects (int, optional): Max number of redirections to follow.
-        guess_extension (bool, optional): Attempt to guess the resource's
-            extension? Defaults to True.
-        guess_encoding (bool, optional): Attempt to guess the resource's
-            encoding? Defaults to True.
         domain_parallelism (int, optional): Max number of urls per domain to
             hit at the same time. Defaults to 1.
         buffer_size (int, optional): Max number of items per domain to enqueue
@@ -91,99 +289,25 @@ def multithreaded_fetch(iterator, key=None, request_args=None, threads=25,
 
     """
 
-    # Creating the http pool manager
-    pool = create_pool(threads=threads, insecure=insecure, timeout=timeout)
-
-    # Thread worker
-    def worker(payload):
-        item, url = payload
-
-        if url is None:
-            return FetchWorkerResult(
-                url=None,
-                item=item,
-                response=None,
-                error=None,
-                meta=None
+    def generator():
+        with FetchThreadPoolExecutor(
+            max_workers=threads,
+            insecure=insecure,
+            timeout=timeout,
+            wait=wait,
+            daemonic=daemonic
+        ) as executor:
+            yield from executor.imap_unordered(
+                iterator,
+                key=key,
+                throttle=throttle,
+                request_args=request_args,
+                buffer_size=buffer_size,
+                domain_parallelism=domain_parallelism,
+                max_redirects=max_redirects
             )
 
-        # NOTE: request_args must be threadsafe
-        kwargs = request_args(url, item) if request_args is not None else {}
-
-        error, response = request(
-            url,
-            pool=pool,
-            max_redirects=max_redirects,
-            **kwargs
-        )
-
-        if error:
-            return FetchWorkerResult(
-                url=url,
-                item=item,
-                response=response,
-                error=error,
-                meta=None
-            )
-
-        # Forcing urllib3 to read data in thread
-        # TODO: this is probably useless and should be replaced by preload_content at the right place
-        data = response.data
-
-        # Meta
-        meta = extract_response_meta(
-            response,
-            guess_encoding=guess_encoding,
-            guess_extension=guess_extension
-        )
-
-        return FetchWorkerResult(
-            url=url,
-            item=item,
-            response=response,
-            error=error,
-            meta=meta
-        )
-
-    # Group resolver
-    def grouper(payload):
-        if payload.url is None:
-            return None
-
-        return get_domain_name(payload.url)
-
-    # Thread payload iterator
-    def payloads():
-        for item in iterator:
-            url = item if key is None else key(item)
-
-            if not url:
-                yield FetchWorkerPayload(
-                    item=item,
-                    url=None
-                )
-
-                continue
-
-            # Url cleanup
-            url = ensure_protocol(url.strip())
-
-            yield FetchWorkerPayload(
-                item=item,
-                url=url
-            )
-
-    return imap_unordered(
-        payloads(),
-        worker,
-        threads,
-        key=grouper,
-        parallelism=domain_parallelism,
-        buffer_size=buffer_size,
-        throttle=throttle,
-        wait=wait,
-        daemonic=daemonic
-    )
+    return generator()
 
 
 def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
@@ -228,78 +352,26 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
 
     """
 
-    # Creating the http pool manager
-    pool = create_pool(threads=threads, insecure=insecure, timeout=timeout)
-
-    # Thread worker
-    def worker(payload):
-        item, url = payload
-
-        if url is None:
-            return ResolveWorkerResult(
-                url=None,
-                item=item,
-                error=None,
-                stack=None
+    def generator():
+        with ResolveThreadPoolExecutor(
+            max_workers=threads,
+            insecure=insecure,
+            timeout=timeout,
+            wait=wait,
+            daemonic=daemonic
+        ) as executor:
+            yield from executor.imap_unordered(
+                iterator,
+                key=key,
+                throttle=throttle,
+                resolve_args=resolve_args,
+                buffer_size=buffer_size,
+                domain_parallelism=domain_parallelism,
+                max_redirects=max_redirects,
+                follow_refresh_header=follow_refresh_header,
+                follow_meta_refresh=follow_meta_refresh,
+                follow_js_relocation=follow_js_relocation,
+                infer_redirection=infer_redirection
             )
 
-        # NOTE: resolve_args must be threadsafe
-        kwargs = resolve_args(url, item) if resolve_args is not None else {}
-
-        error, stack = resolve(
-            url,
-            pool=pool,
-            max_redirects=max_redirects,
-            follow_refresh_header=follow_refresh_header,
-            follow_meta_refresh=follow_meta_refresh,
-            follow_js_relocation=follow_js_relocation,
-            infer_redirection=infer_redirection,
-            **kwargs
-        )
-
-        return ResolveWorkerResult(
-            url=url,
-            item=item,
-            error=error,
-            stack=stack
-        )
-
-    # Group resolver
-    def grouper(payload):
-        if payload.url is None:
-            return None
-
-        return get_domain_name(payload.url)
-
-    # Thread payload iterator
-    def payloads():
-        for item in iterator:
-            url = item if key is None else key(item)
-
-            if not url:
-                yield FetchWorkerPayload(
-                    item=item,
-                    url=None
-                )
-
-                continue
-
-            # Url cleanup
-            url = ensure_protocol(url.strip())
-
-            yield FetchWorkerPayload(
-                item=item,
-                url=url
-            )
-
-    return imap_unordered(
-        payloads(),
-        worker,
-        threads,
-        key=grouper,
-        parallelism=domain_parallelism,
-        buffer_size=buffer_size,
-        throttle=throttle,
-        wait=wait,
-        daemonic=daemonic
-    )
+    return generator()
