@@ -9,7 +9,7 @@ import codecs
 from os import makedirs
 from os.path import basename, join, splitext, abspath, normpath, dirname
 from ural import get_hostname, get_normalized_hostname
-from functools import partial
+from functools import partial, lru_cache
 from quenouille import NamedLocks
 
 from minet.exceptions import FilenameFormattingError
@@ -161,12 +161,19 @@ class ThreadSafeFilesWriter(object):
 
         return abspath(full_path)
 
-    def write(self, filename):
-        filename = self.resolve(filename)
-        directory = dirname(filename)
+    def makedirs(self, directory):
 
+        # TODO: cache
         with self.folder_locks[directory]:
             makedirs(directory, exist_ok=True)
 
+    def write(self, filename, contents, mode='wb'):
+        filename = self.resolve(filename)
+        directory = dirname(filename)
+
+        # NOTE: Could have prefix-free locking as a bonus...
+        self.makedirs(directory)
+
         with self.file_locks[filename]:
-            pass
+            with open(filename, mode) as f:
+                f.write(contents)
