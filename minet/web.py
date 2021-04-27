@@ -358,7 +358,8 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
                             location = p[1]
                             redirection.type = 'refresh-header'
 
-                if location is None and follow_meta_refresh:
+                # Reading a small chunk of the html
+                if location is None and (follow_meta_refresh or follow_js_relocation):
                     try:
                         response._body = response.read(CONTENT_CHUNK_SIZE)
                     except Exception as e:
@@ -366,27 +367,20 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
                         redirection.type = 'error'
                         break
 
+                # Meta refresh
+                if location is None and follow_meta_refresh:
                     meta_refresh = find_meta_refresh(response._body)
 
                     if meta_refresh is not None:
                         location = meta_refresh[1]
-
                         redirection.type = 'meta-refresh'
 
+                # JavaScript relocation
                 if location is None and follow_js_relocation:
-                    try:
-                        if response._body is None:
-                            response._body = response.read(CONTENT_CHUNK_SIZE)
-                    except Exception as e:
-                        error = e
-                        redirection.type = 'error'
-                        break
-
                     js_relocation = find_javascript_relocation(response._body)
 
                     if js_relocation is not None:
                         location = js_relocation
-
                         redirection.type = 'js-relocation'
 
             # Found the end
