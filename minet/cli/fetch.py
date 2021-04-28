@@ -49,7 +49,7 @@ def fetch_action(cli_args, resolve=False, defer=None):
     if not resolve and isinstance(cli_args.file, StringIO) and cli_args.contents_in_report is None:
         cli_args.contents_in_report = True
 
-    if cli_args.contents_in_report and cli_args.compress:
+    if not resolve and cli_args.contents_in_report and cli_args.compress:
         die('Cannot both --compress and output --contents-in-report!')
 
     # HTTP method
