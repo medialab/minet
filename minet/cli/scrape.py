@@ -11,7 +11,7 @@ import casanova
 from casanova import DictLikeRow
 from termcolor import colored
 from collections import namedtuple
-from os.path import basename
+from os.path import basename, isdir
 
 from minet import Scraper
 from minet.multiprocessing import LazyPool
@@ -32,7 +32,7 @@ from minet.cli.reporters import (
 from minet.fs import read_potentially_gzipped_path
 from minet.cli.utils import (
     die,
-    create_glob_iterator,
+    dummy_csv_file_from_glob,
     create_report_iterator,
     LoadingBar
 )
@@ -132,26 +132,33 @@ def scrape_action(cli_args):
         cli_args.separator
     )
 
-    def on_irrelevant_row(reason, row):
+    def on_irrelevant_row(reason, row, i):
+        loading_bar.print('Row n°{n} could not be processed: {reason}'.format(n=i + 1, reason=reason))
         loading_bar.update()
 
-    if cli_args.glob is not None:
-        files = create_glob_iterator(cli_args, worker_args)
-    else:
-        reader = casanova.reader(cli_args.report)
+    input_data = cli_args.report
 
-        try:
-            files = create_report_iterator(
-                cli_args,
-                reader,
-                worker_args=worker_args,
-                on_irrelevant_row=on_irrelevant_row
-            )
-        except NotADirectoryError:
-            loading_bar.die([
-                'Could not find the "%s" directory!' % cli_args.input_dir,
-                'Did you forget to specify it with -i/--input-dir?'
-            ])
+    if cli_args.glob is not None:
+        input_data = dummy_csv_file_from_glob(cli_args.glob, cli_args.input_dir)
+
+    reader = casanova.reader(input_data)
+
+    if (
+        cli_args.glob is None and
+        'raw_contents' not in reader.pos and
+        not isdir(cli_args.input_dir)
+    ):
+        loading_bar.die([
+            'Could not find the "%s" directory!' % cli_args.input_dir,
+            'Did you forget to specify it with -i/--input-dir?'
+        ])
+
+    files = create_report_iterator(
+        cli_args,
+        reader,
+        worker_args=worker_args,
+        on_irrelevant_row=on_irrelevant_row
+    )
 
     if cli_args.format == 'csv':
         output_writer = csv.DictWriter(cli_args.output, fieldnames=scraper.headers)
@@ -174,6 +181,8 @@ def scrape_action(cli_args):
             if error is not None:
                 if isinstance(error, (ScraperEvalError, ScraperEvalTypeError, ScraperEvalNoneError)):
                     loading_bar.print(report_scraper_evaluation_error(error), end='')
+                else:
+                    loading_bar.print(error, repr(error))
                 loading_bar.inc('errors')
                 continue
 

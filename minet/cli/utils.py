@@ -8,7 +8,7 @@ import sys
 import yaml
 import platform
 from glob import iglob
-from os.path import join, expanduser, isfile, isdir
+from os.path import join, expanduser, isfile, relpath
 from collections import namedtuple
 from tqdm import tqdm
 from ebbe import noop
@@ -104,45 +104,55 @@ WorkerPayload = namedtuple(
     ['row', 'headers', 'path', 'encoding', 'content', 'args']
 )
 
-REPORT_HEADERS = ['status', 'filename', 'encoding', 'mimetype']
+
+def getdefault(row, pos, default=None):
+    if pos is None:
+        return default
+
+    try:
+        return row[pos] or default
+    except IndexError:
+        return default
 
 
 def create_report_iterator(cli_args, reader, worker_args=None, on_irrelevant_row=noop):
-    for col in REPORT_HEADERS:
-        if col not in reader.pos:
-            raise MissingColumnError(col)
+    if 'filename' not in reader.pos:
+        raise MissingColumnError
 
-    status_pos = reader.pos.status
     filename_pos = reader.pos.filename
-    encoding_pos = reader.pos.encoding
-    mimetype_pos = reader.pos.mimetype
+    error_pos = reader.pos.get('error')
+    status_pos = reader.pos.get('status')
+    filename_pos = reader.pos.get('filename')
+    encoding_pos = reader.pos.get('encoding')
+    mimetype_pos = reader.pos.get('mimetype')
     raw_content_pos = reader.pos.get('raw_contents')
-
-    if raw_content_pos is None and not isdir(cli_args.input_dir):
-        raise NotADirectoryError
 
     indexed_headers = reader.pos.as_dict()
 
     def generator():
-        for row in reader:
-            status = fuzzy_int(row[status_pos]) if row[status_pos] else None
-            mimetype = row[mimetype_pos]
-            filename = row[filename_pos]
+        for i, row in enumerate(reader):
+            error = getdefault(row, error_pos)
 
-            if status is None:
-                on_irrelevant_row('no-status', row)
+            if error is not None:
+                on_irrelevant_row('errored', row, i)
                 continue
 
+            status = fuzzy_int(getdefault(row, status_pos, '200'))
+
+            mimetype = getdefault(row, mimetype_pos, 'text/html').strip()
+            filename = row[filename_pos]
+            encoding = getdefault(row, encoding_pos, 'utf-8').strip()
+
             if status != 200:
-                on_irrelevant_row('invalid-status', row)
+                on_irrelevant_row('invalid-status', row, i)
                 continue
 
             if not filename:
-                on_irrelevant_row('no-filename', row)
+                on_irrelevant_row('no-filename', row, i)
                 continue
 
             if '/htm' not in mimetype:
-                on_irrelevant_row('invalid-mimetype', row)
+                on_irrelevant_row('invalid-mimetype', row, i)
                 continue
 
             if raw_content_pos is not None:
@@ -150,7 +160,7 @@ def create_report_iterator(cli_args, reader, worker_args=None, on_irrelevant_row
                     row=row,
                     headers=indexed_headers,
                     path=None,
-                    encoding=row[encoding_pos],
+                    encoding=encoding,
                     content=row[raw_content_pos],
                     args=worker_args
                 )
@@ -158,7 +168,6 @@ def create_report_iterator(cli_args, reader, worker_args=None, on_irrelevant_row
                 continue
 
             path = join(cli_args.input_dir, filename)
-            encoding = row[encoding_pos].strip() or 'utf-8'
 
             yield WorkerPayload(
                 row=row,
@@ -172,16 +181,14 @@ def create_report_iterator(cli_args, reader, worker_args=None, on_irrelevant_row
     return generator()
 
 
-def create_glob_iterator(cli_args, worker_args):
-    for p in iglob(cli_args.glob, recursive=True):
-        yield WorkerPayload(
-            row=None,
-            headers=None,
-            path=p,
-            encoding='utf-8',
-            content=None,
-            args=worker_args
-        )
+def dummy_csv_file_from_glob(pattern, root_directory=None):
+    if root_directory is not None:
+        pattern = join(root_directory, pattern)
+
+    yield ['filename']
+
+    for p in iglob(pattern, recursive=True):
+        yield [relpath(p, start=root_directory or '')]
 
 
 def get_rcfile(rcfile_path=None):
