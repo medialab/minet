@@ -5,7 +5,6 @@
 # Multiple helper functions related to reading and writing files.
 #
 import gzip
-import codecs
 from os import makedirs
 from os.path import basename, join, splitext, abspath, normpath, dirname
 from ural import get_hostname, get_normalized_hostname
@@ -16,16 +15,15 @@ from minet.utils import md5, PseudoFStringFormatter
 
 
 def read_potentially_gzipped_path(path, encoding='utf-8'):
+    open_fn = open
+    flag = 'r'
+
     if path.endswith('.gz'):
-        with open(path, 'rb') as f:
-            raw_bytes = gzip.decompress(f.read())
+        open_fn = gzip.open
+        flag = 'rt'
 
-        raw = raw_bytes.decode(encoding, errors='replace')
-    else:
-        with codecs.open(path, 'r', encoding=encoding, errors='replace') as f:
-            raw = f.read()
-
-    return raw
+    with open_fn(path, flag, encoding=encoding, errors='replace') as f:
+        return f.read()
 
 
 class FolderStrategy(object):
@@ -190,8 +188,10 @@ class ThreadSafeFilesWriter(object):
             open_kwargs['encoding'] = 'utf-8'
 
         if compress:
-            contents = gzip.compress(contents)
+            open_fn = gzip.open
+        else:
+            open_fn = open
 
         with self.file_locks[filename]:
-            with open(filename, **open_kwargs) as f:
+            with open_fn(filename, **open_kwargs) as f:
                 f.write(contents)

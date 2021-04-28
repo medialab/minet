@@ -109,7 +109,7 @@ def hyphe_dump_action(cli_args):
                 with open(filter, 'wb') as f:
                     binary = base64.b64decode(page['body'])
                     binary = zlib.decompress(binary)
-                    binary = gzip.compress(binary)
+                    binary = gzip.compress(binary)  # TODO: use gzip.open rather
 
                     f.write(binary)
 
