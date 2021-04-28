@@ -167,7 +167,7 @@ def create_report_iterator(cli_args, reader, worker_args=None, on_irrelevant_row
 
                 continue
 
-            path = join(cli_args.input_dir, filename)
+            path = join(cli_args.input_dir or '', filename)
 
             yield WorkerPayload(
                 row=row,

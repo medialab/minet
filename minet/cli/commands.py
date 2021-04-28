@@ -18,7 +18,7 @@ from minet.constants import (
     DEFAULT_FETCH_MAX_REDIRECTS,
     DEFAULT_RESOLVE_MAX_REDIRECTS
 )
-from minet.cli.defaults import DEFAULT_CONTENT_FOLDER
+from minet.cli.constants import DEFAULT_CONTENT_FOLDER
 from minet.cli.argparse import (
     BooleanAction,
     ConfigAction,
@@ -655,8 +655,11 @@ MINET_COMMANDS = {
 
             examples:
 
-            . Extracting raw text from a `minet fetch` report:
+            . Extracting text from a `minet fetch` report:
                 $ minet extract report.csv > extracted.csv
+
+            . Extracting text from a bunch of files using a glob pattern:
+                $ minet extract --glob "./content/**/*.html" > extracted.csv
 
             . Working on a report from stdin:
                 $ minet fetch url_column file.csv | minet extract > extracted.csv
@@ -668,9 +671,12 @@ MINET_COMMANDS = {
                 'action': InputFileAction
             },
             {
+                'flags': ['-g', '--glob'],
+                'help': 'Whether to extract text from a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.'
+            },
+            {
                 'flags': ['-i', '--input-dir'],
-                'help': 'Directory where the HTML files are stored. Defaults to "%s".' % DEFAULT_CONTENT_FOLDER,
-                'default': DEFAULT_CONTENT_FOLDER
+                'help': 'Directory where the HTML files are stored. Defaults to "%s" if --glob is not set.' % DEFAULT_CONTENT_FOLDER
             },
             {
                 'flags': ['-o', '--output'],
@@ -1453,8 +1459,7 @@ MINET_COMMANDS = {
             },
             {
                 'flags': ['-i', '--input-dir'],
-                'help': 'Directory where the HTML files are stored. Defaults to "%s".' % DEFAULT_CONTENT_FOLDER,
-                'default': DEFAULT_CONTENT_FOLDER
+                'help': 'Directory where the HTML files are stored. Defaults to "%s".' % DEFAULT_CONTENT_FOLDER
             },
             {
                 'flags': ['-o', '--output'],

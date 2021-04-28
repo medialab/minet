@@ -36,6 +36,7 @@ from minet.cli.utils import (
     create_report_iterator,
     LoadingBar
 )
+from minet.cli.constants import DEFAULT_CONTENT_FOLDER
 
 ScrapeWorkerResult = namedtuple(
     'ScrapeWorkerResult',
@@ -88,6 +89,8 @@ def worker(payload):
 
 
 def scrape_action(cli_args):
+    if cli_args.glob is None and cli_args.input_dir is None:
+        cli_args.input_dir = DEFAULT_CONTENT_FOLDER
 
     # Parsing scraper definition
     try:

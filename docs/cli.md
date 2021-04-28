@@ -288,8 +288,8 @@ examples:
 ## extract
 
 ```
-usage: minet extract [-h] [-i INPUT_DIR] [-o OUTPUT] [-p PROCESSES] [-s SELECT]
-                     [--total TOTAL]
+usage: minet extract [-h] [-g GLOB] [-i INPUT_DIR] [-o OUTPUT] [-p PROCESSES]
+                     [-s SELECT] [--total TOTAL]
                      [report]
 
 Minet Extract Command
@@ -312,7 +312,8 @@ positional arguments:
 
 optional arguments:
   -h, --help                           show this help message and exit
-  -i INPUT_DIR, --input-dir INPUT_DIR  Directory where the HTML files are stored. Defaults to "downloaded".
+  -g GLOB, --glob GLOB                 Whether to extract text from a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.
+  -i INPUT_DIR, --input-dir INPUT_DIR  Directory where the HTML files are stored. Defaults to "downloaded" if --glob is not set.
   -o OUTPUT, --output OUTPUT           Path to the output file. By default, the results will be printed to stdout.
   -p PROCESSES, --processes PROCESSES  Number of processes to use. Defaults to roughly half of the available CPUs.
   -s SELECT, --select SELECT           Columns of input CSV file to include in the output (separated by `,`).
@@ -341,8 +342,11 @@ columns being added to the output:
 
 examples:
 
-. Extracting raw text from a `minet fetch` report:
+. Extracting text from a `minet fetch` report:
     $ minet extract report.csv > extracted.csv
+
+. Extracting text from a bunch of files using a glob pattern:
+    $ minet extract --glob "./content/**/*.html" > extracted.csv
 
 . Working on a report from stdin:
     $ minet fetch url_column file.csv | minet extract > extracted.csv

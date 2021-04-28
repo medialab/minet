@@ -5,6 +5,7 @@
 # Logic of the extract action.
 #
 import casanova
+from os.path import isdir
 from trafilatura.core import bare_extraction
 
 from minet.multiprocessing import LazyPool
@@ -12,12 +13,12 @@ from minet.encodings import is_supported_encoding
 from minet.fs import read_potentially_gzipped_path
 from minet.cli.utils import (
     create_report_iterator,
+    dummy_csv_file_from_glob,
     LoadingBar
 )
 from minet.cli.reporters import report_error
-from minet.exceptions import TrafilaturaError
-
-from minet.exceptions import UnknownEncodingError
+from minet.exceptions import TrafilaturaError, UnknownEncodingError
+from minet.cli.constants import DEFAULT_CONTENT_FOLDER
 
 OUTPUT_ADDITIONAL_HEADERS = [
     'extract_error',
@@ -109,8 +110,16 @@ def worker(payload):
 
 
 def extract_action(cli_args):
+    if cli_args.glob is None and cli_args.input_dir is None:
+        cli_args.input_dir = DEFAULT_CONTENT_FOLDER
+
+    input_data = cli_args.report
+
+    if cli_args.glob is not None:
+        input_data = dummy_csv_file_from_glob(cli_args.glob, cli_args.input_dir)
+
     enricher = casanova.enricher(
-        cli_args.report,
+        input_data,
         cli_args.output,
         keep=cli_args.select,
         add=OUTPUT_ADDITIONAL_HEADERS
@@ -122,21 +131,26 @@ def extract_action(cli_args):
         unit='doc'
     )
 
-    def on_irrelevant_row(reason, row):
+    def on_irrelevant_row(reason, row, i):
         loading_bar.update()
+        loading_bar.print('Row n°{n} could not be processed: {reason}'.format(n=i + 1, reason=reason))
         enricher.writerow(row, format_error(reason))
 
-    try:
-        files = create_report_iterator(
-            cli_args,
-            enricher,
-            on_irrelevant_row=on_irrelevant_row
-        )
-    except NotADirectoryError:
+    if (
+        cli_args.glob is None and
+        'raw_contents' not in enricher.pos and
+        not isdir(cli_args.input_dir)
+    ):
         loading_bar.die([
             'Could not find the "%s" directory!' % cli_args.input_dir,
             'Did you forget to specify it with -i/--input-dir?'
         ])
+
+    files = create_report_iterator(
+        cli_args,
+        enricher,
+        on_irrelevant_row=on_irrelevant_row
+    )
 
     pool = LazyPool(cli_args.processes)
 
