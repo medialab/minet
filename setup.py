@@ -42,7 +42,7 @@ setup(name='minet',
         'termcolor>=1.0.0',
         'tqdm>=4.60.0',
         'trafilatura>=0.8.1,<0.9',
-        'twitwi>=0.6.0,<0.7',
+        'twitwi>=0.6.0,<1',
         'ural>=0.30.0,<0.31',
         'urllib3[secure]>=1.25.3,<2'
       ],
