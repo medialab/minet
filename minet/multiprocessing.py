@@ -4,6 +4,7 @@
 #
 # Multiple helper functions related to multiprocessing execution.
 #
+import sys
 import multiprocessing
 
 
@@ -21,6 +22,20 @@ def half_cpus(override=None):
         half += 1
 
     return half
+
+
+# NOTE: this is a class and not a decorator so it can be pickled
+class WorkerWrapper(object):
+    __slots__ = ('fn',)
+
+    def __init__(self, fn):
+        self.fn = fn
+
+    def __call__(self, *args, **kwargs):
+        try:
+            return self.fn(*args, **kwargs)
+        except KeyboardInterrupt:
+            sys.exit(1)
 
 
 class LazyPool(object):
@@ -50,7 +65,7 @@ class LazyPool(object):
 
     def imap_unordered(self, worker, tasks):
         if self.actually_multiprocessed:
-            yield from self.inner_pool.imap_unordered(worker, tasks)
+            yield from self.inner_pool.imap_unordered(WorkerWrapper(worker), tasks)
         else:
             for task in tasks:
                 yield worker(task)
