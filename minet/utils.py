@@ -321,12 +321,15 @@ def prettyprint_seconds(seconds, granularity=None):
 
 
 def parse_date(formatted_date, lang='en'):
-    try:
-        parsed = dateparser.parse(
-            formatted_date,
-            languages=[lang]
-        )
-    except ValueError:
+    if not isinstance(formatted_date, str):
+        raise TypeError
+
+    parsed = dateparser.parse(
+        formatted_date,
+        languages=[lang]
+    )
+
+    if not parsed:
         return None
 
     return parsed.isoformat().split('.', 1)[0]
