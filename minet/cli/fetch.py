@@ -18,9 +18,9 @@ from minet.web import (
     grab_cookies,
     parse_http_header
 )
-from minet.exceptions import InvalidURLError
+from minet.exceptions import InvalidURLError, FilenameFormattingError
 from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
-from minet.cli.reporters import report_error
+from minet.cli.reporters import report_error, report_filename_formatting_error
 from minet.cli.utils import LoadingBar, die
 
 
@@ -231,13 +231,17 @@ def fetch_action(cli_args, resolve=False, defer=None):
         if cli_args.filename_template and 'line' in cli_args.filename_template:
             formatter_kwargs['line'] = enricher.wrap(row)
 
-        filename = filename_builder(
-            result.resolved,
-            filename=filename_cell,
-            ext=meta.get('ext'),
-            formatter_kwargs=formatter_kwargs,
-            compressed=cli_args.compress
-        )
+        try:
+            filename = filename_builder(
+                result.resolved,
+                filename=filename_cell,
+                ext=meta.get('ext'),
+                formatter_kwargs=formatter_kwargs,
+                compressed=cli_args.compress
+            )
+        except FilenameFormattingError as e:
+            result.error = e
+            return
 
         meta['filename'] = filename
 
@@ -367,6 +371,9 @@ def fetch_action(cli_args, resolve=False, defer=None):
 
                 if isinstance(result.error, InvalidURLError):
                     resolved = result.error.url
+
+                if isinstance(result.error, FilenameFormattingError):
+                    loading_bar.print(report_filename_formatting_error(result.error))
 
                 write_fetch_output(
                     index,

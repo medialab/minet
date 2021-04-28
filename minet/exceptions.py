@@ -97,4 +97,7 @@ class TrafilaturaError(MinetError):
 
 # Filesystem errors
 class FilenameFormattingError(MinetError):
-    pass
+    def __init__(self, msg=None, reason=None, template=None):
+        super().__init__(msg)
+        self.reason = reason
+        self.template = template

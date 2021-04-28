@@ -9,7 +9,6 @@ import codecs
 from os import makedirs
 from os.path import basename, join, splitext, abspath, normpath, dirname
 from ural import get_hostname, get_normalized_hostname
-from functools import partial
 from quenouille import NamedLocks
 
 from minet.exceptions import FilenameFormattingError
@@ -108,10 +107,7 @@ class FilenameBuilder(object):
             self.folder_strategy = FolderStrategy.from_name(folder_strategy)
 
         self.formatter = PseudoFStringFormatter()
-        self.template = None
-
-        if template is not None:
-            self.template = partial(self.formatter.format, template)
+        self.template = template
 
     def __call__(self, url=None, filename=None, ext=None, formatter_kwargs={},
                  compressed=False):
@@ -128,13 +124,14 @@ class FilenameBuilder(object):
 
         if self.template is not None:
             try:
-                filename = self.template(
+                filename = self.formatter.format(
+                    self.template,
                     value=base,
                     ext=ext,
                     **formatter_kwargs
                 )
-            except Exception:
-                raise FilenameFormattingError
+            except Exception as e:
+                raise FilenameFormattingError(reason=e, template=self.template)
         else:
             filename = base + ext
 
