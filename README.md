@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/medialab/minet/workflows/Tests/badge.svg)](https://github.com/medialab/minet/actions) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.4727009.svg)](https://zenodo.org/badge/latestdoi/169059797)
+[![Build Status](https://github.com/medialab/minet/workflows/Tests/badge.svg)](https://github.com/medialab/minet/actions) [![DOI](https://zenodo.org/badge/169059797.svg)](https://zenodo.org/badge/latestdoi/169059797)
 
 ![Minet](img/minet.png)
 
@@ -128,7 +128,7 @@ To contribute to **minet** you can check out [this](./CONTRIBUTING.md) documenta
 
 ## How to cite
 
-**minet** is published on [Zenodo](https://zenodo.org/) as [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.4727009.svg)](https://zenodo.org/badge/latestdoi/169059797)
+**minet** is published on [Zenodo](https://zenodo.org/) as [![DOI](https://zenodo.org/badge/169059797.svg)](https://zenodo.org/badge/latestdoi/169059797)
 
 You can cite it thusly:
 
