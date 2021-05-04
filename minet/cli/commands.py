@@ -1624,6 +1624,10 @@ MINET_COMMANDS = {
 
                         . Templating the given CSV column to query tweets by users:
                             $ minet tw scrape tweets user users.csv --query-template 'from:@{value}' > tweets.csv
+                        
+                        . Avoid to search into usernames or handles by adding a OR @aNotExistingHandle (this is a temporary hack which might be deprecated anytime)
+                            $ minet tw scrape tweets "keyword OR @aNotExistingHandle"
+                        related discussion: https://webapps.stackexchange.com/questions/127425/how-to-exclude-usernames-and-handles-while-searching-twitter
                     ''',
                     'arguments': [
                         {
