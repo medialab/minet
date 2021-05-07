@@ -78,7 +78,7 @@ def facebook_url_likes_action(cli_args):
         prebuffer_bytes=DEFAULT_PREBUFFER_BYTES
     )
 
-    if cli_args.column not in enricher.pos:
+    if cli_args.column not in enricher.headers:
         die([
             'Could not find the "%s" column containing the urls in the given CSV file.' % cli_args.column
         ])

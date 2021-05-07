@@ -25,7 +25,7 @@ from encodings import idna  # NOTE: this is necessary for pyinstaller build
 from minet.__version__ import __version__
 from minet.cli.utils import die, get_rcfile
 from minet.cli.argparse import resolve_arg_dependencies
-from minet.cli.exceptions import NotResumable
+from minet.cli.exceptions import NotResumable, InvalidArgumentsError
 
 from minet.cli.commands import MINET_COMMANDS
 
@@ -214,7 +214,11 @@ def main():
             for buffer in to_close:
                 stack.callback(buffer.close)
 
-            fn(cli_args)
+            try:
+                fn(cli_args)
+            except InvalidArgumentsError as e:
+                parser.error(e.message)
+                sys.exit(1)
 
     elif cli_args.action == 'help':
 
@@ -238,6 +242,7 @@ if __name__ == '__main__':
 
     try:
         main()
+
     except BrokenPipeError:
 
         # Taken from: https://docs.python.org/3/library/signal.html

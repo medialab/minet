@@ -189,8 +189,9 @@ examples:
 ```
 usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM]
                    [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
-                   [--insecure] [-o OUTPUT] [--resume] [-s SELECT] [-t THREADS]
-                   [--throttle THROTTLE] [--timeout TIMEOUT] [--total TOTAL]
+                   [--insecure] [-o OUTPUT] [--resume] [-s SELECT]
+                   [--separator SEPARATOR] [-t THREADS] [--throttle THROTTLE]
+                   [--timeout TIMEOUT] [--total TOTAL]
                    [--url-template URL_TEMPLATE] [-X METHOD]
                    [--max-redirects MAX_REDIRECTS] [--compress]
                    [--contents-in-report] [-d OUTPUT_DIR] [-f FILENAME]
@@ -221,6 +222,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
   --resume                                        Whether to resume from an aborted report.
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
+  --separator SEPARATOR                           Character used to split the url cell in the CSV file, if this one can in fact contain multiple urls.
   -t THREADS, --threads THREADS                   Number of threads to use. Defaults to 25.
   --throttle THROTTLE                             Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
   --timeout TIMEOUT                               Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.
@@ -359,8 +361,9 @@ examples:
 usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM]
                      [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
                      [--insecure] [-o OUTPUT] [--resume] [-s SELECT]
-                     [-t THREADS] [--throttle THROTTLE] [--timeout TIMEOUT]
-                     [--total TOTAL] [--url-template URL_TEMPLATE] [-X METHOD]
+                     [--separator SEPARATOR] [-t THREADS] [--throttle THROTTLE]
+                     [--timeout TIMEOUT] [--total TOTAL]
+                     [--url-template URL_TEMPLATE] [-X METHOD]
                      [--max-redirects MAX_REDIRECTS] [--follow-meta-refresh]
                      [--follow-js-relocation] [--infer-redirection]
                      [--only-shortened]
@@ -387,6 +390,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
   --resume                                        Whether to resume from an aborted report.
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
+  --separator SEPARATOR                           Character used to split the url cell in the CSV file, if this one can in fact contain multiple urls.
   -t THREADS, --threads THREADS                   Number of threads to use. Defaults to 25.
   --throttle THROTTLE                             Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
   --timeout TIMEOUT                               Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.

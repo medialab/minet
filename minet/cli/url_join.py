@@ -16,7 +16,7 @@ def url_join_action(cli_args):
     left_idx = None
 
     if cli_args.select:
-        left_idx = left_reader.pos.collect(cli_args.select)
+        left_idx = left_reader.headers.collect(cli_args.select)
         left_headers = list(cli_args.select)
 
     # Applying column prefix now

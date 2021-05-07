@@ -116,18 +116,18 @@ def getdefault(row, pos, default=None):
 
 
 def create_report_iterator(cli_args, reader, worker_args=None, on_irrelevant_row=noop):
-    if 'filename' not in reader.pos:
+    if 'filename' not in reader.headers:
         raise MissingColumnError
 
-    filename_pos = reader.pos.filename
-    error_pos = reader.pos.get('error')
-    status_pos = reader.pos.get('status')
-    filename_pos = reader.pos.get('filename')
-    encoding_pos = reader.pos.get('encoding')
-    mimetype_pos = reader.pos.get('mimetype')
-    raw_content_pos = reader.pos.get('raw_contents')
+    filename_pos = reader.headers.filename
+    error_pos = reader.headers.get('error')
+    status_pos = reader.headers.get('status')
+    filename_pos = reader.headers.get('filename')
+    encoding_pos = reader.headers.get('encoding')
+    mimetype_pos = reader.headers.get('mimetype')
+    raw_content_pos = reader.headers.get('raw_contents')
 
-    indexed_headers = reader.pos.as_dict()
+    indexed_headers = reader.headers.as_dict()
 
     def generator():
         for i, row in enumerate(reader):

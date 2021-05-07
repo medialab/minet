@@ -19,6 +19,7 @@ from minet.web import (
     parse_http_header
 )
 from minet.exceptions import InvalidURLError, FilenameFormattingError
+from minet.cli.exceptions import InvalidArgumentsError
 from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
 from minet.cli.reporters import report_error, report_filename_formatting_error
 from minet.cli.utils import LoadingBar, die
@@ -50,7 +51,7 @@ def fetch_action(cli_args, resolve=False, defer=None):
         cli_args.contents_in_report = True
 
     if not resolve and cli_args.contents_in_report and cli_args.compress:
-        die('Cannot both --compress and output --contents-in-report!')
+        raise InvalidArgumentsError('Cannot both --compress and output --contents-in-report!')
 
     # HTTP method
     http_method = cli_args.method
@@ -99,34 +100,36 @@ def fetch_action(cli_args, resolve=False, defer=None):
             additional_headers = additional_headers + ['raw_contents']
 
     # Enricher
+    multiplex = None
+
+    if cli_args.separator is not None:
+        multiplex = (cli_args.column, cli_args.separator)
+
     enricher = casanova.threadsafe_enricher(
         cli_args.file,
         cli_args.output,
         add=additional_headers,
         keep=cli_args.select,
         total=cli_args.total,
-        prebuffer_bytes=DEFAULT_PREBUFFER_BYTES
+        prebuffer_bytes=DEFAULT_PREBUFFER_BYTES,
+        multiplex=multiplex
     )
 
     if resuming_reader_loading is not None:
         resuming_reader_loading.close()
 
-    if cli_args.column not in enricher.pos:
-        die([
-            'Could not find the "%s" column containing the urls in the given CSV file.' % cli_args.column
-        ])
+    if cli_args.column not in enricher.headers:
+        raise InvalidArgumentsError('Could not find the "%s" column containing the urls in the given CSV file.' % cli_args.column)
 
-    url_pos = enricher.pos[cli_args.column]
+    url_pos = enricher.headers[cli_args.column]
 
     filename_pos = None
 
     if not resolve and cli_args.filename is not None:
-        if cli_args.filename not in enricher.pos:
-            die([
-                'Could not find the "%s" column containing the filenames in the given CSV file.' % cli_args.filename
-            ])
+        if cli_args.filename not in enricher.headers:
+            raise InvalidArgumentsError('Could not find the "%s" column containing the filenames in the given CSV file.' % cli_args.filename)
 
-        filename_pos = enricher.pos[cli_args.filename]
+        filename_pos = enricher.headers[cli_args.filename]
 
     # Loading bar
     loading_bar = LoadingBar(

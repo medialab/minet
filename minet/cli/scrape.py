@@ -148,7 +148,7 @@ def scrape_action(cli_args):
 
     if (
         cli_args.glob is None and
-        'raw_contents' not in reader.pos and
+        'raw_contents' not in reader.headers and
         not isdir(cli_args.input_dir)
     ):
         loading_bar.die([

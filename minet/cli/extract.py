@@ -138,7 +138,7 @@ def extract_action(cli_args):
 
     if (
         cli_args.glob is None and
-        'raw_contents' not in enricher.pos and
+        'raw_contents' not in enricher.headers and
         not isdir(cli_args.input_dir)
     ):
         loading_bar.die([
