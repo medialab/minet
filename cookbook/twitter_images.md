@@ -2,17 +2,24 @@
 
 Let's say we are interested in images being shared on tweets containing the [#saccageparis](https://twitter.com/hashtag/saccageparis) hashtag and that we need to download them to understand how this hashtag might be leveraged by different categories of actors.
 
-This specific French example is interesting because it's a good example of how a hashtag initially fomented by right-wing activists can be repurposed through sarcasm and hijacking, as it is now used to mock those activists or redirect the discourse toward issues regarding urban planning and public transportation.
+This specific French example is interesting because it's a good example of how a hashtag initially fomented by right-wing activists can be repurposed through sarcasm and hijacking, as it is now used to mock those activists or redirect the discourse toward issues like urban planning and public transportation.
 
 It is similar, in a sense, to what happened with "proud boys" tweets in Canada and the K-Pop fans flooding racist hashtags during the BLM movements.
 
-So now, let's see how `minet` could help us achieve our goal efficiently.
+So let's see how `minet` could help us achieve our goal efficiently.
 
 ## Summary
 
+* [Scraping the relevant tweets](#scraping-the-relevant-tweets)
+* [Downloading the images](#downloading-the-images)
+* [Scaling up](#scaling-up)
+
 ## Scraping the relevant tweets
 
-In order to retrieve the relevant tweets, we need to be able to formulate a query on Twitter's search engine that will only return tweets 1) containing the `#saccageparis` hashtag and 2) containing at least an image.
+In order to retrieve the relevant tweets, we need to be able to formulate a query on Twitter's search engine that will only return tweets:
+
+1. containing the `#saccageparis` hashtag and
+2. containing at least an image.
 
 Fortunately, writing such a query is fairly simple and it would look like this:
 
@@ -20,23 +27,27 @@ Fortunately, writing such a query is fairly simple and it would look like this:
 #saccageparis filter:images
 ```
 
-Let's check on Twitter's public search that our query returns what we are actually searching for: [https://twitter.com/search?q=%23saccageparis%20filter%3Aimages&src=typed_query&f=live](https://twitter.com/search?q=%23saccageparis%20filter%3Aimages&src=typed_query&f=live)
+Let's check on Twitter's public search that our query actually returns what we are looking for: [https://twitter.com/search?q=%23saccageparis%20filter%3Aimages&src=typed_query&f=live](https://twitter.com/search?q=%23saccageparis%20filter%3Aimages&src=typed_query&f=live)
 
-And now we can use minet to scrape those tweets (notice how I am using a `--limit` for the time being because Twitter might return millions of tweets for some queries and for now we just want to make sure our methodology is actually working):
+Now we can give this query to minet in order to scrape those tweets like so:
 
 ```bash
 minet twitter scrape tweets "#saccageparis filter:images" --limit 500 > tweets.csv
 ```
 
+Notice how I am using a `--limit` for the time being because Twitter might return millions of tweets for some queries and for now we just want to make sure our methodology is actually working.
+
 ## Downloading the images
 
-Now that you have scraped some tweets, you should have a CSV file containing all their relevant metadata. In this metadata, you will find, in the `media_urls` column, a list of image urls separated by a `|` like so:
+Now that we have scraped some tweets, we should have a CSV file containing all their relevant metadata.
+
+In this metadata, we will find, in the `media_urls` column, a list of image urls separated by a `|` like so:
 
 ```
 https://pbs.twimg.com/media/E03RN41XMAIeA4w.jpg|https://pbs.twimg.com/media/E03RN4uWEAYaSS8.jpg
 ```
 
-You can now use minet `fetch` command to download them all as fast as possible:
+We can now use minet `fetch` command to download them all as fast as possible:
 
 ```bash
 minet fetch media_urls tweets.csv \
@@ -46,15 +57,13 @@ minet fetch media_urls tweets.csv \
   --domain-parallelism 5 > report.csv
 ```
 
-Let's decompose the above command: `minet fetch media_urls tweets.csv` means we want minet to read the `tweets.csv` file and that we should fetch, i.e. download, the urls found within the `media_urls` column.
+Let's decompose the above command to understand what it does:
 
-The `--separator "|"` part is us telling minet that the url column may contain multiple urls, instead of a single one, and that those will be separated by the `|` character.
-
-The `-d images` part means that we want to store the downloaded images in the `images` folder (relative to our current working directory).
-
-The `--throttle 0` part indicates minet that we don't want to wait between two requests on the same domain. By default, minet tries to wait a little bit between two requests on the same domain not to be too hard on the server and to avoid getting kicked. But here, `twitter.com` doesn't really care and can take the load.
-
-The `--domain-parallelism 5` part tells minet we can accept making multiple requests on the same domain at once. Once again, by default minet tries to avoid making multiple concurrent requests on the same domain but `twitter.com` can take it. So here, we will always be downloading at least 5 images at once. Feel free to increase or decrease this number based on 1) your bandwith and 2) Twitter's tolerance.
+* `minet fetch media_urls tweets.csv` means we want minet to read the `tweets.csv` file and that we should fetch, i.e. download, the urls found within the `media_urls` column.
+* The `--separator "|"` part is us telling minet that the url column may contain multiple urls, instead of a single one, and that those will be separated by the `|` character.
+* The `-d images` part means that we want to store the downloaded images in the `images` folder (relative to our current working directory).
+* The `--throttle 0` part indicates minet that we don't want to wait between two requests on the same domain. By default, minet tries to wait a little bit between two requests on the same domain not to be too hard on the server and to avoid getting kicked. But here, `twitter.com` doesn't really care and can take the load.
+* The `--domain-parallelism 5` part tells minet we can accept making multiple requests on the same domain at once. Once again, by default minet tries to avoid making multiple concurrent requests on the same domain but `twitter.com` can take it. So here, we will always be downloading at least 5 images at once. Feel free to increase or decrease this number based on 1) your bandwith and 2) Twitter's tolerance.
 
 So now, by the end of the process, you will have downloaded all the images and you will be able to peruse them in the `images` folder. In the meantime, and this is what the `> report.csv` file of the command means, minet will write a CSV report containing your original tweet metadata along with some information about the HTTP requests made while downloading the images. What's more, you will find a `filename` column in this report so you can trace downloaded images back to your tweets.
 
