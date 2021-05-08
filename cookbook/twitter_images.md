@@ -1,6 +1,6 @@
 # Downloading images associated with a given hashtag on Twitter
 
-Let's say we are interested in images being shared on tweets containing the [#saccageparis](https://twitter.com/hashtag/saccageparis) hashtag and that we need to download them to understand how this hashtag might be leveraged by different categories of actors.
+Let's say we are interested in images being shared on tweets containing the [#saccageparis](https://twitter.com/hashtag/saccageparis) hashtag and that we need to download them to understand how this hashtag might be used by different categories of actors.
 
 This specific French example is interesting because it's a good example of how a hashtag initially fomented by right-wing activists can be repurposed through sarcasm and hijacking, as it is now used to mock those activists or redirect the discourse toward issues like urban planning and public transportation.
 
