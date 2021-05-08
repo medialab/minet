@@ -59,13 +59,13 @@ minet fetch media_urls tweets.csv \
 
 Let's decompose the above command to understand what it does:
 
-* `minet fetch media_urls tweets.csv` means we want minet to read the `tweets.csv` file and that we should fetch, i.e. download, the urls found within the `media_urls` column.
+* `minet fetch media_urls tweets.csv` means we want minet to read the `tweets.csv` file and then fetch, i.e. download, the urls found within the `media_urls` column.
 * The `--separator "|"` part is us telling minet that the url column may contain multiple urls, instead of a single one, and that those will be separated by the `|` character.
 * The `-d images` part means that we want to store the downloaded images in the `images` folder (relative to our current working directory).
-* The `--throttle 0` part indicates minet that we don't want to wait between two requests on the same domain. By default, minet tries to wait a little bit between two requests on the same domain not to be too hard on the server and to avoid getting kicked. But here, `twitter.com` doesn't really care and can take the load.
-* The `--domain-parallelism 5` part tells minet we can accept making multiple requests on the same domain at once. Once again, by default minet tries to avoid making multiple concurrent requests on the same domain but `twitter.com` can take it. So here, we will always be downloading at least 5 images at once. Feel free to increase or decrease this number based on 1) your bandwith and 2) Twitter's tolerance.
+* The `--throttle 0` part indicates minet that we don't want to wait between two requests on the same domain. By default, minet tries to wait a little bit between two requests on the same domain not to be too hard on servers and to avoid getting kicked. But here, `twitter.com` doesn't really care and can take the load.
+* The `--domain-parallelism 5` part tells minet we can accept making multiple requests on the same domain at once. For the same reasons as with `--throttle`, minet tries by default to avoid making multiple concurrent requests on the same domain but `twitter.com` can take it. So here, we will always be downloading at least 5 images at once. Feel free to increase or decrease this number based on your bandwith and Twitter's tolerance.
 
-So now, by the end of the process, you will have downloaded all the images and you will be able to peruse them in the `images` folder. In the meantime, and this is what the `> report.csv` file of the command means, minet will write a CSV report containing your original tweet metadata along with some information about the HTTP requests made while downloading the images. What's more, you will find a `filename` column in this report so you can trace downloaded images back to your tweets.
+So now, when the command finishes, we will have downloaded all the images and we will be able to peruse them in the `images` folder. In the meantime, and this is what the `> report.csv` file of the command means, minet will write a CSV report containing the original tweet metadata along with some information about the HTTP requests made while downloading the images. What's more, a `filename` column can be found in this report so we can trace the downloaded images back to the tweets on which they were shared.
 
 ## Scaling up
 
@@ -74,6 +74,6 @@ Finally, here are some advice if you need to scale up and, for instance, downloa
 1. Remove or increase the `--limit` flag of minet `twitter scrape` command.
 2. You should of course ensure that you have sufficient disk space to spare to store the images before doing so.
 3. If you want to save some space, you can use minet `fetch` `--compress` flag to gzip the images. But note that you will lose the possibility to browse them easily (without scripting or using a proper application able to display compressed images).
-4. You might want to set minet `fetch` `--timeout` flag to some high value like `180` (3 minutes) to be sure minet `fetch` won't timeout on some very large images or if you internet connection hiccups.
+4. You might want to set minet `fetch` `--timeout` flag to some high value like `180` (3 minutes) to be sure minet `fetch` won't timeout on some very large images or if your internet connection can be subject to hiccups.
 5. Storing many (> tens of thousands) images in a single folder can be a bad idea on some filesystems. You can use the `--folder-strategy`, or `--filename-template` flag to partition images within subfolders if required. I recommend `--folder-strategy prefix-2` or `--folder-strategy prefix-4` in this case.
 6. Twitter search lets you filter chronologically using the `since` and `until` operator. This can be useful to search a specific period in the past or partition your work into batches.
