@@ -52,6 +52,7 @@ Minet can single-handedly:
 * [Fetching a large amount of urls](./cookbook/fetch.md)
 * [Joining 2 CSV files by urls](./cookbook/url_join.md)
 * [Using minet from a Jupyter notebook](./cookbook/notebooks/Minet%20in%20a%20Jupyter%20notebook.ipynb) (*very useful to experiment with the tool or teach students*)
+* [Downloading images associated with a given hashtag on Twitter](./cookbook/twitter_images.md)
 * [Scraping DSL Tutorial](./cookbook/scraping_dsl.md)
 
 ## Features (from a technical standpoint)
