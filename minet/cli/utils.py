@@ -30,6 +30,14 @@ def get_stdin_status():
     return 'terminal'
 
 
+def is_stdin_empty():
+    return not sys.stdin.buffer.peek(1)
+
+
+def was_piped_something():
+    return get_stdin_status() != 'terminal' and not is_stdin_empty()
+
+
 def print_err(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
