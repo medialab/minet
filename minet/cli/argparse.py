@@ -15,7 +15,7 @@ from casanova import Resumer, CsvCellIO
 from ebbe import getpath
 
 from minet.cli.exceptions import NotResumable
-from minet.cli.utils import acquire_cross_platform_stdout
+from minet.cli.utils import acquire_cross_platform_stdout, get_stdin_status
 
 
 class SplitterType(object):
@@ -71,7 +71,7 @@ class InputFileAction(Action):
             f = sys.stdin
 
             # No stdin was piped and we have a "dummy" csv file to build
-            if self.dummy_csv_column is not None and sys.stdin.isatty():
+            if self.dummy_csv_column is not None and get_stdin_status() == 'terminal':
                 value = getattr(cli_args, self.column_dest)
 
                 if self.dummy_csv_guard is not None and not self.dummy_csv_guard(value):

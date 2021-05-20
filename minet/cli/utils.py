@@ -4,7 +4,9 @@
 #
 # Miscellaneous helpers used by the CLI tools.
 #
+import os
 import sys
+import stat
 import yaml
 import platform
 from glob import iglob
@@ -15,6 +17,17 @@ from ebbe import noop
 
 from minet.cli.exceptions import MissingColumnError
 from minet.utils import fuzzy_int
+
+
+def get_stdin_status():
+    mode = os.fstat(sys.stdin.fileno()).st_mode
+
+    if stat.S_ISFIFO(mode):
+        return 'piped'
+    elif stat.S_ISREG(mode):
+        return 'redirected'
+
+    return 'terminal'
 
 
 def print_err(*args, **kwargs):
