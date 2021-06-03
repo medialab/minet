@@ -299,9 +299,9 @@ class TwitterAPIScraper(object):
                         continue
 
                     if is_first:
-                        extracted_tweets.append((extracted_tweet, meta))
+                        tweets.append((extracted_tweet, meta))
                     else:
-                        extracted_tweets.append((extracted_tweet, None))
+                        tweets.append((extracted_tweet, None))
 
                     refs.add(id_int64)
             else:
