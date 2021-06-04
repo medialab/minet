@@ -40,7 +40,7 @@ def twitter_users_action(cli_args):
     )
 
     for chunk in as_chunks(100, enricher.cells(cli_args.column, with_rows=True)):
-        users = ','.join(row[1] for row in chunk)
+        users = ','.join(row[1].lstrip('@') for row in chunk)
 
         if cli_args.ids:
             wrapper_args = {'user_id': users}
@@ -68,7 +68,7 @@ def twitter_users_action(cli_args):
             indexed_result[user[key]] = user_row
 
         for row, user in chunk:
-            user_row = indexed_result.get(user)
+            user_row = indexed_result.get(user.lstrip('@'))
 
             enricher.writerow(row, user_row)
 
