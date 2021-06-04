@@ -54,21 +54,22 @@ def twitter_users_action(cli_args):
         except TwitterHTTPError as e:
             if e.e.code == 404:
                 for row, user in chunk:
-                    enricher.writerow(row, user_row)
+                    enricher.writerow(row)
             else:
                 raise e
 
-        if result is not None:
-            indexed_result = {}
+            continue
 
-            for user in result:
-                user = normalize_user(user)
-                user_row = format_user_as_csv_row(user)
-                indexed_result[user[key]] = user_row
+        indexed_result = {}
 
-            for row, user in chunk:
-                user_row = indexed_result.get(user)
+        for user in result:
+            user = normalize_user(user)
+            user_row = format_user_as_csv_row(user)
+            indexed_result[user[key]] = user_row
 
-                enricher.writerow(row, user_row)
+        for row, user in chunk:
+            user_row = indexed_result.get(user)
+
+            enricher.writerow(row, user_row)
 
         loading_bar.update(len(chunk))
