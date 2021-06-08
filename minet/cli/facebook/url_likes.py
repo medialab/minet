@@ -36,15 +36,6 @@ def make_request(url):
     return err, response.data
 
 
-def parse_approx_likes(approx_likes, unit='K'):
-    multiplier = 1000
-
-    if unit == 'M':
-        multiplier = 1000000
-
-    return str(int(float(approx_likes[:-1]) * multiplier))
-
-
 def scrape(data):
 
     match = NUMBER_RE.search(data)
@@ -56,10 +47,10 @@ def scrape(data):
     approx_likes_int = approx_likes
 
     if 'K' in approx_likes:
-        approx_likes_int = parse_approx_likes(approx_likes, unit='K')
+        approx_likes_int = str(int(float(approx_likes[:-1]) * 10**3))
 
     elif 'M' in approx_likes:
-        approx_likes_int = parse_approx_likes(approx_likes, unit='M')
+        approx_likes_int = str(int(float(approx_likes[:-1]) * 10**6))
 
     return [approx_likes, approx_likes_int]
 
