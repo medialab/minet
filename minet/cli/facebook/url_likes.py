@@ -16,12 +16,11 @@ from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
 from minet.cli.utils import die, LoadingBar
 
 REPORT_HEADERS = ['approx_likes', 'approx_likes_int']
-ONE_LIKE_RE = re.compile(rb'>\s*One person likes this\.', re.I)
-LIKES_RE = re.compile(rb'>\s*([\d.KM]+)\s+people\s+like', re.I)
+NUMBER_RE = re.compile(rb'>(\d+\.?\d*[KM]?)<', re.I)
 
 
 def forge_url(url):
-    return 'https://www.facebook.com/plugins/like.php?href=%s' % quote(url)
+    return 'https://www.facebook.com/plugins/share_button.php?href=%s&layout=button_count' % quote(url)
 
 
 @rate_limited(5)
@@ -48,10 +47,7 @@ def parse_approx_likes(approx_likes, unit='K'):
 
 def scrape(data):
 
-    if ONE_LIKE_RE.search(data):
-        return ['1', '1']
-
-    match = LIKES_RE.search(data)
+    match = NUMBER_RE.search(data)
 
     if match is None:
         return ['', '']
