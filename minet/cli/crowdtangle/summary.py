@@ -68,6 +68,6 @@ def crowdtangle_summary_action(cli_args):
                 for post in posts:
                     posts_writer.writerow(post.as_csv_row())
 
-        enricher.writerow(row, stats.as_csv_row())
+        enricher.writerow(row, stats.as_csv_row() if stats is not None else None)
 
         loading_bar.update()
