@@ -16,12 +16,11 @@ from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
 from minet.cli.utils import die, LoadingBar
 
 REPORT_HEADERS = ['approx_likes', 'approx_likes_int']
-ONE_LIKE_RE = re.compile(rb'>\s*One person likes this\.', re.I)
-LIKES_RE = re.compile(rb'>\s*([\d.KM]+)\s+people\s+like', re.I)
+NUMBER_RE = re.compile(rb'>(\d+\.?\d*[KM]?)<', re.I)
 
 
 def forge_url(url):
-    return 'https://www.facebook.com/plugins/like.php?href=%s' % quote(url)
+    return 'https://www.facebook.com/plugins/share_button.php?href=%s&layout=button_count' % quote(url)
 
 
 @rate_limited(5)
@@ -37,21 +36,9 @@ def make_request(url):
     return err, response.data
 
 
-def parse_approx_likes(approx_likes, unit='K'):
-    multiplier = 1000
-
-    if unit == 'M':
-        multiplier = 1000000
-
-    return str(int(float(approx_likes[:-1]) * multiplier))
-
-
 def scrape(data):
 
-    if ONE_LIKE_RE.search(data):
-        return ['1', '1']
-
-    match = LIKES_RE.search(data)
+    match = NUMBER_RE.search(data)
 
     if match is None:
         return ['', '']
@@ -60,10 +47,10 @@ def scrape(data):
     approx_likes_int = approx_likes
 
     if 'K' in approx_likes:
-        approx_likes_int = parse_approx_likes(approx_likes, unit='K')
+        approx_likes_int = str(int(float(approx_likes[:-1]) * 10**3))
 
     elif 'M' in approx_likes:
-        approx_likes_int = parse_approx_likes(approx_likes, unit='M')
+        approx_likes_int = str(int(float(approx_likes[:-1]) * 10**6))
 
     return [approx_likes, approx_likes_int]
 
