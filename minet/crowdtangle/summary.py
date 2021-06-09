@@ -10,7 +10,8 @@ from urllib.parse import quote
 from minet.crowdtangle.exceptions import (
     CrowdTangleMissingTokenError,
     CrowdTangleInvalidTokenError,
-    CrowdTangleInvalidRequestError
+    CrowdTangleInvalidRequestError,
+    CrowdTangleRateLimitExceeded
 )
 from minet.web import request_json
 from minet.crowdtangle.constants import (
@@ -78,6 +79,9 @@ def crowdtangle_summary(pool, link, token=None, start_date=None, with_top_posts=
 
     if response.status == 401:
         raise CrowdTangleInvalidTokenError
+
+    if response.status == 429:
+        raise CrowdTangleRateLimitExceeded
 
     if response.status >= 400:
         raise CrowdTangleInvalidRequestError(api_url)
