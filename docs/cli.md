@@ -1332,6 +1332,14 @@ Minet Twitter Scrape Command
 
 Scrape Twitter's public facing search API to collect tweets etc.
 
+Be sure to check Twitter's advanced search to check what kind of
+operators you can use to tune your queries (time range, hashtags,
+mentions, boolean etc.):
+https://twitter.com/search-advanced?f=live
+
+Useful operators include "since" and "until" to search specific
+time ranges like so: "since:2014-01-01 until:2017-12-31".
+
 positional arguments:
   {tweets}                         What to scrape. Currently only `tweets` is possible.
   query                            Search query or name of the column containing queries to run in given CSV file.
@@ -1356,9 +1364,14 @@ examples:
 . Templating the given CSV column to query tweets by users:
     $ minet tw scrape tweets user users.csv --query-template 'from:@{value}' > tweets.csv
 
-. Avoid to search into usernames or handles by adding a OR @aNotExistingHandle (this is a temporary hack which might be deprecated anytime)
-    $ minet tw scrape tweets "keyword OR @aNotExistingHandle"
-related discussion: https://webapps.stackexchange.com/questions/127425/how-to-exclude-usernames-and-handles-while-searching-twitter
+. Tip: You can add a "OR @aNotExistingHandle" to your query to avoid searching
+  for your query terms in usernames or handles.
+  Note that this is a temporary hack which might stop working at any time so be
+  sure to double check before relying on this trick.
+  For more information see the related discussion here:
+  https://webapps.stackexchange.com/questions/127425/how-to-exclude-usernames-and-handles-while-searching-twitter
+
+    $ minet tw scrape tweets "keyword OR @anObviouslyNotExistingHandle"
 
 ```
 
