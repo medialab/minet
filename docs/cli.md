@@ -1032,13 +1032,13 @@ Minet Facebook Url Likes Command
 ================================
 
 Retrieve the approximate number of "likes" (actually an aggregated engagement metric)
-that a url generated Facebook. The command can also be used with a list of urls stored in a CSV file.
+that a url got on Facebook. The command can also be used with a list of urls stored in a CSV file.
 This number is found by scraping Facebook's share button, which only gives a
-rough estimation of the real engagement metric: "Share 45K".
+rough estimation of the real engagement metric: "Share 45K" for example.
 
 Note that this number does not actually only correspond to the number of
-like or share reactions, but it is rather the sum of like, love, ahah, angry, etc.
-reactions plus the number of comments and shares that the URL generated on Facebook
+likes or shares, but it is rather the sum of like, love, ahah, angry, etc.
+reactions plus the number of comments and shares that the URL got on Facebook
 (here is the official documentation: https://developers.facebook.com/docs/plugins/faqs
 explaining "What makes up the number shown next to my Share button?").
 
