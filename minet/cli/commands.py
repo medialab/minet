@@ -899,20 +899,23 @@ MINET_COMMANDS = {
                 'url-likes': {
                     'title': 'Minet Facebook Url Likes Command',
                     'description': '''
-                        Retrieve the approximate number of "likes" each url of
-                        a CSV file has on Facebook.
+                        Retrieve the approximate number of "likes" (actually an aggregated engagement metric)
+                        that a url generated Facebook. The command can also be used with a list of urls stored in a CSV file.
+                        This number is found by scraping Facebook's share button, which only gives a
+                        rough estimation of the real engagement metric: "Share 45K".
 
-                        It is found by scraping Facebook's like button, which only give a
-                        rough estimation of the real number like so: "1.2K people like this."
-
-                        Note that the number does not actually only correspond to the number of
-                        like reactions, but rather to the sum of like, love, ahah, angry, etc.
-                        reactions plus the number of comments and shares that the URL generated on Facebook.
+                        Note that this number does not actually only correspond to the number of
+                        like or share reactions, but it is rather the sum of like, love, ahah, angry, etc.
+                        reactions plus the number of comments and shares that the URL generated on Facebook
+                        (here is the official documentation: https://developers.facebook.com/docs/plugins/faqs
+                        explaining "What makes up the number shown next to my Share button?").
                     ''',
                     'epilog': '''
                         example:
+                        . Retrieving the "like" number for one url:
+                            $ minet fb url-likes "www.example-url.com" > url_like.csv
 
-                        . Retrieving likes for the urls listed in a CSV file:
+                        . Retrieving the "like" number for the urls listed in a CSV file:
                             $ minet fb url-likes url url.csv > url_likes.csv
                     ''',
                     'arguments': [
