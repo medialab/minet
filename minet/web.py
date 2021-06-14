@@ -498,7 +498,7 @@ def request(url, pool=DEFAULT_POOL, method='GET', headers=None, cookie=None, spo
             timeout=timeout
         )
     else:
-        err, stack, response = raw_resolve(
+        err, _, response = raw_resolve(
             pool,
             url,
             method,
@@ -529,7 +529,7 @@ def request(url, pool=DEFAULT_POOL, method='GET', headers=None, cookie=None, spo
 
 
 def resolve(url, pool=DEFAULT_POOL, method='GET', headers=None, cookie=None, spoof_ua=True,
-            follow_redirects=True, max_redirects=5, follow_refresh_header=True,
+            max_redirects=5, follow_refresh_header=True,
             follow_meta_refresh=False, follow_js_relocation=False,
             infer_redirection=False, timeout=None):
 
