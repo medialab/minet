@@ -8,6 +8,7 @@ import casanova
 from twitwi import TwitterWrapper
 from twitter import TwitterHTTPError
 
+from minet.web import create_request_retryer
 from minet.cli.utils import LoadingBar
 
 
@@ -42,6 +43,10 @@ def make_twitter_action(method_name, csv_headers):
             listener=listener
         )
 
+        # TODO: I should probably create a twitter api client high-level abstraction
+        # to be used with all the relevant cli commands
+        retryer = create_request_retryer()
+
         resuming_state = None
 
         if cli_args.resume:
@@ -72,7 +77,7 @@ def make_twitter_action(method_name, csv_headers):
                     resuming_state = None
 
                 try:
-                    result = wrapper.call([method_name, 'ids'], **wrapper_kwargs)
+                    result = retryer(wrapper.call, [method_name, 'ids'], **wrapper_kwargs)
                 except TwitterHTTPError as e:
 
                     # The user does not exist
