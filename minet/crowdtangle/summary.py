@@ -4,6 +4,7 @@
 #
 # Function related to link summary using CrowdTangle's APIs.
 #
+import json
 from ebbe import getpath
 from urllib.parse import quote
 
@@ -11,7 +12,8 @@ from minet.crowdtangle.exceptions import (
     CrowdTangleMissingTokenError,
     CrowdTangleInvalidTokenError,
     CrowdTangleInvalidRequestError,
-    CrowdTangleRateLimitExceeded
+    CrowdTangleRateLimitExceeded,
+    CrowdTangleInvalidJSONError
 )
 from minet.web import request_json
 from minet.crowdtangle.constants import (
@@ -73,6 +75,9 @@ def crowdtangle_summary(pool, link, token=None, start_date=None, with_top_posts=
     )
 
     err, response, data = request_json(api_url, pool=pool)
+
+    if isinstance(err, json.decoder.JSONDecodeError):
+        raise CrowdTangleInvalidJSONError
 
     if err is not None:
         raise err
