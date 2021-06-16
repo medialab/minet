@@ -28,6 +28,6 @@ tenacity==7.0.0
 termcolor==1.1.0
 tqdm==4.60.0
 trafilatura==0.8.1
-twitwi==0.8.0
+twitwi==0.9.0
 ural==0.30.0
 urllib3[secure]==1.25.3
