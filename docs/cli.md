@@ -265,7 +265,7 @@ columns being added to the output:
   having a name that is the first x characters of the file's name.
   This is an efficient way to partition content into folders containing
   roughly the same number of files if the file names are random (which
-  is the case by default since uuids will be used).
+  is the case by default since md5 hashes will be used).
 
 . "hostname": files will be written in folders based on their url's
   full host name.
