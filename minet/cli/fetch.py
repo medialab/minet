@@ -227,7 +227,7 @@ def fetch_action(cli_args, resolve=False, defer=None):
             return
 
         # First we need to build a filename
-        filename_cell = row[filename_pos] if filename_pos else None
+        filename_cell = row[filename_pos] if filename_pos is not None else None
 
         formatter_kwargs = {}
 
