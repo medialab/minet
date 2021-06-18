@@ -12,6 +12,7 @@ import urllib3
 import ural
 import json
 import mimetypes
+import functools
 import cchardet as chardet
 from collections import OrderedDict
 from json.decoder import JSONDecodeError
@@ -672,3 +673,20 @@ def create_request_retryer(min=10, max=THREE_HOURS, max_attempts=9, before_sleep
         stop=stop_after_attempt(max_attempts),
         before_sleep=before_sleep if callable(before_sleep) else None
     )
+
+
+def retrying_method(attr='retryer'):
+    def decorate(fn):
+
+        @functools.wraps(fn)
+        def decorated(self, *args, **kwargs):
+            retryer = getattr(self, attr)
+
+            if not isinstance(retryer, Retrying):
+                raise ValueError
+
+            return retryer(fn, self, *args, **kwargs)
+
+        return decorated
+
+    return decorate
