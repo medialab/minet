@@ -56,32 +56,32 @@ class CrowdTangleAPIClient(object):
 
     @retrying_method()
     def __request(self, url):
-        err, result = request(url, pool=self.pool)
+        err, response = request(url, pool=self.pool)
 
         # Debug
         if err:
             raise err
 
         # Bad auth
-        if result.status == 401:
+        if response.status == 401:
             raise CrowdTangleInvalidTokenError
 
-        elif result.status == 429:
+        elif response.status == 429:
             raise CrowdTangleRateLimitExceeded
 
         # Bad params
-        if result.status >= 400:
-            data = result.data.decode('utf-8')
+        if response.status >= 400:
+            data = response.data.decode('utf-8')
 
             try:
                 data = json.loads(data)
             except:
-                raise CrowdTangleInvalidRequestError(data)
+                raise CrowdTangleInvalidRequestError(data, url=url)
 
-            raise CrowdTangleInvalidRequestError(data['message'], code=data['code'], status=result.status)
+            raise CrowdTangleInvalidRequestError(data['message'], url=url, code=data.get('code'), status=response.status)
 
         try:
-            data = json.loads(result.data)['result']
+            data = json.loads(response.data)['result']
         except (json.decoder.JSONDecodeError, TypeError, KeyError):
             raise CrowdTangleInvalidJSONError
 
