@@ -55,7 +55,7 @@ class CrowdTangleAPIClient(object):
         )
 
     @retrying_method()
-    def request(self, url):
+    def __request(self, url):
         err, result = request(url, pool=self.pool)
 
         # Debug
@@ -86,6 +86,14 @@ class CrowdTangleAPIClient(object):
             raise CrowdTangleInvalidJSONError
 
         return data
+
+    @rate_limited_method('rate_limiter_state')
+    def request(self, url):
+        return self.__request(url)
+
+    @rate_limited_method('summary_rate_limiter_state')
+    def request_summary(self, url):
+        return self.__request(url)
 
     def leaderboard(self, **kwargs):
         return crowdtangle_leaderboard(
@@ -131,10 +139,9 @@ class CrowdTangleAPIClient(object):
             **kwargs
         )
 
-    @rate_limited_method('summary_rate_limiter_state')
     def summary(self, link, **kwargs):
         return crowdtangle_summary(
-            self.pool,
+            self.request_summary,
             link,
             token=self.token,
             **kwargs
