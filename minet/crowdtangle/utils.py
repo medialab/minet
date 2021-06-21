@@ -161,7 +161,6 @@ def make_paginated_iterator(url_forge, item_key, formatter,
 
         N = 0
         C = 0
-        last_url = None
         last_items = set()
 
         has_limit = limit is not None
@@ -215,8 +214,6 @@ def make_paginated_iterator(url_forge, item_key, formatter,
 
             enough_to_stop = False
             n = 0
-
-            last_url = url
 
             acc = []
 

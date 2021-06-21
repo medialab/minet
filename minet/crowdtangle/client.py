@@ -5,15 +5,28 @@
 # A unified CrowdTangle API client that can be used to keep an eye on the
 # rate limit and the used token etc.
 #
+import json
+
 from minet.utils import (
     RateLimiterState,
     rate_limited_method
 )
-from minet.web import create_pool
+from minet.web import (
+    create_pool,
+    create_request_retryer,
+    retrying_method,
+    request
+)
 from minet.crowdtangle.constants import (
     CROWDTANGLE_DEFAULT_TIMEOUT,
     CROWDTANGLE_DEFAULT_RATE_LIMIT,
     CROWDTANGLE_LINKS_DEFAULT_RATE_LIMIT
+)
+from minet.crowdtangle.exceptions import (
+    CrowdTangleInvalidJSONError,
+    CrowdTangleInvalidTokenError,
+    CrowdTangleRateLimitExceeded,
+    CrowdTangleInvalidRequestError
 )
 from minet.crowdtangle.leaderboard import crowdtangle_leaderboard
 from minet.crowdtangle.lists import crowdtangle_lists
@@ -24,7 +37,7 @@ from minet.crowdtangle.summary import crowdtangle_summary
 
 
 class CrowdTangleAPIClient(object):
-    def __init__(self, token, rate_limit=None):
+    def __init__(self, token, rate_limit=None, before_sleep=None):
         if rate_limit is None:
             rate_limit = CROWDTANGLE_DEFAULT_RATE_LIMIT
             summary_rate_limit = CROWDTANGLE_LINKS_DEFAULT_RATE_LIMIT
@@ -36,6 +49,43 @@ class CrowdTangleAPIClient(object):
         self.rate_limiter_state = RateLimiterState(rate_limit, period=60)
         self.summary_rate_limiter_state = RateLimiterState(summary_rate_limit, period=60)
         self.pool = create_pool(timeout=CROWDTANGLE_DEFAULT_TIMEOUT)
+        self.retryer = create_request_retryer(
+            additional_exceptions=[CrowdTangleInvalidJSONError],
+            before_sleep=before_sleep
+        )
+
+    @retrying_method()
+    def request(self, url):
+        err, result = request(url, pool=self.pool)
+
+        # Debug
+        if err:
+            raise err
+
+        # Bad auth
+        if result.status == 401:
+            raise CrowdTangleInvalidTokenError
+
+        elif result.status == 429:
+            raise CrowdTangleRateLimitExceeded
+
+        # Bad params
+        if result.status >= 400:
+            data = result.data.decode('utf-8')
+
+            try:
+                data = json.loads(data)
+            except:
+                raise CrowdTangleInvalidRequestError(data)
+
+            raise CrowdTangleInvalidRequestError(data['message'], code=data['code'], status=result.status)
+
+        try:
+            data = json.loads(result.data)['result']
+        except (json.decoder.JSONDecodeError, TypeError, KeyError):
+            raise CrowdTangleInvalidJSONError
+
+        return data
 
     def leaderboard(self, **kwargs):
         return crowdtangle_leaderboard(
