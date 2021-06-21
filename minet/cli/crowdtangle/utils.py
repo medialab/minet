@@ -12,7 +12,6 @@ from minet.cli.utils import print_err, die, LoadingBar
 from minet.crowdtangle import CrowdTangleAPIClient
 from minet.crowdtangle.exceptions import (
     CrowdTangleInvalidTokenError,
-    CrowdTangleRateLimitExceeded,
     CrowdTangleInvalidJSONError
 )
 
@@ -56,8 +55,6 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
             total=cli_args.limit
         )
 
-        client = CrowdTangleAPIClient(cli_args.token, rate_limit=cli_args.rate_limit)
-
         args = []
 
         if callable(get_args):
@@ -66,10 +63,7 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
         def before_sleep(retry_state):
             exc = retry_state.outcome.exception()
 
-            if isinstance(exc, CrowdTangleRateLimitExceeded):
-                reason = 'Call failed because of rate limit!'
-
-            elif isinstance(exc, CrowdTangleInvalidJSONError):
+            if isinstance(exc, CrowdTangleInvalidJSONError):
                 reason = 'Call failed because of invalid JSON payload!'
 
             else:
@@ -82,6 +76,12 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
                 )
             )
 
+        client = CrowdTangleAPIClient(
+            cli_args.token,
+            rate_limit=cli_args.rate_limit,
+            before_sleep=before_sleep
+        )
+
         create_iterator = getattr(client, method_name)
         iterator = create_iterator(
             *args,
@@ -89,8 +89,7 @@ def make_paginated_action(method_name, item_name, csv_headers, get_args=None,
             raw=cli_args.format != 'csv',
             per_call=True,
             detailed=True,
-            namespace=cli_args,
-            before_sleep=before_sleep
+            namespace=cli_args
         )
 
         try:

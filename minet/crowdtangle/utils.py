@@ -4,17 +4,10 @@
 #
 # Miscellaneous generic functions used throughout the CrowdTangle namespace.
 #
-import json
 from datetime import date, datetime, timedelta
 
-from minet.utils import rate_limited_from_state
-from minet.web import request, create_request_retryer
 from minet.crowdtangle.exceptions import (
-    CrowdTangleMissingStartDateError,
-    CrowdTangleInvalidTokenError,
-    CrowdTangleInvalidRequestError,
-    CrowdTangleInvalidJSONError,
-    CrowdTangleRateLimitExceeded
+    CrowdTangleMissingStartDateError
 )
 
 DAY_DELTA = timedelta(days=1)
@@ -82,36 +75,8 @@ def complement_date(d, bound):
     return d
 
 
-def step(pool, url, item_key):
-    err, result = request(url, pool=pool)
-
-    # Debug
-    if err:
-        raise err
-
-    # Bad auth
-    if result.status == 401:
-        raise CrowdTangleInvalidTokenError
-
-    elif result.status == 429:
-        raise CrowdTangleRateLimitExceeded
-
-    # Bad params
-    if result.status >= 400:
-        data = result.data.decode('utf-8')
-
-        try:
-            data = json.loads(data)
-        except:
-            raise CrowdTangleInvalidRequestError(data)
-
-        raise CrowdTangleInvalidRequestError(data['message'], code=data['code'], status=result.status)
-
-    try:
-        data = json.loads(result.data)['result']
-    except (json.decoder.JSONDecodeError, TypeError, KeyError):
-        raise CrowdTangleInvalidJSONError
-
+def step(request, url, item_key):
+    data = request(url)
     items = None
 
     if item_key in data:
@@ -134,9 +99,9 @@ def default_item_id_getter(item):
 def make_paginated_iterator(url_forge, item_key, formatter,
                             item_id_getter=default_item_id_getter):
 
-    def create_iterator(pool, token, rate_limiter_state, limit=None,
+    def create_iterator(request, token, limit=None,
                         raw=False, per_call=False, detailed=False,
-                        namespace=None, before_sleep=None, **kwargs):
+                        namespace=None, **kwargs):
 
         if namespace is not None:
             kwargs = vars(namespace)
@@ -165,13 +130,6 @@ def make_paginated_iterator(url_forge, item_key, formatter,
 
         has_limit = limit is not None
 
-        rate_limited_step = rate_limited_from_state(rate_limiter_state)(step)
-
-        retryer = create_request_retryer(
-            additional_exceptions=[CrowdTangleRateLimitExceeded, CrowdTangleInvalidJSONError],
-            before_sleep=before_sleep
-        )
-
         # Chunking
         need_to_chunk = kwargs.get('sort_by') == 'date'
         chunk_size = kwargs.get('chunk_size', 500)
@@ -198,7 +156,7 @@ def make_paginated_iterator(url_forge, item_key, formatter,
         while True:
             C += 1
 
-            items, next_url = retryer(rate_limited_step, pool, url, item_key)
+            items, next_url = step(request, url, item_key)
 
             # We have exhausted the available data
             if items is None:

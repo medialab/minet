@@ -97,9 +97,8 @@ class CrowdTangleAPIClient(object):
 
     def leaderboard(self, **kwargs):
         return crowdtangle_leaderboard(
-            self.pool,
+            self.request,
             token=self.token,
-            rate_limiter_state=self.rate_limiter_state,
             **kwargs
         )
 
@@ -120,18 +119,16 @@ class CrowdTangleAPIClient(object):
 
     def posts(self, sort_by='date', **kwargs):
         return crowdtangle_posts(
-            self.pool,
+            self.request,
             token=self.token,
-            rate_limiter_state=self.rate_limiter_state,
             sort_by=sort_by,
             **kwargs
         )
 
     def search(self, terms, sort_by='date', **kwargs):
         return crowdtangle_search(
-            self.pool,
+            self.request,
             token=self.token,
-            rate_limiter_state=self.rate_limiter_state,
             terms=terms,
             sort_by=sort_by,
             **kwargs
