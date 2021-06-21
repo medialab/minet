@@ -103,10 +103,9 @@ class CrowdTangleAPIClient(object):
             **kwargs
         )
 
-    @rate_limited_method('rate_limiter_state')
     def lists(self, **kwargs):
         return crowdtangle_lists(
-            self.pool,
+            self.request,
             token=self.token,
             **kwargs
         )
