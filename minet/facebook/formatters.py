@@ -14,3 +14,4 @@ from minet.facebook.constants import (
 
 FacebookComment = namedrecord('FacebookComment', FACEBOOK_COMMENT_CSV_HEADERS)
 FacebookPost = namedrecord('FacebookPost', FACEBOOK_POST_CSV_HEADERS)
+FacebookUser = namedrecord('FacebookUser', ['id', 'handle', 'url'])

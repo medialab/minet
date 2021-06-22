@@ -15,7 +15,9 @@ from ural.facebook import (
     parse_facebook_url,
     convert_facebook_url_to_mobile,
     has_facebook_comments,
-    FacebookGroup as ParsedFacebookGroup
+    FacebookGroup as ParsedFacebookGroup,
+    FacebookHandle as ParsedFacebookHandle,
+    FacebookUser as ParsedFacebookUser
 )
 
 from minet.utils import (
@@ -26,7 +28,7 @@ from minet.utils import (
 from minet.web import create_pool, request, create_request_retryer, retrying_method
 from minet.scrape.std import get_display_text
 from minet.facebook.utils import grab_facebook_cookie
-from minet.facebook.formatters import FacebookComment, FacebookPost
+from minet.facebook.formatters import FacebookComment, FacebookPost, FacebookUser
 from minet.facebook.exceptions import (
     FacebookInvalidCookieError,
     FacebookInvalidTargetError
@@ -423,4 +425,19 @@ class FacebookMobileScraper(object):
         # Reformatting url to hit mobile website
         url = convert_url_to_mobile(url)
 
-        raise NotImplementedError
+        html = self.request_page(url)
+        soup = BeautifulSoup(html, 'lxml')
+
+        user_item = soup.select_one('[data-ft] h3 a[href]')
+
+        if user_item is None:
+            return None
+
+        parsed = parse_facebook_url(user_item.get('href'), allow_relative_urls=True)
+
+        if isinstance(parsed, ParsedFacebookHandle):
+            return FacebookUser(None, parsed.handle, parsed.url)
+        elif isinstance(parsed, ParsedFacebookUser):
+            return FacebookUser(parsed.id, parsed.handle, parsed.url)
+        else:
+            raise TypeError
