@@ -5,11 +5,10 @@
 # Miscellaneous generic functions used throughout the twitter actions.
 #
 import casanova
-from twitwi import TwitterWrapper
 from twitter import TwitterHTTPError
 
-from minet.web import create_request_retryer
 from minet.cli.utils import LoadingBar
+from minet.twitter import TwitterAPIClient
 
 
 def make_twitter_action(method_name, csv_headers):
@@ -30,22 +29,12 @@ def make_twitter_action(method_name, csv_headers):
             }
         )
 
-        # TODO: this is temp debug
-        def listener(event, data):
-            loading_bar.print(event)
-            loading_bar.print(repr(data))
-
-        wrapper = TwitterWrapper(
+        client = TwitterAPIClient(
             cli_args.access_token,
             cli_args.access_token_secret,
             cli_args.api_key,
-            cli_args.api_secret_key,
-            listener=listener
+            cli_args.api_secret_key
         )
-
-        # TODO: I should probably create a twitter api client high-level abstraction
-        # to be used with all the relevant cli commands
-        retryer = create_request_retryer()
 
         resuming_state = None
 
@@ -63,12 +52,12 @@ def make_twitter_action(method_name, csv_headers):
                 next_cursor = int(resuming_state.last_cursor)
 
             if cli_args.ids:
-                wrapper_kwargs = {'user_id': user}
+                client_kwargs = {'user_id': user}
             else:
-                wrapper_kwargs = {'screen_name': user}
+                client_kwargs = {'screen_name': user}
 
             while next_cursor != 0:
-                wrapper_kwargs['cursor'] = next_cursor
+                client_kwargs['cursor'] = next_cursor
 
                 skip_in_output = None
 
@@ -77,7 +66,7 @@ def make_twitter_action(method_name, csv_headers):
                     resuming_state = None
 
                 try:
-                    result = retryer(wrapper.call, [method_name, 'ids'], **wrapper_kwargs)
+                    result = client.call([method_name, 'ids'], **client_kwargs)
                 except TwitterHTTPError as e:
 
                     # The user does not exist

@@ -6,7 +6,6 @@
 #
 import casanova
 from twitwi import (
-    TwitterWrapper,
     normalize_user,
     format_user_as_csv_row
 )
@@ -15,11 +14,12 @@ from twitwi.constants import USER_FIELDS
 from ebbe import as_chunks
 
 from minet.cli.utils import LoadingBar
+from minet.twitter import TwitterAPIClient
 
 
 def twitter_users_action(cli_args):
 
-    wrapper = TwitterWrapper(
+    client = TwitterAPIClient(
         cli_args.access_token,
         cli_args.access_token_secret,
         cli_args.api_key,
@@ -43,14 +43,14 @@ def twitter_users_action(cli_args):
         users = ','.join(row[1].lstrip('@') for row in chunk)
 
         if cli_args.ids:
-            wrapper_args = {'user_id': users}
+            client_args = {'user_id': users}
             key = 'id'
         else:
-            wrapper_args = {'screen_name': users}
+            client_args = {'screen_name': users}
             key = 'screen_name'
 
         try:
-            result = wrapper.call(['users', 'lookup'], **wrapper_args)
+            result = client.call(['users', 'lookup'], **client_args)
         except TwitterHTTPError as e:
             if e.e.code == 404:
                 for row, user in chunk:

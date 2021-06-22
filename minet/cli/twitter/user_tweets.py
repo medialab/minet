@@ -6,7 +6,6 @@
 #
 import casanova
 from twitwi import (
-    TwitterWrapper,
     normalize_tweet,
     format_tweet_as_csv_row
 )
@@ -15,11 +14,12 @@ from twitter import TwitterHTTPError
 
 from minet.cli.utils import LoadingBar
 from minet.twitter.constants import TWITTER_API_MAX_STATUSES_COUNT
+from minet.twitter import TwitterAPIClient
 
 
 def twitter_user_tweets_action(cli_args):
 
-    wrapper = TwitterWrapper(
+    client = TwitterAPIClient(
         cli_args.access_token,
         cli_args.access_token_secret,
         cli_args.api_key,
@@ -60,7 +60,7 @@ def twitter_user_tweets_action(cli_args):
             loading_bar.inc('calls')
 
             try:
-                tweets = wrapper.call(['statuses', 'user_timeline'], **kwargs)
+                tweets = client.call(['statuses', 'user_timeline'], **kwargs)
             except TwitterHTTPError as e:
                 loading_bar.inc('errors')
 
