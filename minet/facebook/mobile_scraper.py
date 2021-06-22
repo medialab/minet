@@ -434,10 +434,21 @@ class FacebookMobileScraper(object):
             return None
 
         parsed = parse_facebook_url(user_item.get('href'), allow_relative_urls=True)
+        user_label = user_item.get_text().strip()
 
         if isinstance(parsed, ParsedFacebookHandle):
-            return FacebookUser(None, parsed.handle, parsed.url)
+            return FacebookUser(
+                user_label,
+                None,
+                parsed.handle,
+                parsed.url
+            )
         elif isinstance(parsed, ParsedFacebookUser):
-            return FacebookUser(parsed.id, parsed.handle, parsed.url)
+            return FacebookUser(
+                user_label,
+                parsed.id,
+                parsed.handle,
+                parsed.url
+            )
         else:
             raise TypeError
