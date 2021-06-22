@@ -23,7 +23,7 @@ from minet.utils import (
     RateLimiterState,
     parse_date
 )
-from minet.web import create_pool, request, create_request_retryer
+from minet.web import create_pool, request, create_request_retryer, retrying_method
 from minet.scrape.std import get_display_text
 from minet.facebook.utils import grab_facebook_cookie
 from minet.facebook.formatters import FacebookComment, FacebookPost
@@ -309,8 +309,10 @@ class FacebookMobileScraper(object):
         self.pool = create_pool()
 
         self.rate_limiter_state = RateLimiterState(1, throttle)
+        self.retryer = create_request_retryer()
 
     @rate_limited_method()
+    @retrying_method()
     def request_page(self, url):
         error, result = request(
             url,
@@ -341,12 +343,10 @@ class FacebookMobileScraper(object):
             calls = 0
             replies = 0
 
-            retryer = create_request_retryer()
-
             while len(url_queue) != 0:
                 current_url, direction, in_reply_to = url_queue.popleft()
 
-                html = retryer(self.request_page, current_url)
+                html = self.request_page(current_url)
 
                 try:
                     data = scrape_comments(html, direction, in_reply_to)
@@ -396,12 +396,10 @@ class FacebookMobileScraper(object):
         url = convert_url_to_mobile(parsed.url)
 
         def generator():
-
-            retryer = create_request_retryer()
             current_url = url
 
             while True:
-                html = retryer(self.request_page, current_url)
+                html = self.request_page(current_url)
 
                 # with open('./dump.html', 'w') as f:
                 #     f.write(html)
@@ -417,3 +415,12 @@ class FacebookMobileScraper(object):
                 current_url = next_url
 
         return generator()
+
+    def group_post_user(self, url):
+        if not has_facebook_comments(url):
+            raise FacebookInvalidTargetError
+
+        # Reformatting url to hit mobile website
+        url = convert_url_to_mobile(url)
+
+        raise NotImplementedError
