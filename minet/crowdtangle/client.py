@@ -75,8 +75,8 @@ class CrowdTangleAPIClient(object):
 
             try:
                 data = json.loads(data)
-            except:
-                raise CrowdTangleInvalidRequestError(data, url=url)
+            except json.decoder.JSONDecodeError:
+                raise CrowdTangleInvalidRequestError(data, url=url, status=response.status)
 
             raise CrowdTangleInvalidRequestError(data['message'], url=url, code=data.get('code'), status=response.status)
 
