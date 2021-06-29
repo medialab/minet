@@ -33,6 +33,7 @@
 * [facebook (fb)](#facebook)
   * [comments](#facebook-comments)
   * [posts](#facebook-posts)
+  * [post-authors](#facebook-post-authors)
   * [url-likes](#facebook-url-likes)
 * [google](#google)
   * [sheets](#google-sheets)
@@ -899,7 +900,8 @@ examples:
 ## Facebook
 
 ```
-usage: minet facebook [-h] {comments,posts,post-stats,url-likes} ...
+usage: minet facebook [-h]
+                      {comments,posts,post-authors,post-stats,url-likes} ...
 
 Minet Facebook Command
 ======================
@@ -907,10 +909,11 @@ Minet Facebook Command
 Collects data from Facebook.
 
 optional arguments:
-  -h, --help                             show this help message and exit
+  -h, --help                                      show this help message and exit
 
 actions:
-  {comments,posts,post-stats,url-likes}  Action to perform to collect data on Facebook
+  {comments,posts,post-authors,post-stats,url-likes}
+                                                  Action to perform to collect data on Facebook
 
 ```
 
@@ -1019,6 +1022,40 @@ examples:
 
 . Scraping posts from multiple groups listed in a CSV file:
     $ minet fb posts group_url groups.csv > posts.csv
+
+```
+
+<h3 id="facebook-post-authors">post-authors</h3>
+
+```
+usage: minet facebook post-authors [-h] [-c COOKIE] [-o OUTPUT] [-s SELECT]
+                                   [--throttle THROTTLE] [--total TOTAL]
+                                   column [file]
+
+Minet Facebook Post Authors Command
+===================================
+
+Retrieve the author of the given Facebook posts.
+
+Note that it is only relevant for group posts since
+only administrators can post something on pages.
+
+positional arguments:
+  column                      Name of the CSV column containing the posts' urls.
+  file                        CSV file containing the posts.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "facebook.cookie" or read from the MINET_FACEBOOK_COOKIE env variable.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
+  --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.
+
+examples:
+
+. Fetching authors of a series of posts in a CSV file:
+    $ minet fb post-authors post_url fb-posts.csv > authors.csv
 
 ```
 

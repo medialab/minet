@@ -418,7 +418,7 @@ class FacebookMobileScraper(object):
 
         return generator()
 
-    def group_post_user(self, url):
+    def post_author(self, url):
         if not has_facebook_comments(url):
             raise FacebookInvalidTargetError
 

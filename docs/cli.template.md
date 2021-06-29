@@ -33,6 +33,7 @@
 * [facebook (fb)](#facebook)
   * [comments](#facebook-comments)
   * [posts](#facebook-posts)
+  * [post-authors](#facebook-post-authors)
   * [url-likes](#facebook-url-likes)
 * [google](#google)
   * [sheets](#google-sheets)
@@ -197,6 +198,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 <h3 id="facebook-posts">posts</h3>
 
 <% fb/posts %>
+
+<h3 id="facebook-post-authors">post-authors</h3>
+
+<% fb/post-authors %>
 
 <h3 id="facebook-url-likes">url-likes</h3>
 

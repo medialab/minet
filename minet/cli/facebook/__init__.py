@@ -18,6 +18,11 @@ def facebook_action(cli_args):
 
         facebook_posts_action(cli_args)
 
+    elif cli_args.fb_action == 'post-authors':
+        from minet.cli.facebook.post_authors import facebook_post_authors_action
+
+        facebook_post_authors_action(cli_args)
+
     elif cli_args.fb_action == 'post-stats':
         from minet.cli.facebook.post_stats import facebook_post_stats_action
 

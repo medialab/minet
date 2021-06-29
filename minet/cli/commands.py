@@ -859,6 +859,60 @@ MINET_COMMANDS = {
                         }
                     ]
                 },
+                'post-authors': {
+                    'title': 'Minet Facebook Post Authors Command',
+                    'description': '''
+                        Retrieve the author of the given Facebook posts.
+
+                        Note that it is only relevant for group posts since
+                        only administrators can post something on pages.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Fetching authors of a series of posts in a CSV file:
+                            $ minet fb post-authors post_url fb-posts.csv > authors.csv
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the CSV column containing the posts\' urls.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the posts.',
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'post_url'
+                        },
+                        {
+                            'flags': ['-c', '--cookie'],
+                            'help': 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".',
+                            'default': 'firefox',
+                            'rc_key': ['facebook', 'cookie'],
+                            'action': ConfigAction
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--throttle',
+                            'help': 'Throttling time, in seconds, to wait between each request.',
+                            'type': float,
+                            'default': FACEBOOK_MOBILE_DEFAULT_THROTTLE
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.',
+                            'type': int
+                        }
+                    ]
+                },
                 'post-stats': {
                     'title': 'Minet Facebook Post Stats Command',
                     'description': '''
@@ -868,7 +922,7 @@ MINET_COMMANDS = {
                         examples:
 
                         . Fetching stats about lists of posts in a CSV file:
-                            $ minet fb post-stats post_url fb-posts.csv
+                            $ minet fb post-stats post_url fb-posts.csv > stats.csv
                     ''',
                     'arguments': [
                         {
