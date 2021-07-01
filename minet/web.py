@@ -19,7 +19,6 @@ from json.decoder import JSONDecodeError
 from urllib.parse import urljoin
 from urllib3 import HTTPResponse
 from urllib.request import Request
-from urllib.error import URLError
 from tenacity import (
     Retrying,
     wait_random_exponential,
@@ -658,7 +657,7 @@ def create_request_retryer(min=10, max=THREE_HOURS, max_attempts=9, before_sleep
 
     retry_for = [
         urllib3.exceptions.TimeoutError,
-        URLError  # NOTE: attempting this to see if it does not cause issues
+        urllib3.exceptions.URLError  # NOTE: attempting this to see if it does not cause issues
     ]
 
     if additional_exceptions:
