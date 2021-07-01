@@ -1,6 +1,4 @@
-[![Build Status](https://github.com/medialab/minet/workflows/Tests/badge.svg)](https://github.com/medialab/minet/actions) [![DOI](https://zenodo.org/badge/169059797.svg)](https://zenodo.org/badge/latestdoi/169059797) ![download number](https://static.pepy.tech/badge/minet)
-
-https://static.pepy.tech/badge/minet
+[![Build Status](https://github.com/medialab/minet/workflows/Tests/badge.svg)](https://github.com/medialab/minet/actions) [![DOI](https://zenodo.org/badge/169059797.svg)](https://zenodo.org/badge/latestdoi/169059797) [![download number](https://static.pepy.tech/badge/minet)](https://pepy.tech/project/minet)
 
 ![Minet](img/minet.png)
 
