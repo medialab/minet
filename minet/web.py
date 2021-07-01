@@ -657,7 +657,7 @@ def create_request_retryer(min=10, max=THREE_HOURS, max_attempts=9, before_sleep
 
     retry_for = [
         urllib3.exceptions.TimeoutError,
-        urllib3.exceptions.URLError  # NOTE: attempting this to see if it does not cause issues
+        urllib3.exceptions.ProtocolError
     ]
 
     if additional_exceptions:
