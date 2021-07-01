@@ -52,7 +52,7 @@ def page_id_from_handle(handle):
 def group_id_from_handle(handle):
     url = urljoin(FACEBOOK_MOBILE_URL, 'groups/%s' % handle)
 
-    err, response, html = request_text(FACEBOOK_DEFAULT_POOL, url, headers={
+    err, response, html = request_text(url, headers={
         'User-Agent': 'curl/7.68.0'
     })
 
@@ -74,7 +74,7 @@ def group_id_from_handle(handle):
 def scrape_post_id(post_url):
     post_mobile_url = convert_facebook_url_to_mobile(post_url)
 
-    err, response, html = request_text(FACEBOOK_DEFAULT_POOL, post_mobile_url)
+    err, response, html = request_text(post_mobile_url)
 
     if err:
         raise err
