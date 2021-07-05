@@ -25,6 +25,10 @@ class TwitterPublicAPIInvalidResponseError(TwitterError):
     pass
 
 
+class TwitterPublicAPIBadRequest(TwitterError):
+    pass
+
+
 class TwitterPublicAPIOverCapacityError(TwitterError):
     pass
 

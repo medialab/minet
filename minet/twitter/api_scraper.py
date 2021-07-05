@@ -24,6 +24,7 @@ from minet.twitter.constants import (
 )
 from minet.twitter.exceptions import (
     TwitterGuestTokenError,
+    TwitterPublicAPIBadRequest,
     TwitterPublicAPIRateLimitError,
     TwitterPublicAPIInvalidResponseError,
     TwitterPublicAPIParsingError,
@@ -270,6 +271,9 @@ class TwitterAPIScraper(object):
 
         if response.status >= 400:
             error = getpath(data, ['errors', 0])
+
+            if error is not None and response.status == 400 and error.get('code') == 47:
+                raise TwitterPublicAPIBadRequest
 
             if error is not None and error.get('code') == 130:
                 raise TwitterPublicAPIOverCapacityError
