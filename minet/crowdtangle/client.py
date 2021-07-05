@@ -26,7 +26,8 @@ from minet.crowdtangle.exceptions import (
     CrowdTangleInvalidJSONError,
     CrowdTangleInvalidTokenError,
     CrowdTangleRateLimitExceeded,
-    CrowdTangleInvalidRequestError
+    CrowdTangleInvalidRequestError,
+    CrowdTangleServerError
 )
 from minet.crowdtangle.leaderboard import crowdtangle_leaderboard
 from minet.crowdtangle.lists import crowdtangle_lists
@@ -50,7 +51,10 @@ class CrowdTangleAPIClient(object):
         self.summary_rate_limiter_state = RateLimiterState(summary_rate_limit, period=60)
         self.pool = create_pool(timeout=CROWDTANGLE_DEFAULT_TIMEOUT)
         self.retryer = create_request_retryer(
-            additional_exceptions=[CrowdTangleInvalidJSONError],
+            additional_exceptions=[
+                CrowdTangleInvalidJSONError,
+                CrowdTangleServerError
+            ],
             before_sleep=before_sleep
         )
 
@@ -66,8 +70,13 @@ class CrowdTangleAPIClient(object):
         if response.status == 401:
             raise CrowdTangleInvalidTokenError
 
-        elif response.status == 429:
+        # Rate limited
+        if response.status == 429:
             raise CrowdTangleRateLimitExceeded
+
+        # Server error
+        if response.status >= 500:
+            raise CrowdTangleServerError(url=url, status=response.status)
 
         # Bad params
         if response.status >= 400:
