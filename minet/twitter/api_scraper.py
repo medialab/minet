@@ -44,6 +44,10 @@ GUEST_TOKEN_COOKIE_PATTERN = re.compile(rb'document\.cookie = decodeURIComponent
 # =============================================================================
 # Helpers
 # =============================================================================
+def is_query_too_long(query):
+    return len(quote(query)) > MAXIMUM_QUERY_LENGTH
+
+
 def forge_search_url(query):
     return (
         'https://twitter.com/search?f=live&type=spelling_expansion_revert_click&q=%s' %
@@ -316,7 +320,7 @@ class TwitterAPIScraper(object):
     def search(self, query, limit=None, before_sleep=None,
                include_referenced_tweets=False, with_meta=False):
 
-        if len(query) > MAXIMUM_QUERY_LENGTH:
+        if is_query_too_long(query):
             raise TwitterPublicAPIQueryTooLongError
 
         cursor = None
