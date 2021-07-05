@@ -16,7 +16,7 @@ from ebbe import getpath
 from minet.utils import sleep_with_entropy
 from minet.web import request
 from minet.cli.utils import print_err, die, LoadingBar
-from minet.facebook.constants import FACEBOOK_WEB_DEFAULT_THROTTLE
+from minet.facebook.constants import FACEBOOK_WEB_DEFAULT_THROTTLE, FACEBOOK_REACTION_KEYS
 
 META_EXTRACTOR_TEMPLATE = rb'bigPipe\.onPageletArrive\((\{.+share_fbid:"%s".+\})\);\}\)'
 HTML_EXTRACTOR_TEMPLATE = rb'<code[^>]*><!--(.+%s.+)--></code>'
@@ -40,19 +40,7 @@ REPORT_HEADERS = [
     'video_view_count'
 ]
 
-REACTION_KEYS = OrderedDict({
-    1: 'like',
-    2: 'love',
-    3: 'wow',
-    4: 'haha',
-    7: 'sad',
-    8: 'angry',
-    11: 'thankful',
-    12: 'pride',
-    16: 'care'
-})
-
-for emotion_name in REACTION_KEYS.values():
+for emotion_name in FACEBOOK_REACTION_KEYS.values():
     REPORT_HEADERS.append('%s_count' % emotion_name)
 
 ERROR_PADDING = [''] * (len(REPORT_HEADERS) - 1)
@@ -79,7 +67,7 @@ def collect_top_reactions(data):
     index = {}
 
     for edge in edges:
-        emotion = REACTION_KEYS.get(edge['node']['key'])
+        emotion = FACEBOOK_REACTION_KEYS.get(edge['node']['key'])
 
         if emotion is None:
             print_err('Found unkown emotion %s' % edge)
@@ -115,7 +103,7 @@ def format(data):
 
     emotion_index = collect_top_reactions(data)
 
-    for emotion_name in REACTION_KEYS.values():
+    for emotion_name in FACEBOOK_REACTION_KEYS.values():
         row.append(emotion_index.get(emotion_name, 0))
 
     return row
