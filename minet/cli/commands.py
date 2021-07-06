@@ -168,10 +168,10 @@ MINET_COMMANDS = {
                 $ minet cookies firefox --csv > cookies.csv
 
             . Print cookie for lemonde.fr:
-                $ minet cookie firefox --url https://www.lemonde.fr
+                $ minet cookies firefox --url https://www.lemonde.fr
 
             . Dump cookie morsels for lemonde.fr as CSV:
-                $ minet cookie firefox --url https://www.lemonde.fr --csv > morsels.csv
+                $ minet cookies firefox --url https://www.lemonde.fr --csv > morsels.csv
         ''',
         'arguments': [
             {
