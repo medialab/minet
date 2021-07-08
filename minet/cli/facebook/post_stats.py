@@ -9,7 +9,6 @@ import json5
 import casanova
 from bs4 import BeautifulSoup
 from datetime import datetime
-from collections import OrderedDict
 from ural.facebook import is_facebook_post_url
 from ebbe import getpath
 

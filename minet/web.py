@@ -650,10 +650,35 @@ def request_text(url, pool=DEFAULT_POOL, *args, encoding='utf-8', **kwargs):
 
 
 THREE_HOURS = 3 * 60 * 60
+GLOBAL_RETRYER_BEFORE_SLEEP = None
+
+
+def register_global_request_retryer_before_sleep(callback):
+    global GLOBAL_RETRYER_BEFORE_SLEEP
+
+    if not callable(callback):
+        raise TypeError
+
+    GLOBAL_RETRYER_BEFORE_SLEEP = callback
+
+
+def make_callback_chain(*callbacks):
+    if all(callback is None for callback in callbacks):
+        return None
+
+    def chain(*args, **kwargs):
+        for callback in callbacks:
+            if callback is None:
+                continue
+
+            callback(*args, **kwargs)
+
+    return chain
 
 
 def create_request_retryer(min=10, max=THREE_HOURS, max_attempts=9, before_sleep=None,
                            additional_exceptions=None):
+    global GLOBAL_RETRYER_BEFORE_SLEEP
 
     retry_for = [
         urllib3.exceptions.TimeoutError,
@@ -664,13 +689,18 @@ def create_request_retryer(min=10, max=THREE_HOURS, max_attempts=9, before_sleep
         for exc in additional_exceptions:
             retry_for.append(exc)
 
+    before_sleep_chain = make_callback_chain(
+        GLOBAL_RETRYER_BEFORE_SLEEP,
+        before_sleep
+    )
+
     return Retrying(
         wait=wait_random_exponential(exp_base=6, min=min, max=max),
         retry=retry_if_exception_type(
             exception_types=tuple(retry_for)
         ),
         stop=stop_after_attempt(max_attempts),
-        before_sleep=before_sleep if callable(before_sleep) else None
+        before_sleep=before_sleep_chain
     )
 
 
