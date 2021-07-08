@@ -15,8 +15,9 @@ from collections import namedtuple
 from tqdm import tqdm
 from ebbe import noop
 
+from minet.web import register_global_request_retryer_before_sleep
 from minet.cli.exceptions import MissingColumnError
-from minet.utils import fuzzy_int
+from minet.utils import fuzzy_int, prettyprint_seconds
 
 
 def get_stdin_status():
@@ -76,6 +77,8 @@ class LoadingBar(tqdm):
             kwargs['unit'] = unit
 
         super().__init__(desc=desc, total=total, **kwargs)
+
+        register_retryer_logger(self)
 
     def update_total(self, total):
         self.total = total
@@ -235,3 +238,25 @@ def get_rcfile(rcfile_path=None):
             return yaml.safe_load(f)
 
     return None
+
+
+def register_retryer_logger(loading_bar):
+    def callback(retry_state):
+        exc = retry_state.outcome.exception()
+        pretty_time = prettyprint_seconds(retry_state.idle_for, granularity=2)
+
+        exc_name = '%s.%s' % (
+            exc.__class__.__module__,
+            exc.__class__.__name__
+        )
+
+        msg = '\n'.join([
+            'Failed attempt because of following exception:',
+            exc_name,
+            'Will wait for %s before attempting again.' % pretty_time,
+            ''
+        ])
+
+        loading_bar.print(msg)
+
+    register_global_request_retryer_before_sleep(callback)
