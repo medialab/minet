@@ -15,7 +15,10 @@ from collections import namedtuple
 from tqdm import tqdm
 from ebbe import noop
 
-from minet.web import register_global_request_retryer_before_sleep
+from minet.web import (
+    register_global_request_retryer_before_sleep,
+    reset_global_request_retryer_before_sleep
+)
 from minet.cli.exceptions import MissingColumnError
 from minet.utils import fuzzy_int, prettyprint_seconds
 
@@ -78,7 +81,28 @@ class LoadingBar(tqdm):
 
         super().__init__(desc=desc, total=total, **kwargs)
 
-        register_retryer_logger(self)
+        self.__register_retryer_logger()
+
+    def __register_retryer_logger(self):
+        def callback(retry_state):
+            exc = retry_state.outcome.exception()
+            pretty_time = prettyprint_seconds(retry_state.idle_for, granularity=2)
+
+            exc_name = '%s.%s' % (
+                exc.__class__.__module__,
+                exc.__class__.__name__
+            )
+
+            msg = '\n'.join([
+                'Failed attempt because of following exception:',
+                exc_name,
+                'Will wait for %s before attempting again.' % pretty_time,
+                ''
+            ])
+
+            self.print(msg)
+
+        register_global_request_retryer_before_sleep(callback)
 
     def update_total(self, total):
         self.total = total
@@ -99,6 +123,10 @@ class LoadingBar(tqdm):
     def print(self, *args, end='\n'):
         msg = ' '.join(str(arg) for arg in args)
         self.write(msg, file=sys.stderr, end=end)
+
+    def close(self):
+        super().close()
+        reset_global_request_retryer_before_sleep()
 
     def die(self, msg):
         self.close()
@@ -238,25 +266,3 @@ def get_rcfile(rcfile_path=None):
             return yaml.safe_load(f)
 
     return None
-
-
-def register_retryer_logger(loading_bar):
-    def callback(retry_state):
-        exc = retry_state.outcome.exception()
-        pretty_time = prettyprint_seconds(retry_state.idle_for, granularity=2)
-
-        exc_name = '%s.%s' % (
-            exc.__class__.__module__,
-            exc.__class__.__name__
-        )
-
-        msg = '\n'.join([
-            'Failed attempt because of following exception:',
-            exc_name,
-            'Will wait for %s before attempting again.' % pretty_time,
-            ''
-        ])
-
-        loading_bar.print(msg)
-
-    register_global_request_retryer_before_sleep(callback)

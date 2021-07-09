@@ -662,6 +662,12 @@ def register_global_request_retryer_before_sleep(callback):
     GLOBAL_RETRYER_BEFORE_SLEEP = callback
 
 
+def reset_global_request_retryer_before_sleep():
+    global GLOBAL_RETRYER_BEFORE_SLEEP
+
+    GLOBAL_RETRYER_BEFORE_SLEEP = None
+
+
 def make_callback_chain(*callbacks):
     if all(callback is None for callback in callbacks):
         return None
