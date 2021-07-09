@@ -29,19 +29,10 @@ from minet.cli.exceptions import NotResumable, InvalidArgumentsError
 
 from minet.cli.commands import MINET_COMMANDS
 
-# Colorama
-colorama_init()
-
-SUBPARSERS = {}
-
-# Getting terminal size
-terminal_size = shutil.get_terminal_size()
-
-# Increasing max CSV file limit to avoid pesky issues
-csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
-
 
 def custom_formatter(prog):
+    terminal_size = shutil.get_terminal_size()
+
     return RawTextHelpFormatter(
         prog,
         max_help_position=50,
@@ -110,8 +101,6 @@ def build_description(command):
 
 def build_subparsers(parser, index, commands, help='Action to execute', title='actions',
                      dest='action', common_arguments=[]):
-
-    subparser_index = {}
 
     subparsers = parser.add_subparsers(
         help=help,
@@ -238,7 +227,14 @@ def main():
 
 
 if __name__ == '__main__':
+    # Freezing multiprocessing support for pyinstaller etc.
     multiprocessing.freeze_support()
+
+    # Colorama initialization hook
+    colorama_init()
+
+    # Increasing max CSV file limit to avoid pesky issues
+    csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
 
     try:
         main()
