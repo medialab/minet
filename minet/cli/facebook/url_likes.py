@@ -12,7 +12,6 @@ from ural import is_url
 
 from minet.utils import rate_limited
 from minet.web import request
-from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
 from minet.cli.utils import die, LoadingBar
 
 REPORT_HEADERS = ['approx_likes', 'approx_likes_int']
@@ -61,8 +60,7 @@ def facebook_url_likes_action(cli_args):
         cli_args.output,
         keep=cli_args.select,
         add=REPORT_HEADERS,
-        total=cli_args.total,
-        prebuffer_bytes=DEFAULT_PREBUFFER_BYTES
+        total=cli_args.total
     )
 
     if cli_args.column not in enricher.headers:

@@ -12,6 +12,7 @@ import ctypes
 import shutil
 import importlib
 import multiprocessing
+import casanova
 from textwrap import dedent
 from tqdm import tqdm
 from contextlib import ExitStack
@@ -23,6 +24,7 @@ from colorama import init as colorama_init
 from encodings import idna  # NOTE: this is necessary for pyinstaller build
 
 from minet.__version__ import __version__
+from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
 from minet.cli.utils import die, get_rcfile
 from minet.cli.argparse import resolve_arg_dependencies
 from minet.cli.exceptions import NotResumable, InvalidArgumentsError
@@ -235,6 +237,9 @@ if __name__ == '__main__':
 
     # Increasing max CSV file limit to avoid pesky issues
     csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
+
+    # Casanova global defaults
+    casanova.set_default_prebuffer_bytes(DEFAULT_PREBUFFER_BYTES)
 
     try:
         main()

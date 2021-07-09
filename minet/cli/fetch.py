@@ -20,7 +20,6 @@ from minet.web import (
 )
 from minet.exceptions import InvalidURLError, FilenameFormattingError
 from minet.cli.exceptions import InvalidArgumentsError
-from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
 from minet.cli.reporters import report_error, report_filename_formatting_error
 from minet.cli.utils import LoadingBar, die
 
@@ -111,7 +110,6 @@ def fetch_action(cli_args, resolve=False, defer=None):
         add=additional_headers,
         keep=cli_args.select,
         total=cli_args.total,
-        prebuffer_bytes=DEFAULT_PREBUFFER_BYTES,
         multiplex=multiplex
     )
 
