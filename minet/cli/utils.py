@@ -113,11 +113,11 @@ class LoadingBar(tqdm):
 
         return self.set_postfix(**self.__stats)
 
-    def inc(self, name):
+    def inc(self, name, amount=1):
         if name not in self.__stats:
             self.__stats[name] = 0
 
-        self.__stats[name] += 1
+        self.__stats[name] += amount
         return self.update_stats()
 
     def print(self, *args, end='\n'):

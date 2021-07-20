@@ -30,13 +30,14 @@ def twitter_user_tweets_action(cli_args):
         cli_args.file,
         cli_args.output,
         keep=cli_args.select,
-        add=TWEET_FIELDS
+        add=TWEET_FIELDS,
+        total=cli_args.total
     )
 
     loading_bar = LoadingBar(
         'Retrieving tweets',
-        total=cli_args.total,
-        unit='tweet'
+        total=enricher.total,
+        unit='user'
     )
 
     for row, user in enricher.cells(cli_args.column, with_rows=True):
@@ -74,7 +75,7 @@ def twitter_user_tweets_action(cli_args):
             if not tweets:
                 break
 
-            loading_bar.update(len(tweets))
+            loading_bar.inc('tweets', len(tweets))
 
             max_id = min(int(tweet['id_str']) for tweet in tweets) - 1
 
@@ -87,4 +88,4 @@ def twitter_user_tweets_action(cli_args):
 
                 enricher.writerow(row, addendum)
 
-        loading_bar.inc('done')
+        loading_bar.update()
