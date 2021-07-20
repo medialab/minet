@@ -67,7 +67,7 @@ def twitter_user_tweets_action(cli_args):
                 if e.e.code == 404:
                     loading_bar.print('Could not find user "%s"' % user)
                 else:
-                    loading_bar.print('An error happened when attempting to retrieve tweets from "%s"' % user)
+                    loading_bar.print('An error happened when attempting to retrieve tweets from "%s" (HTTP status %i)' % (user, e.e.code))
 
                 break
 
