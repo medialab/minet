@@ -23,6 +23,7 @@ from tenacity import (
     Retrying,
     wait_random_exponential,
     retry_if_exception_type,
+    retry_if_exception,
     stop_after_attempt
 )
 
@@ -683,28 +684,33 @@ def make_callback_chain(*callbacks):
 
 
 def create_request_retryer(min=10, max=THREE_HOURS, max_attempts=9, before_sleep=None,
-                           additional_exceptions=None):
+                           additional_exceptions=None, predicate=None):
     global GLOBAL_RETRYER_BEFORE_SLEEP
 
-    retry_for = [
+    retryable_exception_types = [
         urllib3.exceptions.TimeoutError,
         urllib3.exceptions.ProtocolError
     ]
 
     if additional_exceptions:
         for exc in additional_exceptions:
-            retry_for.append(exc)
+            retryable_exception_types.append(exc)
 
     before_sleep_chain = make_callback_chain(
         GLOBAL_RETRYER_BEFORE_SLEEP,
         before_sleep
     )
 
+    retry_condition = retry_if_exception_type(
+        exception_types=tuple(retryable_exception_types)
+    )
+
+    if callable(predicate):
+        retry_condition |= predicate
+
     return Retrying(
         wait=wait_random_exponential(exp_base=6, min=min, max=max),
-        retry=retry_if_exception_type(
-            exception_types=tuple(retry_for)
-        ),
+        retry=retry_condition,
         stop=stop_after_attempt(max_attempts),
         before_sleep=before_sleep_chain
     )
