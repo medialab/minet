@@ -93,9 +93,11 @@ class LoadingBar(tqdm):
                 exc.__class__.__name__
             )
 
+            exc_msg = str(exc)
+
             msg = '\n'.join([
                 'Failed attempt because of following exception:',
-                exc_name,
+                ('%s (%s)' % (exc_name, exc_msg)) if exc_msg else exc_name,
                 'Will wait for %s before attempting again.' % pretty_time,
                 ''
             ])

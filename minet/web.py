@@ -669,15 +669,12 @@ def reset_global_request_retryer_before_sleep():
     GLOBAL_RETRYER_BEFORE_SLEEP = None
 
 
-def make_callback_chain(*callbacks):
-    if all(callback is None for callback in callbacks):
-        return None
-
+def wrap_before_sleep_callback_with_global_hook(callback):
     def chain(*args, **kwargs):
-        for callback in callbacks:
-            if callback is None:
-                continue
+        if GLOBAL_RETRYER_BEFORE_SLEEP is not None:
+            GLOBAL_RETRYER_BEFORE_SLEEP(*args, **kwargs)
 
+        if callback is not None:
             callback(*args, **kwargs)
 
     return chain
@@ -696,17 +693,14 @@ def create_request_retryer(min=10, max=THREE_HOURS, max_attempts=9, before_sleep
         for exc in additional_exceptions:
             retryable_exception_types.append(exc)
 
-    before_sleep_chain = make_callback_chain(
-        GLOBAL_RETRYER_BEFORE_SLEEP,
-        before_sleep
-    )
+    before_sleep_chain = wrap_before_sleep_callback_with_global_hook(before_sleep)
 
     retry_condition = retry_if_exception_type(
         exception_types=tuple(retryable_exception_types)
     )
 
     if callable(predicate):
-        retry_condition |= predicate
+        retry_condition |= retry_if_exception(predicate)
 
     return Retrying(
         wait=wait_random_exponential(exp_base=6, min=min, max=max),
