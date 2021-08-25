@@ -70,7 +70,8 @@ def fetch_facebook_flag(url, cookie):
 
     data = [
         b'Get Vaccine Info' in html,
-        b'Checked by independent fact-checkers' in html,
+        (b'Checked by independent fact-checkers' in html or 
+        b'Independent fact-checkers say that this information could mislead people' in html ),
     ]
 
     return None, data
