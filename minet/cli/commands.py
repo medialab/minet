@@ -953,13 +953,13 @@ MINET_COMMANDS = {
                 'post-flags': {
                     'title': 'Minet Facebook Post Flags Command',
                     'description': '''
-                        Retrieve the presence of fact-check flags about a given list of Facebook posts.
+                        Retrieve the presence of fact-check flags and information banners about a given list of Facebook posts.
                     ''',
                     'epilog': '''
                         examples:
 
                         . Fetching flags about lists of posts in a CSV file:
-                            $ minet fb post-flags post_url fb-posts.csv > stats.csv
+                            $ minet fb post-flags post_url fb-posts.csv > flags.csv
                     ''',
                     'arguments': [
                         {
