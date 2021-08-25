@@ -57,7 +57,7 @@ def fetch_facebook_flag(url, cookie):
             'Rate limit reached!',
             'Last url: %s' % url
         ])
-    
+
     if (
         CURRENT_AVAILABILITY_DISCLAIMER in html or
         AVAILABILITY_DISCLAIMER in html or
