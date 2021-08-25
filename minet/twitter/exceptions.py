@@ -35,3 +35,7 @@ class TwitterPublicAPIOverCapacityError(TwitterError):
 
 class TwitterPublicAPIParsingError(TwitterError):
     pass
+
+
+class TwitterPublicAPIHiccupError(TwitterError):
+    pass

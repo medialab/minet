@@ -29,7 +29,8 @@ from minet.twitter.exceptions import (
     TwitterPublicAPIInvalidResponseError,
     TwitterPublicAPIParsingError,
     TwitterPublicAPIQueryTooLongError,
-    TwitterPublicAPIOverCapacityError
+    TwitterPublicAPIOverCapacityError,
+    TwitterPublicAPIHiccupError
 )
 
 # =============================================================================
@@ -284,7 +285,7 @@ class TwitterAPIScraper(object):
 
             raise TwitterPublicAPIInvalidResponseError
 
-        cursor = extract_cursor_from_payload(data)
+        next_cursor = extract_cursor_from_payload(data)
         tweets = []
 
         if dump:
@@ -315,7 +316,13 @@ class TwitterAPIScraper(object):
             else:
                 tweets.append((result, meta))
 
-        return cursor, tweets
+        # Attempting to fix Twitter's public-facing API recent hiccups (#316):
+        # It seems that sometimes the API returns an empty response, containing
+        # the same cursor as before, in which case we should retry...
+        if not tweets and cursor == next_cursor:
+            raise TwitterPublicAPIHiccupError
+
+        return next_cursor, tweets
 
     def search(self, query, limit=None, before_sleep=None,
                include_referenced_tweets=False, with_meta=False):
@@ -330,7 +337,8 @@ class TwitterAPIScraper(object):
             min=1,
             additional_exceptions=[
                 TwitterPublicAPIRateLimitError,
-                TwitterPublicAPIInvalidResponseError
+                TwitterPublicAPIInvalidResponseError,
+                TwitterPublicAPIHiccupError
             ],
             before_sleep=before_sleep
         )
