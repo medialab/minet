@@ -23,6 +23,11 @@ def facebook_action(cli_args):
 
         facebook_post_authors_action(cli_args)
 
+    elif cli_args.fb_action == 'post-flags':
+        from minet.cli.facebook.post_flags import facebook_post_flags_action
+
+        facebook_post_flags_action(cli_args)
+
     elif cli_args.fb_action == 'post-stats':
         from minet.cli.facebook.post_stats import facebook_post_stats_action
 

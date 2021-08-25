@@ -950,6 +950,43 @@ MINET_COMMANDS = {
                         }
                     ]
                 },
+                'post-flags': {
+                    'title': 'Minet Facebook Post Flags Command',
+                    'description': '''
+                        Retrieve the presence of fact-check flags about a given list of Facebook posts.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Fetching flags about lists of posts in a CSV file:
+                            $ minet fb post-flags post_url fb-posts.csv > stats.csv
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the CSV column containing the posts\' urls.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the posts.',
+                            'action': InputFileAction
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.',
+                            'type': int
+                        }
+                    ]
+                },
                 'url-likes': {
                     'title': 'Minet Facebook Url Likes Command',
                     'description': '''
