@@ -82,19 +82,33 @@ def create_cookie_expiration():
 
 def forge_search_params(query, count=DEFAULT_COUNT, cursor=None):
     params = {
+        'include_profile_interstitial_type': '1',
+        'include_blocking': '1',
+        'include_blocked_by': '1',
+        'include_followed_by': '1',
+        'include_want_retweets': '1',
+        'include_mute_edge': '1',
+        'include_can_dm': '1',
         'include_can_media_tag': '1',
+        'skip_status': '1',
+        'cards_platform': 'Web-12',
+        'include_cards': '1',
         'include_ext_alt_text': 'true',
         'include_quote_count': 'true',
         'include_reply_count': '1',
         'tweet_mode': 'extended',
         'include_entities': 'true',
         'include_user_entities': 'true',
+        'include_ext_media_color': 'true',
         'include_ext_media_availability': 'true',
         'send_error_codes': 'true',
-        'simple_quoted_tweet': 'true',
+        'simple_quoted_tweets': 'true',
+        'tweet_search_mode': 'live',
+        'query_source': 'spelling_expansion_revert_click',
+        'cursor': None,
+        'pc': '1',
         'spelling_corrections': '1',
         'ext': 'mediaStats,highlightedLabel',
-        'tweet_search_mode': 'live',
         'count': count,
         'q': query
     }
@@ -262,7 +276,7 @@ class TwitterAPIScraper(object):
             'Authorization': TWITTER_PUBLIC_API_AUTH_HEADER,
             'X-Guest-Token': self.guest_token,
             'Cookie': self.cookie,
-            'Accept-Language': 'en'
+            'Accept-Language': 'en-US,en;q=0.5'
         }
 
         err, response, data = self.request_json(url, headers=headers)
