@@ -36,9 +36,9 @@ from minet.twitter.exceptions import (
 # =============================================================================
 # Constants
 # =============================================================================
-TWITTER_PUBLIC_SEARCH_ENDPOINT = 'https://api.twitter.com/2/search/adaptive.json'
+TWITTER_PUBLIC_SEARCH_ENDPOINT = 'https://twitter.com/i/api/2/search/adaptive.json'
 MAXIMUM_QUERY_LENGTH = 500
-DEFAULT_COUNT = 100
+DEFAULT_COUNT = 100  # NOTE: the actual upper limit seems to be 20, but I keep 100 just in case it changes in the future, who knows...
 GUEST_TOKEN_COOKIE_PATTERN = re.compile(rb'document\.cookie = decodeURIComponent\("gt=(\d+);')
 
 
@@ -333,8 +333,15 @@ class TwitterAPIScraper(object):
         # Attempting to fix Twitter's public-facing API recent hiccups (#316):
         # It seems that sometimes the API returns an empty response, containing
         # the same cursor as before, in which case we should retry...
-        if not tweets and cursor == next_cursor:
-            raise TwitterPublicAPIHiccupError
+        # NOTE: in fact, the real issue lies elsewhere as the way to hit the API
+        # changed slightly and was causing our issues. But we cannot rely
+        # on this condition now because it will degenerate to a retry loop
+        # when hitting the last available tweets of the query.
+        # NOTE: since those API changes, we cannot get 100 results at once anymore
+        # as the upper limit seems to be 20 now :'(
+
+        # if not tweets and cursor == next_cursor:
+        #     raise TwitterPublicAPIHiccupError
 
         return next_cursor, tweets
 
@@ -352,7 +359,7 @@ class TwitterAPIScraper(object):
             additional_exceptions=[
                 TwitterPublicAPIRateLimitError,
                 TwitterPublicAPIInvalidResponseError,
-                TwitterPublicAPIHiccupError
+                TwitterPublicAPIHiccupError  # TODO: I might want to drop this at some point
             ],
             before_sleep=before_sleep
         )

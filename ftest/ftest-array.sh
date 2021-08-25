@@ -35,5 +35,5 @@ $MINET url-parse url ftest/resources/medias.csv | wc -l
 echo
 
 echo "Scraping Twitter"
-$MINET twitter scrape tweets "from:medialab_ScPo" --limit 100 | wc -l
+$MINET twitter scrape tweets "from:medialab_ScPo" --limit 40 | wc -l
 echo
