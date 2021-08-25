@@ -913,16 +913,16 @@ MINET_COMMANDS = {
                         }
                     ]
                 },
-                'post-stats': {
-                    'title': 'Minet Facebook Post Stats Command',
+                'post-flags': {
+                    'title': 'Minet Facebook Post Flags Command',
                     'description': '''
-                        Retrieve statistics about a given list of Facebook posts.
+                        Retrieve the presence of fact-check flags and information banners about a given list of Facebook posts.
                     ''',
                     'epilog': '''
                         examples:
 
-                        . Fetching stats about lists of posts in a CSV file:
-                            $ minet fb post-stats post_url fb-posts.csv > stats.csv
+                        . Fetching flags about lists of posts in a CSV file:
+                            $ minet fb post-flags post_url fb-posts.csv > flags.csv
                     ''',
                     'arguments': [
                         {
@@ -939,6 +939,13 @@ MINET_COMMANDS = {
                             'action': OutputFileAction
                         },
                         {
+                            'flags': ['-c', '--cookie'],
+                            'help': 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".',
+                            'default': 'firefox',
+                            'rc_key': ['facebook', 'cookie'],
+                            'action': ConfigAction
+                        },
+                        {
                             'flags': ['-s', '--select'],
                             'help': 'Columns of input CSV file to include in the output (separated by `,`).',
                             'type': SplitterType()
@@ -950,16 +957,16 @@ MINET_COMMANDS = {
                         }
                     ]
                 },
-                'post-flags': {
-                    'title': 'Minet Facebook Post Flags Command',
+                'post-stats': {
+                    'title': 'Minet Facebook Post Stats Command',
                     'description': '''
-                        Retrieve the presence of fact-check flags and information banners about a given list of Facebook posts.
+                        Retrieve statistics about a given list of Facebook posts.
                     ''',
                     'epilog': '''
                         examples:
 
-                        . Fetching flags about lists of posts in a CSV file:
-                            $ minet fb post-flags post_url fb-posts.csv > flags.csv
+                        . Fetching stats about lists of posts in a CSV file:
+                            $ minet fb post-stats post_url fb-posts.csv > stats.csv
                     ''',
                     'arguments': [
                         {

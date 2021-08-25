@@ -7,11 +7,11 @@
 import casanova
 from ural.facebook import is_facebook_post_url
 
-from minet.utils import sleep_with_entropy
-from minet.web import request
 from minet.cli.utils import die, LoadingBar
 from minet.facebook.constants import FACEBOOK_WEB_DEFAULT_THROTTLE
 from minet.facebook.utils import grab_facebook_cookie
+from minet.utils import sleep_with_entropy
+from minet.web import request
 
 OTHER_AVAILABILITY_DISCLAIMER = b"This content isn't available at the moment"
 CURRENT_AVAILABILITY_DISCLAIMER = b'The link you followed may have expired, or the page may only be visible to an audience'
@@ -78,7 +78,7 @@ def fetch_facebook_flag(url, cookie):
 
 def facebook_post_flags_action(cli_args):
 
-    fb_cookie = grab_facebook_cookie('firefox')
+    cookie = grab_facebook_cookie(cli_args.cookie)
 
     enricher = casanova.enricher(
         cli_args.file,
@@ -104,7 +104,7 @@ def facebook_post_flags_action(cli_args):
             enricher.writerow(row, format_err('not-facebook-post'))
             continue
 
-        err, data = fetch_facebook_flag(post_url, fb_cookie)
+        err, data = fetch_facebook_flag(post_url, cookie)
 
         if err:
             enricher.writerow(row, format_err(err))

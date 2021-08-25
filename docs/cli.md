@@ -903,7 +903,7 @@ examples:
 
 ```
 usage: minet facebook [-h]
-                      {comments,posts,post-authors,post-stats,post-flags,url-likes}
+                      {comments,posts,post-authors,post-flags,post-stats,url-likes}
                       ...
 
 Minet Facebook Command
@@ -915,7 +915,7 @@ optional arguments:
   -h, --help                                      show this help message and exit
 
 actions:
-  {comments,posts,post-authors,post-stats,post-flags,url-likes}
+  {comments,posts,post-authors,post-flags,post-stats,url-likes}
                                                   Action to perform to collect data on Facebook
 
 ```
@@ -1065,7 +1065,8 @@ examples:
 <h3 id="facebook-post-flags">post-flags</h3>
 
 ```
-usage: minet facebook post-flags [-h] [-o OUTPUT] [-s SELECT] [--total TOTAL]
+usage: minet facebook post-flags [-h] [-o OUTPUT] [-c COOKIE] [-s SELECT]
+                                 [--total TOTAL]
                                  column [file]
 
 Minet Facebook Post Flags Command
@@ -1080,6 +1081,7 @@ positional arguments:
 optional arguments:
   -h, --help                  show this help message and exit
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "facebook.cookie" or read from the MINET_FACEBOOK_COOKIE env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.
 
