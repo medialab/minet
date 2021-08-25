@@ -34,6 +34,8 @@
   * [comments](#facebook-comments)
   * [posts](#facebook-posts)
   * [post-authors](#facebook-post-authors)
+  * [post-flags](#facebook-post-flags)
+  * [post-stats](#facebook-post-stats)
   * [url-likes](#facebook-url-likes)
 * [google](#google)
   * [sheets](#google-sheets)
@@ -901,7 +903,8 @@ examples:
 
 ```
 usage: minet facebook [-h]
-                      {comments,posts,post-authors,post-stats,url-likes} ...
+                      {comments,posts,post-authors,post-stats,post-flags,url-likes}
+                      ...
 
 Minet Facebook Command
 ======================
@@ -912,7 +915,7 @@ optional arguments:
   -h, --help                                      show this help message and exit
 
 actions:
-  {comments,posts,post-authors,post-stats,url-likes}
+  {comments,posts,post-authors,post-stats,post-flags,url-likes}
                                                   Action to perform to collect data on Facebook
 
 ```
@@ -1056,6 +1059,62 @@ examples:
 
 . Fetching authors of a series of posts in a CSV file:
     $ minet fb post-authors post_url fb-posts.csv > authors.csv
+
+```
+
+<h3 id="facebook-post-flags">post-flags</h3>
+
+```
+usage: minet facebook post-flags [-h] [-o OUTPUT] [-s SELECT] [--total TOTAL]
+                                 column [file]
+
+Minet Facebook Post Flags Command
+=================================
+
+Retrieve the presence of fact-check flags and information banners about a given list of Facebook posts.
+
+positional arguments:
+  column                      Name of the CSV column containing the posts' urls.
+  file                        CSV file containing the posts.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.
+
+examples:
+
+. Fetching flags about lists of posts in a CSV file:
+    $ minet fb post-flags post_url fb-posts.csv > flags.csv
+
+```
+
+<h3 id="facebook-post-stats">post-stats</h3>
+
+```
+usage: minet facebook post-stats [-h] [-o OUTPUT] [-s SELECT] [--total TOTAL]
+                                 column [file]
+
+Minet Facebook Post Stats Command
+=================================
+
+Retrieve statistics about a given list of Facebook posts.
+
+positional arguments:
+  column                      Name of the CSV column containing the posts' urls.
+  file                        CSV file containing the posts.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.
+
+examples:
+
+. Fetching stats about lists of posts in a CSV file:
+    $ minet fb post-stats post_url fb-posts.csv > stats.csv
 
 ```
 
