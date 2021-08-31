@@ -122,12 +122,13 @@ def extract_action(cli_args):
         input_data,
         cli_args.output,
         keep=cli_args.select,
-        add=OUTPUT_ADDITIONAL_HEADERS
+        add=OUTPUT_ADDITIONAL_HEADERS,
+        total=cli_args.total
     )
 
     loading_bar = LoadingBar(
         desc='Extracting content',
-        total=cli_args.total,
+        total=enricher.total,
         unit='doc'
     )
 
