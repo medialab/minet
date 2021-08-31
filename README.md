@@ -66,7 +66,7 @@ Minet can single-handedly:
 
 ## Installation
 
-**minet** can be installed as a standalone CLI tool (currently only on mac, ubuntu & similar) by running the following command in your terminal:
+**minet** can be installed as a standalone CLI tool (currently only on mac >= 10.14, ubuntu & similar) by running the following command in your terminal:
 
 ```shell
 curl -sSL https://raw.githubusercontent.com/medialab/minet/master/scripts/install.sh | bash
