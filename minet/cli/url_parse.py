@@ -12,7 +12,8 @@ from ural import (
     get_hostname,
     get_domain_name,
     get_normalized_hostname,
-    infer_redirection
+    infer_redirection,
+    is_typo_url
 )
 from ural.facebook import (
     parse_facebook_url,
@@ -38,7 +39,8 @@ REPORT_HEADERS = [
     'domain_name',
     'hostname',
     'normalized_hostname',
-    'probably_shortened'
+    'probably_shortened',
+    'probably_typo'
 ]
 
 FACEBOOK_REPORT_HEADERS = [
@@ -69,7 +71,8 @@ def extract_standard_addendum(cli_args, url):
         get_domain_name(url),
         get_hostname(url),
         get_normalized_hostname(url),
-        'yes' if is_shortened_url(url) else ''
+        'yes' if is_shortened_url(url) else '',
+        'yes' if is_typo_url(url) else ''
     ]
 
 
