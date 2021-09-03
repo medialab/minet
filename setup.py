@@ -43,7 +43,7 @@ setup(name='minet',
         'tqdm>=4.60.0',
         'trafilatura>=0.9.1,<0.10',
         'twitwi>=0.9.0,<1',
-        'ural>=0.30.0,<0.31',
+        'ural>=0.31.0,<0.32',
         'urllib3[secure]>=1.25.3,<2'
       ],
       entry_points={
