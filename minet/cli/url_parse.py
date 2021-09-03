@@ -132,11 +132,17 @@ def url_parse_action(cli_args):
     elif cli_args.youtube:
         headers = YOUTUBE_REPORT_HEADERS
 
+    multiplex = None
+
+    if cli_args.separator is not None:
+        multiplex = (cli_args.column, cli_args.separator)
+
     enricher = casanova.enricher(
         cli_args.file,
         cli_args.output,
         add=headers,
-        keep=cli_args.select
+        keep=cli_args.select,
+        multiplex=multiplex
     )
 
     loading_bar = LoadingBar(
@@ -145,30 +151,24 @@ def url_parse_action(cli_args):
         total=cli_args.total
     )
 
-    for row, cell in enricher.cells(cli_args.column, with_rows=True):
+    for row, url in enricher.cells(cli_args.column, with_rows=True):
         loading_bar.update()
 
-        if cli_args.separator:
-            urls = cell.split(cli_args.separator)
+        url = url.strip()
+
+        if not is_url(url, allow_spaces_in_path=True, require_protocol=False):
+            enricher.writerow(row)
+            continue
+
+        if cli_args.facebook:
+            addendum = extract_facebook_addendum(url)
+        elif cli_args.youtube:
+            addendum = extract_youtube_addendum(url)
         else:
-            urls = [cell]
+            addendum = extract_standard_addendum(cli_args, url)
 
-        for url in urls:
-            url = url.strip()
+        if addendum is None:
+            enricher.writerow(row)
+            continue
 
-            if not is_url(url, allow_spaces_in_path=True, require_protocol=False):
-                enricher.writerow(row)
-                continue
-
-            if cli_args.facebook:
-                addendum = extract_facebook_addendum(url)
-            elif cli_args.youtube:
-                addendum = extract_youtube_addendum(url)
-            else:
-                addendum = extract_standard_addendum(cli_args, url)
-
-            if addendum is None:
-                enricher.writerow(row)
-                continue
-
-            enricher.writerow(row, addendum)
+        enricher.writerow(row, addendum)
