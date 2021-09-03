@@ -600,6 +600,8 @@ columns being added to the output:
   "m" or some language subdomains etc., of the url.
 . "probably_shortened": whether the url is probably shortened or
   not (bit.ly, t.co etc.).
+. "probably_typo": whether the url probably contains typo or not
+  (such as inclusive language in french : curieux.se etc.).
 
 columns being added with --facebook:
 
