@@ -42,10 +42,10 @@ def forge_videos_url(key, ids):
     return '%(base)s/videos?id=%(ids)s&key=%(key)s&part=snippet,statistics,contentDetails' % data
 
 
-def forge_search_url(key, query, order, token=None):
+def forge_search_url(key, query, order=YOUTUBE_API_DEFAULT_SEARCH_ORDER, token=None):
     data = {
         'base': YOUTUBE_API_BASE_URL,
-        'order': YOUTUBE_API_DEFAULT_SEARCH_ORDER,
+        'order': order,
         'query': quote(query),
         'key': key,
         'count': YOUTUBE_API_MAX_VIDEOS_PER_CALL
