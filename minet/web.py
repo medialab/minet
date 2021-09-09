@@ -169,8 +169,7 @@ def parse_html_canonical(value):
             ret = ret.decode('utf-8')
 
         if ret.startswith("\""):
-            l = ret.split("\"")
-            ret = l[1]
+            ret = ret.strip("\"")
         return ret
     except Exception:
         return None
@@ -334,8 +333,6 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
     url_stack = OrderedDict()
     error = None
     response = None
-    canonicalized = False
-    hit_count = 0
 
     for _ in range(max_redirects):
         if infer_redirection:
@@ -418,28 +415,12 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
                         location = js_relocation
                         redirection.type = 'js-relocation'
 
-                # canonical url
-                # if location is None and canonicalize:
-                #     try:
-                #         response._body = response.read(CONTENT_CHUNK_SIZE_CANONICALIZE)
-                #     except Exception as e:
-                #         error = e
-                #         redirection.type = 'error'
-                #         break
-
-                #     canonical_relocation = find_canonical_link(response._body)
-
-                #     if canonical_relocation is not None:
-                #         location = canonical_relocation
-                #         redirection.type = 'canonical-relocation'
-
             # Found the end
-            if location is None and not canonicalized:
+            if location is None:
                 redirection.type = 'hit'
-                hit_count += 1
 
             # canonical url
-            if location is None and canonicalize and not canonicalized and hit_count == 2:
+            if redirection.type == 'hit' and canonicalize:
                 try:
                     response._body = response.read(CONTENT_CHUNK_SIZE_CANONICALIZE)
                 except Exception as e:
@@ -449,11 +430,15 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
 
                 canonical_relocation = find_canonical_link(response._body)
 
-                if canonical_relocation is not None:
+                if canonical_relocation is not None and canonical_relocation != url:
+                    redirection = Redirection(canonical_relocation, 'canonical-relocation')
+                    redirection.status = response.status
+                    url_stack[canonical_relocation] = redirection
                     location = canonical_relocation
-                    redirection.type = 'canonical-relocation'
-                    canonicalized = True
                     break
+                break
+
+            elif redirection == 'hit':
                 break
 
         else:
