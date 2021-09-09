@@ -8,8 +8,6 @@ import re
 import cgi
 import certifi
 import browser_cookie3
-from ural.urls_from_html import urls_from_html
-from ural.urls_from_text import urls_from_text
 import urllib3
 import ural
 import json
