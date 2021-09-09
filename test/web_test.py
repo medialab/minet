@@ -2,7 +2,6 @@
 # Minet Web Utils Unit Tests
 # =============================================================================
 from minet.web import (
-    CANONICAL_LINK,
     find_canonical_link,
     parse_html_canonical,
     parse_http_refresh,

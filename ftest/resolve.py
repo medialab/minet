@@ -48,7 +48,7 @@ URLS = [
 
 for url in URLS:
     print()
-    error, stack = resolve(url, follow_meta_refresh=True, infer_redirection=True, canonicalize=True, max_redirects=10)
+    error, stack = resolve(url, follow_meta_refresh=True, infer_redirection=True, canonicalize=True)
     print(type(error), error)
     for item in stack:
         print(item)

@@ -54,14 +54,14 @@ JAVASCRIPT_LOCATION_RE = re.compile(rb'''(?:window\.)?location(?:\s*=\s*|\.repla
 ESCAPED_SLASH_RE = re.compile(rb'\\\/')
 ASCII_RE = re.compile(r'^[ -~]*$')
 HTML_RE = re.compile(rb'^<(?:html|head|body|title|meta|link|span|div|img|ul|ol|[ap!?])', flags=re.I)
-CANONICAL_LINK = re.compile(rb'<link\s*[^>]*\s+rel=(?:"\s*canonical\s*"|canonical|\'\s*canonical\s*\')\s*[^>]*\s?/?>')
-HREF = re.compile(rb'href=(\"[\w+\./:\?\#\-]+|\'[\w+\./:\?\#\-]+|[\w+\./:\?\#\-]+)>?\s?', flags=re.I)
+CANONICAL_LINK_RE = re.compile(rb'<link\s*[^>]*\s+rel=(?:"\s*canonical\s*"|canonical|\'\s*canonical\s*\')\s*[^>]*\s?/?>')
+HREF_RE = re.compile(rb'href=(\"[\w+\./:\?\#\-]+|\'[\w+\./:\?\#\-]+|[\w+\./:\?\#\-]+)>?\s?', flags=re.I)
 
 # Constants
 CHARDET_CONFIDENCE_THRESHOLD = 0.9
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
 CONTENT_CHUNK_SIZE = 1024
-CONTENT_CHUNK_SIZE_CANONICALIZE = 2**16
+CONTENT_CHUNK_SIZE_CANONICALIZE = 2 ** 16
 
 
 # TODO: add a version that tallies the possibilities
@@ -158,23 +158,21 @@ def parse_http_refresh(value):
 
 
 def parse_html_canonical(value):
-    try:
 
-        m = HREF.search(value)
+        m = HREF_RE.search(value)
+        if not m:
+            return None
 
         ret = m.group(1)
-        if isinstance(ret, bytes):
-            ret = ret.decode('utf-8')
+        ret = ret.decode('utf-8')
 
-        if ret.startswith("\""):
-            ret = ret.strip("\"")
+        ret = ret.strip("\"")
+        ret = ret.strip("\'")
         return ret
-    except Exception:
-        return None
-
+        
 
 def find_canonical_link(html_chunk):
-    m = CANONICAL_LINK.search(html_chunk)
+    m = CANONICAL_LINK_RE.search(html_chunk)
 
     if not m:
         return None
@@ -429,14 +427,9 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
                 canonical_relocation = find_canonical_link(response._body)
 
                 if canonical_relocation is not None and canonical_relocation != url:
-                    redirection = Redirection(canonical_relocation, 'canonical-relocation')
-                    redirection.status = response.status
+                    redirection = Redirection(canonical_relocation, 'canonical')
                     url_stack[canonical_relocation] = redirection
                     location = canonical_relocation
-                    break
-                break
-
-            elif redirection == 'hit':
                 break
 
         else:
