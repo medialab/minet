@@ -162,7 +162,8 @@ class YouTubeAPIClient(object):
                 url = forge_search_url(
                     self.key,
                     query,
-                    order=order
+                    order=order,
+                    token=token
                 )
 
                 result = self.request_json(url)
