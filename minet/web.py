@@ -54,8 +54,8 @@ JAVASCRIPT_LOCATION_RE = re.compile(rb'''(?:window\.)?location(?:\s*=\s*|\.repla
 ESCAPED_SLASH_RE = re.compile(rb'\\\/')
 ASCII_RE = re.compile(r'^[ -~]*$')
 HTML_RE = re.compile(rb'^<(?:html|head|body|title|meta|link|span|div|img|ul|ol|[ap!?])', flags=re.I)
-CANONICAL_LINK_RE = re.compile(rb'<link\s*[^>]*\s+rel=(?:"\s*canonical\s*"|canonical|\'\s*canonical\s*\')\s*[^>]*\s?/?>')
-HREF_RE = re.compile(rb'href=(\"[\w+\./:\?\#\-]+|\'[\w+\./:\?\#\-]+|[\w+\./:\?\#\-]+)>?\s?', flags=re.I)
+CANONICAL_LINK_RE = re.compile(rb'<link\s*[^>]*\s+rel=(?:"\s*canonical\s*"|canonical|\'\s*canonical\s*\')\s+[^>]*\s?/?>')
+HREF_RE = re.compile(rb'href=(\"[^"]+|\'[^\']+|[^\s]+)>?\s?', flags=re.I)
 
 # Constants
 CHARDET_CONFIDENCE_THRESHOLD = 0.9
