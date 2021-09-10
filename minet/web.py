@@ -159,17 +159,17 @@ def parse_http_refresh(value):
 
 def parse_html_canonical(value):
 
-        m = HREF_RE.search(value)
-        if not m:
-            return None
+    m = HREF_RE.search(value)
+    if not m:
+        return None
 
-        ret = m.group(1)
-        ret = ret.decode('utf-8')
+    ret = m.group(1)
+    ret = ret.decode('utf-8')
 
-        ret = ret.strip("\"")
-        ret = ret.strip("\'")
-        return ret
-        
+    ret = ret.strip("\"")
+    ret = ret.strip("'")
+    return ret
+
 
 def find_canonical_link(html_chunk):
     m = CANONICAL_LINK_RE.search(html_chunk)
