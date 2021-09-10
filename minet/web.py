@@ -66,6 +66,24 @@ LARGE_CONTENT_CHUNK_SIZE = 2 ** 16
 assert CONTENT_CHUNK_SIZE < LARGE_CONTENT_CHUNK_SIZE
 
 
+def prebuffer_response_up_to(response, target):
+    try:
+        if response._body is None:
+            response._body = response.read(target)
+        else:
+            target -= len(response._body)
+
+            if target <= 0:
+                return None
+
+            response._body += response.read(target)
+
+    except Exception as e:
+        return e
+
+    return None
+
+
 # TODO: add a version that tallies the possibilities
 def guess_response_encoding(response, is_xml=False, use_chardet=False):
     """
@@ -393,10 +411,9 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
 
                 # Reading a small chunk of the html
                 if location is None and (follow_meta_refresh or follow_js_relocation):
-                    try:
-                        response._body = response.read(CONTENT_CHUNK_SIZE)
-                    except Exception as e:
-                        error = e
+                    error = prebuffer_response_up_to(response, CONTENT_CHUNK_SIZE)
+
+                    if error is not None:
                         redirection.type = 'error'
                         break
 
@@ -423,13 +440,9 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
             # Canonical url
             if redirection.type == 'hit':
                 if canonicalize:
-                    try:
-                        if response._body is None:
-                            response._body = response.read(LARGE_CONTENT_CHUNK_SIZE)
-                        else:
-                            response._body += response.read(LARGE_CONTENT_CHUNK_SIZE - CONTENT_CHUNK_SIZE)
-                    except Exception as e:
-                        error = e
+                    error = prebuffer_response_up_to(response, LARGE_CONTENT_CHUNK_SIZE)
+
+                    if error is not None:
                         redirection.type = 'error'
                         break
 
