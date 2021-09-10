@@ -26,6 +26,7 @@ from tenacity import (
     retry_if_exception,
     stop_after_attempt
 )
+from urllib3.exceptions import DecodeError
 
 from minet.encodings import is_supported_encoding
 from minet.utils import is_binary_mimetype
@@ -163,12 +164,14 @@ def parse_html_canonical(value):
     if not m:
         return None
 
-    ret = m.group(1)
-    ret = ret.decode('utf-8')
+    url = m.group(1)
 
-    ret = ret.strip("\"")
-    ret = ret.strip("'")
-    return ret
+    try:
+        url = url.decode('utf-8')
+    except UnicodeDecodeError:
+        return None
+
+    return url.strip('"\'')
 
 
 def find_canonical_link(html_chunk):
@@ -427,6 +430,7 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
                 canonical_relocation = find_canonical_link(response._body)
 
                 if canonical_relocation is not None and canonical_relocation != url:
+                    canonical_relocation = urljoin(url, canonical_relocation)
                     redirection = Redirection(canonical_relocation, 'canonical')
                     url_stack[canonical_relocation] = redirection
                     location = canonical_relocation
