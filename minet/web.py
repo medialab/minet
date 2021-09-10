@@ -54,11 +54,16 @@ JAVASCRIPT_LOCATION_RE = re.compile(rb'''(?:window\.)?location(?:\s*=\s*|\.repla
 ESCAPED_SLASH_RE = re.compile(rb'\\\/')
 ASCII_RE = re.compile(r'^[ -~]*$')
 HTML_RE = re.compile(rb'^<(?:html|head|body|title|meta|link|span|div|img|ul|ol|[ap!?])', flags=re.I)
+CANONICAL_LINK_RE = re.compile(rb'<link\s*[^>]*\s+rel=(?:"\s*canonical\s*"|canonical|\'\s*canonical\s*\')\s+[^>]*\s?/?>')
+HREF_RE = re.compile(rb'href=(\"[^"]+|\'[^\']+|[^\s]+)>?\s?', flags=re.I)
 
 # Constants
 CHARDET_CONFIDENCE_THRESHOLD = 0.9
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
 CONTENT_CHUNK_SIZE = 1024
+CONTENT_CHUNK_SIZE_CANONICALIZE = 2 ** 16
+
+assert CONTENT_CHUNK_SIZE < CONTENT_CHUNK_SIZE_CANONICALIZE
 
 
 # TODO: add a version that tallies the possibilities
@@ -152,6 +157,31 @@ def parse_http_refresh(value):
         return int(duration), str(url.split('=', 1)[1])
     except:
         return None
+
+
+def parse_html_canonical(value):
+
+    m = HREF_RE.search(value)
+    if not m:
+        return None
+
+    url = m.group(1)
+
+    try:
+        url = url.decode('utf-8')
+    except UnicodeDecodeError:
+        return None
+
+    return url.strip('"\'')
+
+
+def find_canonical_link(html_chunk):
+    m = CANONICAL_LINK_RE.search(html_chunk)
+
+    if not m:
+        return None
+
+    return parse_html_canonical(m.group())
 
 
 def find_meta_refresh(html_chunk):
@@ -295,7 +325,7 @@ class Redirection(object):
 def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
                 follow_refresh_header=True, follow_meta_refresh=False,
                 follow_js_relocation=False, return_response=False,
-                infer_redirection=False, timeout=None, body=None,):
+                infer_redirection=False, timeout=None, body=None, canonicalize=False):
     """
     Helper function attempting to resolve the given url.
     """
@@ -388,7 +418,29 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
             # Found the end
             if location is None:
                 redirection.type = 'hit'
+
+            # Canonical url
+            if redirection.type == 'hit':
+                if canonicalize:
+                    try:
+                        if response._body is None:
+                            response._body = response.read(CONTENT_CHUNK_SIZE_CANONICALIZE)
+                        else:
+                            response._body += response.read(CONTENT_CHUNK_SIZE_CANONICALIZE - CONTENT_CHUNK_SIZE)
+                    except Exception as e:
+                        error = e
+                        redirection.type = 'error'
+                        break
+
+                    canonical_relocation = find_canonical_link(response._body)
+
+                    if canonical_relocation is not None and canonical_relocation != url and canonical_relocation != '':
+                        canonical_relocation = urljoin(url, canonical_relocation)
+                        redirection = Redirection(canonical_relocation, 'canonical')
+                        url_stack[canonical_relocation] = redirection
+                        location = canonical_relocation
                 break
+
         else:
             redirection.type = 'location-header'
             location = response.getheader('location')
@@ -532,7 +584,7 @@ def request(url, pool=DEFAULT_POOL, method='GET', headers=None, cookie=None, spo
 def resolve(url, pool=DEFAULT_POOL, method='GET', headers=None, cookie=None, spoof_ua=True,
             max_redirects=5, follow_refresh_header=True,
             follow_meta_refresh=False, follow_js_relocation=False,
-            infer_redirection=False, timeout=None):
+            infer_redirection=False, timeout=None, canonicalize=False):
 
     final_headers = build_request_headers(
         headers=headers,
@@ -550,7 +602,8 @@ def resolve(url, pool=DEFAULT_POOL, method='GET', headers=None, cookie=None, spo
         follow_meta_refresh=follow_meta_refresh,
         follow_js_relocation=follow_js_relocation,
         infer_redirection=infer_redirection,
-        timeout=timeout
+        timeout=timeout,
+        canonicalize=canonicalize
     )
 
 

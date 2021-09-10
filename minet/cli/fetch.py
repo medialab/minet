@@ -148,8 +148,7 @@ def fetch_action(cli_args, resolve=False, defer=None):
                 status = result.stack[-1].status
             else:
                 status = result.response.status
-
-            if status >= 400:
+            if status is not None and status >= 400:
                 status_codes[status] += 1
 
         stats = {'errors': errors}
@@ -392,6 +391,7 @@ def fetch_action(cli_args, resolve=False, defer=None):
             follow_meta_refresh=cli_args.follow_meta_refresh,
             follow_js_relocation=cli_args.follow_js_relocation,
             infer_redirection=cli_args.infer_redirection,
+            canonicalize=cli_args.canonicalize,
             **common_kwargs
         )
 

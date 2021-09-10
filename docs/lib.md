@@ -152,7 +152,9 @@ for result in multithreaded_resolve(urls, key=lambda x: x['url']):
 * **max_redirects** *?int* [`5`]: Max number of redirections to follow.
 * **follow_refresh_header** *?bool* [`False`]: Whether to follow `Refresh` headers or not.
 * **follow_meta_refresh** *?bool* [`False`]: Whether to follow meta refresh tags. It's more costly because we need to stream the start of the response's body and cannot rely on headers alone.
+* **follow_js_relocation** *?bool* [`False`]: Whether to follow typical JavaScript window relocation. It's more costly because we need to stream the start of the response's body and cannot rely on headers alone.
 * **infer_redirection** *?bool* [`False`]: Whether to heuristically infer redirections from urls by using `ural.infer_redirection`?
+* **canonicalize** *?bool* [`False`]: Whether to try to find the canonical url from the html source code of the web page. It's more costly because we need to stream the start of the response's body.
 * **buffer_size** *?int* [`25`]: Max number of items per domain to enqueue into memory in hope of finding a new domain that can be processed immediately.
 * **insecure** *?bool* [`False`]: Whether to ignore SSL certification errors when performing requests.
 * **timeout** *?float|urllib3.Timeout*: Custom timeout for every request.
