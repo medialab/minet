@@ -148,9 +148,7 @@ def fetch_action(cli_args, resolve=False, defer=None):
                 status = result.stack[-1].status
             else:
                 status = result.response.status
-            if status is None:
-                status_codes[status] += 1
-            elif status >= 400:
+            if status is not None and status >= 400:
                 status_codes[status] += 1
 
         stats = {'errors': errors}
