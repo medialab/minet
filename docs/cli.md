@@ -399,10 +399,10 @@ optional arguments:
   --url-template URL_TEMPLATE                     A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.
   -X METHOD, --request METHOD                     The http method to use. Will default to GET.
   --max-redirects MAX_REDIRECTS                   Maximum number of redirections to follow before breaking. Defaults to 20.
-  --follow-meta-refresh                           Whether to follow meta refresh tags. Requires to buffer a bit of the response body, so it will slow things down.
-  --follow-js-relocation                          Whether to follow typical JavaScript window relocation. Requires to buffer a bit of the response body, so it will slow things down.
+  --follow-meta-refresh                           Whether to follow meta refresh tags. Requires to buffer part of the response body, so it will slow things down.
+  --follow-js-relocation                          Whether to follow typical JavaScript window relocation. Requires to buffer part of the response body, so it will slow things down.
   --infer-redirection                             Whether to try to heuristically infer redirections from the urls themselves, without requiring a HTTP call.
-  --canonicalize                                  Whether to try to find the canonical url from the html source code of the web page. Requires to buffer a bit of the response body, so it will slow things down.
+  --canonicalize                                  Whether to extract the canonical url from the html source code of the web page if found. Requires to buffer part of the response body, so it will slow things down.
   --only-shortened                                Whether to only attempt to resolve urls that are probably shortened.
 
 columns being added to the output:

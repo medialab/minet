@@ -61,9 +61,9 @@ HREF_RE = re.compile(rb'href=(\"[^"]+|\'[^\']+|[^\s]+)>?\s?', flags=re.I)
 CHARDET_CONFIDENCE_THRESHOLD = 0.9
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
 CONTENT_CHUNK_SIZE = 1024
-CONTENT_CHUNK_SIZE_CANONICALIZE = 2 ** 16
+LARGE_CONTENT_CHUNK_SIZE = 2 ** 16
 
-assert CONTENT_CHUNK_SIZE < CONTENT_CHUNK_SIZE_CANONICALIZE
+assert CONTENT_CHUNK_SIZE < LARGE_CONTENT_CHUNK_SIZE
 
 
 # TODO: add a version that tallies the possibilities
@@ -159,9 +159,10 @@ def parse_http_refresh(value):
         return None
 
 
-def parse_html_canonical(value):
+def extract_href(value):
 
     m = HREF_RE.search(value)
+
     if not m:
         return None
 
@@ -172,7 +173,7 @@ def parse_html_canonical(value):
     except UnicodeDecodeError:
         return None
 
-    return url.strip('"\'')
+    return url.strip('"\'') or None
 
 
 def find_canonical_link(html_chunk):
@@ -181,7 +182,7 @@ def find_canonical_link(html_chunk):
     if not m:
         return None
 
-    return parse_html_canonical(m.group())
+    return extract_href(m.group())
 
 
 def find_meta_refresh(html_chunk):
@@ -424,21 +425,21 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
                 if canonicalize:
                     try:
                         if response._body is None:
-                            response._body = response.read(CONTENT_CHUNK_SIZE_CANONICALIZE)
+                            response._body = response.read(LARGE_CONTENT_CHUNK_SIZE)
                         else:
-                            response._body += response.read(CONTENT_CHUNK_SIZE_CANONICALIZE - CONTENT_CHUNK_SIZE)
+                            response._body += response.read(LARGE_CONTENT_CHUNK_SIZE - CONTENT_CHUNK_SIZE)
                     except Exception as e:
                         error = e
                         redirection.type = 'error'
                         break
 
-                    canonical_relocation = find_canonical_link(response._body)
+                    canonical = find_canonical_link(response._body)
 
-                    if canonical_relocation is not None and canonical_relocation != url and canonical_relocation != '':
-                        canonical_relocation = urljoin(url, canonical_relocation)
-                        redirection = Redirection(canonical_relocation, 'canonical')
-                        url_stack[canonical_relocation] = redirection
-                        location = canonical_relocation
+                    if canonical is not None and canonical != url:
+                        canonical = urljoin(url, canonical)
+                        redirection = Redirection(canonical, 'canonical')
+                        url_stack[canonical] = redirection
+
                 break
 
         else:

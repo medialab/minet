@@ -368,7 +368,7 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
             Defaults to False.
         infer_redirection (bool, optional): Whether to infer redirections
             heuristically from urls. Defaults to False.
-        canonicalize (bool, optional): Whether to find the canonical url found
+        canonicalize (bool, optional): Whether to extract the canonical url found
             in the html of the web page. Defaults to False.
         buffer_size (int, optional): Max number of items per domain to enqueue
             into memory in hope of finding a new domain that can be processed

@@ -1439,12 +1439,12 @@ MINET_COMMANDS = {
             },
             {
                 'flag': '--follow-meta-refresh',
-                'help': 'Whether to follow meta refresh tags. Requires to buffer a bit of the response body, so it will slow things down.',
+                'help': 'Whether to follow meta refresh tags. Requires to buffer part of the response body, so it will slow things down.',
                 'action': 'store_true'
             },
             {
                 'flag': '--follow-js-relocation',
-                'help': 'Whether to follow typical JavaScript window relocation. Requires to buffer a bit of the response body, so it will slow things down.',
+                'help': 'Whether to follow typical JavaScript window relocation. Requires to buffer part of the response body, so it will slow things down.',
                 'action': 'store_true'
             },
             {
@@ -1454,7 +1454,7 @@ MINET_COMMANDS = {
             },
             {
                 'flag': '--canonicalize',
-                'help': 'Whether to try to find the canonical url from the html source code of the web page. Requires to buffer a bit of the response body, so it will slow things down.',
+                'help': 'Whether to extract the canonical url from the html source code of the web page if found. Requires to buffer part of the response body, so it will slow things down.',
                 'action': 'store_true'
             },
             {
