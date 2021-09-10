@@ -77,7 +77,9 @@ CANONICAL_LINK_TESTS = [(b'<link href="https://www.dailymail.co.uk/home/index.ht
                         (b'<link rel="canonical" href="https://www.corriere.it/" />', 'https://www.corriere.it/'),
                         (b'<link rel="canonical" href="https://www.thesun.co.uk/news/16044176/buckingham-palace-furious-queens-secret-death/"/>', 'https://www.thesun.co.uk/news/16044176/buckingham-palace-furious-queens-secret-death/'),
                         (b'<link rel="canonical" href="https://www.theguardian.com/us-news/commentisfree/2016/feb/16/thomas-piketty-bernie-sanders-us-election-2016" />', 'https://www.theguardian.com/us-news/commentisfree/2016/feb/16/thomas-piketty-bernie-sanders-us-election-2016'),
-                        (b'<link rel="canonical" "https://www.theguardian.com/us-news/commentisfree/2016/feb/16/thomas-piketty-bernie-sanders-us-election-2016" />', None)]
+                        (b'<link rel="canonical" "https://www.theguardian.com/us-news/commentisfree/2016/feb/16/thomas-piketty-bernie-sanders-us-election-2016" />', None),
+                        (b'<link rel="canonical" href=', None),
+                        (b'<link rel="canonical" href=""', '')]
 
 
 class TestWeb(object):

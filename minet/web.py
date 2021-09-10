@@ -425,7 +425,7 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
                     if response._body is None:
                         response._body = response.read(CONTENT_CHUNK_SIZE_CANONICALIZE)
                     else:
-                        response._body = response._body + response.read(CONTENT_CHUNK_SIZE_CANONICALIZE - CONTENT_CHUNK_SIZE)
+                        response._body += response.read(CONTENT_CHUNK_SIZE_CANONICALIZE - CONTENT_CHUNK_SIZE)
                 except Exception as e:
                     error = e
                     redirection.type = 'error'
@@ -433,7 +433,7 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
 
                 canonical_relocation = find_canonical_link(response._body)
 
-                if canonical_relocation is not None and canonical_relocation != url:
+                if canonical_relocation is not None and canonical_relocation != url and canonical_relocation != '':
                     canonical_relocation = urljoin(url, canonical_relocation)
                     redirection = Redirection(canonical_relocation, 'canonical')
                     url_stack[canonical_relocation] = redirection
