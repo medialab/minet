@@ -381,7 +381,10 @@ class TwitterAPIScraper(object):
                 if limit is not None and i >= limit:
                     return
 
-            if new_cursor is None or len(tweets) == 0:
+            # NOTE: we cannot stop when no tweets are found anymore because
+            # of Twitter's public facing API's strange hiccups.
+            # Comparing cursors seems to be the only good option now...
+            if new_cursor is None or new_cursor == cursor:
                 return
 
             cursor = new_cursor
