@@ -392,6 +392,7 @@ def fetch_action(cli_args, resolve=False, defer=None):
             follow_meta_refresh=cli_args.follow_meta_refresh,
             follow_js_relocation=cli_args.follow_js_relocation,
             infer_redirection=cli_args.infer_redirection,
+            canonicalize=cli_args.canonicalize,
             **common_kwargs
         )
 

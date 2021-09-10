@@ -173,7 +173,7 @@ class FetchWorker(object):
 class ResolveWorker(object):
     def __init__(self, pool, *, resolve_args=None, max_redirects=DEFAULT_RESOLVE_MAX_REDIRECTS,
                  follow_refresh_header=True, follow_meta_refresh=False, follow_js_relocation=False,
-                 infer_redirection=False):
+                 infer_redirection=False, canonicalize=False):
 
         self.pool = pool
         self.resolve_args = resolve_args
@@ -182,6 +182,7 @@ class ResolveWorker(object):
         self.follow_meta_refresh = follow_meta_refresh
         self.follow_js_relocation = follow_js_relocation
         self.infer_redirection = infer_redirection
+        self.canonicalize = canonicalize
 
     def __call__(self, payload):
         item, domain, url = payload
@@ -209,6 +210,7 @@ class ResolveWorker(object):
             follow_meta_refresh=self.follow_meta_refresh,
             follow_js_relocation=self.follow_js_relocation,
             infer_redirection=self.infer_redirection,
+            canonicalize=self.canonicalize,
             **kwargs
         )
 
@@ -256,7 +258,7 @@ class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor):
     def imap_unordered(self, iterator, *, key=None, throttle=DEFAULT_THROTTLE, resolve_args=None,
                        buffer_size=DEFAULT_IMAP_BUFFER_SIZE, domain_parallelism=DEFAULT_DOMAIN_PARALLELISM,
                        max_redirects=DEFAULT_FETCH_MAX_REDIRECTS, follow_refresh_header=True,
-                       follow_meta_refresh=False, follow_js_relocation=False, infer_redirection=False):
+                       follow_meta_refresh=False, follow_js_relocation=False, infer_redirection=False, canonicalize=False):
 
         # TODO: validate
         iterator = payloads_iter(iterator, key=key)
@@ -267,7 +269,8 @@ class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor):
             follow_refresh_header=follow_refresh_header,
             follow_meta_refresh=follow_meta_refresh,
             follow_js_relocation=follow_js_relocation,
-            infer_redirection=infer_redirection
+            infer_redirection=infer_redirection,
+            canonicalize=canonicalize
         )
 
         return super().imap_unordered(
@@ -339,6 +342,7 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
                           throttle=DEFAULT_THROTTLE, max_redirects=5,
                           follow_refresh_header=True, follow_meta_refresh=False,
                           follow_js_relocation=False, infer_redirection=False,
+                          canonicalize=False,
                           buffer_size=DEFAULT_IMAP_BUFFER_SIZE,
                           insecure=False, timeout=DEFAULT_URLLIB3_TIMEOUT,
                           domain_parallelism=DEFAULT_DOMAIN_PARALLELISM,
@@ -360,8 +364,12 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
             headers. Defaults to True.
         follow_meta_refresh (bool, optional): Whether to follow meta refresh.
             Defaults to False.
+        follow_js_relocation (bool, optional): Whether to follow js relocation.
+            Defaults to False.
         infer_redirection (bool, optional): Whether to infer redirections
             heuristically from urls. Defaults to False.
+        canonicalize (bool, optional): Whether to find the canonical url found
+            in the html of the web page. Defaults to False.
         buffer_size (int, optional): Max number of items per domain to enqueue
             into memory in hope of finding a new domain that can be processed
             immediately. Defaults to 1.
@@ -396,7 +404,8 @@ def multithreaded_resolve(iterator, key=None, resolve_args=None, threads=25,
                 follow_refresh_header=follow_refresh_header,
                 follow_meta_refresh=follow_meta_refresh,
                 follow_js_relocation=follow_js_relocation,
-                infer_redirection=infer_redirection
+                infer_redirection=infer_redirection,
+                canonicalize=canonicalize
             )
 
     return generator()

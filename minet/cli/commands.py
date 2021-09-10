@@ -1453,6 +1453,11 @@ MINET_COMMANDS = {
                 'action': 'store_true'
             },
             {
+                'flag': '--canonicalize',
+                'help': 'Whether to try to find the canonical url from the html source code of the web page. Requires to buffer a bit of the response body, so it will slow things down.',
+                'action': 'store_true'
+            },
+            {
                 'flag': '--only-shortened',
                 'help': 'Whether to only attempt to resolve urls that are probably shortened.',
                 'action': 'store_true'

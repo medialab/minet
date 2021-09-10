@@ -26,7 +26,6 @@ from tenacity import (
     retry_if_exception,
     stop_after_attempt
 )
-from urllib3.exceptions import DecodeError
 
 from minet.encodings import is_supported_encoding
 from minet.utils import is_binary_mimetype
@@ -63,6 +62,8 @@ CHARDET_CONFIDENCE_THRESHOLD = 0.9
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
 CONTENT_CHUNK_SIZE = 1024
 CONTENT_CHUNK_SIZE_CANONICALIZE = 2 ** 16
+
+assert CONTENT_CHUNK_SIZE < CONTENT_CHUNK_SIZE_CANONICALIZE
 
 
 # TODO: add a version that tallies the possibilities
@@ -421,7 +422,10 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
             # canonical url
             if redirection.type == 'hit' and canonicalize:
                 try:
-                    response._body = response.read(CONTENT_CHUNK_SIZE_CANONICALIZE)
+                    if response._body is None:
+                        response._body = response.read(CONTENT_CHUNK_SIZE_CANONICALIZE)
+                    else:
+                        response._body = response._body + response.read(CONTENT_CHUNK_SIZE_CANONICALIZE - CONTENT_CHUNK_SIZE)
                 except Exception as e:
                     error = e
                     redirection.type = 'error'

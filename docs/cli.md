@@ -367,7 +367,7 @@ usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM]
                      [--url-template URL_TEMPLATE] [-X METHOD]
                      [--max-redirects MAX_REDIRECTS] [--follow-meta-refresh]
                      [--follow-js-relocation] [--infer-redirection]
-                     [--only-shortened]
+                     [--canonicalize] [--only-shortened]
                      column [file]
 
 Minet Resolve Command
@@ -402,6 +402,7 @@ optional arguments:
   --follow-meta-refresh                           Whether to follow meta refresh tags. Requires to buffer a bit of the response body, so it will slow things down.
   --follow-js-relocation                          Whether to follow typical JavaScript window relocation. Requires to buffer a bit of the response body, so it will slow things down.
   --infer-redirection                             Whether to try to heuristically infer redirections from the urls themselves, without requiring a HTTP call.
+  --canonicalize                                  Whether to try to find the canonical url from the html source code of the web page. Requires to buffer a bit of the response body, so it will slow things down.
   --only-shortened                                Whether to only attempt to resolve urls that are probably shortened.
 
 columns being added to the output:
