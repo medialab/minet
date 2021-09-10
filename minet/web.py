@@ -173,7 +173,7 @@ def parse_http_refresh(value):
             return None
 
         return int(duration), str(url.split('=', 1)[1])
-    except:
+    except Exception:
         return None
 
 
@@ -220,7 +220,7 @@ def find_javascript_relocation(html_chunk):
 
     try:
         return ESCAPED_SLASH_RE.sub(b'/', m.group(1)).decode()
-    except:
+    except Exception:
         return None
 
 
@@ -477,7 +477,7 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
                     detection['confidence'] >= CHARDET_CONFIDENCE_THRESHOLD
                 ):
                     location = byte_location.decode(guessed_encoding)
-        except:
+        except Exception:
             pass
 
         # Resolving next url

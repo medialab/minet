@@ -201,17 +201,17 @@ def facebook_post_stats_action(cli_args):
             # TODO: use a context manager
             try:
                 data['scraped']['aria_label'] = timestamp_elem.parent.get('aria-label')
-            except:
+            except Exception:
                 pass
 
             try:
                 data['scraped']['text'] = soup.select_one('[data-testid="post_message"]').get_text()
-            except:
+            except Exception:
                 pass
 
             # try:
             #     data['scraped']['link'] = soup.select_one('[data-lynx-uri]').get('href')
-            # except:
+            # except Exception:
             #     pass
 
         return None, data
