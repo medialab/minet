@@ -42,8 +42,8 @@ setup(name='minet',
         'termcolor>=1.0.0',
         'tqdm>=4.60.0',
         'trafilatura>=0.9.1,<0.10',
-        'twitwi>=0.9.0,<1',
-        'ural>=0.31.0,<0.32',
+        'twitwi>=0.9.2,<1',
+        'ural>=0.31.1,<0.32',
         'urllib3[secure]>=1.25.3,<2'
       ],
       entry_points={
