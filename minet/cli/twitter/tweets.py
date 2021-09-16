@@ -38,6 +38,7 @@ def twitter_tweets_hydration_action(cli_args):
     for chunk in as_chunks(100, enricher.cells(cli_args.column, with_rows=True)):
         tweets = ','.join(row[1] for row in chunk)
         kwargs = {'_id': tweets}
+        kwargs['tweet_mode'] = 'extended'
         key = 'id'
 
         try:
