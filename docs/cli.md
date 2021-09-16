@@ -1500,21 +1500,20 @@ examples:
 
 ```
 usage: minet twitter tweets [-h] [--api-key API_KEY]
-                                 [--api-secret-key API_SECRET_KEY]
-                                 [--access-token ACCESS_TOKEN]
-                                 [--access-token-secret ACCESS_TOKEN_SECRET]
-                                 [-o OUTPUT]
-                                 [-s SELECT] [--total TOTAL]
-                                 column [file]
+                            [--api-secret-key API_SECRET_KEY]
+                            [--access-token ACCESS_TOKEN]
+                            [--access-token-secret ACCESS_TOKEN_SECRET]
+                            [-o OUTPUT] [-s SELECT] [--total TOTAL]
+                            column [file]
 
 Minet Twitter Tweets Command
 ============================
 
-Collecting metadata of a given tweet id using the API.
+Collecting tweet metadata from the given tweet ids, using the API.
 
 positional arguments:
   column                                     Name of the column containing the tweet ids.
-  file                                       CSV file containing the inquired tweet ids.
+  file                                       CSV file containing the inquired tweets.
 
 optional arguments:
   -h, --help                                 show this help message and exit
@@ -1528,8 +1527,8 @@ optional arguments:
 
 examples:
 
-. Getting metadata from tweet ids in a CSV file:
-    $ minet tw tweets tweet_id tweets.csv > data.csv
+. Getting metadata from tweets in a CSV file:
+    $ minet tw tweets tweet_id tweets.csv > tweets_metadata.csv
 
 ```
 

@@ -62,7 +62,6 @@ def twitter_tweets_hydration_action(cli_args):
             tweet = normalize_tweet(tweet, collection_source='api')
             addendum = format_tweet_as_csv_row(tweet)
             indexed_result[tweet[key]] = addendum
-            
 
         for row, tweet in chunk:
             addendum = indexed_result.get(tweet)
