@@ -1,3 +1,9 @@
+# =============================================================================
+# Minet Twitter Tweets CLI Action
+# =============================================================================
+#
+# Logic of the `tw tweets` action.
+#
 import casanova
 from twitwi import (
     normalize_tweet,
