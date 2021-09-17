@@ -59,7 +59,6 @@ def twitter_tweets_hydration_action(cli_args):
             break
 
         for tweet in result:
-            # raise KeyError(tweet.get('extended_entities', tweet['entities']))
             tweet = normalize_tweet(tweet, collection_source='api')
             addendum = format_tweet_as_csv_row(tweet)
             indexed_result[tweet[key]] = addendum
