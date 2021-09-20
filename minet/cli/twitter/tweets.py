@@ -1,3 +1,9 @@
+# =============================================================================
+# Minet Twitter Tweets CLI Action
+# =============================================================================
+#
+# Logic of the `tw tweets` action.
+#
 import casanova
 from twitwi import (
     normalize_tweet,
@@ -5,7 +11,6 @@ from twitwi import (
 )
 from twitwi.constants import TWEET_FIELDS
 from twitter import TwitterHTTPError
-
 from ebbe import as_chunks
 
 from minet.cli.utils import LoadingBar
@@ -32,14 +37,13 @@ def twitter_tweets_hydration_action(cli_args):
     loading_bar = LoadingBar(
         'Retrieving tweets metadata',
         total=enricher.total,
-        unit='tweet_id'
+        unit='tweet'
     )
 
     for chunk in as_chunks(100, enricher.cells(cli_args.column, with_rows=True)):
         tweets = ','.join(row[1] for row in chunk)
         kwargs = {'_id': tweets}
         kwargs['tweet_mode'] = 'extended'
-        key = 'id'
 
         try:
             result = client.call(['statuses', 'lookup'], **kwargs)
@@ -47,22 +51,19 @@ def twitter_tweets_hydration_action(cli_args):
             loading_bar.inc('errors')
 
             if e.e.code == 404:
-                loading_bar.print('Could not find tweet "%s"' % tweet)
+                for row, tweet in chunk:
+                    enricher.writerow(row)
             else:
-                loading_bar.print('An error happened when attempting to retrieve tweets from "%s" (HTTP status %i)' % (tweet, e.e.code))
+                raise e
 
             continue
 
         indexed_result = {}
 
-        if not result:
-            break
-
         for tweet in result:
-            # raise KeyError(tweet.get('extended_entities', tweet['entities']))
             tweet = normalize_tweet(tweet, collection_source='api')
             addendum = format_tweet_as_csv_row(tweet)
-            indexed_result[tweet[key]] = addendum
+            indexed_result[tweet['id']] = addendum
 
         for row, tweet in chunk:
             addendum = indexed_result.get(tweet)

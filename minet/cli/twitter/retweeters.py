@@ -17,7 +17,7 @@ REPORT_HEADERS = [
 ]
 
 
-def twitter_tweets_retweeters_action(cli_args):
+def twitter_retweeters_action(cli_args):
 
     client = TwitterAPIClient(
         cli_args.access_token,
