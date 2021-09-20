@@ -49,8 +49,7 @@ def twitter_retweeters_action(cli_args):
         resuming_state = cli_args.output.pop_state()
 
     for row, tweet in enricher.cells(cli_args.column, with_rows=True):
-        kwargs = {'_id': tweet}
-        kwargs['tweet_mode'] = 'extended'
+        kwargs = {'_id': tweet, 'tweet_mode': 'extended'}
         # kwargs['count'] = 100
         loading_bar.update_stats(tweet=tweet)
 
