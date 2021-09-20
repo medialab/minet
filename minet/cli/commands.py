@@ -1882,6 +1882,52 @@ MINET_COMMANDS = {
                             'type': int
                         }
                     ]
+                },
+                'retweeters': {
+                    'title': 'Minet Twitter Retweeters Command',
+                    'description': '''
+                        Collecting retweeters ids from the given tweet ids, using the API.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Getting retweeters ids from tweets in a CSV file:
+                            $ minet tw retweeters tweet_id tweets.csv > retweeters.csv
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the tweet ids.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the inquired tweets.',
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'tweet_id'
+                        },
+                        *TWITTER_API_COMMON_ARGUMENTS,
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction,
+                            'resumer': BatchResumer,
+                            'resumer_kwargs': lambda args: ({'value_column': args.column})
+                        },
+                        {
+                            'flag': '--resume',
+                            'help': 'Whether to resume from an aborted collection. Need -o to be set.',
+                            'action': 'store_true'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of tweets. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
                 }
             }
         }
