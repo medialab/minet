@@ -56,9 +56,9 @@ def twitter_action(cli_args):
             twitter_user_tweets_action(cli_args)
 
         elif cli_args.tw_action == 'tweets':
-            from minet.cli.twitter.tweets import twitter_tweets_hydration_action
+            from minet.cli.twitter.tweets import twitter_tweets_action
 
-            twitter_tweets_hydration_action(cli_args)
+            twitter_tweets_action(cli_args)
 
         else:
             raise TypeError('unkown tw_action "%s"' % cli_args.tw_action)
