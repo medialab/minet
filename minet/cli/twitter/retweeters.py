@@ -49,8 +49,7 @@ def twitter_retweeters_action(cli_args):
         resuming_state = cli_args.output.pop_state()
 
     for row, tweet in enricher.cells(cli_args.column, with_rows=True):
-        kwargs = {'_id': tweet, 'tweet_mode': 'extended'}
-        # kwargs['count'] = 100
+        kwargs = {'_id': tweet}
         loading_bar.update_stats(tweet=tweet)
 
         all_ids = []
@@ -94,5 +93,6 @@ def twitter_retweeters_action(cli_args):
                 enricher.writebatch(row, batch, next_cursor or None)
             else:
                 next_cursor = 0
+            # loading_bar.print(result)
 
         loading_bar.inc('tweets')
