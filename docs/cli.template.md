@@ -50,6 +50,7 @@
   * [scrape](#twitter-scrape)
   * [users](#users)
   * [user-tweets](#user-tweets)
+  * [tweets](#tweets)
 * [youtube (yt)](#youtube)
   * [captions](#captions)
   * [comments](#youtube-comments)
@@ -258,6 +259,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### user-tweets
 
 <% twitter/user-tweets %>
+
+### tweets
+
+<% twitter/tweets %>
 
 ## Youtube
 

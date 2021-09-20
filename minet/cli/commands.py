@@ -1843,6 +1843,45 @@ MINET_COMMANDS = {
                             'type': int
                         }
                     ]
+                },
+                'tweets': {
+                    'title': 'Minet Twitter Tweets Command',
+                    'description': '''
+                        Collecting tweet metadata from the given tweet ids, using the API.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Getting metadata from tweets in a CSV file:
+                            $ minet tw tweets tweet_id tweets.csv > tweets_metadata.csv
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the tweet ids.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the inquired tweets.',
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'tweet_id'
+                        },
+                        *TWITTER_API_COMMON_ARGUMENTS,
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of tweets. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
                 }
             }
         }
