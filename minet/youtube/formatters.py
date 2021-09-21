@@ -54,7 +54,9 @@ def format_video(item):
         get_int(stats, 'viewCount'),
         get_int(stats, 'likeCount'),
         get_int(stats, 'dislikeCount'),
-        get_int(stats, 'favoriteCount'),
+        # get_int(stats, 'favoriteCount'),
+        # This property has been deprecated by YouTube in 2015. The property's value is now always set to 0.
+        # (Look for statistics.favoriteCount in this web page : statistics.favoriteCount).
         get_int(stats, 'commentCount'),
         details['duration'],
         details['caption'] == 'true'
