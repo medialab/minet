@@ -9,8 +9,6 @@ jobs:
         include:
 
           # Old ubuntu
-          - os: ubuntu-16.04
-            python-version: "3.6"
           - os: ubuntu-18.04
             python-version: "3.6"
 
