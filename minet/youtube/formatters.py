@@ -54,7 +54,7 @@ def format_video(item):
         get_int(stats, 'viewCount'),
         get_int(stats, 'likeCount'),
         get_int(stats, 'dislikeCount'),
-        get_int(stats, 'favoriteCount'),
+        # get_int(stats, 'favoriteCount'),
         get_int(stats, 'commentCount'),
         details['duration'],
         details['caption'] == 'true'
