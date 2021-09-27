@@ -9,7 +9,8 @@ from argparse import FileType
 from casanova import (
     LastCellResumer,
     ThreadSafeResumer,
-    BatchResumer
+    BatchResumer,
+    RowCountResumer
 )
 from ural import is_url
 
@@ -1869,7 +1870,13 @@ MINET_COMMANDS = {
                         *TWITTER_API_COMMON_ARGUMENTS,
                         {
                             'flags': ['-o', '--output'],
-                            'action': OutputFileAction
+                            'action': OutputFileAction,
+                            'resumer': RowCountResumer
+                        },
+                        {
+                            'flag': '--resume',
+                            'help': 'Whether to resume from an aborted collection. Need -o to be set.',
+                            'action': 'store_true'
                         },
                         {
                             'flags': ['-s', '--select'],

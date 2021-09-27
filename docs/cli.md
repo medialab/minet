@@ -1503,7 +1503,7 @@ usage: minet twitter tweets [-h] [--api-key API_KEY]
                             [--api-secret-key API_SECRET_KEY]
                             [--access-token ACCESS_TOKEN]
                             [--access-token-secret ACCESS_TOKEN_SECRET]
-                            [-o OUTPUT] [-s SELECT] [--total TOTAL]
+                            [-o OUTPUT] [--resume] [-s SELECT] [--total TOTAL]
                             column [file]
 
 Minet Twitter Tweets Command
@@ -1522,6 +1522,7 @@ optional arguments:
   --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
+  --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of tweets. Necessary if you want to display a finite progress indicator.
 
