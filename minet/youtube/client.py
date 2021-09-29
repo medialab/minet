@@ -20,6 +20,8 @@ from minet.youtube.constants import (
     YOUTUBE_API_SEARCH_ORDERS
 )
 from minet.youtube.exceptions import (
+    YouTubeDisabledComments,
+    YouTubeVideoNotFound,
     YouTubeInvalidAPIKeyError,
     YouTubeInvalidAPICall,
     YouTubeInvalidVideoId
@@ -104,6 +106,9 @@ class YouTubeAPIClient(object):
             raise err
 
         if response.status == 403:
+            if data is not None and getpath(data, ['error', 'errors', 0, 'reason'], '') == 'commentsDisabled':
+                raise YouTubeDisabledComments
+
             sleep_time = seconds_to_midnight_pacific_time() + 10
 
             if callable(self.before_sleep):
@@ -112,6 +117,9 @@ class YouTubeAPIClient(object):
             time.sleep(sleep_time)
 
             return self.request_json(url)
+
+        if response.status == 404:
+            raise YouTubeVideoNotFound
 
         if response.status >= 400:
             if data is not None and 'API key not valid' in getpath(data, ['error', 'message'], ''):
@@ -198,7 +206,11 @@ class YouTubeAPIClient(object):
             while len(queue) != 0:
                 is_reply, item_id, url = queue.popleft()
 
-                result = self.request_json(url)
+                try:
+                    result = self.request_json(url)
+
+                except (YouTubeDisabledComments, YouTubeVideoNotFound):
+                    return
 
                 for item in result['items']:
                     comment_id = item['id']
