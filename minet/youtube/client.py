@@ -119,8 +119,7 @@ class YouTubeAPIClient(object):
             return self.request_json(url)
 
         if response.status == 404:
-            if data is not None and getpath(data, ['error', 'errors', 0, 'reason'], '') == 'videoNotFound':
-                raise YouTubeVideoNotFound
+            raise YouTubeVideoNotFound
 
         if response.status >= 400:
             if data is not None and 'API key not valid' in getpath(data, ['error', 'message'], ''):
