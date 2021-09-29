@@ -28,13 +28,9 @@ class YouTubeInvalidVideoId(YouTubeError):
     pass
 
 
-class YouTubeAPIResponseError(YouTubeError):
+class YouTubeDisabledComments(YouTubeError):
     pass
 
 
-class YouTubeDisabledComments(YouTubeAPIResponseError):
-    pass
-
-
-class YouTubeVideoNotFound(YouTubeAPIResponseError):
+class YouTubeVideoNotFound(YouTubeError):
     pass
