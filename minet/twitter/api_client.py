@@ -18,7 +18,7 @@ def catch_json_error(exc):
 
     # Retrying if we actually caught a json decoding error
     # TODO: simplify this if the `twitter` lib changes its error inheritance scheme
-    if 'json' in msg:
+    if 'incomplete json data collected' in msg:
         return True
 
     return False
