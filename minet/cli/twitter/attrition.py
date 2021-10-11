@@ -7,7 +7,6 @@
 import casanova
 from twitter import TwitterHTTPError
 from ebbe import getpath, as_chunks
-from collections import Counter
 
 from minet.cli.utils import LoadingBar
 from minet.cli.exceptions import InvalidArgumentsError
@@ -52,7 +51,7 @@ def twitter_attrition_action(cli_args):
 
     user_id_pos = enricher.headers[user_id_column]
 
-    for chunk in as_chunks(100,enricher.cells(cli_args.column_tweets, with_rows=True)):
+    for chunk in as_chunks(100, enricher.cells(cli_args.column_tweets, with_rows=True)):
         tweets = ','.join(row[1] for row in chunk)
         kwargs = {'_id': tweets}
 
@@ -65,7 +64,7 @@ def twitter_attrition_action(cli_args):
 
         for tw in result:
             indexed_tweets[str(tw['id'])] = 1
-        
+
         for row, tweet in chunk:
             user = row[user_id_pos]
 
