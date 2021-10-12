@@ -45,13 +45,13 @@
   * [topic](#topic)
     * [stories](#stories)
 * [twitter](#twitter)
+  * [attrition](#attrition)
   * [followers](#followers)
   * [friends](#friends)
   * [scrape](#twitter-scrape)
+  * [tweets](#tweets)
   * [users](#users)
   * [user-tweets](#user-tweets)
-  * [tweets](#tweets)
-  * [attrition](#attrition)
 * [youtube (yt)](#youtube)
   * [captions](#captions)
   * [comments](#youtube-comments)
@@ -1288,6 +1288,44 @@ optional arguments:
 
 ## Twitter
 
+### attrition
+
+```
+usage: minet twitter attrition [-h] [--api-key API_KEY]
+                            [--api-secret-key API_SECRET_KEY]
+                            [--access-token ACCESS_TOKEN]
+                            [--access-token-secret ACCESS_TOKEN_SECRET]
+                            [-o OUTPUT] [--resume] [-s SELECT] [--total TOTAL]
+                            column_tweets column_users [file]
+
+Minet Twitter Attrition Command
+============================
+
+Retrieving the reason for tweet attrition from the given tweet and user ids, using the API.
+
+positional arguments:
+  column_tweets                              Name of the column containing the tweet ids.
+  column_users                               Name of the clumn containing the user ids.
+  file                                       CSV file containing the inquired tweets.
+
+optional arguments:
+  -h, --help                                 show this help message and exit
+  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
+  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
+  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
+  --resume                                   Whether to resume from an aborted collection. Need -o to be set.
+  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
+  --total TOTAL                              Total number of tweets. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Getting reason for attrition from tweets (and corresponding users) in a CSV file:
+    $ minet tw attrition tweet_id user_id tweets_and_user_data.csv > tweets_attrition.csv
+
+```
+
 ### followers
 
 ```
@@ -1420,6 +1458,43 @@ examples:
 
 ```
 
+### tweets
+
+```
+usage: minet twitter tweets [-h] [--api-key API_KEY]
+                            [--api-secret-key API_SECRET_KEY]
+                            [--access-token ACCESS_TOKEN]
+                            [--access-token-secret ACCESS_TOKEN_SECRET]
+                            [-o OUTPUT] [--resume] [-s SELECT] [--total TOTAL]
+                            column [file]
+
+Minet Twitter Tweets Command
+============================
+
+Collecting tweet metadata from the given tweet ids, using the API.
+
+positional arguments:
+  column                                     Name of the column containing the tweet ids.
+  file                                       CSV file containing the inquired tweets.
+
+optional arguments:
+  -h, --help                                 show this help message and exit
+  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
+  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
+  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
+  --resume                                   Whether to resume from an aborted collection. Need -o to be set.
+  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
+  --total TOTAL                              Total number of tweets. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Getting metadata from tweets in a CSV file:
+    $ minet tw tweets tweet_id tweets.csv > tweets_metadata.csv
+
+```
+
 ### users
 
 ```
@@ -1494,81 +1569,6 @@ examples:
 
 . Getting tweets from users in a CSV file:
     $ minet tw user-tweets screen_name users.csv > tweets.csv
-
-```
-
-### tweets
-
-```
-usage: minet twitter tweets [-h] [--api-key API_KEY]
-                            [--api-secret-key API_SECRET_KEY]
-                            [--access-token ACCESS_TOKEN]
-                            [--access-token-secret ACCESS_TOKEN_SECRET]
-                            [-o OUTPUT] [--resume] [-s SELECT] [--total TOTAL]
-                            column [file]
-
-Minet Twitter Tweets Command
-============================
-
-Collecting tweet metadata from the given tweet ids, using the API.
-
-positional arguments:
-  column                                     Name of the column containing the tweet ids.
-  file                                       CSV file containing the inquired tweets.
-
-optional arguments:
-  -h, --help                                 show this help message and exit
-  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
-  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --resume                                   Whether to resume from an aborted collection. Need -o to be set.
-  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                              Total number of tweets. Necessary if you want to display a finite progress indicator.
-
-examples:
-
-. Getting metadata from tweets in a CSV file:
-    $ minet tw tweets tweet_id tweets.csv > tweets_metadata.csv
-
-```
-
-### attrition
-
-```
-usage: minet twitter attrition [-h] [--api-key API_KEY]
-                            [--api-secret-key API_SECRET_KEY]
-                            [--access-token ACCESS_TOKEN]
-                            [--access-token-secret ACCESS_TOKEN_SECRET]
-                            [-o OUTPUT] [--resume] [-s SELECT] [--total TOTAL]
-                            column_tweets column_users [file]
-
-Minet Twitter Attrition Command
-============================
-
-Retrieving the reason for tweet attrition from the given tweet and user ids, using the API.
-
-positional arguments:
-  column_tweets                              Name of the column containing the tweet ids.
-  column_users                               Name of the clumn containing the user ids.
-  file                                       CSV file containing the inquired tweets.
-
-optional arguments:
-  -h, --help                                 show this help message and exit
-  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
-  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --resume                                   Whether to resume from an aborted collection. Need -o to be set.
-  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                              Total number of tweets. Necessary if you want to display a finite progress indicator.
-
-examples:
-
-. Getting reason for attrition from tweets (and corresponding users) in a CSV file:
-    $ minet tw attrition tweet_id user_id tweets_and_user_data.csv > tweets_attrition.csv
 
 ```
 
