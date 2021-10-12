@@ -63,7 +63,7 @@ def twitter_attrition_action(cli_args):
             raise e
 
         for tw in result:
-            indexed_tweets[str(tw['id'])] = 1
+            indexed_tweets[tw['id_str']] = 1
 
         for row, tweet in chunk:
             user = row[user_id_pos]
