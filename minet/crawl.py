@@ -317,7 +317,7 @@ class Crawler(object):
     def __init__(self, spec=None, spider=None, spiders=None, start_jobs=None,
                  queue_path=None, threads=25,
                  buffer_size=DEFAULT_IMAP_BUFFER_SIZE, throttle=DEFAULT_THROTTLE,
-                 join=True, daemonic=False):
+                 wait=True, daemonic=False):
 
         # NOTE: crawling could work depth-first but:
         # buffer_size should be 0 (requires to fix quenouille issue #1)
@@ -328,7 +328,7 @@ class Crawler(object):
         self.threads = threads
         self.buffer_size = buffer_size
         self.throttle = throttle
-        self.join = join
+        self.wait = wait
         self.daemonic = daemonic
 
         self.using_persistent_queue = queue_path is not None
@@ -469,7 +469,7 @@ class Crawler(object):
             parallelism=DEFAULT_DOMAIN_PARALLELISM,
             buffer_size=self.buffer_size,
             throttle=self.throttle,
-            join=self.join,
+            wait=self.wait,
             daemonic=self.daemonic
         )
 
