@@ -40,6 +40,8 @@ def twitter_attrition_action(cli_args):
 
     indexed_tweets = {}
 
+    indexed_users = {}
+
     result = None
 
     if cli_args.column_tweets not in enricher.headers:
@@ -73,27 +75,33 @@ def twitter_attrition_action(cli_args):
 
             else:
                 if tweet not in indexed_results:
-                    client_args = {'user_id': user}
+                    if user not in indexed_users:
+                        client_args = {'user_id': user}
+                        result_user = None
 
-                    try:
-                        result = client.call(['users', 'show'], **client_args)
+                        try:
+                            result_user = client.call(['users', 'show'], **client_args)
 
-                    except TwitterHTTPError as e:
-                        if e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 63:
-                            indexed_results[tweet] = 'suspended_user'
+                        except TwitterHTTPError as e:
+                            if e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 63:
+                                indexed_users[user] = 'suspended_user'
 
-                        elif e.e.code == 404 and getpath(e.response_data, ['errors', 0, 'code'], '') == 50:
-                            indexed_results[tweet] = 'deleted_user'
+                            elif e.e.code == 404 and getpath(e.response_data, ['errors', 0, 'code'], '') == 50:
+                                indexed_users[user] = 'deleted_user'
 
-                        else:
-                            raise e
+                            else:
+                                raise e
 
-                    if result is not None:
-                        if result['protected']:
-                            indexed_results[tweet] = 'protected_user'
-                        else:
-                            indexed_results[tweet] = 'tweet_deleted'
+                        if result_user is not None:
+                            if result_user['protected']:
+                                indexed_users[user] = 'protected_user'
+                            else:
+                                indexed_users[user] = 'user_ok'
+
+                    if indexed_users[user] == 'user_ok':
+                        indexed_results[tweet] = 'tweet_deleted'
+                    else:
+                        indexed_results[tweet] = indexed_users[user]
 
             enricher.writerow(row, [indexed_results[tweet]])
-            result = None
             loading_bar.update()
