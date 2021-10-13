@@ -55,11 +55,6 @@ def twitter_user_tweets_action(cli_args):
             kwargs['count'] = TWITTER_API_MAX_STATUSES_COUNT
             kwargs['tweet_mode'] = 'extended'
 
-            if cli_args.min_date:
-                min_date_utc = cli_args.min_date
-            else:
-                min_date_utc = 0
-
             if max_id is not None:
                 kwargs['max_id'] = max_id
 
@@ -91,8 +86,9 @@ def twitter_user_tweets_action(cli_args):
                 )
                 addendum = format_tweet_as_csv_row(tweet)
 
-                if int(addendum[1]) < min_date_utc:
-                    break
+                if cli_args.min_date:
+                    if int(addendum[1]) < cli_args.min_date:
+                        break
 
                 enricher.writerow(row, addendum)
 

@@ -19,7 +19,7 @@ from minet.cli.exceptions import NotResumable
 from minet.cli.utils import acquire_cross_platform_stdout, was_piped_something
 
 
-class TimeStampType(object):
+class TimestampType(object):
     def __call__(self, date):
         try:
             timestamp = int(datetime.strptime(date, "%Y-%m-%d").timestamp())
