@@ -1889,6 +1889,54 @@ MINET_COMMANDS = {
                             'type': int
                         }
                     ]
+                },
+                'attrition': {
+                    'title': 'Minet Twitter Attrition Command',
+                    'description': '''
+                        Determining why tweets aren't available anymore from the given user ids, using the API.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Finding out why tweets in a CSV file can't be found using the tweet's ids and user_id:
+                            $ minet tw attrition tweet_id,user_id deleted_tweets.csv > deleted_tweets_reasoning.csv
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column_tweets',
+                            'help': 'Names of the columns containing the tweet ids.'
+                        },
+                        {
+                            'name': 'column_users',
+                            'help': 'Names of the columns containing the user ids.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the inquired tweets.',
+                            'action': InputFileAction
+                        },
+                        *TWITTER_API_COMMON_ARGUMENTS,
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction,
+                            'resumer': RowCountResumer
+                        },
+                        {
+                            'flag': '--resume',
+                            'help': 'Whether to resume from an aborted collection. Need -o to be set.',
+                            'action': 'store_true'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of tweets. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
                 }
             }
         }

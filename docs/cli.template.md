@@ -45,12 +45,13 @@
   * [topic](#topic)
     * [stories](#stories)
 * [twitter](#twitter)
+  * [attrition](#attrition)
   * [followers](#followers)
   * [friends](#friends)
   * [scrape](#twitter-scrape)
+  * [tweets](#tweets)
   * [users](#users)
   * [user-tweets](#user-tweets)
-  * [tweets](#tweets)
 * [youtube (yt)](#youtube)
   * [captions](#captions)
   * [comments](#youtube-comments)
@@ -240,6 +241,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 ## Twitter
 
+### attrition
+
+<% twitter/attrition %>
+
 ### followers
 
 <% twitter/followers %>
@@ -252,6 +257,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% twitter/scrape %>
 
+### tweets
+
+<% twitter/tweets %>
+
 ### users
 
 <% twitter/users %>
@@ -259,10 +268,6 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### user-tweets
 
 <% twitter/user-tweets %>
-
-### tweets
-
-<% twitter/tweets %>
 
 ## Youtube
 

@@ -60,5 +60,10 @@ def twitter_action(cli_args):
 
             twitter_tweets_action(cli_args)
 
+        elif cli_args.tw_action == 'attrition':
+            from minet.cli.twitter.attrition import twitter_attrition_action
+
+            twitter_attrition_action(cli_args)
+
         else:
             raise TypeError('unkown tw_action "%s"' % cli_args.tw_action)
