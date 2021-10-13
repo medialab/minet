@@ -26,7 +26,7 @@ def twitter_attrition_action(cli_args):
         cli_args.file,
         cli_args.output,
         keep=cli_args.select,
-        add=['attrition_reason'],
+        add=['tweet_current_status'],
         total=cli_args.total
     )
 
@@ -37,21 +37,20 @@ def twitter_attrition_action(cli_args):
     )
 
     indexed_tweets = set()
-
     indexed_users = {}
 
     result = None
 
-    if cli_args.column_tweets not in enricher.headers:
-        raise InvalidArgumentsError('Could not find the "%s" column containing the tweet ids in the given CSV file.' % cli_args.column_tweets)
-    if cli_args.column_users not in enricher.headers:
-        raise InvalidArgumentsError('Could not find the "%s" column containing the user ids in the given CSV file.' % cli_args.column_users)
+    if cli_args.tweet_column not in enricher.headers:
+        raise InvalidArgumentsError('Could not find the "%s" column containing the tweet ids in the given CSV file.' % cli_args.tweet_column)
 
-    user_id_column = cli_args.column_users
+    if cli_args.user_column not in enricher.headers:
+        raise InvalidArgumentsError('Could not find the "%s" column containing the user ids in the given CSV file.' % cli_args.user_column)
 
+    user_id_column = cli_args.user_column
     user_id_pos = enricher.headers[user_id_column]
 
-    for chunk in as_chunks(100, enricher.cells(cli_args.column_tweets, with_rows=True)):
+    for chunk in as_chunks(100, enricher.cells(cli_args.tweet_column, with_rows=True)):
         tweets = ','.join(row[1] for row in chunk)
         kwargs = {'_id': tweets}
 
@@ -66,11 +65,13 @@ def twitter_attrition_action(cli_args):
             indexed_tweets.add(tw['id_str'])
 
         for row, tweet in chunk:
+            loading_bar.update()
+
             user = row[user_id_pos]
 
             if tweet in indexed_tweets:
-                new_cell = 'tweet_ok'
-
+                current_tweet_status = 'available_tweet'
+                enricher.writerow(row, [current_tweet_status])
                 continue
 
             if user not in indexed_users:
@@ -85,7 +86,7 @@ def twitter_attrition_action(cli_args):
                         indexed_users[user] = 'suspended_user'
 
                     elif e.e.code == 404 and getpath(e.response_data, ['errors', 0, 'code'], '') == 50:
-                        indexed_users[user] = 'deleted_user'
+                        indexed_users[user] = 'deactivated_user'
 
                     else:
                         raise e
@@ -97,9 +98,8 @@ def twitter_attrition_action(cli_args):
                         indexed_users[user] = 'user_ok'
 
             if indexed_users[user] == 'user_ok':
-                new_cell = 'tweet_deleted'
+                current_tweet_status = 'unavailable_tweet'
             else:
-                new_cell = indexed_users[user]
+                current_tweet_status = indexed_users[user]
 
-            enricher.writerow(row, [new_cell])
-            loading_bar.update()
+            enricher.writerow(row, [current_tweet_status])

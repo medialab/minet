@@ -1893,22 +1893,33 @@ MINET_COMMANDS = {
                 'attrition': {
                     'title': 'Minet Twitter Attrition Command',
                     'description': '''
-                        Determining why tweets aren't available anymore from the given user ids, using the API.
+                        Using Twitter API to find whether batches of tweets are still
+                        available today and if they aren't, attempt to find a reason why.
+
+                        This commands rely on tweet ids and their user ids to work and will
+                        output a report similar to the input file and containing an additional
+                        column named "current_tweet_status" that can take the following values:
+                            - "available_tweet": tweet is still available.
+                            - "suspended_user": tweet cannot be found because its user is suspended
+                            - "deactivated_user": tweet cannot be found because its user is deactivated
+                            - "protected_user": tweet cannot be found because its user is protected
+                            - "unavailable_tweet": tweet is not available, which means it was either
+                                                   deleted by its user or was censored by Twitter
                     ''',
                     'epilog': '''
                         examples:
 
-                        . Finding out why tweets in a CSV file can't be found using the tweet's ids and user_id:
-                            $ minet tw attrition tweet_id,user_id deleted_tweets.csv > deleted_tweets_reasoning.csv
+                        . Finding out if tweets in a CSV files are still available or not using tweet & user ids:
+                            $ minet tw attrition tweet_id user_id deleted_tweets.csv > attrition-report.csv
                     ''',
                     'arguments': [
                         {
-                            'name': 'column_tweets',
-                            'help': 'Names of the columns containing the tweet ids.'
+                            'name': 'tweet_column',
+                            'help': 'Name of the column containing the tweet ids.'
                         },
                         {
-                            'name': 'column_users',
-                            'help': 'Names of the columns containing the user ids.'
+                            'name': 'user_column',
+                            'help': 'Name of the column containing the user ids.'
                         },
                         {
                             'name': 'file',
