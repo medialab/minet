@@ -133,4 +133,4 @@ To contribute to **minet** you can check out [this](./CONTRIBUTING.md) documenta
 
 You can cite it thusly:
 
-> Guillaume Plique, Pauline Breteau, Jules Farjas, Héloïse Théro, & Jean Descamps. (2019, October 14). Minet, a webmining CLI tool & library for python. Zenodo. http://doi.org/10.5281/zenodo.4564399
+> Guillaume Plique, Pauline Breteau, Jules Farjas, Héloïse Théro, Jean Descamps, & Amélie Pellé. (2019, October 14). Minet, a webmining CLI tool & library for python. Zenodo. http://doi.org/10.5281/zenodo.4564399
