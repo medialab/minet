@@ -23,6 +23,7 @@ from minet.cli.constants import DEFAULT_CONTENT_FOLDER
 from minet.cli.argparse import (
     BooleanAction,
     ConfigAction,
+    DateType,
     InputFileAction,
     OutputFileAction,
     SplitterType
@@ -1823,6 +1824,11 @@ MINET_COMMANDS = {
                             'flag': '--ids',
                             'help': 'Whether your users are given as ids rather than screen names.',
                             'action': 'store_true'
+                        },
+                        {
+                            'flag': '--min-date',
+                            'help': 'Whether to add a date to stop at for user\'s tweets retrieval. UTC date should have the following format : YYY-MM-DD',
+                            'type': DateType()
                         },
                         {
                             'flag': '--exclude-retweets',

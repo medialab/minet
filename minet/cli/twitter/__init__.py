@@ -4,8 +4,6 @@
 #
 # Logic of the `tw` action.
 #
-import sys
-
 from minet.cli.utils import die
 
 

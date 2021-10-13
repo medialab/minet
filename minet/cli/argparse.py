@@ -14,8 +14,22 @@ from tqdm.contrib import DummyTqdmFile
 from casanova import Resumer, CsvCellIO
 from ebbe import getpath
 
-from minet.cli.exceptions import NotResumable
+from minet.cli.exceptions import NotResumable, InvalidArgumentsError
 from minet.cli.utils import acquire_cross_platform_stdout, was_piped_something
+
+
+class DateType(object):
+    def __call__(self, date):
+        date_bits = date.split("-")
+        if len(date_bits) != 3:
+            raise InvalidArgumentsError('UTC date format should be YYYY-MM-DD')
+        if len(date_bits[0]) != 4:
+            raise InvalidArgumentsError('UTC date format should be YYYY-MM-DD')
+        if len(date_bits[1]) != 2 or len(date_bits[2]) != 2:
+            raise InvalidArgumentsError('UTC date format should be YYYY-MM-DD')
+        if int(date_bits[1]) > 12:
+            raise InvalidArgumentsError('UTC date format should be YYYY-MM-DD')
+        return date
 
 
 class SplitterType(object):
