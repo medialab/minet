@@ -11,7 +11,7 @@ from twitwi import (
 )
 from twitwi.constants import TWEET_FIELDS
 from twitter import TwitterHTTPError
-import datetime
+from datetime import datetime
 
 from minet.cli.utils import LoadingBar
 from minet.twitter.constants import TWITTER_API_MAX_STATUSES_COUNT
@@ -58,7 +58,10 @@ def twitter_user_tweets_action(cli_args):
 
             if cli_args.min_date:
                 min_date = cli_args.min_date
-                min_date_utc = int(datetime.datetime.strptime(min_date, "%Y-%m-%d").timestamp())
+                try:
+                    min_date_utc = int(datetime.strptime(min_date, "%Y-%m-%d").timestamp())
+                except ValueError:
+                    raise
             else:
                 min_date_utc = 0
 
