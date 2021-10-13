@@ -37,6 +37,10 @@ def twitter_attrition_action(cli_args):
     )
 
     indexed_tweets = set()
+
+    # NOTE: currently this index is unbounded and could potentially
+    # exhaust the user's memory even if unlikely (the index is bounded
+    # by the total number of users of unvailable tweets in input dataset)
     indexed_users = {}
 
     result = None
