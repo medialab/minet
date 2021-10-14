@@ -25,7 +25,8 @@ from minet.cli.argparse import (
     ConfigAction,
     InputFileAction,
     OutputFileAction,
-    SplitterType
+    SplitterType,
+    TimestampType
 )
 
 from minet.constants import COOKIE_BROWSERS
@@ -1823,6 +1824,11 @@ MINET_COMMANDS = {
                             'flag': '--ids',
                             'help': 'Whether your users are given as ids rather than screen names.',
                             'action': 'store_true'
+                        },
+                        {
+                            'flag': '--min-date',
+                            'help': 'Whether to add a date to stop at for user\'s tweets retrieval. UTC date should have the following format : YYY-MM-DD',
+                            'type': TimestampType()
                         },
                         {
                             'flag': '--exclude-retweets',

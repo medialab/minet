@@ -13,9 +13,19 @@ from gettext import gettext
 from tqdm.contrib import DummyTqdmFile
 from casanova import Resumer, CsvCellIO
 from ebbe import getpath
+from datetime import datetime
 
 from minet.cli.exceptions import NotResumable
 from minet.cli.utils import acquire_cross_platform_stdout, was_piped_something
+
+
+class TimestampType(object):
+    def __call__(self, date):
+        try:
+            timestamp = int(datetime.strptime(date, "%Y-%m-%d").timestamp())
+        except ValueError:
+            raise ArgumentTypeError('UTC date should have the following format : %Y-%m-%d')
+        return timestamp
 
 
 class SplitterType(object):
