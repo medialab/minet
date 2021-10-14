@@ -79,6 +79,8 @@ def twitter_user_tweets_action(cli_args):
 
             max_id = min(int(tweet['id_str']) for tweet in tweets) - 1
 
+            min_date_reached = False
+
             for tweet in tweets:
                 tweet = normalize_tweet(
                     tweet,
@@ -88,8 +90,12 @@ def twitter_user_tweets_action(cli_args):
 
                 if cli_args.min_date:
                     if int(addendum[1]) < cli_args.min_date:
+                        min_date_reached = True
                         break
 
                 enricher.writerow(row, addendum)
+
+            if min_date_reached:
+                break
 
         loading_bar.update()
