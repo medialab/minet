@@ -1463,8 +1463,9 @@ usage: minet twitter user-tweets [-h] [--api-key API_KEY]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
-                                 [--ids] [--exclude-retweets] [-o OUTPUT]
-                                 [-s SELECT] [--total TOTAL]
+                                 [--ids] [--min-date MIN_DATE]
+                                 [--exclude-retweets] [-o OUTPUT] [-s SELECT]
+                                 [--total TOTAL]
                                  column [file]
 
 Minet Twitter User Tweets Command
@@ -1484,6 +1485,7 @@ optional arguments:
   --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
   --ids                                      Whether your users are given as ids rather than screen names.
+  --min-date MIN_DATE                        Whether to add a date to stop at for user's tweets retrieval. UTC date should have the following format : YYY-MM-DD
   --exclude-retweets                         Whether to exclude retweets from the output.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
