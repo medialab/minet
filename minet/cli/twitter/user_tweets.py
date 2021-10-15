@@ -12,9 +12,10 @@ from twitwi import (
 from twitwi.constants import TWEET_FIELDS
 from twitter import TwitterHTTPError
 
-from minet.cli.utils import LoadingBar
+from minet.cli.utils import LoadingBar, die
 from minet.twitter.constants import TWITTER_API_MAX_STATUSES_COUNT
 from minet.twitter import TwitterAPIClient
+from minet.cli.twitter.utils import is_id, is_screen_name
 
 
 def twitter_user_tweets_action(cli_args):
@@ -39,6 +40,14 @@ def twitter_user_tweets_action(cli_args):
         total=enricher.total,
         unit='user'
     )
+
+    if cli_args.ids:
+        if not is_id(cli_args.column, enricher):
+            die('\nThe column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead.')
+    else:
+        if not is_screen_name(cli_args.column, enricher):
+            die('\nThe column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead.')
+            # force flag to add
 
     for row, user in enricher.cells(cli_args.column, with_rows=True):
         max_id = None
