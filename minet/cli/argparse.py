@@ -84,6 +84,8 @@ class InputFileAction(Action):
         )
 
     def __call__(self, parser, cli_args, value, option_string=None):
+        setattr(cli_args, 'has_dummy_csv', False)
+
         if value is None:
             f = sys.stdin
 
