@@ -1905,6 +1905,13 @@ MINET_COMMANDS = {
                             - "protected_user": tweet cannot be found because its user is protected
                             - "unavailable_tweet": tweet is not available, which means it was either
                                                    deleted by its user or was censored by Twitter
+                            - "unavailable_retweet": retweet is not available, meaning that the user
+                                                    cancelled their retweet
+                            - "original_tweet_unavailable": the original tweet retweeted is unavailable,
+                                                    meaning it was either deleted by its original user,
+                                                    the original user deactivated their account or censored by Twitter
+                            - "original_user_protected": tweet cannot be found because it is a retweet from a protected user
+                            - "original_user_suspended": tweet cannot be found because it is a retweet from a suspended user
                     ''',
                     'epilog': '''
                         examples:
