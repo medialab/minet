@@ -90,6 +90,7 @@ class InputFileAction(Action):
             # No stdin was piped and we have a "dummy" csv file to build
             if not was_piped_something():
                 if self.dummy_csv_column is not None:
+                    # NOTE: this only work because we are considering positional arguments
                     value = getattr(cli_args, self.column_dest)
 
                     if self.dummy_csv_guard is not None and not self.dummy_csv_guard(value):
@@ -100,6 +101,7 @@ class InputFileAction(Action):
                     setattr(cli_args, 'has_dummy_csv', True)
 
                 elif self.dummy_csv_columns is not None:
+                    # NOTE: this only work because we are considering positional arguments
                     values = [getattr(cli_args, dest) for dest in self.column_dests]
 
                     f = CsvRowIO(self.dummy_csv_columns, values)
