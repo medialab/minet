@@ -1296,8 +1296,8 @@ usage: minet twitter attrition [-h] [--api-key API_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
                                [-o OUTPUT] [--resume] [--ids]
-                               [--retweeted-id-column RETWEETED_ID_COLUMN]
-                               [-s SELECT] [--total TOTAL]
+                               [--retweeted-id RETWEETED_ID] [-s SELECT]
+                               [--total TOTAL]
                                tweet_column user_column [file]
 
 Minet Twitter Attrition Command
@@ -1309,12 +1309,21 @@ available today and if they aren't, attempt to find a reason why.
 This commands rely on tweet ids and their user ids to work and will
 output a report similar to the input file and containing an additional
 column named "current_tweet_status" that can take the following values:
+
     - "available_tweet": tweet is still available.
-    - "suspended_user": tweet cannot be found because its user is suspended
-    - "deactivated_user": tweet cannot be found because its user is deactivated
-    - "protected_user": tweet cannot be found because its user is protected
+    - "suspended_user": tweet cannot be found because its user is suspended.
+    - "deactivated_user": tweet cannot be found because its user is deactivated.
+    - "protected_user": tweet cannot be found because its user is protected.
     - "unavailable_tweet": tweet is not available, which means it was either
-                           deleted by its user or was censored by Twitter
+                           deleted by its user or was censored by Twitter.
+    - "unavailable_retweet": retweet is not available, meaning that the user
+                             cancelled their retweet.
+    - "retweeted_tweet_unavailable": the retweeted tweet is unavailable,
+                                     meaning it was either deleted by its original
+                                     user, or that the original user was deactivated
+                                     or censored by Twitter.
+    - "retweeted_user_protected": tweet cannot be found because it is a retweet of a protected user.
+    - "retweeted_user_suspended": tweet cannot be found because it is a retweet of a suspended user.
 
 positional arguments:
   tweet_column                               Name of the column containing the tweet ids.
@@ -1330,7 +1339,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   --ids                                      Whether your users are given as ids rather than screen names.
-  --retweeted-id-column RETWEETED_ID_COLUMN  Name of the column containing the ids of the original tweets in case the tweets no longer available were retweets.
+  --retweeted-id RETWEETED_ID                Name of the column containing the ids of the original tweets in case the tweets no longer available were retweets.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of tweets. Necessary if you want to display a finite progress indicator.
 

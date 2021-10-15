@@ -1905,19 +1905,21 @@ MINET_COMMANDS = {
                         This commands rely on tweet ids and their user ids to work and will
                         output a report similar to the input file and containing an additional
                         column named "current_tweet_status" that can take the following values:
+
                             - "available_tweet": tweet is still available.
-                            - "suspended_user": tweet cannot be found because its user is suspended
-                            - "deactivated_user": tweet cannot be found because its user is deactivated
-                            - "protected_user": tweet cannot be found because its user is protected
+                            - "suspended_user": tweet cannot be found because its user is suspended.
+                            - "deactivated_user": tweet cannot be found because its user is deactivated.
+                            - "protected_user": tweet cannot be found because its user is protected.
                             - "unavailable_tweet": tweet is not available, which means it was either
-                                                   deleted by its user or was censored by Twitter
+                                                   deleted by its user or was censored by Twitter.
                             - "unavailable_retweet": retweet is not available, meaning that the user
-                                                    cancelled their retweet
-                            - "original_tweet_unavailable": the original tweet retweeted is unavailable,
-                                                    meaning it was either deleted by its original user,
-                                                    the original user deactivated their account or censored by Twitter
-                            - "original_user_protected": tweet cannot be found because it is a retweet from a protected user
-                            - "original_user_suspended": tweet cannot be found because it is a retweet from a suspended user
+                                                     cancelled their retweet.
+                            - "retweeted_tweet_unavailable": the retweeted tweet is unavailable,
+                                                             meaning it was either deleted by its original
+                                                             user, or that the original user was deactivated
+                                                             or censored by Twitter.
+                            - "retweeted_user_protected": tweet cannot be found because it is a retweet of a protected user.
+                            - "retweeted_user_suspended": tweet cannot be found because it is a retweet of a suspended user.
                     ''',
                     'epilog': '''
                         examples:

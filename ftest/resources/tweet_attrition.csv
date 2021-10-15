@@ -1,6 +1,6 @@
 tweet_id,user_id,user_screen_name,tweet_current_status,is_retweet,retweet_original_id
 1448273572833730561,1726979112,Gazou_Rctest,retweet_unavailable,yes,1446024037197615105
-1448275153595637764,1726979112,Gazou_Rctest,original_tweet_unavailable,yes,1448275076189720577
+1448275153595637764,1726979112,Gazou_Rctest,retweeted_tweet_unavailable,yes,1448275076189720577
 1443907176888737795,1114578902,AmliePell,protected_user,no,
 1443602789284782096,2341888057,NetflixFR,available_tweet,no,
 1347569870578266115,25073877,realDonaldTrump,suspended_user,no,

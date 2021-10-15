@@ -58,6 +58,8 @@ def twitter_attrition_action(cli_args):
         tweets = ','.join(row[1] for row in chunk)
         kwargs = {'_id': tweets}
 
+        # First we need to query a batch of tweet ids at once to figure out
+        # whether they are still available or not
         try:
             result = client.call(['statuses', 'lookup'], **kwargs)
 
@@ -78,6 +80,8 @@ def twitter_attrition_action(cli_args):
                 enricher.writerow(row, [current_tweet_status])
                 continue
 
+            # If tweet is not available, we will query its user to check
+            # if the reason is the user's status
             if user not in indexed_users:
                 if cli_args.ids:
                     client_args = {'user_id': user}
@@ -108,6 +112,9 @@ def twitter_attrition_action(cli_args):
             if indexed_users[user] == 'user_ok':
                 current_tweet_status = 'original_tweet_ok'
 
+                # Sometimes, the unavailable tweet is a retweet, in which
+                # case we need to enquire about the original tweet to find
+                # a reason for the tweet's unavailability
                 if cli_args.retweeted_id:
                     original_id_pos = enricher.headers[cli_args.retweeted_id]
                     original_tweet = row[original_id_pos]
@@ -121,13 +128,13 @@ def twitter_attrition_action(cli_args):
 
                         except TwitterHTTPError as e:
                             if e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 63:
-                                current_tweet_status = 'original_user_suspended'
+                                current_tweet_status = 'retweeted_user_suspended'
 
                             elif e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 179:
-                                current_tweet_status = 'original_user_protected'
+                                current_tweet_status = 'retweeted_user_protected'
 
                             elif e.e.code == 404 and (getpath(e.response_data, ['errors', 0, 'code'], '') == 144 or getpath(e.response_data, ['errors', 0, 'code'], '') == 34):
-                                current_tweet_status = 'original_tweet_unavailable'
+                                current_tweet_status = 'retweeted_tweet_unavailable'
 
                             else:
                                 raise e
