@@ -1938,6 +1938,15 @@ MINET_COMMANDS = {
                             'action': 'store_true'
                         },
                         {
+                            'flag': '--ids',
+                            'help': 'Whether your users are given as ids rather than screen names.',
+                            'action': 'store_true'
+                        },
+                        {
+                            'flag': '--retweeted-id',
+                            'help': 'Name of the column containing the ids of the original tweets in case the tweets no longer available were retweets.'
+                        },
+                        {
                             'flags': ['-s', '--select'],
                             'help': 'Columns of input CSV file to include in the output (separated by `,`).',
                             'type': SplitterType()
