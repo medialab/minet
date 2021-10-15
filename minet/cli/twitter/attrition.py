@@ -66,7 +66,7 @@ def twitter_attrition_action(cli_args):
                     loading_bar.die('The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead.')
                     # force flag to add
 
-            yield (row, cell)
+            yield row, cell
 
     for chunk in as_chunks(100, cells()):
         tweets = ','.join(row[1] for row in chunk)
