@@ -10,3 +10,4 @@ tweet_id,user_id,user_screen_name,tweet_current_status,is_retweet,retweet_origin
 1346928882595885058,25073877,realDonaldTrump,suspended_user,no,
 1346912780700577792,25073877,realDonaldTrump,suspended_user,no,
 1442929331915747335,862770295219916802,Djebbari_JB,unavailable_tweet,no,
+1448943568958132256,1565623927,Yomguithereal,protected_retweeted_user,yes,1448943124626149395
