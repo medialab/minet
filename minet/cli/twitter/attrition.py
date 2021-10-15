@@ -43,8 +43,6 @@ def twitter_attrition_action(cli_args):
     # by the total number of users of unvailable tweets in input dataset)
     indexed_users = {}
 
-    indexed_retweets = {}
-
     result = None
 
     if cli_args.tweet_column not in enricher.headers:
@@ -123,21 +121,19 @@ def twitter_attrition_action(cli_args):
 
                         except TwitterHTTPError as e:
                             if e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 63:
-                                indexed_retweets[original_tweet] = 'original_user_suspended'
+                                current_tweet_status = 'original_user_suspended'
 
                             elif e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 179:
-                                indexed_retweets[original_tweet] = 'original_user_protected'
+                                current_tweet_status = 'original_user_protected'
 
                             elif e.e.code == 404 and (getpath(e.response_data, ['errors', 0, 'code'], '') == 144 or getpath(e.response_data, ['errors', 0, 'code'], '') == 34):
-                                indexed_retweets[original_tweet] = 'original_tweet_unavailable'
+                                current_tweet_status = 'original_tweet_unavailable'
 
                             else:
                                 raise e
 
                         if result_retweet is not None:
-                            indexed_retweets[original_tweet] = 'retweet_unavailable'
-
-                        current_tweet_status = indexed_retweets[original_tweet]
+                            current_tweet_status = 'retweet_unavailable'
 
                 if current_tweet_status == 'original_tweet_ok':
                     current_tweet_status = 'unavailable_tweet'
