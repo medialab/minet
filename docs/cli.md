@@ -1318,12 +1318,12 @@ column named "current_tweet_status" that can take the following values:
                            deleted by its user or was censored by Twitter.
     - "unavailable_retweet": retweet is not available, meaning that the user
                              cancelled their retweet.
-    - "retweeted_tweet_unavailable": the retweeted tweet is unavailable,
+    - "unavailable_retweeted_tweet": the retweeted tweet is unavailable,
                                      meaning it was either deleted by its original
                                      user, or that the original user was deactivated
                                      or censored by Twitter.
-    - "retweeted_user_protected": tweet cannot be found because it is a retweet of a protected user.
-    - "retweeted_user_suspended": tweet cannot be found because it is a retweet of a suspended user.
+    - "protected_retweeted_user": tweet cannot be found because it is a retweet of a protected user.
+    - "suspended_retweeted_user": tweet cannot be found because it is a retweet of a suspended user.
 
 positional arguments:
   tweet_column                               Name of the column containing the tweet ids.

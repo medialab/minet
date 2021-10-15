@@ -73,7 +73,7 @@ class InputFileAction(Action):
         self.column_dests = column_dests
 
         if self.dummy_csv_columns is not None:
-            assert len(self.dummy_csv_columns) == len(self.column_dests)
+            assert isinstance(self.column_dests, list) and len(self.dummy_csv_columns) == len(self.column_dests)
 
         super().__init__(
             option_strings,
@@ -97,6 +97,7 @@ class InputFileAction(Action):
 
                     f = CsvCellIO(self.dummy_csv_column, value)
                     setattr(cli_args, self.column_dest, self.dummy_csv_column)
+                    setattr(cli_args, 'has_dummy_csv', True)
 
                 elif self.dummy_csv_columns is not None:
                     values = [getattr(cli_args, dest) for dest in self.column_dests]
@@ -105,6 +106,8 @@ class InputFileAction(Action):
 
                     for i, dest in enumerate(self.column_dests):
                         setattr(cli_args, dest, self.dummy_csv_columns[i])
+
+                    setattr(cli_args, 'has_dummy_csv', True)
         else:
             try:
                 f = open(value, 'r', encoding='utf-8')

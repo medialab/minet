@@ -116,8 +116,12 @@ def twitter_attrition_action(cli_args):
                 # case we need to enquire about the original tweet to find
                 # a reason for the tweet's unavailability
                 if cli_args.retweeted_id:
-                    original_id_pos = enricher.headers[cli_args.retweeted_id]
-                    original_tweet = row[original_id_pos]
+                    if cli_args.has_dummy_csv:
+                        original_tweet = cli_args.retweeted_id
+                    else:
+                        original_id_pos = enricher.headers[cli_args.retweeted_id]
+                        original_tweet = row[original_id_pos]
+
                     client_arg = {'_id': original_tweet}
                     result_retweet = None
                     current_tweet_status = 'original_tweet_ok'
@@ -128,13 +132,13 @@ def twitter_attrition_action(cli_args):
 
                         except TwitterHTTPError as e:
                             if e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 63:
-                                current_tweet_status = 'retweeted_user_suspended'
+                                current_tweet_status = 'suspended_retweeted_user'
 
                             elif e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 179:
-                                current_tweet_status = 'retweeted_user_protected'
+                                current_tweet_status = 'protected_retweeted_user'
 
                             elif e.e.code == 404 and (getpath(e.response_data, ['errors', 0, 'code'], '') == 144 or getpath(e.response_data, ['errors', 0, 'code'], '') == 34):
-                                current_tweet_status = 'retweeted_tweet_unavailable'
+                                current_tweet_status = 'unavailable_retweeted_tweet'
 
                             else:
                                 raise e
