@@ -90,7 +90,6 @@ def twitter_attrition_action(cli_args):
                     result_user = client.call(['users', 'show'], **client_args)
 
                 except TwitterHTTPError as e:
-                    loading_bar.print(e.response_data)
                     if e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 63:
                         indexed_users[user] = 'suspended_user'
 
