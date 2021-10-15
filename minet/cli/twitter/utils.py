@@ -8,8 +8,11 @@ import casanova
 import re
 from twitter import TwitterHTTPError
 
-from minet.cli.utils import LoadingBar, die
+from minet.cli.utils import LoadingBar
 from minet.twitter import TwitterAPIClient
+
+CHARACTERS = re.compile(r'[A-Za-z_]')
+NUMBERS = re.compile(r'[0-9]+')
 
 
 def make_twitter_action(method_name, csv_headers):
@@ -39,14 +42,6 @@ def make_twitter_action(method_name, csv_headers):
 
         resuming_state = None
 
-        if cli_args.ids:
-            if not is_id(cli_args.column, enricher):
-                die('\nThe column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead.')
-        else:
-            if not is_screen_name(cli_args.column, enricher):
-                die('\nThe column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead.')
-                # force flag to add
-
         if cli_args.resume:
             resuming_state = cli_args.output.pop_state()
 
@@ -61,8 +56,16 @@ def make_twitter_action(method_name, csv_headers):
                 next_cursor = int(resuming_state.last_cursor)
 
             if cli_args.ids:
+                if is_not_user_id(user):
+                    loading_bar.die('The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead.')
+
                 client_kwargs = {'user_id': user}
+
             else:
+                if is_probably_not_user_screen_name(user):
+                    loading_bar.die('The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead.')
+                    # force flag to add
+
                 client_kwargs = {'screen_name': user}
 
             while next_cursor != 0:
@@ -105,25 +108,17 @@ def make_twitter_action(method_name, csv_headers):
     return action
 
 
-def is_id(column, enricher):
+def is_not_user_id(item):
 
-    characters = re.compile(r'[A-Za-z_]')
-
-    for item in enricher.cells(column, with_rows=True):
-        matches = re.findall(characters, item[1])
-        if matches:
-            return False
-        else:
-            return True
+    matches = re.findall(CHARACTERS, item)
+    if matches:
+        return True
+    return False
 
 
-def is_screen_name(column, enricher):
+def is_probably_not_user_screen_name(item):
 
-    numbers = re.compile(r'[0-9]+')
-
-    for item in enricher.cells(column, with_rows=True):
-        matches = numbers.fullmatch(item[1])
-        if matches:
-            return False
-        else:
-            return True
+    matches = NUMBERS.fullmatch(item)
+    if matches:
+        return True
+    return False

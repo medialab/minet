@@ -8,10 +8,10 @@ import casanova
 from twitter import TwitterHTTPError
 from ebbe import getpath, as_chunks
 
-from minet.cli.utils import LoadingBar, die
+from minet.cli.utils import LoadingBar
 from minet.cli.exceptions import InvalidArgumentsError
 from minet.twitter import TwitterAPIClient
-from minet.cli.twitter.utils import is_id, is_screen_name
+from minet.cli.twitter.utils import is_not_user_id, is_probably_not_user_screen_name
 
 
 def twitter_attrition_action(cli_args):
@@ -52,18 +52,23 @@ def twitter_attrition_action(cli_args):
     if cli_args.user_column not in enricher.headers:
         raise InvalidArgumentsError('Could not find the "%s" column containing the user ids in the given CSV file.' % cli_args.user_column)
 
-    if cli_args.ids:
-        if not is_id(cli_args.user_column, enricher):
-            die('\nThe column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead.')
-    else:
-        if not is_screen_name(cli_args.user_column, enricher):
-            die('\nThe column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead.')
-            # force flag to add
-
     user_column = cli_args.user_column
     user_pos = enricher.headers[user_column]
 
-    for chunk in as_chunks(100, enricher.cells(cli_args.tweet_column, with_rows=True)):
+    def cells():
+        for row, cell in enricher.cells(cli_args.tweet_column, with_rows=True):
+            if cli_args.ids:
+                if is_not_user_id(row[user_pos]):
+                    loading_bar.die('The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead.')
+
+            else:
+                if is_probably_not_user_screen_name(row[user_pos]):
+                    loading_bar.die('The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead.')
+                    # force flag to add
+
+            yield (row, cell)
+
+    for chunk in as_chunks(100, cells()):
         tweets = ','.join(row[1] for row in chunk)
         kwargs = {'_id': tweets}
 
