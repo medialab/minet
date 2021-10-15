@@ -1911,6 +1911,13 @@ MINET_COMMANDS = {
                             - "protected_user": tweet cannot be found because its user is protected
                             - "unavailable_tweet": tweet is not available, which means it was either
                                                    deleted by its user or was censored by Twitter
+                            - "unavailable_retweet": retweet is not available, meaning that the user
+                                                    cancelled their retweet
+                            - "original_tweet_unavailable": the original tweet retweeted is unavailable,
+                                                    meaning it was either deleted by its original user,
+                                                    the original user deactivated their account or censored by Twitter
+                            - "original_user_protected": tweet cannot be found because it is a retweet from a protected user
+                            - "original_user_suspended": tweet cannot be found because it is a retweet from a suspended user
                     ''',
                     'epilog': '''
                         examples:
@@ -1942,6 +1949,15 @@ MINET_COMMANDS = {
                             'flag': '--resume',
                             'help': 'Whether to resume from an aborted collection. Need -o to be set.',
                             'action': 'store_true'
+                        },
+                        {
+                            'flag': '--ids',
+                            'help': 'Whether your users are given as ids rather than screen names.',
+                            'action': 'store_true'
+                        },
+                        {
+                            'flag': '--retweeted-id',
+                            'help': 'Name of the column containing the ids of the original tweets in case the tweets no longer available were retweets.'
                         },
                         {
                             'flags': ['-s', '--select'],

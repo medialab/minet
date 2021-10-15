@@ -1295,8 +1295,9 @@ usage: minet twitter attrition [-h] [--api-key API_KEY]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
-                               [-o OUTPUT] [--resume] [-s SELECT]
-                               [--total TOTAL]
+                               [-o OUTPUT] [--resume] [--ids]
+                               [--retweeted-id-column RETWEETED_ID_COLUMN]
+                               [-s SELECT] [--total TOTAL]
                                tweet_column user_column [file]
 
 Minet Twitter Attrition Command
@@ -1328,6 +1329,8 @@ optional arguments:
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
+  --ids                                      Whether your users are given as ids rather than screen names.
+  --retweeted-id-column RETWEETED_ID_COLUMN  Name of the column containing the ids of the original tweets in case the tweets no longer available were retweets.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of tweets. Necessary if you want to display a finite progress indicator.
 

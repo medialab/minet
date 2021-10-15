@@ -79,7 +79,11 @@ def twitter_attrition_action(cli_args):
                 continue
 
             if user not in indexed_users:
-                client_args = {'user_id': user}
+                if cli_args.ids:
+                    client_args = {'user_id': user}
+                else:
+                    client_args = {'screen_name': user}
+
                 result_user = None
 
                 try:
@@ -102,7 +106,38 @@ def twitter_attrition_action(cli_args):
                         indexed_users[user] = 'user_ok'
 
             if indexed_users[user] == 'user_ok':
-                current_tweet_status = 'unavailable_tweet'
+                current_tweet_status = 'original_tweet_ok'
+
+                if cli_args.retweeted_id:
+                    original_id_pos = enricher.headers[cli_args.retweeted_id]
+                    original_tweet = row[original_id_pos]
+                    client_arg = {'_id': original_tweet}
+                    result_retweet = None
+                    current_tweet_status = 'original_tweet_ok'
+
+                    if original_tweet:
+                        try:
+                            result_retweet = client.call(['statuses', 'show'], **client_arg)
+
+                        except TwitterHTTPError as e:
+                            if e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 63:
+                                current_tweet_status = 'original_user_suspended'
+
+                            elif e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 179:
+                                current_tweet_status = 'original_user_protected'
+
+                            elif e.e.code == 404 and (getpath(e.response_data, ['errors', 0, 'code'], '') == 144 or getpath(e.response_data, ['errors', 0, 'code'], '') == 34):
+                                current_tweet_status = 'original_tweet_unavailable'
+
+                            else:
+                                raise e
+
+                        if result_retweet is not None:
+                            current_tweet_status = 'unavailable_retweet'
+
+                if current_tweet_status == 'original_tweet_ok':
+                    current_tweet_status = 'unavailable_tweet'
+
             else:
                 current_tweet_status = indexed_users[user]
 
