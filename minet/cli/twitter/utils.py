@@ -109,16 +109,8 @@ def make_twitter_action(method_name, csv_headers):
 
 
 def is_not_user_id(item):
-
-    matches = re.findall(CHARACTERS, item)
-    if matches:
-        return True
-    return False
+    return bool(re.match(CHARACTERS, item))
 
 
 def is_probably_not_user_screen_name(item):
-
-    matches = NUMBERS.fullmatch(item)
-    if matches:
-        return True
-    return False
+    return bool(NUMBERS.fullmatch(item))
