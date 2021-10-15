@@ -307,6 +307,10 @@ MINET_COMMANDS = {
                         {
                             'flags': ['-o', '--output'],
                             'action': OutputFileAction
+                        },
+                        {
+                            'flag': '--start-date',
+                            'help': 'The earliest date at which to start aggregating statistics (UTC!). You can pass just a year or a year-month for convenience.'
                         }
                     ]
                 },
