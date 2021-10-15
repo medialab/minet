@@ -10,6 +10,7 @@ from os.path import isdir
 from io import TextIOBase
 from argparse import Action, ArgumentError, ArgumentTypeError
 from gettext import gettext
+from casanova.utils import CsvRowIO
 from tqdm.contrib import DummyTqdmFile
 from casanova import Resumer, CsvCellIO
 from ebbe import getpath
@@ -57,16 +58,22 @@ class BooleanAction(Action):
 
 class InputFileAction(Action):
     def __init__(self, option_strings, dest, dummy_csv_column=None,
-                 dummy_csv_guard=None, dummy_csv_error='', column_dest='column',
+                 dummy_csv_columns=None, dummy_csv_guard=None, dummy_csv_error='',
+                 column_dest='column', column_dests=None,
                  nargs='?', **kwargs):
 
         if dummy_csv_guard is not None and not callable(dummy_csv_guard):
             raise TypeError
 
         self.dummy_csv_column = dummy_csv_column
+        self.dummy_csv_columns = dummy_csv_columns
         self.dummy_csv_guard = dummy_csv_guard
         self.dummy_csv_error = dummy_csv_error
         self.column_dest = column_dest
+        self.column_dests = column_dests
+
+        if self.dummy_csv_columns is not None:
+            assert len(self.dummy_csv_columns) == len(self.column_dests)
 
         super().__init__(
             option_strings,
@@ -81,14 +88,23 @@ class InputFileAction(Action):
             f = sys.stdin
 
             # No stdin was piped and we have a "dummy" csv file to build
-            if self.dummy_csv_column is not None and not was_piped_something():
-                value = getattr(cli_args, self.column_dest)
+            if not was_piped_something():
+                if self.dummy_csv_column is not None:
+                    value = getattr(cli_args, self.column_dest)
 
-                if self.dummy_csv_guard is not None and not self.dummy_csv_guard(value):
-                    raise ArgumentError(self, self.dummy_csv_error + (' Got "%s"' % value))
+                    if self.dummy_csv_guard is not None and not self.dummy_csv_guard(value):
+                        raise ArgumentError(self, self.dummy_csv_error + (' Got "%s"' % value))
 
-                f = CsvCellIO(self.dummy_csv_column, value)
-                setattr(cli_args, self.column_dest, self.dummy_csv_column)
+                    f = CsvCellIO(self.dummy_csv_column, value)
+                    setattr(cli_args, self.column_dest, self.dummy_csv_column)
+
+                elif self.dummy_csv_columns is not None:
+                    values = [getattr(cli_args, dest) for dest in self.column_dests]
+
+                    f = CsvRowIO(self.dummy_csv_columns, values)
+
+                    for i, dest in enumerate(self.column_dests):
+                        setattr(cli_args, dest, self.dummy_csv_columns[i])
         else:
             try:
                 f = open(value, 'r', encoding='utf-8')
