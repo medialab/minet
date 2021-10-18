@@ -13,6 +13,7 @@ from minet.twitter import TwitterAPIClient
 
 CHARACTERS = re.compile(r'[A-Za-z_]')
 NUMBERS = re.compile(r'[0-9]+')
+TWITTER_SCREEN_NAME = re.compile(r"[a-zA-Z0-9_]{1,15}")
 
 
 def make_twitter_action(method_name, csv_headers):
@@ -113,4 +114,7 @@ def is_not_user_id(item):
 
 
 def is_probably_not_user_screen_name(item):
-    return bool(NUMBERS.fullmatch(item))
+    matches = TWITTER_SCREEN_NAME.fullmatch(item)
+    if matches:
+        return bool(NUMBERS.fullmatch(item))
+    return True
