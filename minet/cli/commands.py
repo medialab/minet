@@ -150,6 +150,51 @@ FETCH_COMMON_ARGUMENTS = [
 
 MINET_COMMANDS = {
 
+    # Buzzsumo action subparser
+    # --------------------------------------------------------------------------
+    'buzzsumo': {
+        'package': 'minet.cli.buzzsumo',
+        'action': 'buzzsumo_action',
+        'aliases': ['bz'],
+        'title': 'Minet Buzzsumo Command',
+        'description': '''
+            Gather data from the BuzzSumo APIs easily and efficiently.
+        ''',
+        'subparsers': {
+            'help': 'Action to perform using the BuzzSumo API.',
+            'title': 'actions',
+            'dest': 'bz_action',
+            'common_arguments': [
+                {
+                    'flags': ['-t', '--token'],
+                    'help': 'BuzzSumo API token. Rcfile key: buzzsumo.token',
+                    'action': ConfigAction,
+                    'rc_key': ['buzzsumo', 'token']
+                }
+            ],
+            'commands': {
+                'test': {
+                    'title': 'Minet Buzzsumo Test Command',
+                    'description': '''
+                        Print the headers returned by any successful Buzzsumo call (indicating notably the remaining number of calls per month).
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Returning the headers for a given test call:
+                            $ minet bz test --token YOUR_TOKEN
+                    ''',
+                    'arguments': [
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
+                        }
+                    ]
+                }
+            }
+        }
+    },
+
     # Cookies action subparser
     # --------------------------------------------------------------------------
     'cookies': {
