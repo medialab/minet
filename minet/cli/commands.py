@@ -1979,7 +1979,7 @@ MINET_COMMANDS = {
                         }
                     ]
                 },
-                'users-search': {
+                'user-search': {
                     'title': 'Minet Twitter Users Search Command',
                     'description': '''
                         Retrieve Twitter users using the API.
@@ -1988,7 +1988,7 @@ MINET_COMMANDS = {
                         examples:
 
                         . Getting users from a search query:
-                            $ minet tw users-search 'query' > users.csv
+                            $ minet tw user-search 'query' > users.csv
                     ''',
                     'arguments': [
                         {

@@ -51,7 +51,7 @@
   * [scrape](#twitter-scrape)
   * [tweets](#tweets)
   * [users](#users)
-  * [users-search](#users-search)
+  * [user-search](#user-search)
   * [user-tweets](#user-tweets)
 * [youtube (yt)](#youtube)
   * [captions](#captions)
@@ -1559,15 +1559,15 @@ examples:
 
 ```
 
-### users-search
+### user-search
 
 ```
-usage: minet twitter users-search [-h] [--api-key API_KEY]
-                                  [--api-secret-key API_SECRET_KEY]
-                                  [--access-token ACCESS_TOKEN]
-                                  [--access-token-secret ACCESS_TOKEN_SECRET]
-                                  [-o OUTPUT] [-s SELECT] [--total TOTAL]
-                                  query [file]
+usage: minet twitter user-search [-h] [--api-key API_KEY]
+                                 [--api-secret-key API_SECRET_KEY]
+                                 [--access-token ACCESS_TOKEN]
+                                 [--access-token-secret ACCESS_TOKEN_SECRET]
+                                 [-o OUTPUT] [-s SELECT] [--total TOTAL]
+                                 query [file]
 
 Minet Twitter Users Search Command
 ==================================
@@ -1591,7 +1591,7 @@ optional arguments:
 examples:
 
 . Getting users from a search query:
-    $ minet tw users-search 'query' > users.csv
+    $ minet tw user-search 'query' > users.csv
 
 ```
 

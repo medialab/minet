@@ -17,7 +17,7 @@ from minet.cli.utils import LoadingBar
 from minet.twitter import TwitterAPIClient
 
 
-def twitter_users_search_action(cli_args):
+def twitter_user_search_action(cli_args):
 
     client = TwitterAPIClient(
         cli_args.access_token,
