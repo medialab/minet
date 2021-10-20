@@ -15,6 +15,7 @@ from twitter import TwitterHTTPError
 from minet.cli.utils import LoadingBar
 from minet.twitter.constants import TWITTER_API_MAX_STATUSES_COUNT
 from minet.twitter import TwitterAPIClient
+from minet.cli.twitter.utils import is_not_user_id, is_probably_not_user_screen_name
 
 
 def twitter_user_tweets_action(cli_args):
@@ -47,8 +48,16 @@ def twitter_user_tweets_action(cli_args):
 
         while True:
             if cli_args.ids:
+                if is_not_user_id(user):
+                    loading_bar.die('The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
+
                 kwargs = {'user_id': user}
+
             else:
+                if is_probably_not_user_screen_name(user):
+                    loading_bar.die('The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command.')
+                    # force flag to add
+
                 kwargs = {'screen_name': user}
 
             kwargs['include_rts'] = not cli_args.exclude_retweets

@@ -5,10 +5,15 @@
 # Miscellaneous generic functions used throughout the twitter actions.
 #
 import casanova
+import re
 from twitter import TwitterHTTPError
 
 from minet.cli.utils import LoadingBar
 from minet.twitter import TwitterAPIClient
+
+CHARACTERS = re.compile(r'[A-Za-z_]')
+NUMBERS = re.compile(r'[0-9]+')
+TWITTER_SCREEN_NAME = re.compile(r'[a-zA-Z0-9_]{1,15}')
 
 
 def make_twitter_action(method_name, csv_headers):
@@ -52,8 +57,16 @@ def make_twitter_action(method_name, csv_headers):
                 next_cursor = int(resuming_state.last_cursor)
 
             if cli_args.ids:
+                if is_not_user_id(user):
+                    loading_bar.die('The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
+
                 client_kwargs = {'user_id': user}
+
             else:
+                if is_probably_not_user_screen_name(user):
+                    loading_bar.die('The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command.')
+                    # force flag to add
+
                 client_kwargs = {'screen_name': user}
 
             while next_cursor != 0:
@@ -94,3 +107,14 @@ def make_twitter_action(method_name, csv_headers):
             loading_bar.inc('users')
 
     return action
+
+
+def is_not_user_id(item):
+    return bool(re.match(CHARACTERS, item))
+
+
+def is_probably_not_user_screen_name(item):
+    matches = TWITTER_SCREEN_NAME.fullmatch(item)
+    if matches:
+        return bool(NUMBERS.fullmatch(item))
+    return True
