@@ -120,8 +120,7 @@ def twitter_attrition_action(cli_args):
 
                 else:
                     try:
-                        client.call(['users', 'show'], **c_args)
-                        indexed_users[user] = 'user_ok'
+                        result_user = client.call(['users', 'show'], **c_args)
 
                     except TwitterHTTPError as e:
                         error_code = getpath(e.response_data, ['errors', 0, 'code'], '')
@@ -129,7 +128,8 @@ def twitter_attrition_action(cli_args):
                             current_tweet_status = 'deactivated_user'
                             indexed_users[user] = 'deactivated_user'
 
-                    if indexed_users[user] == 'user_ok':
+                    if result_user:
+                        indexed_users[user] = 'user_ok'
                         current_tweet_status = 'unavailable_tweet'
 
                 # Sometimes, the unavailable tweet is a retweet, in which
