@@ -22,7 +22,8 @@
 * [url-parse](#url-parse)
 
 *Platform-related commands*
-
+* [buzzsumo (bz)](#buzzsumo)
+  * [limit](#buzzsumo-limit)
 * [crowdtangle (ct)](#crowdtangle)
   * [leaderboard](#leaderboard)
   * [lists](#lists)
@@ -160,6 +161,14 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ## url-parse
 
 <% url-parse %>
+
+## BuzzSumo
+
+<% bz %>
+
+<h3 id="buzzsumo-limit">limit</h3>
+
+<% bz/limit %>
 
 ## CrowdTangle
 

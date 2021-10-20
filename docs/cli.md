@@ -22,7 +22,8 @@
 * [url-parse](#url-parse)
 
 *Platform-related commands*
-
+* [buzzsumo (bz)](#buzzsumo)
+  * [limit](#buzzsumo-limit)
 * [crowdtangle (ct)](#crowdtangle)
   * [leaderboard](#leaderboard)
   * [lists](#lists)
@@ -637,6 +638,46 @@ examples:
 
 . Parsing YouTube urls:
     $ minet url-parse url ytvideos.csv --youtube > report.csv
+
+```
+
+## BuzzSumo
+
+```
+usage: minet buzzsumo [-h] [-t TOKEN] {limit} ...
+
+Minet Buzzsumo Command
+======================
+
+Gather data from the BuzzSumo APIs easily and efficiently.
+
+optional arguments:
+  -h, --help               show this help message and exit
+  -t TOKEN, --token TOKEN  BuzzSumo API token. Rcfile key: buzzsumo.token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
+
+actions:
+  {limit}                  Action to perform using the BuzzSumo API.
+
+```
+
+<h3 id="buzzsumo-limit">limit</h3>
+
+```
+usage: minet buzzsumo limit [-h] [-t TOKEN]
+
+Minet Buzzsumo Limit Command
+============================
+
+Call BuzzSumo for a given request and return the remaining number of calls for this month contained in the request's headers.
+
+optional arguments:
+  -h, --help               show this help message and exit
+  -t TOKEN, --token TOKEN  BuzzSumo API token. Rcfile key: buzzsumo.token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
+
+examples:
+
+. Returning the headers for a given test call:
+    $ minet bz limit --token YOUR_TOKEN
 
 ```
 

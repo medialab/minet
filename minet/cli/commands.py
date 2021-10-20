@@ -173,23 +173,17 @@ MINET_COMMANDS = {
                 }
             ],
             'commands': {
-                'test': {
-                    'title': 'Minet Buzzsumo Test Command',
+                'limit': {
+                    'title': 'Minet Buzzsumo Limit Command',
                     'description': '''
-                        Print the headers returned by any successful Buzzsumo call (indicating notably the remaining number of calls per month).
+                        Call BuzzSumo for a given request and return the remaining number of calls for this month contained in the request's headers.
                     ''',
                     'epilog': '''
                         examples:
 
                         . Returning the headers for a given test call:
-                            $ minet bz test --token YOUR_TOKEN
-                    ''',
-                    'arguments': [
-                        {
-                            'flags': ['-o', '--output'],
-                            'action': OutputFileAction
-                        }
-                    ]
+                            $ minet bz limit --token YOUR_TOKEN
+                    '''
                 }
             }
         }

@@ -18,7 +18,7 @@ def buzzsumo_action(cli_args):
             'You can provide one using the `--token` argument.'
         ])
 
-    if cli_args.bz_action == 'test':
-        from minet.cli.buzzsumo.test import buzzsumo_test_action
+    if cli_args.bz_action == 'limit':
+        from minet.cli.buzzsumo.limit import buzzsumo_limit_action
 
-        buzzsumo_test_action(cli_args)
+        buzzsumo_limit_action(cli_args)
