@@ -59,7 +59,6 @@ def twitter_users_search_action(cli_args):
             except TwitterHTTPError as e:
                 error_code = getpath(e.response_data, ['errors', 0, 'code'], '')
                 if e.e.code == 400 and error_code == 44:
-                    loading_bar.print('Done')
                     break
 
                 else:
