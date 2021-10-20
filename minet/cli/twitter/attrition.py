@@ -11,6 +11,7 @@ from ebbe import getpath, as_chunks
 from minet.cli.utils import LoadingBar
 from minet.cli.exceptions import InvalidArgumentsError
 from minet.twitter import TwitterAPIClient
+from minet.cli.twitter.utils import is_not_user_id, is_probably_not_user_screen_name
 
 
 def twitter_attrition_action(cli_args):
@@ -51,10 +52,23 @@ def twitter_attrition_action(cli_args):
     if cli_args.user_column not in enricher.headers:
         raise InvalidArgumentsError('Could not find the "%s" column containing the user ids in the given CSV file.' % cli_args.user_column)
 
-    user_id_column = cli_args.user_column
-    user_id_pos = enricher.headers[user_id_column]
+    user_column = cli_args.user_column
+    user_pos = enricher.headers[user_column]
 
-    for chunk in as_chunks(100, enricher.cells(cli_args.tweet_column, with_rows=True)):
+    def cells():
+        for row, cell in enricher.cells(cli_args.tweet_column, with_rows=True):
+            if cli_args.ids:
+                if is_not_user_id(row[user_pos]):
+                    loading_bar.die('The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
+
+            else:
+                if is_probably_not_user_screen_name(row[user_pos]):
+                    loading_bar.die('The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command.')
+                    # force flag to add
+
+            yield row, cell
+
+    for chunk in as_chunks(100, cells()):
         tweets = ','.join(row[1] for row in chunk)
         kwargs = {'_id': tweets}
 
@@ -73,7 +87,7 @@ def twitter_attrition_action(cli_args):
         for row, tweet in chunk:
             loading_bar.update()
 
-            user = row[user_id_pos]
+            user = row[user_pos]
 
             if tweet in indexed_tweets:
                 current_tweet_status = 'available_tweet'

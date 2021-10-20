@@ -15,6 +15,7 @@ from ebbe import as_chunks
 
 from minet.cli.utils import LoadingBar
 from minet.twitter import TwitterAPIClient
+from minet.cli.twitter.utils import is_not_user_id, is_probably_not_user_screen_name
 
 
 def twitter_users_action(cli_args):
@@ -43,9 +44,17 @@ def twitter_users_action(cli_args):
         users = ','.join(row[1].lstrip('@') for row in chunk)
 
         if cli_args.ids:
+            if is_not_user_id(user):
+                loading_bar.die('The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
+
             client_args = {'user_id': users}
             key = 'id'
+
         else:
+            if is_probably_not_user_screen_name(user):
+                loading_bar.die('The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command.')
+                # force flag to add
+
             client_args = {'screen_name': users}
             key = 'screen_name'
 
