@@ -22,6 +22,7 @@
 * [url-parse](#url-parse)
 
 *Platform-related commands*
+
 * [buzzsumo (bz)](#buzzsumo)
   * [limit](#buzzsumo-limit)
 * [crowdtangle (ct)](#crowdtangle)
@@ -94,6 +95,8 @@ Those configuration files can be written in YAML or JSON and can either be passe
 
 ```yml
 ---
+buzzsumo:
+  token: "MY_BZ_TOKEN" # Used as --token for `minet bz` commands
 crowdtangle:
   token: "MY_CT_TOKEN" # Used as --token for `minet ct` commands
   rate_limit: 10 # Used as --rate-limit for `minet ct` commands
