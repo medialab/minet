@@ -10,6 +10,10 @@ ITERATOR_ALIASES = ['iterator', '$$']
 PLURAL_MODIFIERS = ['filter', 'filter_eval', 'uniq']
 BURROWING_KEYS = ITERATOR_ALIASES + ['item', 'fields']
 LEAF_KEYS = ['attr', 'extract', 'get_context', 'eval', 'default']
+KNOWN_KEYS = SELECT_ALIASES + PLURAL_MODIFIERS + BURROWING_KEYS + LEAF_KEYS + [
+    'sel_eval',
+    'iterator_eval'
+]
 
 BLOCK_ELEMENTS = {
     'article',

@@ -41,6 +41,7 @@ from minet.scrape.exceptions import (
     ScraperValidationMixedConcernError,
     ScraperValidationInvalidPluralModifierError,
     ScraperValidationInvalidExtractorError,
+    ScraperValidationUnknownKeyError,
     ScraperEvalError
 )
 
@@ -142,26 +143,29 @@ def report_scraper_validation_errors(errors):
         if isinstance(error, ScraperValidationConflictError):
             p('  the {keys} keys are conflicting and should not be found at the same level!'.format(keys=and_join(error.keys)))
 
-        if isinstance(error, ScraperValidationIrrelevantPluralModifierError):
+        elif isinstance(error, ScraperValidationIrrelevantPluralModifierError):
             p('  the {modifier} modifier should not be found at a non-plural level (i.e. without iterator)!'.format(modifier=colored(error.modifier, 'green')))
 
-        if isinstance(error, ScraperValidationInvalidPluralModifierError):
+        elif isinstance(error, ScraperValidationInvalidPluralModifierError):
             p('  the {modifier} modifier cannot be a boolean without {fields} and cannot be a key/path with {fields}!'.format(modifier=colored(error.modifier, 'green'), fields=colored('fields', 'green')))
 
-        if isinstance(error, ScraperValidationInvalidExtractorError):
+        elif isinstance(error, ScraperValidationInvalidExtractorError):
             p('  unknown {extractor} extractor!'.format(extractor=colored(error.extractor, 'green')))
 
-        if isinstance(error, ScraperValidationMixedConcernError):
+        elif isinstance(error, ScraperValidationMixedConcernError):
             p('  mixed concerns could not be interpreted (i.e. the {burrowing} keys should not be found alongside the {leaf} ones)!'.format(burrowing=and_join(BURROWING_KEYS), leaf=and_join(LEAF_KEYS)))
 
-        if isinstance(error, InvalidCSSSelectorError):
+        elif isinstance(error, InvalidCSSSelectorError):
             p('  invalid CSS selector {css}'.format(css=colored(error.expression, 'cyan')))
 
-        if isinstance(error, ScraperEvalSyntaxError):
+        elif isinstance(error, ScraperEvalSyntaxError):
             p('  invalid python code was found:')
 
             for line in error.expression.split('\n'):
                 p(colored('    | {line}'.format(line=line), 'cyan'))
+
+        elif isinstance(error, ScraperValidationUnknownKeyError):
+            p('  unknown {key} key!'.format(key=colored(error.key, 'cyan')))
 
         p()
 

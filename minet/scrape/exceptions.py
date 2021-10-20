@@ -62,6 +62,12 @@ class ScraperValidationMixedConcernError(ScraperRuntimeError):
     pass
 
 
+class ScraperValidationUnknownKeyError(ScraperRuntimeError):
+    def __init__(self, msg=None, key=None, **kwargs):
+        super().__init__(msg, **kwargs)
+        self.key = key
+
+
 class ScraperValidationConflictError(ScraperRuntimeError):
     def __init__(self, msg=None, keys=[], **kwargs):
         super().__init__(msg, **kwargs)

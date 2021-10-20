@@ -29,6 +29,7 @@ from minet.scrape.exceptions import (
     ScraperValidationInvalidPluralModifierError,
     ScraperValidationInvalidExtractorError,
     ScraperValidationMixedConcernError,
+    ScraperValidationUnknownKeyError,
     ScraperNotTabularError
 )
 
@@ -865,6 +866,9 @@ class TestScrape(object):
                     'fields': {
                         'id': 'text'
                     }
+                },
+                'unknown_key': {
+                    'idontknowyou': True
                 }
             }
         }
@@ -888,7 +892,8 @@ class TestScrape(object):
             (['fields', 'id'], ScraperValidationMixedConcernError),
             (['fields', 'invalid_filter1'], ScraperValidationInvalidPluralModifierError),
             (['fields', 'invalid_filter2'], ScraperValidationInvalidPluralModifierError),
-            (['fields', 'extractor'], ScraperValidationInvalidExtractorError)
+            (['fields', 'extractor'], ScraperValidationInvalidExtractorError),
+            (['fields', 'unknown_key'], ScraperValidationUnknownKeyError)
         ], key=key)
 
         assert errors == expecting

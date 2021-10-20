@@ -13,7 +13,8 @@ from minet.scrape.constants import (
     PLURAL_MODIFIERS,
     BURROWING_KEYS,
     LEAF_KEYS,
-    EXTRACTOR_NAMES
+    EXTRACTOR_NAMES,
+    KNOWN_KEYS
 )
 from minet.scrape.exceptions import (
     ScraperEvalSyntaxError,
@@ -22,7 +23,8 @@ from minet.scrape.exceptions import (
     ScraperValidationIrrelevantPluralModifierError,
     ScraperValidationMixedConcernError,
     ScraperValidationInvalidPluralModifierError,
-    ScraperValidationInvalidExtractorError
+    ScraperValidationInvalidExtractorError,
+    ScraperValidationUnknownKeyError
 )
 
 
@@ -96,12 +98,13 @@ def analyse(scraper):
 
 ERRORS_PRIORITY = {
     InvalidCSSSelectorError: 0,
-    ScraperEvalSyntaxError: 1,
-    ScraperValidationConflictError: 2,
-    ScraperValidationMixedConcernError: 3,
-    ScraperValidationIrrelevantPluralModifierError: 4,
-    ScraperValidationInvalidPluralModifierError: 5,
-    ScraperValidationInvalidExtractorError: 6
+    ScraperValidationUnknownKeyError: 1,
+    ScraperEvalSyntaxError: 2,
+    ScraperValidationConflictError: 3,
+    ScraperValidationMixedConcernError: 4,
+    ScraperValidationIrrelevantPluralModifierError: 5,
+    ScraperValidationInvalidPluralModifierError: 6,
+    ScraperValidationInvalidExtractorError: 7
 }
 
 
@@ -192,7 +195,15 @@ def validate(scraper):
         if any(k in node for k in BURROWING_KEYS) and any(k in node for k in LEAF_KEYS):
             errors.append(ScraperValidationMixedConcernError(path=path))
 
+        in_fields = path and path[-1] == 'fields'
+
         for k, v in node.items():
+
+            # Unkown keys
+            if not in_fields and k not in KNOWN_KEYS:
+                errors.append(ScraperValidationUnknownKeyError(path=path, key=k))
+                continue
+
             p = path + [k]
 
             # Validating python syntax
