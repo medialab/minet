@@ -38,6 +38,8 @@ def twitter_attrition_action(cli_args):
 
     indexed_tweets = set()
 
+    indexed_users = set()
+
     result = None
 
     if cli_args.tweet_column not in enricher.headers:
@@ -111,16 +113,21 @@ def twitter_attrition_action(cli_args):
                 else:
                     c_args = {'screen_name': user}
 
-                try:
-                    result_user = client.call(['users', 'show'], **c_args)
+                if user in indexed_users:
+                    current_tweet_status = 'deactivated_user'
 
-                except TwitterHTTPError as e:
-                    error_code = getpath(e.response_data, ['errors', 0, 'code'], '')
-                    if e.e.code == 404 and error_code == 50:
-                        current_tweet_status = 'deactivated_user'
+                else:
+                    try:
+                        result_user = client.call(['users', 'show'], **c_args)
 
-                if result_user:
-                    current_tweet_status = 'unavailable_tweet'
+                    except TwitterHTTPError as e:
+                        error_code = getpath(e.response_data, ['errors', 0, 'code'], '')
+                        if e.e.code == 404 and error_code == 50:
+                            current_tweet_status = 'deactivated_user'
+                            indexed_users.add(user)
+
+                    if result_user:
+                        current_tweet_status = 'unavailable_tweet'
 
                 # Sometimes, the unavailable tweet is a retweet, in which
                 # case we need to enquire about the original tweet to find
