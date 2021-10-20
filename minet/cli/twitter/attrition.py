@@ -86,13 +86,15 @@ def twitter_attrition_action(cli_args):
                 result_tweet = client.call(['statuses', 'show'], **client_args)
 
             except TwitterHTTPError as e:
-                if e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 63:
+                error_code = getpath(e.response_data, ['errors', 0, 'code'], '')
+
+                if e.e.code == 403 and error_code == 63:
                     current_tweet_status = 'suspended_user'
 
-                elif e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 179:
+                elif e.e.code == 403 and error_code == 179:
                     current_tweet_status = 'protected_user'
 
-                elif e.e.code == 404 and (getpath(e.response_data, ['errors', 0, 'code'], '') == 144 or getpath(e.response_data, ['errors', 0, 'code'], '') == 34):
+                elif e.e.code == 404 and (error_code == 144 or error_code == 34):
                     current_tweet_status = 'user_or_tweet_deleted'
 
                 else:
@@ -113,7 +115,8 @@ def twitter_attrition_action(cli_args):
                     result_user = client.call(['users', 'show'], **c_args)
 
                 except TwitterHTTPError as e:
-                    if e.e.code == 404 and getpath(e.response_data, ['errors', 0, 'code'], '') == 50:
+                    error_code = getpath(e.response_data, ['errors', 0, 'code'], '')
+                    if e.e.code == 404 and error_code == 50:
                         current_tweet_status = 'deactivated_user'
 
                 if result_user:
@@ -140,13 +143,14 @@ def twitter_attrition_action(cli_args):
                                 result_retweet = client.call(['statuses', 'show'], **client_arg)
 
                             except TwitterHTTPError as e:
-                                if e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 63:
+                                error_code = getpath(e.response_data, ['errors', 0, 'code'], '')
+                                if e.e.code == 403 and error_code == 63:
                                     current_tweet_status = 'suspended_retweeted_user'
 
-                                elif e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 179:
+                                elif e.e.code == 403 and error_code == 179:
                                     current_tweet_status = 'protected_retweeted_user'
 
-                                elif e.e.code == 404 and (getpath(e.response_data, ['errors', 0, 'code'], '') == 144 or getpath(e.response_data, ['errors', 0, 'code'], '') == 34):
+                                elif e.e.code == 404 and (error_code == 144 or error_code == 34):
                                     current_tweet_status = 'unavailable_retweeted_tweet'
 
                                 else:
