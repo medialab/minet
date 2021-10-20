@@ -37,8 +37,7 @@ def twitter_attrition_action(cli_args):
         unit='user'
     )
 
-    indexed_users = {}
-
+    user_cache = {}
     result = None
 
     if cli_args.tweet_column not in enricher.headers:
@@ -64,6 +63,7 @@ def twitter_attrition_action(cli_args):
             yield row, cell
 
     for chunk in as_chunks(100, cells()):
+        available_tweets = set()
         tweets = ','.join(row[1] for row in chunk)
         kwargs = {'_id': tweets}
 
@@ -77,12 +77,12 @@ def twitter_attrition_action(cli_args):
             raise e
 
         for tw in result:
-            indexed_tweets.add(tw['id_str'])
+            available_tweets.add(tw['id_str'])
 
         for row, tweet in chunk:
             loading_bar.update()
 
-            if tweet in indexed_tweets:
+            if tweet in available_tweets:
                 current_tweet_status = 'available_tweet'
                 enricher.writerow(row, [current_tweet_status])
                 continue
@@ -119,30 +119,31 @@ def twitter_attrition_action(cli_args):
             if current_tweet_status == 'user_or_tweet_deleted' or current_tweet_status == 'unknown':
                 user = row[user_pos]
 
-                if cli_args.ids:
-                    c_args = {'user_id': user}
-                else:
-                    c_args = {'screen_name': user}
-
-                if user in indexed_users:
-                    if indexed_users[user] == 'user_ok':
+                if user in user_cache:
+                    if user_cache[user] == 'user_ok':
                         current_tweet_status = 'unavailable_tweet'
 
                     else:
-                        current_tweet_status = indexed_users[user]
+                        current_tweet_status = user_cache[user]
 
                 else:
+
+                    if cli_args.ids:
+                        c_args = {'user_id': user}
+                    else:
+                        c_args = {'screen_name': user}
+
                     try:
-                        result_user = client.call(['users', 'show'], **c_args)
+                        client.call(['users', 'show'], **c_args)
 
                     except TwitterHTTPError as e:
                         error_code = getpath(e.response_data, ['errors', 0, 'code'], '')
                         if e.e.code == 404 and error_code == 50:
                             current_tweet_status = 'deactivated_user'
-                            indexed_users[user] = 'deactivated_user'
+                            user_cache[user] = 'deactivated_user'
 
-                    if result_user:
-                        indexed_users[user] = 'user_ok'
+                    else:
+                        user_cache[user] = 'user_ok'
                         current_tweet_status = 'unavailable_tweet'
 
                 # Sometimes, the unavailable tweet is a retweet, in which
