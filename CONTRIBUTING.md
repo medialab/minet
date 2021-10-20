@@ -75,8 +75,6 @@ Let's say we want to add a new command to minet, something like `minet platform 
 * Finally create an `__init__` file at the root of your `platform` folder with the following code:
 
 ```python
-import sys
-
 def platform_my_command_action(cli_args):
     if cli_args.pf_action == 'my-command':
         from minet.cli.platform.my_command import platform_my_command_action
