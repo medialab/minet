@@ -1544,7 +1544,8 @@ MINET_COMMANDS = {
             },
             {
                 'flag': '--separator',
-                'help': 'Separator use to join lists of values when output format is CSV. Defaults to "|".'
+                'help': 'Separator use to join lists of values when output format is CSV. Defaults to "|".',
+                'default': '|'
             },
             {
                 'flag': '--strain',
