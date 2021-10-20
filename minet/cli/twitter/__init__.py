@@ -63,5 +63,10 @@ def twitter_action(cli_args):
 
             twitter_attrition_action(cli_args)
 
+        elif cli_args.tw_action == 'users-search':
+            from minet.cli.twitter.users_search import twitter_users_search_action
+
+            twitter_users_search_action(cli_args)
+
         else:
             raise TypeError('unkown tw_action "%s"' % cli_args.tw_action)

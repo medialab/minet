@@ -51,6 +51,7 @@
   * [scrape](#twitter-scrape)
   * [tweets](#tweets)
   * [users](#users)
+  * [users-search](#users-search)
   * [user-tweets](#user-tweets)
 * [youtube (yt)](#youtube)
   * [captions](#captions)
@@ -1555,6 +1556,42 @@ examples:
 
 . Getting metadata from an user:
     $ minet tw users screen_name users.csv > data_users.csv
+
+```
+
+### users-search
+
+```
+usage: minet twitter users-search [-h] [--api-key API_KEY]
+                                  [--api-secret-key API_SECRET_KEY]
+                                  [--access-token ACCESS_TOKEN]
+                                  [--access-token-secret ACCESS_TOKEN_SECRET]
+                                  [-o OUTPUT] [-s SELECT] [--total TOTAL]
+                                  query [file]
+
+Minet Twitter Users Search Command
+==================================
+
+Retrieve Twitter users using the API.
+
+positional arguments:
+  query                                      Search query or name of the column containing queries to run in given CSV file.
+  file                                       Optional CSV file containing the queries to be run.
+
+optional arguments:
+  -h, --help                                 show this help message and exit
+  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
+  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
+  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
+  --total TOTAL                              Total number of queries. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Getting users from a search query:
+    $ minet tw users-search 'query' > users.csv
 
 ```
 
