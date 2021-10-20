@@ -66,7 +66,7 @@ def twitter_users_search_action(cli_args):
 
             next_page += 1
 
-            if not result:
+            if result is None:
                 break
 
             for user in result:
