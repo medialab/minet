@@ -830,7 +830,7 @@ class TestScrape(object):
             }
         }, REPETITIVE_HTML)
 
-        assert [1, 2, 3]
+        assert result == [1, 2, 3]
 
     def test_validate(self):
         bad_definition = {
