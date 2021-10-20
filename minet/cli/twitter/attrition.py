@@ -36,8 +36,6 @@ def twitter_attrition_action(cli_args):
         unit='user'
     )
 
-    indexed_tweets = set()
-
     indexed_users = set()
 
     result = None
@@ -52,6 +50,7 @@ def twitter_attrition_action(cli_args):
     user_id_pos = enricher.headers[user_id_column]
 
     for chunk in as_chunks(100, enricher.cells(cli_args.tweet_column, with_rows=True)):
+        indexed_tweets = set()
         tweets = ','.join(row[1] for row in chunk)
         kwargs = {'_id': tweets}
 
