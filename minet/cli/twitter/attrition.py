@@ -101,8 +101,7 @@ def twitter_attrition_action(cli_args):
                 else:
                     raise e
 
-            if result_tweet:
-                current_tweet_status = 'available_tweet'
+            assert result_tweet is None, 'It is not possible that this tweet is available.'
 
             if current_tweet_status == 'user_or_tweet_deleted' or current_tweet_status == 'unknown':
                 user = row[user_id_pos]
