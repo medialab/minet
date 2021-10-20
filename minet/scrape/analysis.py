@@ -168,7 +168,7 @@ def validate(scraper):
                     errors.append(ScraperValidationIrrelevantPluralModifierError(path=path, modifier=modifier))
 
         for modifier in PLURAL_MODIFIERS:
-            if modifier not in node:
+            if modifier not in node or '_eval' in modifier:
                 continue
 
             if isinstance(node[modifier], bool):
