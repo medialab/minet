@@ -37,11 +37,6 @@ def twitter_attrition_action(cli_args):
         unit='user'
     )
 
-    indexed_tweets = set()
-
-    # NOTE: currently this index is unbounded and could potentially
-    # exhaust the user's memory even if unlikely (the index is bounded
-    # by the total number of users of unvailable tweets in input dataset)
     indexed_users = {}
 
     result = None
@@ -87,83 +82,107 @@ def twitter_attrition_action(cli_args):
         for row, tweet in chunk:
             loading_bar.update()
 
-            user = row[user_pos]
-
             if tweet in indexed_tweets:
                 current_tweet_status = 'available_tweet'
                 enricher.writerow(row, [current_tweet_status])
                 continue
 
-            # If tweet is not available, we will query its user to check
-            # if the reason is the user's status
-            if user not in indexed_users:
-                if cli_args.ids:
-                    client_args = {'user_id': user}
+            # If tweet is not available, we will query once more to find out
+            # what the reason for its unavailability is
+
+            client_args = {'_id': tweet}
+
+            current_tweet_status = 'unknown'
+
+            result_tweet = None
+
+            try:
+                result_tweet = client.call(['statuses', 'show'], **client_args)
+
+            except TwitterHTTPError as e:
+                error_code = getpath(e.response_data, ['errors', 0, 'code'], '')
+
+                if e.e.code == 403 and error_code == 63:
+                    current_tweet_status = 'suspended_user'
+
+                elif e.e.code == 403 and error_code == 179:
+                    current_tweet_status = 'protected_user'
+
+                elif e.e.code == 404 and (error_code == 144 or error_code == 34):
+                    current_tweet_status = 'user_or_tweet_deleted'
+
                 else:
-                    client_args = {'screen_name': user}
+                    raise e
 
-                result_user = None
+            assert result_tweet is None, 'It is not possible that this tweet is available.'
 
-                try:
-                    result_user = client.call(['users', 'show'], **client_args)
+            if current_tweet_status == 'user_or_tweet_deleted' or current_tweet_status == 'unknown':
+                user = row[user_pos]
 
-                except TwitterHTTPError as e:
-                    if e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 63:
-                        indexed_users[user] = 'suspended_user'
+                if cli_args.ids:
+                    c_args = {'user_id': user}
+                else:
+                    c_args = {'screen_name': user}
 
-                    elif e.e.code == 404 and getpath(e.response_data, ['errors', 0, 'code'], '') == 50:
-                        indexed_users[user] = 'deactivated_user'
+                if user in indexed_users:
+                    if indexed_users[user] == 'user_ok':
+                        current_tweet_status = 'unavailable_tweet'
 
                     else:
-                        raise e
+                        current_tweet_status = indexed_users[user]
 
-                if result_user is not None:
-                    if result_user['protected']:
-                        indexed_users[user] = 'protected_user'
-                    else:
+                else:
+                    try:
+                        result_user = client.call(['users', 'show'], **c_args)
+
+                    except TwitterHTTPError as e:
+                        error_code = getpath(e.response_data, ['errors', 0, 'code'], '')
+                        if e.e.code == 404 and error_code == 50:
+                            current_tweet_status = 'deactivated_user'
+                            indexed_users[user] = 'deactivated_user'
+
+                    if result_user:
                         indexed_users[user] = 'user_ok'
-
-            if indexed_users[user] == 'user_ok':
-                current_tweet_status = 'original_tweet_ok'
+                        current_tweet_status = 'unavailable_tweet'
 
                 # Sometimes, the unavailable tweet is a retweet, in which
                 # case we need to enquire about the original tweet to find
                 # a reason for the tweet's unavailability
                 if cli_args.retweeted_id:
-                    if cli_args.has_dummy_csv:
-                        original_tweet = cli_args.retweeted_id
-                    else:
-                        original_id_pos = enricher.headers[cli_args.retweeted_id]
-                        original_tweet = row[original_id_pos]
 
-                    client_arg = {'_id': original_tweet}
-                    result_retweet = None
-                    current_tweet_status = 'original_tweet_ok'
+                    if current_tweet_status == 'unavailable_tweet' or current_tweet_status == 'unknown':
 
-                    if original_tweet:
-                        try:
-                            result_retweet = client.call(['statuses', 'show'], **client_arg)
+                        if cli_args.has_dummy_csv:
+                            original_tweet = cli_args.retweeted_id
+                        else:
+                            original_id_pos = enricher.headers[cli_args.retweeted_id]
+                            original_tweet = row[original_id_pos]
 
-                        except TwitterHTTPError as e:
-                            if e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 63:
-                                current_tweet_status = 'suspended_retweeted_user'
+                        client_arg = {'_id': original_tweet}
+                        result_retweet = None
 
-                            elif e.e.code == 403 and getpath(e.response_data, ['errors', 0, 'code'], '') == 179:
-                                current_tweet_status = 'protected_retweeted_user'
+                        if original_tweet:
+                            try:
+                                result_retweet = client.call(['statuses', 'show'], **client_arg)
 
-                            elif e.e.code == 404 and (getpath(e.response_data, ['errors', 0, 'code'], '') == 144 or getpath(e.response_data, ['errors', 0, 'code'], '') == 34):
-                                current_tweet_status = 'unavailable_retweeted_tweet'
+                            except TwitterHTTPError as e:
+                                error_code = getpath(e.response_data, ['errors', 0, 'code'], '')
+                                if e.e.code == 403 and error_code == 63:
+                                    current_tweet_status = 'suspended_retweeted_user'
 
-                            else:
-                                raise e
+                                elif e.e.code == 403 and error_code == 179:
+                                    current_tweet_status = 'protected_retweeted_user'
 
-                        if result_retweet is not None:
-                            current_tweet_status = 'unavailable_retweet'
+                                elif e.e.code == 404 and (error_code == 144 or error_code == 34):
+                                    current_tweet_status = 'unavailable_retweeted_tweet'
 
-                if current_tweet_status == 'original_tweet_ok':
+                                else:
+                                    raise e
+
+                            if result_retweet is not None:
+                                current_tweet_status = 'unavailable_retweet'
+
+                if current_tweet_status == 'unknown':
                     current_tweet_status = 'unavailable_tweet'
-
-            else:
-                current_tweet_status = indexed_users[user]
 
             enricher.writerow(row, [current_tweet_status])
