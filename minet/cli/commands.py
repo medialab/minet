@@ -215,11 +215,14 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--begin-date',
-                            'help': 'The date you wish to fetch articles from.'
+                            'help': 'The date you wish to fetch articles from.',
+                            'required': True
+
                         },
                         {
                             'flag': '--end-date',
-                            'help': 'The date you wish to fetch articles to.'
+                            'help': 'The date you wish to fetch articles to.',
+                            'required': True
                         }
                     ]
                 }
