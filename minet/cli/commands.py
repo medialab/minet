@@ -1978,7 +1978,47 @@ MINET_COMMANDS = {
                             'type': int
                         }
                     ]
-                }
+                },
+                'user-search': {
+                    'title': 'Minet Twitter Users Search Command',
+                    'description': '''
+                        Retrieve Twitter users using the API.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Getting users from a search query:
+                            $ minet tw user-search 'query' > users.csv
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'query',
+                            'help': 'Search query or name of the column containing queries to run in given CSV file.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'Optional CSV file containing the queries to be run.',
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'query',
+                            'column_dest': 'query'
+                        },
+                        *TWITTER_API_COMMON_ARGUMENTS,
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of queries. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
+                },
             }
         }
     },
