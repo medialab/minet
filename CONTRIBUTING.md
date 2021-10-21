@@ -121,6 +121,7 @@ make readme
 so that the `docs/cli.template.md` file you modified will rewrite the user-facing `docs/cli.md` file.
 
 Before making a pull request, do not forget to run:
-```
+
+```bash
 make
 ```
