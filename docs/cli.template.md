@@ -25,6 +25,7 @@
 
 * [buzzsumo (bz)](#buzzsumo)
   * [limit](#buzzsumo-limit)
+  * [domain-summary](#buzzsumo-domain-summary)
 * [crowdtangle (ct)](#crowdtangle)
   * [leaderboard](#leaderboard)
   * [lists](#lists)
@@ -172,6 +173,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 <h3 id="buzzsumo-limit">limit</h3>
 
 <% bz/limit %>
+
+<h3 id="buzzsumo-domain-summary">domain-summary</h3>
+
+<% bz/domain-summary %>
 
 ## CrowdTangle
 

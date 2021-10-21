@@ -25,6 +25,7 @@
 
 * [buzzsumo (bz)](#buzzsumo)
   * [limit](#buzzsumo-limit)
+  * [domain-summary](#buzzsumo-domain-summary)
 * [crowdtangle (ct)](#crowdtangle)
   * [leaderboard](#leaderboard)
   * [lists](#lists)
@@ -647,7 +648,7 @@ examples:
 ## BuzzSumo
 
 ```
-usage: minet buzzsumo [-h] [-t TOKEN] {limit} ...
+usage: minet buzzsumo [-h] [-t TOKEN] {limit,domain-summary} ...
 
 Minet Buzzsumo Command
 ======================
@@ -659,7 +660,7 @@ optional arguments:
   -t TOKEN, --token TOKEN  BuzzSumo API token. Rcfile key: buzzsumo.token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
 
 actions:
-  {limit}                  Action to perform using the BuzzSumo API.
+  {limit,domain-summary}   Action to perform using the BuzzSumo API.
 
 ```
 
@@ -679,8 +680,43 @@ optional arguments:
 
 examples:
 
-. Returning the headers for a given test call:
+. Returning the remaining number of calls for this month:
     $ minet bz limit --token YOUR_TOKEN
+
+```
+
+<h3 id="buzzsumo-domain-summary">domain-summary</h3>
+
+```
+usage: minet buzzsumo domain-summary [-h] [-t TOKEN] [-o OUTPUT] --begin-date
+                                     BEGIN_DATE --end-date END_DATE
+                                     column [file]
+
+Minet Buzzsumo Domain Summary Command
+=====================================
+
+Gather information about the quantity of articles crawled by BuzzSumo for certain domain names and a given period.
+
+Inform the user about the number of calls (corresponding to the number of pages) needed to request BuzzSumo about those domain names.
+
+positional arguments:
+  column                      Name of the column containing the domain names.
+  file                        CSV file containing the domain names.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -t TOKEN, --token TOKEN     BuzzSumo API token. Rcfile key: buzzsumo.token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  --begin-date BEGIN_DATE     The date you wish to fetch articles from.
+  --end-date END_DATE         The date you wish to fetch articles to.
+
+examples:
+
+. Returning the number of articles and pages found in BuzzSumo for one domain name:
+    $ minet bz domain-summary 'nytimes.com' --begin-date 2019-01-01 --end-date 2019-03-01 --token YOUR_TOKEN
+
+. Returning the number of articles and pages found in BuzzSumo for a list of domain names in a CSV:
+    $ minet bz domain-summary domain_name domain_names.csv --begin-date 2020-01-01 --end-date 2021-06-15 --token YOUR_TOKEN  > domain_name_summary.csv
 
 ```
 
