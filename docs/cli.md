@@ -1309,7 +1309,7 @@ Minet Twitter Attrition Command
 Using Twitter API to find whether batches of tweets are still
 available today and if they aren't, attempt to find a reason why.
 
-This commands rely on tweet ids and their user ids to work and will
+This command relies on tweet ids and their user ids. It will
 output a report similar to the input file and containing an additional
 column named "current_tweet_status" that can take the following values:
 
