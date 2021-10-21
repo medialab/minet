@@ -181,9 +181,47 @@ MINET_COMMANDS = {
                     'epilog': '''
                         examples:
 
-                        . Returning the headers for a given test call:
+                        . Returning the remaining number of calls for this month:
                             $ minet bz limit --token YOUR_TOKEN
                     '''
+                },
+                'domain-summary': {
+                    'title': 'Minet Buzzsumo Domain Summary Command',
+                    'description': '''
+                        Gather information about the quantity of articles crawled by BuzzSumo for a given list of domain names and a given period.
+
+                        Inform the user about the ressources (number of calls) and the time that will be needed to request BuzzSumo about those domain names.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Returning the number of articles found in BuzzSumo for a given list of domain names and a given period:
+                            $ minet bz domain-summary domain_name domain_names.csv --begin-date 2020-01-01 --end-date 2021-06-15 --token YOUR_TOKEN
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the domain names.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the domain names.',
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'domain_name'
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
+                        },
+                        {
+                            'flag': '--begin-date',
+                            'help': 'The date you wish to fetch articles from.'
+                        },
+                        {
+                            'flag': '--end-date',
+                            'help': 'The date you wish to fetch articles to.'
+                        }
+                    ]
                 }
             }
         }
