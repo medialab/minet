@@ -1,8 +1,8 @@
 # =============================================================================
-# Minet Twitter Users Search CLI Action
+# Minet Twitter User Search CLI Action
 # =============================================================================
 #
-# Logic of the `tw users-search` action.
+# Logic of the `tw user-search` action.
 #
 import casanova
 from twitwi import (
