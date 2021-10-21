@@ -1571,7 +1571,11 @@ usage: minet twitter user-search [-h] [--api-key API_KEY]
 Minet Twitter Users Search Command
 ==================================
 
-Retrieve Twitter users using the API.
+Search Twitter users using API v1.
+
+This will only return ~1000 results maximum per query
+so you might want to find a way to segment your inquiry
+into smaller queries to find more users.
 
 positional arguments:
   query                                      Search query or name of the column containing queries to run in given CSV file.
@@ -1589,8 +1593,11 @@ optional arguments:
 
 examples:
 
-. Getting users from a search query:
-    $ minet tw user-search 'query' > users.csv
+. Searching user using "cancer" as a query:
+    $ minet tw user-search cancer > users.csv
+
+. Running multiple queries in series:
+    $ minet tw user-search query queries.csv > users.csv
 
 ```
 

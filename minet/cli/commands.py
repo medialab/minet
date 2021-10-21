@@ -1982,13 +1982,20 @@ MINET_COMMANDS = {
                 'user-search': {
                     'title': 'Minet Twitter Users Search Command',
                     'description': '''
-                        Retrieve Twitter users using the API.
+                        Search Twitter users using API v1.
+
+                        This will only return ~1000 results maximum per query
+                        so you might want to find a way to segment your inquiry
+                        into smaller queries to find more users.
                     ''',
                     'epilog': '''
                         examples:
 
-                        . Getting users from a search query:
-                            $ minet tw user-search 'query' > users.csv
+                        . Searching user using "cancer" as a query:
+                            $ minet tw user-search cancer > users.csv
+
+                        . Running multiple queries in series:
+                            $ minet tw user-search query queries.csv > users.csv
                     ''',
                     'arguments': [
                         {
