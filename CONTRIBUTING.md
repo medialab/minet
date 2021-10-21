@@ -72,10 +72,10 @@ Let's say we want to add a new command to minet, something like `minet platform 
 
 1. Then create a `platform` folder in the `minet/cli` folder and add a `my_command.py` file in it. In this file, create a function called `platform_my_command_action` that will execute the code you want to run when calling the `minet platform my-command` command.
 
-* Finally create an `__init__` file at the root of your `platform` folder with the following code:
+1. Finally create an `__init__` file at the root of your `platform` folder with the following code:
 
 ```python
-def platform_my_command_action(cli_args):
+def platform_action(cli_args):
     if cli_args.pf_action == 'my-command':
         from minet.cli.platform.my_command import platform_my_command_action
         platform_my_command_action(cli_args)
@@ -91,7 +91,7 @@ When your command is finalized, do not forget to add your command's documentatio
 
 To do so, you must do three things:
 
-In the `docs/cli.template.md` file, in the `*Platform-related commands*` section (around the line 20-30) you should add:
+1. In the `docs/cli.template.md` file, in the `*Platform-related commands*` section (around the line 20-30) you should add:
 
 ```markdown
 * [platform (alias)](#platform)
@@ -100,7 +100,7 @@ In the `docs/cli.template.md` file, in the `*Platform-related commands*` section
 
 Please respect the alphabetical order between the platforms when adding those lines.
 
-Around the end of the same file, you should add:
+2. Around the end of the same file, you should add:
 
 ```markdown
 ## Platform
@@ -112,10 +112,15 @@ Around the end of the same file, you should add:
 <% pf/script %>
 ```
 
-Mind the templating and finally run:
+3. Mind the templating and finally run:
 
 ```bash
 make readme
 ```
 
 so that the `docs/cli.template.md` file you modified will rewrite the user-facing `docs/cli.md` file.
+
+Before making a pull request, do not forget to run:
+```
+make
+```
