@@ -11,7 +11,6 @@ from twitwi import (
 )
 from twitter import TwitterHTTPError
 from twitwi.constants import USER_FIELDS
-from ebbe import getpath
 
 from minet.cli.utils import LoadingBar
 from minet.twitter import TwitterAPIClient
@@ -36,20 +35,20 @@ def twitter_user_search_action(cli_args):
     loading_bar = LoadingBar(
         desc='Retrieving users',
         total=cli_args.total,
-        unit='query'
+        unit='user'
     )
 
     for row, query in enricher.cells(cli_args.query, with_rows=True):
 
-        kwargs = {'q': query, 'count': 20}
+        kwargs = {'q': query, 'count': 20, 'include_entities': True}
 
         loading_bar.print('Searching for "%s" users' % query)
         loading_bar.inc('queries')
 
-        next_page = 0
+        indexed_users = set()
 
-        while True:
-            kwargs['page'] = next_page
+        for page in range(1, 52):
+            kwargs['page'] = page
 
             result = None
 
@@ -57,20 +56,33 @@ def twitter_user_search_action(cli_args):
                 result = client.call(['users', 'search'], **kwargs)
 
             except TwitterHTTPError as e:
-                error_code = getpath(e.response_data, ['errors', 0, 'code'], '')
-                if e.e.code == 400 and error_code == 44:
-                    break
-
-                else:
-                    raise
-
-            next_page += 1
+                raise
 
             if not result:
                 break
 
+            user_count = 0
+
             for user in result:
                 user = normalize_user(user)
+
+                if user['id'] in indexed_users:
+                    user_count += 1
+                    continue
+
+                if user_count == 20:
+                    break
+
+                indexed_users.add(user['id'])
+
                 user_row = format_user_as_csv_row(user)
 
                 enricher.writerow(row, user_row)
+
+                loading_bar.update()
+
+            if user_count == 20:
+                break
+
+            if len(result) < 20:
+                break
