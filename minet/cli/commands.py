@@ -228,6 +228,55 @@ MINET_COMMANDS = {
                             'required': True
                         }
                     ]
+                },
+                'domain': {
+                    'title': 'Minet Buzzsumo Domain Command',
+                    'description': '''
+                        Gather social media information about all the articles crawled by BuzzSumo for one or a list of domain names and over a given period.
+
+                        The link to the official documentation: https://developers.buzzsumo.com/reference/articles.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Returning social media information for one domain name:
+                            $ minet bz domain 'trump-feed.com' --begin-date 2021-01-01 --end-date 2021-06-30 --articles trump_feed_articles.csv --token YOUR_TOKEN
+
+                        . Returning social media information for a list of domain names in a CSV:
+                            $ minet bz domain domain_name domain_names.csv --begin-date 2019-01-01 --end-date 2020-12-31 --articles domain_name_articles.csv --token YOUR_TOKEN
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the domain names.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the domain names.',
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'domain_name'
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
+                        },
+                        {
+                            'name': '--articles',
+                            'help': 'Path to a file containing the retrieved articles.',
+                            'action': OutputFileAction
+                        },
+                        {
+                            'flag': '--begin-date',
+                            'help': 'The date you wish to fetch articles from.',
+                            'required': True
+
+                        },
+                        {
+                            'flag': '--end-date',
+                            'help': 'The date you wish to fetch articles to.',
+                            'required': True
+                        }
+                    ]
                 }
             }
         }

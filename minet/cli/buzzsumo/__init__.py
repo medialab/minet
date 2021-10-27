@@ -25,3 +25,8 @@ def buzzsumo_action(cli_args):
         from minet.cli.buzzsumo.domain_summary import buzzsumo_domain_summary_action
 
         buzzsumo_domain_summary_action(cli_args)
+
+    if cli_args.bz_action == 'domain':
+        from minet.cli.buzzsumo.domain import buzzsumo_domain_action
+
+        buzzsumo_domain_action(cli_args)

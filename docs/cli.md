@@ -26,6 +26,7 @@
 * [buzzsumo (bz)](#buzzsumo)
   * [limit](#buzzsumo-limit)
   * [domain-summary](#buzzsumo-domain-summary)
+  * [domain](#buzzsumo-domain)
 * [crowdtangle (ct)](#crowdtangle)
   * [leaderboard](#leaderboard)
   * [lists](#lists)
@@ -648,7 +649,7 @@ examples:
 ## BuzzSumo
 
 ```
-usage: minet buzzsumo [-h] [-t TOKEN] {limit,domain-summary} ...
+usage: minet buzzsumo [-h] [-t TOKEN] {limit,domain-summary,domain} ...
 
 Minet Buzzsumo Command
 ======================
@@ -656,11 +657,11 @@ Minet Buzzsumo Command
 Gather data from the BuzzSumo APIs easily and efficiently.
 
 optional arguments:
-  -h, --help               show this help message and exit
-  -t TOKEN, --token TOKEN  BuzzSumo API token. Rcfile key: buzzsumo.token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
+  -h, --help                     show this help message and exit
+  -t TOKEN, --token TOKEN        BuzzSumo API token. Rcfile key: buzzsumo.token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
 
 actions:
-  {limit,domain-summary}   Action to perform using the BuzzSumo API.
+  {limit,domain-summary,domain}  Action to perform using the BuzzSumo API.
 
 ```
 
@@ -717,6 +718,42 @@ examples:
 
 . Returning the number of articles and pages found in BuzzSumo for a list of domain names in a CSV:
     $ minet bz domain-summary domain_name domain_names.csv --begin-date 2020-01-01 --end-date 2021-06-15 --token YOUR_TOKEN  > domain_name_summary.csv
+
+```
+
+<h3 id="buzzsumo-domain">domain</h3>
+
+```
+usage: minet buzzsumo domain [-h] [-t TOKEN] [-o OUTPUT] [--articles ARTICLES]
+                             --begin-date BEGIN_DATE --end-date END_DATE
+                             column [file]
+
+Minet Buzzsumo Domain Command
+=============================
+
+Gather social media information about all the articles crawled by BuzzSumo for one or a list of domain names and over a given period.
+
+The link to the official documentation: https://developers.buzzsumo.com/reference/articles.
+
+positional arguments:
+  column                      Name of the column containing the domain names.
+  file                        CSV file containing the domain names.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  -t TOKEN, --token TOKEN     BuzzSumo API token. Rcfile key: buzzsumo.token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  --articles ARTICLES         Path to a file containing the retrieved articles.
+  --begin-date BEGIN_DATE     The date you wish to fetch articles from.
+  --end-date END_DATE         The date you wish to fetch articles to.
+
+examples:
+
+. Returning social media information for one domain name:
+    $ minet bz domain 'trump-feed.com' --begin-date 2021-01-01 --end-date 2021-06-30 --articles trump_feed_articles.csv --token YOUR_TOKEN
+
+. Returning social media information for a list of domain names in a CSV:
+    $ minet bz domain domain_name domain_names.csv --begin-date 2019-01-01 --end-date 2020-12-31 --articles domain_name_articles.csv --token YOUR_TOKEN
 
 ```
 
