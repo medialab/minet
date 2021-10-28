@@ -22,22 +22,20 @@ SUMMARY_HEADERS = [
 ]
 
 
-def convert_date_to_correct_format(begin_date, end_date):
-    begin_date = datetime.strptime(begin_date, '%Y-%m-%d').timestamp()
-    end_date = datetime.strptime(end_date, '%Y-%m-%d').timestamp()
-    end_date -= 1  # Wihdraw 1 ms to the end_date to exclude the article published at midnight
-    return begin_date, end_date
+def convert_string_date_into_timestamp(date):
+    return datetime.strptime(date, '%Y-%m-%d').timestamp()
 
 
-def construct_url(url, token, begin_date, end_date):
+def construct_url(url, token, begin_date=None, end_date=None):
 
     url = url % token
 
-    begin_date, end_date = convert_date_to_correct_format(begin_date, end_date)
-    url += '&begin_date=%s' % begin_date
-    url += '&end_date=%s' % end_date
-
     url += '&num_results=100'
+
+    if begin_date:
+        url += '&begin_date=%s' % begin_date
+    if end_date:
+        url += '&end_date=%s' % (end_date - 1)
 
     return url
 
@@ -76,7 +74,10 @@ def call_buzzsumo_once(url):
 
 def buzzsumo_domain_summary_action(cli_args):
 
-    base_url = construct_url(URL_TEMPLATE, cli_args.token, cli_args.begin_date, cli_args.end_date)
+    begin_date = convert_string_date_into_timestamp(cli_args.begin_date)
+    end_date = convert_string_date_into_timestamp(cli_args.end_date)
+
+    base_url = construct_url(URL_TEMPLATE, cli_args.token, begin_date, end_date)
 
     enricher = casanova.enricher(
         cli_args.file,
