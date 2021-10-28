@@ -186,6 +186,15 @@ def main():
 
     if action is not None:
 
+        # If subparser is called without any subaction, we print help and exit
+        if 'subparsers' in action['command']:
+            subdest = action['command']['subparsers']['dest']
+            subaction = getattr(cli_args, subdest)
+
+            if subaction is None:
+                action['parser'].print_help()
+                sys.exit(0)
+
         # Loading config
         config = get_rcfile(cli_args.rcfile)
 
