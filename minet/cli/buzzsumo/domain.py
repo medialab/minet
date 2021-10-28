@@ -78,16 +78,18 @@ def buzzsumo_domain_action(cli_args):
         add=[],
     )
 
+    articles_writer = csv.writer(cli_args.articles)
+    articles_writer.writerow(ARTICLES_HEADERS)
+
     loading_bar = LoadingBar(
         desc='Retrieving domain',
         unit='domain',
         total=enricher.total
     )
 
-    articles_writer = csv.writer(cli_args.articles)
-    articles_writer.writerow(ARTICLES_HEADERS)
-
     for row, domain_name in enricher.cells(cli_args.column, with_rows=True):
+
+        enricher.writerow(row)
 
         domain_base_url = base_url + '&q=%s' % domain_name
 
@@ -125,4 +127,3 @@ def buzzsumo_domain_action(cli_args):
                     page += 1
 
         loading_bar.update()
-        enricher.writerow(row)
