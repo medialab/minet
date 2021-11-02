@@ -9,13 +9,13 @@ import csv
 import casanova
 
 from minet.cli.utils import LoadingBar
-from minet.cli.buzzsumo.domain_summary import (construct_url,
-                                               convert_string_date_into_timestamp,
-                                               call_buzzsumo_once)
-# from minet.web import request_json
+from minet.buzzsumo.utils import (
+    convert_string_date_into_timestamp,
+    construct_url,
+    URL_TEMPLATE,
+    call_buzzsumo_once
+)
 
-
-URL_TEMPLATE = 'https://api.buzzsumo.com/search/articles.json?api_key=%s'
 
 ARTICLES_HEADERS = [
     'id',
@@ -69,8 +69,8 @@ def get_nb_pages_per_period_dates(period_dates, domain_base_url):
         url = domain_base_url + '&begin_date=%s' % period_dates[period_dates_index]
         url += '&end_date=%s' % (period_dates[period_dates_index + 1] - 1)
 
-        response = call_buzzsumo_once(url)
-        nb_pages.append(response['total_pages'])
+        data, _ = call_buzzsumo_once(url)
+        nb_pages.append(data['total_pages'])
 
     return nb_pages
 
@@ -141,12 +141,12 @@ def buzzsumo_domain_action(cli_args):
 
             while True:
 
-                response = call_buzzsumo_once(url + '&page=%s' % page)
+                data, _ = call_buzzsumo_once(url + '&page=%s' % page)
 
-                if response['results'] == []:
+                if data['results'] == []:
                     break
                 else:
-                    for result in response['results']:
+                    for result in data['results']:
                         articles_writer.writerow([result[column_name] for column_name in ARTICLES_HEADERS])
                     page += 1
 
