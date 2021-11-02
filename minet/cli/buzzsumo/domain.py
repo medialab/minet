@@ -5,7 +5,6 @@
 # Logic of the `bz domain` action.
 #
 
-import csv
 import casanova
 
 from minet.cli.utils import LoadingBar
@@ -99,21 +98,17 @@ def buzzsumo_domain_action(cli_args):
     enricher = casanova.enricher(
         cli_args.file,
         cli_args.output,
-        add=[],
+        keep=cli_args.select,
+        add=ARTICLES_HEADERS,
     )
 
-    articles_writer = csv.writer(cli_args.articles)
-    articles_writer.writerow(ARTICLES_HEADERS)
-
     loading_bar = LoadingBar(
-        desc='Retrieving domain',
+        desc='Retrieving domain articles',
         unit='domain',
         total=enricher.total
     )
 
     for row, domain_name in enricher.cells(cli_args.column, with_rows=True):
-
-        enricher.writerow(row)
 
         domain_base_url = base_url + '&q=%s' % domain_name
 
@@ -147,7 +142,7 @@ def buzzsumo_domain_action(cli_args):
                     break
                 else:
                     for result in data['results']:
-                        articles_writer.writerow([result[column_name] for column_name in ARTICLES_HEADERS])
+                        enricher.writerow(row, [result[column_name] for column_name in ARTICLES_HEADERS])
                     page += 1
 
         loading_bar.update()

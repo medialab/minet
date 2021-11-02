@@ -724,7 +724,7 @@ examples:
 <h3 id="buzzsumo-domain">domain</h3>
 
 ```
-usage: minet buzzsumo domain [-h] [-t TOKEN] [-o OUTPUT] [--articles ARTICLES]
+usage: minet buzzsumo domain [-h] [-t TOKEN] [-o OUTPUT] [-s SELECT]
                              --begin-date BEGIN_DATE --end-date END_DATE
                              column [file]
 
@@ -743,7 +743,7 @@ optional arguments:
   -h, --help                  show this help message and exit
   -t TOKEN, --token TOKEN     BuzzSumo API token. Rcfile key: buzzsumo.token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --articles ARTICLES         Path to a file containing the retrieved articles.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --begin-date BEGIN_DATE     The date you wish to fetch articles from.
   --end-date END_DATE         The date you wish to fetch articles to.
 

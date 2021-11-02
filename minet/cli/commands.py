@@ -261,9 +261,9 @@ MINET_COMMANDS = {
                             'action': OutputFileAction
                         },
                         {
-                            'name': '--articles',
-                            'help': 'Path to a file containing the retrieved articles.',
-                            'action': OutputFileAction
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
                         },
                         {
                             'flag': '--begin-date',
