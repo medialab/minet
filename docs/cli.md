@@ -750,10 +750,10 @@ optional arguments:
 examples:
 
 . Returning social media information for one domain name:
-    $ minet bz domain 'trump-feed.com' --begin-date 2021-01-01 --end-date 2021-06-30 --articles trump_feed_articles.csv --token YOUR_TOKEN
+    $ minet bz domain 'trump-feed.com' --begin-date 2021-01-01 --end-date 2021-06-30 --token YOUR_TOKEN > trump_feed_articles.csv
 
 . Returning social media information for a list of domain names in a CSV:
-    $ minet bz domain domain_name domain_names.csv --begin-date 2019-01-01 --end-date 2020-12-31 --articles domain_name_articles.csv --token YOUR_TOKEN
+    $ minet bz domain domain_name domain_names.csv --select domain_name --begin-date 2019-01-01 --end-date 2020-12-31 --token YOUR_TOKEN > domain_name_articles.csv
 
 ```
 
