@@ -7,17 +7,27 @@
 from termcolor import colored
 
 from minet.utils import prettyprint_integer
-from minet.buzzsumo.utils import URL_TEMPLATE, call_buzzsumo_once
+from minet.cli.utils import die, LoadingBar
+from minet.buzzsumo import BuzzSumoAPIClient
+from minet.buzzsumo.exceptions import (
+    BuzzSumoInvalidTokenError
+)
 
 
 def buzzsumo_limit_action(cli_args):
 
-    url = URL_TEMPLATE % cli_args.token + '&q=fake%20news'
+    loading_bar = LoadingBar('Querying BuzzSumo API...')
+    client = BuzzSumoAPIClient(cli_args.token)
 
-    _, headers = call_buzzsumo_once(url)
+    try:
+        limit = client.limit()
+    except BuzzSumoInvalidTokenError:
+        die('Your BuzzSumo token is invalid!')
 
     print(
         'With your token, you can still make',
-        colored(prettyprint_integer(headers['X-RateLimit-Month-Remaining']), 'green'),
+        colored(prettyprint_integer(limit), 'green'),
         'calls to the BuzzSumo API until the end of the month.'
     )
+
+    loading_bar.close()
