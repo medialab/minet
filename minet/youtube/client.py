@@ -240,13 +240,10 @@ class YouTubeAPIClient(object):
 
                         queue.append((True, comment_id, replies_url))
 
-                if len(result['items']) == 0:
-                    break
-
                 # Next page
                 token = result.get('nextPageToken')
 
-                if token is not None:
+                if token is not None and len(result['items']) != 0:
                     forge = forge_replies_url if is_reply else forge_comments_url
 
                     next_url = forge(
