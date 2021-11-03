@@ -297,6 +297,10 @@ INTERVALS = [
 ]
 
 
+def prettyprint_integer(n):
+    return '{:,}'.format(int(n))
+
+
 def prettyprint_seconds(seconds, granularity=None):
     result = []
 
