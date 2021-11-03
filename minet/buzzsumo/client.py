@@ -55,7 +55,6 @@ class BuzzSumoAPIClient(object):
     @retrying_method()
     @rate_limited_method()
     def request(self, url):
-
         try:
             err, response, data = request_json(url)
         except JSONDecodeError:

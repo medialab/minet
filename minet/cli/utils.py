@@ -64,6 +64,30 @@ def safe_index(l, e):
         return None
 
 
+def register_retryer_logger(print_fn=print_err):
+    def callback(retry_state):
+        exc = retry_state.outcome.exception()
+        pretty_time = prettyprint_seconds(retry_state.idle_for, granularity=2)
+
+        exc_name = '%s.%s' % (
+            exc.__class__.__module__,
+            exc.__class__.__name__
+        )
+
+        exc_msg = str(exc)
+
+        msg = '\n'.join([
+            'Failed attempt because of following exception:',
+            ('%s (%s)' % (exc_name, exc_msg)) if exc_msg else exc_name,
+            'Will wait for %s before attempting again.' % pretty_time,
+            ''
+        ])
+
+        print_fn(msg)
+
+    register_global_request_retryer_before_sleep(callback)
+
+
 class LoadingBar(tqdm):
     def __init__(self, desc, stats=None, unit=None, unit_plural=None,
                  total=None, **kwargs):
@@ -81,30 +105,7 @@ class LoadingBar(tqdm):
 
         super().__init__(desc=desc, total=total, **kwargs)
 
-        self.__register_retryer_logger()
-
-    def __register_retryer_logger(self):
-        def callback(retry_state):
-            exc = retry_state.outcome.exception()
-            pretty_time = prettyprint_seconds(retry_state.idle_for, granularity=2)
-
-            exc_name = '%s.%s' % (
-                exc.__class__.__module__,
-                exc.__class__.__name__
-            )
-
-            exc_msg = str(exc)
-
-            msg = '\n'.join([
-                'Failed attempt because of following exception:',
-                ('%s (%s)' % (exc_name, exc_msg)) if exc_msg else exc_name,
-                'Will wait for %s before attempting again.' % pretty_time,
-                ''
-            ])
-
-            self.print(msg)
-
-        register_global_request_retryer_before_sleep(callback)
+        register_retryer_logger(self.print)
 
     def update_total(self, total):
         self.total = total

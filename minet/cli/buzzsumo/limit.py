@@ -7,7 +7,7 @@
 from termcolor import colored
 
 from minet.utils import prettyprint_integer
-from minet.cli.utils import die, LoadingBar
+from minet.cli.utils import die, register_retryer_logger
 from minet.buzzsumo import BuzzSumoAPIClient
 from minet.buzzsumo.exceptions import (
     BuzzSumoInvalidTokenError
@@ -15,8 +15,8 @@ from minet.buzzsumo.exceptions import (
 
 
 def buzzsumo_limit_action(cli_args):
+    register_retryer_logger()
 
-    loading_bar = LoadingBar('Querying BuzzSumo API...')
     client = BuzzSumoAPIClient(cli_args.token)
 
     try:
@@ -29,5 +29,3 @@ def buzzsumo_limit_action(cli_args):
         colored(prettyprint_integer(limit), 'green'),
         'calls to the BuzzSumo API until the end of the month.'
     )
-
-    loading_bar.close()
