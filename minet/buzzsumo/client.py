@@ -14,6 +14,7 @@ from minet.web import (
     request_json
 )
 
+from minet.buzzsumo.formatters import format_article
 from minet.buzzsumo.exceptions import (
     BuzzSumoInvalidTokenError,
     BuzzSumoOutageError,
@@ -21,6 +22,7 @@ from minet.buzzsumo.exceptions import (
 )
 
 URL_TEMPLATE = 'https://api.buzzsumo.com%s?api_key=%s'
+MAXIMUM_PAGE_NB = 98
 
 
 def construct_url(endpoint, token, begin_timestamp=None, end_timestamp=None,
@@ -40,6 +42,19 @@ def construct_url(endpoint, token, begin_timestamp=None, end_timestamp=None,
         url += '&page=%i' % page
 
     return url
+
+
+def optimize_period_timestamps_wrt_nb_pages(period_timestamps, nb_pages, maximum_page_nb):
+    new_period_timestamps = period_timestamps
+
+    if any(nb_page > maximum_page_nb for nb_page in nb_pages):
+        for i in range(len(nb_pages)):
+            if nb_pages[i] > maximum_page_nb:
+                new_period_timestamps.append((period_timestamps[i] + period_timestamps[i + 1]) / 2)
+
+        new_period_timestamps.sort()
+
+    return period_timestamps
 
 
 class BuzzSumoAPIClient(object):
@@ -101,3 +116,57 @@ class BuzzSumoAPIClient(object):
             'total_results': int(data['total_results']),
             'total_pages': data['total_pages']
         }
+
+    def __get_nb_pages_per_period_dates(self, domain, period_timestamps):
+        nb_pages = []
+
+        for i in range(len(period_timestamps) - 1):
+            begin_timestamp = period_timestamps[i]
+            end_timestamp = period_timestamps[i + 1] - 1
+
+            info = self.domain_summary(domain, begin_timestamp, end_timestamp)
+
+            nb_pages.append(info['total_pages'])
+
+        return nb_pages
+
+    def domain_articles(self, domain, begin_timestamp, end_timestamp):
+
+        # Here we optimize the periods used to request the API, because BuzzSumo
+        # prevents us from getting more than 99 pages.
+        maximum_page_nb = MAXIMUM_PAGE_NB
+        period_timestamps = [begin_timestamp, end_timestamp]
+        nb_pages = [1000]
+
+        # This loop creates adapted time periods that all return less than 99 pages of results:
+        while any(nb_page > maximum_page_nb for nb_page in nb_pages):
+
+            # We ask how many pages are needed to get all the articles for the given periods:
+            nb_pages = self.__get_nb_pages_per_period_dates(domain, period_timestamps)
+
+            # If a given period gets more than 98 pages, this period is then cut down in half:
+            period_timestamps = optimize_period_timestamps_wrt_nb_pages(period_timestamps, nb_pages, maximum_page_nb)
+
+        # Now we get all the results for the optimized periods
+        for i in range(len(period_timestamps) - 1):
+            page = 0
+
+            while True:
+                url = construct_url(
+                    '/search/articles.json',
+                    token=self.token,
+                    q=domain,
+                    begin_timestamp=period_timestamps[i],
+                    end_timestamp=period_timestamps[i + 1] - 1,
+                    page=page or None
+                )
+
+                _, data = self.request(url)
+
+                if not data['results']:
+                    break
+
+                for article in data['results']:
+                    yield format_article(article)
+
+                page += 1

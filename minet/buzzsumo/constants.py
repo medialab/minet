@@ -1,0 +1,47 @@
+# =============================================================================
+# Minet BuzzSumo Constants
+# =============================================================================
+#
+# General constants used by the buzzsumo package.
+#
+ARTICLES_CSV_HEADERS = [
+    'id',
+    'published_date',
+    'updated_at',
+    'url',
+    'og_url',
+    'thumbnail',
+    'domain_name',
+    'subdomain',
+    'num_linking_domains',
+    'total_shares',
+    'total_facebook_shares',
+    'facebook_comments',
+    'facebook_shares',
+    'facebook_likes',
+    'love_count',
+    'wow_count',
+    'haha_count',
+    'angry_count',
+    'sad_count',
+    'twitter_shares',
+    'twitter_user_id',
+    'pinterest_shares',
+    'total_reddit_engagements',
+    'alexa_rank',
+    'evergreen_score',
+    'evergreen_score2',
+    'youtube_trending_score',
+    'youtube_views',
+    'youtube_likes',
+    'youtube_dislikes',
+    'youtube_comments',
+    'article_amplifiers',
+    'title',
+    'display_title',
+    'author_name',
+    'language',
+    'num_words',
+    'article_types',
+    'video_length',
+]
