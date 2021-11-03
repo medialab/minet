@@ -23,17 +23,17 @@ from minet.buzzsumo.exceptions import (
 URL_TEMPLATE = 'https://api.buzzsumo.com%s?api_key=%s'
 
 
-def construct_url(endpoint, token, begin_date=None, end_date=None,
+def construct_url(endpoint, token, begin_timestamp=None, end_timestamp=None,
                   num_results=100, q=None, page=None):
 
     url = URL_TEMPLATE % (endpoint, token)
 
     url += '&num_results=%i' % num_results
 
-    if begin_date:
-        url += '&begin_date=%s' % begin_date
-    if end_date:
-        url += '&end_date=%s' % (end_date - 1)
+    if begin_timestamp:
+        url += '&begin_date=%s' % begin_timestamp
+    if end_timestamp:
+        url += '&end_date=%s' % (end_timestamp - 1)
     if q is not None:
         url += '&q=%s' % quote(q)
     if page is not None:
@@ -86,3 +86,19 @@ class BuzzSumoAPIClient(object):
         response, _ = self.request(url)
 
         return response.headers['X-RateLimit-Month-Remaining']
+
+    def domain_summary(self, domain, begin_timestamp, end_timestamp):
+        url = construct_url(
+            '/search/articles.json',
+            token=self.token,
+            q=domain,
+            begin_timestamp=begin_timestamp,
+            end_timestamp=end_timestamp
+        )
+
+        _, data = self.request(url)
+
+        return {
+            'total_results': int(data['total_results']),
+            'total_pages': data['total_pages']
+        }

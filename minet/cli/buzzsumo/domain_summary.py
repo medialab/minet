@@ -7,11 +7,10 @@
 import casanova
 
 from minet.cli.utils import LoadingBar
+from minet.buzzsumo import BuzzSumoAPIClient
+from minet.buzzsumo.exceptions import BuzzSumoInvalidTokenError
 from minet.buzzsumo.utils import (
-    convert_string_date_into_timestamp,
-    construct_url,
-    URL_TEMPLATE,
-    call_buzzsumo_once
+    convert_string_date_into_timestamp
 )
 
 
@@ -23,10 +22,10 @@ SUMMARY_HEADERS = [
 
 def buzzsumo_domain_summary_action(cli_args):
 
-    begin_date = convert_string_date_into_timestamp(cli_args.begin_date)
-    end_date = convert_string_date_into_timestamp(cli_args.end_date)
+    begin_timestamp = convert_string_date_into_timestamp(cli_args.begin_date)
+    end_timestamp = convert_string_date_into_timestamp(cli_args.end_date)
 
-    base_url = construct_url(URL_TEMPLATE, cli_args.token, begin_date, end_date)
+    client = BuzzSumoAPIClient(cli_args.token)
 
     enricher = casanova.enricher(
         cli_args.file,
@@ -42,8 +41,10 @@ def buzzsumo_domain_summary_action(cli_args):
 
     for row, domain_name in enricher.cells(cli_args.column, with_rows=True):
 
-        url = base_url + '&q=%s' % domain_name
-        data, _ = call_buzzsumo_once(url)
+        try:
+            data = client.domain_summary(domain_name, begin_timestamp, end_timestamp)
+        except BuzzSumoInvalidTokenError:
+            loading_bar.die('Your BuzzSumo token is invalid!')
 
-        enricher.writerow(row, [int(data['total_results']), data['total_pages']])
+        enricher.writerow(row, [data['total_results'], data['total_pages']])
         loading_bar.update()
