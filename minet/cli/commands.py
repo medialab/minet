@@ -150,6 +150,138 @@ FETCH_COMMON_ARGUMENTS = [
 
 MINET_COMMANDS = {
 
+    # Buzzsumo action subparser
+    # --------------------------------------------------------------------------
+    'buzzsumo': {
+        'package': 'minet.cli.buzzsumo',
+        'action': 'buzzsumo_action',
+        'aliases': ['bz'],
+        'title': 'Minet Buzzsumo Command',
+        'description': '''
+            Gather data from the BuzzSumo APIs easily and efficiently.
+        ''',
+        'subparsers': {
+            'help': 'Action to perform using the BuzzSumo API.',
+            'title': 'actions',
+            'dest': 'bz_action',
+            'common_arguments': [
+                {
+                    'flags': ['-t', '--token'],
+                    'help': 'BuzzSumo API token. Rcfile key: buzzsumo.token',
+                    'action': ConfigAction,
+                    'rc_key': ['buzzsumo', 'token']
+                }
+            ],
+            'commands': {
+                'limit': {
+                    'title': 'Minet Buzzsumo Limit Command',
+                    'description': '''
+                        Call BuzzSumo for a given request and return the remaining number of calls for this month contained in the request's headers.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Returning the remaining number of calls for this month:
+                            $ minet bz limit --token YOUR_TOKEN
+                    '''
+                },
+                'domain-summary': {
+                    'title': 'Minet Buzzsumo Domain Summary Command',
+                    'description': '''
+                        Gather information about the quantity of articles crawled by BuzzSumo for certain domain names and a given period.
+
+                        Inform the user about the number of calls (corresponding to the number of pages) needed to request BuzzSumo about those domain names.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Returning the number of articles and pages found in BuzzSumo for one domain name:
+                            $ minet bz domain-summary 'nytimes.com' --begin-date 2019-01-01 --end-date 2019-03-01 --token YOUR_TOKEN
+
+                        . Returning the number of articles and pages found in BuzzSumo for a list of domain names in a CSV:
+                            $ minet bz domain-summary domain_name domain_names.csv --begin-date 2020-01-01 --end-date 2021-06-15 --token YOUR_TOKEN  > domain_name_summary.csv
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the domain names.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the domain names.',
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'domain_name'
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
+                        },
+                        {
+                            'flag': '--begin-date',
+                            'help': 'The date you wish to fetch articles from.',
+                            'required': True
+
+                        },
+                        {
+                            'flag': '--end-date',
+                            'help': 'The date you wish to fetch articles to.',
+                            'required': True
+                        }
+                    ]
+                },
+                'domain': {
+                    'title': 'Minet Buzzsumo Domain Command',
+                    'description': '''
+                        Gather social media information about all the articles crawled by BuzzSumo for one or a list of domain names and over a given period.
+
+                        The link to the official documentation: https://developers.buzzsumo.com/reference/articles.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Returning social media information for one domain name:
+                            $ minet bz domain 'trump-feed.com' --begin-date 2021-01-01 --end-date 2021-06-30 --token YOUR_TOKEN > trump_feed_articles.csv
+
+                        . Returning social media information for a list of domain names in a CSV:
+                            $ minet bz domain domain_name domain_names.csv --select domain_name --begin-date 2019-01-01 --end-date 2020-12-31 --token YOUR_TOKEN > domain_name_articles.csv
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the domain names.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the domain names.',
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'domain_name'
+                        },
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--begin-date',
+                            'help': 'The date you wish to fetch articles from.',
+                            'required': True
+
+                        },
+                        {
+                            'flag': '--end-date',
+                            'help': 'The date you wish to fetch articles to.',
+                            'required': True
+                        }
+                    ]
+                }
+            }
+        }
+    },
+
     # Cookies action subparser
     # --------------------------------------------------------------------------
     'cookies': {

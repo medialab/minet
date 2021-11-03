@@ -23,6 +23,10 @@
 
 *Platform-related commands*
 
+* [buzzsumo (bz)](#buzzsumo)
+  * [limit](#buzzsumo-limit)
+  * [domain-summary](#buzzsumo-domain-summary)
+  * [domain](#buzzsumo-domain)
 * [crowdtangle (ct)](#crowdtangle)
   * [leaderboard](#leaderboard)
   * [lists](#lists)
@@ -94,6 +98,8 @@ Those configuration files can be written in YAML or JSON and can either be passe
 
 ```yml
 ---
+buzzsumo:
+  token: "MY_BZ_TOKEN" # Used as --token for `minet bz` commands
 crowdtangle:
   token: "MY_CT_TOKEN" # Used as --token for `minet ct` commands
   rate_limit: 10 # Used as --rate-limit for `minet ct` commands
@@ -161,6 +167,22 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ## url-parse
 
 <% url-parse %>
+
+## BuzzSumo
+
+<% bz %>
+
+<h3 id="buzzsumo-limit">limit</h3>
+
+<% bz/limit %>
+
+<h3 id="buzzsumo-domain-summary">domain-summary</h3>
+
+<% bz/domain-summary %>
+
+<h3 id="buzzsumo-domain">domain</h3>
+
+<% bz/domain %>
 
 ## CrowdTangle
 
