@@ -22,6 +22,7 @@ from minet.constants import (
 from minet.cli.constants import DEFAULT_CONTENT_FOLDER
 from minet.cli.argparse import (
     BooleanAction,
+    BuzzSumoDateType,
     ConfigAction,
     InputFileAction,
     OutputFileAction,
@@ -218,14 +219,15 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--begin-date',
-                            'help': 'The date you wish to fetch articles from.',
-                            'required': True
-
+                            'help': 'The date you wish to fetch articles from. UTC date should have the following format : YYYY-MM-DD',
+                            'required': True,
+                            'type': BuzzSumoDateType()
                         },
                         {
                             'flag': '--end-date',
-                            'help': 'The date you wish to fetch articles to.',
-                            'required': True
+                            'help': 'The date you wish to fetch articles to. UTC date should have the following format : YYYY-MM-DD',
+                            'required': True,
+                            'type': BuzzSumoDateType()
                         }
                     ]
                 },
@@ -267,14 +269,15 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--begin-date',
-                            'help': 'The date you wish to fetch articles from.',
-                            'required': True
-
+                            'help': 'The date you wish to fetch articles from. UTC date should have the following format : YYYY-MM-DD',
+                            'required': True,
+                            'type': BuzzSumoDateType()
                         },
                         {
                             'flag': '--end-date',
-                            'help': 'The date you wish to fetch articles to.',
-                            'required': True
+                            'help': 'The date you wish to fetch articles to. UTC date should have the following format : YYYY-MM-DD',
+                            'required': True,
+                            'type': BuzzSumoDateType()
                         }
                     ]
                 }
@@ -1964,7 +1967,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--min-date',
-                            'help': 'Whether to add a date to stop at for user\'s tweets retrieval. UTC date should have the following format : YYY-MM-DD',
+                            'help': 'Whether to add a date to stop at for user\'s tweets retrieval. UTC date should have the following format : YYYY-MM-DD',
                             'type': TimestampType()
                         },
                         {
