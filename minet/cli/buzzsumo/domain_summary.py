@@ -41,8 +41,8 @@ def buzzsumo_domain_summary_action(cli_args):
             data = client.domain_summary(domain_name, cli_args.begin_date, cli_args.end_date)
         except BuzzSumoInvalidTokenError:
             loading_bar.die('Your BuzzSumo token is invalid!')
-        except BuzzSumoInvalidQueryError:
-            loading_bar.die('Your query is invalid.')
+        except BuzzSumoInvalidQueryError as e:
+            loading_bar.die('Invalid query: %s' % e.url + '\nMessage from the API: %s' % e.msg)
 
         enricher.writerow(row, [data['total_results'], data['total_pages']])
         loading_bar.update()

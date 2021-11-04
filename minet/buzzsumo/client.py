@@ -83,7 +83,7 @@ class BuzzSumoAPIClient(object):
             raise BuzzSumoInvalidTokenError
 
         if response.status == 406:
-            raise BuzzSumoInvalidQueryError
+            raise BuzzSumoInvalidQueryError(url=url, msg=data)
 
         if response.status == 500:
             raise BuzzSumoBadRequestError
