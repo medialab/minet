@@ -14,10 +14,9 @@ class BuzzSumoInvalidTokenError(BuzzSumoError):
 
 
 class BuzzSumoInvalidQueryError(BuzzSumoError):
-    def __init__(self, url=None, msg=None):
-        super().__init__()
+    def __init__(self, msg=None, url=None):
+        super().__init__(msg)
         self.url = url
-        self.msg = msg
 
 
 class BuzzSumoBadRequestError(BuzzSumoError):

@@ -42,7 +42,7 @@ def buzzsumo_domain_summary_action(cli_args):
         except BuzzSumoInvalidTokenError:
             loading_bar.die('Your BuzzSumo token is invalid!')
         except BuzzSumoInvalidQueryError as e:
-            loading_bar.die('Invalid query: %s' % e.url + '\nMessage from the API: %s' % e.msg)
+            loading_bar.die('Invalid query: %s' % e.url + '\nMessage from the API: %s' % e)
 
         enricher.writerow(row, [data['total_results'], data['total_pages']])
         loading_bar.update()
