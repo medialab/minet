@@ -13,6 +13,10 @@ class BuzzSumoInvalidTokenError(BuzzSumoError):
     pass
 
 
+class BuzzSumoInvalidRequestError(BuzzSumoError):
+    pass
+
+
 class BuzzSumoBadRequestError(BuzzSumoError):
     pass
 
