@@ -29,22 +29,22 @@ Minet can single-handedly:
 * Parse URLs (get useful information, with Facebook- and Youtube-specific stuff)
 * Join two CSV files by matching the columns containing URLs
 * From a list of URLs, resolve their redirections
-	* ...and check their HTTP status
-	* ...and download the HTML
-	* ...and extract hyperlinks
-	* ...and extract the text content and other metadata (title...)
-	* ...and scrape structured data (using a declarative language to define your heuristics)
+  * ...and check their HTTP status
+  * ...and download the HTML
+  * ...and extract hyperlinks
+  * ...and extract the text content and other metadata (title...)
+  * ...and scrape structured data (using a declarative language to define your heuristics)
 * Crawl (using a declarative language to define a browsing behavior, and what to harvest)
 * Mine or search:
-    * *[Buzzsumo](https://buzzsumo.com/)* (requires API acess)
-	* *[Crowdtangle](https://www.crowdtangle.com/)* (requires API access)
-	* *[Mediacloud](https://mediacloud.org/)* (requires free API access)
-	* *[Twitter](https://twitter.com)* (requires free API access)
-	* *[Youtube](https://www.youtube.com/)* (requires free API access)
+  * *[Buzzsumo](https://buzzsumo.com/)* (requires API acess)
+  * *[Crowdtangle](https://www.crowdtangle.com/)* (requires API access)
+  * *[Mediacloud](https://mediacloud.org/)* (requires free API access)
+  * *[Twitter](https://twitter.com)* (requires free API access)
+  * *[Youtube](https://www.youtube.com/)* (requires free API access)
 * Scrape (without requiring special access):
-	* *[Facebook](https://www.facebook.com/)*
-	* *[Twitter](https://twitter.com)*
-	* *[Google Drive](https://drive.google.com)* (spreadsheets etc.)
+  * *[Facebook](https://www.facebook.com/)*
+  * *[Twitter](https://twitter.com)*
+  * *[Google Drive](https://drive.google.com)* (spreadsheets etc.)
 * Grab & dump cookies from your browser
 * Dump *[Hyphe](https://hyphe.medialab.sciences-po.fr/)* data
 
