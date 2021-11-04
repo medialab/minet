@@ -20,6 +20,9 @@ from minet.cli.exceptions import NotResumable
 from minet.cli.utils import acquire_cross_platform_stdout, was_piped_something
 
 
+FIVE_YEARS_IN_SEC = 5 * 365.25 * 24 * 60 * 60
+
+
 class TimestampType(object):
     def __call__(self, date):
         try:
@@ -28,6 +31,18 @@ class TimestampType(object):
             raise ArgumentTypeError('UTC date should have the following format : %Y-%m-%d')
         return timestamp
 
+
+class BuzzSumoDateType(object):
+    def __call__(self, date):
+        try:
+            timestamp = int(datetime.strptime(date, "%Y-%m-%d").timestamp())
+        except ValueError:
+            raise ArgumentTypeError('dates should have the following format : YYYY-MM-DD.')
+
+        if (datetime.now().timestamp() - timestamp) > FIVE_YEARS_IN_SEC:
+            raise ArgumentTypeError('you cannot query BuzzSumo using dates before 5 years ago.')
+
+        return timestamp
 
 class SplitterType(object):
     def __init__(self, splitchar=','):

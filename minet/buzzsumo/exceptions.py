@@ -13,7 +13,7 @@ class BuzzSumoInvalidTokenError(BuzzSumoError):
     pass
 
 
-class BuzzSumoInvalidRequestError(BuzzSumoError):
+class BuzzSumoInvalidQueryError(BuzzSumoError):
     pass
 
 

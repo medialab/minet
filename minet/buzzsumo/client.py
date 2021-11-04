@@ -19,7 +19,7 @@ from minet.buzzsumo.exceptions import (
     BuzzSumoInvalidTokenError,
     BuzzSumoOutageError,
     BuzzSumoBadRequestError,
-    BuzzSumoInvalidRequestError
+    BuzzSumoInvalidQueryError
 )
 
 URL_TEMPLATE = 'https://api.buzzsumo.com%s?api_key=%s'
@@ -83,7 +83,7 @@ class BuzzSumoAPIClient(object):
             raise BuzzSumoInvalidTokenError
 
         if response.status == 406:
-            raise BuzzSumoInvalidRequestError
+            raise BuzzSumoInvalidQueryError
 
         if response.status == 500:
             raise BuzzSumoBadRequestError
