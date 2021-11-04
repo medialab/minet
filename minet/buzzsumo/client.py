@@ -121,10 +121,11 @@ class BuzzSumoAPIClient(object):
         nb_pages = []
 
         for i in range(len(period_timestamps) - 1):
-            begin_timestamp = period_timestamps[i]
-            end_timestamp = period_timestamps[i + 1] - 1
-
-            info = self.domain_summary(domain, begin_timestamp, end_timestamp)
+            info = self.domain_summary(
+                domain,
+                begin_timestamp=period_timestamps[i],
+                end_timestamp=period_timestamps[i + 1]
+            )
 
             nb_pages.append(info['total_pages'])
 
@@ -157,8 +158,8 @@ class BuzzSumoAPIClient(object):
                     token=self.token,
                     q=domain,
                     begin_timestamp=period_timestamps[i],
-                    end_timestamp=period_timestamps[i + 1] - 1,
-                    page=page or None
+                    end_timestamp=period_timestamps[i + 1],
+                    page=page
                 )
 
                 _, data = self.request(url)
