@@ -709,8 +709,8 @@ optional arguments:
   -h, --help                  show this help message and exit
   -t TOKEN, --token TOKEN     BuzzSumo API token. Rcfile key: buzzsumo.token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --begin-date BEGIN_DATE     The date you wish to fetch articles from.
-  --end-date END_DATE         The date you wish to fetch articles to.
+  --begin-date BEGIN_DATE     The date you wish to fetch articles from. UTC date should have the following format : YYYY-MM-DD
+  --end-date END_DATE         The date you wish to fetch articles to. UTC date should have the following format : YYYY-MM-DD
 
 examples:
 
@@ -745,8 +745,8 @@ optional arguments:
   -t TOKEN, --token TOKEN     BuzzSumo API token. Rcfile key: buzzsumo.token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  --begin-date BEGIN_DATE     The date you wish to fetch articles from.
-  --end-date END_DATE         The date you wish to fetch articles to.
+  --begin-date BEGIN_DATE     The date you wish to fetch articles from. UTC date should have the following format : YYYY-MM-DD
+  --end-date END_DATE         The date you wish to fetch articles to. UTC date should have the following format : YYYY-MM-DD
 
 examples:
 
@@ -1433,6 +1433,8 @@ column named "current_tweet_status" that can take the following values:
     - "available_tweet": tweet is still available.
     - "suspended_user": tweet cannot be found because its user is suspended.
     - "deactivated_user": tweet cannot be found because its user is deactivated.
+    - "deactivated_or_renamed_user": tweet cannot be found because its user is either deactivated or changed its screen name 
+                                    (only when using screen names instead of user ids).
     - "protected_user": tweet cannot be found because its user is protected.
     - "unavailable_tweet": tweet is not available, which means it was either
                            deleted by its user or was censored by Twitter.
@@ -1747,7 +1749,7 @@ optional arguments:
   --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
   --ids                                      Whether your users are given as ids rather than screen names.
-  --min-date MIN_DATE                        Whether to add a date to stop at for user's tweets retrieval. UTC date should have the following format : YYY-MM-DD
+  --min-date MIN_DATE                        Whether to add a date to stop at for user's tweets retrieval. UTC date should have the following format : YYYY-MM-DD
   --exclude-retweets                         Whether to exclude retweets from the output.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
