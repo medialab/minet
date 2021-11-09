@@ -139,8 +139,12 @@ def twitter_attrition_action(cli_args):
                     except TwitterHTTPError as e:
                         error_code = getpath(e.response_data, ['errors', 0, 'code'], '')
                         if e.e.code == 404 and error_code == 50:
-                            current_tweet_status = 'deactivated_user'
-                            user_cache[user] = 'deactivated_user'
+                            if cli_args.ids:
+                                current_tweet_status = 'deactivated_user'
+                                user_cache[user] = 'deactivated_user'
+                            else:
+                                current_tweet_status = 'deactivated_or_renamed_user'
+                                user_cache[user] = 'deactivated_or_renamed_user'
 
                     else:
                         user_cache[user] = 'user_ok'

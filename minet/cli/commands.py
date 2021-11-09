@@ -2049,6 +2049,8 @@ MINET_COMMANDS = {
                             - "available_tweet": tweet is still available.
                             - "suspended_user": tweet cannot be found because its user is suspended.
                             - "deactivated_user": tweet cannot be found because its user is deactivated.
+                            - "deactivated_or_renamed_user": tweet cannot be found because its user is either deactivated or changed its screen name
+                                                             (only when using screen names instead of user ids).
                             - "protected_user": tweet cannot be found because its user is protected.
                             - "unavailable_tweet": tweet is not available, which means it was either
                                                    deleted by its user or was censored by Twitter.
