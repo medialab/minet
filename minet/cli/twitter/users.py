@@ -43,20 +43,21 @@ def twitter_users_action(cli_args):
     for chunk in as_chunks(100, enricher.cells(cli_args.column, with_rows=True)):
         users = ','.join(row[1].lstrip('@') for row in chunk)
 
-        if cli_args.ids:
-            if is_not_user_id(user):
-                loading_bar.die('The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
+        for _, user in chunk:
+            if cli_args.ids:
+                if is_not_user_id(user):
+                    loading_bar.die('The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
 
-            client_args = {'user_id': users}
-            key = 'id'
+                client_args = {'user_id': users}
+                key = 'id'
 
-        else:
-            if is_probably_not_user_screen_name(user):
-                loading_bar.die('The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command.')
-                # force flag to add
+            else:
+                if is_probably_not_user_screen_name(user):
+                    loading_bar.die('The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command.')
+                    # force flag to add
 
-            client_args = {'screen_name': users}
-            key = 'screen_name'
+                client_args = {'screen_name': users}
+                key = 'screen_name'
 
         try:
             result = client.call(['users', 'lookup'], **client_args)
