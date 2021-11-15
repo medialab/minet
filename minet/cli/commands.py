@@ -2052,13 +2052,15 @@ MINET_COMMANDS = {
                             - "deactivated_or_renamed_user": tweet cannot be found because its user is either deactivated or changed its screen name
                                                              (only when using screen names instead of user ids).
                             - "protected_user": tweet cannot be found because its user is protected.
+                            - "censored_tweet": tweet is unavailable because it was consored by Twitter.
                             - "unavailable_tweet": tweet is not available, which means it was either
-                                                   deleted by its user or was censored by Twitter.
+                                                   deleted by its user.
                             - "unavailable_retweet": retweet is not available, meaning that the user
                                                      cancelled their retweet.
                             - "unavailable_retweeted_tweet": the retweeted tweet is unavailable,
                                                              meaning it was either deleted by its original
-                                                             user, censored by Twitter, or that the original user was deactivated.
+                                                             user or the original user was deactivated.
+                            - "censored_retweeted_tweet": the original tweet was censored by Twitter, making the retweet unavailable.
                             - "protected_retweeted_user": tweet cannot be found because it is a retweet of a protected user.
                             - "suspended_retweeted_user": tweet cannot be found because it is a retweet of a suspended user.
                     ''',

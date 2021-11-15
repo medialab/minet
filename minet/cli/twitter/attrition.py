@@ -111,6 +111,9 @@ def twitter_attrition_action(cli_args):
                 elif e.e.code == 404 and (error_code == 144 or error_code == 34):
                     current_tweet_status = 'user_or_tweet_deleted'
 
+                elif e.e.code == 404 and (error_code == 421 or error_code == 422):
+                    current_tweet_status = 'censored_tweet'
+
                 else:
                     raise e
 
@@ -180,6 +183,9 @@ def twitter_attrition_action(cli_args):
 
                                 elif e.e.code == 404 and (error_code == 144 or error_code == 34):
                                     current_tweet_status = 'unavailable_retweeted_tweet'
+
+                                elif e.e.code == 404 and (error_code == 421 or error_code == 422):
+                                    current_tweet_status = 'censored_retwetted_tweet'
 
                                 else:
                                     raise e
