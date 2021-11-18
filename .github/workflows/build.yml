@@ -53,6 +53,7 @@ jobs:
           file: ./minet_${{ matrix.name }}.zip
           asset_name: ${{ matrix.name }}.zip
           tag: ${{ github.ref }}
+          overwrite: true
 
       - name: Build PyPi package
         run: |
