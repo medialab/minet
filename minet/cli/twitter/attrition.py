@@ -34,7 +34,7 @@ def twitter_attrition_action(cli_args):
     loading_bar = LoadingBar(
         'Retrieving attrition reason',
         total=enricher.total,
-        unit='user'
+        unit='tweet'
     )
 
     user_cache = {}
