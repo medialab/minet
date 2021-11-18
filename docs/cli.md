@@ -1437,6 +1437,7 @@ column named "current_tweet_status" that can take the following values:
                                      (only when using screen names instead of user ids).
     - "protected_user": tweet cannot be found because its user is protected.
     - "censored_tweet": tweet is unavailable because it was consored by Twitter.
+    - "blocked_by_tweet_author": tweet cannot be found because you were blocked by its author.
     - "unavailable_tweet": tweet is not available, which means it was either
                            deleted by its user.
     - "unavailable_retweet": retweet is not available, meaning that the user
@@ -1447,6 +1448,7 @@ column named "current_tweet_status" that can take the following values:
     - "censored_retweeted_tweet": the original tweet was censored by Twitter, making the retweet unavailable.
     - "protected_retweeted_user": tweet cannot be found because it is a retweet of a protected user.
     - "suspended_retweeted_user": tweet cannot be found because it is a retweet of a suspended user.
+    - "blocked_by_original_tweet_author": tweet cannot be found because it is a retweet of a user who blocked you.
 
 positional arguments:
   tweet_column                               Name of the column containing the tweet ids.

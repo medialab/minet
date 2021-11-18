@@ -114,6 +114,9 @@ def twitter_attrition_action(cli_args):
                 elif e.e.code == 404 and (error_code == 421 or error_code == 422):
                     current_tweet_status = 'censored_tweet'
 
+                elif e.e.code == 401 and (error_code == 136):
+                    current_tweet_status = 'blocked_by_tweet_author'
+
                 else:
                     raise e
 
@@ -185,7 +188,10 @@ def twitter_attrition_action(cli_args):
                                     current_tweet_status = 'unavailable_retweeted_tweet'
 
                                 elif e.e.code == 404 and (error_code == 421 or error_code == 422):
-                                    current_tweet_status = 'censored_retwetted_tweet'
+                                    current_tweet_status = 'censored_retweeted_tweet'
+
+                                elif e.e.code == 401 and (error_code == 136):
+                                    current_tweet_status = 'blocked_by_original_tweet_author'
 
                                 else:
                                     raise e
