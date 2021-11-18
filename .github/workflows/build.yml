@@ -13,6 +13,7 @@ jobs:
             name: ubuntu_18
           - os: ubuntu-20.04
             name: ubuntu_20
+            pypi: yes
           - os: macos-10.15
             name: macos
           - os: windows-latest
@@ -62,6 +63,7 @@ jobs:
 
       - name: Publish package
         uses: pypa/gh-action-pypi-publish@release/v1
+        if: ${{ matrix.pypi }}
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
