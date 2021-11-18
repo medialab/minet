@@ -52,3 +52,16 @@ jobs:
           file: ./minet_${{ matrix.name }}.zip
           asset_name: ${{ matrix.name }}.zip
           tag: ${{ github.ref }}
+
+      - name: Build PyPi package
+        run: |
+          make clean
+          python setup.py --version
+          python setup.py sdist --format=gztar bdist_wheel
+          twine check dist/*
+
+      - name: Publish package
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
