@@ -1438,7 +1438,7 @@ column named "current_tweet_status" that can take the following values:
     - "protected_user": tweet cannot be found because its user is protected.
     - "censored_tweet": tweet is unavailable because it was consored by Twitter.
     - "blocked_by_tweet_author": tweet cannot be found because you were blocked by its author.
-    - "unavailable_tweet": tweet is not available, which means it was either
+    - "unavailable_tweet": tweet is not available, which means it was
                            deleted by its user.
     - "unavailable_retweet": retweet is not available, meaning that the user
                              cancelled their retweet.
