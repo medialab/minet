@@ -143,10 +143,8 @@ def twitter_attrition_action(cli_args):
                     else:
                         c_args = {'screen_name': user}
 
-                    result_user = None
-
                     try:
-                        result_user = client.call(['users', 'show'], **c_args)
+                        client.call(['users', 'show'], **c_args)
 
                     except TwitterHTTPError as e:
                         error_code = getpath(e.response_data, ['errors', 0, 'code'], '')
@@ -158,20 +156,12 @@ def twitter_attrition_action(cli_args):
                                 current_tweet_status = 'deactivated_or_renamed_user'
                                 user_cache[user] = 'deactivated_or_renamed_user'
 
-                        if e.e.code == 403 and error_code == 63:
-                            current_tweet_status = 'suspended_user'
-
                         else:
-                            raise e
-
-                    if result_user is not None:
-                        if result_user['protected']:
-                            user_cache[user] = 'protected_user'
-                            current_tweet_status = 'protected_user'
-
-                        else:
-                            user_cache[user] = 'user_ok'
                             current_tweet_status = 'unavailable_tweet'
+
+                    else:
+                        user_cache[user] = 'user_ok'
+                        current_tweet_status = 'unavailable_tweet'
 
                 # Sometimes, the unavailable tweet is a retweet, in which
                 # case we need to enquire about the original tweet to find
