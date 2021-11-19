@@ -120,7 +120,11 @@ def twitter_attrition_action(cli_args):
                 else:
                     raise e
 
-            assert result_tweet is None, 'It is not possible that this tweet is available.'
+            # This could happen in a case where you've been blocked by the tweet's author.
+            # This is because the client uses 2 different methods to call the API, one linked to a user and one to an app.
+            # One can be blocked and not the other.
+            if result_tweet is not None:
+                current_tweet_status = 'available_tweet'
 
             if current_tweet_status == 'user_or_tweet_deleted' or current_tweet_status == 'unknown':
                 user = row[user_pos]
