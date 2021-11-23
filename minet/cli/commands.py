@@ -2331,6 +2331,12 @@ MINET_COMMANDS = {
             . "youtube_id": YouTube resource id.
             . "youtube_name": YouTube resource name.
 
+            columns being added with --twitter:
+
+            . "twitter_type": Twitter resource type (user or tweet).
+            . "twitter_user_screen_name": Twitter user's screen name.
+            . "tweet_id": id of tweet.
+
             examples:
 
             . Creating a report about a file's urls:
@@ -2347,6 +2353,9 @@ MINET_COMMANDS = {
 
             . Parsing YouTube urls:
                 $ minet url-parse url ytvideos.csv --youtube > report.csv
+
+            . Parsing Twitter urls:
+                $ minet url-parse url tweets.csv --twitter > report.csv
         ''',
         'arguments': [
             {
@@ -2356,7 +2365,8 @@ MINET_COMMANDS = {
             {
                 'name': 'file',
                 'help': 'Target CSV file.',
-                'action': InputFileAction
+                'action': InputFileAction,
+                'dummy_csv_column': 'url'
             },
             {
                 'flag': '--facebook',
@@ -2391,6 +2401,11 @@ MINET_COMMANDS = {
             {
                 'flag': '--youtube',
                 'help': 'Whether to consider and parse the given urls as coming from YouTube.',
+                'action': 'store_true'
+            },
+            {
+                'flag': '--twitter',
+                'help': 'Whether to consider and parse the given urls as coming from Twitter.',
                 'action': 'store_true'
             }
         ]

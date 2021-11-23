@@ -30,6 +30,11 @@ from ural.youtube import (
     YoutubeUser,
     YoutubeChannel
 )
+from ural.twitter import (
+    parse_twitter_url,
+    TwitterTweet,
+    TwitterUser
+)
 
 from minet.cli.utils import LoadingBar
 
@@ -55,6 +60,12 @@ YOUTUBE_REPORT_HEADERS = [
     'youtube_type',
     'youtube_id',
     'youtube_name'
+]
+
+TWITTER_REPORT_HEADERS = [
+    'twitter_type',
+    'twitter_user_screen_name',
+    'tweet_id'
 ]
 
 
@@ -124,6 +135,22 @@ def extract_facebook_addendum(url):
         raise TypeError('unknown facebook parse result type!')
 
 
+def extract_twitter_addendum(url):
+    parsed = parse_twitter_url(url)
+
+    if parsed is None:
+        return None
+
+    if isinstance(parsed, TwitterUser):
+        return ['user', parsed.screen_name, '']
+
+    elif isinstance(parsed, TwitterTweet):
+        return ['tweet', parsed.user_screen_name, parsed.id]
+
+    else:
+        raise TypeError('unknown twitter parse result type!')
+
+
 def url_parse_action(cli_args):
     headers = REPORT_HEADERS
 
@@ -131,6 +158,8 @@ def url_parse_action(cli_args):
         headers = FACEBOOK_REPORT_HEADERS
     elif cli_args.youtube:
         headers = YOUTUBE_REPORT_HEADERS
+    elif cli_args.twitter:
+        headers = TWITTER_REPORT_HEADERS
 
     multiplex = None
 
@@ -164,6 +193,8 @@ def url_parse_action(cli_args):
             addendum = extract_facebook_addendum(url)
         elif cli_args.youtube:
             addendum = extract_youtube_addendum(url)
+        elif cli_args.twitter:
+            addendum = extract_twitter_addendum(url)
         else:
             addendum = extract_standard_addendum(cli_args, url)
 
