@@ -573,7 +573,7 @@ examples:
 ```
 usage: minet url-parse [-h] [--facebook] [-o OUTPUT] [-s SELECT]
                        [--separator SEPARATOR] [--strip-protocol]
-                       [--total TOTAL] [--youtube]
+                       [--total TOTAL] [--youtube] [--twitter]
                        column [file]
 
 Minet Url Parse Command
@@ -596,6 +596,7 @@ optional arguments:
   --strip-protocol, --no-strip-protocol  Whether or not to strip the protocol when normalizing the url. Defaults to strip protocol.
   --total TOTAL                          Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.
   --youtube                              Whether to consider and parse the given urls as coming from YouTube.
+  --twitter                              Whether to consider and parse the given urls as coming from Twitter.
 
 columns being added to the output:
 
@@ -628,6 +629,12 @@ columns being added with --youtube:
 . "youtube_id": YouTube resource id.
 . "youtube_name": YouTube resource name.
 
+columns being added with --twitter:
+
+. "twitter_type": Twitter resource type (user or tweet).
+. "twitter_user_screen_name": Twitter user's screen name.
+. "tweet_id": id of tweet.
+
 examples:
 
 . Creating a report about a file's urls:
@@ -644,6 +651,9 @@ examples:
 
 . Parsing YouTube urls:
     $ minet url-parse url ytvideos.csv --youtube > report.csv
+
+. Parsing Twitter urls:
+    $ minet url-parse url tweets.csv --twitter > report.csv
 
 ```
 
