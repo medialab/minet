@@ -2042,9 +2042,11 @@ MINET_COMMANDS = {
                         Using Twitter API to find whether batches of tweets are still
                         available today and if they aren't, attempt to find a reason why.
 
-                        This command relies on tweet ids and their user ids. It will
-                        output a report similar to the input file and containing an additional
-                        column named "current_tweet_status" that can take the following values:
+                        This command relies on tweet ids. We recommand to add --user and
+                        the tweet's user id to the command, as more information is given in the output when you
+                        use this flag. It will output a report similar to the input file and
+                        containing an additional column named "current_tweet_status" that can take
+                        the following values:
 
                             - "available_tweet": tweet is still available.
                             - "user_or_tweet_deleted": tweet was deleted or its author was deactivated. To know whether it is one or the other reason
@@ -2102,7 +2104,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--user',
-                            'help': 'Name of the column containing the tweet\'s author (given as ids or screen names). This is usefull to have more information on a tweet\'s unavailability.'
+                            'help': 'Name of the column containing the tweet\'s author (given as ids or screen names). This is useful to have more information on a tweet\'s unavailability.'
                         },
                         {
                             'flag': '--ids',

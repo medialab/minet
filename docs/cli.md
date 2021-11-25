@@ -1436,9 +1436,11 @@ Minet Twitter Attrition Command
 Using Twitter API to find whether batches of tweets are still
 available today and if they aren't, attempt to find a reason why.
 
-This command relies on tweet ids and their user ids. It will
-output a report similar to the input file and containing an additional
-column named "current_tweet_status" that can take the following values:
+This command relies on tweet ids. We recommand to add --user and
+the tweet's user id to the command, as more information is given in the output when you
+use this flag. It will output a report similar to the input file and
+containing an additional column named "current_tweet_status" that can take
+the following values:
 
     - "available_tweet": tweet is still available.
     - "user_or_tweet_deleted": tweet was deleted or its author was deactivated. To know whether it is one or the other reason
@@ -1474,7 +1476,7 @@ optional arguments:
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
-  --user USER                                Name of the column containing the tweet's author (given as ids or screen names). This is usefull to have more information on a tweet's unavailability.
+  --user USER                                Name of the column containing the tweet's author (given as ids or screen names). This is useful to have more information on a tweet's unavailability.
   --ids                                      Whether your users are given as ids rather than screen names.
   --retweeted-id RETWEETED_ID                Name of the column containing the ids of the original tweets in case the tweets no longer available were retweets.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
