@@ -41,7 +41,8 @@ def twitter_attrition_action(cli_args):
     result = None
 
     if cli_args.tweet_column not in enricher.headers:
-        raise InvalidArgumentsError('Could not find the "%s" column containing the tweet ids in the given CSV file.' % cli_args.tweet_column)
+        raise InvalidArgumentsError(
+            'Could not find the "%s" column containing the tweet ids in the given CSV file.' % cli_args.tweet_column)
 
     if cli_args.user:
         if cli_args.user not in enricher.headers:
@@ -51,15 +52,15 @@ def twitter_attrition_action(cli_args):
         user_column = cli_args.user
         user_pos = enricher.headers[user_column]
 
-    if cli_args.retweeted_id:
-        if cli_args.retweeted_id not in enricher.headers:
-            raise InvalidArgumentsError(
-                'Could not find the "%s" column containing the retweeted ids in the given CSV file.' % cli_args.retweeted_id)
+    if cli_args.retweeted_id and cli_args.retweeted_id not in enricher.headers:
+        raise InvalidArgumentsError(
+            'Could not find the "%s" column containing the retweeted ids in the given CSV file.' % cli_args.retweeted_id)
 
     def cells():
         for row, cell in enricher.cells(cli_args.tweet_column, with_rows=True):
             if cli_args.user:
                 if cli_args.ids:
+
                     if is_not_user_id(row[user_pos]):
                         loading_bar.die(
                             'The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
@@ -110,7 +111,8 @@ def twitter_attrition_action(cli_args):
                 result_tweet = client.call(['statuses', 'show'], **client_args)
 
             except TwitterHTTPError as e:
-                error_code = getpath(e.response_data, ['errors', 0, 'code'], '')
+                error_code = getpath(
+                    e.response_data, ['errors', 0, 'code'], '')
 
                 if e.e.code == 403 and error_code == 63:
                     current_tweet_status = 'suspended_user'
@@ -193,10 +195,12 @@ def twitter_attrition_action(cli_args):
 
                         if original_tweet:
                             try:
-                                result_retweet = client.call(['statuses', 'show'], **client_arg)
+                                result_retweet = client.call(
+                                    ['statuses', 'show'], **client_arg)
 
                             except TwitterHTTPError as e:
-                                error_code = getpath(e.response_data, ['errors', 0, 'code'], '')
+                                error_code = getpath(
+                                    e.response_data, ['errors', 0, 'code'], '')
                                 if e.e.code == 403 and error_code == 63:
                                     current_tweet_status = 'suspended_retweeted_user'
 
