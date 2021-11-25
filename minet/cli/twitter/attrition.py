@@ -43,22 +43,32 @@ def twitter_attrition_action(cli_args):
     if cli_args.tweet_column not in enricher.headers:
         raise InvalidArgumentsError('Could not find the "%s" column containing the tweet ids in the given CSV file.' % cli_args.tweet_column)
 
-    if cli_args.user_column not in enricher.headers:
-        raise InvalidArgumentsError('Could not find the "%s" column containing the user ids in the given CSV file.' % cli_args.user_column)
+    if cli_args.user:
+        if cli_args.user not in enricher.headers:
+            raise InvalidArgumentsError(
+                'Could not find the "%s" column containing the user ids in the given CSV file.' % cli_args.user)
 
-    user_column = cli_args.user_column
-    user_pos = enricher.headers[user_column]
+        user_column = cli_args.user
+        user_pos = enricher.headers[user_column]
+
+    if cli_args.retweeted_id:
+        if cli_args.retweeted_id not in enricher.headers:
+            raise InvalidArgumentsError(
+                'Could not find the "%s" column containing the retweeted ids in the given CSV file.' % cli_args.retweeted_id)
 
     def cells():
         for row, cell in enricher.cells(cli_args.tweet_column, with_rows=True):
-            if cli_args.ids:
-                if is_not_user_id(row[user_pos]):
-                    loading_bar.die('The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
+            if cli_args.user:
+                if cli_args.ids:
+                    if is_not_user_id(row[user_pos]):
+                        loading_bar.die(
+                            'The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
 
-            else:
-                if is_probably_not_user_screen_name(row[user_pos]):
-                    loading_bar.die('The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command.')
-                    # force flag to add
+                else:
+                    if is_probably_not_user_screen_name(row[user_pos]):
+                        loading_bar.die(
+                            'The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command.')
+                        # force flag to add
 
             yield row, cell
 
@@ -127,41 +137,43 @@ def twitter_attrition_action(cli_args):
                 current_tweet_status = 'available_tweet'
 
             if current_tweet_status == 'user_or_tweet_deleted' or current_tweet_status == 'unknown':
-                user = row[user_pos]
+                if cli_args.user:
+                    user = row[user_pos]
 
-                if user in user_cache:
-                    if user_cache[user] == 'user_ok':
-                        current_tweet_status = 'unavailable_tweet'
-
-                    else:
-                        current_tweet_status = user_cache[user]
-
-                else:
-
-                    if cli_args.ids:
-                        c_args = {'user_id': user}
-                    else:
-                        c_args = {'screen_name': user}
-
-                    try:
-                        client.call(['users', 'show'], **c_args)
-
-                    except TwitterHTTPError as e:
-                        error_code = getpath(e.response_data, ['errors', 0, 'code'], '')
-                        if e.e.code == 404 and error_code == 50:
-                            if cli_args.ids:
-                                current_tweet_status = 'deactivated_user'
-                                user_cache[user] = 'deactivated_user'
-                            else:
-                                current_tweet_status = 'deactivated_or_renamed_user'
-                                user_cache[user] = 'deactivated_or_renamed_user'
-
-                        else:
+                    if user in user_cache:
+                        if user_cache[user] == 'user_ok':
                             current_tweet_status = 'unavailable_tweet'
 
+                        else:
+                            current_tweet_status = user_cache[user]
+
                     else:
-                        user_cache[user] = 'user_ok'
-                        current_tweet_status = 'unavailable_tweet'
+
+                        if cli_args.ids:
+                            c_args = {'user_id': user}
+                        else:
+                            c_args = {'screen_name': user}
+
+                        try:
+                            client.call(['users', 'show'], **c_args)
+
+                        except TwitterHTTPError as e:
+                            error_code = getpath(
+                                e.response_data, ['errors', 0, 'code'], '')
+                            if e.e.code == 404 and error_code == 50:
+                                if cli_args.ids:
+                                    current_tweet_status = 'deactivated_user'
+                                    user_cache[user] = 'deactivated_user'
+                                else:
+                                    current_tweet_status = 'deactivated_or_renamed_user'
+                                    user_cache[user] = 'deactivated_or_renamed_user'
+
+                            else:
+                                current_tweet_status = 'unavailable_tweet'
+
+                        else:
+                            user_cache[user] = 'user_ok'
+                            current_tweet_status = 'unavailable_tweet'
 
                 # Sometimes, the unavailable tweet is a retweet, in which
                 # case we need to enquire about the original tweet to find
