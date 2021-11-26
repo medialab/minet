@@ -1428,7 +1428,7 @@ usage: minet twitter attrition [-h] [--api-key API_KEY]
                                [-o OUTPUT] [--resume] [--user USER] [--ids]
                                [--retweeted-id RETWEETED_ID] [-s SELECT]
                                [--total TOTAL]
-                               tweet_column [file]
+                               tweet_or_url_column [file]
 
 Minet Twitter Attrition Command
 ===============================
@@ -1436,7 +1436,7 @@ Minet Twitter Attrition Command
 Using Twitter API to find whether batches of tweets are still
 available today and if they aren't, attempt to find a reason why.
 
-This command relies on tweet ids. We recommand to add --user and
+This command relies on tweet ids or tweet urls. We recommand to add --user and
 the tweet's user id to the command, as more information is given in the output when you
 use this flag. It will output a report similar to the input file and
 containing an additional column named "current_tweet_status" that can take
@@ -1448,7 +1448,7 @@ the following values:
     - "suspended_user": tweet cannot be found because its user is suspended.
     - "deactivated_user": tweet cannot be found because its user is deactivated.
     - "deactivated_or_renamed_user": tweet cannot be found because its user is either deactivated or changed its screen name
-                                     (only when using screen names instead of user ids).
+                                     (only when using tweet urls or tweet ids and screen names instead of user ids).
     - "protected_user": tweet cannot be found because its user is protected.
     - "censored_tweet": tweet is unavailable because it was consored by Twitter.
     - "blocked_by_tweet_author": tweet cannot be found because you were blocked by its author.
@@ -1465,7 +1465,7 @@ the following values:
     - "blocked_by_original_tweet_author": tweet cannot be found because it is a retweet of a user who blocked you.
 
 positional arguments:
-  tweet_column                               Name of the column containing the tweet ids.
+  tweet_or_url_column                        Name of the column containing the tweet ids or the tweet urls.
   file                                       CSV file containing the inquired tweets.
 
 optional arguments:
@@ -1485,7 +1485,7 @@ optional arguments:
 examples:
 
 . Finding out if tweets in a CSV files are still available or not using tweet ids:
-    $ minet tw attrition tweet_id deleted_tweets.csv > attrition-report.csv
+    $ minet tw attrition tweet_url deleted_tweets.csv > attrition-report.csv
 
 .Finding out if tweets are still available or not using tweet & user ids:
     $ minet tw attrition tweet_id deleted_tweets.csv --user user_id --ids > attrition-report.csv

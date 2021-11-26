@@ -4,9 +4,11 @@
 #
 # Logic of the `tw attrition` action.
 #
+from json import load
 import casanova
 from twitter import TwitterHTTPError
 from ebbe import getpath, as_chunks
+from ural.twitter import TwitterTweet, TwitterUser, parse_twitter_url
 
 from minet.cli.utils import LoadingBar
 from minet.cli.exceptions import InvalidArgumentsError
@@ -40,9 +42,9 @@ def twitter_attrition_action(cli_args):
     user_cache = {}
     result = None
 
-    if cli_args.tweet_column not in enricher.headers:
+    if cli_args.tweet_or_url_column not in enricher.headers:
         raise InvalidArgumentsError(
-            'Could not find the "%s" column containing the tweet ids in the given CSV file.' % cli_args.tweet_column)
+            'Could not find the "%s" column containing the tweet ids in the given CSV file.' % cli_args.tweet_or_url_column)
 
     if cli_args.user:
         if cli_args.user not in enricher.headers:
@@ -57,7 +59,7 @@ def twitter_attrition_action(cli_args):
             'Could not find the "%s" column containing the retweeted ids in the given CSV file.' % cli_args.retweeted_id)
 
     def cells():
-        for row, cell in enricher.cells(cli_args.tweet_column, with_rows=True):
+        for row, cell in enricher.cells(cli_args.tweet_or_url_column, with_rows=True):
             if cli_args.user:
                 if cli_args.ids:
 
@@ -75,7 +77,19 @@ def twitter_attrition_action(cli_args):
 
     for chunk in as_chunks(100, cells()):
         available_tweets = set()
-        tweets = ','.join(row[1] for row in chunk)
+
+        tweet_ids = []
+        for row in chunk:
+            parsed = parse_twitter_url(str(row[1]))
+
+            if parsed is None:
+                tweet_ids.append(row[1])
+            elif isinstance(parsed, TwitterTweet):
+                tweet_ids.append(parsed.id)
+            else:
+                raise InvalidArgumentsError('The url given doesn\'t contain a tweet id: %s' % row[1])
+
+        tweets = ','.join(tweet_id for tweet_id in tweet_ids)
         kwargs = {'_id': tweets}
 
         # First we need to query a batch of tweet ids at once to figure out
@@ -92,6 +106,11 @@ def twitter_attrition_action(cli_args):
 
         for row, tweet in chunk:
             loading_bar.update()
+
+            parsed_tweet = parse_twitter_url(tweet)
+
+            if isinstance(parsed_tweet, TwitterTweet):
+                tweet = parsed_tweet.id
 
             if tweet in available_tweets:
                 current_tweet_status = 'available_tweet'
@@ -139,8 +158,12 @@ def twitter_attrition_action(cli_args):
                 current_tweet_status = 'available_tweet'
 
             if current_tweet_status == 'user_or_tweet_deleted' or current_tweet_status == 'unknown':
-                if cli_args.user:
-                    user = row[user_pos]
+
+                if cli_args.user or isinstance(parsed_tweet, TwitterTweet):
+                    if isinstance(parsed_tweet, TwitterTweet):
+                        user = parsed_tweet.user_screen_name
+                    if cli_args.user:
+                        user = row[user_pos]
 
                     if user in user_cache:
                         if user_cache[user] == 'user_ok':
