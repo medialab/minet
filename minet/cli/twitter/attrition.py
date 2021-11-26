@@ -4,11 +4,10 @@
 #
 # Logic of the `tw attrition` action.
 #
-from json import load
 import casanova
 from twitter import TwitterHTTPError
 from ebbe import getpath, as_chunks
-from ural.twitter import TwitterTweet, TwitterUser, parse_twitter_url
+from ural.twitter import TwitterTweet, parse_twitter_url
 
 from minet.cli.utils import LoadingBar
 from minet.cli.exceptions import InvalidArgumentsError
@@ -60,36 +59,38 @@ def twitter_attrition_action(cli_args):
 
     def cells():
         for row, cell in enricher.cells(cli_args.tweet_or_url_column, with_rows=True):
+            parsed = parse_twitter_url(cell)
+
+            if parsed is None:
+                tweet = cell
+                user = None
+            elif isinstance(parsed, TwitterTweet):
+                tweet = parsed.id
+                user = parsed.user_screen_name
+            else:
+                raise InvalidArgumentsError('The url given doesn\'t contain a tweet id: %s' % row[1])
+
             if cli_args.user:
+                user = row[user_pos]
+
                 if cli_args.ids:
 
-                    if is_not_user_id(row[user_pos]):
+                    if is_not_user_id(user):
                         loading_bar.die(
                             'The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
 
                 else:
-                    if is_probably_not_user_screen_name(row[user_pos]):
+                    if is_probably_not_user_screen_name(user):
                         loading_bar.die(
                             'The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command.')
                         # force flag to add
 
-            yield row, cell
+            yield row, tweet, user
 
     for chunk in as_chunks(100, cells()):
         available_tweets = set()
 
-        tweet_ids = []
-        for row in chunk:
-            parsed = parse_twitter_url(str(row[1]))
-
-            if parsed is None:
-                tweet_ids.append(row[1])
-            elif isinstance(parsed, TwitterTweet):
-                tweet_ids.append(parsed.id)
-            else:
-                raise InvalidArgumentsError('The url given doesn\'t contain a tweet id: %s' % row[1])
-
-        tweets = ','.join(tweet_id for tweet_id in tweet_ids)
+        tweets = ','.join(row[1] for row in chunk)
         kwargs = {'_id': tweets}
 
         # First we need to query a batch of tweet ids at once to figure out
@@ -104,13 +105,8 @@ def twitter_attrition_action(cli_args):
         for tw in result:
             available_tweets.add(tw['id_str'])
 
-        for row, tweet in chunk:
+        for row, tweet, user in chunk:
             loading_bar.update()
-
-            parsed_tweet = parse_twitter_url(tweet)
-
-            if isinstance(parsed_tweet, TwitterTweet):
-                tweet = parsed_tweet.id
 
             if tweet in available_tweets:
                 current_tweet_status = 'available_tweet'
@@ -159,12 +155,7 @@ def twitter_attrition_action(cli_args):
 
             if current_tweet_status == 'user_or_tweet_deleted' or current_tweet_status == 'unknown':
 
-                if cli_args.user or isinstance(parsed_tweet, TwitterTweet):
-                    if isinstance(parsed_tweet, TwitterTweet):
-                        user = parsed_tweet.user_screen_name
-                    if cli_args.user:
-                        user = row[user_pos]
-
+                if user is not None:
                     if user in user_cache:
                         if user_cache[user] == 'user_ok':
                             current_tweet_status = 'unavailable_tweet'
