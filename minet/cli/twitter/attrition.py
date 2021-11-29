@@ -59,40 +59,44 @@ def twitter_attrition_action(cli_args):
 
     def cells():
         for row, cell in enricher.cells(cli_args.tweet_or_url_column, with_rows=True):
-            parsed = parse_twitter_url(cell)
 
             if cell == '':
                 tweet = None
                 user = None
-            elif parsed is None:
-                tweet = cell
-                user = None
-            elif isinstance(parsed, TwitterTweet):
-                tweet = parsed.id
-                user = parsed.user_screen_name
+
             else:
-                tweet = None
-                user = None
 
-            if cli_args.user:
-                user = row[user_pos]
+                parsed = parse_twitter_url(cell)
 
-                if row[user_pos] == '':
+                if parsed is None:
+                    tweet = cell
                     user = None
+                elif isinstance(parsed, TwitterTweet):
+                    tweet = parsed.id
+                    user = parsed.user_screen_name
                 else:
+                    tweet = None
+                    user = None
+
+                if cli_args.user:
                     user = row[user_pos]
 
-                if cli_args.ids:
+                    if row[user_pos] == '':
+                        user = None
+                    else:
+                        user = row[user_pos]
 
-                    if is_not_user_id(user):
-                        loading_bar.die(
-                            'The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
+                    if cli_args.ids:
 
-                else:
-                    if is_probably_not_user_screen_name(user):
-                        loading_bar.die(
-                            'The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command.')
-                        # force flag to add
+                        if is_not_user_id(user):
+                            loading_bar.die(
+                                'The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
+
+                    else:
+                        if is_probably_not_user_screen_name(user):
+                            loading_bar.die(
+                                'The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command.')
+                            # force flag to add
 
             yield row, tweet, user
 
