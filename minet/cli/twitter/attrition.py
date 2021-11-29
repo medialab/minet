@@ -68,7 +68,8 @@ def twitter_attrition_action(cli_args):
                 tweet = parsed.id
                 user = parsed.user_screen_name
             else:
-                raise InvalidArgumentsError('The url given doesn\'t contain a tweet id: %s' % row[1])
+                tweet = None
+                user = None
 
             if cli_args.user:
                 user = row[user_pos]
@@ -90,7 +91,11 @@ def twitter_attrition_action(cli_args):
     for chunk in as_chunks(100, cells()):
         available_tweets = set()
 
-        tweets = ','.join(row[1] for row in chunk)
+        valid_tweets = []
+        for row in chunk:
+            if row[1] is not None:
+                valid_tweets.append(row[1])
+        tweets = ','.join(valid_tweet for valid_tweet in valid_tweets)
         kwargs = {'_id': tweets}
 
         # First we need to query a batch of tweet ids at once to figure out
@@ -107,6 +112,12 @@ def twitter_attrition_action(cli_args):
 
         for row, tweet, user in chunk:
             loading_bar.update()
+
+            if tweet is None:
+                current_tweet_status = ''
+                enricher.writerow(row, [current_tweet_status])
+                loading_bar.print('The url given doesn\'t correspond to a tweet.')
+                continue
 
             if tweet in available_tweets:
                 current_tweet_status = 'available_tweet'
