@@ -7,6 +7,7 @@
 import casanova
 from twitter import TwitterHTTPError
 from ebbe import getpath, as_chunks
+from ural.twitter import TwitterTweet, parse_twitter_url
 
 from minet.cli.utils import LoadingBar
 from minet.cli.exceptions import InvalidArgumentsError
@@ -40,9 +41,9 @@ def twitter_attrition_action(cli_args):
     user_cache = {}
     result = None
 
-    if cli_args.tweet_column not in enricher.headers:
+    if cli_args.tweet_or_url_column not in enricher.headers:
         raise InvalidArgumentsError(
-            'Could not find the "%s" column containing the tweet ids in the given CSV file.' % cli_args.tweet_column)
+            'Could not find the "%s" column containing the tweet ids in the given CSV file.' % cli_args.tweet_or_url_column)
 
     if cli_args.user:
         if cli_args.user not in enricher.headers:
@@ -57,25 +58,48 @@ def twitter_attrition_action(cli_args):
             'Could not find the "%s" column containing the retweeted ids in the given CSV file.' % cli_args.retweeted_id)
 
     def cells():
-        for row, cell in enricher.cells(cli_args.tweet_column, with_rows=True):
+        for row, cell in enricher.cells(cli_args.tweet_or_url_column, with_rows=True):
+            parsed = parse_twitter_url(cell)
+
+            if cell == '':
+                tweet = None
+                user = None
+            elif parsed is None:
+                tweet = cell
+                user = None
+            elif isinstance(parsed, TwitterTweet):
+                tweet = parsed.id
+                user = parsed.user_screen_name
+            else:
+                tweet = None
+                user = None
+
             if cli_args.user:
+                user = row[user_pos]
+
+                if row[user_pos] == '':
+                    user = None
+                else:
+                    user = row[user_pos]
+
                 if cli_args.ids:
 
-                    if is_not_user_id(row[user_pos]):
+                    if is_not_user_id(user):
                         loading_bar.die(
                             'The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
 
                 else:
-                    if is_probably_not_user_screen_name(row[user_pos]):
+                    if is_probably_not_user_screen_name(user):
                         loading_bar.die(
                             'The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command.')
                         # force flag to add
 
-            yield row, cell
+            yield row, tweet, user
 
     for chunk in as_chunks(100, cells()):
         available_tweets = set()
-        tweets = ','.join(row[1] for row in chunk)
+
+        tweets = ','.join(row[1] for row in chunk if row[1] is not None)
         kwargs = {'_id': tweets}
 
         # First we need to query a batch of tweet ids at once to figure out
@@ -90,8 +114,13 @@ def twitter_attrition_action(cli_args):
         for tw in result:
             available_tweets.add(tw['id_str'])
 
-        for row, tweet in chunk:
+        for row, tweet, user in chunk:
             loading_bar.update()
+
+            if tweet is None:
+                enricher.writerow(row)
+                loading_bar.print('The url or id given doesn\'t correspond to a tweet : %s' % row[enricher.headers[cli_args.tweet_or_url_column]])
+                continue
 
             if tweet in available_tweets:
                 current_tweet_status = 'available_tweet'
@@ -139,9 +168,8 @@ def twitter_attrition_action(cli_args):
                 current_tweet_status = 'available_tweet'
 
             if current_tweet_status == 'user_or_tweet_deleted' or current_tweet_status == 'unknown':
-                if cli_args.user:
-                    user = row[user_pos]
 
+                if user is not None:
                     if user in user_cache:
                         if user_cache[user] == 'user_ok':
                             current_tweet_status = 'unavailable_tweet'

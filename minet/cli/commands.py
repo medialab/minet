@@ -2042,7 +2042,7 @@ MINET_COMMANDS = {
                         Using Twitter API to find whether batches of tweets are still
                         available today and if they aren't, attempt to find a reason why.
 
-                        This command relies on tweet ids. We recommand to add --user and
+                        This command relies on tweet ids or tweet urls. We recommand to add --user and
                         the tweet's user id to the command, as more information is given in the output when you
                         use this flag. It will output a report similar to the input file and
                         containing an additional column named "current_tweet_status" that can take
@@ -2054,7 +2054,7 @@ MINET_COMMANDS = {
                             - "suspended_user": tweet cannot be found because its user is suspended.
                             - "deactivated_user": tweet cannot be found because its user is deactivated.
                             - "deactivated_or_renamed_user": tweet cannot be found because its user is either deactivated or changed its screen name
-                                                             (only when using screen names instead of user ids).
+                                                             (only when using tweet urls or tweet ids and screen names instead of user ids).
                             - "protected_user": tweet cannot be found because its user is protected.
                             - "censored_tweet": tweet is unavailable because it was consored by Twitter.
                             - "blocked_by_tweet_author": tweet cannot be found because you were blocked by its author.
@@ -2074,22 +2074,22 @@ MINET_COMMANDS = {
                         examples:
 
                         . Finding out if tweets in a CSV files are still available or not using tweet ids:
-                            $ minet tw attrition tweet_id deleted_tweets.csv > attrition-report.csv
+                            $ minet tw attrition tweet_url deleted_tweets.csv > attrition-report.csv
 
                         .Finding out if tweets are still available or not using tweet & user ids:
                             $ minet tw attrition tweet_id deleted_tweets.csv --user user_id --ids > attrition-report.csv
                     ''',
                     'arguments': [
                         {
-                            'name': 'tweet_column',
-                            'help': 'Name of the column containing the tweet ids.'
+                            'name': 'tweet_or_url_column',
+                            'help': 'Name of the column containing the tweet ids or the tweet urls.'
                         },
                         {
                             'name': 'file',
                             'help': 'CSV file containing the inquired tweets.',
                             'action': InputFileAction,
-                            'dummy_csv_column': 'tweet_id',
-                            'column_dest': 'tweet_column'
+                            'dummy_csv_column': 'tweet_or_url_id',
+                            'column_dest': 'tweet_or_url_column'
                         },
                         *TWITTER_API_COMMON_ARGUMENTS,
                         {
