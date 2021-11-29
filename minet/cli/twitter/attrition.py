@@ -91,11 +91,7 @@ def twitter_attrition_action(cli_args):
     for chunk in as_chunks(100, cells()):
         available_tweets = set()
 
-        valid_tweets = []
-        for row in chunk:
-            if row[1] is not None:
-                valid_tweets.append(row[1])
-        tweets = ','.join(valid_tweet for valid_tweet in valid_tweets)
+        tweets = ','.join(row[1] for row in chunk if row[1] is not None)
         kwargs = {'_id': tweets}
 
         # First we need to query a batch of tweet ids at once to figure out
@@ -114,9 +110,8 @@ def twitter_attrition_action(cli_args):
             loading_bar.update()
 
             if tweet is None:
-                current_tweet_status = ''
-                enricher.writerow(row, [current_tweet_status])
-                loading_bar.print('The url given doesn\'t correspond to a tweet.')
+                enricher.writerow(row)
+                loading_bar.print('The url given doesn\'t correspond to a tweet : %s' % row[enricher.headers[cli_args.tweet_or_url_column]])
                 continue
 
             if tweet in available_tweets:
