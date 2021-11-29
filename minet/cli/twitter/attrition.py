@@ -61,7 +61,10 @@ def twitter_attrition_action(cli_args):
         for row, cell in enricher.cells(cli_args.tweet_or_url_column, with_rows=True):
             parsed = parse_twitter_url(cell)
 
-            if parsed is None:
+            if cell == '':
+                tweet = None
+                user = None
+            elif parsed is None:
                 tweet = cell
                 user = None
             elif isinstance(parsed, TwitterTweet):
@@ -73,6 +76,11 @@ def twitter_attrition_action(cli_args):
 
             if cli_args.user:
                 user = row[user_pos]
+
+                if row[user_pos] == '':
+                    user = None
+                else:
+                    user = row[user_pos]
 
                 if cli_args.ids:
 
@@ -111,7 +119,7 @@ def twitter_attrition_action(cli_args):
 
             if tweet is None:
                 enricher.writerow(row)
-                loading_bar.print('The url given doesn\'t correspond to a tweet : %s' % row[enricher.headers[cli_args.tweet_or_url_column]])
+                loading_bar.print('The url or id given doesn\'t correspond to a tweet : %s' % row[enricher.headers[cli_args.tweet_or_url_column]])
                 continue
 
             if tweet in available_tweets:
