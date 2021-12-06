@@ -1436,9 +1436,13 @@ Minet Twitter Attrition Command
 Using Twitter API to find whether batches of tweets are still
 available today and if they aren't, attempt to find a reason why.
 
-This command relies on tweet ids or tweet urls. We recommand to add --user and
-the tweet's user id to the command, as more information is given in the output when you
-use this flag. It will output a report similar to the input file and
+This command relies on tweet ids or tweet urls. We recommand to add `--user` and
+the tweet's user id to the command if you can, as more information can
+be obtained when the user id (or the full url) is known.
+
+The same can be said about retweet information and the `--retweeted-id` flag.
+
+The command will output a report similar to the input file and
 containing an additional column named "current_tweet_status" that can take
 the following values:
 
@@ -1487,7 +1491,7 @@ examples:
 . Finding out if tweets in a CSV files are still available or not using tweet ids:
     $ minet tw attrition tweet_url deleted_tweets.csv > attrition-report.csv
 
-.Finding out if tweets are still available or not using tweet & user ids:
+. Finding out if tweets are still available or not using tweet & user ids:
     $ minet tw attrition tweet_id deleted_tweets.csv --user user_id --ids > attrition-report.csv
 
 ```
