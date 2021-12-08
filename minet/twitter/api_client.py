@@ -4,6 +4,7 @@
 #
 # Twitter public API client.
 #
+from json import JSONDecodeError
 from twitwi import TwitterWrapper
 from twitter import TwitterError
 
@@ -11,6 +12,9 @@ from minet.web import create_request_retryer, retrying_method
 
 
 def catch_json_error(exc):
+    if isinstance(exc, JSONDecodeError):
+        return True
+
     if not isinstance(exc, TwitterError):
         return False
 
