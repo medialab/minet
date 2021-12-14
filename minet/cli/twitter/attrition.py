@@ -46,12 +46,13 @@ def twitter_attrition_action(cli_args):
             'Could not find the "%s" column containing the tweet ids in the given CSV file.' % cli_args.tweet_or_url_column)
 
     if cli_args.user:
-        if cli_args.user not in enricher.headers:
-            raise InvalidArgumentsError(
-                'Could not find the "%s" column containing the user ids in the given CSV file.' % cli_args.user)
+        if not cli_args.has_dummy_csv:
+            if cli_args.user not in enricher.headers:
+                raise InvalidArgumentsError(
+                    'Could not find the "%s" column containing the user ids in the given CSV file.' % cli_args.user)
 
-        user_column = cli_args.user
-        user_pos = enricher.headers[user_column]
+            user_column = cli_args.user
+            user_pos = enricher.headers[user_column]
 
     if cli_args.retweeted_id and cli_args.retweeted_id not in enricher.headers:
         raise InvalidArgumentsError(
@@ -79,12 +80,15 @@ def twitter_attrition_action(cli_args):
                     user = None
 
                 if cli_args.user:
-                    user = row[user_pos]
 
-                    if row[user_pos] == '':
-                        user = None
+                    if cli_args.has_dummy_csv:
+                        user = cli_args.user
+
                     else:
-                        user = row[user_pos]
+                        if row[user_pos] == '':
+                            user = None
+                        else:
+                            user = row[user_pos]
 
                     if cli_args.ids:
 
@@ -103,6 +107,7 @@ def twitter_attrition_action(cli_args):
     for chunk in as_chunks(100, cells()):
         available_tweets = set()
 
+        # WARNING: if each tweet in chunk is None, the client calls the API with empty tweets list
         tweets = ','.join(row[1] for row in chunk if row[1] is not None)
         kwargs = {'_id': tweets}
 
