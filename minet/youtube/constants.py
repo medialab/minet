@@ -32,10 +32,10 @@ YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS = [
 YOUTUBE_VIDEO_CSV_HEADERS = YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS + [
     'view_count',
     'like_count',
-    'dislike_count',
+    # 'dislike_count',
+    # This property is deprecated since december 13th 2021.
     # 'favorite_count',
     # This property has been deprecated by YouTube in 2015. The property's value is now always set to 0.
-    # (Look for statistics.favoriteCount in this web page : statistics.favoriteCount).
     'comment_count',
     'duration',
     'has_caption'
