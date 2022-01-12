@@ -37,9 +37,9 @@ from minet.twitter.exceptions import (
 # Constants
 # =============================================================================
 TWITTER_PUBLIC_SEARCH_ENDPOINT = 'https://twitter.com/i/api/2/search/adaptive.json'
+TWITTER_GUEST_ACTIVATE_ENDPOINT = 'https://api.twitter.com/1.1/guest/activate.json'
 MAXIMUM_QUERY_LENGTH = 500
 DEFAULT_COUNT = 100  # NOTE: the actual upper limit seems to be 20, but I keep 100 just in case it changes in the future, who knows...
-GUEST_TOKEN_COOKIE_PATTERN = re.compile(rb'document\.cookie = decodeURIComponent\("gt=(\d+);')
 
 
 # =============================================================================
@@ -47,22 +47,6 @@ GUEST_TOKEN_COOKIE_PATTERN = re.compile(rb'document\.cookie = decodeURIComponent
 # =============================================================================
 def is_query_too_long(query):
     return len(quote(query)) > MAXIMUM_QUERY_LENGTH
-
-
-def forge_search_url(query):
-    return (
-        'https://twitter.com/search?f=live&type=spelling_expansion_revert_click&q=%s' %
-        quote(query)
-    )
-
-
-def extract_guest_token(html):
-    match = GUEST_TOKEN_COOKIE_PATTERN.search(html)
-
-    if match is None:
-        return None
-
-    return match.group(1).decode()
 
 
 def ensure_guest_token(method):
@@ -244,19 +228,20 @@ class TwitterAPIScraper(object):
     def request(self, url):
         return request(url, pool=self.pool, spoof_ua=True)
 
-    def request_json(self, url, headers=None):
-        return request_json(url, pool=self.pool, spoof_ua=True, headers=headers)
+    def request_json(self, url, headers=None, method='GET'):
+        return request_json(url, pool=self.pool, spoof_ua=True, method=method, headers=headers)
 
     def acquire_guest_token(self):
-        base_url = forge_search_url('test')
-
-        err, response = self.request(base_url)
-
+        headers = {
+            'Authorization': TWITTER_PUBLIC_API_AUTH_HEADER,
+            'Accept-Language': 'en-US,en;q=0.5'
+        }
+        err, response, api_token_response = self.request_json(
+            TWITTER_GUEST_ACTIVATE_ENDPOINT, headers, method="POST")
         if err or response.status >= 400:
             raise TwitterPublicAPIInvalidResponseError
 
-        guest_token = extract_guest_token(response.data)
-
+        guest_token = api_token_response.get('guest_token')
         if guest_token is None:
             raise TwitterGuestTokenError
 
