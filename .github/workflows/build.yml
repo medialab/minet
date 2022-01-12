@@ -41,7 +41,7 @@ jobs:
         run: ./dist/minet/minet --version
 
       - name: Prepare release
-        uses: papeloto/action-zip@v1
+        uses: vimtor/action-zip@v1
         with:
           files: ./dist/minet/
           dest: minet_${{ matrix.name }}.zip
