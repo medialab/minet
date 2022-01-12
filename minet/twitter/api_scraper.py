@@ -4,7 +4,6 @@
 #
 # Twitter public API "scraper".
 #
-import re
 import time
 import datetime
 from ebbe import with_is_first
