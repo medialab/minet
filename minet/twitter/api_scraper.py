@@ -37,6 +37,7 @@ from minet.twitter.exceptions import (
 # Constants
 # =============================================================================
 TWITTER_PUBLIC_SEARCH_ENDPOINT = 'https://twitter.com/i/api/2/search/adaptive.json'
+TWITTER_GUEST_ACTIVATE_ENDPOINT = 'https://api.twitter.com/1.1/guest/activate.json'
 MAXIMUM_QUERY_LENGTH = 500
 DEFAULT_COUNT = 100  # NOTE: the actual upper limit seems to be 20, but I keep 100 just in case it changes in the future, who knows...
 
@@ -46,10 +47,6 @@ DEFAULT_COUNT = 100  # NOTE: the actual upper limit seems to be 20, but I keep 1
 # =============================================================================
 def is_query_too_long(query):
     return len(quote(query)) > MAXIMUM_QUERY_LENGTH
-
-
-def guest_token_API_url():
-    return ('https://api.twitter.com/1.1/guest/activate.json')
 
 
 def ensure_guest_token(method):
@@ -240,7 +237,7 @@ class TwitterAPIScraper(object):
             'Accept-Language': 'en-US,en;q=0.5'
         }
         err, response, api_token_response = self.request_json(
-            guest_token_API_url(), headers, method="POST")
+            TWITTER_GUEST_ACTIVATE_ENDPOINT, headers, method="POST")
         if err or response.status >= 400:
             raise TwitterPublicAPIInvalidResponseError
 
