@@ -4,6 +4,7 @@
 #
 # Logic of the `tw` action.
 #
+from pydoc import cli
 from minet.cli.utils import die
 
 
@@ -43,6 +44,11 @@ def twitter_action(cli_args):
 
             twitter_followers_action(cli_args)
 
+        elif cli_args.tw_action == 'followers-v2':
+            from minet.cli.twitter.followers_v2 import twitter_followers_v2_action
+
+            twitter_followers_v2_action(cli_args)
+
         elif cli_args.tw_action == 'users':
             from minet.cli.twitter.users import twitter_users_action
 
@@ -52,6 +58,16 @@ def twitter_action(cli_args):
             from minet.cli.twitter.user_tweets import twitter_user_tweets_action
 
             twitter_user_tweets_action(cli_args)
+
+        elif cli_args.tw_action == 'tweet-search':
+            from minet.cli.twitter.tweet_search import twitter_tweet_search_action
+
+            twitter_tweet_search_action(cli_args)
+
+        elif cli_args.tw_action == 'tweets-count':
+            from minet.cli.twitter.tweets_count import twitter_tweets_count_action
+
+            twitter_tweets_count_action(cli_args)
 
         elif cli_args.tw_action == 'tweets':
             from minet.cli.twitter.tweets import twitter_tweets_action

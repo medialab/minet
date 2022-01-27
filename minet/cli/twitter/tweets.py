@@ -7,9 +7,11 @@
 import casanova
 from twitwi import (
     normalize_tweet,
+    normalize_tweets_payload_v2,
     format_tweet_as_csv_row
 )
 from twitwi.constants import TWEET_FIELDS
+from twitwi.constants_api_v2 import TWEETS_LOOKUP_EXPANSIONS, TWEETS_LOOKUP_PARAMS
 from twitter import TwitterHTTPError
 from ebbe import as_chunks
 
@@ -25,6 +27,15 @@ def twitter_tweets_action(cli_args):
         cli_args.api_key,
         cli_args.api_secret_key
     )
+
+    if cli_args.api_v2:
+        client = TwitterAPIClient(
+            cli_args.access_token,
+            cli_args.access_token_secret,
+            cli_args.api_key,
+            cli_args.api_secret_key,
+            api_version='2'
+        )
 
     enricher = casanova.enricher(
         cli_args.file,
@@ -42,27 +53,52 @@ def twitter_tweets_action(cli_args):
 
     for chunk in as_chunks(100, enricher.cells(cli_args.column, with_rows=True)):
         tweets = ','.join(row[1] for row in chunk)
-        kwargs = {'_id': tweets, 'tweet_mode': 'extended'}
 
-        try:
-            result = client.call(['statuses', 'lookup'], **kwargs)
-        except TwitterHTTPError as e:
-            loading_bar.inc('errors')
+        if cli_args.api_v2:
+            kwargs = {'ids': tweets, 'expansions': TWEETS_LOOKUP_EXPANSIONS, 'params': TWEETS_LOOKUP_PARAMS}
 
-            if e.e.code == 404:
-                for row, tweet in chunk:
-                    enricher.writerow(row)
-            else:
-                raise e
+            try:
+                result = client.call(['tweets'], **kwargs)
+            except TwitterHTTPError as e:
+                loading_bar.inc('errors')
 
-            continue
+                if e.e.code == 404:
+                    for row, tweet in chunk:
+                        enricher.writerow(row)
+                else:
+                    raise e
+
+                continue
+
+        else:
+            kwargs = {'_id': tweets, 'tweet_mode': 'extended'}
+
+            try:
+                result = client.call(['statuses', 'lookup'], **kwargs)
+            except TwitterHTTPError as e:
+                loading_bar.inc('errors')
+
+                if e.e.code == 404:
+                    for row, tweet in chunk:
+                        enricher.writerow(row)
+                else:
+                    raise e
+
+                continue
 
         indexed_result = {}
 
-        for tweet in result:
-            tweet = normalize_tweet(tweet, collection_source='api')
-            addendum = format_tweet_as_csv_row(tweet)
-            indexed_result[tweet['id']] = addendum
+        if cli_args.api_v2:
+            normalized_tweets = normalize_tweets_payload_v2(result, collection_source='api')
+            for normalized_tweet in normalized_tweets:
+                addendum = format_tweet_as_csv_row(normalized_tweet)
+                indexed_result[normalized_tweet['id']] = addendum
+
+        else:
+            for tweet in result:
+                tweet = normalize_tweet(tweet, collection_source='api')
+                addendum = format_tweet_as_csv_row(tweet)
+                indexed_result[tweet['id']] = addendum
 
         for row, tweet in chunk:
             addendum = indexed_result.get(tweet)

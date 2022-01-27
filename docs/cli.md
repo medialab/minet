@@ -53,6 +53,8 @@
   * [followers](#followers)
   * [friends](#friends)
   * [scrape](#twitter-scrape)
+  * [tweet-search](#tweet-search)
+  * [tweets-count](#tweets-count)
   * [tweets](#tweets)
   * [users](#users)
   * [user-search](#user-search)
@@ -1628,6 +1630,110 @@ examples:
 
 ```
 
+### tweet-search
+
+```
+usage: minet twitter tweet-search [-h] [--api-key API_KEY]
+                                  [--api-secret-key API_SECRET_KEY]
+                                  [--access-token ACCESS_TOKEN]
+                                  [--access-token-secret ACCESS_TOKEN_SECRET]
+                                  [-o OUTPUT] [-s SELECT] [--total TOTAL]
+                                  [--since-id SINCE_ID] [--until-id UNTIL_ID]
+                                  [--start-time START_TIME]
+                                  [--end-time END_TIME] [--academic]
+                                  query [file]
+
+Minet Twitter Tweets Search Command
+===================================
+
+Search Twitter tweets using API v2.
+
+This will only return the last 8 days of results maximum per query (unless you have Academic Research access)
+so you might want to find a way to segment your inquiry
+into smaller queries to find more tweets.
+To search the full archive of public tweets, use --academic if you have academic research access.
+
+positional arguments:
+  query                                      Search query or name of the column containing queries to run in given CSV file.
+  file                                       Optional CSV file containing the queries to be run.
+
+optional arguments:
+  -h, --help                                 show this help message and exit
+  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
+  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
+  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
+  --total TOTAL                              Total number of queries. Necessary if you want to display a finite progress indicator.
+  --since-id SINCE_ID                        Will return tweets with ids that are greater than the specified id. If used with --start-time, only since-id will be taken into account.
+  --until-id UNTIL_ID                        Will return tweets that are older than the tweet with the specified id.
+  --start-time START_TIME                    The oldest UTC stamp from which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ
+  --end-time END_TIME                        The UTC stamp to which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ
+  --academic                                 Flag to add if you want to use your academic research access (in order to search the complete history of public tweets).
+
+examples:
+
+. Searching tweets using "cancer" as a query:
+    $ minet tw tweet-search cancer > tweets.csv
+
+. Running multiple queries in series:
+    $ minet tw tweet-search query queries.csv > tweets.csv
+
+```
+
+### tweets-count
+
+```
+usage: minet twitter tweets-count [-h] [--api-key API_KEY]
+                                  [--api-secret-key API_SECRET_KEY]
+                                  [--access-token ACCESS_TOKEN]
+                                  [--access-token-secret ACCESS_TOKEN_SECRET]
+                                  [-o OUTPUT] [-s SELECT] [--total TOTAL]
+                                  [--granularity GRANULARITY]
+                                  [--since-id SINCE_ID] [--until-id UNTIL_ID]
+                                  [--start-time START_TIME]
+                                  [--end-time END_TIME] [--academic]
+                                  query [file]
+
+Minet Twitter Tweets Count Command
+==================================
+
+Count Twitter tweets using API v2.
+
+This will only return the last 8 days of results maximum per query (unless you have Academic Research access,
+in which case you can add --academic to the command).
+
+positional arguments:
+  query                                      Search query or name of the column containing queries to run in given CSV file.
+  file                                       Optional CSV file containing the queries to be run.
+
+optional arguments:
+  -h, --help                                 show this help message and exit
+  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
+  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
+  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
+  --total TOTAL                              Total number of queries. Necessary if you want to display a finite progress indicator.
+  --granularity GRANULARITY                  Granularity used to group the data by : can be minute, hour or day (defaults to day).
+  --since-id SINCE_ID                        Will return tweets with ids that are greater than the specified id. If used with --start-time, only since-id will be taken into account.
+  --until-id UNTIL_ID                        Will return tweets that are older than the tweet with the specified id.
+  --start-time START_TIME                    The oldest UTC stamp from which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ
+  --end-time END_TIME                        The UTC stamp to which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ
+  --academic                                 Flag to add if you want to use your academic research access (in order to search the complete history of public tweets).
+
+examples:
+
+. Counting tweets using "cancer" as a query:
+    $ minet tw tweets-count cancer > count.csv
+
+. Running multiple queries in series:
+    $ minet tw tweets-count query queries.csv > counts.csv
+
+```
+
 ### tweets
 
 ```
@@ -1636,6 +1742,7 @@ usage: minet twitter tweets [-h] [--api-key API_KEY]
                             [--access-token ACCESS_TOKEN]
                             [--access-token-secret ACCESS_TOKEN_SECRET]
                             [-o OUTPUT] [--resume] [-s SELECT] [--total TOTAL]
+                            [--api-v2]
                             column [file]
 
 Minet Twitter Tweets Command
@@ -1657,6 +1764,7 @@ optional arguments:
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of tweets. Necessary if you want to display a finite progress indicator.
+  --api-v2                                   Whether to use the command with twitter api v2 rather than v1.1
 
 examples:
 
