@@ -29,13 +29,14 @@ def catch_json_error(exc):
 
 
 class TwitterAPIClient(object):
-    def __init__(self, access_token, access_token_secret, api_key, api_secret_key,
+    def __init__(self, access_token, access_token_secret, api_key, api_secret_key, api_version='1.1',
                  before_sleep=None):
         self.wrapper = TwitterWrapper(
             access_token,
             access_token_secret,
             api_key,
-            api_secret_key
+            api_secret_key,
+            api_version=api_version
         )
         self.retryer = create_request_retryer(
             before_sleep=before_sleep,

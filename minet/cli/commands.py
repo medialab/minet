@@ -1816,6 +1816,52 @@ MINET_COMMANDS = {
                         }
                     ]
                 },
+                'followers-v2': {
+                    'title': 'Minet Twitter Followers Command',
+                    'description': '''
+                        Retrieve followers of given user (using ids).
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Getting followers of a list of user:
+                            $ minet tw followers-v2 user_id users.csv > followers.csv
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the Twitter account screen names or ids.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the inquired Twitter users.',
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'user'
+                        },
+                        *TWITTER_API_COMMON_ARGUMENTS,
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction,
+                            'resumer': BatchResumer,
+                            'resumer_kwargs': lambda args: ({'value_column': args.column})
+                        },
+                        {
+                            'flag': '--resume',
+                            'help': 'Whether to resume from an aborted collection. Need -o to be set.',
+                            'action': 'store_true'
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of accounts. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
+                },
                 'scrape': {
                     'title': 'Minet Twitter Scrape Command',
                     'description': '''
@@ -2033,6 +2079,11 @@ MINET_COMMANDS = {
                             'flag': '--total',
                             'help': 'Total number of tweets. Necessary if you want to display a finite progress indicator.',
                             'type': int
+                        },
+                        {
+                            'flag': '--api-v2',
+                            'help': 'Whether to use the command with twitter api v2 rather than v1.1',
+                            'action': 'store_true'
                         }
                     ]
                 },
@@ -2128,6 +2179,151 @@ MINET_COMMANDS = {
                             'flag': '--total',
                             'help': 'Total number of tweets. Necessary if you want to display a finite progress indicator.',
                             'type': int
+                        }
+                    ]
+                },
+                'tweet-search': {
+                    'title': 'Minet Twitter Tweets Search Command',
+                    'description': '''
+                        Search Twitter tweets using API v2.
+
+                        This will only return the last 8 days of results maximum per query (unless you have Academic Research access)
+                        so you might want to find a way to segment your inquiry
+                        into smaller queries to find more tweets.
+                        To search the full archive of public tweets, use --academic if you have academic research access.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Searching tweets using "cancer" as a query:
+                            $ minet tw tweet-search cancer > tweets.csv
+
+                        . Running multiple queries in series:
+                            $ minet tw tweet-search query queries.csv > tweets.csv
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'query',
+                            'help': 'Search query or name of the column containing queries to run in given CSV file.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'Optional CSV file containing the queries to be run.',
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'query',
+                            'column_dest': 'query'
+                        },
+                        *TWITTER_API_COMMON_ARGUMENTS,
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of queries. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        },
+                        {
+                            'flag': '--since-id',
+                            'help': 'Will return tweets with ids that are greater than the specified id. If used with --start-time, only since-id will be taken into account.',
+                            'type': int
+                        },
+                        {
+                            'flag': '--until-id',
+                            'help': 'Will return tweets that are older than the tweet with the specified id.',
+                            'type': int
+                        },
+                        {
+                            'flag': '--start-time',
+                            'help': 'The oldest UTC stamp from which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ'
+                        },
+                        {
+                            'flag': '--end-time',
+                            'help': 'The UTC stamp to which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ'
+                        },
+                        {
+                            'flag': '--academic',
+                            'help': 'Flag to add if you want to use your academic research access (in order to search the complete history of public tweets).',
+                            'action': 'store_true'
+                        }
+                    ]
+                },
+                'tweets-count': {
+                    'title': 'Minet Twitter Tweets Count Command',
+                    'description': '''
+                        Count Twitter tweets using API v2.
+
+                        This will only return the last 8 days of results maximum per query (unless you have Academic Research access,
+                        in which case you can add --academic to the command).
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Counting tweets using "cancer" as a query:
+                            $ minet tw tweets-count cancer > count.csv
+
+                        . Running multiple queries in series:
+                            $ minet tw tweets-count query queries.csv > counts.csv
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'query',
+                            'help': 'Search query or name of the column containing queries to run in given CSV file.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'Optional CSV file containing the queries to be run.',
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'query',
+                            'column_dest': 'query'
+                        },
+                        *TWITTER_API_COMMON_ARGUMENTS,
+                        {
+                            'flags': ['-o', '--output'],
+                            'action': OutputFileAction
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of queries. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        },
+                        {
+                            'flag': '--granularity',
+                            'help': 'Granularity used to group the data by : can be minute, hour or day (defaults to day).',
+                            'type': str
+                        },
+                        {
+                            'flag': '--since-id',
+                            'help': 'Will return tweets with ids that are greater than the specified id. If used with --start-time, only since-id will be taken into account.',
+                            'type': int
+                        },
+                        {
+                            'flag': '--until-id',
+                            'help': 'Will return tweets that are older than the tweet with the specified id.',
+                            'type': int
+                        },
+                        {
+                            'flag': '--start-time',
+                            'help': 'The oldest UTC stamp from which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ'
+                        },
+                        {
+                            'flag': '--end-time',
+                            'help': 'The UTC stamp to which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ'
+                        },
+                        {
+                            'flag': '--academic',
+                            'help': 'Flag to add if you want to use your academic research access (in order to search the complete history of public tweets).',
+                            'action': 'store_true'
                         }
                     ]
                 },
