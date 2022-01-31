@@ -70,6 +70,7 @@ def twitter_tweets_count_action(cli_args):
             kwargs['granularity'] = cli_args.granularity
 
         if cli_args.academic:
+            total_count = 0
             while True:
                 try:
                     result = client.call(['tweets', 'counts', 'all'], **kwargs)
@@ -84,7 +85,8 @@ def twitter_tweets_count_action(cli_args):
                     continue
 
                 for count in result['data']:
-                    addendum = [count['start'], count['end'], count['tweet_count'], result['meta']['total_tweet_count']]
+                    total_count += result['meta']['total_tweet_count']
+                    addendum = [count['start'], count['end'], count['tweet_count'], total_count]
                     enricher.writerow(row, addendum)
 
                 if 'next_token' in result['meta']:
