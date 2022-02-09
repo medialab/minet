@@ -11,6 +11,7 @@ from twitwi import (
 )
 from twitter import TwitterHTTPError
 from twitwi.constants import USER_FIELDS
+from twitwi.constants_api_v2 import USERS_LOOKUP_PARAMS
 from ebbe import as_chunks
 
 from minet.cli.utils import LoadingBar
@@ -26,6 +27,15 @@ def twitter_users_action(cli_args):
         cli_args.api_key,
         cli_args.api_secret_key
     )
+
+    if cli_args.api_v2:
+        client = TwitterAPIClient(
+            cli_args.access_token,
+            cli_args.access_token_secret,
+            cli_args.api_key,
+            cli_args.api_secret_key,
+            api_version='2'
+        )
 
     enricher = casanova.enricher(
         cli_args.file,
@@ -48,7 +58,10 @@ def twitter_users_action(cli_args):
                 if is_not_user_id(user):
                     loading_bar.die('The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
 
-                client_args = {'user_id': users}
+                if cli_args.api_v2:
+                    client_args = {'ids': users}
+                else:
+                    client_args = {'user_id': users}
                 key = 'id'
 
             else:
@@ -56,24 +69,58 @@ def twitter_users_action(cli_args):
                     loading_bar.die('The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command.')
                     # force flag to add
 
-                client_args = {'screen_name': users}
+                if cli_args.api_v2:
+                    client_args = {'usernames': users}
+                else:
+                    client_args = {'screen_name': users}
                 key = 'screen_name'
 
-        try:
-            result = client.call(['users', 'lookup'], **client_args)
-        except TwitterHTTPError as e:
-            if e.e.code == 404:
-                for row, user in chunk:
-                    enricher.writerow(row)
+        if not cli_args.api_v2:
+            try:
+                result = client.call(['users', 'lookup'], **client_args)
+            except TwitterHTTPError as e:
+                if e.e.code == 404:
+                    for row, user in chunk:
+                        enricher.writerow(row)
+                else:
+                    raise e
+
+                continue
+
+            users_raw_data = result
+
+        else:
+            client_args['params'] = USERS_LOOKUP_PARAMS
+            if cli_args.ids:
+                try:
+                    result = client.call(['users'], **client_args)
+                except TwitterHTTPError as e:
+                    if e.e.code == 404:
+                        for row, user in chunk:
+                            enricher.writerow(row)
+                    else:
+                        raise e
+
+                    continue
             else:
-                raise e
+                try:
+                    result = client.call(['users', 'by'], **client_args)
+                except TwitterHTTPError as e:
+                    if e.e.code == 404:
+                        for row, user in chunk:
+                            enricher.writerow(row)
+                    else:
+                        raise e
 
-            continue
+                    continue
 
+            users_raw_data = result['data']
+        loading_bar.print(result)
         indexed_result = {}
 
-        for user in result:
-            user = normalize_user(user)
+        for user in users_raw_data:
+            user = normalize_user(user, v2=cli_args.api_v2)
+            loading_bar.print(user)
             user_row = format_user_as_csv_row(user)
             indexed_result[user[key]] = user_row
 

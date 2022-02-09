@@ -1943,6 +1943,11 @@ MINET_COMMANDS = {
                             'flag': '--total',
                             'help': 'Total number of accounts. Necessary if you want to display a finite progress indicator.',
                             'type': int
+                        },
+                        {
+                            'flag': '--api-v2',
+                            'help': 'Whether to use the command with twitter api v2 rather than v1.1',
+                            'action': 'store_true'
                         }
                     ]
                 },
