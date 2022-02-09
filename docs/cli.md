@@ -54,7 +54,7 @@
   * [friends](#friends)
   * [scrape](#twitter-scrape)
   * [tweet-search](#tweet-search)
-  * [tweets-count](#tweets-count)
+  * [tweet-count](#tweet-count)
   * [tweets](#tweets)
   * [users](#users)
   * [user-search](#user-search)
@@ -1506,7 +1506,7 @@ usage: minet twitter followers [-h] [--api-key API_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
                                [--ids] [-o OUTPUT] [--resume] [-s SELECT]
-                               [--total TOTAL]
+                               [--total TOTAL] [--api-v2]
                                column [file]
 
 Minet Twitter Followers Command
@@ -1529,6 +1529,7 @@ optional arguments:
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
+  --api-v2                                   Whether to use the command with twitter api v2 rather than v1.1
 
 examples:
 
@@ -1545,6 +1546,7 @@ usage: minet twitter friends [-h] [--api-key API_KEY]
                              [--access-token ACCESS_TOKEN]
                              [--access-token-secret ACCESS_TOKEN_SECRET] [--ids]
                              [-o OUTPUT] [--resume] [-s SELECT] [--total TOTAL]
+                             [--api-v2]
                              column [file]
 
 Minet Twitter Friends Command
@@ -1567,6 +1569,7 @@ optional arguments:
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
+  --api-v2                                   Whether to use the command with twitter api v2 rather than v1.1
 
 examples:
 
@@ -1648,9 +1651,8 @@ Minet Twitter Tweets Search Command
 
 Search Twitter tweets using API v2.
 
-This will only return the last 8 days of results maximum per query (unless you have Academic Research access)
-so you might want to find a way to segment your inquiry
-into smaller queries to find more tweets.
+This will only return the last 8 days of results maximum per query (unless you have Academic Research access).
+
 To search the full archive of public tweets, use --academic if you have academic research access.
 
 positional arguments:
@@ -1682,19 +1684,19 @@ examples:
 
 ```
 
-### tweets-count
+### tweet-count
 
 ```
-usage: minet twitter tweets-count [-h] [--api-key API_KEY]
-                                  [--api-secret-key API_SECRET_KEY]
-                                  [--access-token ACCESS_TOKEN]
-                                  [--access-token-secret ACCESS_TOKEN_SECRET]
-                                  [-o OUTPUT] [-s SELECT] [--total TOTAL]
-                                  [--granularity GRANULARITY]
-                                  [--since-id SINCE_ID] [--until-id UNTIL_ID]
-                                  [--start-time START_TIME]
-                                  [--end-time END_TIME] [--academic]
-                                  query [file]
+usage: minet twitter tweet-count [-h] [--api-key API_KEY]
+                                 [--api-secret-key API_SECRET_KEY]
+                                 [--access-token ACCESS_TOKEN]
+                                 [--access-token-secret ACCESS_TOKEN_SECRET]
+                                 [-o OUTPUT] [-s SELECT] [--total TOTAL]
+                                 [--granularity GRANULARITY]
+                                 [--since-id SINCE_ID] [--until-id UNTIL_ID]
+                                 [--start-time START_TIME] [--end-time END_TIME]
+                                 [--academic]
+                                 query [file]
 
 Minet Twitter Tweets Count Command
 ==================================
@@ -1727,10 +1729,10 @@ optional arguments:
 examples:
 
 . Counting tweets using "cancer" as a query:
-    $ minet tw tweets-count cancer > count.csv
+    $ minet tw tweet-count cancer > count.csv
 
 . Running multiple queries in series:
-    $ minet tw tweets-count query queries.csv > counts.csv
+    $ minet tw tweet-count query queries.csv > counts.csv
 
 ```
 

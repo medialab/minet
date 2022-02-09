@@ -96,6 +96,11 @@ def twitter_tweet_search_action(cli_args):
 
                     continue
 
+            if result['meta']['result_count'] == 0 and 'next_token' in result['meta']:
+                loading_bar.print(result)
+                kwargs['next_token'] = result['meta']['next_token']
+                continue
+
             normalized_tweets = normalize_tweets_payload_v2(result, collection_source='api')
 
             for normalized_tweet in normalized_tweets:

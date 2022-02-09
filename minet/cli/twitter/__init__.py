@@ -44,11 +44,6 @@ def twitter_action(cli_args):
 
             twitter_followers_action(cli_args)
 
-        elif cli_args.tw_action == 'followers-v2':
-            from minet.cli.twitter.followers_v2 import twitter_followers_v2_action
-
-            twitter_followers_v2_action(cli_args)
-
         elif cli_args.tw_action == 'users':
             from minet.cli.twitter.users import twitter_users_action
 
@@ -64,10 +59,10 @@ def twitter_action(cli_args):
 
             twitter_tweet_search_action(cli_args)
 
-        elif cli_args.tw_action == 'tweets-count':
-            from minet.cli.twitter.tweets_count import twitter_tweets_count_action
+        elif cli_args.tw_action == 'tweet-count':
+            from minet.cli.twitter.tweet_count import twitter_tweet_count_action
 
-            twitter_tweets_count_action(cli_args)
+            twitter_tweet_count_action(cli_args)
 
         elif cli_args.tw_action == 'tweets':
             from minet.cli.twitter.tweets import twitter_tweets_action

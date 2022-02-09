@@ -15,6 +15,8 @@ CHARACTERS = re.compile(r'[A-Za-z_]')
 NUMBERS = re.compile(r'[0-9]+')
 TWITTER_SCREEN_NAME = re.compile(r'[a-zA-Z0-9_]{1,15}')
 
+ITEMS_PER_PAGE = 1000
+
 
 def make_twitter_action(method_name, csv_headers):
 
@@ -41,6 +43,15 @@ def make_twitter_action(method_name, csv_headers):
             cli_args.api_secret_key
         )
 
+        if cli_args.api_v2:
+            client = TwitterAPIClient(
+                cli_args.access_token,
+                cli_args.access_token_secret,
+                cli_args.api_key,
+                cli_args.api_secret_key,
+                api_version='2'
+            )
+
         resuming_state = None
 
         if cli_args.resume:
@@ -53,10 +64,19 @@ def make_twitter_action(method_name, csv_headers):
             next_cursor = -1
             result = None
 
+            if cli_args.api_v2:
+                next_cursor = None
+
             if resuming_state is not None and resuming_state.last_cursor:
                 next_cursor = int(resuming_state.last_cursor)
 
-            if cli_args.ids:
+            if cli_args.api_v2:
+                if is_not_user_id(user):
+                    loading_bar.die('The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. With --api-v2, you can only use user ids to retrieve followers.')
+
+                client_kwargs = {'max_results': ITEMS_PER_PAGE}
+
+            elif cli_args.ids:
                 if is_not_user_id(user):
                     loading_bar.die('The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
 
@@ -69,8 +89,7 @@ def make_twitter_action(method_name, csv_headers):
 
                 client_kwargs = {'screen_name': user}
 
-            while next_cursor != 0:
-                client_kwargs['cursor'] = next_cursor
+            while True:
 
                 skip_in_output = None
 
@@ -78,31 +97,73 @@ def make_twitter_action(method_name, csv_headers):
                     skip_in_output = resuming_state.values_to_skip
                     resuming_state = None
 
-                try:
-                    result = client.call([method_name, 'ids'], **client_kwargs)
-                except TwitterHTTPError as e:
+                if not cli_args.api_v2:
+                    client_kwargs['cursor'] = next_cursor
 
-                    # The user does not exist
-                    loading_bar.inc('users_not_found')
-                    break
+                    try:
+                        result = client.call([method_name, 'ids'], **client_kwargs)
+                    except TwitterHTTPError as e:
 
-                if result is not None:
-                    all_ids = result.get('ids', [])
-                    next_cursor = result.get('next_cursor', 0)
+                        # The user does not exist
+                        loading_bar.inc('users_not_found')
+                        break
 
-                    loading_bar.update(len(all_ids))
+                    if result is not None:
+                        all_ids = result.get('ids', [])
+                        next_cursor = result.get('next_cursor', 0)
 
-                    batch = []
+                        loading_bar.update(len(all_ids))
 
-                    for user_id in all_ids:
-                        if skip_in_output and user_id in skip_in_output:
-                            continue
+                        batch = []
 
-                        batch.append([user_id])
+                        for user_id in all_ids:
+                            if skip_in_output and user_id in skip_in_output:
+                                continue
 
-                    enricher.writebatch(row, batch, next_cursor or None)
+                            batch.append([user_id])
+
+                    else:
+                        break
+
                 else:
-                    next_cursor = 0
+                    if method_name == 'friends':
+                        method_name_v2 = 'following'
+                    else:
+                        method_name_v2 = method_name
+
+                    try:
+                        result = client.call(route=['users', user, method_name_v2], **client_kwargs)
+                    except TwitterHTTPError as e:
+
+                        # The user does not exist
+                        loading_bar.inc('users_not_found')
+                        break
+
+                    if result is not None and 'data' in result:
+                        batch = []
+
+                        for follower_metadata in result['data']:
+                            user_id = follower_metadata['id']
+
+                            if skip_in_output and user_id in skip_in_output:
+                                continue
+                            batch.append([user_id])
+
+                        loading_bar.update(len(result['data']))
+
+                        if 'next_token' in result['meta']:
+                            next_cursor = result['meta']['next_token']
+                            client_kwargs['pagination_token'] = next_cursor
+                        else:
+                            next_cursor = None
+
+                    else:
+                        break
+
+                enricher.writebatch(row, batch, next_cursor or None)
+
+                if next_cursor is None or next_cursor == 0:
+                    break
 
             loading_bar.inc('users')
 

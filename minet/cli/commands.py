@@ -1762,6 +1762,11 @@ MINET_COMMANDS = {
                             'flag': '--total',
                             'help': 'Total number of accounts. Necessary if you want to display a finite progress indicator.',
                             'type': int
+                        },
+                        {
+                            'flag': '--api-v2',
+                            'help': 'Whether to use the command with twitter api v2 rather than v1.1',
+                            'action': 'store_true'
                         }
                     ]
                 },
@@ -1813,52 +1818,11 @@ MINET_COMMANDS = {
                             'flag': '--total',
                             'help': 'Total number of accounts. Necessary if you want to display a finite progress indicator.',
                             'type': int
-                        }
-                    ]
-                },
-                'followers-v2': {
-                    'title': 'Minet Twitter Followers Command',
-                    'description': '''
-                        Retrieve followers of given user (using ids).
-                    ''',
-                    'epilog': '''
-                        examples:
-
-                        . Getting followers of a list of user:
-                            $ minet tw followers-v2 user_id users.csv > followers.csv
-                    ''',
-                    'arguments': [
-                        {
-                            'name': 'column',
-                            'help': 'Name of the column containing the Twitter account screen names or ids.'
                         },
                         {
-                            'name': 'file',
-                            'help': 'CSV file containing the inquired Twitter users.',
-                            'action': InputFileAction,
-                            'dummy_csv_column': 'user'
-                        },
-                        *TWITTER_API_COMMON_ARGUMENTS,
-                        {
-                            'flags': ['-o', '--output'],
-                            'action': OutputFileAction,
-                            'resumer': BatchResumer,
-                            'resumer_kwargs': lambda args: ({'value_column': args.column})
-                        },
-                        {
-                            'flag': '--resume',
-                            'help': 'Whether to resume from an aborted collection. Need -o to be set.',
+                            'flag': '--api-v2',
+                            'help': 'Whether to use the command with twitter api v2 rather than v1.1',
                             'action': 'store_true'
-                        },
-                        {
-                            'flags': ['-s', '--select'],
-                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
-                            'type': SplitterType()
-                        },
-                        {
-                            'flag': '--total',
-                            'help': 'Total number of accounts. Necessary if you want to display a finite progress indicator.',
-                            'type': int
                         }
                     ]
                 },
@@ -2187,9 +2151,8 @@ MINET_COMMANDS = {
                     'description': '''
                         Search Twitter tweets using API v2.
 
-                        This will only return the last 8 days of results maximum per query (unless you have Academic Research access)
-                        so you might want to find a way to segment your inquiry
-                        into smaller queries to find more tweets.
+                        This will only return the last 8 days of results maximum per query (unless you have Academic Research access).
+
                         To search the full archive of public tweets, use --academic if you have academic research access.
                     ''',
                     'epilog': '''
@@ -2253,7 +2216,7 @@ MINET_COMMANDS = {
                         }
                     ]
                 },
-                'tweets-count': {
+                'tweet-count': {
                     'title': 'Minet Twitter Tweets Count Command',
                     'description': '''
                         Count Twitter tweets using API v2.
@@ -2265,10 +2228,10 @@ MINET_COMMANDS = {
                         examples:
 
                         . Counting tweets using "cancer" as a query:
-                            $ minet tw tweets-count cancer > count.csv
+                            $ minet tw tweet-count cancer > count.csv
 
                         . Running multiple queries in series:
-                            $ minet tw tweets-count query queries.csv > counts.csv
+                            $ minet tw tweet-count query queries.csv > counts.csv
                     ''',
                     'arguments': [
                         {
