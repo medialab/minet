@@ -1,8 +1,8 @@
 # =============================================================================
-# Minet Twitter Tweet Search CLI Action
+# Minet Twitter Tweet Count CLI Action
 # =============================================================================
 #
-# Logic of the `tw tweet-search` action.
+# Logic of the `tw tweet-count` action.
 #
 import casanova
 from twitter import TwitterHTTPError
@@ -14,12 +14,12 @@ ITEMS_PER_PAGE = 100
 TWEETS_COUNT_FIELDS = [
     'start_time',
     'end_time',
-    'tweets_count',
+    'tweet_count',
     'total_count'
 ]
 
 
-def twitter_tweets_count_action(cli_args):
+def twitter_tweet_count_action(cli_args):
     client = TwitterAPIClient(
         cli_args.access_token,
         cli_args.access_token_secret,
@@ -37,7 +37,7 @@ def twitter_tweets_count_action(cli_args):
     )
 
     loading_bar = LoadingBar(
-        'Retrieving tweets count',
+        'Retrieving tweet count',
         total=enricher.total,
         unit='query'
     )

@@ -54,7 +54,7 @@
   * [friends](#friends)
   * [scrape](#twitter-scrape)
   * [tweet-search](#tweet-search)
-  * [tweets-count](#tweets-count)
+  * [tweet-count](#tweet-count)
   * [tweets](#tweets)
   * [users](#users)
   * [user-search](#user-search)
@@ -286,9 +286,9 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% twitter/tweet-search %>
 
-### tweets-count
+### tweet-count
 
-<% twitter/tweets-count %>
+<% twitter/tweet-count %>
 
 ### tweets
 
