@@ -115,12 +115,11 @@ def twitter_users_action(cli_args):
                     continue
 
             users_raw_data = result['data']
-        loading_bar.print(result)
+
         indexed_result = {}
 
         for user in users_raw_data:
             user = normalize_user(user, v2=cli_args.api_v2)
-            loading_bar.print(user)
             user_row = format_user_as_csv_row(user)
             indexed_result[user[key]] = user_row
 
