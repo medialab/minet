@@ -52,6 +52,7 @@
   * [attrition](#attrition)
   * [followers](#followers)
   * [friends](#friends)
+  * [retweeters](#retweeters)
   * [scrape](#twitter-scrape)
   * [tweet-search](#tweet-search)
   * [tweet-count](#tweet-count)
@@ -1575,6 +1576,42 @@ examples:
 
 . Getting friends of a list of user:
     $ minet tw friends screen_name users.csv > friends.csv
+
+```
+
+### retweeters
+
+```
+usage: minet twitter retweeters [-h] [--api-key API_KEY]
+                                [--api-secret-key API_SECRET_KEY]
+                                [--access-token ACCESS_TOKEN]
+                                [--access-token-secret ACCESS_TOKEN_SECRET]
+                                [-o OUTPUT] [-s SELECT] [--total TOTAL]
+                                column [file]
+
+Minet Twitter Retweeters Command
+================================
+
+Retrieve retweeters of given tweet using Twitter API v2.
+
+positional arguments:
+  column                                     Name of the column containing the tweet ids.
+  file                                       CSV file containing the inquired tweets.
+
+optional arguments:
+  -h, --help                                 show this help message and exit
+  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
+  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
+  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
+  --total TOTAL                              Total number of tweets. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Getting the users who retweeted a list of tweets:
+    $ minet tw retweeters tweet_id tweets.csv > retweeters.csv
 
 ```
 
