@@ -79,5 +79,10 @@ def twitter_action(cli_args):
 
             twitter_user_search_action(cli_args)
 
+        elif cli_args.tw_action == 'retweeters':
+            from minet.cli.twitter.retweeters import twitter_retweeters_action
+
+            twitter_retweeters_action(cli_args)
+
         else:
             raise TypeError('unkown tw_action "%s"' % cli_args.tw_action)

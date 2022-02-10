@@ -52,6 +52,7 @@
   * [attrition](#attrition)
   * [followers](#followers)
   * [friends](#friends)
+  * [retweeters](#retweeters)
   * [scrape](#twitter-scrape)
   * [tweet-search](#tweet-search)
   * [tweet-count](#tweet-count)
@@ -277,6 +278,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### friends
 
 <% twitter/friends %>
+
+### retweeters
+
+<% twitter/retweeters %>
 
 <h3 id="twitter-scrape">scrape</h3>
 
