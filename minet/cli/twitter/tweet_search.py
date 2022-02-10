@@ -86,7 +86,6 @@ def twitter_tweet_search_action(cli_args):
             else:
                 try:
                     result = client.call(['tweets', 'search', 'recent'], **kwargs)
-                    loading_bar.print(result)
                 except TwitterHTTPError as e:
                     loading_bar.inc('errors')
 
