@@ -44,7 +44,7 @@ def twitter_tweet_search_action(cli_args):
 
     for row, query in enricher.cells(cli_args.query, with_rows=True):
 
-        kwargs = {'query': query, 'max_results': ITEMS_PER_PAGE, 'expansions': SEARCH_TWEETS_EXPANSIONS, 'params': SEARCH_TWEETS_PARAMS}
+        kwargs = {'query': query, 'max_results': ITEMS_PER_PAGE, 'sort_order': 'recency', 'expansions': SEARCH_TWEETS_EXPANSIONS, 'params': SEARCH_TWEETS_PARAMS}
 
         loading_bar.print('Searching for "%s"' % query)
         loading_bar.inc('queries')
@@ -86,6 +86,7 @@ def twitter_tweet_search_action(cli_args):
             else:
                 try:
                     result = client.call(['tweets', 'search', 'recent'], **kwargs)
+                    loading_bar.print(result)
                 except TwitterHTTPError as e:
                     loading_bar.inc('errors')
 

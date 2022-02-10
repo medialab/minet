@@ -1782,7 +1782,7 @@ usage: minet twitter users [-h] [--api-key API_KEY]
                            [--api-secret-key API_SECRET_KEY]
                            [--access-token ACCESS_TOKEN]
                            [--access-token-secret ACCESS_TOKEN_SECRET] [--ids]
-                           [-o OUTPUT] [-s SELECT] [--total TOTAL]
+                           [-o OUTPUT] [-s SELECT] [--total TOTAL] [--api-v2]
                            column [file]
 
 Minet Twitter Users Command
@@ -1804,6 +1804,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
+  --api-v2                                   Whether to use the command with twitter api v2 rather than v1.1
 
 examples:
 
@@ -1864,7 +1865,7 @@ usage: minet twitter user-tweets [-h] [--api-key API_KEY]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
                                  [--ids] [--min-date MIN_DATE]
                                  [--exclude-retweets] [-o OUTPUT] [-s SELECT]
-                                 [--total TOTAL]
+                                 [--total TOTAL] [--api-v2]
                                  column [file]
 
 Minet Twitter User Tweets Command
@@ -1889,6 +1890,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
+  --api-v2                                   Whether to use the command with twitter api v2 rather than v1.1
 
 examples:
 
