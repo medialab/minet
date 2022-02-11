@@ -10,8 +10,7 @@ from twitwi import (
     format_user_as_csv_row
 )
 from twitter import TwitterHTTPError
-from twitwi.constants import USER_FIELDS
-from twitwi.constants_api_v2 import USERS_LOOKUP_PARAMS
+from twitwi.constants import USER_FIELDS, USER_PARAMS
 from ebbe import as_chunks
 
 from minet.cli.utils import LoadingBar
@@ -90,7 +89,7 @@ def twitter_users_action(cli_args):
             users_raw_data = result
 
         else:
-            client_args['params'] = USERS_LOOKUP_PARAMS
+            client_args['params'] = USER_PARAMS
             if cli_args.ids:
                 try:
                     result = client.call(['users'], **client_args)

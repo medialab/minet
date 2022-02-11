@@ -9,8 +9,7 @@ from twitwi import (
     normalize_tweets_payload_v2,
     format_tweet_as_csv_row
 )
-from twitwi.constants import TWEET_FIELDS
-from twitwi.constants_api_v2 import SEARCH_TWEETS_EXPANSIONS, SEARCH_TWEETS_PARAMS
+from twitwi.constants import TWEET_FIELDS, TWEET_EXPANSIONS, TWEET_PARAMS
 from twitter import TwitterHTTPError
 
 from minet.cli.utils import LoadingBar
@@ -44,7 +43,7 @@ def twitter_tweet_search_action(cli_args):
 
     for row, query in enricher.cells(cli_args.query, with_rows=True):
 
-        kwargs = {'query': query, 'max_results': ITEMS_PER_PAGE, 'sort_order': 'recency', 'expansions': SEARCH_TWEETS_EXPANSIONS, 'params': SEARCH_TWEETS_PARAMS}
+        kwargs = {'query': query, 'max_results': ITEMS_PER_PAGE, 'sort_order': 'recency', 'expansions': ','.join(TWEET_EXPANSIONS), 'params': TWEET_PARAMS}
 
         loading_bar.print('Searching for "%s"' % query)
         loading_bar.inc('queries')

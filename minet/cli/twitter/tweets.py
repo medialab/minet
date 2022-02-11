@@ -10,8 +10,7 @@ from twitwi import (
     normalize_tweets_payload_v2,
     format_tweet_as_csv_row
 )
-from twitwi.constants import TWEET_FIELDS
-from twitwi.constants_api_v2 import TWEETS_LOOKUP_EXPANSIONS, TWEETS_LOOKUP_PARAMS
+from twitwi.constants import TWEET_FIELDS, TWEET_EXPANSIONS, TWEET_PARAMS
 from twitter import TwitterHTTPError
 from ebbe import as_chunks
 
@@ -55,7 +54,7 @@ def twitter_tweets_action(cli_args):
         tweets = ','.join(row[1] for row in chunk)
 
         if cli_args.api_v2:
-            kwargs = {'ids': tweets, 'expansions': TWEETS_LOOKUP_EXPANSIONS, 'params': TWEETS_LOOKUP_PARAMS}
+            kwargs = {'ids': tweets, 'expansions': ','.join(TWEET_EXPANSIONS), 'params': TWEET_PARAMS}
 
             try:
                 result = client.call(['tweets'], **kwargs)
