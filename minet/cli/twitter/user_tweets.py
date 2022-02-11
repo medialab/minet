@@ -28,17 +28,9 @@ def twitter_user_tweets_action(cli_args):
         cli_args.access_token,
         cli_args.access_token_secret,
         cli_args.api_key,
-        cli_args.api_secret_key
+        cli_args.api_secret_key,
+        api_version='2' if cli_args.v2 else '1.1'
     )
-
-    if cli_args.api_v2:
-        client = TwitterAPIClient(
-            cli_args.access_token,
-            cli_args.access_token_secret,
-            cli_args.api_key,
-            cli_args.api_secret_key,
-            api_version='2'
-        )
 
     enricher = casanova.enricher(
         cli_args.file,
@@ -64,7 +56,7 @@ def twitter_user_tweets_action(cli_args):
         kwargs = {}
 
         while True:
-            if cli_args.api_v2:
+            if cli_args.v2:
                 if is_not_user_id(user):
                     loading_bar.die('The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. With --api-v2, you can only use user ids to retrieve followers.')
 

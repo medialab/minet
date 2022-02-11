@@ -48,7 +48,7 @@ def twitter_tweet_search_action(cli_args):
         loading_bar.print('Searching for "%s"' % query)
         loading_bar.inc('queries')
 
-        already_seen_tweets = set()
+        # already_seen_tweets = set()
 
         if cli_args.start_time and cli_args.end_time:
             if cli_args.end_time < cli_args.start_time:
@@ -67,33 +67,20 @@ def twitter_tweet_search_action(cli_args):
         if cli_args.until_id:
             kwargs['until_id'] = cli_args.until_id
 
+        route = ['tweets', 'search', 'all'] if cli_args.academic else ['tweets', 'search', 'recent']
+
         while True:
+            try:
+                result = client.call(route, **kwargs)
+            except TwitterHTTPError as e:
+                loading_bar.inc('errors')
 
-            if cli_args.academic:
-                try:
-                    result = client.call(['tweets', 'search', 'all'], **kwargs)
-                except TwitterHTTPError as e:
-                    loading_bar.inc('errors')
+                if e.e.code == 404:
+                    enricher.writerow(row)
+                else:
+                    raise e
 
-                    if e.e.code == 404:
-                        enricher.writerow(row)
-                    else:
-                        raise e
-
-                    continue
-
-            else:
-                try:
-                    result = client.call(['tweets', 'search', 'recent'], **kwargs)
-                except TwitterHTTPError as e:
-                    loading_bar.inc('errors')
-
-                    if e.e.code == 404:
-                        enricher.writerow(row)
-                    else:
-                        raise e
-
-                    continue
+                continue
 
             if result['meta']['result_count'] == 0 and 'next_token' in result['meta']:
                 loading_bar.print(result)
@@ -103,14 +90,11 @@ def twitter_tweet_search_action(cli_args):
             normalized_tweets = normalize_tweets_payload_v2(result, collection_source='api')
 
             for normalized_tweet in normalized_tweets:
-                if normalized_tweet['id'] in already_seen_tweets:
-                    continue
 
                 loading_bar.update()
 
                 addendum = format_tweet_as_csv_row(normalized_tweet)
                 enricher.writerow(row, addendum)
-                already_seen_tweets.add(normalized_tweet['id'])
 
             if 'next_token' in result['meta']:
                 kwargs['next_token'] = result['meta']['next_token']

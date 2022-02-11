@@ -1507,7 +1507,7 @@ usage: minet twitter followers [-h] [--api-key API_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
                                [--ids] [-o OUTPUT] [--resume] [-s SELECT]
-                               [--total TOTAL] [--api-v2]
+                               [--total TOTAL] [--v2]
                                column [file]
 
 Minet Twitter Followers Command
@@ -1530,7 +1530,7 @@ optional arguments:
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
-  --api-v2                                   Whether to use the command with twitter api v2 rather than v1.1
+  --v2                                       Whether to use the command with twitter api v2 rather than v1.1
 
 examples:
 
@@ -1547,7 +1547,7 @@ usage: minet twitter friends [-h] [--api-key API_KEY]
                              [--access-token ACCESS_TOKEN]
                              [--access-token-secret ACCESS_TOKEN_SECRET] [--ids]
                              [-o OUTPUT] [--resume] [-s SELECT] [--total TOTAL]
-                             [--api-v2]
+                             [--v2]
                              column [file]
 
 Minet Twitter Friends Command
@@ -1570,7 +1570,7 @@ optional arguments:
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
-  --api-v2                                   Whether to use the command with twitter api v2 rather than v1.1
+  --v2                                       Whether to use the command with twitter api v2 rather than v1.1
 
 examples:
 
@@ -1729,7 +1729,7 @@ usage: minet twitter tweet-count [-h] [--api-key API_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
                                  [-o OUTPUT] [-s SELECT] [--total TOTAL]
-                                 [--granularity GRANULARITY]
+                                 [--granularity {day,hour,minute}]
                                  [--since-id SINCE_ID] [--until-id UNTIL_ID]
                                  [--start-time START_TIME] [--end-time END_TIME]
                                  [--academic]
@@ -1742,6 +1742,8 @@ Count Twitter tweets using API v2.
 
 This will only return the last 8 days of results maximum per query (unless you have Academic Research access,
 in which case you can add --academic to the command).
+
+Warning: For now, results are returned unordered by the API.
 
 positional arguments:
   query                                      Search query or name of the column containing queries to run in given CSV file.
@@ -1756,7 +1758,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of queries. Necessary if you want to display a finite progress indicator.
-  --granularity GRANULARITY                  Granularity used to group the data by : can be minute, hour or day (defaults to day).
+  --granularity {day,hour,minute}            Granularity used to group the data by. Defaults to day.
   --since-id SINCE_ID                        Will return tweets with ids that are greater than the specified id. If used with --start-time, only since-id will be taken into account.
   --until-id UNTIL_ID                        Will return tweets that are older than the tweet with the specified id.
   --start-time START_TIME                    The oldest UTC stamp from which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ
@@ -1781,7 +1783,7 @@ usage: minet twitter tweets [-h] [--api-key API_KEY]
                             [--access-token ACCESS_TOKEN]
                             [--access-token-secret ACCESS_TOKEN_SECRET]
                             [-o OUTPUT] [--resume] [-s SELECT] [--total TOTAL]
-                            [--api-v2]
+                            [--v2]
                             column [file]
 
 Minet Twitter Tweets Command
@@ -1803,7 +1805,7 @@ optional arguments:
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of tweets. Necessary if you want to display a finite progress indicator.
-  --api-v2                                   Whether to use the command with twitter api v2 rather than v1.1
+  --v2                                       Whether to use the command with twitter api v2 rather than v1.1
 
 examples:
 
@@ -1819,7 +1821,7 @@ usage: minet twitter users [-h] [--api-key API_KEY]
                            [--api-secret-key API_SECRET_KEY]
                            [--access-token ACCESS_TOKEN]
                            [--access-token-secret ACCESS_TOKEN_SECRET] [--ids]
-                           [-o OUTPUT] [-s SELECT] [--total TOTAL] [--api-v2]
+                           [-o OUTPUT] [-s SELECT] [--total TOTAL] [--v2]
                            column [file]
 
 Minet Twitter Users Command
@@ -1841,7 +1843,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
-  --api-v2                                   Whether to use the command with twitter api v2 rather than v1.1
+  --v2                                       Whether to use the command with twitter api v2 rather than v1.1
 
 examples:
 
@@ -1902,7 +1904,7 @@ usage: minet twitter user-tweets [-h] [--api-key API_KEY]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
                                  [--ids] [--min-date MIN_DATE]
                                  [--exclude-retweets] [-o OUTPUT] [-s SELECT]
-                                 [--total TOTAL] [--api-v2]
+                                 [--total TOTAL] [--v2]
                                  column [file]
 
 Minet Twitter User Tweets Command
@@ -1927,7 +1929,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
-  --api-v2                                   Whether to use the command with twitter api v2 rather than v1.1
+  --v2                                       Whether to use the command with twitter api v2 rather than v1.1
 
 examples:
 
