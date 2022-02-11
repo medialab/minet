@@ -11,8 +11,7 @@ from twitwi import (
     normalize_tweets_payload_v2,
     format_tweet_as_csv_row
 )
-from twitwi.constants import TWEET_FIELDS
-from twitwi.constants_api_v2 import USER_TWEET_OR_MENTION_TIMELINE_EXPANSIONS, USER_TWEET_OR_MENTION_TIMELINE_PARAMS
+from twitwi.constants import TWEET_FIELDS, TWEET_EXPANSIONS, TWEET_PARAMS
 from twitter import TwitterHTTPError
 
 from minet.cli.utils import LoadingBar
@@ -70,8 +69,8 @@ def twitter_user_tweets_action(cli_args):
                     loading_bar.die('The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. With --api-v2, you can only use user ids to retrieve followers.')
 
                 kwargs['max_results'] = ITEMS_PER_PAGE
-                kwargs['params'] = USER_TWEET_OR_MENTION_TIMELINE_PARAMS
-                kwargs['expansions'] = USER_TWEET_OR_MENTION_TIMELINE_EXPANSIONS
+                kwargs['params'] = TWEET_PARAMS
+                kwargs['expansions'] = ','.join(TWEET_EXPANSIONS)
 
                 if cli_args.exclude_retweets:
                     kwargs['exclude'] = 'retweets'

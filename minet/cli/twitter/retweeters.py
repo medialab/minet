@@ -6,16 +6,16 @@
 #
 import casanova
 from twitter import TwitterHTTPError
+from twitwi import (
+    normalize_user,
+    format_user_as_csv_row
+)
+from twitwi.constants import USER_PARAMS, USER_FIELDS
 
 from minet.cli.utils import LoadingBar
 from minet.twitter import TwitterAPIClient
 
 ITEMS_PER_PAGE = 100
-CSV_HEADERS = [
-    'retweeter_id',
-    'retweeter_screen_name',
-    'retweeter_name'
-]
 
 
 def twitter_retweeters_action(cli_args):
@@ -31,7 +31,7 @@ def twitter_retweeters_action(cli_args):
         cli_args.file,
         cli_args.output,
         keep=cli_args.select,
-        add=CSV_HEADERS,
+        add=USER_FIELDS,
         total=cli_args.total
     )
 
@@ -43,7 +43,7 @@ def twitter_retweeters_action(cli_args):
 
     for row, tweet in enricher.cells(cli_args.column, with_rows=True):
         loading_bar.inc('tweets')
-        kwargs = {'max_results': ITEMS_PER_PAGE}
+        kwargs = {'max_results': ITEMS_PER_PAGE, 'params': USER_PARAMS}
 
         while True:
             try:
@@ -62,10 +62,9 @@ def twitter_retweeters_action(cli_args):
                 break
 
             for user in result['data']:
-                id = user['id']
-                screen_name = user['username']
-                name = user['name']
-                enricher.writerow(row, [id, screen_name, name])
+                user = normalize_user(user, v2=True)
+                user_row = format_user_as_csv_row(user)
+                enricher.writerow(row, user_row)
                 loading_bar.update()
 
             if 'next_token' in result['meta']:
