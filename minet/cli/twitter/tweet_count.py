@@ -14,8 +14,7 @@ ITEMS_PER_PAGE = 100
 TWEETS_COUNT_FIELDS = [
     'start_time',
     'end_time',
-    'tweet_count',
-    'total_count'
+    'tweet_count'
 ]
 
 
@@ -44,7 +43,7 @@ def twitter_tweet_count_action(cli_args):
 
     for row, query in enricher.cells(cli_args.query, with_rows=True):
 
-        kwargs = {'query': query, 'granularity': 'day'}
+        kwargs = {'query': query}
 
         loading_bar.print('Counting tweets for "%s"' % query)
         loading_bar.inc('queries')
@@ -57,6 +56,8 @@ def twitter_tweet_count_action(cli_args):
             if cli_args.until_id < cli_args.since_id:
                 loading_bar.die('until-id should be greater than since-id')
 
+        if cli_args.academic and not cli_args.start_time:
+            kwargs['start_time'] = '2006-03-21T00:00:00Z'
         if cli_args.start_time:
             kwargs['start_time'] = cli_args.start_time
         if cli_args.end_time:
@@ -66,37 +67,13 @@ def twitter_tweet_count_action(cli_args):
         if cli_args.until_id:
             kwargs['until_id'] = cli_args.until_id
 
-        if cli_args.granularity:
-            kwargs['granularity'] = cli_args.granularity
+        kwargs['granularity'] = cli_args.granularity
 
-        if cli_args.academic:
-            total_count = 0
-            while True:
-                try:
-                    result = client.call(['tweets', 'counts', 'all'], **kwargs)
-                except TwitterHTTPError as e:
-                    loading_bar.inc('errors')
+        route = ['tweets', 'counts', 'all'] if cli_args.academic else ['tweets', 'counts', 'recent']
 
-                    if e.e.code == 404:
-                        enricher.writerow(row)
-                    else:
-                        raise e
-
-                    continue
-
-                for count in result['data']:
-                    total_count += result['meta']['total_tweet_count']
-                    addendum = [count['start'], count['end'], count['tweet_count'], total_count]
-                    enricher.writerow(row, addendum)
-
-                if 'next_token' in result['meta']:
-                    kwargs['next_token'] = result['meta']['next_token']
-                else:
-                    break
-
-        else:
+        while True:
             try:
-                result = client.call(['tweets', 'counts', 'recent'], **kwargs)
+                result = client.call(route, **kwargs)
             except TwitterHTTPError as e:
                 loading_bar.inc('errors')
 
@@ -108,5 +85,10 @@ def twitter_tweet_count_action(cli_args):
                 continue
 
             for count in result['data']:
-                addendum = [count['start'], count['end'], count['tweet_count'], result['meta']['total_tweet_count']]
+                addendum = [count['start'], count['end'], count['tweet_count']]
                 enricher.writerow(row, addendum)
+
+            if 'next_token' in result['meta']:
+                kwargs['next_token'] = result['meta']['next_token']
+            else:
+                break

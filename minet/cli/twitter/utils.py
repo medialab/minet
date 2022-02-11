@@ -40,17 +40,9 @@ def make_twitter_action(method_name, csv_headers):
             cli_args.access_token,
             cli_args.access_token_secret,
             cli_args.api_key,
-            cli_args.api_secret_key
+            cli_args.api_secret_key,
+            api_version='2' if cli_args.v2 else '1.1'
         )
-
-        if cli_args.api_v2:
-            client = TwitterAPIClient(
-                cli_args.access_token,
-                cli_args.access_token_secret,
-                cli_args.api_key,
-                cli_args.api_secret_key,
-                api_version='2'
-            )
 
         resuming_state = None
 
@@ -64,13 +56,13 @@ def make_twitter_action(method_name, csv_headers):
             next_cursor = -1
             result = None
 
-            if cli_args.api_v2:
+            if cli_args.v2:
                 next_cursor = None
 
             if resuming_state is not None and resuming_state.last_cursor:
                 next_cursor = int(resuming_state.last_cursor)
 
-            if cli_args.api_v2:
+            if cli_args.v2:
                 if is_not_user_id(user):
                     loading_bar.die('The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. With --api-v2, you can only use user ids to retrieve followers.')
 
@@ -97,7 +89,7 @@ def make_twitter_action(method_name, csv_headers):
                     skip_in_output = resuming_state.values_to_skip
                     resuming_state = None
 
-                if not cli_args.api_v2:
+                if not cli_args.v2:
                     client_kwargs['cursor'] = next_cursor
 
                     try:

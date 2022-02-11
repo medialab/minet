@@ -4,7 +4,6 @@
 #
 # Logic of the `tw` action.
 #
-from pydoc import cli
 from minet.cli.utils import die
 
 

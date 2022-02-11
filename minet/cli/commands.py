@@ -1764,7 +1764,7 @@ MINET_COMMANDS = {
                             'type': int
                         },
                         {
-                            'flag': '--api-v2',
+                            'flag': '--v2',
                             'help': 'Whether to use the command with twitter api v2 rather than v1.1',
                             'action': 'store_true'
                         }
@@ -1820,7 +1820,7 @@ MINET_COMMANDS = {
                             'type': int
                         },
                         {
-                            'flag': '--api-v2',
+                            'flag': '--v2',
                             'help': 'Whether to use the command with twitter api v2 rather than v1.1',
                             'action': 'store_true'
                         }
@@ -1984,7 +1984,7 @@ MINET_COMMANDS = {
                             'type': int
                         },
                         {
-                            'flag': '--api-v2',
+                            'flag': '--v2',
                             'help': 'Whether to use the command with twitter api v2 rather than v1.1',
                             'action': 'store_true'
                         }
@@ -2044,7 +2044,7 @@ MINET_COMMANDS = {
                             'type': int
                         },
                         {
-                            'flag': '--api-v2',
+                            'flag': '--v2',
                             'help': 'Whether to use the command with twitter api v2 rather than v1.1',
                             'action': 'store_true'
                         }
@@ -2094,7 +2094,7 @@ MINET_COMMANDS = {
                             'type': int
                         },
                         {
-                            'flag': '--api-v2',
+                            'flag': '--v2',
                             'help': 'Whether to use the command with twitter api v2 rather than v1.1',
                             'action': 'store_true'
                         }
@@ -2272,6 +2272,8 @@ MINET_COMMANDS = {
 
                         This will only return the last 8 days of results maximum per query (unless you have Academic Research access,
                         in which case you can add --academic to the command).
+
+                        Warning: For now, results are returned unordered by the API.
                     ''',
                     'epilog': '''
                         examples:
@@ -2311,8 +2313,9 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--granularity',
-                            'help': 'Granularity used to group the data by : can be minute, hour or day (defaults to day).',
-                            'type': str
+                            'help': 'Granularity used to group the data by. Defaults to day.',
+                            'choices': ['minute', 'hour', 'day'],
+                            'default': 'day'
                         },
                         {
                             'flag': '--since-id',

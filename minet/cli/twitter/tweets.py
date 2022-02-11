@@ -24,17 +24,9 @@ def twitter_tweets_action(cli_args):
         cli_args.access_token,
         cli_args.access_token_secret,
         cli_args.api_key,
-        cli_args.api_secret_key
+        cli_args.api_secret_key,
+        api_version='2' if cli_args.v2 else '1.1'
     )
-
-    if cli_args.api_v2:
-        client = TwitterAPIClient(
-            cli_args.access_token,
-            cli_args.access_token_secret,
-            cli_args.api_key,
-            cli_args.api_secret_key,
-            api_version='2'
-        )
 
     enricher = casanova.enricher(
         cli_args.file,
@@ -50,44 +42,33 @@ def twitter_tweets_action(cli_args):
         unit='tweet'
     )
 
+    def call_client(v2, tweet_ids):
+        if v2:
+            kwargs = {'ids': tweet_ids, 'expansions': ','.join(TWEET_EXPANSIONS), 'params': TWEET_PARAMS}
+            return client.call(['tweets'], **kwargs)
+        else:
+            kwargs = {'_id': tweet_ids, 'tweet_mode': 'extended'}
+            return client.call(['statuses', 'lookup'], **kwargs)
+
     for chunk in as_chunks(100, enricher.cells(cli_args.column, with_rows=True)):
         tweets = ','.join(row[1] for row in chunk)
 
-        if cli_args.api_v2:
-            kwargs = {'ids': tweets, 'expansions': ','.join(TWEET_EXPANSIONS), 'params': TWEET_PARAMS}
+        try:
+            result = call_client(cli_args.v2, tweets)
+        except TwitterHTTPError as e:
+            loading_bar.inc('errors')
 
-            try:
-                result = client.call(['tweets'], **kwargs)
-            except TwitterHTTPError as e:
-                loading_bar.inc('errors')
+            if e.e.code == 404:
+                for row, tweet in chunk:
+                    enricher.writerow(row)
+            else:
+                raise e
 
-                if e.e.code == 404:
-                    for row, tweet in chunk:
-                        enricher.writerow(row)
-                else:
-                    raise e
-
-                continue
-
-        else:
-            kwargs = {'_id': tweets, 'tweet_mode': 'extended'}
-
-            try:
-                result = client.call(['statuses', 'lookup'], **kwargs)
-            except TwitterHTTPError as e:
-                loading_bar.inc('errors')
-
-                if e.e.code == 404:
-                    for row, tweet in chunk:
-                        enricher.writerow(row)
-                else:
-                    raise e
-
-                continue
+            continue
 
         indexed_result = {}
 
-        if cli_args.api_v2:
+        if cli_args.v2:
             normalized_tweets = normalize_tweets_payload_v2(result, collection_source='api')
             for normalized_tweet in normalized_tweets:
                 addendum = format_tweet_as_csv_row(normalized_tweet)
