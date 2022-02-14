@@ -136,7 +136,7 @@ Finally note that command line arguments and flags will take precedence over env
 ## cookies
 
 ```
-usage: minet cookies [-h] [--csv] [-o OUTPUT] [--url URL]
+usage: minet cookies [-h] [--rcfile RCFILE] [--csv] [-o OUTPUT] [--url URL]
                      {chrome,chromium,edge,firefox,opera}
 
 Minet Cookies Command
@@ -150,6 +150,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                            show this help message and exit
+  --rcfile RCFILE                       Custom path to a minet configuration file.
   --csv                                 Whether to format the output as CSV. If --url is set, will output the cookie's morsels as CSV.
   -o OUTPUT, --output OUTPUT            Path to the output file. By default, the results will be printed to stdout.
   --url URL                             If given, only returns full cookie header value for this url.
@@ -173,7 +174,9 @@ examples:
 ## crawl
 
 ```
-usage: minet crawl [-h] [-d OUTPUT_DIR] [--resume] [--throttle THROTTLE] crawler
+usage: minet crawl [-h] [--rcfile RCFILE] [-d OUTPUT_DIR] [--resume]
+                   [--throttle THROTTLE]
+                   crawler
 
 Minet Crawl Command
 ===================
@@ -186,6 +189,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                              show this help message and exit
+  --rcfile RCFILE                         Custom path to a minet configuration file.
   -d OUTPUT_DIR, --output-dir OUTPUT_DIR  Output directory.
   --resume                                Whether to resume an interrupted crawl.
   --throttle THROTTLE                     Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
@@ -200,7 +204,8 @@ examples:
 ## fetch
 
 ```
-usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM]
+usage: minet fetch [-h] [--rcfile RCFILE]
+                   [--domain-parallelism DOMAIN_PARALLELISM]
                    [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
                    [--insecure] [-o OUTPUT] [--resume] [-s SELECT]
                    [--separator SEPARATOR] [-t THREADS] [--throttle THROTTLE]
@@ -227,6 +232,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                      show this help message and exit
+  --rcfile RCFILE                                 Custom path to a minet configuration file.
   --domain-parallelism DOMAIN_PARALLELISM         Max number of urls per domain to hit at the same time. Defaults to 1
   -g {chrome,chromium,edge,firefox,opera}, --grab-cookies {chrome,chromium,edge,firefox,opera}
                                                   Whether to attempt to grab cookies from your computer's browser (supports "firefox", "chrome", "chromium", "opera" and "edge").
@@ -303,8 +309,8 @@ examples:
 ## extract
 
 ```
-usage: minet extract [-h] [-g GLOB] [-i INPUT_DIR] [-o OUTPUT] [-p PROCESSES]
-                     [-s SELECT] [--total TOTAL]
+usage: minet extract [-h] [--rcfile RCFILE] [-g GLOB] [-i INPUT_DIR] [-o OUTPUT]
+                     [-p PROCESSES] [-s SELECT] [--total TOTAL]
                      [report]
 
 Minet Extract Command
@@ -327,6 +333,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                           show this help message and exit
+  --rcfile RCFILE                      Custom path to a minet configuration file.
   -g GLOB, --glob GLOB                 Whether to extract text from a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.
   -i INPUT_DIR, --input-dir INPUT_DIR  Directory where the HTML files are stored. Defaults to "downloaded" if --glob is not set.
   -o OUTPUT, --output OUTPUT           Path to the output file. By default, the results will be printed to stdout.
@@ -371,7 +378,8 @@ examples:
 ## resolve
 
 ```
-usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM]
+usage: minet resolve [-h] [--rcfile RCFILE]
+                     [--domain-parallelism DOMAIN_PARALLELISM]
                      [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
                      [--insecure] [-o OUTPUT] [--resume] [-s SELECT]
                      [--separator SEPARATOR] [-t THREADS] [--throttle THROTTLE]
@@ -395,6 +403,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                      show this help message and exit
+  --rcfile RCFILE                                 Custom path to a minet configuration file.
   --domain-parallelism DOMAIN_PARALLELISM         Max number of urls per domain to hit at the same time. Defaults to 1
   -g {chrome,chromium,edge,firefox,opera}, --grab-cookies {chrome,chromium,edge,firefox,opera}
                                                   Whether to attempt to grab cookies from your computer's browser (supports "firefox", "chrome", "chromium", "opera" and "edge").
@@ -443,9 +452,10 @@ examples:
 For more documentation about minet's scraping DSL check this [page](../cookbook/scraping_dsl.md) from the Cookbook.
 
 ```
-usage: minet scrape [-h] [-f {csv,jsonl}] [-g GLOB] [-i INPUT_DIR] [-o OUTPUT]
-                    [-p PROCESSES] [--separator SEPARATOR] [--strain STRAIN]
-                    [--total TOTAL] [--validate]
+usage: minet scrape [-h] [--rcfile RCFILE] [-f {csv,jsonl}] [-g GLOB]
+                    [-i INPUT_DIR] [-o OUTPUT] [-p PROCESSES]
+                    [--separator SEPARATOR] [--strain STRAIN] [--total TOTAL]
+                    [--validate]
                     scraper [report]
 
 Minet Scrape Command
@@ -463,6 +473,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                            show this help message and exit
+  --rcfile RCFILE                       Custom path to a minet configuration file.
   -f {csv,jsonl}, --format {csv,jsonl}  Output format.
   -g GLOB, --glob GLOB                  Whether to scrape a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.
   -i INPUT_DIR, --input-dir INPUT_DIR   Directory where the HTML files are stored. Defaults to "downloaded".
@@ -501,8 +512,9 @@ examples:
 ## url-extract
 
 ```
-usage: minet url-extract [-h] [--base-url BASE_URL] [--from {html,text}]
-                         [-o OUTPUT] [-s SELECT] [--total TOTAL]
+usage: minet url-extract [-h] [--rcfile RCFILE] [--base-url BASE_URL]
+                         [--from {html,text}] [-o OUTPUT] [-s SELECT]
+                         [--total TOTAL]
                          column [file]
 
 Minet Url Extract Command
@@ -517,6 +529,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
   --base-url BASE_URL         Base url used to resolve relative urls.
   --from {html,text}          Extract urls from which kind of source?
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
@@ -536,7 +549,8 @@ examples:
 ## url-join
 
 ```
-usage: minet url-join [-h] [-o OUTPUT] [-p MATCH_COLUMN_PREFIX] [-s SELECT]
+usage: minet url-join [-h] [--rcfile RCFILE] [-o OUTPUT]
+                      [-p MATCH_COLUMN_PREFIX] [-s SELECT]
                       [--separator SEPARATOR]
                       column1 file1 column2 file2
 
@@ -555,6 +569,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                      show this help message and exit
+  --rcfile RCFILE                                 Custom path to a minet configuration file.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
   -p MATCH_COLUMN_PREFIX, --match-column-prefix MATCH_COLUMN_PREFIX
                                                   Optional prefix to add to the first file's column names to avoid conflicts.
@@ -574,8 +589,8 @@ examples:
 ## url-parse
 
 ```
-usage: minet url-parse [-h] [--facebook] [-o OUTPUT] [-s SELECT]
-                       [--separator SEPARATOR] [--strip-protocol]
+usage: minet url-parse [-h] [--rcfile RCFILE] [--facebook] [-o OUTPUT]
+                       [-s SELECT] [--separator SEPARATOR] [--strip-protocol]
                        [--total TOTAL] [--youtube] [--twitter]
                        column [file]
 
@@ -592,6 +607,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                             show this help message and exit
+  --rcfile RCFILE                        Custom path to a minet configuration file.
   --facebook                             Whether to consider and parse the given urls as coming from Facebook.
   -o OUTPUT, --output OUTPUT             Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT             Columns to keep in output, separated by comma.
@@ -663,7 +679,8 @@ examples:
 ## BuzzSumo
 
 ```
-usage: minet buzzsumo [-h] [-t TOKEN] {limit,domain-summary,domain} ...
+usage: minet buzzsumo [-h] [--rcfile RCFILE] [-t TOKEN]
+                      {limit,domain-summary,domain} ...
 
 Minet Buzzsumo Command
 ======================
@@ -672,6 +689,7 @@ Gather data from the BuzzSumo APIs easily and efficiently.
 
 optional arguments:
   -h, --help                     show this help message and exit
+  --rcfile RCFILE                Custom path to a minet configuration file.
   -t TOKEN, --token TOKEN        BuzzSumo API token. Rcfile key: buzzsumo.token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
 
 actions:
@@ -682,7 +700,7 @@ actions:
 <h3 id="buzzsumo-limit">limit</h3>
 
 ```
-usage: minet buzzsumo limit [-h] [-t TOKEN]
+usage: minet buzzsumo limit [-h] [--rcfile RCFILE] [-t TOKEN]
 
 Minet Buzzsumo Limit Command
 ============================
@@ -691,6 +709,7 @@ Call BuzzSumo for a given request and return the remaining number of calls for t
 
 optional arguments:
   -h, --help               show this help message and exit
+  --rcfile RCFILE          Custom path to a minet configuration file.
   -t TOKEN, --token TOKEN  BuzzSumo API token. Rcfile key: buzzsumo.token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
 
 examples:
@@ -703,8 +722,9 @@ examples:
 <h3 id="buzzsumo-domain-summary">domain-summary</h3>
 
 ```
-usage: minet buzzsumo domain-summary [-h] [-t TOKEN] [-o OUTPUT] --begin-date
-                                     BEGIN_DATE --end-date END_DATE
+usage: minet buzzsumo domain-summary [-h] [--rcfile RCFILE] [-t TOKEN]
+                                     [-o OUTPUT] --begin-date BEGIN_DATE
+                                     --end-date END_DATE
                                      column [file]
 
 Minet Buzzsumo Domain Summary Command
@@ -720,6 +740,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
   -t TOKEN, --token TOKEN     BuzzSumo API token. Rcfile key: buzzsumo.token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   --begin-date BEGIN_DATE     The date you wish to fetch articles from. UTC date should have the following format : YYYY-MM-DD
@@ -738,8 +759,9 @@ examples:
 <h3 id="buzzsumo-domain">domain</h3>
 
 ```
-usage: minet buzzsumo domain [-h] [-t TOKEN] [-o OUTPUT] [-s SELECT]
-                             --begin-date BEGIN_DATE --end-date END_DATE
+usage: minet buzzsumo domain [-h] [--rcfile RCFILE] [-t TOKEN] [-o OUTPUT]
+                             [-s SELECT] --begin-date BEGIN_DATE --end-date
+                             END_DATE
                              column [file]
 
 Minet Buzzsumo Domain Command
@@ -755,6 +777,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
   -t TOKEN, --token TOKEN     BuzzSumo API token. Rcfile key: buzzsumo.token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
@@ -774,7 +797,8 @@ examples:
 ## CrowdTangle
 
 ```
-usage: minet crowdtangle [-h] [--rate-limit RATE_LIMIT] [-t TOKEN]
+usage: minet crowdtangle [-h] [--rcfile RCFILE] [--rate-limit RATE_LIMIT]
+                         [-t TOKEN]
                          {leaderboard,lists,posts,posts-by-id,search,summary}
                          ...
 
@@ -785,6 +809,7 @@ Gather data from the CrowdTangle APIs easily and efficiently.
 
 optional arguments:
   -h, --help                                      show this help message and exit
+  --rcfile RCFILE                                 Custom path to a minet configuration file.
   --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
 
@@ -797,7 +822,8 @@ actions:
 ### leaderboard
 
 ```
-usage: minet crowdtangle leaderboard [-h] [--rate-limit RATE_LIMIT] [-t TOKEN]
+usage: minet crowdtangle leaderboard [-h] [--rcfile RCFILE]
+                                     [--rate-limit RATE_LIMIT] [-t TOKEN]
                                      [--no-breakdown] [-f {csv,jsonl}]
                                      [-l LIMIT] [--list-id LIST_ID] [-o OUTPUT]
                                      [--start-date START_DATE]
@@ -811,6 +837,7 @@ For more information, see the API endpoint documentation: https://github.com/Cro
 
 optional arguments:
   -h, --help                            show this help message and exit
+  --rcfile RCFILE                       Custom path to a minet configuration file.
   --rate-limit RATE_LIMIT               Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -t TOKEN, --token TOKEN               CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   --no-breakdown                        Whether to skip statistics breakdown by post type in the CSV output.
@@ -830,8 +857,8 @@ examples:
 ### lists
 
 ```
-usage: minet crowdtangle lists [-h] [--rate-limit RATE_LIMIT] [-t TOKEN]
-                               [-o OUTPUT]
+usage: minet crowdtangle lists [-h] [--rcfile RCFILE] [--rate-limit RATE_LIMIT]
+                               [-t TOKEN] [-o OUTPUT]
 
 Minet CrowdTangle Lists Command
 ===============================
@@ -842,6 +869,7 @@ For more information, see the API endpoint documentation: https://github.com/Cro
 
 optional arguments:
   -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
   --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
@@ -856,7 +884,8 @@ examples:
 ### posts-by-id
 
 ```
-usage: minet crowdtangle posts-by-id [-h] [--rate-limit RATE_LIMIT] [-t TOKEN]
+usage: minet crowdtangle posts-by-id [-h] [--rcfile RCFILE]
+                                     [--rate-limit RATE_LIMIT] [-t TOKEN]
                                      [-o OUTPUT] [-s SELECT] [--resume]
                                      [--total TOTAL]
                                      column [file]
@@ -874,6 +903,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
   --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
@@ -894,9 +924,10 @@ examples:
 ### posts
 
 ```
-usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [-t TOKEN]
-                               [--chunk-size CHUNK_SIZE] [--end-date END_DATE]
-                               [-f {csv,jsonl}] [--language LANGUAGE] [-l LIMIT]
+usage: minet crowdtangle posts [-h] [--rcfile RCFILE] [--rate-limit RATE_LIMIT]
+                               [-t TOKEN] [--chunk-size CHUNK_SIZE]
+                               [--end-date END_DATE] [-f {csv,jsonl}]
+                               [--language LANGUAGE] [-l LIMIT]
                                [--list-ids LIST_IDS] [-o OUTPUT] [--resume]
                                [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
                                --start-date START_DATE
@@ -910,6 +941,7 @@ For more information, see the API endpoint documentation: https://github.com/Cro
 
 optional arguments:
   -h, --help                                      show this help message and exit
+  --rcfile RCFILE                                 Custom path to a minet configuration file.
   --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   --chunk-size CHUNK_SIZE                         When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations. Defaults to 500.
@@ -943,8 +975,8 @@ To know the different list ids associated with your dashboard:
 <h3 id="ct-search">search</h3>
 
 ```
-usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [-t TOKEN]
-                                [--and AND] [--chunk-size CHUNK_SIZE]
+usage: minet crowdtangle search [-h] [--rcfile RCFILE] [--rate-limit RATE_LIMIT]
+                                [-t TOKEN] [--and AND] [--chunk-size CHUNK_SIZE]
                                 [--end-date END_DATE] [-f {csv,jsonl}]
                                 [--in-list-ids IN_LIST_IDS]
                                 [--language LANGUAGE] [-l LIMIT]
@@ -967,6 +999,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                      show this help message and exit
+  --rcfile RCFILE                                 Custom path to a minet configuration file.
   --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   --and AND                                       AND clause to add to the query terms.
@@ -997,7 +1030,8 @@ examples:
 ### summary
 
 ```
-usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT] [-t TOKEN]
+usage: minet crowdtangle summary [-h] [--rcfile RCFILE]
+                                 [--rate-limit RATE_LIMIT] [-t TOKEN]
                                  [-o OUTPUT] [-p PLATFORMS] [--posts POSTS]
                                  [-s SELECT]
                                  [--sort-by {date,subscriber_count,total_interactions}]
@@ -1017,6 +1051,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                      show this help message and exit
+  --rcfile RCFILE                                 Custom path to a minet configuration file.
   --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
@@ -1038,7 +1073,7 @@ examples:
 ## Facebook
 
 ```
-usage: minet facebook [-h]
+usage: minet facebook [-h] [--rcfile RCFILE]
                       {comments,posts,post-authors,post-stats,url-likes} ...
 
 Minet Facebook Command
@@ -1048,6 +1083,7 @@ Collects data from Facebook.
 
 optional arguments:
   -h, --help                                      show this help message and exit
+  --rcfile RCFILE                                 Custom path to a minet configuration file.
 
 actions:
   {comments,posts,post-authors,post-stats,url-likes}
@@ -1058,8 +1094,8 @@ actions:
 <h3 id="facebook-comments">comments</h3>
 
 ```
-usage: minet facebook comments [-h] [-c COOKIE] [-o OUTPUT] [-s SELECT]
-                               [--throttle THROTTLE]
+usage: minet facebook comments [-h] [--rcfile RCFILE] [-c COOKIE] [-o OUTPUT]
+                               [-s SELECT] [--throttle THROTTLE]
                                column [file]
 
 Minet Facebook Comments Command
@@ -1081,6 +1117,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
   -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "facebook.cookie" or read from the MINET_FACEBOOK_COOKIE env variable.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
@@ -1102,8 +1139,8 @@ examples:
 <h3 id="facebook-posts">posts</h3>
 
 ```
-usage: minet facebook posts [-h] [-c COOKIE] [-o OUTPUT] [-s SELECT]
-                            [--throttle THROTTLE]
+usage: minet facebook posts [-h] [--rcfile RCFILE] [-c COOKIE] [-o OUTPUT]
+                            [-s SELECT] [--throttle THROTTLE]
                             column [file]
 
 Minet Facebook Posts Command
@@ -1145,6 +1182,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
   -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "facebook.cookie" or read from the MINET_FACEBOOK_COOKIE env variable.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
@@ -1166,8 +1204,9 @@ examples:
 <h3 id="facebook-post-authors">post-authors</h3>
 
 ```
-usage: minet facebook post-authors [-h] [-c COOKIE] [-o OUTPUT] [-s SELECT]
-                                   [--throttle THROTTLE] [--total TOTAL]
+usage: minet facebook post-authors [-h] [--rcfile RCFILE] [-c COOKIE]
+                                   [-o OUTPUT] [-s SELECT] [--throttle THROTTLE]
+                                   [--total TOTAL]
                                    column [file]
 
 Minet Facebook Post Authors Command
@@ -1184,6 +1223,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
   -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "facebook.cookie" or read from the MINET_FACEBOOK_COOKIE env variable.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
@@ -1200,7 +1240,8 @@ examples:
 <h3 id="facebook-url-likes">url-likes</h3>
 
 ```
-usage: minet facebook url-likes [-h] [-o OUTPUT] [-s SELECT] [--total TOTAL]
+usage: minet facebook url-likes [-h] [--rcfile RCFILE] [-o OUTPUT] [-s SELECT]
+                                [--total TOTAL]
                                 column [file]
 
 Minet Facebook Url Likes Command
@@ -1223,6 +1264,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.
@@ -1239,7 +1281,7 @@ example:
 ## Google
 
 ```
-usage: minet google [-h] {sheets} ...
+usage: minet google [-h] [--rcfile RCFILE] {sheets} ...
 
 Minet Google Command
 ====================
@@ -1247,17 +1289,20 @@ Minet Google Command
 Commands related to Google and Google Drive.
 
 optional arguments:
-  -h, --help  show this help message and exit
+  -h, --help       show this help message and exit
+  --rcfile RCFILE  Custom path to a minet configuration file.
 
 actions:
-  {sheets}    Action to perform.
+  {sheets}         Action to perform.
 
 ```
 
 <h3 id="google-sheets">sheets</h3>
 
 ```
-usage: minet google sheets [-h] [-a AUTHUSER] [-c COOKIE] [-o OUTPUT] url
+usage: minet google sheets [-h] [--rcfile RCFILE] [-a AUTHUSER] [-c COOKIE]
+                           [-o OUTPUT]
+                           url
 
 Minet Google Sheets Command
 ===========================
@@ -1283,6 +1328,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                        show this help message and exit
+  --rcfile RCFILE                   Custom path to a minet configuration file.
   -a AUTHUSER, --authuser AUTHUSER  Connected google account number to use.
   -c COOKIE, --cookie COOKIE        Google Drive cookie or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge").
   -o OUTPUT, --output OUTPUT        Path to the output file. By default, the results will be printed to stdout.
@@ -1302,8 +1348,8 @@ examples:
 ### dump
 
 ```
-usage: minet hyphe dump [-h] [-d OUTPUT_DIR] [--body] [--password PASSWORD]
-                        [--statuses STATUSES]
+usage: minet hyphe dump [-h] [--rcfile RCFILE] [-d OUTPUT_DIR] [--body]
+                        [--password PASSWORD] [--statuses STATUSES]
                         url corpus
 
 Minet Hyphe Dump Command
@@ -1318,6 +1364,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                              show this help message and exit
+  --rcfile RCFILE                         Custom path to a minet configuration file.
   -d OUTPUT_DIR, --output-dir OUTPUT_DIR  Output directory for dumped files. Will default to some name based on corpus name.
   --body                                  Whether to download pages body.
   --password PASSWORD                     The corpus's password if required.
@@ -1335,8 +1382,8 @@ examples:
 <h3 id="mc-medias">medias</h3>
 
 ```
-usage: minet mediacloud medias [-h] [-t TOKEN] [-o OUTPUT] [--feeds FEEDS]
-                               [-s SELECT] [--total TOTAL]
+usage: minet mediacloud medias [-h] [--rcfile RCFILE] [-t TOKEN] [-o OUTPUT]
+                               [--feeds FEEDS] [-s SELECT] [--total TOTAL]
                                column [file]
 
 Minet Mediacloud Medias Command
@@ -1350,6 +1397,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
   -t TOKEN, --token TOKEN     Mediacloud API token (also called key). Can also be configured in a .minetrc file as "mediacloud.token" or read from the MINET_MEDIACLOUD_TOKEN env variable.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   --feeds FEEDS               If given, path of the CSV file listing media RSS feeds.
@@ -1361,9 +1409,9 @@ optional arguments:
 <h3 id="mc-search">search</h3>
 
 ```
-usage: minet mediacloud search [-h] [-t TOKEN] [-o OUTPUT] [-c COLLECTIONS]
-                               [--filter-query FILTER_QUERY] [-m MEDIAS]
-                               [--publish-day PUBLISH_DAY]
+usage: minet mediacloud search [-h] [--rcfile RCFILE] [-t TOKEN] [-o OUTPUT]
+                               [-c COLLECTIONS] [--filter-query FILTER_QUERY]
+                               [-m MEDIAS] [--publish-day PUBLISH_DAY]
                                [--publish-month PUBLISH_MONTH]
                                [--publish-year PUBLISH_YEAR] [--skip-count]
                                query
@@ -1380,6 +1428,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                 show this help message and exit
+  --rcfile RCFILE                            Custom path to a minet configuration file.
   -t TOKEN, --token TOKEN                    Mediacloud API token (also called key). Can also be configured in a .minetrc file as "mediacloud.token" or read from the MINET_MEDIACLOUD_TOKEN env variable.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   -c COLLECTIONS, --collections COLLECTIONS  List of collection ids to search, separated by commas.
@@ -1397,8 +1446,8 @@ optional arguments:
 #### stories
 
 ```
-usage: minet mediacloud topic stories [-h] [-t TOKEN] [-o OUTPUT]
-                                      [--media-id MEDIA_ID]
+usage: minet mediacloud topic stories [-h] [--rcfile RCFILE] [-t TOKEN]
+                                      [-o OUTPUT] [--media-id MEDIA_ID]
                                       [--from-media-id FROM_MEDIA_ID]
                                       topic_id
 
@@ -1412,6 +1461,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                     show this help message and exit
+  --rcfile RCFILE                Custom path to a minet configuration file.
   -t TOKEN, --token TOKEN        Mediacloud API token (also called key). Can also be configured in a .minetrc file as "mediacloud.token" or read from the MINET_MEDIACLOUD_TOKEN env variable.
   -o OUTPUT, --output OUTPUT     Path to the output file. By default, the results will be printed to stdout.
   --media-id MEDIA_ID            Return only stories belonging to the given media_ids.
@@ -1424,7 +1474,7 @@ optional arguments:
 ### attrition
 
 ```
-usage: minet twitter attrition [-h] [--api-key API_KEY]
+usage: minet twitter attrition [-h] [--rcfile RCFILE] [--api-key API_KEY]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -1477,6 +1527,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                 show this help message and exit
+  --rcfile RCFILE                            Custom path to a minet configuration file.
   --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
   --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
   --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
@@ -1502,7 +1553,7 @@ examples:
 ### followers
 
 ```
-usage: minet twitter followers [-h] [--api-key API_KEY]
+usage: minet twitter followers [-h] [--rcfile RCFILE] [--api-key API_KEY]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -1521,6 +1572,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                 show this help message and exit
+  --rcfile RCFILE                            Custom path to a minet configuration file.
   --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
   --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
   --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
@@ -1542,7 +1594,7 @@ examples:
 ### friends
 
 ```
-usage: minet twitter friends [-h] [--api-key API_KEY]
+usage: minet twitter friends [-h] [--rcfile RCFILE] [--api-key API_KEY]
                              [--api-secret-key API_SECRET_KEY]
                              [--access-token ACCESS_TOKEN]
                              [--access-token-secret ACCESS_TOKEN_SECRET] [--ids]
@@ -1561,6 +1613,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                 show this help message and exit
+  --rcfile RCFILE                            Custom path to a minet configuration file.
   --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
   --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
   --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
@@ -1582,7 +1635,7 @@ examples:
 ### retweeters
 
 ```
-usage: minet twitter retweeters [-h] [--api-key API_KEY]
+usage: minet twitter retweeters [-h] [--rcfile RCFILE] [--api-key API_KEY]
                                 [--api-secret-key API_SECRET_KEY]
                                 [--access-token ACCESS_TOKEN]
                                 [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -1600,6 +1653,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                 show this help message and exit
+  --rcfile RCFILE                            Custom path to a minet configuration file.
   --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
   --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
   --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
@@ -1618,8 +1672,9 @@ examples:
 <h3 id="twitter-scrape">scrape</h3>
 
 ```
-usage: minet twitter scrape [-h] [--include-refs] [-l LIMIT] [-o OUTPUT]
-                            [--query-template QUERY_TEMPLATE] [-s SELECT]
+usage: minet twitter scrape [-h] [--rcfile RCFILE] [--include-refs] [-l LIMIT]
+                            [-o OUTPUT] [--query-template QUERY_TEMPLATE]
+                            [-s SELECT]
                             {tweets} query [file]
 
 Minet Twitter Scrape Command
@@ -1642,6 +1697,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                       show this help message and exit
+  --rcfile RCFILE                  Custom path to a minet configuration file.
   --include-refs                   Whether to emit referenced tweets (quoted, retweeted & replied) in the CSV output. Note that it consumes a memory proportional to the total number of unique tweets retrieved.
   -l LIMIT, --limit LIMIT          Maximum number of tweets to collect per query.
   -o OUTPUT, --output OUTPUT       Path to the output file. By default, the results will be printed to stdout.
@@ -1673,7 +1729,7 @@ examples:
 ### tweet-search
 
 ```
-usage: minet twitter tweet-search [-h] [--api-key API_KEY]
+usage: minet twitter tweet-search [-h] [--rcfile RCFILE] [--api-key API_KEY]
                                   [--api-secret-key API_SECRET_KEY]
                                   [--access-token ACCESS_TOKEN]
                                   [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -1698,6 +1754,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                 show this help message and exit
+  --rcfile RCFILE                            Custom path to a minet configuration file.
   --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
   --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
   --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
@@ -1705,7 +1762,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of queries. Necessary if you want to display a finite progress indicator.
-  --since-id SINCE_ID                        Will return tweets with ids that are greater than the specified id. If used with --start-time, only since-id will be taken into account.
+  --since-id SINCE_ID                        Will return tweets with ids that are greater than the specified id. Takes precedence over --start-time.
   --until-id UNTIL_ID                        Will return tweets that are older than the tweet with the specified id.
   --start-time START_TIME                    The oldest UTC stamp from which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ
   --end-time END_TIME                        The UTC stamp to which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ
@@ -1724,7 +1781,7 @@ examples:
 ### tweet-count
 
 ```
-usage: minet twitter tweet-count [-h] [--api-key API_KEY]
+usage: minet twitter tweet-count [-h] [--rcfile RCFILE] [--api-key API_KEY]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -1738,12 +1795,16 @@ usage: minet twitter tweet-count [-h] [--api-key API_KEY]
 Minet Twitter Tweets Count Command
 ==================================
 
-Count Twitter tweets using API v2.
+Count the number of tweets matching the given query using Twitter
+latest API v2.
 
-This will only return the last 8 days of results maximum per query (unless you have Academic Research access,
-in which case you can add --academic to the command).
+This will only return result for the last 8 days only, unless
+you have Academic Research access in which case you
+can use the --academic flag to retrieve the full count.
 
-Warning: For now, results are returned unordered by the API.
+Be advised that, for now, results are returned unordered
+by Twitter's API if you choose a time granularity for the
+results.
 
 positional arguments:
   query                                      Search query or name of the column containing queries to run in given CSV file.
@@ -1751,6 +1812,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                 show this help message and exit
+  --rcfile RCFILE                            Custom path to a minet configuration file.
   --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
   --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
   --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
@@ -1759,7 +1821,7 @@ optional arguments:
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of queries. Necessary if you want to display a finite progress indicator.
   --granularity {day,hour,minute}            Granularity used to group the data by. Defaults to day.
-  --since-id SINCE_ID                        Will return tweets with ids that are greater than the specified id. If used with --start-time, only since-id will be taken into account.
+  --since-id SINCE_ID                        Will return tweets with ids that are greater than the specified id. Takes precedence over --start-time.
   --until-id UNTIL_ID                        Will return tweets that are older than the tweet with the specified id.
   --start-time START_TIME                    The oldest UTC stamp from which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ
   --end-time END_TIME                        The UTC stamp to which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ
@@ -1768,17 +1830,20 @@ optional arguments:
 examples:
 
 . Counting tweets using "cancer" as a query:
-    $ minet tw tweet-count cancer > count.csv
+    $ minet tw tweet-count cancer
 
 . Running multiple queries in series:
     $ minet tw tweet-count query queries.csv > counts.csv
+
+. Number of tweets matching the query per day:
+    $ minet tw tweet-count "query" --granularity days > counts.csv
 
 ```
 
 ### tweets
 
 ```
-usage: minet twitter tweets [-h] [--api-key API_KEY]
+usage: minet twitter tweets [-h] [--rcfile RCFILE] [--api-key API_KEY]
                             [--api-secret-key API_SECRET_KEY]
                             [--access-token ACCESS_TOKEN]
                             [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -1797,6 +1862,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                 show this help message and exit
+  --rcfile RCFILE                            Custom path to a minet configuration file.
   --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
   --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
   --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
@@ -1817,7 +1883,7 @@ examples:
 ### users
 
 ```
-usage: minet twitter users [-h] [--api-key API_KEY]
+usage: minet twitter users [-h] [--rcfile RCFILE] [--api-key API_KEY]
                            [--api-secret-key API_SECRET_KEY]
                            [--access-token ACCESS_TOKEN]
                            [--access-token-secret ACCESS_TOKEN_SECRET] [--ids]
@@ -1835,6 +1901,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                 show this help message and exit
+  --rcfile RCFILE                            Custom path to a minet configuration file.
   --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
   --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
   --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
@@ -1855,7 +1922,7 @@ examples:
 ### user-search
 
 ```
-usage: minet twitter user-search [-h] [--api-key API_KEY]
+usage: minet twitter user-search [-h] [--rcfile RCFILE] [--api-key API_KEY]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -1877,6 +1944,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                 show this help message and exit
+  --rcfile RCFILE                            Custom path to a minet configuration file.
   --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
   --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
   --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
@@ -1898,7 +1966,7 @@ examples:
 ### user-tweets
 
 ```
-usage: minet twitter user-tweets [-h] [--api-key API_KEY]
+usage: minet twitter user-tweets [-h] [--rcfile RCFILE] [--api-key API_KEY]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -1919,6 +1987,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                 show this help message and exit
+  --rcfile RCFILE                            Custom path to a minet configuration file.
   --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
   --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
   --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
@@ -1943,7 +2012,8 @@ examples:
 ### captions
 
 ```
-usage: minet youtube captions [-h] [-o OUTPUT] [-s SELECT] [--lang LANG]
+usage: minet youtube captions [-h] [--rcfile RCFILE] [-o OUTPUT] [-s SELECT]
+                              [--lang LANG]
                               column [file]
 
 Youtube captions
@@ -1957,6 +2027,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --lang LANG                 Language (ISO code like "en") of captions to retrieve. You can specify several languages by preferred order separated by commas. Defaults to "en".
@@ -1974,7 +2045,8 @@ examples:
 <h3 id="youtube-comments">comments</h3>
 
 ```
-usage: minet youtube comments [-h] [-o OUTPUT] [-k KEY] [-s SELECT]
+usage: minet youtube comments [-h] [--rcfile RCFILE] [-o OUTPUT] [-k KEY]
+                              [-s SELECT]
                               column [file]
 
 Youtube comments
@@ -1988,6 +2060,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -k KEY, --key KEY           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
@@ -2002,7 +2075,8 @@ example:
 <h3 id="youtube-search">search</h3>
 
 ```
-usage: minet youtube search [-h] [-o OUTPUT] [-k KEY] [-s SELECT] [-l LIMIT]
+usage: minet youtube search [-h] [--rcfile RCFILE] [-o OUTPUT] [-k KEY]
+                            [-s SELECT] [-l LIMIT]
                             [--order {date,rating,relevance,title,videoCount,viewCount}]
                             column [file]
 
@@ -2017,6 +2091,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                                      show this help message and exit
+  --rcfile RCFILE                                 Custom path to a minet configuration file.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
   -k KEY, --key KEY                               YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
@@ -2034,8 +2109,8 @@ example:
 ### videos
 
 ```
-usage: minet youtube videos [-h] [-o OUTPUT] [-k KEY] [-s SELECT]
-                            [--total TOTAL]
+usage: minet youtube videos [-h] [--rcfile RCFILE] [-o OUTPUT] [-k KEY]
+                            [-s SELECT] [--total TOTAL]
                             column [file]
 
 Youtube videos
@@ -2049,6 +2124,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -k KEY, --key KEY           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).

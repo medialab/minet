@@ -2242,7 +2242,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--since-id',
-                            'help': 'Will return tweets with ids that are greater than the specified id. If used with --start-time, only since-id will be taken into account.',
+                            'help': 'Will return tweets with ids that are greater than the specified id. Takes precedence over --start-time.',
                             'type': int
                         },
                         {
@@ -2268,21 +2268,28 @@ MINET_COMMANDS = {
                 'tweet-count': {
                     'title': 'Minet Twitter Tweets Count Command',
                     'description': '''
-                        Count Twitter tweets using API v2.
+                        Count the number of tweets matching the given query using Twitter
+                        latest API v2.
 
-                        This will only return the last 8 days of results maximum per query (unless you have Academic Research access,
-                        in which case you can add --academic to the command).
+                        This will only return result for the last 8 days only, unless
+                        you have Academic Research access in which case you
+                        can use the --academic flag to retrieve the full count.
 
-                        Warning: For now, results are returned unordered by the API.
+                        Be advised that, for now, results are returned unordered
+                        by Twitter's API if you choose a time granularity for the
+                        results.
                     ''',
                     'epilog': '''
                         examples:
 
                         . Counting tweets using "cancer" as a query:
-                            $ minet tw tweet-count cancer > count.csv
+                            $ minet tw tweet-count cancer
 
                         . Running multiple queries in series:
                             $ minet tw tweet-count query queries.csv > counts.csv
+
+                        . Number of tweets matching the query per day:
+                            $ minet tw tweet-count "query" --granularity days > counts.csv
                     ''',
                     'arguments': [
                         {
@@ -2314,12 +2321,11 @@ MINET_COMMANDS = {
                         {
                             'flag': '--granularity',
                             'help': 'Granularity used to group the data by. Defaults to day.',
-                            'choices': ['minute', 'hour', 'day'],
-                            'default': 'day'
+                            'choices': ['minute', 'hour', 'day']
                         },
                         {
                             'flag': '--since-id',
-                            'help': 'Will return tweets with ids that are greater than the specified id. If used with --start-time, only since-id will be taken into account.',
+                            'help': 'Will return tweets with ids that are greater than the specified id. Takes precedence over --start-time.',
                             'type': int
                         },
                         {
