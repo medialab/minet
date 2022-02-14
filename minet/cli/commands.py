@@ -1765,7 +1765,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--v2',
-                            'help': 'Whether to use the command with twitter api v2 rather than v1.1',
+                            'help': 'Whether to use latest Twitter API v2 rather than v1.1.',
                             'action': 'store_true'
                         }
                     ]
@@ -1821,7 +1821,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--v2',
-                            'help': 'Whether to use the command with twitter api v2 rather than v1.1',
+                            'help': 'Whether to use latest Twitter API v2 rather than v1.1.',
                             'action': 'store_true'
                         }
                     ]
@@ -1985,7 +1985,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--v2',
-                            'help': 'Whether to use the command with twitter api v2 rather than v1.1',
+                            'help': 'Whether to use latest Twitter API v2 rather than v1.1.',
                             'action': 'store_true'
                         }
                     ]
@@ -2045,7 +2045,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--v2',
-                            'help': 'Whether to use the command with twitter api v2 rather than v1.1',
+                            'help': 'Whether to use latest Twitter API v2 rather than v1.1.',
                             'action': 'store_true'
                         }
                     ]
@@ -2095,7 +2095,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flag': '--v2',
-                            'help': 'Whether to use the command with twitter api v2 rather than v1.1',
+                            'help': 'Whether to use latest Twitter API v2 rather than v1.1.',
                             'action': 'store_true'
                         }
                     ]

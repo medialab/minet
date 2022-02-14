@@ -1530,7 +1530,7 @@ optional arguments:
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
-  --v2                                       Whether to use the command with twitter api v2 rather than v1.1
+  --v2                                       Whether to use latest Twitter API v2 rather than v1.1.
 
 examples:
 
@@ -1570,7 +1570,7 @@ optional arguments:
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
-  --v2                                       Whether to use the command with twitter api v2 rather than v1.1
+  --v2                                       Whether to use latest Twitter API v2 rather than v1.1.
 
 examples:
 
@@ -1805,7 +1805,7 @@ optional arguments:
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of tweets. Necessary if you want to display a finite progress indicator.
-  --v2                                       Whether to use the command with twitter api v2 rather than v1.1
+  --v2                                       Whether to use latest Twitter API v2 rather than v1.1.
 
 examples:
 
@@ -1843,7 +1843,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
-  --v2                                       Whether to use the command with twitter api v2 rather than v1.1
+  --v2                                       Whether to use latest Twitter API v2 rather than v1.1.
 
 examples:
 
@@ -1929,7 +1929,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
-  --v2                                       Whether to use the command with twitter api v2 rather than v1.1
+  --v2                                       Whether to use latest Twitter API v2 rather than v1.1.
 
 examples:
 
