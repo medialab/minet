@@ -41,15 +41,27 @@ def twitter_users_action(cli_args):
         unit='user'
     )
 
-    def call_client(v2, ids, kwargs):
-        if not v2:
+    def call_client(users):
+        kwargs = {}
+
+        if not cli_args.v2:
+            if cli_args.ids:
+                kwargs['user_id'] = users
+            else:
+                kwargs['screen_name'] = users
+
             return client.call(['users', 'lookup'], **kwargs)
         else:
             kwargs['params'] = USER_PARAMS
-            if ids:
-                return client.call(['users'], **kwargs)
+            route = ['users']
+
+            if cli_args.ids:
+                kwargs['ids'] = users
             else:
-                return client.call(['users', 'by'], **kwargs)
+                kwargs['usernames'] = users
+                route = ['users', 'by']
+
+            return client.call(route, **kwargs)
 
     for chunk in as_chunks(100, enricher.cells(cli_args.column, with_rows=True)):
         users = ','.join(row[1].lstrip('@') for row in chunk)
@@ -59,10 +71,6 @@ def twitter_users_action(cli_args):
                 if is_not_user_id(user):
                     loading_bar.die('The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
 
-                if cli_args.v2:
-                    client_args = {'ids': users}
-                else:
-                    client_args = {'user_id': users}
                 key = 'id'
 
             else:
@@ -70,14 +78,10 @@ def twitter_users_action(cli_args):
                     loading_bar.die('The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command.')
                     # force flag to add
 
-                if cli_args.v2:
-                    client_args = {'usernames': users}
-                else:
-                    client_args = {'screen_name': users}
                 key = 'screen_name'
 
         try:
-            result = call_client(cli_args.v2, cli_args.ids, client_args)
+            result = call_client(users)
         except TwitterHTTPError as e:
             if e.e.code == 404:
                 for row, user in chunk:
