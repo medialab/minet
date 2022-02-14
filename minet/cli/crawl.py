@@ -179,7 +179,8 @@ def crawl_action(cli_args, defer):
     crawler = Crawler(
         cli_args.crawler,
         throttle=cli_args.throttle,
-        queue_path=queue_path
+        queue_path=queue_path,
+        wait=False
     )
 
     reporter_pool = ScraperReporterPool(
