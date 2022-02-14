@@ -1737,6 +1737,7 @@ usage: minet twitter tweet-search [-h] [--rcfile RCFILE] [--api-key API_KEY]
                                   [--since-id SINCE_ID] [--until-id UNTIL_ID]
                                   [--start-time START_TIME]
                                   [--end-time END_TIME] [--academic]
+                                  [--sort-order {recency,relevancy}]
                                   query [file]
 
 Minet Twitter Tweets Search Command
@@ -1767,6 +1768,7 @@ optional arguments:
   --start-time START_TIME                    The oldest UTC stamp from which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ
   --end-time END_TIME                        The UTC stamp to which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ
   --academic                                 Flag to add if you want to use your academic research access (in order to search the complete history of public tweets).
+  --sort-order {recency,relevancy}           How to sort retrieved tweets. Defaults to "recency".
 
 examples:
 

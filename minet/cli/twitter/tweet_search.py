@@ -46,7 +46,7 @@ def twitter_tweet_search_action(cli_args):
 
     for row, query in enricher.cells(cli_args.query, with_rows=True):
 
-        kwargs = {'query': query, 'max_results': ITEMS_PER_PAGE, 'sort_order': 'recency', 'expansions': ','.join(TWEET_EXPANSIONS), 'params': TWEET_PARAMS}
+        kwargs = {'query': query, 'max_results': ITEMS_PER_PAGE, 'sort_order': cli_args.sort_order, 'expansions': ','.join(TWEET_EXPANSIONS), 'params': TWEET_PARAMS}
 
         loading_bar.print('Searching for "%s"' % query)
         loading_bar.inc('queries')
@@ -75,15 +75,14 @@ def twitter_tweet_search_action(cli_args):
 
                 continue
 
+            # Empty response
             if result['meta']['result_count'] == 0 and 'next_token' in result['meta']:
-                loading_bar.print(result)
                 kwargs['next_token'] = result['meta']['next_token']
                 continue
 
             normalized_tweets = normalize_tweets_payload_v2(result, collection_source='api')
 
             for normalized_tweet in normalized_tweets:
-
                 loading_bar.update()
 
                 addendum = format_tweet_as_csv_row(normalized_tweet)
