@@ -2262,6 +2262,12 @@ MINET_COMMANDS = {
                             'flag': '--academic',
                             'help': 'Flag to add if you want to use your academic research access (in order to search the complete history of public tweets).',
                             'action': 'store_true'
+                        },
+                        {
+                            'flag': '--sort-order',
+                            'help': 'How to sort retrieved tweets. Defaults to "recency".',
+                            'choices': ['recency', 'relevancy'],
+                            'default': 'recency'
                         }
                     ]
                 },
