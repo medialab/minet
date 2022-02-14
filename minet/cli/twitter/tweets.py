@@ -42,19 +42,19 @@ def twitter_tweets_action(cli_args):
         unit='tweet'
     )
 
-    def call_client(v2, tweet_ids):
-        if v2:
-            kwargs = {'ids': tweet_ids, 'expansions': ','.join(TWEET_EXPANSIONS), 'params': TWEET_PARAMS}
+    def call_client(ids):
+        if cli_args.v2:
+            kwargs = {'ids': ids, 'expansions': ','.join(TWEET_EXPANSIONS), 'params': TWEET_PARAMS}
             return client.call(['tweets'], **kwargs)
         else:
-            kwargs = {'_id': tweet_ids, 'tweet_mode': 'extended'}
+            kwargs = {'_id': ids, 'tweet_mode': 'extended'}
             return client.call(['statuses', 'lookup'], **kwargs)
 
     for chunk in as_chunks(100, enricher.cells(cli_args.column, with_rows=True)):
         tweets = ','.join(row[1] for row in chunk)
 
         try:
-            result = call_client(cli_args.v2, tweets)
+            result = call_client(tweets)
         except TwitterHTTPError as e:
             loading_bar.inc('errors')
 
