@@ -14,11 +14,14 @@ from twitter import TwitterHTTPError
 
 from minet.cli.utils import LoadingBar
 from minet.twitter import TwitterAPIClient
+from minet.cli.twitter.utils import validate_query_boundaries
 
 ITEMS_PER_PAGE = 100
 
 
 def twitter_tweet_search_action(cli_args):
+    validate_query_boundaries(cli_args)
+
     client = TwitterAPIClient(
         cli_args.access_token,
         cli_args.access_token_secret,
@@ -47,16 +50,6 @@ def twitter_tweet_search_action(cli_args):
 
         loading_bar.print('Searching for "%s"' % query)
         loading_bar.inc('queries')
-
-        # already_seen_tweets = set()
-
-        if cli_args.start_time and cli_args.end_time:
-            if cli_args.end_time < cli_args.start_time:
-                loading_bar.die('end-time should be greater than start-time.')
-
-        if cli_args.since_id and cli_args.until_id:
-            if cli_args.until_id < cli_args.since_id:
-                loading_bar.die('until-id should be greater than since-id')
 
         if cli_args.start_time:
             kwargs['start_time'] = cli_args.start_time

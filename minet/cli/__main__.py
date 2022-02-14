@@ -119,6 +119,8 @@ def build_subparsers(parser, index, commands, help='Action to execute', title='a
             aliases=command.get('aliases', [])
         )
 
+        subparser.add_argument('--rcfile', help='Custom path to a minet configuration file.')
+
         to_index = {
             'parser': subparser,
             'command': command,
@@ -161,7 +163,6 @@ def build_parser(commands):
     parser = ArgumentParser(prog='minet')
 
     parser.add_argument('--version', action='version', version='minet %s' % __version__)
-    parser.add_argument('--rcfile', help='Custom path to a minet configuration file.')
 
     subparser_index = {}
 
