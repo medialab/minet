@@ -8,7 +8,7 @@ import time
 import datetime
 from ebbe import with_is_first
 from urllib.parse import urlencode, quote
-from twitwi import normalize_tweet
+from twitwi import normalize_tweet, normalize_user
 from ebbe import getpath, pathgetter
 
 from minet.web import (
@@ -63,41 +63,81 @@ def create_cookie_expiration():
     return datetime.datetime.utcfromtimestamp(time.time() + 10800).strftime('%a, %d %b %Y %H:%M:%S GMT')
 
 
-def forge_search_params(query, count=DEFAULT_COUNT, cursor=None):
-    params = {
-        'include_profile_interstitial_type': '1',
-        'include_blocking': '1',
-        'include_blocked_by': '1',
-        'include_followed_by': '1',
-        'include_want_retweets': '1',
-        'include_mute_edge': '1',
-        'include_can_dm': '1',
-        'include_can_media_tag': '1',
-        'skip_status': '1',
-        'cards_platform': 'Web-12',
-        'include_cards': '1',
-        'include_ext_alt_text': 'true',
-        'include_quote_count': 'true',
-        'include_reply_count': '1',
-        'tweet_mode': 'extended',
-        'include_entities': 'true',
-        'include_user_entities': 'true',
-        'include_ext_media_color': 'true',
-        'include_ext_media_availability': 'true',
-        'send_error_codes': 'true',
-        'simple_quoted_tweets': 'true',
-        'tweet_search_mode': 'live',
-        'query_source': 'spelling_expansion_revert_click',
-        'cursor': None,
-        'pc': '1',
-        'spelling_corrections': '1',
-        'ext': 'mediaStats,highlightedLabel',
-        'count': count,
-        'q': query
-    }
+TWEET_SEARCH_DEFAULT_PARAMS = {
+    'include_profile_interstitial_type': '1',
+    'include_blocking': '1',
+    'include_blocked_by': '1',
+    'include_followed_by': '1',
+    'include_want_retweets': '1',
+    'include_mute_edge': '1',
+    'include_can_dm': '1',
+    'include_can_media_tag': '1',
+    'skip_status': '1',
+    'cards_platform': 'Web-12',
+    'include_cards': '1',
+    'include_ext_alt_text': 'true',
+    'include_quote_count': 'true',
+    'include_reply_count': '1',
+    'tweet_mode': 'extended',
+    'include_entities': 'true',
+    'include_user_entities': 'true',
+    'include_ext_media_color': 'true',
+    'include_ext_media_availability': 'true',
+    'send_error_codes': 'true',
+    'simple_quoted_tweets': 'true',
+    'tweet_search_mode': 'live',
+    'query_source': 'spelling_expansion_revert_click',
+    'pc': '1',
+    'spelling_corrections': '1',
+    'ext': 'mediaStats,highlightedLabel'
+}
 
-    if cursor is not None:
-        params['cursor'] = cursor
+USER_SEARCH_DEFAULT_PARAMS = {
+    'include_profile_interstitial_type': '1',
+    'include_blocking': '1',
+    'include_blocked_by': '1',
+    'include_followed_by': '1',
+    'include_want_retweets': '1',
+    'include_mute_edge': '1',
+    'include_can_dm': '1',
+    'include_can_media_tag': '1',
+    'include_ext_has_nft_avatar': '1',
+    'skip_status': '1',
+    'cards_platform': 'Web-12',
+    'include_cards': '1',
+    'include_ext_alt_text': 'true',
+    'include_quote_count': 'true',
+    'include_reply_count': '1',
+    'tweet_mode': 'extended',
+    'include_entities': 'true',
+    'include_user_entities': 'true',
+    'include_ext_media_color': 'true',
+    'include_ext_media_availability': 'true',
+    'include_ext_sensitive_media_warning': 'true',
+    'send_error_codes': 'true',
+    'simple_quoted_tweet': 'true',
+    'result_filter': 'user',
+    'query_source': 'typed_query',
+    'pc': '1',
+    'spelling_corrections': '0',
+    'ext': 'mediaStats,highlightedLabel,hasNftAvatar,voiceInfo,superFollowMetadata'
+}
+
+
+def forge_search_params(query, target='tweets', count=DEFAULT_COUNT, cursor=None):
+    if target == 'tweets':
+        base = TWEET_SEARCH_DEFAULT_PARAMS
+    elif target == 'users':
+        base = USER_SEARCH_DEFAULT_PARAMS
+    else:
+        raise TypeError('Invalid target. Expecting "tweets" or "users".')
+
+    params = {
+        **base,
+        'q': query,
+        'count': count,
+        'cursor': cursor
+    }
 
     return urlencode(params, quote_via=quote)
 
@@ -127,14 +167,31 @@ CURSOR_SECOND_POSSIBLE_PATH_GETTER = pathgetter([
     'value'
 ])
 
+CURSOR_USER_PATH_GETTER = pathgetter([
+    'timeline',
+    'instructions',
+    -1,
+    'addEntries',
+    'entries',
+    -1,
+    'content',
+    'operation',
+    'cursor',
+    'value'
+])
 
-def extract_cursor_from_payload(payload):
+
+def extract_cursor_from_tweets_payload(payload):
     found_cursor = CURSOR_FIRST_POSSIBLE_PATH_GETTER(payload)
 
     if found_cursor is None:
         found_cursor = CURSOR_SECOND_POSSIBLE_PATH_GETTER(payload)
 
     return found_cursor
+
+
+def extract_cursor_from_users_payload(payload):
+    return CURSOR_USER_PATH_GETTER(payload)
 
 
 def process_single_tweet(tweet_id, tweet_index, user_index):
@@ -158,7 +215,7 @@ def process_single_tweet(tweet_id, tweet_index, user_index):
     return tweet
 
 
-def payload_tweets_iter(payload):
+def tweets_payload_iter(payload):
     tweet_index = payload['globalObjects']['tweets']
     user_index = payload['globalObjects']['users']
 
@@ -283,13 +340,13 @@ class TwitterAPIScraper(object):
 
             raise TwitterPublicAPIInvalidResponseError
 
-        next_cursor = extract_cursor_from_payload(data)
+        next_cursor = extract_cursor_from_tweets_payload(data)
         tweets = []
 
         if dump:
             return data
 
-        for tweet, meta in payload_tweets_iter(data):
+        for tweet, meta in tweets_payload_iter(data):
             result = normalize_tweet(
                 tweet,
                 extract_referenced_tweets=refs is not None,
