@@ -1,5 +1,7 @@
 import json
 from minet.twitter.api_scraper import TwitterAPIScraper
+import csv
+import sys
 
 scraper = TwitterAPIScraper()
 
@@ -9,10 +11,17 @@ QUERIES = [
   'from:EmmanuelMacron'
 ]
 
-# data = scraper.request_search(QUERIES[0], dump=False)
+#data = scraper.request_search(QUERIES[0], dump=False)
+#print(data)
 
-for tweet, meta in scraper.search(QUERIES[0], with_meta=True):
-  print(meta)
+#for tweet, meta in scraper.request_search('cancer'):
+#  print(meta)
 
-# with open('./dump.json', 'w') as f:
+# for data in scraper.request_search_user('cancer')
+#   with open('./dump.json', 'w') as f:
 #     json.dump(data, f, ensure_ascii=False, indent=2)
+
+writer = csv.writer(sys.stdout)
+writer.writerow(['screen_name'])
+for user in scraper.search_user('my'):
+  writer.writerow([user['screen_name']])

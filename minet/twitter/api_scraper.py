@@ -4,11 +4,16 @@
 #
 # Twitter public API "scraper".
 #
+
+#to be removed when done
+#import ipdb; ipdb.set_trace()
+import json
+
 import time
 import datetime
 from ebbe import with_is_first
 from urllib.parse import urlencode, quote
-from twitwi import normalize_tweet
+from twitwi import normalize_tweet, normalize_user
 from ebbe import getpath, pathgetter
 
 from minet.web import (
@@ -101,6 +106,48 @@ def forge_search_params(query, count=DEFAULT_COUNT, cursor=None):
 
     return urlencode(params, quote_via=quote)
 
+def forge_search_params_users(query, count=DEFAULT_COUNT, cursor=None):
+    params = {
+        'include_profile_interstitial_type': '1',
+        'include_blocking': '1',
+        'include_blocked_by': '1',
+        'include_followed_by': '1',
+        'include_want_retweets': '1',
+        'include_mute_edge': '1',
+        'include_can_dm': '1',
+        'include_can_media_tag': '1',
+        'include_ext_has_nft_avatar':'1',
+        'skip_status': '1',
+        'cards_platform': 'Web-12',
+        'include_cards': '1',
+        'include_ext_alt_text': 'true',
+        'include_quote_count': 'true',
+        'include_reply_count': '1',
+        'tweet_mode': 'extended',
+        'include_entities': 'true',
+        'include_user_entities': 'true',
+        'include_ext_media_color': 'true',
+        'include_ext_media_availability': 'true',
+        'include_ext_sensitive_media_warning': 'true',
+        'send_error_codes': 'true',
+        'simple_quoted_tweet': 'true',
+        'q': query,
+        'result_filter':'user',
+        'count': count,
+        #à modifier?
+        'query_source': 'typed_query', 
+        'pc': '1',
+        #revert to 1?
+        'spelling_corrections': '0',
+        #'cursor': None,
+        'ext': 'mediaStats,highlightedLabel,hasNftAvatar,voiceInfo,superFollowMetadata',
+    }
+
+    if cursor is not None:
+        params['cursor'] = cursor
+
+    return urlencode(params, quote_via=quote)
+
 
 CURSOR_FIRST_POSSIBLE_PATH_GETTER = pathgetter([
     'timeline',
@@ -127,6 +174,18 @@ CURSOR_SECOND_POSSIBLE_PATH_GETTER = pathgetter([
     'value'
 ])
 
+CURSOR_USER_PATH_GETTER = pathgetter([
+    'timeline',
+    'instructions',
+    -1,
+    'addEntries',
+    'entries',
+    -1,
+    'content',
+    'operation',
+    'cursor',
+    'value'
+])
 
 def extract_cursor_from_payload(payload):
     found_cursor = CURSOR_FIRST_POSSIBLE_PATH_GETTER(payload)
@@ -135,6 +194,10 @@ def extract_cursor_from_payload(payload):
         found_cursor = CURSOR_SECOND_POSSIBLE_PATH_GETTER(payload)
 
     return found_cursor
+
+def extract_user_cursor_from_payload(payload):    
+    found_user_cursor = CURSOR_USER_PATH_GETTER(payload)
+    return found_user_cursor
 
 
 def process_single_tweet(tweet_id, tweet_index, user_index):
@@ -211,6 +274,9 @@ def payload_tweets_iter(payload):
 
                 yield tweet, meta
 
+# def payload_users_iter(payload):
+#     user_index = payload['globalObjects']['users']
+#     return user_index
 
 # =============================================================================
 # Main class
@@ -314,20 +380,53 @@ class TwitterAPIScraper(object):
             else:
                 tweets.append((result, meta))
 
-        # Attempting to fix Twitter's public-facing API recent hiccups (#316):
-        # It seems that sometimes the API returns an empty response, containing
-        # the same cursor as before, in which case we should retry...
-        # NOTE: in fact, the real issue lies elsewhere as the way to hit the API
-        # changed slightly and was causing our issues. But we cannot rely
-        # on this condition now because it will degenerate to a retry loop
-        # when hitting the last available tweets of the query.
-        # NOTE: since those API changes, we cannot get 100 results at once anymore
-        # as the upper limit seems to be 20 now :'(
-
-        # if not tweets and cursor == next_cursor:
-        #     raise TwitterPublicAPIHiccupError
-
         return next_cursor, tweets
+
+    @ensure_guest_token
+    def request_search_user(self, query, cursor=None, refs=None, dump=False):
+        params = forge_search_params_users(query, cursor=cursor)
+        url = '%s?%s' % (TWITTER_PUBLIC_SEARCH_ENDPOINT, params)
+
+        headers = {
+            'Authorization': TWITTER_PUBLIC_API_AUTH_HEADER,
+            'X-Guest-Token': self.guest_token,
+            'Cookie': self.cookie,
+            'Accept-Language': 'en-US,en;q=0.5'
+        }
+
+        err, response, data = self.request_json(url, headers=headers)
+
+        if err:
+            raise err
+
+        if response.status == 429:
+            self.reset()
+            raise TwitterPublicAPIRateLimitError
+
+        if response.status >= 400:
+            error = getpath(data, ['errors', 0])
+
+            if error is not None and response.status == 400 and error.get('code') == 47:
+                raise TwitterPublicAPIBadRequest
+
+            if error is not None and error.get('code') == 130:
+                raise TwitterPublicAPIOverCapacityError
+
+            raise TwitterPublicAPIInvalidResponseError
+
+        next_cursor = extract_user_cursor_from_payload(data)
+
+        users = []
+
+        if dump:
+            return data
+
+        user_index = data['globalObjects']['users']
+        for user in user_index.values():
+            result = normalize_user(user)
+            users.append(result)
+
+        return next_cursor, users
 
     def search(self, query, limit=None, before_sleep=None,
                include_referenced_tweets=False, with_meta=False):
@@ -371,4 +470,40 @@ class TwitterAPIScraper(object):
             if new_cursor is None or new_cursor == cursor:
                 return
 
+            cursor = new_cursor
+
+    def search_user(self, query, limit=None, before_sleep=None):
+        if is_query_too_long(query):
+            raise TwitterPublicAPIQueryTooLongError
+
+        cursor = None
+        i = 0
+
+        retryer = create_request_retryer(
+            min=1,
+            additional_exceptions=[
+                TwitterPublicAPIRateLimitError,
+                TwitterPublicAPIInvalidResponseError,
+                TwitterPublicAPIHiccupError  # TODO: I might want to drop this at some point
+            ],
+            before_sleep=before_sleep
+        )
+
+        while True:
+            new_cursor, users = retryer(self.request_search_user, query, cursor)
+
+            for user in users:
+                yield user
+
+                i += 1
+
+                if limit is not None and i >= limit:
+                    return
+            
+            if new_cursor is None or new_cursor == cursor:
+                return 
+            
+            if not users:
+                return
+                
             cursor = new_cursor
