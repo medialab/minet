@@ -15,7 +15,8 @@ from minet.web import (
     create_pool,
     request,
     request_json,
-    create_request_retryer
+    create_request_retryer,
+    retrying_method
 )
 from minet.twitter.constants import (
     TWITTER_PUBLIC_API_DEFAULT_TIMEOUT,
@@ -135,9 +136,11 @@ def forge_search_params(query, target='tweets', count=DEFAULT_COUNT, cursor=None
     params = {
         **base,
         'q': query,
-        'count': count,
-        'cursor': cursor
+        'count': count
     }
+
+    if cursor is not None:
+        params['cursor'] = cursor
 
     return urlencode(params, quote_via=quote)
 
@@ -277,6 +280,15 @@ class TwitterAPIScraper(object):
         self.pool = create_pool(timeout=TWITTER_PUBLIC_API_DEFAULT_TIMEOUT)
         self.reset()
 
+        self.retryer = create_request_retryer(
+            min=1,
+            additional_exceptions=[
+                TwitterPublicAPIRateLimitError,
+                TwitterPublicAPIInvalidResponseError,
+                TwitterPublicAPIHiccupError  # TODO: I might want to drop this at some point
+            ]
+        )
+
     def reset(self):
         self.guest_token = None
         self.cookie = None
@@ -292,8 +304,10 @@ class TwitterAPIScraper(object):
             'Authorization': TWITTER_PUBLIC_API_AUTH_HEADER,
             'Accept-Language': 'en-US,en;q=0.5'
         }
+
         err, response, api_token_response = self.request_json(
             TWITTER_GUEST_ACTIVATE_ENDPOINT, headers, method="POST")
+
         if err or response.status >= 400:
             raise TwitterPublicAPIInvalidResponseError
 
@@ -308,11 +322,9 @@ class TwitterAPIScraper(object):
             (guest_token, create_cookie_expiration())
         )
 
+    @retrying_method()
     @ensure_guest_token
-    def request_search(self, query, cursor=None, refs=None, dump=False):
-        params = forge_search_params(query, cursor=cursor)
-        url = '%s?%s' % (TWITTER_PUBLIC_SEARCH_ENDPOINT, params)
-
+    def request_search(self, url):
         headers = {
             'Authorization': TWITTER_PUBLIC_API_AUTH_HEADER,
             'X-Guest-Token': self.guest_token,
@@ -339,6 +351,14 @@ class TwitterAPIScraper(object):
                 raise TwitterPublicAPIOverCapacityError
 
             raise TwitterPublicAPIInvalidResponseError
+
+        return data
+
+    def request_tweet_search(self, query, cursor=None, refs=None, dump=False):
+        params = forge_search_params(query, cursor=cursor, target='tweets')
+        url = '%s?%s' % (TWITTER_PUBLIC_SEARCH_ENDPOINT, params)
+
+        data = self.request_search(url)
 
         next_cursor = extract_cursor_from_tweets_payload(data)
         tweets = []
@@ -386,8 +406,22 @@ class TwitterAPIScraper(object):
 
         return next_cursor, tweets
 
-    def search(self, query, limit=None, before_sleep=None,
-               include_referenced_tweets=False, with_meta=False):
+    def request_user_search(self, query, cursor=None, dump=False):
+        params = forge_search_params(query, cursor=cursor, target='users')
+        url = '%s?%s' % (TWITTER_PUBLIC_SEARCH_ENDPOINT, params)
+
+        data = self.request_search(url)
+
+        next_cursor = extract_cursor_from_users_payload(data)
+
+        if dump:
+            return data
+
+        users = [normalize_user(user) for user in data['globalObjects']['users'].values()]
+
+        return next_cursor, users
+
+    def search_tweets(self, query, limit=None, include_referenced_tweets=False, with_meta=False):
 
         if is_query_too_long(query):
             raise TwitterPublicAPIQueryTooLongError
@@ -395,20 +429,10 @@ class TwitterAPIScraper(object):
         cursor = None
         i = 0
 
-        retryer = create_request_retryer(
-            min=1,
-            additional_exceptions=[
-                TwitterPublicAPIRateLimitError,
-                TwitterPublicAPIInvalidResponseError,
-                TwitterPublicAPIHiccupError  # TODO: I might want to drop this at some point
-            ],
-            before_sleep=before_sleep
-        )
-
         refs = set() if include_referenced_tweets else None
 
         while True:
-            new_cursor, tweets = retryer(self.request_search, query, cursor, refs=refs)
+            new_cursor, tweets = self.request_tweet_search(query, cursor, refs=refs)
 
             for tweet, meta in tweets:
                 if with_meta:
@@ -425,6 +449,32 @@ class TwitterAPIScraper(object):
             # NOTE: we cannot stop when no tweets are found anymore because
             # of Twitter's public facing API's strange hiccups.
             # Comparing cursors seems to be the only good option now...
+            if new_cursor is None or new_cursor == cursor:
+                return
+
+            cursor = new_cursor
+
+    def search_users(self, query, limit=None):
+        if is_query_too_long(query):
+            raise TwitterPublicAPIQueryTooLongError
+
+        cursor = None
+        i = 0
+
+        while True:
+            new_cursor, users = self.request_user_search(query, cursor)
+
+            if not users:
+                return
+
+            for user in users:
+                yield user
+
+                i += 1
+
+                if limit is not None and i >= limit:
+                    return
+
             if new_cursor is None or new_cursor == cursor:
                 return
 

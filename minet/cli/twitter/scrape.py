@@ -58,7 +58,7 @@ def twitter_scrape_action(cli_args):
         loading_bar.print('Searching for "%s"' % query)
         loading_bar.inc('queries')
 
-        iterator = scraper.search(
+        iterator = scraper.search_tweets(
             query,
             limit=cli_args.limit,
             include_referenced_tweets=cli_args.include_refs,
