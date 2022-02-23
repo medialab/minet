@@ -1898,7 +1898,7 @@ MINET_COMMANDS = {
                           https://webapps.stackexchange.com/questions/127425/how-to-exclude-usernames-and-handles-while-searching-twitter
 
                             $ minet tw scrape tweets "keyword OR @anObviouslyNotExistingHandle"
-                        
+
                         . Collecting users with "adam" in their user_name or user_description:
                             $ minet tw scrape users adam > users.csv
                     ''',
