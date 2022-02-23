@@ -1868,7 +1868,7 @@ MINET_COMMANDS = {
                 'scrape': {
                     'title': 'Minet Twitter Scrape Command',
                     'description': '''
-                        Scrape Twitter's public facing search API to collect tweets etc.
+                        Scrape Twitter's public facing search API to collect tweets or users.
 
                         Be sure to check Twitter's advanced search to check what kind of
                         operators you can use to tune your queries (time range, hashtags,
@@ -1898,12 +1898,15 @@ MINET_COMMANDS = {
                           https://webapps.stackexchange.com/questions/127425/how-to-exclude-usernames-and-handles-while-searching-twitter
 
                             $ minet tw scrape tweets "keyword OR @anObviouslyNotExistingHandle"
+
+                        . Collecting users with "adam" in their user_name or user_description:
+                            $ minet tw scrape users adam > users.csv
                     ''',
                     'arguments': [
                         {
                             'name': 'items',
-                            'help': 'What to scrape. Currently only `tweets` is possible.',
-                            'choices': ['tweets']
+                            'help': 'What to scrape. Currently only `tweets` and `users` are possible.',
+                            'choices': ['tweets', 'users']
                         },
                         {
                             'name': 'query',
@@ -1923,7 +1926,7 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-l', '--limit'],
-                            'help': 'Maximum number of tweets to collect per query.',
+                            'help': 'Maximum number of tweets or users to collect per query.',
                             'type': int
                         },
                         {

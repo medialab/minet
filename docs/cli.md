@@ -1675,12 +1675,12 @@ examples:
 usage: minet twitter scrape [-h] [--rcfile RCFILE] [--include-refs] [-l LIMIT]
                             [-o OUTPUT] [--query-template QUERY_TEMPLATE]
                             [-s SELECT]
-                            {tweets} query [file]
+                            {tweets,users} query [file]
 
 Minet Twitter Scrape Command
 ============================
 
-Scrape Twitter's public facing search API to collect tweets etc.
+Scrape Twitter's public facing search API to collect tweets or users.
 
 Be sure to check Twitter's advanced search to check what kind of
 operators you can use to tune your queries (time range, hashtags,
@@ -1691,7 +1691,7 @@ Useful operators include "since" and "until" to search specific
 time ranges like so: "since:2014-01-01 until:2017-12-31".
 
 positional arguments:
-  {tweets}                         What to scrape. Currently only `tweets` is possible.
+  {tweets,users}                   What to scrape. Currently only `tweets` and `users` are possible.
   query                            Search query or name of the column containing queries to run in given CSV file.
   file                             Optional CSV file containing the queries to be run.
 
@@ -1699,7 +1699,7 @@ optional arguments:
   -h, --help                       show this help message and exit
   --rcfile RCFILE                  Custom path to a minet configuration file.
   --include-refs                   Whether to emit referenced tweets (quoted, retweeted & replied) in the CSV output. Note that it consumes a memory proportional to the total number of unique tweets retrieved.
-  -l LIMIT, --limit LIMIT          Maximum number of tweets to collect per query.
+  -l LIMIT, --limit LIMIT          Maximum number of tweets or users to collect per query.
   -o OUTPUT, --output OUTPUT       Path to the output file. By default, the results will be printed to stdout.
   --query-template QUERY_TEMPLATE  Query template. Can be useful for instance to change a column of twitter user screen names into from:@user queries.
   -s SELECT, --select SELECT       Columns of input CSV file to include in the output (separated by `,`).
@@ -1723,6 +1723,9 @@ examples:
   https://webapps.stackexchange.com/questions/127425/how-to-exclude-usernames-and-handles-while-searching-twitter
 
     $ minet tw scrape tweets "keyword OR @anObviouslyNotExistingHandle"
+
+. Collecting users with "adam" in their user_name or user_description:
+    $ minet tw scrape users adam > users.csv
 
 ```
 
