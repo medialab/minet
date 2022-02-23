@@ -47,7 +47,7 @@ def twitter_scrape_action(cli_args):
             keep=cli_args.select
         )
 
-    if cli_args.items == 'users':
+    elif cli_args.items == 'users':
         # Stats
         loading_bar = LoadingBar(
             'Collecting users',
@@ -92,7 +92,7 @@ def twitter_scrape_action(cli_args):
             except TwitterPublicAPIOverCapacityError:
                 loading_bar.die('Got an "Over Capacity" error. Shutting down...')
 
-        if cli_args.items == 'users':
+        elif cli_args.items == 'users':
             iterator = scraper.search_users(
                 query,
                 limit=cli_args.limit
