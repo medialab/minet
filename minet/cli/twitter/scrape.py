@@ -46,7 +46,7 @@ def twitter_scrape_action(cli_args):
             add=TWEET_FIELDS + ADDITIONAL_TWEET_FIELDS,
             keep=cli_args.select
         )
-    
+
     if cli_args.items == 'users':
         # Stats
         loading_bar = LoadingBar(
@@ -91,7 +91,7 @@ def twitter_scrape_action(cli_args):
                     enricher.writerow(row, tweet_row + format_meta_row(meta))
             except TwitterPublicAPIOverCapacityError:
                 loading_bar.die('Got an "Over Capacity" error. Shutting down...')
-        
+
         if cli_args.items == 'users':
             iterator = scraper.search_users(
                 query,
