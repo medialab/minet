@@ -31,37 +31,24 @@ def format_meta_row(meta):
 def twitter_scrape_action(cli_args):
     scraper = TwitterAPIScraper()
 
-    if cli_args.items == 'tweets':
-        # Stats
-        loading_bar = LoadingBar(
-            'Collecting tweets',
-            total=cli_args.limit,
-            unit='tweet',
-            stats={'tokens': 1, 'queries': 0}
-        )
+    unit = cli_args.items[:-1]
 
-        enricher = casanova.enricher(
-            cli_args.file,
-            cli_args.output,
-            add=TWEET_FIELDS + ADDITIONAL_TWEET_FIELDS,
-            keep=cli_args.select
-        )
+    # Stats
+    loading_bar = LoadingBar(
+        'Collecting %s' % unit,
+        total=cli_args.limit,
+        unit=unit,
+        stats={'tokens': 1, 'queries': 0}
+    )
 
-    elif cli_args.items == 'users':
-        # Stats
-        loading_bar = LoadingBar(
-            'Collecting users',
-            total=cli_args.limit,
-            unit='user',
-            stats={'tokens': 1, 'queries': 0}
-        )
+    headers = (TWEET_FIELDS + ADDITIONAL_TWEET_FIELDS) if cli_args.items == 'tweets' else USER_FIELDS
 
-        enricher = casanova.enricher(
-            cli_args.file,
-            cli_args.output,
-            add=USER_FIELDS,
-            keep=cli_args.select
-        )
+    enricher = casanova.enricher(
+        cli_args.file,
+        cli_args.output,
+        add=headers,
+        keep=cli_args.select
+    )
 
     for row, query in enricher.cells(cli_args.query, with_rows=True):
 
@@ -82,27 +69,24 @@ def twitter_scrape_action(cli_args):
                 include_referenced_tweets=cli_args.include_refs,
                 with_meta=True
             )
-
-            try:
-                for tweet, meta in iterator:
-                    loading_bar.update()
-
-                    tweet_row = format_tweet_as_csv_row(tweet)
-                    enricher.writerow(row, tweet_row + format_meta_row(meta))
-            except TwitterPublicAPIOverCapacityError:
-                loading_bar.die('Got an "Over Capacity" error. Shutting down...')
-
-        elif cli_args.items == 'users':
+        else:
             iterator = scraper.search_users(
                 query,
                 limit=cli_args.limit
             )
 
-            try:
-                for user in iterator:
-                    loading_bar.update()
+        try:
+            for data in iterator:
+                loading_bar.update()
 
-                    user_row = format_user_as_csv_row(user)
-                    enricher.writerow(row, user_row)
-            except TwitterPublicAPIOverCapacityError:
-                loading_bar.die('Got an "Over Capacity" error. Shutting down...')
+                if cli_args.items == 'tweets':
+                    tweet, meta = data
+                    tweet_row = format_tweet_as_csv_row(tweet)
+                    addendum = tweet_row + format_meta_row(meta)
+                else:
+                    addendum = format_user_as_csv_row(data)
+
+                enricher.writerow(row, addendum)
+
+        except TwitterPublicAPIOverCapacityError:
+            loading_bar.die('Got an "Over Capacity" error. Shutting down...')
