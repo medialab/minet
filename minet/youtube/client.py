@@ -30,8 +30,25 @@ from minet.youtube.formatters import (
     format_video,
     format_video_snippet,
     format_comment,
-    format_reply
+    format_reply,
+    format_playlist_item_snippet,
 )
+
+
+def forge_playlist_videos_url(key, playlist_id, token=None):
+    data = {
+        'base': YOUTUBE_API_BASE_URL,
+        'playlist_id': playlist_id,
+        'key': key,
+        'count': YOUTUBE_API_MAX_VIDEOS_PER_CALL
+    }
+
+    url = '%(base)s/playlistItems?part=snippet&maxResults=%(count)i&playlistId=%(playlist_id)s&key=%(key)s' % data
+
+    if token is not None:
+        url += '&pageToken=%s' % token
+
+    return url
 
 
 def forge_videos_url(key, ids):
@@ -253,5 +270,33 @@ class YouTubeAPIClient(object):
                     )
 
                     queue.append((is_reply, item_id, next_url))
+
+        return generator()
+
+    def channel_videos(self, channel_id):
+
+        playlist_id = 'UU' + channel_id[2:]
+
+        def generator():
+            token = None
+
+            while True:
+                url = forge_playlist_videos_url(
+                    self.key,
+                    playlist_id,
+                    token=token
+                )
+
+                result = self.request_json(url)
+
+                token = result.get('nextPageToken')
+
+                for item in result['items']:
+                    item = format_playlist_item_snippet(item)
+
+                    yield item
+
+                if token is None or len(result['items']) == 0:
+                    break
 
         return generator()

@@ -2705,6 +2705,42 @@ MINET_COMMANDS = {
                         },
                     ]
                 },
+                'channel': {
+                    'title': 'Youtube channel',
+                    'description': 'Retrieve metadata about all Youtube videos from one or many channel(s) using the API.',
+                    'epilog': '''
+                        example:
+
+                        . Fetching a channel's videos:
+                            $ minet youtube channel UCprclkVrNPls7PR-nHhf1Ow -k my-api-key > channel_videos.csv
+                    
+                        . Fetching multiple channels' videos:
+                            $ minet youtube channel channel_id channels_id.csv -k my-api-key > channels_videos.csv
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'column',
+                            'help': 'Name of the column containing the channel\'s ids.'
+                        },
+                        {
+                            'name': 'file',
+                            'help': 'CSV file containing the Youtube channel\'s ids.',
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'channel'
+                        },
+                        {
+                            'flags': ['-k', '--key'],
+                            'help': 'YouTube API Data dashboard API key.',
+                            'rc_key': ['youtube', 'key'],
+                            'action': ConfigAction
+                        },
+                        {
+                            'flags': ['-s', '--select'],
+                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
+                            'type': SplitterType()
+                        }
+                    ]
+                },
                 'comments': {
                     'title': 'Youtube comments',
                     'description': 'Retrieve metadata about Youtube comments using the API.',
