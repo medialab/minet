@@ -12,7 +12,7 @@ from minet.youtube import YouTubeAPIClient
 from minet.youtube.constants import YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS
 
 
-def channel_action(cli_args):
+def channel_videos_action(cli_args):
     enricher = casanova.enricher(
         cli_args.file,
         cli_args.output,

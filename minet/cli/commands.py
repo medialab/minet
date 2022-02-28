@@ -2705,17 +2705,20 @@ MINET_COMMANDS = {
                         },
                     ]
                 },
-                'channel': {
-                    'title': 'Youtube channel',
+                'channel-videos': {
+                    'title': 'Youtube channel videos',
                     'description': 'Retrieve metadata about all Youtube videos from one or many channel(s) using the API.',
                     'epilog': '''
                         example:
 
-                        . Fetching a channel's videos:
-                            $ minet youtube channel UCprclkVrNPls7PR-nHhf1Ow -k my-api-key > channel_videos.csv
-                    
+                        . Fetching all the videos from a channel based on the channel's id or url:
+                            $ minet youtube channel-videos https://www.youtube.com/c/LinksOff -k my-api-key > linksoff_videos.csv
+                            $ minet youtube channel-videos https://www.youtube.com/channel/UCqnbDFdCpuN8CMEg0VuEBqA -k my-api-key > thenewyorktimes_videos.csv
+                            $ minet youtube channel-videos UCprclkVrNPls7PR-nHhf1Ow -k my-api-key > tonyheller_videos.csv
+
                         . Fetching multiple channels' videos:
-                            $ minet youtube channel channel_id channels_id.csv -k my-api-key > channels_videos.csv
+                            $ minet youtube channel-videos channel_id channels_id.csv -k my-api-key > channels_videos.csv
+                            $ minet youtube channel-videos channel_url channels_url.csv -k my-api-key > channels_videos.csv
                     ''',
                     'arguments': [
                         {

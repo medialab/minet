@@ -109,3 +109,15 @@ def get_video_captions(video_target, langs):
         ))
 
     return best_track, captions
+
+
+def scrape_channel_id_from_channel_url(channel_url):
+
+    err, response = request(channel_url, pool=YOUTUBE_SCRAPER_POOL)
+    if err:
+        raise err
+
+    soup = BeautifulSoup(response.data.decode('utf-8'), 'lxml')
+    channel_id = soup.find("meta", {"itemprop" : "channelId"}).get('content')
+
+    return channel_id

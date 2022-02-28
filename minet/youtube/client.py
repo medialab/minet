@@ -9,6 +9,8 @@ from ebbe import as_chunks
 from collections import deque
 from urllib.parse import quote
 from ebbe import getpath
+from ural import is_url
+from ural.youtube import parse_youtube_url
 
 from minet.web import create_pool, request_json
 from minet.youtube.utils import ensure_video_id, seconds_to_midnight_pacific_time
@@ -33,6 +35,7 @@ from minet.youtube.formatters import (
     format_reply,
     format_playlist_item_snippet,
 )
+from minet.youtube.scrapers import scrape_channel_id_from_channel_url
 
 
 def forge_playlist_videos_url(key, playlist_id, token=None):
@@ -273,7 +276,16 @@ class YouTubeAPIClient(object):
 
         return generator()
 
-    def channel_videos(self, channel_id):
+    def channel_videos(self, channel_target):
+
+        if is_url(channel_target):
+            parsed_youtube_channel = parse_youtube_url(channel_target)
+            if parsed_youtube_channel.id:
+                channel_id = parsed_youtube_channel.id
+            else:
+                channel_id = scrape_channel_id_from_channel_url(channel_target)
+        else:
+            channel_id = channel_target
 
         playlist_id = 'UU' + channel_id[2:]
 
