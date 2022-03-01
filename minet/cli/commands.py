@@ -4,7 +4,6 @@
 #
 # Defining every minet command.
 #
-import sys
 from argparse import FileType
 from casanova import (
     LastCellResumer,
@@ -572,13 +571,13 @@ MINET_COMMANDS = {
                         {
                             'name': 'file',
                             'help': 'CSV file containing the inquired URLs or ids.',
-                            'type': FileType('r', encoding='utf-8'),
-                            'default': sys.stdin,
-                            'nargs': '?'
+                            'action': InputFileAction,
+                            'dummy_csv_column': 'post_url_or_id'
                         },
                         {
                             'flags': ['-o', '--output'],
-                            'action': OutputFileAction
+                            'action': OutputFileAction,
+                            'resumer': RowCountResumer
                         },
                         {
                             'flags': ['-s', '--select'],
