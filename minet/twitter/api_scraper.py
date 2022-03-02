@@ -337,7 +337,7 @@ class TwitterAPIScraper(object):
         if err:
             raise err
 
-        if response.status == 429:
+        if response.status in [403, 429]:
             self.reset()
             raise TwitterPublicAPIRateLimitError
 
