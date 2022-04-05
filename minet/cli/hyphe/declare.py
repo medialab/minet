@@ -12,15 +12,32 @@ from minet.hyphe import HypheAPIClient
 from minet.hyphe.exceptions import HypheCorpusAuthenticationError
 
 
+def extract_tags(row, tag_pos_list):
+    tags = {}
+
+    for name, pos in tag_pos_list:
+        cell_value = row[pos]
+
+        if not cell_value:
+            continue
+
+        values = [value for value in cell_value.split('|')]
+        tags[name] = values
+
+    return tags
+
+
 def hyphe_declare_action(cli_args):
     reader = casanova.reader(cli_args.webentities, total=cli_args.total)
     headers = reader.headers
 
     name_pos = headers.get('NAME')
-    homepage_pos = headers.get('HOMEPAGE')
+    homepage_pos = headers.get('HOME PAGE')
     prefixes_pos = headers.get('PREFIXES AS LRU')
     status_pos = headers.get('STATUS')
     startpages_pos = headers.get('START PAGES')
+
+    tag_pos_list = [(name.split('(TAGS)', 1)[0].strip(), pos) for name, pos in headers if name.endswith('(TAGS)')]
 
     if (
         name_pos is None or
@@ -52,8 +69,11 @@ def hyphe_declare_action(cli_args):
     for row in reader:
         loading_bar.update()
 
+        startpages_cell = row[startpages_pos]
+
         prefixes = row[prefixes_pos].split(' ')
-        startpages = row[startpages_pos].split(' ')
+        startpages = startpages_cell.split(' ') if startpages_cell else []
+        tags = extract_tags(row, tag_pos_list)
 
         # 1. Declaring the entities
         err, result = corpus.call(
@@ -62,10 +82,9 @@ def hyphe_declare_action(cli_args):
             name=row[name_pos],
             status=row[status_pos],
             lruVariations=False,
-            startpages=startpages
+            startpages=startpages,
+            tags=tags
         )
-
-        # TODO: tags
 
         if err:
             raise err
@@ -73,8 +92,11 @@ def hyphe_declare_action(cli_args):
         webentity_id = result['result']['id']
 
         # 2. Setting the homepage
-        client.call(
-            'set_webentity_homepage',
+        err, _ = client.call(
+            'store.set_webentity_homepage',
             webentity_id=webentity_id,
             homepage=row[homepage_pos]
         )
+
+        if err:
+            raise err
