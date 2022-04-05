@@ -1342,6 +1342,46 @@ MINET_COMMANDS = {
             'title': 'actions',
             'dest': 'hyphe_action',
             'commands': {
+                'declare': {
+                    'title': 'Minet Hyphe Declare Command',
+                    'description': '''
+                        Command that can be used to declare series of webentities
+                        in a corpus.
+
+                        It is ideal to start or restart a corpus using the same exact
+                        webentity declarations as another one.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Declaring webentities from a Hyphe export:
+                            $ minet hyphe declare http://myhyphe.com/api/ target-corpus export.csv
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'url',
+                            'help': 'Url of the Hyphe API.'
+                        },
+                        {
+                            'name': 'corpus',
+                            'help': 'Id of the corpus.'
+                        },
+                        {
+                            'name': 'webentities',
+                            'help': 'CSV file of webentities (exported from Hyphe).',
+                            'type': FileType('r', encoding='utf-8')
+                        },
+                        {
+                            'flag': '--password',
+                            'help': 'The corpus\'s password if required.'
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of medias. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
+                },
                 'dump': {
                     'title': 'Minet Hyphe Dump Command',
                     'description': '''

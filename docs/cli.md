@@ -42,6 +42,7 @@
 * [google](#google)
   * [sheets](#google-sheets)
 * [hyphe](#hyphe)
+  * [declare](#declare)
   * [dump](#dump)
 * [mediacloud (mc)](#mediacloud)
   * [medias](#mc-medias)
@@ -1344,6 +1345,40 @@ examples:
 ```
 
 ## Hyphe
+
+### declare
+
+```
+usage: minet hyphe declare [-h] [--rcfile RCFILE] [--password PASSWORD]
+                           [--total TOTAL]
+                           url corpus webentities
+
+Minet Hyphe Declare Command
+===========================
+
+Command that can be used to declare series of webentities
+in a corpus.
+
+It is ideal to start or restart a corpus using the same exact
+webentity declarations as another one.
+
+positional arguments:
+  url                  Url of the Hyphe API.
+  corpus               Id of the corpus.
+  webentities          CSV file of webentities (exported from Hyphe).
+
+optional arguments:
+  -h, --help           show this help message and exit
+  --rcfile RCFILE      Custom path to a minet configuration file.
+  --password PASSWORD  The corpus's password if required.
+  --total TOTAL        Total number of medias. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Declaring webentities from a Hyphe export:
+    $ minet hyphe declare http://myhyphe.com/api/ target-corpus export.csv
+
+```
 
 ### dump
 

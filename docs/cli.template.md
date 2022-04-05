@@ -42,6 +42,7 @@
 * [google](#google)
   * [sheets](#google-sheets)
 * [hyphe](#hyphe)
+  * [declare](#declare)
   * [dump](#dump)
 * [mediacloud (mc)](#mediacloud)
   * [medias](#mc-medias)
@@ -244,6 +245,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 <% google/sheets %>
 
 ## Hyphe
+
+### declare
+
+<% hyphe/declare %>
 
 ### dump
 
