@@ -17,3 +17,8 @@ def hyphe_action(cli_args):
         from minet.cli.hyphe.dump import hyphe_dump_action
 
         hyphe_dump_action(cli_args)
+
+    elif cli_args.hyphe_action == 'reset':
+        from minet.cli.hyphe.reset import hyphe_reset_action
+
+        hyphe_reset_action(cli_args)

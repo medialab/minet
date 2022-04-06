@@ -1422,7 +1422,33 @@ MINET_COMMANDS = {
                             'type': SplitterType()
                         }
                     ]
-                }
+                },
+                'reset': {
+                    'title': 'Minet Hyphe Reset Command',
+                    'description': '''
+                        Command that can be used to reset a corpus entirely.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Resetting a corpus:
+                            $ minet hyphe reset http://myhyphe.com/api/ my-corpus
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'url',
+                            'help': 'Url of the Hyphe API.'
+                        },
+                        {
+                            'name': 'corpus',
+                            'help': 'Id of the corpus.'
+                        },
+                        {
+                            'flag': '--password',
+                            'help': 'The corpus\'s password if required.'
+                        }
+                    ]
+                },
             }
         }
     },

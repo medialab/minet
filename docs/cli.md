@@ -42,8 +42,9 @@
 * [google](#google)
   * [sheets](#google-sheets)
 * [hyphe](#hyphe)
-  * [declare](#declare)
-  * [dump](#dump)
+  * [declare](#hyphe-declare)
+  * [dump](#hyphe-dump)
+  * [reset](#hyphe-reset)
 * [mediacloud (mc)](#mediacloud)
   * [medias](#mc-medias)
   * [search](#mc-search)
@@ -1346,7 +1347,7 @@ examples:
 
 ## Hyphe
 
-### declare
+<h3 id="hyphe-declare">declare</h3>
 
 ```
 usage: minet hyphe declare [-h] [--rcfile RCFILE] [--password PASSWORD]
@@ -1380,7 +1381,7 @@ examples:
 
 ```
 
-### dump
+<h3 id="hyphe-dump">dump</h3>
 
 ```
 usage: minet hyphe dump [-h] [--rcfile RCFILE] [-d OUTPUT_DIR] [--body]
@@ -1409,6 +1410,32 @@ examples:
 
 . Dumping a corpus into the ./corpus directory:
     $ minet hyphe dump http://myhyphe.com/api/ corpus-name -d corpus
+
+```
+
+<h3 id="hyphe-reset">reset</h3>
+
+```
+usage: minet hyphe reset [-h] [--rcfile RCFILE] [--password PASSWORD] url corpus
+
+Minet Hyphe Reset Command
+=========================
+
+Command that can be used to reset a corpus entirely.
+
+positional arguments:
+  url                  Url of the Hyphe API.
+  corpus               Id of the corpus.
+
+optional arguments:
+  -h, --help           show this help message and exit
+  --rcfile RCFILE      Custom path to a minet configuration file.
+  --password PASSWORD  The corpus's password if required.
+
+examples:
+
+. Resetting a corpus:
+    $ minet hyphe reset http://myhyphe.com/api/ my-corpus
 
 ```
 

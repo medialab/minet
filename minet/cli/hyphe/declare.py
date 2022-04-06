@@ -5,11 +5,12 @@
 # Logic of the `hyphe dump` action.
 #
 import casanova
+from urllib.parse import unquote
 
 from minet.cli.utils import die, LoadingBar
 from minet.cli.exceptions import InvalidArgumentsError
 from minet.hyphe import HypheAPIClient
-from minet.hyphe.exceptions import HypheCorpusAuthenticationError
+from minet.hyphe.exceptions import HypheCorpusAuthenticationError, HypheRequestFailError
 
 
 def extract_tags(row, tag_pos_list):
@@ -21,10 +22,14 @@ def extract_tags(row, tag_pos_list):
         if not cell_value:
             continue
 
-        values = [value for value in cell_value.split('|')]
+        if name == 'FREETAGS':
+            values = cell_value.split('|')
+        else:
+            values = [cell_value]
+
         tags[name] = values
 
-    return tags
+    return {"USER": tags}
 
 
 def hyphe_declare_action(cli_args):
@@ -71,6 +76,14 @@ def hyphe_declare_action(cli_args):
 
         startpages_cell = row[startpages_pos]
 
+        name = row[name_pos]
+
+        # TODO: bug on hyphe's side
+        if 'h:localhost|' in row[prefixes_pos]:
+            loading_bar.print('Dropping %s because of localhost issue' % name)
+            continue
+
+        homepage = row[homepage_pos]
         prefixes = row[prefixes_pos].split(' ')
         startpages = startpages_cell.split(' ') if startpages_cell else []
         tags = extract_tags(row, tag_pos_list)
@@ -79,7 +92,7 @@ def hyphe_declare_action(cli_args):
         err, result = corpus.call(
             'store.declare_webentity_by_lrus',
             list_lrus=prefixes,
-            name=row[name_pos],
+            name=name,
             status=row[status_pos],
             lruVariations=False,
             startpages=startpages,
@@ -92,11 +105,17 @@ def hyphe_declare_action(cli_args):
         webentity_id = result['result']['id']
 
         # 2. Setting the homepage
-        err, _ = client.call(
-            'store.set_webentity_homepage',
-            webentity_id=webentity_id,
-            homepage=row[homepage_pos]
-        )
+        try:
+            err, _ = corpus.call(
+                'store.set_webentity_homepage',
+                webentity_id=webentity_id,
+                homepage=unquote(homepage)  # TODO: drop unquote, linked to hyphe issue #447
+            )
+        except HypheRequestFailError as e:
+            if 'belong' in str(e):
+                loading_bar.print('Homepage error with %s %s' % (name, homepage))
+            else:
+                raise
 
         if err:
             raise err
