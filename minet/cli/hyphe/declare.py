@@ -22,12 +22,8 @@ def extract_tags(row, tag_pos_list):
         if not cell_value:
             continue
 
-        if name == 'FREETAGS':
-            values = cell_value.split('|')
-        else:
-            values = [cell_value]
-
-        tags[name] = values
+        # TODO: hyphe tag serialization is not bijective
+        tags[name] = cell_value.split('|')
 
     return {"USER": tags}
 
