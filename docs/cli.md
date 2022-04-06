@@ -46,6 +46,7 @@
   * [destroy](#hyphe-destroy)
   * [dump](#hyphe-dump)
   * [reset](#hyphe-reset)
+  * [tag](#hyphe-tag)
 * [mediacloud (mc)](#mediacloud)
   * [medias](#mc-medias)
   * [search](#mc-search)
@@ -1464,6 +1465,40 @@ examples:
 
 . Resetting a corpus:
     $ minet hyphe reset http://myhyphe.com/api/ my-corpus
+
+```
+
+<h3 id="hyphe-tag">tag</h3>
+
+```
+usage: minet hyphe tag [-h] [--rcfile RCFILE] [--password PASSWORD]
+                       [--separator SEPARATOR] [--total TOTAL]
+                       url corpus webentity_id_column tag_columns data
+
+Minet Hyphe Tag Command
+=======================
+
+Command that can be used to tag webentities in batch using
+metadata recorded in a CSV file.
+
+positional arguments:
+  url                    Url of the Hyphe API.
+  corpus                 Id of the corpus.
+  webentity_id_column    Column of the CSV file containing the webentity ids.
+  tag_columns            Columns, separated by comma, to use as tags.
+  data                   CSV file of webentities (exported from Hyphe).
+
+optional arguments:
+  -h, --help             show this help message and exit
+  --rcfile RCFILE        Custom path to a minet configuration file.
+  --password PASSWORD    The corpus's password if required.
+  --separator SEPARATOR  Separator use to split multiple tag values in the same column. Defaults to "|".
+  --total TOTAL          Total number of medias. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Tag webentities from two columns of CSV file:
+    $ minet hyphe tag http://myhyphe.com/api/ my-corpus webentity_id type,creator metadata.csv
 
 ```
 

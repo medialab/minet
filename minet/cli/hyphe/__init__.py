@@ -27,3 +27,8 @@ def hyphe_action(cli_args):
         from minet.cli.hyphe.reset import hyphe_reset_action
 
         hyphe_reset_action(cli_args)
+
+    elif cli_args.hyphe_action == 'tag':
+        from minet.cli.hyphe.tag import hyphe_tag_action
+
+        hyphe_tag_action(cli_args)

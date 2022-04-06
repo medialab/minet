@@ -1474,6 +1474,57 @@ MINET_COMMANDS = {
                             'help': 'The corpus\'s password if required.'
                         }
                     ]
+                },
+                'tag': {
+                    'title': 'Minet Hyphe Tag Command',
+                    'description': '''
+                        Command that can be used to tag webentities in batch using
+                        metadata recorded in a CSV file.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Tag webentities from two columns of CSV file:
+                            $ minet hyphe tag http://myhyphe.com/api/ my-corpus webentity_id type,creator metadata.csv
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'url',
+                            'help': 'Url of the Hyphe API.'
+                        },
+                        {
+                            'name': 'corpus',
+                            'help': 'Id of the corpus.'
+                        },
+                        {
+                            'name': 'webentity_id_column',
+                            'help': 'Column of the CSV file containing the webentity ids.'
+                        },
+                        {
+                            'name': 'tag_columns',
+                            'help': 'Columns, separated by comma, to use as tags.',
+                            'type': SplitterType()
+                        },
+                        {
+                            'name': 'data',
+                            'help': 'CSV file of webentities (exported from Hyphe).',
+                            'type': FileType('r', encoding='utf-8')
+                        },
+                        {
+                            'flag': '--password',
+                            'help': 'The corpus\'s password if required.'
+                        },
+                        {
+                            'flag': '--separator',
+                            'help': 'Separator use to split multiple tag values in the same column. Defaults to "|".',
+                            'default': '|'
+                        },
+                        {
+                            'flag': '--total',
+                            'help': 'Total number of medias. Necessary if you want to display a finite progress indicator.',
+                            'type': int
+                        }
+                    ]
                 }
             }
         }
