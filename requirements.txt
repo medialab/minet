@@ -3,7 +3,7 @@ autopep8==1.5.6
 importchecker==2.0
 ipython
 pycodestyle==2.7.0
-PyInstaller==4.3
+PyInstaller==4.10
 pytest==3.5.1
 twine==3.6.0
 wheel
