@@ -1382,6 +1382,32 @@ MINET_COMMANDS = {
                         }
                     ]
                 },
+                'destroy': {
+                    'title': 'Minet Hyphe Destroy Command',
+                    'description': '''
+                        Command that can be used to destroy a corpus entirely.
+                    ''',
+                    'epilog': '''
+                        examples:
+
+                        . Destroying a corpus:
+                            $ minet hyphe destroy http://myhyphe.com/api/ my-corpus
+                    ''',
+                    'arguments': [
+                        {
+                            'name': 'url',
+                            'help': 'Url of the Hyphe API.'
+                        },
+                        {
+                            'name': 'corpus',
+                            'help': 'Id of the corpus.'
+                        },
+                        {
+                            'flag': '--password',
+                            'help': 'The corpus\'s password if required.'
+                        }
+                    ]
+                },
                 'dump': {
                     'title': 'Minet Hyphe Dump Command',
                     'description': '''
@@ -1448,7 +1474,7 @@ MINET_COMMANDS = {
                             'help': 'The corpus\'s password if required.'
                         }
                     ]
-                },
+                }
             }
         }
     },

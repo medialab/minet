@@ -43,6 +43,7 @@
   * [sheets](#google-sheets)
 * [hyphe](#hyphe)
   * [declare](#hyphe-declare)
+  * [destroy](#hyphe-destroy)
   * [dump](#hyphe-dump)
   * [reset](#hyphe-reset)
 * [mediacloud (mc)](#mediacloud)
@@ -250,6 +251,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 <h3 id="hyphe-declare">declare</h3>
 
 <% hyphe/declare %>
+
+<h3 id="hyphe-destroy">destroy</h3>
+
+<% hyphe/destroy %>
 
 <h3 id="hyphe-dump">dump</h3>
 

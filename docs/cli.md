@@ -43,6 +43,7 @@
   * [sheets](#google-sheets)
 * [hyphe](#hyphe)
   * [declare](#hyphe-declare)
+  * [destroy](#hyphe-destroy)
   * [dump](#hyphe-dump)
   * [reset](#hyphe-reset)
 * [mediacloud (mc)](#mediacloud)
@@ -1378,6 +1379,33 @@ examples:
 
 . Declaring webentities from a Hyphe export:
     $ minet hyphe declare http://myhyphe.com/api/ target-corpus export.csv
+
+```
+
+<h3 id="hyphe-destroy">destroy</h3>
+
+```
+usage: minet hyphe destroy [-h] [--rcfile RCFILE] [--password PASSWORD]
+                           url corpus
+
+Minet Hyphe Destroy Command
+===========================
+
+Command that can be used to destroy a corpus entirely.
+
+positional arguments:
+  url                  Url of the Hyphe API.
+  corpus               Id of the corpus.
+
+optional arguments:
+  -h, --help           show this help message and exit
+  --rcfile RCFILE      Custom path to a minet configuration file.
+  --password PASSWORD  The corpus's password if required.
+
+examples:
+
+. Destroying a corpus:
+    $ minet hyphe destroy http://myhyphe.com/api/ my-corpus
 
 ```
 

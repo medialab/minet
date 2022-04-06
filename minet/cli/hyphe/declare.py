@@ -1,8 +1,8 @@
 # =============================================================================
-# Minet Hyphe Dump CLI Action
+# Minet Hyphe Declare CLI Action
 # =============================================================================
 #
-# Logic of the `hyphe dump` action.
+# Logic of the `hyphe declare` action.
 #
 import casanova
 from urllib.parse import unquote

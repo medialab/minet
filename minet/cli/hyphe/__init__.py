@@ -13,6 +13,11 @@ def hyphe_action(cli_args):
 
         hyphe_declare_action(cli_args)
 
+    elif cli_args.hyphe_action == 'destroy':
+        from minet.cli.hyphe.destroy import hyphe_destroy_action
+
+        hyphe_destroy_action(cli_args)
+
     elif cli_args.hyphe_action == 'dump':
         from minet.cli.hyphe.dump import hyphe_dump_action
 
