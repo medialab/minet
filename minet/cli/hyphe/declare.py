@@ -86,6 +86,7 @@ def hyphe_declare_action(cli_args):
         homepage = row[homepage_pos]
         prefixes = row[prefixes_pos].split(' ')
         startpages = startpages_cell.split(' ') if startpages_cell else []
+        startpages = list(set(startpages))  # TODO: dedupe because of hyphe issues
         tags = extract_tags(row, tag_pos_list)
 
         # 1. Declaring the entities
