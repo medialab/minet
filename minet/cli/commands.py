@@ -2065,7 +2065,13 @@ MINET_COMMANDS = {
                         },
                         {
                             'flags': ['-o', '--output'],
-                            'action': OutputFileAction
+                            'action': OutputFileAction,
+                            'resumer': RowCountResumer
+                        },
+                        {
+                            'flag': '--resume',
+                            'help': 'Whether to resume from an aborted collection. Need -o to be set.',
+                            'action': 'store_true'
                         },
                         {
                             'flags': ['-s', '--select'],

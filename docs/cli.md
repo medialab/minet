@@ -1982,7 +1982,8 @@ usage: minet twitter users [-h] [--rcfile RCFILE] [--api-key API_KEY]
                            [--api-secret-key API_SECRET_KEY]
                            [--access-token ACCESS_TOKEN]
                            [--access-token-secret ACCESS_TOKEN_SECRET] [--ids]
-                           [-o OUTPUT] [-s SELECT] [--total TOTAL] [--v2]
+                           [-o OUTPUT] [--resume] [-s SELECT] [--total TOTAL]
+                           [--v2]
                            column [file]
 
 Minet Twitter Users Command
@@ -2003,6 +2004,7 @@ optional arguments:
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
   --ids                                      Whether your users are given as ids rather than screen names.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
+  --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
   --v2                                       Whether to use latest Twitter API v2 rather than v1.1.
