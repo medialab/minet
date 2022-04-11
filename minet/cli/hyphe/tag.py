@@ -89,6 +89,7 @@ def hyphe_tag_action(cli_args):
                         loading_bar.print(
                             'unkown webentity with id "%s"' % webentity_id
                         )
+                        break
                     else:
                         raise
 
