@@ -28,7 +28,11 @@ class CrowdTangleInvalidRequestError(CrowdTangleError):
         if self.status is None:
             return super().__str__()
 
-        return super().__str__() + ', Url: %s, Code: %s, Status: %s' % (self.url, self.code, self.status)
+        return super().__str__() + ", Url: %s, Code: %s, Status: %s" % (
+            self.url,
+            self.code,
+            self.status,
+        )
 
 
 class CrowdTangleServerError(CrowdTangleError):
@@ -41,7 +45,7 @@ class CrowdTangleServerError(CrowdTangleError):
         if self.status is None:
             return super().__str__()
 
-        return super().__str__() + '%s Status: %s' % (self.url, self.status)
+        return super().__str__() + "%s Status: %s" % (self.url, self.status)
 
 
 class CrowdTangleMissingStartDateError(CrowdTangleError):

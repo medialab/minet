@@ -6,10 +6,7 @@
 #
 import casanova
 from twitter import TwitterHTTPError
-from twitwi import (
-    normalize_user,
-    format_user_as_csv_row
-)
+from twitwi import normalize_user, format_user_as_csv_row
 from twitwi.constants import USER_PARAMS, USER_FIELDS
 
 from minet.cli.utils import LoadingBar
@@ -24,7 +21,7 @@ def twitter_retweeters_action(cli_args):
         cli_args.access_token_secret,
         cli_args.api_key,
         cli_args.api_secret_key,
-        api_version='2'
+        api_version="2",
     )
 
     enricher = casanova.enricher(
@@ -32,24 +29,22 @@ def twitter_retweeters_action(cli_args):
         cli_args.output,
         keep=cli_args.select,
         add=USER_FIELDS,
-        total=cli_args.total
+        total=cli_args.total,
     )
 
     loading_bar = LoadingBar(
-        'Retrieving retweeters',
-        total=enricher.total,
-        unit=' users'
+        "Retrieving retweeters", total=enricher.total, unit=" users"
     )
 
     for row, tweet in enricher.cells(cli_args.column, with_rows=True):
-        loading_bar.inc('tweets')
-        kwargs = {'max_results': ITEMS_PER_PAGE, 'params': USER_PARAMS}
+        loading_bar.inc("tweets")
+        kwargs = {"max_results": ITEMS_PER_PAGE, "params": USER_PARAMS}
 
         while True:
             try:
-                result = client.call(['tweets', tweet, 'retweeted_by'], **kwargs)
+                result = client.call(["tweets", tweet, "retweeted_by"], **kwargs)
             except TwitterHTTPError as e:
-                loading_bar.inc('errors')
+                loading_bar.inc("errors")
 
                 if e.e.code == 404:
                     enricher.writerow(row)
@@ -58,16 +53,16 @@ def twitter_retweeters_action(cli_args):
 
                 continue
 
-            if 'data' not in 'result' and result['meta']['result_count'] == 0:
+            if "data" not in "result" and result["meta"]["result_count"] == 0:
                 break
 
-            for user in result['data']:
+            for user in result["data"]:
                 user = normalize_user(user, v2=True)
                 user_row = format_user_as_csv_row(user)
                 enricher.writerow(row, user_row)
                 loading_bar.update()
 
-            if 'next_token' in result['meta']:
-                kwargs['pagination_token'] = result['meta']['next_token']
+            if "next_token" in result["meta"]:
+                kwargs["pagination_token"] = result["meta"]["next_token"]
             else:
                 break

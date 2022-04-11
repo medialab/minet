@@ -21,7 +21,11 @@ class YouTubeInvalidAPICall(YouTubeError):
         self.data = data
 
     def __str__(self):
-        return super().__str__() + ', Url: %s, Status: %i, Data: %s' % (self.url, self.status, self.data)
+        return super().__str__() + ", Url: %s, Status: %i, Data: %s" % (
+            self.url,
+            self.status,
+            self.data,
+        )
 
 
 class YouTubeInvalidVideoId(YouTubeError):

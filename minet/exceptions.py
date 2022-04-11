@@ -9,18 +9,14 @@
 # Base minet error
 class MinetError(Exception):
     def __init__(self, message=None):
-        super().__init__('' if message is None else message)
+        super().__init__("" if message is None else message)
         self.message = message
 
     def __repr__(self):
-        representation = '<' + self.__class__.__name__
+        representation = "<" + self.__class__.__name__
 
         for k in dir(self):
-            if (
-                k.startswith('_') or
-                k == 'args' or
-                'traceback' in k
-            ):
+            if k.startswith("_") or k == "args" or "traceback" in k:
                 continue
 
             v = getattr(self, k)
@@ -29,15 +25,15 @@ class MinetError(Exception):
                 continue
 
             if isinstance(v, BaseException):
-                representation += ' {k}=<{name}>'.format(k=k, name=v.__class__.__name__)
+                representation += " {k}=<{name}>".format(k=k, name=v.__class__.__name__)
                 continue
 
             if isinstance(v, str) and len(v) > 30:
-                v = v[:29] + '…'
+                v = v[:29] + "…"
 
-            representation += ' {k}={v!r}'.format(k=k, v=v)
+            representation += " {k}={v!r}".format(k=k, v=v)
 
-        representation += '>'
+        representation += ">"
 
         return representation
 

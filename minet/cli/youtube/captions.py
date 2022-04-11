@@ -16,13 +16,10 @@ def captions_action(cli_args):
         cli_args.file,
         cli_args.output,
         add=YOUTUBE_CAPTIONS_CSV_HEADERS,
-        keep=cli_args.select
+        keep=cli_args.select,
     )
 
-    loading_bar = LoadingBar(
-        'Retrieving captions',
-        unit='video'
-    )
+    loading_bar = LoadingBar("Retrieving captions", unit="video")
 
     for row, video in enricher.cells(cli_args.column, with_rows=True):
         loading_bar.update()
@@ -34,7 +31,7 @@ def captions_action(cli_args):
 
         track, lines = result
 
-        prefix = [track.lang, '1' if track.generated else '']
+        prefix = [track.lang, "1" if track.generated else ""]
 
         for line in lines:
             enricher.writerow(row, prefix + list(line))

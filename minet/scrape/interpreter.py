@@ -18,13 +18,13 @@ from minet.scrape.exceptions import (
     ScraperEvalError,
     ScraperEvalTypeError,
     ScraperEvalNoneError,
-    NotATableError
+    NotATableError,
 )
 
 DEFAULT_CONTEXT = {}
 DATA_TYPES = (str, int, float, bool, list, dict)
 
-nested_getter = partial(getpath, split_char='.', parse_indices=True, attributes=True)
+nested_getter = partial(getpath, split_char=".", parse_indices=True, attributes=True)
 
 
 def is_list_of_tags(value):
@@ -50,16 +50,16 @@ def merge_contexts(global_context, local_context):
 
 
 def extract(element, extractor_name):
-    if extractor_name == 'text':
+    if extractor_name == "text":
         return element.get_text().strip()
 
-    if extractor_name == 'display_text':
+    if extractor_name == "display_text":
         return get_display_text(element)
 
-    if extractor_name == 'html' or extractor_name == 'inner_html':
+    if extractor_name == "html" or extractor_name == "inner_html":
         return element.decode_contents().strip()
 
-    if extractor_name == 'outer_html':
+    if extractor_name == "outer_html":
         return str(element).strip()
 
     raise TypeError('Unknown "%s" extractor' % extractor_name)
@@ -77,9 +77,19 @@ EVAL_CONTEXT = get_default_evaluation_context()
 
 
 # NOTE: this is not threadsafe, but it does not have to be
-def eval_expression(expression, element=None, elements=None, value=None,
-                    context=None, root=None, scope=None,
-                    path=None, expect=None, check=None, allow_none=False):
+def eval_expression(
+    expression,
+    element=None,
+    elements=None,
+    value=None,
+    context=None,
+    root=None,
+    scope=None,
+    path=None,
+    expect=None,
+    check=None,
+    allow_none=False,
+):
 
     if callable(expression):
         try:
@@ -88,81 +98,66 @@ def eval_expression(expression, element=None, elements=None, value=None,
                 elements=elements,
                 value=value,
                 context=context,
-                root=root
+                root=root,
             )
         except Exception as e:
-            raise ScraperEvalError(
-                reason=e,
-                path=path,
-                expression=expression
-            )
+            raise ScraperEvalError(reason=e, path=path, expression=expression)
     else:
 
         # Local variables
-        EVAL_CONTEXT['element'] = element
-        EVAL_CONTEXT['elements'] = elements
-        EVAL_CONTEXT['value'] = value
+        EVAL_CONTEXT["element"] = element
+        EVAL_CONTEXT["elements"] = elements
+        EVAL_CONTEXT["value"] = value
 
         # Context
-        EVAL_CONTEXT['context'] = context
-        EVAL_CONTEXT['root'] = root
-        EVAL_CONTEXT['scope'] = scope
+        EVAL_CONTEXT["context"] = context
+        EVAL_CONTEXT["root"] = root
+        EVAL_CONTEXT["scope"] = scope
 
-        if '\n' in expression:
+        if "\n" in expression:
 
             # Multiline expression
             scope = {}
 
-            wrapped_expression = 'def __run__():\n%s\n__return_value__ = __run__()' % textwrap.indent(expression, '  ')
+            wrapped_expression = (
+                "def __run__():\n%s\n__return_value__ = __run__()"
+                % textwrap.indent(expression, "  ")
+            )
 
             try:
                 exec(wrapped_expression, EVAL_CONTEXT, scope)
-                result = scope['__return_value__']
+                result = scope["__return_value__"]
             except Exception as e:
-                raise ScraperEvalError(
-                    reason=e,
-                    path=path,
-                    expression=expression
-                )
+                raise ScraperEvalError(reason=e, path=path, expression=expression)
         else:
 
             # Simple expression
             try:
                 result = eval(expression, EVAL_CONTEXT, None)
             except Exception as e:
-                raise ScraperEvalError(
-                    reason=e,
-                    path=path,
-                    expression=expression
-                )
+                raise ScraperEvalError(reason=e, path=path, expression=expression)
 
     if not allow_none and result is None:
-        raise ScraperEvalNoneError(
-            path=path,
-            expression=expression
-        )
+        raise ScraperEvalNoneError(path=path, expression=expression)
 
     if (expect is not None or check is not None) and result is not None:
         if not (check(result) if check else isinstance(result, expect)):
             raise ScraperEvalTypeError(
-                path=path,
-                expression=expression,
-                expected=expect,
-                got=result
+                path=path, expression=expression, expected=expect, got=result
             )
 
     return result
 
 
-def tabulate(element, headers_inference='th', headers=None, path=None):
-    if element.name != 'table':
+def tabulate(element, headers_inference="th", headers=None, path=None):
+    if element.name != "table":
         raise NotATableError(path=path)
 
     def generator():
         nonlocal headers
 
-        body = element.find('tbody', recursive=False)
-        head = element.find('thead', recursive=False)
+        body = element.find("tbody", recursive=False)
+        head = element.find("thead", recursive=False)
 
         if body is None:
             body = element
@@ -170,19 +165,22 @@ def tabulate(element, headers_inference='th', headers=None, path=None):
         if head is None:
             head = element
 
-        trs = body.select('tr:has(td)', recursive=False)
-        ths = head.select('tr > th', recursive=False)
+        trs = body.select("tr:has(td)", recursive=False)
+        ths = head.select("tr > th", recursive=False)
 
         if headers is None:
-            if headers_inference == 'th':
+            if headers_inference == "th":
                 headers = [th.get_text() for th in ths]
 
         if headers is not None:
             for tr in trs:
-                yield {headers[i]: td.get_text() for i, td in enumerate(tr.find_all('td', recursive=False))}
+                yield {
+                    headers[i]: td.get_text()
+                    for i, td in enumerate(tr.find_all("td", recursive=False))
+                }
         else:
             for tr in trs:
-                yield [td.get_text() for td in tr.find_all('td', recursive=False)]
+                yield [td.get_text() for td in tr.find_all("td", recursive=False)]
 
     return generator()
 
@@ -204,18 +202,18 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[], scope=
     # First we need to solve local selection
     if sel is not None:
         element = soupsieve.select_one(sel, element)
-    elif 'sel_eval' in scraper:
+    elif "sel_eval" in scraper:
 
         evaluated_sel = eval_expression(
-            scraper['sel_eval'],
+            scraper["sel_eval"],
             element=element,
             elements=[],
             context=context,
             root=root,
-            path=path + ['sel_eval'],
+            path=path + ["sel_eval"],
             expect=(Tag, str),
             allow_none=True,
-            scope=scope
+            scope=scope,
         )
 
         if isinstance(evaluated_sel, str):
@@ -232,17 +230,17 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[], scope=
     if iterator is not None:
         single_value = False
         elements = soupsieve.select(iterator, element)
-    elif 'iterator_eval' in scraper:
+    elif "iterator_eval" in scraper:
         single_value = False
         evaluated_elements = eval_expression(
-            scraper['iterator_eval'],
+            scraper["iterator_eval"],
             element=element,
             elements=[],
             context=context,
             root=root,
-            path=path + ['iterator_eval'],
+            path=path + ["iterator_eval"],
             check=is_valid_iterator_eval_output,
-            scope=scope
+            scope=scope,
         )
 
         if isinstance(evaluated_elements, str):
@@ -253,17 +251,17 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[], scope=
         elements = [element]
 
     # Handling local context
-    if 'set_context' in scraper:
+    if "set_context" in scraper:
         local_context = {}
 
-        for k, field_scraper in scraper['set_context'].items():
+        for k, field_scraper in scraper["set_context"].items():
             local_context[k] = interpret_scraper(
                 field_scraper,
                 element,
                 root=root,
                 context=context,
-                path=path + ['set_context', k],
-                scope=scope
+                path=path + ["set_context", k],
+                scope=scope,
             )
 
         context = merge_contexts(context, local_context)
@@ -271,103 +269,105 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[], scope=
     # Actual iteration
     acc = None if single_value else []
 
-    already_seen = set() if 'uniq' in scraper and not single_value else None
+    already_seen = set() if "uniq" in scraper and not single_value else None
 
     for element in elements:
         value = None
 
         # Do we have fields?
-        if 'fields' in scraper:
+        if "fields" in scraper:
             value = {}
 
-            for k, field_scraper in scraper['fields'].items():
+            for k, field_scraper in scraper["fields"].items():
                 value[k] = interpret_scraper(
                     field_scraper,
                     element,
                     root=root,
                     context=context,
-                    path=path + ['fields', k],
-                    scope=scope
+                    path=path + ["fields", k],
+                    scope=scope,
                 )
 
         # Do we have a scalar?
-        elif 'item' in scraper:
+        elif "item" in scraper:
 
             # Default value is text
             value = interpret_scraper(
-                scraper['item'],
+                scraper["item"],
                 element,
                 root=root,
                 context=context,
-                path=path + ['item'],
-                scope=scope
+                path=path + ["item"],
+                scope=scope,
             )
 
         else:
 
-            if 'attr' in scraper:
-                value = element.get(scraper['attr'])
-            elif 'extract' in scraper:
-                value = extract(element, scraper['extract'])
-            elif 'get_context' in scraper:
-                value = nested_getter(context, scraper['get_context'])
-            elif 'default' not in scraper:
+            if "attr" in scraper:
+                value = element.get(scraper["attr"])
+            elif "extract" in scraper:
+                value = extract(element, scraper["extract"])
+            elif "get_context" in scraper:
+                value = nested_getter(context, scraper["get_context"])
+            elif "default" not in scraper:
 
                 # Default value is text
-                value = extract(element, 'text')
+                value = extract(element, "text")
 
             # Eval?
-            if 'eval' in scraper:
+            if "eval" in scraper:
                 value = eval_expression(
-                    scraper['eval'],
+                    scraper["eval"],
                     element=element,
                     elements=elements,
                     value=value,
                     context=context,
                     root=root,
-                    path=path + ['eval'],
+                    path=path + ["eval"],
                     expect=DATA_TYPES,
                     allow_none=True,
-                    scope=scope
+                    scope=scope,
                 )
 
         # Default value after all?
-        if 'default' in scraper and value is None:
-            value = scraper['default']
+        if "default" in scraper and value is None:
+            value = scraper["default"]
 
         if single_value:
             acc = value
         else:
 
             # Filtering?
-            if 'filter_eval' in scraper:
+            if "filter_eval" in scraper:
                 passed_filter = eval_expression(
-                    scraper['filter_eval'],
+                    scraper["filter_eval"],
                     element=element,
                     elements=elements,
                     value=value,
                     context=context,
                     root=root,
-                    path=path + ['filter_eval'],
+                    path=path + ["filter_eval"],
                     expect=bool,
                     allow_none=True,
-                    scope=scope
+                    scope=scope,
                 )
 
                 if not passed_filter:
                     continue
 
-            if 'filter' in scraper:
-                filtering_clause = scraper['filter']
+            if "filter" in scraper:
+                filtering_clause = scraper["filter"]
 
                 if filtering_clause is True and not value:
                     continue
 
-                if isinstance(filtering_clause, str) and not nested_getter(value, filtering_clause):
+                if isinstance(filtering_clause, str) and not nested_getter(
+                    value, filtering_clause
+                ):
                     continue
 
-            if 'uniq' in scraper:
-                uniq_clause = scraper['uniq']
+            if "uniq" in scraper:
+                uniq_clause = scraper["uniq"]
                 k = value
 
                 if uniq_clause is True and value in already_seen:

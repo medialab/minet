@@ -16,11 +16,7 @@ from threading import Lock
 
 from minet.scrape import Scraper
 from minet.utils import load_definition
-from minet.web import (
-    create_pool,
-    request,
-    extract_response_meta
-)
+from minet.web import create_pool, request, extract_response_meta
 from minet.utils import PseudoFStringFormatter
 
 from minet.exceptions import UnknownSpiderError
@@ -28,22 +24,14 @@ from minet.exceptions import UnknownSpiderError
 from minet.constants import (
     DEFAULT_DOMAIN_PARALLELISM,
     DEFAULT_IMAP_BUFFER_SIZE,
-    DEFAULT_THROTTLE
+    DEFAULT_THROTTLE,
 )
 
 FORMATTER = PseudoFStringFormatter()
 
 CrawlWorkerResult = namedtuple(
-    'CrawlWorkerResult',
-    [
-        'job',
-        'scraped',
-        'error',
-        'response',
-        'meta',
-        'content',
-        'next_jobs'
-    ]
+    "CrawlWorkerResult",
+    ["job", "scraped", "error", "response", "meta", "content", "next_jobs"],
 )
 
 
@@ -54,27 +42,25 @@ def ensure_list(value):
 
 
 class CrawlJob(object):
-    __slots__ = ('url', 'level', 'spider', 'data')
+    __slots__ = ("url", "level", "spider", "data")
 
-    def __init__(self, url, level=0, spider='default', data=None):
+    def __init__(self, url, level=0, spider="default", data=None):
         self.url = url
         self.level = level
         self.spider = spider
         self.data = data
 
     def id(self):
-        return '%x' % id(self)
+        return "%x" % id(self)
 
     def __repr__(self):
         class_name = self.__class__.__name__
 
-        return (
-            '<%(class_name)s level=%(level)s url=%(url)s spider=%(spider)s>'
-        ) % {
-            'class_name': class_name,
-            'url': self.url,
-            'level': self.level,
-            'spider': self.spider
+        return ("<%(class_name)s level=%(level)s url=%(url)s spider=%(spider)s>") % {
+            "class_name": class_name,
+            "url": self.url,
+            "level": self.level,
+            "spider": self.spider,
         }
 
     @staticmethod
@@ -131,17 +117,17 @@ class CrawlerState(object):
         class_name = self.__class__.__name__
 
         return (
-            '<%(class_name)s queued=%(jobs_queued)i doing=%(jobs_doing)i done=%(jobs_done)i>'
+            "<%(class_name)s queued=%(jobs_queued)i doing=%(jobs_doing)i done=%(jobs_done)i>"
         ) % {
-            'class_name': class_name,
-            'jobs_done': self.jobs_done,
-            'jobs_queued': self.jobs_queued,
-            'jobs_doing': self.jobs_doing
+            "class_name": class_name,
+            "jobs_done": self.jobs_done,
+            "jobs_queued": self.jobs_queued,
+            "jobs_doing": self.jobs_doing,
         }
 
 
 class Spider(object):
-    def __init__(self, name='default'):
+    def __init__(self, name="default"):
         self.name = name
 
     def start_jobs(self):
@@ -151,7 +137,7 @@ class Spider(object):
         return extract_response_meta(response)
 
     def process_content(self, job, response, meta=None):
-        return response.data.decode(meta['encoding'], errors='replace')
+        return response.data.decode(meta["encoding"], errors="replace")
 
     def scrape(self, job, response, content, meta=None):
         return None
@@ -162,16 +148,14 @@ class Spider(object):
     def __repr__(self):
         class_name = self.__class__.__name__
 
-        return (
-            '<%(class_name)s name=%(name)s>'
-        ) % {
-            'class_name': class_name,
-            'name': self.name
+        return ("<%(class_name)s name=%(name)s>") % {
+            "class_name": class_name,
+            "name": self.name,
         }
 
 
 class FunctionSpider(Spider):
-    def __init__(self, fn, name='default'):
+    def __init__(self, fn, name="default"):
         super().__init__(name)
         self.fn = fn
 
@@ -180,7 +164,7 @@ class FunctionSpider(Spider):
 
 
 class BeautifulSoupSpider(Spider):
-    def __init__(self, name='default', engine='lxml'):
+    def __init__(self, name="default", engine="lxml"):
         super().__init__(name)
         self.engine = engine
 
@@ -193,15 +177,15 @@ class BeautifulSoupSpider(Spider):
 
 
 class DefinitionSpider(Spider):
-    def __init__(self, definition, name='default'):
+    def __init__(self, definition, name="default"):
 
         # Descriptors
         self.name = name
         self.definition = definition
-        self.next_definition = definition.get('next')
+        self.next_definition = definition.get("next")
 
         # Settings
-        self.max_level = definition.get('max_level', float('inf'))
+        self.max_level = definition.get("max_level", float("inf"))
 
         # Scrapers
         self.scraper = None
@@ -209,27 +193,26 @@ class DefinitionSpider(Spider):
         self.next_scraper = None
         self.next_scrapers = {}
 
-        if 'scraper' in definition:
-            self.scraper = Scraper(definition['scraper'])
+        if "scraper" in definition:
+            self.scraper = Scraper(definition["scraper"])
 
-        if 'scrapers' in definition:
-            for name, scraper in definition['scrapers'].items():
+        if "scrapers" in definition:
+            for name, scraper in definition["scrapers"].items():
                 self.scrapers[name] = Scraper(scraper)
 
         if self.next_definition is not None:
-            if 'scraper' in self.next_definition:
-                self.next_scraper = Scraper(self.next_definition['scraper'])
+            if "scraper" in self.next_definition:
+                self.next_scraper = Scraper(self.next_definition["scraper"])
 
-            if 'scrapers' in self.next_definition:
-                for name, scraper in self.next_definition['scrapers'].items():
+            if "scrapers" in self.next_definition:
+                for name, scraper in self.next_definition["scrapers"].items():
                     self.next_scrapers[name] = Scraper(scraper)
 
     def start_jobs(self):
 
         # TODO: possibility to name this as jobs
-        start_urls = (
-            ensure_list(self.definition.get('start_url', [])) +
-            ensure_list(self.definition.get('start_urls', []))
+        start_urls = ensure_list(self.definition.get("start_url", [])) + ensure_list(
+            self.definition.get("start_urls", [])
         )
 
         for url in start_urls:
@@ -258,28 +241,23 @@ class DefinitionSpider(Spider):
                         yield scraped
 
         # Formatting next url
-        if 'format' in self.next_definition:
-            yield FORMATTER.format(
-                self.next_definition['format'],
-                level=next_level
-            )
+        if "format" in self.next_definition:
+            yield FORMATTER.format(self.next_definition["format"], level=next_level)
 
     def job_from_target(self, current_url, target, next_level):
         if isinstance(target, str):
             return CrawlJob(
-                url=urljoin(current_url, target),
-                spider=self.name,
-                level=next_level
+                url=urljoin(current_url, target), spider=self.name, level=next_level
             )
 
         else:
 
             # TODO: validate target
             return CrawlJob(
-                url=urljoin(current_url, target['url']),
-                spider=target.get('spider', self.name),
+                url=urljoin(current_url, target["url"]),
+                spider=target.get("spider", self.name),
                 level=next_level,
-                data=target.get('data')
+                data=target.get("data"),
             )
 
     def next_jobs(self, job, response, content, meta=None):
@@ -295,18 +273,15 @@ class DefinitionSpider(Spider):
             yield self.job_from_target(response.geturl(), target, next_level)
 
     def scrape(self, job, response, content, meta=None):
-        scraped = {
-            'single': None,
-            'multiple': {}
-        }
+        scraped = {"single": None, "multiple": {}}
 
-        context = {'job': job.id(), 'url': job.url}
+        context = {"job": job.id(), "url": job.url}
 
         if self.scraper is not None:
-            scraped['single'] = self.scraper(content, context=context)
+            scraped["single"] = self.scraper(content, context=context)
 
         for name, scraper in self.scrapers.items():
-            scraped['multiple'][name] = scraper(content, context=context)
+            scraped["multiple"][name] = scraper(content, context=context)
 
         return scraped
 
@@ -314,10 +289,19 @@ class DefinitionSpider(Spider):
 class Crawler(object):
 
     # TODO: start_jobs with multiple spiders
-    def __init__(self, spec=None, spider=None, spiders=None, start_jobs=None,
-                 queue_path=None, threads=25,
-                 buffer_size=DEFAULT_IMAP_BUFFER_SIZE, throttle=DEFAULT_THROTTLE,
-                 wait=True, daemonic=False):
+    def __init__(
+        self,
+        spec=None,
+        spider=None,
+        spiders=None,
+        start_jobs=None,
+        queue_path=None,
+        threads=25,
+        buffer_size=DEFAULT_IMAP_BUFFER_SIZE,
+        throttle=DEFAULT_THROTTLE,
+        wait=True,
+        daemonic=False,
+    ):
 
         # NOTE: crawling could work depth-first but:
         # buffer_size should be 0 (requires to fix quenouille issue #1)
@@ -349,18 +333,23 @@ class Crawler(object):
             if not isinstance(spec, dict):
                 spec = load_definition(spec)
 
-            if 'spiders' in spec:
-                spiders = {name: DefinitionSpider(s, name=name) for name, s in spec['spiders'].items()}
+            if "spiders" in spec:
+                spiders = {
+                    name: DefinitionSpider(s, name=name)
+                    for name, s in spec["spiders"].items()
+                }
                 self.single_spider = False
             else:
-                spiders = {'default': DefinitionSpider(spec)}
+                spiders = {"default": DefinitionSpider(spec)}
                 self.single_spider = True
 
         elif spider is not None:
-            spiders = {'default': spider}
+            spiders = {"default": spider}
 
         elif spiders is None:
-            raise TypeError('minet.Crawler: expecting either `spec`, `spider` or `spiders`.')
+            raise TypeError(
+                "minet.Crawler: expecting either `spec`, `spider` or `spiders`."
+            )
 
         # Solving function spiders
         for name, s in spiders.items():
@@ -420,7 +409,7 @@ class Crawler(object):
                 response=response,
                 meta=None,
                 content=None,
-                next_jobs=None
+                next_jobs=None,
             )
 
         meta = spider.extract_meta_from_response(job, response)
@@ -454,7 +443,7 @@ class Crawler(object):
             response=response,
             meta=meta,
             content=content,
-            next_jobs=next_jobs
+            next_jobs=next_jobs,
         )
 
     def __iter__(self):
@@ -470,7 +459,7 @@ class Crawler(object):
             buffer_size=self.buffer_size,
             throttle=self.throttle,
             wait=self.wait,
-            daemonic=self.daemonic
+            daemonic=self.daemonic,
         )
 
         def generator():

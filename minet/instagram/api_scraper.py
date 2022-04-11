@@ -12,36 +12,33 @@ from minet.constants import COOKIE_BROWSERS
 from minet.web import create_pool, request_json, grab_cookies
 from minet.instagram.constants import (
     INSTAGRAM_URL,
-    INSTAGRAM_PUBLIC_API_DEFAULT_TIMEOUT
+    INSTAGRAM_PUBLIC_API_DEFAULT_TIMEOUT,
 )
 from minet.instagram.exceptions import (
     InstagramPublicAPIInvalidResponseError,
-    InstagramInvalidCookieError
+    InstagramInvalidCookieError,
 )
 
-INSTAGRAM_GRAPHQL_ENDPOINT = 'https://www.instagram.com/graphql/query/'
-INSTAGRAM_HASHTAG_QUERY_HASH = '9b498c08113f1e09617a1703c22b2f32'
+INSTAGRAM_GRAPHQL_ENDPOINT = "https://www.instagram.com/graphql/query/"
+INSTAGRAM_HASHTAG_QUERY_HASH = "9b498c08113f1e09617a1703c22b2f32"
 
 
 def forge_hashtag_search_url(name, cursor=None, count=50):
-    params = {
-        'tag_name': name,
-        'first': count
-    }
+    params = {"tag_name": name, "first": count}
 
     if cursor is not None:
-        params['after'] = cursor
+        params["after"] = cursor
 
-    url = INSTAGRAM_GRAPHQL_ENDPOINT + '?query_hash=%s&variables=%s' % (
+    url = INSTAGRAM_GRAPHQL_ENDPOINT + "?query_hash=%s&variables=%s" % (
         INSTAGRAM_HASHTAG_QUERY_HASH,
-        quote(json.dumps(params))
+        quote(json.dumps(params)),
     )
 
     return url
 
 
 class InstagramAPIScraper(object):
-    def __init__(self, cookie='firefox'):
+    def __init__(self, cookie="firefox"):
         self.pool = create_pool(timeout=INSTAGRAM_PUBLIC_API_DEFAULT_TIMEOUT)
 
         if cookie in COOKIE_BROWSERS:
@@ -55,10 +52,7 @@ class InstagramAPIScraper(object):
 
     def request_json(self, url):
         err, response, data = request_json(
-            url,
-            pool=self.pool,
-            spoof_ua=True,
-            headers={'Cookie': self.cookie}
+            url, pool=self.pool, spoof_ua=True, headers={"Cookie": self.cookie}
         )
 
         if err:
@@ -70,7 +64,7 @@ class InstagramAPIScraper(object):
         return data
 
     def search_hashtag(self, name):
-        name = name.lstrip('#')
+        name = name.lstrip("#")
         cursor = None
 
         while True:
@@ -79,17 +73,17 @@ class InstagramAPIScraper(object):
 
             data = self.request_json(url)
 
-            data = getpath(data, ['data', 'hashtag', 'edge_hashtag_to_media'])
-            edges = data.get('edges')
+            data = getpath(data, ["data", "hashtag", "edge_hashtag_to_media"])
+            edges = data.get("edges")
 
             for edge in edges:
-                yield edge['node']['shortcode']
+                yield edge["node"]["shortcode"]
 
-            print('Found %i posts' % len(edges))
+            print("Found %i posts" % len(edges))
 
-            has_next_page = getpath(data, ['page_info', 'has_next_page'])
+            has_next_page = getpath(data, ["page_info", "has_next_page"])
 
             if not has_next_page:
                 break
 
-            cursor = getpath(data, ['page_info', 'end_cursor'])
+            cursor = getpath(data, ["page_info", "end_cursor"])

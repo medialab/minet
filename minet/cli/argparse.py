@@ -25,7 +25,9 @@ class TimestampType(object):
         try:
             timestamp = int(datetime.strptime(date, "%Y-%m-%d").timestamp())
         except ValueError:
-            raise ArgumentTypeError('UTC date should have the following format : %Y-%m-%d')
+            raise ArgumentTypeError(
+                "UTC date should have the following format : %Y-%m-%d"
+            )
         return timestamp
 
 
@@ -37,16 +39,20 @@ class BuzzSumoDateType(object):
         try:
             timestamp = int(datetime.strptime(date, "%Y-%m-%d").timestamp())
         except ValueError:
-            raise ArgumentTypeError('dates should have the following format : YYYY-MM-DD.')
+            raise ArgumentTypeError(
+                "dates should have the following format : YYYY-MM-DD."
+            )
 
         if (datetime.now().timestamp() - timestamp) > FIVE_YEARS_IN_SEC:
-            raise ArgumentTypeError('you cannot query BuzzSumo using dates before 5 years ago.')
+            raise ArgumentTypeError(
+                "you cannot query BuzzSumo using dates before 5 years ago."
+            )
 
         return timestamp
 
 
 class SplitterType(object):
-    def __init__(self, splitchar=','):
+    def __init__(self, splitchar=","):
         self.splitchar = splitchar
 
     def __call__(self, string):
@@ -69,14 +75,25 @@ class BooleanAction(Action):
         super().__init__(option_strings, dest, nargs=0, **kwargs)
 
     def __call__(self, parser, cli_args, values, option_string=None):
-        setattr(cli_args, self.dest, False if option_string.startswith('--no') else True)
+        setattr(
+            cli_args, self.dest, False if option_string.startswith("--no") else True
+        )
 
 
 class InputFileAction(Action):
-    def __init__(self, option_strings, dest, dummy_csv_column=None,
-                 dummy_csv_columns=None, dummy_csv_guard=None, dummy_csv_error='',
-                 column_dest='column', column_dests=None,
-                 nargs='?', **kwargs):
+    def __init__(
+        self,
+        option_strings,
+        dest,
+        dummy_csv_column=None,
+        dummy_csv_columns=None,
+        dummy_csv_guard=None,
+        dummy_csv_error="",
+        column_dest="column",
+        column_dests=None,
+        nargs="?",
+        **kwargs
+    ):
 
         if dummy_csv_guard is not None and not callable(dummy_csv_guard):
             raise TypeError
@@ -89,18 +106,14 @@ class InputFileAction(Action):
         self.column_dests = column_dests
 
         if self.dummy_csv_columns is not None:
-            assert isinstance(self.column_dests, list) and len(self.dummy_csv_columns) == len(self.column_dests)
+            assert isinstance(self.column_dests, list) and len(
+                self.dummy_csv_columns
+            ) == len(self.column_dests)
 
-        super().__init__(
-            option_strings,
-            dest,
-            default=None,
-            nargs=nargs,
-            **kwargs
-        )
+        super().__init__(option_strings, dest, default=None, nargs=nargs, **kwargs)
 
     def __call__(self, parser, cli_args, value, option_string=None):
-        setattr(cli_args, 'has_dummy_csv', False)
+        setattr(cli_args, "has_dummy_csv", False)
 
         if value is None:
             f = sys.stdin
@@ -111,12 +124,16 @@ class InputFileAction(Action):
                     # NOTE: this only work because we are considering positional arguments
                     value = getattr(cli_args, self.column_dest)
 
-                    if self.dummy_csv_guard is not None and not self.dummy_csv_guard(value):
-                        raise ArgumentError(self, self.dummy_csv_error + (' Got "%s"' % value))
+                    if self.dummy_csv_guard is not None and not self.dummy_csv_guard(
+                        value
+                    ):
+                        raise ArgumentError(
+                            self, self.dummy_csv_error + (' Got "%s"' % value)
+                        )
 
                     f = CsvCellIO(self.dummy_csv_column, value)
                     setattr(cli_args, self.column_dest, self.dummy_csv_column)
-                    setattr(cli_args, 'has_dummy_csv', True)
+                    setattr(cli_args, "has_dummy_csv", True)
 
                 elif self.dummy_csv_columns is not None:
                     # NOTE: this only work because we are considering positional arguments
@@ -127,20 +144,22 @@ class InputFileAction(Action):
                     for i, dest in enumerate(self.column_dests):
                         setattr(cli_args, dest, self.dummy_csv_columns[i])
 
-                    setattr(cli_args, 'has_dummy_csv', True)
+                    setattr(cli_args, "has_dummy_csv", True)
         else:
             try:
-                f = open(value, 'r', encoding='utf-8')
+                f = open(value, "r", encoding="utf-8")
             except OSError as e:
-                args = {'filename': value, 'error': e}
-                message = gettext('can\'t open \'%(filename)s\': %(error)s')
+                args = {"filename": value, "error": e}
+                message = gettext("can't open '%(filename)s': %(error)s")
                 raise ArgumentError(self, message % args)
 
         setattr(cli_args, self.dest, f)
 
 
 class OutputFileOpener(object):
-    def __init__(self, path=None, resumer_class=None, resumer_kwargs={}, stdout_fallback=True):
+    def __init__(
+        self, path=None, resumer_class=None, resumer_kwargs={}, stdout_fallback=True
+    ):
         self.path = path
         self.resumer_class = resumer_class
         self.resumer_kwargs = resumer_kwargs
@@ -164,19 +183,29 @@ class OutputFileOpener(object):
 
             return self.resumer_class(self.path, **resumer_kwargs)
 
-        mode = 'a' if resume else 'w'
+        mode = "a" if resume else "w"
 
         # As per #254: newline='' is necessary for CSV output on windows to avoid
         # outputting extra lines because of a '\r\r\n' end of line...
-        return open(self.path, mode, encoding='utf-8', newline='')
+        return open(self.path, mode, encoding="utf-8", newline="")
 
 
-DEFAULT_OUTPUT_FILE_HELP = 'Path to the output file. By default, the results will be printed to stdout.'
+DEFAULT_OUTPUT_FILE_HELP = (
+    "Path to the output file. By default, the results will be printed to stdout."
+)
 
 
 class OutputFileAction(Action):
-    def __init__(self, option_strings, dest, resumer=None, resumer_kwargs={},
-                 help=DEFAULT_OUTPUT_FILE_HELP, stdout_fallback=True, **kwargs):
+    def __init__(
+        self,
+        option_strings,
+        dest,
+        resumer=None,
+        resumer_kwargs={},
+        help=DEFAULT_OUTPUT_FILE_HELP,
+        stdout_fallback=True,
+        **kwargs
+    ):
         self.resumer = resumer
         self.resumer_kwargs = resumer_kwargs
         self.stdout_fallback = stdout_fallback
@@ -187,7 +216,7 @@ class OutputFileAction(Action):
             default=OutputFileOpener(
                 resumer_class=resumer,
                 resumer_kwargs=resumer_kwargs,
-                stdout_fallback=stdout_fallback
+                stdout_fallback=stdout_fallback,
             ),
             **kwargs
         )
@@ -197,13 +226,13 @@ class OutputFileAction(Action):
             value,
             resumer_class=self.resumer,
             resumer_kwargs=self.resumer_kwargs,
-            stdout_fallback=self.stdout_fallback
+            stdout_fallback=self.stdout_fallback,
         )
         setattr(cli_args, self.dest, opener)
 
 
 def rc_key_to_env_var(key):
-    return 'MINET_%s' % '_'.join(token.upper() for token in key)
+    return "MINET_%s" % "_".join(token.upper() for token in key)
 
 
 class WrappedConfigValue(object):
@@ -216,7 +245,7 @@ class WrappedConfigValue(object):
 
         # Attempting to resolve env variable
         env_var = rc_key_to_env_var(self.key)
-        env_value = os.environ.get(env_var, '').strip()
+        env_value = os.environ.get(env_var, "").strip()
 
         if env_value:
             return self.type(env_value)
@@ -226,20 +255,18 @@ class WrappedConfigValue(object):
 
 class ConfigAction(Action):
     def __init__(self, option_strings, dest, rc_key, default=None, **kwargs):
-        if 'help' in kwargs:
-            kwargs['help'] = kwargs['help'].rstrip('.') + '. Can also be configured in a .minetrc file as "%s" or read from the %s env variable.' % (
-                '.'.join(rc_key),
-                rc_key_to_env_var(rc_key)
+        if "help" in kwargs:
+            kwargs["help"] = kwargs["help"].rstrip(
+                "."
+            ) + '. Can also be configured in a .minetrc file as "%s" or read from the %s env variable.' % (
+                ".".join(rc_key),
+                rc_key_to_env_var(rc_key),
             )
 
         super().__init__(
             option_strings,
             dest,
-            default=WrappedConfigValue(
-                rc_key,
-                default,
-                kwargs.get('type', str)
-            ),
+            default=WrappedConfigValue(rc_key, default, kwargs.get("type", str)),
             **kwargs
         )
 
@@ -251,7 +278,7 @@ def resolve_arg_dependencies(cli_args, config):
     to_close = []
 
     # Validation
-    if getattr(cli_args, 'resume', False) and cli_args.output.path is None:
+    if getattr(cli_args, "resume", False) and cli_args.output.path is None:
         raise NotResumable
 
     # Unwrapping values
@@ -264,19 +291,16 @@ def resolve_arg_dependencies(cli_args, config):
 
         # Opening output files
         if isinstance(value, OutputFileOpener):
-            value = value.open(cli_args, resume=getattr(cli_args, 'resume', False))
+            value = value.open(cli_args, resume=getattr(cli_args, "resume", False))
             setattr(cli_args, name, value)
 
         # Finding buffers to close eventually
         if (
-            (
-                isinstance(value, TextIOBase) and
-                value is not sys.stdin and
-                value is not sys.stdout and
-                value is not sys.stderr
-            ) or
-            isinstance(value, Resumer)
-        ):
+            isinstance(value, TextIOBase)
+            and value is not sys.stdin
+            and value is not sys.stdout
+            and value is not sys.stderr
+        ) or isinstance(value, Resumer):
             to_close.append(value)
 
     return to_close

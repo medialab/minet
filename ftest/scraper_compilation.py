@@ -167,29 +167,15 @@ RECURSIVE_HTML = """
 #         scraper(soup)
 
 THE_WORST_SCRAPER_EVER = {
-    'sel': 'li',
-    'item': {
-        'sel': 'a[',
-        'eval': '"ok'
+    "sel": "li",
+    "item": {"sel": "a[", "eval": '"ok'},
+    "filter": True,
+    "fields": {
+        "url": {"iterator": ":first", "iterator_eval": '"span"'},
+        "name": {"attr": "id", "extract": "text"},
+        "id": {"attr": "id", "item": "href"},
+        "code": {"eval": "a = 45\nif a == 34:\n  return a\nif"},
     },
-    'filter': True,
-    'fields': {
-        'url': {
-            'iterator': ':first',
-            'iterator_eval': '"span"'
-        },
-        'name': {
-            'attr': 'id',
-            'extract': 'text'
-        },
-        'id': {
-            'attr': 'id',
-            'item': 'href'
-        },
-        'code': {
-            'eval': 'a = 45\nif a == 34:\n  return a\nif'
-        }
-    }
 }
 
 errors = validate(THE_WORST_SCRAPER_EVER)

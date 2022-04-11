@@ -12,22 +12,22 @@ from soupsieve.css_parser import CSSParser
 
 from minet.scrape.exceptions import CSSSelectorTooComplex, InvalidCSSSelectorError
 
-WHITESPACE_RE = re.compile(r'\s+')
+WHITESPACE_RE = re.compile(r"\s+")
 
 
 def match_selector(selector, tag, attrs):
 
     # Checking tag name
-    if selector.tag.name != '*' and tag != selector.tag.name:
+    if selector.tag.name != "*" and tag != selector.tag.name:
         return False
 
     # Checking id
-    if selector.ids and attrs.get('id') not in selector.ids:
+    if selector.ids and attrs.get("id") not in selector.ids:
         return False
 
     # Checking class
     if selector.classes:
-        classes = WHITESPACE_RE.split(attrs.get('class', ''))
+        classes = WHITESPACE_RE.split(attrs.get("class", ""))
 
         # NOTE: this is quadratic but probably faster than using sets in most cases?
         if not any(c in selector.classes for c in classes):
@@ -70,12 +70,11 @@ def strainer_from_css(css, ignore_relations=False):
 
     def strainer_function(tag, attrs):
         return any(
-            match_selector(selector, tag, attrs)
-            for selector in usable_selectors
+            match_selector(selector, tag, attrs) for selector in usable_selectors
         )
 
     strainer = SoupStrainer(strainer_function)
 
-    setattr(strainer, 'css', css)
+    setattr(strainer, "css", css)
 
     return strainer

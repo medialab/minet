@@ -8,27 +8,27 @@
 
 def hyphe_action(cli_args):
 
-    if cli_args.hyphe_action == 'declare':
+    if cli_args.hyphe_action == "declare":
         from minet.cli.hyphe.declare import hyphe_declare_action
 
         hyphe_declare_action(cli_args)
 
-    elif cli_args.hyphe_action == 'destroy':
+    elif cli_args.hyphe_action == "destroy":
         from minet.cli.hyphe.destroy import hyphe_destroy_action
 
         hyphe_destroy_action(cli_args)
 
-    elif cli_args.hyphe_action == 'dump':
+    elif cli_args.hyphe_action == "dump":
         from minet.cli.hyphe.dump import hyphe_dump_action
 
         hyphe_dump_action(cli_args)
 
-    elif cli_args.hyphe_action == 'reset':
+    elif cli_args.hyphe_action == "reset":
         from minet.cli.hyphe.reset import hyphe_reset_action
 
         hyphe_reset_action(cli_args)
 
-    elif cli_args.hyphe_action == 'tag':
+    elif cli_args.hyphe_action == "tag":
         from minet.cli.hyphe.tag import hyphe_tag_action
 
         hyphe_tag_action(cli_args)

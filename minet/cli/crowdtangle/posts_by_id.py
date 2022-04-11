@@ -23,14 +23,10 @@ def crowdtangle_posts_by_id_action(cli_args):
         cli_args.file,
         cli_args.output,
         keep=cli_args.select,
-        add=CROWDTANGLE_POST_CSV_HEADERS
+        add=CROWDTANGLE_POST_CSV_HEADERS,
     )
 
-    loading_bar = LoadingBar(
-        desc='Retrieving posts',
-        total=cli_args.total,
-        unit='post'
-    )
+    loading_bar = LoadingBar(desc="Retrieving posts", total=cli_args.total, unit="post")
 
     try:
         for row, url in enricher.cells(cli_args.column, with_rows=True):
@@ -58,7 +54,9 @@ def crowdtangle_posts_by_id_action(cli_args):
             enricher.writerow(row, post)
 
     except CrowdTangleInvalidTokenError:
-        loading_bar.die([
-            'Your API token is invalid.',
-            'Check that you indicated a valid one using the `--token` argument.'
-        ])
+        loading_bar.die(
+            [
+                "Your API token is invalid.",
+                "Check that you indicated a valid one using the `--token` argument.",
+            ]
+        )

@@ -27,18 +27,14 @@ deps:
 	pip3 install -r requirements.txt
 
 lint:
-	@echo Linting source code using pep8...
-	pycodestyle --ignore $(PEP8_IGNORE) $(SOURCE) test hooks
-	@echo
 	@echo Searching for unused imports...
 	importchecker $(SOURCE) | grep -v __init__ | grep -v idna || true
 	importchecker test | grep -v __init__ || true
 	@echo
 
 format:
-	@echo Formatting source code using autopep8
-	find ./minet -name '*.py' | xargs autopep8 --in-place --ignore $(PEP8_IGNORE)
-	find ./test -name '*.py' | xargs autopep8 --in-place --ignore $(PEP8_IGNORE)
+	@echo Formatting source code using black
+	black $(SOURCE) ftest hooks test
 	@echo
 
 readme:

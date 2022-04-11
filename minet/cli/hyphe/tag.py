@@ -17,13 +17,17 @@ def hyphe_tag_action(cli_args):
     headers = reader.headers
 
     if cli_args.webentity_id_column not in headers:
-        raise InvalidArgumentsError('%s column does not exists in given CSV file' % cli_args.webentity_id_column)
+        raise InvalidArgumentsError(
+            "%s column does not exists in given CSV file" % cli_args.webentity_id_column
+        )
 
     tag_pos_map = {}
 
     for tag_column in cli_args.tag_columns:
         if tag_column not in headers:
-            raise InvalidArgumentsError('%s column does not exists in given CSV file' % tag_column)
+            raise InvalidArgumentsError(
+                "%s column does not exists in given CSV file" % tag_column
+            )
 
         tag_pos_map[tag_column] = headers[tag_column]
 
@@ -33,16 +37,18 @@ def hyphe_tag_action(cli_args):
     try:
         corpus.ensure_is_started()
     except HypheCorpusAuthenticationError:
-        die([
-            'Wrong password for the "%s" corpus!' % cli_args.corpus,
-            'Don\'t forget to provide a password for this corpus using --password'
-        ])
+        die(
+            [
+                'Wrong password for the "%s" corpus!' % cli_args.corpus,
+                "Don't forget to provide a password for this corpus using --password",
+            ]
+        )
 
     loading_bar = LoadingBar(
-        desc='Tagging web entities',
-        unit='webentity',
-        unit_plural='webentities',
-        total=reader.total
+        desc="Tagging web entities",
+        unit="webentity",
+        unit_plural="webentities",
+        total=reader.total,
     )
 
     for row, webentity_id in reader.cells(cli_args.webentity_id_column, with_rows=True):
@@ -72,15 +78,17 @@ def hyphe_tag_action(cli_args):
 
                 try:
                     err, _ = corpus.call(
-                        'store.add_webentity_tag_value',
+                        "store.add_webentity_tag_value",
                         webentity_id=webentity_id,
-                        namespace='USER',
+                        namespace="USER",
                         category=tag_name,
-                        value=tag_value
+                        value=tag_value,
                     )
                 except HypheRequestFailError as e:
-                    if 'could not retrieve WebEntity with id' in str(e):
-                        loading_bar.print('unkown webentity with id "%s"' % webentity_id)
+                    if "could not retrieve WebEntity with id" in str(e):
+                        loading_bar.print(
+                            'unkown webentity with id "%s"' % webentity_id
+                        )
                     else:
                         raise
 

@@ -18,21 +18,18 @@ def videos_action(cli_args):
         cli_args.file,
         cli_args.output,
         add=YOUTUBE_VIDEO_CSV_HEADERS,
-        keep=cli_args.select
+        keep=cli_args.select,
     )
 
-    loading_bar = LoadingBar(
-        'Retrieving videos',
-        unit='video',
-        total=cli_args.total
-    )
+    loading_bar = LoadingBar("Retrieving videos", unit="video", total=cli_args.total)
 
     def before_sleep_until_midnight(seconds):
-        loading_bar.print('API limits reached. Will now wait until midnight Pacific time!')
+        loading_bar.print(
+            "API limits reached. Will now wait until midnight Pacific time!"
+        )
 
     client = YouTubeAPIClient(
-        cli_args.key,
-        before_sleep_until_midnight=before_sleep_until_midnight
+        cli_args.key, before_sleep_until_midnight=before_sleep_until_midnight
     )
 
     iterator = enricher.cells(cli_args.column, with_rows=True)

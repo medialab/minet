@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 N = 1_000
 
-bar = LoadingBar(desc='Range', total=1_000)
+bar = LoadingBar(desc="Range", total=1_000)
 
 # for i in range(N):
 #     bar.print('one')

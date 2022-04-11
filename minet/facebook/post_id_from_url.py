@@ -11,7 +11,7 @@ from urllib.parse import urlsplit, parse_qsl, urljoin
 from ural.facebook import (
     convert_facebook_url_to_mobile,
     parse_facebook_url,
-    FacebookPost
+    FacebookPost,
 )
 
 from minet.utils import rate_limited_from_state
@@ -19,20 +19,18 @@ from minet.web import request_text
 from minet.facebook.constants import (
     FACEBOOK_URL,
     FACEBOOK_MOBILE_URL,
-    FACEBOOK_MOBILE_RATE_LIMITER_STATE
+    FACEBOOK_MOBILE_RATE_LIMITER_STATE,
 )
 
-PAGE_ID_PATTERN = re.compile(r'&amp;rid=(\d+)&amp;')
-GROUP_ID_PATTERN = re.compile(r'fb://group/(\d+)')
+PAGE_ID_PATTERN = re.compile(r"&amp;rid=(\d+)&amp;")
+GROUP_ID_PATTERN = re.compile(r"fb://group/(\d+)")
 
 
 @rate_limited_from_state(FACEBOOK_MOBILE_RATE_LIMITER_STATE)
 def page_id_from_handle(handle):
     url = urljoin(FACEBOOK_MOBILE_URL, handle)
 
-    err, response, html = request_text(url, headers={
-        'User-Agent': 'curl/7.68.0'
-    })
+    err, response, html = request_text(url, headers={"User-Agent": "curl/7.68.0"})
 
     if err:
         raise err
@@ -50,11 +48,9 @@ def page_id_from_handle(handle):
 
 @rate_limited_from_state(FACEBOOK_MOBILE_RATE_LIMITER_STATE)
 def group_id_from_handle(handle):
-    url = urljoin(FACEBOOK_MOBILE_URL, 'groups/%s' % handle)
+    url = urljoin(FACEBOOK_MOBILE_URL, "groups/%s" % handle)
 
-    err, response, html = request_text(url, headers={
-        'User-Agent': 'curl/7.68.0'
-    })
+    err, response, html = request_text(url, headers={"User-Agent": "curl/7.68.0"})
 
     if err:
         raise err
@@ -79,9 +75,9 @@ def scrape_post_id(post_url):
     if err:
         raise err
 
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, "lxml")
 
-    root_element = soup.select_one('#m_story_permalink_view [data-ft]')
+    root_element = soup.select_one("#m_story_permalink_view [data-ft]")
 
     if root_element is None:
 
@@ -91,7 +87,7 @@ def scrape_post_id(post_url):
         if next_link is None:
             return
 
-        href = next_link.get('href')
+        href = next_link.get("href")
 
         if not href:
             return
@@ -104,9 +100,9 @@ def scrape_post_id(post_url):
 
         query = dict(parse_qsl(query))
 
-        return '%s_%s' % (query['id'], query['fbid'])
+        return "%s_%s" % (query["id"], query["fbid"])
 
-    data = root_element.get('data-ft')
+    data = root_element.get("data-ft")
 
     if data is None:
         return
@@ -116,13 +112,13 @@ def scrape_post_id(post_url):
     except json.JSONDecodeError:
         return
 
-    content_owner_id_new = data.get('content_owner_id_new') or data.get('page_id')
-    mf_story_key = data.get('mf_story_key')
+    content_owner_id_new = data.get("content_owner_id_new") or data.get("page_id")
+    mf_story_key = data.get("mf_story_key")
 
     if content_owner_id_new is None or mf_story_key is None:
         return
 
-    return '%s_%s' % (content_owner_id_new, mf_story_key)
+    return "%s_%s" % (content_owner_id_new, mf_story_key)
 
 
 # TODO: could easily cache some retrieved handles...
@@ -139,12 +135,12 @@ def post_id_from_url(post_url):
         parent_id = page_id_from_handle(parsed.parent_handle)
 
         if parent_id is not None:
-            return '%s_%s' % (parent_id, parsed.id)
+            return "%s_%s" % (parent_id, parsed.id)
 
     elif parsed.group_handle is not None:
         group_id = group_id_from_handle(parsed.group_handle)
 
         if group_id is not None:
-            return '%s_%s' % (group_id, parsed.id)
+            return "%s_%s" % (group_id, parsed.id)
 
     return scrape_post_id(post_url)

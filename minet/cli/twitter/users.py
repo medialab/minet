@@ -5,10 +5,7 @@
 # Logic of the `tw users` action.
 #
 import casanova
-from twitwi import (
-    normalize_user,
-    format_user_as_csv_row
-)
+from twitwi import normalize_user, format_user_as_csv_row
 from twitter import TwitterHTTPError
 from twitwi.constants import USER_FIELDS, USER_PARAMS
 from ebbe import as_chunks
@@ -25,60 +22,57 @@ def twitter_users_action(cli_args):
         cli_args.access_token_secret,
         cli_args.api_key,
         cli_args.api_secret_key,
-        api_version='2' if cli_args.v2 else '1.1'
+        api_version="2" if cli_args.v2 else "1.1",
     )
 
     enricher = casanova.enricher(
-        cli_args.file,
-        cli_args.output,
-        keep=cli_args.select,
-        add=USER_FIELDS
+        cli_args.file, cli_args.output, keep=cli_args.select, add=USER_FIELDS
     )
 
-    loading_bar = LoadingBar(
-        desc='Retrieving users',
-        total=cli_args.total,
-        unit='user'
-    )
+    loading_bar = LoadingBar(desc="Retrieving users", total=cli_args.total, unit="user")
 
     def call_client(users):
         kwargs = {}
 
         if not cli_args.v2:
             if cli_args.ids:
-                kwargs['user_id'] = users
+                kwargs["user_id"] = users
             else:
-                kwargs['screen_name'] = users
+                kwargs["screen_name"] = users
 
-            return client.call(['users', 'lookup'], **kwargs)
+            return client.call(["users", "lookup"], **kwargs)
         else:
-            kwargs['params'] = USER_PARAMS
-            route = ['users']
+            kwargs["params"] = USER_PARAMS
+            route = ["users"]
 
             if cli_args.ids:
-                kwargs['ids'] = users
+                kwargs["ids"] = users
             else:
-                kwargs['usernames'] = users
-                route = ['users', 'by']
+                kwargs["usernames"] = users
+                route = ["users", "by"]
 
             return client.call(route, **kwargs)
 
     for chunk in as_chunks(100, enricher.cells(cli_args.column, with_rows=True)):
-        users = ','.join(row[1].lstrip('@') for row in chunk)
+        users = ",".join(row[1].lstrip("@") for row in chunk)
 
         for _, user in chunk:
             if cli_args.ids:
                 if is_not_user_id(user):
-                    loading_bar.die('The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
+                    loading_bar.die(
+                        "The column given as argument doesn't contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command."
+                    )
 
-                key = 'id'
+                key = "id"
 
             else:
                 if is_probably_not_user_screen_name(user):
-                    loading_bar.die('The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command.')
+                    loading_bar.die(
+                        "The column given as argument probably doesn't contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command."
+                    )
                     # force flag to add
 
-                key = 'screen_name'
+                key = "screen_name"
 
         try:
             result = call_client(users)
@@ -91,7 +85,7 @@ def twitter_users_action(cli_args):
 
             continue
 
-        users_raw_data = result if not cli_args.v2 else result['data']
+        users_raw_data = result if not cli_args.v2 else result["data"]
 
         indexed_result = {}
 
@@ -101,7 +95,7 @@ def twitter_users_action(cli_args):
             indexed_result[user[key]] = user_row
 
         for row, user in chunk:
-            user_row = indexed_result.get(user.lstrip('@'))
+            user_row = indexed_result.get(user.lstrip("@"))
 
             enricher.writerow(row, user_row)
 
