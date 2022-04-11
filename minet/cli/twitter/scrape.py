@@ -38,7 +38,7 @@ def twitter_scrape_action(cli_args):
         "Collecting %s" % unit,
         total=cli_args.limit,
         unit=unit,
-        stats={"tokens": 1, "queries": 0},
+        stats={"queries": 0},
     )
 
     headers = (
