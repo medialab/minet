@@ -5,7 +5,8 @@ Documentation for the utilities found in the `minet.twitter` subpackage.
 ## Summary
 
 * [TwitterAPIScraper](#twitterapiscraper)
-  * [#.search](#search)
+  * [#.search_tweets](#search_tweets)
+  * [#.search_users](#search_users)
 
 ## TwitterAPIScraper
 
@@ -19,12 +20,12 @@ from minet.twitter import TwitterAPIScraper
 scraper = TwitterAPIScraper()
 ```
 
-### #.search
+### #.search_tweets
 
 Method yielding tweets matched by the given query.
 
 ```python
-for tweet in scraper.search('from:medialab_ScPo'):
+for tweet in scraper.search_tweets('from:medialab_ScPo'):
   print(tweet)
 ```
 
@@ -32,3 +33,17 @@ for tweet in scraper.search('from:medialab_ScPo'):
 
 * **query** *str*: the query to search.
 * **limit** *?int*: maximum number of tweets to retrieve.
+
+### #.search_users
+
+Method yielding users matched by the given query. Note that this method will hit a hard limit set by Twitter, around ~1000.
+
+```python
+for user in scraper.search_users('cancer'):
+  print(user)
+```
+
+*Arguments*
+
+* **query** *str*: the query to search.
+* **limit** *?int*: maximum number of users to retrieve.
