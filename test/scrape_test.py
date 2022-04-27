@@ -1032,6 +1032,8 @@ class TestScrape(object):
             Other
             Again
 
+            some very interesting stuff
+
             This is a large span with something else over here.
 
             Hello gorgeous!

@@ -20,6 +20,7 @@ LINE_STRIPPER_RE = re.compile(r"\n +| +\n")
 PARAGRAPH_NORMALIZER_RE = re.compile(r"\n{3,}")
 SPACE_SQUEEZER_RE = re.compile(r" {2,}")
 WHITESPACE_SQUEEZER_RE = re.compile(r"\s{2,}")
+CDATA_STRIPPER_RE = re.compile(r"<!\[CDATA\[(.*?)\]\]>", re.I)
 
 
 def has_leading_whitespace(string):
@@ -28,6 +29,10 @@ def has_leading_whitespace(string):
 
 def has_trailing_whitespace(string):
     return TRAILING_WHITESPACE_RE.search(string) is not None
+
+
+def unescape_cdata(string):
+    return CDATA_STRIPPER_RE.sub(r"\1", string)
 
 
 def is_block_element(element):
@@ -120,6 +125,8 @@ def get_display_text(element):
 
             if last_string and last_string.endswith(" "):
                 string = string.lstrip()
+
+            string = unescape_cdata(string)
 
             if string:
                 yield string
