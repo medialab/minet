@@ -47,8 +47,9 @@ def youtube_action(cli_args):
 
         search_action(cli_args)
 
-    if cli_args.yt_action == 'channel-videos':
+    if cli_args.yt_action == "channel-videos":
         check_key(cli_args)
 
         from minet.cli.youtube.channel_videos import channel_videos_action
+
         channel_videos_action(cli_args)

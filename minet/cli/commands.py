@@ -2697,10 +2697,10 @@ MINET_COMMANDS = {
                         },
                     ],
                 },
-                'channel-videos': {
-                    'title': 'Youtube channel videos',
-                    'description': 'Retrieve metadata about all Youtube videos from one or many channel(s) using the API.',
-                    'epilog': '''
+                "channel-videos": {
+                    "title": "Youtube channel videos",
+                    "description": "Retrieve metadata about all Youtube videos from one or many channel(s) using the API.",
+                    "epilog": """
                         example:
 
                         . Fetching all the videos from a channel based on the channel's id or url:
@@ -2711,30 +2711,30 @@ MINET_COMMANDS = {
                         . Fetching multiple channels' videos:
                             $ minet youtube channel-videos channel_id channels_id.csv -k my-api-key > channels_videos.csv
                             $ minet youtube channel-videos channel_url channels_url.csv -k my-api-key > channels_videos.csv
-                    ''',
-                    'arguments': [
+                    """,
+                    "arguments": [
                         {
-                            'name': 'column',
-                            'help': 'Name of the column containing the channel\'s ids.'
+                            "name": "column",
+                            "help": "Name of the column containing the channel's ids.",
                         },
                         {
-                            'name': 'file',
-                            'help': 'CSV file containing the Youtube channel\'s ids.',
-                            'action': InputFileAction,
-                            'dummy_csv_column': 'channel'
+                            "name": "file",
+                            "help": "CSV file containing the Youtube channel's ids.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "channel",
                         },
                         {
-                            'flags': ['-k', '--key'],
-                            'help': 'YouTube API Data dashboard API key.',
-                            'rc_key': ['youtube', 'key'],
-                            'action': ConfigAction
+                            "flags": ["-k", "--key"],
+                            "help": "YouTube API Data dashboard API key.",
+                            "rc_key": ["youtube", "key"],
+                            "action": ConfigAction,
                         },
                         {
-                            'flags': ['-s', '--select'],
-                            'help': 'Columns of input CSV file to include in the output (separated by `,`).',
-                            'type': SplitterType()
-                        }
-                    ]
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                    ],
                 },
                 "comments": {
                     "title": "Youtube comments",

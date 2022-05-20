@@ -117,7 +117,7 @@ def scrape_channel_id_from_channel_url(channel_url):
     if err:
         raise err
 
-    soup = BeautifulSoup(response.data.decode('utf-8'), 'lxml')
-    channel_id = soup.find("meta", {"itemprop": "channelId"}).get('content')
+    soup = BeautifulSoup(response.data.decode("utf-8"), "lxml")
+    channel_id = soup.find("meta", {"itemprop": "channelId"}).get("content")
 
     return channel_id

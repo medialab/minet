@@ -112,15 +112,15 @@ def format_reply(item, video_id=None):
 
 
 def format_playlist_item_snippet(item):
-    snippet = item['snippet']
+    snippet = item["snippet"]
 
     row = YouTubeVideoSnippet(
-        snippet['resourceId']['videoId'],
-        snippet['publishedAt'],
-        snippet['channelId'],
-        snippet['title'],
-        snippet['description'],
-        snippet['channelTitle']
+        snippet["resourceId"]["videoId"],
+        snippet["publishedAt"],
+        snippet["channelId"],
+        snippet["title"],
+        snippet["description"],
+        snippet["channelTitle"],
     )
 
     return row
