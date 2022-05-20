@@ -2699,7 +2699,14 @@ MINET_COMMANDS = {
                 },
                 "channel-videos": {
                     "title": "Youtube channel videos",
-                    "description": "Retrieve metadata about all Youtube videos from one or many channel(s) using the API.",
+                    "description": """
+                        Retrieve metadata about all Youtube videos from one or many channel(s) using the API.
+
+                        Under the hood, this command extract the channel id from the given url or scrape the
+                        website to find it if necessary. Then the command uses the API to retrieve
+                        information about videos stored in the main playlist of the channel
+                        supposed to contain all the channel's videos.
+                    """,
                     "epilog": """
                         example:
 

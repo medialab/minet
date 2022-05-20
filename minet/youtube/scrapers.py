@@ -13,7 +13,7 @@ from collections import namedtuple
 
 from minet.web import request, create_pool
 from minet.youtube.utils import ensure_video_id
-from minet.youtube.exceptions import YouTubeInvalidVideoId
+from minet.youtube.exceptions import YouTubeInvalidVideoTarget
 
 CAPTION_TRACKS_RE = re.compile(r'({"captionTracks":.*isTranslatable":(true|false)}])')
 TIMEDTEXT_RE = re.compile(rb'timedtext?[^"]+')
@@ -82,7 +82,7 @@ def get_video_captions(video_target, langs):
     video_id = ensure_video_id(video_target)
 
     if video_id is None:
-        raise YouTubeInvalidVideoId
+        raise YouTubeInvalidVideoTarget
 
     tracks = get_caption_tracks(video_id)
 
@@ -111,9 +111,9 @@ def get_video_captions(video_target, langs):
     return best_track, captions
 
 
-def scrape_channel_id_from_channel_url(channel_url):
-
+def scrape_channel_id(channel_url):
     err, response = request(channel_url, pool=YOUTUBE_SCRAPER_POOL)
+
     if err:
         raise err
 

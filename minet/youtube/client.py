@@ -9,11 +9,14 @@ from ebbe import as_chunks
 from collections import deque
 from urllib.parse import quote
 from ebbe import getpath
-from ural import is_url
-from ural.youtube import parse_youtube_url
 
 from minet.web import create_pool, request_json
-from minet.youtube.utils import ensure_video_id, seconds_to_midnight_pacific_time
+from minet.youtube.utils import (
+    ensure_video_id,
+    ensure_channel_id,
+    get_channel_main_playlist_id,
+    seconds_to_midnight_pacific_time,
+)
 from minet.youtube.constants import (
     YOUTUBE_API_BASE_URL,
     YOUTUBE_API_MAX_VIDEOS_PER_CALL,
@@ -26,7 +29,8 @@ from minet.youtube.exceptions import (
     YouTubeVideoNotFound,
     YouTubeInvalidAPIKeyError,
     YouTubeInvalidAPICall,
-    YouTubeInvalidVideoId,
+    YouTubeInvalidVideoTarget,
+    YouTubeInvalidChannelTarget,
 )
 from minet.youtube.formatters import (
     format_video,
@@ -35,7 +39,7 @@ from minet.youtube.formatters import (
     format_reply,
     format_playlist_item_snippet,
 )
-from minet.youtube.scrapers import scrape_channel_id_from_channel_url
+from minet.youtube.scrapers import scrape_channel_id
 
 
 def forge_playlist_videos_url(key, playlist_id, token=None):
@@ -225,7 +229,7 @@ class YouTubeAPIClient(object):
         video_id = ensure_video_id(video_target)
 
         if video_id is None:
-            raise YouTubeInvalidVideoId
+            raise YouTubeInvalidVideoTarget
 
         def generator():
             starting_url = forge_comments_url(self.key, video_id)
@@ -284,16 +288,15 @@ class YouTubeAPIClient(object):
 
     def channel_videos(self, channel_target):
 
-        if is_url(channel_target):
-            parsed_youtube_channel = parse_youtube_url(channel_target)
-            if parsed_youtube_channel.id:
-                channel_id = parsed_youtube_channel.id
-            else:
-                channel_id = scrape_channel_id_from_channel_url(channel_target)
-        else:
-            channel_id = channel_target
+        should_scrape, channel_id = ensure_channel_id(channel_target)
 
-        playlist_id = "UU" + channel_id[2:]
+        if should_scrape:
+            channel_id = scrape_channel_id(channel_target)
+
+        if channel_id is None:
+            raise YouTubeInvalidChannelTarget
+
+        playlist_id = get_channel_main_playlist_id(channel_id)
 
         def generator():
             token = None

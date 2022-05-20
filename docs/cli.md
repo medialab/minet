@@ -2187,6 +2187,11 @@ Youtube channel videos
 
 Retrieve metadata about all Youtube videos from one or many channel(s) using the API.
 
+Under the hood, this command extract the channel id from the given url or scrape the
+website to find it if necessary. Then the command uses the API to retrieve
+information about videos stored in the main playlist of the channel
+supposed to contain all the channel's videos.
+
 positional arguments:
   column                      Name of the column containing the channel's ids.
   file                        CSV file containing the Youtube channel's ids.
