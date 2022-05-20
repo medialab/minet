@@ -20,28 +20,30 @@ TIMEDTEXT_RE = re.compile(rb'timedtext?[^"]+')
 
 YOUTUBE_SCRAPER_POOL = create_pool()
 
-YouTubeCaptionTrack = namedtuple('YouTubeCaptionTrack', ['lang', 'url', 'generated'])
+YouTubeCaptionTrack = namedtuple("YouTubeCaptionTrack", ["lang", "url", "generated"])
 
 
 def get_caption_tracks(video_id):
 
     # First we try to retrieve it from video info
-    url = 'https://www.youtube.com/get_video_info?video_id=%s' % video_id
+    url = "https://www.youtube.com/get_video_info?video_id=%s" % video_id
 
     err, response = request(url)
 
     if err:
         raise err
 
-    data = unquote(response.data.decode('utf-8'))
+    data = unquote(response.data.decode("utf-8"))
 
     m = CAPTION_TRACKS_RE.search(data)
 
     if m is not None:
-        data = json.loads(m.group(0) + '}')['captionTracks']
+        data = json.loads(m.group(0) + "}")["captionTracks"]
 
         return [
-            YouTubeCaptionTrack(item['languageCode'], item['baseUrl'], item.get('kind') == 'asr')
+            YouTubeCaptionTrack(
+                item["languageCode"], item["baseUrl"], item.get("kind") == "asr"
+            )
             for item in data
         ]
 
@@ -97,16 +99,14 @@ def get_video_captions(video_target, langs):
     if err:
         raise err
 
-    soup = BeautifulSoup(response.data.decode('utf-8'), 'lxml')
+    soup = BeautifulSoup(response.data.decode("utf-8"), "lxml")
 
     captions = []
 
-    for item in soup.select('text'):
-        captions.append((
-            item.get('start'),
-            item.get('dur'),
-            unescape(item.get_text().strip())
-        ))
+    for item in soup.select("text"):
+        captions.append(
+            (item.get("start"), item.get("dur"), unescape(item.get_text().strip()))
+        )
 
     return best_track, captions
 

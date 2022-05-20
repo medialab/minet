@@ -1,24 +1,22 @@
 # Dev dependencies
-autopep8==1.5.6
+black==22.3.0
 importchecker==2.0
-ipython
-pycodestyle==2.7.0
-PyInstaller==4.3
+PyInstaller==4.10
 pytest==3.5.1
 twine==3.6.0
 wheel
 
 # Dependencies
-beautifulsoup4==4.7.1
+beautifulsoup4==4.11.1
 browser-cookie3==0.13.0
-casanova==0.17.1
+casanova==0.18.0
 cchardet>=2.1.7
 colorama==0.4.4
-dateparser==1.0.0
+dateparser==1.1.1
 ebbe==1.3.1
 json5==0.8.5
 keyring<19.3
-lxml==4.6.3
+lxml==4.8.0
 ndjson==0.3.1
 persist-queue==0.7.0
 pyyaml==5.4.1
@@ -27,7 +25,7 @@ soupsieve>=2.1
 tenacity==7.0.0
 termcolor==1.1.0
 tqdm==4.60.0
-trafilatura==0.9.1
-twitwi==0.10.0
+trafilatura==1.2.0
+twitwi==0.10.4
 ural==0.32.0
-urllib3[secure]==1.25.3
+urllib3[secure]==1.26.9

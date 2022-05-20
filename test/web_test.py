@@ -11,14 +11,23 @@ from minet.web import (
 )
 
 HTTP_REFRESH_TESTS = [
-    ('0;url=https://www.youtube.com/watch?v=sTJ1XwGDcA4', (0, 'https://www.youtube.com/watch?v=sTJ1XwGDcA4')),
-    ('0;url=https://www.youtube.com/watch?v=sTJ1XwGDcA4   ', (0, 'https://www.youtube.com/watch?v=sTJ1XwGDcA4')),
-    ('   0;URL=https://www.youtube.com/watch?v=sTJ1XwGDcA4', (0, 'https://www.youtube.com/watch?v=sTJ1XwGDcA4')),
-    ('test;url=https://www.youtube.com/watch?v=sTJ1XwGDcA4', None),
-    ('0;/www.youtube.com/watch?v=sTJ1XwGDcA4', None)
+    (
+        "0;url=https://www.youtube.com/watch?v=sTJ1XwGDcA4",
+        (0, "https://www.youtube.com/watch?v=sTJ1XwGDcA4"),
+    ),
+    (
+        "0;url=https://www.youtube.com/watch?v=sTJ1XwGDcA4   ",
+        (0, "https://www.youtube.com/watch?v=sTJ1XwGDcA4"),
+    ),
+    (
+        "   0;URL=https://www.youtube.com/watch?v=sTJ1XwGDcA4",
+        (0, "https://www.youtube.com/watch?v=sTJ1XwGDcA4"),
+    ),
+    ("test;url=https://www.youtube.com/watch?v=sTJ1XwGDcA4", None),
+    ("0;/www.youtube.com/watch?v=sTJ1XwGDcA4", None),
 ]
 
-META_REFRESH = rb'''
+META_REFRESH = rb"""
     <head>
         <noscript>
             <META http-equiv="refresh" content="0;URL=https://twitter.com/i/web/status/1155764949777620992">
@@ -29,9 +38,9 @@ META_REFRESH = rb'''
         window.opener = null;
         location.replace("https:\/\/twitter.com\/i\/web\/status\/1155764949777620992")
     </script>
-'''
+"""
 
-JAVASCRIPT_LOCATION = rb'''
+JAVASCRIPT_LOCATION = rb"""
     <head>
         <title>https://twitter.com/i/web/status/1155764949777620992</title>
     </head>
@@ -44,9 +53,9 @@ JAVASCRIPT_LOCATION = rb'''
         window.location='https:\/\/twitter.com\/i\/web\/status\/5'
         window.location      ="https:\/\/twitter.com\/i\/web\/status\/6"
     </script>
-'''
+"""
 
-HTML_CANONICAL_TESTS = b'''
+HTML_CANONICAL_TESTS = b"""
     <head>
         <link rel="canonical" href="https://www.corriere.it/" />
         <meta property="vr:canonical" content="https://www.corriere.it/"/>
@@ -58,29 +67,77 @@ HTML_CANONICAL_TESTS = b'''
         <meta name="apple-itunes-app" content="app-id=326634016, affiliate-data=, app-argument=">
         <link rel="icon" href="https://components2.corriereobjects.it/rcs_cor_corriere-layout/v2/assets/img/ext/favicon/favicon.ico?v1" sizes="16x16 24x24 32x32 48x48 64x64 128x128" type="image/vnd.microsoft.icon">
     </head>
-'''
+"""
 
 CANONICAL_LINK_TESTS = [
-    (b'<link href="https://www.dailymail.co.uk/home/index.html" rel="canonical" />', 'https://www.dailymail.co.uk/home/index.html'),
-    (b'<link rel="canonical" href="https://www.lefigaro.fr/">', 'https://www.lefigaro.fr/'),
-    (b'<link data-rh="true" rel="canonical" href="https://www.lesechos.fr/industrie-services/conso-distribution/passe-sanitaire-le-gouvernement-desserre-letau-sur-les-centres-commerciaux-1343524"/>', 'https://www.lesechos.fr/industrie-services/conso-distribution/passe-sanitaire-le-gouvernement-desserre-letau-sur-les-centres-commerciaux-1343524'),
-    (b'<link rel="canonical" href="https://www.tokyo-sports.co.jp"/>', 'https://www.tokyo-sports.co.jp'),
-    (b'<link rel="canonical" href="https://www.chinadaily.com.cn" />', 'https://www.chinadaily.com.cn'),
-    (b'<link rel="canonical" href="https://www.repubblica.it/esteri/2021/09/03/news/afghanistana_murtaza_messi_maglia_di_plastica_bimbo_kabul-316373369/">', 'https://www.repubblica.it/esteri/2021/09/03/news/afghanistana_murtaza_messi_maglia_di_plastica_bimbo_kabul-316373369/'),
-    (b'<link HREF="https://www.elmundo.es/" rel="canonical" data-ue-c="href" data-ue-u="canonical"/>', 'https://www.elmundo.es/'),
-    (b'<link rel="canonical" href="https://www.theglobeandmail.com/">', 'https://www.theglobeandmail.com/'),
-    (b'<link rel="canonical" href="https://www.spiegel.de/wirtschaft/soziales/inflation-angst-vor-steigenden-preisen-bei-friedrich-merz-und-co-kolumne-a-2aff6230-8965-4b0f-954d-984cc57fb35c">', 'https://www.spiegel.de/wirtschaft/soziales/inflation-angst-vor-steigenden-preisen-bei-friedrich-merz-und-co-kolumne-a-2aff6230-8965-4b0f-954d-984cc57fb35c'),
-    (b'<link rel="canonical" href="https://elpais.com"/>', 'https://elpais.com'),
-    (b'<link rel="canonical" href="https://www.nrc.nl/">', 'https://www.nrc.nl/'),
-    (b'<link data-n-head="ssr" rel="canonical" href="https://www.nzz.ch">', 'https://www.nzz.ch'),
-    (b'<link rel="canonical" href="https://www.haaretz.com/"/>', 'https://www.haaretz.com/'),
-    (b'<link rel="canonical" href="https://timesofindia.indiatimes.com/world/south-asia/hunted-by-the-men-they-jailed-afghanistans-women-judges-seek-escape/articleshow/85896129.cms"/>', 'https://timesofindia.indiatimes.com/world/south-asia/hunted-by-the-men-they-jailed-afghanistans-women-judges-seek-escape/articleshow/85896129.cms'),
-    (b'<link rel="canonical" href="https://www.corriere.it/" />', 'https://www.corriere.it/'),
-    (b'<link rel="canonical" href="https://www.thesun.co.uk/news/16044176/buckingham-palace-furious-queens-secret-death/"/>', 'https://www.thesun.co.uk/news/16044176/buckingham-palace-furious-queens-secret-death/'),
-    (b'<link rel="canonical" href="https://www.theguardian.com/us-news/commentisfree/2016/feb/16/thomas-piketty-bernie-sanders-us-election-2016" />', 'https://www.theguardian.com/us-news/commentisfree/2016/feb/16/thomas-piketty-bernie-sanders-us-election-2016'),
-    (b'<link rel="canonical" "https://www.theguardian.com/us-news/commentisfree/2016/feb/16/thomas-piketty-bernie-sanders-us-election-2016" />', None),
+    (
+        b'<link href="https://www.dailymail.co.uk/home/index.html" rel="canonical" />',
+        "https://www.dailymail.co.uk/home/index.html",
+    ),
+    (
+        b'<link rel="canonical" href="https://www.lefigaro.fr/">',
+        "https://www.lefigaro.fr/",
+    ),
+    (
+        b'<link data-rh="true" rel="canonical" href="https://www.lesechos.fr/industrie-services/conso-distribution/passe-sanitaire-le-gouvernement-desserre-letau-sur-les-centres-commerciaux-1343524"/>',
+        "https://www.lesechos.fr/industrie-services/conso-distribution/passe-sanitaire-le-gouvernement-desserre-letau-sur-les-centres-commerciaux-1343524",
+    ),
+    (
+        b'<link rel="canonical" href="https://www.tokyo-sports.co.jp"/>',
+        "https://www.tokyo-sports.co.jp",
+    ),
+    (
+        b'<link rel="canonical" href="https://www.chinadaily.com.cn" />',
+        "https://www.chinadaily.com.cn",
+    ),
+    (
+        b'<link rel="canonical" href="https://www.repubblica.it/esteri/2021/09/03/news/afghanistana_murtaza_messi_maglia_di_plastica_bimbo_kabul-316373369/">',
+        "https://www.repubblica.it/esteri/2021/09/03/news/afghanistana_murtaza_messi_maglia_di_plastica_bimbo_kabul-316373369/",
+    ),
+    (
+        b'<link HREF="https://www.elmundo.es/" rel="canonical" data-ue-c="href" data-ue-u="canonical"/>',
+        "https://www.elmundo.es/",
+    ),
+    (
+        b'<link rel="canonical" href="https://www.theglobeandmail.com/">',
+        "https://www.theglobeandmail.com/",
+    ),
+    (
+        b'<link rel="canonical" href="https://www.spiegel.de/wirtschaft/soziales/inflation-angst-vor-steigenden-preisen-bei-friedrich-merz-und-co-kolumne-a-2aff6230-8965-4b0f-954d-984cc57fb35c">',
+        "https://www.spiegel.de/wirtschaft/soziales/inflation-angst-vor-steigenden-preisen-bei-friedrich-merz-und-co-kolumne-a-2aff6230-8965-4b0f-954d-984cc57fb35c",
+    ),
+    (b'<link rel="canonical" href="https://elpais.com"/>', "https://elpais.com"),
+    (b'<link rel="canonical" href="https://www.nrc.nl/">', "https://www.nrc.nl/"),
+    (
+        b'<link data-n-head="ssr" rel="canonical" href="https://www.nzz.ch">',
+        "https://www.nzz.ch",
+    ),
+    (
+        b'<link rel="canonical" href="https://www.haaretz.com/"/>',
+        "https://www.haaretz.com/",
+    ),
+    (
+        b'<link rel="canonical" href="https://timesofindia.indiatimes.com/world/south-asia/hunted-by-the-men-they-jailed-afghanistans-women-judges-seek-escape/articleshow/85896129.cms"/>',
+        "https://timesofindia.indiatimes.com/world/south-asia/hunted-by-the-men-they-jailed-afghanistans-women-judges-seek-escape/articleshow/85896129.cms",
+    ),
+    (
+        b'<link rel="canonical" href="https://www.corriere.it/" />',
+        "https://www.corriere.it/",
+    ),
+    (
+        b'<link rel="canonical" href="https://www.thesun.co.uk/news/16044176/buckingham-palace-furious-queens-secret-death/"/>',
+        "https://www.thesun.co.uk/news/16044176/buckingham-palace-furious-queens-secret-death/",
+    ),
+    (
+        b'<link rel="canonical" href="https://www.theguardian.com/us-news/commentisfree/2016/feb/16/thomas-piketty-bernie-sanders-us-election-2016" />',
+        "https://www.theguardian.com/us-news/commentisfree/2016/feb/16/thomas-piketty-bernie-sanders-us-election-2016",
+    ),
+    (
+        b'<link rel="canonical" "https://www.theguardian.com/us-news/commentisfree/2016/feb/16/thomas-piketty-bernie-sanders-us-election-2016" />',
+        None,
+    ),
     (b'<link rel="canonical" href=', None),
-    (b'<link rel="canonical" href=""', None)
+    (b'<link rel="canonical" href=""', None),
 ]
 
 
@@ -92,24 +149,27 @@ class TestWeb(object):
     def test_find_meta_refresh(self):
         meta_refresh = find_meta_refresh(META_REFRESH)
 
-        assert meta_refresh == (0, 'https://twitter.com/i/web/status/1155764949777620992')
+        assert meta_refresh == (
+            0,
+            "https://twitter.com/i/web/status/1155764949777620992",
+        )
 
     def test_find_javascript_relocation(self):
         locations = JAVASCRIPT_LOCATION_RE.findall(JAVASCRIPT_LOCATION)
 
-        r = set(int(m.decode().rsplit('/', 1)[-1]) for m in locations)
+        r = set(int(m.decode().rsplit("/", 1)[-1]) for m in locations)
 
         assert r == set(range(7))
 
         location = find_javascript_relocation(JAVASCRIPT_LOCATION)
 
-        assert location == 'https://twitter.com/i/web/status/0'
+        assert location == "https://twitter.com/i/web/status/0"
 
         location = find_javascript_relocation(META_REFRESH)
 
-        assert location == 'https://twitter.com/i/web/status/1155764949777620992'
+        assert location == "https://twitter.com/i/web/status/1155764949777620992"
 
-        location = find_javascript_relocation(b'NOTHING')
+        location = find_javascript_relocation(b"NOTHING")
 
         assert location is None
 
@@ -119,4 +179,4 @@ class TestWeb(object):
 
     def test_find_canonical_link(self):
         canonical_link = find_canonical_link(HTML_CANONICAL_TESTS)
-        assert canonical_link == 'https://www.corriere.it/'
+        assert canonical_link == "https://www.corriere.it/"

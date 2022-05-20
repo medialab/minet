@@ -6,10 +6,7 @@
 #
 from functools import partial
 
-from minet.scrape.constants import (
-    SELECT_ALIASES,
-    ITERATOR_ALIASES
-)
+from minet.scrape.constants import SELECT_ALIASES, ITERATOR_ALIASES
 
 
 def get_aliases(aliases, target, with_key=False):

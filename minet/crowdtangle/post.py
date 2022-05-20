@@ -6,14 +6,10 @@
 #
 from ebbe import getpath
 
-from minet.crowdtangle.exceptions import (
-    CrowdTangleMissingTokenError
-)
-from minet.crowdtangle.formatters import (
-    format_post
-)
+from minet.crowdtangle.exceptions import CrowdTangleMissingTokenError
+from minet.crowdtangle.formatters import format_post
 
-URL_TEMPLATE = 'https://api.crowdtangle.com/post/%s?token=%s'
+URL_TEMPLATE = "https://api.crowdtangle.com/post/%s?token=%s"
 
 
 def crowdtangle_post(request, post_id, token=None, raw=False):
@@ -24,7 +20,7 @@ def crowdtangle_post(request, post_id, token=None, raw=False):
     # Fetching
     api_url = URL_TEMPLATE % (post_id, token)
     data = request(api_url)
-    post = getpath(data, ['posts', 0])
+    post = getpath(data, ["posts", 0])
 
     if post is None:
         return

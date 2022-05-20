@@ -17,14 +17,14 @@ def fix_cookie(cookie_string):
 
     # NOTE: those cookie items can rat you out
     try:
-        del cookie['m_pixel_ratio']
-        del cookie['wd']
+        del cookie["m_pixel_ratio"]
+        del cookie["wd"]
     except KeyError:
         pass
 
-    cookie['locale'] = 'en_US'
+    cookie["locale"] = "en_US"
 
-    return '; '.join(key + '=' + morsel.coded_value for key, morsel in cookie.items())
+    return "; ".join(key + "=" + morsel.coded_value for key, morsel in cookie.items())
 
 
 def grab_facebook_cookie(source):
@@ -34,12 +34,12 @@ def grab_facebook_cookie(source):
         if get_cookie_for_url is None:
             return None
 
-        cookie = get_cookie_for_url(FACEBOOK_URL + '/')
+        cookie = get_cookie_for_url(FACEBOOK_URL + "/")
 
     else:
         cookie = source.strip()
 
-    if not cookie or 'c_user=' not in cookie.lower():
+    if not cookie or "c_user=" not in cookie.lower():
         return None
 
     return fix_cookie(cookie)

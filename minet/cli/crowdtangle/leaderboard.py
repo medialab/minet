@@ -6,7 +6,7 @@
 #
 from minet.crowdtangle.constants import (
     CROWDTANGLE_LEADERBOARD_CSV_HEADERS,
-    CROWDTANGLE_LEADERBOARD_CSV_HEADERS_WITH_BREAKDOWN
+    CROWDTANGLE_LEADERBOARD_CSV_HEADERS_WITH_BREAKDOWN,
 )
 from minet.cli.crowdtangle.utils import make_paginated_action
 
@@ -19,7 +19,5 @@ def select_csv_headers(cli_args):
 
 
 crowdtangle_leaderboard_action = make_paginated_action(
-    method_name='leaderboard',
-    item_name='accounts',
-    csv_headers=select_csv_headers
+    method_name="leaderboard", item_name="accounts", csv_headers=select_csv_headers
 )

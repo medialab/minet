@@ -10,8 +10,8 @@ from ural.youtube import is_youtube_video_id, extract_video_id_from_youtube_url
 
 
 def seconds_to_midnight_pacific_time():
-    now_utc = timezone('utc').localize(datetime.utcnow())
-    pacific_time = now_utc.astimezone(timezone('US/Pacific')).replace(tzinfo=None)
+    now_utc = timezone("utc").localize(datetime.utcnow())
+    pacific_time = now_utc.astimezone(timezone("US/Pacific")).replace(tzinfo=None)
     midnight_pacific = datetime.combine(pacific_time, datetime.min.time())
 
     return (midnight_pacific - pacific_time).seconds

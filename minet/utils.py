@@ -201,7 +201,6 @@ def rate_limited(max_per_period, period=1.0):
     state = RateLimiterState(max_per_period, period)
 
     def decorate(fn):
-
         @functools.wraps(fn)
         def decorated(*args, **kwargs):
             state.wait_if_needed()
@@ -217,7 +216,6 @@ def rate_limited(max_per_period, period=1.0):
 
 def rate_limited_from_state(state):
     def decorate(fn):
-
         @functools.wraps(fn)
         def decorated(*args, **kwargs):
             state.wait_if_needed()
@@ -231,9 +229,8 @@ def rate_limited_from_state(state):
     return decorate
 
 
-def rate_limited_method(attr='rate_limiter_state'):
+def rate_limited_method(attr="rate_limiter_state"):
     def decorate(fn):
-
         @functools.wraps(fn)
         def decorated(self, *args, **kwargs):
             state = getattr(self, attr)
@@ -259,7 +256,7 @@ class PseudoFStringFormatter(string.Formatter):
         return result, None
 
 
-def load_definition(f, encoding='utf-8'):
+def load_definition(f, encoding="utf-8"):
     string_path = isinstance(f, str)
 
     if string_path:
@@ -268,10 +265,10 @@ def load_definition(f, encoding='utf-8'):
     else:
         path = f.name
 
-    if path.endswith('.json'):
+    if path.endswith(".json"):
         definition = json.load(f)
 
-    elif path.endswith('.yml') or path.endswith('.yaml'):
+    elif path.endswith(".yml") or path.endswith(".yaml"):
         definition = yaml.safe_load(f)
 
     else:
@@ -289,16 +286,16 @@ def sleep_with_entropy(seconds, max_random_addendum):
 
 
 INTERVALS = [
-    ('weeks', 60 * 60 * 24 * 7),  # 60 * 60 * 24 * 7
-    ('days', 60 * 60 * 24),    # 60 * 60 * 24
-    ('hours', 60 * 60),    # 60 * 60
-    ('minutes', 60),
-    ('seconds', 1)
+    ("weeks", 60 * 60 * 24 * 7),  # 60 * 60 * 24 * 7
+    ("days", 60 * 60 * 24),  # 60 * 60 * 24
+    ("hours", 60 * 60),  # 60 * 60
+    ("minutes", 60),
+    ("seconds", 1),
 ]
 
 
 def prettyprint_integer(n):
-    return '{:,}'.format(int(n))
+    return "{:,}".format(int(n))
 
 
 def prettyprint_seconds(seconds, granularity=None):
@@ -311,48 +308,45 @@ def prettyprint_seconds(seconds, granularity=None):
             seconds -= value * count
 
             if value == 1:
-                name = name.rstrip('s')
+                name = name.rstrip("s")
 
-            result.append('%i %s' % (value, name))
+            result.append("%i %s" % (value, name))
 
     if not result:
-        return '%.2f seconds' % seconds
+        return "%.2f seconds" % seconds
 
     if granularity is not None:
         result = result[:granularity]
 
-    return ', '.join(result)
+    return ", ".join(result)
 
 
-def parse_date(formatted_date, lang='en'):
+def parse_date(formatted_date, lang="en"):
     if not isinstance(formatted_date, str):
         raise TypeError
 
-    parsed = dateparser.parse(
-        formatted_date,
-        languages=[lang]
-    )
+    parsed = dateparser.parse(formatted_date, languages=[lang])
 
     if not parsed:
         return None
 
-    return parsed.isoformat().split('.', 1)[0]
+    return parsed.isoformat().split(".", 1)[0]
 
 
 def is_binary_mimetype(m: str) -> bool:
-    if m.startswith('text/'):
+    if m.startswith("text/"):
         return False
 
-    if not m.startswith('application/'):
+    if not m.startswith("application/"):
         return True
 
-    second_part = m.split('/', 1)[-1]
+    second_part = m.split("/", 1)[-1]
 
     return not (
-        'json' in second_part or
-        'html' in second_part or
-        'xml' in second_part or
-        'yaml' in second_part or
-        'yml' in second_part or
-        second_part == 'x-httpd-php'
+        "json" in second_part
+        or "html" in second_part
+        or "xml" in second_part
+        or "yaml" in second_part
+        or "yml" in second_part
+        or second_part == "x-httpd-php"
     )

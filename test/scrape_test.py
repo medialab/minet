@@ -10,7 +10,7 @@ from minet.scrape.analysis import (
     headers_from_definition,
     validate,
     analyse,
-    ScraperAnalysis
+    ScraperAnalysis,
 )
 from minet.scrape.interpreter import tabulate
 from minet.scrape.std import get_display_text
@@ -30,7 +30,7 @@ from minet.scrape.exceptions import (
     ScraperValidationInvalidExtractorError,
     ScraperValidationMixedConcernError,
     ScraperValidationUnknownKeyError,
-    ScraperNotTabularError
+    ScraperNotTabularError,
 )
 
 BASIC_HTML = """
@@ -163,549 +163,441 @@ THE_WORST_HTML = """
 
 class TestScrape(object):
     def test_basics(self):
-        result = scrape({
-            'iterator': 'li'
-        }, BASIC_HTML)
+        result = scrape({"iterator": "li"}, BASIC_HTML)
 
-        assert result == ['One', 'Two']
+        assert result == ["One", "Two"]
 
-        result = scrape({
-            'iterator': 'li',
-            'item': 'id'
-        }, BASIC_HTML)
+        result = scrape({"iterator": "li", "item": "id"}, BASIC_HTML)
 
-        assert result == ['li1', 'li2']
+        assert result == ["li1", "li2"]
 
-        result = scrape({
-            'iterator': 'li',
-            'item': {
-                'attr': 'id'
-            }
-        }, BASIC_HTML)
+        result = scrape({"iterator": "li", "item": {"attr": "id"}}, BASIC_HTML)
 
-        assert result == ['li1', 'li2']
+        assert result == ["li1", "li2"]
 
-        result = scrape({
-            'sel': '#ok',
-            'item': 'id'
-        }, META_HTML)
+        result = scrape({"sel": "#ok", "item": "id"}, META_HTML)
 
-        assert result == 'ok'
+        assert result == "ok"
 
-        result = scrape({
-            'sel': '#ok',
-            'iterator': 'li',
-            'item': 'id'
-        }, META_HTML)
+        result = scrape({"sel": "#ok", "iterator": "li", "item": "id"}, META_HTML)
 
-        assert result == ['li1', 'li2']
+        assert result == ["li1", "li2"]
 
-        result = scrape({
-            'iterator': 'li',
-            'item': {
-                'eval': 'element.get("id") + "-ok"'
-            }
-        }, BASIC_HTML)
+        result = scrape(
+            {"iterator": "li", "item": {"eval": 'element.get("id") + "-ok"'}},
+            BASIC_HTML,
+        )
 
-        assert result == ['li1-ok', 'li2-ok']
+        assert result == ["li1-ok", "li2-ok"]
 
-        result = scrape({
-            'iterator': 'li',
-            'item': {
-                'attr': 'id',
-                'eval': 'value + "-test"'
-            }
-        }, BASIC_HTML)
+        result = scrape(
+            {"iterator": "li", "item": {"attr": "id", "eval": 'value + "-test"'}},
+            BASIC_HTML,
+        )
 
-        result == ['li1-test', 'li2-test']
+        result == ["li1-test", "li2-test"]
 
-        result = scrape({
-            'iterator': 'li',
-            'fields': {
-                'id': 'id',
-                'text': 'text'
-            }
-        }, BASIC_HTML)
+        result = scrape(
+            {"iterator": "li", "fields": {"id": "id", "text": "text"}}, BASIC_HTML
+        )
 
-        assert result == [{'id': 'li1', 'text': 'One'}, {'id': 'li2', 'text': 'Two'}]
+        assert result == [{"id": "li1", "text": "One"}, {"id": "li2", "text": "Two"}]
 
-        result = scrape({
-            'iterator': 'li',
-            'fields': {
-                'label': {
-                    'sel': '.first'
+        result = scrape(
+            {
+                "iterator": "li",
+                "fields": {"label": {"sel": ".first"}, "number": {"sel": ".second"}},
+            },
+            NESTED_HTML,
+        )
+
+        assert result == [
+            {"number": "1", "label": "One"},
+            {"number": "2", "label": "Two"},
+        ]
+
+        result = scrape(
+            {
+                "iterator": "li",
+                "fields": {
+                    "inner": {"extract": "inner_html"},
+                    "outer": {"extract": "outer_html"},
                 },
-                'number': {
-                    'sel': '.second'
-                }
-            }
-        }, NESTED_HTML)
-
-        assert result == [{'number': '1', 'label': 'One'}, {'number': '2', 'label': 'Two'}]
-
-        result = scrape({
-            'iterator': 'li',
-            'fields': {
-                'inner': {
-                    'extract': 'inner_html'
-                },
-                'outer': {
-                    'extract': 'outer_html'
-                }
-            }
-        }, NESTED_HTML)
+            },
+            NESTED_HTML,
+        )
 
         assert result == [
             {
-                'inner': '<span class="first">One</span> <span class="second">1</span>',
-                'outer': '<li class="li" id="li1"><span class="first">One</span> <span class="second">1</span></li>'
+                "inner": '<span class="first">One</span> <span class="second">1</span>',
+                "outer": '<li class="li" id="li1"><span class="first">One</span> <span class="second">1</span></li>',
             },
             {
-                'inner': '<span class="first">Two</span> <span class="second">2</span>',
-                'outer': '<li class="li" id="li2"><span class="first">Two</span> <span class="second">2</span></li>'
-            }
+                "inner": '<span class="first">Two</span> <span class="second">2</span>',
+                "outer": '<li class="li" id="li2"><span class="first">Two</span> <span class="second">2</span></li>',
+            },
         ]
-        result = scrape({'item': {'extract': 'display_text'}}, '<p>Hello</p><p>World</p>')
+        result = scrape(
+            {"item": {"extract": "display_text"}}, "<p>Hello</p><p>World</p>"
+        )
 
-        assert result == 'Hello\n\nWorld'
+        assert result == "Hello\n\nWorld"
 
-        result = scrape({
-            'iterator': 'li',
-            'fields': {
-                'value': 'text',
-                'constant': {
-                    'default': 'Same'
-                }
-            }
-        }, BASIC_HTML)
+        result = scrape(
+            {
+                "iterator": "li",
+                "fields": {"value": "text", "constant": {"default": "Same"}},
+            },
+            BASIC_HTML,
+        )
 
-        assert result == [{'value': 'One', 'constant': 'Same'}, {'value': 'Two', 'constant': 'Same'}]
+        assert result == [
+            {"value": "One", "constant": "Same"},
+            {"value": "Two", "constant": "Same"},
+        ]
 
-        result = scrape({
-            'iterator': 'li',
-            'item': {
-                'attr': 'class',
-                'default': 'no-class'
-            }
-        }, BASIC_HTML)
+        result = scrape(
+            {"iterator": "li", "item": {"attr": "class", "default": "no-class"}},
+            BASIC_HTML,
+        )
 
-        assert result == ['no-class', 'no-class']
+        assert result == ["no-class", "no-class"]
 
     def test_stripped_extraction(self):
-        text = scrape({
-            'sel': 'div'
-        }, '<div>    Hello world        </div>')
+        text = scrape({"sel": "div"}, "<div>    Hello world        </div>")
 
-        assert text == 'Hello world'
+        assert text == "Hello world"
 
     def test_filter(self):
-        result = scrape({
-            'iterator': 'li',
-            'item': 'id'
-        }, HOLEY_HTML)
+        result = scrape({"iterator": "li", "item": "id"}, HOLEY_HTML)
 
-        assert result == ['li1', None, 'li3']
+        assert result == ["li1", None, "li3"]
 
-        result = scrape({
-            'iterator': 'li',
-            'item': 'id',
-            'filter_eval': 'bool(value)'
-        }, HOLEY_HTML)
+        result = scrape(
+            {"iterator": "li", "item": "id", "filter_eval": "bool(value)"}, HOLEY_HTML
+        )
 
-        assert result == ['li1', 'li3']
+        assert result == ["li1", "li3"]
 
-        result = scrape({
-            'iterator': 'li',
-            'item': 'id',
-            'filter': True
-        }, HOLEY_HTML)
+        result = scrape({"iterator": "li", "item": "id", "filter": True}, HOLEY_HTML)
 
-        assert result == ['li1', 'li3']
+        assert result == ["li1", "li3"]
 
-        result = scrape({
-            '$$': 'li',
-            'fields': {
-                'id': 'id'
-            },
-            'filter': True
-        }, HOLEY_HTML)
+        result = scrape(
+            {"$$": "li", "fields": {"id": "id"}, "filter": True}, HOLEY_HTML
+        )
 
-        assert result == [{'id': 'li1'}, {'id': None}, {'id': 'li3'}]
+        assert result == [{"id": "li1"}, {"id": None}, {"id": "li3"}]
 
-        result = scrape({
-            'iterator': 'li',
-            'fields': {
-                'id': 'id'
-            },
-            'filter': 'id'
-        }, HOLEY_HTML)
+        result = scrape(
+            {"iterator": "li", "fields": {"id": "id"}, "filter": "id"}, HOLEY_HTML
+        )
 
-        assert result == [{'id': 'li1'}, {'id': 'li3'}]
+        assert result == [{"id": "li1"}, {"id": "li3"}]
 
-        target_html = '''
+        target_html = """
             <ul>
                 <li color="blue" age="34">John</li>
                 <li age="45">Mary</li>
                 <li color="purple" age="23">Susan    </li>
             </ul>
-        '''
+        """
 
-        result = scrape({
-            'iterator': 'li',
-            'fields': {
-                'name': 'text',
-                'attributes': {
-                    'fields': {
-                        'color': 'color',
-                        'age': 'age'
-                    }
-                }
+        result = scrape(
+            {
+                "iterator": "li",
+                "fields": {
+                    "name": "text",
+                    "attributes": {"fields": {"color": "color", "age": "age"}},
+                },
+                "filter": "attributes.color",
             },
-            'filter': 'attributes.color'
-        }, target_html)
+            target_html,
+        )
 
         assert result == [
-            {'name': 'John', 'attributes': {'color': 'blue', 'age': '34'}},
-            {'name': 'Susan', 'attributes': {'color': 'purple', 'age': '23'}}
+            {"name": "John", "attributes": {"color": "blue", "age": "34"}},
+            {"name": "Susan", "attributes": {"color": "purple", "age": "23"}},
         ]
 
     def test_uniq(self):
-        result = scrape({
-            'iterator': 'li',
-            'item': 'id',
-            'uniq': True
-        }, REPETITIVE_HTML)
+        result = scrape({"iterator": "li", "item": "id", "uniq": True}, REPETITIVE_HTML)
 
-        assert result == ['li1', 'li3']
+        assert result == ["li1", "li3"]
 
-        result = scrape({
-            'iterator': 'li',
-            'fields': {
-                'id': 'id'
-            },
-            'uniq': 'id'
-        }, REPETITIVE_HTML)
+        result = scrape(
+            {"iterator": "li", "fields": {"id": "id"}, "uniq": "id"}, REPETITIVE_HTML
+        )
 
-        assert result == [{'id': 'li1'}, {'id': 'li3'}]
+        assert result == [{"id": "li1"}, {"id": "li3"}]
 
     def test_recursive(self):
-        result = scrape({
-            'iterator': 'li',
-            'item': {
-                'iterator': 'span'
-            }
-        }, NESTED_HTML)
+        result = scrape({"iterator": "li", "item": {"iterator": "span"}}, NESTED_HTML)
 
-        assert result == [['One', '1'], ['Two', '2']]
+        assert result == [["One", "1"], ["Two", "2"]]
 
     def test_selection_eval(self):
 
-        result = scrape({
-            'iterator': 'li',
-            'item': {
-                'sel_eval': 'element.select_one("span")'
-            }
-        }, NESTED_HTML)
+        result = scrape(
+            {"iterator": "li", "item": {"sel_eval": 'element.select_one("span")'}},
+            NESTED_HTML,
+        )
 
-        assert result == ['One', 'Two']
+        assert result == ["One", "Two"]
 
-        result = scrape({
-            'iterator_eval': 'element.select("li") + element.select("span")',
-            'item': {
-                'attr': 'class'
-            }
-        }, NESTED_HTML)
+        result = scrape(
+            {
+                "iterator_eval": 'element.select("li") + element.select("span")',
+                "item": {"attr": "class"},
+            },
+            NESTED_HTML,
+        )
 
-        assert result == [['li'], ['li'], ['first'], ['second'], ['first'], ['second']]
+        assert result == [["li"], ["li"], ["first"], ["second"], ["first"], ["second"]]
 
-        result = scrape({
-            'iterator': 'li',
-            'item': {
-                'sel_eval': '"span"'
-            }
-        }, NESTED_HTML)
+        result = scrape({"iterator": "li", "item": {"sel_eval": '"span"'}}, NESTED_HTML)
 
-        assert result == ['One', 'Two']
+        assert result == ["One", "Two"]
 
-        result = scrape({
-            'iterator_eval': '"li, span"',
-            'item': {
-                'attr': 'class'
-            }
-        }, NESTED_HTML)
+        result = scrape(
+            {"iterator_eval": '"li, span"', "item": {"attr": "class"}}, NESTED_HTML
+        )
 
-        assert result == [['li'], ['first'], ['second'], ['li'], ['first'], ['second']]
+        assert result == [["li"], ["first"], ["second"], ["li"], ["first"], ["second"]]
 
     def test_eval(self):
-        result = scrape({
-            'iterator': 'li',
-            'fields': {
-                'root_id': {
-                    'eval': 'root.select_one("#ok").get("id")'
-                }
-            }
-        }, META_HTML)
+        result = scrape(
+            {
+                "iterator": "li",
+                "fields": {"root_id": {"eval": 'root.select_one("#ok").get("id")'}},
+            },
+            META_HTML,
+        )
 
-        assert result == [{'root_id': 'ok'}, {'root_id': 'ok'}]
+        assert result == [{"root_id": "ok"}, {"root_id": "ok"}]
 
-        result = scrape({
-            'sel': 'li',
-            'item': {
-                'eval': 'a = 45\nreturn a + 10'
-            }
-        }, BASIC_HTML)
+        result = scrape(
+            {"sel": "li", "item": {"eval": "a = 45\nreturn a + 10"}}, BASIC_HTML
+        )
 
         assert result == 55
 
-        result = scrape({
-            'item': {
-                'eval': 'el = element.select_one("li")\nreturn el.get_text().strip()'
-            }
-        }, BASIC_HTML)
+        result = scrape(
+            {
+                "item": {
+                    "eval": 'el = element.select_one("li")\nreturn el.get_text().strip()'
+                }
+            },
+            BASIC_HTML,
+        )
 
-        assert result == 'One'
+        assert result == "One"
 
     def test_callable_eval(self):
         def process(value, **kwargs):
             return value.upper()
 
-        result = scrape({
-            'iterator': 'li',
-            'item': {
-                'eval': process
-            }
-        }, BASIC_HTML)
+        result = scrape({"iterator": "li", "item": {"eval": process}}, BASIC_HTML)
 
-        assert result == ['ONE', 'TWO']
+        assert result == ["ONE", "TWO"]
 
     def test_context(self):
-        result = scrape({
-            'iterator': 'li',
-            'fields': {
-                'text': {
-                    'method': 'text'
+        result = scrape(
+            {
+                "iterator": "li",
+                "fields": {
+                    "text": {"method": "text"},
+                    "context": {"eval": 'context["value"]'},
                 },
-                'context': {
-                    'eval': 'context["value"]'
-                }
-            }
-        }, BASIC_HTML, context={'value': 1})
+            },
+            BASIC_HTML,
+            context={"value": 1},
+        )
 
         assert list(result) == [
-            {'text': 'One', 'context': 1},
-            {'text': 'Two', 'context': 1}
+            {"text": "One", "context": 1},
+            {"text": "Two", "context": 1},
         ]
 
-        result = scrape({
-            'iterator': 'li',
-            'fields': {
-                'text': {
-                    'method': 'text'
+        result = scrape(
+            {
+                "iterator": "li",
+                "fields": {
+                    "text": {"method": "text"},
+                    "context": {"get_context": "value"},
                 },
-                'context': {
-                    'get_context': 'value'
-                }
-            }
-        }, BASIC_HTML, context={'value': 1})
+            },
+            BASIC_HTML,
+            context={"value": 1},
+        )
 
         assert list(result) == [
-            {'text': 'One', 'context': 1},
-            {'text': 'Two', 'context': 1}
+            {"text": "One", "context": 1},
+            {"text": "Two", "context": 1},
         ]
 
-        result = scrape({
-            'set_context': {
-                'divid': {
-                    '$': '#ok',
-                    'attr': 'id'
-                }
+        result = scrape(
+            {
+                "set_context": {"divid": {"$": "#ok", "attr": "id"}},
+                "iterator": "li",
+                "fields": {"context": {"get_context": "divid"}, "value": "text"},
             },
-            'iterator': 'li',
-            'fields': {
-                'context': {
-                    'get_context': 'divid'
-                },
-                'value': 'text'
-            }
-        }, META_HTML)
-
-        assert result == [{'context': 'ok', 'value': 'One'}, {'context': 'ok', 'value': 'Two'}]
-
-        result = scrape({
-            'set_context': {
-                'title': {
-                    'default': 'Scrape'
-                }
-            },
-            'iterator': 'li',
-            'fields': {
-                'local': {
-                    'set_context': {
-                        'divid': {
-                            'eval': 'root.select_one("#ok").get("id")'
-                        }
-                    },
-                    'get_context': 'divid'
-                },
-                'global': {
-                    'get_context': 'divid'
-                },
-                'title': {
-                    'get_context': 'title'
-                }
-            }
-        }, META_HTML, context={'divid': 'notok'})
+            META_HTML,
+        )
 
         assert result == [
-            {'local': 'ok', 'global': 'notok', 'title': 'Scrape'},
-            {'local': 'ok', 'global': 'notok', 'title': 'Scrape'}
+            {"context": "ok", "value": "One"},
+            {"context": "ok", "value": "Two"},
+        ]
+
+        result = scrape(
+            {
+                "set_context": {"title": {"default": "Scrape"}},
+                "iterator": "li",
+                "fields": {
+                    "local": {
+                        "set_context": {
+                            "divid": {"eval": 'root.select_one("#ok").get("id")'}
+                        },
+                        "get_context": "divid",
+                    },
+                    "global": {"get_context": "divid"},
+                    "title": {"get_context": "title"},
+                },
+            },
+            META_HTML,
+            context={"divid": "notok"},
+        )
+
+        assert result == [
+            {"local": "ok", "global": "notok", "title": "Scrape"},
+            {"local": "ok", "global": "notok", "title": "Scrape"},
         ]
 
     def test_tabulate(self):
-        soup = BeautifulSoup(TABLE_TH_HTML, 'lxml')
-        table = soup.select_one('table')
+        soup = BeautifulSoup(TABLE_TH_HTML, "lxml")
+        table = soup.select_one("table")
 
         result = list(tabulate(table))
 
-        assert result == [{'Name': 'John', 'Surname': 'Mayall'}, {'Name': 'Mary', 'Surname': 'Susan'}]
+        assert result == [
+            {"Name": "John", "Surname": "Mayall"},
+            {"Name": "Mary", "Surname": "Susan"},
+        ]
 
-        result = list(tabulate(table, headers=['name', 'surname']))
+        result = list(tabulate(table, headers=["name", "surname"]))
 
-        assert result == [{'name': 'John', 'surname': 'Mayall'}, {'name': 'Mary', 'surname': 'Susan'}]
+        assert result == [
+            {"name": "John", "surname": "Mayall"},
+            {"name": "Mary", "surname": "Susan"},
+        ]
 
         result = list(tabulate(table, headers_inference=None))
 
-        assert result == [['John', 'Mayall'], ['Mary', 'Susan']]
+        assert result == [["John", "Mayall"], ["Mary", "Susan"]]
 
         with pytest.raises(NotATableError):
-            tabulate(soup.select_one('tr'))
+            tabulate(soup.select_one("tr"))
 
     def test_headers(self):
-        headers = headers_from_definition({'iterator': 'li'})
+        headers = headers_from_definition({"iterator": "li"})
 
-        assert headers == ['value']
+        assert headers == ["value"]
 
-        headers = headers_from_definition({'iterator': 'li', 'item': 'id'})
+        headers = headers_from_definition({"iterator": "li", "item": "id"})
 
-        assert headers == ['value']
+        assert headers == ["value"]
 
-        headers = headers_from_definition({'iterator': 'li', 'fields': {'id': 'id'}})
+        headers = headers_from_definition({"iterator": "li", "fields": {"id": "id"}})
 
-        assert headers == ['id']
+        assert headers == ["id"]
 
-        headers = headers_from_definition({'sel': 'table', 'tabulate': {'headers': ['id']}})
+        headers = headers_from_definition(
+            {"sel": "table", "tabulate": {"headers": ["id"]}}
+        )
 
-        assert headers == ['id']
+        assert headers == ["id"]
 
-        headers = headers_from_definition({'sel': 'table', 'tabulate': True})
+        headers = headers_from_definition({"sel": "table", "tabulate": True})
 
-        scraper = Scraper({'iterator': 'li', 'fields': {'id': 'id'}})
+        scraper = Scraper({"iterator": "li", "fields": {"id": "id"}})
 
-        assert scraper.headers == ['id']
+        assert scraper.headers == ["id"]
 
     def test_analysis(self):
-        analysis = analyse({
-            'item': 'href'
-        })
+        analysis = analyse({"item": "href"})
 
-        assert analysis == ScraperAnalysis(plural=False, headers=['value'], output_type='scalar')
+        assert analysis == ScraperAnalysis(
+            plural=False, headers=["value"], output_type="scalar"
+        )
 
-        analysis = analyse({
-            'fields': {
-                'url': 'href',
-                'title': 'text'
-            }
-        })
+        analysis = analyse({"fields": {"url": "href", "title": "text"}})
 
-        assert analysis == ScraperAnalysis(plural=False, headers=['url', 'title'], output_type='dict')
+        assert analysis == ScraperAnalysis(
+            plural=False, headers=["url", "title"], output_type="dict"
+        )
 
-        analysis = analyse({
-            'iterator': 'li',
-            'fields': {
-                'url': 'href',
-                'title': 'text'
-            }
-        })
+        analysis = analyse(
+            {"iterator": "li", "fields": {"url": "href", "title": "text"}}
+        )
 
-        assert analysis == ScraperAnalysis(plural=True, headers=['url', 'title'], output_type='collection')
+        assert analysis == ScraperAnalysis(
+            plural=True, headers=["url", "title"], output_type="collection"
+        )
 
     def test_absent_tail_call(self):
-        item = scrape({
-            'sel': 'quote',
-            'fields': {
-                'url': 'href'
-            }
-        }, BASIC_HTML)
+        item = scrape({"sel": "quote", "fields": {"url": "href"}}, BASIC_HTML)
 
         assert item is None
 
     def test_inexistent_selection(self):
-        expected = [{'id': 'li1', 'empty': None}, {'id': 'li2', 'empty': None}]
+        expected = [{"id": "li1", "empty": None}, {"id": "li2", "empty": None}]
 
-        items = scrape({
-            'iterator': 'li',
-            'fields': {
-                'id': 'id',
-                'empty': {
-                    'sel': 'blockquote'
-                }
-            }
-        }, BASIC_HTML)
+        items = scrape(
+            {"iterator": "li", "fields": {"id": "id", "empty": {"sel": "blockquote"}}},
+            BASIC_HTML,
+        )
 
         assert items == expected
 
-        items = scrape({
-            'iterator': 'li',
-            'fields': {
-                'id': 'id',
-                'empty': {
-                    'sel': 'blockquote',
-                    'item': 'text'
-                }
-            }
-        }, BASIC_HTML)
+        items = scrape(
+            {
+                "iterator": "li",
+                "fields": {"id": "id", "empty": {"sel": "blockquote", "item": "text"}},
+            },
+            BASIC_HTML,
+        )
 
         assert items == expected
 
-        item = scrape({
-            'sel': 'li',
-            'fields': {
-                'id': 'id',
-                'empty': {
-                    'sel': 'blockquote',
-                    'item': 'text'
-                }
-            }
-        }, BASIC_HTML)
+        item = scrape(
+            {
+                "sel": "li",
+                "fields": {"id": "id", "empty": {"sel": "blockquote", "item": "text"}},
+            },
+            BASIC_HTML,
+        )
 
         assert item == expected[0]
 
     def test_leaf(self):
-        item = scrape({
-            'sel': 'li'
-        }, BASIC_HTML)
+        item = scrape({"sel": "li"}, BASIC_HTML)
 
-        assert item == 'One'
+        assert item == "One"
 
         item = scrape({}, BASIC_HTML)
 
-        assert item == 'One\nTwo'
+        assert item == "One\nTwo"
 
     def test_dumb_recursive(self):
-        item = scrape({
-            'sel': 'ul',
-            'item': {
-                'sel': 'li',
-                'item': {
-                    'sel': 'span'
-                }
-            }
-        }, NESTED_HTML)
+        item = scrape(
+            {"sel": "ul", "item": {"sel": "li", "item": {"sel": "span"}}}, NESTED_HTML
+        )
 
-        assert item == 'One'
+        assert item == "One"
 
     def test_conditional_eval(self):
-        html = '''
+        html = """
             <main>
                 <div id="colors">
                     <p>Red</p>
@@ -718,25 +610,28 @@ class TestScrape(object):
                     </ul>
                 </div>
             </main>
-        '''
+        """
 
-        result = scrape({
-            'iterator': 'div',
-            'fields': {
-                'kind': 'id',
-                'items': {
-                    'iterator_eval': 'element.select("p") if element.get("id") == "colors" else element.select("li")'
-                }
-            }
-        }, html)
+        result = scrape(
+            {
+                "iterator": "div",
+                "fields": {
+                    "kind": "id",
+                    "items": {
+                        "iterator_eval": 'element.select("p") if element.get("id") == "colors" else element.select("li")'
+                    },
+                },
+            },
+            html,
+        )
 
         assert result == [
-            {'kind': 'colors', 'items': ['Red', 'Blue']},
-            {'kind': 'animals', 'items': ['Tiger', 'Dog']}
+            {"kind": "colors", "items": ["Red", "Blue"]},
+            {"kind": "animals", "items": ["Tiger", "Dog"]},
         ]
 
     def test_nested_local_context(self):
-        html = '''
+        html = """
             <div data-topic="science">
                 <ul>
                     <li>
@@ -765,206 +660,177 @@ class TestScrape(object):
                     </li>
                 </ul>
             </div>
-        '''
+        """
 
-        result = scrape({
-            'iterator': 'div',
-            'item': {
-                'set_context': {
-                    'topic': 'data-topic'
+        result = scrape(
+            {
+                "iterator": "div",
+                "item": {
+                    "set_context": {"topic": "data-topic"},
+                    "iterator": "li > p",
+                    "fields": {
+                        "topic": {"get_context": "topic"},
+                        "post": {"sel": "strong"},
+                        "author": {"sel": "em"},
+                    },
                 },
-                'iterator': 'li > p',
-                'fields': {
-                    'topic': {
-                        'get_context': 'topic'
-                    },
-                    'post': {
-                        'sel': 'strong'
-                    },
-                    'author': {
-                        'sel': 'em'
-                    }
-                }
-            }
-        }, html)
+            },
+            html,
+        )
 
         assert result == [
             [
-                {'topic': 'science', 'post': '1', 'author': 'Allan'},
-                {'topic': 'science', 'post': '2', 'author': 'Susan'},
+                {"topic": "science", "post": "1", "author": "Allan"},
+                {"topic": "science", "post": "2", "author": "Susan"},
             ],
             [
-                {'topic': 'arts', 'post': '3', 'author': 'Josephine'},
-                {'topic': 'arts', 'post': '4', 'author': 'Peter'}
-            ]
+                {"topic": "arts", "post": "3", "author": "Josephine"},
+                {"topic": "arts", "post": "4", "author": "Peter"},
+            ],
         ]
 
-        result = scrape({
-            'iterator': 'li',
-            'fields': {
-                'topic': {
-                    'sel_eval': 'element.find_parent("div")',
-                    'attr': 'data-topic'
+        result = scrape(
+            {
+                "iterator": "li",
+                "fields": {
+                    "topic": {
+                        "sel_eval": 'element.find_parent("div")',
+                        "attr": "data-topic",
+                    },
+                    "post": {"sel": "strong"},
+                    "author": {"sel": "em"},
                 },
-                'post': {
-                    'sel': 'strong'
-                },
-                'author': {
-                    'sel': 'em'
-                }
-            }
-        }, html)
+            },
+            html,
+        )
 
         assert result == [
-            {'topic': 'science', 'post': '1', 'author': 'Allan'},
-            {'topic': 'science', 'post': '2', 'author': 'Susan'},
-            {'topic': 'arts', 'post': '3', 'author': 'Josephine'},
-            {'topic': 'arts', 'post': '4', 'author': 'Peter'}
+            {"topic": "science", "post": "1", "author": "Allan"},
+            {"topic": "science", "post": "2", "author": "Susan"},
+            {"topic": "arts", "post": "3", "author": "Josephine"},
+            {"topic": "arts", "post": "4", "author": "Peter"},
         ]
 
     def test_scope(self):
-        result = scrape({
-            'iterator': 'li',
-            'item': {
-                'eval': 'x = scope.x or 0\nscope.x = x + 1\nreturn scope.x'
-            }
-        }, REPETITIVE_HTML)
+        result = scrape(
+            {
+                "iterator": "li",
+                "item": {"eval": "x = scope.x or 0\nscope.x = x + 1\nreturn scope.x"},
+            },
+            REPETITIVE_HTML,
+        )
 
         assert result == [1, 2, 3]
 
     def test_validate(self):
         bad_definition = {
-            'sel': 'li',
-            'item': {
-                'sel': 'a[',
-                'eval': '"ok'
+            "sel": "li",
+            "item": {"sel": "a[", "eval": '"ok'},
+            "filter": True,
+            "fields": {
+                "url": {"iterator": ":first", "iterator_eval": '"span"'},
+                "name": {"attr": "id", "extract": "text"},
+                "extractor": {"extract": "blabla"},
+                "id": {"attr": "id", "item": "href"},
+                "invalid_filter1": {"iterator": "div", "filter": "guacamole"},
+                "invalid_filter2": {
+                    "iterator": "div",
+                    "filter": True,
+                    "fields": {"id": "text"},
+                },
+                "unknown_key": {"idontknowyou": True},
             },
-            'filter': True,
-            'fields': {
-                'url': {
-                    'iterator': ':first',
-                    'iterator_eval': '"span"'
-                },
-                'name': {
-                    'attr': 'id',
-                    'extract': 'text'
-                },
-                'extractor': {
-                    'extract': 'blabla'
-                },
-                'id': {
-                    'attr': 'id',
-                    'item': 'href'
-                },
-                'invalid_filter1': {
-                    'iterator': 'div',
-                    'filter': 'guacamole'
-                },
-                'invalid_filter2': {
-                    'iterator': 'div',
-                    'filter': True,
-                    'fields': {
-                        'id': 'text'
-                    }
-                },
-                'unknown_key': {
-                    'idontknowyou': True
-                }
-            }
         }
 
         errors = validate(bad_definition)
 
         def key(t):
-            return ('.'.join(t[0]), t[1].__name__)
+            return (".".join(t[0]), t[1].__name__)
 
         errors = sorted([(e.path, type(e)) for e in errors], key=key)
 
-        expecting = sorted([
-            ([], ScraperValidationConflictError),
-            ([], ScraperValidationInvalidPluralModifierError),
-            (['item', 'sel'], InvalidCSSSelectorError),
-            (['item', 'eval'], ScraperEvalSyntaxError),
-            (['fields', 'url', 'iterator'], InvalidCSSSelectorError),
-            ([], ScraperValidationIrrelevantPluralModifierError),
-            (['fields', 'url'], ScraperValidationConflictError),
-            (['fields', 'name'], ScraperValidationConflictError),
-            (['fields', 'id'], ScraperValidationMixedConcernError),
-            (['fields', 'invalid_filter1'], ScraperValidationInvalidPluralModifierError),
-            (['fields', 'invalid_filter2'], ScraperValidationInvalidPluralModifierError),
-            (['fields', 'extractor'], ScraperValidationInvalidExtractorError),
-            (['fields', 'unknown_key'], ScraperValidationUnknownKeyError)
-        ], key=key)
+        expecting = sorted(
+            [
+                ([], ScraperValidationConflictError),
+                ([], ScraperValidationInvalidPluralModifierError),
+                (["item", "sel"], InvalidCSSSelectorError),
+                (["item", "eval"], ScraperEvalSyntaxError),
+                (["fields", "url", "iterator"], InvalidCSSSelectorError),
+                ([], ScraperValidationIrrelevantPluralModifierError),
+                (["fields", "url"], ScraperValidationConflictError),
+                (["fields", "name"], ScraperValidationConflictError),
+                (["fields", "id"], ScraperValidationMixedConcernError),
+                (
+                    ["fields", "invalid_filter1"],
+                    ScraperValidationInvalidPluralModifierError,
+                ),
+                (
+                    ["fields", "invalid_filter2"],
+                    ScraperValidationInvalidPluralModifierError,
+                ),
+                (["fields", "extractor"], ScraperValidationInvalidExtractorError),
+                (["fields", "unknown_key"], ScraperValidationUnknownKeyError),
+            ],
+            key=key,
+        )
 
         assert errors == expecting
 
         with pytest.raises(InvalidScraperError) as info:
             Scraper(bad_definition)
 
-        errors = sorted([(e.path, type(e)) for e in info.value.validation_errors], key=key)
+        errors = sorted(
+            [(e.path, type(e)) for e in info.value.validation_errors], key=key
+        )
 
         assert errors == expecting
 
     def test_eval_errors(self):
         with pytest.raises(ScraperEvalError) as info:
-            scrape({
-                'iterator': 'li',
-                'item': {
-                    'eval': 'item.split()'
-                }
-            }, BASIC_HTML)
+            scrape({"iterator": "li", "item": {"eval": "item.split()"}}, BASIC_HTML)
 
         assert isinstance(info.value.reason, NameError)
-        assert info.value.path == ['item', 'eval']
+        assert info.value.path == ["item", "eval"]
 
         with pytest.raises(ScraperEvalError) as info:
+
             def hellraiser(**kwargs):
                 raise RuntimeError
 
-            scrape({
-                'iterator': 'li',
-                'item': {
-                    'eval': hellraiser
-                }
-            }, BASIC_HTML)
+            scrape({"iterator": "li", "item": {"eval": hellraiser}}, BASIC_HTML)
 
         assert isinstance(info.value.reason, RuntimeError)
-        assert info.value.path == ['item', 'eval']
+        assert info.value.path == ["item", "eval"]
 
         with pytest.raises(ScraperEvalTypeError) as info:
-            scrape({
-                'sel_eval': '45'
-            }, BASIC_HTML)
+            scrape({"sel_eval": "45"}, BASIC_HTML)
 
         assert info.value.expected == (Tag, str)
         assert info.value.got == 45
-        assert info.value.path == ['sel_eval']
+        assert info.value.path == ["sel_eval"]
 
         with pytest.raises(ScraperEvalNoneError) as info:
-            scrape({
-                'iterator_eval': 'None'
-            }, BASIC_HTML)
+            scrape({"iterator_eval": "None"}, BASIC_HTML)
 
-        assert info.value.path == ['iterator_eval']
+        assert info.value.path == ["iterator_eval"]
 
         with pytest.raises(ScraperEvalTypeError) as info:
+
             def iterator(element, **kwargs):
-                return [element.select_one('li'), 45]
+                return [element.select_one("li"), 45]
 
-            scrape({
-                'iterator_eval': iterator
-            }, BASIC_HTML)
+            scrape({"iterator_eval": iterator}, BASIC_HTML)
 
-        assert info.value.path == ['iterator_eval']
+        assert info.value.path == ["iterator_eval"]
 
     def test_straining(self):
         too_complex = [
-            'ul > li',
-            'ul>li',
-            'ul li',
-            'ul ~ li',
-            ':is(span, div)',
-            'div:nth-child(4n)'
+            "ul > li",
+            "ul>li",
+            "ul li",
+            "ul ~ li",
+            ":is(span, div)",
+            "div:nth-child(4n)",
         ]
 
         for css in too_complex:
@@ -972,187 +838,171 @@ class TestScrape(object):
                 strainer_from_css(css)
 
         with pytest.raises(InvalidCSSSelectorError):
-            strainer_from_css('')
+            strainer_from_css("")
 
         with pytest.raises(InvalidCSSSelectorError):
-            strainer_from_css('a[')
+            strainer_from_css("a[")
 
-        strainer = strainer_from_css('td')
+        strainer = strainer_from_css("td")
 
         assert isinstance(strainer, SoupStrainer)
 
         def test_strainer(css, input_html, output_html, **kwargs):
             parse_only = strainer_from_css(css, **kwargs)
             input_soup = BeautifulSoup(
-                '<main>%s</main>' % input_html,
-                'lxml',
-                parse_only=parse_only
+                "<main>%s</main>" % input_html, "lxml", parse_only=parse_only
             )
 
             assert input_soup.decode_contents().strip() == output_html
 
         test_strainer(
-            'td',
+            "td",
             TABLE_TH_HTML,
-            '<td>John</td><td>Mayall</td><td>Mary</td><td>Susan</td>'
+            "<td>John</td><td>Mayall</td><td>Mary</td><td>Susan</td>",
         )
 
         test_strainer(
-            '#important',
+            "#important",
             '<div><p>ok</p><p id="important">whatever</p></div><div>Hello</div>',
-            '<p id="important">whatever</p>'
+            '<p id="important">whatever</p>',
         )
 
         test_strainer(
-            'em, strong',
-            '<div>Hello this is <em>horse</em> and <strong>chicken</strong></div><div>Hello</div>',
-            '<em>horse</em><strong>chicken</strong>'
+            "em, strong",
+            "<div>Hello this is <em>horse</em> and <strong>chicken</strong></div><div>Hello</div>",
+            "<em>horse</em><strong>chicken</strong>",
         )
 
         test_strainer(
-            '*',
+            "*",
             '<div><p>ok</p><p id="important">whatever</p></div><div>Hello</div>',
-            '<html><body><main><div><p>ok</p><p id="important">whatever</p></div><div>Hello</div></main></body></html>'
+            '<html><body><main><div><p>ok</p><p id="important">whatever</p></div><div>Hello</div></main></body></html>',
         )
 
         test_strainer(
-            'li > span',
-            '<ul><li>1. <span>One</span></li><li>2. Two</li></ul><div>Hello</div>',
-            '<li>1. <span>One</span></li><li>2. Two</li>',
-            ignore_relations=True
+            "li > span",
+            "<ul><li>1. <span>One</span></li><li>2. Two</li></ul><div>Hello</div>",
+            "<li>1. <span>One</span></li><li>2. Two</li>",
+            ignore_relations=True,
         )
 
         test_strainer(
-            'ul span',
-            '<ul><li>1. <span>One</span></li><li>2. Two</li></ul><div>Hello</div>',
-            '<ul><li>1. <span>One</span></li><li>2. Two</li></ul>',
-            ignore_relations=True
+            "ul span",
+            "<ul><li>1. <span>One</span></li><li>2. Two</li></ul><div>Hello</div>",
+            "<ul><li>1. <span>One</span></li><li>2. Two</li></ul>",
+            ignore_relations=True,
         )
 
         test_strainer(
-            '.number',
+            ".number",
             '<ul><li>1. <span class="number">One</span></li><li>2. Two</li></ul><div class="  yellow  number">Hello</div>',
-            '<span class="number">One</span><div class="yellow number">Hello</div>'
+            '<span class="number">One</span><div class="yellow number">Hello</div>',
         )
 
         test_strainer(
-            'span.number',
+            "span.number",
             '<ul><li>1. <span class="number">One</span></li><li>2. Two</li></ul><div class="  yellow  number">Hello</div>',
-            '<span class="number">One</span>'
+            '<span class="number">One</span>',
         )
 
         test_strainer(
-            '[color]',
+            "[color]",
             '<ul><li>1. <span color="blue">One</span></li><li>2. Two</li></ul><div>Hello</div>',
-            '<span color="blue">One</span>'
+            '<span color="blue">One</span>',
         )
 
         test_strainer(
-            'span[color]',
+            "span[color]",
             '<ul color="red"><li>1. <span color="blue">One</span></li><li>2. Two</li></ul><div>Hello</div>',
-            '<span color="blue">One</span>'
+            '<span color="blue">One</span>',
         )
 
         test_strainer(
-            '[color=blue]',
+            "[color=blue]",
             '<ul color="red"><li>1. <span color="blue">One</span></li><li>2. Two</li></ul><div>Hello</div>',
-            '<span color="blue">One</span>'
+            '<span color="blue">One</span>',
         )
 
         test_strainer(
-            '[color*=u]',
+            "[color*=u]",
             '<ul color="red"><li>1. <span color="blue">One</span></li><li>2. Two</li></ul><div>Hello</div>',
-            '<span color="blue">One</span>'
+            '<span color="blue">One</span>',
         )
 
         test_strainer(
-            '[color^=bl]',
+            "[color^=bl]",
             '<ul color="red"><li>1. <span color="blue">One</span></li><li>2. Two</li></ul><div>Hello</div>',
-            '<span color="blue">One</span>'
+            '<span color="blue">One</span>',
         )
 
         test_strainer(
-            '[color$=ue]',
+            "[color$=ue]",
             '<ul color="red"><li>1. <span color="blue">One</span></li><li>2. Two</li></ul><div>Hello</div>',
-            '<span color="blue">One</span>'
+            '<span color="blue">One</span>',
         )
 
         test_strainer(
-            '[color=blue]',
+            "[color=blue]",
             '<ul color="red"><li>1. <span COLOR="blue">One</span></li><li>2. Two</li></ul><div>Hello</div>',
-            '<span color="blue">One</span>'
+            '<span color="blue">One</span>',
         )
 
-        scraper = Scraper({
-            'iterator': 'li'
-        }, strain='div')
+        scraper = Scraper({"iterator": "li"}, strain="div")
 
-        html = '<div>Hello</div><ul><li>ok</li>'
+        html = "<div>Hello</div><ul><li>ok</li>"
 
         assert scraper(html) == []
 
     def test_as_csv_row(self):
         with pytest.raises(ScraperNotTabularError):
-            scraper = Scraper({
-                'iterator': 'li',
-                'fields': {
-                    'nested': {
-                        'fields': {
-                            'text': 'text'
-                        }
-                    }
-                }
-            })
+            scraper = Scraper(
+                {"iterator": "li", "fields": {"nested": {"fields": {"text": "text"}}}}
+            )
 
             scraper.as_csv_dict_rows(BASIC_HTML)
 
-        scraper = Scraper({
-            'iterator': 'li'
-        })
+        scraper = Scraper({"iterator": "li"})
 
         rows = list(scraper.as_csv_dict_rows(BASIC_HTML))
 
-        assert rows == [{'value': 'One'}, {'value': 'Two'}]
+        assert rows == [{"value": "One"}, {"value": "Two"}]
 
-        scraper = Scraper({
-            'iterator': 'li',
-            'fields': {
-                'text': 'text',
-                'list': {
-                    'default': [1, 2]
+        scraper = Scraper(
+            {
+                "iterator": "li",
+                "fields": {
+                    "text": "text",
+                    "list": {"default": [1, 2]},
+                    "false": {"default": False},
+                    "true": {"default": True},
                 },
-                'false': {
-                    'default': False
-                },
-                'true': {
-                    'default': True
-                }
             }
-        })
+        )
 
         rows = list(scraper.as_csv_dict_rows(BASIC_HTML))
 
         assert rows == [
-            {'text': 'One', 'list': '1|2', 'false': 'false', 'true': 'true'},
-            {'text': 'Two', 'list': '1|2', 'false': 'false', 'true': 'true'}
+            {"text": "One", "list": "1|2", "false": "false", "true": "true"},
+            {"text": "Two", "list": "1|2", "false": "false", "true": "true"},
         ]
 
-        rows = list(scraper.as_csv_dict_rows(BASIC_HTML, plural_separator='§'))
+        rows = list(scraper.as_csv_dict_rows(BASIC_HTML, plural_separator="§"))
 
         assert rows == [
-            {'text': 'One', 'list': '1§2', 'false': 'false', 'true': 'true'},
-            {'text': 'Two', 'list': '1§2', 'false': 'false', 'true': 'true'}
+            {"text": "One", "list": "1§2", "false": "false", "true": "true"},
+            {"text": "Two", "list": "1§2", "false": "false", "true": "true"},
         ]
 
     def test_get_display_test(self):
-        soup = BeautifulSoup(THE_WORST_HTML, 'lxml')
+        soup = BeautifulSoup(THE_WORST_HTML, "lxml")
 
         text = get_display_text(soup)
 
         def clean(t):
             return dedent(t).strip()
 
-        assert text == clean('''
+        assert text == clean(
+            """
             Some text isn't it?
             Hello Mr. Bond, How are you? This is italic isn't it?
 
@@ -1182,6 +1032,8 @@ class TestScrape(object):
             Other
             Again
 
+            some very interesting stuff
+
             This is a large span with something else over here.
 
             Hello gorgeous!
@@ -1197,17 +1049,21 @@ class TestScrape(object):
             Inspiring citation.
 
             Same line!
-        ''')
+        """
+        )
 
-        text = get_display_text(BeautifulSoup(TABLE_TH_HTML, 'lxml'))
+        text = get_display_text(BeautifulSoup(TABLE_TH_HTML, "lxml"))
 
-        assert text == clean('''
+        assert text == clean(
+            """
             Name Surname
             John Mayall
             Mary Susan
-        ''')
+        """
+        )
 
-        piecewise_html = clean('''
+        piecewise_html = clean(
+            """
             <main>
                 <div></div>
                 <div>
@@ -1218,11 +1074,12 @@ class TestScrape(object):
 
                 <div>World!</div>
             </main>
-        ''')
+        """
+        )
 
-        soup = BeautifulSoup(piecewise_html, 'lxml')
-        elements = soup.select('div')
+        soup = BeautifulSoup(piecewise_html, "lxml")
+        elements = soup.select("div")
 
         text = get_display_text(elements)
 
-        assert text == 'Hello\n\nWorld!'
+        assert text == "Hello\n\nWorld!"

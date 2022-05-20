@@ -10,9 +10,9 @@ from minet.buzzsumo.constants import ARTICLES_CSV_HEADERS
 
 
 BuzzSumoArticle = namedrecord(
-    'BuzzSumoArticle',
+    "BuzzSumoArticle",
     ARTICLES_CSV_HEADERS,
-    plural=['article_amplifiers', 'article_types']
+    plural=["article_amplifiers", "article_types"],
 )
 
 

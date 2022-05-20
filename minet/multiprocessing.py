@@ -26,7 +26,7 @@ def half_cpus(override=None):
 
 # NOTE: this is a class and not a decorator so it can be pickled
 class WorkerWrapper(object):
-    __slots__ = ('fn',)
+    __slots__ = ("fn",)
 
     def __init__(self, fn):
         self.fn = fn
@@ -55,9 +55,7 @@ class LazyPool(object):
 
         if self.actually_multiprocessed:
             self.inner_pool = multiprocessing.Pool(
-                processes,
-                initializer=initializer,
-                initargs=initargs
+                processes, initializer=initializer, initargs=initargs
             )
         else:
             if initializer is not None:

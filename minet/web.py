@@ -24,7 +24,7 @@ from tenacity import (
     wait_random_exponential,
     retry_if_exception_type,
     retry_if_exception,
-    stop_after_attempt
+    stop_after_attempt,
 )
 
 from minet.encodings import is_supported_encoding
@@ -34,13 +34,9 @@ from minet.exceptions import (
     InfiniteRedirectsError,
     InvalidRedirectError,
     InvalidURLError,
-    SelfRedirectError
+    SelfRedirectError,
 )
-from minet.constants import (
-    DEFAULT_SPOOFED_UA,
-    DEFAULT_URLLIB3_TIMEOUT,
-    COOKIE_BROWSERS
-)
+from minet.constants import DEFAULT_SPOOFED_UA, DEFAULT_URLLIB3_TIMEOUT, COOKIE_BROWSERS
 
 mimetypes.init()
 
@@ -48,20 +44,29 @@ mimetypes.init()
 CHARSET_RE = re.compile(rb'<meta.*?charset=["\']*(.+?)["\'>]', flags=re.I)
 PRAGMA_RE = re.compile(rb'<meta.*?content=["\']*;?charset=(.+?)["\'>]', flags=re.I)
 XML_RE = re.compile(rb'^<\?xml.*?encoding=["\']*(.+?)["\'>]', flags=re.I)
-NOSCRIPT_RE = re.compile(rb'<noscript[^>]*>.*</noscript[^>]*>', flags=re.I)
-META_REFRESH_RE = re.compile(rb'''<meta\s+http-equiv=['"]?refresh['"]?\s+content=['"]?([^"']+)['">]?''', flags=re.I)
-JAVASCRIPT_LOCATION_RE = re.compile(rb'''(?:window\.)?location(?:\s*=\s*|\.replace\(\s*)['"`](.*?)['"`]''')
-ESCAPED_SLASH_RE = re.compile(rb'\\\/')
-ASCII_RE = re.compile(r'^[ -~]*$')
-HTML_RE = re.compile(rb'^<(?:html|head|body|title|meta|link|span|div|img|ul|ol|[ap!?])', flags=re.I)
-CANONICAL_LINK_RE = re.compile(rb'<link\s*[^>]*\s+rel=(?:"\s*canonical\s*"|canonical|\'\s*canonical\s*\')\s+[^>]*\s?/?>')
+NOSCRIPT_RE = re.compile(rb"<noscript[^>]*>.*</noscript[^>]*>", flags=re.I)
+META_REFRESH_RE = re.compile(
+    rb"""<meta\s+http-equiv=['"]?refresh['"]?\s+content=['"]?([^"']+)['">]?""",
+    flags=re.I,
+)
+JAVASCRIPT_LOCATION_RE = re.compile(
+    rb"""(?:window\.)?location(?:\s*=\s*|\.replace\(\s*)['"`](.*?)['"`]"""
+)
+ESCAPED_SLASH_RE = re.compile(rb"\\\/")
+ASCII_RE = re.compile(r"^[ -~]*$")
+HTML_RE = re.compile(
+    rb"^<(?:html|head|body|title|meta|link|span|div|img|ul|ol|[ap!?])", flags=re.I
+)
+CANONICAL_LINK_RE = re.compile(
+    rb'<link\s*[^>]*\s+rel=(?:"\s*canonical\s*"|canonical|\'\s*canonical\s*\')\s+[^>]*\s?/?>'
+)
 HREF_RE = re.compile(rb'href=(\"[^"]+|\'[^\']+|[^\s]+)>?\s?', flags=re.I)
 
 # Constants
 CHARDET_CONFIDENCE_THRESHOLD = 0.9
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
 CONTENT_CHUNK_SIZE = 1024
-LARGE_CONTENT_CHUNK_SIZE = 2 ** 16
+LARGE_CONTENT_CHUNK_SIZE = 2**16
 
 assert CONTENT_CHUNK_SIZE < LARGE_CONTENT_CHUNK_SIZE
 
@@ -90,7 +95,7 @@ def guess_response_encoding(response, is_xml=False, use_chardet=False):
     Function taking an urllib3 response object and attempting to guess its
     encoding.
     """
-    content_type_header = response.getheader('content-type')
+    content_type_header = response.getheader("content-type")
 
     suboptimal_charset = None
 
@@ -98,7 +103,7 @@ def guess_response_encoding(response, is_xml=False, use_chardet=False):
         parsed_header = cgi.parse_header(content_type_header)
 
         if len(parsed_header) > 1:
-            charset = parsed_header[1].get('charset')
+            charset = parsed_header[1].get("charset")
 
             if charset is not None:
                 if is_supported_encoding(charset):
@@ -137,14 +142,11 @@ def guess_response_encoding(response, is_xml=False, use_chardet=False):
         chardet_result = chardet.detect(data)
 
         # Could not detect anything
-        if (
-            not chardet_result or
-            chardet_result.get('confidence') is None
-        ):
+        if not chardet_result or chardet_result.get("confidence") is None:
             return None
 
-        if chardet_result['confidence'] >= CHARDET_CONFIDENCE_THRESHOLD:
-            return chardet_result['encoding'].lower()
+        if chardet_result["confidence"] >= CHARDET_CONFIDENCE_THRESHOLD:
+            return chardet_result["encoding"].lower()
 
     return suboptimal_charset
 
@@ -154,7 +156,7 @@ def looks_like_html(html_chunk):
 
 
 def parse_http_header(header):
-    key, value = header.split(':', 1)
+    key, value = header.split(":", 1)
 
     return key.strip(), value.strip()
 
@@ -167,12 +169,12 @@ def parse_http_refresh(value):
         if isinstance(value, bytes):
             value = value.decode()
 
-        duration, url = value.strip().split(';', 1)
+        duration, url = value.strip().split(";", 1)
 
-        if not url.lower().strip().startswith('url='):
+        if not url.lower().strip().startswith("url="):
             return None
 
-        return int(duration), str(url.split('=', 1)[1])
+        return int(duration), str(url.split("=", 1)[1])
     except Exception:
         return None
 
@@ -187,11 +189,11 @@ def extract_href(value):
     url = m.group(1)
 
     try:
-        url = url.decode('utf-8')
+        url = url.decode("utf-8")
     except UnicodeDecodeError:
         return None
 
-    return url.strip('"\'') or None
+    return url.strip("\"'") or None
 
 
 def find_canonical_link(html_chunk):
@@ -219,7 +221,7 @@ def find_javascript_relocation(html_chunk):
         return None
 
     try:
-        return ESCAPED_SLASH_RE.sub(b'/', m.group(1)).decode()
+        return ESCAPED_SLASH_RE.sub(b"/", m.group(1)).decode()
     except Exception:
         return None
 
@@ -232,10 +234,10 @@ class CookieResolver(object):
         req = Request(url)
         self.jar.add_cookie_header(req)
 
-        return req.get_header('Cookie') or None
+        return req.get_header("Cookie") or None
 
 
-def grab_cookies(browser='firefox'):
+def grab_cookies(browser="firefox"):
     if browser not in COOKIE_BROWSERS:
         raise TypeError('minet.utils.grab_cookies: unknown "%s" browser.' % browser)
 
@@ -246,7 +248,7 @@ def grab_cookies(browser='firefox'):
 
 
 def dict_to_cookie_string(d):
-    return '; '.join('%s=%s' % r for r in d.items())
+    return "; ".join("%s=%s" % r for r in d.items())
 
 
 def create_pool(proxy=None, threads=None, insecure=False, **kwargs):
@@ -254,15 +256,13 @@ def create_pool(proxy=None, threads=None, insecure=False, **kwargs):
     Helper function returning a urllib3 pool manager with sane defaults.
     """
 
-    manager_kwargs = {
-        'timeout': DEFAULT_URLLIB3_TIMEOUT
-    }
+    manager_kwargs = {"timeout": DEFAULT_URLLIB3_TIMEOUT}
 
     if not insecure:
-        manager_kwargs['cert_reqs'] = 'CERT_REQUIRED'
-        manager_kwargs['ca_certs'] = certifi.where()
+        manager_kwargs["cert_reqs"] = "CERT_REQUIRED"
+        manager_kwargs["ca_certs"] = certifi.where()
     else:
-        manager_kwargs['cert_reqs'] = 'CERT_NONE'
+        manager_kwargs["cert_reqs"] = "CERT_NONE"
         # manager_kwargs['assert_hostname'] = False
 
         urllib3.disable_warnings()
@@ -270,8 +270,8 @@ def create_pool(proxy=None, threads=None, insecure=False, **kwargs):
     if threads is not None:
 
         # TODO: maxsize should increase with group_parallelism
-        manager_kwargs['maxsize'] = 10
-        manager_kwargs['num_pools'] = threads * 2
+        manager_kwargs["maxsize"] = 10
+        manager_kwargs["num_pools"] = threads * 2
 
     manager_kwargs.update(kwargs)
 
@@ -284,36 +284,41 @@ def create_pool(proxy=None, threads=None, insecure=False, **kwargs):
 DEFAULT_POOL = create_pool(maxsize=10, num_pools=10)
 
 
-def raw_request(http, url, method='GET', headers=None,
-                preload_content=True, release_conn=True, timeout=None,
-                body=None):
+def raw_request(
+    http,
+    url,
+    method="GET",
+    headers=None,
+    preload_content=True,
+    release_conn=True,
+    timeout=None,
+    body=None,
+):
     """
     Generic request helpers using a urllib3 pool to access some resource.
     """
 
     # Validating URL
-    if not ural.is_url(url, require_protocol=True, tld_aware=True, allow_spaces_in_path=True):
+    if not ural.is_url(
+        url, require_protocol=True, tld_aware=True, allow_spaces_in_path=True
+    ):
         return InvalidURLError(url=url), None
 
     # Performing request
     request_kwargs = {
-        'headers': headers,
-        'body': body,
-        'preload_content': preload_content,
-        'release_conn': release_conn,
-        'redirect': False,
-        'retries': False
+        "headers": headers,
+        "body": body,
+        "preload_content": preload_content,
+        "release_conn": release_conn,
+        "redirect": False,
+        "retries": False,
     }
 
     if timeout is not None:
-        request_kwargs['timeout'] = timeout
+        request_kwargs["timeout"] = timeout
 
     try:
-        response = http.request(
-            method,
-            url,
-            **request_kwargs
-        )
+        response = http.request(method, url, **request_kwargs)
     except Exception as e:
         return e, None
 
@@ -321,9 +326,9 @@ def raw_request(http, url, method='GET', headers=None,
 
 
 class Redirection(object):
-    __slots__ = ('status', 'type', 'url')
+    __slots__ = ("status", "type", "url")
 
-    def __init__(self, url, _type='hit'):
+    def __init__(self, url, _type="hit"):
         self.status = None
         self.url = url
         self.type = _type
@@ -331,20 +336,29 @@ class Redirection(object):
     def __repr__(self):
         class_name = self.__class__.__name__
 
-        return (
-            '<%(class_name)s type=%(type)s status=%(status)s url=%(url)s>'
-        ) % {
-            'class_name': class_name,
-            'type': self.type,
-            'status': self.status,
-            'url': self.url
+        return ("<%(class_name)s type=%(type)s status=%(status)s url=%(url)s>") % {
+            "class_name": class_name,
+            "type": self.type,
+            "status": self.status,
+            "url": self.url,
         }
 
 
-def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
-                follow_refresh_header=True, follow_meta_refresh=False,
-                follow_js_relocation=False, return_response=False,
-                infer_redirection=False, timeout=None, body=None, canonicalize=False):
+def raw_resolve(
+    http,
+    url,
+    method="GET",
+    headers=None,
+    max_redirects=5,
+    follow_refresh_header=True,
+    follow_meta_refresh=False,
+    follow_js_relocation=False,
+    return_response=False,
+    infer_redirection=False,
+    timeout=None,
+    body=None,
+    canonicalize=False,
+):
     """
     Helper function attempting to resolve the given url.
     """
@@ -358,7 +372,7 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
             target = ural.infer_redirection(url, recursive=False)
 
             if target != url:
-                url_stack[url] = Redirection(url, 'infer')
+                url_stack[url] = Redirection(url, "infer")
                 url = target
                 continue
 
@@ -374,21 +388,21 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
             body=body,
             preload_content=False,
             release_conn=False,
-            timeout=timeout
+            timeout=timeout,
         )
 
         redirection = Redirection(url)
 
         # Request error
         if http_error:
-            redirection.type = 'error'
+            redirection.type = "error"
             url_stack[url] = redirection
             error = http_error
             break
 
         # Cycle
         if url in url_stack:
-            error = InfiniteRedirectsError('Infinite redirects')
+            error = InfiniteRedirectsError("Infinite redirects")
             break
 
         redirection.status = response.status
@@ -400,21 +414,21 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
             if response.status < 400:
 
                 if follow_refresh_header:
-                    refresh = response.getheader('refresh')
+                    refresh = response.getheader("refresh")
 
                     if refresh is not None:
                         p = parse_http_refresh(refresh)
 
                         if p is not None:
                             location = p[1]
-                            redirection.type = 'refresh-header'
+                            redirection.type = "refresh-header"
 
                 # Reading a small chunk of the html
                 if location is None and (follow_meta_refresh or follow_js_relocation):
                     error = prebuffer_response_up_to(response, CONTENT_CHUNK_SIZE)
 
                     if error is not None:
-                        redirection.type = 'error'
+                        redirection.type = "error"
                         break
 
                 # Meta refresh
@@ -423,7 +437,7 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
 
                     if meta_refresh is not None:
                         location = meta_refresh[1]
-                        redirection.type = 'meta-refresh'
+                        redirection.type = "meta-refresh"
 
                 # JavaScript relocation
                 if location is None and follow_js_relocation:
@@ -431,50 +445,50 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
 
                     if js_relocation is not None:
                         location = js_relocation
-                        redirection.type = 'js-relocation'
+                        redirection.type = "js-relocation"
 
             # Found the end
             if location is None:
-                redirection.type = 'hit'
+                redirection.type = "hit"
 
             # Canonical url
-            if redirection.type == 'hit':
+            if redirection.type == "hit":
                 if canonicalize:
                     error = prebuffer_response_up_to(response, LARGE_CONTENT_CHUNK_SIZE)
 
                     if error is not None:
-                        redirection.type = 'error'
+                        redirection.type = "error"
                         break
 
                     canonical = find_canonical_link(response._body)
 
                     if canonical is not None and canonical != url:
                         canonical = urljoin(url, canonical)
-                        redirection = Redirection(canonical, 'canonical')
+                        redirection = Redirection(canonical, "canonical")
                         url_stack[canonical] = redirection
 
                 break
 
         else:
-            redirection.type = 'location-header'
-            location = response.getheader('location')
+            redirection.type = "location-header"
+            location = response.getheader("location")
 
         # Invalid redirection
         if not location:
-            error = InvalidRedirectError('Redirection is invalid')
+            error = InvalidRedirectError("Redirection is invalid")
             break
 
         # Location badly encoded?
         try:
             if not ASCII_RE.match(location):
-                byte_location = location.encode('latin1')
+                byte_location = location.encode("latin1")
                 detection = chardet.detect(byte_location)
-                guessed_encoding = detection['encoding'].lower()
+                guessed_encoding = detection["encoding"].lower()
 
                 if (
-                    guessed_encoding != 'iso-8859-1' and
-                    guessed_encoding != 'ascii' and
-                    detection['confidence'] >= CHARDET_CONFIDENCE_THRESHOLD
+                    guessed_encoding != "iso-8859-1"
+                    and guessed_encoding != "ascii"
+                    and detection["confidence"] >= CHARDET_CONFIDENCE_THRESHOLD
                 ):
                     location = byte_location.decode(guessed_encoding)
         except Exception:
@@ -485,7 +499,7 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
 
         # Self loop?
         if next_url == url:
-            error = SelfRedirectError('Self redirection')
+            error = SelfRedirectError("Self redirection")
             break
 
         # Go to next
@@ -493,7 +507,7 @@ def raw_resolve(http, url, method='GET', headers=None, max_redirects=5,
 
     # We reached max redirects
     else:
-        error = MaxRedirectsError('Maximum number of redirects exceeded')
+        error = MaxRedirectsError("Maximum number of redirects exceeded")
 
     if response and not return_response:
         response.release_conn()
@@ -513,16 +527,16 @@ def build_request_headers(headers=None, cookie=None, spoof_ua=False, json_body=F
     final_headers = {}
 
     if spoof_ua:
-        final_headers['User-Agent'] = DEFAULT_SPOOFED_UA
+        final_headers["User-Agent"] = DEFAULT_SPOOFED_UA
 
     if cookie:
         if not isinstance(cookie, str):
             cookie = dict_to_cookie_string(cookie)
 
-        final_headers['Cookie'] = cookie
+        final_headers["Cookie"] = cookie
 
     if json_body:
-        final_headers['Content-Type'] = 'application/json'
+        final_headers["Content-Type"] = "application/json"
 
     # Note: headers passed explicitly by users always win
     if headers is not None:
@@ -531,17 +545,29 @@ def build_request_headers(headers=None, cookie=None, spoof_ua=False, json_body=F
     return final_headers
 
 
-def request(url, pool=DEFAULT_POOL, method='GET', headers=None, cookie=None, spoof_ua=True,
-            follow_redirects=True, max_redirects=5, follow_refresh_header=True,
-            follow_meta_refresh=False, follow_js_relocation=False, timeout=None,
-            body=None, json_body=None):
+def request(
+    url,
+    pool=DEFAULT_POOL,
+    method="GET",
+    headers=None,
+    cookie=None,
+    spoof_ua=True,
+    follow_redirects=True,
+    max_redirects=5,
+    follow_refresh_header=True,
+    follow_meta_refresh=False,
+    follow_js_relocation=False,
+    timeout=None,
+    body=None,
+    json_body=None,
+):
 
     # Formatting headers
     final_headers = build_request_headers(
         headers=headers,
         cookie=cookie,
         spoof_ua=spoof_ua,
-        json_body=json_body is not None
+        json_body=json_body is not None,
     )
 
     # Dealing with body
@@ -550,19 +576,14 @@ def request(url, pool=DEFAULT_POOL, method='GET', headers=None, cookie=None, spo
     if isinstance(body, bytes):
         final_body = body
     elif isinstance(body, str):
-        final_body = body.encode('utf-8')
+        final_body = body.encode("utf-8")
 
     if json_body is not None:
-        final_body = json.dumps(json_body, ensure_ascii=False).encode('utf-8')
+        final_body = json.dumps(json_body, ensure_ascii=False).encode("utf-8")
 
     if not follow_redirects:
         return raw_request(
-            pool,
-            url,
-            method,
-            headers=final_headers,
-            body=final_body,
-            timeout=timeout
+            pool, url, method, headers=final_headers, body=final_body, timeout=timeout
         )
     else:
         err, _, response = raw_resolve(
@@ -576,7 +597,7 @@ def request(url, pool=DEFAULT_POOL, method='GET', headers=None, cookie=None, spo
             follow_refresh_header=follow_refresh_header,
             follow_meta_refresh=follow_meta_refresh,
             follow_js_relocation=follow_js_relocation,
-            timeout=timeout
+            timeout=timeout,
         )
 
         if err:
@@ -584,7 +605,7 @@ def request(url, pool=DEFAULT_POOL, method='GET', headers=None, cookie=None, spo
 
         # Finishing reading body
         try:
-            response._body = (response._body or b'') + response.read()
+            response._body = (response._body or b"") + response.read()
         except Exception as e:
             return e, response
         finally:
@@ -595,15 +616,24 @@ def request(url, pool=DEFAULT_POOL, method='GET', headers=None, cookie=None, spo
         return None, response
 
 
-def resolve(url, pool=DEFAULT_POOL, method='GET', headers=None, cookie=None, spoof_ua=True,
-            max_redirects=5, follow_refresh_header=True,
-            follow_meta_refresh=False, follow_js_relocation=False,
-            infer_redirection=False, timeout=None, canonicalize=False):
+def resolve(
+    url,
+    pool=DEFAULT_POOL,
+    method="GET",
+    headers=None,
+    cookie=None,
+    spoof_ua=True,
+    max_redirects=5,
+    follow_refresh_header=True,
+    follow_meta_refresh=False,
+    follow_js_relocation=False,
+    infer_redirection=False,
+    timeout=None,
+    canonicalize=False,
+):
 
     final_headers = build_request_headers(
-        headers=headers,
-        cookie=cookie,
-        spoof_ua=spoof_ua
+        headers=headers, cookie=cookie, spoof_ua=spoof_ua
     )
 
     return raw_resolve(
@@ -617,17 +647,12 @@ def resolve(url, pool=DEFAULT_POOL, method='GET', headers=None, cookie=None, spo
         follow_js_relocation=follow_js_relocation,
         infer_redirection=infer_redirection,
         timeout=timeout,
-        canonicalize=canonicalize
+        canonicalize=canonicalize,
     )
 
 
 def extract_response_meta(response, guess_encoding=True, guess_extension=True):
-    meta = {
-        'ext': None,
-        'mimetype': None,
-        'encoding': None,
-        'is_text': None
-    }
+    meta = {"ext": None, "mimetype": None, "encoding": None, "is_text": None}
 
     # Guessing extension
     if guess_extension:
@@ -636,36 +661,38 @@ def extract_response_meta(response, guess_encoding=True, guess_extension=True):
         # TODO: validate mime type string?
         mimetype, _ = mimetypes.guess_type(response.geturl())
 
-        if 'Content-Type' in response.headers:
-            content_type = response.headers['Content-Type']
+        if "Content-Type" in response.headers:
+            content_type = response.headers["Content-Type"]
             parsed_header = cgi.parse_header(content_type)
 
             if parsed_header and parsed_header[0].strip():
                 mimetype = parsed_header[0].strip()
 
         if mimetype is None and looks_like_html(response.data[:CONTENT_CHUNK_SIZE]):
-            mimetype = 'text/html'
+            mimetype = "text/html"
 
         if mimetype is not None:
             ext = mimetypes.guess_extension(mimetype)
 
-            if ext == '.htm':
-                ext = '.html'
-            elif ext == '.jpe':
-                ext = '.jpg'
+            if ext == ".htm":
+                ext = ".html"
+            elif ext == ".jpe":
+                ext = ".jpg"
 
-            meta['mimetype'] = mimetype
-            meta['ext'] = ext
+            meta["mimetype"] = mimetype
+            meta["ext"] = ext
 
-    if meta['mimetype'] is not None:
-        meta['is_text'] = not is_binary_mimetype(meta['mimetype'])
+    if meta["mimetype"] is not None:
+        meta["is_text"] = not is_binary_mimetype(meta["mimetype"])
 
-        if not meta['is_text']:
+        if not meta["is_text"]:
             guess_encoding = False
 
     # Guessing encoding
     if guess_encoding:
-        meta['encoding'] = guess_response_encoding(response, is_xml=True, use_chardet=True)
+        meta["encoding"] = guess_response_encoding(
+            response, is_xml=True, use_chardet=True
+        )
 
     return meta
 
@@ -679,13 +706,7 @@ def request_jsonrpc(url, method, pool=DEFAULT_POOL, *args, **kwargs):
         params = kwargs
 
     err, response = request(
-        url,
-        pool=pool,
-        method='POST',
-        json_body={
-            'method': method,
-            'params': params
-        }
+        url, pool=pool, method="POST", json_body={"method": method, "params": params}
     )
 
     if err is not None:
@@ -708,7 +729,7 @@ def request_json(url, pool=DEFAULT_POOL, *args, **kwargs):
         return e, response, None
 
 
-def request_text(url, pool=DEFAULT_POOL, *args, encoding='utf-8', **kwargs):
+def request_text(url, pool=DEFAULT_POOL, *args, encoding="utf-8", **kwargs):
     err, response = request(url, pool=pool, *args, **kwargs)
 
     if err:
@@ -747,13 +768,19 @@ def wrap_before_sleep_callback_with_global_hook(callback):
     return chain
 
 
-def create_request_retryer(min=10, max=THREE_HOURS, max_attempts=9, before_sleep=None,
-                           additional_exceptions=None, predicate=None):
+def create_request_retryer(
+    min=10,
+    max=THREE_HOURS,
+    max_attempts=9,
+    before_sleep=None,
+    additional_exceptions=None,
+    predicate=None,
+):
     global GLOBAL_RETRYER_BEFORE_SLEEP
 
     retryable_exception_types = [
         urllib3.exceptions.TimeoutError,
-        urllib3.exceptions.ProtocolError
+        urllib3.exceptions.ProtocolError,
     ]
 
     if additional_exceptions:
@@ -773,13 +800,12 @@ def create_request_retryer(min=10, max=THREE_HOURS, max_attempts=9, before_sleep
         wait=wait_random_exponential(exp_base=6, min=min, max=max),
         retry=retry_condition,
         stop=stop_after_attempt(max_attempts),
-        before_sleep=before_sleep_chain
+        before_sleep=before_sleep_chain,
     )
 
 
-def retrying_method(attr='retryer'):
+def retrying_method(attr="retryer"):
     def decorate(fn):
-
         @functools.wraps(fn)
         def decorated(self, *args, **kwargs):
             retryer = getattr(self, attr)

@@ -16,9 +16,7 @@ def mediacloud_topic_action(cli_args):
     writer.writerow(MEDIACLOUD_TOPIC_STORIES_CSV_HEADERS)
 
     loading_bar = LoadingBar(
-        desc='Fetching stories',
-        unit='story',
-        unit_plural='stories'
+        desc="Fetching stories", unit="story", unit_plural="stories"
     )
 
     client = MediacloudAPIClient(cli_args.token)
@@ -26,7 +24,7 @@ def mediacloud_topic_action(cli_args):
     iterator = client.topic_stories(
         cli_args.topic_id,
         media_id=cli_args.media_id,
-        from_media_id=cli_args.from_media_id
+        from_media_id=cli_args.from_media_id,
     )
 
     for story in iterator:

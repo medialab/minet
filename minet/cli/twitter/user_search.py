@@ -13,10 +13,7 @@
 #
 import casanova
 import math
-from twitwi import (
-    normalize_user,
-    format_user_as_csv_row
-)
+from twitwi import normalize_user, format_user_as_csv_row
 from twitwi.constants import USER_FIELDS
 
 from minet.cli.utils import LoadingBar
@@ -33,47 +30,40 @@ def twitter_user_search_action(cli_args):
         cli_args.access_token,
         cli_args.access_token_secret,
         cli_args.api_key,
-        cli_args.api_secret_key
+        cli_args.api_secret_key,
     )
 
     enricher = casanova.enricher(
-        cli_args.file,
-        cli_args.output,
-        keep=cli_args.select,
-        add=USER_FIELDS
+        cli_args.file, cli_args.output, keep=cli_args.select, add=USER_FIELDS
     )
 
-    loading_bar = LoadingBar(
-        desc='Retrieving users',
-        total=cli_args.total,
-        unit='user'
-    )
+    loading_bar = LoadingBar(desc="Retrieving users", total=cli_args.total, unit="user")
 
     for row, query in enricher.cells(cli_args.query, with_rows=True):
 
-        kwargs = {'q': query, 'count': ITEMS_PER_PAGE, 'include_entities': True}
+        kwargs = {"q": query, "count": ITEMS_PER_PAGE, "include_entities": True}
 
         loading_bar.print('Searching for "%s"' % query)
-        loading_bar.inc('queries')
+        loading_bar.inc("queries")
 
         already_seen_users = set()
 
         for page in range(1, RANGE_UPPER_BOUND):
-            kwargs['page'] = page
+            kwargs["page"] = page
 
-            result = client.call(['users', 'search'], **kwargs)
+            result = client.call(["users", "search"], **kwargs)
             new_user_count = 0
 
             for user in result:
                 user = normalize_user(user)
 
-                if user['id'] in already_seen_users:
+                if user["id"] in already_seen_users:
                     continue
 
                 loading_bar.update()
 
                 new_user_count += 1
-                already_seen_users.add(user['id'])
+                already_seen_users.add(user["id"])
                 user_row = format_user_as_csv_row(user)
                 enricher.writerow(row, user_row)
 

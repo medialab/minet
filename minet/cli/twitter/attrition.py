@@ -21,21 +21,19 @@ def twitter_attrition_action(cli_args):
         cli_args.access_token,
         cli_args.access_token_secret,
         cli_args.api_key,
-        cli_args.api_secret_key
+        cli_args.api_secret_key,
     )
 
     enricher = casanova.enricher(
         cli_args.file,
         cli_args.output,
         keep=cli_args.select,
-        add=['tweet_current_status'],
-        total=cli_args.total
+        add=["tweet_current_status"],
+        total=cli_args.total,
     )
 
     loading_bar = LoadingBar(
-        'Retrieving attrition reason',
-        total=enricher.total,
-        unit='tweet'
+        "Retrieving attrition reason", total=enricher.total, unit="tweet"
     )
 
     user_cache = {}
@@ -43,25 +41,31 @@ def twitter_attrition_action(cli_args):
 
     if cli_args.tweet_or_url_column not in enricher.headers:
         raise InvalidArgumentsError(
-            'Could not find the "%s" column containing the tweet ids in the given CSV file.' % cli_args.tweet_or_url_column)
+            'Could not find the "%s" column containing the tweet ids in the given CSV file.'
+            % cli_args.tweet_or_url_column
+        )
 
     if cli_args.user:
         if not cli_args.has_dummy_csv:
             if cli_args.user not in enricher.headers:
                 raise InvalidArgumentsError(
-                    'Could not find the "%s" column containing the user ids in the given CSV file.' % cli_args.user)
+                    'Could not find the "%s" column containing the user ids in the given CSV file.'
+                    % cli_args.user
+                )
 
             user_column = cli_args.user
             user_pos = enricher.headers[user_column]
 
     if cli_args.retweeted_id and cli_args.retweeted_id not in enricher.headers:
         raise InvalidArgumentsError(
-            'Could not find the "%s" column containing the retweeted ids in the given CSV file.' % cli_args.retweeted_id)
+            'Could not find the "%s" column containing the retweeted ids in the given CSV file.'
+            % cli_args.retweeted_id
+        )
 
     def cells():
         for row, cell in enricher.cells(cli_args.tweet_or_url_column, with_rows=True):
 
-            if cell == '':
+            if cell == "":
                 tweet = None
                 user = None
 
@@ -85,7 +89,7 @@ def twitter_attrition_action(cli_args):
                         user = cli_args.user
 
                     else:
-                        if row[user_pos] == '':
+                        if row[user_pos] == "":
                             user = None
                         else:
                             user = row[user_pos]
@@ -94,12 +98,14 @@ def twitter_attrition_action(cli_args):
 
                         if is_not_user_id(user):
                             loading_bar.die(
-                                'The column given as argument doesn\'t contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command.')
+                                "The column given as argument doesn't contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command."
+                            )
 
                     else:
                         if is_probably_not_user_screen_name(user):
                             loading_bar.die(
-                                'The column given as argument probably doesn\'t contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command.')
+                                "The column given as argument probably doesn't contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command."
+                            )
                             # force flag to add
 
             yield row, tweet, user
@@ -108,64 +114,66 @@ def twitter_attrition_action(cli_args):
         available_tweets = set()
 
         # WARNING: if each tweet in chunk is None, the client calls the API with empty tweets list
-        tweets = ','.join(row[1] for row in chunk if row[1] is not None)
-        kwargs = {'_id': tweets}
+        tweets = ",".join(row[1] for row in chunk if row[1] is not None)
+        kwargs = {"_id": tweets}
 
         # First we need to query a batch of tweet ids at once to figure out
         # whether they are still available or not
         try:
-            result = client.call(['statuses', 'lookup'], **kwargs)
+            result = client.call(["statuses", "lookup"], **kwargs)
 
         except TwitterHTTPError as e:
-            loading_bar.inc('errors')
+            loading_bar.inc("errors")
             raise e
 
         for tw in result:
-            available_tweets.add(tw['id_str'])
+            available_tweets.add(tw["id_str"])
 
         for row, tweet, user in chunk:
             loading_bar.update()
 
             if tweet is None:
                 enricher.writerow(row)
-                loading_bar.print('The url or id given doesn\'t correspond to a tweet : %s' % row[enricher.headers[cli_args.tweet_or_url_column]])
+                loading_bar.print(
+                    "The url or id given doesn't correspond to a tweet : %s"
+                    % row[enricher.headers[cli_args.tweet_or_url_column]]
+                )
                 continue
 
             if tweet in available_tweets:
-                current_tweet_status = 'available_tweet'
+                current_tweet_status = "available_tweet"
                 enricher.writerow(row, [current_tweet_status])
                 continue
 
             # If tweet is not available, we will query once more to find out
             # what the reason for its unavailability is
 
-            client_args = {'_id': tweet}
+            client_args = {"_id": tweet}
 
-            current_tweet_status = 'unknown'
+            current_tweet_status = "unknown"
 
             result_tweet = None
 
             try:
-                result_tweet = client.call(['statuses', 'show'], **client_args)
+                result_tweet = client.call(["statuses", "show"], **client_args)
 
             except TwitterHTTPError as e:
-                error_code = getpath(
-                    e.response_data, ['errors', 0, 'code'], '')
+                error_code = getpath(e.response_data, ["errors", 0, "code"], "")
 
                 if e.e.code == 403 and error_code == 63:
-                    current_tweet_status = 'suspended_user'
+                    current_tweet_status = "suspended_user"
 
                 elif e.e.code == 403 and error_code == 179:
-                    current_tweet_status = 'protected_user'
+                    current_tweet_status = "protected_user"
 
                 elif e.e.code == 404 and (error_code == 144 or error_code == 34):
-                    current_tweet_status = 'user_or_tweet_deleted'
+                    current_tweet_status = "user_or_tweet_deleted"
 
                 elif e.e.code == 404 and (error_code == 421 or error_code == 422):
-                    current_tweet_status = 'censored_tweet'
+                    current_tweet_status = "censored_tweet"
 
                 elif e.e.code == 401 and (error_code == 136):
-                    current_tweet_status = 'blocked_by_tweet_author'
+                    current_tweet_status = "blocked_by_tweet_author"
 
                 else:
                     raise e
@@ -174,14 +182,17 @@ def twitter_attrition_action(cli_args):
             # This is because the client uses 2 different methods to call the API, one linked to a user and one to an app.
             # One can be blocked and not the other.
             if result_tweet is not None:
-                current_tweet_status = 'available_tweet'
+                current_tweet_status = "available_tweet"
 
-            if current_tweet_status == 'user_or_tweet_deleted' or current_tweet_status == 'unknown':
+            if (
+                current_tweet_status == "user_or_tweet_deleted"
+                or current_tweet_status == "unknown"
+            ):
 
                 if user is not None:
                     if user in user_cache:
-                        if user_cache[user] == 'user_ok':
-                            current_tweet_status = 'unavailable_tweet'
+                        if user_cache[user] == "user_ok":
+                            current_tweet_status = "unavailable_tweet"
 
                         else:
                             current_tweet_status = user_cache[user]
@@ -189,37 +200,41 @@ def twitter_attrition_action(cli_args):
                     else:
 
                         if cli_args.ids:
-                            c_args = {'user_id': user}
+                            c_args = {"user_id": user}
                         else:
-                            c_args = {'screen_name': user}
+                            c_args = {"screen_name": user}
 
                         try:
-                            client.call(['users', 'show'], **c_args)
+                            client.call(["users", "show"], **c_args)
 
                         except TwitterHTTPError as e:
                             error_code = getpath(
-                                e.response_data, ['errors', 0, 'code'], '')
+                                e.response_data, ["errors", 0, "code"], ""
+                            )
                             if e.e.code == 404 and error_code == 50:
                                 if cli_args.ids:
-                                    current_tweet_status = 'deactivated_user'
-                                    user_cache[user] = 'deactivated_user'
+                                    current_tweet_status = "deactivated_user"
+                                    user_cache[user] = "deactivated_user"
                                 else:
-                                    current_tweet_status = 'deactivated_or_renamed_user'
-                                    user_cache[user] = 'deactivated_or_renamed_user'
+                                    current_tweet_status = "deactivated_or_renamed_user"
+                                    user_cache[user] = "deactivated_or_renamed_user"
 
                             else:
-                                current_tweet_status = 'unavailable_tweet'
+                                current_tweet_status = "unavailable_tweet"
 
                         else:
-                            user_cache[user] = 'user_ok'
-                            current_tweet_status = 'unavailable_tweet'
+                            user_cache[user] = "user_ok"
+                            current_tweet_status = "unavailable_tweet"
 
                 # Sometimes, the unavailable tweet is a retweet, in which
                 # case we need to enquire about the original tweet to find
                 # a reason for the tweet's unavailability
                 if cli_args.retweeted_id:
 
-                    if current_tweet_status == 'unavailable_tweet' or current_tweet_status == 'unknown':
+                    if (
+                        current_tweet_status == "unavailable_tweet"
+                        or current_tweet_status == "unknown"
+                    ):
 
                         if cli_args.has_dummy_csv:
                             original_tweet = cli_args.retweeted_id
@@ -227,39 +242,47 @@ def twitter_attrition_action(cli_args):
                             original_id_pos = enricher.headers[cli_args.retweeted_id]
                             original_tweet = row[original_id_pos]
 
-                        client_arg = {'_id': original_tweet}
+                        client_arg = {"_id": original_tweet}
                         result_retweet = None
 
                         if original_tweet:
                             try:
                                 result_retweet = client.call(
-                                    ['statuses', 'show'], **client_arg)
+                                    ["statuses", "show"], **client_arg
+                                )
 
                             except TwitterHTTPError as e:
                                 error_code = getpath(
-                                    e.response_data, ['errors', 0, 'code'], '')
+                                    e.response_data, ["errors", 0, "code"], ""
+                                )
                                 if e.e.code == 403 and error_code == 63:
-                                    current_tweet_status = 'suspended_retweeted_user'
+                                    current_tweet_status = "suspended_retweeted_user"
 
                                 elif e.e.code == 403 and error_code == 179:
-                                    current_tweet_status = 'protected_retweeted_user'
+                                    current_tweet_status = "protected_retweeted_user"
 
-                                elif e.e.code == 404 and (error_code == 144 or error_code == 34):
-                                    current_tweet_status = 'unavailable_retweeted_tweet'
+                                elif e.e.code == 404 and (
+                                    error_code == 144 or error_code == 34
+                                ):
+                                    current_tweet_status = "unavailable_retweeted_tweet"
 
-                                elif e.e.code == 404 and (error_code == 421 or error_code == 422):
-                                    current_tweet_status = 'censored_retweeted_tweet'
+                                elif e.e.code == 404 and (
+                                    error_code == 421 or error_code == 422
+                                ):
+                                    current_tweet_status = "censored_retweeted_tweet"
 
                                 elif e.e.code == 401 and (error_code == 136):
-                                    current_tweet_status = 'blocked_by_original_tweet_author'
+                                    current_tweet_status = (
+                                        "blocked_by_original_tweet_author"
+                                    )
 
                                 else:
                                     raise e
 
                             if result_retweet is not None:
-                                current_tweet_status = 'unavailable_retweet'
+                                current_tweet_status = "unavailable_retweet"
 
-                if current_tweet_status == 'unknown':
-                    current_tweet_status = 'unavailable_tweet'
+                if current_tweet_status == "unknown":
+                    current_tweet_status = "unavailable_tweet"
 
             enricher.writerow(row, [current_tweet_status])

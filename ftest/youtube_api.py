@@ -5,19 +5,19 @@ from minet.youtube import YouTubeAPIClient
 from minet.youtube.scrapers import (
     get_caption_tracks,
     select_caption_track,
-    get_video_captions
+    get_video_captions,
 )
 
 config = get_rcfile()
 
 VIDEOS = [
-    'psHGtkvSNwE',
-    '9HOI3zSwhPg',
-    'https://www.youtube.com/watch?v=1CpAygAF5nE',
-    'nothing-to-see-here'
+    "psHGtkvSNwE",
+    "9HOI3zSwhPg",
+    "https://www.youtube.com/watch?v=1CpAygAF5nE",
+    "nothing-to-see-here",
 ]
 
-client = YouTubeAPIClient(config['youtube']['key'])
+client = YouTubeAPIClient(config["youtube"]["key"])
 
 # for item, video in client.videos(VIDEOS):
 #     print(item, video)
@@ -25,8 +25,8 @@ client = YouTubeAPIClient(config['youtube']['key'])
 # for video in islice(client.search('"white rabbit tyto alba"'), 103):
 #     print(video)
 
-KROCK = 'DPzAvAlUJ24'
-SCILABUS = 'https://www.youtube.com/watch?v=ARAQUgkdIvQ'
+KROCK = "DPzAvAlUJ24"
+SCILABUS = "https://www.youtube.com/watch?v=ARAQUgkdIvQ"
 
 # count = 0
 # ids = Counter()
@@ -48,6 +48,8 @@ SCILABUS = 'https://www.youtube.com/watch?v=ARAQUgkdIvQ'
 
 # print(select_caption_track(tracks, langs=['da'], strict=False))
 
-captions = get_video_captions('https://www.youtube.com/watch?v=jsiY6s8-SJ8', langs=['fr', 'en'])
+captions = get_video_captions(
+    "https://www.youtube.com/watch?v=jsiY6s8-SJ8", langs=["fr", "en"]
+)
 
 print(captions)

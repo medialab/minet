@@ -19,21 +19,21 @@ from minet.youtube.constants import (
     YOUTUBE_API_MAX_VIDEOS_PER_CALL,
     YOUTUBE_API_MAX_COMMENTS_PER_CALL,
     YOUTUBE_API_DEFAULT_SEARCH_ORDER,
-    YOUTUBE_API_SEARCH_ORDERS
+    YOUTUBE_API_SEARCH_ORDERS,
 )
 from minet.youtube.exceptions import (
     YouTubeDisabledComments,
     YouTubeVideoNotFound,
     YouTubeInvalidAPIKeyError,
     YouTubeInvalidAPICall,
-    YouTubeInvalidVideoId
+    YouTubeInvalidVideoId,
 )
 from minet.youtube.formatters import (
     format_video,
     format_video_snippet,
     format_comment,
     format_reply,
-    format_playlist_item_snippet,
+    format_playlist_item_snippet
 )
 from minet.youtube.scrapers import scrape_channel_id_from_channel_url
 
@@ -55,60 +55,68 @@ def forge_playlist_videos_url(key, playlist_id, token=None):
 
 
 def forge_videos_url(key, ids):
-    data = {
-        'base': YOUTUBE_API_BASE_URL,
-        'ids': ','.join(ids),
-        'key': key
-    }
+    data = {"base": YOUTUBE_API_BASE_URL, "ids": ",".join(ids), "key": key}
 
-    return '%(base)s/videos?id=%(ids)s&key=%(key)s&part=snippet,statistics,contentDetails' % data
+    return (
+        "%(base)s/videos?id=%(ids)s&key=%(key)s&part=snippet,statistics,contentDetails"
+        % data
+    )
 
 
 def forge_search_url(key, query, order=YOUTUBE_API_DEFAULT_SEARCH_ORDER, token=None):
     data = {
-        'base': YOUTUBE_API_BASE_URL,
-        'order': order,
-        'query': quote(query),
-        'key': key,
-        'count': YOUTUBE_API_MAX_VIDEOS_PER_CALL
+        "base": YOUTUBE_API_BASE_URL,
+        "order": order,
+        "query": quote(query),
+        "key": key,
+        "count": YOUTUBE_API_MAX_VIDEOS_PER_CALL,
     }
 
-    url = '%(base)s/search?part=snippet&maxResults=%(count)i&q=%(query)s&type=video&order=%(order)s&key=%(key)s' % data
+    url = (
+        "%(base)s/search?part=snippet&maxResults=%(count)i&q=%(query)s&type=video&order=%(order)s&key=%(key)s"
+        % data
+    )
 
     if token is not None:
-        url += '&pageToken=%s' % token
+        url += "&pageToken=%s" % token
 
     return url
 
 
 def forge_comments_url(key, video_id, token=None):
     data = {
-        'base': YOUTUBE_API_BASE_URL,
-        'key': key,
-        'count': YOUTUBE_API_MAX_COMMENTS_PER_CALL,
-        'video_id': video_id
+        "base": YOUTUBE_API_BASE_URL,
+        "key": key,
+        "count": YOUTUBE_API_MAX_COMMENTS_PER_CALL,
+        "video_id": video_id,
     }
 
-    url = '%(base)s/commentThreads?videoId=%(video_id)s&key=%(key)s&part=snippet,replies&maxResults=%(count)s' % data
+    url = (
+        "%(base)s/commentThreads?videoId=%(video_id)s&key=%(key)s&part=snippet,replies&maxResults=%(count)s"
+        % data
+    )
 
     if token is not None:
-        url += '&pageToken=%s' % token
+        url += "&pageToken=%s" % token
 
     return url
 
 
 def forge_replies_url(key, comment_id, token=None):
     data = {
-        'base': YOUTUBE_API_BASE_URL,
-        'key': key,
-        'comment_id': comment_id,
-        'count': YOUTUBE_API_MAX_COMMENTS_PER_CALL
+        "base": YOUTUBE_API_BASE_URL,
+        "key": key,
+        "comment_id": comment_id,
+        "count": YOUTUBE_API_MAX_COMMENTS_PER_CALL,
     }
 
-    url = '%(base)s/comments?part=snippet&parentId=%(comment_id)s&key=%(key)s&maxResults=%(count)s' % data
+    url = (
+        "%(base)s/comments?part=snippet&parentId=%(comment_id)s&key=%(key)s&maxResults=%(count)s"
+        % data
+    )
 
     if token is not None:
-        url += '&pageToken=%s' % token
+        url += "&pageToken=%s" % token
 
     return url
 
@@ -126,7 +134,11 @@ class YouTubeAPIClient(object):
             raise err
 
         if response.status == 403:
-            if data is not None and getpath(data, ['error', 'errors', 0, 'reason'], '') == 'commentsDisabled':
+            if (
+                data is not None
+                and getpath(data, ["error", "errors", 0, "reason"], "")
+                == "commentsDisabled"
+            ):
                 raise YouTubeDisabledComments
 
             sleep_time = seconds_to_midnight_pacific_time() + 10
@@ -142,7 +154,9 @@ class YouTubeAPIClient(object):
             raise YouTubeVideoNotFound
 
         if response.status >= 400:
-            if data is not None and 'API key not valid' in getpath(data, ['error', 'message'], ''):
+            if data is not None and "API key not valid" in getpath(
+                data, ["error", "message"], ""
+            ):
                 raise YouTubeInvalidAPIKeyError
 
             raise YouTubeInvalidAPICall(url, response.status, data)
@@ -168,8 +182,8 @@ class YouTubeAPIClient(object):
 
             indexed_result = {}
 
-            for item in result['items']:
-                video_id = item['id']
+            for item in result["items"]:
+                video_id = item["id"]
 
                 if not raw:
                     item = format_video(item)
@@ -187,24 +201,19 @@ class YouTubeAPIClient(object):
             token = None
 
             while True:
-                url = forge_search_url(
-                    self.key,
-                    query,
-                    order=order,
-                    token=token
-                )
+                url = forge_search_url(self.key, query, order=order, token=token)
 
                 result = self.request_json(url)
 
-                token = result.get('nextPageToken')
+                token = result.get("nextPageToken")
 
-                for item in result['items']:
+                for item in result["items"]:
                     if not raw:
                         item = format_video_snippet(item)
 
                     yield item
 
-                if token is None or len(result['items']) == 0:
+                if token is None or len(result["items"]) == 0:
                     break
 
         return generator()
@@ -216,10 +225,7 @@ class YouTubeAPIClient(object):
             raise YouTubeInvalidVideoId
 
         def generator():
-            starting_url = forge_comments_url(
-                self.key,
-                video_id
-            )
+            starting_url = forge_comments_url(self.key, video_id)
 
             queue = deque([(False, video_id, starting_url)])
 
@@ -232,13 +238,17 @@ class YouTubeAPIClient(object):
                 except (YouTubeDisabledComments, YouTubeVideoNotFound):
                     return
 
-                for item in result['items']:
-                    comment_id = item['id']
-                    replies = getpath(item, ['replies', 'comments'], [])
-                    total_reply_count = getpath(item, ['snippet', 'totalReplyCount'], 0)
+                for item in result["items"]:
+                    comment_id = item["id"]
+                    replies = getpath(item, ["replies", "comments"], [])
+                    total_reply_count = getpath(item, ["snippet", "totalReplyCount"], 0)
 
                     if not raw:
-                        item = format_comment(item) if not is_reply else format_reply(item, video_id=video_id)
+                        item = (
+                            format_comment(item)
+                            if not is_reply
+                            else format_reply(item, video_id=video_id)
+                        )
 
                     yield item
 
@@ -253,24 +263,17 @@ class YouTubeAPIClient(object):
 
                             yield reply
                     elif total_reply_count > 0:
-                        replies_url = forge_replies_url(
-                            self.key,
-                            comment_id
-                        )
+                        replies_url = forge_replies_url(self.key, comment_id)
 
                         queue.append((True, comment_id, replies_url))
 
                 # Next page
-                token = result.get('nextPageToken')
+                token = result.get("nextPageToken")
 
-                if token is not None and len(result['items']) != 0:
+                if token is not None and len(result["items"]) != 0:
                     forge = forge_replies_url if is_reply else forge_comments_url
 
-                    next_url = forge(
-                        self.key,
-                        item_id,
-                        token=token
-                    )
+                    next_url = forge(self.key, item_id, token=token)
 
                     queue.append((is_reply, item_id, next_url))
 

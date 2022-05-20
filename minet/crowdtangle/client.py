@@ -7,27 +7,19 @@
 #
 import json
 
-from minet.utils import (
-    RateLimiterState,
-    rate_limited_method
-)
-from minet.web import (
-    create_pool,
-    create_request_retryer,
-    retrying_method,
-    request
-)
+from minet.utils import RateLimiterState, rate_limited_method
+from minet.web import create_pool, create_request_retryer, retrying_method, request
 from minet.crowdtangle.constants import (
     CROWDTANGLE_DEFAULT_TIMEOUT,
     CROWDTANGLE_DEFAULT_RATE_LIMIT,
-    CROWDTANGLE_LINKS_DEFAULT_RATE_LIMIT
+    CROWDTANGLE_LINKS_DEFAULT_RATE_LIMIT,
 )
 from minet.crowdtangle.exceptions import (
     CrowdTangleInvalidJSONError,
     CrowdTangleInvalidTokenError,
     CrowdTangleRateLimitExceeded,
     CrowdTangleInvalidRequestError,
-    CrowdTangleServerError
+    CrowdTangleServerError,
 )
 from minet.crowdtangle.leaderboard import crowdtangle_leaderboard
 from minet.crowdtangle.lists import crowdtangle_lists
@@ -48,14 +40,13 @@ class CrowdTangleAPIClient(object):
 
         self.token = token
         self.rate_limiter_state = RateLimiterState(rate_limit, period=60)
-        self.summary_rate_limiter_state = RateLimiterState(summary_rate_limit, period=60)
+        self.summary_rate_limiter_state = RateLimiterState(
+            summary_rate_limit, period=60
+        )
         self.pool = create_pool(timeout=CROWDTANGLE_DEFAULT_TIMEOUT)
         self.retryer = create_request_retryer(
-            additional_exceptions=[
-                CrowdTangleInvalidJSONError,
-                CrowdTangleServerError
-            ],
-            before_sleep=before_sleep
+            additional_exceptions=[CrowdTangleInvalidJSONError, CrowdTangleServerError],
+            before_sleep=before_sleep,
         )
 
     @retrying_method()
@@ -80,73 +71,54 @@ class CrowdTangleAPIClient(object):
 
         # Bad params
         if response.status >= 400:
-            data = response.data.decode('utf-8')
+            data = response.data.decode("utf-8")
 
             try:
                 data = json.loads(data)
             except json.decoder.JSONDecodeError:
-                raise CrowdTangleInvalidRequestError(data, url=url, status=response.status)
+                raise CrowdTangleInvalidRequestError(
+                    data, url=url, status=response.status
+                )
 
-            raise CrowdTangleInvalidRequestError(data['message'], url=url, code=data.get('code'), status=response.status)
+            raise CrowdTangleInvalidRequestError(
+                data["message"], url=url, code=data.get("code"), status=response.status
+            )
 
         try:
-            data = json.loads(response.data)['result']
+            data = json.loads(response.data)["result"]
         except (json.decoder.JSONDecodeError, TypeError, KeyError):
             raise CrowdTangleInvalidJSONError
 
         return data
 
-    @rate_limited_method('rate_limiter_state')
+    @rate_limited_method("rate_limiter_state")
     def request(self, url):
         return self.__request(url)
 
-    @rate_limited_method('summary_rate_limiter_state')
+    @rate_limited_method("summary_rate_limiter_state")
     def request_summary(self, url):
         return self.__request(url)
 
     def leaderboard(self, **kwargs):
-        return crowdtangle_leaderboard(
-            self.request,
-            token=self.token,
-            **kwargs
-        )
+        return crowdtangle_leaderboard(self.request, token=self.token, **kwargs)
 
     def lists(self, **kwargs):
-        return crowdtangle_lists(
-            self.request,
-            token=self.token,
-            **kwargs
-        )
+        return crowdtangle_lists(self.request, token=self.token, **kwargs)
 
     def post(self, post_id, **kwargs):
-        return crowdtangle_post(
-            self.request,
-            post_id,
-            token=self.token,
-            **kwargs
-        )
+        return crowdtangle_post(self.request, post_id, token=self.token, **kwargs)
 
-    def posts(self, sort_by='date', **kwargs):
+    def posts(self, sort_by="date", **kwargs):
         return crowdtangle_posts(
-            self.request,
-            token=self.token,
-            sort_by=sort_by,
-            **kwargs
+            self.request, token=self.token, sort_by=sort_by, **kwargs
         )
 
-    def search(self, terms, sort_by='date', **kwargs):
+    def search(self, terms, sort_by="date", **kwargs):
         return crowdtangle_search(
-            self.request,
-            token=self.token,
-            terms=terms,
-            sort_by=sort_by,
-            **kwargs
+            self.request, token=self.token, terms=terms, sort_by=sort_by, **kwargs
         )
 
     def summary(self, link, **kwargs):
         return crowdtangle_summary(
-            self.request_summary,
-            link,
-            token=self.token,
-            **kwargs
+            self.request_summary, link, token=self.token, **kwargs
         )

@@ -23,15 +23,10 @@ def url_join_action(cli_args):
     left_headers = [cli_args.match_column_prefix + h for h in left_headers]
 
     right_enricher = casanova.enricher(
-        cli_args.file2,
-        cli_args.output,
-        add=left_headers
+        cli_args.file2, cli_args.output, add=left_headers
     )
 
-    loading_bar = LoadingBar(
-        desc='Indexing left file',
-        unit='line'
-    )
+    loading_bar = LoadingBar(desc="Indexing left file", unit="line")
 
     # First step is to index left file
     trie = NormalizedLRUTrie()
@@ -56,10 +51,7 @@ def url_join_action(cli_args):
 
     loading_bar.close()
 
-    loading_bar = LoadingBar(
-        desc='Matching right file',
-        unit='line'
-    )
+    loading_bar = LoadingBar(desc="Matching right file", unit="line")
 
     for row, url in right_enricher.cells(cli_args.column2, with_rows=True):
         loading_bar.update()

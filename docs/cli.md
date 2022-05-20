@@ -42,7 +42,11 @@
 * [google](#google)
   * [sheets](#google-sheets)
 * [hyphe](#hyphe)
-  * [dump](#dump)
+  * [declare](#hyphe-declare)
+  * [destroy](#hyphe-destroy)
+  * [dump](#hyphe-dump)
+  * [reset](#hyphe-reset)
+  * [tag](#hyphe-tag)
 * [mediacloud (mc)](#mediacloud)
   * [medias](#mc-medias)
   * [search](#mc-search)
@@ -1346,7 +1350,68 @@ examples:
 
 ## Hyphe
 
-### dump
+<h3 id="hyphe-declare">declare</h3>
+
+```
+usage: minet hyphe declare [-h] [--rcfile RCFILE] [--password PASSWORD]
+                           [--total TOTAL]
+                           url corpus webentities
+
+Minet Hyphe Declare Command
+===========================
+
+Command that can be used to declare series of webentities
+in a corpus.
+
+It is ideal to start or restart a corpus using the same exact
+webentity declarations as another one.
+
+positional arguments:
+  url                  Url of the Hyphe API.
+  corpus               Id of the corpus.
+  webentities          CSV file of webentities (exported from Hyphe).
+
+optional arguments:
+  -h, --help           show this help message and exit
+  --rcfile RCFILE      Custom path to a minet configuration file.
+  --password PASSWORD  The corpus's password if required.
+  --total TOTAL        Total number of medias. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Declaring webentities from a Hyphe export:
+    $ minet hyphe declare http://myhyphe.com/api/ target-corpus export.csv
+
+```
+
+<h3 id="hyphe-destroy">destroy</h3>
+
+```
+usage: minet hyphe destroy [-h] [--rcfile RCFILE] [--password PASSWORD]
+                           url corpus
+
+Minet Hyphe Destroy Command
+===========================
+
+Command that can be used to destroy a corpus entirely.
+
+positional arguments:
+  url                  Url of the Hyphe API.
+  corpus               Id of the corpus.
+
+optional arguments:
+  -h, --help           show this help message and exit
+  --rcfile RCFILE      Custom path to a minet configuration file.
+  --password PASSWORD  The corpus's password if required.
+
+examples:
+
+. Destroying a corpus:
+    $ minet hyphe destroy http://myhyphe.com/api/ my-corpus
+
+```
+
+<h3 id="hyphe-dump">dump</h3>
 
 ```
 usage: minet hyphe dump [-h] [--rcfile RCFILE] [-d OUTPUT_DIR] [--body]
@@ -1375,6 +1440,66 @@ examples:
 
 . Dumping a corpus into the ./corpus directory:
     $ minet hyphe dump http://myhyphe.com/api/ corpus-name -d corpus
+
+```
+
+<h3 id="hyphe-reset">reset</h3>
+
+```
+usage: minet hyphe reset [-h] [--rcfile RCFILE] [--password PASSWORD] url corpus
+
+Minet Hyphe Reset Command
+=========================
+
+Command that can be used to reset a corpus entirely.
+
+positional arguments:
+  url                  Url of the Hyphe API.
+  corpus               Id of the corpus.
+
+optional arguments:
+  -h, --help           show this help message and exit
+  --rcfile RCFILE      Custom path to a minet configuration file.
+  --password PASSWORD  The corpus's password if required.
+
+examples:
+
+. Resetting a corpus:
+    $ minet hyphe reset http://myhyphe.com/api/ my-corpus
+
+```
+
+<h3 id="hyphe-tag">tag</h3>
+
+```
+usage: minet hyphe tag [-h] [--rcfile RCFILE] [--password PASSWORD]
+                       [--separator SEPARATOR] [--total TOTAL]
+                       url corpus webentity_id_column tag_columns data
+
+Minet Hyphe Tag Command
+=======================
+
+Command that can be used to tag webentities in batch using
+metadata recorded in a CSV file.
+
+positional arguments:
+  url                    Url of the Hyphe API.
+  corpus                 Id of the corpus.
+  webentity_id_column    Column of the CSV file containing the webentity ids.
+  tag_columns            Columns, separated by comma, to use as tags.
+  data                   CSV file of webentities (exported from Hyphe).
+
+optional arguments:
+  -h, --help             show this help message and exit
+  --rcfile RCFILE        Custom path to a minet configuration file.
+  --password PASSWORD    The corpus's password if required.
+  --separator SEPARATOR  Separator use to split multiple tag values in the same column. Defaults to "|".
+  --total TOTAL          Total number of medias. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Tag webentities from two columns of CSV file:
+    $ minet hyphe tag http://myhyphe.com/api/ my-corpus webentity_id type,creator metadata.csv
 
 ```
 
@@ -1893,7 +2018,8 @@ usage: minet twitter users [-h] [--rcfile RCFILE] [--api-key API_KEY]
                            [--api-secret-key API_SECRET_KEY]
                            [--access-token ACCESS_TOKEN]
                            [--access-token-secret ACCESS_TOKEN_SECRET] [--ids]
-                           [-o OUTPUT] [-s SELECT] [--total TOTAL] [--v2]
+                           [-o OUTPUT] [--resume] [-s SELECT] [--total TOTAL]
+                           [--v2]
                            column [file]
 
 Minet Twitter Users Command
@@ -1914,6 +2040,7 @@ optional arguments:
   --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
   --ids                                      Whether your users are given as ids rather than screen names.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
+  --resume                                   Whether to resume from an aborted collection. Need -o to be set.
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
   --v2                                       Whether to use latest Twitter API v2 rather than v1.1.

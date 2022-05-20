@@ -25,7 +25,9 @@ def crowdtangle_lists_action(cli_args):
             writer.writerow(l)
 
     except CrowdTangleInvalidTokenError:
-        die([
-            'Your API token is invalid.',
-            'Check that you indicated a valid one using the `--token` argument.'
-        ])
+        die(
+            [
+                "Your API token is invalid.",
+                "Check that you indicated a valid one using the `--token` argument.",
+            ]
+        )
