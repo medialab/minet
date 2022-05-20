@@ -28,7 +28,11 @@ class YouTubeInvalidAPICall(YouTubeError):
         )
 
 
-class YouTubeInvalidVideoId(YouTubeError):
+class YouTubeInvalidVideoTarget(YouTubeError):
+    pass
+
+
+class YouTubeInvalidChannelTarget(YouTubeError):
     pass
 
 

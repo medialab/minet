@@ -66,6 +66,7 @@
   * [user-tweets](#user-tweets)
 * [youtube (yt)](#youtube)
   * [captions](#captions)
+  * [channel-videos](#channel-videos)
   * [comments](#youtube-comments)
   * [search](#youtube-search)
   * [videos](#videos)
@@ -336,6 +337,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### captions
 
 <% yt/captions %>
+
+### channel-videos
+
+<% yt/channel-videos %>
 
 <h3 id="youtube-comments">comments</h3>
 

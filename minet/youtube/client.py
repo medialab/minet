@@ -11,7 +11,12 @@ from urllib.parse import quote
 from ebbe import getpath
 
 from minet.web import create_pool, request_json
-from minet.youtube.utils import ensure_video_id, seconds_to_midnight_pacific_time
+from minet.youtube.utils import (
+    ensure_video_id,
+    ensure_channel_id,
+    get_channel_main_playlist_id,
+    seconds_to_midnight_pacific_time,
+)
 from minet.youtube.constants import (
     YOUTUBE_API_BASE_URL,
     YOUTUBE_API_MAX_VIDEOS_PER_CALL,
@@ -24,14 +29,36 @@ from minet.youtube.exceptions import (
     YouTubeVideoNotFound,
     YouTubeInvalidAPIKeyError,
     YouTubeInvalidAPICall,
-    YouTubeInvalidVideoId,
+    YouTubeInvalidVideoTarget,
+    YouTubeInvalidChannelTarget,
 )
 from minet.youtube.formatters import (
     format_video,
     format_video_snippet,
     format_comment,
     format_reply,
+    format_playlist_item_snippet,
 )
+from minet.youtube.scrapers import scrape_channel_id
+
+
+def forge_playlist_videos_url(key, playlist_id, token=None):
+    data = {
+        "base": YOUTUBE_API_BASE_URL,
+        "playlist_id": playlist_id,
+        "key": key,
+        "count": YOUTUBE_API_MAX_VIDEOS_PER_CALL,
+    }
+
+    url = (
+        "%(base)s/playlistItems?part=snippet&maxResults=%(count)i&playlistId=%(playlist_id)s&key=%(key)s"
+        % data
+    )
+
+    if token is not None:
+        url += "&pageToken=%s" % token
+
+    return url
 
 
 def forge_videos_url(key, ids):
@@ -202,7 +229,7 @@ class YouTubeAPIClient(object):
         video_id = ensure_video_id(video_target)
 
         if video_id is None:
-            raise YouTubeInvalidVideoId
+            raise YouTubeInvalidVideoTarget
 
         def generator():
             starting_url = forge_comments_url(self.key, video_id)
@@ -256,5 +283,37 @@ class YouTubeAPIClient(object):
                     next_url = forge(self.key, item_id, token=token)
 
                     queue.append((is_reply, item_id, next_url))
+
+        return generator()
+
+    def channel_videos(self, channel_target):
+
+        should_scrape, channel_id = ensure_channel_id(channel_target)
+
+        if should_scrape:
+            channel_id = scrape_channel_id(channel_target)
+
+        if channel_id is None:
+            raise YouTubeInvalidChannelTarget
+
+        playlist_id = get_channel_main_playlist_id(channel_id)
+
+        def generator():
+            token = None
+
+            while True:
+                url = forge_playlist_videos_url(self.key, playlist_id, token=token)
+
+                result = self.request_json(url)
+
+                token = result.get("nextPageToken")
+
+                for item in result["items"]:
+                    item = format_playlist_item_snippet(item)
+
+                    yield item
+
+                if token is None or len(result["items"]) == 0:
+                    break
 
         return generator()

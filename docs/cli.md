@@ -66,6 +66,7 @@
   * [user-tweets](#user-tweets)
 * [youtube (yt)](#youtube)
   * [captions](#captions)
+  * [channel-videos](#channel-videos)
   * [comments](#youtube-comments)
   * [search](#youtube-search)
   * [videos](#videos)
@@ -2171,6 +2172,47 @@ examples:
 
 . Fetching French captions with a fallback to English:
     $ minet yt captions video_id videos.csv --lang fr,en > captions.csv
+
+```
+
+### channel-videos
+
+```
+usage: minet youtube channel-videos [-h] [--rcfile RCFILE] [-o OUTPUT] [-k KEY]
+                                    [-s SELECT]
+                                    column [file]
+
+Youtube channel videos
+======================
+
+Retrieve metadata about all Youtube videos from one or many channel(s) using the API.
+
+Under the hood, this command extract the channel id from the given url or scrape the
+website to find it if necessary. Then the command uses the API to retrieve
+information about videos stored in the main playlist of the channel
+supposed to contain all the channel's videos.
+
+positional arguments:
+  column                      Name of the column containing the channel's ids.
+  file                        CSV file containing the Youtube channel's ids.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -k KEY, --key KEY           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+
+example:
+
+. Fetching all the videos from a channel based on the channel's id or url:
+    $ minet youtube channel-videos https://www.youtube.com/c/LinksOff -k my-api-key > linksoff_videos.csv
+    $ minet youtube channel-videos https://www.youtube.com/channel/UCqnbDFdCpuN8CMEg0VuEBqA -k my-api-key > thenewyorktimes_videos.csv
+    $ minet youtube channel-videos UCprclkVrNPls7PR-nHhf1Ow -k my-api-key > tonyheller_videos.csv
+
+. Fetching multiple channels' videos:
+    $ minet youtube channel-videos channel_id channels_id.csv -k my-api-key > channels_videos.csv
+    $ minet youtube channel-videos channel_url channels_url.csv -k my-api-key > channels_videos.csv
 
 ```
 
