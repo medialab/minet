@@ -43,7 +43,7 @@ setup(
         "termcolor>=1.0.0",
         "tqdm>=4.60.0",
         "trafilatura>=1.2.0,<1.3",
-        "twitwi>=0.10.4,<0.11",
+        "twitwi>=0.11.0,<0.12",
         "ural>=0.32.0,<0.33",
         "urllib3[secure]>=1.26.9,<2",
     ],
