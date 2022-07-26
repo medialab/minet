@@ -50,7 +50,7 @@ def twitter_tweet_count_action(cli_args):
 
         # Because we are greedy, we want stuff from the beginning of Twitter
         if cli_args.academic and not cli_args.start_time:
-            kwargs["start_time"] = "2006-01-01T00:00:00Z"
+            kwargs["start_time"] = "2006-03-21T00:00:00Z"
 
         if cli_args.start_time:
             kwargs["start_time"] = cli_args.start_time
