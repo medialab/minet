@@ -45,7 +45,7 @@ setup(
         "trafilatura>=1.2.0,<1.3",
         "twitwi>=0.14.0,<0.15",
         "ural>=0.32.0,<0.33",
-        "urllib3[secure]>=1.26.9,<2",
+        "urllib3>=1.26.9,<2",
     ],
     entry_points={"console_scripts": ["minet=minet.cli.__main__:main"]},
     zip_safe=True,
