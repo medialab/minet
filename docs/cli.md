@@ -1002,6 +1002,9 @@ For more information, see the API endpoint documentation: https://github.com/Cro
 positional arguments:
   terms                                           The search query term or terms.
 
+required arguments:
+  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
+
 optional arguments:
   -h, --help                                      show this help message and exit
   --rcfile RCFILE                                 Custom path to a minet configuration file.
@@ -1022,7 +1025,6 @@ optional arguments:
                                                   In what to search the query. Defaults to `text_fields_and_image_text`.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
-  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
   --types TYPES                                   Types of post to include, separated by comma.
 
 examples:
