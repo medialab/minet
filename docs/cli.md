@@ -935,7 +935,7 @@ usage: minet crowdtangle posts [-h] [--rcfile RCFILE] [--rate-limit RATE_LIMIT]
                                [--language LANGUAGE] [-l LIMIT]
                                [--list-ids LIST_IDS] [-o OUTPUT] [--resume]
                                [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
-                               --start-date START_DATE
+                               [--start-date START_DATE]
 
 Minet CrowdTangle Posts Command
 ===============================
@@ -959,7 +959,7 @@ optional arguments:
   --resume                                        Whether to resume an interrupted collection. Requires -o/--output & --sort-by date
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
-  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
+  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010-01-01`.
 
 examples:
 
@@ -989,7 +989,7 @@ usage: minet crowdtangle search [-h] [--rcfile RCFILE] [--rate-limit RATE_LIMIT]
                                 [-p PLATFORMS]
                                 [--search-field {account_name_only,image_text_only,include_query_strings,text_fields_and_image_text,text_fields_only}]
                                 [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
-                                --start-date START_DATE [--types TYPES]
+                                [--start-date START_DATE] [--types TYPES]
                                 terms
 
 Minet CrowdTangle Search Command
@@ -1022,7 +1022,7 @@ optional arguments:
                                                   In what to search the query. Defaults to `text_fields_and_image_text`.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
-  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
+  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010-01-01`.
   --types TYPES                                   Types of post to include, separated by comma.
 
 examples:
@@ -1065,7 +1065,7 @@ optional arguments:
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   --sort-by {date,subscriber_count,total_interactions}
                                                   How to sort retrieved posts. Defaults to `date`.
-  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
+  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010-01-01`.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
 
 examples:
