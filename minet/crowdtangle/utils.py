@@ -116,7 +116,7 @@ def make_paginated_iterator(
         # Checking we have the necessary dates
         if kwargs.get("sort_by") == "date":
             if kwargs.get("start_date") is None:
-                raise CrowdTangleMissingStartDateError
+                kwargs["start_date"] = "2010-01-01"
 
             # Inferring end date to be now, this will be important later
             if kwargs.get("end_date") is None:

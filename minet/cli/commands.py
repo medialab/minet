@@ -643,7 +643,7 @@ MINET_COMMANDS = {
                         {
                             "flag": "--start-date",
                             "help": "The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.",
-                            "required": True,
+                            "required": False,
                         },
                         {
                             "flag": "--types",
