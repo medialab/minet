@@ -14,6 +14,8 @@ from ural import (
     get_normalized_hostname,
     infer_redirection,
     is_typo_url,
+    is_homepage,
+    should_resolve,
 )
 from ural.facebook import (
     parse_facebook_url,
@@ -37,6 +39,8 @@ REPORT_HEADERS = [
     "normalized_hostname",
     "probably_shortened",
     "probably_typo",
+    "probably_homepage",
+    "should_probably_resolve",
 ]
 
 FACEBOOK_REPORT_HEADERS = [
@@ -65,6 +69,8 @@ def extract_standard_addendum(cli_args, url):
         get_normalized_hostname(url),
         "yes" if is_shortened_url(url) else "",
         "yes" if is_typo_url(url) else "",
+        "yes" if is_homepage(url) else "",
+        "yes" if should_resolve(url) else "",
     ]
 
 

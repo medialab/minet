@@ -2557,6 +2557,10 @@ MINET_COMMANDS = {
               not (bit.ly, t.co etc.).
             . "probably_typo": whether the url probably contains typo or not
               (such as inclusive language in french : curieux.se etc.).
+            . "probably_homepage": whether the given url looks like a website's
+              homepage.
+            . "should_probably_resolve": whether the given url looks like something
+              we should resolve, i.e. shortened url.
 
             columns being added with --facebook:
 
