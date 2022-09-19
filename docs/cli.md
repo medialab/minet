@@ -850,7 +850,7 @@ optional arguments:
   -l LIMIT, --limit LIMIT               Maximum number of accounts to retrieve. Will fetch every account by default.
   --list-id LIST_ID                     Optional list id from which to retrieve accounts.
   -o OUTPUT, --output OUTPUT            Path to the output file. By default, the results will be printed to stdout.
-  --start-date START_DATE               The earliest date at which to start aggregating statistics (UTC!). You can pass just a year or a year-month for convenience.
+  --start-date START_DATE               The earliest date at which to start aggregating statistics (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010`.
 
 examples:
 
@@ -959,7 +959,7 @@ optional arguments:
   --resume                                        Whether to resume an interrupted collection. Requires -o/--output & --sort-by date
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
-  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010-01-01`.
+  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010`.
 
 examples:
 
@@ -1022,7 +1022,7 @@ optional arguments:
                                                   In what to search the query. Defaults to `text_fields_and_image_text`.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                                   The order in which to retrieve posts. Defaults to `date`.
-  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010-01-01`.
+  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010`.
   --types TYPES                                   Types of post to include, separated by comma.
 
 examples:
@@ -1065,7 +1065,7 @@ optional arguments:
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   --sort-by {date,subscriber_count,total_interactions}
                                                   How to sort retrieved posts. Defaults to `date`.
-  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010-01-01`.
+  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010`.
   --total TOTAL                                   Total number of HTML documents. Necessary if you want to display a finite progress indicator.
 
 examples:
