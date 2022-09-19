@@ -6,8 +6,6 @@
 #
 from datetime import date, datetime, timedelta
 
-from minet.crowdtangle.exceptions import CrowdTangleMissingStartDateError
-
 DAY_DELTA = timedelta(days=1)
 
 
