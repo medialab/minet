@@ -13,7 +13,7 @@ class YouTubeInvalidAPIKeyError(YouTubeError):
     pass
 
 
-class YouTubeInvalidAPICall(YouTubeError):
+class YouTubeInvalidAPICallError(YouTubeError):
     def __init__(self, url, status, data):
         super().__init__()
         self.url = url
@@ -28,17 +28,17 @@ class YouTubeInvalidAPICall(YouTubeError):
         )
 
 
-class YouTubeInvalidVideoTarget(YouTubeError):
+class YouTubeInvalidVideoTargetError(YouTubeError):
     pass
 
 
-class YouTubeInvalidChannelTarget(YouTubeError):
+class YouTubeInvalidChannelTargetError(YouTubeError):
     pass
 
 
-class YouTubeDisabledComments(YouTubeError):
+class YouTubeDisabledCommentsError(YouTubeError):
     pass
 
 
-class YouTubeVideoNotFound(YouTubeError):
+class YouTubeVideoNotFoundError(YouTubeError):
     pass

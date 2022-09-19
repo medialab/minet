@@ -25,12 +25,12 @@ from minet.youtube.constants import (
     YOUTUBE_API_SEARCH_ORDERS,
 )
 from minet.youtube.exceptions import (
-    YouTubeDisabledComments,
-    YouTubeVideoNotFound,
+    YouTubeDisabledCommentsError,
+    YouTubeVideoNotFoundError,
     YouTubeInvalidAPIKeyError,
-    YouTubeInvalidAPICall,
-    YouTubeInvalidVideoTarget,
-    YouTubeInvalidChannelTarget,
+    YouTubeInvalidAPICallError,
+    YouTubeInvalidVideoTargetError,
+    YouTubeInvalidChannelTargetError,
 )
 from minet.youtube.formatters import (
     format_video,
@@ -146,7 +146,7 @@ class YouTubeAPIClient(object):
                 and getpath(data, ["error", "errors", 0, "reason"], "")
                 == "commentsDisabled"
             ):
-                raise YouTubeDisabledComments
+                raise YouTubeDisabledCommentsError
 
             sleep_time = seconds_to_midnight_pacific_time() + 10
 
@@ -158,7 +158,7 @@ class YouTubeAPIClient(object):
             return self.request_json(url)
 
         if response.status == 404:
-            raise YouTubeVideoNotFound
+            raise YouTubeVideoNotFoundError
 
         if response.status >= 400:
             if data is not None and "API key not valid" in getpath(
@@ -166,7 +166,7 @@ class YouTubeAPIClient(object):
             ):
                 raise YouTubeInvalidAPIKeyError
 
-            raise YouTubeInvalidAPICall(url, response.status, data)
+            raise YouTubeInvalidAPICallError(url, response.status, data)
 
         return data
 
@@ -229,7 +229,7 @@ class YouTubeAPIClient(object):
         video_id = ensure_video_id(video_target)
 
         if video_id is None:
-            raise YouTubeInvalidVideoTarget
+            raise YouTubeInvalidVideoTargetError
 
         def generator():
             starting_url = forge_comments_url(self.key, video_id)
@@ -242,7 +242,7 @@ class YouTubeAPIClient(object):
                 try:
                     result = self.request_json(url)
 
-                except (YouTubeDisabledComments, YouTubeVideoNotFound):
+                except (YouTubeDisabledCommentsError, YouTubeVideoNotFoundError):
                     return
 
                 for item in result["items"]:
@@ -294,7 +294,7 @@ class YouTubeAPIClient(object):
             channel_id = scrape_channel_id(channel_target)
 
         if channel_id is None:
-            raise YouTubeInvalidChannelTarget
+            raise YouTubeInvalidChannelTargetError
 
         playlist_id = get_channel_main_playlist_id(channel_id)
 
