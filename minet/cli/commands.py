@@ -31,6 +31,7 @@ from minet.crowdtangle.constants import (
     CROWDTANGLE_SUMMARY_SORT_TYPES,
     CROWDTANGLE_DEFAULT_RATE_LIMIT,
     CROWDTANGLE_SEARCH_FIELDS,
+    CROWDTANGLE_DEFAULT_START_DATE,
 )
 from minet.facebook.constants import FACEBOOK_MOBILE_DEFAULT_THROTTLE
 from minet.youtube.constants import (
@@ -514,8 +515,8 @@ MINET_COMMANDS = {
                         },
                         {
                             "flag": "--start-date",
-                            "help": "The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.",
-                            "required": True,
+                            "help": "The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010`.",
+                            "default": CROWDTANGLE_DEFAULT_START_DATE,
                         },
                     ],
                 },
@@ -642,8 +643,8 @@ MINET_COMMANDS = {
                         },
                         {
                             "flag": "--start-date",
-                            "help": "The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.",
-                            "required": True,
+                            "help": "The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010`.",
+                            "default": CROWDTANGLE_DEFAULT_START_DATE,
                         },
                         {
                             "flag": "--types",
@@ -701,7 +702,8 @@ MINET_COMMANDS = {
                         },
                         {
                             "flag": "--start-date",
-                            "help": "The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.",
+                            "help": "The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010`.",
+                            "default": CROWDTANGLE_DEFAULT_START_DATE,
                         },
                         {
                             "flag": "--total",

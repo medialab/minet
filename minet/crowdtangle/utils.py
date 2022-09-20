@@ -6,8 +6,6 @@
 #
 from datetime import date, datetime, timedelta
 
-from minet.crowdtangle.exceptions import CrowdTangleMissingStartDateError
-
 DAY_DELTA = timedelta(days=1)
 
 
@@ -115,8 +113,6 @@ def make_paginated_iterator(
 
         # Checking we have the necessary dates
         if kwargs.get("sort_by") == "date":
-            if kwargs.get("start_date") is None:
-                raise CrowdTangleMissingStartDateError
 
             # Inferring end date to be now, this will be important later
             if kwargs.get("end_date") is None:
