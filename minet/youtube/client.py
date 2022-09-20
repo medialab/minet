@@ -10,7 +10,7 @@ from collections import deque
 from urllib.parse import quote
 from ebbe import getpath
 
-from minet.web import create_pool, request_json
+from minet.web import create_pool, create_request_retryer, request_json, retrying_method
 from minet.youtube.utils import (
     ensure_video_id,
     ensure_channel_id,
@@ -133,7 +133,9 @@ class YouTubeAPIClient(object):
         self.key = key
         self.pool = create_pool()
         self.before_sleep = before_sleep_until_midnight
+        self.retryer = create_request_retryer()
 
+    @retrying_method()
     def request_json(self, url):
         err, response, data = request_json(url, pool=self.pool)
 
