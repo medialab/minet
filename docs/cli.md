@@ -850,7 +850,7 @@ optional arguments:
   -l LIMIT, --limit LIMIT               Maximum number of accounts to retrieve. Will fetch every account by default.
   --list-id LIST_ID                     Optional list id from which to retrieve accounts.
   -o OUTPUT, --output OUTPUT            Path to the output file. By default, the results will be printed to stdout.
-  --start-date START_DATE               The earliest date at which to start aggregating statistics (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010`.
+  --start-date START_DATE               The earliest date at which to start aggregating statistics (UTC!). You can pass just a year or a year-month for convenience.
 
 examples:
 
