@@ -37,10 +37,10 @@ REPORT_HEADERS = [
     "domain_name",
     "hostname",
     "normalized_hostname",
-    "probably_shortened",
-    "probably_typo",
-    "probably_homepage",
-    "should_probably_resolve",
+    "shortened",
+    "typo",
+    "homepage",
+    "should_resolve",
 ]
 
 FACEBOOK_REPORT_HEADERS = [
