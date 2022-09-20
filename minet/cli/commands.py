@@ -2553,10 +2553,14 @@ MINET_COMMANDS = {
             . "hostname": full hostname of the url.
             . "normalized_hostname": normalized hostname, i.e. stripped of "www",
               "m" or some language subdomains etc., of the url.
-            . "probably_shortened": whether the url is probably shortened or
+            . "shortened": whether the url is probably shortened or
               not (bit.ly, t.co etc.).
-            . "probably_typo": whether the url probably contains typo or not
+            . "typo": whether the url probably contains typo or not
               (such as inclusive language in french : curieux.se etc.).
+            . "homepage": whether the given url looks like a website's
+              homepage.
+            . "should_resolve": whether the given url looks like something
+              we should resolve, i.e. shortened url.
 
             columns being added with --facebook:
 
