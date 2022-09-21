@@ -121,6 +121,7 @@ def format_playlist_item_snippet(item):
         snippet["title"],
         snippet["description"],
         snippet["channelTitle"],
+        snippet["position"],
     )
 
     return row

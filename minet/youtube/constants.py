@@ -27,6 +27,7 @@ YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS = [
     "title",
     "description",
     "channel_title",
+    "position",
 ]
 
 YOUTUBE_VIDEO_CSV_HEADERS = YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS + [
