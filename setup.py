@@ -25,7 +25,7 @@ setup(
     packages=find_packages(exclude=["ftest", "scripts", "test"]),
     install_requires=[
         "beautifulsoup4>=4.7.1",
-        "browser-cookie3==0.13.0",
+        "browser-cookie3==0.16.1",
         "casanova>=0.18.0,<0.19",
         "cchardet>=2.1.7",
         "colorama>=0.4.0",
@@ -37,7 +37,7 @@ setup(
         "ndjson>=0.3.1",
         "persist-queue>=0.7.0",
         "pyyaml",
-        "quenouille>=1.4.2,<2",
+        "quenouille>=1.4.3,<2",
         "soupsieve>=2.1",
         "tenacity>=7.0.0",
         "termcolor>=1.0.0",
