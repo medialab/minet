@@ -148,7 +148,7 @@ class YouTubeAPIClient(object):
 
             if data is not None:
 
-                reason = getpath(data, ["error", "errors", 0, "reason"], "")
+                reason = getpath(data, ["error", "errors", 0, "reason"])
 
                 if reason == "commentsDisabled":
                     raise YouTubeDisabledCommentsError(url)

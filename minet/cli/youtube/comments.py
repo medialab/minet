@@ -45,15 +45,15 @@ def comments_action(cli_args):
                 enricher.writerow(row, comment.as_csv_row())
 
             loading_bar.inc("videos")
-        except (YouTubeDisabledCommentsError):
-            print()
-            print("YouTube disabled the comments for this video.")
-        except (YouTubeVideoNotFoundError):
-            print()
-            print("This YouTube video can't be found.")
-        except (YouTubeExclusiveMemberError):
-            print()
-            print("This video is reserved for exclusive members.")
-        except (YouTubeUnknown403Error):
-            print()
-            print("An unknown 403 error has occured.")
+        except YouTubeDisabledCommentsError:
+            loading_bar.print(
+                "\nYouTube disabled the comments for this video: %s" % video
+            )
+        except YouTubeVideoNotFoundError:
+            loading_bar.print("\nThis YouTube video can't be found: %s" % video)
+        except YouTubeExclusiveMemberError:
+            loading_bar.print(
+                "\nThis video is reserved for exclusive members: %s" % video
+            )
+        except YouTubeUnknown403Error:
+            loading_bar.print("\nAn unknown 403 error has occured: %s" % video)
