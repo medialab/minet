@@ -4,8 +4,7 @@ from tenacity import (
     retry_if_exception_type,
     stop_after_attempt,
 )
-
-from minet.utils import prettyprint_seconds
+from ebbe import format_seconds
 
 
 def dummy_sleep(retry_state):
@@ -17,7 +16,7 @@ def before(retry_state):
 
 
 def debug(retry_state):
-    print("Will wait for %s" % prettyprint_seconds(retry_state.idle_for))
+    print("Will wait for %s" % format_seconds(retry_state.idle_for))
 
 
 retryer = Retrying(
