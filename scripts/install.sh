@@ -80,8 +80,10 @@ else
 
     if [[ $ubuntu_version -le "18" ]]; then
       os="ubuntu_18"
-    else
+    elif [[ $ubuntu_version -le "20" ]]; then
       os="ubuntu_20"
+    else
+      os="ubuntu_22"
     fi
   else
     fail_install
