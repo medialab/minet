@@ -31,6 +31,8 @@ from minet.youtube.exceptions import (
     YouTubeInvalidAPICallError,
     YouTubeInvalidVideoTargetError,
     YouTubeInvalidChannelTargetError,
+    YouTubeExclusiveMemberError,
+    YouTubeUnknown403Error,
 )
 from minet.youtube.formatters import (
     format_video,
@@ -143,21 +145,28 @@ class YouTubeAPIClient(object):
             raise err
 
         if response.status == 403:
-            if (
-                data is not None
-                and getpath(data, ["error", "errors", 0, "reason"], "")
-                == "commentsDisabled"
-            ):
-                raise YouTubeDisabledCommentsError
 
-            sleep_time = seconds_to_midnight_pacific_time() + 10
+            if data is not None:
 
-            if callable(self.before_sleep):
-                self.before_sleep(sleep_time)
+                reason = getpath(data, ["error", "errors", 0, "reason"], "")
 
-            time.sleep(sleep_time)
+                if reason == "commentsDisabled":
+                    raise YouTubeDisabledCommentsError(url)
 
-            return self.request_json(url)
+                elif reason == "forbidden":
+                    raise YouTubeExclusiveMemberError(url)
+
+                elif reason == "quotaExceeded":
+                    sleep_time = seconds_to_midnight_pacific_time() + 10
+
+                    if callable(self.before_sleep):
+                        self.before_sleep(sleep_time)
+
+                    time.sleep(sleep_time)
+
+                    return self.request_json(url)
+
+            raise YouTubeUnknown403Error
 
         if response.status == 404:
             raise YouTubeVideoNotFoundError
@@ -241,11 +250,7 @@ class YouTubeAPIClient(object):
             while len(queue) != 0:
                 is_reply, item_id, url = queue.popleft()
 
-                try:
-                    result = self.request_json(url)
-
-                except (YouTubeDisabledCommentsError, YouTubeVideoNotFoundError):
-                    return
+                result = self.request_json(url)
 
                 for item in result["items"]:
                     comment_id = item["id"]
