@@ -8,7 +8,7 @@ wheel
 
 # Dependencies
 beautifulsoup4==4.11.1
-browser-cookie3==0.13.0
+browser-cookie3==0.16.1
 casanova==0.18.0
 cchardet>=2.1.7
 colorama==0.4.4
@@ -20,7 +20,7 @@ lxml==4.8.0
 ndjson==0.3.1
 persist-queue==0.7.0
 pyyaml==5.4.1
-quenouille==1.4.2
+quenouille==1.4.3
 soupsieve>=2.1
 tenacity==7.0.0
 termcolor==1.1.0
