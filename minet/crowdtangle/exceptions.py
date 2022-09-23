@@ -58,3 +58,22 @@ class CrowdTangleInvalidJSONError(CrowdTangleError):
 
 class CrowdTangleRateLimitExceeded(CrowdTangleError):
     pass
+
+class CrowdTanglePostNotFound(CrowdTangleError):
+    def __init__(self, message=None, data=None, url=None):
+        super().__init__(message)
+        self.data = data
+        self.url = url
+        self.message = f"\n\n\
+            CrowdTangle does not have data about the post at URL: {self.url}\n\
+            The CrowdTangle API's response is: \n\
+            {self.data}\n\
+            This URL has been skipped and the inaccessible post will not be output.\n\
+            "
+
+    def __str__(self):
+            
+        if self.data:
+            return super().__str__() + self.message
+        
+        return super().__str__()
