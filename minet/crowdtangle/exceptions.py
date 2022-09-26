@@ -71,7 +71,7 @@ class CrowdTanglePostNotFound(CrowdTangleError):
             This URL has been skipped and the inaccessible post will not be output.\n\
             "
 
-    def __str__(self):
+    def __repr__(self):
             
         if self.data:
             return super().__str__() + self.message

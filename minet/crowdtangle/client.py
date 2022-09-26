@@ -91,11 +91,9 @@ class CrowdTangleAPIClient(object):
             raise CrowdTangleInvalidJSONError
 
         try:
-            data["result"]
-        except:
-            print(CrowdTanglePostNotFound(None, data, url).__str__())
-
-        return data.get("result")
+            return data["result"]
+        except KeyError:
+            raise CrowdTanglePostNotFound(None, data, url)
 
     @rate_limited_method("rate_limiter_state")
     def request(self, url):
