@@ -9,7 +9,13 @@ from urllib.parse import quote
 from ebbe import getpath
 
 from minet.constants import COOKIE_BROWSERS
-from minet.web import create_pool, request_json, grab_cookies
+from minet.web import (
+    create_pool,
+    request_json,
+    grab_cookies,
+    create_request_retryer,
+    retrying_method,
+)
 from minet.instagram.constants import (
     INSTAGRAM_URL,
     INSTAGRAM_PUBLIC_API_DEFAULT_TIMEOUT,
@@ -18,6 +24,7 @@ from minet.instagram.exceptions import (
     InstagramPublicAPIInvalidResponseError,
     InstagramInvalidCookieError,
 )
+from minet.instagram.formatters import format_post
 
 INSTAGRAM_GRAPHQL_ENDPOINT = "https://www.instagram.com/graphql/query/"
 INSTAGRAM_HASHTAG_QUERY_HASH = "9b498c08113f1e09617a1703c22b2f32"
@@ -49,7 +56,9 @@ class InstagramAPIScraper(object):
             raise InstagramInvalidCookieError
 
         self.cookie = cookie
+        self.retryer = create_request_retryer()
 
+    @retrying_method()
     def request_json(self, url):
         err, response, data = request_json(
             url, pool=self.pool, spoof_ua=True, headers={"Cookie": self.cookie}
@@ -59,6 +68,7 @@ class InstagramAPIScraper(object):
             raise err
 
         if response.status >= 400:
+            print(response.status)
             raise InstagramPublicAPIInvalidResponseError
 
         return data
@@ -69,7 +79,6 @@ class InstagramAPIScraper(object):
 
         while True:
             url = forge_hashtag_search_url(name, cursor=cursor)
-            print(url, cursor)
 
             data = self.request_json(url)
 
@@ -77,9 +86,7 @@ class InstagramAPIScraper(object):
             edges = data.get("edges")
 
             for edge in edges:
-                yield edge["node"]["shortcode"]
-
-            print("Found %i posts" % len(edges))
+                yield format_post(edge["node"])
 
             has_next_page = getpath(data, ["page_info", "has_next_page"])
 
