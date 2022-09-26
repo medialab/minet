@@ -23,6 +23,8 @@ def hashtag_action(cli_args):
 
     client = InstagramAPIScraper(cookie=cli_args.cookie)
     for row, hashtag in enricher.cells(cli_args.column, with_rows=True):
+        loading_bar.update()
+
         generator = client.search_hashtag(hashtag)
 
         if cli_args.limit:
@@ -32,5 +34,3 @@ def hashtag_action(cli_args):
             enricher.writerow(row, post.as_csv_row())
 
             loading_bar.inc("posts")
-
-        loading_bar.update()

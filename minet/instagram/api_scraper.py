@@ -68,6 +68,7 @@ class InstagramAPIScraper(object):
             raise err
 
         if response.status >= 400:
+            print(response)
             raise InstagramPublicAPIInvalidResponseError
 
         return data
