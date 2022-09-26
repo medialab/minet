@@ -12,7 +12,7 @@ import minet.facebook as facebook
 from minet.cli.utils import LoadingBar
 from minet.crowdtangle.constants import CROWDTANGLE_POST_CSV_HEADERS
 from minet.crowdtangle.client import CrowdTangleAPIClient
-from minet.crowdtangle.exceptions import CrowdTangleInvalidTokenError
+from minet.crowdtangle.exceptions import CrowdTangleInvalidTokenError, CrowdTanglePostNotFound
 
 
 def crowdtangle_posts_by_id_action(cli_args):
@@ -50,8 +50,12 @@ def crowdtangle_posts_by_id_action(cli_args):
                 enricher.writerow(row)
                 continue
 
-            post = client.post(post_id)
-            enricher.writerow(row, post.as_csv_row())
+            try:
+                post = client.post(post_id)
+                enricher.writerow(row, post.as_csv_row())
+            except CrowdTanglePostNotFound as error:
+                enricher.writerow(row)
+                loading_bar.print(error, repr(error))
 
     except CrowdTangleInvalidTokenError:
         loading_bar.die(
