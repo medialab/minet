@@ -19,7 +19,9 @@ def hashtag_action(cli_args):
         add=INSTAGRAM_POST_CSV_HEADERS,
     )
 
-    loading_bar = LoadingBar("Retrieving posts", unit="post", stats={"posts": 0})
+    loading_bar = LoadingBar(
+        "Retrieving posts", unit="post", stats={"posts": 0, "hashtags": 0}
+    )
 
     client = InstagramAPIScraper(cookie=cli_args.cookie)
     for row, hashtag in enricher.cells(cli_args.column, with_rows=True):
@@ -28,8 +30,10 @@ def hashtag_action(cli_args):
         if cli_args.limit:
             generator = islice(generator, cli_args.limit)
 
-        for hashtag in generator:
+        for post in generator:
             loading_bar.update()
-            enricher.writerow(row, hashtag.as_csv_row())
+            enricher.writerow(row, post.as_csv_row())
 
             loading_bar.inc("posts")
+
+        loading_bar.inc("hashtags")

@@ -47,6 +47,8 @@
   * [dump](#hyphe-dump)
   * [reset](#hyphe-reset)
   * [tag](#hyphe-tag)
+* [instagram (insta)](#instagram)
+  * [hashtag](#insta-hashtag)
 * [mediacloud (mc)](#mediacloud)
   * [medias](#mc-medias)
   * [search](#mc-search)
@@ -1504,6 +1506,65 @@ examples:
 
 . Tag webentities from two columns of CSV file:
     $ minet hyphe tag http://myhyphe.com/api/ my-corpus webentity_id type,creator metadata.csv
+
+```
+
+## Instagram
+
+```
+usage: minet instagram [-h] [--rcfile RCFILE] [-o OUTPUT] {hashtag} ...
+
+Minet Instagram command
+=======================
+
+Gather data from Instagram.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+
+actions:
+  {hashtag}                   Actions to perform on Instagram.
+
+```
+
+<h3 id="insta-hashtag">hashtag</h3>
+
+```
+usage: minet instagram hashtag [-h] [--rcfile RCFILE] [-o OUTPUT] [-s SELECT]
+                               [-c COOKIE] [-l LIMIT]
+                               column [file]
+
+Instagram hashtag
+=================
+
+Scrape Instagram posts with a given hashtag.
+
+This requires to be logged in to an Instagram account, so
+by default this command will attempt to grab the relevant
+authentication cookies from a local Firefox browser.
+
+If you want to grab cookies from another browser or want
+to directly pass the cookie as a string, check out the
+-c/--cookie flag.
+
+positional arguments:
+  column                      This argument can either take the query on which we want to retrieve posts or the name of the column containing that query
+  file                        CSV file containing the query for instagram hashtag.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".
+  -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve per query.
+
+example:
+
+. Searching posts with the hashtag paris:
+    $ minet instagram hashtag paris > paris_posts.csv
 
 ```
 

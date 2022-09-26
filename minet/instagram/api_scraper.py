@@ -68,7 +68,6 @@ class InstagramAPIScraper(object):
             raise err
 
         if response.status >= 400:
-            print(response.status)
             raise InstagramPublicAPIInvalidResponseError
 
         return data
@@ -83,6 +82,10 @@ class InstagramAPIScraper(object):
             data = self.request_json(url)
 
             data = getpath(data, ["data", "hashtag", "edge_hashtag_to_media"])
+
+            if not data:
+                break
+
             edges = data.get("edges")
 
             for edge in edges:

@@ -15,3 +15,7 @@ class InstagramPublicAPIInvalidResponseError(InstagramError):
 
 class InstagramInvalidCookieError(InstagramError):
     pass
+
+
+class InstagramNoResultError(InstagramError):
+    pass
