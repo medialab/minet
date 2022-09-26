@@ -2741,6 +2741,7 @@ MINET_COMMANDS = {
                             "help": "YouTube API Data dashboard API key.",
                             "rc_key": ["youtube", "key"],
                             "action": ConfigAction,
+                            "nargs": "+",
                         },
                         {
                             "flags": ["-s", "--select"],
@@ -2774,6 +2775,7 @@ MINET_COMMANDS = {
                             "help": "YouTube API Data dashboard API key.",
                             "rc_key": ["youtube", "key"],
                             "action": ConfigAction,
+                            "nargs": "+",
                         },
                         {
                             "flags": ["-s", "--select"],
@@ -2807,6 +2809,7 @@ MINET_COMMANDS = {
                             "help": "YouTube API Data dashboard API key.",
                             "rc_key": ["youtube", "key"],
                             "action": ConfigAction,
+                            "nargs": "+",
                         },
                         {
                             "flags": ["-s", "--select"],
@@ -2845,6 +2848,7 @@ MINET_COMMANDS = {
                             "help": "YouTube API Data dashboard API key.",
                             "rc_key": ["youtube", "key"],
                             "action": ConfigAction,
+                            "nargs": "+",
                         },
                         {
                             "flags": ["-s", "--select"],

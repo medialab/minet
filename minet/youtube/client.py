@@ -44,16 +44,15 @@ from minet.youtube.formatters import (
 from minet.youtube.scrapers import scrape_channel_id
 
 
-def forge_playlist_videos_url(key, playlist_id, token=None):
+def forge_playlist_videos_url(playlist_id, token=None):
     data = {
         "base": YOUTUBE_API_BASE_URL,
         "playlist_id": playlist_id,
-        "key": key,
         "count": YOUTUBE_API_MAX_VIDEOS_PER_CALL,
     }
 
     url = (
-        "%(base)s/playlistItems?part=snippet&maxResults=%(count)i&playlistId=%(playlist_id)s&key=%(key)s"
+        "%(base)s/playlistItems?part=snippet&maxResults=%(count)i&playlistId=%(playlist_id)s|"
         % data
     )
 
@@ -63,26 +62,22 @@ def forge_playlist_videos_url(key, playlist_id, token=None):
     return url
 
 
-def forge_videos_url(key, ids):
-    data = {"base": YOUTUBE_API_BASE_URL, "ids": ",".join(ids), "key": key}
+def forge_videos_url(ids):
+    data = {"base": YOUTUBE_API_BASE_URL, "ids": ",".join(ids)}
 
-    return (
-        "%(base)s/videos?id=%(ids)s&key=%(key)s&part=snippet,statistics,contentDetails"
-        % data
-    )
+    return "%(base)s/videos?id=%(ids)s|&part=snippet,statistics,contentDetails" % data
 
 
-def forge_search_url(key, query, order=YOUTUBE_API_DEFAULT_SEARCH_ORDER, token=None):
+def forge_search_url(query, order=YOUTUBE_API_DEFAULT_SEARCH_ORDER, token=None):
     data = {
         "base": YOUTUBE_API_BASE_URL,
         "order": order,
         "query": quote(query),
-        "key": key,
         "count": YOUTUBE_API_MAX_VIDEOS_PER_CALL,
     }
 
     url = (
-        "%(base)s/search?part=snippet&maxResults=%(count)i&q=%(query)s&type=video&order=%(order)s&key=%(key)s"
+        "%(base)s/search?part=snippet&maxResults=%(count)i&q=%(query)s&type=video&order=%(order)s|"
         % data
     )
 
@@ -92,16 +87,15 @@ def forge_search_url(key, query, order=YOUTUBE_API_DEFAULT_SEARCH_ORDER, token=N
     return url
 
 
-def forge_comments_url(key, video_id, token=None):
+def forge_comments_url(video_id, token=None):
     data = {
         "base": YOUTUBE_API_BASE_URL,
-        "key": key,
         "count": YOUTUBE_API_MAX_COMMENTS_PER_CALL,
         "video_id": video_id,
     }
 
     url = (
-        "%(base)s/commentThreads?videoId=%(video_id)s&key=%(key)s&part=snippet,replies&maxResults=%(count)s"
+        "%(base)s/commentThreads?videoId=%(video_id)s|&part=snippet,replies&maxResults=%(count)s"
         % data
     )
 
@@ -111,16 +105,15 @@ def forge_comments_url(key, video_id, token=None):
     return url
 
 
-def forge_replies_url(key, comment_id, token=None):
+def forge_replies_url(comment_id, token=None):
     data = {
         "base": YOUTUBE_API_BASE_URL,
-        "key": key,
         "comment_id": comment_id,
         "count": YOUTUBE_API_MAX_COMMENTS_PER_CALL,
     }
 
     url = (
-        "%(base)s/comments?part=snippet&parentId=%(comment_id)s&key=%(key)s&maxResults=%(count)s"
+        "%(base)s/comments?part=snippet&parentId=%(comment_id)s|&maxResults=%(count)s"
         % data
     )
 
@@ -132,54 +125,83 @@ def forge_replies_url(key, comment_id, token=None):
 
 class YouTubeAPIClient(object):
     def __init__(self, key, before_sleep_until_midnight=None):
-        self.key = key
+        if not isinstance(key, list):
+            key = [key]
+        self.keys = {k: True for k in key}
+        self.current_key = key[0]
         self.pool = create_pool()
         self.before_sleep = before_sleep_until_midnight
         self.retryer = create_request_retryer()
 
     @retrying_method()
     def request_json(self, url):
-        err, response, data = request_json(url, pool=self.pool)
 
-        if err:
-            raise err
+        while True:
 
-        if response.status == 403:
+            url = url.replace("|", "&key=%s" % self.current_key)
+            err, response, data = request_json(url, pool=self.pool)
 
-            if data is not None:
+            if err:
+                raise err
 
-                reason = getpath(data, ["error", "errors", 0, "reason"])
+            if response.status == 403:
 
-                if reason == "commentsDisabled":
-                    raise YouTubeDisabledCommentsError(url)
+                if data is not None:
 
-                elif reason == "forbidden":
-                    raise YouTubeExclusiveMemberError(url)
+                    reason = getpath(data, ["error", "errors", 0, "reason"])
 
-                elif reason == "quotaExceeded":
-                    sleep_time = seconds_to_midnight_pacific_time() + 10
+                    if reason == "commentsDisabled":
+                        raise YouTubeDisabledCommentsError(url)
 
-                    if callable(self.before_sleep):
-                        self.before_sleep(sleep_time)
+                    elif reason == "forbidden":
+                        raise YouTubeExclusiveMemberError(url)
 
-                    time.sleep(sleep_time)
+                    elif reason == "quotaExceeded":
+                        # Current key is exhausted, disabling it and switching to another if there is one
+                        self.current_key = self.rotate_key()
 
-                    return self.request_json(url)
+                        if not self.current_key:
+                            # If all keys are exhausted, start waiting until tomorrow and reset keys
+                            sleep_time = seconds_to_midnight_pacific_time() + 10
 
-            raise YouTubeUnknown403Error
+                            if callable(self.before_sleep):
+                                self.before_sleep(sleep_time)
 
-        if response.status == 404:
-            raise YouTubeVideoNotFoundError
+                            time.sleep(sleep_time)
 
-        if response.status >= 400:
-            if data is not None and "API key not valid" in getpath(
-                data, ["error", "message"], ""
-            ):
-                raise YouTubeInvalidAPIKeyError
+                            self.reset_key()
 
-            raise YouTubeInvalidAPICallError(url, response.status, data)
+                        continue
 
-        return data
+                raise YouTubeUnknown403Error
+
+            if response.status == 404:
+                raise YouTubeVideoNotFoundError
+
+            if response.status >= 400:
+                if data is not None and "API key not valid" in getpath(
+                    data, ["error", "message"], ""
+                ):
+                    raise YouTubeInvalidAPIKeyError
+
+                raise YouTubeInvalidAPICallError(url, response.status, data)
+
+            return data
+
+    def rotate_key(self):
+        self.keys[self.current_key] = False
+        available_key = None
+        for key, status in self.keys.items():
+            if status:
+                available_key = key
+                break
+        if available_key:
+            return available_key
+        return None
+
+    def reset_key(self):
+        for key in self.keys:
+            self.keys[key] = True
 
     def videos(self, videos, key=None, raw=False):
 
@@ -194,7 +216,7 @@ class YouTubeAPIClient(object):
 
             ids = [video_id for video_id, _ in group_data if video_id is not None]
 
-            url = forge_videos_url(self.key, ids)
+            url = forge_videos_url(ids)
 
             result = self.request_json(url)
 
@@ -219,7 +241,7 @@ class YouTubeAPIClient(object):
             token = None
 
             while True:
-                url = forge_search_url(self.key, query, order=order, token=token)
+                url = forge_search_url(query, order=order, token=token)
 
                 result = self.request_json(url)
 
@@ -243,7 +265,7 @@ class YouTubeAPIClient(object):
             raise YouTubeInvalidVideoTargetError
 
         def generator():
-            starting_url = forge_comments_url(self.key, video_id)
+            starting_url = forge_comments_url(video_id)
 
             queue = deque([(False, video_id, starting_url)])
 
@@ -277,7 +299,7 @@ class YouTubeAPIClient(object):
 
                             yield reply
                     elif total_reply_count > 0:
-                        replies_url = forge_replies_url(self.key, comment_id)
+                        replies_url = forge_replies_url(comment_id)
 
                         queue.append((True, comment_id, replies_url))
 
@@ -287,7 +309,7 @@ class YouTubeAPIClient(object):
                 if token is not None and len(result["items"]) != 0:
                     forge = forge_replies_url if is_reply else forge_comments_url
 
-                    next_url = forge(self.key, item_id, token=token)
+                    next_url = forge(item_id, token=token)
 
                     queue.append((is_reply, item_id, next_url))
 
@@ -309,7 +331,7 @@ class YouTubeAPIClient(object):
             token = None
 
             while True:
-                url = forge_playlist_videos_url(self.key, playlist_id, token=token)
+                url = forge_playlist_videos_url(playlist_id, token=token)
 
                 result = self.request_json(url)
 

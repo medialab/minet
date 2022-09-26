@@ -2182,8 +2182,8 @@ examples:
 ### channel-videos
 
 ```
-usage: minet youtube channel-videos [-h] [--rcfile RCFILE] [-o OUTPUT] [-k KEY]
-                                    [-s SELECT]
+usage: minet youtube channel-videos [-h] [--rcfile RCFILE] [-o OUTPUT]
+                                    [-k KEY [KEY ...]] [-s SELECT]
                                     column [file]
 
 Youtube channel videos
@@ -2197,15 +2197,15 @@ information about videos stored in the main playlist of the channel
 supposed to contain all the channel's videos.
 
 positional arguments:
-  column                      Name of the column containing the channel's ids.
-  file                        CSV file containing the Youtube channel's ids.
+  column                                 Name of the column containing the channel's ids.
+  file                                   CSV file containing the Youtube channel's ids.
 
 optional arguments:
-  -h, --help                  show this help message and exit
-  --rcfile RCFILE             Custom path to a minet configuration file.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  -k KEY, --key KEY           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  -h, --help                             show this help message and exit
+  --rcfile RCFILE                        Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT             Path to the output file. By default, the results will be printed to stdout.
+  -k KEY [KEY ...], --key KEY [KEY ...]  YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
+  -s SELECT, --select SELECT             Columns of input CSV file to include in the output (separated by `,`).
 
 example:
 
@@ -2223,8 +2223,8 @@ example:
 <h3 id="youtube-comments">comments</h3>
 
 ```
-usage: minet youtube comments [-h] [--rcfile RCFILE] [-o OUTPUT] [-k KEY]
-                              [-s SELECT]
+usage: minet youtube comments [-h] [--rcfile RCFILE] [-o OUTPUT]
+                              [-k KEY [KEY ...]] [-s SELECT]
                               column [file]
 
 Youtube comments
@@ -2233,15 +2233,15 @@ Youtube comments
 Retrieve metadata about Youtube comments using the API.
 
 positional arguments:
-  column                      This argument can either take the name of the column containing the video's id/url if a file is passed as an argument, or a single youtube video's id/url if there is no file 
-  file                        CSV file containing the Youtube videos ids.
+  column                                 This argument can either take the name of the column containing the video's id/url if a file is passed as an argument, or a single youtube video's id/url if there is no file 
+  file                                   CSV file containing the Youtube videos ids.
 
 optional arguments:
-  -h, --help                  show this help message and exit
-  --rcfile RCFILE             Custom path to a minet configuration file.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  -k KEY, --key KEY           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  -h, --help                             show this help message and exit
+  --rcfile RCFILE                        Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT             Path to the output file. By default, the results will be printed to stdout.
+  -k KEY [KEY ...], --key KEY [KEY ...]  YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
+  -s SELECT, --select SELECT             Columns of input CSV file to include in the output (separated by `,`).
 
 example:
 
@@ -2253,8 +2253,8 @@ example:
 <h3 id="youtube-search">search</h3>
 
 ```
-usage: minet youtube search [-h] [--rcfile RCFILE] [-o OUTPUT] [-k KEY]
-                            [-s SELECT] [-l LIMIT]
+usage: minet youtube search [-h] [--rcfile RCFILE] [-o OUTPUT]
+                            [-k KEY [KEY ...]] [-s SELECT] [-l LIMIT]
                             [--order {date,rating,relevance,title,videoCount,viewCount}]
                             column [file]
 
@@ -2271,7 +2271,7 @@ optional arguments:
   -h, --help                                      show this help message and exit
   --rcfile RCFILE                                 Custom path to a minet configuration file.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
-  -k KEY, --key KEY                               YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
+  -k KEY [KEY ...], --key KEY [KEY ...]           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   -l LIMIT, --limit LIMIT                         Maximum number of videos to retrieve per query.
   --order {date,rating,relevance,title,videoCount,viewCount}
@@ -2287,8 +2287,8 @@ example:
 ### videos
 
 ```
-usage: minet youtube videos [-h] [--rcfile RCFILE] [-o OUTPUT] [-k KEY]
-                            [-s SELECT] [--total TOTAL]
+usage: minet youtube videos [-h] [--rcfile RCFILE] [-o OUTPUT]
+                            [-k KEY [KEY ...]] [-s SELECT] [--total TOTAL]
                             column [file]
 
 Youtube videos
@@ -2297,16 +2297,16 @@ Youtube videos
 Retrieve metadata about Youtube videos using the API.
 
 positional arguments:
-  column                      Name of the column containing the video's urls or ids.
-  file                        CSV file containing the Youtube videos urls or ids.
+  column                                 Name of the column containing the video's urls or ids.
+  file                                   CSV file containing the Youtube videos urls or ids.
 
 optional arguments:
-  -h, --help                  show this help message and exit
-  --rcfile RCFILE             Custom path to a minet configuration file.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  -k KEY, --key KEY           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL               Total number of videos. Necessary if you want to display a finite progress indicator.
+  -h, --help                             show this help message and exit
+  --rcfile RCFILE                        Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT             Path to the output file. By default, the results will be printed to stdout.
+  -k KEY [KEY ...], --key KEY [KEY ...]  YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
+  -s SELECT, --select SELECT             Columns of input CSV file to include in the output (separated by `,`).
+  --total TOTAL                          Total number of videos. Necessary if you want to display a finite progress indicator.
 
 ```
 
