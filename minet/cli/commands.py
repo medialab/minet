@@ -2738,10 +2738,10 @@ MINET_COMMANDS = {
                         },
                         {
                             "flags": ["-k", "--key"],
-                            "help": "YouTube API Data dashboard API key.",
+                            "help": "YouTube API Data dashboard API key. Can be used more than once.",
                             "rc_key": ["youtube", "key"],
                             "action": ConfigAction,
-                            "nargs": "+",
+                            "plural": True,
                         },
                         {
                             "flags": ["-s", "--select"],
@@ -2772,10 +2772,10 @@ MINET_COMMANDS = {
                         },
                         {
                             "flags": ["-k", "--key"],
-                            "help": "YouTube API Data dashboard API key.",
+                            "help": "YouTube API Data dashboard API key. Can be used more than once.",
                             "rc_key": ["youtube", "key"],
                             "action": ConfigAction,
-                            "nargs": "+",
+                            "plural": True,
                         },
                         {
                             "flags": ["-s", "--select"],
@@ -2806,10 +2806,10 @@ MINET_COMMANDS = {
                         },
                         {
                             "flags": ["-k", "--key"],
-                            "help": "YouTube API Data dashboard API key.",
+                            "help": "YouTube API Data dashboard API key. Can be used more than once.",
                             "rc_key": ["youtube", "key"],
                             "action": ConfigAction,
-                            "nargs": "+",
+                            "plural": True,
                         },
                         {
                             "flags": ["-s", "--select"],
@@ -2845,10 +2845,10 @@ MINET_COMMANDS = {
                         },
                         {
                             "flags": ["-k", "--key"],
-                            "help": "YouTube API Data dashboard API key.",
+                            "help": "YouTube API Data dashboard API key. Can be used more than once.",
                             "rc_key": ["youtube", "key"],
                             "action": ConfigAction,
-                            "nargs": "+",
+                            "plural": True,
                         },
                         {
                             "flags": ["-s", "--select"],

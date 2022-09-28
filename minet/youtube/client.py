@@ -52,7 +52,7 @@ def forge_playlist_videos_url(playlist_id, token=None):
     }
 
     url = (
-        "%(base)s/playlistItems?part=snippet&maxResults=%(count)i&playlistId=%(playlist_id)s|"
+        "%(base)s/playlistItems?part=snippet&maxResults=%(count)i&playlistId=%(playlist_id)s"
         % data
     )
 
@@ -65,7 +65,7 @@ def forge_playlist_videos_url(playlist_id, token=None):
 def forge_videos_url(ids):
     data = {"base": YOUTUBE_API_BASE_URL, "ids": ",".join(ids)}
 
-    return "%(base)s/videos?id=%(ids)s|&part=snippet,statistics,contentDetails" % data
+    return "%(base)s/videos?id=%(ids)s&part=snippet,statistics,contentDetails" % data
 
 
 def forge_search_url(query, order=YOUTUBE_API_DEFAULT_SEARCH_ORDER, token=None):
@@ -77,7 +77,7 @@ def forge_search_url(query, order=YOUTUBE_API_DEFAULT_SEARCH_ORDER, token=None):
     }
 
     url = (
-        "%(base)s/search?part=snippet&maxResults=%(count)i&q=%(query)s&type=video&order=%(order)s|"
+        "%(base)s/search?part=snippet&maxResults=%(count)i&q=%(query)s&type=video&order=%(order)s"
         % data
     )
 
@@ -95,7 +95,7 @@ def forge_comments_url(video_id, token=None):
     }
 
     url = (
-        "%(base)s/commentThreads?videoId=%(video_id)s|&part=snippet,replies&maxResults=%(count)s"
+        "%(base)s/commentThreads?videoId=%(video_id)s&part=snippet,replies&maxResults=%(count)s"
         % data
     )
 
@@ -113,7 +113,7 @@ def forge_replies_url(comment_id, token=None):
     }
 
     url = (
-        "%(base)s/comments?part=snippet&parentId=%(comment_id)s|&maxResults=%(count)s"
+        "%(base)s/comments?part=snippet&parentId=%(comment_id)s&maxResults=%(count)s"
         % data
     )
 
@@ -137,9 +137,8 @@ class YouTubeAPIClient(object):
     def request_json(self, url):
 
         while True:
-
-            url = url.replace("|", "&key=%s" % self.current_key)
-            err, response, data = request_json(url, pool=self.pool)
+            final_url = url + "&key=%s" % self.current_key
+            err, response, data = request_json(final_url, pool=self.pool)
 
             if err:
                 raise err
@@ -158,9 +157,7 @@ class YouTubeAPIClient(object):
 
                     elif reason == "quotaExceeded":
                         # Current key is exhausted, disabling it and switching to another if there is one
-                        self.current_key = self.rotate_key()
-
-                        if not self.current_key:
+                        if not self.rotate_key():
                             # If all keys are exhausted, start waiting until tomorrow and reset keys
                             sleep_time = seconds_to_midnight_pacific_time() + 10
 
@@ -169,7 +166,7 @@ class YouTubeAPIClient(object):
 
                             time.sleep(sleep_time)
 
-                            self.reset_key()
+                            self.reset_keys()
 
                         continue
 
@@ -196,10 +193,11 @@ class YouTubeAPIClient(object):
                 available_key = key
                 break
         if available_key:
-            return available_key
-        return None
+            self.current_key = available_key
+            return True
+        return False
 
-    def reset_key(self):
+    def reset_keys(self):
         for key in self.keys:
             self.keys[key] = True
 
