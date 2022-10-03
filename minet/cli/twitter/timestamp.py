@@ -16,7 +16,7 @@ def twitter_timestamp_action(cli_args):
         cli_args.file,
         cli_args.output,
         keep=cli_args.select,
-        add=["timestamp"],
+        add=["timestamp_utc"],
     )
 
     loading_bar = LoadingBar("Getting tweets timestamp", unit="tweet")
