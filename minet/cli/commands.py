@@ -1979,6 +1979,38 @@ MINET_COMMANDS = {
                         },
                     ],
                 },
+                "timestamp": {
+                    "title": "Minet Twitter Timestamp Command",
+                    "description": """
+                        Getting timestamp from tweet id.
+                    """,
+                    "epilog": """
+                        examples:
+
+                            $ minet tw timestamp id tweets.csv > tweets_timestamp.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "Name of the column containing the tweet ids.",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the tweet ids.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "id",
+                        },
+                        {
+                            "flags": ["-o", "--output"],
+                            "action": OutputFileAction,
+                        },
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                    ],
+                },
                 "users": {
                     "title": "Minet Twitter Users Command",
                     "description": """

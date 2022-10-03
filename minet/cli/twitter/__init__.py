@@ -34,6 +34,11 @@ def twitter_action(cli_args):
 
         twitter_scrape_action(cli_args)
 
+    elif cli_args.tw_action == "timestamp":
+        from minet.cli.twitter.timestamp import twitter_timestamp_action
+
+        twitter_timestamp_action(cli_args)
+
     else:
         check_credentials(cli_args)
 
