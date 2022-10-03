@@ -58,6 +58,7 @@
   * [friends](#friends)
   * [retweeters](#retweeters)
   * [scrape](#twitter-scrape)
+  * [timestamp] (#timestamp)
   * [tweet-search](#tweet-search)
   * [tweet-count](#tweet-count)
   * [tweets](#tweets)
@@ -1856,6 +1857,33 @@ examples:
 
 . Collecting users with "adam" in their user_name or user_description:
     $ minet tw scrape users adam > users.csv
+
+```
+
+### timestamp
+
+```
+usage: minet twitter timestamp [-h] [--rcfile RCFILE] [-o OUTPUT] [-s SELECT]
+                               column [file]
+
+Minet Twitter Timestamp Command
+===============================
+
+Getting timestamp from tweet id.
+
+positional arguments:
+  column                      Name of the column containing the tweet ids.
+  file                        CSV file containing the tweet ids.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+
+examples:
+
+    $ minet tw timestamp id tweets.csv > tweets_timestamp.csv
 
 ```
 
