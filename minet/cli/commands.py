@@ -1451,7 +1451,10 @@ MINET_COMMANDS = {
             "title": "actions",
             "dest": "insta_action",
             "common_arguments": [
-                {"flags": ["-o", "--output"], "action": OutputFileAction}
+                {
+                    "flags": ["-o", "--output"],
+                    "action": OutputFileAction,
+                }
             ],
             "commands": {
                 "hashtag": {
@@ -1493,6 +1496,57 @@ MINET_COMMANDS = {
                             "flags": ["-c", "--cookie"],
                             "help": 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".',
                             "default": "firefox",
+                            "rc_key": ["instagram", "cookie"],
+                            "action": ConfigAction,
+                        },
+                        {
+                            "flags": ["-l", "--limit"],
+                            "help": "Maximum number of posts to retrieve per query.",
+                            "type": int,
+                        },
+                    ],
+                },
+                "user-posts": {
+                    "title": "Instagram user-posts",
+                    "description": """
+                        Scrape Instagram posts with a given username.
+
+                        This requires to be logged in to an Instagram account, so
+                        by default this command will attempt to grab the relevant
+                        authentication cookies from a local Firefox browser.
+
+                        If you want to grab cookies from another browser or want
+                        to directly pass the cookie as a string, check out the
+                        -c/--cookie flag.
+                    """,
+                    "epilog": """
+                        example:
+
+                        . Searching posts with the hashtag paris:
+                            $ minet instagram user-posts paramountplus > paramountplus_posts.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "This argument can either take the query on which we want to retrieve posts or the name of the column containing that query",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the query for instagram hashtag.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "query",
+                        },
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flags": ["-c", "--cookie"],
+                            "help": 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".',
+                            "default": "firefox",
+                            "rc_key": ["instagram", "cookie"],
+                            "action": ConfigAction,
                         },
                         {
                             "flags": ["-l", "--limit"],

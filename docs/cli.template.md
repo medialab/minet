@@ -49,6 +49,7 @@
   * [tag](#hyphe-tag)
 * [instagram (insta)](#instagram)
   * [hashtag](#insta-hashtag)
+  * [user-posts](#insta-user-posts)
 * [mediacloud (mc)](#mediacloud)
   * [medias](#mc-medias)
   * [search](#mc-search)
@@ -279,6 +280,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 <h3 id="insta-hashtag">hashtag</h3>
 
 <% insta/hashtag %>
+
+<h3 id="insta-user_posts">user_posts</h3>
+
+<% insta/user_posts %>
 
 ## Mediacloud
 

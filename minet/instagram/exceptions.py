@@ -17,5 +17,9 @@ class InstagramInvalidCookieError(InstagramError):
     pass
 
 
-class InstagramNoResultError(InstagramError):
+class InstagramTooManyRequestsError(InstagramError):
+    pass
+
+
+class InstagramError500(InstagramError):
     pass

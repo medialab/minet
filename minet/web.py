@@ -243,8 +243,8 @@ def grab_cookies(browser="firefox"):
 
     try:
         return CookieResolver(getattr(browser_cookie3, browser)())
-    except browser_cookie3.BrowserCookieError:
-        return None
+    except browser_cookie3.BrowserCookieError as e:
+        raise e
 
 
 def dict_to_cookie_string(d):

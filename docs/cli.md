@@ -49,6 +49,7 @@
   * [tag](#hyphe-tag)
 * [instagram (insta)](#instagram)
   * [hashtag](#insta-hashtag)
+  * [user-posts](#insta-user-posts)
 * [mediacloud (mc)](#mediacloud)
   * [medias](#mc-medias)
   * [search](#mc-search)
@@ -1512,7 +1513,8 @@ examples:
 ## Instagram
 
 ```
-usage: minet instagram [-h] [--rcfile RCFILE] [-o OUTPUT] {hashtag} ...
+usage: minet instagram [-h] [--rcfile RCFILE] [-o OUTPUT]
+                       {hashtag,user-posts} ...
 
 Minet Instagram command
 =======================
@@ -1525,7 +1527,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
 
 actions:
-  {hashtag}                   Actions to perform on Instagram.
+  {hashtag,user-posts}        Actions to perform on Instagram.
 
 ```
 
@@ -1558,7 +1560,7 @@ optional arguments:
   --rcfile RCFILE             Custom path to a minet configuration file.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
   -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve per query.
 
 example:
@@ -1567,6 +1569,10 @@ example:
     $ minet instagram hashtag paris > paris_posts.csv
 
 ```
+
+<h3 id="insta-user_posts">user_posts</h3>
+
+<% insta/user_posts %>
 
 ## Mediacloud
 
