@@ -1864,6 +1864,84 @@ MINET_COMMANDS = {
                         },
                     ],
                 },
+                "list-members": {
+                    "title": "Minet Twitter List Members Command",
+                    "description": """
+                        Retrieve members of given list using Twitter API v2.
+                    """,
+                    "epilog": """
+                        examples:
+
+                        . Getting members of a list of lists:
+                            $ minet tw list-members id lists.csv > members.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "Name of the column containing the Twitter list id.",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the inquired Twitter lists.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "list",
+                        },
+                        *TWITTER_API_COMMON_ARGUMENTS,
+                        {
+                            "flags": ["-o", "--output"],
+                            "action": OutputFileAction,
+                        },
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flag": "--total",
+                            "help": "Total number of accounts. Necessary if you want to display a finite progress indicator.",
+                            "type": int,
+                        },
+                    ],
+                },
+                "list-followers": {
+                    "title": "Minet Twitter List Followers Command",
+                    "description": """
+                        Retrieve members of given list using Twitter API v2.
+                    """,
+                    "epilog": """
+                        examples:
+
+                        . Getting followers of a list of lists:
+                            $ minet tw list-followers id lists.csv > followers.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "Name of the column containing the Twitter list id.",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the inquired Twitter lists.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "list",
+                        },
+                        *TWITTER_API_COMMON_ARGUMENTS,
+                        {
+                            "flags": ["-o", "--output"],
+                            "action": OutputFileAction,
+                        },
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flag": "--total",
+                            "help": "Total number of accounts. Necessary if you want to display a finite progress indicator.",
+                            "type": int,
+                        },
+                    ],
+                },
                 "retweeters": {
                     "title": "Minet Twitter Retweeters Command",
                     "description": """
