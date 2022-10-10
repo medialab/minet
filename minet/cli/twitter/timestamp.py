@@ -8,6 +8,7 @@ import casanova
 
 from minet.cli.utils import LoadingBar
 from twitwi.utils import get_timestamp_from_id
+from ural.twitter import parse_twitter_url
 
 
 def twitter_timestamp_action(cli_args):
@@ -21,8 +22,12 @@ def twitter_timestamp_action(cli_args):
 
     loading_bar = LoadingBar("Getting tweets timestamp", unit="tweet")
 
-    for row, tweets in enricher.cells(cli_args.column, with_rows=True):
+    for row, tweet in enricher.cells(cli_args.column, with_rows=True):
         loading_bar.update()
 
-        timestamp = get_timestamp_from_id(tweets)
+        tweet_id = parse_twitter_url(tweet)[1]
+        if not tweet_id:
+            tweet_id = tweet
+
+        timestamp = get_timestamp_from_id(tweet_id)
         enricher.writerow(row, [timestamp])

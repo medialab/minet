@@ -1869,11 +1869,11 @@ usage: minet twitter timestamp [-h] [--rcfile RCFILE] [-o OUTPUT] [-s SELECT]
 Minet Twitter Timestamp Command
 ===============================
 
-Getting timestamp from tweet id.
+Getting timestamp from tweet url or id.
 
 positional arguments:
-  column                      Name of the column containing the tweet ids.
-  file                        CSV file containing the tweet ids.
+  column                      Name of the column containing the tweet url or id.
+  file                        CSV file containing the tweet url or id. Default to url.
 
 optional arguments:
   -h, --help                  show this help message and exit
@@ -1883,7 +1883,7 @@ optional arguments:
 
 examples:
 
-    $ minet tw timestamp id tweets.csv > tweets_timestamp.csv
+    $ minet tw timestamp url tweets.csv > tweets_timestamp.csv
 
 ```
 

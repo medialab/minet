@@ -1982,23 +1982,23 @@ MINET_COMMANDS = {
                 "timestamp": {
                     "title": "Minet Twitter Timestamp Command",
                     "description": """
-                        Getting timestamp from tweet id.
+                        Getting timestamp from tweet url or id.
                     """,
                     "epilog": """
                         examples:
 
-                            $ minet tw timestamp id tweets.csv > tweets_timestamp.csv
+                            $ minet tw timestamp url tweets.csv > tweets_timestamp.csv
                     """,
                     "arguments": [
                         {
                             "name": "column",
-                            "help": "Name of the column containing the tweet ids.",
+                            "help": "Name of the column containing the tweet url or id.",
                         },
                         {
                             "name": "file",
-                            "help": "CSV file containing the tweet ids.",
+                            "help": "CSV file containing the tweet url or id. Default to url.",
                             "action": InputFileAction,
-                            "dummy_csv_column": "id",
+                            "dummy_csv_column": "url",
                         },
                         {
                             "flags": ["-o", "--output"],
