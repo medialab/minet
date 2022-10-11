@@ -1971,7 +1971,7 @@ examples:
     $ minet tw tweet-count query queries.csv > counts.csv
 
 . Number of tweets matching the query per day:
-    $ minet tw tweet-count "query" --granularity days > counts.csv
+    $ minet tw tweet-count "query" --granularity day > counts.csv
 
 ```
 
