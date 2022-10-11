@@ -12,7 +12,11 @@ from minet.instagram.constants import (
     INSTAGRAM_USER_POST_CSV_HEADERS,
     INSTAGRAM_MEDIA_TYPE,
 )
-from minet.instagram.utils import extract_from_text, timestamp_to_isoformat
+from minet.instagram.utils import (
+    extract_from_text,
+    timestamp_to_isoformat,
+    short_code_to_url
+)
 
 InstagramHashtagPost = namedrecord(
     "InstagramHashtagPost",
@@ -88,6 +92,7 @@ def format_user_post(item):
         item["id"],
         media_type,
         item["code"],
+        short_code_to_url(item["code"]),
         getpath(item, ["caption", "text"]),
         # hashtags,
         # mentioned_names,

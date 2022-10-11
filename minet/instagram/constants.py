@@ -32,6 +32,7 @@ INSTAGRAM_USER_POST_CSV_HEADERS = [
     "id",
     "media_type",
     "shortcode",
+    "url",
     "caption",
     # "hashtags",
     # "mentioned_names",
