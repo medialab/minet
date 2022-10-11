@@ -33,8 +33,8 @@ INSTAGRAM_USER_POST_CSV_HEADERS = [
     "media_type",
     "shortcode",
     "caption",
-    "hashtags",
-    "mentioned_names",
+    # "hashtags",
+    # "mentioned_names",
     "like_and_view_counts_disabled",
     "like_count",
     "comment_count",
@@ -42,4 +42,5 @@ INSTAGRAM_USER_POST_CSV_HEADERS = [
     "video_title",
     "video_duration",
     "taken_at_timestamp",
+    "utc_time"
 ]

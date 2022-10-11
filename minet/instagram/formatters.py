@@ -12,7 +12,7 @@ from minet.instagram.constants import (
     INSTAGRAM_USER_POST_CSV_HEADERS,
     INSTAGRAM_MEDIA_TYPE,
 )
-from minet.instagram.utils import extract_from_text
+from minet.instagram.utils import extract_from_text, timestamp_to_isoformat
 
 InstagramHashtagPost = namedrecord(
     "InstagramHashtagPost",
@@ -72,25 +72,25 @@ def format_user_post(item):
     if media_type is None:
         media_type = item["media_type"]
 
-    hashtags = "|".join(
-        extract_from_text(
-            getpath(item, ["edge_media_to_caption", "edges", 0, "node", "text"]), "#"
-        )
-    )
-
-    mentioned_names = "|".join(
-        extract_from_text(
-            getpath(item, ["edge_media_to_caption", "edges", 0, "node", "text"]), "@"
-        )
-    )
+    # hashtags = "|".join(
+    #     extract_from_text(
+    #         getpath(item, ["edge_media_to_caption", "edges", 0, "node", "text"]), "#"
+    #     )
+    # )
+    #
+    # mentioned_names = "|".join(
+    #     extract_from_text(
+    #         getpath(item, ["edge_media_to_caption", "edges", 0, "node", "text"]), "@"
+    #     )
+    # )
 
     row = InstagramUserPost(
         item["id"],
         media_type,
         item["code"],
         getpath(item, ["caption", "text"]),
-        hashtags,
-        mentioned_names,
+        # hashtags,
+        # mentioned_names,
         item["like_and_view_counts_disabled"],
         item["like_count"],
         item["comment_count"],
@@ -98,6 +98,7 @@ def format_user_post(item):
         item.get("title"),
         item.get("video_duration"),
         item["taken_at"],
+        timestamp_to_isoformat(item["taken_at"])
     )
 
     return row
