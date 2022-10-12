@@ -2281,7 +2281,7 @@ optional arguments:
   -h, --help                  show this help message and exit
   --rcfile RCFILE             Custom path to a minet configuration file.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  -k KEY, --key KEY           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
+  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used more than once. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
 
 example:
@@ -2317,7 +2317,7 @@ optional arguments:
   -h, --help                  show this help message and exit
   --rcfile RCFILE             Custom path to a minet configuration file.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  -k KEY, --key KEY           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
+  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used more than once. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
 
 example:
@@ -2348,7 +2348,7 @@ optional arguments:
   -h, --help                                      show this help message and exit
   --rcfile RCFILE                                 Custom path to a minet configuration file.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
-  -k KEY, --key KEY                               YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
+  -k KEY, --key KEY                               YouTube API Data dashboard API key. Can be used more than once. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   -l LIMIT, --limit LIMIT                         Maximum number of videos to retrieve per query.
   --order {date,rating,relevance,title,videoCount,viewCount}
@@ -2381,7 +2381,7 @@ optional arguments:
   -h, --help                  show this help message and exit
   --rcfile RCFILE             Custom path to a minet configuration file.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  -k KEY, --key KEY           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
+  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used more than once. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of videos. Necessary if you want to display a finite progress indicator.
 

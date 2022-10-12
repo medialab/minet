@@ -254,7 +254,9 @@ class WrappedConfigValue(object):
 
 
 class ConfigAction(Action):
-    def __init__(self, option_strings, dest, rc_key, default=None, **kwargs):
+    def __init__(
+        self, option_strings, dest, rc_key, default=None, plural=False, **kwargs
+    ):
         if "help" in kwargs:
             kwargs["help"] = kwargs["help"].rstrip(
                 "."
@@ -262,6 +264,11 @@ class ConfigAction(Action):
                 ".".join(rc_key),
                 rc_key_to_env_var(rc_key),
             )
+
+        self.plural = plural
+
+        if plural == True:
+            self.list_values = []
 
         super().__init__(
             option_strings,
@@ -271,7 +278,11 @@ class ConfigAction(Action):
         )
 
     def __call__(self, parser, cli_args, values, option_string=None):
-        setattr(cli_args, self.dest, values)
+        if self.plural:
+            self.list_values.append(values)
+            setattr(cli_args, self.dest, self.list_values)
+        else:
+            setattr(cli_args, self.dest, values)
 
 
 def resolve_arg_dependencies(cli_args, config):
