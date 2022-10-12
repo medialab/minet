@@ -186,19 +186,27 @@ class YouTubeAPIClient(object):
             return data
 
     def rotate_key(self):
+
         self.keys[self.current_key] = False
-        available_key = None
-        for key, status in self.keys.items():
-            if status:
-                available_key = key
-                break
+
+        available_key = next(
+            (key for key, available in self.keys.items() if available), None
+        )
+
         if available_key:
             self.current_key = available_key
             return True
+
+        self.current_key = None
         return False
 
     def reset_keys(self):
+
         for key in self.keys:
+
+            if self.current_key is None:
+                self.current_key = key
+
             self.keys[key] = True
 
     def videos(self, videos, key=None, raw=False):
