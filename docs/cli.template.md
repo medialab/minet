@@ -56,6 +56,8 @@
   * [attrition](#attrition)
   * [followers](#followers)
   * [friends](#friends)
+  * [list-followers](#list-followers)
+  * [list-members](#list-members)
   * [retweeters](#retweeters)
   * [scrape](#twitter-scrape)
   * [tweet-search](#tweet-search)
@@ -299,6 +301,14 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### friends
 
 <% twitter/friends %>
+
+### list-followers
+
+<% twitter/list-followers %>
+
+### list-members
+
+<% twitter/list-members %>
 
 ### retweeters
 

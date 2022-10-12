@@ -87,5 +87,15 @@ def twitter_action(cli_args):
 
             twitter_retweeters_action(cli_args)
 
+        elif cli_args.tw_action == "list-members":
+            from minet.cli.twitter.list_members import twitter_list_members_action
+
+            twitter_list_members_action(cli_args)
+
+        elif cli_args.tw_action == "list-followers":
+            from minet.cli.twitter.list_followers import twitter_list_followers_action
+
+            twitter_list_followers_action(cli_args)
+
         else:
             raise TypeError('unkown tw_action "%s"' % cli_args.tw_action)
