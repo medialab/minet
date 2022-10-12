@@ -1777,7 +1777,7 @@ usage: minet twitter list-followers [-h] [--rcfile RCFILE] [--api-key API_KEY]
 Minet Twitter List Followers Command
 ====================================
 
-Retrieve members of given list using Twitter API v2.
+Retrieve followers of given list using Twitter API v2.
 
 positional arguments:
   column                                     Name of the column containing the Twitter list id.

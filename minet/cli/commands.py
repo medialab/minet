@@ -1864,16 +1864,16 @@ MINET_COMMANDS = {
                         },
                     ],
                 },
-                "list-members": {
-                    "title": "Minet Twitter List Members Command",
+                "list-followers": {
+                    "title": "Minet Twitter List Followers Command",
                     "description": """
-                        Retrieve members of given list using Twitter API v2.
+                        Retrieve followers of given list using Twitter API v2.
                     """,
                     "epilog": """
                         examples:
 
-                        . Getting members of a list of lists:
-                            $ minet tw list-members id lists.csv > members.csv
+                        . Getting followers of a list of lists:
+                            $ minet tw list-followers id lists.csv > followers.csv
                     """,
                     "arguments": [
                         {
@@ -1903,16 +1903,16 @@ MINET_COMMANDS = {
                         },
                     ],
                 },
-                "list-followers": {
-                    "title": "Minet Twitter List Followers Command",
+                "list-members": {
+                    "title": "Minet Twitter List Members Command",
                     "description": """
                         Retrieve members of given list using Twitter API v2.
                     """,
                     "epilog": """
                         examples:
 
-                        . Getting followers of a list of lists:
-                            $ minet tw list-followers id lists.csv > followers.csv
+                        . Getting members of a list of lists:
+                            $ minet tw list-members id lists.csv > members.csv
                     """,
                     "arguments": [
                         {
