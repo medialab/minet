@@ -2312,8 +2312,9 @@ MINET_COMMANDS = {
                 "tweet-count": {
                     "title": "Minet Twitter Tweets Count Command",
                     "description": """
-                        Count the number of tweets matching the given query using Twitter
-                        latest API v2.
+                        Count the number of tweets matching the given query using Twitter's
+                        latest API v2. The count's granularity can be at the level of tweets 
+                        per day, per hour, or per minute.
 
                         This will only return result for the last 8 days only, unless
                         you have Academic Research access in which case you
@@ -2333,7 +2334,7 @@ MINET_COMMANDS = {
                             $ minet tw tweet-count query queries.csv > counts.csv
 
                         . Number of tweets matching the query per day:
-                            $ minet tw tweet-count "query" --granularity days > counts.csv
+                            $ minet tw tweet-count "query" --granularity day > counts.csv
                     """,
                     "arguments": [
                         {
