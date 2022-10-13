@@ -58,7 +58,7 @@
   * [friends](#friends)
   * [retweeters](#retweeters)
   * [scrape](#twitter-scrape)
-  * [timestamp-date] (#timestamp-date)
+  * [tweet-date] (#tweet-date)
   * [tweet-search](#tweet-search)
   * [tweet-count](#tweet-count)
   * [tweets](#tweets)
@@ -309,9 +309,9 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% twitter/scrape %>
 
-### timestamp-date
+### tweet-date
 
-<% twitter/timestamp-date %>
+<% twitter/tweet-date %>
 
 ### tweet-search
 

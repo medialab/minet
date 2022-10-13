@@ -35,7 +35,7 @@ class TimestampType(object):
 FIVE_YEARS_IN_SEC = 5 * 365.25 * 24 * 60 * 60
 
 
-class LocaleType(object):
+class TimezoneType(object):
     def __call__(self, locale):
         try:
             tz = timezone(locale)

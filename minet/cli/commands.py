@@ -22,7 +22,7 @@ from minet.cli.argparse import (
     OutputFileAction,
     SplitterType,
     TimestampType,
-    LocaleType,
+    TimezoneType,
 )
 
 from minet.constants import COOKIE_BROWSERS
@@ -1980,15 +1980,15 @@ MINET_COMMANDS = {
                         },
                     ],
                 },
-                "timestamp-date": {
-                    "title": "Minet Twitter Timestamp-date Command",
+                "tweet-date": {
+                    "title": "Minet Twitter Tweet-date Command",
                     "description": """
                         Getting timestamp and date from tweet url or id.
                     """,
                     "epilog": """
                         examples:
 
-                            $ minet tw timestamp-date url tweets.csv > tweets_timestamp_date.csv
+                            $ minet tw tweet-date url tweets.csv --timezone 'Europe/Paris'> tweets_timestamp_date.csv
                     """,
                     "arguments": [
                         {
@@ -2011,9 +2011,9 @@ MINET_COMMANDS = {
                             "type": SplitterType(),
                         },
                         {
-                            "flag": "--locale",
-                            "help": "Timezone for the date. Default to UTC.",
-                            "type": LocaleType(),
+                            "flag": "--timezone",
+                            "help": "Timezone for the date, for example 'Europe/Paris'. Default to UTC.",
+                            "type": TimezoneType(),
                         },
                     ],
                 },
