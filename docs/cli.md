@@ -49,6 +49,8 @@
   * [tag](#hyphe-tag)
 * [instagram (insta)](#instagram)
   * [hashtag](#insta-hashtag)
+  * [user-followers](#user-followers)
+  * [user-following](#user-following)
   * [user-posts](#insta-user-posts)
 * [mediacloud (mc)](#mediacloud)
   * [medias](#mc-medias)
@@ -1514,7 +1516,7 @@ examples:
 
 ```
 usage: minet instagram [-h] [--rcfile RCFILE] [-o OUTPUT]
-                       {hashtag,user-posts} ...
+                       {hashtag,user-posts,user-followers,user-following} ...
 
 Minet Instagram command
 =======================
@@ -1522,12 +1524,13 @@ Minet Instagram command
 Gather data from Instagram.
 
 optional arguments:
-  -h, --help                  show this help message and exit
-  --rcfile RCFILE             Custom path to a minet configuration file.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -h, --help                                      show this help message and exit
+  --rcfile RCFILE                                 Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
 
 actions:
-  {hashtag,user-posts}        Actions to perform on Instagram.
+  {hashtag,user-posts,user-followers,user-following}
+                                                  Actions to perform on Instagram.
 
 ```
 
@@ -1569,6 +1572,14 @@ example:
     $ minet instagram hashtag paris > paris_posts.csv
 
 ```
+
+<h3 id="insta-user_followers">user_followers</h3>
+
+<% insta/user_followers %>
+
+<h3 id="insta-user_following">user_following</h3>
+
+<% insta/user_following %>
 
 <h3 id="insta-user_posts">user_posts</h3>
 
