@@ -139,7 +139,7 @@ class InstagramAPIScraper(object):
 
         self.cookie = cookie
         self.magic_token = None
-        self.nb_tries = 0
+        self.nb_calls = 0
         self.retryer = create_request_retryer(
             min=INSTAGRAM_MIN_TIME_RETRYER,
             additional_exceptions=[InstagramTooManyRequestsError, InstagramError500],
@@ -170,17 +170,17 @@ class InstagramAPIScraper(object):
             print(response.status, response.data)
             raise InstagramPublicAPIInvalidResponseError
 
-        if self.nb_tries == 10:
+        if self.nb_calls == 10:
             sleep_with_entropy(
                 INSTAGRAM_DEFAULT_THROTTLE_EVERY_10_CALLS,
                 INSTAGRAM_MAX_RANDOM_ADDENDUM_EVERY_10_CALLS,
             )
-            self.nb_tries = 0
+            self.nb_calls = 0
 
             return data
 
         sleep_with_entropy(INSTAGRAM_DEFAULT_THROTTLE, INSTAGRAM_MAX_RANDOM_ADDENDUM)
-        self.nb_tries += 1
+        self.nb_calls += 1
 
         return data
 
