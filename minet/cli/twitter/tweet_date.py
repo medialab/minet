@@ -9,9 +9,6 @@ import casanova
 from minet.cli.utils import LoadingBar
 from twitwi.utils import get_dates_from_id
 from ural.twitter import parse_twitter_url, TwitterTweet
-import re
-
-RE_ID = re.compile(r"\d+")
 
 
 def twitter_tweet_date_action(cli_args):
