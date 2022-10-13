@@ -58,7 +58,7 @@
   * [friends](#friends)
   * [retweeters](#retweeters)
   * [scrape](#twitter-scrape)
-  * [timestamp] (#timestamp)
+  * [timestamp-date] (#timestamp-date)
   * [tweet-search](#tweet-search)
   * [tweet-count](#tweet-count)
   * [tweets](#tweets)
@@ -1860,16 +1860,17 @@ examples:
 
 ```
 
-### timestamp
+### timestamp-date
 
 ```
-usage: minet twitter timestamp [-h] [--rcfile RCFILE] [-o OUTPUT] [-s SELECT]
-                               column [file]
+usage: minet twitter timestamp-date [-h] [--rcfile RCFILE] [-o OUTPUT]
+                                    [-s SELECT] [--locale LOCALE]
+                                    column [file]
 
-Minet Twitter Timestamp Command
-===============================
+Minet Twitter Timestamp-date Command
+====================================
 
-Getting timestamp from tweet url or id.
+Getting timestamp and date from tweet url or id.
 
 positional arguments:
   column                      Name of the column containing the tweet url or id.
@@ -1880,10 +1881,11 @@ optional arguments:
   --rcfile RCFILE             Custom path to a minet configuration file.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  --locale LOCALE             Timezone for the date. Default to UTC.
 
 examples:
 
-    $ minet tw timestamp url tweets.csv > tweets_timestamp.csv
+    $ minet tw timestamp-date url tweets.csv > tweets_timestamp_date.csv
 
 ```
 
