@@ -9,7 +9,7 @@ wheel
 # Dependencies
 beautifulsoup4==4.11.1
 browser-cookie3==0.16.1
-casanova==0.18.0
+casanova==0.19.0
 cchardet>=2.1.7
 colorama==0.4.4
 dateparser==1.1.1
