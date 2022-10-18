@@ -22,6 +22,7 @@ from minet.cli.argparse import (
     OutputFileAction,
     SplitterType,
     TimestampType,
+    TimezoneType,
 )
 
 from minet.constants import COOKIE_BROWSERS
@@ -2054,6 +2055,43 @@ MINET_COMMANDS = {
                             "flags": ["-s", "--select"],
                             "help": "Columns of input CSV file to include in the output (separated by `,`).",
                             "type": SplitterType(),
+                        },
+                    ],
+                },
+                "tweet-date": {
+                    "title": "Minet Twitter Tweet-date Command",
+                    "description": """
+                        Getting timestamp and date from tweet url or id.
+                    """,
+                    "epilog": """
+                        examples:
+
+                            $ minet tw tweet-date url tweets.csv --timezone 'Europe/Paris'> tweets_timestamp_date.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "Name of the column containing the tweet url or id.",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the tweet url or id. Default to url.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "url",
+                        },
+                        {
+                            "flags": ["-o", "--output"],
+                            "action": OutputFileAction,
+                        },
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flag": "--timezone",
+                            "help": "Timezone for the date, for example 'Europe/Paris'. Default to UTC.",
+                            "type": TimezoneType(),
                         },
                     ],
                 },

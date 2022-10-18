@@ -15,7 +15,8 @@ from tqdm.contrib import DummyTqdmFile
 from casanova import Resumer, CsvCellIO
 from ebbe import getpath
 from datetime import datetime
-
+from pytz import timezone
+from pytz.exceptions import UnknownTimeZoneError
 from minet.cli.exceptions import NotResumable
 from minet.cli.utils import acquire_cross_platform_stdout, was_piped_something
 
@@ -32,6 +33,15 @@ class TimestampType(object):
 
 
 FIVE_YEARS_IN_SEC = 5 * 365.25 * 24 * 60 * 60
+
+
+class TimezoneType(object):
+    def __call__(self, locale):
+        try:
+            tz = timezone(locale)
+        except UnknownTimeZoneError:
+            raise ArgumentTypeError("This timezone is not recognized.")
+        return tz
 
 
 class BuzzSumoDateType(object):

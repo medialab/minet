@@ -60,6 +60,7 @@
   * [list-members](#list-members)
   * [retweeters](#retweeters)
   * [scrape](#twitter-scrape)
+  * [tweet-date] (#tweet-date)
   * [tweet-search](#tweet-search)
   * [tweet-count](#tweet-count)
   * [tweets](#tweets)
@@ -1932,6 +1933,35 @@ examples:
 
 . Collecting users with "adam" in their user_name or user_description:
     $ minet tw scrape users adam > users.csv
+
+```
+
+### tweet-date
+
+```
+usage: minet twitter tweet-date [-h] [--rcfile RCFILE] [-o OUTPUT] [-s SELECT]
+                                [--timezone TIMEZONE]
+                                column [file]
+
+Minet Twitter Tweet-date Command
+================================
+
+Getting timestamp and date from tweet url or id.
+
+positional arguments:
+  column                      Name of the column containing the tweet url or id.
+  file                        CSV file containing the tweet url or id. Default to url.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  --timezone TIMEZONE         Timezone for the date, for example 'Europe/Paris'. Default to UTC.
+
+examples:
+
+    $ minet tw tweet-date url tweets.csv --timezone 'Europe/Paris'> tweets_timestamp_date.csv
 
 ```
 
