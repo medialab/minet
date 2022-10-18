@@ -83,20 +83,6 @@ FACEBOOK_REACTION_KEYS = OrderedDict(
     }
 )
 
-FACEBOOK_POST_CSV_HEADERS_WITH_REACTIONS_TYPES = [
-    "url",
-    "user_id",
-    "user_handle",
-    "user_url",
-    "user_label",
-    "text",
-    "html",
-    "translated_text",
-    "translated_html",
-    "translated_from",
-    "formatted_date",
-    "date",
-    "reactions",
-    "comments",
-    "reactions_types",
+FACEBOOK_POST_CSV_HEADERS_WITH_REACTIONS_TYPES = FACEBOOK_POST_CSV_HEADERS + [
+    "reactions_types"
 ]
