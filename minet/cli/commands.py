@@ -35,6 +35,7 @@ from minet.crowdtangle.constants import (
     CROWDTANGLE_DEFAULT_START_DATE,
 )
 from minet.facebook.constants import FACEBOOK_MOBILE_DEFAULT_THROTTLE
+from minet.telegram.constants import TELEGRAM_DEFAULT_THROTTLE
 from minet.youtube.constants import (
     YOUTUBE_API_DEFAULT_SEARCH_ORDER,
     YOUTUBE_API_SEARCH_ORDERS,
@@ -1733,6 +1734,95 @@ MINET_COMMANDS = {
                 "action": "store_true",
             },
         ],
+    },
+    # Telegram actions subparser
+    # -------------------------------------------------------------------------
+    "telegram": {
+        "package": "minet.cli.telegram",
+        "action": "telegram_action",
+        "title": "Minet Telegram Command",
+        "description": """
+            Collects data from Telegram.
+        """,
+        "subparsers": {
+            "help": "Action to perform to collect data on Telegram",
+            "title": "actions",
+            "dest": "tl_action",
+            "commands": {
+                "channel-infos": {
+                    "title": "Minet Telegram Channel-Infos Command",
+                    "description": """
+                        Scrape a Telegram channel's infos.
+                    """,
+                    "epilog": """
+                        examples:
+
+                        . Scraping a channel's infos:
+                            $ minet telegram channel-infos jesstern > infos.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "Column of the CSV file containing channel name or a single channel name.",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the channel names.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "channel_name",
+                        },
+                        {"flags": ["-o", "--output"], "action": OutputFileAction},
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flag": "--throttle",
+                            "help": "Throttling time, in seconds, to wait between each request.",
+                            "type": float,
+                            "default": TELEGRAM_DEFAULT_THROTTLE,
+                        },
+                    ],
+                },
+                "channel-messages": {
+                    "title": "Minet Telegram Channel-Messages Command",
+                    "description": """
+                        Scrape Telegram channel messages.
+                    """,
+                    "epilog": """
+                        examples:
+
+                        . Scraping a group's posts:
+                            $ minet telegram channel-messages jesstern > messages.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "Column of the CSV file containing channel name or a single channel name.",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the channel name.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "channel_name",
+                        },
+                        {"flags": ["-o", "--output"], "action": OutputFileAction},
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flag": "--throttle",
+                            "help": "Throttling time, in seconds, to wait between each request.",
+                            "type": float,
+                            "default": TELEGRAM_DEFAULT_THROTTLE,
+                        },
+                    ],
+                },
+            },
+        },
     },
     # Twitter action subparser
     # -------------------------------------------------------------------------

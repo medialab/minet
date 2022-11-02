@@ -52,6 +52,9 @@
   * [search](#mc-search)
   * [topic](#topic)
     * [stories](#stories)
+* [telegram](#telegram)
+  * [channel-infos](#channel-infos)
+  * [channel-messages](#channel-messages)
 * [twitter](#twitter)
   * [attrition](#attrition)
   * [followers](#followers)
@@ -1599,6 +1602,68 @@ optional arguments:
   -o OUTPUT, --output OUTPUT     Path to the output file. By default, the results will be printed to stdout.
   --media-id MEDIA_ID            Return only stories belonging to the given media_ids.
   --from-media-id FROM_MEDIA_ID  Return only stories that are linked from stories in the given media_id.
+
+```
+
+## Telegram
+
+### channel-infos
+
+```
+usage: minet telegram channel-infos [-h] [--rcfile RCFILE] [-o OUTPUT]
+                                    [-s SELECT] [--throttle THROTTLE]
+                                    column [file]
+
+Minet Telegram Channel-Infos Command
+====================================
+
+Scrape a Telegram channel's infos.
+
+positional arguments:
+  column                      Column of the CSV file containing channel name or a single channel name.
+  file                        CSV file containing the channel names.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
+
+examples:
+
+. Scraping a channel's infos:
+    $ minet telegram channel-infos jesstern > infos.csv
+
+```
+
+### channel-messages
+
+```
+usage: minet telegram channel-messages [-h] [--rcfile RCFILE] [-o OUTPUT]
+                                       [-s SELECT] [--throttle THROTTLE]
+                                       column [file]
+
+Minet Telegram Channel-Messages Command
+=======================================
+
+Scrape Telegram channel messages.
+
+positional arguments:
+  column                      Column of the CSV file containing channel name or a single channel name.
+  file                        CSV file containing the channel name.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
+
+examples:
+
+. Scraping a group's posts:
+    $ minet telegram channel-messages jesstern > messages.csv
 
 ```
 
