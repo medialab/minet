@@ -23,10 +23,15 @@ from ural.facebook import (
     FacebookPhoto as ParsedFacebookPhoto,
 )
 
-from minet.utils import rate_limited_method, RateLimiterState, parse_date
+from minet.utils import (
+    rate_limited_method,
+    RateLimiterState,
+    parse_date,
+    clean_human_readable_numbers,
+)
 from minet.web import create_pool, request, create_request_retryer, retrying_method
 from minet.scrape.std import get_display_text
-from minet.facebook.utils import grab_facebook_cookie, clean_likes
+from minet.facebook.utils import grab_facebook_cookie
 from minet.facebook.formatters import (
     FacebookComment,
     FacebookPost,
@@ -347,7 +352,9 @@ def scrape_video(soup):
         reactions_text = reactions_item.get_text()
 
         if reactions_text.count("·") > 1:
-            reactions = clean_likes(reactions_text.split("·", 1)[0].strip())
+            reactions = clean_human_readable_numbers(
+                reactions_text.split("·", 1)[0].strip()
+            )
 
     comments_item = soupsieve.select_one('a:-soup-contains(" Comment")', soup)
     comments = "0"
@@ -435,7 +442,7 @@ def scrape_photo(soup):
     reactions_item = soup.select_one("a[href^='/ufi/reaction/profile/browser']")
 
     if reactions_item:
-        reactions = clean_likes(reactions_item.get_text())
+        reactions = clean_human_readable_numbers(reactions_item.get_text())
         reactions_types = []
 
         for reaction in reactions_item.find("div").select("img"):
@@ -542,7 +549,7 @@ def scrape_post(html):
     reactions_item = soup.select_one("a[href^='/ufi/reaction/profile/browser']")
 
     if reactions_item:
-        reactions = clean_likes(reactions_item.get_text())
+        reactions = clean_human_readable_numbers(reactions_item.get_text())
         reactions_types = []
 
         for reaction in reactions_item.find("div").select("img"):
