@@ -9,14 +9,14 @@ import casanova
 
 from minet.cli.utils import LoadingBar
 from minet.youtube import YouTubeAPIClient
-from minet.youtube.constants import YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS
+from minet.youtube.constants import YOUTUBE_PLAYLIST_VIDEO_SNIPPET_CSV_HEADERS
 
 
 def channel_videos_action(cli_args):
     enricher = casanova.enricher(
         cli_args.file,
         cli_args.output,
-        add=YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS,
+        add=YOUTUBE_PLAYLIST_VIDEO_SNIPPET_CSV_HEADERS,
         keep=cli_args.select,
     )
 

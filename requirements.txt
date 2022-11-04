@@ -9,7 +9,7 @@ wheel
 # Dependencies
 beautifulsoup4==4.11.1
 browser-cookie3==0.16.1
-casanova==0.18.0
+casanova==0.19.1
 cchardet>=2.1.7
 colorama==0.4.4
 dateparser==1.1.1
@@ -26,6 +26,6 @@ tenacity==7.0.0
 termcolor==1.1.0
 tqdm==4.60.0
 trafilatura==1.2.0
-twitwi==0.14.1
-ural==0.34.0
+twitwi==0.15.0
+ural==0.36.0
 urllib3==1.26.9

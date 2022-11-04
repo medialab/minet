@@ -22,6 +22,7 @@ from minet.cli.argparse import (
     OutputFileAction,
     SplitterType,
     TimestampType,
+    TimezoneType,
 )
 
 from minet.constants import COOKIE_BROWSERS
@@ -1939,6 +1940,84 @@ MINET_COMMANDS = {
                         },
                     ],
                 },
+                "list-followers": {
+                    "title": "Minet Twitter List Followers Command",
+                    "description": """
+                        Retrieve followers of given list using Twitter API v2.
+                    """,
+                    "epilog": """
+                        examples:
+
+                        . Getting followers of a list of lists:
+                            $ minet tw list-followers id lists.csv > followers.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "Name of the column containing the Twitter list id.",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the inquired Twitter lists.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "list",
+                        },
+                        *TWITTER_API_COMMON_ARGUMENTS,
+                        {
+                            "flags": ["-o", "--output"],
+                            "action": OutputFileAction,
+                        },
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flag": "--total",
+                            "help": "Total number of accounts. Necessary if you want to display a finite progress indicator.",
+                            "type": int,
+                        },
+                    ],
+                },
+                "list-members": {
+                    "title": "Minet Twitter List Members Command",
+                    "description": """
+                        Retrieve members of given list using Twitter API v2.
+                    """,
+                    "epilog": """
+                        examples:
+
+                        . Getting members of a list of lists:
+                            $ minet tw list-members id lists.csv > members.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "Name of the column containing the Twitter list id.",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the inquired Twitter lists.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "list",
+                        },
+                        *TWITTER_API_COMMON_ARGUMENTS,
+                        {
+                            "flags": ["-o", "--output"],
+                            "action": OutputFileAction,
+                        },
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flag": "--total",
+                            "help": "Total number of accounts. Necessary if you want to display a finite progress indicator.",
+                            "type": int,
+                        },
+                    ],
+                },
                 "retweeters": {
                     "title": "Minet Twitter Retweeters Command",
                     "description": """
@@ -2051,6 +2130,43 @@ MINET_COMMANDS = {
                             "flags": ["-s", "--select"],
                             "help": "Columns of input CSV file to include in the output (separated by `,`).",
                             "type": SplitterType(),
+                        },
+                    ],
+                },
+                "tweet-date": {
+                    "title": "Minet Twitter Tweet-date Command",
+                    "description": """
+                        Getting timestamp and date from tweet url or id.
+                    """,
+                    "epilog": """
+                        examples:
+
+                            $ minet tw tweet-date url tweets.csv --timezone 'Europe/Paris'> tweets_timestamp_date.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "Name of the column containing the tweet url or id.",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the tweet url or id. Default to url.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "url",
+                        },
+                        {
+                            "flags": ["-o", "--output"],
+                            "action": OutputFileAction,
+                        },
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flag": "--timezone",
+                            "help": "Timezone for the date, for example 'Europe/Paris'. Default to UTC.",
+                            "type": TimezoneType(),
                         },
                     ],
                 },
@@ -2387,8 +2503,9 @@ MINET_COMMANDS = {
                 "tweet-count": {
                     "title": "Minet Twitter Tweets Count Command",
                     "description": """
-                        Count the number of tweets matching the given query using Twitter
-                        latest API v2.
+                        Count the number of tweets matching the given query using Twitter's
+                        latest API v2. The count's granularity can be at the level of tweets 
+                        per day, per hour, or per minute.
 
                         This will only return result for the last 8 days only, unless
                         you have Academic Research access in which case you
@@ -2408,7 +2525,7 @@ MINET_COMMANDS = {
                             $ minet tw tweet-count query queries.csv > counts.csv
 
                         . Number of tweets matching the query per day:
-                            $ minet tw tweet-count "query" --granularity days > counts.csv
+                            $ minet tw tweet-count "query" --granularity day > counts.csv
                     """,
                     "arguments": [
                         {
@@ -2813,9 +2930,10 @@ MINET_COMMANDS = {
                         },
                         {
                             "flags": ["-k", "--key"],
-                            "help": "YouTube API Data dashboard API key.",
+                            "help": "YouTube API Data dashboard API key. Can be used more than once.",
                             "rc_key": ["youtube", "key"],
                             "action": ConfigAction,
+                            "plural": True,
                         },
                         {
                             "flags": ["-s", "--select"],
@@ -2846,9 +2964,10 @@ MINET_COMMANDS = {
                         },
                         {
                             "flags": ["-k", "--key"],
-                            "help": "YouTube API Data dashboard API key.",
+                            "help": "YouTube API Data dashboard API key. Can be used more than once.",
                             "rc_key": ["youtube", "key"],
                             "action": ConfigAction,
+                            "plural": True,
                         },
                         {
                             "flags": ["-s", "--select"],
@@ -2879,9 +2998,10 @@ MINET_COMMANDS = {
                         },
                         {
                             "flags": ["-k", "--key"],
-                            "help": "YouTube API Data dashboard API key.",
+                            "help": "YouTube API Data dashboard API key. Can be used more than once.",
                             "rc_key": ["youtube", "key"],
                             "action": ConfigAction,
+                            "plural": True,
                         },
                         {
                             "flags": ["-s", "--select"],
@@ -2917,9 +3037,10 @@ MINET_COMMANDS = {
                         },
                         {
                             "flags": ["-k", "--key"],
-                            "help": "YouTube API Data dashboard API key.",
+                            "help": "YouTube API Data dashboard API key. Can be used more than once.",
                             "rc_key": ["youtube", "key"],
                             "action": ConfigAction,
+                            "plural": True,
                         },
                         {
                             "flags": ["-s", "--select"],

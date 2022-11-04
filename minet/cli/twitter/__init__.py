@@ -34,6 +34,11 @@ def twitter_action(cli_args):
 
         twitter_scrape_action(cli_args)
 
+    elif cli_args.tw_action == "tweet-date":
+        from minet.cli.twitter.tweet_date import twitter_tweet_date_action
+
+        twitter_tweet_date_action(cli_args)
+
     else:
         check_credentials(cli_args)
 
@@ -86,6 +91,16 @@ def twitter_action(cli_args):
             from minet.cli.twitter.retweeters import twitter_retweeters_action
 
             twitter_retweeters_action(cli_args)
+
+        elif cli_args.tw_action == "list-members":
+            from minet.cli.twitter.list_members import twitter_list_members_action
+
+            twitter_list_members_action(cli_args)
+
+        elif cli_args.tw_action == "list-followers":
+            from minet.cli.twitter.list_followers import twitter_list_followers_action
+
+            twitter_list_followers_action(cli_args)
 
         else:
             raise TypeError('unkown tw_action "%s"' % cli_args.tw_action)

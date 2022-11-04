@@ -15,7 +15,8 @@ from tqdm.contrib import DummyTqdmFile
 from casanova import Resumer, CsvCellIO
 from ebbe import getpath
 from datetime import datetime
-
+from pytz import timezone
+from pytz.exceptions import UnknownTimeZoneError
 from minet.cli.exceptions import NotResumable
 from minet.cli.utils import acquire_cross_platform_stdout, was_piped_something
 
@@ -32,6 +33,15 @@ class TimestampType(object):
 
 
 FIVE_YEARS_IN_SEC = 5 * 365.25 * 24 * 60 * 60
+
+
+class TimezoneType(object):
+    def __call__(self, locale):
+        try:
+            tz = timezone(locale)
+        except UnknownTimeZoneError:
+            raise ArgumentTypeError("This timezone is not recognized.")
+        return tz
 
 
 class BuzzSumoDateType(object):
@@ -254,7 +264,9 @@ class WrappedConfigValue(object):
 
 
 class ConfigAction(Action):
-    def __init__(self, option_strings, dest, rc_key, default=None, **kwargs):
+    def __init__(
+        self, option_strings, dest, rc_key, default=None, plural=False, **kwargs
+    ):
         if "help" in kwargs:
             kwargs["help"] = kwargs["help"].rstrip(
                 "."
@@ -262,6 +274,11 @@ class ConfigAction(Action):
                 ".".join(rc_key),
                 rc_key_to_env_var(rc_key),
             )
+
+        self.plural = plural
+
+        if plural == True:
+            self.list_values = []
 
         super().__init__(
             option_strings,
@@ -271,7 +288,11 @@ class ConfigAction(Action):
         )
 
     def __call__(self, parser, cli_args, values, option_string=None):
-        setattr(cli_args, self.dest, values)
+        if self.plural:
+            self.list_values.append(values)
+            setattr(cli_args, self.dest, self.list_values)
+        else:
+            setattr(cli_args, self.dest, values)
 
 
 def resolve_arg_dependencies(cli_args, config):

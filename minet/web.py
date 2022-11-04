@@ -9,6 +9,7 @@ import cgi
 import certifi
 import browser_cookie3
 import urllib3
+import urllib.error
 import ural
 import json
 import mimetypes
@@ -781,6 +782,7 @@ def create_request_retryer(
     retryable_exception_types = [
         urllib3.exceptions.TimeoutError,
         urllib3.exceptions.ProtocolError,
+        urllib.error.URLError,
     ]
 
     if additional_exceptions:
