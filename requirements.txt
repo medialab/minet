@@ -27,5 +27,5 @@ termcolor==1.1.0
 tqdm==4.60.0
 trafilatura==1.2.0
 twitwi==0.15.0
-ural==0.34.0
+ural==0.36.0
 urllib3==1.26.9

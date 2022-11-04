@@ -44,7 +44,7 @@ setup(
         "tqdm>=4.60.0",
         "trafilatura>=1.2.0,<1.3",
         "twitwi>=0.15.0,<0.16",
-        "ural>=0.34.0,<0.35",
+        "ural>=0.36.0,<0.37",
         "urllib3>=1.26.9,<2",
     ],
     entry_points={"console_scripts": ["minet=minet.cli.__main__:main"]},
