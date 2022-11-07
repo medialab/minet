@@ -13,6 +13,7 @@ import string
 import functools
 import dateparser
 from random import uniform
+from datetime import datetime
 
 from minet.exceptions import DefinitionInvalidFormatError
 
@@ -350,3 +351,7 @@ def is_binary_mimetype(m: str) -> bool:
         or "yml" in second_part
         or second_part == "x-httpd-php"
     )
+
+
+def timestamp_to_isoformat(timestamp):
+    return datetime.utcfromtimestamp(timestamp).isoformat()

@@ -6,19 +6,23 @@
 #
 
 import re
-from datetime import datetime
+
+HASHTAGS_RE = re.compile(r"[^\w#]+")
+HANDLES_RE = re.compile(r"[^\w@]+")
 
 
-def extract_from_text(text, char):
-    splitter = re.compile(r"[^\w%s]+" % char)
+def extract_hashtags(text):
 
     return sorted(
-        set(r.lstrip(char).lower() for r in splitter.split(text) if r.startswith(char))
+        set(r.lstrip("#").lower() for r in HASHTAGS_RE.split(text) if r.startswith("#"))
     )
 
 
-def timestamp_to_isoformat(timestamp):
-    return datetime.utcfromtimestamp(timestamp).isoformat()
+def extract_handles(text):
+
+    return sorted(
+        set(r.lstrip("@").lower() for r in HANDLES_RE.split(text) if r.startswith("@"))
+    )
 
 
 def short_code_to_url(short_code):

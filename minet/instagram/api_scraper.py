@@ -20,15 +20,17 @@ from minet.web import (
     retrying_method,
 )
 from minet.instagram.constants import (
-    INSTAGRAM_DEFAULT_THROTTLE_EVERY_10_CALLS,
+    INSTAGRAM_DEFAULT_THROTTLE,
     INSTAGRAM_MAX_RANDOM_ADDENDUM,
-    INSTAGRAM_MAX_RANDOM_ADDENDUM_EVERY_10_CALLS,
-    INSTAGRAM_DEFAULT_THROTTLE_EVERY_2900_CALLS,
-    INSTAGRAM_MAX_RANDOM_ADDENDUM_EVERY_2900_CALLS,
+    INSTAGRAM_NB_REQUEST_LITTLE_WAIT,
+    INSTAGRAM_DEFAULT_THROTTLE_LITTLE_WAIT,
+    INSTAGRAM_MAX_RANDOM_ADDENDUM_LITTLE_WAIT,
+    INSTAGRAM_NB_REQUEST_BIG_WAIT,
+    INSTAGRAM_DEFAULT_THROTTLE_BIG_WAIT,
+    INSTAGRAM_MAX_RANDOM_ADDENDUM_BIG_WAIT,
     INSTAGRAM_MIN_TIME_RETRYER,
     INSTAGRAM_URL,
     INSTAGRAM_PUBLIC_API_DEFAULT_TIMEOUT,
-    INSTAGRAM_DEFAULT_THROTTLE,
 )
 from minet.instagram.exceptions import (
     InstagramError500,
@@ -38,7 +40,7 @@ from minet.instagram.exceptions import (
 )
 from minet.instagram.formatters import (
     format_hashtag_post,
-    format_user_follow,
+    format_user,
     format_user_post,
 )
 
@@ -140,7 +142,6 @@ class InstagramAPIScraper(object):
         self.cookie = cookie
         self.magic_token = None
         self.nb_calls = 0
-        self.nb_calls_2900 = 0
         self.retryer = create_request_retryer(
             min=INSTAGRAM_MIN_TIME_RETRYER,
             additional_exceptions=[InstagramTooManyRequestsError, InstagramError500],
@@ -168,31 +169,32 @@ class InstagramAPIScraper(object):
             raise InstagramError500
 
         if response.status >= 400:
-            print(response.status, response.data)
-            raise InstagramPublicAPIInvalidResponseError
+            raise InstagramPublicAPIInvalidResponseError(url, response.status, data)
 
-        if self.nb_calls == 10:
+        if (
+            self.nb_calls != 0
+            and (self.nb_calls % INSTAGRAM_NB_REQUEST_LITTLE_WAIT) == 0
+        ):
 
-            if self.nb_calls_2900 == 2900:
+            if (self.nb_calls % INSTAGRAM_NB_REQUEST_BIG_WAIT) == 0:
                 sleep_with_entropy(
-                    INSTAGRAM_DEFAULT_THROTTLE_EVERY_2900_CALLS,
-                    INSTAGRAM_MAX_RANDOM_ADDENDUM_EVERY_2900_CALLS,
+                    INSTAGRAM_DEFAULT_THROTTLE_BIG_WAIT,
+                    INSTAGRAM_MAX_RANDOM_ADDENDUM_BIG_WAIT,
                 )
-                self.nb_calls_2900 = 0
+                self.nb_calls += 1
 
                 return data
 
             sleep_with_entropy(
-                INSTAGRAM_DEFAULT_THROTTLE_EVERY_10_CALLS,
-                INSTAGRAM_MAX_RANDOM_ADDENDUM_EVERY_10_CALLS,
+                INSTAGRAM_DEFAULT_THROTTLE_LITTLE_WAIT,
+                INSTAGRAM_MAX_RANDOM_ADDENDUM_LITTLE_WAIT,
             )
-            self.nb_calls = 0
+            self.nb_calls += 1
 
             return data
 
         sleep_with_entropy(INSTAGRAM_DEFAULT_THROTTLE, INSTAGRAM_MAX_RANDOM_ADDENDUM)
         self.nb_calls += 1
-        self.nb_calls_2900 += 1
 
         return data
 
@@ -276,7 +278,7 @@ class InstagramAPIScraper(object):
                 break
 
             for item in items:
-                yield format_user_follow(item)
+                yield format_user(item)
 
             max_id = data.get("next_max_id")
 
@@ -300,7 +302,7 @@ class InstagramAPIScraper(object):
                 break
 
             for item in items:
-                yield format_user_follow(item)
+                yield format_user(item)
 
             max_id = data.get("next_max_id")
 

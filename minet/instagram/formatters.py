@@ -14,10 +14,11 @@ from minet.instagram.constants import (
     INSTAGRAM_USER_FOLLOW_CSV_HEADERS,
 )
 from minet.instagram.utils import (
-    extract_from_text,
-    timestamp_to_isoformat,
+    extract_hashtags,
+    extract_handles,
     short_code_to_url,
 )
+from minet.utils import timestamp_to_isoformat
 
 InstagramHashtagPost = namedrecord(
     "InstagramHashtagPost",
@@ -56,8 +57,8 @@ def format_hashtag_post(item):
     mentioned_names = None
 
     if text:
-        hashtags = "|".join(extract_from_text(text, "#"))
-        mentioned_names = "|".join(extract_from_text(text, "@"))
+        hashtags = "|".join(extract_hashtags(text))
+        mentioned_names = "|".join(extract_handles(text))
 
     row = InstagramHashtagPost(
         item["id"],
@@ -94,8 +95,8 @@ def format_user_post(item):
     mentioned_names = None
 
     if text:
-        hashtags = "|".join(extract_from_text(text, "#"))
-        mentioned_names = "|".join(extract_from_text(text, "@"))
+        hashtags = "|".join(extract_hashtags(text))
+        mentioned_names = "|".join(extract_handles(text))
 
     row = InstagramUserPost(
         item["id"],
@@ -118,22 +119,22 @@ def format_user_post(item):
     return row
 
 
-def format_user_follow(item):
+def format_user(item):
 
     row = InstagramUserFollow(
-        getpath(item, ["pk"]),
-        getpath(item, ["username"]),
-        getpath(item, ["full_name"]),
-        getpath(item, ["is_private"]),
-        getpath(item, ["profile_pic_url"]),
-        getpath(item, ["profile_pic_id"]),
-        getpath(item, ["is_verified"]),
-        getpath(item, ["has_anonymous_profile_picture"]),
-        getpath(item, ["has_highlight_reels"]),
-        getpath(item, ["account_badges"]),
-        getpath(item, ["similar_user_id"]),
-        getpath(item, ["latest_reel_media"]),
-        getpath(item, ["is_favorite"]),
+        item.get("pk"),
+        item.get("username"),
+        item.get("full_name"),
+        item.get("is_private"),
+        item.get("profile_pic_url"),
+        item.get("profile_pic_id"),
+        item.get("is_verified"),
+        item.get("has_anonymous_profile_picture"),
+        item.get("has_highlight_reels"),
+        item.get("account_badges"),
+        item.get("similar_user_id"),
+        item.get("latest_reel_media"),
+        item.get("is_favorite"),
     )
 
     return row
