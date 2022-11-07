@@ -11,7 +11,7 @@ from minet.instagram.constants import (
     INSTAGRAM_HASHTAG_POST_CSV_HEADERS,
     INSTAGRAM_USER_POST_CSV_HEADERS,
     INSTAGRAM_MEDIA_TYPE,
-    INSTAGRAM_USER_FOLLOW_CSV_HEADERS,
+    INSTAGRAM_USER_CSV_HEADERS,
 )
 from minet.instagram.utils import (
     extract_hashtags,
@@ -36,9 +36,9 @@ InstagramUserPost = namedrecord(
     ],
 )
 
-InstagramUserFollow = namedrecord(
-    "InstagramUserFollow",
-    INSTAGRAM_USER_FOLLOW_CSV_HEADERS,
+InstagramUser = namedrecord(
+    "InstagramUser",
+    INSTAGRAM_USER_CSV_HEADERS,
     boolean=[
         "is_private",
         "is_verified",
@@ -121,7 +121,7 @@ def format_user_post(item):
 
 def format_user(item):
 
-    row = InstagramUserFollow(
+    row = InstagramUser(
         item.get("pk"),
         item.get("username"),
         item.get("full_name"),

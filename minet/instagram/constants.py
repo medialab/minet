@@ -57,7 +57,7 @@ INSTAGRAM_USER_POST_CSV_HEADERS = [
     "utc_time",
 ]
 
-INSTAGRAM_USER_FOLLOW_CSV_HEADERS = [
+INSTAGRAM_USER_CSV_HEADERS = [
     "pk",
     "username",
     "full_name",

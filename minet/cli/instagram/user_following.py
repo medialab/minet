@@ -10,14 +10,14 @@ from itertools import islice
 
 from minet.cli.utils import LoadingBar
 from minet.instagram import InstagramAPIScraper
-from minet.instagram.constants import INSTAGRAM_USER_FOLLOW_CSV_HEADERS
+from minet.instagram.constants import INSTAGRAM_USER_CSV_HEADERS
 
 
 def user_following_action(cli_args):
     enricher = casanova.enricher(
         cli_args.file,
         cli_args.output,
-        add=INSTAGRAM_USER_FOLLOW_CSV_HEADERS,
+        add=INSTAGRAM_USER_CSV_HEADERS,
     )
 
     loading_bar = LoadingBar(
