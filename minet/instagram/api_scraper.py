@@ -23,6 +23,8 @@ from minet.instagram.constants import (
     INSTAGRAM_DEFAULT_THROTTLE_EVERY_10_CALLS,
     INSTAGRAM_MAX_RANDOM_ADDENDUM,
     INSTAGRAM_MAX_RANDOM_ADDENDUM_EVERY_10_CALLS,
+    INSTAGRAM_DEFAULT_THROTTLE_EVERY_2900_CALLS,
+    INSTAGRAM_MAX_RANDOM_ADDENDUM_EVERY_2900_CALLS,
     INSTAGRAM_MIN_TIME_RETRYER,
     INSTAGRAM_URL,
     INSTAGRAM_PUBLIC_API_DEFAULT_TIMEOUT,
@@ -61,9 +63,7 @@ def forge_hashtag_search_url(name, cursor=None, count=50):
 
 
 def forge_user_url(name):
-    url = "https://i.instagram.com/api/v1/users/web_profile_info/?username=%s" % name
-
-    return url
+    return "https://i.instagram.com/api/v1/users/web_profile_info/?username=%s" % name
 
 
 def forge_user_followers_url(
@@ -140,6 +140,7 @@ class InstagramAPIScraper(object):
         self.cookie = cookie
         self.magic_token = None
         self.nb_calls = 0
+        self.nb_calls_2900 = 0
         self.retryer = create_request_retryer(
             min=INSTAGRAM_MIN_TIME_RETRYER,
             additional_exceptions=[InstagramTooManyRequestsError, InstagramError500],
@@ -171,6 +172,16 @@ class InstagramAPIScraper(object):
             raise InstagramPublicAPIInvalidResponseError
 
         if self.nb_calls == 10:
+
+            if self.nb_calls_2900 == 2900:
+                sleep_with_entropy(
+                    INSTAGRAM_DEFAULT_THROTTLE_EVERY_2900_CALLS,
+                    INSTAGRAM_MAX_RANDOM_ADDENDUM_EVERY_2900_CALLS,
+                )
+                self.nb_calls_2900 = 0
+
+                return data
+
             sleep_with_entropy(
                 INSTAGRAM_DEFAULT_THROTTLE_EVERY_10_CALLS,
                 INSTAGRAM_MAX_RANDOM_ADDENDUM_EVERY_10_CALLS,
@@ -181,6 +192,7 @@ class InstagramAPIScraper(object):
 
         sleep_with_entropy(INSTAGRAM_DEFAULT_THROTTLE, INSTAGRAM_MAX_RANDOM_ADDENDUM)
         self.nb_calls += 1
+        self.nb_calls_2900 += 1
 
         return data
 

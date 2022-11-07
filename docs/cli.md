@@ -48,10 +48,10 @@
   * [reset](#hyphe-reset)
   * [tag](#hyphe-tag)
 * [instagram (insta)](#instagram)
-  * [hashtag](#insta-hashtag)
+  * [hashtag](#hashtag)
   * [user-followers](#user-followers)
   * [user-following](#user-following)
-  * [user-posts](#insta-user-posts)
+  * [user-posts](#user-posts)
 * [mediacloud (mc)](#mediacloud)
   * [medias](#mc-medias)
   * [search](#mc-search)
@@ -118,6 +118,8 @@ crowdtangle:
   rate_limit: 10 # Used as --rate-limit for `minet ct` commands
 facebook:
   cookie: "MY_FACEBOOK_COOKIE" # Used as --cookie for `minet fb` commands
+instagram:
+  cookie: "MY_INSTAGRAM_COOKIE" # Used as --cookie for `minet insta` commands
 mediacloud:
   token: "MY_MC_TOKEN" # Used as --token for `minet mc` commands
 twitter:
@@ -1534,7 +1536,7 @@ actions:
 
 ```
 
-<h3 id="insta-hashtag">hashtag</h3>
+### hashtag
 
 ```
 usage: minet instagram hashtag [-h] [--rcfile RCFILE] [-o OUTPUT] [-s SELECT]
@@ -1573,17 +1575,123 @@ example:
 
 ```
 
-<h3 id="insta-user_followers">user_followers</h3>
+### user-followers
 
-<% insta/user_followers %>
+```
+usage: minet instagram user-followers [-h] [--rcfile RCFILE] [-o OUTPUT]
+                                      [-s SELECT] [-c COOKIE] [-l LIMIT]
+                                      column [file]
 
-<h3 id="insta-user_following">user_following</h3>
+Instagram user-followers
+========================
 
-<% insta/user_following %>
+Scrape Instagram followers with a given username.
+On verified accounts, you may be unable to get all of them.
 
-<h3 id="insta-user_posts">user_posts</h3>
+This requires to be logged in to an Instagram account, so
+by default this command will attempt to grab the relevant
+authentication cookies from a local Firefox browser.
 
-<% insta/user_posts %>
+If you want to grab cookies from another browser or want
+to directly pass the cookie as a string, check out the
+-c/--cookie flag.
+
+positional arguments:
+  column                      This argument can either take the query on which we want to retrieve followers accounts or the name of the column containing that query
+  file                        CSV file containing the query for instagram username.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
+  -l LIMIT, --limit LIMIT     Maximum number of followers to retrieve per query.
+
+example:
+
+. Searching followers with the username banksrepeta:
+    $ minet instagram user-followers banksrepeta > banksrepeta_followers.csv
+
+```
+
+### user-following
+
+```
+usage: minet instagram user-following [-h] [--rcfile RCFILE] [-o OUTPUT]
+                                      [-s SELECT] [-c COOKIE] [-l LIMIT]
+                                      column [file]
+
+Instagram user-following
+========================
+
+Scrape Instagram accounts followed with a given username.
+
+This requires to be logged in to an Instagram account, so
+by default this command will attempt to grab the relevant
+authentication cookies from a local Firefox browser.
+
+If you want to grab cookies from another browser or want
+to directly pass the cookie as a string, check out the
+-c/--cookie flag.
+
+positional arguments:
+  column                      This argument can either take the query on which we want to retrieve followed accounts or the name of the column containing that query
+  file                        CSV file containing the query for instagram username.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
+  -l LIMIT, --limit LIMIT     Maximum number of accounts to retrieve per query.
+
+example:
+
+. Searching accounts followed with the username paramountplus:
+    $ minet instagram user-following paramountplus > paramountplus_following.csv
+
+```
+
+### user-posts
+
+```
+usage: minet instagram user-posts [-h] [--rcfile RCFILE] [-o OUTPUT] [-s SELECT]
+                                  [-c COOKIE] [-l LIMIT]
+                                  column [file]
+
+Instagram user-posts
+====================
+
+Scrape Instagram posts with a given username.
+
+This requires to be logged in to an Instagram account, so
+by default this command will attempt to grab the relevant
+authentication cookies from a local Firefox browser.
+
+If you want to grab cookies from another browser or want
+to directly pass the cookie as a string, check out the
+-c/--cookie flag.
+
+positional arguments:
+  column                      This argument can either take the query on which we want to retrieve posts or the name of the column containing that query
+  file                        CSV file containing the query for instagram username.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
+  -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve per query.
+
+example:
+
+. Searching posts from the account paramountplus:
+    $ minet instagram user-posts paramountplus > paramountplus_posts.csv
+
+```
 
 ## Mediacloud
 

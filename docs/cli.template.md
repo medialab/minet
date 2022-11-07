@@ -48,10 +48,10 @@
   * [reset](#hyphe-reset)
   * [tag](#hyphe-tag)
 * [instagram (insta)](#instagram)
-  * [hashtag](#insta-hashtag)
+  * [hashtag](#hashtag)
   * [user-followers](#user-followers)
   * [user-following](#user-following)
-  * [user-posts](#insta-user-posts)
+  * [user-posts](#user-posts)
 * [mediacloud (mc)](#mediacloud)
   * [medias](#mc-medias)
   * [search](#mc-search)
@@ -118,6 +118,8 @@ crowdtangle:
   rate_limit: 10 # Used as --rate-limit for `minet ct` commands
 facebook:
   cookie: "MY_FACEBOOK_COOKIE" # Used as --cookie for `minet fb` commands
+instagram:
+  cookie: "MY_INSTAGRAM_COOKIE" # Used as --cookie for `minet insta` commands
 mediacloud:
   token: "MY_MC_TOKEN" # Used as --token for `minet mc` commands
 twitter:
@@ -279,21 +281,21 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% insta %>
 
-<h3 id="insta-hashtag">hashtag</h3>
+### hashtag
 
 <% insta/hashtag %>
 
-<h3 id="insta-user_followers">user_followers</h3>
+### user-followers
 
-<% insta/user_followers %>
+<% insta/user-followers %>
 
-<h3 id="insta-user_following">user_following</h3>
+### user-following
 
-<% insta/user_following %>
+<% insta/user-following %>
 
-<h3 id="insta-user_posts">user_posts</h3>
+### user-posts
 
-<% insta/user_posts %>
+<% insta/user-posts %>
 
 ## Mediacloud
 
