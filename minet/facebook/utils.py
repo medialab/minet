@@ -5,7 +5,6 @@
 # Miscellaneous helpers used by the minet.facebook namespace.
 #
 from http.cookies import SimpleCookie
-import re
 
 from minet.web import grab_cookies
 from minet.constants import COOKIE_BROWSERS

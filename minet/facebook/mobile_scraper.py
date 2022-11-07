@@ -36,7 +36,7 @@ from minet.facebook.formatters import (
     FacebookComment,
     FacebookPost,
     FacebookUser,
-    FacebookPostReaction,
+    FacebookPostWithReaction,
 )
 from minet.facebook.exceptions import (
     FacebookInvalidCookieError,
@@ -399,7 +399,7 @@ def scrape_video(soup):
         else None
     )
 
-    post = FacebookPostReaction(
+    post = FacebookPostWithReaction(
         url=video_url,
         user_id=getattr(user, "id", ""),
         user_handle=getattr(user, "handle", ""),
@@ -492,7 +492,7 @@ def scrape_photo(soup):
         else None
     )
 
-    post = FacebookPostReaction(
+    post = FacebookPostWithReaction(
         url=photo_url,
         user_id=getattr(user, "id", ""),
         user_handle=getattr(user, "handle", ""),
@@ -598,7 +598,7 @@ def scrape_post(html):
         else None
     )
 
-    post = FacebookPostReaction(
+    post = FacebookPostWithReaction(
         url=post_url,
         user_id=getattr(user, "id", ""),
         user_handle=getattr(user, "handle", ""),
@@ -635,7 +635,7 @@ class FacebookMobileScraper(object):
 
     @rate_limited_method()
     @retrying_method()
-    def request_page(self, url, get_url=False):
+    def request_page(self, url):
         error, result = request(
             url,
             pool=self.pool,
@@ -645,9 +645,6 @@ class FacebookMobileScraper(object):
 
         if error:
             raise error
-
-        if get_url:
-            return result.data.decode("utf-8"), result.geturl()
 
         return result.data.decode("utf-8")
 
@@ -751,7 +748,7 @@ class FacebookMobileScraper(object):
 
         url = convert_url_to_mobile(parsed.url)
 
-        html, url = self.request_page(url, get_url=True)
+        html = self.request_page(url)
 
         return scrape_post(html)
 

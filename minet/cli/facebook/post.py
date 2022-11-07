@@ -10,7 +10,7 @@ from minet.constants import COOKIE_BROWSERS
 from minet.cli.utils import die, LoadingBar
 from minet.facebook import FacebookMobileScraper
 from minet.facebook.constants import (
-    FACEBOOK_POST_CSV_HEADERS_WITH_REACTIONS_TYPES,
+    FACEBOOK_POST_WITH_REACTIONS_CSV_HEADERS,
 )
 from minet.facebook.exceptions import (
     FacebookInvalidCookieError,
@@ -40,7 +40,7 @@ def facebook_post_action(cli_args):
         cli_args.file,
         cli_args.output,
         keep=cli_args.select,
-        add=FACEBOOK_POST_CSV_HEADERS_WITH_REACTIONS_TYPES,
+        add=FACEBOOK_POST_WITH_REACTIONS_CSV_HEADERS,
     )
 
     # Loading bar

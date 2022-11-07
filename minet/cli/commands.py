@@ -887,6 +887,9 @@ MINET_COMMANDS = {
                         to directly pass the cookie as a string, check out the
                         -c/--cookie flag.
 
+                        You must set your account language to English (US) for the
+                        command to work.
+
                         Note that, by default, Facebook will translate post text
                         when they are not written in a language whitelisted here:
                         https://www.facebook.com/settings/?tab=language

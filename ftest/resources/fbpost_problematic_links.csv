@@ -1,4 +1,4 @@
-url, problem, error raised
+url, problem, error_raised
 https://m.facebook.com/photo/?fbid=3439670996254080&amp%3Bset=a.1982975035257024, dead link on web and mobile, FacebookInvalidTargetError
 https://m.facebook.com/photo.php?fbid=4873024496125930&set=gm.1377536832711216&type=3&theater, dead link on web and mobile, FacebookInvalidTargetError
 https://m.facebook.com/succes.sagesse/posts/4550736008372896, dead link on web and mobile, FacebookInvalidTargetError
