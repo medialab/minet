@@ -63,7 +63,7 @@
   * [list-members](#list-members)
   * [retweeters](#retweeters)
   * [scrape](#twitter-scrape)
-  * [tweet-date] (#tweet-date)
+  * [tweet-date](#tweet-date)
   * [tweet-search](#tweet-search)
   * [tweet-count](#tweet-count)
   * [tweets](#tweets)
