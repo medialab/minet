@@ -1,32 +1,32 @@
-url, problem, error_raised
-https://m.facebook.com/photo/?fbid=3439670996254080&amp%3Bset=a.1982975035257024, dead link on web and mobile, FacebookInvalidTargetError
-https://m.facebook.com/photo.php?fbid=4873024496125930&set=gm.1377536832711216&type=3&theater, dead link on web and mobile, FacebookInvalidTargetError
-https://m.facebook.com/succes.sagesse/posts/4550736008372896, dead link on web and mobile, FacebookInvalidTargetError
-https://m.facebook.com/105523878764166/photos/a.105530815430139/124833386833215/, dead link on web and mobile, FacebookInvalidTargetError
-https://www.facebook.com/peter.mbemba.50/posts/1717319255326023, dead link on web and mobile, FacebookInvalidTargetError
-https://m.facebook.com/camerplaysport/posts/3214715528776261, dead link on web and mobile, FacebookInvalidTargetError
-https://m.facebook.com/109743754136226/videos/409130300981257/, dead link on web and mobile, FacebookInvalidTargetError
-https://www.facebook.com/equinoxesoir/posts/503523411168847, dead link on web and mobile, FacebookInvalidTargetError
-https://www.facebook.com/photo.php?fbid=178637554607470&amp%3Bset=a.101666372304589&amp%3Btype=3, dead link on web and mobile, FacebookInvalidTargetError
-https://www.facebook.com/100063486369524/videos/2008381422654312, dead link on web and mobile, FacebookInvalidTargetError
-https://www.facebook.com/pinky.panther.5243/videos/449510089948122, dead link on web and mobile, FacebookInvalidTargetError
-https://www.facebook.com/ghali.bes.50/videos/392351282837966, dead link on web and mobile, FacebookInvalidTargetError
-https://www.facebook.com/GbagboOuRienTv/photos/a.1960057130893966/3203776193188714/, dead link on web and mobile, FacebookInvalidTargetError
-https://www.facebook.com/217438019758972/posts/584727049696732, dead link on web and mobile, FacebookInvalidTargetError
-https://www.facebook.com/permalink.php?story_fbid=460713232125196&id=100045595686217, dead link on web and mobile, FacebookInvalidTargetError
-https://m.facebook.com/278493465501441/posts/5822354324448633, dead link on web and mobile, FacebookInvalidTargetError
-https://m.facebook.com/story.php?story_fbid=591368902357865&amp%3Bid=100005131420124&amp%3B_rdr, dead link on web and mobile, FacebookInvalidTargetError
-https://m.facebook.com/permalink.php?story_fbid=pfbid0soaW7kxMr4D3iAPFaqmN2c7ZFTFF8FiyarH67nX5CfgYeZWU9DqLX55C8bqFxhRwl&amp%3Bid=106692535436432, dead link on web and mobile, FacebookNotPostError
-https://m.facebook.com/story.php?story_fbid=591368902357865&amp%3Bid=100005131420124&amp%3B_rdr, dead link on web and mobile, FacebookNotPostError
-https://www.facebook.com/permalink.php?story_fbid=282777187398838&amp%3Bid=100069996758766, dead link on web and mobile, FacebookNotPostError
-https://www.facebook.com/permalink.php?story_fbid=pfbid02cKkwzzYPFTwnVfJRRQbZ6MjvtYy2K9AsNehmgnjT3VNrPPDehwXcTHVFNsrad6EXl&amp%3Bid=451772955363043, dead link on web and mobile, FacebookNotPostError
-https://www.facebook.com/permalink.php?story_fbid=1896343793981015&amp%3Bid=100008162387746, dead link on web and mobile, FacebookNotPostError
-https://m.facebook.com/LesPetitsFrenchies/photos/voici-les-designs-rejet%C3%A9s-de-la-tour-eiffel-/5735751069785931/, dead link on mobile, FacebookInvalidTargetError
-https://m.facebook.com/IKD.22/photos/a.814877315350620/1895675063937501/,dead link on mobile, FacebookInvalidTargetError
-https://m.facebook.com/photo.php?fbid=3078739962366438&set=a.1483770221863428&type=3, dead link on mobile, FacebookInvalidTargetError
-https://www.facebook.com/photo/?fbid=5445792478818800&amp%3Bset=a.616223698442393, dead link on mobile, FacebookInvalidTargetError
-https://m.facebook.com/photo.php?fbid=410443227750979&amp%3Bset=a.130768569051781&amp%3Btype=3, dead link on mobile, FacebookInvalidTargetError
-https://www.facebook.com/photo.php?fbid=1732696350417242&amp%3Bset=a.581939198826302&amp%3Btype=3, dead link on mobile, FacebookInvalidTargetError
-https://m.facebook.com/Soonx3/photos/a.273666745999998/946015915431741, correct link, FacebookInvalidTargetError
-https://m.facebook.com/InvestigAction/videos/lotan-sallie-à-des-néo-nazis-en-ukraine-michel-collon/487512746078880/?_rdr, correct link, FacebookInvalidTargetError
-https://m.facebook.com/groups/231322418927950?view=permalink&id=378374147556109&eav=Afa9I9zt2q4kklIGCobSiucH6ILBaEqnHAi_eTIdh2NLiHVM68oRXRdeBYIQpVW1kLA&paipv=0&_rdr, correct link, FacebookInvalidTargetError
+url,problem,error_raised
+https://m.facebook.com/photo/?fbid=3439670996254080&amp%3Bset=a.1982975035257024,dead link on web and mobile,FacebookInvalidTargetError
+https://m.facebook.com/photo.php?fbid=4873024496125930&set=gm.1377536832711216&type=3&theater,dead link on web and mobile,FacebookInvalidTargetError
+https://m.facebook.com/succes.sagesse/posts/4550736008372896,dead link on web and mobile,FacebookInvalidTargetError
+https://m.facebook.com/105523878764166/photos/a.105530815430139/124833386833215/,dead link on web and mobile,FacebookInvalidTargetError
+https://www.facebook.com/peter.mbemba.50/posts/1717319255326023,dead link on web and mobile,FacebookInvalidTargetError
+https://m.facebook.com/camerplaysport/posts/3214715528776261,dead link on web and mobile,FacebookInvalidTargetError
+https://m.facebook.com/109743754136226/videos/409130300981257/,dead link on web and mobile,FacebookInvalidTargetError
+https://www.facebook.com/equinoxesoir/posts/503523411168847,dead link on web and mobile,FacebookInvalidTargetError
+https://www.facebook.com/photo.php?fbid=178637554607470&amp%3Bset=a.101666372304589&amp%3Btype=3,dead link on web and mobile,FacebookInvalidTargetError
+https://www.facebook.com/100063486369524/videos/2008381422654312,dead link on web and mobile,FacebookInvalidTargetError
+https://www.facebook.com/pinky.panther.5243/videos/449510089948122,dead link on web and mobile,FacebookInvalidTargetError
+https://www.facebook.com/ghali.bes.50/videos/392351282837966,dead link on web and mobile,FacebookInvalidTargetError
+https://www.facebook.com/GbagboOuRienTv/photos/a.1960057130893966/3203776193188714/,dead link on web and mobile,FacebookInvalidTargetError
+https://www.facebook.com/217438019758972/posts/584727049696732,dead link on web and mobile,FacebookInvalidTargetError
+https://www.facebook.com/permalink.php?story_fbid=460713232125196&id=100045595686217,dead link on web and mobile,FacebookInvalidTargetError
+https://m.facebook.com/278493465501441/posts/5822354324448633,dead link on web and mobile,FacebookInvalidTargetError
+https://m.facebook.com/story.php?story_fbid=591368902357865&amp%3Bid=100005131420124&amp%3B_rdr,dead link on web and mobile,FacebookInvalidTargetError
+https://m.facebook.com/permalink.php?story_fbid=pfbid0soaW7kxMr4D3iAPFaqmN2c7ZFTFF8FiyarH67nX5CfgYeZWU9DqLX55C8bqFxhRwl&amp%3Bid=106692535436432,dead link on web and mobile,FacebookNotPostError
+https://m.facebook.com/story.php?story_fbid=591368902357865&amp%3Bid=100005131420124&amp%3B_rdr,dead link on web and mobile,FacebookNotPostError
+https://www.facebook.com/permalink.php?story_fbid=282777187398838&amp%3Bid=100069996758766,dead link on web and mobile,FacebookNotPostError
+https://www.facebook.com/permalink.php?story_fbid=pfbid02cKkwzzYPFTwnVfJRRQbZ6MjvtYy2K9AsNehmgnjT3VNrPPDehwXcTHVFNsrad6EXl&amp%3Bid=451772955363043,dead link on web and mobile,FacebookNotPostError
+https://www.facebook.com/permalink.php?story_fbid=1896343793981015&amp%3Bid=100008162387746,dead link on web and mobile,FacebookNotPostError
+https://m.facebook.com/LesPetitsFrenchies/photos/voici-les-designs-rejet%C3%A9s-de-la-tour-eiffel-/5735751069785931/,dead link on mobile,FacebookInvalidTargetError
+https://m.facebook.com/IKD.22/photos/a.814877315350620/1895675063937501/,dead link on mobile,FacebookInvalidTargetError
+https://m.facebook.com/photo.php?fbid=3078739962366438&set=a.1483770221863428&type=3,dead link on mobile,FacebookInvalidTargetError
+https://www.facebook.com/photo/?fbid=5445792478818800&amp%3Bset=a.616223698442393,dead link on mobile,FacebookInvalidTargetError
+https://m.facebook.com/photo.php?fbid=410443227750979&amp%3Bset=a.130768569051781&amp%3Btype=3,dead link on mobile,FacebookInvalidTargetError
+https://www.facebook.com/photo.php?fbid=1732696350417242&amp%3Bset=a.581939198826302&amp%3Btype=3,dead link on mobile,FacebookInvalidTargetError
+https://m.facebook.com/Soonx3/photos/a.273666745999998/946015915431741,correct link,FacebookInvalidTargetError
+https://m.facebook.com/InvestigAction/videos/lotan-sallie-à-des-néo-nazis-en-ukraine-michel-collon/487512746078880/?_rdr,correct link,FacebookInvalidTargetError
+https://m.facebook.com/groups/231322418927950?view=permalink&id=378374147556109&eav=Afa9I9zt2q4kklIGCobSiucH6ILBaEqnHAi_eTIdh2NLiHVM68oRXRdeBYIQpVW1kLA&paipv=0&_rdr,correct link,FacebookInvalidTargetError
