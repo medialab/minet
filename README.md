@@ -41,8 +41,9 @@ Minet can single-handedly:
   * *[Mediacloud](https://mediacloud.org/)* (requires free API access)
   * *[Twitter](https://twitter.com)* (requires free API access)
   * *[Youtube](https://www.youtube.com/)* (requires free API access)
-* Scrape (without requiring special access):
+* Scrape (without requiring special access, often just a user account):
   * *[Facebook](https://www.facebook.com/)*
+  * *[Instagram](https://www.instagram.com/)*
   * *[Twitter](https://twitter.com)*
   * *[Google Drive](https://drive.google.com)* (spreadsheets etc.)
 * Grab & dump cookies from your browser
