@@ -7,7 +7,11 @@
 from bs4 import BeautifulSoup
 import re
 
-from minet.utils import rate_limited_method, RateLimiterState
+from minet.utils import (
+    rate_limited_method,
+    RateLimiterState,
+    clean_human_readable_numbers,
+)
 from minet.web import create_pool, request, create_request_retryer, retrying_method
 
 from minet.telegram.constants import (
@@ -102,10 +106,10 @@ def scrape_channel_infos(html):
         link=link,
         img=img,
         description=description,
-        nb_subscribers=nb_subscribers,
-        nb_photos=nb_photos,
-        nb_videos=nb_videos,
-        nb_links=nb_links,
+        nb_subscribers=clean_human_readable_numbers(nb_subscribers),
+        nb_photos=clean_human_readable_numbers(nb_photos),
+        nb_videos=clean_human_readable_numbers(nb_videos),
+        nb_links=clean_human_readable_numbers(nb_links),
     )
 
 
@@ -136,7 +140,7 @@ def scrape_channel_messages(html):
 
         link_message = (
             TELEGRAM_URL
-            + "/s/"
+            + "s/"
             + (
                 message.select_one(
                     "div[class*='tgme_widget_message text_not_supported_wrap']"
@@ -313,7 +317,7 @@ def scrape_channel_messages(html):
             link_site=link_site,
             link_title=link_title,
             link_description=link_description,
-            views=views,
+            views=clean_human_readable_numbers(views),
             datetime=datetime,
             edited=edited,
         )
