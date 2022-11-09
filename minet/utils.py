@@ -13,6 +13,7 @@ import string
 import functools
 import dateparser
 from random import uniform
+from datetime import datetime
 
 from minet.exceptions import DefinitionInvalidFormatError
 
@@ -338,3 +339,7 @@ def clean_human_readable_numbers(text):
     approx_likes = approx_likes.replace(".", "")
 
     return approx_likes
+
+
+def timestamp_to_isoformat(timestamp):
+    return datetime.utcfromtimestamp(timestamp).isoformat()
