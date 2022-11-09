@@ -874,6 +874,84 @@ MINET_COMMANDS = {
                         },
                     ],
                 },
+                "post": {
+                    "title": "Minet Facebook Post Command",
+                    "description": """
+                        Scrape Facebook post.
+
+                        This requires to be logged in to a Facebook account, so
+                        by default this command will attempt to grab the relevant
+                        authentication cookies from a local Firefox browser.
+
+                        If you want to grab cookies from another browser or want
+                        to directly pass the cookie as a string, check out the
+                        -c/--cookie flag.
+
+                        You must set your account language to English (US) for the
+                        command to work.
+
+                        Note that, by default, Facebook will translate post text
+                        when they are not written in a language whitelisted here:
+                        https://www.facebook.com/settings/?tab=language
+
+                        In this case, minet will output both the original text and
+                        the translated one. But be aware that original text may be
+                        truncated, so you might want to edit your Facebook settings
+                        using the url above to make sure text won't be translated
+                        for posts you are interested in.
+
+                        Of course, the CLI will warn you when translated text is
+                        found so you can choose to edit your settings early as
+                        as possible.
+
+                        Finally, some post text is always truncated on Facebook
+                        when displayed in lists. This text is not yet entirely
+                        scraped by minet at this time.
+                    """,
+                    "epilog": """
+                        examples:
+
+                        . Scraping a post:
+                            $ minet fb post https://m.facebook.com/watch/?v=448540820705115 > post.csv
+
+                        . Grabbing cookies from chrome:
+                            $ minet fb posts -c chrome https://m.facebook.com/watch/?v=448540820705115 > post.csv
+
+                        . Scraping post from multiple urls listed in a CSV file:
+                            $ minet fb post url urls.csv > post.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "Column of the CSV file containing post urls or a single post url.",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the post urls.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "url",
+                        },
+                        {
+                            "flags": ["-c", "--cookie"],
+                            "help": 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".',
+                            "default": "firefox",
+                            "rc_key": ["facebook", "cookie"],
+                            "action": ConfigAction,
+                        },
+                        {"flags": ["-o", "--output"], "action": OutputFileAction},
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flag": "--throttle",
+                            "help": "Throttling time, in seconds, to wait between each request.",
+                            "type": float,
+                            "default": FACEBOOK_MOBILE_DEFAULT_THROTTLE,
+                        },
+                    ],
+                },
                 "posts": {
                     "title": "Minet Facebook Posts Command",
                     "description": """

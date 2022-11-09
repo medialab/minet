@@ -317,5 +317,29 @@ def is_binary_mimetype(m: str) -> bool:
     )
 
 
+NUMBER_RE = re.compile(r"\d+[\.,]?\d*[KM]?")
+
+
+def clean_human_readable_numbers(text):
+
+    match = NUMBER_RE.search(text)
+
+    if match is None:
+        return text
+
+    approx_likes = match.group(0)
+
+    if "K" in approx_likes:
+        approx_likes = str(int(float(approx_likes[:-1]) * 10**3))
+
+    elif "M" in approx_likes:
+        approx_likes = str(int(float(approx_likes[:-1]) * 10**6))
+
+    approx_likes = approx_likes.replace(",", "")
+    approx_likes = approx_likes.replace(".", "")
+
+    return approx_likes
+
+
 def timestamp_to_isoformat(timestamp):
     return datetime.utcfromtimestamp(timestamp).isoformat()

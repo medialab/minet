@@ -15,3 +15,11 @@ class FacebookInvalidCookieError(FacebookError):
 
 class FacebookInvalidTargetError(FacebookError):
     pass
+
+
+class FacebookNotPostError(FacebookError):
+    pass
+
+
+class FacebookWatchError(FacebookError):
+    pass

@@ -82,3 +82,7 @@ FACEBOOK_REACTION_KEYS = OrderedDict(
         16: "care",
     }
 )
+
+FACEBOOK_POST_WITH_REACTIONS_CSV_HEADERS = FACEBOOK_POST_CSV_HEADERS + [
+    "reactions_types"
+]
