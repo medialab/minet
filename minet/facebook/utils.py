@@ -16,12 +16,9 @@ def fix_cookie(cookie_string):
     cookie.load(cookie_string)
 
     # NOTE: those cookie items can rat you out
-    try:
-        del cookie["m_pixel_ratio"]
-        del cookie["wd"]
-    except KeyError:
-        pass
-
+    cookie.pop("m_pixel_ratio", None)
+    cookie.pop("wd", None)
+    cookie.pop("fr", None)
     cookie["locale"] = "en_US"
 
     return "; ".join(key + "=" + morsel.coded_value for key, morsel in cookie.items())

@@ -13,6 +13,7 @@ import string
 import functools
 import dateparser
 from random import uniform
+from datetime import datetime
 
 from minet.exceptions import DefinitionInvalidFormatError
 
@@ -314,3 +315,31 @@ def is_binary_mimetype(m: str) -> bool:
         or "yml" in second_part
         or second_part == "x-httpd-php"
     )
+
+
+NUMBER_RE = re.compile(r"\d+[\.,]?\d*[KM]?")
+
+
+def clean_human_readable_numbers(text):
+
+    match = NUMBER_RE.search(text)
+
+    if match is None:
+        return text
+
+    approx_likes = match.group(0)
+
+    if "K" in approx_likes:
+        approx_likes = str(int(float(approx_likes[:-1]) * 10**3))
+
+    elif "M" in approx_likes:
+        approx_likes = str(int(float(approx_likes[:-1]) * 10**6))
+
+    approx_likes = approx_likes.replace(",", "")
+    approx_likes = approx_likes.replace(".", "")
+
+    return approx_likes
+
+
+def timestamp_to_isoformat(timestamp):
+    return datetime.utcfromtimestamp(timestamp).isoformat()

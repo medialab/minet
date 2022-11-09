@@ -36,6 +36,7 @@
   * [summary](#summary)
 * [facebook (fb)](#facebook)
   * [comments](#facebook-comments)
+  * [post](#facebook-post)
   * [posts](#facebook-posts)
   * [post-authors](#facebook-post-authors)
   * [url-likes](#facebook-url-likes)
@@ -47,6 +48,11 @@
   * [dump](#hyphe-dump)
   * [reset](#hyphe-reset)
   * [tag](#hyphe-tag)
+* [instagram (insta)](#instagram)
+  * [hashtag](#hashtag)
+  * [user-followers](#user-followers)
+  * [user-following](#user-following)
+  * [user-posts](#user-posts)
 * [mediacloud (mc)](#mediacloud)
   * [medias](#mc-medias)
   * [search](#mc-search)
@@ -119,6 +125,8 @@ crowdtangle:
   rate_limit: 10 # Used as --rate-limit for `minet ct` commands
 facebook:
   cookie: "MY_FACEBOOK_COOKIE" # Used as --cookie for `minet fb` commands
+instagram:
+  cookie: "MY_INSTAGRAM_COOKIE" # Used as --cookie for `minet insta` commands
 mediacloud:
   token: "MY_MC_TOKEN" # Used as --token for `minet mc` commands
 twitter:
@@ -234,6 +242,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% fb/comments %>
 
+<h3 id="facebook-post">post</h3>
+
+<% fb/post %>
+
 <h3 id="facebook-posts">posts</h3>
 
 <% fb/posts %>
@@ -275,6 +287,26 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 <h3 id="hyphe-tag">tag</h3>
 
 <% hyphe/tag %>
+
+## Instagram
+
+<% insta %>
+
+### hashtag
+
+<% insta/hashtag %>
+
+### user-followers
+
+<% insta/user-followers %>
+
+### user-following
+
+<% insta/user-following %>
+
+### user-posts
+
+<% insta/user-posts %>
 
 ## Mediacloud
 
