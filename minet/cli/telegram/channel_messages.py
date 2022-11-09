@@ -9,6 +9,7 @@ import casanova
 from minet.cli.utils import LoadingBar
 from minet.telegram import TelegramScraper
 from minet.telegram.constants import TELEGRAM_MESSAGES_CSV_HEADERS
+from minet.telegram.exceptions import TelegramInvalidTargetError
 
 
 def channel_messages_action(cli_args):
@@ -22,11 +23,20 @@ def channel_messages_action(cli_args):
 
     loading_bar = LoadingBar("Retrieving messages", unit="message")
 
-    for row, channel in enricher.cells(cli_args.column, with_rows=True):
+    for i, (row, channel) in enumerate(
+        enricher.cells(cli_args.column, with_rows=True), 1
+    ):
         loading_bar.inc("channels")
 
-        messages = scraper.channel_messages(channel)
+        try:
+            messages = scraper.channel_messages(channel)
 
-        for message in messages:
-            loading_bar.update()
-            enricher.writerow(row, message)
+            for message in messages:
+                enricher.writerow(row, message)
+                loading_bar.update()
+
+        except TelegramInvalidTargetError:
+            loading_bar.print(
+                "%s (line %i) is not a telegram channel or url, or is not accessible."
+                % (channel, i)
+            )

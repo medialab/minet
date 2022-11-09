@@ -4,7 +4,6 @@
 #
 # Functions to scrape Telegram.
 #
-from pickle import NEWOBJ_EX
 from bs4 import BeautifulSoup
 import re
 
@@ -15,13 +14,22 @@ from minet.telegram.constants import (
     TELEGRAM_URL,
     TELEGRAM_DEFAULT_THROTTLE,
 )
+from ural.telegram import (
+    convert_telegram_url_to_public,
+    parse_telegram_url,
+    TelegramChannel as ParsedTelegramChannel,
+    TelegramGroup as ParsedTelegramGroup,
+    TelegramMessage as ParsedTelegramMessage,
+)
+from minet.telegram.formatters import TelegramChannelInfos, TelegramChannelMessages
+from minet.telegram.exceptions import TelegramInvalidTargetError
 
 TELEGRAM_IMG_RE = re.compile(r"background-image:url\(\'(.*?)\'\)")
 TELEGRAM_HASHTAG_RE = re.compile(r"\?q=%23(.*)")
 
 
 def forge_telegram_channel_url(name):
-    url = TELEGRAM_URL + "/s/" + name + "/1"
+    url = TELEGRAM_URL + name + "/1"
     return url
 
 
@@ -35,9 +43,13 @@ def scrape_channel_infos(html):
 
     channel_infos = soup.select_one("div[class='tgme_channel_info']")
 
+    if not channel_infos:
+        raise TelegramInvalidTargetError
+
     channel_header_infos = channel_infos.select_one(
         "div[class='tgme_channel_info_header']"
     )
+
     img = channel_header_infos.select_one("img").get("src")
     title = channel_header_infos.select_one("span").get_text()
     name = channel_header_infos.select_one(
@@ -76,7 +88,7 @@ def scrape_channel_infos(html):
     nb_videos = (
         counters_infos.get("videos")
         if counters_infos.get("videos")
-        else counters_infos.get("videos")
+        else counters_infos.get("video")
     )
     nb_links = (
         counters_infos.get("links")
@@ -84,26 +96,29 @@ def scrape_channel_infos(html):
         else counters_infos.get("link")
     )
 
-    return [
-        title,
-        name,
-        link,
-        img,
-        description,
-        nb_subscribers,
-        nb_photos,
-        nb_videos,
-        nb_links,
-    ]
+    return TelegramChannelInfos(
+        title=title,
+        name=name,
+        link=link,
+        img=img,
+        description=description,
+        nb_subscribers=nb_subscribers,
+        nb_photos=nb_photos,
+        nb_videos=nb_videos,
+        nb_links=nb_links,
+    )
 
 
 def scrape_channel_messages(html):
-    result = []
+    results = []
     soup = BeautifulSoup(html, "lxml")
 
     messages_section = soup.select_one(
         "section[class='tgme_channel_history js-message_history']"
     )
+
+    if not messages_section:
+        raise TelegramInvalidTargetError
 
     next_after = messages_section.select_one("a[data-after]")
     if next_after:
@@ -260,7 +275,10 @@ def scrape_channel_messages(html):
             if link_description:
                 link_description = link_description.get_text()
 
-        views = message.select_one("span[class='tgme_widget_message_views']").get_text()
+        views = message.select_one("span[class='tgme_widget_message_views']")
+        could_be_displayed = bool(views)
+        if views:
+            views = views.get_text()
         datetime = (
             message.select_one("a[class='tgme_widget_message_date']")
             .select_one("time")
@@ -271,37 +289,38 @@ def scrape_channel_messages(html):
         ).get_text()
         edited = "edited" in edited_html
 
-        result.append(
-            [
-                link_message,
-                user,
-                user_link,
-                user_img,
-                text,
-                nb_hashtags,
-                hashtags,
-                reply_img,
-                reply_user,
-                reply_text,
-                stickers,
-                nb_photos,
-                photos,
-                nb_videos,
-                videos,
-                videos_times,
-                nb_links,
-                links,
-                link_img,
-                link_site,
-                link_title,
-                link_description,
-                views,
-                datetime,
-                edited,
-            ]
+        result = TelegramChannelMessages(
+            link_to_message=link_message,
+            could_be_displayed=could_be_displayed,
+            user=user,
+            user_link=user_link,
+            user_img=user_img,
+            text=text,
+            nb_hashtags=nb_hashtags,
+            hashtags=hashtags,
+            is_reply_img=reply_img,
+            is_reply_user=reply_user,
+            is_reply_text=reply_text,
+            stickers=stickers,
+            nb_photos=nb_photos,
+            photos=photos,
+            nb_videos=nb_videos,
+            videos=videos,
+            videos_times=videos_times,
+            nb_links=nb_links,
+            links=links,
+            link_img=link_img,
+            link_site=link_site,
+            link_title=link_title,
+            link_description=link_description,
+            views=views,
+            datetime=datetime,
+            edited=edited,
         )
 
-    return next_after, result
+        results.append(result)
+
+    return next_after, results
 
 
 class TelegramScraper(object):
@@ -325,16 +344,34 @@ class TelegramScraper(object):
         return result.data.decode("utf-8")
 
     def channel_infos(self, name):
-        url = forge_telegram_channel_url(name)
+        parsed = parse_telegram_url(name)
+
+        if isinstance(parsed, ParsedTelegramGroup):
+            raise TelegramInvalidTargetError
+
+        if isinstance(parsed, ParsedTelegramChannel) or isinstance(
+            parsed, ParsedTelegramMessage
+        ):
+            name = parsed.name
+
+        url = convert_telegram_url_to_public(forge_telegram_channel_url(name))
 
         html = self.request_page(url)
 
-        infos = scrape_channel_infos(html)
-
-        return infos
+        return scrape_channel_infos(html)
 
     def channel_messages(self, name):
-        url = forge_telegram_channel_url(name)
+        parsed = parse_telegram_url(name)
+
+        if isinstance(parsed, ParsedTelegramGroup):
+            raise TelegramInvalidTargetError
+
+        if isinstance(parsed, ParsedTelegramChannel) or isinstance(
+            parsed, ParsedTelegramMessage
+        ):
+            name = parsed.name
+
+        url = convert_telegram_url_to_public(forge_telegram_channel_url(name))
 
         def generator():
             current_url = url

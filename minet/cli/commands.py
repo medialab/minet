@@ -1758,16 +1758,16 @@ MINET_COMMANDS = {
                         examples:
 
                         . Scraping a channel's infos:
-                            $ minet telegram channel-infos jesstern > infos.csv
+                            $ minet telegram channel-infos nytimes > infos.csv
                     """,
                     "arguments": [
                         {
                             "name": "column",
-                            "help": "Column of the CSV file containing channel name or a single channel name.",
+                            "help": "Column of the CSV file containing channel names / urls or a single channel name / url.",
                         },
                         {
                             "name": "file",
-                            "help": "CSV file containing the channel names.",
+                            "help": "CSV file containing the channel names / urls.",
                             "action": InputFileAction,
                             "dummy_csv_column": "channel_name",
                         },
@@ -1794,16 +1794,16 @@ MINET_COMMANDS = {
                         examples:
 
                         . Scraping a group's posts:
-                            $ minet telegram channel-messages jesstern > messages.csv
+                            $ minet telegram channel-messages nytimes > messages.csv
                     """,
                     "arguments": [
                         {
                             "name": "column",
-                            "help": "Column of the CSV file containing channel name or a single channel name.",
+                            "help": "Column of the CSV file containing channel names / urls or a single channel name / url.",
                         },
                         {
                             "name": "file",
-                            "help": "CSV file containing the channel name.",
+                            "help": "CSV file containing the channel names / urls.",
                             "action": InputFileAction,
                             "dummy_csv_column": "channel_name",
                         },

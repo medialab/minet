@@ -1620,8 +1620,8 @@ Minet Telegram Channel-Infos Command
 Scrape a Telegram channel's infos.
 
 positional arguments:
-  column                      Column of the CSV file containing channel name or a single channel name.
-  file                        CSV file containing the channel names.
+  column                      Column of the CSV file containing channel names / urls or a single channel name / url.
+  file                        CSV file containing the channel names / urls.
 
 optional arguments:
   -h, --help                  show this help message and exit
@@ -1633,7 +1633,7 @@ optional arguments:
 examples:
 
 . Scraping a channel's infos:
-    $ minet telegram channel-infos jesstern > infos.csv
+    $ minet telegram channel-infos nytimes > infos.csv
 
 ```
 
@@ -1650,8 +1650,8 @@ Minet Telegram Channel-Messages Command
 Scrape Telegram channel messages.
 
 positional arguments:
-  column                      Column of the CSV file containing channel name or a single channel name.
-  file                        CSV file containing the channel name.
+  column                      Column of the CSV file containing channel names / urls or a single channel name / url.
+  file                        CSV file containing the channel names / urls.
 
 optional arguments:
   -h, --help                  show this help message and exit
@@ -1663,7 +1663,7 @@ optional arguments:
 examples:
 
 . Scraping a group's posts:
-    $ minet telegram channel-messages jesstern > messages.csv
+    $ minet telegram channel-messages nytimes > messages.csv
 
 ```
 

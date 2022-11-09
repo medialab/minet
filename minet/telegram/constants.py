@@ -21,6 +21,7 @@ TELEGRAM_INFOS_CSV_HEADERS = [
 ]
 TELEGRAM_MESSAGES_CSV_HEADERS = [
     "link_to_message",
+    "could_be_displayed",
     "user",
     "user_link",
     "user_img",
@@ -34,8 +35,8 @@ TELEGRAM_MESSAGES_CSV_HEADERS = [
     "nb_photos",
     "photos",
     "nb_videos",
-    "video",
-    "video_time",
+    "videos",
+    "videos_times",
     "nb_links",
     "links",
     "link_img",
