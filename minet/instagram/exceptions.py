@@ -34,3 +34,27 @@ class InstagramTooManyRequestsError(InstagramError):
 
 class InstagramError500(InstagramError):
     pass
+
+
+class InstagramInvalidTargetError(InstagramError):
+    pass
+
+
+class InstagramNoPublicationError(InstagramError):
+    pass
+
+
+class InstagramPrivateOrNonExistentAccountError(InstagramError):
+    pass
+
+
+class InstagramHashtagNeverUsedError(InstagramError):
+    pass
+
+
+class InstagramPrivateAccountError(InstagramError):
+    pass
+
+
+class InstagramAccountNoFollowError(InstagramError):
+    pass
