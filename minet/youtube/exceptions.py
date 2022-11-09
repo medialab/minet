@@ -42,3 +42,11 @@ class YouTubeDisabledCommentsError(YouTubeError):
 
 class YouTubeVideoNotFoundError(YouTubeError):
     pass
+
+
+class YouTubeExclusiveMemberError(YouTubeError):
+    pass
+
+
+class YouTubeUnknown403Error(YouTubeError):
+    pass

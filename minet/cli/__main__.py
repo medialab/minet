@@ -246,6 +246,7 @@ if __name__ == "__main__":
 
     # Casanova global defaults
     casanova.set_default_prebuffer_bytes(DEFAULT_PREBUFFER_BYTES)
+    casanova.set_default_ignore_null_bytes(True)
 
     try:
         main()

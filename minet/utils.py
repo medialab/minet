@@ -286,42 +286,6 @@ def sleep_with_entropy(seconds, max_random_addendum):
     time.sleep(seconds + random_addendum)
 
 
-INTERVALS = [
-    ("weeks", 60 * 60 * 24 * 7),  # 60 * 60 * 24 * 7
-    ("days", 60 * 60 * 24),  # 60 * 60 * 24
-    ("hours", 60 * 60),  # 60 * 60
-    ("minutes", 60),
-    ("seconds", 1),
-]
-
-
-def prettyprint_integer(n):
-    return "{:,}".format(int(n))
-
-
-def prettyprint_seconds(seconds, granularity=None):
-    result = []
-
-    for name, count in INTERVALS:
-        value = seconds // count
-
-        if value:
-            seconds -= value * count
-
-            if value == 1:
-                name = name.rstrip("s")
-
-            result.append("%i %s" % (value, name))
-
-    if not result:
-        return "%.2f seconds" % seconds
-
-    if granularity is not None:
-        result = result[:granularity]
-
-    return ", ".join(result)
-
-
 def parse_date(formatted_date, lang="en"):
     if not isinstance(formatted_date, str):
         raise TypeError
@@ -351,6 +315,30 @@ def is_binary_mimetype(m: str) -> bool:
         or "yml" in second_part
         or second_part == "x-httpd-php"
     )
+
+
+NUMBER_RE = re.compile(r"\d+[\.,]?\d*[KM]?")
+
+
+def clean_human_readable_numbers(text):
+
+    match = NUMBER_RE.search(text)
+
+    if match is None:
+        return text
+
+    approx_likes = match.group(0)
+
+    if "K" in approx_likes:
+        approx_likes = str(int(float(approx_likes[:-1]) * 10**3))
+
+    elif "M" in approx_likes:
+        approx_likes = str(int(float(approx_likes[:-1]) * 10**6))
+
+    approx_likes = approx_likes.replace(",", "")
+    approx_likes = approx_likes.replace(".", "")
+
+    return approx_likes
 
 
 def timestamp_to_isoformat(timestamp):

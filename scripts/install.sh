@@ -56,9 +56,11 @@ fail_install() {
   exit 1
 }
 
-fail_download() {
+fail_gh_api() {
   echo
-  echo "The zipped file was not able to be downladed. This might be because the rate limit of GitHub's API was reached. Please wait a few moments and launch the command again."
+  echo "Could not reach GitHub API to find minet's latest version."
+  echo "This might be because the rate limit of GitHub's API was reached."
+  echo "Please wait a few moments and launch the command again."
   echo
   exit 1
 }
@@ -80,8 +82,10 @@ else
 
     if [[ $ubuntu_version -le "18" ]]; then
       os="ubuntu_18"
-    else
+    elif [[ $ubuntu_version -le "20" ]]; then
       os="ubuntu_20"
+    else
+      os="ubuntu_22"
     fi
   else
     fail_install
@@ -93,7 +97,7 @@ latest=$(get_latest_release medialab/minet)
 
 # Verify that the GitHub API returned the latest released version
 if [ -z "$latest" ]; then
-  fail_download
+  fail_gh_api
 fi
 
 # Generic install script

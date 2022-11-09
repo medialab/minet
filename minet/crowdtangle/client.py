@@ -20,6 +20,7 @@ from minet.crowdtangle.exceptions import (
     CrowdTangleRateLimitExceeded,
     CrowdTangleInvalidRequestError,
     CrowdTangleServerError,
+    CrowdTanglePostNotFound,
 )
 from minet.crowdtangle.leaderboard import crowdtangle_leaderboard
 from minet.crowdtangle.lists import crowdtangle_lists
@@ -85,11 +86,14 @@ class CrowdTangleAPIClient(object):
             )
 
         try:
-            data = json.loads(response.data)["result"]
-        except (json.decoder.JSONDecodeError, TypeError, KeyError):
+            data = json.loads(response.data)
+        except (json.decoder.JSONDecodeError, TypeError):
             raise CrowdTangleInvalidJSONError
 
-        return data
+        try:
+            return data["result"]
+        except KeyError:
+            raise CrowdTanglePostNotFound(data=data, url=url)
 
     @rate_limited_method("rate_limiter_state")
     def request(self, url):

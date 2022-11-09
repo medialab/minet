@@ -58,3 +58,10 @@ class CrowdTangleInvalidJSONError(CrowdTangleError):
 
 class CrowdTangleRateLimitExceeded(CrowdTangleError):
     pass
+
+
+class CrowdTanglePostNotFound(CrowdTangleError):
+    def __init__(self, message=None, data=None, url=None):
+        super().__init__(message)
+        self.data = data
+        self.url = url

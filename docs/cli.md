@@ -36,6 +36,7 @@
   * [summary](#summary)
 * [facebook (fb)](#facebook)
   * [comments](#facebook-comments)
+  * [post](#facebook-post)
   * [posts](#facebook-posts)
   * [post-authors](#facebook-post-authors)
   * [url-likes](#facebook-url-likes)
@@ -61,8 +62,11 @@
   * [attrition](#attrition)
   * [followers](#followers)
   * [friends](#friends)
+  * [list-followers](#list-followers)
+  * [list-members](#list-members)
   * [retweeters](#retweeters)
   * [scrape](#twitter-scrape)
+  * [tweet-date](#tweet-date)
   * [tweet-search](#tweet-search)
   * [tweet-count](#tweet-count)
   * [tweets](#tweets)
@@ -1090,7 +1094,8 @@ examples:
 
 ```
 usage: minet facebook [-h] [--rcfile RCFILE]
-                      {comments,posts,post-authors,post-stats,url-likes} ...
+                      {comments,post,posts,post-authors,post-stats,url-likes}
+                      ...
 
 Minet Facebook Command
 ======================
@@ -1102,7 +1107,7 @@ optional arguments:
   --rcfile RCFILE                                 Custom path to a minet configuration file.
 
 actions:
-  {comments,posts,post-authors,post-stats,url-likes}
+  {comments,post,posts,post-authors,post-stats,url-likes}
                                                   Action to perform to collect data on Facebook
 
 ```
@@ -1149,6 +1154,72 @@ examples:
 
 . Scraping comments from multiple posts listed in a CSV file:
     $ minet fb comments post_url posts.csv > comments.csv
+
+```
+
+<h3 id="facebook-post">post</h3>
+
+```
+usage: minet facebook post [-h] [--rcfile RCFILE] [-c COOKIE] [-o OUTPUT]
+                           [-s SELECT] [--throttle THROTTLE]
+                           column [file]
+
+Minet Facebook Post Command
+===========================
+
+Scrape Facebook post.
+
+This requires to be logged in to a Facebook account, so
+by default this command will attempt to grab the relevant
+authentication cookies from a local Firefox browser.
+
+If you want to grab cookies from another browser or want
+to directly pass the cookie as a string, check out the
+-c/--cookie flag.
+
+You must set your account language to English (US) for the
+command to work.
+
+Note that, by default, Facebook will translate post text
+when they are not written in a language whitelisted here:
+https://www.facebook.com/settings/?tab=language
+
+In this case, minet will output both the original text and
+the translated one. But be aware that original text may be
+truncated, so you might want to edit your Facebook settings
+using the url above to make sure text won't be translated
+for posts you are interested in.
+
+Of course, the CLI will warn you when translated text is
+found so you can choose to edit your settings early as
+as possible.
+
+Finally, some post text is always truncated on Facebook
+when displayed in lists. This text is not yet entirely
+scraped by minet at this time.
+
+positional arguments:
+  column                      Column of the CSV file containing post urls or a single post url.
+  file                        CSV file containing the post urls.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "facebook.cookie" or read from the MINET_FACEBOOK_COOKIE env variable.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
+
+examples:
+
+. Scraping a post:
+    $ minet fb post https://m.facebook.com/watch/?v=448540820705115 > post.csv
+
+. Grabbing cookies from chrome:
+    $ minet fb posts -c chrome https://m.facebook.com/watch/?v=448540820705115 > post.csv
+
+. Scraping post from multiple urls listed in a CSV file:
+    $ minet fb post url urls.csv > post.csv
 
 ```
 
@@ -1948,6 +2019,80 @@ examples:
 
 ```
 
+### list-followers
+
+```
+usage: minet twitter list-followers [-h] [--rcfile RCFILE] [--api-key API_KEY]
+                                    [--api-secret-key API_SECRET_KEY]
+                                    [--access-token ACCESS_TOKEN]
+                                    [--access-token-secret ACCESS_TOKEN_SECRET]
+                                    [-o OUTPUT] [-s SELECT] [--total TOTAL]
+                                    column [file]
+
+Minet Twitter List Followers Command
+====================================
+
+Retrieve followers of given list using Twitter API v2.
+
+positional arguments:
+  column                                     Name of the column containing the Twitter list id.
+  file                                       CSV file containing the inquired Twitter lists.
+
+optional arguments:
+  -h, --help                                 show this help message and exit
+  --rcfile RCFILE                            Custom path to a minet configuration file.
+  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
+  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
+  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
+  --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Getting followers of a list of lists:
+    $ minet tw list-followers id lists.csv > followers.csv
+
+```
+
+### list-members
+
+```
+usage: minet twitter list-members [-h] [--rcfile RCFILE] [--api-key API_KEY]
+                                  [--api-secret-key API_SECRET_KEY]
+                                  [--access-token ACCESS_TOKEN]
+                                  [--access-token-secret ACCESS_TOKEN_SECRET]
+                                  [-o OUTPUT] [-s SELECT] [--total TOTAL]
+                                  column [file]
+
+Minet Twitter List Members Command
+==================================
+
+Retrieve members of given list using Twitter API v2.
+
+positional arguments:
+  column                                     Name of the column containing the Twitter list id.
+  file                                       CSV file containing the inquired Twitter lists.
+
+optional arguments:
+  -h, --help                                 show this help message and exit
+  --rcfile RCFILE                            Custom path to a minet configuration file.
+  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
+  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
+  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
+  --total TOTAL                              Total number of accounts. Necessary if you want to display a finite progress indicator.
+
+examples:
+
+. Getting members of a list of lists:
+    $ minet tw list-members id lists.csv > members.csv
+
+```
+
 ### retweeters
 
 ```
@@ -2045,6 +2190,35 @@ examples:
 
 ```
 
+### tweet-date
+
+```
+usage: minet twitter tweet-date [-h] [--rcfile RCFILE] [-o OUTPUT] [-s SELECT]
+                                [--timezone TIMEZONE]
+                                column [file]
+
+Minet Twitter Tweet-date Command
+================================
+
+Getting timestamp and date from tweet url or id.
+
+positional arguments:
+  column                      Name of the column containing the tweet url or id.
+  file                        CSV file containing the tweet url or id. Default to url.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  --timezone TIMEZONE         Timezone for the date, for example 'Europe/Paris'. Default to UTC.
+
+examples:
+
+    $ minet tw tweet-date url tweets.csv --timezone 'Europe/Paris'> tweets_timestamp_date.csv
+
+```
+
 ### tweet-search
 
 ```
@@ -2116,8 +2290,9 @@ usage: minet twitter tweet-count [-h] [--rcfile RCFILE] [--api-key API_KEY]
 Minet Twitter Tweets Count Command
 ==================================
 
-Count the number of tweets matching the given query using Twitter
-latest API v2.
+Count the number of tweets matching the given query using Twitter's
+latest API v2. The count's granularity can be at the level of tweets 
+per day, per hour, or per minute.
 
 This will only return result for the last 8 days only, unless
 you have Academic Research access in which case you
@@ -2157,7 +2332,7 @@ examples:
     $ minet tw tweet-count query queries.csv > counts.csv
 
 . Number of tweets matching the query per day:
-    $ minet tw tweet-count "query" --granularity days > counts.csv
+    $ minet tw tweet-count "query" --granularity day > counts.csv
 
 ```
 
@@ -2390,7 +2565,7 @@ optional arguments:
   -h, --help                  show this help message and exit
   --rcfile RCFILE             Custom path to a minet configuration file.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  -k KEY, --key KEY           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
+  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used more than once. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
 
 example:
@@ -2426,7 +2601,7 @@ optional arguments:
   -h, --help                  show this help message and exit
   --rcfile RCFILE             Custom path to a minet configuration file.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  -k KEY, --key KEY           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
+  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used more than once. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
 
 example:
@@ -2457,7 +2632,7 @@ optional arguments:
   -h, --help                                      show this help message and exit
   --rcfile RCFILE                                 Custom path to a minet configuration file.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
-  -k KEY, --key KEY                               YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
+  -k KEY, --key KEY                               YouTube API Data dashboard API key. Can be used more than once. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   -l LIMIT, --limit LIMIT                         Maximum number of videos to retrieve per query.
   --order {date,rating,relevance,title,videoCount,viewCount}
@@ -2490,7 +2665,7 @@ optional arguments:
   -h, --help                  show this help message and exit
   --rcfile RCFILE             Custom path to a minet configuration file.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  -k KEY, --key KEY           YouTube API Data dashboard API key. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
+  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used more than once. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of videos. Necessary if you want to display a finite progress indicator.
 

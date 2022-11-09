@@ -36,6 +36,7 @@
   * [summary](#summary)
 * [facebook (fb)](#facebook)
   * [comments](#facebook-comments)
+  * [post](#facebook-post)
   * [posts](#facebook-posts)
   * [post-authors](#facebook-post-authors)
   * [url-likes](#facebook-url-likes)
@@ -61,8 +62,11 @@
   * [attrition](#attrition)
   * [followers](#followers)
   * [friends](#friends)
+  * [list-followers](#list-followers)
+  * [list-members](#list-members)
   * [retweeters](#retweeters)
   * [scrape](#twitter-scrape)
+  * [tweet-date](#tweet-date)
   * [tweet-search](#tweet-search)
   * [tweet-count](#tweet-count)
   * [tweets](#tweets)
@@ -235,6 +239,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% fb/comments %>
 
+<h3 id="facebook-post">post</h3>
+
+<% fb/post %>
+
 <h3 id="facebook-posts">posts</h3>
 
 <% fb/posts %>
@@ -327,6 +335,14 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% twitter/friends %>
 
+### list-followers
+
+<% twitter/list-followers %>
+
+### list-members
+
+<% twitter/list-members %>
+
 ### retweeters
 
 <% twitter/retweeters %>
@@ -334,6 +350,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 <h3 id="twitter-scrape">scrape</h3>
 
 <% twitter/scrape %>
+
+### tweet-date
+
+<% twitter/tweet-date %>
 
 ### tweet-search
 

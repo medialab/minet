@@ -41,8 +41,9 @@ Minet can single-handedly:
   * *[Mediacloud](https://mediacloud.org/)* (requires free API access)
   * *[Twitter](https://twitter.com)* (requires free API access)
   * *[Youtube](https://www.youtube.com/)* (requires free API access)
-* Scrape (without requiring special access):
+* Scrape (without requiring special access, often just a user account):
   * *[Facebook](https://www.facebook.com/)*
+  * *[Instagram](https://www.instagram.com/)*
   * *[Twitter](https://twitter.com)*
   * *[Google Drive](https://drive.google.com)* (spreadsheets etc.)
 * Grab & dump cookies from your browser
@@ -134,4 +135,4 @@ To contribute to **minet** you can check out [this](./CONTRIBUTING.md) documenta
 
 You can cite it thusly:
 
-> Guillaume Plique, Pauline Breteau, Jules Farjas, Héloïse Théro, Jean Descamps, & Amélie Pellé. (2019, October 14). Minet, a webmining CLI tool & library for python. Zenodo. http://doi.org/10.5281/zenodo.4564399
+> Guillaume Plique, Pauline Breteau, Jules Farjas, Héloïse Théro, Jean Descamps, Amélie Pellé, & Laura Miguel. (2019, October 14). Minet, a webmining CLI tool & library for python. Zenodo. http://doi.org/10.5281/zenodo.4564399

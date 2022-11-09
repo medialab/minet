@@ -9,6 +9,12 @@ import casanova
 from minet.cli.utils import LoadingBar
 from minet.youtube import YouTubeAPIClient
 from minet.youtube.constants import YOUTUBE_COMMENT_CSV_HEADERS
+from minet.youtube.exceptions import (
+    YouTubeDisabledCommentsError,
+    YouTubeVideoNotFoundError,
+    YouTubeExclusiveMemberError,
+    YouTubeUnknown403Error,
+)
 
 
 def comments_action(cli_args):
@@ -33,8 +39,21 @@ def comments_action(cli_args):
     for row, video in enricher.cells(cli_args.column, with_rows=True):
         generator = client.comments(video)
 
-        for comment in generator:
-            loading_bar.update()
-            enricher.writerow(row, comment.as_csv_row())
+        try:
+            for comment in generator:
+                loading_bar.update()
+                enricher.writerow(row, comment.as_csv_row())
 
-        loading_bar.inc("videos")
+            loading_bar.inc("videos")
+        except YouTubeDisabledCommentsError:
+            loading_bar.print(
+                "\nYouTube disabled the comments for this video: %s" % video
+            )
+        except YouTubeVideoNotFoundError:
+            loading_bar.print("\nThis YouTube video can't be found: %s" % video)
+        except YouTubeExclusiveMemberError:
+            loading_bar.print(
+                "\nThis video is reserved for exclusive members: %s" % video
+            )
+        except YouTubeUnknown403Error:
+            loading_bar.print("\nAn unknown 403 error has occured: %s" % video)

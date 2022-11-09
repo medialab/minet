@@ -10,6 +10,7 @@ from ebbe import getpath
 from minet.youtube.constants import (
     YOUTUBE_VIDEO_CSV_HEADERS,
     YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS,
+    YOUTUBE_PLAYLIST_VIDEO_SNIPPET_CSV_HEADERS,
     YOUTUBE_COMMENT_CSV_HEADERS,
 )
 
@@ -19,6 +20,10 @@ YouTubeVideo = namedrecord(
 
 YouTubeVideoSnippet = namedrecord(
     "YouTubeVideoSnippet", YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS
+)
+
+YouTubePlaylistVideoSnippet = namedrecord(
+    "YouTubePlaylistVideoSnippet", YOUTUBE_PLAYLIST_VIDEO_SNIPPET_CSV_HEADERS
 )
 
 YouTubeComment = namedrecord("YoutubeComment", YOUTUBE_COMMENT_CSV_HEADERS)
@@ -114,13 +119,14 @@ def format_reply(item, video_id=None):
 def format_playlist_item_snippet(item):
     snippet = item["snippet"]
 
-    row = YouTubeVideoSnippet(
+    row = YouTubePlaylistVideoSnippet(
         snippet["resourceId"]["videoId"],
         snippet["publishedAt"],
         snippet["channelId"],
         snippet["title"],
         snippet["description"],
         snippet["channelTitle"],
+        snippet["position"],
     )
 
     return row

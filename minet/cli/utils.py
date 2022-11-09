@@ -13,14 +13,14 @@ from glob import iglob
 from os.path import join, expanduser, isfile, relpath
 from collections import namedtuple
 from tqdm import tqdm
-from ebbe import noop
+from ebbe import noop, format_seconds
 
 from minet.web import (
     register_global_request_retryer_before_sleep,
     reset_global_request_retryer_before_sleep,
 )
 from minet.cli.exceptions import MissingColumnError
-from minet.utils import fuzzy_int, prettyprint_seconds
+from minet.utils import fuzzy_int
 
 
 def get_stdin_status():
@@ -67,7 +67,7 @@ def safe_index(l, e):
 def register_retryer_logger(print_fn=print_err):
     def callback(retry_state):
         exc = retry_state.outcome.exception()
-        pretty_time = prettyprint_seconds(retry_state.idle_for, granularity=2)
+        pretty_time = format_seconds(retry_state.idle_for, max_items=2)
 
         exc_name = "%s.%s" % (exc.__class__.__module__, exc.__class__.__name__)
 

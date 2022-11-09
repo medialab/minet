@@ -22,6 +22,7 @@ from minet.cli.argparse import (
     OutputFileAction,
     SplitterType,
     TimestampType,
+    TimezoneType,
 )
 
 from minet.constants import COOKIE_BROWSERS
@@ -851,6 +852,84 @@ MINET_COMMANDS = {
                             "help": "CSV file containing the post urls.",
                             "action": InputFileAction,
                             "dummy_csv_column": "post_url",
+                        },
+                        {
+                            "flags": ["-c", "--cookie"],
+                            "help": 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".',
+                            "default": "firefox",
+                            "rc_key": ["facebook", "cookie"],
+                            "action": ConfigAction,
+                        },
+                        {"flags": ["-o", "--output"], "action": OutputFileAction},
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flag": "--throttle",
+                            "help": "Throttling time, in seconds, to wait between each request.",
+                            "type": float,
+                            "default": FACEBOOK_MOBILE_DEFAULT_THROTTLE,
+                        },
+                    ],
+                },
+                "post": {
+                    "title": "Minet Facebook Post Command",
+                    "description": """
+                        Scrape Facebook post.
+
+                        This requires to be logged in to a Facebook account, so
+                        by default this command will attempt to grab the relevant
+                        authentication cookies from a local Firefox browser.
+
+                        If you want to grab cookies from another browser or want
+                        to directly pass the cookie as a string, check out the
+                        -c/--cookie flag.
+
+                        You must set your account language to English (US) for the
+                        command to work.
+
+                        Note that, by default, Facebook will translate post text
+                        when they are not written in a language whitelisted here:
+                        https://www.facebook.com/settings/?tab=language
+
+                        In this case, minet will output both the original text and
+                        the translated one. But be aware that original text may be
+                        truncated, so you might want to edit your Facebook settings
+                        using the url above to make sure text won't be translated
+                        for posts you are interested in.
+
+                        Of course, the CLI will warn you when translated text is
+                        found so you can choose to edit your settings early as
+                        as possible.
+
+                        Finally, some post text is always truncated on Facebook
+                        when displayed in lists. This text is not yet entirely
+                        scraped by minet at this time.
+                    """,
+                    "epilog": """
+                        examples:
+
+                        . Scraping a post:
+                            $ minet fb post https://m.facebook.com/watch/?v=448540820705115 > post.csv
+
+                        . Grabbing cookies from chrome:
+                            $ minet fb posts -c chrome https://m.facebook.com/watch/?v=448540820705115 > post.csv
+
+                        . Scraping post from multiple urls listed in a CSV file:
+                            $ minet fb post url urls.csv > post.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "Column of the CSV file containing post urls or a single post url.",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the post urls.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "url",
                         },
                         {
                             "flags": ["-c", "--cookie"],
@@ -2085,6 +2164,84 @@ MINET_COMMANDS = {
                         },
                     ],
                 },
+                "list-followers": {
+                    "title": "Minet Twitter List Followers Command",
+                    "description": """
+                        Retrieve followers of given list using Twitter API v2.
+                    """,
+                    "epilog": """
+                        examples:
+
+                        . Getting followers of a list of lists:
+                            $ minet tw list-followers id lists.csv > followers.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "Name of the column containing the Twitter list id.",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the inquired Twitter lists.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "list",
+                        },
+                        *TWITTER_API_COMMON_ARGUMENTS,
+                        {
+                            "flags": ["-o", "--output"],
+                            "action": OutputFileAction,
+                        },
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flag": "--total",
+                            "help": "Total number of accounts. Necessary if you want to display a finite progress indicator.",
+                            "type": int,
+                        },
+                    ],
+                },
+                "list-members": {
+                    "title": "Minet Twitter List Members Command",
+                    "description": """
+                        Retrieve members of given list using Twitter API v2.
+                    """,
+                    "epilog": """
+                        examples:
+
+                        . Getting members of a list of lists:
+                            $ minet tw list-members id lists.csv > members.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "Name of the column containing the Twitter list id.",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the inquired Twitter lists.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "list",
+                        },
+                        *TWITTER_API_COMMON_ARGUMENTS,
+                        {
+                            "flags": ["-o", "--output"],
+                            "action": OutputFileAction,
+                        },
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flag": "--total",
+                            "help": "Total number of accounts. Necessary if you want to display a finite progress indicator.",
+                            "type": int,
+                        },
+                    ],
+                },
                 "retweeters": {
                     "title": "Minet Twitter Retweeters Command",
                     "description": """
@@ -2197,6 +2354,43 @@ MINET_COMMANDS = {
                             "flags": ["-s", "--select"],
                             "help": "Columns of input CSV file to include in the output (separated by `,`).",
                             "type": SplitterType(),
+                        },
+                    ],
+                },
+                "tweet-date": {
+                    "title": "Minet Twitter Tweet-date Command",
+                    "description": """
+                        Getting timestamp and date from tweet url or id.
+                    """,
+                    "epilog": """
+                        examples:
+
+                            $ minet tw tweet-date url tweets.csv --timezone 'Europe/Paris'> tweets_timestamp_date.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "Name of the column containing the tweet url or id.",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the tweet url or id. Default to url.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "url",
+                        },
+                        {
+                            "flags": ["-o", "--output"],
+                            "action": OutputFileAction,
+                        },
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flag": "--timezone",
+                            "help": "Timezone for the date, for example 'Europe/Paris'. Default to UTC.",
+                            "type": TimezoneType(),
                         },
                     ],
                 },
@@ -2533,8 +2727,9 @@ MINET_COMMANDS = {
                 "tweet-count": {
                     "title": "Minet Twitter Tweets Count Command",
                     "description": """
-                        Count the number of tweets matching the given query using Twitter
-                        latest API v2.
+                        Count the number of tweets matching the given query using Twitter's
+                        latest API v2. The count's granularity can be at the level of tweets 
+                        per day, per hour, or per minute.
 
                         This will only return result for the last 8 days only, unless
                         you have Academic Research access in which case you
@@ -2554,7 +2749,7 @@ MINET_COMMANDS = {
                             $ minet tw tweet-count query queries.csv > counts.csv
 
                         . Number of tweets matching the query per day:
-                            $ minet tw tweet-count "query" --granularity days > counts.csv
+                            $ minet tw tweet-count "query" --granularity day > counts.csv
                     """,
                     "arguments": [
                         {
@@ -2959,9 +3154,10 @@ MINET_COMMANDS = {
                         },
                         {
                             "flags": ["-k", "--key"],
-                            "help": "YouTube API Data dashboard API key.",
+                            "help": "YouTube API Data dashboard API key. Can be used more than once.",
                             "rc_key": ["youtube", "key"],
                             "action": ConfigAction,
+                            "plural": True,
                         },
                         {
                             "flags": ["-s", "--select"],
@@ -2992,9 +3188,10 @@ MINET_COMMANDS = {
                         },
                         {
                             "flags": ["-k", "--key"],
-                            "help": "YouTube API Data dashboard API key.",
+                            "help": "YouTube API Data dashboard API key. Can be used more than once.",
                             "rc_key": ["youtube", "key"],
                             "action": ConfigAction,
+                            "plural": True,
                         },
                         {
                             "flags": ["-s", "--select"],
@@ -3025,9 +3222,10 @@ MINET_COMMANDS = {
                         },
                         {
                             "flags": ["-k", "--key"],
-                            "help": "YouTube API Data dashboard API key.",
+                            "help": "YouTube API Data dashboard API key. Can be used more than once.",
                             "rc_key": ["youtube", "key"],
                             "action": ConfigAction,
+                            "plural": True,
                         },
                         {
                             "flags": ["-s", "--select"],
@@ -3063,9 +3261,10 @@ MINET_COMMANDS = {
                         },
                         {
                             "flags": ["-k", "--key"],
-                            "help": "YouTube API Data dashboard API key.",
+                            "help": "YouTube API Data dashboard API key. Can be used more than once.",
                             "rc_key": ["youtube", "key"],
                             "action": ConfigAction,
+                            "plural": True,
                         },
                         {
                             "flags": ["-s", "--select"],

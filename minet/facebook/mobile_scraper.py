@@ -18,16 +18,31 @@ from ural.facebook import (
     FacebookGroup as ParsedFacebookGroup,
     FacebookHandle as ParsedFacebookHandle,
     FacebookUser as ParsedFacebookUser,
+    FacebookPost as ParsedFacebookPost,
+    FacebookVideo as ParsedFacebookVideo,
+    FacebookPhoto as ParsedFacebookPhoto,
 )
 
-from minet.utils import rate_limited_method, RateLimiterState, parse_date
+from minet.utils import (
+    rate_limited_method,
+    RateLimiterState,
+    parse_date,
+    clean_human_readable_numbers,
+)
 from minet.web import create_pool, request, create_request_retryer, retrying_method
 from minet.scrape.std import get_display_text
 from minet.facebook.utils import grab_facebook_cookie
-from minet.facebook.formatters import FacebookComment, FacebookPost, FacebookUser
+from minet.facebook.formatters import (
+    FacebookComment,
+    FacebookPost,
+    FacebookUser,
+    FacebookPostWithReaction,
+)
 from minet.facebook.exceptions import (
     FacebookInvalidCookieError,
     FacebookInvalidTargetError,
+    FacebookNotPostError,
+    FacebookWatchError,
 )
 from minet.facebook.constants import (
     FACEBOOK_MOBILE_DEFAULT_THROTTLE,
@@ -305,6 +320,304 @@ def scrape_posts(html):
     return next_link, posts
 
 
+def scrape_video(soup):
+
+    video_url_html = soup.select_one("meta[property='og:video:url']")
+
+    if not video_url_html:
+
+        title = soup.head.select_one("title").get_text().lower()
+
+        if title == "facebook watch":
+            raise FacebookWatchError
+
+        raise FacebookInvalidTargetError
+
+    video_url = video_url_html.get("content")
+
+    user_label = None
+    user = None
+    user_link = soup.select_one("h3 a")
+
+    if user_link:
+        user_label, user = extract_user_information_from_link(user_link)
+
+    formatted_date = soup.select_one("abbr").get_text().strip()
+    parsed_date = parse_date(formatted_date)
+
+    reactions_item = soup.select_one('[id^="like_"]')
+    reactions = "0"
+
+    if reactions_item:
+        reactions_text = reactions_item.get_text()
+
+        if reactions_text.count("·") > 1:
+            reactions = clean_human_readable_numbers(
+                reactions_text.split("·", 1)[0].strip()
+            )
+
+    comments_item = soupsieve.select_one('a:-soup-contains(" Comment")', soup)
+    comments = "0"
+
+    if comments_item:
+        comments = comments_item.get_text().split("Comment", 1)[0].strip()
+
+    text_root = soup.select_one('[data-ft=\'{"tn":"*s"}\']')
+    additional_html_roots = []
+
+    img_root = soup.select_one('[data-ft=\'{"tn":"H"}\']')
+
+    if img_root:
+        additional_html_roots.append(img_root)
+
+    all_text_elements = text_root.find_all("div", recursive=False)
+
+    text_elements = []
+    translated_text_elements = []
+    translation_link = None
+
+    for text_el in all_text_elements:
+        translation_link = text_el.select_one(
+            'a[href^="/basic/translation_preferences/"]'
+        )
+        if translation_link is None:
+            text_elements.append(text_el)
+        else:
+            translation_link.extract()
+            translated_text_elements.append(text_el)
+
+    html_elements = text_elements + additional_html_roots
+
+    comment_text = get_display_text(text_elements)
+    comment_html = "".join(str(el) for el in html_elements)
+
+    translated_comment_text = get_display_text(translated_text_elements)
+    translated_comment_html = "".join(str(el) for el in translated_text_elements)
+    translated_from = (
+        translation_link.get_text().rsplit("from ", 1)[-1].strip()
+        if translation_link
+        else None
+    )
+
+    post = FacebookPostWithReaction(
+        url=video_url,
+        user_id=getattr(user, "id", ""),
+        user_handle=getattr(user, "handle", ""),
+        user_url=getattr(user, "url", ""),
+        user_label=user_label,
+        text=comment_text,
+        html=comment_html,
+        translated_text=translated_comment_text,
+        translated_html=translated_comment_html,
+        translated_from=translated_from,
+        formatted_date=formatted_date,
+        date=parsed_date,
+        reactions=reactions,
+        comments=comments,
+        reactions_types=None,
+    )
+    return post
+
+
+def scrape_photo(soup):
+
+    photo_url_html = soup.select_one("meta[property='og:url']")
+
+    if not photo_url_html:
+
+        raise FacebookInvalidTargetError
+
+    photo_url = photo_url_html.get("content")
+
+    user_label = None
+    user = None
+    user_link = soup.select_one("a[class='actor-link']")
+
+    if user_link:
+        user_label, user = extract_user_information_from_link(user_link)
+
+    formatted_date = soup.select_one("abbr").get_text().strip()
+    parsed_date = parse_date(formatted_date)
+
+    reactions_item = soup.select_one("a[href^='/ufi/reaction/profile/browser']")
+
+    if reactions_item:
+        reactions = clean_human_readable_numbers(reactions_item.get_text())
+        reactions_types = []
+
+        for reaction in reactions_item.find("div").select("img"):
+            reactions_types.append(reaction["alt"])
+        reactions_types = "|".join(reactions_types)
+
+    comments = None
+
+    text_root = soup.select_one(".msg")
+
+    additional_html_roots = []
+
+    img_root = soup.select_one("img[class='img']").get("src")
+
+    if img_root:
+        additional_html_roots.append(img_root)
+
+    all_text_elements = (
+        text_root.find_all("div", recursive=False) if text_root else None
+    )
+
+    text_elements = []
+    translated_text_elements = []
+    translation_link = None
+
+    if all_text_elements:
+        for text_el in all_text_elements:
+            translation_link = text_el.select_one(
+                'a[href^="/basic/translation_preferences/"]'
+            )
+            if translation_link is None:
+                text_elements.append(text_el)
+            else:
+                translation_link.extract()
+                translated_text_elements.append(text_el)
+
+    html_elements = text_elements + additional_html_roots
+
+    comment_text = get_display_text(text_elements) if text_elements else None
+    comment_html = "".join(str(el) for el in html_elements)
+
+    translated_comment_text = get_display_text(translated_text_elements)
+    translated_comment_html = "".join(str(el) for el in translated_text_elements)
+    translated_from = (
+        translation_link.get_text().rsplit("from ", 1)[-1].strip()
+        if translation_link
+        else None
+    )
+
+    post = FacebookPostWithReaction(
+        url=photo_url,
+        user_id=getattr(user, "id", ""),
+        user_handle=getattr(user, "handle", ""),
+        user_url=getattr(user, "url", ""),
+        user_label=user_label,
+        text=comment_text,
+        html=comment_html,
+        translated_text=translated_comment_text,
+        translated_html=translated_comment_html,
+        translated_from=translated_from,
+        formatted_date=formatted_date,
+        date=parsed_date,
+        reactions=reactions,
+        comments=comments,
+        reactions_types=reactions_types,
+    )
+    return post
+
+
+def scrape_post(html):
+    soup = BeautifulSoup(html, "lxml")
+
+    # with open("./dump.html", "w") as f:
+    #     f.write(html)
+
+    if soup.find("div", id="MPhotoContent"):
+        return scrape_photo(soup)
+
+    post_url_htlm = soup.head.select_one("meta[property='og:url']")
+
+    if not post_url_htlm:
+
+        title = soup.head.select_one("title").get_text().lower()
+
+        if title == "facebook watch":
+            raise FacebookWatchError
+
+        raise FacebookInvalidTargetError
+
+    post_url = post_url_htlm.get("content") if post_url_htlm else None
+
+    if post_url == "":
+        return scrape_video(soup)
+
+    user_label = None
+    user = None
+    user_link = soup.select_one("h3 a")
+    if user_link:
+        user_label, user = extract_user_information_from_link(user_link)
+
+    formatted_date = soup.select_one("abbr").get_text().strip()
+    parsed_date = parse_date(formatted_date)
+
+    reactions_item = soup.select_one("a[href^='/ufi/reaction/profile/browser']")
+
+    if reactions_item:
+        reactions = clean_human_readable_numbers(reactions_item.get_text())
+        reactions_types = []
+
+        for reaction in reactions_item.find("div").select("img"):
+            reactions_types.append(reaction["alt"])
+        reactions_types = "|".join(reactions_types)
+
+    comments = None
+
+    text_root = soup.select_one('[data-ft=\'{"tn":"*s"}\']')
+    additional_html_roots = []
+
+    img_root = soup.select_one('[data-ft=\'{"tn":"H"}\']')
+
+    if img_root:
+        additional_html_roots.append(img_root)
+
+    all_text_elements = (
+        text_root.find_all("div", recursive=False) if text_root else None
+    )
+
+    text_elements = []
+    translated_text_elements = []
+    translation_link = None
+
+    if all_text_elements:
+        for text_el in all_text_elements:
+            translation_link = text_el.select_one(
+                'a[href^="/basic/translation_preferences/"]'
+            )
+            if translation_link is None:
+                text_elements.append(text_el)
+            else:
+                translation_link.extract()
+                translated_text_elements.append(text_el)
+
+    html_elements = text_elements + additional_html_roots
+
+    comment_text = get_display_text(text_elements) if text_elements else None
+    comment_html = "".join(str(el) for el in html_elements)
+
+    translated_comment_text = get_display_text(translated_text_elements)
+    translated_comment_html = "".join(str(el) for el in translated_text_elements)
+    translated_from = (
+        translation_link.get_text().rsplit("from ", 1)[-1].strip()
+        if translation_link
+        else None
+    )
+
+    post = FacebookPostWithReaction(
+        url=post_url,
+        user_id=getattr(user, "id", ""),
+        user_handle=getattr(user, "handle", ""),
+        user_url=getattr(user, "url", ""),
+        user_label=user_label,
+        text=comment_text,
+        html=comment_html,
+        translated_text=translated_comment_text,
+        translated_html=translated_comment_html,
+        translated_from=translated_from,
+        formatted_date=formatted_date,
+        date=parsed_date,
+        reactions=reactions,
+        comments=comments,
+        reactions_types=reactions_types,
+    )
+    return post
+
+
 class FacebookMobileScraper(object):
     def __init__(self, cookie, throttle=FACEBOOK_MOBILE_DEFAULT_THROTTLE):
 
@@ -330,7 +643,7 @@ class FacebookMobileScraper(object):
             headers={"User-Agent": "curl/7.68.0", "Accept-Language": "en"},
         )
 
-        if error is not None:
+        if error:
             raise error
 
         return result.data.decode("utf-8")
@@ -408,8 +721,7 @@ class FacebookMobileScraper(object):
 
             while True:
                 html = self.request_page(current_url)
-
-                # with open('./dump.html', 'w') as f:
+                # with open("./dump.html", "w") as f:
                 #     f.write(html)
 
                 next_url, posts = scrape_posts(html)
@@ -423,6 +735,22 @@ class FacebookMobileScraper(object):
                 current_url = next_url
 
         return generator()
+
+    def post(self, url):
+        parsed = parse_facebook_url(url)
+
+        if (
+            not isinstance(parsed, ParsedFacebookPost)
+            and not isinstance(parsed, ParsedFacebookVideo)
+            and not isinstance(parsed, ParsedFacebookPhoto)
+        ):
+            raise FacebookNotPostError
+
+        url = convert_url_to_mobile(parsed.url)
+
+        html = self.request_page(url)
+
+        return scrape_post(html)
 
     def post_author(self, url):
         if not has_facebook_comments(url):
