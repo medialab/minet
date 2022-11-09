@@ -8,7 +8,7 @@ import json
 from urllib.parse import quote
 from ebbe import getpath
 import re
-
+import requests
 from minet.constants import COOKIE_BROWSERS
 from minet.utils import sleep_with_entropy
 from minet.web import (
@@ -36,7 +36,13 @@ from minet.instagram.exceptions import (
     InstagramError500,
     InstagramPublicAPIInvalidResponseError,
     InstagramInvalidCookieError,
+    InstagramInvalidTargetError,
     InstagramTooManyRequestsError,
+    InstagramNoPublicationError,
+    InstagramPrivateOrNonExistentAccountError,
+    InstagramHashtagNeverUsedError,
+    InstagramAccountNoFollowError,
+    InstagramPrivateAccountError,
 )
 from minet.instagram.formatters import (
     format_hashtag_post,
@@ -152,6 +158,13 @@ class InstagramAPIScraper(object):
         headers = {"Cookie": self.cookie}
         if magic_token:
             headers["X-IG-App-ID"] = self.magic_token
+
+        if (
+            "The link you followed may be broken, or the page may have been removed."
+            in requests.get(url, headers=headers).text
+        ):
+            raise InstagramInvalidTargetError
+
         err, response, data = request_json(
             url,
             pool=self.pool,
@@ -171,19 +184,19 @@ class InstagramAPIScraper(object):
         if response.status >= 400:
             raise InstagramPublicAPIInvalidResponseError(url, response.status, data)
 
-        if (
+        if self.nb_calls != 0 and (self.nb_calls % INSTAGRAM_NB_REQUEST_BIG_WAIT) == 0:
+            sleep_with_entropy(
+                INSTAGRAM_DEFAULT_THROTTLE_BIG_WAIT,
+                INSTAGRAM_MAX_RANDOM_ADDENDUM_BIG_WAIT,
+            )
+            self.nb_calls += 1
+
+            return data
+
+        elif (
             self.nb_calls != 0
             and (self.nb_calls % INSTAGRAM_NB_REQUEST_LITTLE_WAIT) == 0
         ):
-
-            if (self.nb_calls % INSTAGRAM_NB_REQUEST_BIG_WAIT) == 0:
-                sleep_with_entropy(
-                    INSTAGRAM_DEFAULT_THROTTLE_BIG_WAIT,
-                    INSTAGRAM_MAX_RANDOM_ADDENDUM_BIG_WAIT,
-                )
-                self.nb_calls += 1
-
-                return data
 
             sleep_with_entropy(
                 INSTAGRAM_DEFAULT_THROTTLE_LITTLE_WAIT,
@@ -232,6 +245,9 @@ class InstagramAPIScraper(object):
 
             data = self.request_json(url)
 
+            if not getpath(data, ["data", "hashtag"]):
+                raise InstagramHashtagNeverUsedError
+
             data = getpath(data, ["data", "hashtag", "edge_hashtag_to_media"])
 
             if not data:
@@ -250,21 +266,18 @@ class InstagramAPIScraper(object):
             cursor = getpath(data, ["page_info", "end_cursor"])
 
     @ensure_magic_token
-    def get_user_id(self, name):
+    def get_user(self, name):
         name = name.lstrip("@")
 
         url = forge_user_url(name)
 
-        data = self.request_json(url, magic_token=True)
-
-        user_id = getpath(data, ["data", "user", "id"])
-
-        return user_id
+        return self.request_json(url, magic_token=True)
 
     @ensure_magic_token
     def user_followers(self, name):
         name = name.lstrip("@")
-        id = self.get_user_id(name)
+        data_user = self.get_user(name)
+        id = getpath(data_user, ["data", "user", "id"])
         max_id = None
 
         while True:
@@ -272,10 +285,21 @@ class InstagramAPIScraper(object):
 
             data = self.request_json(url, magic_token=True)
 
-            items = data.get("users")
-
             if not data:
                 break
+
+            items = data.get("users")
+
+            if not items:
+
+                if getpath(data_user, ["data", "user", "edge_followed_by", "count"]):
+                    raise InstagramPrivateAccountError(
+                        getpath(
+                            data_user, ["data", "user", "edge_followed_by", "count"]
+                        )
+                    )
+
+                raise InstagramAccountNoFollowError
 
             for item in items:
                 yield format_user(item)
@@ -288,7 +312,8 @@ class InstagramAPIScraper(object):
     @ensure_magic_token
     def user_following(self, name):
         name = name.lstrip("@")
-        id = self.get_user_id(name)
+        data_user = self.get_user(name)
+        id = getpath(data_user, ["data", "user", "id"])
         max_id = None
 
         while True:
@@ -296,10 +321,19 @@ class InstagramAPIScraper(object):
 
             data = self.request_json(url, magic_token=True)
 
-            items = data.get("users")
-
             if not data:
                 break
+
+            items = data.get("users")
+
+            if not items:
+
+                if getpath(data_user, ["data", "user", "edge_follow", "count"]):
+                    raise InstagramPrivateAccountError(
+                        getpath(data_user, ["data", "user", "edge_follow", "count"])
+                    )
+
+                raise InstagramAccountNoFollowError
 
             for item in items:
                 yield format_user(item)
@@ -323,6 +357,13 @@ class InstagramAPIScraper(object):
                 break
 
             items = data.get("items")
+
+            if not items:
+
+                if getpath(data, ["user", "username"]):
+                    raise InstagramNoPublicationError
+
+                raise InstagramPrivateOrNonExistentAccountError
 
             for item in items:
                 yield format_user_post(item)
