@@ -173,6 +173,7 @@ class InstagramAPIScraper(object):
         )
 
         if err:
+            print(requests.get(url, headers=headers).text)
             raise err
 
         if response.status == 429:

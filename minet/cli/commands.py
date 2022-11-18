@@ -1597,6 +1597,11 @@ MINET_COMMANDS = {
                         If you want to grab cookies from another browser or want
                         to directly pass the cookie as a string, check out the
                         -c/--cookie flag.
+
+                        The urls in the medias_url column have a limited life time.
+                        It is not the case for the url in main_thumbnail_url, which
+                        corresponds to the first image (the video cover if the first
+                        media is a video).
                     """,
                     "epilog": """
                         example:
@@ -1647,6 +1652,8 @@ MINET_COMMANDS = {
                         If you want to grab cookies from another browser or want
                         to directly pass the cookie as a string, check out the
                         -c/--cookie flag.
+
+                        The profile_pic_url has a limited life time.
                     """,
                     "epilog": """
                         example:
@@ -1696,6 +1703,8 @@ MINET_COMMANDS = {
                         If you want to grab cookies from another browser or want
                         to directly pass the cookie as a string, check out the
                         -c/--cookie flag.
+
+                        The profile_pic_url has a limited life time.
                     """,
                     "epilog": """
                         example:

@@ -40,6 +40,9 @@ INSTAGRAM_HASHTAG_POST_CSV_HEADERS = [
 ]
 
 INSTAGRAM_USER_POST_CSV_HEADERS = [
+    "username",
+    "full_name",
+    "is_verified",
     "id",
     "media_type",
     "shortcode",
@@ -50,9 +53,10 @@ INSTAGRAM_USER_POST_CSV_HEADERS = [
     "like_and_view_counts_disabled",
     "like_count",
     "comment_count",
-    "video_view_count",
-    "video_title",
-    "video_duration",
+    "main_thumbnail_url",
+    "medias_type",
+    "medias_url",
+    "usertags_medias",
     "taken_at_timestamp",
     "utc_time",
 ]
