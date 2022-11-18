@@ -2,7 +2,7 @@
 # Minet Telegram CLI Action
 # =============================================================================
 #
-# Logic of the `telegram` action.
+# Logic of the `tl` action.
 #
 
 

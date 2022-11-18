@@ -2039,6 +2039,7 @@ MINET_COMMANDS = {
     "telegram": {
         "package": "minet.cli.telegram",
         "action": "telegram_action",
+        "aliases": ["tl"],
         "title": "Minet Telegram Command",
         "description": """
             Collects data from Telegram.
