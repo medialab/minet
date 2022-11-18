@@ -58,6 +58,8 @@
   * [search](#mc-search)
   * [topic](#topic)
     * [stories](#stories)
+* [tiktok](#tiktok)
+  * [search-videos](#search-videos)
 * [twitter](#twitter)
   * [attrition](#attrition)
   * [followers](#followers)
@@ -320,6 +322,14 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 #### stories
 
 <% mc/topic/stories %>
+
+## Tiktok
+
+<% tk %>
+
+### search-videos
+
+<% tiktok/search-videos %>
 
 ## Twitter
 
