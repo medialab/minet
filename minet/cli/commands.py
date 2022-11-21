@@ -2067,7 +2067,14 @@ MINET_COMMANDS = {
                         to directly pass the cookie as a string, check out the
                         -c/--cookie flag.
 
-                        Challenges are hashtags, that 
+                        Challenges are hashtags, that can be associated with a description.
+
+                        The url have a limited life time (indicated by a timestamp in the
+                        url).
+
+                        This command allows you to get about 450 results, ordered by
+                        relevance (a mix of most popular, and most relevant according to your
+                        profile).
                     """,
                     "epilog": """
                         example:

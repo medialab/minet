@@ -58,7 +58,7 @@
   * [search](#mc-search)
   * [topic](#topic)
     * [stories](#stories)
-* [tiktok](#tiktok)
+* [tiktok (tk)](#tiktok)
   * [search-videos](#search-videos)
 * [twitter](#twitter)
   * [attrition](#attrition)
@@ -128,6 +128,8 @@ instagram:
   cookie: "MY_INSTAGRAM_COOKIE" # Used as --cookie for `minet insta` commands
 mediacloud:
   token: "MY_MC_TOKEN" # Used as --token for `minet mc` commands
+tiktok:
+  cookie: "MY_TIKTOK_COOKIE" # Used as --cookie for `minet tk` commands
 twitter:
   api_key: "MY_API_KEY" # Used as --api-key for `minet tw` commands
   api_secret_key: "MY_API_SECRET_KEY" # Used as --api-secret-key for `minet tw` commands
@@ -1898,7 +1900,14 @@ If you want to grab cookies from another browser or want
 to directly pass the cookie as a string, check out the
 -c/--cookie flag.
 
-Challenges are hashtags, that 
+Challenges are hashtags, that can be associated with a description.
+
+The url have a limited life time (indicated by a timestamp in the
+url).
+
+This command allows you to get about 450 results, ordered by
+relevance (a mix of most popular, and most relevant according to your
+profile).
 
 positional arguments:
   column                      This argument can either take the query on which we want to retrieve videos or the name of the column containing that query

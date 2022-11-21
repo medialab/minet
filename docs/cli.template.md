@@ -58,7 +58,7 @@
   * [search](#mc-search)
   * [topic](#topic)
     * [stories](#stories)
-* [tiktok](#tiktok)
+* [tiktok (tk)](#tiktok)
   * [search-videos](#search-videos)
 * [twitter](#twitter)
   * [attrition](#attrition)
@@ -128,6 +128,8 @@ instagram:
   cookie: "MY_INSTAGRAM_COOKIE" # Used as --cookie for `minet insta` commands
 mediacloud:
   token: "MY_MC_TOKEN" # Used as --token for `minet mc` commands
+tiktok:
+  cookie: "MY_TIKTOK_COOKIE" # Used as --cookie for `minet tk` commands
 twitter:
   api_key: "MY_API_KEY" # Used as --api-key for `minet tw` commands
   api_secret_key: "MY_API_SECRET_KEY" # Used as --api-secret-key for `minet tw` commands
