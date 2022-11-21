@@ -58,7 +58,7 @@
   * [search](#mc-search)
   * [topic](#topic)
     * [stories](#stories)
-* [telegram](#telegram)
+* [telegram (tl)](#telegram)
   * [channel-infos](#channel-infos)
   * [channel-messages](#channel-messages)
 * [twitter](#twitter)
