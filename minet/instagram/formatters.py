@@ -20,6 +20,9 @@ from minet.instagram.utils import (
 )
 from minet.utils import timestamp_to_isoformat
 
+INSTAGRAM_PATH_TO_MEDIA_IMAGE = ["image_versions2", "candidates", 0, "url"]
+INSTAGRAM_PATH_TO_MEDIA_VIDEO = ["video_versions", 0, "url"]
+
 InstagramHashtagPost = namedrecord(
     "InstagramHashtagPost",
     INSTAGRAM_HASHTAG_POST_CSV_HEADERS,
@@ -53,6 +56,16 @@ InstagramUser = namedrecord(
         "is_favorite",
     ],
 )
+
+
+def get_usertags(item, usertags):
+    users = getpath(item, ["usertags", "in"])
+    if not users:
+        return
+    for user in users:
+        username = getpath(user, ["user", "username"])
+        if username not in usertags:
+            usertags.append(username)
 
 
 def format_hashtag_post(item):
@@ -114,36 +127,22 @@ def format_user_post(item):
             medias_type.append(INSTAGRAM_MEDIA_TYPE.get(getpath(media, ["media_type"])))
 
             if medias_type[-1] == "GraphImage":
-                medias_url.append(
-                    getpath(media, ["image_versions2", "candidates", 0, "url"])
-                )
-                if getpath(media, ["usertags", "in"]):
-                    for user in getpath(media, ["usertags", "in"]):
-                        if getpath(user, ["user", "username"]) not in usertags_medias:
-                            usertags_medias.append(getpath(user, ["user", "username"]))
+                medias_url.append(getpath(media, INSTAGRAM_PATH_TO_MEDIA_IMAGE))
+                get_usertags(media, usertags_medias)
 
             elif medias_type[-1] == "GraphVideo":
-                medias_url.append(getpath(media, ["video_versions", 0, "url"]))
-                if getpath(media, ["usertags", "in"]):
-                    for user in getpath(media, ["usertags", "in"]):
-                        if getpath(user, ["user", "username"]) not in usertags_medias:
-                            usertags_medias.append(getpath(user, ["user", "username"]))
+                medias_url.append(getpath(media, INSTAGRAM_PATH_TO_MEDIA_VIDEO))
+                get_usertags(media, usertags_medias)
 
     elif media_type == "GraphImage":
         medias_type.append("GraphImage")
-        medias_url.append(getpath(item, ["image_versions2", "candidates", 0, "url"]))
-        if getpath(item, ["usertags", "in"]):
-            for user in getpath(item, ["usertags", "in"]):
-                if getpath(user, ["user", "username"]) not in usertags_medias:
-                    usertags_medias.append(getpath(user, ["user", "username"]))
+        medias_url.append(getpath(item, INSTAGRAM_PATH_TO_MEDIA_IMAGE))
+        get_usertags(item, usertags_medias)
 
     elif media_type == "GraphVideo":
         medias_type.append("GraphVideo")
-        medias_url.append(getpath(item, ["video_versions", 0, "url"]))
-        if getpath(item, ["usertags", "in"]):
-            for user in getpath(item, ["usertags", "in"]):
-                if getpath(user, ["user", "username"]) not in usertags_medias:
-                    usertags_medias.append(getpath(user, ["user", "username"]))
+        medias_url.append(getpath(item, INSTAGRAM_PATH_TO_MEDIA_VIDEO))
+        get_usertags(item, usertags_medias)
 
     row = InstagramUserPost(
         getpath(item, ["user", "username"]),

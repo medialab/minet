@@ -8,16 +8,16 @@ import json
 from urllib.parse import quote
 from ebbe import getpath
 import re
-import requests
+from json.decoder import JSONDecodeError
 from minet.constants import COOKIE_BROWSERS
 from minet.utils import sleep_with_entropy
 from minet.web import (
     create_pool,
     create_request_retryer,
-    request_json,
     grab_cookies,
     request_text,
     retrying_method,
+    request,
 )
 from minet.instagram.constants import (
     INSTAGRAM_DEFAULT_THROTTLE,
@@ -159,13 +159,7 @@ class InstagramAPIScraper(object):
         if magic_token:
             headers["X-IG-App-ID"] = self.magic_token
 
-        if (
-            "The link you followed may be broken, or the page may have been removed."
-            in requests.get(url, headers=headers).text
-        ):
-            raise InstagramInvalidTargetError
-
-        err, response, data = request_json(
+        err, response = request(
             url,
             pool=self.pool,
             spoof_ua=True,
@@ -173,8 +167,20 @@ class InstagramAPIScraper(object):
         )
 
         if err:
-            print(requests.get(url, headers=headers).text)
             raise err
+
+        text = response.data.decode()
+
+        if (
+            "the link you followed may be broken, or the page may have been removed"
+            in text.lower().strip()
+        ):
+            raise InstagramInvalidTargetError
+
+        try:
+            data = json.loads(text)
+        except JSONDecodeError:
+            raise JSONDecodeError("HTML for the request to " + url + " : " + text)
 
         if response.status == 429:
             raise InstagramTooManyRequestsError
@@ -292,13 +298,11 @@ class InstagramAPIScraper(object):
             items = data.get("users")
 
             if not items:
-
-                if getpath(data_user, ["data", "user", "edge_followed_by", "count"]):
-                    raise InstagramPrivateAccountError(
-                        getpath(
-                            data_user, ["data", "user", "edge_followed_by", "count"]
-                        )
-                    )
+                followed_count = getpath(
+                    data_user, ["data", "user", "edge_followed_by", "count"]
+                )
+                if followed_count:
+                    raise InstagramPrivateAccountError(followed_count)
 
                 raise InstagramAccountNoFollowError
 
@@ -328,11 +332,11 @@ class InstagramAPIScraper(object):
             items = data.get("users")
 
             if not items:
-
-                if getpath(data_user, ["data", "user", "edge_follow", "count"]):
-                    raise InstagramPrivateAccountError(
-                        getpath(data_user, ["data", "user", "edge_follow", "count"])
-                    )
+                followers_count = getpath(
+                    data_user, ["data", "user", "edge_follow", "count"]
+                )
+                if followers_count:
+                    raise InstagramPrivateAccountError(followers_count)
 
                 raise InstagramAccountNoFollowError
 

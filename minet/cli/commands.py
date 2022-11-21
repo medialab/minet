@@ -1653,7 +1653,9 @@ MINET_COMMANDS = {
                         to directly pass the cookie as a string, check out the
                         -c/--cookie flag.
 
-                        The profile_pic_url has a limited life time.
+                        Beware, instagram only provides temporary links, not permalinks,
+                        for profile picture urls retrieved as the "profile_pic_url" in
+                        the result. Be sure to download them fast if you need them.
                     """,
                     "epilog": """
                         example:
@@ -1704,7 +1706,9 @@ MINET_COMMANDS = {
                         to directly pass the cookie as a string, check out the
                         -c/--cookie flag.
 
-                        The profile_pic_url has a limited life time.
+                        Beware, instagram only provides temporary links, not permalinks,
+                        for profile picture urls retrieved as the "profile_pic_url" in
+                        the result. Be sure to download them fast if you need them.
                     """,
                     "epilog": """
                         example:
