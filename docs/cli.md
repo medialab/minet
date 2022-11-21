@@ -36,6 +36,7 @@
   * [summary](#summary)
 * [facebook (fb)](#facebook)
   * [comments](#facebook-comments)
+  * [post](#facebook-post)
   * [posts](#facebook-posts)
   * [post-authors](#facebook-post-authors)
   * [url-likes](#facebook-url-likes)
@@ -1093,7 +1094,8 @@ examples:
 
 ```
 usage: minet facebook [-h] [--rcfile RCFILE]
-                      {comments,posts,post-authors,post-stats,url-likes} ...
+                      {comments,post,posts,post-authors,post-stats,url-likes}
+                      ...
 
 Minet Facebook Command
 ======================
@@ -1105,7 +1107,7 @@ optional arguments:
   --rcfile RCFILE                                 Custom path to a minet configuration file.
 
 actions:
-  {comments,posts,post-authors,post-stats,url-likes}
+  {comments,post,posts,post-authors,post-stats,url-likes}
                                                   Action to perform to collect data on Facebook
 
 ```
@@ -1152,6 +1154,72 @@ examples:
 
 . Scraping comments from multiple posts listed in a CSV file:
     $ minet fb comments post_url posts.csv > comments.csv
+
+```
+
+<h3 id="facebook-post">post</h3>
+
+```
+usage: minet facebook post [-h] [--rcfile RCFILE] [-c COOKIE] [-o OUTPUT]
+                           [-s SELECT] [--throttle THROTTLE]
+                           column [file]
+
+Minet Facebook Post Command
+===========================
+
+Scrape Facebook post.
+
+This requires to be logged in to a Facebook account, so
+by default this command will attempt to grab the relevant
+authentication cookies from a local Firefox browser.
+
+If you want to grab cookies from another browser or want
+to directly pass the cookie as a string, check out the
+-c/--cookie flag.
+
+You must set your account language to English (US) for the
+command to work.
+
+Note that, by default, Facebook will translate post text
+when they are not written in a language whitelisted here:
+https://www.facebook.com/settings/?tab=language
+
+In this case, minet will output both the original text and
+the translated one. But be aware that original text may be
+truncated, so you might want to edit your Facebook settings
+using the url above to make sure text won't be translated
+for posts you are interested in.
+
+Of course, the CLI will warn you when translated text is
+found so you can choose to edit your settings early as
+as possible.
+
+Finally, some post text is always truncated on Facebook
+when displayed in lists. This text is not yet entirely
+scraped by minet at this time.
+
+positional arguments:
+  column                      Column of the CSV file containing post urls or a single post url.
+  file                        CSV file containing the post urls.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "facebook.cookie" or read from the MINET_FACEBOOK_COOKIE env variable.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
+
+examples:
+
+. Scraping a post:
+    $ minet fb post https://m.facebook.com/watch/?v=448540820705115 > post.csv
+
+. Grabbing cookies from chrome:
+    $ minet fb posts -c chrome https://m.facebook.com/watch/?v=448540820705115 > post.csv
+
+. Scraping post from multiple urls listed in a CSV file:
+    $ minet fb post url urls.csv > post.csv
 
 ```
 
@@ -1599,7 +1667,9 @@ If you want to grab cookies from another browser or want
 to directly pass the cookie as a string, check out the
 -c/--cookie flag.
 
-The profile_pic_url has a limited life time.
+Beware, instagram only provides temporary links, not permalinks,
+for profile picture urls retrieved as the "profile_pic_url" in
+the result. Be sure to download them fast if you need them.
 
 positional arguments:
   column                      This argument can either take the query on which we want to retrieve followers accounts or the name of the column containing that query
@@ -1640,7 +1710,9 @@ If you want to grab cookies from another browser or want
 to directly pass the cookie as a string, check out the
 -c/--cookie flag.
 
-The profile_pic_url has a limited life time.
+Beware, instagram only provides temporary links, not permalinks,
+for profile picture urls retrieved as the "profile_pic_url" in
+the result. Be sure to download them fast if you need them.
 
 positional arguments:
   column                      This argument can either take the query on which we want to retrieve followed accounts or the name of the column containing that query
