@@ -58,6 +58,9 @@
   * [search](#mc-search)
   * [topic](#topic)
     * [stories](#stories)
+* [telegram (tl)](#telegram)
+  * [channel-infos](#channel-infos)
+  * [channel-messages](#channel-messages)
 * [twitter](#twitter)
   * [attrition](#attrition)
   * [followers](#followers)
@@ -320,6 +323,16 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 #### stories
 
 <% mc/topic/stories %>
+
+## Telegram
+
+### channel-infos
+
+<% telegram/channel-infos %>
+
+### channel-messages
+
+<% telegram/channel-messages %>
 
 ## Twitter
 
