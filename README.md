@@ -44,6 +44,7 @@ Minet can single-handedly:
 * Scrape (without requiring special access, often just a user account):
   * *[Facebook](https://www.facebook.com/)*
   * *[Instagram](https://www.instagram.com/)*
+  * *[Telegram](https://telegram.org/)*
   * *[Twitter](https://twitter.com)*
   * *[Google Drive](https://drive.google.com)* (spreadsheets etc.)
 * Grab & dump cookies from your browser
