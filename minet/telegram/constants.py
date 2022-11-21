@@ -4,8 +4,6 @@
 #
 # General constants used throughout the Telegram functions.
 #
-from urllib3 import Timeout
-
 TELEGRAM_URL = "https://t.me/"
 TELEGRAM_DEFAULT_THROTTLE = 0.5
 TELEGRAM_INFOS_CSV_HEADERS = [

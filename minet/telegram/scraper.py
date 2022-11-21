@@ -73,32 +73,19 @@ def scrape_channel_infos(html):
     if channel_description:
         description = channel_description.get_text()
 
-    counters_infos = {}
-    channel_counters = channel_infos.select("div[class='tgme_channel_info_counter']")
-    for counter in channel_counters:
-        counters_infos[
-            counter.select_one("span[class='counter_type']").get_text()
-        ] = counter.select_one("span[class='counter_value']").get_text()
-    nb_subscribers = (
-        counters_infos.get("subscribers")
-        if counters_infos.get("subscribers")
-        else counters_infos.get("subscriber")
-    )
-    nb_photos = (
-        counters_infos.get("photos")
-        if counters_infos.get("photos")
-        else counters_infos.get("photo")
-    )
-    nb_videos = (
-        counters_infos.get("videos")
-        if counters_infos.get("videos")
-        else counters_infos.get("video")
-    )
-    nb_links = (
-        counters_infos.get("links")
-        if counters_infos.get("links")
-        else counters_infos.get("link")
-    )
+    # NOTE: the counter_type can be singular or plural, so we normalize
+    counters_infos = {
+        counter.select_one("span[class='counter_type']")
+        .get_text()
+        .rstrip("s"): counter.select_one("span[class='counter_value']")
+        .get_text()
+        for counter in channel_infos.select("div[class='tgme_channel_info_counter']")
+    }
+
+    nb_subscribers = counters_infos["subscriber"]
+    nb_photos = counters_infos["photo"]
+    nb_videos = counters_infos["video"]
+    nb_links = counters_infos["link"]
 
     return TelegramChannelInfos(
         title=title,
