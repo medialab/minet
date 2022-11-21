@@ -2056,7 +2056,6 @@ MINET_COMMANDS = {
                     """,
                     "epilog": """
                         examples:
-
                         . Scraping a channel's infos:
                             $ minet telegram channel-infos nytimes > infos.csv
                     """,
@@ -2092,7 +2091,6 @@ MINET_COMMANDS = {
                     """,
                     "epilog": """
                         examples:
-
                         . Scraping a group's posts:
                             $ minet telegram channel-messages nytimes > messages.csv
                     """,
@@ -2118,6 +2116,88 @@ MINET_COMMANDS = {
                             "help": "Throttling time, in seconds, to wait between each request.",
                             "type": float,
                             "default": TELEGRAM_DEFAULT_THROTTLE,
+                        },
+                    ],
+                },
+            },
+        },
+    },
+    # Tiktok action subparser
+    # --------------------------------------------------------------------------
+    "tiktok": {
+        "package": "minet.cli.tiktok",
+        "action": "tiktok_action",
+        "aliases": ["tk"],
+        "title": "Minet Tiktok command",
+        "description": """
+            Gather data from Tiktok.
+        """,
+        "subparsers": {
+            "help": "Actions to perform on Tiktok.",
+            "title": "actions",
+            "dest": "tk_action",
+            "common_arguments": [
+                {
+                    "flags": ["-o", "--output"],
+                    "action": OutputFileAction,
+                }
+            ],
+            "commands": {
+                "search-videos": {
+                    "title": "Tiktok search-videos",
+                    "description": """
+                        Scrape Tiktok videos with given keyword(s).
+
+                        This requires to be logged in to an Tiktok account, so
+                        by default this command will attempt to grab the relevant
+                        authentication cookies from a local Firefox browser.
+
+                        If you want to grab cookies from another browser or want
+                        to directly pass the cookie as a string, check out the
+                        -c/--cookie flag.
+
+                        Challenges are hashtags, that can be associated with a description.
+
+                        The url have a limited life time (indicated by a timestamp in the
+                        url).
+
+                        This command allows you to get about 450 results, ordered by
+                        relevance (a mix of most popular, and most relevant according to your
+                        profile).
+                    """,
+                    "epilog": """
+                        example:
+
+                        . Searching videos with the keyword paris:
+                            $ minet tiktok search-videos paris > paris_videos.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "This argument can either take the query on which we want to retrieve videos or the name of the column containing that query",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the query for tiktok keyword(s).",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "query",
+                        },
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flags": ["-c", "--cookie"],
+                            "help": 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".',
+                            "default": "firefox",
+                            "rc_key": ["tiktok", "cookie"],
+                            "action": ConfigAction,
+                        },
+                        {
+                            "flags": ["-l", "--limit"],
+                            "help": "Maximum number of videos to retrieve per query.",
+                            "type": int,
                         },
                     ],
                 },
@@ -2819,7 +2899,7 @@ MINET_COMMANDS = {
                     "title": "Minet Twitter Tweets Count Command",
                     "description": """
                         Count the number of tweets matching the given query using Twitter's
-                        latest API v2. The count's granularity can be at the level of tweets 
+                        latest API v2. The count's granularity can be at the level of tweets
                         per day, per hour, or per minute.
 
                         This will only return result for the last 8 days only, unless

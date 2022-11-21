@@ -45,6 +45,7 @@ Minet can single-handedly:
   * *[Facebook](https://www.facebook.com/)*
   * *[Instagram](https://www.instagram.com/)*
   * *[Telegram](https://telegram.org/)*
+  * *[TikTok](https://www.tiktok.com)*
   * *[Twitter](https://twitter.com)*
   * *[Google Drive](https://drive.google.com)* (spreadsheets etc.)
 * Grab & dump cookies from your browser
