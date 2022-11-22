@@ -58,14 +58,15 @@ InstagramUser = namedrecord(
 )
 
 
-def get_usertags(item, usertags):
+def get_usertags(item):
     users = getpath(item, ["usertags", "in"])
+    usertags = set()
     if not users:
-        return
+        return usertags
     for user in users:
         username = getpath(user, ["user", "username"])
-        if username not in usertags:
-            usertags.append(username)
+        usertags.add(username)
+    return usertags
 
 
 def format_hashtag_post(item):
@@ -119,7 +120,7 @@ def format_user_post(item):
 
     medias_url = []
     medias_type = []
-    usertags_medias = []
+    usertags_medias = set()
 
     if media_type == "GraphSidecar":
         carousel = getpath(item, ["carousel_media"])
@@ -128,21 +129,25 @@ def format_user_post(item):
 
             if medias_type[-1] == "GraphImage":
                 medias_url.append(getpath(media, INSTAGRAM_PATH_TO_MEDIA_IMAGE))
-                get_usertags(media, usertags_medias)
+                item_usertags = get_usertags(media)
+                usertags_medias = usertags_medias.union(item_usertags)
 
             elif medias_type[-1] == "GraphVideo":
                 medias_url.append(getpath(media, INSTAGRAM_PATH_TO_MEDIA_VIDEO))
-                get_usertags(media, usertags_medias)
+                item_usertags = get_usertags(media)
+                usertags_medias = usertags_medias.union(item_usertags)
 
     elif media_type == "GraphImage":
         medias_type.append("GraphImage")
         medias_url.append(getpath(item, INSTAGRAM_PATH_TO_MEDIA_IMAGE))
-        get_usertags(item, usertags_medias)
+        item_usertags = get_usertags(item)
+        usertags_medias = usertags_medias.union(item_usertags)
 
     elif media_type == "GraphVideo":
         medias_type.append("GraphVideo")
         medias_url.append(getpath(item, INSTAGRAM_PATH_TO_MEDIA_VIDEO))
-        get_usertags(item, usertags_medias)
+        item_usertags = get_usertags(item)
+        usertags_medias = usertags_medias.union(item_usertags)
 
     row = InstagramUserPost(
         getpath(item, ["user", "username"]),
