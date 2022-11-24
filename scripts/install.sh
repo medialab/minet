@@ -31,9 +31,10 @@ sudo echo "test" > /dev/null
 
 # Functions
 get_latest_release() {
-  curl -sSL "https://api.github.com/repos/$1/releases/latest" |
-    grep '"tag_name":' |
-    sed -E 's/.*"([^"]+)".*/\1/'
+  curl -fsSLI -o /dev/null -w %{url_effective} https://github.com/$1/releases/latest |
+    tr "/" "\n" |
+    tail -n 1 &&
+    echo
 }
 
 cleanup() {
@@ -114,5 +115,5 @@ sudo mv /tmp/minet /usr/local/bin/minet-dist
 sudo chmod +x /usr/local/bin/minet-dist/minet
 sudo ln -s /usr/local/bin/minet-dist/minet /usr/local/bin/minet
 
-echo "Installed:"
+echo "Making sure installed version works..."
 minet --version
