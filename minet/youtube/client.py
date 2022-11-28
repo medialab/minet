@@ -241,7 +241,7 @@ class YouTubeAPIClient(object):
 
     def search(self, query, order=YOUTUBE_API_DEFAULT_SEARCH_ORDER, raw=False):
         if order not in YOUTUBE_API_SEARCH_ORDERS:
-            raise TypeError('unkown search order "%s"' % order)
+            raise TypeError('unknown search order "%s"' % order)
 
         def generator():
             token = None
