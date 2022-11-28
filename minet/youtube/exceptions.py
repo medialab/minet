@@ -50,3 +50,9 @@ class YouTubeExclusiveMemberError(YouTubeError):
 
 class YouTubeUnknown403Error(YouTubeError):
     pass
+
+
+class YouTubeAccessNotConfiguredError(YouTubeError):
+    def __init__(self, message=None, url=None):
+        super().__init__(message)
+        self.url = url

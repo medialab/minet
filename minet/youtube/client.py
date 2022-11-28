@@ -8,6 +8,7 @@ import time
 from ebbe import as_chunks
 from collections import deque
 from urllib.parse import quote
+from ural import urls_from_text
 from ebbe import getpath
 
 from minet.web import create_pool, create_request_retryer, request_json, retrying_method
@@ -33,6 +34,7 @@ from minet.youtube.exceptions import (
     YouTubeInvalidChannelTargetError,
     YouTubeExclusiveMemberError,
     YouTubeUnknown403Error,
+    YouTubeAccessNotConfiguredError,
 )
 from minet.youtube.formatters import (
     format_video,
@@ -149,7 +151,12 @@ class YouTubeAPIClient(object):
 
                     reason = getpath(data, ["error", "errors", 0, "reason"])
 
-                    if reason == "commentsDisabled":
+                    if reason == "accessNotConfigured":
+                        msg = getpath(data, ["error", "message"])
+                        url = next(urls_from_text(msg))
+                        raise YouTubeAccessNotConfiguredError(msg, url=url)
+
+                    elif reason == "commentsDisabled":
                         raise YouTubeDisabledCommentsError(url)
 
                     elif reason == "forbidden":
