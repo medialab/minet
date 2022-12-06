@@ -40,10 +40,11 @@ class FetchResult(object):
         if not self.url:
             return "<{name} empty!>".format(name=name)
 
-        return "<{name}{errored} url={url!r} status={status!r} ext={ext!r} encoding={encoding!r}>".format(
+        return "<{name}{errored} url={url!r} status={status!r} timestamp={timestamp!r} ext={ext!r} encoding={encoding!r}>".format(
             name=name,
             url=self.url,
             status=self.response.status if self.response else None,
+            timestamp=self.meta.get("timestamp").strftime("%Y-%m-%dT%H:%M:%S"),
             ext=self.meta.get("ext"),
             encoding=self.meta.get("encoding"),
             errored=" errored!" if self.error else "",

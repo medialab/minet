@@ -24,6 +24,7 @@ from minet.cli.utils import LoadingBar, die
 FETCH_ADDITIONAL_HEADERS = [
     "resolved",
     "status",
+    "timestamp",
     "error",
     "filename",
     "mimetype",
@@ -268,6 +269,7 @@ def fetch_action(cli_args, resolve=False, defer=None):
         row,
         resolved=None,
         status=None,
+        timestamp=None,
         error=None,
         filename=None,
         encoding=None,
@@ -278,6 +280,7 @@ def fetch_action(cli_args, resolve=False, defer=None):
         addendum = [
             resolved or "",
             status or "",
+            timestamp or "",
             error or "",
             filename or "",
             mimetype or "",
@@ -358,6 +361,7 @@ def fetch_action(cli_args, resolve=False, defer=None):
                     row,
                     resolved=resolved_url,
                     status=result.response.status,
+                    timestamp=meta.get("timestamp").strftime("%Y-%m-%dT%H:%M:%S"),
                     filename=meta.get("filename"),
                     encoding=meta.get("encoding"),
                     mimetype=meta.get("mimetype"),

@@ -7,6 +7,7 @@
 import re
 import cgi
 import certifi
+from datetime import datetime
 import browser_cookie3
 import urllib3
 import urllib.error
@@ -653,7 +654,10 @@ def resolve(
 
 
 def extract_response_meta(response, guess_encoding=True, guess_extension=True):
-    meta = {"ext": None, "mimetype": None, "encoding": None, "is_text": None}
+    meta = {"ext": None, "mimetype": None, "encoding": None, "is_text": None, "timestamp": None}
+
+    # Setting timestamp
+    meta["timestamp"] = datetime.now()
 
     # Guessing extension
     if guess_extension:
