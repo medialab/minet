@@ -7,6 +7,7 @@
 # optimize both running time & memory.
 #
 import casanova
+from datetime import datetime
 from io import StringIO
 from collections import Counter
 from ural import is_shortened_url
@@ -24,7 +25,7 @@ from minet.cli.utils import LoadingBar, die
 FETCH_ADDITIONAL_HEADERS = [
     "resolved",
     "status",
-    "timestamp",
+    "datetime_utc",
     "error",
     "filename",
     "mimetype",
@@ -269,7 +270,7 @@ def fetch_action(cli_args, resolve=False, defer=None):
         row,
         resolved=None,
         status=None,
-        timestamp=None,
+        datetime_utc=None,
         error=None,
         filename=None,
         encoding=None,
@@ -280,7 +281,7 @@ def fetch_action(cli_args, resolve=False, defer=None):
         addendum = [
             resolved or "",
             status or "",
-            timestamp or "",
+            datetime_utc or "",
             error or "",
             filename or "",
             mimetype or "",
@@ -361,7 +362,7 @@ def fetch_action(cli_args, resolve=False, defer=None):
                     row,
                     resolved=resolved_url,
                     status=result.response.status,
-                    timestamp=meta.get("timestamp").strftime("%Y-%m-%dT%H:%M:%S"),
+                    datetime_utc=datetime.isoformat(meta.get("datetime_utc")),
                     filename=meta.get("filename"),
                     encoding=meta.get("encoding"),
                     mimetype=meta.get("mimetype"),
