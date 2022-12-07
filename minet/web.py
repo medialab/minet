@@ -7,6 +7,7 @@
 import re
 import cgi
 import certifi
+from datetime import datetime
 import browser_cookie3
 import urllib3
 import urllib.error
@@ -653,7 +654,10 @@ def resolve(
 
 
 def extract_response_meta(response, guess_encoding=True, guess_extension=True):
-    meta = {"ext": None, "mimetype": None, "encoding": None, "is_text": None}
+    meta = {"ext": None, "mimetype": None, "encoding": None, "is_text": None, "datetime_utc": None}
+
+    # Marking time at which the fetch result object was created
+    meta["datetime_utc"] = datetime.utcnow()
 
     # Guessing extension
     if guess_extension:

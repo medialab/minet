@@ -6,6 +6,7 @@
 # web in a multithreaded fashion.
 #
 from collections import namedtuple
+from datetime import datetime
 from quenouille import ThreadPoolExecutor
 from ural import get_domain_name, ensure_protocol
 
@@ -40,10 +41,11 @@ class FetchResult(object):
         if not self.url:
             return "<{name} empty!>".format(name=name)
 
-        return "<{name}{errored} url={url!r} status={status!r} ext={ext!r} encoding={encoding!r}>".format(
+        return "<{name}{errored} url={url!r} status={status!r} datetime_utc={datetime_utc!r} ext={ext!r} encoding={encoding!r}>".format(
             name=name,
             url=self.url,
             status=self.response.status if self.response else None,
+            datetime_utc=datetime.isoformat(self.meta.get("datetime_utc")),
             ext=self.meta.get("ext"),
             encoding=self.meta.get("encoding"),
             errored=" errored!" if self.error else "",
