@@ -20,19 +20,28 @@ from minet.instagram.utils import (
 )
 from minet.utils import timestamp_to_isoformat
 
+INSTAGRAM_PATH_TO_MEDIA_IMAGE = ["image_versions2", "candidates", 0, "url"]
+INSTAGRAM_PATH_TO_MEDIA_VIDEO = ["video_versions", 0, "url"]
+
 InstagramHashtagPost = namedrecord(
     "InstagramHashtagPost",
     INSTAGRAM_HASHTAG_POST_CSV_HEADERS,
     boolean=[
         "comments_disabled",
     ],
+    plural=["hashtags", "mentioned_names"],
 )
 
 InstagramUserPost = namedrecord(
     "InstagramUserPost",
     INSTAGRAM_USER_POST_CSV_HEADERS,
-    boolean=[
-        "like_and_view_counts_disabled",
+    boolean=["like_and_view_counts_disabled", "is_verified"],
+    plural=[
+        "medias_type",
+        "medias_url",
+        "usertags_medias",
+        "mentioned_names",
+        "hashtags",
     ],
 )
 
@@ -49,16 +58,27 @@ InstagramUser = namedrecord(
 )
 
 
+def get_usertags(item):
+    users = getpath(item, ["usertags", "in"])
+    usertags = set()
+    if not users:
+        return usertags
+    for user in users:
+        username = getpath(user, ["user", "username"])
+        usertags.add(username)
+    return usertags
+
+
 def format_hashtag_post(item):
 
     text = getpath(item, ["edge_media_to_caption", "edges", 0, "node", "text"])
 
-    hashtags = None
-    mentioned_names = None
+    hashtags = []
+    mentioned_names = []
 
     if text:
-        hashtags = "|".join(extract_hashtags(text))
-        mentioned_names = "|".join(extract_handles(text))
+        hashtags = extract_hashtags(text)
+        mentioned_names = extract_handles(text)
 
     row = InstagramHashtagPost(
         item["id"],
@@ -77,7 +97,7 @@ def format_hashtag_post(item):
         item["taken_at_timestamp"],
         timestamp_to_isoformat(item["taken_at_timestamp"]),
         item["accessibility_caption"],
-        item["display_url"],
+        short_code_to_url(item["code"]) + "/media/?size=l",
     )
 
     return row
@@ -91,14 +111,48 @@ def format_user_post(item):
 
     text = getpath(item, ["caption", "text"])
 
-    hashtags = None
-    mentioned_names = None
+    hashtags = []
+    mentioned_names = []
 
     if text:
-        hashtags = "|".join(extract_hashtags(text))
-        mentioned_names = "|".join(extract_handles(text))
+        hashtags = extract_hashtags(text)
+        mentioned_names = extract_handles(text)
+
+    medias_url = []
+    medias_type = []
+    usertags_medias = set()
+
+    if media_type == "GraphSidecar":
+        carousel = getpath(item, ["carousel_media"])
+        for media in carousel:
+            medias_type.append(INSTAGRAM_MEDIA_TYPE.get(getpath(media, ["media_type"])))
+
+            if medias_type[-1] == "GraphImage":
+                medias_url.append(getpath(media, INSTAGRAM_PATH_TO_MEDIA_IMAGE))
+                item_usertags = get_usertags(media)
+                usertags_medias = usertags_medias.union(item_usertags)
+
+            elif medias_type[-1] == "GraphVideo":
+                medias_url.append(getpath(media, INSTAGRAM_PATH_TO_MEDIA_VIDEO))
+                item_usertags = get_usertags(media)
+                usertags_medias = usertags_medias.union(item_usertags)
+
+    elif media_type == "GraphImage":
+        medias_type.append("GraphImage")
+        medias_url.append(getpath(item, INSTAGRAM_PATH_TO_MEDIA_IMAGE))
+        item_usertags = get_usertags(item)
+        usertags_medias = usertags_medias.union(item_usertags)
+
+    elif media_type == "GraphVideo":
+        medias_type.append("GraphVideo")
+        medias_url.append(getpath(item, INSTAGRAM_PATH_TO_MEDIA_VIDEO))
+        item_usertags = get_usertags(item)
+        usertags_medias = usertags_medias.union(item_usertags)
 
     row = InstagramUserPost(
+        getpath(item, ["user", "username"]),
+        getpath(item, ["user", "full_name"]),
+        getpath(item, ["user", "is_verified"]),
         item["id"],
         media_type,
         item["code"],
@@ -109,9 +163,10 @@ def format_user_post(item):
         item["like_and_view_counts_disabled"],
         item["like_count"],
         item["comment_count"],
-        item.get("view_count"),
-        item.get("title"),
-        item.get("video_duration"),
+        short_code_to_url(item["code"]) + "media/?size=l",
+        medias_type,
+        medias_url,
+        usertags_medias,
         item["taken_at"],
         timestamp_to_isoformat(item["taken_at"]),
     )

@@ -1674,6 +1674,10 @@ If you want to grab cookies from another browser or want
 to directly pass the cookie as a string, check out the
 -c/--cookie flag.
 
+Beware, instagram only provides temporary links, not permalinks,
+for profile picture urls retrieved as the "profile_pic_url" in
+the result. Be sure to download them fast if you need them.
+
 positional arguments:
   column                      This argument can either take the query on which we want to retrieve followers accounts or the name of the column containing that query
   file                        CSV file containing the query for instagram username.
@@ -1713,6 +1717,10 @@ If you want to grab cookies from another browser or want
 to directly pass the cookie as a string, check out the
 -c/--cookie flag.
 
+Beware, instagram only provides temporary links, not permalinks,
+for profile picture urls retrieved as the "profile_pic_url" in
+the result. Be sure to download them fast if you need them.
+
 positional arguments:
   column                      This argument can either take the query on which we want to retrieve followed accounts or the name of the column containing that query
   file                        CSV file containing the query for instagram username.
@@ -1751,6 +1759,11 @@ authentication cookies from a local Firefox browser.
 If you want to grab cookies from another browser or want
 to directly pass the cookie as a string, check out the
 -c/--cookie flag.
+
+The urls in the medias_url column have a limited life time.
+It is not the case for the url in main_thumbnail_url, which
+corresponds to the first image (the video cover if the first
+media is a video).
 
 positional arguments:
   column                      This argument can either take the query on which we want to retrieve posts or the name of the column containing that query
