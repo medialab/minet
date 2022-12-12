@@ -57,6 +57,20 @@ def format_video(item):
         for effect in effects:
             effect_stickers_names.append(effect.get("name"))
 
+    duet_from_id = getpath(item, ["duetInfo", "duetFromId"])
+
+    if duet_from_id == "0":
+        duet_from_id = None
+        duet_from_user_id = None
+        duet_from_user_name = None
+        duet_from_user_is_commerce = None
+    else:
+        for text in getpath(item, ["textExtra"]):
+            if text["awemeId"] == duet_from_id:
+                duet_from_user_id = text["userId"]
+                duet_from_user_name = text["userUniqueId"]
+                duet_from_user_is_commerce = text["isCommerce"]
+
     row = TiktokVideo(
         item.get("id"),
         item.get("desc"),
@@ -71,7 +85,8 @@ def format_video(item):
         getpath(item, ["video", "cover"]),
         getpath(item, ["video", "originCover"]),
         getpath(item, ["video", "dynamicCover"]),
-        getpath(item, ["video", "downloadAddr"]),
+        # Access denied
+        # getpath(item, ["video", "downloadAddr"]),
         getpath(item, ["video", "reflowCover"]),
         getpath(item, ["video", "bitrate"]),
         getpath(item, ["video", "format"]),
@@ -88,7 +103,6 @@ def format_video(item):
         getpath(item, ["authorStats", "heartCount"]),
         getpath(item, ["authorStats", "videoCount"]),
         getpath(item, ["authorStats", "diggCount"]),
-        getpath(item, ["authorStats", "heart"]),
         getpath(item, ["music", "id"]),
         getpath(item, ["music", "title"]),
         getpath(item, ["music", "authorName"]),
@@ -100,7 +114,10 @@ def format_video(item):
         getpath(item, ["stats", "shareCount"]),
         getpath(item, ["stats", "commentCount"]),
         getpath(item, ["stats", "playCount"]),
-        getpath(item, ["duetInfo", "duetFromId"]),
+        duet_from_id,
+        duet_from_user_id,
+        duet_from_user_name,
+        duet_from_user_is_commerce,
         challenges_titles,
         challenges_descs,
         stickers_texts,
