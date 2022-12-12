@@ -8,6 +8,7 @@ import casanova
 from twitter import TwitterHTTPError
 from twitwi import normalize_user, format_user_as_csv_row
 from twitwi.constants import USER_PARAMS, USER_FIELDS
+from ural.twitter import parse_twitter_url, TwitterList
 
 from minet.cli.utils import LoadingBar
 from minet.twitter import TwitterAPIClient
@@ -36,11 +37,18 @@ def twitter_list_members_action(cli_args):
 
     for row, twitter_list in enricher.cells(cli_args.column, with_rows=True):
         loading_bar.inc("lists")
+
+        twitter_id_list = twitter_list
+
+        list_parsed = parse_twitter_url(twitter_list)
+        if isinstance(list_parsed, TwitterList):
+            twitter_id_list = list_parsed.id
+
         kwargs = {"max_results": ITEMS_PER_PAGE, "params": USER_PARAMS}
 
         while True:
             try:
-                result = client.call(["lists", twitter_list, "members"], **kwargs)
+                result = client.call(["lists", twitter_id_list, "members"], **kwargs)
             except TwitterHTTPError as e:
                 loading_bar.inc("errors")
 
