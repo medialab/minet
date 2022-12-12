@@ -97,7 +97,7 @@ def format_hashtag_post(item):
         item["taken_at_timestamp"],
         timestamp_to_isoformat(item["taken_at_timestamp"]),
         item["accessibility_caption"],
-        short_code_to_url(item["code"]) + "/media/?size=l",
+        short_code_to_url(item["shortcode"]) + "media/?size=l",
     )
 
     return row

@@ -1596,7 +1596,7 @@ examples:
 
 ```
 usage: minet instagram [-h] [--rcfile RCFILE] [-o OUTPUT]
-                       {hashtag,user-posts,user-followers,user-following} ...
+                       {hashtag,user-followers,user-following,user-posts} ...
 
 Minet Instagram command
 =======================
@@ -1609,7 +1609,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
 
 actions:
-  {hashtag,user-posts,user-followers,user-following}
+  {hashtag,user-followers,user-following,user-posts}
                                                   Actions to perform on Instagram.
 
 ```
@@ -1634,8 +1634,11 @@ If you want to grab cookies from another browser or want
 to directly pass the cookie as a string, check out the
 -c/--cookie flag.
 
+display_url is not the media url, but a thumbnail of the post.
+There is no way with this command to get the media urls.
+
 positional arguments:
-  column                      This argument can either take the query on which we want to retrieve posts or the name of the column containing that query
+  column                      This argument can either take the hashtag on which we want to retrieve posts or the name of the column containing that hashtag
   file                        CSV file containing the query for instagram hashtag.
 
 optional arguments:
@@ -1676,11 +1679,12 @@ to directly pass the cookie as a string, check out the
 
 Beware, instagram only provides temporary links, not permalinks,
 for profile picture urls retrieved as the "profile_pic_url" in
-the result. Be sure to download them fast if you need them.
+the result. Be sure to download them fast if you need them (you can
+use the `minet fetch` command for that, and won't need to use cookies).
 
 positional arguments:
-  column                      This argument can either take the query on which we want to retrieve followers accounts or the name of the column containing that query
-  file                        CSV file containing the query for instagram username.
+  column                      This argument can either take the username on which we want to retrieve followers accounts or the name of the column containing those usernames
+  file                        CSV file containing the Instagram usernames.
 
 optional arguments:
   -h, --help                  show this help message and exit
@@ -1688,7 +1692,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
-  -l LIMIT, --limit LIMIT     Maximum number of followers to retrieve per query.
+  -l LIMIT, --limit LIMIT     Maximum number of followers to retrieve per username.
 
 example:
 
@@ -1719,11 +1723,12 @@ to directly pass the cookie as a string, check out the
 
 Beware, instagram only provides temporary links, not permalinks,
 for profile picture urls retrieved as the "profile_pic_url" in
-the result. Be sure to download them fast if you need them.
+the result. Be sure to download them fast if you need them (you can
+use the `minet fetch` command for that, and won't need to use cookies).
 
 positional arguments:
-  column                      This argument can either take the query on which we want to retrieve followed accounts or the name of the column containing that query
-  file                        CSV file containing the query for instagram username.
+  column                      This argument can either take the username on which we want to retrieve followed accounts or the name of the column containing those usernames
+  file                        CSV file containing the Instagram usernames.
 
 optional arguments:
   -h, --help                  show this help message and exit
@@ -1763,11 +1768,13 @@ to directly pass the cookie as a string, check out the
 The urls in the medias_url column have a limited life time.
 It is not the case for the url in main_thumbnail_url, which
 corresponds to the first image (the video cover if the first
-media is a video).
+media is a video). Be sure to download them fast if you need 
+them (you can use the `minet fetch` command for that, and
+won't need to use cookies).
 
 positional arguments:
-  column                      This argument can either take the query on which we want to retrieve posts or the name of the column containing that query
-  file                        CSV file containing the query for instagram username.
+  column                      This argument can either take the username on which we want to retrieve posts or the name of the column containing those usernames
+  file                        CSV file containing the Instagram usernames.
 
 optional arguments:
   -h, --help                  show this help message and exit
