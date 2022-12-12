@@ -2405,7 +2405,7 @@ MINET_COMMANDS = {
                         },
                         {
                             "name": "file",
-                            "help": "CSV file containing the inquired Twitter lists d or url.",
+                            "help": "CSV file containing the inquired Twitter lists id or url.",
                             "action": InputFileAction,
                             "dummy_csv_column": "list",
                         },
