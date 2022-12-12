@@ -11,7 +11,7 @@ from minet.cli.utils import LoadingBar
 from twitwi.utils import get_dates_from_id
 from ural.twitter import parse_twitter_url, TwitterTweet, TwitterUser, TwitterList
 
-ID_RE = re.compile(r"[0-9]+")
+ID_RE = re.compile(r"^[0-9]+$")
 
 
 def twitter_tweet_date_action(cli_args):

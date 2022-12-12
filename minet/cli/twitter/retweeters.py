@@ -16,7 +16,7 @@ from minet.cli.utils import LoadingBar
 from minet.twitter import TwitterAPIClient
 
 
-ID_RE = re.compile(r"[0-9]+")
+ID_RE = re.compile(r"^[0-9]+$")
 
 ITEMS_PER_PAGE = 100
 
