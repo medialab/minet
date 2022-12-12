@@ -1549,6 +1549,9 @@ MINET_COMMANDS = {
                         If you want to grab cookies from another browser or want
                         to directly pass the cookie as a string, check out the
                         -c/--cookie flag.
+
+                        display_url is not the media url, but a thumbnail of the post.
+                        There is no way with this command to get the media urls.
                     """,
                     "epilog": """
                         example:
@@ -1559,65 +1562,11 @@ MINET_COMMANDS = {
                     "arguments": [
                         {
                             "name": "column",
-                            "help": "This argument can either take the query on which we want to retrieve posts or the name of the column containing that query",
+                            "help": "This argument can either take the hashtag on which we want to retrieve posts or the name of the column containing that hashtag",
                         },
                         {
                             "name": "file",
                             "help": "CSV file containing the query for instagram hashtag.",
-                            "action": InputFileAction,
-                            "dummy_csv_column": "query",
-                        },
-                        {
-                            "flags": ["-s", "--select"],
-                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
-                            "type": SplitterType(),
-                        },
-                        {
-                            "flags": ["-c", "--cookie"],
-                            "help": 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".',
-                            "default": "firefox",
-                            "rc_key": ["instagram", "cookie"],
-                            "action": ConfigAction,
-                        },
-                        {
-                            "flags": ["-l", "--limit"],
-                            "help": "Maximum number of posts to retrieve per query.",
-                            "type": int,
-                        },
-                    ],
-                },
-                "user-posts": {
-                    "title": "Instagram user-posts",
-                    "description": """
-                        Scrape Instagram posts with a given username.
-
-                        This requires to be logged in to an Instagram account, so
-                        by default this command will attempt to grab the relevant
-                        authentication cookies from a local Firefox browser.
-
-                        If you want to grab cookies from another browser or want
-                        to directly pass the cookie as a string, check out the
-                        -c/--cookie flag.
-
-                        The urls in the medias_url column have a limited life time.
-                        It is not the case for the url in main_thumbnail_url, which
-                        corresponds to the first image (the video cover if the first
-                        media is a video).
-                    """,
-                    "epilog": """
-                        example:
-
-                        . Searching posts from the account paramountplus:
-                            $ minet instagram user-posts paramountplus > paramountplus_posts.csv
-                    """,
-                    "arguments": [
-                        {
-                            "name": "column",
-                            "help": "This argument can either take the query on which we want to retrieve posts or the name of the column containing that query",
-                        },
-                        {
-                            "name": "file",
-                            "help": "CSV file containing the query for instagram username.",
                             "action": InputFileAction,
                             "dummy_csv_column": "query",
                         },
@@ -1656,7 +1605,8 @@ MINET_COMMANDS = {
 
                         Beware, instagram only provides temporary links, not permalinks,
                         for profile picture urls retrieved as the "profile_pic_url" in
-                        the result. Be sure to download them fast if you need them.
+                        the result. Be sure to download them fast if you need them (you can
+                        use the `minet fetch` command for that, and won't need to use cookies).
                     """,
                     "epilog": """
                         example:
@@ -1667,11 +1617,11 @@ MINET_COMMANDS = {
                     "arguments": [
                         {
                             "name": "column",
-                            "help": "This argument can either take the query on which we want to retrieve followers accounts or the name of the column containing that query",
+                            "help": "This argument can either take the username on which we want to retrieve followers accounts or the name of the column containing those usernames",
                         },
                         {
                             "name": "file",
-                            "help": "CSV file containing the query for instagram username.",
+                            "help": "CSV file containing the Instagram usernames.",
                             "action": InputFileAction,
                             "dummy_csv_column": "query",
                         },
@@ -1689,7 +1639,7 @@ MINET_COMMANDS = {
                         },
                         {
                             "flags": ["-l", "--limit"],
-                            "help": "Maximum number of followers to retrieve per query.",
+                            "help": "Maximum number of followers to retrieve per username.",
                             "type": int,
                         },
                     ],
@@ -1709,7 +1659,8 @@ MINET_COMMANDS = {
 
                         Beware, instagram only provides temporary links, not permalinks,
                         for profile picture urls retrieved as the "profile_pic_url" in
-                        the result. Be sure to download them fast if you need them.
+                        the result. Be sure to download them fast if you need them (you can
+                        use the `minet fetch` command for that, and won't need to use cookies).
                     """,
                     "epilog": """
                         example:
@@ -1720,11 +1671,11 @@ MINET_COMMANDS = {
                     "arguments": [
                         {
                             "name": "column",
-                            "help": "This argument can either take the query on which we want to retrieve followed accounts or the name of the column containing that query",
+                            "help": "This argument can either take the username on which we want to retrieve followed accounts or the name of the column containing those usernames",
                         },
                         {
                             "name": "file",
-                            "help": "CSV file containing the query for instagram username.",
+                            "help": "CSV file containing the Instagram usernames.",
                             "action": InputFileAction,
                             "dummy_csv_column": "query",
                         },
@@ -1743,6 +1694,62 @@ MINET_COMMANDS = {
                         {
                             "flags": ["-l", "--limit"],
                             "help": "Maximum number of accounts to retrieve per query.",
+                            "type": int,
+                        },
+                    ],
+                },
+                "user-posts": {
+                    "title": "Instagram user-posts",
+                    "description": """
+                        Scrape Instagram posts with a given username.
+
+                        This requires to be logged in to an Instagram account, so
+                        by default this command will attempt to grab the relevant
+                        authentication cookies from a local Firefox browser.
+
+                        If you want to grab cookies from another browser or want
+                        to directly pass the cookie as a string, check out the
+                        -c/--cookie flag.
+
+                        The urls in the medias_url column have a limited life time.
+                        It is not the case for the url in main_thumbnail_url, which
+                        corresponds to the first image (the video cover if the first
+                        media is a video). Be sure to download them fast if you need 
+                        them (you can use the `minet fetch` command for that, and
+                        won't need to use cookies).
+                    """,
+                    "epilog": """
+                        example:
+
+                        . Searching posts from the account paramountplus:
+                            $ minet instagram user-posts paramountplus > paramountplus_posts.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "This argument can either take the username on which we want to retrieve posts or the name of the column containing those usernames",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the Instagram usernames.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "query",
+                        },
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flags": ["-c", "--cookie"],
+                            "help": 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".',
+                            "default": "firefox",
+                            "rc_key": ["instagram", "cookie"],
+                            "action": ConfigAction,
+                        },
+                        {
+                            "flags": ["-l", "--limit"],
+                            "help": "Maximum number of posts to retrieve per query.",
                             "type": int,
                         },
                     ],
