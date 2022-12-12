@@ -4,13 +4,18 @@
 #
 # Logic of the `tw list-followers` action.
 #
+import re
 import casanova
+from ebbe import getpath
 from twitter import TwitterHTTPError
 from twitwi import normalize_user, format_user_as_csv_row
 from twitwi.constants import USER_PARAMS, USER_FIELDS
+from ural.twitter import parse_twitter_url, TwitterList, TwitterTweet, TwitterUser
 
 from minet.cli.utils import LoadingBar
 from minet.twitter import TwitterAPIClient
+
+ID_RE = re.compile(r"^[0-9]+$")
 
 ITEMS_PER_PAGE = 100
 
@@ -38,11 +43,24 @@ def twitter_list_followers_action(cli_args):
 
     for row, twitter_list in enricher.cells(cli_args.column, with_rows=True):
         loading_bar.inc("lists")
+
+        twitter_id_list = twitter_list
+
+        list_parsed = parse_twitter_url(twitter_list)
+        if isinstance(list_parsed, TwitterList):
+            twitter_id_list = list_parsed.id
+        elif isinstance(list_parsed, (TwitterUser, TwitterTweet)) or (
+            not list_parsed and not ID_RE.match(twitter_list)
+        ):
+            loading_bar.inc("errors")
+            loading_bar.print("%s is not a list id or url." % twitter_list)
+            continue
+
         kwargs = {"max_results": ITEMS_PER_PAGE, "params": USER_PARAMS}
 
         while True:
             try:
-                result = client.call(["lists", twitter_list, "followers"], **kwargs)
+                result = client.call(["lists", twitter_id_list, "followers"], **kwargs)
             except TwitterHTTPError as e:
                 loading_bar.inc("errors")
 
@@ -51,9 +69,14 @@ def twitter_list_followers_action(cli_args):
                 else:
                     raise e
 
-                continue
+                break
 
-            if "data" not in "result" and result["meta"]["result_count"] == 0:
+            if result.get("errors"):
+                loading_bar.inc("errors")
+                loading_bar.print(getpath(result, ["errors", 0, "detail"]))
+                break
+
+            if "data" not in result or result["meta"]["result_count"] == 0:
                 break
 
             for user in result["data"]:
