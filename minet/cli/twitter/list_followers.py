@@ -75,6 +75,7 @@ def twitter_list_followers_action(cli_args):
                 break
 
             if result.get("errors"):
+                loading_bar.inc("errors")
                 loading_bar.print(getpath(result, ["errors", 0, "detail"]))
                 break
 
