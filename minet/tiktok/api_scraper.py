@@ -35,7 +35,7 @@ from minet.tiktok.formatters import (
 def forge_video_search_url(query, offset):
 
     url = (
-        "https://www.tiktok.com/api/search/item/full/?aid=1988&keyword=%s&offset=%s"
+        "https://www.tiktok.com/api/search/general/full/?aid=1988&keyword=%s&offset=%s"
         % (quote(query), offset)
     )
 
@@ -86,12 +86,15 @@ class TiktokAPIScraper(object):
 
             data = self.request_json(url)
 
-            item_list = data.get("item_list")
+            item_list = data.get("data")
 
             if not item_list:
                 break
 
             for item in item_list:
+                if item["type"] != 1:
+                    continue
+                item = item["item"]
                 yield format_video(item)
 
             has_next_page = getpath(data, ["has_more"])

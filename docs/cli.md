@@ -1979,9 +1979,10 @@ to directly pass the cookie as a string, check out the
 Challenges are hashtags, that can be associated with a description.
 
 The url have a limited life time (indicated by a timestamp in the
-url).
+url). If you want to get the resources associated to it, you should
+use the `minet fetch` command.
 
-This command allows you to get about 450 results, ordered by
+This command allows you to get about 450 results, ordered by user
 relevance (a mix of most popular, and most relevant according to your
 profile).
 
