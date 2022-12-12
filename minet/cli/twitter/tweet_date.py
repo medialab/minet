@@ -8,7 +8,7 @@ import casanova
 
 from minet.cli.utils import LoadingBar
 from twitwi.utils import get_dates_from_id
-from ural.twitter import parse_twitter_url, TwitterTweet
+from ural.twitter import parse_twitter_url, TwitterTweet, TwitterUser, TwitterList
 
 
 def twitter_tweet_date_action(cli_args):
@@ -30,6 +30,18 @@ def twitter_tweet_date_action(cli_args):
         tweet_parsed = parse_twitter_url(tweet)
         if isinstance(tweet_parsed, TwitterTweet):
             tweet_id = tweet_parsed.id
+        elif isinstance(tweet_parsed, TwitterUser):
+            loading_bar.inc("errors")
+            loading_bar.print(
+                "%s is not a tweet id or url, but a user id or url." % tweet
+            )
+            continue
+        elif isinstance(tweet_parsed, TwitterList):
+            loading_bar.inc("errors")
+            loading_bar.print(
+                "%s is not a tweet id or url, but a list id or url." % tweet
+            )
+            continue
 
         try:
             result = get_dates_from_id(tweet_id, locale=cli_args.timezone)

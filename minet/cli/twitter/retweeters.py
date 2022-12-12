@@ -5,9 +5,11 @@
 # Logic of the `tw retweeters` action.
 #
 import casanova
+from ebbe import getpath
 from twitter import TwitterHTTPError
 from twitwi import normalize_user, format_user_as_csv_row
 from twitwi.constants import USER_PARAMS, USER_FIELDS
+from ural.twitter import parse_twitter_url, TwitterTweet, TwitterUser, TwitterList
 
 from minet.cli.utils import LoadingBar
 from minet.twitter import TwitterAPIClient
@@ -38,11 +40,30 @@ def twitter_retweeters_action(cli_args):
 
     for row, tweet in enricher.cells(cli_args.column, with_rows=True):
         loading_bar.inc("tweets")
+
+        tweet_id = tweet
+
+        tweet_parsed = parse_twitter_url(tweet)
+        if isinstance(tweet_parsed, TwitterTweet):
+            tweet_id = tweet_parsed.id
+        elif isinstance(tweet_parsed, TwitterUser):
+            loading_bar.inc("errors")
+            loading_bar.print(
+                "%s is not a tweet id or url, but a user id or url." % tweet
+            )
+            continue
+        elif isinstance(tweet_parsed, TwitterList):
+            loading_bar.inc("errors")
+            loading_bar.print(
+                "%s is not a tweet id or url, but a list id or url." % tweet
+            )
+            continue
+
         kwargs = {"max_results": ITEMS_PER_PAGE, "params": USER_PARAMS}
 
         while True:
             try:
-                result = client.call(["tweets", tweet, "retweeted_by"], **kwargs)
+                result = client.call(["tweets", tweet_id, "retweeted_by"], **kwargs)
             except TwitterHTTPError as e:
                 loading_bar.inc("errors")
 
@@ -51,9 +72,14 @@ def twitter_retweeters_action(cli_args):
                 else:
                     raise e
 
-                continue
+                break
 
-            if "data" not in "result" and result["meta"]["result_count"] == 0:
+            if result.get("errors"):
+                loading_bar.inc("errors")
+                loading_bar.print(getpath(result, ["errors", 0, "detail"]))
+                break
+
+            if "data" not in result and result["meta"]["result_count"] == 0:
                 break
 
             for user in result["data"]:

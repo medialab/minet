@@ -2183,8 +2183,8 @@ Minet Twitter List Followers Command
 Retrieve followers of given list using Twitter API v2.
 
 positional arguments:
-  column                                     Name of the column containing the Twitter list id.
-  file                                       CSV file containing the inquired Twitter lists.
+  column                                     Name of the column containing the Twitter list id or url.
+  file                                       CSV file containing the inquired Twitter lists id or url.
 
 optional arguments:
   -h, --help                                 show this help message and exit
@@ -2220,8 +2220,8 @@ Minet Twitter List Members Command
 Retrieve members of given list using Twitter API v2.
 
 positional arguments:
-  column                                     Name of the column containing the Twitter list id.
-  file                                       CSV file containing the inquired Twitter lists.
+  column                                     Name of the column containing the Twitter list id or url.
+  file                                       CSV file containing the inquired Twitter lists d or url.
 
 optional arguments:
   -h, --help                                 show this help message and exit

@@ -2362,11 +2362,11 @@ MINET_COMMANDS = {
                     "arguments": [
                         {
                             "name": "column",
-                            "help": "Name of the column containing the Twitter list id.",
+                            "help": "Name of the column containing the Twitter list id or url.",
                         },
                         {
                             "name": "file",
-                            "help": "CSV file containing the inquired Twitter lists.",
+                            "help": "CSV file containing the inquired Twitter lists id or url.",
                             "action": InputFileAction,
                             "dummy_csv_column": "list",
                         },
@@ -2401,11 +2401,11 @@ MINET_COMMANDS = {
                     "arguments": [
                         {
                             "name": "column",
-                            "help": "Name of the column containing the Twitter list id.",
+                            "help": "Name of the column containing the Twitter list id or url.",
                         },
                         {
                             "name": "file",
-                            "help": "CSV file containing the inquired Twitter lists.",
+                            "help": "CSV file containing the inquired Twitter lists d or url.",
                             "action": InputFileAction,
                             "dummy_csv_column": "list",
                         },
