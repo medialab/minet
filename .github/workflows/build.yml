@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    tags: '*'
+    tags: "*"
 
 jobs:
   build:
