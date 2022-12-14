@@ -54,6 +54,7 @@ from minet.instagram.formatters import (
     format_hashtag_post,
     format_user,
     format_user_post,
+    format_user_info,
 )
 
 INSTAGRAM_GRAPHQL_ENDPOINT = "https://www.instagram.com/graphql/query/"
@@ -425,3 +426,32 @@ class InstagramAPIScraper(object):
                 break
 
             max_id = data.get("next_max_id")
+
+    @ensure_magic_token
+    def user_infos(self, name):
+
+        parsed = parse_instagram_url(name)
+
+        if isinstance(parsed, (ParsedInstagramPost, ParsedInstagramUser)):
+            if not parsed.name:
+                raise InstagramInvalidTargetError
+
+            name = parsed.name
+
+        else:
+            name = name.lstrip("@")
+
+            if not is_instagram_username(name):
+                raise InstagramInvalidTargetError
+
+        data = self.get_user(name)
+
+        if not data:
+            raise InstagramInvalidTargetError
+
+        user = getpath(data, ["data", "user"])
+
+        if not user:
+            raise InstagramInvalidTargetError
+
+        return format_user_info(user)
