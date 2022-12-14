@@ -12,6 +12,7 @@ from minet.instagram.constants import (
     INSTAGRAM_USER_POST_CSV_HEADERS,
     INSTAGRAM_MEDIA_TYPE,
     INSTAGRAM_USER_CSV_HEADERS,
+    INSTAGRAM_USER_INFO_CSV_HEADERS,
 )
 from minet.instagram.utils import (
     extract_hashtags,
@@ -54,6 +55,34 @@ InstagramUser = namedrecord(
         "has_anonymous_profile_picture",
         "has_highlight_reels",
         "is_favorite",
+    ],
+)
+
+InstagramUserInfo = namedrecord(
+    "InstagramUserInfo",
+    INSTAGRAM_USER_INFO_CSV_HEADERS,
+    boolean=[
+        "is_private",
+        "is_verified",
+        "hide_like_and_view_counts",
+        "has_ar_effects",
+        "has_clips",
+        "has_guides",
+        "has_channel",
+        "is_business_account",
+        "is_professional_account",
+        "is_supervision_enabled",
+        "is_guardian_of_viewer",
+        "is_supervised_by_viewer",
+        "is_supervised_user",
+        "is_joined_recently",
+    ],
+    plural=[
+        "bio_links_title",
+        "bio_links_url",
+        "biography_with_username",
+        "biography_with_hashtag",
+        "pronouns",
     ],
 )
 
@@ -190,6 +219,70 @@ def format_user(item):
         item.get("similar_user_id"),
         item.get("latest_reel_media"),
         item.get("is_favorite"),
+    )
+
+    return row
+
+
+def format_user_info(user):
+
+    bio_links_title = []
+    bio_links_url = []
+    biography_with_username = []
+    biography_with_hashtag = []
+
+    bio_links = user.get("bio_links")
+    if bio_links:
+        for link in bio_links:
+            bio_links_title.append(link.get("title"))
+            bio_links_url.append(link.get("url"))
+
+    biography_with_entities = getpath(user, ["biography_with_entities", "entities"])
+
+    if biography_with_entities:
+
+        for entity in biography_with_entities:
+            username = getpath(entity, ["user", "username"])
+            if username:
+                biography_with_username.append(username)
+
+            hashtag = getpath(entity, ["user", "hashtag"])
+            if hashtag:
+                biography_with_hashtag.append(hashtag)
+
+    pronouns = user.get("pronouns")
+
+    row = InstagramUserInfo(
+        user.get("username"),
+        user.get("id"),
+        user.get("full_name"),
+        user.get("profile_pic_url_hd"),
+        user.get("is_private"),
+        user.get("is_verified"),
+        user.get("biography"),
+        bio_links_title,
+        bio_links_url,
+        biography_with_username,
+        biography_with_hashtag,
+        getpath(user, ["edge_followed_by", "count"]),
+        getpath(user, ["edge_follow", "count"]),
+        user.get("hide_like_and_view_counts"),
+        pronouns,
+        user.get("has_ar_effects"),
+        user.get("has_clips"),
+        user.get("has_guides"),
+        user.get("has_channel"),
+        user.get("is_business_account"),
+        user.get("is_professional_account"),
+        user.get("is_supervision_enabled"),
+        user.get("is_guardian_of_viewer"),
+        user.get("is_supervised_by_viewer"),
+        user.get("is_supervised_user"),
+        user.get("guardian_id"),
+        user.get("is_joined_recently"),
+        user.get("business_category_name"),
+        user.get("category_name"),
+        user.get("connected_fb_page"),
     )
 
     return row

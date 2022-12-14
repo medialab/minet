@@ -52,6 +52,7 @@
   * [hashtag](#hashtag)
   * [user-followers](#user-followers)
   * [user-following](#user-following)
+  * [user-infos](#user-infos)
   * [user-posts](#user-posts)
 * [mediacloud (mc)](#mediacloud)
   * [medias](#mc-medias)
@@ -307,6 +308,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### user-following
 
 <% insta/user-following %>
+
+### user-infos
+
+<% insta/user-infos %>
 
 ### user-posts
 

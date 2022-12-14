@@ -52,6 +52,7 @@
   * [hashtag](#hashtag)
   * [user-followers](#user-followers)
   * [user-following](#user-following)
+  * [user-infos](#user-infos)
   * [user-posts](#user-posts)
 * [mediacloud (mc)](#mediacloud)
   * [medias](#mc-medias)
@@ -1596,7 +1597,8 @@ examples:
 
 ```
 usage: minet instagram [-h] [--rcfile RCFILE] [-o OUTPUT]
-                       {hashtag,user-followers,user-following,user-posts} ...
+                       {hashtag,user-followers,user-following,user-infos,user-posts}
+                       ...
 
 Minet Instagram command
 =======================
@@ -1609,7 +1611,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
 
 actions:
-  {hashtag,user-followers,user-following,user-posts}
+  {hashtag,user-followers,user-following,user-infos,user-posts}
                                                   Actions to perform on Instagram.
 
 ```
@@ -1742,6 +1744,49 @@ example:
 
 . Searching accounts followed with the username paramountplus:
     $ minet instagram user-following paramountplus > paramountplus_following.csv
+
+```
+
+### user-infos
+
+```
+usage: minet instagram user-infos [-h] [--rcfile RCFILE] [-o OUTPUT] [-s SELECT]
+                                  [-c COOKIE]
+                                  column [file]
+
+Instagram user-infos
+====================
+
+Scrape Instagram infos with a given username or user url.
+
+This requires to be logged in to an Instagram account, so
+by default this command will attempt to grab the relevant
+authentication cookies from a local Firefox browser.
+
+If you want to grab cookies from another browser or want
+to directly pass the cookie as a string, check out the
+-c/--cookie flag.
+
+Beware, instagram only provides temporary links, not permalinks,
+for profile picture urls retrieved as the "profile_pic_url_hd" in
+the result. Be sure to download them fast if you need them (you can
+use the `minet fetch` command for that, and won't need to use cookies).
+
+positional arguments:
+  column                      This argument can either take the username or user url on which we want to retrieve information about or the name of the column containing those usernames or user urls.
+  file                        CSV file containing the Instagram usernames or user urls.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
+
+example:
+
+. Searching infos with the username banksrepeta:
+    $ minet instagram user-infos banksrepeta > banksrepeta_infos.csv
 
 ```
 

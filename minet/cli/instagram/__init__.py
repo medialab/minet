@@ -31,3 +31,9 @@ def instagram_action(cli_args):
         from minet.cli.instagram.user_following import user_following_action
 
         user_following_action(cli_args)
+
+    if cli_args.insta_action == "user-infos":
+
+        from minet.cli.instagram.user_infos import user_infos_action
+
+        user_infos_action(cli_args)

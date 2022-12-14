@@ -1698,6 +1698,55 @@ MINET_COMMANDS = {
                         },
                     ],
                 },
+                "user-infos": {
+                    "title": "Instagram user-infos",
+                    "description": """
+                        Scrape Instagram infos with a given username or user url.
+
+                        This requires to be logged in to an Instagram account, so
+                        by default this command will attempt to grab the relevant
+                        authentication cookies from a local Firefox browser.
+
+                        If you want to grab cookies from another browser or want
+                        to directly pass the cookie as a string, check out the
+                        -c/--cookie flag.
+
+                        Beware, instagram only provides temporary links, not permalinks,
+                        for profile picture urls retrieved as the "profile_pic_url_hd" in
+                        the result. Be sure to download them fast if you need them (you can
+                        use the `minet fetch` command for that, and won't need to use cookies).
+                    """,
+                    "epilog": """
+                        example:
+
+                        . Searching infos with the username banksrepeta:
+                            $ minet instagram user-infos banksrepeta > banksrepeta_infos.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "This argument can either take the username or user url on which we want to retrieve information about or the name of the column containing those usernames or user urls.",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the Instagram usernames or user urls.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "username",
+                        },
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flags": ["-c", "--cookie"],
+                            "help": 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".',
+                            "default": "firefox",
+                            "rc_key": ["instagram", "cookie"],
+                            "action": ConfigAction,
+                        },
+                    ],
+                },
                 "user-posts": {
                     "title": "Instagram user-posts",
                     "description": """
