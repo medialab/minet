@@ -59,14 +59,30 @@ InstagramUser = namedrecord(
 )
 
 InstagramUserInfo = namedrecord(
-    "InstagramUser",
+    "InstagramUserInfo",
     INSTAGRAM_USER_INFO_CSV_HEADERS,
     boolean=[
         "is_private",
         "is_verified",
-        "has_anonymous_profile_picture",
-        "has_highlight_reels",
-        "is_favorite",
+        "hide_like_and_view_counts",
+        "has_ar_effects",
+        "has_clips",
+        "has_guides",
+        "has_channel",
+        "is_business_account",
+        "is_professional_account",
+        "is_supervision_enabled",
+        "is_guardian_of_viewer",
+        "is_supervised_by_viewer",
+        "is_supervised_user",
+        "is_joined_recently",
+    ],
+    plural=[
+        "bio_links_title",
+        "bio_links_url",
+        "biography_with_username",
+        "biography_with_hashtag",
+        "pronouns",
     ],
 )
 
@@ -210,26 +226,20 @@ def format_user(item):
 
 def format_user_info(user):
 
-    bio_links_title = None
-    bio_links_url = None
-    biography_with_username = None
-    biography_with_hashtag = None
+    bio_links_title = []
+    bio_links_url = []
+    biography_with_username = []
+    biography_with_hashtag = []
 
     bio_links = user.get("bio_links")
     if bio_links:
-        bio_links_title = []
-        bio_links_url = []
         for link in bio_links:
             bio_links_title.append(link.get("title"))
             bio_links_url.append(link.get("url"))
-        bio_links_title = "|".join(bio_links_title)
-        bio_links_url = "|".join(bio_links_url)
 
     biography_with_entities = getpath(user, ["biography_with_entities", "entities"])
 
     if biography_with_entities:
-        biography_with_username = []
-        biography_with_hashtag = []
 
         for entity in biography_with_entities:
             username = getpath(entity, ["user", "username"])
@@ -240,14 +250,7 @@ def format_user_info(user):
             if hashtag:
                 biography_with_hashtag.append(hashtag)
 
-        biography_with_username = "|".join(biography_with_username)
-        biography_with_hashtag = "|".join(biography_with_hashtag)
-
     pronouns = user.get("pronouns")
-    if pronouns != []:
-        pronouns = "|".join(pronouns)
-    else:
-        pronouns = None
 
     row = InstagramUserInfo(
         user.get("username"),
