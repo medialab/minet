@@ -15,6 +15,7 @@ from minet.instagram.exceptions import (
     InstagramInvalidCookieError,
     InstagramNoPublicationError,
     InstagramPrivateOrNonExistentAccountError,
+    InstagramInvalidTargetError,
 )
 
 
@@ -54,6 +55,11 @@ def user_posts_action(cli_args):
                 enricher.writerow(row, post.as_csv_row())
 
                 loading_bar.inc("posts")
+
+        except InstagramInvalidTargetError:
+            loading_bar.print(
+                "Given user (line %i) is probably not an Instagram user: %s" % (i, user)
+            )
         except InstagramPrivateOrNonExistentAccountError:
             loading_bar.print(
                 "Given user (line %i) is probably a private Instagram account or is not an Instagram user: %s"

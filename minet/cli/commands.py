@@ -1566,9 +1566,9 @@ MINET_COMMANDS = {
                         },
                         {
                             "name": "file",
-                            "help": "CSV file containing the query for instagram hashtag.",
+                            "help": "CSV file containing the hashtags to get Instagram posts.",
                             "action": InputFileAction,
-                            "dummy_csv_column": "query",
+                            "dummy_csv_column": "hashtag",
                         },
                         {
                             "flags": ["-s", "--select"],
@@ -1584,7 +1584,7 @@ MINET_COMMANDS = {
                         },
                         {
                             "flags": ["-l", "--limit"],
-                            "help": "Maximum number of posts to retrieve per query.",
+                            "help": "Maximum number of posts to retrieve per hashtag.",
                             "type": int,
                         },
                     ],
@@ -1592,7 +1592,7 @@ MINET_COMMANDS = {
                 "user-followers": {
                     "title": "Instagram user-followers",
                     "description": """
-                        Scrape Instagram followers with a given username.
+                        Scrape Instagram followers with a given username or user url.
                         On verified accounts, you may be unable to get all of them.
 
                         This requires to be logged in to an Instagram account, so
@@ -1617,13 +1617,13 @@ MINET_COMMANDS = {
                     "arguments": [
                         {
                             "name": "column",
-                            "help": "This argument can either take the username on which we want to retrieve followers accounts or the name of the column containing those usernames",
+                            "help": "This argument can either take the username or user url on which we want to retrieve followers accounts or the name of the column containing those usernames or user urls.",
                         },
                         {
                             "name": "file",
-                            "help": "CSV file containing the Instagram usernames.",
+                            "help": "CSV file containing the Instagram usernames or user urls.",
                             "action": InputFileAction,
-                            "dummy_csv_column": "query",
+                            "dummy_csv_column": "username",
                         },
                         {
                             "flags": ["-s", "--select"],
@@ -1639,7 +1639,7 @@ MINET_COMMANDS = {
                         },
                         {
                             "flags": ["-l", "--limit"],
-                            "help": "Maximum number of followers to retrieve per username.",
+                            "help": "Maximum number of followers to retrieve per user.",
                             "type": int,
                         },
                     ],
@@ -1671,13 +1671,13 @@ MINET_COMMANDS = {
                     "arguments": [
                         {
                             "name": "column",
-                            "help": "This argument can either take the username on which we want to retrieve followed accounts or the name of the column containing those usernames",
+                            "help": "This argument can either take the username  or user url on which we want to retrieve followed accounts or the name of the column containing those usernames or user urls.",
                         },
                         {
                             "name": "file",
-                            "help": "CSV file containing the Instagram usernames.",
+                            "help": "CSV file containing the Instagram usernames or user urls.",
                             "action": InputFileAction,
-                            "dummy_csv_column": "query",
+                            "dummy_csv_column": "username",
                         },
                         {
                             "flags": ["-s", "--select"],
@@ -1693,7 +1693,7 @@ MINET_COMMANDS = {
                         },
                         {
                             "flags": ["-l", "--limit"],
-                            "help": "Maximum number of accounts to retrieve per query.",
+                            "help": "Maximum number of accounts to retrieve per user.",
                             "type": int,
                         },
                     ],
@@ -1701,7 +1701,7 @@ MINET_COMMANDS = {
                 "user-posts": {
                     "title": "Instagram user-posts",
                     "description": """
-                        Scrape Instagram posts with a given username.
+                        Scrape Instagram posts with a given username or user url.
 
                         This requires to be logged in to an Instagram account, so
                         by default this command will attempt to grab the relevant
@@ -1727,13 +1727,13 @@ MINET_COMMANDS = {
                     "arguments": [
                         {
                             "name": "column",
-                            "help": "This argument can either take the username on which we want to retrieve posts or the name of the column containing those usernames",
+                            "help": "This argument can either take the username or user url on which we want to retrieve posts or the name of the column containing those usernames or user urls.",
                         },
                         {
                             "name": "file",
-                            "help": "CSV file containing the Instagram usernames.",
+                            "help": "CSV file containing the Instagram usernames or user urls.",
                             "action": InputFileAction,
-                            "dummy_csv_column": "query",
+                            "dummy_csv_column": "username",
                         },
                         {
                             "flags": ["-s", "--select"],
@@ -1749,7 +1749,7 @@ MINET_COMMANDS = {
                         },
                         {
                             "flags": ["-l", "--limit"],
-                            "help": "Maximum number of posts to retrieve per query.",
+                            "help": "Maximum number of posts to retrieve per user.",
                             "type": int,
                         },
                     ],

@@ -1639,7 +1639,7 @@ There is no way with this command to get the media urls.
 
 positional arguments:
   column                      This argument can either take the hashtag on which we want to retrieve posts or the name of the column containing that hashtag
-  file                        CSV file containing the query for instagram hashtag.
+  file                        CSV file containing the hashtags to get Instagram posts.
 
 optional arguments:
   -h, --help                  show this help message and exit
@@ -1647,7 +1647,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
-  -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve per query.
+  -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve per hashtag.
 
 example:
 
@@ -1666,7 +1666,7 @@ usage: minet instagram user-followers [-h] [--rcfile RCFILE] [-o OUTPUT]
 Instagram user-followers
 ========================
 
-Scrape Instagram followers with a given username.
+Scrape Instagram followers with a given username or user url.
 On verified accounts, you may be unable to get all of them.
 
 This requires to be logged in to an Instagram account, so
@@ -1683,8 +1683,8 @@ the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
 positional arguments:
-  column                      This argument can either take the username on which we want to retrieve followers accounts or the name of the column containing those usernames
-  file                        CSV file containing the Instagram usernames.
+  column                      This argument can either take the username or user url on which we want to retrieve followers accounts or the name of the column containing those usernames or user urls.
+  file                        CSV file containing the Instagram usernames or user urls.
 
 optional arguments:
   -h, --help                  show this help message and exit
@@ -1692,7 +1692,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
-  -l LIMIT, --limit LIMIT     Maximum number of followers to retrieve per username.
+  -l LIMIT, --limit LIMIT     Maximum number of followers to retrieve per user.
 
 example:
 
@@ -1727,8 +1727,8 @@ the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
 positional arguments:
-  column                      This argument can either take the username on which we want to retrieve followed accounts or the name of the column containing those usernames
-  file                        CSV file containing the Instagram usernames.
+  column                      This argument can either take the username  or user url on which we want to retrieve followed accounts or the name of the column containing those usernames or user urls.
+  file                        CSV file containing the Instagram usernames or user urls.
 
 optional arguments:
   -h, --help                  show this help message and exit
@@ -1736,7 +1736,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
-  -l LIMIT, --limit LIMIT     Maximum number of accounts to retrieve per query.
+  -l LIMIT, --limit LIMIT     Maximum number of accounts to retrieve per user.
 
 example:
 
@@ -1755,7 +1755,7 @@ usage: minet instagram user-posts [-h] [--rcfile RCFILE] [-o OUTPUT] [-s SELECT]
 Instagram user-posts
 ====================
 
-Scrape Instagram posts with a given username.
+Scrape Instagram posts with a given username or user url.
 
 This requires to be logged in to an Instagram account, so
 by default this command will attempt to grab the relevant
@@ -1773,8 +1773,8 @@ them (you can use the `minet fetch` command for that, and
 won't need to use cookies).
 
 positional arguments:
-  column                      This argument can either take the username on which we want to retrieve posts or the name of the column containing those usernames
-  file                        CSV file containing the Instagram usernames.
+  column                      This argument can either take the username or user url on which we want to retrieve posts or the name of the column containing those usernames or user urls.
+  file                        CSV file containing the Instagram usernames or user urls.
 
 optional arguments:
   -h, --help                  show this help message and exit
@@ -1782,7 +1782,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
-  -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve per query.
+  -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve per user.
 
 example:
 
