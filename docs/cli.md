@@ -81,6 +81,7 @@
   * [user-tweets](#user-tweets)
 * [youtube (yt)](#youtube)
   * [captions](#captions)
+  * [channel-meta](#channel-meta)
   * [channel-videos](#channel-videos)
   * [comments](#youtube-comments)
   * [search](#youtube-search)
@@ -2738,6 +2739,47 @@ examples:
 
 . Fetching French captions with a fallback to English:
     $ minet yt captions video_id videos.csv --lang fr,en > captions.csv
+
+```
+
+### channel-meta
+
+```
+usage: minet youtube channel-meta [-h] [--rcfile RCFILE] [-o OUTPUT] [-k KEY]
+                                  [-s SELECT] [--total TOTAL]
+                                  column [file]
+
+Youtube channel metadata
+========================
+
+Retrieve metadata about Youtube channel from one or many name(s) using the API.
+
+Under the hood, this command extract the channel id from the given url or scrape the
+website to find it if necessary. Then the command uses the API to retrieve
+information about the channel.
+
+positional arguments:
+  column                      Name of the column containing the channel's ids.
+  file                        CSV file containing the Youtube channel's ids.
+
+optional arguments:
+  -h, --help                  show this help message and exit
+  --rcfile RCFILE             Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used more than once. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
+  --total TOTAL               Total number of videos. Necessary if you want to display a finite progress indicator.
+
+example:
+
+. Fetching metadata from a channel based on the channel's id or url:
+    $ minet youtube channel-meta https://www.youtube.com/c/LinksOff -k my-api-key > linksoff_meta.csv
+    $ minet youtube channel-meta https://www.youtube.com/channel/UCqnbDFdCpuN8CMEg0VuEBqA -k my-api-key > thenewyorktimes_meta.csv
+    $ minet youtube channel-meta UCprclkVrNPls7PR-nHhf1Ow -k my-api-key > tonyheller_metadat.csv
+
+. Fetching multiple channels' metadata:
+    $ minet youtube channel-meta channel_id channels_id.csv -k my-api-key > channels_meta.csv
+    $ minet youtube channel-meta channel_url channels_url.csv -k my-api-key > channels_meta.csv
 
 ```
 

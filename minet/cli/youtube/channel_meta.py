@@ -10,6 +10,7 @@ import casanova
 from minet.cli.utils import LoadingBar
 from minet.youtube import YouTubeAPIClient
 from minet.youtube.constants import YOUTUBE_CHANNEL_CSV_HEADERS
+from minet.youtube.exceptions import YouTubeInvalidChannelTargetError
 
 
 def channel_meta_action(cli_args):
@@ -36,6 +37,11 @@ def channel_meta_action(cli_args):
     for row, channel_id in enricher.cells(cli_args.column, with_rows=True):
         loading_bar.update()
 
-        result = client.channel_meta(channel_id)
+        try:
+            result = client.channel_meta(channel_id)
 
-        enricher.writerow(row, result.as_csv_row() if result else None)
+            enricher.writerow(row, result.as_csv_row() if result else None)
+        except YouTubeInvalidChannelTargetError:
+            loading_bar.print(
+                "\nWe did not manage to reach this channel: %s" % channel_id
+            )
