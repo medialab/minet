@@ -23,6 +23,7 @@ from minet.cli.argparse import (
     SplitterType,
     TimestampType,
     TimezoneType,
+    UrlFragmentAction,
 )
 
 from minet.constants import COOKIE_BROWSERS
@@ -3270,11 +3271,6 @@ MINET_COMMANDS = {
                 "action": InputFileAction,
                 "dummy_csv_column": "url",
             },
-            {
-                "flag": "--facebook",
-                "help": "Whether to consider and parse the given urls as coming from Facebook.",
-                "action": "store_true",
-            },
             {"flags": ["-o", "--output"], "action": OutputFileAction},
             {
                 "flags": ["-s", "--select"],
@@ -3283,16 +3279,19 @@ MINET_COMMANDS = {
             },
             {"flag": "--separator", "help": "Split url column by a separator?"},
             {
-                "flags": ["--strip-protocol", "--no-strip-protocol"],
-                "help": "Whether or not to strip the protocol when normalizing the url. Defaults to strip protocol.",
-                "dest": "strip_protocol",
-                "action": BooleanAction,
-                "default": True,
-            },
-            {
                 "flag": "--total",
                 "help": "Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.",
                 "type": int,
+            },
+            {
+                "flag": "--facebook",
+                "help": "Whether to consider and parse the given urls as coming from Facebook.",
+                "action": "store_true",
+            },
+            {
+                "flag": "--twitter",
+                "help": "Whether to consider and parse the given urls as coming from Twitter.",
+                "action": "store_true",
             },
             {
                 "flag": "--youtube",
@@ -3300,9 +3299,172 @@ MINET_COMMANDS = {
                 "action": "store_true",
             },
             {
-                "flag": "--twitter",
-                "help": "Whether to consider and parse the given urls as coming from Twitter.",
-                "action": "store_true",
+                "flags": [
+                    "--infer-redirection",
+                    "--no-infer-redirection",
+                ],
+                "help": "Whether or not to attempt resolving common redirects by leveraging well-known GET parameters when normalizing url. Defaults to infer redirection.",
+                "dest": "infer_redirection",
+                "action": BooleanAction,
+                "default": True,
+            },
+            {
+                "flags": [
+                    "--fix-common-mistakes",
+                    "--no-fix-common-mistakes",
+                ],
+                "help": "Whether or not to attempt to fix common URL mistakes when normalizing url. Defaults to fix common mistakes.",
+                "dest": "fix_common_mistakes",
+                "action": BooleanAction,
+                "default": True,
+            },
+            {
+                "flags": [
+                    "--normalize-amp",
+                    "--no-normalize-amp",
+                ],
+                "help": "Whether or not to attempt to normalize Google AMP urls when normalizing url. Defaults to normalize amp.",
+                "dest": "normalize_amp",
+                "action": BooleanAction,
+                "default": True,
+            },
+            {
+                "flags": [
+                    "--quoted",
+                    "--no-quoted",
+                ],
+                "help": "Whether or not to normalize to a quoted or unquoted version of the url when normalizing url. Defaults to quoted.",
+                "dest": "quoted",
+                "action": BooleanAction,
+                "default": True,
+            },
+            {
+                "flags": [
+                    "--sort-query",
+                    "--no-sort-query",
+                ],
+                "help": "Whether or not to sort query items when normalizing url. Defaults to sort query.",
+                "dest": "sort_query",
+                "action": BooleanAction,
+                "default": True,
+            },
+            {
+                "flags": [
+                    "--strip-authentication",
+                    "--no-strip-authentication",
+                ],
+                "help": "Whether or not to strip authentication when normalizing url. Defaults to strip authentication.",
+                "dest": "strip_authentication",
+                "action": BooleanAction,
+                "default": True,
+            },
+            {
+                "flags": [
+                    "--strip-fragment",
+                    "--no-strip-fragment",
+                    "--strip-fragment-except-routing",
+                ],
+                "help": "Whether or not to strip the url's fragment when normalizing url. If set to `--strip-fragment-except-routing`, will only strip the fragment if the fragment is not deemed to be js routing (i.e. if it contains a `/`). Defaults to strip fragment except routing.",
+                "dest": "strip_fragment",
+                "action": UrlFragmentAction,
+                "default": "except-routing",
+            },
+            {
+                "flags": [
+                    "--strip-index",
+                    "--no-strip-index",
+                ],
+                "help": "Whether or not to strip trailing index when normalizing url. Defaults to strip index.",
+                "dest": "strip_index",
+                "action": BooleanAction,
+                "default": True,
+            },
+            {
+                "flags": [
+                    "--strip-irrelevant-subdomains",
+                    "--no-strip-irrelevant-subdomains",
+                ],
+                "help": "Whether or not to strip trailing irrelevant-subdomains such as `www` etc. when normalizing url. Defaults to no strip irrelevantsubdomains.",
+                "dest": "strip_irrelevant_subdomains",
+                "action": BooleanAction,
+                "default": True,
+            },
+            {
+                "flags": [
+                    "--strip-lang-query-items",
+                    "--no-strip-lang-query-items",
+                ],
+                "help": "Whether or not to strip language query items (ex: `gl=pt_BR`) when normalizing url. Defaults to no strip lang query items.",
+                "dest": "strip_lang_query_items",
+                "action": BooleanAction,
+                "default": False,
+            },
+            {
+                "flags": [
+                    "--strip-lang-subdomains",
+                    "--no-strip-lang-subdomains",
+                ],
+                "help": "Whether or not to strip language subdomains (ex: `fr-FR.lemonde.fr` to only `lemonde.fr` because `fr-FR` isn't a relevant subdomain, it indicates the language and the country) when normalizing url. Defaults to no strip lang subdomains.",
+                "dest": "strip_lang_subdomains",
+                "action": BooleanAction,
+                "default": False,
+            },
+            {
+                "flags": ["--strip-protocol", "--no-strip-protocol"],
+                "help": "Whether or not to strip the protocol when normalizing the url. Defaults to strip protocol.",
+                "dest": "strip_protocol",
+                "action": BooleanAction,
+                "default": True,
+            },
+            {
+                "flags": [
+                    "--strip-trailing-slash",
+                    "--no-strip-trailing-slash",
+                ],
+                "help": "Whether or not to trailing slash when normalizing url. Defaults to strip trailing slash.",
+                "dest": "strip_trailing_slash",
+                "action": BooleanAction,
+                "default": True,
+            },
+            {
+                "flags": [
+                    "--unsplit",
+                    "--no-unsplit",
+                ],
+                "help": "Whether or not to return a stringified version of the normalized url or directly the `SplitResult` instance worked on by the normalization process when normalizing url. Defaults to unsplit.",
+                "dest": "unsplit",
+                "action": BooleanAction,
+                "default": True,
+            },
+            {
+                "flags": [
+                    "--infer-redirection-hostname",
+                    "--no-infer-redirection-hostname",
+                ],
+                "help": "Whether or not to attempt resolving common redirects by leveraging well-known GET parameters when normalizing hostname. Defaults to infer redirection hostname.",
+                "dest": "infer_redirection_hostname",
+                "action": BooleanAction,
+                "default": True,
+            },
+            {
+                "flags": [
+                    "--normalize-amp-hostname",
+                    "--no-normalize-amp-hostname",
+                ],
+                "help": "Whether or not to attempt to normalize Google AMP urls when normalizing hostname. Defaults to normalize amp hostname.",
+                "dest": "normalize_amp_hostname",
+                "action": BooleanAction,
+                "default": True,
+            },
+            {
+                "flags": [
+                    "--strip-lang-subdomains-hostname",
+                    "--no-strip-lang-subdomains-hostname",
+                ],
+                "help": "Whether or not to strip language subdomains (ex: `fr-FR.lemonde.fr` to only `lemonde.fr` because `fr-FR` isn't a relevant subdomain, it indicates the language and the country) when normalizing hostname. Defaults to no strip lang subdomains hostname.",
+                "dest": "strip_lang_subdomains_hostname",
+                "action": BooleanAction,
+                "default": False,
             },
         ],
     },

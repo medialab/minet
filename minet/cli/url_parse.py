@@ -61,12 +61,31 @@ def extract_standard_addendum(cli_args, url):
 
     return [
         normalize_url(
-            url, strip_protocol=cli_args.strip_protocol, strip_trailing_slash=True
+            url,
+            infer_redirection=cli_args.infer_redirection,
+            fix_common_mistakes=cli_args.fix_common_mistakes,
+            normalize_amp=cli_args.normalize_amp,
+            quoted=cli_args.quoted,
+            sort_query=cli_args.sort_query,
+            strip_authentication=cli_args.strip_authentication,
+            strip_fragment=cli_args.strip_fragment,
+            strip_index=cli_args.strip_index,
+            strip_irrelevant_subdomains=cli_args.strip_irrelevant_subdomains,
+            strip_lang_query_items=cli_args.strip_lang_query_items,
+            strip_lang_subdomains=cli_args.strip_lang_subdomains,
+            strip_protocol=cli_args.strip_protocol,
+            strip_trailing_slash=cli_args.strip_trailing_slash,
+            unsplit=cli_args.unsplit,
         ),
         inferred_redirection if inferred_redirection != url else "",
         get_domain_name(url),
         get_hostname(url),
-        get_normalized_hostname(url),
+        get_normalized_hostname(
+            url,
+            infer_redirection=cli_args.infer_redirection_hostname,
+            normalize_amp=cli_args.normalize_amp_hostname,
+            strip_lang_subdomains=cli_args.strip_lang_subdomains_hostname,
+        ),
         "yes" if is_shortened_url(url) else "",
         "yes" if is_typo_url(url) else "",
         "yes" if is_homepage(url) else "",

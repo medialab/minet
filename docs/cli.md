@@ -613,9 +613,17 @@ examples:
 ## url-parse
 
 ```
-usage: minet url-parse [-h] [--rcfile RCFILE] [--facebook] [-o OUTPUT]
-                       [-s SELECT] [--separator SEPARATOR] [--strip-protocol]
-                       [--total TOTAL] [--youtube] [--twitter]
+usage: minet url-parse [-h] [--rcfile RCFILE] [-o OUTPUT] [-s SELECT]
+                       [--separator SEPARATOR] [--total TOTAL] [--facebook]
+                       [--twitter] [--youtube] [--infer-redirection]
+                       [--fix-common-mistakes] [--normalize-amp] [--quoted]
+                       [--sort-query] [--strip-authentication]
+                       [--strip-fragment] [--strip-index]
+                       [--strip-irrelevant-subdomains]
+                       [--strip-lang-query-items] [--strip-lang-subdomains]
+                       [--strip-protocol] [--strip-trailing-slash] [--unsplit]
+                       [--infer-redirection-hostname] [--normalize-amp-hostname]
+                       [--strip-lang-subdomains-hostname]
                        column [file]
 
 Minet Url Parse Command
@@ -626,20 +634,46 @@ library to extract useful information about them such as their
 normalized version, domain name, etc.
 
 positional arguments:
-  column                                 Name of the column containing urls.
-  file                                   Target CSV file.
+  column                                          Name of the column containing urls.
+  file                                            Target CSV file.
 
 optional arguments:
-  -h, --help                             show this help message and exit
-  --rcfile RCFILE                        Custom path to a minet configuration file.
-  --facebook                             Whether to consider and parse the given urls as coming from Facebook.
-  -o OUTPUT, --output OUTPUT             Path to the output file. By default, the results will be printed to stdout.
-  -s SELECT, --select SELECT             Columns to keep in output, separated by comma.
-  --separator SEPARATOR                  Split url column by a separator?
-  --strip-protocol, --no-strip-protocol  Whether or not to strip the protocol when normalizing the url. Defaults to strip protocol.
-  --total TOTAL                          Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.
-  --youtube                              Whether to consider and parse the given urls as coming from YouTube.
-  --twitter                              Whether to consider and parse the given urls as coming from Twitter.
+  -h, --help                                      show this help message and exit
+  --rcfile RCFILE                                 Custom path to a minet configuration file.
+  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT                      Columns to keep in output, separated by comma.
+  --separator SEPARATOR                           Split url column by a separator?
+  --total TOTAL                                   Total number of lines in CSV file. Necessary if you want to display a finite progress indicator for large input files.
+  --facebook                                      Whether to consider and parse the given urls as coming from Facebook.
+  --twitter                                       Whether to consider and parse the given urls as coming from Twitter.
+  --youtube                                       Whether to consider and parse the given urls as coming from YouTube.
+  --infer-redirection, --no-infer-redirection     Whether or not to attempt resolving common redirects by leveraging well-known GET parameters when normalizing url. Defaults to infer redirection.
+  --fix-common-mistakes, --no-fix-common-mistakes
+                                                  Whether or not to attempt to fix common URL mistakes when normalizing url. Defaults to fix common mistakes.
+  --normalize-amp, --no-normalize-amp             Whether or not to attempt to normalize Google AMP urls when normalizing url. Defaults to normalize amp.
+  --quoted, --no-quoted                           Whether or not to normalize to a quoted or unquoted version of the url when normalizing url. Defaults to quoted.
+  --sort-query, --no-sort-query                   Whether or not to sort query items when normalizing url. Defaults to sort query.
+  --strip-authentication, --no-strip-authentication
+                                                  Whether or not to strip authentication when normalizing url. Defaults to strip authentication.
+  --strip-fragment, --no-strip-fragment, --strip-fragment-except-routing
+                                                  Whether or not to strip the url's fragment when normalizing url. If set to `--strip-fragment-except-routing`, will only strip the fragment if the fragment is not deemed to be js routing (i.e. if it contains a `/`). Defaults to strip fragment except routing.
+  --strip-index, --no-strip-index                 Whether or not to strip trailing index when normalizing url. Defaults to strip index.
+  --strip-irrelevant-subdomains, --no-strip-irrelevant-subdomains
+                                                  Whether or not to strip trailing irrelevant-subdomains such as `www` etc. when normalizing url. Defaults to no strip irrelevantsubdomains.
+  --strip-lang-query-items, --no-strip-lang-query-items
+                                                  Whether or not to strip language query items (ex: `gl=pt_BR`) when normalizing url. Defaults to no strip lang query items.
+  --strip-lang-subdomains, --no-strip-lang-subdomains
+                                                  Whether or not to strip language subdomains (ex: `fr-FR.lemonde.fr` to only `lemonde.fr` because `fr-FR` isn't a relevant subdomain, it indicates the language and the country) when normalizing url. Defaults to no strip lang subdomains.
+  --strip-protocol, --no-strip-protocol           Whether or not to strip the protocol when normalizing the url. Defaults to strip protocol.
+  --strip-trailing-slash, --no-strip-trailing-slash
+                                                  Whether or not to trailing slash when normalizing url. Defaults to strip trailing slash.
+  --unsplit, --no-unsplit                         Whether or not to return a stringified version of the normalized url or directly the `SplitResult` instance worked on by the normalization process when normalizing url. Defaults to unsplit.
+  --infer-redirection-hostname, --no-infer-redirection-hostname
+                                                  Whether or not to attempt resolving common redirects by leveraging well-known GET parameters when normalizing hostname. Defaults to infer redirection hostname.
+  --normalize-amp-hostname, --no-normalize-amp-hostname
+                                                  Whether or not to attempt to normalize Google AMP urls when normalizing hostname. Defaults to normalize amp hostname.
+  --strip-lang-subdomains-hostname, --no-strip-lang-subdomains-hostname
+                                                  Whether or not to strip language subdomains (ex: `fr-FR.lemonde.fr` to only `lemonde.fr` because `fr-FR` isn't a relevant subdomain, it indicates the language and the country) when normalizing hostname. Defaults to no strip lang subdomains hostname.
 
 columns being added to the output:
 
