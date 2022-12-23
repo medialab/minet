@@ -12,6 +12,7 @@ from minet.youtube.constants import (
     YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS,
     YOUTUBE_PLAYLIST_VIDEO_SNIPPET_CSV_HEADERS,
     YOUTUBE_COMMENT_CSV_HEADERS,
+    YOUTUBE_CHANNEL_CSV_HEADERS,
 )
 
 YouTubeVideo = namedrecord(
@@ -27,6 +28,8 @@ YouTubePlaylistVideoSnippet = namedrecord(
 )
 
 YouTubeComment = namedrecord("YoutubeComment", YOUTUBE_COMMENT_CSV_HEADERS)
+
+YouTubeChannel = namedrecord("YoutubeChannel", YOUTUBE_CHANNEL_CSV_HEADERS)
 
 
 def get_int(item, key):
@@ -127,6 +130,28 @@ def format_playlist_item_snippet(item):
         snippet["description"],
         snippet["channelTitle"],
         snippet["position"],
+    )
+
+    return row
+
+
+def format_channel(item):
+    snippet = item.get("snippet")
+    statistics = item.get("statistics")
+
+    row = YouTubeChannel(
+        item.get("id"),
+        snippet.get("title"),
+        snippet.get("description"),
+        snippet.get("customUrl"),
+        snippet.get("publishedAt"),
+        getpath(snippet, ["thumbnails", "high", "url"]),
+        snippet.get("country"),
+        getpath(item, ["contentDetails", "relatedPlaylists", "uploads"]),
+        statistics.get("viewCount"),
+        statistics.get("hiddenSubscriberCount"),
+        statistics.get("subscriberCount"),
+        statistics.get("videoCount"),
     )
 
     return row

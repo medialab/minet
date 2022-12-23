@@ -3360,6 +3360,57 @@ MINET_COMMANDS = {
                         },
                     ],
                 },
+                "channel-meta": {
+                    "title": "Youtube channel metadata",
+                    "description": """
+                        Retrieve metadata about Youtube channel from one or many name(s) using the API.
+
+                        Under the hood, this command extract the channel id from the given url or scrape the
+                        website to find it if necessary. Then the command uses the API to retrieve
+                        information about the channel.
+                    """,
+                    "epilog": """
+                        example:
+
+                        . Fetching metadata from a channel based on the channel's id or url:
+                            $ minet youtube channel-meta https://www.youtube.com/c/LinksOff -k my-api-key > linksoff_meta.csv
+                            $ minet youtube channel-meta https://www.youtube.com/channel/UCqnbDFdCpuN8CMEg0VuEBqA -k my-api-key > thenewyorktimes_meta.csv
+                            $ minet youtube channel-meta UCprclkVrNPls7PR-nHhf1Ow -k my-api-key > tonyheller_metadat.csv
+
+                        . Fetching multiple channels' metadata:
+                            $ minet youtube channel-meta channel_id channels_id.csv -k my-api-key > channels_meta.csv
+                            $ minet youtube channel-meta channel_url channels_url.csv -k my-api-key > channels_meta.csv
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "Name of the column containing the channel's ids.",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the Youtube channel's ids.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "channel",
+                        },
+                        {
+                            "flags": ["-k", "--key"],
+                            "help": "YouTube API Data dashboard API key. Can be used more than once.",
+                            "rc_key": ["youtube", "key"],
+                            "action": ConfigAction,
+                            "plural": True,
+                        },
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                        {
+                            "flag": "--total",
+                            "help": "Total number of videos. Necessary if you want to display a finite progress indicator.",
+                            "type": int,
+                        },
+                    ],
+                },
                 "channel-videos": {
                     "title": "Youtube channel videos",
                     "description": """

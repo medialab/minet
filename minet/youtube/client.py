@@ -42,6 +42,7 @@ from minet.youtube.formatters import (
     format_comment,
     format_reply,
     format_playlist_item_snippet,
+    format_channel,
 )
 from minet.youtube.scrapers import scrape_channel_id
 
@@ -68,6 +69,12 @@ def forge_videos_url(ids):
     data = {"base": YOUTUBE_API_BASE_URL, "ids": ",".join(ids)}
 
     return "%(base)s/videos?id=%(ids)s&part=snippet,statistics,contentDetails" % data
+
+
+def forge_channel_url(ids):
+    data = {"base": YOUTUBE_API_BASE_URL, "ids": ids}
+
+    return "%(base)s/channels?id=%(ids)s&part=snippet,statistics,contentDetails" % data
 
 
 def forge_search_url(query, order=YOUTUBE_API_DEFAULT_SEARCH_ORDER, token=None):
@@ -215,6 +222,28 @@ class YouTubeAPIClient(object):
                 self.current_key = key
 
             self.keys[key] = True
+
+    def channel_meta(self, channel_target):
+        should_scrape, channel_id = ensure_channel_id(channel_target)
+
+        should_scrape, channel_id = ensure_channel_id(channel_target)
+
+        if should_scrape:
+            channel_id = scrape_channel_id(channel_target)
+
+        if channel_id is None:
+            raise YouTubeInvalidChannelTargetError
+
+        url = forge_channel_url(channel_id)
+
+        result = self.request_json(url)
+
+        channel = getpath(result, ["items", 0])
+
+        if not channel:
+            return None
+
+        return format_channel(channel)
 
     def videos(self, videos, key=None, raw=False):
 
