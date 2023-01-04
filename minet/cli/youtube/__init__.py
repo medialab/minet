@@ -53,3 +53,10 @@ def youtube_action(cli_args):
         from minet.cli.youtube.channel_videos import channel_videos_action
 
         channel_videos_action(cli_args)
+    
+    if cli_args.yt_action == "channel-topics":
+        check_key(cli_args)
+
+        from minet.cli.youtube.channel_topics import channel_topic_ids
+
+        channel_topic_ids(cli_args)

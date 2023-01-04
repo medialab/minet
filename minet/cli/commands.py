@@ -3360,6 +3360,62 @@ MINET_COMMANDS = {
                         },
                     ],
                 },
+                "channel-topics": {
+                    "title": "Youtube channel topic ids",
+                    "description": """
+                        Retrieve details about the topics with which YouTube/Google associates a channel. 
+                        This command requires a key to YouTube's API. Channels can be researched using their 
+                        IDs and/or URLs. An ID or URL can be directly given to the command or, instead, the 
+                        command can take the path to a CSV file and the name of the column containing the 
+                        IDs and/or URLs.
+
+                        columns being added with channel-topics:
+                        . "channel_id": YouTube channel ID, in case the input was a URL rather than a channel ID
+                        . "topic_ids": YouTube's unique identifier for the topic
+                        . "topic_categories": Link to Wikipedia page on the topic, provided in YouTube API response (i.e. https://en.wikipedia.org/wiki/Politics)
+                        . "topic_keywords": Keyword extracted from the given Wikipedia link (i.e. Politics)
+                    """,
+                    "epilog": """
+                        credentials:
+                        . Declaring an API key directly
+                            $ minet youtube channel-topics --key XXXXXXXXXXXXX_XXXXXXXXXXXXXXXXXXXXXXX [query]
+                        . Declaring an API key in a minet config file (.minetrc.yml)
+                            $ minet youtube channel-topics --rcfile .minetrc.yml [query]
+
+                        examples:
+                        . Based on a channel's URL, fetching topics:
+                            $ minet youtube channel-topics [credential] https://www.youtube.com/@sciencespo > channel_topics.csv
+                        . Based on a channel's ID, fetching topics:
+                            $ minet youtube channel-topics [credential] UCjaCN9r_oyIgyUwY7wgACkA > channel_topics.csv
+                        . Based on a CSV file of multiple channels' URLs and/or IDs, fetching topics:
+                            $ minet youtube channel-topics [credential] ids channels.csv > channel_topics.csv
+
+                    """,
+                    "arguments": [
+                        {
+                            "name": "column",
+                            "help": "Name of the column containing the channel's ID or URL.",
+                        },
+                        {
+                            "name": "file",
+                            "help": "CSV file containing the Youtube channel's IDs or URLs.",
+                            "action": InputFileAction,
+                            "dummy_csv_column": "channel",
+                        },
+                        {
+                            "flags": ["-k", "--key"],
+                            "help": "YouTube API Data dashboard API key. Can be used more than once.",
+                            "rc_key": ["youtube", "key"],
+                            "action": ConfigAction,
+                            "plural": True,
+                        },
+                        {
+                            "flags": ["-s", "--select"],
+                            "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                            "type": SplitterType(),
+                        },
+                    ],
+                },
                 "channel-videos": {
                     "title": "Youtube channel videos",
                     "description": """

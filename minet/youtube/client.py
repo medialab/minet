@@ -42,6 +42,7 @@ from minet.youtube.formatters import (
     format_comment,
     format_reply,
     format_playlist_item_snippet,
+    format_channel_topic,
 )
 from minet.youtube.scrapers import scrape_channel_id
 
@@ -62,6 +63,12 @@ def forge_playlist_videos_url(playlist_id, token=None):
         url += "&pageToken=%s" % token
 
     return url
+
+
+def forge_channel_topics_url(channel_id):
+    data = {"base": YOUTUBE_API_BASE_URL, "part": "topicDetails", "id": channel_id}
+
+    return "%(base)s/channels?part=%(part)s&id=%(id)s" % data
 
 
 def forge_videos_url(ids):
@@ -330,13 +337,7 @@ class YouTubeAPIClient(object):
 
     def channel_videos(self, channel_target):
 
-        should_scrape, channel_id = ensure_channel_id(channel_target)
-
-        if should_scrape:
-            channel_id = scrape_channel_id(channel_target)
-
-        if channel_id is None:
-            raise YouTubeInvalidChannelTargetError
+        channel_id = get_channel_id(channel_target)
 
         playlist_id = get_channel_main_playlist_id(channel_id)
 
@@ -359,3 +360,33 @@ class YouTubeAPIClient(object):
                     break
 
         return generator()
+    
+    def channel_topics(self, channel_target):
+
+        channel_id = get_channel_id(channel_target)
+
+        url = forge_channel_topics_url(channel_id)
+
+        result = self.request_json(url)
+
+        def generator():
+            for item in result["items"]:
+
+                item = format_channel_topic(item)
+
+                yield item
+
+        return generator()
+
+
+def get_channel_id(channel_target):
+
+    should_scrape, channel_id = ensure_channel_id(channel_target)
+
+    if should_scrape:
+        channel_id = scrape_channel_id(channel_target)
+
+    if channel_id is None:
+        raise YouTubeInvalidChannelTargetError
+
+    return channel_id

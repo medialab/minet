@@ -6,12 +6,14 @@
 #
 from casanova import namedrecord
 from ebbe import getpath
+import re
 
 from minet.youtube.constants import (
     YOUTUBE_VIDEO_CSV_HEADERS,
     YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS,
     YOUTUBE_PLAYLIST_VIDEO_SNIPPET_CSV_HEADERS,
     YOUTUBE_COMMENT_CSV_HEADERS,
+    YOUTUBE_CHANNEL_TOPIC_ID_CSV_HEADERS
 )
 
 YouTubeVideo = namedrecord(
@@ -27,6 +29,8 @@ YouTubePlaylistVideoSnippet = namedrecord(
 )
 
 YouTubeComment = namedrecord("YoutubeComment", YOUTUBE_COMMENT_CSV_HEADERS)
+
+YouTubeChannelTopicId = namedrecord("YouTubeChannelTopicId", YOUTUBE_CHANNEL_TOPIC_ID_CSV_HEADERS)
 
 
 def get_int(item, key):
@@ -127,6 +131,21 @@ def format_playlist_item_snippet(item):
         snippet["description"],
         snippet["channelTitle"],
         snippet["position"],
+    )
+
+    return row
+
+
+def format_channel_topic(item):
+    topic_details = item["topicDetails"]
+
+    keywords = [re.search(r"wiki\/(.*)$", url).group(1) for url in topic_details["topicCategories"]]
+
+    row = YouTubeChannelTopicId(
+        item["id"],
+        "|".join(topic_details["topicIds"]),
+        "|".join(topic_details["topicCategories"]),
+        "|".join(keywords)
     )
 
     return row
