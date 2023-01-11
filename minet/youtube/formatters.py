@@ -6,6 +6,7 @@
 #
 from casanova import namedrecord
 from ebbe import getpath
+import re
 
 from minet.youtube.constants import (
     YOUTUBE_VIDEO_CSV_HEADERS,
@@ -29,7 +30,12 @@ YouTubePlaylistVideoSnippet = namedrecord(
 
 YouTubeComment = namedrecord("YoutubeComment", YOUTUBE_COMMENT_CSV_HEADERS)
 
-YouTubeChannel = namedrecord("YoutubeChannel", YOUTUBE_CHANNEL_CSV_HEADERS)
+YouTubeChannel = namedrecord(
+    "YoutubeChannel",
+    YOUTUBE_CHANNEL_CSV_HEADERS,
+    boolean=["moderate_comments"],
+    plural=["topic_ids", "topic_categories", "topic_keywords", "keywords"],
+)
 
 
 def get_int(item, key):
@@ -138,6 +144,24 @@ def format_playlist_item_snippet(item):
 def format_channel(item):
     snippet = item.get("snippet")
     statistics = item.get("statistics")
+    topic_details = item.get("topicDetails")
+    status = item.get("status")
+    branding_settings = item.get("brandingSettings")
+
+    topic_keywords = [
+        re.search(r"https:\/\/en.wikipedia.org\/wiki\/(.*)$", url).group(1)
+        for url in topic_details["topicCategories"]
+    ]
+
+    keywords = getpath(branding_settings, ["channel", "keywords"])
+    if keywords:
+        keywords = [
+            keyword.strip()
+            for keyword in getpath(branding_settings, ["channel", "keywords"]).split(
+                '"'
+            )
+            if (keyword and keyword != " ")
+        ]
 
     row = YouTubeChannel(
         item.get("id"),
@@ -146,12 +170,23 @@ def format_channel(item):
         snippet.get("customUrl"),
         snippet.get("publishedAt"),
         getpath(snippet, ["thumbnails", "high", "url"]),
+        snippet.get("defaultLanguage"),
         snippet.get("country"),
         getpath(item, ["contentDetails", "relatedPlaylists", "uploads"]),
         statistics.get("viewCount"),
         statistics.get("hiddenSubscriberCount"),
         statistics.get("subscriberCount"),
         statistics.get("videoCount"),
+        topic_details.get("topicIds"),
+        topic_details.get("topicCategories"),
+        topic_keywords,
+        status.get("privacyStatus"),
+        status.get("madeForKids"),
+        status.get("longUploadsStatus"),
+        keywords,
+        getpath(branding_settings, ["channel", "moderateComments"]),
+        getpath(branding_settings, ["channel", "unsubscribedTrailer"]),
+        getpath(branding_settings, ["image", "bannerExternalUrl"]),
     )
 
     return row

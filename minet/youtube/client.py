@@ -21,6 +21,7 @@ from minet.youtube.utils import (
 from minet.youtube.constants import (
     YOUTUBE_API_BASE_URL,
     YOUTUBE_API_MAX_VIDEOS_PER_CALL,
+    YOUTUBE_API_MAX_CHANNELS_PER_CALL,
     YOUTUBE_API_MAX_COMMENTS_PER_CALL,
     YOUTUBE_API_DEFAULT_SEARCH_ORDER,
     YOUTUBE_API_SEARCH_ORDERS,
@@ -71,10 +72,13 @@ def forge_videos_url(ids):
     return "%(base)s/videos?id=%(ids)s&part=snippet,statistics,contentDetails" % data
 
 
-def forge_channel_url(ids):
-    data = {"base": YOUTUBE_API_BASE_URL, "ids": ids}
+def forge_channels_url(ids):
+    data = {"base": YOUTUBE_API_BASE_URL, "ids": ",".join(ids)}
 
-    return "%(base)s/channels?id=%(ids)s&part=snippet,statistics,contentDetails" % data
+    return (
+        "%(base)s/channels?id=%(ids)s&part=snippet,statistics,contentDetails,topicDetails,brandingSettings,status"
+        % data
+    )
 
 
 def forge_search_url(query, order=YOUTUBE_API_DEFAULT_SEARCH_ORDER, token=None):
@@ -130,6 +134,33 @@ def forge_replies_url(comment_id, token=None):
         url += "&pageToken=%s" % token
 
     return url
+
+
+def get_channel_id(channel_target):
+
+    should_scrape, channel_id = ensure_channel_id(channel_target)
+
+    # is a youtube url without the channel ID
+    if should_scrape:
+        channel_id = scrape_channel_id(channel_target)
+
+    # is not a url
+    elif channel_id == channel_target:
+
+        username = channel_target
+        if not channel_target.startswith("@"):
+            username = "@" + channel_target
+
+        channel_id = scrape_channel_id("https://www.youtube.com/" + username)
+
+        # we didn't get any ID by scraping, channel_target could already be an ID
+        if not channel_id:
+            channel_id = channel_target
+
+    if channel_id is None:
+        raise YouTubeInvalidChannelTargetError
+
+    return channel_id
 
 
 class YouTubeAPIClient(object):
@@ -223,27 +254,38 @@ class YouTubeAPIClient(object):
 
             self.keys[key] = True
 
-    def channel_meta(self, channel_target):
-        should_scrape, channel_id = ensure_channel_id(channel_target)
+    def channels(self, channels_target, key=None, raw=False):
 
-        should_scrape, channel_id = ensure_channel_id(channel_target)
+        # TODO: we could chunk per not None
+        for group in as_chunks(YOUTUBE_API_MAX_CHANNELS_PER_CALL, channels_target):
+            group_data = []
 
-        if should_scrape:
-            channel_id = scrape_channel_id(channel_target)
+            for item in group:
+                target = key(item) if key is not None else item
+                try:
+                    channel_id = get_channel_id(target)
+                    group_data.append((channel_id, item))
+                except YouTubeInvalidChannelTargetError:
+                    group_data.append((None, item))
 
-        if channel_id is None:
-            raise YouTubeInvalidChannelTargetError
+            ids = [channel_id for channel_id, _ in group_data if channel_id is not None]
 
-        url = forge_channel_url(channel_id)
+            url = forge_channels_url(ids)
 
-        result = self.request_json(url)
+            result = self.request_json(url)
 
-        channel = getpath(result, ["items", 0])
+            indexed_result = {}
 
-        if not channel:
-            return None
+            for item in result["items"]:
+                channel_id = item["id"]
 
-        return format_channel(channel)
+                if not raw:
+                    item = format_channel(item)
+
+                indexed_result[channel_id] = item
+
+            for channel_id, item in group_data:
+                yield item, indexed_result.get(channel_id)
 
     def videos(self, videos, key=None, raw=False):
 
@@ -359,13 +401,7 @@ class YouTubeAPIClient(object):
 
     def channel_videos(self, channel_target):
 
-        should_scrape, channel_id = ensure_channel_id(channel_target)
-
-        if should_scrape:
-            channel_id = scrape_channel_id(channel_target)
-
-        if channel_id is None:
-            raise YouTubeInvalidChannelTargetError
+        channel_id = get_channel_id(channel_target)
 
         playlist_id = get_channel_main_playlist_id(channel_id)
 

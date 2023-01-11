@@ -1,5 +1,5 @@
 # =============================================================================
-# Minet Youtube Channel-videos CLI Action
+# Minet Youtube Channel Videos CLI Action
 # =============================================================================
 #
 # Action reading an input CSV file line by line and retrieving videos from

@@ -7,6 +7,7 @@
 
 YOUTUBE_API_BASE_URL = "https://www.googleapis.com/youtube/v3"
 YOUTUBE_API_MAX_VIDEOS_PER_CALL = 50
+YOUTUBE_API_MAX_CHANNELS_PER_CALL = 50
 YOUTUBE_API_MAX_COMMENTS_PER_CALL = 100
 
 YOUTUBE_API_SEARCH_ORDERS = {
@@ -66,11 +67,22 @@ YOUTUBE_CHANNEL_CSV_HEADERS = [
     "description",
     "custom_url",
     "published_at",
-    "thumbnails",
+    "thumbnail",
+    "default_language",
     "country",
     "id_playlists_videos",
     "view_count",
     "hidden_subscriber_count",
     "subscriber_count",
     "video_count",
+    "topic_ids",
+    "topic_categories",
+    "topic_keywords",
+    "privacy_status",
+    "made_for_kids",
+    "long_uploads_status",
+    "keywords",
+    "moderate_comments",
+    "unsubscribed_trailer",
+    "banner_external_url",
 ]

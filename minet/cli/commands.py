@@ -3360,8 +3360,8 @@ MINET_COMMANDS = {
                         },
                     ],
                 },
-                "channel-meta": {
-                    "title": "Youtube channel metadata",
+                "channels": {
+                    "title": "Youtube channels",
                     "description": """
                         Retrieve metadata about Youtube channel from one or many name(s) using the API.
 
@@ -3373,13 +3373,13 @@ MINET_COMMANDS = {
                         example:
 
                         . Fetching metadata from a channel based on the channel's id or url:
-                            $ minet youtube channel-meta https://www.youtube.com/c/LinksOff -k my-api-key > linksoff_meta.csv
-                            $ minet youtube channel-meta https://www.youtube.com/channel/UCqnbDFdCpuN8CMEg0VuEBqA -k my-api-key > thenewyorktimes_meta.csv
-                            $ minet youtube channel-meta UCprclkVrNPls7PR-nHhf1Ow -k my-api-key > tonyheller_metadat.csv
+                            $ minet youtube channels https://www.youtube.com/c/LinksOff -k my-api-key > linksoff_meta.csv
+                            $ minet youtube channels https://www.youtube.com/channel/UCqnbDFdCpuN8CMEg0VuEBqA -k my-api-key > thenewyorktimes_meta.csv
+                            $ minet youtube channels UCprclkVrNPls7PR-nHhf1Ow -k my-api-key > tonyheller_meta.csv
 
                         . Fetching multiple channels' metadata:
-                            $ minet youtube channel-meta channel_id channels_id.csv -k my-api-key > channels_meta.csv
-                            $ minet youtube channel-meta channel_url channels_url.csv -k my-api-key > channels_meta.csv
+                            $ minet youtube channels channel_id channels_id.csv -k my-api-key > channels.csv
+                            $ minet youtube channels channel_url channels_url.csv -k my-api-key > channels.csv
                     """,
                     "arguments": [
                         {
