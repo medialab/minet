@@ -621,7 +621,7 @@ usage: minet url-parse [-h] [--rcfile RCFILE] [-o OUTPUT] [-s SELECT]
                        [--strip-fragment] [--strip-index]
                        [--strip-irrelevant-subdomains]
                        [--strip-lang-query-items] [--strip-lang-subdomains]
-                       [--strip-protocol] [--strip-trailing-slash] [--unsplit]
+                       [--strip-protocol] [--strip-trailing-slash]
                        [--infer-redirection-hostname] [--normalize-amp-hostname]
                        [--strip-lang-subdomains-hostname]
                        column [file]
@@ -647,32 +647,31 @@ optional arguments:
   --facebook                                      Whether to consider and parse the given urls as coming from Facebook.
   --twitter                                       Whether to consider and parse the given urls as coming from Twitter.
   --youtube                                       Whether to consider and parse the given urls as coming from YouTube.
-  --infer-redirection, --no-infer-redirection     Whether or not to attempt resolving common redirects by leveraging well-known GET parameters when normalizing url. Defaults to infer redirection.
-  --fix-common-mistakes, --no-fix-common-mistakes
+  --infer-redirection, --dont-infer-redirection   Whether or not to attempt resolving common redirects by leveraging well-known GET parameters when normalizing url. Defaults to infer redirection.
+  --fix-common-mistakes, --dont-fix-common-mistakes
                                                   Whether or not to attempt to fix common URL mistakes when normalizing url. Defaults to fix common mistakes.
-  --normalize-amp, --no-normalize-amp             Whether or not to attempt to normalize Google AMP urls when normalizing url. Defaults to normalize amp.
+  --normalize-amp, --dont-normalize-amp           Whether or not to attempt to normalize Google AMP urls when normalizing url. Defaults to normalize amp.
   --quoted, --no-quoted                           Whether or not to normalize to a quoted or unquoted version of the url when normalizing url. Defaults to quoted.
-  --sort-query, --no-sort-query                   Whether or not to sort query items when normalizing url. Defaults to sort query.
-  --strip-authentication, --no-strip-authentication
+  --sort-query, --dont-sort-query                 Whether or not to sort query items when normalizing url. Defaults to sort query.
+  --strip-authentication, --dont-strip-authentication
                                                   Whether or not to strip authentication when normalizing url. Defaults to strip authentication.
-  --strip-fragment, --no-strip-fragment, --strip-fragment-except-routing
+  --strip-fragment, --dont-strip-fragment, --strip-fragment-except-routing
                                                   Whether or not to strip the url's fragment when normalizing url. If set to `--strip-fragment-except-routing`, will only strip the fragment if the fragment is not deemed to be js routing (i.e. if it contains a `/`). Defaults to strip fragment except routing.
-  --strip-index, --no-strip-index                 Whether or not to strip trailing index when normalizing url. Defaults to strip index.
-  --strip-irrelevant-subdomains, --no-strip-irrelevant-subdomains
+  --strip-index, --dont-strip-index               Whether or not to strip trailing index when normalizing url. Defaults to strip index.
+  --strip-irrelevant-subdomains, --dont-strip-irrelevant-subdomains
                                                   Whether or not to strip trailing irrelevant-subdomains such as `www` etc. when normalizing url. Defaults to no strip irrelevantsubdomains.
-  --strip-lang-query-items, --no-strip-lang-query-items
+  --strip-lang-query-items, --dont-strip-lang-query-items
                                                   Whether or not to strip language query items (ex: `gl=pt_BR`) when normalizing url. Defaults to no strip lang query items.
-  --strip-lang-subdomains, --no-strip-lang-subdomains
+  --strip-lang-subdomains, --dont-strip-lang-subdomains
                                                   Whether or not to strip language subdomains (ex: `fr-FR.lemonde.fr` to only `lemonde.fr` because `fr-FR` isn't a relevant subdomain, it indicates the language and the country) when normalizing url. Defaults to no strip lang subdomains.
-  --strip-protocol, --no-strip-protocol           Whether or not to strip the protocol when normalizing the url. Defaults to strip protocol.
-  --strip-trailing-slash, --no-strip-trailing-slash
+  --strip-protocol, --dont-strip-protocol         Whether or not to strip the protocol when normalizing the url. Defaults to strip protocol.
+  --strip-trailing-slash, --dont-strip-trailing-slash
                                                   Whether or not to trailing slash when normalizing url. Defaults to strip trailing slash.
-  --unsplit, --no-unsplit                         Whether or not to return a stringified version of the normalized url or directly the `SplitResult` instance worked on by the normalization process when normalizing url. Defaults to unsplit.
-  --infer-redirection-hostname, --no-infer-redirection-hostname
+  --infer-redirection-hostname, --dont-infer-redirection-hostname
                                                   Whether or not to attempt resolving common redirects by leveraging well-known GET parameters when normalizing hostname. Defaults to infer redirection hostname.
-  --normalize-amp-hostname, --no-normalize-amp-hostname
+  --normalize-amp-hostname, --dont-normalize-amp-hostname
                                                   Whether or not to attempt to normalize Google AMP urls when normalizing hostname. Defaults to normalize amp hostname.
-  --strip-lang-subdomains-hostname, --no-strip-lang-subdomains-hostname
+  --strip-lang-subdomains-hostname, --dont-strip-lang-subdomains-hostname
                                                   Whether or not to strip language subdomains (ex: `fr-FR.lemonde.fr` to only `lemonde.fr` because `fr-FR` isn't a relevant subdomain, it indicates the language and the country) when normalizing hostname. Defaults to no strip lang subdomains hostname.
 
 columns being added to the output:

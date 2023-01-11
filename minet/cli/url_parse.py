@@ -75,7 +75,6 @@ def extract_standard_addendum(cli_args, url):
             strip_lang_subdomains=cli_args.strip_lang_subdomains,
             strip_protocol=cli_args.strip_protocol,
             strip_trailing_slash=cli_args.strip_trailing_slash,
-            unsplit=cli_args.unsplit,
         ),
         inferred_redirection if inferred_redirection != url else "",
         get_domain_name(url),

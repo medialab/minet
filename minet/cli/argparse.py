@@ -90,16 +90,31 @@ class BooleanAction(Action):
         )
 
 
-class UrlFragmentAction(Action):
+class BooleanDontAction(Action):
     """
-    Custom argparse action to handle --no-* flags and *except-routing flag.
+    Custom argparse action to handle --dont-* flags.
+    Taken from: https://thisdataguy.com/2017/07/03/no-options-with-argparse-and-python/
     """
 
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         super().__init__(option_strings, dest, nargs=0, **kwargs)
 
     def __call__(self, parser, cli_args, values, option_string=None):
-        attr = False if option_string.startswith("--no") else True
+        setattr(
+            cli_args, self.dest, False if option_string.startswith("--dont") else True
+        )
+
+
+class UrlFragmentAction(Action):
+    """
+    Custom argparse action to handle --dont-* flags and *except-routing flag.
+    """
+
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        super().__init__(option_strings, dest, nargs=0, **kwargs)
+
+    def __call__(self, parser, cli_args, values, option_string=None):
+        attr = False if option_string.startswith("--dont") else True
 
         if attr and option_string.endswith("except-routing"):
             attr = "except-routing"
