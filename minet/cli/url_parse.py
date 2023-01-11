@@ -81,9 +81,9 @@ def extract_standard_addendum(cli_args, url):
         get_hostname(url),
         get_normalized_hostname(
             url,
-            infer_redirection=cli_args.infer_redirection_hostname,
-            normalize_amp=cli_args.normalize_amp_hostname,
-            strip_lang_subdomains=cli_args.strip_lang_subdomains_hostname,
+            infer_redirection=cli_args.infer_redirection,
+            normalize_amp=cli_args.normalize_amp,
+            strip_lang_subdomains=cli_args.strip_lang_subdomains,
         ),
         "yes" if is_shortened_url(url) else "",
         "yes" if is_typo_url(url) else "",

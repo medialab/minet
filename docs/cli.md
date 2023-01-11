@@ -622,8 +622,6 @@ usage: minet url-parse [-h] [--rcfile RCFILE] [-o OUTPUT] [-s SELECT]
                        [--strip-irrelevant-subdomains]
                        [--strip-lang-query-items] [--strip-lang-subdomains]
                        [--strip-protocol] [--strip-trailing-slash]
-                       [--infer-redirection-hostname] [--normalize-amp-hostname]
-                       [--strip-lang-subdomains-hostname]
                        column [file]
 
 Minet Url Parse Command
@@ -667,12 +665,6 @@ optional arguments:
   --strip-protocol, --dont-strip-protocol         Whether or not to strip the protocol when normalizing the url. Defaults to strip protocol.
   --strip-trailing-slash, --dont-strip-trailing-slash
                                                   Whether or not to trailing slash when normalizing url. Defaults to strip trailing slash.
-  --infer-redirection-hostname, --dont-infer-redirection-hostname
-                                                  Whether or not to attempt resolving common redirects by leveraging well-known GET parameters when normalizing hostname. Defaults to infer redirection hostname.
-  --normalize-amp-hostname, --dont-normalize-amp-hostname
-                                                  Whether or not to attempt to normalize Google AMP urls when normalizing hostname. Defaults to normalize amp hostname.
-  --strip-lang-subdomains-hostname, --dont-strip-lang-subdomains-hostname
-                                                  Whether or not to strip language subdomains (ex: `fr-FR.lemonde.fr` to only `lemonde.fr` because `fr-FR` isn't a relevant subdomain, it indicates the language and the country) when normalizing hostname. Defaults to no strip lang subdomains hostname.
 
 columns being added to the output:
 

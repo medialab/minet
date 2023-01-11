@@ -23,7 +23,6 @@ from minet.cli.argparse import (
     SplitterType,
     TimestampType,
     TimezoneType,
-    BooleanDontAction,
     UrlFragmentAction,
 )
 
@@ -3306,7 +3305,7 @@ MINET_COMMANDS = {
                 ],
                 "help": "Whether or not to attempt resolving common redirects by leveraging well-known GET parameters when normalizing url. Defaults to infer redirection.",
                 "dest": "infer_redirection",
-                "action": BooleanDontAction,
+                "action": BooleanAction,
                 "default": True,
             },
             {
@@ -3316,7 +3315,7 @@ MINET_COMMANDS = {
                 ],
                 "help": "Whether or not to attempt to fix common URL mistakes when normalizing url. Defaults to fix common mistakes.",
                 "dest": "fix_common_mistakes",
-                "action": BooleanDontAction,
+                "action": BooleanAction,
                 "default": True,
             },
             {
@@ -3326,7 +3325,7 @@ MINET_COMMANDS = {
                 ],
                 "help": "Whether or not to attempt to normalize Google AMP urls when normalizing url. Defaults to normalize amp.",
                 "dest": "normalize_amp",
-                "action": BooleanDontAction,
+                "action": BooleanAction,
                 "default": True,
             },
             {
@@ -3346,7 +3345,7 @@ MINET_COMMANDS = {
                 ],
                 "help": "Whether or not to sort query items when normalizing url. Defaults to sort query.",
                 "dest": "sort_query",
-                "action": BooleanDontAction,
+                "action": BooleanAction,
                 "default": True,
             },
             {
@@ -3356,7 +3355,7 @@ MINET_COMMANDS = {
                 ],
                 "help": "Whether or not to strip authentication when normalizing url. Defaults to strip authentication.",
                 "dest": "strip_authentication",
-                "action": BooleanDontAction,
+                "action": BooleanAction,
                 "default": True,
             },
             {
@@ -3377,7 +3376,7 @@ MINET_COMMANDS = {
                 ],
                 "help": "Whether or not to strip trailing index when normalizing url. Defaults to strip index.",
                 "dest": "strip_index",
-                "action": BooleanDontAction,
+                "action": BooleanAction,
                 "default": True,
             },
             {
@@ -3387,7 +3386,7 @@ MINET_COMMANDS = {
                 ],
                 "help": "Whether or not to strip trailing irrelevant-subdomains such as `www` etc. when normalizing url. Defaults to no strip irrelevantsubdomains.",
                 "dest": "strip_irrelevant_subdomains",
-                "action": BooleanDontAction,
+                "action": BooleanAction,
                 "default": True,
             },
             {
@@ -3397,7 +3396,7 @@ MINET_COMMANDS = {
                 ],
                 "help": "Whether or not to strip language query items (ex: `gl=pt_BR`) when normalizing url. Defaults to no strip lang query items.",
                 "dest": "strip_lang_query_items",
-                "action": BooleanDontAction,
+                "action": BooleanAction,
                 "default": False,
             },
             {
@@ -3407,14 +3406,14 @@ MINET_COMMANDS = {
                 ],
                 "help": "Whether or not to strip language subdomains (ex: `fr-FR.lemonde.fr` to only `lemonde.fr` because `fr-FR` isn't a relevant subdomain, it indicates the language and the country) when normalizing url. Defaults to no strip lang subdomains.",
                 "dest": "strip_lang_subdomains",
-                "action": BooleanDontAction,
+                "action": BooleanAction,
                 "default": False,
             },
             {
                 "flags": ["--strip-protocol", "--dont-strip-protocol"],
                 "help": "Whether or not to strip the protocol when normalizing the url. Defaults to strip protocol.",
                 "dest": "strip_protocol",
-                "action": BooleanDontAction,
+                "action": BooleanAction,
                 "default": True,
             },
             {
@@ -3424,38 +3423,8 @@ MINET_COMMANDS = {
                 ],
                 "help": "Whether or not to trailing slash when normalizing url. Defaults to strip trailing slash.",
                 "dest": "strip_trailing_slash",
-                "action": BooleanDontAction,
+                "action": BooleanAction,
                 "default": True,
-            },
-            {
-                "flags": [
-                    "--infer-redirection-hostname",
-                    "--dont-infer-redirection-hostname",
-                ],
-                "help": "Whether or not to attempt resolving common redirects by leveraging well-known GET parameters when normalizing hostname. Defaults to infer redirection hostname.",
-                "dest": "infer_redirection_hostname",
-                "action": BooleanDontAction,
-                "default": True,
-            },
-            {
-                "flags": [
-                    "--normalize-amp-hostname",
-                    "--dont-normalize-amp-hostname",
-                ],
-                "help": "Whether or not to attempt to normalize Google AMP urls when normalizing hostname. Defaults to normalize amp hostname.",
-                "dest": "normalize_amp_hostname",
-                "action": BooleanDontAction,
-                "default": True,
-            },
-            {
-                "flags": [
-                    "--strip-lang-subdomains-hostname",
-                    "--dont-strip-lang-subdomains-hostname",
-                ],
-                "help": "Whether or not to strip language subdomains (ex: `fr-FR.lemonde.fr` to only `lemonde.fr` because `fr-FR` isn't a relevant subdomain, it indicates the language and the country) when normalizing hostname. Defaults to no strip lang subdomains hostname.",
-                "dest": "strip_lang_subdomains_hostname",
-                "action": BooleanDontAction,
-                "default": False,
             },
         ],
     },
