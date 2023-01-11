@@ -1,0 +1,16 @@
+---
+iterator: a
+fields:
+  from_url:
+    eval: |
+      line = context['line']
+      return line.resolved or line.url
+  to_url:
+    attr: href
+    eval: |
+      line = context['line']
+      base_url = line.resolved or line.url
+      return urljoin(base_url, value)
+filter_eval: |
+  url = value['to_url']
+  return url and url.startswith('http')
