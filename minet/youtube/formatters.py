@@ -33,7 +33,7 @@ YouTubeComment = namedrecord("YoutubeComment", YOUTUBE_COMMENT_CSV_HEADERS)
 YouTubeChannel = namedrecord(
     "YoutubeChannel",
     YOUTUBE_CHANNEL_CSV_HEADERS,
-    boolean=["moderate_comments"],
+    boolean=["moderate_comments", "made_for_kids"],
     plural=["topic_ids", "topic_categories", "topic_keywords", "keywords"],
 )
 
@@ -148,19 +148,12 @@ def format_channel(item):
     status = item.get("status")
     branding_settings = item.get("brandingSettings")
 
-    topic_keywords = [
-        re.search(r"https:\/\/en.wikipedia.org\/wiki\/(.*)$", url).group(1)
-        for url in topic_details["topicCategories"]
-    ]
+    topic_keywords = [url.rsplit("/", 1)[1] for url in topic_details["topicCategories"]]
 
     keywords = getpath(branding_settings, ["channel", "keywords"])
     if keywords:
         keywords = [
-            keyword.strip()
-            for keyword in getpath(branding_settings, ["channel", "keywords"]).split(
-                '"'
-            )
-            if (keyword and keyword != " ")
+            keyword.strip() for keyword in keywords.split('"') if keyword.strip()
         ]
 
     row = YouTubeChannel(
