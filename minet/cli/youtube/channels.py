@@ -11,7 +11,6 @@ from operator import itemgetter
 from minet.cli.utils import LoadingBar
 from minet.youtube import YouTubeAPIClient
 from minet.youtube.constants import YOUTUBE_CHANNEL_CSV_HEADERS
-from minet.youtube.exceptions import YouTubeInvalidChannelTargetError
 
 
 def channels_action(cli_args):

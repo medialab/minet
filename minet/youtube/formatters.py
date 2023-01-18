@@ -6,7 +6,6 @@
 #
 from casanova import namedrecord
 from ebbe import getpath
-import re
 
 from minet.youtube.constants import (
     YOUTUBE_VIDEO_CSV_HEADERS,
