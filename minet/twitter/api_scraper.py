@@ -36,7 +36,7 @@ from minet.twitter.exceptions import (
 # =============================================================================
 # Constants
 # =============================================================================
-TWITTER_PUBLIC_SEARCH_ENDPOINT = "https://twitter.com/i/api/2/search/adaptive.json"
+TWITTER_PUBLIC_SEARCH_ENDPOINT = "https://api.twitter.com/2/search/adaptive.json"
 TWITTER_GUEST_ACTIVATE_ENDPOINT = "https://api.twitter.com/1.1/guest/activate.json"
 MAXIMUM_QUERY_LENGTH = 500
 DEFAULT_COUNT = 100  # NOTE: the actual upper limit seems to be 20, but I keep 100 just in case it changes in the future, who knows...
@@ -75,24 +75,33 @@ TWEET_SEARCH_DEFAULT_PARAMS = {
     "include_mute_edge": "1",
     "include_can_dm": "1",
     "include_can_media_tag": "1",
+    "include_ext_has_nft_avatar": "1",
+    "include_ext_is_blue_verified": "1",
+    "include_ext_verified_type": "1",
     "skip_status": "1",
     "cards_platform": "Web-12",
     "include_cards": "1",
     "include_ext_alt_text": "true",
+    "include_ext_limited_action_results": "false",
     "include_quote_count": "true",
     "include_reply_count": "1",
     "tweet_mode": "extended",
+    "include_ext_collab_control": "true",
+    "include_ext_views": "true",
     "include_entities": "true",
     "include_user_entities": "true",
     "include_ext_media_color": "true",
     "include_ext_media_availability": "true",
+    "include_ext_sensitive_media_warning": "true",
+    "include_ext_trusted_friends_metadata": "true",
     "send_error_codes": "true",
-    "simple_quoted_tweets": "true",
+    "simple_quoted_tweet": "true",
     "tweet_search_mode": "live",
     "query_source": "spelling_expansion_revert_click",
     "pc": "1",
     "spelling_corrections": "1",
-    "ext": "mediaStats,highlightedLabel",
+    "include_ext_edit_control": "true",
+    "ext": "mediaStats,highlightedLabel,hasNftAvatar,voiceInfo,enrichments,superFollowMetadata,unmentionInfo,editControl,collab_control,vibe",
 }
 
 USER_SEARCH_DEFAULT_PARAMS = {
