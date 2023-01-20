@@ -20,6 +20,7 @@ from collections import OrderedDict
 from json.decoder import JSONDecodeError
 from urllib.parse import urljoin
 from urllib3 import HTTPResponse
+from urllib3.util.ssl_ import create_urllib3_context
 from urllib.request import Request
 from tenacity import (
     Retrying,
@@ -38,7 +39,12 @@ from minet.exceptions import (
     InvalidURLError,
     SelfRedirectError,
 )
-from minet.constants import DEFAULT_SPOOFED_UA, DEFAULT_URLLIB3_TIMEOUT, COOKIE_BROWSERS
+from minet.constants import (
+    DEFAULT_SPOOFED_UA,
+    DEFAULT_SPOOFED_TLS_CIPHERS,
+    DEFAULT_URLLIB3_TIMEOUT,
+    COOKIE_BROWSERS,
+)
 
 mimetypes.init()
 
@@ -253,7 +259,9 @@ def dict_to_cookie_string(d):
     return "; ".join("%s=%s" % r for r in d.items())
 
 
-def create_pool(proxy=None, threads=None, insecure=False, **kwargs):
+def create_pool(
+    proxy=None, threads=None, insecure=False, spoof_tls_ciphers=False, **kwargs
+):
     """
     Helper function returning a urllib3 pool manager with sane defaults.
     """
@@ -276,6 +284,11 @@ def create_pool(proxy=None, threads=None, insecure=False, **kwargs):
         manager_kwargs["num_pools"] = threads * 2
 
     manager_kwargs.update(kwargs)
+
+    if spoof_tls_ciphers:
+        manager_kwargs["ssl_context"] = create_urllib3_context(
+            ciphers=DEFAULT_SPOOFED_TLS_CIPHERS
+        )
 
     if proxy is not None:
         return urllib3.ProxyManager(proxy, **manager_kwargs)
@@ -654,7 +667,13 @@ def resolve(
 
 
 def extract_response_meta(response, guess_encoding=True, guess_extension=True):
-    meta = {"ext": None, "mimetype": None, "encoding": None, "is_text": None, "datetime_utc": None}
+    meta = {
+        "ext": None,
+        "mimetype": None,
+        "encoding": None,
+        "is_text": None,
+        "datetime_utc": None,
+    }
 
     # Marking time at which the fetch result object was created
     meta["datetime_utc"] = datetime.utcnow()

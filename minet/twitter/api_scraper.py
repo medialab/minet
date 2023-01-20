@@ -293,7 +293,9 @@ def tweets_payload_iter(payload):
 # =============================================================================
 class TwitterAPIScraper(object):
     def __init__(self):
-        self.pool = create_pool(timeout=TWITTER_PUBLIC_API_DEFAULT_TIMEOUT)
+        self.pool = create_pool(
+            timeout=TWITTER_PUBLIC_API_DEFAULT_TIMEOUT, spoof_tls_ciphers=True
+        )
         self.reset()
 
         self.retryer = create_request_retryer(
