@@ -25,7 +25,7 @@ setup(
     packages=find_packages(exclude=["ftest", "scripts", "test"]),
     install_requires=[
         "beautifulsoup4>=4.7.1",
-        "browser-cookie3==0.16.2",
+        "browser-cookie3==0.16.5",
         "casanova>=0.19.2,<0.20",
         "cchardet>=2.1.7",
         "colorama>=0.4.0",
