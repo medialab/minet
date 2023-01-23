@@ -10,9 +10,8 @@ from os.path import isdir
 from io import TextIOBase
 from argparse import Action, ArgumentError, ArgumentTypeError
 from gettext import gettext
-from casanova.utils import CsvRowIO
 from tqdm.contrib import DummyTqdmFile
-from casanova import Resumer, CsvCellIO
+from casanova import Resumer, CsvCellIO, CsvRowIO
 from ebbe import getpath
 from datetime import datetime
 from pytz import timezone
