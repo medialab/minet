@@ -2,7 +2,7 @@
 
 ![Minet](img/minet.png)
 
-**minet** is a webmining command line tool & library for python (>= 3.6) that can be used to collect and extract data from a large variety of web sources such as raw webpages, Facebook, CrowdTangle, YouTube, Twitter, Media Cloud etc.
+**minet** is a webmining command line tool & library for python (>= 3.7) that can be used to collect and extract data from a large variety of web sources such as raw webpages, Facebook, CrowdTangle, YouTube, Twitter, Media Cloud etc.
 
 It adopts a very simple approach to various webmining problems by letting you perform a variety of actions from the comfort of the command line. No database needed: raw CSV files should be sufficient to do most of the work.
 

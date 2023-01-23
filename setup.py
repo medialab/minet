@@ -21,7 +21,7 @@ setup(
     license="MIT",
     author="Jules Farjas, Guillaume Plique, Pauline Breteau",
     keywords="webmining",
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     packages=find_packages(exclude=["ftest", "scripts", "test"]),
     install_requires=[
         "beautifulsoup4>=4.7.1",
