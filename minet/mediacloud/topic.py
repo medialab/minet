@@ -46,10 +46,7 @@ def mediacloud_topic_stories(
             from_media_id=from_media_id,
         )
 
-        err, _, data = request_json(url, pool=pool)
-
-        if err:
-            raise err
+        _, data = request_json(url, pool=pool)
 
         if "stories" not in data or len(data["stories"]) == 0:
             return

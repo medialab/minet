@@ -79,12 +79,9 @@ class BuzzSumoAPIClient(object):
     @rate_limited_method()
     def request(self, url):
         try:
-            err, response, data = request_json(url)
+            response, data = request_json(url)
         except JSONDecodeError:
             raise BuzzSumoBadRequestError
-
-        if err:
-            raise err
 
         if response.status == 401:
             raise BuzzSumoInvalidTokenError

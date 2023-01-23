@@ -61,10 +61,7 @@ def export_google_sheets_as_csv(
     while True:
         attempts -= 1
 
-        err, response = request(export_url, cookie=cookie)
-
-        if err:
-            raise err
+        response = request(export_url, cookie=cookie)
 
         if response.status == 404:
             raise GoogleSheetsNotFoundError

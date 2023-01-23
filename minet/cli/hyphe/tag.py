@@ -77,7 +77,7 @@ def hyphe_tag_action(cli_args):
                     continue
 
                 try:
-                    err, _ = corpus.call(
+                    corpus.call(
                         "store.add_webentity_tag_value",
                         webentity_id=webentity_id,
                         namespace="USER",
@@ -92,6 +92,3 @@ def hyphe_tag_action(cli_args):
                         break
                     else:
                         raise
-
-                if err:
-                    raise err

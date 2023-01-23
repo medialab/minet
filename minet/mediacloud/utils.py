@@ -57,10 +57,7 @@ def make_simple_call(
     if query is not None:
         url += "&" + ("&".join("%s=%s" % (str(k), str(v)) for k, v in query.items()))
 
-    err, response, data = request_json(url, pool=pool)
-
-    if err:
-        raise err
+    response, data = request_json(url, pool=pool)
 
     if response.status >= 500:
         raise MediacloudServerError(server_error=data.get("error"))

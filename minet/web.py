@@ -17,9 +17,9 @@ import mimetypes
 import functools
 import charset_normalizer as chardet
 from collections import OrderedDict
-from json.decoder import JSONDecodeError
 from urllib.parse import urljoin
 from urllib3 import HTTPResponse
+from urllib3.exceptions import HTTPError
 from urllib3.util.ssl_ import create_urllib3_context
 from urllib.request import Request
 from tenacity import (
@@ -33,6 +33,7 @@ from tenacity import (
 from minet.encodings import is_supported_encoding
 from minet.utils import is_binary_mimetype
 from minet.exceptions import (
+    RedirectError,
     MaxRedirectsError,
     InfiniteRedirectsError,
     InvalidRedirectError,
@@ -75,6 +76,7 @@ CHARSET_DETECTION_CONFIDENCE_THRESHOLD = 0.9
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
 CONTENT_CHUNK_SIZE = 1024
 LARGE_CONTENT_CHUNK_SIZE = 2**16
+EXPECTED_WEB_ERRORS = (HTTPError, RedirectError, InvalidURLError)
 
 assert CONTENT_CHUNK_SIZE < LARGE_CONTENT_CHUNK_SIZE
 
@@ -317,7 +319,7 @@ def raw_request(
     if not ural.is_url(
         url, require_protocol=True, tld_aware=True, allow_spaces_in_path=True
     ):
-        return InvalidURLError(url=url), None
+        raise InvalidURLError(url=url)
 
     # Performing request
     request_kwargs = {
@@ -332,12 +334,7 @@ def raw_request(
     if timeout is not None:
         request_kwargs["timeout"] = timeout
 
-    try:
-        response = pool.request(method, url, **request_kwargs)
-    except Exception as e:
-        return e, None
-
-    return None, response
+    return pool.request(method, url, **request_kwargs)
 
 
 class Redirection(object):
@@ -395,24 +392,25 @@ def raw_resolve(
             response.release_conn()
             response.close()
 
-        http_error, response = raw_request(
-            pool,
-            url,
-            method=method,
-            headers=headers,
-            body=body,
-            preload_content=False,
-            release_conn=False,
-            timeout=timeout,
-        )
-
         redirection = Redirection(url)
 
+        try:
+            response = raw_request(
+                pool,
+                url,
+                method=method,
+                headers=headers,
+                body=body,
+                preload_content=False,
+                release_conn=False,
+                timeout=timeout,
+            )
+
         # Request error
-        if http_error:
+        except HTTPError as e:
             redirection.type = "error"
             url_stack[url] = redirection
-            error = http_error
+            error = e
             break
 
         # Cycle
@@ -440,9 +438,11 @@ def raw_resolve(
 
                 # Reading a small chunk of the html
                 if location is None and (follow_meta_refresh or follow_js_relocation):
-                    error = prebuffer_response_up_to(response, CONTENT_CHUNK_SIZE)
+                    prebuffer_error = prebuffer_response_up_to(
+                        response, CONTENT_CHUNK_SIZE
+                    )
 
-                    if error is not None:
+                    if prebuffer_error is not None:
                         redirection.type = "error"
                         break
 
@@ -469,9 +469,11 @@ def raw_resolve(
             # Canonical url
             if redirection.type == "hit":
                 if canonicalize:
-                    error = prebuffer_response_up_to(response, LARGE_CONTENT_CHUNK_SIZE)
+                    prebuffer_error = prebuffer_response_up_to(
+                        response, LARGE_CONTENT_CHUNK_SIZE
+                    )
 
-                    if error is not None:
+                    if prebuffer_error is not None:
                         redirection.type = "error"
                         break
 
@@ -525,16 +527,22 @@ def raw_resolve(
     else:
         error = MaxRedirectsError("Maximum number of redirects exceeded")
 
+    # Cleanup
     if response and not return_response:
         response.release_conn()
         response.close()
 
+    # NOTE: error is raised that late to be sure we cleanup resources attached
+    # to the connection
+    if error is not None:
+        raise error
+
     compiled_stack = list(url_stack.values())
 
     if return_response:
-        return error, compiled_stack, response
+        return compiled_stack, response
 
-    return error, compiled_stack
+    return compiled_stack
 
 
 def build_request_headers(headers=None, cookie=None, spoof_ua=False, json_body=False):
@@ -602,7 +610,7 @@ def request(
             pool, url, method, headers=final_headers, body=final_body, timeout=timeout
         )
     else:
-        err, _, response = raw_resolve(
+        _, response = raw_resolve(
             pool,
             url,
             method,
@@ -616,9 +624,6 @@ def request(
             timeout=timeout,
         )
 
-        if err:
-            return err, response
-
         # Finishing reading body
         try:
             response._body = (response._body or b"") + response.read()
@@ -629,7 +634,7 @@ def request(
                 response.close()
                 response.release_conn()
 
-        return None, response
+        return response
 
 
 def resolve(
@@ -728,12 +733,9 @@ def request_jsonrpc(url, method, pool=DEFAULT_POOL, *args, **kwargs):
     elif len(kwargs) > 0:
         params = kwargs
 
-    err, response = request(
+    response = request(
         url, pool=pool, method="POST", json_body={"method": method, "params": params}
     )
-
-    if err is not None:
-        return err, None
 
     data = json.loads(response.data)
 
@@ -741,24 +743,14 @@ def request_jsonrpc(url, method, pool=DEFAULT_POOL, *args, **kwargs):
 
 
 def request_json(url, pool=DEFAULT_POOL, *args, **kwargs):
-    err, response = request(url, pool=pool, *args, **kwargs)
+    response = request(url, pool=pool, *args, **kwargs)
 
-    if err:
-        return err, response, None
-
-    try:
-        return None, response, json.loads(response.data.decode())
-    except (JSONDecodeError, UnicodeDecodeError) as e:
-        return e, response, None
+    return response, json.loads(response.data.decode())
 
 
 def request_text(url, pool=DEFAULT_POOL, *args, encoding="utf-8", **kwargs):
-    err, response = request(url, pool=pool, *args, **kwargs)
-
-    if err:
-        return err, response, None
-
-    return None, response, response.data.decode(encoding)
+    response = request(url, pool=pool, *args, **kwargs)
+    return response, response.data.decode(encoding)
 
 
 THREE_HOURS = 3 * 60 * 60

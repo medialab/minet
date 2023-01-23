@@ -94,7 +94,7 @@ def hyphe_declare_action(cli_args):
         tags = extract_tags(row, tag_pos_list)
 
         # 1. Declaring the entities
-        err, result = corpus.call(
+        result = corpus.call(
             "store.declare_webentity_by_lrus",
             list_lrus=prefixes,
             name=name,
@@ -104,14 +104,11 @@ def hyphe_declare_action(cli_args):
             tags=tags,
         )
 
-        if err:
-            raise err
-
         webentity_id = result["result"]["id"]
 
         # 2. Setting the homepage
         try:
-            err, _ = corpus.call(
+            corpus.call(
                 "store.set_webentity_homepage",
                 webentity_id=webentity_id,
                 homepage=unquote(
@@ -123,6 +120,3 @@ def hyphe_declare_action(cli_args):
                 loading_bar.print("Homepage error with %s %s" % (name, homepage))
             else:
                 raise
-
-        if err:
-            raise err

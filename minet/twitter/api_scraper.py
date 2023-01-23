@@ -10,6 +10,7 @@ from ebbe import with_is_first
 from urllib.parse import urlencode, quote
 from twitwi import normalize_tweet, normalize_user
 from ebbe import getpath, pathgetter
+from json import JSONDecodeError
 
 from minet.web import (
     create_pool,
@@ -325,11 +326,16 @@ class TwitterAPIScraper(object):
             "Accept-Language": "en-US,en;q=0.5",
         }
 
-        err, response, api_token_response = self.request_json(
-            TWITTER_GUEST_ACTIVATE_ENDPOINT, headers, method="POST"
-        )
+        could_not_decode_json = False
 
-        if err or response.status >= 400:
+        try:
+            response, api_token_response = self.request_json(
+                TWITTER_GUEST_ACTIVATE_ENDPOINT, headers, method="POST"
+            )
+        except JSONDecodeError:
+            could_not_decode_json = True
+
+        if could_not_decode_json or response.status >= 400:
             raise TwitterPublicAPIInvalidResponseError
 
         guest_token = api_token_response.get("guest_token")
@@ -354,10 +360,7 @@ class TwitterAPIScraper(object):
             "Accept-Language": "en-US,en;q=0.5",
         }
 
-        err, response, data = self.request_json(url, headers=headers)
-
-        if err:
-            raise err
+        response, data = self.request_json(url, headers=headers)
 
         if response.status in [403, 429]:
             self.reset()

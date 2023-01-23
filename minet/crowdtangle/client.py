@@ -52,11 +52,7 @@ class CrowdTangleAPIClient(object):
 
     @retrying_method()
     def __request(self, url):
-        err, response = request(url, pool=self.pool)
-
-        # Debug
-        if err:
-            raise err
+        response = request(url, pool=self.pool)
 
         # Bad auth
         if response.status == 401:

@@ -135,10 +135,7 @@ def mediacloud_search(
                 last_processed_stories_id=last_processed_stories_id,
             )
 
-            err, response, data = request_json(url, pool=pool)
-
-            if err:
-                raise err
+            response, data = request_json(url, pool=pool)
 
             if response.status >= 500:
                 raise MediacloudServerError(server_error=data.get("error"))

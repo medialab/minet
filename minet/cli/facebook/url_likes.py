@@ -27,15 +27,12 @@ def forge_url(url):
 
 @rate_limited(5)
 def make_request(url):
-    err, response = request(forge_url(url), headers={"Accept-Language": "en"})
+    response = request(forge_url(url), headers={"Accept-Language": "en"})
 
     if response.status == 404:
-        return "not-found", None
+        return None
 
-    if err:
-        return "http-error", None
-
-    return err, response.data
+    return response.data
 
 
 def scrape(data):
@@ -85,12 +82,15 @@ def facebook_url_likes_action(cli_args):
             enricher.writerow(row)
             continue
 
-        err, html = make_request(url)
-
-        if err is not None:
+        try:
+            html = make_request(url)
+        except BaseException:
             loading_bar.die(
                 "An error occurred while fetching like button for this url: %s" % url
             )
+
+        if html is None:
+            loading_bar.die("Could not find data for this url: %s" % url)
 
         scraped = scrape(html)
 

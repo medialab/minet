@@ -10,7 +10,13 @@ from datetime import datetime
 from quenouille import ThreadPoolExecutor
 from ural import get_domain_name, ensure_protocol
 
-from minet.web import create_pool, request, resolve, extract_response_meta
+from minet.web import (
+    create_pool,
+    request,
+    resolve,
+    extract_response_meta,
+    EXPECTED_WEB_ERRORS,
+)
 from minet.heuristics import should_spoof_ua_when_resolving
 from minet.constants import (
     DEFAULT_DOMAIN_PARALLELISM,
@@ -20,6 +26,7 @@ from minet.constants import (
     DEFAULT_FETCH_MAX_REDIRECTS,
     DEFAULT_RESOLVE_MAX_REDIRECTS,
 )
+
 
 FetchWorkerPayload = namedtuple("FetchWorkerPayload", ["item", "domain", "url"])
 
@@ -131,17 +138,18 @@ class FetchWorker(object):
         if self.request_args is not None:
             kwargs = self.request_args(domain, url, item)
 
-        error, response = request(
-            url, pool=self.pool, max_redirects=self.max_redirects, **kwargs
-        )
+        try:
+            response = request(
+                url, pool=self.pool, max_redirects=self.max_redirects, **kwargs
+            )
 
-        if error:
+        except EXPECTED_WEB_ERRORS as error:
             result.error = error
-        else:
 
+        else:
             # Forcing urllib3 to read data in thread
             # TODO: this is probably useless and should be replaced by preload_content at the right place
-            data = response.data
+            _ = response.data
 
             # Meta
             meta = extract_response_meta(response)
@@ -196,20 +204,22 @@ class ResolveWorker(object):
         if "spoof_ua" not in kwargs:
             kwargs["spoof_ua"] = should_spoof_ua_when_resolving(domain)
 
-        error, stack = resolve(
-            url,
-            pool=self.pool,
-            max_redirects=self.max_redirects,
-            follow_refresh_header=self.follow_refresh_header,
-            follow_meta_refresh=self.follow_meta_refresh,
-            follow_js_relocation=self.follow_js_relocation,
-            infer_redirection=self.infer_redirection,
-            canonicalize=self.canonicalize,
-            **kwargs
-        )
-
-        result.error = error
-        result.stack = stack
+        try:
+            stack = resolve(
+                url,
+                pool=self.pool,
+                max_redirects=self.max_redirects,
+                follow_refresh_header=self.follow_refresh_header,
+                follow_meta_refresh=self.follow_meta_refresh,
+                follow_js_relocation=self.follow_js_relocation,
+                infer_redirection=self.infer_redirection,
+                canonicalize=self.canonicalize,
+                **kwargs
+            )
+        except EXPECTED_WEB_ERRORS as error:
+            result.error = error
+        else:
+            result.stack = stack
 
         return result
 

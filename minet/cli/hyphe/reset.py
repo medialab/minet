@@ -23,9 +23,6 @@ def hyphe_reset_action(cli_args):
             ]
         )
 
-    err, _ = corpus.call("reinitialize")
-
-    if err:
-        raise err
+    corpus.call("reinitialize")
 
     print("Corpus was successfully reset!")

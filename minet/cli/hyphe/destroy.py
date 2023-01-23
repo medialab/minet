@@ -23,9 +23,6 @@ def hyphe_destroy_action(cli_args):
             ]
         )
 
-    err, _ = corpus.call("force_destroy_corpus")
-
-    if err:
-        raise err
+    corpus.call("force_destroy_corpus")
 
     print("Corpus was successfully destroyed!")

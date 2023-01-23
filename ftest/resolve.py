@@ -1,4 +1,5 @@
 from minet.web import resolve
+from minet.exceptions import RedirectError
 
 URLS = [
     # Direct hit
@@ -36,9 +37,13 @@ URLS = [
 
 for url in URLS:
     print()
-    error, stack = resolve(
-        url, follow_meta_refresh=True, infer_redirection=True, canonicalize=True
-    )
-    print(type(error), error)
+    try:
+        stack = resolve(
+            url, follow_meta_refresh=True, infer_redirection=True, canonicalize=True
+        )
+    except RedirectError as error:
+        print(type(error), error)
+        continue
+
     for item in stack:
         print(item)

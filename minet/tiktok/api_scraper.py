@@ -61,15 +61,13 @@ class TiktokAPIScraper(object):
     @retrying_method()
     def request_json(self, url):
         headers = {"Cookie": self.cookie}
-        err, response, data = request_json(
+
+        response, data = request_json(
             url,
             pool=self.pool,
             spoof_ua=True,
             headers=headers,
         )
-
-        if err:
-            raise err
 
         if response.status >= 400:
             raise TiktokPublicAPIInvalidResponseError(url, response.status, data)

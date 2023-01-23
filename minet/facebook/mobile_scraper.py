@@ -636,15 +636,12 @@ class FacebookMobileScraper(object):
     @rate_limited_method()
     @retrying_method()
     def request_page(self, url):
-        error, result = request(
+        result = request(
             url,
             pool=self.pool,
             cookie=self.cookie,
             headers={"User-Agent": "curl/7.68.0", "Accept-Language": "en"},
         )
-
-        if error:
-            raise error
 
         return result.data.decode("utf-8")
 

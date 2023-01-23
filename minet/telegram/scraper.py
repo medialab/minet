@@ -324,15 +324,12 @@ class TelegramScraper(object):
     @rate_limited_method()
     @retrying_method()
     def request_page(self, url):
-        error, result = request(
+        response = request(
             url,
             pool=self.pool,
         )
 
-        if error is not None:
-            raise error
-
-        return result.data.decode("utf-8")
+        return response.data.decode("utf-8")
 
     def channel_infos(self, name):
         parsed = parse_telegram_url(name)

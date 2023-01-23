@@ -166,15 +166,12 @@ class InstagramAPIScraper(object):
         if magic_token:
             headers["X-IG-App-ID"] = self.magic_token
 
-        err, response = request(
+        response = request(
             url,
             pool=self.pool,
             spoof_ua=True,
             headers=headers,
         )
-
-        if err:
-            raise err
 
         text = response.data.decode()
 
@@ -226,9 +223,7 @@ class InstagramAPIScraper(object):
         return data
 
     def get_magic_token(self):
-        err, response, html = request_text("https://www.instagram.com/disney")
-        if err:
-            raise err
+        response, html = request_text("https://www.instagram.com/disney")
 
         if response.status >= 400:
             return None

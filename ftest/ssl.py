@@ -1,4 +1,6 @@
-from minet.utils import create_pool, raw_resolve
+from urllib3.exceptions import HTTPError
+
+from minet.web import create_pool, raw_resolve
 
 SSL_ISSUES = [
     "https://lemde.fr/2zmunsV",
@@ -13,10 +15,13 @@ http = create_pool(insecure=True)
 
 for url in SSL_ISSUES:
     print(url)
-    err, stack, response = raw_resolve(http, url, return_response=True)
-    print("Error", err, type(err))
 
-    for r in stack:
-        print(r)
+    try:
+        stack, response = raw_resolve(http, url, return_response=True)
+    except HTTPError as err:
+        print("Error", err, type(err))
+    else:
+        for r in stack:
+            print(r)
 
     print()

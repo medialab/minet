@@ -23,12 +23,7 @@ class HypheAPIClient(object):
         self.pool = create_pool()
 
     def call(self, method, *args, **kwargs):
-        err, result = request_jsonrpc(
-            self.endpoint, method, pool=self.pool, *args, **kwargs
-        )
-
-        if err:
-            return err, None
+        result = request_jsonrpc(self.endpoint, method, pool=self.pool, *args, **kwargs)
 
         if "fault" in result:
             return HypheJSONRPCError(result), None
@@ -65,7 +60,7 @@ class HypheAPIClientCorpus(object):
 
     def ping_until_ready(self, max_attempts=10):
         for _ in range(max_attempts):
-            err, result = self.call("ping", timeout=5)
+            result = self.call("ping", timeout=5)
 
             if result["result"] == "pong":
                 return True
@@ -73,10 +68,7 @@ class HypheAPIClientCorpus(object):
         raise HypheCouldNotStartCorpusError
 
     def ensure_is_started(self):
-        err, result = self.call("start_corpus", password=self.password)
-
-        if err:
-            raise err
+        result = self.call("start_corpus", password=self.password)
 
         # Corpus is already started
         if result["result"]["status"] == "ready":
@@ -86,10 +78,7 @@ class HypheAPIClientCorpus(object):
         return self.ping_until_ready()
 
     def status(self):
-        err, stats = self.call("get_status")
-
-        if err:
-            raise err
+        stats = self.call("get_status")
 
         return stats
 
@@ -123,20 +112,17 @@ class HypheAPIClientCorpus(object):
 
             while True:
                 if token is None:
-                    err, result = self.call(
+                    result = self.call(
                         "store.get_webentities_by_status",
                         status=status,
                         count=DEFAULT_PAGINATION_COUNT,
                     )
                 else:
-                    err, result = self.call(
+                    result = self.call(
                         "store.get_webentities_page",
                         pagination_token=token,
                         n_page=next_page,
                     )
-
-                if err:
-                    raise err
 
                 result = result["result"]
 
@@ -153,7 +139,7 @@ class HypheAPIClientCorpus(object):
         token = None
 
         while True:
-            err, result = self.call(
+            result = self.call(
                 "store.paginate_webentity_pages",
                 webentity_id=webentity_id,
                 count=DEFAULT_PAGINATION_COUNT,
@@ -161,9 +147,6 @@ class HypheAPIClientCorpus(object):
                 include_page_metas=True,
                 include_page_body=include_body,
             )
-
-            if err:
-                raise err
 
             result = result["result"]
 

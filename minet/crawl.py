@@ -16,7 +16,7 @@ from threading import Lock
 
 from minet.scrape import Scraper
 from minet.utils import load_definition
-from minet.web import create_pool, request, extract_response_meta
+from minet.web import create_pool, request, extract_response_meta, EXPECTED_WEB_ERRORS
 from minet.utils import PseudoFStringFormatter
 
 from minet.exceptions import UnknownSpiderError
@@ -399,14 +399,14 @@ class Crawler(object):
         if spider is None:
             raise UnknownSpiderError('Unknown spider "%s"' % job.spider)
 
-        err, response = request(job.url, pool=self.pool)
-
-        if err:
+        try:
+            response = request(job.url, pool=self.pool)
+        except EXPECTED_WEB_ERRORS as err:
             return CrawlWorkerResult(
                 job=job,
                 scraped=None,
                 error=err,
-                response=response,
+                response=None,
                 meta=None,
                 content=None,
                 next_jobs=None,

@@ -30,10 +30,7 @@ GROUP_ID_PATTERN = re.compile(r"fb://group/(\d+)")
 def page_id_from_handle(handle):
     url = urljoin(FACEBOOK_MOBILE_URL, handle)
 
-    err, response, html = request_text(url, headers={"User-Agent": "curl/7.68.0"})
-
-    if err:
-        raise err
+    response, html = request_text(url, headers={"User-Agent": "curl/7.68.0"})
 
     if response.status >= 400:
         return None
@@ -50,10 +47,7 @@ def page_id_from_handle(handle):
 def group_id_from_handle(handle):
     url = urljoin(FACEBOOK_MOBILE_URL, "groups/%s" % handle)
 
-    err, response, html = request_text(url, headers={"User-Agent": "curl/7.68.0"})
-
-    if err:
-        raise err
+    response, html = request_text(url, headers={"User-Agent": "curl/7.68.0"})
 
     if response.status >= 400:
         return None
@@ -70,10 +64,7 @@ def group_id_from_handle(handle):
 def scrape_post_id(post_url):
     post_mobile_url = convert_facebook_url_to_mobile(post_url)
 
-    err, response, html = request_text(post_mobile_url)
-
-    if err:
-        raise err
+    _, html = request_text(post_mobile_url)
 
     soup = BeautifulSoup(html, "lxml")
 

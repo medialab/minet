@@ -28,10 +28,7 @@ def get_caption_tracks(video_id):
     # First we try to retrieve it from video info
     url = "https://www.youtube.com/get_video_info?video_id=%s" % video_id
 
-    err, response = request(url)
-
-    if err:
-        raise err
+    response = request(url)
 
     data = unquote(response.data.decode("utf-8"))
 
@@ -50,10 +47,7 @@ def get_caption_tracks(video_id):
     # Then we try to scrape it directly from the video page
     # url = 'https://www.youtube.com/watch?v=%s' % video_id
 
-    # err, response = request(url)
-
-    # if err:
-    #     raise err
+    # response = request(url)
 
     # timedtexts = TIMEDTEXT_RE.findall(response.data)
 
@@ -94,10 +88,7 @@ def get_video_captions(video_target, langs):
     if best_track is None:
         return
 
-    err, response = request(best_track.url, pool=YOUTUBE_SCRAPER_POOL)
-
-    if err:
-        raise err
+    response = request(best_track.url, pool=YOUTUBE_SCRAPER_POOL)
 
     soup = BeautifulSoup(response.data.decode("utf-8"), "lxml")
 
@@ -112,10 +103,7 @@ def get_video_captions(video_target, langs):
 
 
 def scrape_channel_id(channel_url):
-    err, response = request(channel_url, pool=YOUTUBE_SCRAPER_POOL)
-
-    if err:
-        raise err
+    response = request(channel_url, pool=YOUTUBE_SCRAPER_POOL)
 
     soup = BeautifulSoup(response.data.decode("utf-8"), "lxml")
     tag = soup.find("meta", {"itemprop": "channelId"})

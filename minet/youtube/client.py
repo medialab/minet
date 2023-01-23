@@ -178,10 +178,7 @@ class YouTubeAPIClient(object):
 
         while True:
             final_url = url + "&key=%s" % self.current_key
-            err, response, data = request_json(final_url, pool=self.pool)
-
-            if err:
-                raise err
+            response, data = request_json(final_url, pool=self.pool)
 
             if response.status == 403:
 
