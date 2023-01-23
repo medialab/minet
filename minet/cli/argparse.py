@@ -16,7 +16,7 @@ from ebbe import getpath
 from datetime import datetime
 from pytz import timezone
 from pytz.exceptions import UnknownTimeZoneError
-from minet.cli.exceptions import NotResumable
+from minet.cli.exceptions import NotResumableError
 from minet.cli.utils import acquire_cross_platform_stdout, was_piped_something
 
 
@@ -326,7 +326,7 @@ def resolve_arg_dependencies(cli_args, config):
 
     # Validation
     if getattr(cli_args, "resume", False) and cli_args.output.path is None:
-        raise NotResumable
+        raise NotResumableError
 
     # Unwrapping values
     for name in vars(cli_args):

@@ -21,5 +21,5 @@ class MissingColumnError(MinetCLIError):
         self.column = column
 
 
-class NotResumable(MinetCLIError):
+class NotResumableError(MinetCLIError):
     pass
