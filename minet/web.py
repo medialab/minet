@@ -300,7 +300,7 @@ DEFAULT_POOL = create_pool(maxsize=10, num_pools=10)
 
 
 def raw_request(
-    http,
+    pool,
     url,
     method="GET",
     headers=None,
@@ -333,7 +333,7 @@ def raw_request(
         request_kwargs["timeout"] = timeout
 
     try:
-        response = http.request(method, url, **request_kwargs)
+        response = pool.request(method, url, **request_kwargs)
     except Exception as e:
         return e, None
 
@@ -360,7 +360,7 @@ class Redirection(object):
 
 
 def raw_resolve(
-    http,
+    pool,
     url,
     method="GET",
     headers=None,
@@ -396,7 +396,7 @@ def raw_resolve(
             response.close()
 
         http_error, response = raw_request(
-            http,
+            pool,
             url,
             method=method,
             headers=headers,
