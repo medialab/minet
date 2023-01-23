@@ -13,6 +13,10 @@ class YouTubeInvalidAPIKeyError(YouTubeError):
     pass
 
 
+class YouTubeAPILimitReached(YouTubeError):
+    pass
+
+
 class YouTubeInvalidAPICallError(YouTubeError):
     def __init__(self, url, status, data):
         super().__init__()
