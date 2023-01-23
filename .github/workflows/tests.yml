@@ -9,29 +9,29 @@ jobs:
         include:
           # Old ubuntu
           - os: ubuntu-18.04
-            python-version: "3.6"
+            python-version: "3.7"
 
           # Current ubuntu
           - os: ubuntu-20.04
-            python-version: "3.6"
-            pyinstaller: yes
-          - os: ubuntu-20.04
             python-version: "3.7"
+            pyinstaller: yes
           - os: ubuntu-20.04
             python-version: "3.8"
           - os: ubuntu-20.04
             python-version: "3.9"
+          - os: ubuntu-20.04
+            python-version: "3.10"
 
           # Mac
           - os: macos-12
-            python-version: "3.6"
+            python-version: "3.7"
           - os: macos-12
             python-version: "3.8"
             pyinstaller: yes
 
           # Windows
           - os: windows-latest
-            python-version: "3.6"
+            python-version: "3.7"
           - os: windows-latest
             python-version: "3.8"
             pyinstaller: yes
