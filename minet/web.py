@@ -15,7 +15,7 @@ import ural
 import json
 import mimetypes
 import functools
-import cchardet as chardet
+import charset_normalizer as chardet
 from collections import OrderedDict
 from json.decoder import JSONDecodeError
 from urllib.parse import urljoin
@@ -71,7 +71,7 @@ CANONICAL_LINK_RE = re.compile(
 HREF_RE = re.compile(rb'href=(\"[^"]+|\'[^\']+|[^\s]+)>?\s?', flags=re.I)
 
 # Constants
-CHARDET_CONFIDENCE_THRESHOLD = 0.9
+CHARSET_DETECTION_CONFIDENCE_THRESHOLD = 0.9
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
 CONTENT_CHUNK_SIZE = 1024
 LARGE_CONTENT_CHUNK_SIZE = 2**16
@@ -98,7 +98,7 @@ def prebuffer_response_up_to(response, target):
 
 
 # TODO: add a version that tallies the possibilities
-def guess_response_encoding(response, is_xml=False, use_chardet=False):
+def guess_response_encoding(response, is_xml=False, infer=False):
     """
     Function taking an urllib3 response object and attempting to guess its
     encoding.
@@ -146,15 +146,15 @@ def guess_response_encoding(response, is_xml=False, use_chardet=False):
             else:
                 suboptimal_charset = charset
 
-    if use_chardet:
-        chardet_result = chardet.detect(data)
+    if infer:
+        inferrence_result = chardet.detect(data)
 
         # Could not detect anything
-        if not chardet_result or chardet_result.get("confidence") is None:
+        if not inferrence_result or inferrence_result.get("confidence") is None:
             return None
 
-        if chardet_result["confidence"] >= CHARDET_CONFIDENCE_THRESHOLD:
-            return chardet_result["encoding"].lower()
+        if inferrence_result["confidence"] >= CHARSET_DETECTION_CONFIDENCE_THRESHOLD:
+            return inferrence_result["encoding"].lower()
 
     return suboptimal_charset
 
@@ -503,7 +503,8 @@ def raw_resolve(
                 if (
                     guessed_encoding != "iso-8859-1"
                     and guessed_encoding != "ascii"
-                    and detection["confidence"] >= CHARDET_CONFIDENCE_THRESHOLD
+                    and detection["confidence"]
+                    >= CHARSET_DETECTION_CONFIDENCE_THRESHOLD
                 ):
                     location = byte_location.decode(guessed_encoding)
         except Exception:
@@ -714,9 +715,7 @@ def extract_response_meta(response, guess_encoding=True, guess_extension=True):
 
     # Guessing encoding
     if guess_encoding:
-        meta["encoding"] = guess_response_encoding(
-            response, is_xml=True, use_chardet=True
-        )
+        meta["encoding"] = guess_response_encoding(response, is_xml=True, infer=True)
 
     return meta
 

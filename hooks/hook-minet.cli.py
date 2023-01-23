@@ -22,6 +22,7 @@ for p in iglob("minet/cli/**/*.py", recursive=True):
     hiddenimports.append(m)
 
 hiddenimports.extend(collect_submodules("pkg_resources"))
+hiddenimports.append("charset_normalizer.md__mypyc")
 
 datas = [
     (join(dirname(tld.__file__), "res", "effective_tld_names.dat.txt"), "tld/res"),
