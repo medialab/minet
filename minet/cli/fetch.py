@@ -17,9 +17,9 @@ from minet.fetch import multithreaded_fetch, multithreaded_resolve
 from minet.fs import FilenameBuilder, ThreadSafeFilesWriter
 from minet.web import grab_cookies, parse_http_header
 from minet.exceptions import InvalidURLError, FilenameFormattingError
-from minet.cli.exceptions import InvalidArgumentsError
+from minet.cli.exceptions import InvalidArgumentsError, FatalError
 from minet.cli.reporters import report_error, report_filename_formatting_error
-from minet.cli.utils import LoadingBar, die
+from minet.cli.utils import LoadingBar
 
 
 FETCH_ADDITIONAL_HEADERS = [
@@ -203,7 +203,7 @@ def fetch_action(cli_args, resolve=False, defer=None):
                 template=cli_args.filename_template,
             )
         except TypeError:
-            die(
+            raise FatalError(
                 [
                     'Invalid "%s" --folder-strategy!' % cli_args.folder_strategy,
                     "Check the list at the end of the command help:",

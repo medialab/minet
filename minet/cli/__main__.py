@@ -22,9 +22,9 @@ from encodings import idna  # NOTE: this is necessary for pyinstaller build
 
 from minet.__version__ import __version__
 from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
-from minet.cli.utils import die, get_rcfile
+from minet.cli.utils import die, get_rcfile, print_err
 from minet.cli.argparse import resolve_arg_dependencies
-from minet.cli.exceptions import NotResumableError, InvalidArgumentsError
+from minet.cli.exceptions import NotResumableError, InvalidArgumentsError, FatalError
 
 from minet.cli.commands import MINET_COMMANDS
 
@@ -169,7 +169,7 @@ def build_parser(commands):
     return parser, subparser_index
 
 
-def main():
+def run():
 
     # Building parser
     parser, subparser_index = build_parser(MINET_COMMANDS)
@@ -215,6 +215,8 @@ def main():
                 fn(cli_args)
             except InvalidArgumentsError as e:
                 parser.error(e.message)
+            except FatalError as e:
+                print_err(e.message)
                 sys.exit(1)
 
     elif cli_args.action == "help":
@@ -234,7 +236,7 @@ def main():
         parser.print_help()
 
 
-if __name__ == "__main__":
+def main():
     # Freezing multiprocessing support for pyinstaller etc.
     multiprocessing.freeze_support()
 
@@ -249,7 +251,7 @@ if __name__ == "__main__":
     casanova.set_default_ignore_null_bytes(True)
 
     try:
-        main()
+        run()
 
     except BrokenPipeError:
 
@@ -266,3 +268,7 @@ if __name__ == "__main__":
             bar.close()
 
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

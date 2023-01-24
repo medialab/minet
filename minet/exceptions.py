@@ -4,11 +4,16 @@
 #
 # Collection of handy custom exceptions.
 #
+from collections.abc import Iterable
 
 
 # Base minet error
 class MinetError(Exception):
     def __init__(self, message=None):
+        if not isinstance(message, str):
+            if isinstance(message, Iterable):
+                message = "\n".join(message)
+
         super().__init__("" if message is None else message)
         self.message = message
 

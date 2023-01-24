@@ -23,3 +23,7 @@ class MissingColumnError(MinetCLIError):
 
 class NotResumableError(MinetCLIError):
     pass
+
+
+class FatalError(MinetCLIError):
+    pass
