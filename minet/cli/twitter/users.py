@@ -31,6 +31,9 @@ def twitter_users_action(cli_args):
 
     loading_bar = LoadingBar(desc="Retrieving users", total=cli_args.total, unit="user")
 
+    if cli_args.resume:
+        loading_bar.update(cli_args.output.already_done_count())
+
     def call_client(users):
         kwargs = {}
 
