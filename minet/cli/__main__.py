@@ -203,14 +203,18 @@ def run():
             )
 
         # Lazy loading module for faster startup
-        pkg = action["command"]["package"]
+        meta = action["command"]
 
         if hasattr(cli_args, "subcommand") and cli_args.subcommand:
-            pkg = action["command"]["subparsers"]["commands"][cli_args.subcommand][
-                "package"
-            ]
+            meta = action["command"]["subparsers"]["commands"][cli_args.subcommand]
 
-        m = importlib.import_module(pkg)
+        if "validate" in meta:
+            try:
+                meta["validate"](cli_args)
+            except InvalidArgumentsError as e:
+                parser.error(e.message)
+
+        m = importlib.import_module(meta["package"])
         fn = getattr(m, "action")
 
         with ExitStack() as stack:

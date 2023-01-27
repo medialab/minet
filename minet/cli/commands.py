@@ -67,6 +67,7 @@ def command(
     epilog=None,
     arguments=None,
     subcommands=None,
+    validate=None,
     resumer=None,
     selectable=False,
     total=False,
@@ -109,6 +110,9 @@ def command(
             variadic_input=variadic_input,
         )
 
+    if validate is not None:
+        data["validate"] = validate
+
     return data
 
 
@@ -119,6 +123,7 @@ def subcommand(
     description=None,
     epilog=None,
     arguments=[],
+    validate=None,
     resumer=None,
     selectable=False,
     total=False,
@@ -139,6 +144,9 @@ def subcommand(
         total=total,
         variadic_input=variadic_input,
     )
+
+    if validate is not None:
+        data["validate"] = validate
 
     return data
 

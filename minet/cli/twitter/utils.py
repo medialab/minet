@@ -48,9 +48,33 @@ TWITTER_API_COMMON_ARGUMENTS = [
 ]
 
 
+def check_credentials(cli_args):
+
+    # Credentials are required to be able to access the API
+    if (
+        not cli_args.api_key
+        or not cli_args.api_secret_key
+        or not cli_args.access_token
+        or not cli_args.access_token_secret
+    ):
+        raise InvalidArgumentsError(
+            [
+                "Full credentials are required to access Twitter API.",
+                "You can provide them using various CLI arguments:",
+                "    --api-key",
+                "    --api-secret-key",
+                "    --access-token",
+                "    --access-token-secret",
+            ]
+        )
+
+
 def twitter_api_subcommand(*args, arguments=[], **kwargs):
     return subcommand(
-        *args, arguments=arguments + TWITTER_API_COMMON_ARGUMENTS, **kwargs
+        *args,
+        arguments=arguments + TWITTER_API_COMMON_ARGUMENTS,
+        validate=check_credentials,
+        **kwargs
     )
 
 
