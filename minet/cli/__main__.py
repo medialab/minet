@@ -25,7 +25,7 @@ from minet.cli.utils import die, get_rcfile, print_err, cleanup_loading_bars
 from minet.cli.argparse import resolve_arg_dependencies
 from minet.cli.exceptions import NotResumableError, InvalidArgumentsError, FatalError
 
-from minet.cli.commands import MINET_COMMANDS
+from minet.cli import MINET_COMMANDS
 
 
 def custom_formatter(prog):
@@ -203,8 +203,15 @@ def run():
             )
 
         # Lazy loading module for faster startup
-        m = importlib.import_module(action["command"]["package"])
-        fn = getattr(m, action["command"]["action"])
+        pkg = action["command"]["package"]
+
+        if hasattr(cli_args, "subcommand") and cli_args.subcommand:
+            pkg = action["command"]["subparsers"]["commands"][cli_args.subcommand][
+                "package"
+            ]
+
+        m = importlib.import_module(pkg)
+        fn = getattr(m, "action")
 
         with ExitStack() as stack:
             for buffer in to_close:
