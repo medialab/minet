@@ -65,6 +65,7 @@ def command(
     aliases=None,
     description=None,
     epilog=None,
+    common_arguments=None,
     arguments=None,
     subcommands=None,
     validate=None,
@@ -100,6 +101,9 @@ def command(
             "dest": "subcommand",
             "commands": {s["name"]: s for s in subcommands},
         }
+
+        if common_arguments is not None:
+            data["subparsers"]["common_arguments"] = common_arguments
 
     elif arguments is not None:
         data["arguments"] = resolve_typical_arguments(
@@ -165,7 +169,6 @@ from minet.constants import (
 from minet.cli.constants import DEFAULT_CONTENT_FOLDER
 from minet.cli.argparse import (
     BooleanAction,
-    BuzzSumoDateType,
     ConfigAction,
     InputFileAction,
     OutputFileAction,

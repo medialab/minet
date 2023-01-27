@@ -4,6 +4,9 @@
 #
 # Logic of the `bz limit` action.
 #
+
+# TODO: port this command then attach global fatal errors
+
 from termcolor import colored
 from ebbe import format_int
 
