@@ -57,6 +57,12 @@ def die(msg=None):
     sys.exit(1)
 
 
+def cleanup_loading_bars(leave=True):
+    for bar in list(tqdm._instances):
+        bar.leave = leave
+        bar.close()
+
+
 def safe_index(l, e):
     try:
         return l.index(e)

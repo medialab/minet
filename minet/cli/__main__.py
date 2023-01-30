@@ -14,7 +14,6 @@ import importlib
 import multiprocessing
 import casanova
 from textwrap import dedent
-from tqdm import tqdm
 from contextlib import ExitStack
 from argparse import ArgumentParser, RawTextHelpFormatter
 from colorama import init as colorama_init
@@ -22,7 +21,7 @@ from encodings import idna  # NOTE: this is necessary for pyinstaller build
 
 from minet.__version__ import __version__
 from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
-from minet.cli.utils import die, get_rcfile, print_err
+from minet.cli.utils import die, get_rcfile, print_err, cleanup_loading_bars
 from minet.cli.argparse import resolve_arg_dependencies
 from minet.cli.exceptions import NotResumableError, InvalidArgumentsError, FatalError
 
@@ -261,12 +260,10 @@ def main():
         sys.exit(1)
 
     except KeyboardInterrupt:
+        # Leaving loading bars to avoid duplication
+        cleanup_loading_bars()
 
-        # Cleaning up tqdm loading bar nicely on keyboard interrupts
-        for bar in list(tqdm._instances):
-            bar.leave = False
-            bar.close()
-
+        # Exiting right now to avoid stack frames
         sys.exit(1)
 
 
