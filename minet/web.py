@@ -301,7 +301,7 @@ def create_pool(
 DEFAULT_POOL = create_pool(maxsize=10, num_pools=10)
 
 
-def raw_request(
+def make_request(
     pool,
     url,
     method="GET",
@@ -356,7 +356,7 @@ class Redirection(object):
         }
 
 
-def raw_resolve(
+def make_resolve(
     pool,
     url,
     method="GET",
@@ -395,7 +395,7 @@ def raw_resolve(
         redirection = Redirection(url)
 
         try:
-            response = raw_request(
+            response = make_request(
                 pool,
                 url,
                 method=method,
@@ -606,11 +606,11 @@ def request(
         final_body = json.dumps(json_body, ensure_ascii=False).encode("utf-8")
 
     if not follow_redirects:
-        return raw_request(
+        return make_request(
             pool, url, method, headers=final_headers, body=final_body, timeout=timeout
         )
     else:
-        _, response = raw_resolve(
+        _, response = make_resolve(
             pool,
             url,
             method,
@@ -627,8 +627,6 @@ def request(
         # Finishing reading body
         try:
             response._body = (response._body or b"") + response.read()
-        except Exception as e:
-            return e, response
         finally:
             if response is not None:
                 response.close()
@@ -657,7 +655,7 @@ def resolve(
         headers=headers, cookie=cookie, spoof_ua=spoof_ua
     )
 
-    return raw_resolve(
+    return make_resolve(
         pool,
         url,
         method,

@@ -59,6 +59,9 @@ def max_retry_error_reporter(error):
 def new_connection_error_reporter(error):
     msg = repr(error).lower()
 
+    if "no route to host" in msg or "errno 113" in msg:
+        return "no-route-to-host"
+
     if "name or service not known" in msg or "errno 8" in msg:
         return "unknown-host"
 
