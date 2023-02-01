@@ -45,6 +45,49 @@ BUZZSUMO_LIMIT_SUBCOMMAND = subcommand(
     """,
 )
 
+DATE_ARGUMENTS = [
+    {
+        "flag": "--begin-date",
+        "help": "The date you wish to fetch articles from. UTC date should have the following format : YYYY-MM-DD",
+        "required": True,
+        "type": BuzzSumoDateType(),
+    },
+    {
+        "flag": "--end-date",
+        "help": "The date you wish to fetch articles to. UTC date should have the following format : YYYY-MM-DD",
+        "required": True,
+        "type": BuzzSumoDateType(),
+    },
+]
+
+BUZZSUMO_DOMAIN_COMMAND = subcommand(
+    "domain",
+    "minet.cli.buzzsumo.domain",
+    title="Minet Buzzsumo Domain Command",
+    description="""
+        Gather social media information about all the articles crawled by BuzzSumo for one or a list of domain names and over a given period.
+
+        The link to the official documentation: https://developers.buzzsumo.com/reference/articles.
+    """,
+    epilog="""
+        examples:
+
+        . Returning social media information for one domain name:
+            $ minet bz domain 'trump-feed.com' --begin-date 2021-01-01 --end-date 2021-06-30 --token YOUR_TOKEN > trump_feed_articles.csv
+
+        . Returning social media information for a list of domain names in a CSV:
+            $ minet bz domain domain_name domain_names.csv --select domain_name --begin-date 2019-01-01 --end-date 2020-12-31 --token YOUR_TOKEN > domain_name_articles.csv
+    """,
+    variadic_input=("domain_name", "CSV file containing the domain names."),
+    selectable=True,
+    arguments=[
+        {
+            "name": "column",
+            "help": "Name of the column containing the domain names.",
+        },
+        *DATE_ARGUMENTS,
+    ],
+)
 
 BUZZSUMO_COMMAND = command(
     "buzzsumo",
@@ -62,5 +105,5 @@ BUZZSUMO_COMMAND = command(
             "rc_key": ["buzzsumo", "token"],
         }
     ],
-    subcommands=[BUZZSUMO_LIMIT_SUBCOMMAND],
+    subcommands=[BUZZSUMO_LIMIT_SUBCOMMAND, BUZZSUMO_DOMAIN_COMMAND],
 )

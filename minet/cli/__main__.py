@@ -234,6 +234,7 @@ def run():
             except InvalidArgumentsError as e:
                 parser.error(e.message)
             except FatalError as e:
+                cleanup_loading_bars(leave=True)
                 print_err(e.message)
                 sys.exit(1)
 

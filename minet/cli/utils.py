@@ -12,6 +12,7 @@ import platform
 from glob import iglob
 from os.path import join, expanduser, isfile, relpath
 from collections import namedtuple
+from collections.abc import Mapping
 from functools import wraps
 from tqdm import tqdm
 from ebbe import noop, format_seconds
@@ -58,7 +59,7 @@ def die(msg=None):
     sys.exit(1)
 
 
-def cleanup_loading_bars(leave=True):
+def cleanup_loading_bars(leave=False):
     for bar in list(tqdm._instances):
         bar.leave = leave
         bar.close()
@@ -277,15 +278,22 @@ def get_rcfile(rcfile_path=None):
     return None
 
 
-def with_fatal_errors(mapping):
+def with_fatal_errors(mapping_or_hook):
+    if not isinstance(mapping_or_hook, Mapping) and not callable(mapping_or_hook):
+        raise TypeError("Expecting mapping or callable")
+
     def decorate(fn):
         @wraps(fn)
         def wrapper(*args, **kwargs):
             try:
                 return fn(*args, **kwargs)
             except Exception as e:
-                exc_type = type(e)
-                msg = mapping.get(exc_type)
+                msg = None
+
+                if isinstance(mapping_or_hook, Mapping):
+                    msg = mapping_or_hook.get(type(e))
+                elif callable(mapping_or_hook):
+                    msg = mapping_or_hook(e)
 
                 if msg is not None:
                     raise FatalError(msg)
