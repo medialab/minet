@@ -6,20 +6,16 @@
 #
 
 # TODO: port this command then attach global fatal errors
-# TODO: check pyinstaller and be wary of lazyloading utils, or divide sub .commands,
-# TODO: debug lazyloading by tracking imports
 
 from termcolor import colored
 from ebbe import format_int
 
-from minet.cli.utils import die, register_retryer_logger
+from minet.cli.utils import die
 from minet.buzzsumo import BuzzSumoAPIClient
 from minet.buzzsumo.exceptions import BuzzSumoInvalidTokenError
 
 
-def buzzsumo_limit_action(cli_args):
-    register_retryer_logger()
-
+def action(cli_args):
     client = BuzzSumoAPIClient(cli_args.token)
 
     try:

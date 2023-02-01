@@ -21,7 +21,13 @@ from encodings import idna  # NOTE: this is necessary for pyinstaller build
 
 from minet.__version__ import __version__
 from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
-from minet.cli.utils import die, get_rcfile, print_err, cleanup_loading_bars
+from minet.cli.utils import (
+    die,
+    get_rcfile,
+    print_err,
+    cleanup_loading_bars,
+    register_retryer_logger,
+)
 from minet.cli.argparse import resolve_arg_dependencies
 from minet.cli.exceptions import NotResumableError, InvalidArgumentsError, FatalError
 
@@ -220,6 +226,8 @@ def run():
         with ExitStack() as stack:
             for buffer in to_close:
                 stack.callback(buffer.close)
+
+            register_retryer_logger()
 
             try:
                 fn(cli_args)
