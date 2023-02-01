@@ -4,57 +4,18 @@
 #
 # Logic of the `tw users` action.
 #
-from casanova import RowCountResumer
+import casanova
+from twitwi import normalize_user, format_user_as_csv_row
+from twitter import TwitterHTTPError
+from twitwi.constants import USER_FIELDS, USER_PARAMS
+from ebbe import as_chunks
 
-from minet.cli.twitter.utils import twitter_api_subcommand
-
-TWITTER_USERS_SUBCOMMAND = twitter_api_subcommand(
-    "users",
-    "minet.cli.twitter.users",
-    title="Minet Twitter Friends Command",
-    description="""
-        Retrieve friends, i.e. followed users, of given user.
-    """,
-    epilog="""
-        examples:
-
-        . Getting friends of a list of user:
-            $ minet tw friends screen_name users.csv > friends.csv
-    """,
-    resumer=RowCountResumer,
-    selectable=True,
-    total=True,
-    variadic_input=("user", "CSV file containing the inquired Twitter users."),
-    arguments=[
-        {
-            "name": "column",
-            "help": "Name of the column containing the Twitter account screen names or ids.",
-        },
-        {
-            "flag": "--ids",
-            "help": "Whether your users are given as ids rather than screen names.",
-            "action": "store_true",
-        },
-        {
-            "flag": "--v2",
-            "help": "Whether to use latest Twitter API v2 rather than v1.1.",
-            "action": "store_true",
-        },
-    ],
-)
+from minet.cli.utils import LoadingBar
+from minet.twitter import TwitterAPIClient
+from minet.cli.twitter.utils import is_not_user_id, is_probably_not_user_screen_name
 
 
 def action(cli_args):
-    import casanova
-    from twitwi import normalize_user, format_user_as_csv_row
-    from twitter import TwitterHTTPError
-    from twitwi.constants import USER_FIELDS, USER_PARAMS
-    from ebbe import as_chunks
-
-    from minet.cli.utils import LoadingBar
-    from minet.twitter import TwitterAPIClient
-    from minet.cli.twitter.utils import is_not_user_id, is_probably_not_user_screen_name
-
     client = TwitterAPIClient(
         cli_args.access_token,
         cli_args.access_token_secret,

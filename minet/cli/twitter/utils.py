@@ -8,9 +8,7 @@ import casanova
 import re
 from twitter import TwitterHTTPError
 
-from minet.cli.commands import subcommand
 from minet.cli.utils import LoadingBar
-from minet.cli.argparse import ConfigAction
 from minet.cli.exceptions import InvalidArgumentsError
 from minet.twitter import TwitterAPIClient
 
@@ -19,63 +17,6 @@ NUMBERS = re.compile(r"[0-9]+")
 TWITTER_SCREEN_NAME = re.compile(r"[a-zA-Z0-9_]{1,15}")
 
 ITEMS_PER_PAGE = 1000
-
-TWITTER_API_COMMON_ARGUMENTS = [
-    {
-        "flag": "--api-key",
-        "help": "Twitter API key.",
-        "rc_key": ["twitter", "api_key"],
-        "action": ConfigAction,
-    },
-    {
-        "flag": "--api-secret-key",
-        "help": "Twitter API secret key.",
-        "rc_key": ["twitter", "api_secret_key"],
-        "action": ConfigAction,
-    },
-    {
-        "flag": "--access-token",
-        "help": "Twitter API access token.",
-        "rc_key": ["twitter", "access_token"],
-        "action": ConfigAction,
-    },
-    {
-        "flag": "--access-token-secret",
-        "help": "Twitter API access token secret.",
-        "rc_key": ["twitter", "access_token_secret"],
-        "action": ConfigAction,
-    },
-]
-
-
-def check_credentials(cli_args):
-
-    # Credentials are required to be able to access the API
-    if (
-        not cli_args.api_key
-        or not cli_args.api_secret_key
-        or not cli_args.access_token
-        or not cli_args.access_token_secret
-    ):
-        raise InvalidArgumentsError(
-            [
-                "Full credentials are required to access Twitter API.",
-                "You can provide them using various CLI arguments:",
-                "    --api-key",
-                "    --api-secret-key",
-                "    --access-token",
-                "    --access-token-secret",
-            ]
-        )
-
-
-def twitter_api_subcommand(*args, arguments=[], **kwargs):
-    return subcommand(
-        *args,
-        arguments=arguments + TWITTER_API_COMMON_ARGUMENTS,
-        validate=check_credentials,
-        **kwargs
-    )
 
 
 def validate_query_boundaries(cli_args):

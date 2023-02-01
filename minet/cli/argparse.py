@@ -310,3 +310,151 @@ def resolve_arg_dependencies(cli_args, config):
             to_close.append(value)
 
     return to_close
+
+
+def resolve_typical_arguments(
+    args, resumer=None, selectable=False, total=False, variadic_input=None
+):
+    args = [] if args is None else args.copy()
+
+    output_argument = {"flags": ["-o", "--output"], "action": OutputFileAction}
+
+    if variadic_input is not None:
+        args.append(
+            {
+                "name": "file",
+                "help": variadic_input[1],
+                "action": InputFileAction,
+                "dummy_csv_column": variadic_input[0],
+            }
+        )
+
+    if selectable:
+        args.append(
+            {
+                "flags": ["-s", "--select"],
+                "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                "type": SplitterType(),
+            },
+        )
+
+    if total:
+        args.append(
+            {
+                "flag": "--total",
+                "help": "Total number of accounts. Necessary if you want to display a finite progress indicator.",
+                "type": int,
+            }
+        )
+
+    if resumer is not None:
+        args.append(
+            {
+                "flag": "--resume",
+                "help": "Whether to resume from an aborted collection. Need -o to be set.",
+                "action": "store_true",
+            },
+        )
+
+        output_argument["resumer"] = resumer
+
+    args.append(output_argument)
+
+    return args
+
+
+def command(
+    name,
+    package=None,
+    title=None,
+    aliases=None,
+    description=None,
+    epilog=None,
+    common_arguments=None,
+    arguments=None,
+    subcommands=None,
+    validate=None,
+    resumer=None,
+    selectable=False,
+    total=False,
+    variadic_input=None,
+):
+
+    if arguments is not None and subcommands is not None:
+        raise TypeError(
+            "command cannot have subcommands and be executable on its own (avoid giving arguments AND subcommands)"
+        )
+
+    data = {"name": name, "title": title}
+
+    if package is not None:
+        data["package"] = package
+
+    if aliases is not None:
+        data["aliases"] = aliases
+
+    if description is not None:
+        data["description"] = description
+
+    if epilog is not None:
+        data["epilog"] = epilog
+
+    if subcommands is not None:
+        data["subparsers"] = {
+            "help": "Subcommand to use.",
+            "title": "subcommands",
+            "dest": "subcommand",
+            "commands": {s["name"]: s for s in subcommands},
+        }
+
+        if common_arguments is not None:
+            data["subparsers"]["common_arguments"] = common_arguments
+
+    elif arguments is not None:
+        data["arguments"] = resolve_typical_arguments(
+            arguments,
+            resumer=resumer,
+            selectable=selectable,
+            total=total,
+            variadic_input=variadic_input,
+        )
+
+    if validate is not None:
+        data["validate"] = validate
+
+    return data
+
+
+def subcommand(
+    name,
+    package,
+    title,
+    description=None,
+    epilog=None,
+    arguments=[],
+    validate=None,
+    resumer=None,
+    selectable=False,
+    total=False,
+    variadic_input=None,
+):
+    data = {"name": name, "title": title, "package": package, "arguments": arguments}
+
+    if description is not None:
+        data["description"] = description
+
+    if epilog is not None:
+        data["epilog"] = epilog
+
+    data["arguments"] = resolve_typical_arguments(
+        arguments,
+        resumer=resumer,
+        selectable=selectable,
+        total=total,
+        variadic_input=variadic_input,
+    )
+
+    if validate is not None:
+        data["validate"] = validate
+
+    return data

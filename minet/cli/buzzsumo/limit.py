@@ -6,7 +6,8 @@
 #
 
 # TODO: port this command then attach global fatal errors
-# TODO: check pyinstaller and be wary of lazyloading utils, or divide sub .commands
+# TODO: check pyinstaller and be wary of lazyloading utils, or divide sub .commands,
+# TODO: debug lazyloading by tracking imports
 
 from termcolor import colored
 from ebbe import format_int
