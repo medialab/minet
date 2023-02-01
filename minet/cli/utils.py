@@ -12,6 +12,7 @@ import platform
 from glob import iglob
 from os.path import join, expanduser, isfile, relpath
 from collections import namedtuple
+from functools import wraps
 from tqdm import tqdm
 from ebbe import noop, format_seconds
 
@@ -19,7 +20,7 @@ from minet.web import (
     register_global_request_retryer_before_sleep,
     reset_global_request_retryer_before_sleep,
 )
-from minet.cli.exceptions import MissingColumnError
+from minet.cli.exceptions import MissingColumnError, FatalError
 from minet.utils import fuzzy_int
 
 
@@ -274,3 +275,23 @@ def get_rcfile(rcfile_path=None):
             return yaml.safe_load(f)
 
     return None
+
+
+def with_fatal_errors(mapping):
+    def decorate(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            try:
+                return fn(*args, **kwargs)
+            except Exception as e:
+                exc_type = type(e)
+                msg = mapping.get(exc_type)
+
+                if msg is not None:
+                    raise FatalError(msg)
+
+                raise e
+
+        return wrapper
+
+    return decorate

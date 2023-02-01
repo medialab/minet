@@ -4,24 +4,18 @@
 #
 # Logic of the `bz limit` action.
 #
-
-# TODO: port this command then attach global fatal errors
-
 from termcolor import colored
 from ebbe import format_int
 
-from minet.cli.utils import die
 from minet.buzzsumo import BuzzSumoAPIClient
-from minet.buzzsumo.exceptions import BuzzSumoInvalidTokenError
+from minet.cli.buzzsumo.utils import with_buzzsumo_fatal_errors
 
 
+@with_buzzsumo_fatal_errors
 def action(cli_args):
     client = BuzzSumoAPIClient(cli_args.token)
 
-    try:
-        limit = client.limit()
-    except BuzzSumoInvalidTokenError:
-        die("Your BuzzSumo token is invalid!")
+    limit = client.limit()
 
     print(
         "With your token, you can still make",
