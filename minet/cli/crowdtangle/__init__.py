@@ -4,46 +4,51 @@
 #
 # Logic of the `ct` action.
 #
-from minet.cli.utils import die
+from minet.cli.argparse import command, subcommand, ConfigAction
+from minet.cli.exceptions import InvalidArgumentsError
 
+# TODO: lazy loading constants
+CROWDTANGLE_DEFAULT_RATE_LIMIT = 6
 
-def crowdtangle_action(cli_args):
-
-    # A token is needed to be able to access the API
+# TODO: this should probably be a required instead, see #534
+def check_token(cli_args):
     if not cli_args.token:
-        die(
+        raise InvalidArgumentsError(
             [
                 "A token is needed to be able to access CrowdTangle's API.",
                 "You can provide one using the `--token` argument.",
             ]
         )
 
-    if cli_args.ct_action == "posts":
-        from minet.cli.crowdtangle.posts import crowdtangle_posts_action
 
-        crowdtangle_posts_action(cli_args)
+def crowdtangle_api_subcommand(*args, **kwargs):
+    return subcommand(*args, validate=check_token, **kwargs)
 
-    elif cli_args.ct_action == "posts-by-id":
-        from minet.cli.crowdtangle.posts_by_id import crowdtangle_posts_by_id_action
 
-        crowdtangle_posts_by_id_action(cli_args)
-
-    elif cli_args.ct_action == "lists":
-        from minet.cli.crowdtangle.lists import crowdtangle_lists_action
-
-        crowdtangle_lists_action(cli_args)
-
-    elif cli_args.ct_action == "leaderboard":
-        from minet.cli.crowdtangle.leaderboard import crowdtangle_leaderboard_action
-
-        crowdtangle_leaderboard_action(cli_args)
-
-    elif cli_args.ct_action == "search":
-        from minet.cli.crowdtangle.search import crowdtangle_search_action
-
-        crowdtangle_search_action(cli_args)
-
-    elif cli_args.ct_action == "summary":
-        from minet.cli.crowdtangle.summary import crowdtangle_summary_action
-
-        crowdtangle_summary_action(cli_args)
+CROWDTANGLE_COMMAND = command(
+    "crowdtangle",
+    "minet.cli.crowdtangle",
+    "Minet Crowdtangle Command",
+    aliases=["ct"],
+    description="""
+        Gather data from the CrowdTangle APIs easily and efficiently.
+    """,
+    common_arguments=[
+        {
+            "flag": "--rate-limit",
+            "help": "Authorized number of hits by minutes. Defaults to %i. Rcfile key: crowdtangle.rate_limit"
+            % CROWDTANGLE_DEFAULT_RATE_LIMIT,
+            "type": int,
+            "default": CROWDTANGLE_DEFAULT_RATE_LIMIT,
+            "rc_key": ["crowdtangle", "rate_limit"],
+            "action": ConfigAction,
+        },
+        {
+            "flags": ["-t", "--token"],
+            "help": "CrowdTangle dashboard API token. Rcfile key: crowdtangle.token",
+            "action": ConfigAction,
+            "rc_key": ["crowdtangle", "token"],
+        },
+    ],
+    subcommands=[],
+)
