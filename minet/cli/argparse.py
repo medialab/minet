@@ -320,12 +320,13 @@ def resolve_typical_arguments(
     output_argument = {"flags": ["-o", "--output"], "action": OutputFileAction}
 
     if variadic_input is not None:
+        args.append({"name": "column", "help": variadic_input["column_help"]})
         args.append(
             {
                 "name": "file",
-                "help": variadic_input[1],
+                "help": variadic_input["file_help"],
                 "action": InputFileAction,
-                "dummy_csv_column": variadic_input[0],
+                "dummy_csv_column": variadic_input["dummy_column"],
             }
         )
 

@@ -95,11 +95,14 @@ URL_PARSE_COMMAND = command(
         . Parsing Twitter urls:
             $ minet url-parse url tweets.csv --twitter > report.csv
     """,
-    variadic_input=("url", "CSV file containing target urls."),
+    variadic_input={
+        "dummy_column": "url",
+        "file_help": "CSV file containing target urls.",
+        "column_help": "Name of the column containing urls.",
+    },
     selectable=True,
     total=True,
     arguments=[
-        {"name": "column", "help": "Name of the column containing urls."},
         {"flag": "--separator", "help": "Split url column by a separator?"},
         {
             "flag": "--facebook",

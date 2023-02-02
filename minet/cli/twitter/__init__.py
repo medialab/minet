@@ -83,12 +83,12 @@ TWITTER_USERS_SUBCOMMAND = twitter_api_subcommand(
     resumer=RowCountResumer,
     selectable=True,
     total=True,
-    variadic_input=("user", "CSV file containing the inquired Twitter users."),
+    variadic_input={
+        "dummy_column": "user",
+        "file_help": "CSV file containing the inquired Twitter users.",
+        "column_help": "Name of the column containing the Twitter account screen names or ids.",
+    },
     arguments=[
-        {
-            "name": "column",
-            "help": "Name of the column containing the Twitter account screen names or ids.",
-        },
         {
             "flag": "--ids",
             "help": "Whether your users are given as ids rather than screen names.",
