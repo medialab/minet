@@ -89,6 +89,36 @@ BUZZSUMO_DOMAIN_COMMAND = subcommand(
     ],
 )
 
+
+BUZZSUMO_DOMAIN_SUMMARY_COMMAND = subcommand(
+    "domain-summary",
+    "minet.cli.buzzsumo.domain_summary",
+    title="Minet Buzzsumo Domain Summary Command",
+    description="""
+        Gather information about the quantity of articles crawled by BuzzSumo for certain domain names and a given period.
+
+        Inform the user about the number of calls (corresponding to the number of pages) needed to request BuzzSumo about those domain names.
+    """,
+    epilog="""
+        examples:
+
+        . Returning the number of articles and pages found in BuzzSumo for one domain name:
+            $ minet bz domain-summary 'nytimes.com' --begin-date 2019-01-01 --end-date 2019-03-01 --token YOUR_TOKEN
+
+        . Returning the number of articles and pages found in BuzzSumo for a list of domain names in a CSV:
+            $ minet bz domain-summary domain_name domain_names.csv --begin-date 2020-01-01 --end-date 2021-06-15 --token YOUR_TOKEN  > domain_name_summary.csv
+    """,
+    variadic_input=("domain_name", "CSV file containing the domain names."),
+    selectable=True,
+    arguments=[
+        {
+            "name": "column",
+            "help": "Name of the column containing the domain names.",
+        },
+        *DATE_ARGUMENTS,
+    ],
+)
+
 BUZZSUMO_COMMAND = command(
     "buzzsumo",
     "minet.cli.buzzsumo",
@@ -105,5 +135,9 @@ BUZZSUMO_COMMAND = command(
             "rc_key": ["buzzsumo", "token"],
         }
     ],
-    subcommands=[BUZZSUMO_LIMIT_SUBCOMMAND, BUZZSUMO_DOMAIN_COMMAND],
+    subcommands=[
+        BUZZSUMO_LIMIT_SUBCOMMAND,
+        BUZZSUMO_DOMAIN_COMMAND,
+        BUZZSUMO_DOMAIN_SUMMARY_COMMAND,
+    ],
 )
