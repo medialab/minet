@@ -10,7 +10,9 @@ class FacebookError(MinetError):
 
 
 class FacebookInvalidCookieError(FacebookError):
-    pass
+    def __init__(self, msg=None, target=None):
+        super().__init__(msg)
+        self.target = target
 
 
 class FacebookInvalidTargetError(FacebookError):
