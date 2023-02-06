@@ -6,7 +6,7 @@
 #
 from browser_cookie3 import BrowserCookieError
 
-from minet.cli.utils import die
+from minet.cli.exceptions import FatalError
 from minet.google import export_google_sheets_as_csv
 from minet.google.exceptions import (
     GoogleSheetsInvalidTargetError,
@@ -18,27 +18,29 @@ from minet.google.exceptions import (
 )
 
 
-def google_sheets_action(cli_args):
+def action(cli_args):
     try:
         data = export_google_sheets_as_csv(
             cli_args.url, cookie=cli_args.cookie, authuser=cli_args.authuser
         )
     except GoogleSheetsInvalidTargetError:
-        die("Could not extract a valid google sheets id from provided argument!")
+        raise FatalError(
+            "Could not extract a valid google sheets id from provided argument!"
+        )
     except BrowserCookieError:
-        die("Could not extract cookie from %s!" % cli_args.cookie)
+        raise FatalError("Could not extract cookie from %s!" % cli_args.cookie)
     except GoogleSheetsMissingCookieError:
-        die("Did not find a relevant cookie!")
+        raise FatalError("Did not find a relevant cookie!")
     except GoogleSheetsInvalidContentTypeError:
-        die("Could not export spreadsheet as CSV!")
+        raise FatalError("Could not export spreadsheet as CSV!")
     except GoogleSheetsNotFoundError:
-        die("Could not find spreadsheet (404)!")
+        raise FatalError("Could not find spreadsheet (404)!")
     except GoogleSheetsUnauthorizedError:
-        die(
+        raise FatalError(
             "You don't have access to this spreadsheet. Did you forget to set --cookie?"
         )
     except GoogleSheetsMaxAttemptsExceeded:
-        die(
+        raise FatalError(
             "Maximum number of attempts exceeded! You can still set --authuser if you logged in numerous google accounts at once."
         )
 
