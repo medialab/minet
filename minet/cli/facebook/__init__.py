@@ -58,9 +58,33 @@ FACEBOOK_COMMENTS_SUBCOMMAND = subcommand(
         "column_help": "Column of the CSV file containing post urls or a single post url.",
     },
     selectable=True,
-    arguments=[
-        *MOBILE_ARGUMENTS
-    ],
+    arguments=[*MOBILE_ARGUMENTS],
+)
+
+FACEBOOK_POST_AUTHORS_SUBCOMMAND = subcommand(
+    "post-authors",
+    "minet.cli.facebook.post_authors",
+    title="Minet Facebook Post Authors Command",
+    description="""
+        Retrieve the author of the given Facebook posts.
+
+        Note that it is only relevant for group posts since
+        only administrators can post something on pages.
+    """,
+    epilog="""
+        examples:
+
+        . Fetching authors of a series of posts in a CSV file:
+            $ minet fb post-authors post_url fb-posts.csv > authors.csv
+    """,
+    variadic_input={
+        "dummy_column": "post_url",
+        "file_help": "CSV file containing the posts.",
+        "column_help": "Name of the CSV column containing the posts' urls.",
+    },
+    selectable=True,
+    total=True,
+    arguments=[*MOBILE_ARGUMENTS],
 )
 
 FACEBOOK_COMMAND = command(
@@ -71,5 +95,5 @@ FACEBOOK_COMMAND = command(
     description="""
         Collect data from Facebook.
     """,
-    subcommands=[FACEBOOK_COMMENTS_SUBCOMMAND],
+    subcommands=[FACEBOOK_COMMENTS_SUBCOMMAND, FACEBOOK_POST_AUTHORS_SUBCOMMAND],
 )

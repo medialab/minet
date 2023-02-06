@@ -6,30 +6,16 @@
 #
 import casanova
 
-from minet.constants import COOKIE_BROWSERS
-from minet.cli.utils import die, LoadingBar
+from minet.cli.utils import LoadingBar
+from minet.cli.facebook.utils import with_facebook_fatal_errors
 from minet.facebook import FacebookMobileScraper
 from minet.facebook.constants import FACEBOOK_USER_CSV_HEADERS
-from minet.facebook.exceptions import (
-    FacebookInvalidCookieError,
-    FacebookInvalidTargetError,
-)
+from minet.facebook.exceptions import FacebookInvalidTargetError
 
 
-def facebook_post_authors_action(cli_args):
-    try:
-        scraper = FacebookMobileScraper(cli_args.cookie, throttle=cli_args.throttle)
-    except FacebookInvalidCookieError:
-        if cli_args.cookie in COOKIE_BROWSERS:
-            die(['Could not extract relevant cookie from "%s".' % cli_args.cookie])
-
-        die(
-            [
-                "Relevant cookie not found.",
-                "A Facebook authentication cookie is necessary to be able to scrape Facebook comments.",
-                "Use the --cookie flag to choose a browser from which to extract the cookie or give your cookie directly.",
-            ]
-        )
+@with_facebook_fatal_errors
+def action(cli_args):
+    scraper = FacebookMobileScraper(cli_args.cookie, throttle=cli_args.throttle)
 
     # Enricher
     enricher = casanova.enricher(
