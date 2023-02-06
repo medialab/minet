@@ -7,7 +7,7 @@ from minet.buzzsumo.exceptions import (
 FATAL_ERRORS = {BuzzSumoInvalidTokenError: "Your BuzzSumo token is invalid!"}
 
 
-def fatal_errors_hook(e):
+def fatal_errors_hook(_, e):
     if isinstance(e, BuzzSumoInvalidQueryError):
         return ["Invalid query: %s" % e.url, "Message from the API: %s" % e]
 
@@ -15,4 +15,4 @@ def fatal_errors_hook(e):
 
 
 def with_buzzsumo_fatal_errors(fn):
-    return with_fatal_errors(FATAL_ERRORS)(fn)
+    return with_fatal_errors(fatal_errors_hook)(fn)

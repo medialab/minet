@@ -4,7 +4,7 @@ from minet.cli.utils import with_fatal_errors
 from minet.facebook.exceptions import FacebookInvalidCookieError
 
 
-def fatal_errors_hook(e):
+def fatal_errors_hook(_, e):
     if isinstance(e, FacebookInvalidCookieError):
         if e.target in COOKIE_BROWSERS:
             return 'Could not extract relevant cookie from "%s".' % e.target

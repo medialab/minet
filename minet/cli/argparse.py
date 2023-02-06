@@ -322,7 +322,10 @@ def resolve_typical_arguments(
     if variadic_input is not None:
         variadic_input = variadic_input.copy()
 
-        if "item_label" in variadic_input:
+        if "column_help" not in variadic_input:
+            if "item_label" not in variadic_input:
+                variadic_input['item_label'] = variadic_input['dummy_column']
+
             if "item_label_plural" not in variadic_input:
                 variadic_input["item_label_plural"] = variadic_input["item_label"] + "s"
 

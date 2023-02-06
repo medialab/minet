@@ -293,7 +293,7 @@ def with_fatal_errors(mapping_or_hook):
                 if isinstance(mapping_or_hook, Mapping):
                     msg = mapping_or_hook.get(type(e))
                 elif callable(mapping_or_hook):
-                    msg = mapping_or_hook(e)
+                    msg = mapping_or_hook(args[0], e)
 
                 if msg is not None:
                     raise FatalError(msg)
