@@ -39,6 +39,7 @@ def action(cli_args):
                 enricher.writerow(row, post.as_csv_row())
 
                 loading_bar.inc("posts")
+
         except InstagramHashtagNeverUsedError:
             loading_bar.print(
                 "Given hashtag (line %i) has probably never been used: %s"

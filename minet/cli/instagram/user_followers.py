@@ -8,32 +8,20 @@
 import casanova
 from itertools import islice
 
-from minet.constants import COOKIE_BROWSERS
-from minet.cli.utils import LoadingBar, die
+from minet.cli.utils import LoadingBar
+from minet.cli.instagram.utils import with_instagram_fatal_errors
 from minet.instagram import InstagramAPIScraper
 from minet.instagram.constants import INSTAGRAM_USER_CSV_HEADERS
 from minet.instagram.exceptions import (
     InstagramInvalidTargetError,
-    InstagramInvalidCookieError,
     InstagramAccountNoFollowError,
     InstagramPrivateAccountError,
 )
 
 
-def user_followers_action(cli_args):
-    try:
-        client = InstagramAPIScraper(cookie=cli_args.cookie)
-    except InstagramInvalidCookieError:
-        if cli_args.cookie in COOKIE_BROWSERS:
-            die(['Could not extract relevant cookie from "%s".' % cli_args.cookie])
-
-        die(
-            [
-                "Relevant cookie not found.",
-                "A Facebook authentication cookie is necessary to be able to scrape Instagram.",
-                "Use the --cookie flag to choose a browser from which to extract the cookie or give your cookie directly.",
-            ]
-        )
+@with_instagram_fatal_errors
+def action(cli_args):
+    client = InstagramAPIScraper(cookie=cli_args.cookie)
 
     enricher = casanova.enricher(
         cli_args.file,
@@ -58,14 +46,17 @@ def user_followers_action(cli_args):
                 enricher.writerow(row, post.as_csv_row())
 
                 loading_bar.inc("followers")
+
         except InstagramInvalidTargetError:
             loading_bar.print(
                 "Given user (line %i) is probably not an Instagram user: %s" % (i, user)
             )
+
         except InstagramAccountNoFollowError:
             loading_bar.print(
                 "Given user (line %i) has probably no follower: %s" % (i, user)
             )
+
         except InstagramPrivateAccountError as nb_follow:
             loading_bar.print(
                 "Given user (line %i) is probably a private account with %s followers: %s"
