@@ -95,11 +95,7 @@ URL_PARSE_COMMAND = command(
         . Parsing Twitter urls:
             $ minet url-parse url tweets.csv --twitter > report.csv
     """,
-    variadic_input={
-        "dummy_column": "url",
-        "file_help": "CSV file containing target urls.",
-        "column_help": "Name of the column containing urls.",
-    },
+    variadic_input={"dummy_column": "url", "item_label": "url"},
     selectable=True,
     total=True,
     arguments=[

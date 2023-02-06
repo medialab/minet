@@ -52,11 +52,7 @@ FACEBOOK_COMMENTS_SUBCOMMAND = subcommand(
         . Scraping comments from multiple posts listed in a CSV file:
             $ minet fb comments post_url posts.csv > comments.csv
     """,
-    variadic_input={
-        "dummy_column": "post_url",
-        "file_help": "CSV file containing the post urls.",
-        "column_help": "Column of the CSV file containing post urls or a single post url.",
-    },
+    variadic_input={"dummy_column": "post_url", "item_label": "post url"},
     selectable=True,
     arguments=[*MOBILE_ARGUMENTS],
 )
@@ -77,11 +73,7 @@ FACEBOOK_POST_AUTHORS_SUBCOMMAND = subcommand(
         . Fetching authors of a series of posts in a CSV file:
             $ minet fb post-authors post_url fb-posts.csv > authors.csv
     """,
-    variadic_input={
-        "dummy_column": "post_url",
-        "file_help": "CSV file containing the posts.",
-        "column_help": "Name of the CSV column containing the posts' urls.",
-    },
+    variadic_input={"dummy_column": "post_url", "item_label": "post"},
     selectable=True,
     total=True,
     arguments=[*MOBILE_ARGUMENTS],

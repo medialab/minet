@@ -119,8 +119,8 @@ CROWDTANGLE_POSTS_BY_ID_SUBCOMMAND = crowdtangle_api_subcommand(
     """,
     variadic_input={
         "dummy_column": "post_url_or_id",
-        "file_help": "CSV file containing the inquired URLs or ids.",
-        "column_help": "Name of the column containing the posts URL or id in the CSV file.",
+        "item_label": "URL or id",
+        "item_label_plural": "URLs or ids",
     },
     selectable=True,
     resumer=RowCountResumer,
@@ -289,11 +289,7 @@ CROWDTANGLE_SUMMARY_SUBCOMMAND = crowdtangle_api_subcommand(
         . Computing a summary of aggregated stats for urls contained in a CSV row:
             $ minet ct summary url urls.csv --token YOUR_TOKEN --start-date 2019-01-01 > summary.csv
     """,
-    variadic_input={
-        "dummy_column": "url",
-        "file_help": "CSV file containing the inquired URLs.",
-        "column_help": "Name of the column containing the URL in the CSV file.",
-    },
+    variadic_input={"dummy_column": "url", "item_label": "URL"},
     selectable=True,
     total=True,
     arguments=[
@@ -318,7 +314,7 @@ CROWDTANGLE_SUMMARY_SUBCOMMAND = crowdtangle_api_subcommand(
             "flag": "--start-date",
             "help": "The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010`.",
             "default": CROWDTANGLE_DEFAULT_START_DATE,
-            "required": True
+            "required": True,
         },
     ],
 )

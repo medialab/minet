@@ -320,6 +320,22 @@ def resolve_typical_arguments(
     output_argument = {"flags": ["-o", "--output"], "action": OutputFileAction}
 
     if variadic_input is not None:
+        variadic_input = variadic_input.copy()
+
+        if "item_label" in variadic_input:
+            if "item_label_plural" not in variadic_input:
+                variadic_input["item_label_plural"] = variadic_input["item_label"] + "s"
+
+            variadic_input[
+                "column_help"
+            ] = "Name of the CSV column containing %s or a single %s." % (
+                variadic_input["item_label_plural"],
+                variadic_input["item_label"],
+            )
+            variadic_input["file_help"] = (
+                "CSV file containing the %s." % variadic_input["item_label_plural"]
+            )
+
         args.append({"name": "column", "help": variadic_input["column_help"]})
         args.append(
             {
