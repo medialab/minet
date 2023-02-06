@@ -7,19 +7,17 @@
 import csv
 import casanova
 
-from minet.cli.utils import die, LoadingBar
+from minet.cli.utils import LoadingBar
+from minet.cli.crowdtangle.utils import with_crowdtangle_fatal_errors
 from minet.crowdtangle.constants import (
     CROWDTANGLE_SUMMARY_CSV_HEADERS,
     CROWDTANGLE_POST_CSV_HEADERS_WITH_LINK,
 )
-from minet.crowdtangle.exceptions import CrowdTangleInvalidTokenError
 from minet.crowdtangle import CrowdTangleAPIClient
 
 
-def crowdtangle_summary_action(cli_args):
-    if not cli_args.start_date:
-        die("Missing --start-date!")
-
+@with_crowdtangle_fatal_errors
+def action(cli_args):
     enricher = casanova.enricher(
         cli_args.file,
         cli_args.output,
@@ -40,22 +38,13 @@ def crowdtangle_summary_action(cli_args):
     for row, url in enricher.cells(cli_args.column, with_rows=True):
         url = url.strip()
 
-        try:
-            stats = client.summary(
-                url,
-                start_date=cli_args.start_date,
-                with_top_posts=cli_args.posts is not None,
-                sort_by=cli_args.sort_by,
-                platforms=cli_args.platforms,
-            )
-
-        except CrowdTangleInvalidTokenError:
-            die(
-                [
-                    "Your API token is invalid.",
-                    "Check that you indicated a valid one using the `--token` argument.",
-                ]
-            )
+        stats = client.summary(
+            url,
+            start_date=cli_args.start_date,
+            with_top_posts=cli_args.posts is not None,
+            sort_by=cli_args.sort_by,
+            platforms=cli_args.platforms,
+        )
 
         if cli_args.posts is not None:
             stats, posts = stats

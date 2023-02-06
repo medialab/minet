@@ -343,7 +343,7 @@ def resolve_typical_arguments(
         args.append(
             {
                 "flag": "--total",
-                "help": "Total number of accounts. Necessary if you want to display a finite progress indicator.",
+                "help": "Total number of items to process. Necessary if you want to display a finite progress indicator.",
                 "type": int,
             }
         )
@@ -379,6 +379,7 @@ def command(
     selectable=False,
     total=False,
     variadic_input=None,
+    **kwargs
 ):
 
     if arguments is not None and subcommands is not None:
@@ -423,6 +424,8 @@ def command(
     if validate is not None:
         data["validate"] = validate
 
+    data.update(kwargs)
+
     return data
 
 
@@ -438,6 +441,7 @@ def subcommand(
     selectable=False,
     total=False,
     variadic_input=None,
+    **kwargs
 ):
     data = {"name": name, "title": title, "package": package, "arguments": arguments}
 
@@ -457,5 +461,7 @@ def subcommand(
 
     if validate is not None:
         data["validate"] = validate
+
+    data.update(kwargs)
 
     return data
