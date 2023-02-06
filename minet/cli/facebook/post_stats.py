@@ -113,15 +113,15 @@ def format(data):
     return row
 
 
-def facebook_post_stats_action(cli_args):
+def action(cli_args):
     enricher = casanova.enricher(
         cli_args.file, cli_args.output, add=REPORT_HEADERS, keep=cli_args.select
     )
 
     def fetch_facebook_page_stats(url):
-        err, response = request(url, cookie="locale=en_US")
-
-        if err:
+        try:
+            response = request(url, cookie="locale=en_US")
+        except Exception:
             return "http-error", None
 
         if response.status == 404:
