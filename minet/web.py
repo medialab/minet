@@ -737,7 +737,7 @@ def request_jsonrpc(url, method, pool=DEFAULT_POOL, *args, **kwargs):
 
     data = json.loads(response.data)
 
-    return None, data
+    return response, data
 
 
 def request_json(url, pool=DEFAULT_POOL, *args, **kwargs):

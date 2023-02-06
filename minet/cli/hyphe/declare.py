@@ -7,10 +7,11 @@
 import casanova
 from urllib.parse import unquote
 
-from minet.cli.utils import die, LoadingBar
+from minet.cli.utils import LoadingBar
 from minet.cli.exceptions import InvalidArgumentsError
+from minet.cli.hyphe.utils import with_hyphe_fatal_errors
 from minet.hyphe import HypheAPIClient
-from minet.hyphe.exceptions import HypheCorpusAuthenticationError, HypheRequestFailError
+from minet.hyphe.exceptions import HypheRequestFailError
 
 
 def extract_tags(row, tag_pos_list):
@@ -28,7 +29,8 @@ def extract_tags(row, tag_pos_list):
     return {"USER": tags}
 
 
-def hyphe_declare_action(cli_args):
+@with_hyphe_fatal_errors
+def action(cli_args):
     reader = casanova.reader(cli_args.webentities, total=cli_args.total)
     headers = reader.headers
 
@@ -58,15 +60,7 @@ def hyphe_declare_action(cli_args):
     client = HypheAPIClient(cli_args.url)
     corpus = client.corpus(cli_args.corpus, password=cli_args.password)
 
-    try:
-        corpus.ensure_is_started()
-    except HypheCorpusAuthenticationError:
-        die(
-            [
-                'Wrong password for the "%s" corpus!' % cli_args.corpus,
-                "Don't forget to provide a password for this corpus using --password",
-            ]
-        )
+    corpus.ensure_is_started()
 
     loading_bar = LoadingBar(
         desc="Declaring web entities",

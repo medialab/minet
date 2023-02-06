@@ -23,7 +23,9 @@ class HypheAPIClient(object):
         self.pool = create_pool()
 
     def call(self, method, *args, **kwargs):
-        result = request_jsonrpc(self.endpoint, method, pool=self.pool, *args, **kwargs)
+        _, result = request_jsonrpc(
+            self.endpoint, method, pool=self.pool, *args, **kwargs
+        )
 
         if "fault" in result:
             return HypheJSONRPCError(result), None
@@ -41,7 +43,7 @@ class HypheAPIClient(object):
 
             raise HypheRequestFailError(msg)
 
-        return None, result[0]
+        return result[0]
 
     def corpus(self, corpus, password=None):
         return HypheAPIClientCorpus(self, corpus, password)
