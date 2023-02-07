@@ -6,6 +6,7 @@ from minet.cli.hyphe import HYPHE_COMMAND
 from minet.cli.instagram import INSTAGRAM_COMMAND
 from minet.cli.mediacloud import MEDIACLOUD_COMMAND
 from minet.cli.telegram import TELEGRAM_COMMAND
+from minet.cli.tiktok import TIKTOK_COMMAND
 from minet.cli.twitter import TWITTER_COMMAND
 from minet.cli.url_parse import URL_PARSE_COMMAND
 
@@ -19,6 +20,7 @@ MINET_COMMANDS = {
     "instagram": INSTAGRAM_COMMAND,
     "mediacloud": MEDIACLOUD_COMMAND,
     "telegram": TELEGRAM_COMMAND,
+    "tiktok": TIKTOK_COMMAND,
     "url-parse": URL_PARSE_COMMAND,
     "twitter": TWITTER_COMMAND,
 }
