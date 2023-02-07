@@ -154,7 +154,9 @@ def build_parser(commands):
 
     subparser_index = {}
 
-    subparsers = build_subparsers(parser, subparser_index, commands)
+    subparsers = build_subparsers(
+        parser, subparser_index, {c["name"]: c for c in commands}
+    )
 
     # Help subparser
     help_subparser = subparsers.add_parser("help")

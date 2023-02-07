@@ -79,7 +79,7 @@ def format_morsel_for_csv(morsel):
     return [morsel.key, morsel.value]
 
 
-def cookies_action(cli_args):
+def action(cli_args):
     if cli_args.csv:
         output_writer = csv.writer(cli_args.output)
 

@@ -101,49 +101,6 @@ FETCH_COMMON_ARGUMENTS = [
 ]
 
 MINET_COMMANDS = {
-    # Cookies action subparser
-    # --------------------------------------------------------------------------
-    "cookies": {
-        "package": "minet.cli.cookies",
-        "action": "cookies_action",
-        "title": "Minet Cookies Command",
-        "description": """
-            Grab cookies directly from your browsers to use them easily later
-            in python scripts, for instance.
-        """,
-        "epilog": """
-            examples:
-
-            . Dumping cookie jar from firefox:
-                $ minet cookies firefox > jar.txt
-
-            . Dumping cookies as CSV:
-                $ minet cookies firefox --csv > cookies.csv
-
-            . Print cookie for lemonde.fr:
-                $ minet cookies firefox --url https://www.lemonde.fr
-
-            . Dump cookie morsels for lemonde.fr as CSV:
-                $ minet cookies firefox --url https://www.lemonde.fr --csv > morsels.csv
-        """,
-        "arguments": [
-            {
-                "name": "browser",
-                "help": "Name of the browser from which to grab cookies.",
-                "choices": COOKIE_BROWSERS,
-            },
-            {
-                "flag": "--csv",
-                "help": "Whether to format the output as CSV. If --url is set, will output the cookie's morsels as CSV.",
-                "action": "store_true",
-            },
-            {"flags": ["-o", "--output"], "action": OutputFileAction},
-            {
-                "flag": "--url",
-                "help": "If given, only returns full cookie header value for this url.",
-            },
-        ],
-    },
     # Crawl action subparser
     # --------------------------------------------------------------------------
     "crawl": {
