@@ -21,7 +21,7 @@ ID_RE = re.compile(r"^[0-9]+$")
 ITEMS_PER_PAGE = 100
 
 
-def twitter_retweeters_action(cli_args):
+def action(cli_args):
     client = TwitterAPIClient(
         cli_args.access_token,
         cli_args.access_token_secret,

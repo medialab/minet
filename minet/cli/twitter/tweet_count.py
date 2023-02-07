@@ -17,7 +17,7 @@ COUNT_FIELDS = ["tweet_count"]
 GRANULARIZED_COUNT_FIELDS = ["start_time", "end_time", "tweet_count"]
 
 
-def twitter_tweet_count_action(cli_args):
+def action(cli_args):
     validate_query_boundaries(cli_args)
 
     client = TwitterAPIClient(
@@ -42,7 +42,7 @@ def twitter_tweet_count_action(cli_args):
         "Counting tweets", total=enricher.total, unit="query", unit_plural="queries"
     )
 
-    for row, query in enricher.cells(cli_args.query, with_rows=True):
+    for row, query in enricher.cells(cli_args.column, with_rows=True):
 
         kwargs = {"query": query}
 

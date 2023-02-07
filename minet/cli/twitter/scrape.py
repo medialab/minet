@@ -10,6 +10,7 @@ from twitwi import format_tweet_as_csv_row, format_user_as_csv_row
 
 from minet.utils import PseudoFStringFormatter
 from minet.cli.utils import LoadingBar
+from minet.cli.exceptions import FatalError
 from minet.twitter import TwitterAPIScraper
 from minet.twitter.exceptions import TwitterPublicAPIOverCapacityError
 from minet.twitter.constants import ADDITIONAL_TWEET_FIELDS
@@ -28,7 +29,7 @@ def format_meta_row(meta):
     ]
 
 
-def twitter_scrape_action(cli_args):
+def action(cli_args):
     scraper = TwitterAPIScraper()
 
     unit = cli_args.items[:-1]
@@ -84,4 +85,4 @@ def twitter_scrape_action(cli_args):
                 enricher.writerow(row, addendum)
 
         except TwitterPublicAPIOverCapacityError:
-            loading_bar.die('Got an "Over Capacity" error. Shutting down...')
+            raise FatalError('Got an "Over Capacity" error. Shutting down...')
