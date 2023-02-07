@@ -1,3 +1,5 @@
+from minet.cli.url_parse import URL_PARSE_COMMAND
+
 from minet.cli.buzzsumo import BUZZSUMO_COMMAND
 from minet.cli.crowdtangle import CROWDTANGLE_COMMAND
 from minet.cli.facebook import FACEBOOK_COMMAND
@@ -8,10 +10,12 @@ from minet.cli.mediacloud import MEDIACLOUD_COMMAND
 from minet.cli.telegram import TELEGRAM_COMMAND
 from minet.cli.tiktok import TIKTOK_COMMAND
 from minet.cli.twitter import TWITTER_COMMAND
-from minet.cli.url_parse import URL_PARSE_COMMAND
+from minet.cli.youtube import YOUTUBE_COMMAND
 
 # TODO: move to commands.py in the end
 MINET_COMMANDS = {
+    "url-parse": URL_PARSE_COMMAND,
+    #
     "buzzsumo": BUZZSUMO_COMMAND,
     "crowdtangle": CROWDTANGLE_COMMAND,
     "facebook": FACEBOOK_COMMAND,
@@ -21,6 +25,6 @@ MINET_COMMANDS = {
     "mediacloud": MEDIACLOUD_COMMAND,
     "telegram": TELEGRAM_COMMAND,
     "tiktok": TIKTOK_COMMAND,
-    "url-parse": URL_PARSE_COMMAND,
     "twitter": TWITTER_COMMAND,
+    "youtube": YOUTUBE_COMMAND,
 }

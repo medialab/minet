@@ -13,6 +13,7 @@ import shutil
 import importlib
 import multiprocessing
 import casanova
+from ebbe import omit
 from textwrap import dedent
 from contextlib import ExitStack
 from argparse import ArgumentParser, RawTextHelpFormatter
@@ -38,18 +39,6 @@ def custom_formatter(prog):
     terminal_size = shutil.get_terminal_size()
 
     return RawTextHelpFormatter(prog, max_help_position=50, width=terminal_size.columns)
-
-
-def omit(d, keys_to_omit):
-    nd = {}
-
-    for k, v in d.items():
-        if k in keys_to_omit:
-            continue
-
-        nd[k] = v
-
-    return nd
 
 
 def get_subparser(o, keys):

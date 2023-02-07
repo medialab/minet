@@ -13,7 +13,7 @@ from minet.youtube import YouTubeAPIClient
 from minet.youtube.constants import YOUTUBE_CHANNEL_CSV_HEADERS
 
 
-def channels_action(cli_args):
+def action(cli_args):
     enricher = casanova.enricher(
         cli_args.file,
         cli_args.output,
