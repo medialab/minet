@@ -36,7 +36,7 @@ RESOLVE_ADDITIONAL_HEADERS = ["resolved", "status", "error", "redirects", "chain
 
 
 @with_defer()
-def fetch_action(cli_args, resolve=False, defer=None):
+def action(cli_args, resolve=False, defer=None):
 
     # If we are hitting a single url we enable contents_in_report by default
     if (

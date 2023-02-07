@@ -87,7 +87,7 @@ def worker(payload):
     return ScrapeWorkerResult(None, items)
 
 
-def scrape_action(cli_args):
+def action(cli_args):
     if cli_args.glob is None and cli_args.input_dir is None:
         cli_args.input_dir = DEFAULT_CONTENT_FOLDER
 

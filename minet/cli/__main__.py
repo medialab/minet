@@ -32,7 +32,7 @@ from minet.cli.utils import (
 from minet.cli.argparse import resolve_arg_dependencies
 from minet.cli.exceptions import NotResumableError, InvalidArgumentsError, FatalError
 
-from minet.cli import MINET_COMMANDS
+from minet.cli.commands import MINET_COMMANDS
 
 
 def custom_formatter(prog):

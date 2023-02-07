@@ -156,7 +156,7 @@ class ScraperReporterPool(object):
 
 
 @with_defer()
-def crawl_action(cli_args, defer):
+def action(cli_args, defer):
 
     # Loading crawler definition
     queue_path = join(cli_args.output_dir, "queue")

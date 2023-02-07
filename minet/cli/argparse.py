@@ -369,14 +369,21 @@ def resolve_typical_arguments(
             )
 
         args.append({"name": "column", "help": variadic_input["column_help"]})
-        args.append(
-            {
-                "name": "file",
-                "help": variadic_input["file_help"],
-                "action": InputFileAction,
-                "dummy_csv_column": variadic_input["dummy_column"],
-            }
-        )
+
+        file_argument = {
+            "name": "file",
+            "help": variadic_input["file_help"],
+            "action": InputFileAction,
+            "dummy_csv_column": variadic_input["dummy_column"],
+        }
+
+        if "guard" in variadic_input:
+            file_argument['dummy_csv_guard']= variadic_input["guard"]
+
+        if "guard_error_message" in variadic_input:
+            file_argument["dummy_csv_error"] = variadic_input["guard_error_message"]
+
+        args.append(file_argument)
 
     if select:
         args.append(
