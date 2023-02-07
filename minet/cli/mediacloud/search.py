@@ -7,12 +7,13 @@
 import csv
 
 from minet.cli.utils import LoadingBar
+from minet.cli.mediacloud.utils import with_mediacloud_fatal_errors
 from minet.mediacloud import MediacloudAPIClient
 from minet.mediacloud.constants import MEDIACLOUD_STORIES_CSV_HEADER
-from minet.mediacloud.exceptions import MediacloudServerError
 
 
-def mediacloud_search_action(cli_args):
+@with_mediacloud_fatal_errors
+def action(cli_args):
     writer = csv.writer(cli_args.output)
     writer.writerow(MEDIACLOUD_STORIES_CSV_HEADER)
 
@@ -29,17 +30,13 @@ def mediacloud_search_action(cli_args):
 
     loading_bar = LoadingBar("Searching stories", unit="story", unit_plural="stories")
 
-    try:
-        if not cli_args.skip_count:
-            count = client.count(cli_args.query, **kwargs)
+    if not cli_args.skip_count:
+        count = client.count(cli_args.query, **kwargs)
 
-            loading_bar.update_total(count)
+        loading_bar.update_total(count)
 
-        iterator = client.search(cli_args.query, **kwargs)
+    iterator = client.search(cli_args.query, **kwargs)
 
-        for story in iterator:
-            writer.writerow(story.as_csv_row())
-            loading_bar.update()
-
-    except MediacloudServerError as e:
-        loading_bar.die(["Aborted due to a mediacloud server error:", e.server_error])
+    for story in iterator:
+        writer.writerow(story.as_csv_row())
+        loading_bar.update()

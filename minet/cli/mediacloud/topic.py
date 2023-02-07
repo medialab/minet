@@ -11,7 +11,7 @@ from minet.mediacloud import MediacloudAPIClient
 from minet.mediacloud.constants import MEDIACLOUD_TOPIC_STORIES_CSV_HEADERS
 
 
-def mediacloud_topic_action(cli_args):
+def action(cli_args):
     writer = csv.writer(cli_args.output)
     writer.writerow(MEDIACLOUD_TOPIC_STORIES_CSV_HEADERS)
 
