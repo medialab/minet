@@ -7,11 +7,7 @@ jobs:
     strategy:
       matrix:
         include:
-          # Old ubuntu
-          - os: ubuntu-18.04
-            python-version: "3.7"
-
-          # Current ubuntu
+          # Ubuntu
           - os: ubuntu-20.04
             python-version: "3.7"
             pyinstaller: yes

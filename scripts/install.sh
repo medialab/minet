@@ -73,7 +73,7 @@ if [[ $(uname -s) == "Darwin" ]]; then
   os="macos"
   echo "Installing minet for mac..."
 elif cat /etc/os-release | grep -q "Debian GNU/Linux"; then
-  os="ubuntu_18"
+  os="ubuntu_20"
   echo "Installing minet for debian..."
 else
   ubuntu_version=$(get_ubuntu_version)
@@ -81,9 +81,7 @@ else
   if [[ $ubuntu_version != "unkown" ]]; then
     echo "Installing minet for ubuntu $ubuntu_version (or similar)..."
 
-    if [[ $ubuntu_version -le "18" ]]; then
-      os="ubuntu_18"
-    elif [[ $ubuntu_version -le "20" ]]; then
+    if [[ $ubuntu_version -le "20" ]]; then
       os="ubuntu_20"
     else
       os="ubuntu_22"
