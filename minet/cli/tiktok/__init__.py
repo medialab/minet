@@ -58,7 +58,7 @@ TIKTOK_SEARCH_VIDEOS_SUBCOMMAND = subcommand(
 TIKTOK_COMMAND = command(
     "tiktok",
     "minet.cli.tiktok",
-    aliases=["tl"],
+    aliases=["tk"],
     title="Minet Tiktok Command",
     description="""
         Gather data from Tiktok.

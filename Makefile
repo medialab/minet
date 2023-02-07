@@ -34,7 +34,7 @@ lint:
 
 format:
 	@echo Formatting source code using black
-	black $(SOURCE) ftest hooks test
+	black $(SOURCE) ftest hooks scripts test
 	@echo
 
 readme:
