@@ -53,7 +53,7 @@ FACEBOOK_COMMENTS_SUBCOMMAND = subcommand(
             $ minet fb comments post_url posts.csv > comments.csv
     """,
     variadic_input={"dummy_column": "post_url", "item_label": "post url"},
-    selectable=True,
+    select=True,
     arguments=[*MOBILE_ARGUMENTS],
 )
 
@@ -74,7 +74,7 @@ FACEBOOK_POST_AUTHORS_SUBCOMMAND = subcommand(
             $ minet fb post-authors post_url fb-posts.csv > authors.csv
     """,
     variadic_input={"dummy_column": "post_url", "item_label": "post"},
-    selectable=True,
+    select=True,
     total=True,
     arguments=[*MOBILE_ARGUMENTS],
 )
@@ -93,7 +93,7 @@ FACEBOOK_POST_STATS_SUBCOMMAND = subcommand(
             $ minet fb post-stats post_url fb-posts.csv > stats.csv
     """,
     variadic_input={"dummy_column": "post_url", "item_label": "post url"},
-    selectable=True,
+    select=True,
     total=True,
 )
 
@@ -146,7 +146,7 @@ FACEBOOK_POST_SUBCOMMAND = subcommand(
             $ minet fb post url urls.csv > post.csv
     """,
     variadic_input={"dummy_column": "post_url", "item_label": "post url"},
-    selectable=True,
+    select=True,
     arguments=[*MOBILE_ARGUMENTS],
 )
 
@@ -199,7 +199,7 @@ FACEBOOK_POSTS_SUBCOMMAND = subcommand(
     """,
     variadic_input={"dummy_column": "group_url", "item_label": "group url"},
     arguments=[*MOBILE_ARGUMENTS],
-    selectable=True,
+    select=True,
 )
 
 FACEBOOK_URL_LIKES_SUBCOMMAND = subcommand(
@@ -227,7 +227,7 @@ FACEBOOK_URL_LIKES_SUBCOMMAND = subcommand(
             $ minet fb url-likes url url.csv > url_likes.csv
     """,
     variadic_input={"dummy_column": "url", "item_label": "url"},
-    selectable=True,
+    select=True,
     total=True,
 )
 

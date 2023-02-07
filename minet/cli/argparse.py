@@ -340,7 +340,7 @@ def resolve_typical_arguments(
     args,
     resumer=None,
     resumer_kwargs=None,
-    selectable=False,
+    select=False,
     total=False,
     variadic_input=None,
 ):
@@ -378,7 +378,7 @@ def resolve_typical_arguments(
             }
         )
 
-    if selectable:
+    if select:
         args.append(
             {
                 "flags": ["-s", "--select"],
@@ -428,7 +428,7 @@ def command(
     validate=None,
     resumer=None,
     resumer_kwargs=None,
-    selectable=False,
+    select=False,
     total=False,
     variadic_input=None,
     **kwargs
@@ -469,7 +469,7 @@ def command(
             arguments,
             resumer=resumer,
             resumer_kwargs=resumer_kwargs,
-            selectable=selectable,
+            select=select,
             total=total,
             variadic_input=variadic_input,
         )
@@ -492,7 +492,7 @@ def subcommand(
     validate=None,
     resumer=None,
     resumer_kwargs=None,
-    selectable=False,
+    select=False,
     total=False,
     variadic_input=None,
     **kwargs
@@ -509,7 +509,7 @@ def subcommand(
         arguments,
         resumer=resumer,
         resumer_kwargs=resumer_kwargs,
-        selectable=selectable,
+        select=select,
         total=total,
         variadic_input=variadic_input,
     )

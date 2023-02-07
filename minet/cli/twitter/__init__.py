@@ -11,8 +11,8 @@ from minet.cli.argparse import (
     subcommand,
     ConfigAction,
     InputFileAction,
-    SplitterType,
     TimezoneType,
+    TimestampType,
 )
 from minet.cli.exceptions import InvalidArgumentsError
 
@@ -61,6 +61,27 @@ ACADEMIC_ARGUMENT = {
     "action": "store_true",
 }
 
+COMMON_V2_SEARCH_ARGUMENTS = [
+    {
+        "flag": "--since-id",
+        "help": "Will return tweets with ids that are greater than the specified id. Takes precedence over --start-time.",
+        "type": int,
+    },
+    {
+        "flag": "--until-id",
+        "help": "Will return tweets that are older than the tweet with the specified id.",
+        "type": int,
+    },
+    {
+        "flag": "--start-time",
+        "help": "The oldest UTC stamp from which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ",
+    },
+    {
+        "flag": "--end-time",
+        "help": "The UTC stamp to which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ",
+    },
+]
+
 
 def check_credentials(cli_args):
 
@@ -92,6 +113,76 @@ def twitter_api_subcommand(*args, arguments=[], **kwargs):
     )
 
 
+TWITTER_ATTRITION_SUBCOMMAND = twitter_api_subcommand(
+    "attrition",
+    "minet.cli.twitter.attrition",
+    title="Minet Twitter Attrition Command",
+    description="""
+        Using Twitter API to find whether batches of tweets are still
+        available today and if they aren't, attempt to find a reason why.
+
+        This command relies on tweet ids or tweet urls. We recommand to add `--user` and
+        the tweet's user id to the command if you can, as more information can
+        be obtained when the user id (or the full url) is known.
+
+        The same can be said about retweet information and the `--retweeted-id` flag.
+
+        The command will output a report similar to the input file and
+        containing an additional column named "current_tweet_status" that can take
+        the following values:
+
+            - "available_tweet": tweet is still available.
+            - "user_or_tweet_deleted": tweet was deleted or its author was deactivated. To know whether it is one or the other reason
+                                        for unavailability that is the right one, add --user to the command.
+            - "suspended_user": tweet cannot be found because its user is suspended.
+            - "deactivated_user": tweet cannot be found because its user is deactivated.
+            - "deactivated_or_renamed_user": tweet cannot be found because its user is either deactivated or changed its screen name
+                                                (only when using tweet urls or tweet ids and screen names instead of user ids).
+            - "protected_user": tweet cannot be found because its user is protected.
+            - "censored_tweet": tweet is unavailable because it was consored by Twitter.
+            - "blocked_by_tweet_author": tweet cannot be found because you were blocked by its author.
+            - "unavailable_tweet": tweet is not available, which means it was
+                                    deleted by its user.
+            - "unavailable_retweet": retweet is not available, meaning that the user
+                                        cancelled their retweet.
+            - "unavailable_retweeted_tweet": the retweeted tweet is unavailable,
+                                                meaning it was either deleted by its original
+                                                user or the original user was deactivated.
+            - "censored_retweeted_tweet": the original tweet was censored by Twitter, making the retweet unavailable.
+            - "protected_retweeted_user": tweet cannot be found because it is a retweet of a protected user.
+            - "suspended_retweeted_user": tweet cannot be found because it is a retweet of a suspended user.
+            - "blocked_by_original_tweet_author": tweet cannot be found because it is a retweet of a user who blocked you.
+    """,
+    epilog="""
+        examples:
+
+        . Finding out if tweets in a CSV files are still available or not using tweet ids:
+            $ minet tw attrition tweet_url deleted_tweets.csv > attrition-report.csv
+
+        . Finding out if tweets are still available or not using tweet & user ids:
+            $ minet tw attrition tweet_id deleted_tweets.csv --user user_id --ids > attrition-report.csv
+    """,
+    variadic_input={
+        "dummy_column": "tweet_url_or_id",
+        "item_label": "tweet url or id",
+        "item_label_plural": "tweet urls or ids",
+    },
+    resumer=RowCountResumer,
+    select=True,
+    total=True,
+    arguments=[
+        {
+            "flag": "--user",
+            "help": "Name of the column containing the tweet's author (given as ids or screen names). This is useful to have more information on a tweet's unavailability.",
+        },
+        {
+            "flag": "--retweeted-id",
+            "help": "Name of the column containing the ids of the original tweets in case the tweets no longer available were retweets.",
+        },
+        IDS_ARGUMENT,
+    ],
+)
+
 TWITTER_FOLLOWERS_SUBCOMMAND = twitter_api_subcommand(
     "followers",
     "minet.cli.twitter.followers",
@@ -112,7 +203,7 @@ TWITTER_FOLLOWERS_SUBCOMMAND = twitter_api_subcommand(
     },
     resumer=BatchResumer,
     resumer_kwargs=lambda args: ({"value_column": args.column}),
-    selectable=True,
+    select=True,
     total=True,
     arguments=[
         IDS_ARGUMENT,
@@ -140,7 +231,7 @@ TWITTER_FRIENDS_SUBCOMMAND = twitter_api_subcommand(
     },
     resumer=BatchResumer,
     resumer_kwargs=lambda args: ({"value_column": args.column}),
-    selectable=True,
+    select=True,
     total=True,
     arguments=[
         IDS_ARGUMENT,
@@ -166,7 +257,7 @@ TWITTER_LIST_FOLLOWERS_SUBCOMMAND = twitter_api_subcommand(
         "item_label": "Twitter list id or url",
         "item_label_plural": "Twitter list ids or urls",
     },
-    selectable=True,
+    select=True,
     total=True,
 )
 
@@ -188,7 +279,7 @@ TWITTER_LIST_MEMBERS_SUBCOMMAND = twitter_api_subcommand(
         "item_label": "Twitter list id or url",
         "item_label_plural": "Twitter list ids or urls",
     },
-    selectable=True,
+    select=True,
     total=True,
 )
 
@@ -206,7 +297,7 @@ TWITTER_RETWEETERS_SUBCOMMAND = twitter_api_subcommand(
             $ minet tw retweeters tweet_id tweets.csv > retweeters.csv
     """,
     variadic_input={"dummy_column": "tweet_id", "item_label": "tweet id"},
-    selectable=True,
+    select=True,
     total=True,
 )
 
@@ -249,7 +340,7 @@ TWITTER_SCRAPE_SUBCOMMAND = subcommand(
         . Collecting users with "adam" in their user_name or user_description:
             $ minet tw scrape users adam > users.csv
     """,
-    selectable=True,
+    select=True,
     arguments=[
         {
             "name": "items",
@@ -314,7 +405,7 @@ TWITTER_TWEET_COUNT_SUBCOMMAND = twitter_api_subcommand(
             $ minet tw tweet-count "query" --granularity day > counts.csv
     """,
     variadic_input={"dummy_column": "query", "item_label_plural": "queries"},
-    selectable=True,
+    select=True,
     total=True,
     arguments=[
         {
@@ -322,24 +413,7 @@ TWITTER_TWEET_COUNT_SUBCOMMAND = twitter_api_subcommand(
             "help": "Granularity used to group the data by. Defaults to day.",
             "choices": ["minute", "hour", "day"],
         },
-        {
-            "flag": "--since-id",
-            "help": "Will return tweets with ids that are greater than the specified id. Takes precedence over --start-time.",
-            "type": int,
-        },
-        {
-            "flag": "--until-id",
-            "help": "Will return tweets that are older than the tweet with the specified id.",
-            "type": int,
-        },
-        {
-            "flag": "--start-time",
-            "help": "The oldest UTC stamp from which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ",
-        },
-        {
-            "flag": "--end-time",
-            "help": "The UTC stamp to which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ",
-        },
+        *COMMON_V2_SEARCH_ARGUMENTS,
         ACADEMIC_ARGUMENT,
     ],
 )
@@ -361,13 +435,130 @@ TWITTER_TWEET_DATE_SUBCOMMAND = subcommand(
         "item_label": "tweet url or id",
         "item_label_plural": "tweet urls or ids",
     },
-    selectable=True,
+    select=True,
     arguments=[
         {
             "flag": "--timezone",
             "help": "Timezone for the date, for example 'Europe/Paris'. Default to UTC.",
             "type": TimezoneType(),
         }
+    ],
+)
+
+TWITTER_TWEET_SEARCH_SUBCOMMAND = twitter_api_subcommand(
+    "tweet-search",
+    "minet.cli.twitter.tweet_search",
+    title="Minet Twitter Tweets Search Command",
+    description="""
+        Search Twitter tweets using API v2.
+
+        This will only return the last 8 days of results maximum per query (unless you have Academic Research access).
+
+        To search the full archive of public tweets, use --academic if you have academic research access.
+    """,
+    epilog="""
+        examples:
+
+        . Searching tweets using "cancer" as a query:
+            $ minet tw tweet-search cancer > tweets.csv
+
+        . Running multiple queries in series:
+            $ minet tw tweet-search query queries.csv > tweets.csv
+    """,
+    variadic_input={"dummy_column": "query", "item_label_plural": "queries"},
+    select=True,
+    total=True,
+    arguments=[
+        *COMMON_V2_SEARCH_ARGUMENTS,
+        ACADEMIC_ARGUMENT,
+        {
+            "flag": "--sort-order",
+            "help": 'How to sort retrieved tweets. Defaults to "recency".',
+            "choices": ["recency", "relevancy"],
+            "default": "recency",
+        },
+    ],
+)
+
+TWITTER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
+    "tweets",
+    "minet.cli.twitter.tweets",
+    title="Minet Twitter Tweets Command",
+    description="""
+        Collecting tweet metadata from the given tweet ids, using the API.
+    """,
+    epilog="""
+        examples:
+
+        . Getting metadata from tweets in a CSV file:
+            $ minet tw tweets tweet_id tweets.csv > tweets_metadata.csv
+    """,
+    variadic_input={"dummy_column": "tweet_id", "item_label": "tweet id"},
+    resumer=RowCountResumer,
+    select=True,
+    total=True,
+    arguments=[V2_ARGUMENT],
+)
+
+TWITTER_USER_SEARCH_SUBCOMMAND = twitter_api_subcommand(
+    "user-search",
+    "minet.cli.twitter.user_search",
+    title="Minet Twitter Users Search Command",
+    description="""
+        Search Twitter users using API v1.
+
+        This will only return ~1000 results maximum per query
+        so you might want to find a way to segment your inquiry
+        into smaller queries to find more users.
+    """,
+    epilog="""
+        examples:
+
+        . Searching user using "cancer" as a query:
+            $ minet tw user-search cancer > users.csv
+
+        . Running multiple queries in series:
+            $ minet tw user-search query queries.csv > users.csv
+    """,
+    variadic_input={"dummy_column": "query", "item_label_plural": "queries"},
+    select=True,
+    total=True,
+)
+
+TWITTER_USER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
+    "user-tweets",
+    "minet.cli.twitter.user_tweets",
+    title="Minet Twitter User Tweets Command",
+    description="""
+        Retrieve the last ~3200 tweets, including retweets from
+        the given Twitter users, using the API.
+    """,
+    epilog="""
+        examples:
+
+        . Getting tweets from users in a CSV file:
+            $ minet tw user-tweets screen_name users.csv > tweets.csv
+    """,
+    variadic_input={
+        "dummy_column": "user",
+        "item_label": "Twitter account screen name or id",
+        "item_label_plural": "Twitter account screen names or ids",
+    },
+    select=True,
+    total=True,
+    arguments=[
+        IDS_ARGUMENT,
+        {
+            "flag": "--min-date",
+            "help": "Whether to add a date to stop at for user's tweets retrieval. UTC date should have the following format : YYYY-MM-DD",
+            "type": TimestampType(),
+        },
+        {
+            "flag": "--exclude-retweets",
+            "help": "Whether to exclude retweets from the output.",
+            "action": "store_true",
+        },
+        V2_ARGUMENT,
     ],
 )
 
@@ -385,7 +576,7 @@ TWITTER_USERS_SUBCOMMAND = twitter_api_subcommand(
             $ minet tw friends screen_name users.csv > friends.csv
     """,
     resumer=RowCountResumer,
-    selectable=True,
+    select=True,
     total=True,
     variadic_input={"dummy_column": "user", "item_label": "Twitter user"},
     arguments=[
@@ -403,6 +594,7 @@ TWITTER_COMMAND = command(
         Gather data from Twitter.
     """,
     subcommands=[
+        TWITTER_ATTRITION_SUBCOMMAND,
         TWITTER_FOLLOWERS_SUBCOMMAND,
         TWITTER_FRIENDS_SUBCOMMAND,
         TWITTER_LIST_FOLLOWERS_SUBCOMMAND,
@@ -411,6 +603,10 @@ TWITTER_COMMAND = command(
         TWITTER_SCRAPE_SUBCOMMAND,
         TWITTER_TWEET_COUNT_SUBCOMMAND,
         TWITTER_TWEET_DATE_SUBCOMMAND,
+        TWITTER_TWEET_SEARCH_SUBCOMMAND,
+        TWITTER_TWEETS_SUBCOMMAND,
+        TWITTER_USER_SEARCH_SUBCOMMAND,
+        TWITTER_USER_TWEETS_SUBCOMMAND,
         TWITTER_USERS_SUBCOMMAND,
     ],
 )

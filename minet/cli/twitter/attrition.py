@@ -15,7 +15,7 @@ from minet.twitter import TwitterAPIClient
 from minet.cli.twitter.utils import is_not_user_id, is_probably_not_user_screen_name
 
 
-def twitter_attrition_action(cli_args):
+def action(cli_args):
 
     client = TwitterAPIClient(
         cli_args.access_token,
@@ -39,10 +39,10 @@ def twitter_attrition_action(cli_args):
     user_cache = {}
     result = None
 
-    if cli_args.tweet_or_url_column not in enricher.headers:
+    if cli_args.column not in enricher.headers:
         raise InvalidArgumentsError(
             'Could not find the "%s" column containing the tweet ids in the given CSV file.'
-            % cli_args.tweet_or_url_column
+            % cli_args.column
         )
 
     if cli_args.user:
@@ -63,7 +63,7 @@ def twitter_attrition_action(cli_args):
         )
 
     def cells():
-        for row, cell in enricher.cells(cli_args.tweet_or_url_column, with_rows=True):
+        for row, cell in enricher.cells(cli_args.column, with_rows=True):
 
             if cell == "":
                 tweet = None
@@ -136,7 +136,7 @@ def twitter_attrition_action(cli_args):
                 enricher.writerow(row)
                 loading_bar.print(
                     "The url or id given doesn't correspond to a tweet : %s"
-                    % row[enricher.headers[cli_args.tweet_or_url_column]]
+                    % row[enricher.headers[cli_args.column]]
                 )
                 continue
 

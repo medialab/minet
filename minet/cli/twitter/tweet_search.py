@@ -16,7 +16,7 @@ from minet.cli.twitter.utils import validate_query_boundaries
 ITEMS_PER_PAGE = 100
 
 
-def twitter_tweet_search_action(cli_args):
+def action(cli_args):
     validate_query_boundaries(cli_args)
 
     client = TwitterAPIClient(
@@ -37,7 +37,7 @@ def twitter_tweet_search_action(cli_args):
 
     loading_bar = LoadingBar("Retrieving tweets", total=enricher.total, unit="tweet")
 
-    for row, query in enricher.cells(cli_args.query, with_rows=True):
+    for row, query in enricher.cells(cli_args.column, with_rows=True):
 
         kwargs = {
             "query": query,

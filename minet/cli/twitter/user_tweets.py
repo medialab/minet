@@ -18,7 +18,7 @@ from minet.cli.twitter.utils import is_not_user_id, is_probably_not_user_screen_
 ITEMS_PER_PAGE = 100
 
 
-def twitter_user_tweets_action(cli_args):
+def action(cli_args):
 
     client = TwitterAPIClient(
         cli_args.access_token,
