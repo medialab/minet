@@ -337,7 +337,12 @@ def resolve_arg_dependencies(cli_args, config):
 
 
 def resolve_typical_arguments(
-    args, resumer=None, selectable=False, total=False, variadic_input=None
+    args,
+    resumer=None,
+    resumer_kwargs=None,
+    selectable=False,
+    total=False,
+    variadic_input=None,
 ):
     args = [] if args is None else args.copy()
 
@@ -402,6 +407,9 @@ def resolve_typical_arguments(
 
         output_argument["resumer"] = resumer
 
+        if resumer_kwargs is not None:
+            output_argument["resumer_kwargs"] = resumer_kwargs
+
     args.append(output_argument)
 
     return args
@@ -419,6 +427,7 @@ def command(
     subcommands=None,
     validate=None,
     resumer=None,
+    resumer_kwargs=None,
     selectable=False,
     total=False,
     variadic_input=None,
@@ -459,6 +468,7 @@ def command(
         data["arguments"] = resolve_typical_arguments(
             arguments,
             resumer=resumer,
+            resumer_kwargs=resumer_kwargs,
             selectable=selectable,
             total=total,
             variadic_input=variadic_input,
@@ -481,6 +491,7 @@ def subcommand(
     arguments=[],
     validate=None,
     resumer=None,
+    resumer_kwargs=None,
     selectable=False,
     total=False,
     variadic_input=None,
@@ -497,6 +508,7 @@ def subcommand(
     data["arguments"] = resolve_typical_arguments(
         arguments,
         resumer=resumer,
+        resumer_kwargs=resumer_kwargs,
         selectable=selectable,
         total=total,
         variadic_input=variadic_input,

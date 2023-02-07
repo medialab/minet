@@ -8,6 +8,4 @@ from minet.cli.twitter.utils import make_twitter_action
 
 REPORT_HEADERS = ["friend_id"]
 
-twitter_friends_action = make_twitter_action(
-    method_name="friends", csv_headers=REPORT_HEADERS
-)
+action = make_twitter_action(method_name="friends", csv_headers=REPORT_HEADERS)
