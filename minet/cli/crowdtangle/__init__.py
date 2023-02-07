@@ -18,22 +18,6 @@ from minet.crowdtangle.constants import (
 )
 
 from minet.cli.argparse import command, subcommand, ConfigAction
-from minet.cli.exceptions import InvalidArgumentsError
-
-# TODO: this should probably be a required instead, see #534
-def check_token(cli_args):
-    if not cli_args.token:
-        raise InvalidArgumentsError(
-            [
-                "A token is needed to be able to access CrowdTangle's API.",
-                "You can provide one using the `--token` argument.",
-            ]
-        )
-
-
-def crowdtangle_api_subcommand(*args, **kwargs):
-    return subcommand(*args, validate=check_token, **kwargs)
-
 
 FORMAT_ARGUMENT = {
     "flags": ["-f", "--format"],
@@ -42,7 +26,7 @@ FORMAT_ARGUMENT = {
     "default": "csv",
 }
 
-CROWDTANGLE_LEADERBOARD_SUBCOMMAND = crowdtangle_api_subcommand(
+CROWDTANGLE_LEADERBOARD_SUBCOMMAND = subcommand(
     "leaderboard",
     "minet.cli.crowdtangle.leaderboard",
     title="Minet CrowdTangle Leaderboard Command",
@@ -82,7 +66,7 @@ CROWDTANGLE_LEADERBOARD_SUBCOMMAND = crowdtangle_api_subcommand(
     ],
 )
 
-CROWDTANGLE_LISTS_SUBCOMMAND = crowdtangle_api_subcommand(
+CROWDTANGLE_LISTS_SUBCOMMAND = subcommand(
     "lists",
     "minet.cli.crowdtangle.lists",
     title="Minet CrowdTangle Lists Command",
@@ -99,7 +83,7 @@ CROWDTANGLE_LISTS_SUBCOMMAND = crowdtangle_api_subcommand(
     """,
 )
 
-CROWDTANGLE_POSTS_BY_ID_SUBCOMMAND = crowdtangle_api_subcommand(
+CROWDTANGLE_POSTS_BY_ID_SUBCOMMAND = subcommand(
     "posts-by-id",
     "minet.cli.crowdtangle.posts_by_id",
     title="Minet CrowdTangle Post By Id Command",
@@ -127,7 +111,7 @@ CROWDTANGLE_POSTS_BY_ID_SUBCOMMAND = crowdtangle_api_subcommand(
     total=True,
 )
 
-CROWDTANGLE_POSTS_SUBCOMMAND = crowdtangle_api_subcommand(
+CROWDTANGLE_POSTS_SUBCOMMAND = subcommand(
     "posts",
     "minet.cli.crowdtangle.posts",
     title="Minet CrowdTangle Posts Command",
@@ -193,7 +177,7 @@ CROWDTANGLE_POSTS_SUBCOMMAND = crowdtangle_api_subcommand(
     ],
 )
 
-CROWDTANGLE_SEARCH_SUBCOMMAND = crowdtangle_api_subcommand(
+CROWDTANGLE_SEARCH_SUBCOMMAND = subcommand(
     "search",
     "minet.cli.crowdtangle.search",
     title="Minet CrowdTangle Search Command",
@@ -274,7 +258,7 @@ CROWDTANGLE_SEARCH_SUBCOMMAND = crowdtangle_api_subcommand(
     ],
 )
 
-CROWDTANGLE_SUMMARY_SUBCOMMAND = crowdtangle_api_subcommand(
+CROWDTANGLE_SUMMARY_SUBCOMMAND = subcommand(
     "summary",
     "minet.cli.crowdtangle.summary",
     title="Minet CrowdTangle Link Summary Command",
@@ -343,6 +327,7 @@ CROWDTANGLE_COMMAND = command(
             "help": "CrowdTangle dashboard API token. Rcfile key: crowdtangle.token",
             "action": ConfigAction,
             "rc_key": ["crowdtangle", "token"],
+            "required": True,
         },
     ],
     subcommands=[

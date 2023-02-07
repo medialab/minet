@@ -16,7 +16,7 @@ from ebbe import getpath
 from datetime import datetime
 from pytz import timezone
 from pytz.exceptions import UnknownTimeZoneError
-from minet.cli.exceptions import NotResumableError
+from minet.cli.exceptions import NotResumableError, InvalidArgumentsError
 from minet.cli.utils import acquire_cross_platform_stdout, was_piped_something
 
 
@@ -231,26 +231,44 @@ def rc_key_to_env_var(key):
 
 
 class WrappedConfigValue(object):
-    def __init__(self, key, default, _type):
+    def __init__(self, flag, key, default, _type, required=False):
+        self.flag = flag
         self.key = key
         self.default = default
         self.type = _type
+        self.required = required
 
     def resolve(self, config):
+        value = None
 
         # Attempting to resolve env variable
         env_var = rc_key_to_env_var(self.key)
         env_value = os.environ.get(env_var, "").strip()
 
         if env_value:
-            return self.type(env_value)
+            value = self.type(env_value)
+        else:
+            value = getpath(config, self.key, self.default)
 
-        return getpath(config, self.key, self.default)
+        if value is None and self.required:
+            raise InvalidArgumentsError(
+                '%s is mandatory!\nIt can also be given using the %s env variable or using the "%s" .minetrc config key.\nMore info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc'
+                % ("/".join(self.flag), env_var, ".".join(self.key))
+            )
+
+        return value
 
 
 class ConfigAction(Action):
     def __init__(
-        self, option_strings, dest, rc_key, default=None, plural=False, **kwargs
+        self,
+        option_strings,
+        dest,
+        rc_key,
+        default=None,
+        plural=False,
+        required=False,
+        **kwargs
     ):
         if "help" in kwargs:
             kwargs["help"] = kwargs["help"].rstrip(
@@ -268,7 +286,13 @@ class ConfigAction(Action):
         super().__init__(
             option_strings,
             dest,
-            default=WrappedConfigValue(rc_key, default, kwargs.get("type", str)),
+            default=WrappedConfigValue(
+                option_strings,
+                rc_key,
+                default,
+                kwargs.get("type", str),
+                required=required,
+            ),
             **kwargs
         )
 
@@ -324,7 +348,7 @@ def resolve_typical_arguments(
 
         if "column_help" not in variadic_input:
             if "item_label" not in variadic_input:
-                variadic_input['item_label'] = variadic_input['dummy_column']
+                variadic_input["item_label"] = variadic_input["dummy_column"]
 
             if "item_label_plural" not in variadic_input:
                 variadic_input["item_label_plural"] = variadic_input["item_label"] + "s"

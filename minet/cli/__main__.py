@@ -203,6 +203,8 @@ def run():
             to_close = resolve_arg_dependencies(cli_args, config)
         except OSError as e:
             parser.error("Could not open output file (-o/--output): %s" % str(e))
+        except InvalidArgumentsError as e:
+            parser.error(e.message)
         except NotResumableError:
             parser.error(
                 "Cannot --resume without knowing where the output will be written (use -o/--output)"

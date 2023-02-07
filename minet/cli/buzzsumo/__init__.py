@@ -125,6 +125,7 @@ BUZZSUMO_COMMAND = command(
             "help": "BuzzSumo API token.",
             "action": ConfigAction,
             "rc_key": ["buzzsumo", "token"],
+            "required": True,
         }
     ],
     subcommands=[

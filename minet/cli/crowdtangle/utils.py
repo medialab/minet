@@ -15,7 +15,7 @@ from minet.crowdtangle.exceptions import CrowdTangleInvalidTokenError
 FATAL_ERRORS = {
     CrowdTangleInvalidTokenError: [
         "Your API token is invalid.",
-        "Check that you indicated a valid one using the `--token` argument.",
+        "Check that you indicated a valid one using the `-t/--token` argument.",
     ]
 }
 
