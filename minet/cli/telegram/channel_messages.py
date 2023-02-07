@@ -12,8 +12,9 @@ from minet.telegram.constants import TELEGRAM_MESSAGES_CSV_HEADERS
 from minet.telegram.exceptions import TelegramInvalidTargetError
 
 
-def channel_messages_action(cli_args):
+def action(cli_args):
     scraper = TelegramScraper(throttle=cli_args.throttle)
+
     enricher = casanova.enricher(
         cli_args.file,
         cli_args.output,

@@ -12,11 +12,11 @@ import gzip
 from os.path import join, dirname
 
 from minet.utils import md5
-from minet.cli.utils import die, LoadingBar
+from minet.cli.utils import LoadingBar
+from minet.cli.hyphe.utils import with_hyphe_fatal_errors
 from minet.hyphe import HypheAPIClient
 from minet.hyphe.formatters import format_webentity_for_csv, format_page_for_csv
 from minet.hyphe.constants import WEBENTITY_CSV_HEADERS, PAGE_CSV_HEADERS
-from minet.hyphe.exceptions import HypheCorpusAuthenticationError
 
 ADDITIONAL_PAGE_HEADERS = ["filename"]
 
@@ -28,7 +28,8 @@ def format_page_filename(webentity, page):
     return "%s/%s/%s.html.gz" % (webentity["id"], h[:2], h)
 
 
-def hyphe_dump_action(cli_args):
+@with_hyphe_fatal_errors
+def action(cli_args):
 
     # Paths
     output_dir = "hyphe_corpus_%s" % cli_args.corpus
@@ -48,15 +49,7 @@ def hyphe_dump_action(cli_args):
     client = HypheAPIClient(cli_args.url)
     corpus = client.corpus(cli_args.corpus, password=cli_args.password)
 
-    try:
-        corpus.ensure_is_started()
-    except HypheCorpusAuthenticationError:
-        die(
-            [
-                'Wrong password for the "%s" corpus!' % cli_args.corpus,
-                "Don't forget to provide a password for this corpus using --password",
-            ]
-        )
+    corpus.ensure_is_started()
 
     # Then we gather some handy statistics
     counts = corpus.count(statuses=cli_args.statuses)

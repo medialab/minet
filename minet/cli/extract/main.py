@@ -105,7 +105,7 @@ def worker(payload):
     return None, row, format_trafilatura_result(result)
 
 
-def extract_action(cli_args):
+def action(cli_args):
     if cli_args.glob is None and cli_args.input_dir is None:
         cli_args.input_dir = DEFAULT_CONTENT_FOLDER
 

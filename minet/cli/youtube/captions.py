@@ -11,7 +11,7 @@ from minet.youtube import get_video_captions
 from minet.youtube.constants import YOUTUBE_CAPTIONS_CSV_HEADERS
 
 
-def captions_action(cli_args):
+def action(cli_args):
     enricher = casanova.enricher(
         cli_args.file,
         cli_args.output,

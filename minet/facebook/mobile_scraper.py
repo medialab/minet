@@ -622,12 +622,11 @@ class FacebookMobileScraper(object):
     def __init__(self, cookie, throttle=FACEBOOK_MOBILE_DEFAULT_THROTTLE):
 
         # Grabbing cookie
-        cookie = grab_facebook_cookie(cookie)
+        self.cookie = grab_facebook_cookie(cookie)
 
-        if cookie is None:
-            raise FacebookInvalidCookieError
+        if self.cookie is None:
+            raise FacebookInvalidCookieError(target=cookie)
 
-        self.cookie = cookie
         self.pool = create_pool()
 
         self.rate_limiter_state = RateLimiterState(1, throttle)
@@ -663,7 +662,6 @@ class FacebookMobileScraper(object):
                 current_url, direction, in_reply_to = url_queue.popleft()
 
                 html = self.request_page(current_url)
-
                 try:
                     data = scrape_comments(html, direction, in_reply_to)
                 except TypeError:

@@ -4,31 +4,133 @@
 #
 # Logic of the `bz` action.
 #
-from minet.cli.utils import die
+from argparse import ArgumentTypeError
+from datetime import datetime
+
+from minet.cli.argparse import command, subcommand, ConfigAction
+
+FIVE_YEARS_IN_SEC = 5 * 365.25 * 24 * 60 * 60
 
 
-def buzzsumo_action(cli_args):
+class BuzzSumoDateType(object):
+    def __call__(self, date):
+        try:
+            timestamp = int(datetime.strptime(date, "%Y-%m-%d").timestamp())
+        except ValueError:
+            raise ArgumentTypeError(
+                "dates should have the following format : YYYY-MM-DD."
+            )
 
-    # A token is needed to be able to access the API
-    if not cli_args.token:
-        die(
-            [
-                "A token is needed to be able to access BuzzSumo's API.",
-                "You can provide one using the `--token` argument.",
-            ]
-        )
+        if (datetime.now().timestamp() - timestamp) > FIVE_YEARS_IN_SEC:
+            raise ArgumentTypeError(
+                "you cannot query BuzzSumo using dates before 5 years ago."
+            )
 
-    if cli_args.bz_action == "limit":
-        from minet.cli.buzzsumo.limit import buzzsumo_limit_action
+        return timestamp
 
-        buzzsumo_limit_action(cli_args)
 
-    if cli_args.bz_action == "domain-summary":
-        from minet.cli.buzzsumo.domain_summary import buzzsumo_domain_summary_action
+BUZZSUMO_LIMIT_SUBCOMMAND = subcommand(
+    "limit",
+    "minet.cli.buzzsumo.limit",
+    title="Minet Buzzsumo Limit Command",
+    description="""
+        Call BuzzSumo for a given request and return the remaining number
+        of calls for this month contained in the request's headers.
+    """,
+    epilog="""
+        examples:
 
-        buzzsumo_domain_summary_action(cli_args)
+        . Returning the remaining number of calls for this month:
+            $ minet bz limit --token YOUR_TOKEN
+    """,
+)
 
-    if cli_args.bz_action == "domain":
-        from minet.cli.buzzsumo.domain import buzzsumo_domain_action
+DATE_ARGUMENTS = [
+    {
+        "flag": "--begin-date",
+        "help": "The date you wish to fetch articles from. UTC date should have the following format : YYYY-MM-DD",
+        "required": True,
+        "type": BuzzSumoDateType(),
+    },
+    {
+        "flag": "--end-date",
+        "help": "The date you wish to fetch articles to. UTC date should have the following format : YYYY-MM-DD",
+        "required": True,
+        "type": BuzzSumoDateType(),
+    },
+]
 
-        buzzsumo_domain_action(cli_args)
+BUZZSUMO_DOMAIN_COMMAND = subcommand(
+    "domain",
+    "minet.cli.buzzsumo.domain",
+    title="Minet Buzzsumo Domain Command",
+    description="""
+        Gather social media information about all the articles crawled by BuzzSumo for one or a list of domain names and over a given period.
+
+        The link to the official documentation: https://developers.buzzsumo.com/reference/articles.
+    """,
+    epilog="""
+        examples:
+
+        . Returning social media information for one domain name:
+            $ minet bz domain 'trump-feed.com' --begin-date 2021-01-01 --end-date 2021-06-30 --token YOUR_TOKEN > trump_feed_articles.csv
+
+        . Returning social media information for a list of domain names in a CSV:
+            $ minet bz domain domain_name domain_names.csv --select domain_name --begin-date 2019-01-01 --end-date 2020-12-31 --token YOUR_TOKEN > domain_name_articles.csv
+    """,
+    variadic_input={"dummy_column": "domain_name", "item_label": "domain name"},
+    select=True,
+    arguments=[
+        *DATE_ARGUMENTS,
+    ],
+)
+
+
+BUZZSUMO_DOMAIN_SUMMARY_COMMAND = subcommand(
+    "domain-summary",
+    "minet.cli.buzzsumo.domain_summary",
+    title="Minet Buzzsumo Domain Summary Command",
+    description="""
+        Gather information about the quantity of articles crawled by BuzzSumo for certain domain names and a given period.
+
+        Inform the user about the number of calls (corresponding to the number of pages) needed to request BuzzSumo about those domain names.
+    """,
+    epilog="""
+        examples:
+
+        . Returning the number of articles and pages found in BuzzSumo for one domain name:
+            $ minet bz domain-summary 'nytimes.com' --begin-date 2019-01-01 --end-date 2019-03-01 --token YOUR_TOKEN
+
+        . Returning the number of articles and pages found in BuzzSumo for a list of domain names in a CSV:
+            $ minet bz domain-summary domain_name domain_names.csv --begin-date 2020-01-01 --end-date 2021-06-15 --token YOUR_TOKEN  > domain_name_summary.csv
+    """,
+    variadic_input={"dummy_column": "domain_name", "item_label": "domain name"},
+    select=True,
+    arguments=[
+        *DATE_ARGUMENTS,
+    ],
+)
+
+BUZZSUMO_COMMAND = command(
+    "buzzsumo",
+    "minet.cli.buzzsumo",
+    title="Minet Buzzsumo Command",
+    description="""
+        Gather data from the BuzzSumo APIs easily and efficiently.
+    """,
+    aliases=["bz"],
+    common_arguments=[
+        {
+            "flags": ["-t", "--token"],
+            "help": "BuzzSumo API token.",
+            "action": ConfigAction,
+            "rc_key": ["buzzsumo", "token"],
+            "required": True,
+        }
+    ],
+    subcommands=[
+        BUZZSUMO_LIMIT_SUBCOMMAND,
+        BUZZSUMO_DOMAIN_COMMAND,
+        BUZZSUMO_DOMAIN_SUMMARY_COMMAND,
+    ],
+)

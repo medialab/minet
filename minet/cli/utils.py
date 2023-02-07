@@ -12,6 +12,8 @@ import platform
 from glob import iglob
 from os.path import join, expanduser, isfile, relpath
 from collections import namedtuple
+from collections.abc import Mapping
+from functools import wraps
 from tqdm import tqdm
 from ebbe import noop, format_seconds
 
@@ -19,7 +21,7 @@ from minet.web import (
     register_global_request_retryer_before_sleep,
     reset_global_request_retryer_before_sleep,
 )
-from minet.cli.exceptions import MissingColumnError
+from minet.cli.exceptions import MissingColumnError, FatalError
 from minet.utils import fuzzy_int
 
 
@@ -57,7 +59,7 @@ def die(msg=None):
     sys.exit(1)
 
 
-def cleanup_loading_bars(leave=True):
+def cleanup_loading_bars(leave=False):
     for bar in list(tqdm._instances):
         bar.leave = leave
         bar.close()
@@ -274,3 +276,30 @@ def get_rcfile(rcfile_path=None):
             return yaml.safe_load(f)
 
     return None
+
+
+def with_fatal_errors(mapping_or_hook):
+    if not isinstance(mapping_or_hook, Mapping) and not callable(mapping_or_hook):
+        raise TypeError("Expecting mapping or callable")
+
+    def decorate(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            try:
+                return fn(*args, **kwargs)
+            except Exception as e:
+                msg = None
+
+                if isinstance(mapping_or_hook, Mapping):
+                    msg = mapping_or_hook.get(type(e))
+                elif callable(mapping_or_hook):
+                    msg = mapping_or_hook(args[0], e)
+
+                if msg is not None:
+                    raise FatalError(msg)
+
+                raise e
+
+        return wrapper
+
+    return decorate

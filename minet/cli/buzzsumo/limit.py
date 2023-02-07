@@ -7,20 +7,15 @@
 from termcolor import colored
 from ebbe import format_int
 
-from minet.cli.utils import die, register_retryer_logger
 from minet.buzzsumo import BuzzSumoAPIClient
-from minet.buzzsumo.exceptions import BuzzSumoInvalidTokenError
+from minet.cli.buzzsumo.utils import with_buzzsumo_fatal_errors
 
 
-def buzzsumo_limit_action(cli_args):
-    register_retryer_logger()
-
+@with_buzzsumo_fatal_errors
+def action(cli_args):
     client = BuzzSumoAPIClient(cli_args.token)
 
-    try:
-        limit = client.limit()
-    except BuzzSumoInvalidTokenError:
-        die("Your BuzzSumo token is invalid!")
+    limit = client.limit()
 
     print(
         "With your token, you can still make",

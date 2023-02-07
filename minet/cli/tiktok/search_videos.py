@@ -12,7 +12,7 @@ from minet.tiktok import TiktokAPIScraper
 from minet.tiktok.constants import TIKTOK_VIDEO_CSV_HEADERS
 
 
-def search_videos_action(cli_args):
+def action(cli_args):
     enricher = casanova.enricher(
         cli_args.file,
         cli_args.output,
@@ -22,6 +22,7 @@ def search_videos_action(cli_args):
     loading_bar = LoadingBar("Retrieving videos", unit="querie", stats={"videos": 0})
 
     client = TiktokAPIScraper(cookie=cli_args.cookie)
+
     for row, query in enricher.cells(cli_args.column, with_rows=True):
         loading_bar.update()
 

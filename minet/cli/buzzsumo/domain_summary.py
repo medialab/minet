@@ -7,17 +7,14 @@
 import casanova
 
 from minet.cli.utils import LoadingBar
+from minet.cli.buzzsumo.utils import with_buzzsumo_fatal_errors
 from minet.buzzsumo import BuzzSumoAPIClient
-from minet.buzzsumo.exceptions import (
-    BuzzSumoInvalidQueryError,
-    BuzzSumoInvalidTokenError,
-)
 
 SUMMARY_HEADERS = ["total_results", "total_pages"]
 
 
-def buzzsumo_domain_summary_action(cli_args):
-
+@with_buzzsumo_fatal_errors
+def action(cli_args):
     client = BuzzSumoAPIClient(cli_args.token)
 
     enricher = casanova.enricher(
@@ -31,17 +28,10 @@ def buzzsumo_domain_summary_action(cli_args):
     )
 
     for row, domain_name in enricher.cells(cli_args.column, with_rows=True):
-
-        try:
-            data = client.domain_summary(
-                domain_name, cli_args.begin_date, cli_args.end_date
-            )
-        except BuzzSumoInvalidTokenError:
-            loading_bar.die("Your BuzzSumo token is invalid!")
-        except BuzzSumoInvalidQueryError as e:
-            loading_bar.die(
-                "Invalid query: %s" % e.url + "\nMessage from the API: %s" % e
-            )
+        data = client.domain_summary(
+            domain_name, cli_args.begin_date, cli_args.end_date
+        )
 
         enricher.writerow(row, [data["total_results"], data["total_pages"]])
+
         loading_bar.update()

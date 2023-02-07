@@ -10,7 +10,7 @@ from ural.lru import NormalizedLRUTrie
 from minet.cli.utils import LoadingBar
 
 
-def url_join_action(cli_args):
+def action(cli_args):
     left_reader = casanova.reader(cli_args.file1)
     left_headers = left_reader.fieldnames
     left_idx = None

@@ -13,6 +13,7 @@ import shutil
 import importlib
 import multiprocessing
 import casanova
+from ebbe import omit
 from textwrap import dedent
 from contextlib import ExitStack
 from argparse import ArgumentParser, RawTextHelpFormatter
@@ -21,7 +22,13 @@ from encodings import idna  # NOTE: this is necessary for pyinstaller build
 
 from minet.__version__ import __version__
 from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
-from minet.cli.utils import die, get_rcfile, print_err, cleanup_loading_bars
+from minet.cli.utils import (
+    die,
+    get_rcfile,
+    print_err,
+    cleanup_loading_bars,
+    register_retryer_logger,
+)
 from minet.cli.argparse import resolve_arg_dependencies
 from minet.cli.exceptions import NotResumableError, InvalidArgumentsError, FatalError
 
@@ -32,18 +39,6 @@ def custom_formatter(prog):
     terminal_size = shutil.get_terminal_size()
 
     return RawTextHelpFormatter(prog, max_help_position=50, width=terminal_size.columns)
-
-
-def omit(d, keys_to_omit):
-    nd = {}
-
-    for k, v in d.items():
-        if k in keys_to_omit:
-            continue
-
-        nd[k] = v
-
-    return nd
 
 
 def get_subparser(o, keys):
@@ -159,7 +154,9 @@ def build_parser(commands):
 
     subparser_index = {}
 
-    subparsers = build_subparsers(parser, subparser_index, commands)
+    subparsers = build_subparsers(
+        parser, subparser_index, {c["name"]: c for c in commands}
+    )
 
     # Help subparser
     help_subparser = subparsers.add_parser("help")
@@ -197,24 +194,40 @@ def run():
             to_close = resolve_arg_dependencies(cli_args, config)
         except OSError as e:
             parser.error("Could not open output file (-o/--output): %s" % str(e))
+        except InvalidArgumentsError as e:
+            parser.error(e.message)
         except NotResumableError:
             parser.error(
                 "Cannot --resume without knowing where the output will be written (use -o/--output)"
             )
 
         # Lazy loading module for faster startup
-        m = importlib.import_module(action["command"]["package"])
-        fn = getattr(m, action["command"]["action"])
+        meta = action["command"]
+
+        if hasattr(cli_args, "subcommand") and cli_args.subcommand:
+            meta = action["command"]["subparsers"]["commands"][cli_args.subcommand]
+
+        if "validate" in meta:
+            try:
+                meta["validate"](cli_args)
+            except InvalidArgumentsError as e:
+                parser.error(e.message)
+
+        m = importlib.import_module(meta["package"])
+        fn = getattr(m, "action")
 
         with ExitStack() as stack:
             for buffer in to_close:
                 stack.callback(buffer.close)
+
+            register_retryer_logger()
 
             try:
                 fn(cli_args)
             except InvalidArgumentsError as e:
                 parser.error(e.message)
             except FatalError as e:
+                cleanup_loading_bars(leave=True)
                 print_err(e.message)
                 sys.exit(1)
 

@@ -12,7 +12,8 @@ from ural import is_url
 
 from minet.utils import rate_limited
 from minet.web import request
-from minet.cli.utils import die, LoadingBar
+from minet.cli.utils import LoadingBar
+from minet.cli.exceptions import FatalError
 
 REPORT_HEADERS = ["approx_likes", "approx_likes_int"]
 NUMBER_RE = re.compile(rb">(\d+\.?\d*[KM]?)<", re.I)
@@ -54,7 +55,7 @@ def scrape(data):
     return [approx_likes, approx_likes_int]
 
 
-def facebook_url_likes_action(cli_args):
+def action(cli_args):
     enricher = casanova.enricher(
         cli_args.file,
         cli_args.output,
@@ -62,14 +63,6 @@ def facebook_url_likes_action(cli_args):
         add=REPORT_HEADERS,
         total=cli_args.total,
     )
-
-    if cli_args.column not in enricher.headers:
-        die(
-            [
-                'Could not find the "%s" column containing the urls in the given CSV file.'
-                % cli_args.column
-            ]
-        )
 
     loading_bar = LoadingBar(desc="Retrieving likes", unit="url", total=enricher.total)
 
@@ -84,18 +77,18 @@ def facebook_url_likes_action(cli_args):
 
         try:
             html = make_request(url)
-        except BaseException:
-            loading_bar.die(
+        except Exception:
+            raise FatalError(
                 "An error occurred while fetching like button for this url: %s" % url
             )
 
         if html is None:
-            loading_bar.die("Could not find data for this url: %s" % url)
+            raise FatalError("Could not find data for this url: %s" % url)
 
         scraped = scrape(html)
 
         if scraped is None:
-            loading_bar.die(
+            raise FatalError(
                 "Could not extract Facebook likes from this url's like button: %s" % url
             )
 

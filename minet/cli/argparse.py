@@ -16,7 +16,7 @@ from ebbe import getpath
 from datetime import datetime
 from pytz import timezone
 from pytz.exceptions import UnknownTimeZoneError
-from minet.cli.exceptions import NotResumableError
+from minet.cli.exceptions import NotResumableError, InvalidArgumentsError
 from minet.cli.utils import acquire_cross_platform_stdout, was_piped_something
 
 
@@ -31,9 +31,6 @@ class TimestampType(object):
         return timestamp
 
 
-FIVE_YEARS_IN_SEC = 5 * 365.25 * 24 * 60 * 60
-
-
 class TimezoneType(object):
     def __call__(self, locale):
         try:
@@ -41,23 +38,6 @@ class TimezoneType(object):
         except UnknownTimeZoneError:
             raise ArgumentTypeError("This timezone is not recognized.")
         return tz
-
-
-class BuzzSumoDateType(object):
-    def __call__(self, date):
-        try:
-            timestamp = int(datetime.strptime(date, "%Y-%m-%d").timestamp())
-        except ValueError:
-            raise ArgumentTypeError(
-                "dates should have the following format : YYYY-MM-DD."
-            )
-
-        if (datetime.now().timestamp() - timestamp) > FIVE_YEARS_IN_SEC:
-            raise ArgumentTypeError(
-                "you cannot query BuzzSumo using dates before 5 years ago."
-            )
-
-        return timestamp
 
 
 class SplitterType(object):
@@ -93,27 +73,6 @@ class BooleanAction(Action):
             )
             else True,
         )
-
-
-class UrlFragmentAction(Action):
-    """
-    Custom argparse action to handle --dont-* flags and *except-routing flag.
-    """
-
-    def __init__(self, option_strings, dest, nargs=None, **kwargs):
-        super().__init__(option_strings, dest, nargs=0, **kwargs)
-
-    def __call__(self, parser, cli_args, values, option_string=None):
-        attr = (
-            False
-            if option_string.startswith("--no-") or option_string.startswith("--dont-")
-            else True
-        )
-
-        if attr and option_string.endswith("except-routing"):
-            attr = "except-routing"
-
-        setattr(cli_args, self.dest, attr)
 
 
 class InputFileAction(Action):
@@ -272,26 +231,44 @@ def rc_key_to_env_var(key):
 
 
 class WrappedConfigValue(object):
-    def __init__(self, key, default, _type):
+    def __init__(self, flag, key, default, _type, required=False):
+        self.flag = flag
         self.key = key
         self.default = default
         self.type = _type
+        self.required = required
 
     def resolve(self, config):
+        value = None
 
         # Attempting to resolve env variable
         env_var = rc_key_to_env_var(self.key)
         env_value = os.environ.get(env_var, "").strip()
 
         if env_value:
-            return self.type(env_value)
+            value = self.type(env_value)
+        else:
+            value = getpath(config, self.key, self.default)
 
-        return getpath(config, self.key, self.default)
+        if value is None and self.required:
+            raise InvalidArgumentsError(
+                '%s is mandatory!\nIt can also be given using the %s env variable or using the "%s" .minetrc config key.\nMore info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc'
+                % ("/".join(self.flag), env_var, ".".join(self.key))
+            )
+
+        return value
 
 
 class ConfigAction(Action):
     def __init__(
-        self, option_strings, dest, rc_key, default=None, plural=False, **kwargs
+        self,
+        option_strings,
+        dest,
+        rc_key,
+        default=None,
+        plural=False,
+        required=False,
+        **kwargs
     ):
         if "help" in kwargs:
             kwargs["help"] = kwargs["help"].rstrip(
@@ -309,7 +286,13 @@ class ConfigAction(Action):
         super().__init__(
             option_strings,
             dest,
-            default=WrappedConfigValue(rc_key, default, kwargs.get("type", str)),
+            default=WrappedConfigValue(
+                option_strings,
+                rc_key,
+                default,
+                kwargs.get("type", str),
+                required=required,
+            ),
             **kwargs
         )
 
@@ -351,3 +334,196 @@ def resolve_arg_dependencies(cli_args, config):
             to_close.append(value)
 
     return to_close
+
+
+def resolve_typical_arguments(
+    args,
+    resumer=None,
+    resumer_kwargs=None,
+    select=False,
+    total=False,
+    variadic_input=None,
+):
+    args = [] if args is None else args.copy()
+
+    output_argument = {"flags": ["-o", "--output"], "action": OutputFileAction}
+
+    if variadic_input is not None:
+        variadic_input = variadic_input.copy()
+
+        if "column_help" not in variadic_input:
+            if "item_label" not in variadic_input:
+                variadic_input["item_label"] = variadic_input["dummy_column"]
+
+            if "item_label_plural" not in variadic_input:
+                variadic_input["item_label_plural"] = variadic_input["item_label"] + "s"
+
+            variadic_input[
+                "column_help"
+            ] = "Name of the CSV column containing %s or a single %s." % (
+                variadic_input["item_label_plural"],
+                variadic_input["item_label"],
+            )
+            variadic_input["file_help"] = (
+                "CSV file containing the %s." % variadic_input["item_label_plural"]
+            )
+
+        args.append({"name": "column", "help": variadic_input["column_help"]})
+
+        file_argument = {
+            "name": "file",
+            "help": variadic_input["file_help"],
+            "action": InputFileAction,
+            "dummy_csv_column": variadic_input["dummy_column"],
+        }
+
+        if "guard" in variadic_input:
+            file_argument['dummy_csv_guard']= variadic_input["guard"]
+
+        if "guard_error_message" in variadic_input:
+            file_argument["dummy_csv_error"] = variadic_input["guard_error_message"]
+
+        args.append(file_argument)
+
+    if select:
+        args.append(
+            {
+                "flags": ["-s", "--select"],
+                "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                "type": SplitterType(),
+            },
+        )
+
+    if total:
+        args.append(
+            {
+                "flag": "--total",
+                "help": "Total number of items to process. Necessary if you want to display a finite progress indicator.",
+                "type": int,
+            }
+        )
+
+    if resumer is not None:
+        args.append(
+            {
+                "flag": "--resume",
+                "help": "Whether to resume from an aborted collection. Need -o to be set.",
+                "action": "store_true",
+            },
+        )
+
+        output_argument["resumer"] = resumer
+
+        if resumer_kwargs is not None:
+            output_argument["resumer_kwargs"] = resumer_kwargs
+
+    args.append(output_argument)
+
+    return args
+
+
+def command(
+    name,
+    package=None,
+    title=None,
+    aliases=None,
+    description=None,
+    epilog=None,
+    common_arguments=None,
+    arguments=None,
+    subcommands=None,
+    validate=None,
+    resumer=None,
+    resumer_kwargs=None,
+    select=False,
+    total=False,
+    variadic_input=None,
+    **kwargs
+):
+
+    if arguments is not None and subcommands is not None:
+        raise TypeError(
+            "command cannot have subcommands and be executable on its own (avoid giving arguments AND subcommands)"
+        )
+
+    data = {"name": name, "title": title}
+
+    if package is not None:
+        data["package"] = package
+
+    if aliases is not None:
+        data["aliases"] = aliases
+
+    if description is not None:
+        data["description"] = description
+
+    if epilog is not None:
+        data["epilog"] = epilog
+
+    if subcommands is not None:
+        data["subparsers"] = {
+            "help": "Subcommand to use.",
+            "title": "subcommands",
+            "dest": "subcommand",
+            "commands": {s["name"]: s for s in subcommands},
+        }
+
+        if common_arguments is not None:
+            data["subparsers"]["common_arguments"] = common_arguments
+
+    elif arguments is not None:
+        data["arguments"] = resolve_typical_arguments(
+            arguments,
+            resumer=resumer,
+            resumer_kwargs=resumer_kwargs,
+            select=select,
+            total=total,
+            variadic_input=variadic_input,
+        )
+
+    if validate is not None:
+        data["validate"] = validate
+
+    data.update(kwargs)
+
+    return data
+
+
+def subcommand(
+    name,
+    package,
+    title,
+    description=None,
+    epilog=None,
+    arguments=[],
+    validate=None,
+    resumer=None,
+    resumer_kwargs=None,
+    select=False,
+    total=False,
+    variadic_input=None,
+    **kwargs
+):
+    data = {"name": name, "title": title, "package": package, "arguments": arguments}
+
+    if description is not None:
+        data["description"] = description
+
+    if epilog is not None:
+        data["epilog"] = epilog
+
+    data["arguments"] = resolve_typical_arguments(
+        arguments,
+        resumer=resumer,
+        resumer_kwargs=resumer_kwargs,
+        select=select,
+        total=total,
+        variadic_input=variadic_input,
+    )
+
+    if validate is not None:
+        data["validate"] = validate
+
+    data.update(kwargs)
+
+    return data

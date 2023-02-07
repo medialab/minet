@@ -26,7 +26,12 @@ from ural.facebook import (
     FacebookPhoto,
     FacebookVideo,
 )
-from ural.youtube import parse_youtube_url, YoutubeVideo, YoutubeUser, YoutubeChannel
+from ural.youtube import (
+    parse_youtube_url,
+    YoutubeVideo,
+    YoutubeUser,
+    YoutubeChannel,
+)
 from ural.twitter import parse_twitter_url, TwitterTweet, TwitterUser
 
 from minet.cli.utils import LoadingBar
@@ -92,7 +97,11 @@ def extract_standard_addendum(cli_args, url):
     ]
 
 
-YOUTUBE_TYPES = {YoutubeVideo: "video", YoutubeUser: "user", YoutubeChannel: "channel"}
+YOUTUBE_TYPES = {
+    YoutubeVideo: "video",
+    YoutubeUser: "user",
+    YoutubeChannel: "channel",
+}
 
 
 def extract_youtube_addendum(url):
@@ -148,7 +157,7 @@ def extract_twitter_addendum(url):
         raise TypeError("unknown twitter parse result type!")
 
 
-def url_parse_action(cli_args):
+def action(cli_args):
     headers = REPORT_HEADERS
 
     if cli_args.facebook:

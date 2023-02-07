@@ -15,8 +15,7 @@ from minet.twitter import TwitterAPIClient
 from minet.cli.twitter.utils import is_not_user_id, is_probably_not_user_screen_name
 
 
-def twitter_users_action(cli_args):
-
+def action(cli_args):
     client = TwitterAPIClient(
         cli_args.access_token,
         cli_args.access_token_secret,

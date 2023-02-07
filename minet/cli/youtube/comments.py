@@ -17,7 +17,7 @@ from minet.youtube.exceptions import (
 )
 
 
-def comments_action(cli_args):
+def action(cli_args):
     enricher = casanova.enricher(
         cli_args.file,
         cli_args.output,

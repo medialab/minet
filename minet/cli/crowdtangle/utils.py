@@ -7,14 +7,27 @@
 import casanova
 import ndjson
 
-from minet.cli.utils import print_err, die, LoadingBar
+from minet.cli.utils import print_err, LoadingBar, with_fatal_errors
+from minet.cli.exceptions import InvalidArgumentsError
 from minet.crowdtangle import CrowdTangleAPIClient
 from minet.crowdtangle.exceptions import CrowdTangleInvalidTokenError
+
+FATAL_ERRORS = {
+    CrowdTangleInvalidTokenError: [
+        "Your API token is invalid.",
+        "Check that you indicated a valid one using the `-t/--token` argument.",
+    ]
+}
+
+
+def with_crowdtangle_fatal_errors(fn):
+    return with_fatal_errors(FATAL_ERRORS)(fn)
 
 
 def make_paginated_action(
     method_name, item_name, csv_headers, get_args=None, announce=None
 ):
+    @with_crowdtangle_fatal_errors
     def action(cli_args):
 
         resume = getattr(cli_args, "resume", False)
@@ -22,10 +35,12 @@ def make_paginated_action(
         # Validation
         if resume:
             if cli_args.sort_by != "date":
-                die("Cannot --resume if --sort_by is not `date`.")
+                raise InvalidArgumentsError(
+                    "Cannot --resume if --sort_by is not `date`."
+                )
 
             if cli_args.format != "csv":
-                die("Cannot --resume jsonl format yet.")
+                raise InvalidArgumentsError("Cannot --resume jsonl format yet.")
 
         if cli_args.format == "csv":
             fieldnames = csv_headers(cli_args) if callable(csv_headers) else csv_headers
@@ -66,25 +81,16 @@ def make_paginated_action(
             namespace=cli_args
         )
 
-        try:
-            for details, items in iterator:
-                loading_bar.update(len(items))
+        for details, items in iterator:
+            loading_bar.update(len(items))
 
-                if details is not None:
-                    loading_bar.update_stats(**details)
+            if details is not None:
+                loading_bar.update_stats(**details)
 
-                for item in items:
-                    if cli_args.format == "csv":
-                        item = item.as_csv_row()
+            for item in items:
+                if cli_args.format == "csv":
+                    item = item.as_csv_row()
 
-                    writer.writerow(item)
-
-        except CrowdTangleInvalidTokenError:
-            loading_bar.die(
-                [
-                    "Your API token is invalid.",
-                    "Check that you indicated a valid one using the `--token` argument.",
-                ]
-            )
+                writer.writerow(item)
 
     return action

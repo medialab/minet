@@ -14,7 +14,7 @@ from ural.twitter import parse_twitter_url, TwitterTweet, TwitterUser, TwitterLi
 ID_RE = re.compile(r"^[0-9]+$")
 
 
-def twitter_tweet_date_action(cli_args):
+def action(cli_args):
 
     enricher = casanova.enricher(
         cli_args.file,

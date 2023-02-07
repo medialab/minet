@@ -18,6 +18,6 @@ def select_csv_headers(cli_args):
     return CROWDTANGLE_LEADERBOARD_CSV_HEADERS
 
 
-crowdtangle_leaderboard_action = make_paginated_action(
+action = make_paginated_action(
     method_name="leaderboard", item_name="accounts", csv_headers=select_csv_headers
 )

@@ -24,7 +24,7 @@ MAX_ITEM_COUNT = 1020  # NOTE: API docs say it's 1000, but reality begs to diffe
 RANGE_UPPER_BOUND = math.ceil(MAX_ITEM_COUNT / ITEMS_PER_PAGE) + 1
 
 
-def twitter_user_search_action(cli_args):
+def action(cli_args):
 
     client = TwitterAPIClient(
         cli_args.access_token,
@@ -39,7 +39,7 @@ def twitter_user_search_action(cli_args):
 
     loading_bar = LoadingBar(desc="Retrieving users", total=cli_args.total, unit="user")
 
-    for row, query in enricher.cells(cli_args.query, with_rows=True):
+    for row, query in enricher.cells(cli_args.column, with_rows=True):
 
         kwargs = {"q": query, "count": ITEMS_PER_PAGE, "include_entities": True}
 
