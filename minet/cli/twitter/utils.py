@@ -9,7 +9,7 @@ import re
 from twitter import TwitterHTTPError
 
 from minet.cli.utils import LoadingBar
-from minet.cli.exceptions import InvalidArgumentsError
+from minet.cli.exceptions import InvalidArgumentsError, FatalError
 from minet.twitter import TwitterAPIClient
 
 CHARACTERS = re.compile(r"[A-Za-z_]")
@@ -67,7 +67,7 @@ def make_twitter_action(method_name, csv_headers):
 
             if cli_args.v2:
                 if is_not_user_id(user):
-                    loading_bar.die(
+                    raise FatalError(
                         "The column given as argument doesn't contain user ids, you have probably given user screen names as argument instead. With --api-v2, you can only use user ids to retrieve followers."
                     )
 
@@ -75,7 +75,7 @@ def make_twitter_action(method_name, csv_headers):
 
             elif cli_args.ids:
                 if is_not_user_id(user):
-                    loading_bar.die(
+                    raise FatalError(
                         "The column given as argument doesn't contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command."
                     )
 
@@ -83,7 +83,7 @@ def make_twitter_action(method_name, csv_headers):
 
             else:
                 if is_probably_not_user_screen_name(user):
-                    loading_bar.die(
+                    raise FatalError(
                         "The column given as argument probably doesn't contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command."
                     )
                     # force flag to add

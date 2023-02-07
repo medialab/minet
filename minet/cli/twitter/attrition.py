@@ -10,7 +10,7 @@ from ebbe import getpath, as_chunks
 from ural.twitter import TwitterTweet, parse_twitter_url
 
 from minet.cli.utils import LoadingBar
-from minet.cli.exceptions import InvalidArgumentsError
+from minet.cli.exceptions import InvalidArgumentsError, FatalError
 from minet.twitter import TwitterAPIClient
 from minet.cli.twitter.utils import is_not_user_id, is_probably_not_user_screen_name
 
@@ -97,13 +97,13 @@ def action(cli_args):
                     if cli_args.ids:
 
                         if is_not_user_id(user):
-                            loading_bar.die(
+                            raise FatalError(
                                 "The column given as argument doesn't contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command."
                             )
 
                     else:
                         if is_probably_not_user_screen_name(user):
-                            loading_bar.die(
+                            raise FatalError(
                                 "The column given as argument probably doesn't contain user screen names, you have probably given user ids as argument instead. \nTry adding --ids to the command."
                             )
                             # force flag to add

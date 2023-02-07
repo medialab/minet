@@ -1,7 +1,7 @@
 ---
 fields:
   url:
-    get_context: ['line', 'url']
+    get_context: ["line", "url"]
   title:
     eval: |
       title = root.select_one("title")

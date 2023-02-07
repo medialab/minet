@@ -14,7 +14,8 @@ from ebbe import getpath
 
 from minet.utils import sleep_with_entropy
 from minet.web import request
-from minet.cli.utils import print_err, die, LoadingBar
+from minet.cli.utils import print_err, LoadingBar
+from minet.cli.exceptions import FatalError
 from minet.facebook.constants import (
     FACEBOOK_WEB_DEFAULT_THROTTLE,
     FACEBOOK_REACTION_KEYS,
@@ -133,7 +134,7 @@ def action(cli_args):
         html = response.data
 
         if CAPTCHA in html:
-            die(["Rate limit reached!", "Last url: %s" % url])
+            raise FatalError(["Rate limit reached!", "Last url: %s" % url])
 
         if CURRENT_AVAILABILITY_DISCLAIMER in html or AVAILABILITY_DISCLAIMER in html:
             return "unavailable", None

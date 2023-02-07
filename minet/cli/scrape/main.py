@@ -5,7 +5,6 @@
 # Logic of the scrape action.
 #
 import csv
-import sys
 import ndjson
 import casanova
 from casanova import DictLikeRow
@@ -31,11 +30,12 @@ from minet.cli.reporters import (
 )
 from minet.fs import read_potentially_gzipped_path
 from minet.cli.utils import (
-    die,
+    print_err,
     dummy_csv_file_from_glob,
     create_report_iterator,
     LoadingBar,
 )
+from minet.cli.exceptions import FatalError
 from minet.cli.constants import DEFAULT_CONTENT_FOLDER
 
 ScrapeWorkerResult = namedtuple("ScrapeWorkerResult", ["error", "items"])
@@ -94,20 +94,25 @@ def action(cli_args):
     # Parsing scraper definition
     try:
         scraper = Scraper(cli_args.scraper, strain=cli_args.strain)
+
     except DefinitionInvalidFormatError:
-        die(["Unknown scraper format!", "It should be a JSON or YAML file."])
-    except FileNotFoundError:
-        die("Could not find scraper file!")
-    except InvalidScraperError as error:
-        print(
-            "Your scraper is invalid! You need to fix the following errors:",
-            file=sys.stderr,
+        raise FatalError(
+            ["Unknown scraper format!", "It should be a JSON or YAML file."]
         )
-        print(file=sys.stderr)
-        sys.stderr.write(report_scraper_validation_errors(error.validation_errors))
-        die()
+
+    except FileNotFoundError:
+        raise FatalError("Could not find scraper file!")
+
+    except InvalidScraperError as error:
+        raise FatalError(
+            [
+                "Your scraper is invalid! You need to fix the following errors:\n",
+                report_scraper_validation_errors(error.validation_errors),
+            ]
+        )
+
     except CSSSelectorTooComplex:
-        die(
+        raise FatalError(
             [
                 "Your strainer's CSS selector %s is too complex."
                 % colored(cli_args.strain, "blue"),
@@ -117,11 +122,11 @@ def action(cli_args):
         )
 
     if cli_args.validate:
-        print("Your scraper is valid.", file=sys.stderr)
-        sys.exit(0)
+        print_err("Your scraper is valid.")
+        return
 
     if scraper.headers is None and cli_args.format == "csv":
-        die(
+        raise FatalError(
             [
                 "Your scraper does not yield tabular data.",
                 'Try changing it or setting --format to "jsonl".',
@@ -150,7 +155,7 @@ def action(cli_args):
         and "raw_contents" not in reader.headers
         and not isdir(cli_args.input_dir)
     ):
-        loading_bar.die(
+        raise FatalError(
             [
                 'Could not find the "%s" directory!' % cli_args.input_dir,
                 "Did you forget to specify it with -i/--input-dir?",

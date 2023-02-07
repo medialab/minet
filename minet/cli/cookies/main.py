@@ -10,7 +10,7 @@ import browser_cookie3
 from http.cookies import SimpleCookie
 
 from minet.web import CookieResolver
-from minet.cli.utils import die
+from minet.cli.exceptions import FatalError
 
 
 # Taken from: https://github.com/python/cpython/blob/3.9/Lib/http/cookiejar.py
@@ -86,7 +86,7 @@ def action(cli_args):
     try:
         jar = getattr(browser_cookie3, cli_args.browser)()
     except browser_cookie3.BrowserCookieError:
-        die("Could not extract cookies from %s!" % cli_args.browser)
+        raise FatalError("Could not extract cookies from %s!" % cli_args.browser)
 
     if cli_args.url is not None:
         resolver = CookieResolver(jar)
@@ -105,7 +105,7 @@ def action(cli_args):
             else:
                 print(cookie, file=cli_args.output)
         else:
-            die(
+            raise FatalError(
                 "Could not find relevant cookie for %s in %s!"
                 % (cli_args.url, cli_args.browser)
             )

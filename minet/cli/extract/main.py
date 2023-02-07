@@ -15,6 +15,7 @@ from minet.cli.utils import create_report_iterator, dummy_csv_file_from_glob, Lo
 from minet.cli.reporters import report_error
 from minet.exceptions import TrafilaturaError, UnknownEncodingError
 from minet.cli.constants import DEFAULT_CONTENT_FOLDER
+from minet.cli.exceptions import FatalError
 
 OUTPUT_ADDITIONAL_HEADERS = [
     "extract_error",
@@ -138,7 +139,7 @@ def action(cli_args):
         and "raw_contents" not in enricher.headers
         and not isdir(cli_args.input_dir)
     ):
-        loading_bar.die(
+        raise FatalError(
             [
                 'Could not find the "%s" directory!' % cli_args.input_dir,
                 "Did you forget to specify it with -i/--input-dir?",
