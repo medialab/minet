@@ -93,8 +93,12 @@ def run(name, version, commands):
             except InvalidArgumentsError as e:
                 parser.error(e.message)
 
-        m = importlib.import_module(meta["package"])
-        fn = getattr(m, "action")
+        fn = meta["package"]
+
+        # Lazy-loading
+        if not callable(fn):
+            m = importlib.import_module(meta["package"])
+            fn = getattr(m, "action")
 
         with ExitStack() as stack:
             for buffer in to_close:

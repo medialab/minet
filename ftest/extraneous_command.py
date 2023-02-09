@@ -1,11 +1,12 @@
 from minet.cli.argparse import command
 from minet.cli.run import run
 
-EXTRA_COMMAND = command("extra", "ftest.extraneous_command", title="Extra Command")
-
 
 def action(cli_args):
     print(cli_args)
+
+
+EXTRA_COMMAND = command("extra", action, title="Extra Command")
 
 
 if __name__ == "__main__":
