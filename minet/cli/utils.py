@@ -13,8 +13,10 @@ from glob import iglob
 from os.path import join, expanduser, isfile, relpath
 from collections import namedtuple
 from collections.abc import Mapping
+from contextlib import contextmanager
 from functools import wraps
 from tqdm import tqdm
+from tqdm.contrib import DummyTqdmFile
 from ebbe import noop, format_seconds
 
 from minet.web import (
@@ -142,6 +144,21 @@ class LoadingBar(tqdm):
     def die(self, msg):
         self.close()
         die(msg)
+
+
+@contextmanager
+def tqdm_stdout_stderr():
+    original_stdout = sys.stdout
+    original_stderr = sys.stderr
+
+    try:
+        sys.stdout = DummyTqdmFile(original_stdout)
+        sys.stderr = DummyTqdmFile(original_stderr)
+
+        yield original_stdout, original_stderr
+    finally:
+        sys.stdout = original_stdout
+        sys.stderr = original_stderr
 
 
 def acquire_cross_platform_stdout():

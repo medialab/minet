@@ -378,7 +378,7 @@ def resolve_typical_arguments(
         }
 
         if "guard" in variadic_input:
-            file_argument['dummy_csv_guard']= variadic_input["guard"]
+            file_argument["dummy_csv_guard"] = variadic_input["guard"]
 
         if "guard_error_message" in variadic_input:
             file_argument["dummy_csv_error"] = variadic_input["guard_error_message"]
