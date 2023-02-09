@@ -3,7 +3,7 @@ from minet.cli.constants import DEFAULT_CONTENT_FOLDER
 
 EXTRACT_COMMAND = command(
     "extract",
-    "minet.cli.extract.main",
+    "minet.cli.extract.extract",
     title="Minet Extract Command",
     description="""
         Use multiple processes to extract raw content and various metadata

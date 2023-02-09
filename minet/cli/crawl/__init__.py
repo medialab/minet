@@ -5,7 +5,7 @@ from minet.constants import DEFAULT_THROTTLE
 
 CRAWL_COMMAND = command(
     "crawl",
-    "minet.cli.crawl.main",
+    "minet.cli.crawl.crawl",
     title="Minet Crawl Command",
     description="""
         Use multiple threads to crawl the web using minet crawling and

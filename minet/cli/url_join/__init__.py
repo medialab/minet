@@ -2,7 +2,7 @@ from minet.cli.argparse import command, InputFileAction
 
 URL_JOIN_COMMAND = command(
     "url-join",
-    "minet.cli.url_join.main",
+    "minet.cli.url_join.url_join",
     title="Minet Url Join Command",
     description="""
         Join two CSV files by matching them on columns containing urls. It

@@ -5,7 +5,7 @@ from minet.cli.argparse import command
 
 COOKIES_COMMAND = command(
     "cookies",
-    "minet.cli.cookies.main",
+    "minet.cli.cookies.cookies",
     title="Minet Cookies Command",
     description="""
         Grab cookies directly from your browsers to use them easily later

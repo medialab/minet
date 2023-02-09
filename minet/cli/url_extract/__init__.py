@@ -2,7 +2,7 @@ from minet.cli.argparse import command, InputFileAction
 
 URL_EXTRACT_COMMAND = command(
     "url-extract",
-    "minet.cli.url_extract.main",
+    "minet.cli.url_extract.url_extract",
     title="Minet Url Extract Command",
     description="""
         Extract urls from a CSV column containing either raw text or raw

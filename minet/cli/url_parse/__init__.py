@@ -26,7 +26,7 @@ class UrlFragmentAction(Action):
 
 URL_PARSE_COMMAND = command(
     "url-parse",
-    "minet.cli.url_parse.main",
+    "minet.cli.url_parse.url_parse",
     title="Minet Url Parse Command",
     description="""
         Parse the urls contained in a CSV file using the python `ural`

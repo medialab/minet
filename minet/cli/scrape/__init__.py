@@ -5,7 +5,7 @@ from minet.cli.constants import DEFAULT_CONTENT_FOLDER
 
 SCRAPE_COMMAND = command(
     "scrape",
-    "minet.cli.scrape.main",
+    "minet.cli.scrape.scrape",
     title="Minet Scrape Command",
     description="""
         Use multiple processes to scrape data from a batch of HTML files.
