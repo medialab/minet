@@ -7,6 +7,7 @@
 import casanova
 import re
 from twitter import TwitterHTTPError
+from functools import wraps
 
 from minet.cli.utils import LoadingBar
 from minet.cli.exceptions import InvalidArgumentsError, FatalError
@@ -27,6 +28,24 @@ def validate_query_boundaries(cli_args):
     if cli_args.since_id and cli_args.until_id:
         if cli_args.until_id < cli_args.since_id:
             raise InvalidArgumentsError("--until-id should be greater than --since-id!")
+
+
+def with_twitter_client():
+    def decorate(action):
+        @wraps(action)
+        def wrapper(cli_args, *args, **kwargs):
+            client = TwitterAPIClient(
+                cli_args.access_token,
+                cli_args.access_token_secret,
+                cli_args.api_key,
+                cli_args.api_secret_key,
+            )
+
+            return action(cli_args, *args, **{"client": client}, **kwargs)
+
+        return wrapper
+
+    return decorate
 
 
 def make_twitter_action(method_name, csv_headers):

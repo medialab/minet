@@ -4,38 +4,28 @@
 #
 # Logic of the `tw attrition` action.
 #
-import casanova
 from twitter import TwitterHTTPError
 from ebbe import getpath, as_chunks
 from ural.twitter import TwitterTweet, parse_twitter_url
 
-from minet.cli.utils import LoadingBar
+from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.exceptions import InvalidArgumentsError, FatalError
-from minet.twitter import TwitterAPIClient
-from minet.cli.twitter.utils import is_not_user_id, is_probably_not_user_screen_name
+from minet.cli.twitter.utils import (
+    is_not_user_id,
+    is_probably_not_user_screen_name,
+    with_twitter_client,
+)
+
+ATTRITION_ADDITIONAL_HEADERS = ["tweet_current_status"]
 
 
-def action(cli_args):
-
-    client = TwitterAPIClient(
-        cli_args.access_token,
-        cli_args.access_token_secret,
-        cli_args.api_key,
-        cli_args.api_secret_key,
-    )
-
-    enricher = casanova.enricher(
-        cli_args.file,
-        cli_args.output,
-        keep=cli_args.select,
-        add=["tweet_current_status"],
-        total=cli_args.total,
-    )
-
-    loading_bar = LoadingBar(
-        "Retrieving attrition reason", total=enricher.total, unit="tweet"
-    )
-
+@with_enricher_and_loading_bar(
+    headers=ATTRITION_ADDITIONAL_HEADERS,
+    desc="Retrieving attrition reason",
+    unit="tweet",
+)
+@with_twitter_client()
+def action(cli_args, client, enricher, loading_bar):
     user_cache = {}
     result = None
 
