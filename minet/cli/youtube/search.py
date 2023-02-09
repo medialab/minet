@@ -4,24 +4,17 @@
 #
 # Action searching videos using YouTube's API.
 #
-import casanova
 from itertools import islice
 
-from minet.cli.utils import LoadingBar
+from minet.cli.utils import with_enricher_and_loading_bar
 from minet.youtube import YouTubeAPIClient
 from minet.youtube.constants import YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS
 
 
-def action(cli_args):
-    enricher = casanova.enricher(
-        cli_args.file,
-        cli_args.output,
-        add=YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS,
-        keep=cli_args.select,
-    )
-
-    loading_bar = LoadingBar("Searching videos", unit="video")
-
+@with_enricher_and_loading_bar(
+    headers=YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS, desc="Searching videos", unit="video"
+)
+def action(cli_args, enricher, loading_bar):
     client = YouTubeAPIClient(cli_args.key)
 
     for row, query in enricher.cells(cli_args.column, with_rows=True):

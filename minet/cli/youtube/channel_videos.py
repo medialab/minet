@@ -5,23 +5,17 @@
 # Action reading an input CSV file line by line and retrieving videos from
 # the given Youtube channels using Google's APIs.
 #
-import casanova
-
-from minet.cli.utils import LoadingBar
+from minet.cli.utils import with_enricher_and_loading_bar
 from minet.youtube import YouTubeAPIClient
 from minet.youtube.constants import YOUTUBE_PLAYLIST_VIDEO_SNIPPET_CSV_HEADERS
 
 
-def action(cli_args):
-    enricher = casanova.enricher(
-        cli_args.file,
-        cli_args.output,
-        add=YOUTUBE_PLAYLIST_VIDEO_SNIPPET_CSV_HEADERS,
-        keep=cli_args.select,
-    )
-
-    loading_bar = LoadingBar(desc="Retrieving videos", unit="video")
-
+@with_enricher_and_loading_bar(
+    headers=YOUTUBE_PLAYLIST_VIDEO_SNIPPET_CSV_HEADERS,
+    desc="Retrieving videos",
+    unit="video",
+)
+def action(cli_args, enricher, loading_bar):
     client = YouTubeAPIClient(cli_args.key)
 
     for row, channel_id in enricher.cells(cli_args.column, with_rows=True):

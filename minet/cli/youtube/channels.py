@@ -5,26 +5,17 @@
 # Action reading an input CSV file line by line and retrieving metadata about
 # the given Youtube channels using Google's APIs.
 #
-import casanova
 from operator import itemgetter
 
-from minet.cli.utils import LoadingBar
+from minet.cli.utils import with_enricher_and_loading_bar
 from minet.youtube import YouTubeAPIClient
 from minet.youtube.constants import YOUTUBE_CHANNEL_CSV_HEADERS
 
 
-def action(cli_args):
-    enricher = casanova.enricher(
-        cli_args.file,
-        cli_args.output,
-        add=YOUTUBE_CHANNEL_CSV_HEADERS,
-        keep=cli_args.select,
-    )
-
-    loading_bar = LoadingBar(
-        desc="Retrieving meta", unit="channel", total=cli_args.total
-    )
-
+@with_enricher_and_loading_bar(
+    headers=YOUTUBE_CHANNEL_CSV_HEADERS, desc="Retrieving meta", unit="channel"
+)
+def action(cli_args, enricher, loading_bar):
     client = YouTubeAPIClient(cli_args.key)
 
     iterator = enricher.cells(cli_args.column, with_rows=True)

@@ -338,7 +338,9 @@ def with_fatal_errors(mapping_or_hook):
     return decorate
 
 
-def get_enricher_and_loading_bar(cli_args, headers, desc, unit=None, multiplex=None):
+def get_enricher_and_loading_bar(
+    cli_args, headers, desc, unit=None, multiplex=None, stats=None
+):
     if callable(headers):
         headers = headers(cli_args)
 
@@ -354,17 +356,22 @@ def get_enricher_and_loading_bar(cli_args, headers, desc, unit=None, multiplex=N
         multiplex=multiplex,
     )
 
-    loading_bar = LoadingBar(desc=desc, unit=unit, total=enricher.total)
+    loading_bar = LoadingBar(desc=desc, unit=unit, total=enricher.total, stats=stats)
 
     return enricher, loading_bar
 
 
-def with_enricher_and_loading_bar(headers, desc, unit=None, multiplex=None):
+def with_enricher_and_loading_bar(headers, desc, unit=None, multiplex=None, stats=None):
     def decorate(action):
         @wraps(action)
         def wrapper(cli_args, *args, **kwargs):
             enricher, loading_bar = get_enricher_and_loading_bar(
-                cli_args, headers=headers, desc=desc, unit=unit, multiplex=multiplex
+                cli_args,
+                headers=headers,
+                desc=desc,
+                unit=unit,
+                multiplex=multiplex,
+                stats=stats,
             )
 
             additional_kwargs = {"enricher": enricher, "loading_bar": loading_bar}
