@@ -5,6 +5,7 @@
 # Miscellaneous helpers related to CLI argument parsing.
 #
 import os
+import re
 import sys
 import shutil
 from os.path import isdir
@@ -27,6 +28,8 @@ from pytz.exceptions import UnknownTimeZoneError
 
 from minet.cli.exceptions import NotResumableError, InvalidArgumentsError
 from minet.cli.utils import acquire_cross_platform_stdout, was_piped_something
+
+TEMPLATE_RE = re.compile(r"<%\s+([A-Za-z/\-]+)\s+%>")
 
 
 def custom_formatter(prog):
@@ -668,3 +671,28 @@ def subcommand(
     data.update(kwargs)
 
     return data
+
+
+def template_readme(tpl, commands):
+    parser, subparser_index = build_parser("", "", commands)
+
+    def replacer(match):
+        keys = match.group(1).split("/")
+
+        target = get_subparser(subparser_index, keys)
+
+        if target is None:
+            raise TypeError('missing key "%s"' % "/".join(keys))
+
+        return (
+            dedent(
+                """
+                    ```
+                    %s
+                    ```
+                """
+            )
+            % target.format_help()
+        ).strip()
+
+    return re.sub(TEMPLATE_RE, replacer, tpl)
