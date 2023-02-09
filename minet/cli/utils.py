@@ -24,6 +24,29 @@ from minet.cli.exceptions import MissingColumnError, FatalError
 from minet.utils import fuzzy_int
 
 
+def with_cli_exceptions(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        try:
+            fn(*args, **kwargs)
+
+        except BrokenPipeError:
+
+            # Taken from: https://docs.python.org/3/library/signal.html
+            devnull = os.open(os.devnull, os.O_WRONLY)
+            os.dup2(devnull, sys.stdout.fileno())
+            sys.exit(1)
+
+        except KeyboardInterrupt:
+            # Leaving loading bars to avoid duplication
+            cleanup_loading_bars()
+
+            # Exiting right now to avoid stack frames
+            sys.exit(1)
+
+    return wrapper
+
+
 def get_stdin_status():
     mode = os.fstat(sys.stdin.fileno()).st_mode
 
