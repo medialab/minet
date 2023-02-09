@@ -13,8 +13,7 @@ from glob import iglob
 from os.path import join, expanduser, isfile, relpath
 from collections import namedtuple
 from collections.abc import Mapping
-from contextlib import contextmanager
-from functools import wraps
+from functools import wraps, partial
 from tqdm import tqdm
 from ebbe import noop, format_seconds
 
@@ -45,8 +44,22 @@ def was_piped_something():
     return get_stdin_status() != "terminal" and not is_stdin_empty()
 
 
-def print_err(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
+def format_polymorphic_message(*args, sep=" "):
+    return sep.join(
+        str(item)
+        if not isinstance(item, list)
+        else "\n".join(str(subitem) for subitem in item)
+        for item in args
+    )
+
+
+def better_and_tqdm_aware_print(*args, file=sys.stdout, sep=" ", end="\n"):
+    msg = format_polymorphic_message(*args)
+    tqdm.write(msg, file=file, end=end)
+
+
+print_out = partial(better_and_tqdm_aware_print, file=sys.stdout)
+print_err = partial(better_and_tqdm_aware_print, file=sys.stderr)
 
 
 def die(msg=None):
@@ -133,8 +146,7 @@ class LoadingBar(tqdm):
         return self.update_stats()
 
     def print(self, *args, end="\n"):
-        msg = " ".join(str(arg) for arg in args)
-        self.write(msg, file=sys.stderr, end=end)
+        self.write(format_polymorphic_message(*args), file=sys.stderr, end=end)
 
     def close(self):
         super().close()
@@ -143,17 +155,6 @@ class LoadingBar(tqdm):
     def die(self, msg):
         self.close()
         die(msg)
-
-
-@contextmanager
-def print_as_tqdm_write():
-    original_print = __builtins__.print
-
-    try:
-        __builtins__.print = tqdm.write
-        yield
-    finally:
-        __builtins__.print = original_print
 
 
 def acquire_cross_platform_stdout():
