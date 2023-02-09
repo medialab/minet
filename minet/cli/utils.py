@@ -16,7 +16,6 @@ from collections.abc import Mapping
 from contextlib import contextmanager
 from functools import wraps
 from tqdm import tqdm
-from tqdm.contrib import DummyTqdmFile
 from ebbe import noop, format_seconds
 
 from minet.web import (
@@ -147,18 +146,14 @@ class LoadingBar(tqdm):
 
 
 @contextmanager
-def tqdm_stdout_stderr():
-    original_stdout = sys.stdout
-    original_stderr = sys.stderr
+def print_as_tqdm_write():
+    original_print = __builtins__.print
 
     try:
-        sys.stdout = DummyTqdmFile(original_stdout)
-        sys.stderr = DummyTqdmFile(original_stderr)
-
-        yield original_stdout, original_stderr
+        __builtins__.print = tqdm.write
+        yield
     finally:
-        sys.stdout = original_stdout
-        sys.stderr = original_stderr
+        __builtins__.print = original_print
 
 
 def acquire_cross_platform_stdout():
