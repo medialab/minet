@@ -13,7 +13,7 @@ casanova==0.19.2
 charset-normalizer==3.0.1
 colorama==0.4.6
 dateparser==1.1.6
-ebbe==1.9.0
+ebbe==1.10.0
 json5==0.9.11
 keyring<19.3
 lxml==4.9.2

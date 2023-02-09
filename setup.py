@@ -30,7 +30,7 @@ setup(
         "charset-normalizer>=3,<4",
         "colorama>=0.4.0",
         "dateparser>=1.1.1",
-        "ebbe>=1.9.0,<2",
+        "ebbe>=1.10.0,<2",
         "json5>=0.8.5",
         "keyring<19.3",
         "lxml>=4.3.0",
