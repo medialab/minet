@@ -1,5 +1,4 @@
 from casanova import ThreadSafeResumer
-from ural import is_url
 
 from minet.cli.argparse import command, BooleanAction
 from minet.cli.constants import DEFAULT_CONTENT_FOLDER
@@ -127,11 +126,7 @@ FETCH_COMMAND = command(
     resumer=ThreadSafeResumer,
     select=True,
     total=True,
-    variadic_input={
-        "dummy_column": "url",
-        "guard": is_url,
-        "guard_error_message": "single argument is expected to be a valid url!",
-    },
+    variadic_input={"dummy_column": "url"},
     arguments=[
         *COMMON_ARGUMENTS,
         {
@@ -215,11 +210,7 @@ RESOLVE_COMMAND = command(
     resumer=ThreadSafeResumer,
     select=True,
     total=True,
-    variadic_input={
-        "dummy_column": "url",
-        "guard": is_url,
-        "guard_error_message": "single argument is expected to be a valid url!",
-    },
+    variadic_input={"dummy_column": "url"},
     arguments=[
         *COMMON_ARGUMENTS,
         {
