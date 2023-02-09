@@ -15,13 +15,11 @@ from os.path import join, expanduser, isfile, relpath
 from collections import namedtuple
 from collections.abc import Mapping
 from functools import wraps, partial
+from datetime import datetime
+from logging import Handler
 from tqdm import tqdm
 from ebbe import noop, format_seconds
 
-from minet.web import (
-    register_global_request_retryer_before_sleep,
-    reset_global_request_retryer_before_sleep,
-)
 from minet.cli.exceptions import MissingColumnError, FatalError
 from minet.utils import fuzzy_int
 
@@ -87,27 +85,29 @@ def safe_index(l, e):
         return None
 
 
-def register_retryer_logger(print_fn=print_err):
-    def callback(retry_state):
-        exc = retry_state.outcome.exception()
-        pretty_time = format_seconds(retry_state.idle_for, max_items=2)
+class CLIRetryerHandler(Handler):
+    def emit(self, record):
+        if record.source == "request_retryer":
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            exc = record.exception
+            pretty_time = format_seconds(record.sleep_time)
 
-        exc_name = "%s.%s" % (exc.__class__.__module__, exc.__class__.__name__)
+            exc_name = "%s.%s" % (exc.__class__.__module__, exc.__class__.__name__)
+            exc_msg = str(exc)
 
-        exc_msg = str(exc)
+            msg = "\n".join(
+                [
+                    "%s" % now,
+                    "Will now wait for %s because of following exception:"
+                    % pretty_time,
+                    ("%s (%s)" % (exc_name, exc_msg)) if exc_msg else exc_name,
+                    "",
+                ]
+            )
 
-        msg = "\n".join(
-            [
-                "Failed attempt because of following exception:",
-                ("%s (%s)" % (exc_name, exc_msg)) if exc_msg else exc_name,
-                "Will wait for %s before attempting again." % pretty_time,
-                "",
-            ]
-        )
-
-        print_fn(msg)
-
-    register_global_request_retryer_before_sleep(callback)
+            print_err(msg)
+        else:
+            raise NotImplementedError
 
 
 class LoadingBar(tqdm):
@@ -127,8 +127,6 @@ class LoadingBar(tqdm):
             kwargs["unit"] = unit
 
         super().__init__(desc=desc, total=total, **kwargs)
-
-        register_retryer_logger(self.print)
 
     def update_total(self, total):
         self.total = total
@@ -151,7 +149,6 @@ class LoadingBar(tqdm):
 
     def close(self):
         super().close()
-        reset_global_request_retryer_before_sleep()
 
     def die(self, msg):
         self.close()
@@ -348,10 +345,7 @@ def with_enricher_and_loading_bar(headers, desc, unit=None, multiplex=None):
                 cli_args, headers=headers, desc=desc, unit=unit, multiplex=multiplex
             )
 
-            additional_kwargs = {
-                'enricher': enricher,
-                'loading_bar': loading_bar
-            }
+            additional_kwargs = {"enricher": enricher, "loading_bar": loading_bar}
 
             return action(cli_args, *args, **additional_kwargs, **kwargs)
 

@@ -1,10 +1,10 @@
 from tenacity import (
     Retrying,
-    wait_random_exponential,
     retry_if_exception_type,
     stop_after_attempt,
 )
 from tenacity.wait import wait_base
+from minet.web import request_retryer_custom_exponential_backoff
 from ebbe import format_seconds
 
 
@@ -34,12 +34,11 @@ def wait_predicate(retry_state):
 
 
 def debug(retry_state):
-    print("Will wait for %s" % format_seconds(retry_state.idle_for))
+    print("Will wait for %s" % format_seconds(retry_state.next_action.sleep))
 
 
 retryer = Retrying(
-    wait=wait_random_exponential(exp_base=6, min=10, max=3 * 60 * 60)
-    + wait_if(wait_predicate),
+    wait=request_retryer_custom_exponential_backoff(exp_base=4),
     retry=retry_if_exception_type(exception_types=RuntimeError),
     before=before,
     stop=stop_after_attempt(9),

@@ -7,6 +7,7 @@
 import re
 import cgi
 import certifi
+import random
 from datetime import datetime
 import browser_cookie3
 import urllib3
@@ -22,15 +23,17 @@ from urllib3 import HTTPResponse
 from urllib3.exceptions import HTTPError
 from urllib3.util.ssl_ import create_urllib3_context
 from urllib.request import Request
+from ebbe import rcompose, noop
 from tenacity import (
     Retrying,
-    wait_random_exponential,
     retry_if_exception_type,
     retry_if_exception,
     stop_after_attempt,
 )
+from tenacity.wait import wait_base
 
 from minet.encodings import is_supported_encoding
+from minet.loggers import sleepers_logger
 from minet.utils import is_binary_mimetype
 from minet.exceptions import (
     RedirectError,
@@ -751,41 +754,51 @@ def request_text(url, pool=DEFAULT_POOL, *args, encoding="utf-8", **kwargs):
     return response, response.data.decode(encoding)
 
 
-THREE_HOURS = 3 * 60 * 60
-GLOBAL_RETRYER_BEFORE_SLEEP = None
+ONE_DAY = 24 * 60 * 60
 
 
-def register_global_request_retryer_before_sleep(callback):
-    global GLOBAL_RETRYER_BEFORE_SLEEP
+def log_request_retryer_before_sleep(retry_state):
+    if not retry_state.outcome.failed:
+        raise NotImplementedError
 
-    if not callable(callback):
-        raise TypeError
+    exception = retry_state.outcome.exception()
 
-    GLOBAL_RETRYER_BEFORE_SLEEP = callback
+    sleepers_logger.warn(
+        "request_retryer starts sleeping",
+        extra={
+            "source": "request_retryer",
+            "retry_state": retry_state,
+            "exception": exception,
+            "sleep_time": retry_state.next_action.sleep,
+        },
+    )
 
 
-def reset_global_request_retryer_before_sleep():
-    global GLOBAL_RETRYER_BEFORE_SLEEP
+class request_retryer_custom_exponential_backoff(wait_base):
+    def __init__(self, min=10, max=ONE_DAY, exp_base=4) -> None:
+        self.min = min
+        self.max = max
+        self.exp_base = exp_base
 
-    GLOBAL_RETRYER_BEFORE_SLEEP = None
+    def __call__(self, retry_state):
+        # NOTE: we add/subtract randomly up to 1/4 of expected sleep time
+        jitter = 0.5 - random.random()
 
+        try:
+            exp = self.exp_base ** (retry_state.attempt_number - 1)
+            result = self.min * exp
+            result += result / 2 * jitter
+        except OverflowError:
+            result = self.max
 
-def wrap_before_sleep_callback_with_global_hook(callback):
-    def chain(*args, **kwargs):
-        if GLOBAL_RETRYER_BEFORE_SLEEP is not None:
-            GLOBAL_RETRYER_BEFORE_SLEEP(*args, **kwargs)
-
-        if callback is not None:
-            callback(*args, **kwargs)
-
-    return chain
+        return max(0, min(result, self.max))
 
 
 def create_request_retryer(
     min=10,
-    max=THREE_HOURS,
+    max=ONE_DAY,
     max_attempts=9,
-    before_sleep=None,
+    before_sleep=noop,
     additional_exceptions=None,
     predicate=None,
 ):
@@ -801,8 +814,6 @@ def create_request_retryer(
         for exc in additional_exceptions:
             retryable_exception_types.append(exc)
 
-    before_sleep_chain = wrap_before_sleep_callback_with_global_hook(before_sleep)
-
     retry_condition = retry_if_exception_type(
         exception_types=tuple(retryable_exception_types)
     )
@@ -811,10 +822,10 @@ def create_request_retryer(
         retry_condition |= retry_if_exception(predicate)
 
     return Retrying(
-        wait=wait_random_exponential(exp_base=6, min=min, max=max),
+        wait=request_retryer_custom_exponential_backoff(min=min, max=max),
         retry=retry_condition,
         stop=stop_after_attempt(max_attempts),
-        before_sleep=before_sleep_chain,
+        before_sleep=rcompose(log_request_retryer_before_sleep, before_sleep),
     )
 
 

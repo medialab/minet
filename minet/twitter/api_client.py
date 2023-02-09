@@ -37,7 +37,6 @@ class TwitterAPIClient(object):
         api_key,
         api_secret_key,
         api_version="1.1",
-        before_sleep=None,
     ):
         self.wrapper = TwitterWrapper(
             access_token,
@@ -46,9 +45,7 @@ class TwitterAPIClient(object):
             api_secret_key,
             api_version=api_version,
         )
-        self.retryer = create_request_retryer(
-            before_sleep=before_sleep, predicate=retryer_predicate
-        )
+        self.retryer = create_request_retryer(predicate=retryer_predicate)
 
     @retrying_method()
     def call(self, *args, **kwargs):

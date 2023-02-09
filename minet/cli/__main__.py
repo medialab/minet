@@ -22,12 +22,13 @@ from encodings import idna  # NOTE: this is necessary for pyinstaller build
 
 from minet.__version__ import __version__
 from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
+from minet.loggers import sleepers_logger
 from minet.cli.utils import (
     die,
     get_rcfile,
     print_err,
     cleanup_loading_bars,
-    register_retryer_logger,
+    CLIRetryerHandler,
 )
 from minet.cli.argparse import resolve_arg_dependencies
 from minet.cli.exceptions import NotResumableError, InvalidArgumentsError, FatalError
@@ -220,8 +221,6 @@ def run():
             for buffer in to_close:
                 stack.callback(buffer.close)
 
-            register_retryer_logger()
-
             try:
                 fn(cli_args)
             except InvalidArgumentsError as e:
@@ -261,6 +260,9 @@ def main():
     # Casanova global defaults
     casanova.set_default_prebuffer_bytes(DEFAULT_PREBUFFER_BYTES)
     casanova.set_default_ignore_null_bytes(True)
+
+    # Adding handlers for sleepers
+    sleepers_logger.addHandler(CLIRetryerHandler())
 
     try:
         run()

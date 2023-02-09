@@ -31,7 +31,7 @@ from minet.crowdtangle.summary import crowdtangle_summary
 
 
 class CrowdTangleAPIClient(object):
-    def __init__(self, token, rate_limit=None, before_sleep=None):
+    def __init__(self, token, rate_limit=None):
         if rate_limit is None:
             rate_limit = CROWDTANGLE_DEFAULT_RATE_LIMIT
             summary_rate_limit = CROWDTANGLE_LINKS_DEFAULT_RATE_LIMIT
@@ -46,8 +46,7 @@ class CrowdTangleAPIClient(object):
         )
         self.pool = create_pool(timeout=CROWDTANGLE_DEFAULT_TIMEOUT)
         self.retryer = create_request_retryer(
-            additional_exceptions=[CrowdTangleInvalidJSONError, CrowdTangleServerError],
-            before_sleep=before_sleep,
+            additional_exceptions=[CrowdTangleInvalidJSONError, CrowdTangleServerError]
         )
 
     @retrying_method()
