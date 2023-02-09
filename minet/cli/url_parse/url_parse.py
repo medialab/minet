@@ -4,7 +4,6 @@
 #
 # Logic of the `url-parse` action.
 #
-import casanova
 from ural import (
     is_url,
     is_shortened_url,
@@ -34,7 +33,7 @@ from ural.youtube import (
 )
 from ural.twitter import parse_twitter_url, TwitterTweet, TwitterUser
 
-from minet.cli.utils import LoadingBar
+from minet.cli.utils import with_enricher_and_loading_bar
 
 REPORT_HEADERS = [
     "normalized_url",
@@ -157,31 +156,28 @@ def extract_twitter_addendum(url):
         raise TypeError("unknown twitter parse result type!")
 
 
-def action(cli_args):
-    headers = REPORT_HEADERS
-
+def get_headers(cli_args):
     if cli_args.facebook:
-        headers = FACEBOOK_REPORT_HEADERS
+        return FACEBOOK_REPORT_HEADERS
     elif cli_args.youtube:
-        headers = YOUTUBE_REPORT_HEADERS
+        return YOUTUBE_REPORT_HEADERS
     elif cli_args.twitter:
-        headers = TWITTER_REPORT_HEADERS
+        return TWITTER_REPORT_HEADERS
 
-    multiplex = None
+    return REPORT_HEADERS
 
+
+def get_multiplex(cli_args):
     if cli_args.separator is not None:
-        multiplex = (cli_args.column, cli_args.separator)
+        return (cli_args.column, cli_args.separator)
 
-    enricher = casanova.enricher(
-        cli_args.file,
-        cli_args.output,
-        add=headers,
-        keep=cli_args.select,
-        multiplex=multiplex,
-    )
+    return None
 
-    loading_bar = LoadingBar(desc="Parsing", unit="row", total=cli_args.total)
 
+@with_enricher_and_loading_bar(
+    headers=get_headers, desc="Parsing", unit="row", multiplex=get_multiplex
+)
+def action(cli_args, enricher, loading_bar):
     for row, url in enricher.cells(cli_args.column, with_rows=True):
         loading_bar.update()
 

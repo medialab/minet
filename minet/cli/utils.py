@@ -9,6 +9,7 @@ import sys
 import stat
 import yaml
 import platform
+import casanova
 from glob import iglob
 from os.path import join, expanduser, isfile, relpath
 from collections import namedtuple
@@ -295,11 +296,11 @@ def with_fatal_errors(mapping_or_hook):
     if not isinstance(mapping_or_hook, Mapping) and not callable(mapping_or_hook):
         raise TypeError("Expecting mapping or callable")
 
-    def decorate(fn):
-        @wraps(fn)
+    def decorate(action):
+        @wraps(action)
         def wrapper(*args, **kwargs):
             try:
-                return fn(*args, **kwargs)
+                return action(*args, **kwargs)
             except Exception as e:
                 msg = None
 
@@ -312,6 +313,47 @@ def with_fatal_errors(mapping_or_hook):
                     raise FatalError(msg)
 
                 raise e
+
+        return wrapper
+
+    return decorate
+
+
+def get_enricher_and_loading_bar(cli_args, headers, desc, unit=None, multiplex=None):
+    if callable(headers):
+        headers = headers(cli_args)
+
+    if callable(multiplex):
+        multiplex = multiplex(cli_args)
+
+    enricher = casanova.enricher(
+        cli_args.file,
+        cli_args.output,
+        add=headers,
+        keep=cli_args.select,
+        total=getattr(cli_args, "total", None),
+        multiplex=multiplex,
+    )
+
+    loading_bar = LoadingBar(desc=desc, unit=unit, total=enricher.total)
+
+    return enricher, loading_bar
+
+
+def with_enricher_and_loading_bar(headers, desc, unit=None, multiplex=None):
+    def decorate(action):
+        @wraps(action)
+        def wrapper(cli_args, *args, **kwargs):
+            enricher, loading_bar = get_enricher_and_loading_bar(
+                cli_args, headers=headers, desc=desc, unit=unit, multiplex=multiplex
+            )
+
+            additional_kwargs = {
+                'enricher': enricher,
+                'loading_bar': loading_bar
+            }
+
+            return action(cli_args, *args, **additional_kwargs, **kwargs)
 
         return wrapper
 
