@@ -27,14 +27,7 @@ def action(cli_args):
 
     loading_bar = LoadingBar("Retrieving comments", unit="comment", stats={"videos": 0})
 
-    def before_sleep_until_midnight(seconds):
-        loading_bar.print(
-            "API limits reached. Will now wait until midnight Pacific time!"
-        )
-
-    client = YouTubeAPIClient(
-        cli_args.key, before_sleep_until_midnight=before_sleep_until_midnight
-    )
+    client = YouTubeAPIClient(cli_args.key)
 
     for row, video in enricher.cells(cli_args.column, with_rows=True):
         generator = client.comments(video)
@@ -45,15 +38,19 @@ def action(cli_args):
                 enricher.writerow(row, comment.as_csv_row())
 
             loading_bar.inc("videos")
+
         except YouTubeDisabledCommentsError:
             loading_bar.print(
                 "\nYouTube disabled the comments for this video: %s" % video
             )
+
         except YouTubeVideoNotFoundError:
             loading_bar.print("\nThis YouTube video can't be found: %s" % video)
+
         except YouTubeExclusiveMemberError:
             loading_bar.print(
                 "\nThis video is reserved for exclusive members: %s" % video
             )
+
         except YouTubeUnknown403Error:
             loading_bar.print("\nAn unknown 403 error has occured: %s" % video)

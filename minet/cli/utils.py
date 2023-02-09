@@ -87,27 +87,26 @@ def safe_index(l, e):
 
 class CLIRetryerHandler(Handler):
     def emit(self, record):
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
         if record.source == "request_retryer":
-            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             exc = record.exception
             pretty_time = format_seconds(record.sleep_time)
 
             exc_name = "%s.%s" % (exc.__class__.__module__, exc.__class__.__name__)
             exc_msg = str(exc)
 
-            msg = "\n".join(
-                [
-                    "%s" % now,
-                    "Will now wait for %s because of following exception:"
-                    % pretty_time,
-                    ("%s (%s)" % (exc_name, exc_msg)) if exc_msg else exc_name,
-                    "",
-                ]
-            )
+            msg = [
+                "%s" % now,
+                "Will now wait for %s because of following exception:" % pretty_time,
+                ("%s (%s)" % (exc_name, exc_msg)) if exc_msg else exc_name,
+                "",
+            ]
 
-            print_err(msg)
         else:
-            raise NotImplementedError
+            msg = ["%s" % now, record.msg, ""]
+
+        print_err(msg)
 
 
 class LoadingBar(tqdm):

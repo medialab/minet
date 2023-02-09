@@ -12,6 +12,7 @@ from ural import urls_from_text
 from ebbe import getpath
 
 from minet.web import create_pool, create_request_retryer, request_json, retrying_method
+from minet.loggers import sleepers_logger
 from minet.youtube.utils import (
     ensure_video_id,
     ensure_channel_id,
@@ -164,18 +165,18 @@ def get_channel_id(channel_target):
 
 
 class YouTubeAPIClient(object):
-    def __init__(self, key, before_sleep_until_midnight=None):
+    def __init__(self, key):
+
         if not isinstance(key, list):
             key = [key]
+
         self.keys = {k: True for k in key}
         self.current_key = key[0]
         self.pool = create_pool()
-        self.before_sleep = before_sleep_until_midnight
         self.retryer = create_request_retryer()
 
     @retrying_method()
     def request_json(self, url):
-
         while True:
             final_url = url + "&key=%s" % self.current_key
             response, data = request_json(final_url, pool=self.pool)
@@ -203,8 +204,13 @@ class YouTubeAPIClient(object):
                             # If all keys are exhausted, start waiting until tomorrow and reset keys
                             sleep_time = seconds_to_midnight_pacific_time() + 10
 
-                            if callable(self.before_sleep):
-                                self.before_sleep(sleep_time)
+                            sleepers_logger.warn(
+                                "YouTube API limits reached for every key. Will now wait until midnight Pacific time!",
+                                extra={
+                                    "source": "YouTubeAPIClient",
+                                    "sleep_time": 1,
+                                },
+                            )
 
                             time.sleep(sleep_time)
 

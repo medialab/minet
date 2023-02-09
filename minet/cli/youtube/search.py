@@ -22,14 +22,7 @@ def action(cli_args):
 
     loading_bar = LoadingBar("Searching videos", unit="video")
 
-    def before_sleep_until_midnight(seconds):
-        loading_bar.print(
-            "API limits reached. Will now wait until midnight Pacific time!"
-        )
-
-    client = YouTubeAPIClient(
-        cli_args.key, before_sleep_until_midnight=before_sleep_until_midnight
-    )
+    client = YouTubeAPIClient(cli_args.key)
 
     for row, query in enricher.cells(cli_args.column, with_rows=True):
         loading_bar.print('Searching for "%s"' % query)

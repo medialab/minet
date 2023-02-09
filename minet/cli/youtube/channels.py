@@ -25,14 +25,7 @@ def action(cli_args):
         desc="Retrieving meta", unit="channel", total=cli_args.total
     )
 
-    def before_sleep_until_midnight(seconds):
-        loading_bar.print(
-            "API limits reached. Will now wait until midnight Pacific time!"
-        )
-
-    client = YouTubeAPIClient(
-        cli_args.key, before_sleep_until_midnight=before_sleep_until_midnight
-    )
+    client = YouTubeAPIClient(cli_args.key)
 
     iterator = enricher.cells(cli_args.column, with_rows=True)
 
