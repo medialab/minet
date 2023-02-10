@@ -1,6 +1,6 @@
 [![Build Status](https://github.com/medialab/minet/workflows/Tests/badge.svg)](https://github.com/medialab/minet/actions) [![DOI](https://zenodo.org/badge/169059797.svg)](https://zenodo.org/badge/latestdoi/169059797) [![download number](https://static.pepy.tech/badge/minet)](https://pepy.tech/project/minet)
 
-![Minet](img/minet.png)
+![Minet](docs/img/minet.png)
 
 **minet** is a webmining command line tool & library for python (>= 3.7) that can be used to collect and extract data from a large variety of web sources such as raw webpages, Facebook, CrowdTangle, YouTube, Twitter, Media Cloud etc.
 
@@ -12,61 +12,62 @@ In addition, **minet** also exposes its high-level programmatic interface as a p
 
 ## Summary
 
-* [What it does](#what-it-does)
-* [Documented use cases](#documented-use-cases)
-* [Features (from a technical standpoint)](#features-from-a-technical-standpoint)
-* [Installation](#installation)
-* [Upgrading](#upgrading)
-* [Uninstallation](#uninstallation)
-* [Documentation](#documentation)
-* [Contributing](#contributing)
-* [How to cite](#how-to-cite)
+- [What it does](#what-it-does)
+- [Documented use cases](#documented-use-cases)
+- [Features (from a technical standpoint)](#features-from-a-technical-standpoint)
+- [Installation](#installation)
+- [Upgrading](#upgrading)
+- [Uninstallation](#uninstallation)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [How to cite](#how-to-cite)
 
 ## What it does
 
 Minet can single-handedly:
-* Extract URLs from a text file (or a table)
-* Parse URLs (get useful information, with Facebook- and Youtube-specific stuff)
-* Join two CSV files by matching the columns containing URLs
-* From a list of URLs, resolve their redirections
-  * ...and check their HTTP status
-  * ...and download the HTML
-  * ...and extract hyperlinks
-  * ...and extract the text content and other metadata (title...)
-  * ...and scrape structured data (using a declarative language to define your heuristics)
-* Crawl (using a declarative language to define a browsing behavior, and what to harvest)
-* Mine or search:
-  * *[Buzzsumo](https://buzzsumo.com/)* (requires API acess)
-  * *[Crowdtangle](https://www.crowdtangle.com/)* (requires API access)
-  * *[Mediacloud](https://mediacloud.org/)* (requires free API access)
-  * *[Twitter](https://twitter.com)* (requires free API access)
-  * *[Youtube](https://www.youtube.com/)* (requires free API access)
-* Scrape (without requiring special access, often just a user account):
-  * *[Facebook](https://www.facebook.com/)*
-  * *[Instagram](https://www.instagram.com/)*
-  * *[Telegram](https://telegram.org/)*
-  * *[TikTok](https://www.tiktok.com)*
-  * *[Twitter](https://twitter.com)*
-  * *[Google Drive](https://drive.google.com)* (spreadsheets etc.)
-* Grab & dump cookies from your browser
-* Dump *[Hyphe](https://hyphe.medialab.sciences-po.fr/)* data
+
+- Extract URLs from a text file (or a table)
+- Parse URLs (get useful information, with Facebook- and Youtube-specific stuff)
+- Join two CSV files by matching the columns containing URLs
+- From a list of URLs, resolve their redirections
+  - ...and check their HTTP status
+  - ...and download the HTML
+  - ...and extract hyperlinks
+  - ...and extract the text content and other metadata (title...)
+  - ...and scrape structured data (using a declarative language to define your heuristics)
+- Crawl (using a declarative language to define a browsing behavior, and what to harvest)
+- Mine or search:
+  - _[Buzzsumo](https://buzzsumo.com/)_ (requires API acess)
+  - _[Crowdtangle](https://www.crowdtangle.com/)_ (requires API access)
+  - _[Mediacloud](https://mediacloud.org/)_ (requires free API access)
+  - _[Twitter](https://twitter.com)_ (requires free API access)
+  - _[Youtube](https://www.youtube.com/)_ (requires free API access)
+- Scrape (without requiring special access, often just a user account):
+  - _[Facebook](https://www.facebook.com/)_
+  - _[Instagram](https://www.instagram.com/)_
+  - _[Telegram](https://telegram.org/)_
+  - _[TikTok](https://www.tiktok.com)_
+  - _[Twitter](https://twitter.com)_
+  - _[Google Drive](https://drive.google.com)_ (spreadsheets etc.)
+- Grab & dump cookies from your browser
+- Dump _[Hyphe](https://hyphe.medialab.sciences-po.fr/)_ data
 
 ## Documented use cases
 
-* [Fetching a large amount of urls](./cookbook/fetch.md)
-* [Joining 2 CSV files by urls](./cookbook/url_join.md)
-* [Using minet from a Jupyter notebook](./cookbook/notebooks/Minet%20in%20a%20Jupyter%20notebook.ipynb) (*very useful to experiment with the tool or teach students*)
-* [Downloading images associated with a given hashtag on Twitter](./cookbook/twitter_images.md)
-* [Scraping DSL Tutorial](./cookbook/scraping_dsl.md)
+- [Fetching a large amount of urls](./cookbook/fetch.md)
+- [Joining 2 CSV files by urls](./cookbook/url_join.md)
+- [Using minet from a Jupyter notebook](./cookbook/notebooks/Minet%20in%20a%20Jupyter%20notebook.ipynb) (_very useful to experiment with the tool or teach students_)
+- [Downloading images associated with a given hashtag on Twitter](./cookbook/twitter_images.md)
+- [Scraping DSL Tutorial](./cookbook/scraping_dsl.md)
 
 ## Features (from a technical standpoint)
 
-* Multithreaded, memory-efficient fetching from the web.
-* Multithreaded, scalable crawling using a comfy DSL.
-* Multiprocessed raw text content extraction from HTML pages.
-* Multiprocessed scraping from HTML pages using a comfy DSL.
-* URL-related heuristics utilities such as extraction, normalization and matching.
-* Data collection from various APIs such as [CrowdTangle](https://www.crowdtangle.com/).
+- Multithreaded, memory-efficient fetching from the web.
+- Multithreaded, scalable crawling using a comfy DSL.
+- Multiprocessed raw text content extraction from HTML pages.
+- Multiprocessed scraping from HTML pages using a comfy DSL.
+- URL-related heuristics utilities such as extraction, normalization and matching.
+- Data collection from various APIs such as [CrowdTangle](https://www.crowdtangle.com/).
 
 ## Installation
 
@@ -124,8 +125,8 @@ pip uninstall minet
 
 ## Documentation
 
-* [minet as a command line tool](./docs/cli.md)
-* [minet as a python library](./docs/lib.md)
+- [minet as a command line tool](./docs/cli.md)
+- [minet as a python library](./docs/lib.md)
 
 ## Contributing
 
