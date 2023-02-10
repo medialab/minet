@@ -134,7 +134,12 @@ YOUTUBE_SEARCH_SUBCOMMAND = youtube_api_subcommand(
     "search",
     "minet.cli.youtube.search",
     title="Youtube search",
-    description="Retrieve metadata about Youtube search field using the API.",
+    description="""
+        Search videos using the YouTube API.
+
+        Note that, even if undocumented, the API will never return
+        more than approx. 500 videos for a given query.
+    """,
     epilog="""
         example:
 
