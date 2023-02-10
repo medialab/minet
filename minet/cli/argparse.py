@@ -31,11 +31,50 @@ from minet.cli.utils import acquire_cross_platform_stdout, was_piped_something
 
 TEMPLATE_RE = re.compile(r"<%\s+([A-Za-z/\-]+)\s+%>")
 
+ARGUMENT_PREFIXES_TO_NORMALIZE = ["--dont-", "--no-", "--", "-"]
+FLAG_SORTING_PRIORITIES = {
+    "select": 1,
+    "total": 2,
+    "output": 3,
+    "resume": 4,
+    "rcfile": 5,
+    "help": 6,
+}
+
+
+def normalize_argument_name(name: str) -> str:
+    for prefix in ARGUMENT_PREFIXES_TO_NORMALIZE:
+        if name.startswith(prefix):
+            return name[len(prefix) :]
+
+    return name
+
+
+def arguments_sort_key(option_strings):
+    if not option_strings:
+        return (0, 0)
+
+    longest_name = max(option_strings, key=len)
+    longest_name = normalize_argument_name(longest_name)
+
+    # Special flags that are dragged down
+    priority = FLAG_SORTING_PRIORITIES.get(longest_name, 0)
+
+    return (priority, longest_name)
+
+
+class SortingRawTextHelpFormatter(RawTextHelpFormatter):
+    def add_arguments(self, actions) -> None:
+        actions = sorted(actions, key=lambda a: arguments_sort_key(a.option_strings))
+        return super().add_arguments(actions)
+
 
 def custom_formatter(prog):
     terminal_size = shutil.get_terminal_size()
 
-    return RawTextHelpFormatter(prog, max_help_position=50, width=terminal_size.columns)
+    return SortingRawTextHelpFormatter(
+        prog, max_help_position=50, width=terminal_size.columns
+    )
 
 
 def get_subparser(o, keys):
