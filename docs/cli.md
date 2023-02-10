@@ -2627,10 +2627,10 @@ usage: minet twitter users [-h] [--rcfile RCFILE] [--ids] [--v2]
                            [-s SELECT] [--total TOTAL] [--resume] [-o OUTPUT]
                            column [file]
 
-Minet Twitter Friends Command
-=============================
+Minet Twitter Users Command
+===========================
 
-Retrieve friends, i.e. followed users, of given user.
+Retrieve Twitter user metadata using the API.
 
 positional arguments:
   column                                     Name of the CSV column containing Twitter users or a single Twitter user.
@@ -2653,7 +2653,7 @@ optional arguments:
 examples:
 
 . Getting friends of a list of user:
-    $ minet tw friends screen_name users.csv > friends.csv
+    $ minet tw users screen_name users.csv > data_users.csv
 
 ```
 

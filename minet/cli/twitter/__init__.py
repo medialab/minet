@@ -565,15 +565,15 @@ TWITTER_USER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
 TWITTER_USERS_SUBCOMMAND = twitter_api_subcommand(
     "users",
     "minet.cli.twitter.users",
-    title="Minet Twitter Friends Command",
+    title="Minet Twitter Users Command",
     description="""
-        Retrieve friends, i.e. followed users, of given user.
+        Retrieve Twitter user metadata using the API.
     """,
     epilog="""
         examples:
 
         . Getting friends of a list of user:
-            $ minet tw friends screen_name users.csv > friends.csv
+            $ minet tw users screen_name users.csv > data_users.csv
     """,
     resumer=RowCountResumer,
     select=True,
