@@ -15,7 +15,7 @@ from argparse import (
     ArgumentError,
     ArgumentTypeError,
     ArgumentParser,
-    RawTextHelpFormatter,
+    RawDescriptionHelpFormatter,
 )
 from gettext import gettext
 from textwrap import dedent
@@ -63,7 +63,7 @@ def arguments_sort_key(option_strings):
     return (priority, longest_name)
 
 
-class SortingRawTextHelpFormatter(RawTextHelpFormatter):
+class SortingRawTextHelpFormatter(RawDescriptionHelpFormatter):
     def add_arguments(self, actions) -> None:
         actions = sorted(actions, key=lambda a: arguments_sort_key(a.option_strings))
         return super().add_arguments(actions)
@@ -73,7 +73,7 @@ def custom_formatter(prog):
     terminal_size = shutil.get_terminal_size()
 
     return SortingRawTextHelpFormatter(
-        prog, max_help_position=50, width=terminal_size.columns
+        prog, width=terminal_size.columns, max_help_position=30
     )
 
 
@@ -736,7 +736,7 @@ def template_readme(tpl, commands):
                     ```
                 """
             )
-            % target.format_help()
+            % target.format_help().strip()
         ).strip()
 
     return re.sub(TEMPLATE_RE, replacer, tpl)

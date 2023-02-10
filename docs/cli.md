@@ -171,13 +171,17 @@ Grab cookies directly from your browsers to use them easily later
 in python scripts, for instance.
 
 positional arguments:
-  {chrome,chromium,edge,firefox,opera}  Name of the browser from which to grab cookies.
+  {chrome,chromium,edge,firefox,opera}
+                              Name of the browser from which to grab cookies.
 
 optional arguments:
-  --csv                                 Whether to format the output as CSV. If --url is set, will output the cookie's morsels as CSV.
-  --url URL                             If given, only returns full cookie header value for this url.
-  -o OUTPUT, --output OUTPUT            Path to the output file. By default, the results will be printed to stdout.
-  -h, --help                            show this help message and exit
+  --csv                       Whether to format the output as CSV. If --url is
+                              set, will output the cookie's morsels as CSV.
+  --url URL                   If given, only returns full cookie header value
+                              for this url.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  -h, --help                  show this help message and exit
 
 examples:
 
@@ -192,7 +196,6 @@ examples:
 
 . Dump cookie morsels for lemonde.fr as CSV:
     $ minet cookies firefox --url https://www.lemonde.fr --csv > morsels.csv
-
 ```
 
 ## crawl
@@ -209,20 +212,22 @@ Use multiple threads to crawl the web using minet crawling and
 scraping DSL.
 
 positional arguments:
-  crawler                                 Path to the crawler definition file.
+  crawler                     Path to the crawler definition file.
 
 optional arguments:
-  -d OUTPUT_DIR, --output-dir OUTPUT_DIR  Output directory.
-  --throttle THROTTLE                     Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
-  -o OUTPUT, --output OUTPUT              Path to the output file. By default, the results will be printed to stdout.
-  --resume                                Whether to resume an interrupted crawl.
-  -h, --help                              show this help message and exit
+  -d OUTPUT_DIR, --output-dir OUTPUT_DIR
+                              Output directory.
+  --throttle THROTTLE         Time to wait - in seconds - between 2 calls to the
+                              same domain. Defaults to 0.2.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --resume                    Whether to resume an interrupted crawl.
+  -h, --help                  show this help message and exit
 
 examples:
 
 . Running a crawler definition:
     $ minet crawl crawler.yml -d crawl-data
-
 ```
 
 ## fetch
@@ -250,37 +255,78 @@ HTTP calls and will generally write the retrieved files in a folder
 given by the user.
 
 positional arguments:
-  column                                          Name of the CSV column containing urls or a single url.
-  file                                            CSV file containing the urls.
+  column                      Name of the CSV column containing urls or a single
+                              url.
+  file                        CSV file containing the urls.
 
 optional arguments:
-  --compress                                      Whether to compress the contents.
-  --contents-in-report, --no-contents-in-report   Whether to include retrieved contents, e.g. html, directly in the report
-                                                  and avoid writing them in a separate folder. This requires to standardize
-                                                  encoding and won't work on binary formats.
-  --domain-parallelism DOMAIN_PARALLELISM         Max number of urls per domain to hit at the same time. Defaults to 1
-  -f FILENAME, --filename FILENAME                Name of the column used to build retrieved file names. Defaults to a md5 hash of final url. If the provided file names have no extension (e.g. ".jpg", ".pdf", etc.) the correct extension will be added depending on the file type.
-  --filename-template FILENAME_TEMPLATE           A template for the name of the fetched files.
-  --folder-strategy FOLDER_STRATEGY               Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. Defaults to "flat". All of the strategies are described at the end of this help.
+  --compress                  Whether to compress the contents.
+  --contents-in-report, --no-contents-in-report
+                              Whether to include retrieved contents, e.g. html,
+                              directly in the report and avoid writing them in a
+                              separate folder. This requires to standardize
+                              encoding and won't work on binary formats.
+  --domain-parallelism DOMAIN_PARALLELISM
+                              Max number of urls per domain to hit at the same
+                              time. Defaults to 1
+  -f FILENAME, --filename FILENAME
+                              Name of the column used to build retrieved file
+                              names. Defaults to a md5 hash of final url. If the
+                              provided file names have no extension (e.g.
+                              ".jpg", ".pdf", etc.) the correct extension will
+                              be added depending on the file type.
+  --filename-template FILENAME_TEMPLATE
+                              A template for the name of the fetched files.
+  --folder-strategy FOLDER_STRATEGY
+                              Name of the strategy to be used to dispatch the
+                              retrieved files into folders to alleviate issues
+                              on some filesystems when a folder contains too
+                              much files. Note that this will be applied on top
+                              of --filename-template. Defaults to "flat". All of
+                              the strategies are described at the end of this
+                              help.
   -g {chrome,chromium,edge,firefox,opera}, --grab-cookies {chrome,chromium,edge,firefox,opera}
-                                                  Whether to attempt to grab cookies from your computer's browser (supports "firefox", "chrome", "chromium", "opera" and "edge").
-  -H HEADERS, --header HEADERS                    Custom headers used with every requests.
-  --insecure                                      Whether to allow ssl errors when performing requests or not.
-  --keep-failed-contents                          Whether to keep & write contents for failed (i.e. non-200) http requests.
-  --max-redirects MAX_REDIRECTS                   Maximum number of redirections to follow before breaking. Defaults to 5.
-  -d OUTPUT_DIR, --output-dir OUTPUT_DIR          Directory where the fetched files will be written. Defaults to "downloaded".
-  -X METHOD, --request METHOD                     The http method to use. Will default to GET.
-  --separator SEPARATOR                           Character used to split the url cell in the CSV file, if this one can in fact contain multiple urls.
-  --standardize-encoding                          Whether to systematically convert retrieved text to UTF-8.
-  -t THREADS, --threads THREADS                   Number of threads to use. Defaults to 25.
-  --throttle THROTTLE                             Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
-  --timeout TIMEOUT                               Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.
-  --url-template URL_TEMPLATE                     A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.
-  -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                                   Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
-  --resume                                        Whether to resume from an aborted collection. Need -o to be set.
-  -h, --help                                      show this help message and exit
+                              Whether to attempt to grab cookies from your
+                              computer's browser (supports "firefox", "chrome",
+                              "chromium", "opera" and "edge").
+  -H HEADERS, --header HEADERS
+                              Custom headers used with every requests.
+  --insecure                  Whether to allow ssl errors when performing
+                              requests or not.
+  --keep-failed-contents      Whether to keep & write contents for failed (i.e.
+                              non-200) http requests.
+  --max-redirects MAX_REDIRECTS
+                              Maximum number of redirections to follow before
+                              breaking. Defaults to 5.
+  -d OUTPUT_DIR, --output-dir OUTPUT_DIR
+                              Directory where the fetched files will be written.
+                              Defaults to "downloaded".
+  -X METHOD, --request METHOD
+                              The http method to use. Will default to GET.
+  --separator SEPARATOR       Character used to split the url cell in the CSV
+                              file, if this one can in fact contain multiple
+                              urls.
+  --standardize-encoding      Whether to systematically convert retrieved text
+                              to UTF-8.
+  -t THREADS, --threads THREADS
+                              Number of threads to use. Defaults to 25.
+  --throttle THROTTLE         Time to wait - in seconds - between 2 calls to the
+                              same domain. Defaults to 0.2.
+  --timeout TIMEOUT           Maximum time - in seconds - to spend for each
+                              request before triggering a timeout. Defaults to
+                              ~30s.
+  --url-template URL_TEMPLATE
+                              A template for the urls to fetch. Handy e.g. if
+                              you need to build urls from ids etc.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --resume                    Whether to resume from an aborted collection. Need
+                              -o to be set.
+  -h, --help                  show this help message and exit
 
 columns being added to the output:
 
@@ -325,7 +371,6 @@ examples:
 
 . Fetching a single url, useful to pipe into `minet scrape`:
     $ minet fetch http://google.com | minet scrape ./scrape.json > scraped.csv
-
 ```
 
 ## extract
@@ -351,16 +396,25 @@ Note that this methodology mainly targets news article and may fail
 to extract relevant content from other kind of web pages.
 
 positional arguments:
-  report                               Input CSV fetch action report file.
+  report                      Input CSV fetch action report file.
 
 optional arguments:
-  -g GLOB, --glob GLOB                 Whether to extract text from a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.
-  -i INPUT_DIR, --input-dir INPUT_DIR  Directory where the HTML files are stored. Defaults to "downloaded" if --glob is not set.
-  -p PROCESSES, --processes PROCESSES  Number of processes to use. Defaults to roughly half of the available CPUs.
-  -s SELECT, --select SELECT           Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                        Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT           Path to the output file. By default, the results will be printed to stdout.
-  -h, --help                           show this help message and exit
+  -g GLOB, --glob GLOB        Whether to extract text from a bunch of html files
+                              on disk matched by a glob pattern rather than
+                              sourcing them from a CSV report.
+  -i INPUT_DIR, --input-dir INPUT_DIR
+                              Directory where the HTML files are stored.
+                              Defaults to "downloaded" if --glob is not set.
+  -p PROCESSES, --processes PROCESSES
+                              Number of processes to use. Defaults to roughly
+                              half of the available CPUs.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  -h, --help                  show this help message and exit
 
 columns being added to the output:
 
@@ -393,7 +447,6 @@ examples:
 
 . Working on a report from stdin:
     $ minet fetch url_column file.csv | minet extract > extracted.csv
-
 ```
 
 ## resolve
@@ -418,32 +471,64 @@ command outputs a CSV report with additional metadata about the
 HTTP calls and the followed redirections.
 
 positional arguments:
-  column                                          Name of the CSV column containing urls or a single url.
-  file                                            CSV file containing the urls.
+  column                      Name of the CSV column containing urls or a single
+                              url.
+  file                        CSV file containing the urls.
 
 optional arguments:
-  --canonicalize                                  Whether to extract the canonical url from the html source code of the web page if found. Requires to buffer part of the response body, so it will slow things down.
-  --domain-parallelism DOMAIN_PARALLELISM         Max number of urls per domain to hit at the same time. Defaults to 1
-  --follow-js-relocation                          Whether to follow typical JavaScript window relocation. Requires to buffer part of the response body, so it will slow things down.
-  --follow-meta-refresh                           Whether to follow meta refresh tags. Requires to buffer part of the response body, so it will slow things down.
+  --canonicalize              Whether to extract the canonical url from the html
+                              source code of the web page if found. Requires to
+                              buffer part of the response body, so it will slow
+                              things down.
+  --domain-parallelism DOMAIN_PARALLELISM
+                              Max number of urls per domain to hit at the same
+                              time. Defaults to 1
+  --follow-js-relocation      Whether to follow typical JavaScript window
+                              relocation. Requires to buffer part of the
+                              response body, so it will slow things down.
+  --follow-meta-refresh       Whether to follow meta refresh tags. Requires to
+                              buffer part of the response body, so it will slow
+                              things down.
   -g {chrome,chromium,edge,firefox,opera}, --grab-cookies {chrome,chromium,edge,firefox,opera}
-                                                  Whether to attempt to grab cookies from your computer's browser (supports "firefox", "chrome", "chromium", "opera" and "edge").
-  -H HEADERS, --header HEADERS                    Custom headers used with every requests.
-  --infer-redirection                             Whether to try to heuristically infer redirections from the urls themselves, without requiring a HTTP call.
-  --insecure                                      Whether to allow ssl errors when performing requests or not.
-  --max-redirects MAX_REDIRECTS                   Maximum number of redirections to follow before breaking. Defaults to 20.
-  --only-shortened                                Whether to only attempt to resolve urls that are probably shortened.
-  -X METHOD, --request METHOD                     The http method to use. Will default to GET.
-  --separator SEPARATOR                           Character used to split the url cell in the CSV file, if this one can in fact contain multiple urls.
-  -t THREADS, --threads THREADS                   Number of threads to use. Defaults to 25.
-  --throttle THROTTLE                             Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
-  --timeout TIMEOUT                               Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.
-  --url-template URL_TEMPLATE                     A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.
-  -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                                   Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
-  --resume                                        Whether to resume from an aborted collection. Need -o to be set.
-  -h, --help                                      show this help message and exit
+                              Whether to attempt to grab cookies from your
+                              computer's browser (supports "firefox", "chrome",
+                              "chromium", "opera" and "edge").
+  -H HEADERS, --header HEADERS
+                              Custom headers used with every requests.
+  --infer-redirection         Whether to try to heuristically infer redirections
+                              from the urls themselves, without requiring a HTTP
+                              call.
+  --insecure                  Whether to allow ssl errors when performing
+                              requests or not.
+  --max-redirects MAX_REDIRECTS
+                              Maximum number of redirections to follow before
+                              breaking. Defaults to 20.
+  --only-shortened            Whether to only attempt to resolve urls that are
+                              probably shortened.
+  -X METHOD, --request METHOD
+                              The http method to use. Will default to GET.
+  --separator SEPARATOR       Character used to split the url cell in the CSV
+                              file, if this one can in fact contain multiple
+                              urls.
+  -t THREADS, --threads THREADS
+                              Number of threads to use. Defaults to 25.
+  --throttle THROTTLE         Time to wait - in seconds - between 2 calls to the
+                              same domain. Defaults to 0.2.
+  --timeout TIMEOUT           Maximum time - in seconds - to spend for each
+                              request before triggering a timeout. Defaults to
+                              ~30s.
+  --url-template URL_TEMPLATE
+                              A template for the urls to fetch. Handy e.g. if
+                              you need to build urls from ids etc.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --resume                    Whether to resume from an aborted collection. Need
+                              -o to be set.
+  -h, --help                  show this help message and exit
 
 columns being added to the output:
 
@@ -463,7 +548,6 @@ examples:
 
 . Resolving a single url:
     $ minet resolve https://lemonde.fr
-
 ```
 
 ## scrape
@@ -486,20 +570,32 @@ of files filtered using a glob pattern.
 It will output the scraped items as a CSV file.
 
 positional arguments:
-  scraper                               Path to a scraper definition file.
-  report                                Input CSV fetch action report file.
+  scraper                     Path to a scraper definition file.
+  report                      Input CSV fetch action report file.
 
 optional arguments:
-  -f {csv,jsonl}, --format {csv,jsonl}  Output format.
-  -g GLOB, --glob GLOB                  Whether to scrape a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.
-  -i INPUT_DIR, --input-dir INPUT_DIR   Directory where the HTML files are stored. Defaults to "downloaded".
-  -p PROCESSES, --processes PROCESSES   Number of processes to use. Defaults to roughly half of the available CPUs.
-  --separator SEPARATOR                 Separator use to join lists of values when output format is CSV. Defaults to "|".
-  --strain STRAIN                       Optional CSS selector used to strain, i.e. only parse matched tags in the parsed html files in order to optimize performance.
-  --validate                            Just validate the given scraper then exit.
-  --total TOTAL                         Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT            Path to the output file. By default, the results will be printed to stdout.
-  -h, --help                            show this help message and exit
+  -f {csv,jsonl}, --format {csv,jsonl}
+                              Output format.
+  -g GLOB, --glob GLOB        Whether to scrape a bunch of html files on disk
+                              matched by a glob pattern rather than sourcing
+                              them from a CSV report.
+  -i INPUT_DIR, --input-dir INPUT_DIR
+                              Directory where the HTML files are stored.
+                              Defaults to "downloaded".
+  -p PROCESSES, --processes PROCESSES
+                              Number of processes to use. Defaults to roughly
+                              half of the available CPUs.
+  --separator SEPARATOR       Separator use to join lists of values when output
+                              format is CSV. Defaults to "|".
+  --strain STRAIN             Optional CSS selector used to strain, i.e. only
+                              parse matched tags in the parsed html files in
+                              order to optimize performance.
+  --validate                  Just validate the given scraper then exit.
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  -h, --help                  show this help message and exit
 
 examples:
 
@@ -523,7 +619,6 @@ examples:
 
 . Using a strainer to optimize performance:
     $ minet scraper links-scraper.yml --strain "a[href]" report.csv > links.csv
-
 ```
 
 ## url-extract
@@ -546,9 +641,12 @@ positional arguments:
 optional arguments:
   --base-url BASE_URL         Base url used to resolve relative urls.
   --from {html,text}          Extract urls from which kind of source?
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
   -h, --help                  show this help message and exit
 
 examples:
@@ -558,7 +656,6 @@ examples:
 
 . Extracting urls from a html column:
     $ minet url-extract html --from html posts.csv > urls.csv
-
 ```
 
 ## url-join
@@ -576,18 +673,23 @@ works by indexing the first file's urls in a specialized
 URL trie to match them with the second file's urls.
 
 positional arguments:
-  column1                                         Name of the column containing urls in the indexed file.
-  file1                                           Path to the file to index.
-  column2                                         Name of the column containing urls in the second file.
-  file2                                           Path to the second file.
+  column1                     Name of the column containing urls in the indexed
+                              file.
+  file1                       Path to the file to index.
+  column2                     Name of the column containing urls in the second
+                              file.
+  file2                       Path to the second file.
 
 optional arguments:
   -p MATCH_COLUMN_PREFIX, --match-column-prefix MATCH_COLUMN_PREFIX
-                                                  Optional prefix to add to the first file's column names to avoid conflicts.
-  --separator SEPARATOR                           Split indexed url column by a separator?
-  -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
-  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
-  -h, --help                                      show this help message and exit
+                              Optional prefix to add to the first file's column
+                              names to avoid conflicts.
+  --separator SEPARATOR       Split indexed url column by a separator?
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  -h, --help                  show this help message and exit
 
 examples:
 
@@ -596,7 +698,6 @@ examples:
 
 . Keeping only some columns from first file:
     $ minet url-join url webentities.csv post_url posts.csv -s url,id > joined.csv
-
 ```
 
 ## url-parse
@@ -620,38 +721,77 @@ library to extract useful information about them such as their
 normalized version, domain name, etc.
 
 positional arguments:
-  column                                          Name of the CSV column containing urls or a single url.
-  file                                            CSV file containing the urls.
+  column                      Name of the CSV column containing urls or a single
+                              url.
+  file                        CSV file containing the urls.
 
 optional arguments:
-  --facebook                                      Whether to consider and parse the given urls as coming from Facebook.
+  --facebook                  Whether to consider and parse the given urls as
+                              coming from Facebook.
   --fix-common-mistakes, --dont-fix-common-mistakes
-                                                  Whether or not to attempt to fix common URL mistakes when normalizing url. Defaults to fix common mistakes.
-  --infer-redirection, --dont-infer-redirection   Whether or not to attempt resolving common redirects by leveraging well-known GET parameters when normalizing url. Defaults to infer redirection.
-  --normalize-amp, --dont-normalize-amp           Whether or not to attempt to normalize Google AMP urls when normalizing url. Defaults to normalize amp.
-  --quoted, --no-quoted                           Whether or not to normalize to a quoted or unquoted version of the url when normalizing url. Defaults to quoted.
-  --separator SEPARATOR                           Split url column by a separator?
-  --sort-query, --dont-sort-query                 Whether or not to sort query items when normalizing url. Defaults to sort query.
+                              Whether or not to attempt to fix common URL
+                              mistakes when normalizing url. Defaults to fix
+                              common mistakes.
+  --infer-redirection, --dont-infer-redirection
+                              Whether or not to attempt resolving common
+                              redirects by leveraging well-known GET parameters
+                              when normalizing url. Defaults to infer
+                              redirection.
+  --normalize-amp, --dont-normalize-amp
+                              Whether or not to attempt to normalize Google AMP
+                              urls when normalizing url. Defaults to normalize
+                              amp.
+  --quoted, --no-quoted       Whether or not to normalize to a quoted or
+                              unquoted version of the url when normalizing url.
+                              Defaults to quoted.
+  --separator SEPARATOR       Split url column by a separator?
+  --sort-query, --dont-sort-query
+                              Whether or not to sort query items when
+                              normalizing url. Defaults to sort query.
   --strip-authentication, --dont-strip-authentication
-                                                  Whether or not to strip authentication when normalizing url. Defaults to strip authentication.
+                              Whether or not to strip authentication when
+                              normalizing url. Defaults to strip authentication.
   --strip-fragment, --dont-strip-fragment, --strip-fragment-except-routing
-                                                  Whether or not to strip the url's fragment when normalizing url. If set to `--strip-fragment-except-routing`, will only strip the fragment if the fragment is not deemed to be js routing (i.e. if it contains a `/`). Defaults to strip fragment except routing.
-  --strip-index, --dont-strip-index               Whether or not to strip trailing index when normalizing url. Defaults to strip index.
+                              Whether or not to strip the url's fragment when
+                              normalizing url. If set to `--strip-fragment-
+                              except-routing`, will only strip the fragment if
+                              the fragment is not deemed to be js routing (i.e.
+                              if it contains a `/`). Defaults to strip fragment
+                              except routing.
+  --strip-index, --dont-strip-index
+                              Whether or not to strip trailing index when
+                              normalizing url. Defaults to strip index.
   --strip-irrelevant-subdomains, --dont-strip-irrelevant-subdomains
-                                                  Whether or not to strip trailing irrelevant-subdomains such as `www` etc. when normalizing url. Defaults to no strip irrelevantsubdomains.
+                              Whether or not to strip trailing irrelevant-
+                              subdomains such as `www` etc. when normalizing
+                              url. Defaults to no strip irrelevantsubdomains.
   --strip-lang-query-items, --dont-strip-lang-query-items
-                                                  Whether or not to strip language query items (ex: `gl=pt_BR`) when normalizing url. Defaults to no strip lang query items.
+                              Whether or not to strip language query items (ex:
+                              `gl=pt_BR`) when normalizing url. Defaults to no
+                              strip lang query items.
   --strip-lang-subdomains, --dont-strip-lang-subdomains
-                                                  Whether or not to strip language subdomains (ex: `fr-FR.lemonde.fr` to only `lemonde.fr` because `fr-FR` isn't a relevant subdomain, it indicates the language and the country) when normalizing url. Defaults to no strip lang subdomains.
-  --strip-protocol, --dont-strip-protocol         Whether or not to strip the protocol when normalizing the url. Defaults to strip protocol.
+                              Whether or not to strip language subdomains (ex:
+                              `fr-FR.lemonde.fr` to only `lemonde.fr` because
+                              `fr-FR` isn't a relevant subdomain, it indicates
+                              the language and the country) when normalizing
+                              url. Defaults to no strip lang subdomains.
+  --strip-protocol, --dont-strip-protocol
+                              Whether or not to strip the protocol when
+                              normalizing the url. Defaults to strip protocol.
   --strip-trailing-slash, --dont-strip-trailing-slash
-                                                  Whether or not to trailing slash when normalizing url. Defaults to strip trailing slash.
-  --twitter                                       Whether to consider and parse the given urls as coming from Twitter.
-  --youtube                                       Whether to consider and parse the given urls as coming from YouTube.
-  -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                                   Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
-  -h, --help                                      show this help message and exit
+                              Whether or not to trailing slash when normalizing
+                              url. Defaults to strip trailing slash.
+  --twitter                   Whether to consider and parse the given urls as
+                              coming from Twitter.
+  --youtube                   Whether to consider and parse the given urls as
+                              coming from YouTube.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  -h, --help                  show this help message and exit
 
 columns being added to the output:
 
@@ -713,7 +853,6 @@ examples:
 
 . Parsing Twitter urls:
     $ minet url-parse url tweets.csv --twitter > report.csv
-
 ```
 
 ## BuzzSumo
@@ -728,13 +867,17 @@ Minet Buzzsumo Command
 Gather data from the BuzzSumo APIs easily and efficiently.
 
 optional arguments:
-  -t TOKEN, --token TOKEN        BuzzSumo API token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
-  --rcfile RCFILE                Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                     show this help message and exit
+  -t TOKEN, --token TOKEN     BuzzSumo API token. Can also be configured in a
+                              .minetrc file as "buzzsumo.token" or read from the
+                              MINET_BUZZSUMO_TOKEN env variable.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 subcommands:
-  {limit,domain,domain-summary}  Subcommand to use.
-
+  {limit,domain,domain-summary}
+                              Subcommand to use.
 ```
 
 <h3 id="buzzsumo-limit">limit</h3>
@@ -749,16 +892,20 @@ Call BuzzSumo for a given request and return the remaining number
 of calls for this month contained in the request's headers.
 
 optional arguments:
-  -t TOKEN, --token TOKEN     BuzzSumo API token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  -t TOKEN, --token TOKEN     BuzzSumo API token. Can also be configured in a
+                              .minetrc file as "buzzsumo.token" or read from the
+                              MINET_BUZZSUMO_TOKEN env variable.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
 
 . Returning the remaining number of calls for this month:
     $ minet bz limit --token YOUR_TOKEN
-
 ```
 
 <h3 id="buzzsumo-domain-summary">domain-summary</h3>
@@ -777,16 +924,25 @@ Gather information about the quantity of articles crawled by BuzzSumo for certai
 Inform the user about the number of calls (corresponding to the number of pages) needed to request BuzzSumo about those domain names.
 
 positional arguments:
-  column                      Name of the CSV column containing domain names or a single domain name.
+  column                      Name of the CSV column containing domain names or
+                              a single domain name.
   file                        CSV file containing the domain names.
 
 optional arguments:
-  --begin-date BEGIN_DATE     The date you wish to fetch articles from. UTC date should have the following format : YYYY-MM-DD
-  --end-date END_DATE         The date you wish to fetch articles to. UTC date should have the following format : YYYY-MM-DD
-  -t TOKEN, --token TOKEN     BuzzSumo API token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  --begin-date BEGIN_DATE     The date you wish to fetch articles from. UTC date
+                              should have the following format : YYYY-MM-DD
+  --end-date END_DATE         The date you wish to fetch articles to. UTC date
+                              should have the following format : YYYY-MM-DD
+  -t TOKEN, --token TOKEN     BuzzSumo API token. Can also be configured in a
+                              .minetrc file as "buzzsumo.token" or read from the
+                              MINET_BUZZSUMO_TOKEN env variable.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
@@ -796,7 +952,6 @@ examples:
 
 . Returning the number of articles and pages found in BuzzSumo for a list of domain names in a CSV:
     $ minet bz domain-summary domain_name domain_names.csv --begin-date 2020-01-01 --end-date 2021-06-15 --token YOUR_TOKEN  > domain_name_summary.csv
-
 ```
 
 <h3 id="buzzsumo-domain">domain</h3>
@@ -815,16 +970,25 @@ Gather social media information about all the articles crawled by BuzzSumo for o
 The link to the official documentation: https://developers.buzzsumo.com/reference/articles.
 
 positional arguments:
-  column                      Name of the CSV column containing domain names or a single domain name.
+  column                      Name of the CSV column containing domain names or
+                              a single domain name.
   file                        CSV file containing the domain names.
 
 optional arguments:
-  --begin-date BEGIN_DATE     The date you wish to fetch articles from. UTC date should have the following format : YYYY-MM-DD
-  --end-date END_DATE         The date you wish to fetch articles to. UTC date should have the following format : YYYY-MM-DD
-  -t TOKEN, --token TOKEN     BuzzSumo API token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  --begin-date BEGIN_DATE     The date you wish to fetch articles from. UTC date
+                              should have the following format : YYYY-MM-DD
+  --end-date END_DATE         The date you wish to fetch articles to. UTC date
+                              should have the following format : YYYY-MM-DD
+  -t TOKEN, --token TOKEN     BuzzSumo API token. Can also be configured in a
+                              .minetrc file as "buzzsumo.token" or read from the
+                              MINET_BUZZSUMO_TOKEN env variable.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
@@ -834,7 +998,6 @@ examples:
 
 . Returning social media information for a list of domain names in a CSV:
     $ minet bz domain domain_name domain_names.csv --select domain_name --begin-date 2019-01-01 --end-date 2020-12-31 --token YOUR_TOKEN > domain_name_articles.csv
-
 ```
 
 ## CrowdTangle
@@ -851,15 +1014,23 @@ Minet Crowdtangle Command
 Gather data from the CrowdTangle APIs easily and efficiently.
 
 optional arguments:
-  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
-  --rcfile RCFILE                                 Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                      show this help message and exit
+  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to
+                              6. Rcfile key: crowdtangle.rate_limit. Can also be
+                              configured in a .minetrc file as
+                              "crowdtangle.rate_limit" or read from the
+                              MINET_CROWDTANGLE_RATE_LIMIT env variable.
+  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key:
+                              crowdtangle.token. Can also be configured in a
+                              .minetrc file as "crowdtangle.token" or read from
+                              the MINET_CROWDTANGLE_TOKEN env variable.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 subcommands:
   {leaderboard,lists,posts-by-id,posts,search,summary}
-                                                  Subcommand to use.
-
+                              Subcommand to use.
 ```
 
 ### leaderboard
@@ -879,22 +1050,36 @@ Gather information and aggregated stats about pages and groups of the designated
 For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Leaderboard.
 
 optional arguments:
-  --no-breakdown                        Whether to skip statistics breakdown by post type in the CSV output.
-  -f {csv,jsonl}, --format {csv,jsonl}  Output format. Defaults to `csv`.
-  -l LIMIT, --limit LIMIT               Maximum number of accounts to retrieve. Will fetch every account by default.
-  --list-id LIST_ID                     Optional list id from which to retrieve accounts.
-  --rate-limit RATE_LIMIT               Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  --start-date START_DATE               The earliest date at which to start aggregating statistics (UTC!). You can pass just a year or a year-month for convenience.
-  -t TOKEN, --token TOKEN               CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT            Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                       Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                            show this help message and exit
+  --no-breakdown              Whether to skip statistics breakdown by post type
+                              in the CSV output.
+  -f {csv,jsonl}, --format {csv,jsonl}
+                              Output format. Defaults to `csv`.
+  -l LIMIT, --limit LIMIT     Maximum number of accounts to retrieve. Will fetch
+                              every account by default.
+  --list-id LIST_ID           Optional list id from which to retrieve accounts.
+  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to
+                              6. Rcfile key: crowdtangle.rate_limit. Can also be
+                              configured in a .minetrc file as
+                              "crowdtangle.rate_limit" or read from the
+                              MINET_CROWDTANGLE_RATE_LIMIT env variable.
+  --start-date START_DATE     The earliest date at which to start aggregating
+                              statistics (UTC!). You can pass just a year or a
+                              year-month for convenience.
+  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key:
+                              crowdtangle.token. Can also be configured in a
+                              .minetrc file as "crowdtangle.token" or read from
+                              the MINET_CROWDTANGLE_TOKEN env variable.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 examples:
 
 . Fetching accounts statistics for every account in your dashboard:
     $ minet ct leaderboard --token YOUR_TOKEN > accounts-stats.csv
-
 ```
 
 ### lists
@@ -911,17 +1096,26 @@ Retrieve the lists from a CrowdTangle dashboard (indicated by a given token).
 For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Lists.
 
 optional arguments:
-  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to
+                              6. Rcfile key: crowdtangle.rate_limit. Can also be
+                              configured in a .minetrc file as
+                              "crowdtangle.rate_limit" or read from the
+                              MINET_CROWDTANGLE_RATE_LIMIT env variable.
+  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key:
+                              crowdtangle.token. Can also be configured in a
+                              .minetrc file as "crowdtangle.token" or read from
+                              the MINET_CROWDTANGLE_TOKEN env variable.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
 
 . Fetching a dashboard's lists:
     $ minet ct lists --token YOUR_TOKEN > lists.csv
-
 ```
 
 ### posts-by-id
@@ -940,17 +1134,31 @@ Retrieve metadata about batches of posts using Crowdtangle's API.
 For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Posts#get-postid.
 
 positional arguments:
-  column                      Name of the CSV column containing URLs or ids or a single URL or id.
+  column                      Name of the CSV column containing URLs or ids or a
+                              single URL or id.
   file                        CSV file containing the URLs or ids.
 
 optional arguments:
-  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --resume                    Whether to resume from an aborted collection. Need -o to be set.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to
+                              6. Rcfile key: crowdtangle.rate_limit. Can also be
+                              configured in a .minetrc file as
+                              "crowdtangle.rate_limit" or read from the
+                              MINET_CROWDTANGLE_RATE_LIMIT env variable.
+  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key:
+                              crowdtangle.token. Can also be configured in a
+                              .minetrc file as "crowdtangle.token" or read from
+                              the MINET_CROWDTANGLE_TOKEN env variable.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --resume                    Whether to resume from an aborted collection. Need
+                              -o to be set.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
@@ -960,7 +1168,6 @@ examples:
 
 . Retrieving information about a single post:
     $ minet ct posts-by-id 1784333048289665 --token YOUR_TOKEN
-
 ```
 
 ### posts
@@ -982,21 +1189,43 @@ Gather post data from the designated dashboard (indicated by a given token).
 For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Posts.
 
 optional arguments:
-  --chunk-size CHUNK_SIZE                         When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations. Defaults to 500.
-  --end-date END_DATE                             The latest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
-  -f {csv,jsonl}, --format {csv,jsonl}            Output format. Defaults to `csv`.
-  --language LANGUAGE                             Language of posts to retrieve.
-  -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
-  --list-ids LIST_IDS                             Ids of the lists from which to retrieve posts, separated by commas.
-  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
+  --chunk-size CHUNK_SIZE     When sorting by date (default), the number of
+                              items to retrieve before shifting the inital query
+                              to circumvent the APIs limitations. Defaults to
+                              500.
+  --end-date END_DATE         The latest date at which a post could be posted
+                              (UTC!). You can pass just a year or a year-month
+                              for convenience.
+  -f {csv,jsonl}, --format {csv,jsonl}
+                              Output format. Defaults to `csv`.
+  --language LANGUAGE         Language of posts to retrieve.
+  -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve. Will fetch
+                              every post by default.
+  --list-ids LIST_IDS         Ids of the lists from which to retrieve posts,
+                              separated by commas.
+  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to
+                              6. Rcfile key: crowdtangle.rate_limit. Can also be
+                              configured in a .minetrc file as
+                              "crowdtangle.rate_limit" or read from the
+                              MINET_CROWDTANGLE_RATE_LIMIT env variable.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
-                                                  The order in which to retrieve posts. Defaults to `date`.
-  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010`.
-  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
-  --resume                                        Whether to resume from an aborted collection. Need -o to be set.
-  --rcfile RCFILE                                 Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                      show this help message and exit
+                              The order in which to retrieve posts. Defaults to
+                              `date`.
+  --start-date START_DATE     The earliest date at which a post could be posted
+                              (UTC!). You can pass just a year or a year-month
+                              for convenience. Defaults to `2010`.
+  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key:
+                              crowdtangle.token. Can also be configured in a
+                              .minetrc file as "crowdtangle.token" or read from
+                              the MINET_CROWDTANGLE_TOKEN env variable.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --resume                    Whether to resume from an aborted collection. Need
+                              -o to be set.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 examples:
 
@@ -1011,7 +1240,6 @@ examples:
 
 To know the different list ids associated with your dashboard:
     $ minet ct lists --token YOUR_TOKEN
-
 ```
 
 <h3 id="ct-search">search</h3>
@@ -1038,36 +1266,60 @@ Search posts on the whole CrowdTangle platform.
 For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Search.
 
 positional arguments:
-  terms                                           The search query term or terms.
+  terms                       The search query term or terms.
 
 optional arguments:
-  --and AND                                       AND clause to add to the query terms.
-  --chunk-size CHUNK_SIZE                         When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations. Defaults to 500.
-  --end-date END_DATE                             The latest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.
-  -f {csv,jsonl}, --format {csv,jsonl}            Output format. Defaults to `csv`.
-  --in-list-ids IN_LIST_IDS                       Ids of the lists in which to search, separated by commas.
-  --language LANGUAGE                             Language ISO code like "fr" or "zh-CN".
-  -l LIMIT, --limit LIMIT                         Maximum number of posts to retrieve. Will fetch every post by default.
-  --not-in-title                                  Whether to search terms in account titles also.
-  --offset OFFSET                                 Count offset.
-  -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
-  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
+  --and AND                   AND clause to add to the query terms.
+  --chunk-size CHUNK_SIZE     When sorting by date (default), the number of
+                              items to retrieve before shifting the inital query
+                              to circumvent the APIs limitations. Defaults to
+                              500.
+  --end-date END_DATE         The latest date at which a post could be posted
+                              (UTC!). You can pass just a year or a year-month
+                              for convenience.
+  -f {csv,jsonl}, --format {csv,jsonl}
+                              Output format. Defaults to `csv`.
+  --in-list-ids IN_LIST_IDS   Ids of the lists in which to search, separated by
+                              commas.
+  --language LANGUAGE         Language ISO code like "fr" or "zh-CN".
+  -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve. Will fetch
+                              every post by default.
+  --not-in-title              Whether to search terms in account titles also.
+  --offset OFFSET             Count offset.
+  -p PLATFORMS, --platforms PLATFORMS
+                              The platforms from which to retrieve links
+                              (facebook, instagram, or reddit). This value can
+                              be comma-separated.
+  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to
+                              6. Rcfile key: crowdtangle.rate_limit. Can also be
+                              configured in a .minetrc file as
+                              "crowdtangle.rate_limit" or read from the
+                              MINET_CROWDTANGLE_RATE_LIMIT env variable.
   --search-field {account_name_only,image_text_only,include_query_strings,text_fields_and_image_text,text_fields_only}
-                                                  In what to search the query. Defaults to `text_fields_and_image_text`.
+                              In what to search the query. Defaults to
+                              `text_fields_and_image_text`.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
-                                                  The order in which to retrieve posts. Defaults to `date`.
-  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010`.
-  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
-  --types TYPES                                   Types of post to include, separated by comma.
-  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                                 Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                      show this help message and exit
+                              The order in which to retrieve posts. Defaults to
+                              `date`.
+  --start-date START_DATE     The earliest date at which a post could be posted
+                              (UTC!). You can pass just a year or a year-month
+                              for convenience. Defaults to `2010`.
+  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key:
+                              crowdtangle.token. Can also be configured in a
+                              .minetrc file as "crowdtangle.token" or read from
+                              the MINET_CROWDTANGLE_TOKEN env variable.
+  --types TYPES               Types of post to include, separated by comma.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 examples:
 
 . Fetching all the 2021 posts containing the words 'acetylsalicylic acid':
     $ minet ct search 'acetylsalicylic acid' --start-date 2021-01-01 --token YOUR_TOKEN > posts.csv
-
 ```
 
 ### summary
@@ -1089,28 +1341,45 @@ Retrieve aggregated statistics about link sharing on the Crowdtangle API and by 
 For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Links.
 
 positional arguments:
-  column                                          Name of the CSV column containing URLs or a single URL.
-  file                                            CSV file containing the URLs.
+  column                      Name of the CSV column containing URLs or a single
+                              URL.
+  file                        CSV file containing the URLs.
 
 optional arguments:
-  -p PLATFORMS, --platforms PLATFORMS             The platforms from which to retrieve links (facebook, instagram, or reddit). This value can be comma-separated.
-  --posts POSTS                                   Path to a file containing the retrieved posts.
-  --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
+  -p PLATFORMS, --platforms PLATFORMS
+                              The platforms from which to retrieve links
+                              (facebook, instagram, or reddit). This value can
+                              be comma-separated.
+  --posts POSTS               Path to a file containing the retrieved posts.
+  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to
+                              6. Rcfile key: crowdtangle.rate_limit. Can also be
+                              configured in a .minetrc file as
+                              "crowdtangle.rate_limit" or read from the
+                              MINET_CROWDTANGLE_RATE_LIMIT env variable.
   --sort-by {date,subscriber_count,total_interactions}
-                                                  How to sort retrieved posts. Defaults to `date`.
-  --start-date START_DATE                         The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010`.
-  -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
-  -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                                   Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                                 Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                      show this help message and exit
+                              How to sort retrieved posts. Defaults to `date`.
+  --start-date START_DATE     The earliest date at which a post could be posted
+                              (UTC!). You can pass just a year or a year-month
+                              for convenience. Defaults to `2010`.
+  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key:
+                              crowdtangle.token. Can also be configured in a
+                              .minetrc file as "crowdtangle.token" or read from
+                              the MINET_CROWDTANGLE_TOKEN env variable.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 examples:
 
 . Computing a summary of aggregated stats for urls contained in a CSV row:
     $ minet ct summary url urls.csv --token YOUR_TOKEN --start-date 2019-01-01 > summary.csv
-
 ```
 
 ## Facebook
@@ -1126,12 +1395,11 @@ Minet Facebook Command
 Collect data from Facebook.
 
 optional arguments:
-  -h, --help                                      show this help message and exit
+  -h, --help                  show this help message and exit
 
 subcommands:
   {comments,post-authors,post-stats,post,posts,url-likes}
-                                                  Subcommand to use.
-
+                              Subcommand to use.
 ```
 
 <h3 id="facebook-comments">comments</h3>
@@ -1155,15 +1423,26 @@ to directly pass the cookie as a string, check out the
 -c/--cookie flag.
 
 positional arguments:
-  column                      Name of the CSV column containing post urls or a single post url.
+  column                      Name of the CSV column containing post urls or a
+                              single post url.
   file                        CSV file containing the post urls.
 
 optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "facebook.cookie" or read from the MINET_FACEBOOK_COOKIE env variable.
-  --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+                              to extract it (supports "firefox", "chrome",
+                              "chromium", "opera" and "edge"). Defaults to
+                              "firefox". Can also be configured in a .minetrc
+                              file as "facebook.cookie" or read from the
+                              MINET_FACEBOOK_COOKIE env variable.
+  --throttle THROTTLE         Throttling time, in seconds, to wait between each
+                              request.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
@@ -1176,7 +1455,6 @@ examples:
 
 . Scraping comments from multiple posts listed in a CSV file:
     $ minet fb comments post_url posts.csv > comments.csv
-
 ```
 
 <h3 id="facebook-post">post</h3>
@@ -1221,15 +1499,26 @@ when displayed in lists. This text is not yet entirely
 scraped by minet at this time.
 
 positional arguments:
-  column                      Name of the CSV column containing post urls or a single post url.
+  column                      Name of the CSV column containing post urls or a
+                              single post url.
   file                        CSV file containing the post urls.
 
 optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "facebook.cookie" or read from the MINET_FACEBOOK_COOKIE env variable.
-  --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+                              to extract it (supports "firefox", "chrome",
+                              "chromium", "opera" and "edge"). Defaults to
+                              "firefox". Can also be configured in a .minetrc
+                              file as "facebook.cookie" or read from the
+                              MINET_FACEBOOK_COOKIE env variable.
+  --throttle THROTTLE         Throttling time, in seconds, to wait between each
+                              request.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
@@ -1242,7 +1531,6 @@ examples:
 
 . Scraping post from multiple urls listed in a CSV file:
     $ minet fb post url urls.csv > post.csv
-
 ```
 
 <h3 id="facebook-posts">posts</h3>
@@ -1286,15 +1574,26 @@ when displayed in lists. This text is not yet entirely
 scraped by minet at this time.
 
 positional arguments:
-  column                      Name of the CSV column containing group urls or a single group url.
+  column                      Name of the CSV column containing group urls or a
+                              single group url.
   file                        CSV file containing the group urls.
 
 optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "facebook.cookie" or read from the MINET_FACEBOOK_COOKIE env variable.
-  --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+                              to extract it (supports "firefox", "chrome",
+                              "chromium", "opera" and "edge"). Defaults to
+                              "firefox". Can also be configured in a .minetrc
+                              file as "facebook.cookie" or read from the
+                              MINET_FACEBOOK_COOKIE env variable.
+  --throttle THROTTLE         Throttling time, in seconds, to wait between each
+                              request.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
@@ -1307,7 +1606,6 @@ examples:
 
 . Scraping posts from multiple groups listed in a CSV file:
     $ minet fb posts group_url groups.csv > posts.csv
-
 ```
 
 <h3 id="facebook-post-authors">post-authors</h3>
@@ -1327,23 +1625,34 @@ Note that it is only relevant for group posts since
 only administrators can post something on pages.
 
 positional arguments:
-  column                      Name of the CSV column containing posts or a single post.
+  column                      Name of the CSV column containing posts or a
+                              single post.
   file                        CSV file containing the posts.
 
 optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "facebook.cookie" or read from the MINET_FACEBOOK_COOKIE env variable.
-  --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+                              to extract it (supports "firefox", "chrome",
+                              "chromium", "opera" and "edge"). Defaults to
+                              "firefox". Can also be configured in a .minetrc
+                              file as "facebook.cookie" or read from the
+                              MINET_FACEBOOK_COOKIE env variable.
+  --throttle THROTTLE         Throttling time, in seconds, to wait between each
+                              request.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
 
 . Fetching authors of a series of posts in a CSV file:
     $ minet fb post-authors post_url fb-posts.csv > authors.csv
-
 ```
 
 <h3 id="facebook-url-likes">url-likes</h3>
@@ -1367,13 +1676,17 @@ reactions plus the number of comments and shares that the URL got on Facebook
 explaining "What makes up the number shown next to my Share button?").
 
 positional arguments:
-  column                      Name of the CSV column containing urls or a single url.
+  column                      Name of the CSV column containing urls or a single
+                              url.
   file                        CSV file containing the urls.
 
 optional arguments:
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
   -h, --help                  show this help message and exit
 
 example:
@@ -1382,7 +1695,6 @@ example:
 
 . Retrieving the "like" number for the urls listed in a CSV file:
     $ minet fb url-likes url url.csv > url_likes.csv
-
 ```
 
 ## Google
@@ -1400,7 +1712,6 @@ optional arguments:
 
 subcommands:
   {sheets}    Subcommand to use.
-
 ```
 
 <h3 id="google-sheets">sheets</h3>
@@ -1428,13 +1739,18 @@ to which account some spreadsheets are tied to, be sure
 to give --authuser.
 
 positional arguments:
-  url                               Url, sharing url or id of the spreadsheet to export.
+  url                         Url, sharing url or id of the spreadsheet to
+                              export.
 
 optional arguments:
-  -a AUTHUSER, --authuser AUTHUSER  Connected google account number to use.
-  -c COOKIE, --cookie COOKIE        Google Drive cookie or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge").
-  -o OUTPUT, --output OUTPUT        Path to the output file. By default, the results will be printed to stdout.
-  -h, --help                        show this help message and exit
+  -a AUTHUSER, --authuser AUTHUSER
+                              Connected google account number to use.
+  -c COOKIE, --cookie COOKIE  Google Drive cookie or browser from which to
+                              extract it (supports "firefox", "chrome",
+                              "chromium", "opera" and "edge").
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  -h, --help                  show this help message and exit
 
 examples:
 
@@ -1443,7 +1759,6 @@ examples:
 
 . Using your Firefox authentication cookies:
     $ minet google sheets --cookie firefox 1QXQ1yaNYrVUlMt6LQ4jrLGt_PvZI9goozYiBTgaC4RI > file.csv
-
 ```
 
 ## Hyphe
@@ -1471,15 +1786,16 @@ positional arguments:
 
 optional arguments:
   --password PASSWORD         The corpus's password if required.
-  --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
   -h, --help                  show this help message and exit
 
 examples:
 
 . Declaring webentities from a Hyphe export:
     $ minet hyphe declare http://myhyphe.com/api/ target-corpus export.csv
-
 ```
 
 <h3 id="hyphe-destroy">destroy</h3>
@@ -1498,14 +1814,14 @@ positional arguments:
 
 optional arguments:
   --password PASSWORD         The corpus's password if required.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
   -h, --help                  show this help message and exit
 
 examples:
 
 . Destroying a corpus:
     $ minet hyphe destroy http://myhyphe.com/api/ my-corpus
-
 ```
 
 <h3 id="hyphe-dump">dump</h3>
@@ -1522,22 +1838,26 @@ Command dumping page-level information from a given
 Hyphe corpus.
 
 positional arguments:
-  url                                     Url of the Hyphe API.
-  corpus                                  Id of the corpus.
+  url                         Url of the Hyphe API.
+  corpus                      Id of the corpus.
 
 optional arguments:
-  --body                                  Whether to download pages body.
-  -d OUTPUT_DIR, --output-dir OUTPUT_DIR  Output directory for dumped files. Will default to some name based on corpus name.
-  --password PASSWORD                     The corpus's password if required.
-  --statuses STATUSES                     Webentity statuses to dump, separated by comma. Possible statuses being "IN", "OUT", "UNDECIDED" and "DISCOVERED".
-  -o OUTPUT, --output OUTPUT              Path to the output file. By default, the results will be printed to stdout.
-  -h, --help                              show this help message and exit
+  --body                      Whether to download pages body.
+  -d OUTPUT_DIR, --output-dir OUTPUT_DIR
+                              Output directory for dumped files. Will default to
+                              some name based on corpus name.
+  --password PASSWORD         The corpus's password if required.
+  --statuses STATUSES         Webentity statuses to dump, separated by comma.
+                              Possible statuses being "IN", "OUT", "UNDECIDED"
+                              and "DISCOVERED".
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  -h, --help                  show this help message and exit
 
 examples:
 
 . Dumping a corpus into the ./corpus directory:
     $ minet hyphe dump http://myhyphe.com/api/ corpus-name -d corpus
-
 ```
 
 <h3 id="hyphe-reset">reset</h3>
@@ -1556,14 +1876,14 @@ positional arguments:
 
 optional arguments:
   --password PASSWORD         The corpus's password if required.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
   -h, --help                  show this help message and exit
 
 examples:
 
 . Resetting a corpus:
     $ minet hyphe reset http://myhyphe.com/api/ my-corpus
-
 ```
 
 <h3 id="hyphe-tag">tag</h3>
@@ -1582,22 +1902,25 @@ metadata recorded in a CSV file.
 positional arguments:
   url                         Url of the Hyphe API.
   corpus                      Id of the corpus.
-  webentity_id_column         Column of the CSV file containing the webentity ids.
+  webentity_id_column         Column of the CSV file containing the webentity
+                              ids.
   tag_columns                 Columns, separated by comma, to use as tags.
   data                        CSV file of webentities (exported from Hyphe).
 
 optional arguments:
   --password PASSWORD         The corpus's password if required.
-  --separator SEPARATOR       Separator use to split multiple tag values in the same column. Defaults to "|".
-  --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  --separator SEPARATOR       Separator use to split multiple tag values in the
+                              same column. Defaults to "|".
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
   -h, --help                  show this help message and exit
 
 examples:
 
 . Tag webentities from two columns of CSV file:
     $ minet hyphe tag http://myhyphe.com/api/ my-corpus webentity_id type,creator metadata.csv
-
 ```
 
 ## Instagram
@@ -1613,14 +1936,20 @@ Minet Instagram Command
 Gather data from Instagram.
 
 optional arguments:
-  -c COOKIE, --cookie COOKIE                      Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
-  --rcfile RCFILE                                 Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                      show this help message and exit
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+                              to extract it (supports "firefox", "chrome",
+                              "chromium", "opera" and "edge"). Defaults to
+                              "firefox". Can also be configured in a .minetrc
+                              file as "instagram.cookie" or read from the
+                              MINET_INSTAGRAM_COOKIE env variable.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 subcommands:
   {hashtag,user-followers,user-following,user-infos,user-posts}
-                                                  Subcommand to use.
-
+                              Subcommand to use.
 ```
 
 ### hashtag
@@ -1647,23 +1976,33 @@ display_url is not the media url, but a thumbnail of the post.
 There is no way with this command to get the media urls.
 
 positional arguments:
-  column                      Name of the CSV column containing hashtags or a single hashtag.
+  column                      Name of the CSV column containing hashtags or a
+                              single hashtag.
   file                        CSV file containing the hashtags.
 
 optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+                              to extract it (supports "firefox", "chrome",
+                              "chromium", "opera" and "edge"). Defaults to
+                              "firefox". Can also be configured in a .minetrc
+                              file as "instagram.cookie" or read from the
+                              MINET_INSTAGRAM_COOKIE env variable.
   -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve per hashtag.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
 
 . Searching posts with the hashtag paris:
     $ minet instagram hashtag paris > paris_posts.csv
-
 ```
 
 ### user-followers
@@ -1693,22 +2032,31 @@ the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
 positional arguments:
-  column                      Name of the CSV column containing usernames or user urls or a single username or user url.
+  column                      Name of the CSV column containing usernames or
+                              user urls or a single username or user url.
   file                        CSV file containing the usernames or user urls.
 
 optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+                              to extract it (supports "firefox", "chrome",
+                              "chromium", "opera" and "edge"). Defaults to
+                              "firefox". Can also be configured in a .minetrc
+                              file as "instagram.cookie" or read from the
+                              MINET_INSTAGRAM_COOKIE env variable.
   -l LIMIT, --limit LIMIT     Maximum number of followers to retrieve per user.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
 
 . Searching followers with the username banksrepeta:
     $ minet instagram user-followers banksrepeta > banksrepeta_followers.csv
-
 ```
 
 ### user-following
@@ -1737,22 +2085,31 @@ the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
 positional arguments:
-  column                      Name of the CSV column containing usernames or user urls or a single username or user url.
+  column                      Name of the CSV column containing usernames or
+                              user urls or a single username or user url.
   file                        CSV file containing the usernames or user urls.
 
 optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+                              to extract it (supports "firefox", "chrome",
+                              "chromium", "opera" and "edge"). Defaults to
+                              "firefox". Can also be configured in a .minetrc
+                              file as "instagram.cookie" or read from the
+                              MINET_INSTAGRAM_COOKIE env variable.
   -l LIMIT, --limit LIMIT     Maximum number of accounts to retrieve per user.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
 
 . Searching accounts followed with the username paramountplus:
     $ minet instagram user-following paramountplus > paramountplus_following.csv
-
 ```
 
 ### user-infos
@@ -1781,21 +2138,30 @@ the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
 positional arguments:
-  column                      Name of the CSV column containing usernames or user urls or a single username or user url.
+  column                      Name of the CSV column containing usernames or
+                              user urls or a single username or user url.
   file                        CSV file containing the usernames or user urls.
 
 optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+                              to extract it (supports "firefox", "chrome",
+                              "chromium", "opera" and "edge"). Defaults to
+                              "firefox". Can also be configured in a .minetrc
+                              file as "instagram.cookie" or read from the
+                              MINET_INSTAGRAM_COOKIE env variable.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
 
 . Searching infos with the username banksrepeta:
     $ minet instagram user-infos banksrepeta > banksrepeta_infos.csv
-
 ```
 
 ### user-posts
@@ -1826,22 +2192,31 @@ them (you can use the `minet fetch` command for that, and
 won't need to use cookies).
 
 positional arguments:
-  column                      Name of the CSV column containing usernames or user urls or a single username or user url.
+  column                      Name of the CSV column containing usernames or
+                              user urls or a single username or user url.
   file                        CSV file containing the usernames or user urls.
 
 optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+                              to extract it (supports "firefox", "chrome",
+                              "chromium", "opera" and "edge"). Defaults to
+                              "firefox". Can also be configured in a .minetrc
+                              file as "instagram.cookie" or read from the
+                              MINET_INSTAGRAM_COOKIE env variable.
   -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve per user.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
 
 . Searching posts from the account paramountplus:
     $ minet instagram user-posts paramountplus > paramountplus_posts.csv
-
 ```
 
 ## Mediacloud
@@ -1859,18 +2234,27 @@ Minet Mediacloud Medias Command
 Retrieve metadata about a list of Mediacloud medias.
 
 positional arguments:
-  column                      Name of the CSV column containing Mediacloud media ids or a single Mediacloud media id.
+  column                      Name of the CSV column containing Mediacloud media
+                              ids or a single Mediacloud media id.
   file                        CSV file containing the Mediacloud media ids.
 
 optional arguments:
-  --feeds FEEDS               If given, path of the CSV file listing media RSS feeds.
-  -t TOKEN, --token TOKEN     Mediacloud API token (also called "key" sometimes). Can also be configured in a .minetrc file as "mediacloud.token" or read from the MINET_MEDIACLOUD_TOKEN env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  --feeds FEEDS               If given, path of the CSV file listing media RSS
+                              feeds.
+  -t TOKEN, --token TOKEN     Mediacloud API token (also called "key"
+                              sometimes). Can also be configured in a .minetrc
+                              file as "mediacloud.token" or read from the
+                              MINET_MEDIACLOUD_TOKEN env variable.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
-
 ```
 
 <h3 id="mc-search">search</h3>
@@ -1892,21 +2276,36 @@ To learn how to compose more relevant queries, check out this guide:
 https://mediacloud.org/support/query-guide
 
 positional arguments:
-  query                                      Search query.
+  query                       Search query.
 
 optional arguments:
-  -c COLLECTIONS, --collections COLLECTIONS  List of collection ids to search, separated by commas.
-  --filter-query FILTER_QUERY                Solr filter query `fq` to use. Can be used to optimize some parts of the query.
-  -m MEDIAS, --medias MEDIAS                 List of media ids to search, separated by commas.
-  --publish-day PUBLISH_DAY                  Only search stories published on provided day (iso format, e.g. "2018-03-24").
-  --publish-month PUBLISH_MONTH              Only search stories published on provided month (iso format, e.g. "2018-03").
-  --publish-year PUBLISH_YEAR                Only search stories published on provided year (iso format, e.g. "2018").
-  --skip-count                               Whether to skip the first API call counting the number of posts for the progress bar.
-  -t TOKEN, --token TOKEN                    Mediacloud API token (also called "key" sometimes). Can also be configured in a .minetrc file as "mediacloud.token" or read from the MINET_MEDIACLOUD_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                 show this help message and exit
-
+  -c COLLECTIONS, --collections COLLECTIONS
+                              List of collection ids to search, separated by
+                              commas.
+  --filter-query FILTER_QUERY
+                              Solr filter query `fq` to use. Can be used to
+                              optimize some parts of the query.
+  -m MEDIAS, --medias MEDIAS  List of media ids to search, separated by commas.
+  --publish-day PUBLISH_DAY   Only search stories published on provided day (iso
+                              format, e.g. "2018-03-24").
+  --publish-month PUBLISH_MONTH
+                              Only search stories published on provided month
+                              (iso format, e.g. "2018-03").
+  --publish-year PUBLISH_YEAR
+                              Only search stories published on provided year
+                              (iso format, e.g. "2018").
+  --skip-count                Whether to skip the first API call counting the
+                              number of posts for the progress bar.
+  -t TOKEN, --token TOKEN     Mediacloud API token (also called "key"
+                              sometimes). Can also be configured in a .minetrc
+                              file as "mediacloud.token" or read from the
+                              MINET_MEDIACLOUD_TOKEN env variable.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 ```
 
 ### topic
@@ -1925,15 +2324,22 @@ Minet Mediacloud Topic Stories Command
 Retrieves the list of stories from a mediacloud topic.
 
 positional arguments:
-  topic_id                       Id of the topic.
+  topic_id                    Id of the topic.
 
 optional arguments:
-  --from-media-id FROM_MEDIA_ID  Return only stories that are linked from stories in the given media_id.
-  --media-id MEDIA_ID            Return only stories belonging to the given media_ids.
-  -t TOKEN, --token TOKEN        Mediacloud API token (also called "key" sometimes). Can also be configured in a .minetrc file as "mediacloud.token" or read from the MINET_MEDIACLOUD_TOKEN env variable.
-  --rcfile RCFILE                Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                     show this help message and exit
-
+  --from-media-id FROM_MEDIA_ID
+                              Return only stories that are linked from stories
+                              in the given media_id.
+  --media-id MEDIA_ID         Return only stories belonging to the given
+                              media_ids.
+  -t TOKEN, --token TOKEN     Mediacloud API token (also called "key"
+                              sometimes). Can also be configured in a .minetrc
+                              file as "mediacloud.token" or read from the
+                              MINET_MEDIACLOUD_TOKEN env variable.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 ```
 
 ## Telegram
@@ -1951,19 +2357,22 @@ Minet Telegram Channel-Infos Command
 Scrape a Telegram channel's infos.
 
 positional arguments:
-  column                      Name of the CSV column containing channel names / urls or a single channel name / url.
+  column                      Name of the CSV column containing channel names /
+                              urls or a single channel name / url.
   file                        CSV file containing the channel names / urls.
 
 optional arguments:
-  --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  --throttle THROTTLE         Throttling time, in seconds, to wait between each
+                              request.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
   -h, --help                  show this help message and exit
 
 examples:
 . Scraping a channel's infos:
     $ minet telegram channel-infos nytimes > infos.csv
-
 ```
 
 ### channel-messages
@@ -1979,19 +2388,22 @@ Minet Telegram Channel-Messages Command
 Scrape Telegram channel messages.
 
 positional arguments:
-  column                      Name of the CSV column containing channel names / urls or a single channel name / url.
+  column                      Name of the CSV column containing channel names /
+                              urls or a single channel name / url.
   file                        CSV file containing the channel names / urls.
 
 optional arguments:
-  --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  --throttle THROTTLE         Throttling time, in seconds, to wait between each
+                              request.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
   -h, --help                  show this help message and exit
 
 examples:
 . Scraping a group's posts:
     $ minet telegram channel-messages nytimes > messages.csv
-
 ```
 
 ## Tiktok
@@ -2009,7 +2421,6 @@ optional arguments:
 
 subcommands:
   {search-videos}  Subcommand to use.
-
 ```
 
 ### search-videos
@@ -2043,22 +2454,31 @@ relevance (a mix of most popular, and most relevant according to your
 profile).
 
 positional arguments:
-  column                      Name of the CSV column containing tiktok keywords or a single tiktok keyword.
+  column                      Name of the CSV column containing tiktok keywords
+                              or a single tiktok keyword.
   file                        CSV file containing the tiktok keywords.
 
 optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "tiktok.cookie" or read from the MINET_TIKTOK_COOKIE env variable.
+  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+                              to extract it (supports "firefox", "chrome",
+                              "chromium", "opera" and "edge"). Defaults to
+                              "firefox". Can also be configured in a .minetrc
+                              file as "tiktok.cookie" or read from the
+                              MINET_TIKTOK_COOKIE env variable.
   -l LIMIT, --limit LIMIT     Maximum number of videos to retrieve per query.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
 
 . Searching videos with the keyword paris:
     $ minet tiktok search-videos paris > paris_videos.csv
-
 ```
 
 ## Twitter
@@ -2114,23 +2534,50 @@ the following values:
     - "blocked_by_original_tweet_author": tweet cannot be found because it is a retweet of a user who blocked you.
 
 positional arguments:
-  column                                     Name of the CSV column containing tweet urls or ids or a single tweet url or id.
-  file                                       CSV file containing the tweet urls or ids.
+  column                      Name of the CSV column containing tweet urls or
+                              ids or a single tweet url or id.
+  file                        CSV file containing the tweet urls or ids.
 
 optional arguments:
-  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
-  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
-  --ids                                      Whether your users are given as ids rather than screen names.
-  --retweeted-id RETWEETED_ID                Name of the column containing the ids of the original tweets in case the tweets no longer available were retweets.
-  --user USER                                Name of the column containing the tweet's author (given as ids or screen names). This is useful to have more information on a tweet's unavailability.
-  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --resume                                   Whether to resume from an aborted collection. Need -o to be set.
-  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                 show this help message and exit
+  --access-token ACCESS_TOKEN
+                              Twitter API access token. Can also be configured
+                              in a .minetrc file as "twitter.access_token" or
+                              read from the MINET_TWITTER_ACCESS_TOKEN env
+                              variable.
+  --access-token-secret ACCESS_TOKEN_SECRET
+                              Twitter API access token secret. Can also be
+                              configured in a .minetrc file as
+                              "twitter.access_token_secret" or read from the
+                              MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  --api-key API_KEY           Twitter API key. Can also be configured in a
+                              .minetrc file as "twitter.api_key" or read from
+                              the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY
+                              Twitter API secret key. Can also be configured in
+                              a .minetrc file as "twitter.api_secret_key" or
+                              read from the MINET_TWITTER_API_SECRET_KEY env
+                              variable.
+  --ids                       Whether your users are given as ids rather than
+                              screen names.
+  --retweeted-id RETWEETED_ID
+                              Name of the column containing the ids of the
+                              original tweets in case the tweets no longer
+                              available were retweets.
+  --user USER                 Name of the column containing the tweet's author
+                              (given as ids or screen names). This is useful to
+                              have more information on a tweet's unavailability.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --resume                    Whether to resume from an aborted collection. Need
+                              -o to be set.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 examples:
 
@@ -2139,7 +2586,6 @@ examples:
 
 . Finding out if tweets are still available or not using tweet & user ids:
     $ minet tw attrition tweet_id deleted_tweets.csv --user user_id --ids > attrition-report.csv
-
 ```
 
 ### followers
@@ -2160,28 +2606,52 @@ Minet Twitter Followers Command
 Retrieve followers, i.e. followed users, of given user.
 
 positional arguments:
-  column                                     Name of the CSV column containing Twitter account screen names or ids or a single Twitter account screen name or id.
-  file                                       CSV file containing the Twitter account screen names or ids.
+  column                      Name of the CSV column containing Twitter account
+                              screen names or ids or a single Twitter account
+                              screen name or id.
+  file                        CSV file containing the Twitter account screen
+                              names or ids.
 
 optional arguments:
-  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
-  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
-  --ids                                      Whether your users are given as ids rather than screen names.
-  --v2                                       Whether to use latest Twitter API v2 rather than v1.1.
-  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --resume                                   Whether to resume from an aborted collection. Need -o to be set.
-  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                 show this help message and exit
+  --access-token ACCESS_TOKEN
+                              Twitter API access token. Can also be configured
+                              in a .minetrc file as "twitter.access_token" or
+                              read from the MINET_TWITTER_ACCESS_TOKEN env
+                              variable.
+  --access-token-secret ACCESS_TOKEN_SECRET
+                              Twitter API access token secret. Can also be
+                              configured in a .minetrc file as
+                              "twitter.access_token_secret" or read from the
+                              MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  --api-key API_KEY           Twitter API key. Can also be configured in a
+                              .minetrc file as "twitter.api_key" or read from
+                              the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY
+                              Twitter API secret key. Can also be configured in
+                              a .minetrc file as "twitter.api_secret_key" or
+                              read from the MINET_TWITTER_API_SECRET_KEY env
+                              variable.
+  --ids                       Whether your users are given as ids rather than
+                              screen names.
+  --v2                        Whether to use latest Twitter API v2 rather than
+                              v1.1.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --resume                    Whether to resume from an aborted collection. Need
+                              -o to be set.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 examples:
 
 . Getting followers of a list of user:
     $ minet tw followers screen_name users.csv > followers.csv
-
 ```
 
 ### friends
@@ -2200,28 +2670,52 @@ Minet Twitter Friends Command
 Retrieve friends, i.e. followed users, of given user.
 
 positional arguments:
-  column                                     Name of the CSV column containing Twitter account screen names or ids or a single Twitter account screen name or id.
-  file                                       CSV file containing the Twitter account screen names or ids.
+  column                      Name of the CSV column containing Twitter account
+                              screen names or ids or a single Twitter account
+                              screen name or id.
+  file                        CSV file containing the Twitter account screen
+                              names or ids.
 
 optional arguments:
-  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
-  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
-  --ids                                      Whether your users are given as ids rather than screen names.
-  --v2                                       Whether to use latest Twitter API v2 rather than v1.1.
-  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --resume                                   Whether to resume from an aborted collection. Need -o to be set.
-  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                 show this help message and exit
+  --access-token ACCESS_TOKEN
+                              Twitter API access token. Can also be configured
+                              in a .minetrc file as "twitter.access_token" or
+                              read from the MINET_TWITTER_ACCESS_TOKEN env
+                              variable.
+  --access-token-secret ACCESS_TOKEN_SECRET
+                              Twitter API access token secret. Can also be
+                              configured in a .minetrc file as
+                              "twitter.access_token_secret" or read from the
+                              MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  --api-key API_KEY           Twitter API key. Can also be configured in a
+                              .minetrc file as "twitter.api_key" or read from
+                              the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY
+                              Twitter API secret key. Can also be configured in
+                              a .minetrc file as "twitter.api_secret_key" or
+                              read from the MINET_TWITTER_API_SECRET_KEY env
+                              variable.
+  --ids                       Whether your users are given as ids rather than
+                              screen names.
+  --v2                        Whether to use latest Twitter API v2 rather than
+                              v1.1.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --resume                    Whether to resume from an aborted collection. Need
+                              -o to be set.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 examples:
 
 . Getting friends of a list of user:
     $ minet tw friends screen_name users.csv > friends.csv
-
 ```
 
 ### list-followers
@@ -2240,25 +2734,44 @@ Minet Twitter List Followers Command
 Retrieve followers of given list using Twitter API v2.
 
 positional arguments:
-  column                                     Name of the CSV column containing Twitter list ids or urls or a single Twitter list id or url.
-  file                                       CSV file containing the Twitter list ids or urls.
+  column                      Name of the CSV column containing Twitter list ids
+                              or urls or a single Twitter list id or url.
+  file                        CSV file containing the Twitter list ids or urls.
 
 optional arguments:
-  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
-  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
-  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                 show this help message and exit
+  --access-token ACCESS_TOKEN
+                              Twitter API access token. Can also be configured
+                              in a .minetrc file as "twitter.access_token" or
+                              read from the MINET_TWITTER_ACCESS_TOKEN env
+                              variable.
+  --access-token-secret ACCESS_TOKEN_SECRET
+                              Twitter API access token secret. Can also be
+                              configured in a .minetrc file as
+                              "twitter.access_token_secret" or read from the
+                              MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  --api-key API_KEY           Twitter API key. Can also be configured in a
+                              .minetrc file as "twitter.api_key" or read from
+                              the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY
+                              Twitter API secret key. Can also be configured in
+                              a .minetrc file as "twitter.api_secret_key" or
+                              read from the MINET_TWITTER_API_SECRET_KEY env
+                              variable.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 examples:
 
 . Getting followers of a list of lists:
     $ minet tw list-followers id lists.csv > followers.csv
-
 ```
 
 ### list-members
@@ -2277,25 +2790,44 @@ Minet Twitter List Members Command
 Retrieve members of given list using Twitter API v2.
 
 positional arguments:
-  column                                     Name of the CSV column containing Twitter list ids or urls or a single Twitter list id or url.
-  file                                       CSV file containing the Twitter list ids or urls.
+  column                      Name of the CSV column containing Twitter list ids
+                              or urls or a single Twitter list id or url.
+  file                        CSV file containing the Twitter list ids or urls.
 
 optional arguments:
-  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
-  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
-  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                 show this help message and exit
+  --access-token ACCESS_TOKEN
+                              Twitter API access token. Can also be configured
+                              in a .minetrc file as "twitter.access_token" or
+                              read from the MINET_TWITTER_ACCESS_TOKEN env
+                              variable.
+  --access-token-secret ACCESS_TOKEN_SECRET
+                              Twitter API access token secret. Can also be
+                              configured in a .minetrc file as
+                              "twitter.access_token_secret" or read from the
+                              MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  --api-key API_KEY           Twitter API key. Can also be configured in a
+                              .minetrc file as "twitter.api_key" or read from
+                              the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY
+                              Twitter API secret key. Can also be configured in
+                              a .minetrc file as "twitter.api_secret_key" or
+                              read from the MINET_TWITTER_API_SECRET_KEY env
+                              variable.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 examples:
 
 . Getting members of a list of lists:
     $ minet tw list-members id lists.csv > members.csv
-
 ```
 
 ### retweeters
@@ -2314,25 +2846,44 @@ Minet Twitter Retweeters Command
 Retrieve retweeters of given tweet using Twitter API v2.
 
 positional arguments:
-  column                                     Name of the CSV column containing tweet ids or a single tweet id.
-  file                                       CSV file containing the tweet ids.
+  column                      Name of the CSV column containing tweet ids or a
+                              single tweet id.
+  file                        CSV file containing the tweet ids.
 
 optional arguments:
-  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
-  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
-  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                 show this help message and exit
+  --access-token ACCESS_TOKEN
+                              Twitter API access token. Can also be configured
+                              in a .minetrc file as "twitter.access_token" or
+                              read from the MINET_TWITTER_ACCESS_TOKEN env
+                              variable.
+  --access-token-secret ACCESS_TOKEN_SECRET
+                              Twitter API access token secret. Can also be
+                              configured in a .minetrc file as
+                              "twitter.access_token_secret" or read from the
+                              MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  --api-key API_KEY           Twitter API key. Can also be configured in a
+                              .minetrc file as "twitter.api_key" or read from
+                              the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY
+                              Twitter API secret key. Can also be configured in
+                              a .minetrc file as "twitter.api_secret_key" or
+                              read from the MINET_TWITTER_API_SECRET_KEY env
+                              variable.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 examples:
 
 . Getting the users who retweeted a list of tweets:
     $ minet tw retweeters tweet_id tweets.csv > retweeters.csv
-
 ```
 
 <h3 id="twitter-scrape">scrape</h3>
@@ -2357,17 +2908,29 @@ Useful operators include "since" and "until" to search specific
 time ranges like so: "since:2014-01-01 until:2017-12-31".
 
 positional arguments:
-  {tweets,users}                   What to scrape. Currently only `tweets` and `users` are possible.
-  query                            Search query or name of the column containing queries to run in given CSV file.
-  file                             Optional CSV file containing the queries to be run.
+  {tweets,users}              What to scrape. Currently only `tweets` and
+                              `users` are possible.
+  query                       Search query or name of the column containing
+                              queries to run in given CSV file.
+  file                        Optional CSV file containing the queries to be
+                              run.
 
 optional arguments:
-  --include-refs                   Whether to emit referenced tweets (quoted, retweeted & replied) in the CSV output. Note that it consumes a memory proportional to the total number of unique tweets retrieved.
-  -l LIMIT, --limit LIMIT          Maximum number of tweets or users to collect per query.
-  --query-template QUERY_TEMPLATE  Query template. Can be useful for instance to change a column of twitter user screen names into from:@user queries.
-  -s SELECT, --select SELECT       Columns of input CSV file to include in the output (separated by `,`).
-  -o OUTPUT, --output OUTPUT       Path to the output file. By default, the results will be printed to stdout.
-  -h, --help                       show this help message and exit
+  --include-refs              Whether to emit referenced tweets (quoted,
+                              retweeted & replied) in the CSV output. Note that
+                              it consumes a memory proportional to the total
+                              number of unique tweets retrieved.
+  -l LIMIT, --limit LIMIT     Maximum number of tweets or users to collect per
+                              query.
+  --query-template QUERY_TEMPLATE
+                              Query template. Can be useful for instance to
+                              change a column of twitter user screen names into
+                              from:@user queries.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  -h, --help                  show this help message and exit
 
 examples:
 
@@ -2391,7 +2954,6 @@ examples:
 
 . Collecting users with "adam" in their user_name or user_description:
     $ minet tw scrape users adam > users.csv
-
 ```
 
 ### tweet-date
@@ -2407,19 +2969,22 @@ Minet Twitter Tweet Date Command
 Getting timestamp and date from tweet url or id.
 
 positional arguments:
-  column                      Name of the CSV column containing tweet urls or ids or a single tweet url or id.
+  column                      Name of the CSV column containing tweet urls or
+                              ids or a single tweet url or id.
   file                        CSV file containing the tweet urls or ids.
 
 optional arguments:
-  --timezone TIMEZONE         Timezone for the date, for example 'Europe/Paris'. Default to UTC.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  --timezone TIMEZONE         Timezone for the date, for example 'Europe/Paris'.
+                              Default to UTC.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
   -h, --help                  show this help message and exit
 
 examples:
 
     $ minet tw tweet-date url tweets.csv --timezone 'Europe/Paris'> tweets_timestamp_date.csv
-
 ```
 
 ### tweet-search
@@ -2447,25 +3012,56 @@ This will only return the last 8 days of results maximum per query (unless you h
 To search the full archive of public tweets, use --academic if you have academic research access.
 
 positional arguments:
-  column                                     Name of the CSV column containing queries or a single query.
-  file                                       CSV file containing the queries.
+  column                      Name of the CSV column containing queries or a
+                              single query.
+  file                        CSV file containing the queries.
 
 optional arguments:
-  --academic                                 Flag to add if you want to use your academic research access (in order to search the complete history of public tweets).
-  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
-  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
-  --end-time END_TIME                        The UTC stamp to which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ
-  --since-id SINCE_ID                        Will return tweets with ids that are greater than the specified id. Takes precedence over --start-time.
-  --sort-order {recency,relevancy}           How to sort retrieved tweets. Defaults to "recency".
-  --start-time START_TIME                    The oldest UTC stamp from which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ
-  --until-id UNTIL_ID                        Will return tweets that are older than the tweet with the specified id.
-  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                 show this help message and exit
+  --academic                  Flag to add if you want to use your academic
+                              research access (in order to search the complete
+                              history of public tweets).
+  --access-token ACCESS_TOKEN
+                              Twitter API access token. Can also be configured
+                              in a .minetrc file as "twitter.access_token" or
+                              read from the MINET_TWITTER_ACCESS_TOKEN env
+                              variable.
+  --access-token-secret ACCESS_TOKEN_SECRET
+                              Twitter API access token secret. Can also be
+                              configured in a .minetrc file as
+                              "twitter.access_token_secret" or read from the
+                              MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  --api-key API_KEY           Twitter API key. Can also be configured in a
+                              .minetrc file as "twitter.api_key" or read from
+                              the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY
+                              Twitter API secret key. Can also be configured in
+                              a .minetrc file as "twitter.api_secret_key" or
+                              read from the MINET_TWITTER_API_SECRET_KEY env
+                              variable.
+  --end-time END_TIME         The UTC stamp to which the tweets will be
+                              provided. The date should have the format : YYYY-
+                              MM-DDTHH:mm:ssZ
+  --since-id SINCE_ID         Will return tweets with ids that are greater than
+                              the specified id. Takes precedence over --start-
+                              time.
+  --sort-order {recency,relevancy}
+                              How to sort retrieved tweets. Defaults to
+                              "recency".
+  --start-time START_TIME     The oldest UTC stamp from which the tweets will be
+                              provided. The date should have the format : YYYY-
+                              MM-DDTHH:mm:ssZ
+  --until-id UNTIL_ID         Will return tweets that are older than the tweet
+                              with the specified id.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 examples:
 
@@ -2474,7 +3070,6 @@ examples:
 
 . Running multiple queries in series:
     $ minet tw tweet-search query queries.csv > tweets.csv
-
 ```
 
 ### tweet-count
@@ -2507,25 +3102,56 @@ by Twitter's API if you choose a time granularity for the
 results.
 
 positional arguments:
-  column                                     Name of the CSV column containing queries or a single query.
-  file                                       CSV file containing the queries.
+  column                      Name of the CSV column containing queries or a
+                              single query.
+  file                        CSV file containing the queries.
 
 optional arguments:
-  --academic                                 Flag to add if you want to use your academic research access (in order to search the complete history of public tweets).
-  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
-  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
-  --end-time END_TIME                        The UTC stamp to which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ
-  --granularity {day,hour,minute}            Granularity used to group the data by. Defaults to day.
-  --since-id SINCE_ID                        Will return tweets with ids that are greater than the specified id. Takes precedence over --start-time.
-  --start-time START_TIME                    The oldest UTC stamp from which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ
-  --until-id UNTIL_ID                        Will return tweets that are older than the tweet with the specified id.
-  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                 show this help message and exit
+  --academic                  Flag to add if you want to use your academic
+                              research access (in order to search the complete
+                              history of public tweets).
+  --access-token ACCESS_TOKEN
+                              Twitter API access token. Can also be configured
+                              in a .minetrc file as "twitter.access_token" or
+                              read from the MINET_TWITTER_ACCESS_TOKEN env
+                              variable.
+  --access-token-secret ACCESS_TOKEN_SECRET
+                              Twitter API access token secret. Can also be
+                              configured in a .minetrc file as
+                              "twitter.access_token_secret" or read from the
+                              MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  --api-key API_KEY           Twitter API key. Can also be configured in a
+                              .minetrc file as "twitter.api_key" or read from
+                              the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY
+                              Twitter API secret key. Can also be configured in
+                              a .minetrc file as "twitter.api_secret_key" or
+                              read from the MINET_TWITTER_API_SECRET_KEY env
+                              variable.
+  --end-time END_TIME         The UTC stamp to which the tweets will be
+                              provided. The date should have the format : YYYY-
+                              MM-DDTHH:mm:ssZ
+  --granularity {day,hour,minute}
+                              Granularity used to group the data by. Defaults to
+                              day.
+  --since-id SINCE_ID         Will return tweets with ids that are greater than
+                              the specified id. Takes precedence over --start-
+                              time.
+  --start-time START_TIME     The oldest UTC stamp from which the tweets will be
+                              provided. The date should have the format : YYYY-
+                              MM-DDTHH:mm:ssZ
+  --until-id UNTIL_ID         Will return tweets that are older than the tweet
+                              with the specified id.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 examples:
 
@@ -2537,7 +3163,6 @@ examples:
 
 . Number of tweets matching the query per day:
     $ minet tw tweet-count "query" --granularity day > counts.csv
-
 ```
 
 ### tweets
@@ -2556,27 +3181,48 @@ Minet Twitter Tweets Command
 Collecting tweet metadata from the given tweet ids, using the API.
 
 positional arguments:
-  column                                     Name of the CSV column containing tweet ids or a single tweet id.
-  file                                       CSV file containing the tweet ids.
+  column                      Name of the CSV column containing tweet ids or a
+                              single tweet id.
+  file                        CSV file containing the tweet ids.
 
 optional arguments:
-  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
-  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
-  --v2                                       Whether to use latest Twitter API v2 rather than v1.1.
-  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --resume                                   Whether to resume from an aborted collection. Need -o to be set.
-  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                 show this help message and exit
+  --access-token ACCESS_TOKEN
+                              Twitter API access token. Can also be configured
+                              in a .minetrc file as "twitter.access_token" or
+                              read from the MINET_TWITTER_ACCESS_TOKEN env
+                              variable.
+  --access-token-secret ACCESS_TOKEN_SECRET
+                              Twitter API access token secret. Can also be
+                              configured in a .minetrc file as
+                              "twitter.access_token_secret" or read from the
+                              MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  --api-key API_KEY           Twitter API key. Can also be configured in a
+                              .minetrc file as "twitter.api_key" or read from
+                              the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY
+                              Twitter API secret key. Can also be configured in
+                              a .minetrc file as "twitter.api_secret_key" or
+                              read from the MINET_TWITTER_API_SECRET_KEY env
+                              variable.
+  --v2                        Whether to use latest Twitter API v2 rather than
+                              v1.1.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --resume                    Whether to resume from an aborted collection. Need
+                              -o to be set.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 examples:
 
 . Getting metadata from tweets in a CSV file:
     $ minet tw tweets tweet_id tweets.csv > tweets_metadata.csv
-
 ```
 
 ### users
@@ -2595,28 +3241,50 @@ Minet Twitter Users Command
 Retrieve Twitter user metadata using the API.
 
 positional arguments:
-  column                                     Name of the CSV column containing Twitter users or a single Twitter user.
-  file                                       CSV file containing the Twitter users.
+  column                      Name of the CSV column containing Twitter users or
+                              a single Twitter user.
+  file                        CSV file containing the Twitter users.
 
 optional arguments:
-  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
-  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
-  --ids                                      Whether your users are given as ids rather than screen names.
-  --v2                                       Whether to use latest Twitter API v2 rather than v1.1.
-  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --resume                                   Whether to resume from an aborted collection. Need -o to be set.
-  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                 show this help message and exit
+  --access-token ACCESS_TOKEN
+                              Twitter API access token. Can also be configured
+                              in a .minetrc file as "twitter.access_token" or
+                              read from the MINET_TWITTER_ACCESS_TOKEN env
+                              variable.
+  --access-token-secret ACCESS_TOKEN_SECRET
+                              Twitter API access token secret. Can also be
+                              configured in a .minetrc file as
+                              "twitter.access_token_secret" or read from the
+                              MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  --api-key API_KEY           Twitter API key. Can also be configured in a
+                              .minetrc file as "twitter.api_key" or read from
+                              the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY
+                              Twitter API secret key. Can also be configured in
+                              a .minetrc file as "twitter.api_secret_key" or
+                              read from the MINET_TWITTER_API_SECRET_KEY env
+                              variable.
+  --ids                       Whether your users are given as ids rather than
+                              screen names.
+  --v2                        Whether to use latest Twitter API v2 rather than
+                              v1.1.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --resume                    Whether to resume from an aborted collection. Need
+                              -o to be set.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 examples:
 
 . Getting friends of a list of user:
     $ minet tw users screen_name users.csv > data_users.csv
-
 ```
 
 ### user-search
@@ -2639,19 +3307,39 @@ so you might want to find a way to segment your inquiry
 into smaller queries to find more users.
 
 positional arguments:
-  column                                     Name of the CSV column containing queries or a single query.
-  file                                       CSV file containing the queries.
+  column                      Name of the CSV column containing queries or a
+                              single query.
+  file                        CSV file containing the queries.
 
 optional arguments:
-  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
-  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
-  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                 show this help message and exit
+  --access-token ACCESS_TOKEN
+                              Twitter API access token. Can also be configured
+                              in a .minetrc file as "twitter.access_token" or
+                              read from the MINET_TWITTER_ACCESS_TOKEN env
+                              variable.
+  --access-token-secret ACCESS_TOKEN_SECRET
+                              Twitter API access token secret. Can also be
+                              configured in a .minetrc file as
+                              "twitter.access_token_secret" or read from the
+                              MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  --api-key API_KEY           Twitter API key. Can also be configured in a
+                              .minetrc file as "twitter.api_key" or read from
+                              the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY
+                              Twitter API secret key. Can also be configured in
+                              a .minetrc file as "twitter.api_secret_key" or
+                              read from the MINET_TWITTER_API_SECRET_KEY env
+                              variable.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 examples:
 
@@ -2660,7 +3348,6 @@ examples:
 
 . Running multiple queries in series:
     $ minet tw user-search query queries.csv > users.csv
-
 ```
 
 ### user-tweets
@@ -2682,29 +3369,54 @@ Retrieve the last ~3200 tweets, including retweets from
 the given Twitter users, using the API.
 
 positional arguments:
-  column                                     Name of the CSV column containing Twitter account screen names or ids or a single Twitter account screen name or id.
-  file                                       CSV file containing the Twitter account screen names or ids.
+  column                      Name of the CSV column containing Twitter account
+                              screen names or ids or a single Twitter account
+                              screen name or id.
+  file                        CSV file containing the Twitter account screen
+                              names or ids.
 
 optional arguments:
-  --access-token ACCESS_TOKEN                Twitter API access token. Can also be configured in a .minetrc file as "twitter.access_token" or read from the MINET_TWITTER_ACCESS_TOKEN env variable.
-  --access-token-secret ACCESS_TOKEN_SECRET  Twitter API access token secret. Can also be configured in a .minetrc file as "twitter.access_token_secret" or read from the MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
-  --api-key API_KEY                          Twitter API key. Can also be configured in a .minetrc file as "twitter.api_key" or read from the MINET_TWITTER_API_KEY env variable.
-  --api-secret-key API_SECRET_KEY            Twitter API secret key. Can also be configured in a .minetrc file as "twitter.api_secret_key" or read from the MINET_TWITTER_API_SECRET_KEY env variable.
-  --exclude-retweets                         Whether to exclude retweets from the output.
-  --ids                                      Whether your users are given as ids rather than screen names.
-  --min-date MIN_DATE                        Whether to add a date to stop at for user's tweets retrieval. UTC date should have the following format : YYYY-MM-DD
-  --v2                                       Whether to use latest Twitter API v2 rather than v1.1.
-  -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                 show this help message and exit
+  --access-token ACCESS_TOKEN
+                              Twitter API access token. Can also be configured
+                              in a .minetrc file as "twitter.access_token" or
+                              read from the MINET_TWITTER_ACCESS_TOKEN env
+                              variable.
+  --access-token-secret ACCESS_TOKEN_SECRET
+                              Twitter API access token secret. Can also be
+                              configured in a .minetrc file as
+                              "twitter.access_token_secret" or read from the
+                              MINET_TWITTER_ACCESS_TOKEN_SECRET env variable.
+  --api-key API_KEY           Twitter API key. Can also be configured in a
+                              .minetrc file as "twitter.api_key" or read from
+                              the MINET_TWITTER_API_KEY env variable.
+  --api-secret-key API_SECRET_KEY
+                              Twitter API secret key. Can also be configured in
+                              a .minetrc file as "twitter.api_secret_key" or
+                              read from the MINET_TWITTER_API_SECRET_KEY env
+                              variable.
+  --exclude-retweets          Whether to exclude retweets from the output.
+  --ids                       Whether your users are given as ids rather than
+                              screen names.
+  --min-date MIN_DATE         Whether to add a date to stop at for user's tweets
+                              retrieval. UTC date should have the following
+                              format : YYYY-MM-DD
+  --v2                        Whether to use latest Twitter API v2 rather than
+                              v1.1.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 examples:
 
 . Getting tweets from users in a CSV file:
     $ minet tw user-tweets screen_name users.csv > tweets.csv
-
 ```
 
 ## Youtube
@@ -2722,14 +3434,21 @@ Youtube captions
 Retrieve captions for the given YouTube videos.
 
 positional arguments:
-  column                      Name of the CSV column containing video urls or ids or a single video url or id.
+  column                      Name of the CSV column containing video urls or
+                              ids or a single video url or id.
   file                        CSV file containing the video urls or ids.
 
 optional arguments:
-  --lang LANG                 Language (ISO code like "en") of captions to retrieve. You can specify several languages by preferred order separated by commas. Defaults to "en".
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
+  --lang LANG                 Language (ISO code like "en") of captions to
+                              retrieve. You can specify several languages by
+                              preferred order separated by commas. Defaults to
+                              "en".
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2739,7 +3458,6 @@ examples:
 
 . Fetching French captions with a fallback to English:
     $ minet yt captions video_id videos.csv --lang fr,en > captions.csv
-
 ```
 
 ### channel-videos
@@ -2760,15 +3478,24 @@ information about videos stored in the main playlist of the channel
 supposed to contain all the channel's videos.
 
 positional arguments:
-  column                      Name of the CSV column containing channels or a single channel.
+  column                      Name of the CSV column containing channels or a
+                              single channel.
   file                        CSV file containing the channels.
 
 optional arguments:
-  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used more than once. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used
+                              more than once. Can also be configured in a
+                              .minetrc file as "youtube.key" or read from the
+                              MINET_YOUTUBE_KEY env variable.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
@@ -2781,7 +3508,6 @@ example:
 . Fetching multiple channels' videos:
     $ minet youtube channel-videos channel_id channels_id.csv -k my-api-key > channels_videos.csv
     $ minet youtube channel-videos channel_url channels_url.csv -k my-api-key > channels_videos.csv
-
 ```
 
 <h3 id="youtube-comments">comments</h3>
@@ -2803,15 +3529,24 @@ website to find it if necessary. Then the command uses the API to retrieve
 information about the channel.
 
 positional arguments:
-  column                      Name of the CSV column containing channels or a single channel.
+  column                      Name of the CSV column containing channels or a
+                              single channel.
   file                        CSV file containing the channels.
 
 optional arguments:
-  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used more than once. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used
+                              more than once. Can also be configured in a
+                              .minetrc file as "youtube.key" or read from the
+                              MINET_YOUTUBE_KEY env variable.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
@@ -2824,7 +3559,6 @@ example:
 . Fetching multiple channels' metadata:
     $ minet youtube channels channel_id channels_id.csv -k my-api-key > channels.csv
     $ minet youtube channels channel_url channels_url.csv -k my-api-key > channels.csv
-
 ```
 
 ```
@@ -2838,22 +3572,30 @@ Youtube comments
 Retrieve metadata about Youtube comments using the API.
 
 positional arguments:
-  column                      Name of the CSV column containing videos or a single video.
+  column                      Name of the CSV column containing videos or a
+                              single video.
   file                        CSV file containing the videos.
 
 optional arguments:
-  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used more than once. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used
+                              more than once. Can also be configured in a
+                              .minetrc file as "youtube.key" or read from the
+                              MINET_YOUTUBE_KEY env variable.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
 
 . Fetching a video's comments:
     $ minet yt comments https://www.youtube.com/watch?v=7JTb2vf1OQQ -k my-api-key > comments.csv
-
 ```
 
 <h3 id="youtube-search">search</h3>
@@ -2871,25 +3613,34 @@ Youtube search
 Retrieve metadata about Youtube search field using the API.
 
 positional arguments:
-  column                                          Name of the CSV column containing queries or a single query.
-  file                                            CSV file containing the queries.
+  column                      Name of the CSV column containing queries or a
+                              single query.
+  file                        CSV file containing the queries.
 
 optional arguments:
-  -k KEY, --key KEY                               YouTube API Data dashboard API key. Can be used more than once. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
-  -l LIMIT, --limit LIMIT                         Maximum number of videos to retrieve per query.
+  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used
+                              more than once. Can also be configured in a
+                              .minetrc file as "youtube.key" or read from the
+                              MINET_YOUTUBE_KEY env variable.
+  -l LIMIT, --limit LIMIT     Maximum number of videos to retrieve per query.
   --order {date,rating,relevance,title,videoCount,viewCount}
-                                                  Order in which videos are retrieved. The default one is relevance.
-  -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL                                   Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                                 Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
-  -h, --help                                      show this help message and exit
+                              Order in which videos are retrieved. The default
+                              one is relevance.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
+  -h, --help                  show this help message and exit
 
 example:
 
 . Searching videos about birds:
     $ minet youtube search bird -k my-api-key > bird_videos.csv
-
 ```
 
 ### videos
@@ -2905,16 +3656,24 @@ Youtube videos
 Retrieve metadata about Youtube videos using the API.
 
 positional arguments:
-  column                      Name of the CSV column containing videos or a single video.
+  column                      Name of the CSV column containing videos or a
+                              single video.
   file                        CSV file containing the videos.
 
 optional arguments:
-  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used more than once. Can also be configured in a .minetrc file as "youtube.key" or read from the MINET_YOUTUBE_KEY env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
+  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used
+                              more than once. Can also be configured in a
+                              .minetrc file as "youtube.key" or read from the
+                              MINET_YOUTUBE_KEY env variable.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Necessary if you
+                              want to display a finite progress indicator.
+  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
+                              will be printed to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here: https://github.com/medialab/
+                              minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
-
 ```
 
