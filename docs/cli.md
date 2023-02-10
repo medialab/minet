@@ -161,7 +161,7 @@ Finally note that command line arguments and flags will take precedence over env
 ## cookies
 
 ```
-usage: minet cookies [-h] [--rcfile RCFILE] [--csv] [--url URL] [-o OUTPUT]
+usage: minet cookies [-h] [--csv] [--url URL] [-o OUTPUT]
                      {chrome,chromium,edge,firefox,opera}
 
 Minet Cookies Command
@@ -177,7 +177,6 @@ optional arguments:
   --csv                                 Whether to format the output as CSV. If --url is set, will output the cookie's morsels as CSV.
   --url URL                             If given, only returns full cookie header value for this url.
   -o OUTPUT, --output OUTPUT            Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                       Custom path to a minet configuration file.
   -h, --help                            show this help message and exit
 
 examples:
@@ -199,8 +198,8 @@ examples:
 ## crawl
 
 ```
-usage: minet crawl [-h] [--rcfile RCFILE] [-d OUTPUT_DIR] [--resume]
-                   [--throttle THROTTLE] [-o OUTPUT]
+usage: minet crawl [-h] [-d OUTPUT_DIR] [--resume] [--throttle THROTTLE]
+                   [-o OUTPUT]
                    crawler
 
 Minet Crawl Command
@@ -217,7 +216,6 @@ optional arguments:
   --throttle THROTTLE                     Time to wait - in seconds - between 2 calls to the same domain. Defaults to 0.2.
   -o OUTPUT, --output OUTPUT              Path to the output file. By default, the results will be printed to stdout.
   --resume                                Whether to resume an interrupted crawl.
-  --rcfile RCFILE                         Custom path to a minet configuration file.
   -h, --help                              show this help message and exit
 
 examples:
@@ -230,8 +228,7 @@ examples:
 ## fetch
 
 ```
-usage: minet fetch [-h] [--rcfile RCFILE]
-                   [--domain-parallelism DOMAIN_PARALLELISM]
+usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM]
                    [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
                    [--insecure] [--separator SEPARATOR] [-t THREADS]
                    [--throttle THROTTLE] [--timeout TIMEOUT]
@@ -283,7 +280,6 @@ optional arguments:
   --total TOTAL                                   Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
   --resume                                        Whether to resume from an aborted collection. Need -o to be set.
-  --rcfile RCFILE                                 Custom path to a minet configuration file.
   -h, --help                                      show this help message and exit
 
 columns being added to the output:
@@ -335,8 +331,8 @@ examples:
 ## extract
 
 ```
-usage: minet extract [-h] [--rcfile RCFILE] [-g GLOB] [-i INPUT_DIR]
-                     [-p PROCESSES] [-s SELECT] [--total TOTAL] [-o OUTPUT]
+usage: minet extract [-h] [-g GLOB] [-i INPUT_DIR] [-p PROCESSES] [-s SELECT]
+                     [--total TOTAL] [-o OUTPUT]
                      [report]
 
 Minet Extract Command
@@ -364,7 +360,6 @@ optional arguments:
   -s SELECT, --select SELECT           Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                        Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT           Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                      Custom path to a minet configuration file.
   -h, --help                           show this help message and exit
 
 columns being added to the output:
@@ -404,8 +399,7 @@ examples:
 ## resolve
 
 ```
-usage: minet resolve [-h] [--rcfile RCFILE]
-                     [--domain-parallelism DOMAIN_PARALLELISM]
+usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM]
                      [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
                      [--insecure] [--separator SEPARATOR] [-t THREADS]
                      [--throttle THROTTLE] [--timeout TIMEOUT]
@@ -449,7 +443,6 @@ optional arguments:
   --total TOTAL                                   Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
   --resume                                        Whether to resume from an aborted collection. Need -o to be set.
-  --rcfile RCFILE                                 Custom path to a minet configuration file.
   -h, --help                                      show this help message and exit
 
 columns being added to the output:
@@ -478,9 +471,9 @@ examples:
 For more documentation about minet's scraping DSL check this [page](../cookbook/scraping_dsl.md) from the Cookbook.
 
 ```
-usage: minet scrape [-h] [--rcfile RCFILE] [-f {csv,jsonl}] [-g GLOB]
-                    [-i INPUT_DIR] [-p PROCESSES] [--separator SEPARATOR]
-                    [--strain STRAIN] [--validate] [--total TOTAL] [-o OUTPUT]
+usage: minet scrape [-h] [-f {csv,jsonl}] [-g GLOB] [-i INPUT_DIR]
+                    [-p PROCESSES] [--separator SEPARATOR] [--strain STRAIN]
+                    [--validate] [--total TOTAL] [-o OUTPUT]
                     scraper [report]
 
 Minet Scrape Command
@@ -506,7 +499,6 @@ optional arguments:
   --validate                            Just validate the given scraper then exit.
   --total TOTAL                         Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT            Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                       Custom path to a minet configuration file.
   -h, --help                            show this help message and exit
 
 examples:
@@ -537,9 +529,8 @@ examples:
 ## url-extract
 
 ```
-usage: minet url-extract [-h] [--rcfile RCFILE] [--base-url BASE_URL]
-                         [--from {html,text}] [-s SELECT] [--total TOTAL]
-                         [-o OUTPUT]
+usage: minet url-extract [-h] [--base-url BASE_URL] [--from {html,text}]
+                         [-s SELECT] [--total TOTAL] [-o OUTPUT]
                          column [file]
 
 Minet Url Extract Command
@@ -558,7 +549,6 @@ optional arguments:
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
   -h, --help                  show this help message and exit
 
 examples:
@@ -574,8 +564,8 @@ examples:
 ## url-join
 
 ```
-usage: minet url-join [-h] [--rcfile RCFILE] [-p MATCH_COLUMN_PREFIX]
-                      [--separator SEPARATOR] [-s SELECT] [-o OUTPUT]
+usage: minet url-join [-h] [-p MATCH_COLUMN_PREFIX] [--separator SEPARATOR]
+                      [-s SELECT] [-o OUTPUT]
                       column1 file1 column2 file2
 
 Minet Url Join Command
@@ -597,7 +587,6 @@ optional arguments:
   --separator SEPARATOR                           Split indexed url column by a separator?
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                                 Custom path to a minet configuration file.
   -h, --help                                      show this help message and exit
 
 examples:
@@ -613,9 +602,8 @@ examples:
 ## url-parse
 
 ```
-usage: minet url-parse [-h] [--rcfile RCFILE] [--separator SEPARATOR]
-                       [--facebook] [--twitter] [--youtube]
-                       [--infer-redirection] [--fix-common-mistakes]
+usage: minet url-parse [-h] [--separator SEPARATOR] [--facebook] [--twitter]
+                       [--youtube] [--infer-redirection] [--fix-common-mistakes]
                        [--normalize-amp] [--quoted] [--sort-query]
                        [--strip-authentication] [--strip-fragment]
                        [--strip-index] [--strip-irrelevant-subdomains]
@@ -663,7 +651,6 @@ optional arguments:
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                                   Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                                 Custom path to a minet configuration file.
   -h, --help                                      show this help message and exit
 
 columns being added to the output:
@@ -732,7 +719,7 @@ examples:
 ## BuzzSumo
 
 ```
-usage: minet buzzsumo [-h] [--rcfile RCFILE] [-t TOKEN]
+usage: minet buzzsumo [-h] [-t TOKEN] [--rcfile RCFILE]
                       {limit,domain,domain-summary} ...
 
 Minet Buzzsumo Command
@@ -742,7 +729,7 @@ Gather data from the BuzzSumo APIs easily and efficiently.
 
 optional arguments:
   -t TOKEN, --token TOKEN        BuzzSumo API token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
-  --rcfile RCFILE                Custom path to a minet configuration file.
+  --rcfile RCFILE                Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                     show this help message and exit
 
 subcommands:
@@ -753,7 +740,7 @@ subcommands:
 <h3 id="buzzsumo-limit">limit</h3>
 
 ```
-usage: minet buzzsumo limit [-h] [--rcfile RCFILE] [-t TOKEN] [-o OUTPUT]
+usage: minet buzzsumo limit [-h] [-t TOKEN] [--rcfile RCFILE] [-o OUTPUT]
 
 Minet Buzzsumo Limit Command
 ============================
@@ -764,7 +751,7 @@ of calls for this month contained in the request's headers.
 optional arguments:
   -t TOKEN, --token TOKEN     BuzzSumo API token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
@@ -777,7 +764,7 @@ examples:
 <h3 id="buzzsumo-domain-summary">domain-summary</h3>
 
 ```
-usage: minet buzzsumo domain-summary [-h] [--rcfile RCFILE] [-t TOKEN]
+usage: minet buzzsumo domain-summary [-h] [-t TOKEN] [--rcfile RCFILE]
                                      --begin-date BEGIN_DATE --end-date END_DATE
                                      [-s SELECT] [-o OUTPUT]
                                      column [file]
@@ -799,7 +786,7 @@ optional arguments:
   -t TOKEN, --token TOKEN     BuzzSumo API token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
@@ -815,7 +802,7 @@ examples:
 <h3 id="buzzsumo-domain">domain</h3>
 
 ```
-usage: minet buzzsumo domain [-h] [--rcfile RCFILE] [-t TOKEN] --begin-date
+usage: minet buzzsumo domain [-h] [-t TOKEN] [--rcfile RCFILE] --begin-date
                              BEGIN_DATE --end-date END_DATE [-s SELECT]
                              [-o OUTPUT]
                              column [file]
@@ -837,7 +824,7 @@ optional arguments:
   -t TOKEN, --token TOKEN     BuzzSumo API token. Can also be configured in a .minetrc file as "buzzsumo.token" or read from the MINET_BUZZSUMO_TOKEN env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
@@ -853,7 +840,7 @@ examples:
 ## CrowdTangle
 
 ```
-usage: minet crowdtangle [-h] [--rcfile RCFILE] [--rate-limit RATE_LIMIT]
+usage: minet crowdtangle [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
                          [-t TOKEN]
                          {leaderboard,lists,posts-by-id,posts,search,summary}
                          ...
@@ -866,7 +853,7 @@ Gather data from the CrowdTangle APIs easily and efficiently.
 optional arguments:
   --rate-limit RATE_LIMIT                         Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
-  --rcfile RCFILE                                 Custom path to a minet configuration file.
+  --rcfile RCFILE                                 Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                      show this help message and exit
 
 subcommands:
@@ -878,8 +865,8 @@ subcommands:
 ### leaderboard
 
 ```
-usage: minet crowdtangle leaderboard [-h] [--rcfile RCFILE]
-                                     [--rate-limit RATE_LIMIT] [-t TOKEN]
+usage: minet crowdtangle leaderboard [-h] [--rate-limit RATE_LIMIT]
+                                     [--rcfile RCFILE] [-t TOKEN]
                                      [--no-breakdown] [-f {csv,jsonl}]
                                      [-l LIMIT] [--list-id LIST_ID]
                                      [--start-date START_DATE] [-o OUTPUT]
@@ -900,7 +887,7 @@ optional arguments:
   --start-date START_DATE               The earliest date at which to start aggregating statistics (UTC!). You can pass just a year or a year-month for convenience.
   -t TOKEN, --token TOKEN               CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   -o OUTPUT, --output OUTPUT            Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                       Custom path to a minet configuration file.
+  --rcfile RCFILE                       Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                            show this help message and exit
 
 examples:
@@ -913,7 +900,7 @@ examples:
 ### lists
 
 ```
-usage: minet crowdtangle lists [-h] [--rcfile RCFILE] [--rate-limit RATE_LIMIT]
+usage: minet crowdtangle lists [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
                                [-t TOKEN] [-o OUTPUT]
 
 Minet CrowdTangle Lists Command
@@ -927,7 +914,7 @@ optional arguments:
   --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to 6. Rcfile key: crowdtangle.rate_limit. Can also be configured in a .minetrc file as "crowdtangle.rate_limit" or read from the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
@@ -940,10 +927,9 @@ examples:
 ### posts-by-id
 
 ```
-usage: minet crowdtangle posts-by-id [-h] [--rcfile RCFILE]
-                                     [--rate-limit RATE_LIMIT] [-t TOKEN]
-                                     [-s SELECT] [--total TOTAL] [--resume]
-                                     [-o OUTPUT]
+usage: minet crowdtangle posts-by-id [-h] [--rate-limit RATE_LIMIT]
+                                     [--rcfile RCFILE] [-t TOKEN] [-s SELECT]
+                                     [--total TOTAL] [--resume] [-o OUTPUT]
                                      column [file]
 
 Minet CrowdTangle Post By Id Command
@@ -964,7 +950,7 @@ optional arguments:
   --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
   --resume                    Whether to resume from an aborted collection. Need -o to be set.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
@@ -980,7 +966,7 @@ examples:
 ### posts
 
 ```
-usage: minet crowdtangle posts [-h] [--rcfile RCFILE] [--rate-limit RATE_LIMIT]
+usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
                                [-t TOKEN] [--chunk-size CHUNK_SIZE]
                                [--end-date END_DATE] [-f {csv,jsonl}]
                                [--language LANGUAGE] [-l LIMIT]
@@ -1009,7 +995,7 @@ optional arguments:
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
   --resume                                        Whether to resume from an aborted collection. Need -o to be set.
-  --rcfile RCFILE                                 Custom path to a minet configuration file.
+  --rcfile RCFILE                                 Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                      show this help message and exit
 
 examples:
@@ -1031,7 +1017,7 @@ To know the different list ids associated with your dashboard:
 <h3 id="ct-search">search</h3>
 
 ```
-usage: minet crowdtangle search [-h] [--rcfile RCFILE] [--rate-limit RATE_LIMIT]
+usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
                                 [-t TOKEN] [--and AND] [--chunk-size CHUNK_SIZE]
                                 [--end-date END_DATE] [-f {csv,jsonl}]
                                 [--in-list-ids IN_LIST_IDS]
@@ -1074,7 +1060,7 @@ optional arguments:
   -t TOKEN, --token TOKEN                         CrowdTangle dashboard API token. Rcfile key: crowdtangle.token. Can also be configured in a .minetrc file as "crowdtangle.token" or read from the MINET_CROWDTANGLE_TOKEN env variable.
   --types TYPES                                   Types of post to include, separated by comma.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                                 Custom path to a minet configuration file.
+  --rcfile RCFILE                                 Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                      show this help message and exit
 
 examples:
@@ -1087,9 +1073,9 @@ examples:
 ### summary
 
 ```
-usage: minet crowdtangle summary [-h] [--rcfile RCFILE]
-                                 [--rate-limit RATE_LIMIT] [-t TOKEN]
-                                 [-p PLATFORMS] [--posts POSTS]
+usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT]
+                                 [--rcfile RCFILE] [-t TOKEN] [-p PLATFORMS]
+                                 [--posts POSTS]
                                  [--sort-by {date,subscriber_count,total_interactions}]
                                  --start-date START_DATE [-s SELECT]
                                  [--total TOTAL] [-o OUTPUT]
@@ -1117,7 +1103,7 @@ optional arguments:
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                                   Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                                 Custom path to a minet configuration file.
+  --rcfile RCFILE                                 Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                      show this help message and exit
 
 examples:
@@ -1130,7 +1116,7 @@ examples:
 ## Facebook
 
 ```
-usage: minet facebook [-h] [--rcfile RCFILE]
+usage: minet facebook [-h]
                       {comments,post-authors,post-stats,post,posts,url-likes}
                       ...
 
@@ -1140,7 +1126,6 @@ Minet Facebook Command
 Collect data from Facebook.
 
 optional arguments:
-  --rcfile RCFILE                                 Custom path to a minet configuration file.
   -h, --help                                      show this help message and exit
 
 subcommands:
@@ -1152,7 +1137,7 @@ subcommands:
 <h3 id="facebook-comments">comments</h3>
 
 ```
-usage: minet facebook comments [-h] [--rcfile RCFILE] [-c COOKIE]
+usage: minet facebook comments [-h] [-c COOKIE] [--rcfile RCFILE]
                                [--throttle THROTTLE] [-s SELECT] [-o OUTPUT]
                                column [file]
 
@@ -1178,7 +1163,7 @@ optional arguments:
   --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
@@ -1197,7 +1182,7 @@ examples:
 <h3 id="facebook-post">post</h3>
 
 ```
-usage: minet facebook post [-h] [--rcfile RCFILE] [-c COOKIE]
+usage: minet facebook post [-h] [-c COOKIE] [--rcfile RCFILE]
                            [--throttle THROTTLE] [-s SELECT] [-o OUTPUT]
                            column [file]
 
@@ -1244,7 +1229,7 @@ optional arguments:
   --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
@@ -1263,7 +1248,7 @@ examples:
 <h3 id="facebook-posts">posts</h3>
 
 ```
-usage: minet facebook posts [-h] [--rcfile RCFILE] [-c COOKIE]
+usage: minet facebook posts [-h] [-c COOKIE] [--rcfile RCFILE]
                             [--throttle THROTTLE] [-s SELECT] [-o OUTPUT]
                             column [file]
 
@@ -1309,7 +1294,7 @@ optional arguments:
   --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
@@ -1328,7 +1313,7 @@ examples:
 <h3 id="facebook-post-authors">post-authors</h3>
 
 ```
-usage: minet facebook post-authors [-h] [--rcfile RCFILE] [-c COOKIE]
+usage: minet facebook post-authors [-h] [-c COOKIE] [--rcfile RCFILE]
                                    [--throttle THROTTLE] [-s SELECT]
                                    [--total TOTAL] [-o OUTPUT]
                                    column [file]
@@ -1351,7 +1336,7 @@ optional arguments:
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 examples:
@@ -1364,8 +1349,7 @@ examples:
 <h3 id="facebook-url-likes">url-likes</h3>
 
 ```
-usage: minet facebook url-likes [-h] [--rcfile RCFILE] [-s SELECT]
-                                [--total TOTAL] [-o OUTPUT]
+usage: minet facebook url-likes [-h] [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                 column [file]
 
 Minet Facebook Url Likes Command
@@ -1390,7 +1374,6 @@ optional arguments:
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
   -h, --help                  show this help message and exit
 
 example:
@@ -1405,7 +1388,7 @@ example:
 ## Google
 
 ```
-usage: minet google [-h] [--rcfile RCFILE] {sheets} ...
+usage: minet google [-h] {sheets} ...
 
 Minet Google Command
 ====================
@@ -1413,20 +1396,17 @@ Minet Google Command
 Collect data from Google.
 
 optional arguments:
-  --rcfile RCFILE  Custom path to a minet configuration file.
-  -h, --help       show this help message and exit
+  -h, --help  show this help message and exit
 
 subcommands:
-  {sheets}         Subcommand to use.
+  {sheets}    Subcommand to use.
 
 ```
 
 <h3 id="google-sheets">sheets</h3>
 
 ```
-usage: minet google sheets [-h] [--rcfile RCFILE] [-a AUTHUSER] [-c COOKIE]
-                           [-o OUTPUT]
-                           url
+usage: minet google sheets [-h] [-a AUTHUSER] [-c COOKIE] [-o OUTPUT] url
 
 Minet Google Sheets Command
 ===========================
@@ -1454,7 +1434,6 @@ optional arguments:
   -a AUTHUSER, --authuser AUTHUSER  Connected google account number to use.
   -c COOKIE, --cookie COOKIE        Google Drive cookie or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge").
   -o OUTPUT, --output OUTPUT        Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                   Custom path to a minet configuration file.
   -h, --help                        show this help message and exit
 
 examples:
@@ -1472,8 +1451,8 @@ examples:
 <h3 id="hyphe-declare">declare</h3>
 
 ```
-usage: minet hyphe declare [-h] [--rcfile RCFILE] [--password PASSWORD]
-                           [--total TOTAL] [-o OUTPUT]
+usage: minet hyphe declare [-h] [--password PASSWORD] [--total TOTAL]
+                           [-o OUTPUT]
                            url corpus webentities
 
 Minet Hyphe Declare Command
@@ -1494,7 +1473,6 @@ optional arguments:
   --password PASSWORD         The corpus's password if required.
   --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1507,9 +1485,7 @@ examples:
 <h3 id="hyphe-destroy">destroy</h3>
 
 ```
-usage: minet hyphe destroy [-h] [--rcfile RCFILE] [--password PASSWORD]
-                           [-o OUTPUT]
-                           url corpus
+usage: minet hyphe destroy [-h] [--password PASSWORD] [-o OUTPUT] url corpus
 
 Minet Hyphe Destroy Command
 ===========================
@@ -1523,7 +1499,6 @@ positional arguments:
 optional arguments:
   --password PASSWORD         The corpus's password if required.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1536,8 +1511,8 @@ examples:
 <h3 id="hyphe-dump">dump</h3>
 
 ```
-usage: minet hyphe dump [-h] [--rcfile RCFILE] [-d OUTPUT_DIR] [--body]
-                        [--statuses STATUSES] [--password PASSWORD] [-o OUTPUT]
+usage: minet hyphe dump [-h] [-d OUTPUT_DIR] [--body] [--statuses STATUSES]
+                        [--password PASSWORD] [-o OUTPUT]
                         url corpus
 
 Minet Hyphe Dump Command
@@ -1556,7 +1531,6 @@ optional arguments:
   --password PASSWORD                     The corpus's password if required.
   --statuses STATUSES                     Webentity statuses to dump, separated by comma. Possible statuses being "IN", "OUT", "UNDECIDED" and "DISCOVERED".
   -o OUTPUT, --output OUTPUT              Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                         Custom path to a minet configuration file.
   -h, --help                              show this help message and exit
 
 examples:
@@ -1569,9 +1543,7 @@ examples:
 <h3 id="hyphe-reset">reset</h3>
 
 ```
-usage: minet hyphe reset [-h] [--rcfile RCFILE] [--password PASSWORD]
-                         [-o OUTPUT]
-                         url corpus
+usage: minet hyphe reset [-h] [--password PASSWORD] [-o OUTPUT] url corpus
 
 Minet Hyphe Reset Command
 =========================
@@ -1585,7 +1557,6 @@ positional arguments:
 optional arguments:
   --password PASSWORD         The corpus's password if required.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1598,8 +1569,8 @@ examples:
 <h3 id="hyphe-tag">tag</h3>
 
 ```
-usage: minet hyphe tag [-h] [--rcfile RCFILE] [--separator SEPARATOR]
-                       [--password PASSWORD] [--total TOTAL] [-o OUTPUT]
+usage: minet hyphe tag [-h] [--separator SEPARATOR] [--password PASSWORD]
+                       [--total TOTAL] [-o OUTPUT]
                        url corpus webentity_id_column tag_columns data
 
 Minet Hyphe Tag Command
@@ -1620,7 +1591,6 @@ optional arguments:
   --separator SEPARATOR       Separator use to split multiple tag values in the same column. Defaults to "|".
   --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1633,7 +1603,7 @@ examples:
 ## Instagram
 
 ```
-usage: minet instagram [-h] [--rcfile RCFILE] [-c COOKIE]
+usage: minet instagram [-h] [-c COOKIE] [--rcfile RCFILE]
                        {hashtag,user-followers,user-following,user-infos,user-posts}
                        ...
 
@@ -1644,7 +1614,7 @@ Gather data from Instagram.
 
 optional arguments:
   -c COOKIE, --cookie COOKIE                      Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
-  --rcfile RCFILE                                 Custom path to a minet configuration file.
+  --rcfile RCFILE                                 Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                      show this help message and exit
 
 subcommands:
@@ -1656,7 +1626,7 @@ subcommands:
 ### hashtag
 
 ```
-usage: minet instagram hashtag [-h] [--rcfile RCFILE] [-c COOKIE] [-l LIMIT]
+usage: minet instagram hashtag [-h] [-c COOKIE] [--rcfile RCFILE] [-l LIMIT]
                                [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                column [file]
 
@@ -1686,7 +1656,7 @@ optional arguments:
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
@@ -1699,7 +1669,7 @@ example:
 ### user-followers
 
 ```
-usage: minet instagram user-followers [-h] [--rcfile RCFILE] [-c COOKIE]
+usage: minet instagram user-followers [-h] [-c COOKIE] [--rcfile RCFILE]
                                       [-l LIMIT] [-s SELECT] [-o OUTPUT]
                                       column [file]
 
@@ -1731,7 +1701,7 @@ optional arguments:
   -l LIMIT, --limit LIMIT     Maximum number of followers to retrieve per user.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
@@ -1744,7 +1714,7 @@ example:
 ### user-following
 
 ```
-usage: minet instagram user-following [-h] [--rcfile RCFILE] [-c COOKIE]
+usage: minet instagram user-following [-h] [-c COOKIE] [--rcfile RCFILE]
                                       [-l LIMIT] [-s SELECT] [-o OUTPUT]
                                       column [file]
 
@@ -1775,7 +1745,7 @@ optional arguments:
   -l LIMIT, --limit LIMIT     Maximum number of accounts to retrieve per user.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
@@ -1788,7 +1758,7 @@ example:
 ### user-infos
 
 ```
-usage: minet instagram user-infos [-h] [--rcfile RCFILE] [-c COOKIE] [-s SELECT]
+usage: minet instagram user-infos [-h] [-c COOKIE] [--rcfile RCFILE] [-s SELECT]
                                   [-o OUTPUT]
                                   column [file]
 
@@ -1818,7 +1788,7 @@ optional arguments:
   -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox". Can also be configured in a .minetrc file as "instagram.cookie" or read from the MINET_INSTAGRAM_COOKIE env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
@@ -1831,7 +1801,7 @@ example:
 ### user-posts
 
 ```
-usage: minet instagram user-posts [-h] [--rcfile RCFILE] [-c COOKIE] [-l LIMIT]
+usage: minet instagram user-posts [-h] [-c COOKIE] [--rcfile RCFILE] [-l LIMIT]
                                   [-s SELECT] [-o OUTPUT]
                                   column [file]
 
@@ -1864,7 +1834,7 @@ optional arguments:
   -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve per user.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
@@ -1879,7 +1849,7 @@ example:
 <h3 id="mc-medias">medias</h3>
 
 ```
-usage: minet mediacloud medias [-h] [--rcfile RCFILE] [-t TOKEN] [--feeds FEEDS]
+usage: minet mediacloud medias [-h] [-t TOKEN] [--rcfile RCFILE] [--feeds FEEDS]
                                [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                column [file]
 
@@ -1898,7 +1868,7 @@ optional arguments:
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 ```
@@ -1906,7 +1876,7 @@ optional arguments:
 <h3 id="mc-search">search</h3>
 
 ```
-usage: minet mediacloud search [-h] [--rcfile RCFILE] [-t TOKEN]
+usage: minet mediacloud search [-h] [-t TOKEN] [--rcfile RCFILE]
                                [-c COLLECTIONS] [--filter-query FILTER_QUERY]
                                [-m MEDIAS] [--publish-day PUBLISH_DAY]
                                [--publish-month PUBLISH_MONTH]
@@ -1934,7 +1904,7 @@ optional arguments:
   --skip-count                               Whether to skip the first API call counting the number of posts for the progress bar.
   -t TOKEN, --token TOKEN                    Mediacloud API token (also called "key" sometimes). Can also be configured in a .minetrc file as "mediacloud.token" or read from the MINET_MEDIACLOUD_TOKEN env variable.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                            Custom path to a minet configuration file.
+  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                 show this help message and exit
 
 ```
@@ -1944,7 +1914,7 @@ optional arguments:
 #### stories
 
 ```
-usage: minet mediacloud topic stories [-h] [--rcfile RCFILE] [-t TOKEN]
+usage: minet mediacloud topic stories [-h] [-t TOKEN] [--rcfile RCFILE]
                                       [--media-id MEDIA_ID]
                                       [--from-media-id FROM_MEDIA_ID]
                                       topic_id
@@ -1961,7 +1931,7 @@ optional arguments:
   --from-media-id FROM_MEDIA_ID  Return only stories that are linked from stories in the given media_id.
   --media-id MEDIA_ID            Return only stories belonging to the given media_ids.
   -t TOKEN, --token TOKEN        Mediacloud API token (also called "key" sometimes). Can also be configured in a .minetrc file as "mediacloud.token" or read from the MINET_MEDIACLOUD_TOKEN env variable.
-  --rcfile RCFILE                Custom path to a minet configuration file.
+  --rcfile RCFILE                Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                     show this help message and exit
 
 ```
@@ -1971,8 +1941,8 @@ optional arguments:
 ### channel-infos
 
 ```
-usage: minet telegram channel-infos [-h] [--rcfile RCFILE] [--throttle THROTTLE]
-                                    [-s SELECT] [-o OUTPUT]
+usage: minet telegram channel-infos [-h] [--throttle THROTTLE] [-s SELECT]
+                                    [-o OUTPUT]
                                     column [file]
 
 Minet Telegram Channel-Infos Command
@@ -1988,7 +1958,6 @@ optional arguments:
   --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2000,8 +1969,7 @@ examples:
 ### channel-messages
 
 ```
-usage: minet telegram channel-messages [-h] [--rcfile RCFILE]
-                                       [--throttle THROTTLE] [-s SELECT]
+usage: minet telegram channel-messages [-h] [--throttle THROTTLE] [-s SELECT]
                                        [-o OUTPUT]
                                        column [file]
 
@@ -2018,7 +1986,6 @@ optional arguments:
   --throttle THROTTLE         Throttling time, in seconds, to wait between each request.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2030,7 +1997,7 @@ examples:
 ## Tiktok
 
 ```
-usage: minet tiktok [-h] [--rcfile RCFILE] {search-videos} ...
+usage: minet tiktok [-h] {search-videos} ...
 
 Minet Tiktok Command
 ====================
@@ -2038,7 +2005,6 @@ Minet Tiktok Command
 Gather data from Tiktok.
 
 optional arguments:
-  --rcfile RCFILE  Custom path to a minet configuration file.
   -h, --help       show this help message and exit
 
 subcommands:
@@ -2049,7 +2015,7 @@ subcommands:
 ### search-videos
 
 ```
-usage: minet tiktok search-videos [-h] [--rcfile RCFILE] [-c COOKIE] [-l LIMIT]
+usage: minet tiktok search-videos [-h] [-c COOKIE] [--rcfile RCFILE] [-l LIMIT]
                                   [-s SELECT] [-o OUTPUT]
                                   column [file]
 
@@ -2085,7 +2051,7 @@ optional arguments:
   -l LIMIT, --limit LIMIT     Maximum number of videos to retrieve per query.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
@@ -2100,9 +2066,8 @@ example:
 ### attrition
 
 ```
-usage: minet twitter attrition [-h] [--rcfile RCFILE] [--user USER]
-                               [--retweeted-id RETWEETED_ID] [--ids]
-                               [--api-key API_KEY]
+usage: minet twitter attrition [-h] [--user USER] [--retweeted-id RETWEETED_ID]
+                               [--ids] [--api-key API_KEY] [--rcfile RCFILE]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -2164,7 +2129,7 @@ optional arguments:
   --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
-  --rcfile RCFILE                            Custom path to a minet configuration file.
+  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                 show this help message and exit
 
 examples:
@@ -2180,8 +2145,8 @@ examples:
 ### followers
 
 ```
-usage: minet twitter followers [-h] [--rcfile RCFILE] [--ids] [--v2]
-                               [--api-key API_KEY]
+usage: minet twitter followers [-h] [--ids] [--v2] [--api-key API_KEY]
+                               [--rcfile RCFILE]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -2209,7 +2174,7 @@ optional arguments:
   --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
-  --rcfile RCFILE                            Custom path to a minet configuration file.
+  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                 show this help message and exit
 
 examples:
@@ -2222,9 +2187,8 @@ examples:
 ### friends
 
 ```
-usage: minet twitter friends [-h] [--rcfile RCFILE] [--ids] [--v2]
-                             [--api-key API_KEY]
-                             [--api-secret-key API_SECRET_KEY]
+usage: minet twitter friends [-h] [--ids] [--v2] [--api-key API_KEY]
+                             [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
                              [--access-token ACCESS_TOKEN]
                              [--access-token-secret ACCESS_TOKEN_SECRET]
                              [-s SELECT] [--total TOTAL] [--resume] [-o OUTPUT]
@@ -2250,7 +2214,7 @@ optional arguments:
   --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
-  --rcfile RCFILE                            Custom path to a minet configuration file.
+  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                 show this help message and exit
 
 examples:
@@ -2263,7 +2227,7 @@ examples:
 ### list-followers
 
 ```
-usage: minet twitter list-followers [-h] [--rcfile RCFILE] [--api-key API_KEY]
+usage: minet twitter list-followers [-h] [--api-key API_KEY] [--rcfile RCFILE]
                                     [--api-secret-key API_SECRET_KEY]
                                     [--access-token ACCESS_TOKEN]
                                     [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -2287,7 +2251,7 @@ optional arguments:
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                            Custom path to a minet configuration file.
+  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                 show this help message and exit
 
 examples:
@@ -2300,7 +2264,7 @@ examples:
 ### list-members
 
 ```
-usage: minet twitter list-members [-h] [--rcfile RCFILE] [--api-key API_KEY]
+usage: minet twitter list-members [-h] [--api-key API_KEY] [--rcfile RCFILE]
                                   [--api-secret-key API_SECRET_KEY]
                                   [--access-token ACCESS_TOKEN]
                                   [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -2324,7 +2288,7 @@ optional arguments:
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                            Custom path to a minet configuration file.
+  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                 show this help message and exit
 
 examples:
@@ -2337,7 +2301,7 @@ examples:
 ### retweeters
 
 ```
-usage: minet twitter retweeters [-h] [--rcfile RCFILE] [--api-key API_KEY]
+usage: minet twitter retweeters [-h] [--api-key API_KEY] [--rcfile RCFILE]
                                 [--api-secret-key API_SECRET_KEY]
                                 [--access-token ACCESS_TOKEN]
                                 [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -2361,7 +2325,7 @@ optional arguments:
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                            Custom path to a minet configuration file.
+  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                 show this help message and exit
 
 examples:
@@ -2374,7 +2338,7 @@ examples:
 <h3 id="twitter-scrape">scrape</h3>
 
 ```
-usage: minet twitter scrape [-h] [--rcfile RCFILE] [--include-refs] [-l LIMIT]
+usage: minet twitter scrape [-h] [--include-refs] [-l LIMIT]
                             [--query-template QUERY_TEMPLATE] [-s SELECT]
                             [-o OUTPUT]
                             {tweets,users} query [file]
@@ -2403,7 +2367,6 @@ optional arguments:
   --query-template QUERY_TEMPLATE  Query template. Can be useful for instance to change a column of twitter user screen names into from:@user queries.
   -s SELECT, --select SELECT       Columns of input CSV file to include in the output (separated by `,`).
   -o OUTPUT, --output OUTPUT       Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                  Custom path to a minet configuration file.
   -h, --help                       show this help message and exit
 
 examples:
@@ -2434,8 +2397,8 @@ examples:
 ### tweet-date
 
 ```
-usage: minet twitter tweet-date [-h] [--rcfile RCFILE] [--timezone TIMEZONE]
-                                [-s SELECT] [-o OUTPUT]
+usage: minet twitter tweet-date [-h] [--timezone TIMEZONE] [-s SELECT]
+                                [-o OUTPUT]
                                 column [file]
 
 Minet Twitter Tweet Date Command
@@ -2451,7 +2414,6 @@ optional arguments:
   --timezone TIMEZONE         Timezone for the date, for example 'Europe/Paris'. Default to UTC.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2463,12 +2425,12 @@ examples:
 ### tweet-search
 
 ```
-usage: minet twitter tweet-search [-h] [--rcfile RCFILE] [--since-id SINCE_ID]
+usage: minet twitter tweet-search [-h] [--since-id SINCE_ID]
                                   [--until-id UNTIL_ID]
                                   [--start-time START_TIME]
                                   [--end-time END_TIME] [--academic]
                                   [--sort-order {recency,relevancy}]
-                                  [--api-key API_KEY]
+                                  [--api-key API_KEY] [--rcfile RCFILE]
                                   [--api-secret-key API_SECRET_KEY]
                                   [--access-token ACCESS_TOKEN]
                                   [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -2502,7 +2464,7 @@ optional arguments:
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                            Custom path to a minet configuration file.
+  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                 show this help message and exit
 
 examples:
@@ -2518,11 +2480,11 @@ examples:
 ### tweet-count
 
 ```
-usage: minet twitter tweet-count [-h] [--rcfile RCFILE]
-                                 [--granularity {day,hour,minute}]
+usage: minet twitter tweet-count [-h] [--granularity {day,hour,minute}]
                                  [--since-id SINCE_ID] [--until-id UNTIL_ID]
                                  [--start-time START_TIME] [--end-time END_TIME]
                                  [--academic] [--api-key API_KEY]
+                                 [--rcfile RCFILE]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -2562,7 +2524,7 @@ optional arguments:
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                            Custom path to a minet configuration file.
+  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                 show this help message and exit
 
 examples:
@@ -2581,7 +2543,7 @@ examples:
 ### tweets
 
 ```
-usage: minet twitter tweets [-h] [--rcfile RCFILE] [--v2] [--api-key API_KEY]
+usage: minet twitter tweets [-h] [--v2] [--api-key API_KEY] [--rcfile RCFILE]
                             [--api-secret-key API_SECRET_KEY]
                             [--access-token ACCESS_TOKEN]
                             [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -2607,7 +2569,7 @@ optional arguments:
   --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
-  --rcfile RCFILE                            Custom path to a minet configuration file.
+  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                 show this help message and exit
 
 examples:
@@ -2620,8 +2582,8 @@ examples:
 ### users
 
 ```
-usage: minet twitter users [-h] [--rcfile RCFILE] [--ids] [--v2]
-                           [--api-key API_KEY] [--api-secret-key API_SECRET_KEY]
+usage: minet twitter users [-h] [--ids] [--v2] [--api-key API_KEY]
+                           [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
                            [--access-token ACCESS_TOKEN]
                            [--access-token-secret ACCESS_TOKEN_SECRET]
                            [-s SELECT] [--total TOTAL] [--resume] [-o OUTPUT]
@@ -2647,7 +2609,7 @@ optional arguments:
   --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
   --resume                                   Whether to resume from an aborted collection. Need -o to be set.
-  --rcfile RCFILE                            Custom path to a minet configuration file.
+  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                 show this help message and exit
 
 examples:
@@ -2660,7 +2622,7 @@ examples:
 ### user-search
 
 ```
-usage: minet twitter user-search [-h] [--rcfile RCFILE] [--api-key API_KEY]
+usage: minet twitter user-search [-h] [--api-key API_KEY] [--rcfile RCFILE]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -2688,7 +2650,7 @@ optional arguments:
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                            Custom path to a minet configuration file.
+  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                 show this help message and exit
 
 examples:
@@ -2704,9 +2666,9 @@ examples:
 ### user-tweets
 
 ```
-usage: minet twitter user-tweets [-h] [--rcfile RCFILE] [--ids]
-                                 [--min-date MIN_DATE] [--exclude-retweets]
-                                 [--v2] [--api-key API_KEY]
+usage: minet twitter user-tweets [-h] [--ids] [--min-date MIN_DATE]
+                                 [--exclude-retweets] [--v2] [--api-key API_KEY]
+                                 [--rcfile RCFILE]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -2735,7 +2697,7 @@ optional arguments:
   -s SELECT, --select SELECT                 Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                              Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT                 Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                            Custom path to a minet configuration file.
+  --rcfile RCFILE                            Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                 show this help message and exit
 
 examples:
@@ -2750,8 +2712,8 @@ examples:
 ### captions
 
 ```
-usage: minet youtube captions [-h] [--rcfile RCFILE] [--lang LANG] [-s SELECT]
-                              [--total TOTAL] [-o OUTPUT]
+usage: minet youtube captions [-h] [--lang LANG] [-s SELECT] [--total TOTAL]
+                              [-o OUTPUT]
                               column [file]
 
 Youtube captions
@@ -2768,7 +2730,6 @@ optional arguments:
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2784,7 +2745,7 @@ examples:
 ### channel-videos
 
 ```
-usage: minet youtube channel-videos [-h] [--rcfile RCFILE] [-k KEY] [-s SELECT]
+usage: minet youtube channel-videos [-h] [-k KEY] [--rcfile RCFILE] [-s SELECT]
                                     [--total TOTAL] [-o OUTPUT]
                                     column [file]
 
@@ -2807,7 +2768,7 @@ optional arguments:
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
@@ -2828,7 +2789,7 @@ example:
 ### channels
 
 ```
-usage: minet youtube channels [-h] [--rcfile RCFILE] [-k KEY] [-s SELECT]
+usage: minet youtube channels [-h] [-k KEY] [--rcfile RCFILE] [-s SELECT]
                               [--total TOTAL] [-o OUTPUT]
                               column [file]
 
@@ -2850,7 +2811,7 @@ optional arguments:
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
@@ -2867,7 +2828,7 @@ example:
 ```
 
 ```
-usage: minet youtube comments [-h] [--rcfile RCFILE] [-k KEY] [-s SELECT]
+usage: minet youtube comments [-h] [-k KEY] [--rcfile RCFILE] [-s SELECT]
                               [--total TOTAL] [-o OUTPUT]
                               column [file]
 
@@ -2885,7 +2846,7 @@ optional arguments:
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 example:
@@ -2898,9 +2859,10 @@ example:
 <h3 id="youtube-search">search</h3>
 
 ```
-usage: minet youtube search [-h] [--rcfile RCFILE] [-l LIMIT]
+usage: minet youtube search [-h] [-l LIMIT]
                             [--order {date,rating,relevance,title,videoCount,viewCount}]
-                            [-k KEY] [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                            [-k KEY] [--rcfile RCFILE] [-s SELECT]
+                            [--total TOTAL] [-o OUTPUT]
                             column [file]
 
 Youtube search
@@ -2920,7 +2882,7 @@ optional arguments:
   -s SELECT, --select SELECT                      Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL                                   Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT                      Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE                                 Custom path to a minet configuration file.
+  --rcfile RCFILE                                 Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                                      show this help message and exit
 
 example:
@@ -2933,7 +2895,7 @@ example:
 ### videos
 
 ```
-usage: minet youtube videos [-h] [--rcfile RCFILE] [-k KEY] [-s SELECT]
+usage: minet youtube videos [-h] [-k KEY] [--rcfile RCFILE] [-s SELECT]
                             [--total TOTAL] [-o OUTPUT]
                             column [file]
 
@@ -2951,7 +2913,7 @@ optional arguments:
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you want to display a finite progress indicator.
   -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results will be printed to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file.
+  --rcfile RCFILE             Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
 
 ```

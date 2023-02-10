@@ -114,6 +114,15 @@ def add_arguments(subparser, arguments):
         else:
             subparser.add_argument(*argument["flags"], **argument_kwargs)
 
+        if "action" in argument and argument["action"] is ConfigAction:
+            try:
+                subparser.add_argument(
+                    "--rcfile",
+                    help="Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc",
+                )
+            except ArgumentError:
+                pass
+
 
 def build_description(command):
     description = command["title"] + "\n" + ("=" * len(command["title"]))
@@ -143,10 +152,6 @@ def build_subparsers(
             epilog=dedent(command.get("epilog", "")),
             formatter_class=custom_formatter,
             aliases=command.get("aliases", []),
-        )
-
-        subparser.add_argument(
-            "--rcfile", help="Custom path to a minet configuration file."
         )
 
         to_index = {"parser": subparser, "command": command, "subparsers": {}}
