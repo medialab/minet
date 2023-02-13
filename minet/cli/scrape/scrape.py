@@ -158,7 +158,7 @@ def action(cli_args):
         raise FatalError(
             [
                 'Could not find the "%s" directory!' % cli_args.input_dir,
-                "Did you forget to specify it with -i/--input-dir?",
+                "Did you forget to specify it with -I/--input-dir?",
             ]
         )
 

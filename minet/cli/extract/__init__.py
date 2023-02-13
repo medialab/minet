@@ -65,7 +65,7 @@ EXTRACT_COMMAND = command(
             "help": "Whether to extract text from a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.",
         },
         {
-            "flags": ["-i", "--input-dir"],
+            "flags": ["-I", "--input-dir"],
             "help": 'Directory where the HTML files are stored. Defaults to "%s" if --glob is not set.'
             % DEFAULT_CONTENT_FOLDER,
         },

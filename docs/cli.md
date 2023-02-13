@@ -376,7 +376,7 @@ examples:
 ## extract
 
 ```
-usage: minet extract [-h] [-g GLOB] [-i INPUT_DIR] [-p PROCESSES] [-s SELECT]
+usage: minet extract [-h] [-g GLOB] [-I INPUT_DIR] [-p PROCESSES] [-s SELECT]
                      [--total TOTAL] [-o OUTPUT]
                      [report]
 
@@ -402,7 +402,7 @@ optional arguments:
   -g GLOB, --glob GLOB        Whether to extract text from a bunch of html files
                               on disk matched by a glob pattern rather than
                               sourcing them from a CSV report.
-  -i INPUT_DIR, --input-dir INPUT_DIR
+  -I INPUT_DIR, --input-dir INPUT_DIR
                               Directory where the HTML files are stored.
                               Defaults to "downloaded" if --glob is not set.
   -p PROCESSES, --processes PROCESSES
@@ -555,7 +555,7 @@ examples:
 For more documentation about minet's scraping DSL check this [page](../cookbook/scraping_dsl.md) from the Cookbook.
 
 ```
-usage: minet scrape [-h] [-f {csv,jsonl}] [-g GLOB] [-i INPUT_DIR]
+usage: minet scrape [-h] [-f {csv,jsonl}] [-g GLOB] [-I INPUT_DIR]
                     [-p PROCESSES] [--separator SEPARATOR] [--strain STRAIN]
                     [--validate] [--total TOTAL] [-o OUTPUT]
                     scraper [report]
@@ -579,7 +579,7 @@ optional arguments:
   -g GLOB, --glob GLOB        Whether to scrape a bunch of html files on disk
                               matched by a glob pattern rather than sourcing
                               them from a CSV report.
-  -i INPUT_DIR, --input-dir INPUT_DIR
+  -I INPUT_DIR, --input-dir INPUT_DIR
                               Directory where the HTML files are stored.
                               Defaults to "downloaded".
   -p PROCESSES, --processes PROCESSES
