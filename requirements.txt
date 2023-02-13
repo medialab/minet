@@ -7,6 +7,7 @@ twine==4.0.2
 wheel
 
 # Dependencies
+alive_progress==3.0.1
 beautifulsoup4==4.11.1
 browser-cookie3==0.16.5
 casanova==0.19.2

@@ -24,6 +24,7 @@ setup(
     python_requires=">=3.7",
     packages=find_packages(exclude=["ftest", "scripts", "test"]),
     install_requires=[
+        "alive_progress>=3,<4",
         "beautifulsoup4>=4.7.1",
         "browser-cookie3==0.16.5",
         "casanova>=0.19.2,<0.20",
