@@ -54,11 +54,11 @@ Minet can single-handedly:
 
 ## Documented use cases
 
-- [Fetching a large amount of urls](./cookbook/fetch.md)
-- [Joining 2 CSV files by urls](./cookbook/url_join.md)
-- [Using minet from a Jupyter notebook](./cookbook/notebooks/Minet%20in%20a%20Jupyter%20notebook.ipynb) (_very useful to experiment with the tool or teach students_)
-- [Downloading images associated with a given hashtag on Twitter](./cookbook/twitter_images.md)
-- [Scraping DSL Tutorial](./cookbook/scraping_dsl.md)
+- [Fetching a large amount of urls](./docs/cookbook/fetch.md)
+- [Joining 2 CSV files by urls](./docs/cookbook/url_join.md)
+- [Using minet from a Jupyter notebook](./docs/cookbook/notebooks/Minet%20in%20a%20Jupyter%20notebook.ipynb) (_very useful to experiment with the tool or teach students_)
+- [Downloading images associated with a given hashtag on Twitter](./docs/cookbook/twitter_images.md)
+- [Scraping DSL Tutorial](./docs/cookbook/scraping_dsl.md)
 
 ## Features (from a technical standpoint)
 
