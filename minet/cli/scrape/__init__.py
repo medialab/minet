@@ -20,11 +20,11 @@ SCRAPE_COMMAND = command(
         . Scraping item from a `minet fetch` report:
             $ minet scrape scraper.yml report.csv > scraped.csv
 
-        . Working on a report from stdin:
-            $ minet fetch url_column file.csv | minet scrape scraper.yml > scraped.csv
+        . Working on a report from stdin (mind the `-`):
+            $ minet fetch url_column file.csv | minet scrape scraper.yml - > scraped.csv
 
         . Scraping a single page from the web:
-            $ minet fetch https://news.ycombinator.com/ | minet scrape scraper.yml > scraped.csv
+            $ minet fetch https://news.ycombinator.com/ | minet scrape scraper.yml - > scraped.csv
 
         . Scraping items from a bunch of files:
             $ minet scrape scraper.yml --glob "./content/**/*.html" > scraped.csv

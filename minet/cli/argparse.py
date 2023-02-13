@@ -21,7 +21,6 @@ from gettext import gettext
 from textwrap import dedent
 from tqdm.contrib import DummyTqdmFile
 from casanova import Resumer, CsvCellIO
-from casanova.exceptions import EmptyFileError
 from ebbe import getpath, omit
 from datetime import datetime
 from pytz import timezone

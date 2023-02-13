@@ -49,8 +49,8 @@ EXTRACT_COMMAND = command(
         . Extracting text from a bunch of files using a glob pattern:
             $ minet extract --glob "./content/**/*.html" > extracted.csv
 
-        . Working on a report from stdin:
-            $ minet fetch url_column file.csv | minet extract > extracted.csv
+        . Working on a report from stdin (mind the `-`):
+            $ minet fetch url_column file.csv | minet extract - > extracted.csv
     """,
     select=True,
     total=True,

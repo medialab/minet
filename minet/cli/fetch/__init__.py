@@ -117,11 +117,11 @@ FETCH_COMMAND = command(
         . Fetching a batch of url from existing CSV file:
             $ minet fetch url_column file.csv > report.csv
 
-        . CSV input from stdin:
-            $ xsv select url_column file.csv | minet fetch url_column > report.csv
+        . CSV input from stdin (mind the `-`):
+            $ xsv select url_column file.csv | minet fetch url_column -i i > report.csv
 
         . Fetching a single url, useful to pipe into `minet scrape`:
-            $ minet fetch http://google.com | minet scrape ./scrape.json > scraped.csv
+            $ minet fetch http://google.com | minet scrape ./scrape.json - > scraped.csv
     """,
     resumer=ThreadSafeResumer,
     select=True,
@@ -201,8 +201,8 @@ RESOLVE_COMMAND = command(
         . Resolving a batch of url from existing CSV file:
             $ minet resolve url_column file.csv > report.csv
 
-        . CSV input from stdin:
-            $ xsv select url_column file.csv | minet resolve url_column > report.csv
+        . CSV input from stdin (mind the `-`):
+            $ xsv select url_column file.csv | minet resolve url_column - > report.csv
 
         . Resolving a single url:
             $ minet resolve https://lemonde.fr
