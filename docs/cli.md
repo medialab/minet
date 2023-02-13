@@ -201,7 +201,7 @@ examples:
 ## crawl
 
 ```
-usage: minet crawl [-h] [-d OUTPUT_DIR] [--resume] [--throttle THROTTLE]
+usage: minet crawl [-h] [-O OUTPUT_DIR] [--resume] [--throttle THROTTLE]
                    [-o OUTPUT]
                    crawler
 
@@ -215,7 +215,7 @@ positional arguments:
   crawler                     Path to the crawler definition file.
 
 optional arguments:
-  -d OUTPUT_DIR, --output-dir OUTPUT_DIR
+  -O OUTPUT_DIR, --output-dir OUTPUT_DIR
                               Output directory.
   --throttle THROTTLE         Time to wait - in seconds - between 2 calls to the
                               same domain. Defaults to 0.2.
@@ -227,7 +227,7 @@ optional arguments:
 examples:
 
 . Running a crawler definition:
-    $ minet crawl crawler.yml -d crawl-data
+    $ minet crawl crawler.yml -O crawl-data
 ```
 
 ## fetch
@@ -239,7 +239,7 @@ usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM]
                    [--throttle THROTTLE] [--timeout TIMEOUT]
                    [--url-template URL_TEMPLATE] [-X METHOD]
                    [--max-redirects MAX_REDIRECTS] [--compress]
-                   [--contents-in-report] [-d OUTPUT_DIR] [-f FILENAME]
+                   [--contents-in-report] [-O OUTPUT_DIR] [-f FILENAME]
                    [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [--keep-failed-contents]
                    [--standardize-encoding] [-s SELECT] [--total TOTAL]
@@ -298,7 +298,7 @@ optional arguments:
   --max-redirects MAX_REDIRECTS
                               Maximum number of redirections to follow before
                               breaking. Defaults to 5.
-  -d OUTPUT_DIR, --output-dir OUTPUT_DIR
+  -O OUTPUT_DIR, --output-dir OUTPUT_DIR
                               Directory where the fetched files will be written.
                               Defaults to "downloaded".
   -X METHOD, --request METHOD
@@ -337,7 +337,7 @@ columns being added to the output:
 . "status": HTTP status code of the request, e.g. 200, 404, 503 etc.
 . "error": an error code if anything went wrong when performing the request.
 . "filename": path to the downloaded file, relative to the folder given
-    through -d/--output-dir.
+    through -O/--output-dir.
 . "mimetype": detected mimetype of the requested file.
 . "encoding": detected encoding of the requested file if relevant.
 . "raw_contents": if --contents-in-report is set, will contain the
@@ -1827,7 +1827,7 @@ examples:
 <h3 id="hyphe-dump">dump</h3>
 
 ```
-usage: minet hyphe dump [-h] [-d OUTPUT_DIR] [--body] [--statuses STATUSES]
+usage: minet hyphe dump [-h] [-O OUTPUT_DIR] [--body] [--statuses STATUSES]
                         [--password PASSWORD] [-o OUTPUT]
                         url corpus
 
@@ -1843,7 +1843,7 @@ positional arguments:
 
 optional arguments:
   --body                      Whether to download pages body.
-  -d OUTPUT_DIR, --output-dir OUTPUT_DIR
+  -O OUTPUT_DIR, --output-dir OUTPUT_DIR
                               Output directory for dumped files. Will default to
                               some name based on corpus name.
   --password PASSWORD         The corpus's password if required.
@@ -1857,7 +1857,7 @@ optional arguments:
 examples:
 
 . Dumping a corpus into the ./corpus directory:
-    $ minet hyphe dump http://myhyphe.com/api/ corpus-name -d corpus
+    $ minet hyphe dump http://myhyphe.com/api/ corpus-name -O corpus
 ```
 
 <h3 id="hyphe-reset">reset</h3>

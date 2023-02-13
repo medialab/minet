@@ -62,11 +62,11 @@ marp: true
 
 <h1>Empowering social scientists<br>with web mining tools</h1>
 
-*FOSDEM 2020*
+_FOSDEM 2020_
 
-*Open Research Tools and Technologies Devroom*
+_Open Research Tools and Technologies Devroom_
 
-*Guillaume Plique, SciencesPo médialab*
+_Guillaume Plique, SciencesPo médialab_
 
 ---
 
@@ -189,7 +189,7 @@ Once we cut access to Google to our whole university!
 
 ## Complex spidering, scalability, storage, indexing, recombobulation, steam engines, fancy boats, unionization, agility, upper management, Peters syndrom, eXtreme programming
 
-*Most of it is irrelevant and made up but you get the point...*
+_Most of it is irrelevant and made up but you get the point..._
 
 ---
 
@@ -254,7 +254,7 @@ By **designing** tools suited to their research questions
 
 ![img](img/minet.png)
 
-*Not-contractual logo - Jules Farjas ©*
+_Not-contractual logo - Jules Farjas ©_
 
 ---
 
@@ -267,7 +267,6 @@ By **designing** tools suited to their research questions
 5. **URL-related heuristics** utilities such as normalization and matching.
 6. Data collection from various **APIs** such as CrowdTangle.
 
-
 ---
 
 ## The Unix philosophy
@@ -275,7 +274,7 @@ By **designing** tools suited to their research questions
 Do <u>one</u> thing well
 
 ```
-xsv search -s url urls.csv | minet fetch url -d html > result.txt
+xsv search -s url urls.csv | minet fetch url -O html > result.txt
 ```
 
 ---

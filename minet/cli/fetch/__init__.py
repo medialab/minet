@@ -88,7 +88,7 @@ FETCH_COMMAND = command(
         . "status": HTTP status code of the request, e.g. 200, 404, 503 etc.
         . "error": an error code if anything went wrong when performing the request.
         . "filename": path to the downloaded file, relative to the folder given
-            through -d/--output-dir.
+            through -O/--output-dir.
         . "mimetype": detected mimetype of the requested file.
         . "encoding": detected encoding of the requested file if relevant.
         . "raw_contents": if --contents-in-report is set, will contain the
@@ -147,7 +147,7 @@ FETCH_COMMAND = command(
             "action": BooleanAction,
         },
         {
-            "flags": ["-d", "--output-dir"],
+            "flags": ["-O", "--output-dir"],
             "help": 'Directory where the fetched files will be written. Defaults to "%s".'
             % DEFAULT_CONTENT_FOLDER,
             "default": DEFAULT_CONTENT_FOLDER,

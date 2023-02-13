@@ -80,11 +80,11 @@ HYPHE_DUMP_SUBCOMMAND = hyphe_corpus_subcommand(
         examples:
 
         . Dumping a corpus into the ./corpus directory:
-            $ minet hyphe dump http://myhyphe.com/api/ corpus-name -d corpus
+            $ minet hyphe dump http://myhyphe.com/api/ corpus-name -O corpus
     """,
     arguments=[
         {
-            "flags": ["-d", "--output-dir"],
+            "flags": ["-O", "--output-dir"],
             "help": "Output directory for dumped files. Will default to some name based on corpus name.",
         },
         {

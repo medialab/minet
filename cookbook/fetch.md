@@ -10,25 +10,25 @@ Let's use the `minet fetch` command to do so!
 
 ## Summary
 
-* [First steps](#first-steps)
-* [Options](#options)
-  * [Customizing the output directory and file names](#customizing-the-output-directory-and-file-names)
-  * [Throttling & Threading](#throttling--threading)
-  * [Displaying a finite loading bar](#displaying-a-finite-loading-bar)
-  * [Keeping only selected columns in report](#keeping-only-selected-columns-in-report)
-  * [Standardizing encoding of fetched files](#standardizing-encoding-of-fetched-files)
-  * [Resuming an operation](#resuming-an-operation)
-* [Unix compliance](#unix-compliance)
-* [Fetching from a python script](#fetching-from-a-python-script)
+- [First steps](#first-steps)
+- [Options](#options)
+  - [Customizing the output directory and file names](#customizing-the-output-directory-and-file-names)
+  - [Throttling & Threading](#throttling--threading)
+  - [Displaying a finite loading bar](#displaying-a-finite-loading-bar)
+  - [Keeping only selected columns in report](#keeping-only-selected-columns-in-report)
+  - [Standardizing encoding of fetched files](#standardizing-encoding-of-fetched-files)
+  - [Resuming an operation](#resuming-an-operation)
+- [Unix compliance](#unix-compliance)
+- [Fetching from a python script](#fetching-from-a-python-script)
 
 ## First steps
 
 Being a diligent researcher, you decided to store the found urls in a very simple [CSV](https://en.wikipedia.org/wiki/Comma-separated_values) file containing more than 50k urls:
 
-*urls.csv*
+_urls.csv_
 
 | id    | url                          |
-|-------|------------------------------|
+| ----- | ---------------------------- |
 | 1     | https://www.lemonde.fr       |
 | 2     | https://www.lefigaro.fr      |
 | 3     | https://www.liberation.fr    |
@@ -77,7 +77,7 @@ Now let's check some of the most useful options of the `fetch` command:
 By default, `minet` will write the fetched files in a folder named `content` relative to your working directory. But maybe this is not what you want. Here is how to change this:
 
 ```bash
-minet fetch url urls.csv -d /store/project/html > /store/project/report.csv
+minet fetch url urls.csv -O /store/project/html > /store/project/report.csv
 ```
 
 #### File names
@@ -86,10 +86,10 @@ Also, by default, because the Internet is a messy place and it could be hard to 
 
 But you might want to customize your file names because you have relevant metadata: It is then possible to tell `minet` to use another column from your file as file name likewise:
 
-*urls.csv*
+_urls.csv_
 
 | id    | url                          |
-|-------|------------------------------|
+| ----- | ---------------------------- |
 | 1     | https://www.lemonde.fr       |
 | 2     | https://www.lefigaro.fr      |
 | 3     | https://www.liberation.fr    |
@@ -107,16 +107,15 @@ ls content
 
 But what if you want more complex things? What if you want to create a specific folder hierarchy for performance or organizational reasons? It is also possible to pass a template to `minet` so it will be able to build the desired file paths.
 
-*urls.csv*
+_urls.csv_
 
 | id    | url                          | media      |
-|-------|------------------------------|------------|
+| ----- | ---------------------------- | ---------- |
 | 1     | https://www.lemonde.fr       | lemonde    |
 | 2     | https://www.lefigaro.fr      | lefigaro   |
 | 3     | https://www.liberation.fr    | liberation |
 | ...   | ...                          | ...        |
 | 54038 | https://news.ycombinator.com | hackernews |
-
 
 ```bash
 minet fetch url urls.csv \

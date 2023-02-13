@@ -15,12 +15,12 @@ CRAWL_COMMAND = command(
         examples:
 
         . Running a crawler definition:
-            $ minet crawl crawler.yml -d crawl-data
+            $ minet crawl crawler.yml -O crawl-data
     """,
     arguments=[
         {"name": "crawler", "help": "Path to the crawler definition file."},
         {
-            "flags": ["-d", "--output-dir"],
+            "flags": ["-O", "--output-dir"],
             "help": "Output directory.",
             "default": "crawl",
         },
