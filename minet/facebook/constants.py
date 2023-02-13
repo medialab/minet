@@ -11,7 +11,7 @@ from minet.utils import RateLimiterState
 FACEBOOK_URL = "https://www.facebook.com"
 FACEBOOK_MOBILE_URL = "https://m.facebook.com"
 
-FACEBOOK_MOBILE_DEFAULT_THROTTLE = 0.5
+FACEBOOK_MOBILE_DEFAULT_THROTTLE = 2.0
 FACEBOOK_WEB_DEFAULT_THROTTLE = 20.0
 
 FACEBOOK_MOBILE_RATE_LIMITER_STATE = RateLimiterState(
