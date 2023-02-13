@@ -712,10 +712,12 @@ URL trie to match them with the second file's urls.
 positional arguments:
   column1                       Name of the column containing urls in the
                                 indexed file.
-  input1                        Path to the file to index.
+  input1                        Path to the file to index. Will understand `-`
+                                as stdin.
   column2                       Name of the column containing urls in the second
                                 file.
-  input2                        Path to the second file.
+  input2                        Path to the second file. Will understand `-` as
+                                stdin.
 
 optional arguments:
   -p MATCH_COLUMN_PREFIX, --match-column-prefix MATCH_COLUMN_PREFIX
@@ -734,8 +736,14 @@ examples:
 . Joining two files:
     $ minet url-join url webentities.csv post_url posts.csv > joined.csv
 
+. Adding a prefix to first file's column names:
+    $ minet url-join -p w_ url webentities.csv post_url posts.csv > joined.csv
+
 . Keeping only some columns from first file:
     $ minet url-join url webentities.csv post_url posts.csv -s url,id > joined.csv
+
+. Reading one of the files from stdin:
+    $ xsv select url webentities.csv | minet url-join url - post_url posts.csv > joined.csv
 ```
 
 ## url-parse

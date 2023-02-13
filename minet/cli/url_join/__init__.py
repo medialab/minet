@@ -15,8 +15,14 @@ URL_JOIN_COMMAND = command(
         . Joining two files:
             $ minet url-join url webentities.csv post_url posts.csv > joined.csv
 
+        . Adding a prefix to first file's column names:
+            $ minet url-join -p w_ url webentities.csv post_url posts.csv > joined.csv
+
         . Keeping only some columns from first file:
             $ minet url-join url webentities.csv post_url posts.csv -s url,id > joined.csv
+
+        . Reading one of the files from stdin:
+            $ xsv select url webentities.csv | minet url-join url - post_url posts.csv > joined.csv
     """,
     select=True,
     arguments=[
@@ -26,7 +32,7 @@ URL_JOIN_COMMAND = command(
         },
         {
             "name": "input1",
-            "help": "Path to the file to index.",
+            "help": "Path to the file to index. Will understand `-` as stdin.",
             "action": InputAction,
             "nargs": None,
         },
@@ -36,7 +42,7 @@ URL_JOIN_COMMAND = command(
         },
         {
             "name": "input2",
-            "help": "Path to the second file.",
+            "help": "Path to the second file. Will understand `-` as stdin.",
             "action": InputAction,
             "nargs": None,
         },
