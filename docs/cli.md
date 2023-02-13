@@ -373,6 +373,21 @@ examples:
 
 . Fetching a single url, useful to pipe into `minet scrape`:
     $ minet fetch http://google.com | minet scrape ./scrape.json - > scraped.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ## extract
@@ -552,6 +567,21 @@ examples:
 
 . Resolving a single url:
     $ minet resolve https://lemonde.fr
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ## scrape
@@ -865,6 +895,21 @@ examples:
 
 . Parsing Twitter urls:
     $ minet url-parse url tweets.csv --twitter > report.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ## BuzzSumo
@@ -968,6 +1013,21 @@ examples:
 
 . Returning the number of articles and pages found in BuzzSumo for a list of domain names in a CSV:
     $ minet bz domain-summary domain_name domain_names.csv --begin-date 2020-01-01 --end-date 2021-06-15 --token YOUR_TOKEN  > domain_name_summary.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 <h3 id="buzzsumo-domain">domain</h3>
@@ -1017,6 +1077,21 @@ examples:
 
 . Returning social media information for a list of domain names in a CSV:
     $ minet bz domain domain_name domain_names.csv --select domain_name --begin-date 2019-01-01 --end-date 2020-12-31 --token YOUR_TOKEN > domain_name_articles.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ## CrowdTangle
@@ -1194,6 +1269,21 @@ examples:
 
 . Retrieving information about a single post:
     $ minet ct posts-by-id 1784333048289665 --token YOUR_TOKEN
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### posts
@@ -1410,6 +1500,21 @@ examples:
 
 . Computing a summary of aggregated stats for urls contained in a CSV row:
     $ minet ct summary url urls.csv --token YOUR_TOKEN --start-date 2019-01-01 > summary.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ## Facebook
@@ -1488,6 +1593,21 @@ examples:
 
 . Scraping comments from multiple posts listed in a CSV file:
     $ minet fb comments post_url posts.csv > comments.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 <h3 id="facebook-post">post</h3>
@@ -1567,6 +1687,21 @@ examples:
 
 . Scraping post from multiple urls listed in a CSV file:
     $ minet fb post url urls.csv > post.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 <h3 id="facebook-posts">posts</h3>
@@ -1646,6 +1781,21 @@ examples:
 
 . Scraping posts from multiple groups listed in a CSV file:
     $ minet fb posts group_url groups.csv > posts.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 <h3 id="facebook-post-authors">post-authors</h3>
@@ -1695,6 +1845,21 @@ examples:
 
 . Fetching authors of a series of posts in a CSV file:
     $ minet fb post-authors post_url fb-posts.csv > authors.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 <h3 id="facebook-url-likes">url-likes</h3>
@@ -1740,6 +1905,21 @@ example:
 
 . Retrieving the "like" number for the urls listed in a CSV file:
     $ minet fb url-likes url url.csv > url_likes.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ## Google
@@ -2057,6 +2237,21 @@ example:
 
 . Searching posts with the hashtag paris:
     $ minet instagram hashtag paris > paris_posts.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### user-followers
@@ -2115,6 +2310,21 @@ example:
 
 . Searching followers with the username banksrepeta:
     $ minet instagram user-followers banksrepeta > banksrepeta_followers.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### user-following
@@ -2172,6 +2382,21 @@ example:
 
 . Searching accounts followed with the username paramountplus:
     $ minet instagram user-following paramountplus > paramountplus_following.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### user-infos
@@ -2227,6 +2452,21 @@ example:
 
 . Searching infos with the username banksrepeta:
     $ minet instagram user-infos banksrepeta > banksrepeta_infos.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### user-posts
@@ -2285,6 +2525,21 @@ example:
 
 . Searching posts from the account paramountplus:
     $ minet instagram user-posts paramountplus > paramountplus_posts.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ## Mediacloud
@@ -2327,6 +2582,21 @@ optional arguments:
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 <h3 id="mc-search">search</h3>
@@ -2448,6 +2718,21 @@ optional arguments:
 examples:
 . Scraping a channel's infos:
     $ minet telegram channel-infos nytimes > infos.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### channel-messages
@@ -2482,6 +2767,21 @@ optional arguments:
 examples:
 . Scraping a group's posts:
     $ minet telegram channel-messages nytimes > messages.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ## Tiktok
@@ -2560,6 +2860,21 @@ example:
 
 . Searching videos with the keyword paris:
     $ minet tiktok search-videos paris > paris_videos.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ## Twitter
@@ -2669,6 +2984,21 @@ examples:
 
 . Finding out if tweets are still available or not using tweet & user ids:
     $ minet tw attrition tweet_id deleted_tweets.csv --user user_id --ids > attrition-report.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### followers
@@ -2737,6 +3067,21 @@ examples:
 
 . Getting followers of a list of user:
     $ minet tw followers screen_name users.csv > followers.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### friends
@@ -2804,6 +3149,21 @@ examples:
 
 . Getting friends of a list of user:
     $ minet tw friends screen_name users.csv > friends.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### list-followers
@@ -2864,6 +3224,21 @@ examples:
 
 . Getting followers of a list of lists:
     $ minet tw list-followers id lists.csv > followers.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### list-members
@@ -2924,6 +3299,21 @@ examples:
 
 . Getting members of a list of lists:
     $ minet tw list-members id lists.csv > members.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### retweeters
@@ -2983,6 +3373,21 @@ examples:
 
 . Getting the users who retweeted a list of tweets:
     $ minet tw retweeters tweet_id tweets.csv > retweeters.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 <h3 id="twitter-scrape">scrape</h3>
@@ -3058,6 +3463,21 @@ examples:
 
 . Collecting users with "adam" in their user_name or user_description:
     $ minet tw scrape users adam > users.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### tweet-date
@@ -3092,6 +3512,21 @@ optional arguments:
 examples:
 
     $ minet tw tweet-date url tweets.csv --timezone 'Europe/Paris'> tweets_timestamp_date.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### tweet-search
@@ -3179,6 +3614,21 @@ examples:
 
 . Running multiple queries in series:
     $ minet tw tweet-search query queries.csv > tweets.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### tweet-count
@@ -3274,6 +3724,21 @@ examples:
 
 . Number of tweets matching the query per day:
     $ minet tw tweet-count "query" --granularity day > counts.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### tweets
@@ -3337,6 +3802,21 @@ examples:
 
 . Getting metadata from tweets in a CSV file:
     $ minet tw tweets tweet_id tweets.csv > tweets_metadata.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### users
@@ -3402,6 +3882,21 @@ examples:
 
 . Getting friends of a list of user:
     $ minet tw users screen_name users.csv > data_users.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### user-search
@@ -3467,6 +3962,21 @@ examples:
 
 . Running multiple queries in series:
     $ minet tw user-search query queries.csv > users.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### user-tweets
@@ -3539,6 +4049,21 @@ examples:
 
 . Getting tweets from users in a CSV file:
     $ minet tw user-tweets screen_name users.csv > tweets.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ## Youtube
@@ -3583,6 +4108,21 @@ examples:
 
 . Fetching French captions with a fallback to English:
     $ minet yt captions video_id videos.csv --lang fr,en > captions.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### channel-videos
@@ -3635,6 +4175,21 @@ example:
 . Fetching multiple channels' videos:
     $ minet youtube channel-videos channel_id channels_id.csv -k my-api-key > channels_videos.csv
     $ minet youtube channel-videos channel_url channels_url.csv -k my-api-key > channels_videos.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 <h3 id="youtube-comments">comments</h3>
@@ -3688,6 +4243,21 @@ example:
 . Fetching multiple channels' metadata:
     $ minet youtube channels channel_id channels_id.csv -k my-api-key > channels.csv
     $ minet youtube channels channel_url channels_url.csv -k my-api-key > channels.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ```
@@ -3727,6 +4297,21 @@ example:
 
 . Fetching a video's comments:
     $ minet yt comments https://www.youtube.com/watch?v=7JTb2vf1OQQ -k my-api-key > comments.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 <h3 id="youtube-search">search</h3>
@@ -3777,6 +4362,21 @@ example:
 
 . Searching videos about birds:
     $ minet youtube search bird -k my-api-key > bird_videos.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### videos
@@ -3813,5 +4413,20 @@ optional arguments:
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
   -h, --help                  show this help message and exit
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 

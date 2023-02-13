@@ -505,6 +505,7 @@ def resolve_typical_arguments(
     variadic_input=None,
 ):
     args = [] if args is None else args.copy()
+    epilog_addendum = None
 
     output_argument = {"flags": ["-o", "--output"], "action": OutputAction}
 
@@ -547,6 +548,23 @@ def resolve_typical_arguments(
 
         args.append(input_argument)
 
+        epilog_addendum = """
+        how to use the command with a CSV file?
+
+        > A lot of minet commands, including this one, can both be
+        > given a single value to process or a bunch of them if
+        > given the column of a CSV file passed to -i/--input instead.
+
+        . Here is how to use a command with a single value:
+            $ minet cmd "value"
+
+        . Here is how to use a command with a csv file:
+            $ minet cmd column_name -i file.csv
+
+        . Here is how to read CSV file from stdin using `-`:
+            $ xsv search -s col . | minet cmd column_name -i -
+        """
+
     if select:
         args.append(
             {
@@ -581,7 +599,7 @@ def resolve_typical_arguments(
 
     args.append(output_argument)
 
-    return args
+    return args, epilog_addendum
 
 
 def command(
@@ -634,7 +652,7 @@ def command(
             data["subparsers"]["common_arguments"] = common_arguments
 
     elif arguments is not None:
-        data["arguments"] = resolve_typical_arguments(
+        data["arguments"], epilog_addendum = resolve_typical_arguments(
             arguments,
             resumer=resumer,
             resumer_kwargs=resumer_kwargs,
@@ -642,6 +660,12 @@ def command(
             total=total,
             variadic_input=variadic_input,
         )
+
+        if epilog_addendum is not None:
+            if not "epilog" in data:
+                data["epilog"] = epilog_addendum
+            else:
+                data["epilog"] += "\n\n" + epilog_addendum
 
     if validate is not None:
         data["validate"] = validate
@@ -674,7 +698,7 @@ def subcommand(
     if epilog is not None:
         data["epilog"] = epilog
 
-    data["arguments"] = resolve_typical_arguments(
+    data["arguments"], epilog_addendum = resolve_typical_arguments(
         arguments,
         resumer=resumer,
         resumer_kwargs=resumer_kwargs,
@@ -682,6 +706,12 @@ def subcommand(
         total=total,
         variadic_input=variadic_input,
     )
+
+    if epilog_addendum is not None:
+        if not "epilog" in data:
+            data["epilog"] = epilog_addendum
+        else:
+            data["epilog"] += "\n\n" + epilog_addendum
 
     if validate is not None:
         data["validate"] = validate
