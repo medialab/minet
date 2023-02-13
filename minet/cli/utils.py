@@ -5,6 +5,7 @@
 # Miscellaneous helpers used by the CLI tools.
 #
 import os
+import csv
 import sys
 import stat
 import yaml
@@ -17,9 +18,9 @@ from collections.abc import Mapping
 from functools import wraps, partial
 from datetime import datetime
 from logging import Handler
-from tqdm import tqdm
 from ebbe import noop, format_seconds
 
+from minet.cli.loading_bar import LoadingBar
 from minet.cli.exceptions import MissingColumnError, FatalError
 from minet.utils import fuzzy_int
 
@@ -35,13 +36,6 @@ def with_cli_exceptions(fn):
             # Taken from: https://docs.python.org/3/library/signal.html
             devnull = os.open(os.devnull, os.O_WRONLY)
             os.dup2(devnull, sys.stdout.fileno())
-            sys.exit(1)
-
-        except KeyboardInterrupt:
-            # Leaving loading bars to avoid duplication
-            cleanup_loading_bars()
-
-            # Exiting right now to avoid stack frames
             sys.exit(1)
 
     return wrapper
@@ -75,13 +69,13 @@ def format_polymorphic_message(*args, sep=" "):
     )
 
 
-def better_and_tqdm_aware_print(*args, file=sys.stdout, sep=" ", end="\n"):
-    msg = format_polymorphic_message(*args)
-    tqdm.write(msg, file=file, end=end)
+def better_print(*args, file=sys.stdout, sep=" ", end="\n"):
+    for arg in args:
+        print(arg, end=end, sep=sep, file=file)
 
 
-print_out = partial(better_and_tqdm_aware_print, file=sys.stdout)
-print_err = partial(better_and_tqdm_aware_print, file=sys.stderr)
+print_out = partial(better_print, file=sys.stdout)
+print_err = partial(better_print, file=sys.stderr)
 
 
 def die(msg=None):
@@ -93,12 +87,6 @@ def die(msg=None):
             print_err(m)
 
     sys.exit(1)
-
-
-def cleanup_loading_bars(leave=False):
-    for bar in list(tqdm._instances):
-        bar.leave = leave
-        bar.close()
 
 
 def safe_index(l, e):
@@ -130,51 +118,6 @@ class CLIRetryerHandler(Handler):
             msg = ["%s" % now, record.msg, ""]
 
         print_err(msg)
-
-
-class LoadingBar(tqdm):
-    def __init__(
-        self, desc, stats=None, unit=None, unit_plural=None, total=None, **kwargs
-    ):
-
-        if unit is not None and total is None:
-            if unit_plural is not None:
-                unit = " " + unit_plural
-            else:
-                unit = " " + unit + "s"
-
-        self.__stats = stats or {}
-
-        if unit is not None:
-            kwargs["unit"] = unit
-
-        super().__init__(desc=desc, total=total, **kwargs)
-
-    def update_total(self, total):
-        self.total = total
-
-    def update_stats(self, **kwargs):
-        for key, value in kwargs.items():
-            self.__stats[key] = value
-
-        return self.set_postfix(**self.__stats)
-
-    def inc(self, name, amount=1):
-        if name not in self.__stats:
-            self.__stats[name] = 0
-
-        self.__stats[name] += amount
-        return self.update_stats()
-
-    def print(self, *args, end="\n"):
-        self.write(format_polymorphic_message(*args), file=sys.stderr, end=end)
-
-    def close(self):
-        super().close()
-
-    def die(self, msg):
-        self.close()
-        die(msg)
 
 
 def acquire_cross_platform_stdout():
@@ -338,45 +281,40 @@ def with_fatal_errors(mapping_or_hook):
     return decorate
 
 
-def get_enricher_and_loading_bar(
-    cli_args, headers, desc, unit=None, multiplex=None, stats=None
+def with_enricher_and_loading_bar(
+    headers, title, unit=None, multiplex=None, dual_line=False
 ):
-    if callable(headers):
-        headers = headers(cli_args)
-
-    if callable(multiplex):
-        multiplex = multiplex(cli_args)
-
-    enricher = casanova.enricher(
-        cli_args.input,
-        cli_args.output,
-        add=headers,
-        keep=cli_args.select,
-        total=getattr(cli_args, "total", None),
-        multiplex=multiplex,
-    )
-
-    loading_bar = LoadingBar(desc=desc, unit=unit, total=enricher.total, stats=stats)
-
-    return enricher, loading_bar
-
-
-def with_enricher_and_loading_bar(headers, desc, unit=None, multiplex=None, stats=None):
     def decorate(action):
         @wraps(action)
         def wrapper(cli_args, *args, **kwargs):
-            enricher, loading_bar = get_enricher_and_loading_bar(
-                cli_args,
-                headers=headers,
-                desc=desc,
-                unit=unit,
-                multiplex=multiplex,
-                stats=stats,
+            enricher = casanova.enricher(
+                cli_args.input,
+                cli_args.output,
+                add=headers(cli_args) if callable(headers) else headers,
+                keep=cli_args.select,
+                total=getattr(cli_args, "total", None),
+                multiplex=multiplex(cli_args) if callable(multiplex) else multiplex,
             )
 
-            additional_kwargs = {"enricher": enricher, "loading_bar": loading_bar}
+            with LoadingBar(
+                title=title, total=enricher.total, unit=unit, dual_line=dual_line
+            ) as loading_bar:
 
-            return action(cli_args, *args, **additional_kwargs, **kwargs)
+                # NOTE: we need to patch enricher's output writer to benefit
+                # from alive_progress stdout wrapping
+                if (
+                    hasattr(cli_args.output, "fileno")
+                    and callable(cli_args.output.fileno)
+                    and cli_args.output.fileno() == sys.__stdout__.fileno()
+                ):
+                    enricher.writer = csv.writer(sys.stdout)
+
+                additional_kwargs = {
+                    "enricher": enricher,
+                    "loading_bar": loading_bar,
+                }
+
+                return action(cli_args, *args, **additional_kwargs, **kwargs)
 
         return wrapper
 

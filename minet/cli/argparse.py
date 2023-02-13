@@ -19,7 +19,6 @@ from argparse import (
 )
 from gettext import gettext
 from textwrap import dedent
-from tqdm.contrib import DummyTqdmFile
 from casanova import Resumer, CsvCellIO
 from ebbe import getpath, omit
 from datetime import datetime
@@ -330,7 +329,7 @@ class OutputOpener(object):
             if resume:
                 raise RuntimeError
 
-            return DummyTqdmFile(acquire_cross_platform_stdout())
+            return acquire_cross_platform_stdout()
 
         if resume and self.resumer_class is not None:
             resumer_kwargs = self.resumer_kwargs

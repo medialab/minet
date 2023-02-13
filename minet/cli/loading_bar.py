@@ -57,10 +57,15 @@ apply_alive_progress_patch()
 
 class LoadingBar(object):
     def __init__(
-        self, total: int = None, unit: str = "items", title: Optional[str] = None
+        self,
+        total: int = None,
+        unit: str = "items",
+        title: Optional[str] = None,
+        dual_line: bool = False,
     ) -> None:
         self.title = title
         self.total = total
+        self.dual_line = dual_line
         self.monitor = "{count}/{total} " + unit + " ({percent:.0%})"
 
         if total is None:
@@ -73,6 +78,7 @@ class LoadingBar(object):
         self.bar_context = alive_bar(
             total=self.total,
             title=self.title,
+            dual_line=self.dual_line,
             spinner=DEFAULT_SPINNER,
             monitor=self.monitor,
             file=sys.stderr,
@@ -85,5 +91,14 @@ class LoadingBar(object):
     def __exit__(self, *exc):
         return self.bar_context.__exit__(*exc)
 
-    def update(self, count=1):
+    def update(self, count: int = 1, text: Optional[str] = None):
         self.bar(count)
+
+        if text is not None:
+            self.set_text(text)
+
+    def set_title(self, title):
+        self.bar.title = title
+
+    def set_text(self, text):
+        self.bar.text = text
