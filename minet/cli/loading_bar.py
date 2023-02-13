@@ -8,6 +8,7 @@ from collections.abc import Mapping
 from ebbe import format_int
 from alive_progress import alive_bar
 from alive_progress.animations import frame_spinner_factory
+from termcolor import colored
 
 DEFAULT_SPINNER = frame_spinner_factory("⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏")
 
@@ -68,6 +69,7 @@ class LoadingBar(object):
         text: str = "",
         dual_line: bool = False,
         initial_stats=None,
+        stats_colors=None,
     ) -> None:
         self.title = title
         self.text = text
@@ -75,6 +77,7 @@ class LoadingBar(object):
         self.dual_line = dual_line
         self.monitor = "{count}/{total} " + unit + " ({percent:.0%})"
         self.stats = OrderedDict()
+        self.stats_colors = stats_colors
 
         if initial_stats is not None:
             if isinstance(initial_stats, Mapping):
@@ -105,11 +108,7 @@ class LoadingBar(object):
         self.bar = self.bar_context.__enter__()
 
         # Bar init
-        if self.dual_line and self.stats:
-            self.__draw_stats()
-
-        if self.text:
-            self.set_text(self.text)
+        self.__render_text()
 
         return self
 
@@ -119,11 +118,22 @@ class LoadingBar(object):
     def __render_text(self):
 
         if self.stats:
-            postfix = " ".join(
-                "{k}={c}".format(k=k, c=format_int(c)) for k, c in self.stats.items()
-            )
+            postfix = []
 
-            self.bar.text = self.text + " " + postfix
+            for k, c in self.stats.items():
+                if self.stats_colors is not None:
+                    color = self.stats_colors.get(k)
+
+                    if color is not None:
+                        k = colored(k, color)
+
+                c = format_int(c)
+
+                postfix.append(k + ": " + c)
+
+            postfix = ", ".join(postfix)
+
+            self.bar.text = self.text + " - " + postfix
         else:
             self.bar.text = self.text
 

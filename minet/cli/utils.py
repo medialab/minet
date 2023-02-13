@@ -15,7 +15,8 @@ from glob import iglob
 from os.path import join, expanduser, isfile, relpath
 from collections import namedtuple
 from collections.abc import Mapping
-from functools import wraps, partial
+from functools import wraps
+from termcolor import colored
 from datetime import datetime
 from logging import Handler
 from ebbe import noop, format_seconds
@@ -69,22 +70,23 @@ def format_polymorphic_message(*args, sep=" "):
     )
 
 
-def better_print(*args, file=sys.stdout, sep=" ", end="\n"):
+def variadic_print(*args, file=sys.stdout, sep=" ", end="\n"):
     for arg in args:
-        print(arg, end=end, sep=sep, file=file)
+        if isinstance(arg, list):
+            for msg in arg:
+                print(msg, end=end, sep=sep, file=file)
+        else:
+            print(arg, end=end, sep=sep, file=file)
 
 
-print_out = partial(better_print, file=sys.stdout)
-print_err = partial(better_print, file=sys.stderr)
+# NOTE: I don't use partial here to be sure to be able to use
+# alive_progress stderr wrapper
+def print_err(*args):
+    variadic_print(*args, file=sys.stderr)
 
 
-def die(msg=None):
-    if msg is not None:
-        if not isinstance(msg, list):
-            msg = [msg]
-
-        for m in msg:
-            print_err(m)
+def die(*msg):
+    print_err(*msg)
 
     sys.exit(1)
 
@@ -117,7 +119,7 @@ class CLIRetryerHandler(Handler):
         else:
             msg = ["%s" % now, record.msg, ""]
 
-        print_err(msg)
+        print_err(colored("\n".join(msg), "yellow"))
 
 
 def acquire_cross_platform_stdout():
@@ -282,7 +284,13 @@ def with_fatal_errors(mapping_or_hook):
 
 
 def with_enricher_and_loading_bar(
-    headers, title, unit=None, multiplex=None, dual_line=False
+    headers,
+    title,
+    unit=None,
+    multiplex=None,
+    dual_line=False,
+    stats_colors=None,
+    initial_stats=None,
 ):
     def decorate(action):
         @wraps(action)
@@ -297,7 +305,12 @@ def with_enricher_and_loading_bar(
             )
 
             with LoadingBar(
-                title=title, total=enricher.total, unit=unit, dual_line=dual_line
+                title=title,
+                total=enricher.total,
+                unit=unit,
+                dual_line=dual_line,
+                initial_stats=initial_stats,
+                stats_colors=stats_colors,
             ) as loading_bar:
 
                 # NOTE: we need to patch enricher's output writer to benefit

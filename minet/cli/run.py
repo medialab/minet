@@ -21,7 +21,6 @@ from minet.loggers import sleepers_logger
 from minet.cli.utils import (
     die,
     get_rcfile,
-    print_err,
     CLIRetryerHandler,
     with_cli_exceptions,
 )
@@ -109,11 +108,9 @@ def run(name, version, commands):
             except InvalidArgumentsError as e:
                 parser.error(e.message)
             except EmptyFileError as e:
-                print_err("Some empty CSV file was given to the command!")
-                sys.exit(1)
+                die("Some empty CSV file was given to the command!")
             except FatalError as e:
-                print_err(e.message)
-                sys.exit(1)
+                die(e.message)
 
     elif cli_args.action == "help":
 
