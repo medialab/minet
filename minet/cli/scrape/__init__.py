@@ -47,7 +47,7 @@ SCRAPE_COMMAND = command(
         },
         {
             "name": "report",
-            "help": "Input CSV fetch action report file.",
+            "help": "Report CSV file from `minet fetch`. Will understand `-` as stdin.",
             "action": InputAction,
         },
         {

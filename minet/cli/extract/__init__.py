@@ -57,7 +57,8 @@ EXTRACT_COMMAND = command(
     arguments=[
         {
             "name": "report",
-            "help": "Input CSV fetch action report file.",
+            "metavar": "report_or_glob_pattern",
+            "help": "Report CSV file from `minet fetch` or glob pattern if used with --glob. Will understand `-` as stdin.",
             "action": InputAction,
         },
         {

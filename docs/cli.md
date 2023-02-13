@@ -380,7 +380,7 @@ examples:
 ```
 usage: minet extract [-h] [-g GLOB] [-I INPUT_DIR] [-p PROCESSES] [-s SELECT]
                      [--total TOTAL] [-o OUTPUT]
-                     report
+                     report_or_glob_pattern
 
 Minet Extract Command
 =====================
@@ -398,7 +398,9 @@ Note that this methodology mainly targets news article and may fail
 to extract relevant content from other kind of web pages.
 
 positional arguments:
-  report                        Input CSV fetch action report file.
+  report_or_glob_pattern        Report CSV file from `minet fetch` or glob
+                                pattern if used with --glob. Will understand `-`
+                                as stdin.
 
 optional arguments:
   -g GLOB, --glob GLOB          Whether to extract text from a bunch of html
@@ -573,7 +575,8 @@ It will output the scraped items as a CSV file.
 
 positional arguments:
   scraper                       Path to a scraper definition file.
-  report                        Input CSV fetch action report file.
+  report                        Report CSV file from `minet fetch`. Will
+                                understand `-` as stdin.
 
 optional arguments:
   -f {csv,jsonl}, --format {csv,jsonl}
