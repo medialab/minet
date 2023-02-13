@@ -3,6 +3,9 @@ import sys
 import shutil
 from typing import Optional
 from types import SimpleNamespace
+from collections import OrderedDict
+from collections.abc import Mapping
+from ebbe import format_int
 from alive_progress import alive_bar
 from alive_progress.animations import frame_spinner_factory
 
@@ -62,12 +65,24 @@ class LoadingBar(object):
         total: int = None,
         unit: str = "items",
         title: Optional[str] = None,
+        text: str = "",
         dual_line: bool = False,
+        initial_stats=None,
     ) -> None:
         self.title = title
+        self.text = text
         self.total = total
         self.dual_line = dual_line
         self.monitor = "{count}/{total} " + unit + " ({percent:.0%})"
+        self.stats = OrderedDict()
+
+        if initial_stats is not None:
+            if isinstance(initial_stats, Mapping):
+                for k, v in initial_stats.items():
+                    self.stats[k] = v
+            else:
+                for (k, v) in initial_stats:
+                    self.stats[k] = v
 
         if total is None:
             self.monitor = "{count} " + unit
@@ -89,10 +104,40 @@ class LoadingBar(object):
         )
         self.bar = self.bar_context.__enter__()
 
+        # Bar init
+        if self.dual_line and self.stats:
+            self.__draw_stats()
+
+        if self.text:
+            self.set_text(self.text)
+
         return self
 
     def __exit__(self, *exc):
         return self.bar_context.__exit__(*exc)
+
+    def __render_text(self):
+
+        if self.stats:
+            postfix = " ".join(
+                "{k}={c}".format(k=k, c=format_int(c)) for k, c in self.stats.items()
+            )
+
+            self.bar.text = self.text + " " + postfix
+        else:
+            self.bar.text = self.text
+
+    def set_stat(self, name: str, value: int):
+        self.stats[name] = value
+        self.__render_text()
+
+    def inc_stat(self, name: str, count: int = 1):
+        if name not in self.stats:
+            self.stats[name] = count
+        else:
+            self.stats[name] += count
+
+        self.__render_text()
 
     def update(self, count: int = 1, text: Optional[str] = None):
         self.bar(count)
@@ -101,7 +146,9 @@ class LoadingBar(object):
             self.set_text(text)
 
     def set_title(self, title):
+        self.title = title
         self.bar.title = title
 
     def set_text(self, text):
-        self.bar.text = text
+        self.text = text
+        self.__render_text()
