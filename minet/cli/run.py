@@ -67,7 +67,7 @@ def run(name, version, commands):
                 sys.exit(0)
 
         # Loading config
-        config = get_rcfile(cli_args.rcfile)
+        config = get_rcfile(cli_args.rcfile) if hasattr(cli_args, "rcfile") else None
 
         # Resolving namespace dependencies
         try:
