@@ -80,6 +80,7 @@ class LoadingBar(object):
             title=self.title,
             dual_line=self.dual_line,
             spinner=DEFAULT_SPINNER,
+            enrich_print=False,
             monitor=self.monitor,
             file=sys.stderr,
             ctrl_c=False,
