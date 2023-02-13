@@ -2907,6 +2907,10 @@ https://twitter.com/search-advanced?f=live
 Useful operators include "since" and "until" to search specific
 time ranges like so: "since:2014-01-01 until:2017-12-31".
 
+BEWARE: the web search results seem to become inconsistent when
+queries return vast amounts of tweets. In which case you are
+strongly advised to segment your queries using temporal filters.
+
 positional arguments:
   {tweets,users}              What to scrape. Currently only `tweets` and
                               `users` are possible.
@@ -3610,7 +3614,10 @@ usage: minet youtube search [-h] [-l LIMIT]
 Youtube search
 ==============
 
-Retrieve metadata about Youtube search field using the API.
+Search videos using the YouTube API.
+
+Note that, even if undocumented, the API will never return
+more than approx. 500 videos for a given query.
 
 positional arguments:
   column                      Name of the CSV column containing queries or a
