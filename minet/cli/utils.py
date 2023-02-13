@@ -302,10 +302,13 @@ def with_enricher_and_loading_bar(
 
                 # NOTE: we need to patch enricher's output writer to benefit
                 # from alive_progress stdout wrapping
+                # NOTE: if we know that stdout is piped somewhere, we don't
+                # bother to wrap it either
                 if (
                     hasattr(cli_args.output, "fileno")
                     and callable(cli_args.output.fileno)
                     and cli_args.output.fileno() == sys.__stdout__.fileno()
+                    and sys.__stdout__.isatty()
                 ):
                     enricher.writer = csv.writer(sys.stdout)
 
