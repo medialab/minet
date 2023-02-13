@@ -175,7 +175,7 @@ def get_multiplex(cli_args):
 
 
 @with_enricher_and_loading_bar(
-    headers=get_headers, title="Parsing", unit="row", multiplex=get_multiplex
+    headers=get_headers, title="Parsing", unit="urls", multiplex=get_multiplex
 )
 def action(cli_args, enricher, loading_bar):
     for row, url in enricher.cells(cli_args.column, with_rows=True):
