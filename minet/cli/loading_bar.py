@@ -55,6 +55,7 @@ def apply_alive_progress_patch():
 apply_alive_progress_patch()
 
 
+# TODO: add option to finalize receipt text when exiting ctx
 class LoadingBar(object):
     def __init__(
         self,
@@ -82,6 +83,7 @@ class LoadingBar(object):
             spinner=DEFAULT_SPINNER,
             enrich_print=False,
             monitor=self.monitor,
+            receipt_text=True,
             file=sys.stderr,
             ctrl_c=False,
         )
