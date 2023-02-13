@@ -7,10 +7,7 @@ from collections import OrderedDict
 from collections.abc import Mapping
 from ebbe import format_int
 from alive_progress import alive_bar
-from alive_progress.animations import frame_spinner_factory
 from termcolor import colored
-
-DEFAULT_SPINNER = frame_spinner_factory("⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏")
 
 # NOTE: until the library is patched, we need to take into account
 # the fact that the stderr cols are not computed correctly
@@ -98,7 +95,7 @@ class LoadingBar(object):
             total=self.total,
             title=self.title,
             dual_line=self.dual_line,
-            spinner=DEFAULT_SPINNER,
+            spinner="dots",
             enrich_print=False,
             monitor=self.monitor,
             receipt_text=True,

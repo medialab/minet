@@ -2,6 +2,7 @@ import re
 import tld
 import trafilatura
 import justext
+import grapheme
 from glob import iglob
 from os.path import dirname, join
 from PyInstaller.utils.hooks import collect_submodules
@@ -27,6 +28,10 @@ hiddenimports.append("charset_normalizer.md__mypyc")
 datas = [
     (join(dirname(tld.__file__), "res", "effective_tld_names.dat.txt"), "tld/res"),
     (join(dirname(trafilatura.__file__), "settings.cfg"), "trafilatura"),
+    (
+        join(dirname(grapheme.__file__), "data", "grapheme_break_property.json"),
+        "grapheme/data",
+    ),
 ]
 
 for p in iglob(join(dirname(justext.__file__), "stoplists", "*.txt")):
