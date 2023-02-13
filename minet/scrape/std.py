@@ -87,7 +87,6 @@ def get_display_text(element):
 
         for descendant in element.descendants:
             if not isinstance(descendant, NavigableString):
-
                 if descendant.name == "br":
                     yield "\n"
 
@@ -98,6 +97,11 @@ def get_display_text(element):
                     yield "\n"
 
                 else:
+
+                    # NOTE: an empty inline tag should not generate whitespace
+                    if not descendant.contents:
+                        continue
+
                     sibling = get_previous_sibling(descendant)
 
                     if sibling:

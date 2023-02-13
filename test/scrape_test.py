@@ -1083,3 +1083,13 @@ class TestScrape(object):
         text = get_display_text(elements)
 
         assert text == "Hello\n\nWorld!"
+
+        soup = BeautifulSoup(
+            '<div><span>L\'international</span><wbr/><span class="word_break"></span>e.</div>',
+            "lxml",
+        )
+        elements = soup.select("div")
+
+        text = get_display_text(elements)
+
+        assert text == "L'internationale."
