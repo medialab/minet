@@ -1,4 +1,4 @@
-from minet.cli.argparse import command, InputFileAction
+from minet.cli.argparse import command, InputAction
 
 URL_EXTRACT_COMMAND = command(
     "url-extract",
@@ -21,7 +21,7 @@ URL_EXTRACT_COMMAND = command(
     total=True,
     arguments=[
         {"name": "column", "help": "Name of the column containing text or html."},
-        {"name": "file", "help": "Target CSV file.", "action": InputFileAction},
+        {"name": "file", "help": "Target CSV file.", "action": InputAction},
         {"flag": "--base-url", "help": "Base url used to resolve relative urls."},
         {
             "flag": "--from",

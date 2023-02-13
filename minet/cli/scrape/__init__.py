@@ -1,6 +1,6 @@
 from argparse import FileType
 
-from minet.cli.argparse import command, InputFileAction
+from minet.cli.argparse import command, InputAction
 from minet.cli.constants import DEFAULT_CONTENT_FOLDER
 
 SCRAPE_COMMAND = command(
@@ -48,7 +48,7 @@ SCRAPE_COMMAND = command(
         {
             "name": "report",
             "help": "Input CSV fetch action report file.",
-            "action": InputFileAction,
+            "action": InputAction,
         },
         {
             "flags": ["-f", "--format"],

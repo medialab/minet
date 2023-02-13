@@ -179,8 +179,9 @@ optional arguments:
                               set, will output the cookie's morsels as CSV.
   --url URL                   If given, only returns full cookie header value
                               for this url.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 examples:
@@ -219,8 +220,9 @@ optional arguments:
                               Output directory.
   --throttle THROTTLE         Time to wait - in seconds - between 2 calls to the
                               same domain. Defaults to 0.2.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --resume                    Whether to resume an interrupted crawl.
   -h, --help                  show this help message and exit
 
@@ -322,8 +324,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --resume                    Whether to resume from an aborted collection. Need
                               -o to be set.
   -h, --help                  show this help message and exit
@@ -412,8 +415,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 columns being added to the output:
@@ -524,8 +528,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --resume                    Whether to resume from an aborted collection. Need
                               -o to be set.
   -h, --help                  show this help message and exit
@@ -593,8 +598,9 @@ optional arguments:
   --validate                  Just validate the given scraper then exit.
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 examples:
@@ -645,8 +651,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 examples:
@@ -687,8 +694,9 @@ optional arguments:
   --separator SEPARATOR       Split indexed url column by a separator?
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 examples:
@@ -789,8 +797,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 columns being added to the output:
@@ -895,8 +904,9 @@ optional arguments:
   -t TOKEN, --token TOKEN     BuzzSumo API token. Can also be configured in a
                               .minetrc file as "buzzsumo.token" or read from the
                               MINET_BUZZSUMO_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -938,8 +948,9 @@ optional arguments:
                               MINET_BUZZSUMO_TOKEN env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -984,8 +995,9 @@ optional arguments:
                               MINET_BUZZSUMO_TOKEN env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -1069,8 +1081,9 @@ optional arguments:
                               crowdtangle.token. Can also be configured in a
                               .minetrc file as "crowdtangle.token" or read from
                               the MINET_CROWDTANGLE_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -1105,8 +1118,9 @@ optional arguments:
                               crowdtangle.token. Can also be configured in a
                               .minetrc file as "crowdtangle.token" or read from
                               the MINET_CROWDTANGLE_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -1152,8 +1166,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --resume                    Whether to resume from an aborted collection. Need
                               -o to be set.
   --rcfile RCFILE             Custom path to a minet configuration file. More
@@ -1218,8 +1233,9 @@ optional arguments:
                               crowdtangle.token. Can also be configured in a
                               .minetrc file as "crowdtangle.token" or read from
                               the MINET_CROWDTANGLE_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --resume                    Whether to resume from an aborted collection. Need
                               -o to be set.
   --rcfile RCFILE             Custom path to a minet configuration file. More
@@ -1309,8 +1325,9 @@ optional arguments:
                               .minetrc file as "crowdtangle.token" or read from
                               the MINET_CROWDTANGLE_TOKEN env variable.
   --types TYPES               Types of post to include, separated by comma.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -1369,8 +1386,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -1438,8 +1456,9 @@ optional arguments:
                               request.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -1514,8 +1533,9 @@ optional arguments:
                               request.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -1589,8 +1609,9 @@ optional arguments:
                               request.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -1642,8 +1663,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -1685,8 +1707,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 example:
@@ -1748,8 +1771,9 @@ optional arguments:
   -c COOKIE, --cookie COOKIE  Google Drive cookie or browser from which to
                               extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge").
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1788,8 +1812,9 @@ optional arguments:
   --password PASSWORD         The corpus's password if required.
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1814,8 +1839,9 @@ positional arguments:
 
 optional arguments:
   --password PASSWORD         The corpus's password if required.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1850,8 +1876,9 @@ optional arguments:
   --statuses STATUSES         Webentity statuses to dump, separated by comma.
                               Possible statuses being "IN", "OUT", "UNDECIDED"
                               and "DISCOVERED".
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1876,8 +1903,9 @@ positional arguments:
 
 optional arguments:
   --password PASSWORD         The corpus's password if required.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1913,8 +1941,9 @@ optional arguments:
                               same column. Defaults to "|".
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1992,8 +2021,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -2046,8 +2076,9 @@ optional arguments:
   -l LIMIT, --limit LIMIT     Maximum number of followers to retrieve per user.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -2099,8 +2130,9 @@ optional arguments:
   -l LIMIT, --limit LIMIT     Maximum number of accounts to retrieve per user.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -2151,8 +2183,9 @@ optional arguments:
                               MINET_INSTAGRAM_COOKIE env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -2206,8 +2239,9 @@ optional arguments:
   -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve per user.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -2249,8 +2283,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -2300,8 +2335,9 @@ optional arguments:
                               sometimes). Can also be configured in a .minetrc
                               file as "mediacloud.token" or read from the
                               MINET_MEDIACLOUD_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -2366,8 +2402,9 @@ optional arguments:
                               request.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2397,8 +2434,9 @@ optional arguments:
                               request.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2468,8 +2506,9 @@ optional arguments:
   -l LIMIT, --limit LIMIT     Maximum number of videos to retrieve per query.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -2570,8 +2609,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --resume                    Whether to resume from an aborted collection. Need
                               -o to be set.
   --rcfile RCFILE             Custom path to a minet configuration file. More
@@ -2639,8 +2679,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --resume                    Whether to resume from an aborted collection. Need
                               -o to be set.
   --rcfile RCFILE             Custom path to a minet configuration file. More
@@ -2703,8 +2744,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --resume                    Whether to resume from an aborted collection. Need
                               -o to be set.
   --rcfile RCFILE             Custom path to a minet configuration file. More
@@ -2761,8 +2803,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -2817,8 +2860,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -2873,8 +2917,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -2932,8 +2977,9 @@ optional arguments:
                               from:@user queries.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2982,8 +3028,9 @@ optional arguments:
                               Default to UTC.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 examples:
@@ -3060,8 +3107,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -3150,8 +3198,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -3214,8 +3263,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --resume                    Whether to resume from an aborted collection. Need
                               -o to be set.
   --rcfile RCFILE             Custom path to a minet configuration file. More
@@ -3276,8 +3326,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --resume                    Whether to resume from an aborted collection. Need
                               -o to be set.
   --rcfile RCFILE             Custom path to a minet configuration file. More
@@ -3338,8 +3389,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -3410,8 +3462,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -3451,8 +3504,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   -h, --help                  show this help message and exit
 
 examples:
@@ -3495,8 +3549,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -3546,8 +3601,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -3589,8 +3645,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -3637,8 +3694,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc
@@ -3676,8 +3734,9 @@ optional arguments:
                               (separated by `,`).
   --total TOTAL               Total number of items to process. Necessary if you
                               want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. By default, the results
-                              will be printed to stdout.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
                               info about this here: https://github.com/medialab/
                               minet/blob/master/docs/cli.md#minetrc

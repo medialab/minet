@@ -1,4 +1,4 @@
-from minet.cli.argparse import command, InputFileAction
+from minet.cli.argparse import command, InputAction
 
 URL_JOIN_COMMAND = command(
     "url-join",
@@ -27,7 +27,7 @@ URL_JOIN_COMMAND = command(
         {
             "name": "file1",
             "help": "Path to the file to index.",
-            "action": InputFileAction,
+            "action": InputAction,
             "nargs": None,
         },
         {
@@ -37,7 +37,7 @@ URL_JOIN_COMMAND = command(
         {
             "name": "file2",
             "help": "Path to the second file.",
-            "action": InputFileAction,
+            "action": InputAction,
             "nargs": None,
         },
         {

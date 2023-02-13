@@ -10,7 +10,7 @@ from minet.cli.argparse import (
     command,
     subcommand,
     ConfigAction,
-    InputFileAction,
+    InputAction,
     TimezoneType,
     TimestampType,
 )
@@ -358,7 +358,7 @@ TWITTER_SCRAPE_SUBCOMMAND = subcommand(
         {
             "name": "file",
             "help": "Optional CSV file containing the queries to be run.",
-            "action": InputFileAction,
+            "action": InputAction,
             "dummy_csv_column": "query",
             "column_dest": "query",
         },

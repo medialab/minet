@@ -1,4 +1,4 @@
-from minet.cli.argparse import command, InputFileAction
+from minet.cli.argparse import command, InputAction
 from minet.cli.constants import DEFAULT_CONTENT_FOLDER
 
 EXTRACT_COMMAND = command(
@@ -58,7 +58,7 @@ EXTRACT_COMMAND = command(
         {
             "name": "report",
             "help": "Input CSV fetch action report file.",
-            "action": InputFileAction,
+            "action": InputAction,
         },
         {
             "flags": ["-g", "--glob"],

@@ -263,7 +263,7 @@ class BooleanAction(Action):
         )
 
 
-class InputFileAction(Action):
+class InputAction(Action):
     def __init__(
         self,
         option_strings,
@@ -275,7 +275,7 @@ class InputFileAction(Action):
         column_dest="column",
         column_dests=None,
         nargs="?",
-        **kwargs
+        **kwargs,
     ):
 
         if dummy_csv_guard is not None and not callable(dummy_csv_guard):
@@ -339,20 +339,14 @@ class InputFileAction(Action):
         setattr(cli_args, self.dest, f)
 
 
-class OutputFileOpener(object):
-    def __init__(
-        self, path=None, resumer_class=None, resumer_kwargs={}, stdout_fallback=True
-    ):
+class OutputOpener(object):
+    def __init__(self, path, resumer_class=None, resumer_kwargs={}):
         self.path = path
         self.resumer_class = resumer_class
         self.resumer_kwargs = resumer_kwargs
-        self.stdout_fallback = stdout_fallback
 
     def open(self, cli_args, resume=False):
-        if self.path is None:
-            if not self.stdout_fallback:
-                return None
-
+        if self.path == "-":
             if resume:
                 raise RuntimeError
 
@@ -373,43 +367,34 @@ class OutputFileOpener(object):
         return open(self.path, mode, encoding="utf-8", newline="")
 
 
-DEFAULT_OUTPUT_FILE_HELP = (
-    "Path to the output file. By default, the results will be printed to stdout."
-)
-
-
-class OutputFileAction(Action):
+class OutputAction(Action):
     def __init__(
         self,
         option_strings,
         dest,
         resumer=None,
         resumer_kwargs={},
-        help=DEFAULT_OUTPUT_FILE_HELP,
-        stdout_fallback=True,
-        **kwargs
+        help="Path to the output file. Will consider `-` as stdout. If not given, results will also be printed to stdout.",
+        default="-",
+        **kwargs,
     ):
         self.resumer = resumer
         self.resumer_kwargs = resumer_kwargs
-        self.stdout_fallback = stdout_fallback
         super().__init__(
             option_strings,
             dest,
             help=help,
-            default=OutputFileOpener(
-                resumer_class=resumer,
-                resumer_kwargs=resumer_kwargs,
-                stdout_fallback=stdout_fallback,
+            default=OutputOpener(
+                path=default, resumer_class=resumer, resumer_kwargs=resumer_kwargs
             ),
-            **kwargs
+            **kwargs,
         )
 
     def __call__(self, parser, cli_args, value, option_string=None):
-        opener = OutputFileOpener(
-            value,
+        opener = OutputOpener(
+            path=value,
             resumer_class=self.resumer,
             resumer_kwargs=self.resumer_kwargs,
-            stdout_fallback=self.stdout_fallback,
         )
         setattr(cli_args, self.dest, opener)
 
@@ -456,7 +441,7 @@ class ConfigAction(Action):
         default=None,
         plural=False,
         required=False,
-        **kwargs
+        **kwargs,
     ):
         if "help" in kwargs:
             kwargs["help"] = kwargs["help"].rstrip(
@@ -481,7 +466,7 @@ class ConfigAction(Action):
                 kwargs.get("type", str),
                 required=required,
             ),
-            **kwargs
+            **kwargs,
         )
 
     def __call__(self, parser, cli_args, values, option_string=None):
@@ -508,7 +493,7 @@ def resolve_arg_dependencies(cli_args, config):
             setattr(cli_args, name, value.resolve(config))
 
         # Opening output files
-        if isinstance(value, OutputFileOpener):
+        if isinstance(value, OutputOpener):
             value = value.open(cli_args, resume=getattr(cli_args, "resume", False))
             setattr(cli_args, name, value)
 
@@ -534,7 +519,7 @@ def resolve_typical_arguments(
 ):
     args = [] if args is None else args.copy()
 
-    output_argument = {"flags": ["-o", "--output"], "action": OutputFileAction}
+    output_argument = {"flags": ["-o", "--output"], "action": OutputAction}
 
     if variadic_input is not None:
         variadic_input = variadic_input.copy()
@@ -561,7 +546,7 @@ def resolve_typical_arguments(
         file_argument = {
             "name": "file",
             "help": variadic_input["file_help"],
-            "action": InputFileAction,
+            "action": InputAction,
             "dummy_csv_column": variadic_input["dummy_column"],
         }
 
@@ -626,7 +611,7 @@ def command(
     select=False,
     total=False,
     variadic_input=None,
-    **kwargs
+    **kwargs,
 ):
 
     if arguments is not None and subcommands is not None:
@@ -690,7 +675,7 @@ def subcommand(
     select=False,
     total=False,
     variadic_input=None,
-    **kwargs
+    **kwargs,
 ):
     data = {"name": name, "title": title, "package": package, "arguments": arguments}
 
