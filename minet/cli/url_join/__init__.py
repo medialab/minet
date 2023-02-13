@@ -25,7 +25,7 @@ URL_JOIN_COMMAND = command(
             "help": "Name of the column containing urls in the indexed file.",
         },
         {
-            "name": "file1",
+            "name": "input1",
             "help": "Path to the file to index.",
             "action": InputAction,
             "nargs": None,
@@ -35,7 +35,7 @@ URL_JOIN_COMMAND = command(
             "help": "Name of the column containing urls in the second file.",
         },
         {
-            "name": "file2",
+            "name": "input2",
             "help": "Path to the second file.",
             "action": InputAction,
             "nargs": None,

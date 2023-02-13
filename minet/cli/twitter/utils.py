@@ -51,7 +51,7 @@ def with_twitter_client():
 def make_twitter_action(method_name, csv_headers):
     def action(cli_args):
         enricher = casanova.batch_enricher(
-            cli_args.file, cli_args.output, keep=cli_args.select, add=csv_headers
+            cli_args.input, cli_args.output, keep=cli_args.select, add=csv_headers
         )
 
         loading_bar = LoadingBar(

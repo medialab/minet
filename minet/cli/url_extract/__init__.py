@@ -21,7 +21,7 @@ URL_EXTRACT_COMMAND = command(
     total=True,
     arguments=[
         {"name": "column", "help": "Name of the column containing text or html."},
-        {"name": "file", "help": "Target CSV file.", "action": InputAction},
+        {"name": "input", "help": "Target CSV file.", "action": InputAction},
         {"flag": "--base-url", "help": "Base url used to resolve relative urls."},
         {
             "flag": "--from",

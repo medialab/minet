@@ -23,7 +23,7 @@ def action(cli_args):
     client = InstagramAPIScraper(cookie=cli_args.cookie)
 
     enricher = casanova.enricher(
-        cli_args.file,
+        cli_args.input,
         cli_args.output,
         add=INSTAGRAM_USER_POST_CSV_HEADERS,
     )

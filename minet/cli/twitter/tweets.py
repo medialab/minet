@@ -25,7 +25,7 @@ def action(cli_args):
     )
 
     enricher = casanova.enricher(
-        cli_args.file,
+        cli_args.input,
         cli_args.output,
         keep=cli_args.select,
         add=TWEET_FIELDS,

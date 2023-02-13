@@ -18,7 +18,7 @@ def action(cli_args):
     client = BuzzSumoAPIClient(cli_args.token)
 
     enricher = casanova.enricher(
-        cli_args.file,
+        cli_args.input,
         cli_args.output,
         keep=cli_args.select,
         add=ARTICLES_CSV_HEADERS,

@@ -25,7 +25,7 @@ def action(cli_args):
 
     # Enricher
     enricher = casanova.enricher(
-        cli_args.file,
+        cli_args.input,
         cli_args.output,
         keep=cli_args.select,
         add=FACEBOOK_POST_WITH_REACTIONS_CSV_HEADERS,

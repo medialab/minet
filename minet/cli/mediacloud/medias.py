@@ -28,7 +28,7 @@ def action(cli_args):
         feeds_writer.writerow(MEDIACLOUD_FEED_CSV_HEADER)
 
     enricher = casanova.enricher(
-        cli_args.file, cli_args.output, keep=cli_args.select, add=added_headers
+        cli_args.input, cli_args.output, keep=cli_args.select, add=added_headers
     )
 
     loading_bar = LoadingBar(desc="Fetching medias", unit="media", total=cli_args.total)

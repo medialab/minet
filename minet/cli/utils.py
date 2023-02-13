@@ -348,7 +348,7 @@ def get_enricher_and_loading_bar(
         multiplex = multiplex(cli_args)
 
     enricher = casanova.enricher(
-        cli_args.file,
+        cli_args.input,
         cli_args.output,
         add=headers,
         keep=cli_args.select,

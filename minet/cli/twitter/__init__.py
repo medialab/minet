@@ -10,7 +10,6 @@ from minet.cli.argparse import (
     command,
     subcommand,
     ConfigAction,
-    InputAction,
     TimezoneType,
     TimestampType,
 )
@@ -345,22 +344,12 @@ TWITTER_SCRAPE_SUBCOMMAND = subcommand(
             $ minet tw scrape users adam > users.csv
     """,
     select=True,
+    variadic_input={"dummy_column": "query", "item_label_plural": "queries"},
     arguments=[
         {
             "name": "items",
-            "help": "What to scrape. Currently only `tweets` and `users` are possible.",
+            "help": "What to scrape. Currently only allows for `tweets` or `users`.",
             "choices": ["tweets", "users"],
-        },
-        {
-            "name": "query",
-            "help": "Search query or name of the column containing queries to run in given CSV file.",
-        },
-        {
-            "name": "file",
-            "help": "Optional CSV file containing the queries to be run.",
-            "action": InputAction,
-            "dummy_csv_column": "query",
-            "column_dest": "query",
         },
         {
             "flag": "--include-refs",

@@ -49,10 +49,10 @@ def action(cli_args):
     )
 
     enricher = casanova.enricher(
-        cli_args.file, cli_args.output, add=headers, keep=cli_args.select
+        cli_args.input, cli_args.output, add=headers, keep=cli_args.select
     )
 
-    for row, query in enricher.cells(cli_args.query, with_rows=True):
+    for row, query in enricher.cells(cli_args.column, with_rows=True):
 
         # Templating?
         if cli_args.query_template is not None:

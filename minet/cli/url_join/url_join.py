@@ -11,7 +11,7 @@ from minet.cli.utils import LoadingBar
 
 
 def action(cli_args):
-    left_reader = casanova.reader(cli_args.file1)
+    left_reader = casanova.reader(cli_args.input1)
     left_headers = left_reader.fieldnames
     left_idx = None
 
@@ -23,7 +23,7 @@ def action(cli_args):
     left_headers = [cli_args.match_column_prefix + h for h in left_headers]
 
     right_enricher = casanova.enricher(
-        cli_args.file2, cli_args.output, add=left_headers
+        cli_args.input2, cli_args.output, add=left_headers
     )
 
     loading_bar = LoadingBar(desc="Indexing left file", unit="line")

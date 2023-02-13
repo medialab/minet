@@ -19,7 +19,7 @@ from minet.crowdtangle import CrowdTangleAPIClient
 @with_crowdtangle_fatal_errors
 def action(cli_args):
     enricher = casanova.enricher(
-        cli_args.file,
+        cli_args.input,
         cli_args.output,
         keep=cli_args.select,
         add=CROWDTANGLE_SUMMARY_CSV_HEADERS,

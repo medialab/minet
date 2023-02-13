@@ -16,7 +16,7 @@ def action(cli_args):
     scraper = TelegramScraper(throttle=cli_args.throttle)
 
     enricher = casanova.enricher(
-        cli_args.file,
+        cli_args.input,
         cli_args.output,
         add=TELEGRAM_MESSAGES_CSV_HEADERS,
         keep=cli_args.select,

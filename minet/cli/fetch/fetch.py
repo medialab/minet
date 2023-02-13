@@ -41,7 +41,7 @@ def action(cli_args, resolve=False, defer=None):
     # If we are hitting a single url we enable contents_in_report by default
     if (
         not resolve
-        and isinstance(cli_args.file, StringIO)
+        and isinstance(cli_args.input, StringIO)
         and cli_args.contents_in_report is None
     ):
         cli_args.contents_in_report = True
@@ -101,7 +101,7 @@ def action(cli_args, resolve=False, defer=None):
         multiplex = (cli_args.column, cli_args.separator)
 
     enricher = casanova.threadsafe_enricher(
-        cli_args.file,
+        cli_args.input,
         cli_args.output,
         add=additional_headers,
         keep=cli_args.select,

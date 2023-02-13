@@ -20,25 +20,33 @@ from argparse import (
 from gettext import gettext
 from textwrap import dedent
 from tqdm.contrib import DummyTqdmFile
-from casanova import Resumer, CsvCellIO, CsvRowIO
+from casanova import Resumer, CsvCellIO
+from casanova.exceptions import EmptyFileError
 from ebbe import getpath, omit
 from datetime import datetime
 from pytz import timezone
 from pytz.exceptions import UnknownTimeZoneError
 
 from minet.cli.exceptions import NotResumableError, InvalidArgumentsError
-from minet.cli.utils import acquire_cross_platform_stdout, was_piped_something
+from minet.cli.utils import acquire_cross_platform_stdout
 
 TEMPLATE_RE = re.compile(r"<%\s+([A-Za-z/\-]+)\s+%>")
 
 ARGUMENT_PREFIXES_TO_NORMALIZE = ["--dont-", "--no-", "--", "-"]
 FLAG_SORTING_PRIORITIES = {
-    "select": 1,
-    "total": 2,
-    "output": 3,
-    "resume": 4,
-    "rcfile": 5,
-    "help": 6,
+    name: i
+    for i, name in enumerate(
+        [
+            "select",
+            "total",
+            "input",
+            "output",
+            "resume",
+            "rcfile",
+            "help",
+        ],
+        1,
+    )
 }
 
 
@@ -73,7 +81,7 @@ def custom_formatter(prog):
     terminal_size = shutil.get_terminal_size()
 
     return SortingRawTextHelpFormatter(
-        prog, width=terminal_size.columns, max_help_position=30
+        prog, width=terminal_size.columns, max_help_position=32
     )
 
 
@@ -263,71 +271,44 @@ class BooleanAction(Action):
         )
 
 
+class DummyCSVInput(object):
+    ...
+
+
+class SingleColumnDummyCSVInput(DummyCSVInput):
+    def __init__(self, column, dest):
+        self.column = column
+        self.dest = dest
+
+    def resolve(self, cli_args):
+        value = getattr(cli_args, self.dest)
+        f = CsvCellIO(self.column, value)
+        setattr(cli_args, self.dest, self.column)
+        setattr(cli_args, "has_dummy_csv", True)
+
+        return f
+
+
 class InputAction(Action):
     def __init__(
         self,
         option_strings,
         dest,
         dummy_csv_column=None,
-        dummy_csv_columns=None,
-        dummy_csv_guard=None,
-        dummy_csv_error="",
         column_dest="column",
-        column_dests=None,
-        nargs="?",
+        default=None,
         **kwargs,
     ):
+        if dummy_csv_column is not None:
+            default = SingleColumnDummyCSVInput(dummy_csv_column, column_dest)
 
-        if dummy_csv_guard is not None and not callable(dummy_csv_guard):
-            raise TypeError
-
-        self.dummy_csv_column = dummy_csv_column
-        self.dummy_csv_columns = dummy_csv_columns
-        self.dummy_csv_guard = dummy_csv_guard
-        self.dummy_csv_error = dummy_csv_error
-        self.column_dest = column_dest
-        self.column_dests = column_dests
-
-        if self.dummy_csv_columns is not None:
-            assert isinstance(self.column_dests, list) and len(
-                self.dummy_csv_columns
-            ) == len(self.column_dests)
-
-        super().__init__(option_strings, dest, default=None, nargs=nargs, **kwargs)
+        super().__init__(option_strings, dest, default=default, **kwargs)
 
     def __call__(self, parser, cli_args, value, option_string=None):
         setattr(cli_args, "has_dummy_csv", False)
 
-        if value is None:
+        if value == "-":
             f = sys.stdin
-
-            # No stdin was piped and we have a "dummy" csv file to build
-            if not was_piped_something():
-                if self.dummy_csv_column is not None:
-                    # NOTE: this only work because we are considering positional arguments
-                    value = getattr(cli_args, self.column_dest)
-
-                    if self.dummy_csv_guard is not None and not self.dummy_csv_guard(
-                        value
-                    ):
-                        raise ArgumentError(
-                            self, self.dummy_csv_error + (' Got "%s"' % value)
-                        )
-
-                    f = CsvCellIO(self.dummy_csv_column, value)
-                    setattr(cli_args, self.column_dest, self.dummy_csv_column)
-                    setattr(cli_args, "has_dummy_csv", True)
-
-                elif self.dummy_csv_columns is not None:
-                    # NOTE: this only work because we are considering positional arguments
-                    values = [getattr(cli_args, dest) for dest in self.column_dests]
-
-                    f = CsvRowIO(self.dummy_csv_columns, values)
-
-                    for i, dest in enumerate(self.column_dests):
-                        setattr(cli_args, dest, self.dummy_csv_columns[i])
-
-                    setattr(cli_args, "has_dummy_csv", True)
         else:
             try:
                 f = open(value, "r", encoding="utf-8")
@@ -485,12 +466,19 @@ def resolve_arg_dependencies(cli_args, config):
         raise NotResumableError
 
     # Unwrapping values
-    for name in vars(cli_args):
+    # NOTE: I copy the dict from vars because we are going to add new
+    # attributes from within the loop
+    for name in vars(cli_args).copy():
         value = getattr(cli_args, name)
 
         # Solving wrapped config values
         if isinstance(value, WrappedConfigValue):
             setattr(cli_args, name, value.resolve(config))
+
+        # Resolving dummy csv input files
+        if isinstance(value, DummyCSVInput):
+            value = value.resolve(cli_args)
+            setattr(cli_args, name, value)
 
         # Opening output files
         if isinstance(value, OutputOpener):
@@ -531,32 +519,34 @@ def resolve_typical_arguments(
             if "item_label_plural" not in variadic_input:
                 variadic_input["item_label_plural"] = variadic_input["item_label"] + "s"
 
-            variadic_input[
-                "column_help"
-            ] = "Name of the CSV column containing %s or a single %s." % (
-                variadic_input["item_label_plural"],
-                variadic_input["item_label"],
+            variadic_input["column_help"] = (
+                "Single %(singular)s to process or name of the CSV column containing %(plural)s when using -i/--input."
+                % {
+                    "singular": variadic_input["item_label"],
+                    "plural": variadic_input["item_label_plural"],
+                }
             )
-            variadic_input["file_help"] = (
-                "CSV file containing the %s." % variadic_input["item_label_plural"]
+            variadic_input["input_help"] = (
+                "CSV file containing all the %s you want to process. Will consider `-` as stdin."
+                % variadic_input["item_label_plural"]
             )
 
-        args.append({"name": "column", "help": variadic_input["column_help"]})
+        args.append(
+            {
+                "name": "column",
+                "metavar": "value_or_column_name",
+                "help": variadic_input["column_help"],
+            }
+        )
 
-        file_argument = {
-            "name": "file",
-            "help": variadic_input["file_help"],
+        input_argument = {
+            "flags": ["-i", "--input"],
+            "help": variadic_input["input_help"],
             "action": InputAction,
             "dummy_csv_column": variadic_input["dummy_column"],
         }
 
-        if "guard" in variadic_input:
-            file_argument["dummy_csv_guard"] = variadic_input["guard"]
-
-        if "guard_error_message" in variadic_input:
-            file_argument["dummy_csv_error"] = variadic_input["guard_error_message"]
-
-        args.append(file_argument)
+        args.append(input_argument)
 
     if select:
         args.append(

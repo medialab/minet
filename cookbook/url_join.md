@@ -1,11 +1,11 @@
 # Joining 2 CSV files by urls
 
-* [Use case](#use-case)
-* [Basic minet url-join usage](#basic-minet-url-join-usage)
-* [Keeping only certain columns from first file in final output](#keeping-only-certain-columns-from-first-file-in-final-output)
-* [What to do when entities are symbolized by multiple urls](#what-to-do-when-entities-are-symbolized-by-multiple-urls)
-* [How to do the same thing in python](#how-to-do-the-same-thing-in-python)
-* [The difficulty of joining files by urls](#the-difficulty-of-joining-files-by-urls)
+- [Use case](#use-case)
+- [Basic minet url-join usage](#basic-minet-url-join-usage)
+- [Keeping only certain columns from first file in final output](#keeping-only-certain-columns-from-first-file-in-final-output)
+- [What to do when entities are symbolized by multiple urls](#what-to-do-when-entities-are-symbolized-by-multiple-urls)
+- [How to do the same thing in python](#how-to-do-the-same-thing-in-python)
+- [The difficulty of joining files by urls](#the-difficulty-of-joining-files-by-urls)
 
 ## Use case
 
@@ -13,18 +13,18 @@ In this guide I will show you how to use `minet`'s command line interface to "jo
 
 The usecase is the following: let's say on the one hand you are interested by online media websites and you have a CSV file listing those medias along with some useful metadata:
 
-| id    | homepage                        | media            | politics |
-|-------|---------------------------------|------------------|----------|
-| 1     | https://www.lemonde.fr          | lemonde          | center   |
-| 2     | https://www.lefigaro.fr         | lefigaro         | right    |
-| 3     | https://www.liberation.fr       | liberation       | left     |
-| 4     | https://www.lemonde.fr/economie | lemonde-business | right    |
-| ...   | ...                             | ...              | ...      |
+| id  | homepage                        | media            | politics |
+| --- | ------------------------------- | ---------------- | -------- |
+| 1   | https://www.lemonde.fr          | lemonde          | center   |
+| 2   | https://www.lefigaro.fr         | lefigaro         | right    |
+| 3   | https://www.liberation.fr       | liberation       | left     |
+| 4   | https://www.lemonde.fr/economie | lemonde-business | right    |
+| ... | ...                             | ...              | ...      |
 
 On the other hand, you collected many tweets while researching some subject. And sometimes those tweets may mention urls. As such, to study how Twitter users are referencing your list of online medias, you created a second CSV file such as each line is representing one Twitter user mentioning a given url in one of their tweets. It could look like this:
 
 | tweet_id | twitter_user | url                                                             |
-|----------|--------------|-----------------------------------------------------------------|
+| -------- | ------------ | --------------------------------------------------------------- |
 | 1        | @johnjohn    | https://www.lemonde.fr/planete/article/2021/02/23/covid...      |
 | 2        | @jackie      | https://www.lefigaro.fr/flash-actu/le-zoo-de-lille...           |
 | 3        | @mary        | https://www.liberation.fr/societe/sante/apres-la-vaccination... |
@@ -33,7 +33,7 @@ On the other hand, you collected many tweets while researching some subject. And
 But now if you want to be able to answer whether your users share more right-wing or left-wing media articles, for instance, you will need to find a way to match lines from your second file to the correct ones from the first one so we can obtain this result in the end:
 
 | tweet_id | twitter_user | url                                                             | politics |
-|----------|--------------|-----------------------------------------------------------------|----------|
+| -------- | ------------ | --------------------------------------------------------------- | -------- |
 | 1        | @johnjohn    | https://www.lemonde.fr/planete/article/2021/02/23/covid...      | center   |
 | 2        | @jackie      | https://www.lefigaro.fr/flash-actu/le-zoo-de-lille...           | right    |
 | 3        | @mary        | https://www.liberation.fr/societe/sante/apres-la-vaccination... | left     |
@@ -73,7 +73,7 @@ minet url-join homepage medias.csv url tweets.csv -s id,media > joined.csv
 will produce:
 
 | tweet_id | twitter_user | url                                                             | id  | media      |
-|----------|--------------|-----------------------------------------------------------------|-----|------------|
+| -------- | ------------ | --------------------------------------------------------------- | --- | ---------- |
 | 1        | @johnjohn    | https://www.lemonde.fr/planete/article/2021/02/23/covid...      | 1   | lemonde    |
 | 2        | @jackie      | https://www.lefigaro.fr/flash-actu/le-zoo-de-lille...           | 2   | lefigaro   |
 | 3        | @mary        | https://www.liberation.fr/societe/sante/apres-la-vaccination... | 3   | liberation |
@@ -88,7 +88,7 @@ minet url-join homepage medias.csv url tweets.csv -s politics > joined.csv
 and you will get:
 
 | tweet_id | twitter_user | url                                                             | politics |
-|----------|--------------|-----------------------------------------------------------------|----------|
+| -------- | ------------ | --------------------------------------------------------------- | -------- |
 | 1        | @johnjohn    | https://www.lemonde.fr/planete/article/2021/02/23/covid...      | center   |
 | 2        | @jackie      | https://www.lefigaro.fr/flash-actu/le-zoo-de-lille...           | right    |
 | 3        | @mary        | https://www.liberation.fr/societe/sante/apres-la-vaccination... | left     |
@@ -102,12 +102,12 @@ minet url-join homepage medias.csv url tweets.csv -s id -p media_ > joined.csv
 
 and you will get:
 
-| tweet_id | twitter_user | url                                                             | media_id  |
-|----------|--------------|-----------------------------------------------------------------|-----|
-| 1        | @johnjohn    | https://www.lemonde.fr/planete/article/2021/02/23/covid...      | 1   |
-| 2        | @jackie      | https://www.lefigaro.fr/flash-actu/le-zoo-de-lille...           | 2   |
-| 3        | @mary        | https://www.liberation.fr/societe/sante/apres-la-vaccination... | 3   |
-| ...      | ...          | ...                                                             | ... |
+| tweet_id | twitter_user | url                                                             | media_id |
+| -------- | ------------ | --------------------------------------------------------------- | -------- |
+| 1        | @johnjohn    | https://www.lemonde.fr/planete/article/2021/02/23/covid...      | 1        |
+| 2        | @jackie      | https://www.lefigaro.fr/flash-actu/le-zoo-de-lille...           | 2        |
+| 3        | @mary        | https://www.liberation.fr/societe/sante/apres-la-vaccination... | 3        |
+| ...      | ...          | ...                                                             | ...      |
 
 ## What to do when entities are symbolized by multiple urls
 
@@ -115,8 +115,8 @@ Often you will find that a single url is not enough to delimit an interesting "e
 
 So that both those urls:
 
-* https://www.lemonde.fr/pixels/article/2021/02/23/jeu-video-entre-suite-et-reedition-le-retour-sur-le-devant-de-la-scene-de-diablo_6070953_4408996.html
-* https://twitter.com/lemondefr/status/1364248725661564928
+- https://www.lemonde.fr/pixels/article/2021/02/23/jeu-video-entre-suite-et-reedition-le-retour-sur-le-devant-de-la-scene-de-diablo_6070953_4408996.html
+- https://twitter.com/lemondefr/status/1364248725661564928
 
 can be matched to this same "Le Monde" entity.
 
@@ -125,7 +125,7 @@ This is not an uncommon approach and multiple tools, such as our web crawler [Hy
 The most natural way to handle this is of course to have multiple lines per media in our first file like so:
 
 | id  | prefix                        | media   | politics |
-|-----|-------------------------------|---------|----------|
+| --- | ----------------------------- | ------- | -------- |
 | 1   | https://www.lemonde.fr        | lemonde | center   |
 | 1   | https://twitter.com/lemondefr | lemonde | center   |
 | ... | ...                           | ...     | ...      |
@@ -137,7 +137,7 @@ But you may also prefer keeping both urls in the same CSV line and to do so, peo
 To handle this, `minet` can be told to consider a CSV column as separated by this special character so you can represent your entities thusly:
 
 | id  | prefixes                                             | media   | politics |
-|-----|------------------------------------------------------|---------|----------|
+| --- | ---------------------------------------------------- | ------- | -------- |
 | 1   | https://www.lemonde.fr https://twitter.com/lemondefr | lemonde | center   |
 | ... | ...                                                  | ...     | ...      |
 

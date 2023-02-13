@@ -221,7 +221,7 @@ Also, `minet` is perfectly capable of handling `stdin` if you need to:
 
 ```bash
 # Want to filter the input file to fetch only facebook urls?
-xsv search -s url facebook | minet fetch url > report.csv
+xsv search -s url facebook | minet fetch url - > report.csv
 ```
 
 ## Fetching from a python script
