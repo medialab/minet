@@ -11,7 +11,6 @@ import ctypes
 import importlib
 import multiprocessing
 import casanova
-from casanova.exceptions import EmptyFileError
 from contextlib import ExitStack
 from encodings import idna  # NOTE: this is necessary for pyinstaller build
 
@@ -103,8 +102,6 @@ def run(name, version, commands):
                 fn(cli_args)
             except InvalidArgumentsError as e:
                 parser.error(e.message)
-            except EmptyFileError as e:
-                die("Some empty CSV file was given to the command!")
             except FatalError as e:
                 die(e.message)
 

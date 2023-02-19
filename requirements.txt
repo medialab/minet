@@ -7,12 +7,13 @@ twine==4.0.2
 wheel
 
 # Dependencies
+about-time==4.2.1
 beautifulsoup4==4.11.1
 browser-cookie3==0.16.5
-casanova==0.19.2
+casanova==1.1.3
 charset-normalizer==3.0.1
 dateparser==1.1.6
-ebbe==1.10.0
+ebbe==1.11.0
 json5==0.9.11
 keyring<19.3
 lxml==4.9.2

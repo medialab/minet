@@ -280,7 +280,7 @@ class SingleColumnDummyCSVInput(DummyCSVInput):
 
     def resolve(self, cli_args):
         value = getattr(cli_args, self.dest)
-        f = CsvCellIO(self.column, value)
+        f = CsvCellIO(value, column=self.column)
         setattr(cli_args, self.dest, self.column)
         setattr(cli_args, "has_dummy_csv", True)
 
