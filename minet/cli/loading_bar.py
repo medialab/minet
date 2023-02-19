@@ -4,6 +4,7 @@
 #
 # Various loading bar utilities used by minet CLI.
 #
+from contextlib import contextmanager
 from typing import Optional
 from rich.live import Live
 from rich.text import Text
@@ -17,7 +18,6 @@ from rich.progress import (
     TaskProgressColumn,
     Task,
 )
-from rich.console import Group
 from rich._spinners import SPINNERS
 from about_time import HumanDuration, HumanThroughput
 from ebbe import format_int
@@ -204,6 +204,13 @@ class LoadingBar(object):
                 self.spinner_column.set_spinner("minetDots2", "success")
 
         self.live.stop()
+
+    @contextmanager
+    def tick(self):
+        try:
+            yield
+        finally:
+            self.update(count=1)
 
     def advance(self, count=1):
         self.progress.update(self.task, advance=count)

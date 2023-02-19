@@ -565,11 +565,12 @@ def resolve_typical_arguments(
         """
 
     if select:
+
+        # TODO: actually one can use xsv mini dsl here
         args.append(
             {
                 "flags": ["-s", "--select"],
                 "help": "Columns of input CSV file to include in the output (separated by `,`).",
-                "type": SplitterType(),
             },
         )
 

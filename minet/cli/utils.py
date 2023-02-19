@@ -5,7 +5,6 @@
 # Miscellaneous helpers used by the CLI tools.
 #
 import os
-import csv
 import sys
 import stat
 import yaml
@@ -34,6 +33,9 @@ def with_cli_exceptions(fn):
     def wrapper(*args, **kwargs):
         try:
             fn(*args, **kwargs)
+
+        except KeyboardInterrupt:
+            sys.exit(1)
 
         except BrokenPipeError:
 
@@ -291,9 +293,6 @@ def with_enricher_and_loading_bar(
     title,
     unit=None,
     multiplex=None,
-    dual_line=False,
-    stats_colors=None,
-    initial_stats=None,
 ):
     def decorate(action):
         @wraps(action)
@@ -302,31 +301,26 @@ def with_enricher_and_loading_bar(
                 cli_args.input,
                 cli_args.output,
                 add=headers(cli_args) if callable(headers) else headers,
-                keep=cli_args.select,
+                select=cli_args.select,
                 total=getattr(cli_args, "total", None),
                 multiplex=multiplex(cli_args) if callable(multiplex) else multiplex,
             )
+
+            # NOTE: if we know that stdout is piped somewhere, we don't
+            # bother to wrap it either
+            # if (
+            #     hasattr(cli_args.output, "fileno")
+            #     and callable(cli_args.output.fileno)
+            #     and cli_args.output.fileno() == sys.__stdout__.fileno()
+            #     and sys.__stdout__.isatty()
+            # ):
+            #     enricher.writer = csv.writer(sys.stdout)
 
             with LoadingBar(
                 title=title,
                 total=enricher.total,
                 unit=unit,
-                dual_line=dual_line,
-                initial_stats=initial_stats,
-                stats_colors=stats_colors,
             ) as loading_bar:
-
-                # NOTE: we need to patch enricher's output writer to benefit
-                # from alive_progress stdout wrapping
-                # NOTE: if we know that stdout is piped somewhere, we don't
-                # bother to wrap it either
-                if (
-                    hasattr(cli_args.output, "fileno")
-                    and callable(cli_args.output.fileno)
-                    and cli_args.output.fileno() == sys.__stdout__.fileno()
-                    and sys.__stdout__.isatty()
-                ):
-                    enricher.writer = csv.writer(sys.stdout)
 
                 additional_kwargs = {
                     "enricher": enricher,

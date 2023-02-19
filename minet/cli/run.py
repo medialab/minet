@@ -35,8 +35,11 @@ def run(name, version, commands):
     csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
 
     # Casanova global defaults
-    casanova.set_default_prebuffer_bytes(DEFAULT_PREBUFFER_BYTES)
-    casanova.set_default_ignore_null_bytes(True)
+    casanova.set_defaults(
+        prebuffer_bytes=DEFAULT_PREBUFFER_BYTES,
+        strip_null_bytes_on_read=True,
+        strip_null_bytes_on_write=True,
+    )
 
     # Adding handlers for sleepers
     sleepers_logger.addHandler(CLIRetryerHandler())
