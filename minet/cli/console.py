@@ -20,6 +20,7 @@ MINET_STYLES = {
     **MINET_COLORS,
     # Progress bar
     "bar.complete": MINET_COLORS["info"],
+    "bar.pulse": "",
     "bar.finished": MINET_COLORS["success"],
     "progress.percentage": "",
     "progress.elapsed": "",

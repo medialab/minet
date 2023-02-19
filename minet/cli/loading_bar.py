@@ -16,10 +16,45 @@ from rich.progress import (
     TaskProgressColumn,
     Task,
 )
+from rich._spinners import SPINNERS
 from about_time import HumanDuration, HumanThroughput
 from ebbe import format_int
 
 from minet.cli.console import console
+
+SPINNERS["minetDots1"] = {
+    "interval": 100,
+    "frames": [
+        "|▰▰▰▰▰▰▰   |",
+        "| ▰▰▰▰▰▰▰  |",
+        "|  ▰▰▰▰▰▰▰ |",
+        "|   ▰▰▰▰▰▰▰|",
+        "|▰   ▰▰▰▰▰▰|",
+        "|▰▰   ▰▰▰▰▰|",
+        "|▰▰▰   ▰▰▰▰|",
+        "|▰▰▰▰   ▰▰▰|",
+        "|▰▰▰▰▰   ▰▰|",
+        "|▰▰▰▰▰▰   ▰|",
+    ],
+}
+
+SPINNERS["minetDots2"] = {
+    "interval": 150,
+    "frames": [
+        "|▰▰▰▰      |",
+        "| ▰▰▰▰     |",
+        "|  ▰▰▰▰    |",
+        "|   ▰▰▰▰   |",
+        "|    ▰▰▰▰  |",
+        "|     ▰▰▰▰ |",
+        "|      ▰▰▰▰|",
+        "|     ▰▰▰▰ |",
+        "|    ▰▰▰▰  |",
+        "|   ▰▰▰▰   |",
+        "|  ▰▰▰▰    |",
+        "| ▰▰▰▰     |",
+    ],
+}
 
 
 class TimeElapsedColumn(ProgressColumn):
@@ -53,9 +88,14 @@ class ThroughputColumn(ProgressColumn):
             return None
 
         throughput = HumanThroughput(task.completed / elapsed, "s")
-        remaining = HumanDuration(task.time_remaining)
 
-        message = f"({throughput} eta: {remaining})"
+        eta = ""
+
+        if task.total is not None:
+            remaining = HumanDuration(task.time_remaining)
+            eta = f" eta: {remaining}"
+
+        message = f"({throughput}{eta})"
 
         return Text(message)
 
@@ -71,17 +111,32 @@ class LoadingBar(object):
         self.unit = unit
         self.total = total
 
-        self.bar_column = BarColumn()
+        self.bar_column = None
+        self.spinner_column = None
 
-        columns = [
-            TextColumn("[progress.description]{task.description}"),
-            self.bar_column,
-            CompletionColumn(unit=self.unit),
-            SpinnerColumn("dots", style=None, finished_text="·"),
-            TaskProgressColumn("[progress.percentage][{task.percentage:>3.0f}%]"),
-            TimeElapsedColumn(),
-            ThroughputColumn(),
-        ]
+        if total is not None:
+            self.bar_column = BarColumn()
+
+            columns = [
+                TextColumn("[progress.description]{task.description}"),
+                self.bar_column,
+                CompletionColumn(unit=self.unit),
+                SpinnerColumn("dots", style=None, finished_text="▰"),
+                TaskProgressColumn("[progress.percentage][{task.percentage:>3.0f}%]"),
+                TimeElapsedColumn(),
+                ThroughputColumn(),
+            ]
+        else:
+            self.spinner_column = SpinnerColumn("minetDots2", style="info")
+
+            columns = [
+                TextColumn("[progress.description]{task.description}"),
+                self.spinner_column,
+                CompletionColumn(unit=self.unit),
+                TaskProgressColumn("[progress.percentage][{task.percentage:>3.0f}%]"),
+                TimeElapsedColumn(),
+                ThroughputColumn(),
+            ]
 
         self.progress = Progress(*columns, console=console)
         self.live = Live(self.progress, refresh_per_second=10, console=console)
@@ -97,7 +152,14 @@ class LoadingBar(object):
     def __exit__(self, exc_type, exc_value, exc_traceback):
 
         if exc_type is not None:
-            self.bar_column.complete_style = "warning"
+            if self.bar_column is not None:
+                self.bar_column.complete_style = "warning"
+            if self.spinner_column is not None:
+                self.spinner_column.set_spinner("minetDots2", "warning")
+
+        else:
+            if self.spinner_column is not None:
+                self.spinner_column.set_spinner("minetDots2", "success")
 
         self.live.stop()
 
