@@ -6,6 +6,7 @@
 #
 from contextlib import contextmanager
 from typing import Optional
+from collections.abc import Iterable
 from rich.live import Live
 from rich.text import Text
 from rich.table import Table
@@ -139,14 +140,25 @@ class LoadingBar(object):
             columns = [
                 TextColumn("[progress.description]{task.description}"),
                 self.bar_column,
-                CompletionColumn(unit=self.unit),
-                SpinnerColumn("dots", style=None, finished_text="·")
-                if "secondary" not in self.features
-                else None,
-                TaskProgressColumn("[progress.percentage][{task.percentage:>3.0f}%]"),
-                TimeElapsedColumn(),
-                ThroughputColumn(),
             ]
+
+            if total > 1:
+                columns.append(CompletionColumn(unit=self.unit))
+
+            if "secondary" not in self.features:
+                columns.append(SpinnerColumn("dots", style=None, finished_text="·"))
+
+            if total > 1:
+                columns.append(
+                    TaskProgressColumn(
+                        "[progress.percentage][{task.percentage:>3.0f}%]"
+                    )
+                )
+
+            columns.append(TimeElapsedColumn())
+
+            if total > 1:
+                columns.append(ThroughputColumn)
         else:
             self.spinner_column = SpinnerColumn("minetDots2", style="info")
 
@@ -222,3 +234,13 @@ class LoadingBar(object):
         if label is not None:
             assert self.upper_line is not None
             self.upper_line.update(self.upper_line_task, description=label)
+
+    def print(self, msg):
+        if not isinstance(msg, str):
+            if not isinstance(msg, Iterable):
+                raise TypeError("expecting a message")
+
+            for item in msg:
+                console.print(item)
+        else:
+            console.print(msg)

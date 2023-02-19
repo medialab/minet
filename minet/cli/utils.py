@@ -15,10 +15,10 @@ from os.path import join, expanduser, isfile, relpath
 from collections import namedtuple
 from collections.abc import Mapping
 from functools import wraps
-from datetime import datetime
 from logging import Handler
 from ebbe import noop, format_seconds
 
+from minet.cli.console import console
 from minet.cli.loading_bar import LoadingBar
 from minet.cli.exceptions import MissingColumnError, FatalError
 from minet.utils import fuzzy_int
@@ -84,8 +84,7 @@ def variadic_print(*args, file=sys.stdout, sep=" ", end="\n"):
             print(arg, end=end, sep=sep, file=file)
 
 
-# NOTE: I don't use partial here to be sure to be able to use
-# alive_progress stderr wrapper
+# NOTE: not using partial to avoid dynamic stream remapping
 def print_err(*args):
     variadic_print(*args, file=sys.stderr)
 
@@ -105,8 +104,6 @@ def safe_index(l, e):
 
 class CLIRetryerHandler(Handler):
     def emit(self, record):
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
         if record.source == "request_retryer":
             exc = record.exception
             pretty_time = format_seconds(record.sleep_time)
@@ -115,16 +112,15 @@ class CLIRetryerHandler(Handler):
             exc_msg = str(exc)
 
             msg = [
-                "%s" % now,
                 "Will now wait for %s because of following exception:" % pretty_time,
                 ("%s (%s)" % (exc_name, exc_msg)) if exc_msg else exc_name,
                 "",
             ]
 
         else:
-            msg = ["%s" % now, record.msg, ""]
+            msg = [record.msg, ""]
 
-        print_err(colored("\n".join(msg), "yellow"))
+        console.log("\n".join(msg), style="warning")
 
 
 def acquire_cross_platform_stdout():
@@ -319,7 +315,7 @@ def with_enricher_and_loading_bar(
             with LoadingBar(
                 title=title,
                 total=enricher.total,
-                unit=unit,
+                unit=unit(cli_args) if callable(unit) else unit,
             ) as loading_bar:
 
                 additional_kwargs = {
