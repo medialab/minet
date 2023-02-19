@@ -182,7 +182,7 @@ def format_user_post(item):
         getpath(item, ["user", "username"]),
         getpath(item, ["user", "full_name"]),
         getpath(item, ["user", "is_verified"]),
-        item["id"],
+        item["pk"],
         media_type,
         item["code"],
         short_code_to_url(item["code"]),

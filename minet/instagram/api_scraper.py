@@ -59,8 +59,10 @@ from minet.instagram.formatters import (
 
 INSTAGRAM_GRAPHQL_ENDPOINT = "https://www.instagram.com/graphql/query/"
 INSTAGRAM_HASHTAG_QUERY_HASH = "9b498c08113f1e09617a1703c22b2f32"
+INSTAGRAM_USER_ID_QUERY_HASH = "c9100bf9110dd6361671f113dd02e7d6"
 INSTAGRAM_MAGIC_TOKEN_PATTERN = re.compile(r"\"X-IG-App-ID\"\s*:\s*\"(\d+)\"")
-INSTAGRAM_USER_ID_PATTERN = re.compile(r"\d+_(\d+)")
+INSTAGRAM_USER_ID_PATTERN = re.compile(r"\d+")
+INSTAGRAM_GET_USER_ID_PATTERN = re.compile(r"\d+_(\d+)")
 
 
 def forge_hashtag_search_url(name, cursor=None, count=50):
@@ -71,6 +73,17 @@ def forge_hashtag_search_url(name, cursor=None, count=50):
 
     url = INSTAGRAM_GRAPHQL_ENDPOINT + "?query_hash=%s&variables=%s" % (
         INSTAGRAM_HASHTAG_QUERY_HASH,
+        quote(json.dumps(params)),
+    )
+
+    return url
+
+
+def forge_username_url(user_id):
+    params = {"user_id": user_id, "include_reel": True}
+
+    url = INSTAGRAM_GRAPHQL_ENDPOINT + "?query_hash=%s&variables=%s" % (
+        INSTAGRAM_USER_ID_QUERY_HASH,
         quote(json.dumps(params)),
     )
 
@@ -123,7 +136,7 @@ def forge_user_posts_url(
     max_id=None,
 ):
     if max_id is not None:
-        u = INSTAGRAM_USER_ID_PATTERN.search(max_id)
+        u = INSTAGRAM_GET_USER_ID_PATTERN.search(max_id)
 
         if u is not None:
             user = u.group(1)
@@ -274,6 +287,34 @@ class InstagramAPIScraper(object):
 
             cursor = getpath(data, ["page_info", "end_cursor"])
 
+    def get_username(self, name):
+        if INSTAGRAM_USER_ID_PATTERN.match(name):
+            url = forge_username_url(name)
+
+            data_user_id = self.request_json(url, magic_token=True)
+
+            if not data_user_id:
+                raise InstagramInvalidTargetError
+
+            name = getpath(data_user_id, ["data", "user", "reel", "user", "username"])
+
+        else:
+            parsed = parse_instagram_url(name)
+
+            if isinstance(parsed, (ParsedInstagramPost, ParsedInstagramUser)):
+                if not parsed.name:
+                    raise InstagramInvalidTargetError
+
+                name = parsed.name
+
+            else:
+                name = name.lstrip("@")
+
+                if not is_instagram_username(name):
+                    raise InstagramInvalidTargetError
+
+        return name
+
     @ensure_magic_token
     def get_user(self, name):
         url = forge_user_url(name)
@@ -282,20 +323,7 @@ class InstagramAPIScraper(object):
 
     @ensure_magic_token
     def user_followers(self, name):
-
-        parsed = parse_instagram_url(name)
-
-        if isinstance(parsed, (ParsedInstagramPost, ParsedInstagramUser)):
-            if not parsed.name:
-                raise InstagramInvalidTargetError
-
-            name = parsed.name
-
-        else:
-            name = name.lstrip("@")
-
-            if not is_instagram_username(name):
-                raise InstagramInvalidTargetError
+        name = self.get_username(name)
 
         max_id = None
         data_user = self.get_user(name)
@@ -330,20 +358,7 @@ class InstagramAPIScraper(object):
 
     @ensure_magic_token
     def user_following(self, name):
-
-        parsed = parse_instagram_url(name)
-
-        if isinstance(parsed, (ParsedInstagramPost, ParsedInstagramUser)):
-            if not parsed.name:
-                raise InstagramInvalidTargetError
-
-            name = parsed.name
-
-        else:
-            name = name.lstrip("@")
-
-            if not is_instagram_username(name):
-                raise InstagramInvalidTargetError
+        name = self.get_username(name)
 
         max_id = None
         data_user = self.get_user(name)
@@ -378,20 +393,7 @@ class InstagramAPIScraper(object):
 
     @ensure_magic_token
     def user_posts(self, name):
-
-        parsed = parse_instagram_url(name)
-
-        if isinstance(parsed, (ParsedInstagramPost, ParsedInstagramUser)):
-            if not parsed.name:
-                raise InstagramInvalidTargetError
-
-            name = parsed.name
-
-        else:
-            name = name.lstrip("@")
-
-            if not is_instagram_username(name):
-                raise InstagramInvalidTargetError
+        name = self.get_username(name)
 
         max_id = None
 
@@ -424,20 +426,7 @@ class InstagramAPIScraper(object):
 
     @ensure_magic_token
     def user_infos(self, name):
-
-        parsed = parse_instagram_url(name)
-
-        if isinstance(parsed, (ParsedInstagramPost, ParsedInstagramUser)):
-            if not parsed.name:
-                raise InstagramInvalidTargetError
-
-            name = parsed.name
-
-        else:
-            name = name.lstrip("@")
-
-            if not is_instagram_username(name):
-                raise InstagramInvalidTargetError
+        name = self.get_username(name)
 
         data = self.get_user(name)
 

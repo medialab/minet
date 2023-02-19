@@ -2273,7 +2273,7 @@ usage: minet instagram user-followers [-h] [-c COOKIE] [--rcfile RCFILE]
 Instagram User Followers Command
 ================================
 
-Scrape Instagram followers with a given username or user url.
+Scrape Instagram followers with a given username, user url or user id.
 On verified accounts, you may be unable to get all of them.
 
 This requires to be logged in to an Instagram account, so
@@ -2289,10 +2289,13 @@ for profile picture urls retrieved as the "profile_pic_url" in
 the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
+If a username is a number without '@' at the begining, it will be
+considered as an id.
+
 positional arguments:
-  value_or_column_name        Single username or user url to process or name of
-                              the CSV column containing usernames or user urls
-                              when using -i/--input.
+  value_or_column_name        Single username, user url or user id to process or
+                              name of the CSV column containing usernames, user
+                              urls or user ids when using -i/--input.
 
 optional arguments:
   -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
@@ -2304,8 +2307,9 @@ optional arguments:
   -l LIMIT, --limit LIMIT     Maximum number of followers to retrieve per user.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -i INPUT, --input INPUT     CSV file containing all the usernames or user urls
-                              you want to process. Will consider `-` as stdin.
+  -i INPUT, --input INPUT     CSV file containing all the usernames, user urls
+                              or user ids you want to process. Will consider `-`
+                              as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -2346,7 +2350,7 @@ usage: minet instagram user-following [-h] [-c COOKIE] [--rcfile RCFILE]
 Instagram User Following Command
 ================================
 
-Scrape Instagram accounts followed with a given username.
+Scrape Instagram accounts followed with a given username, user url or user id.
 
 This requires to be logged in to an Instagram account, so
 by default this command will attempt to grab the relevant
@@ -2361,10 +2365,13 @@ for profile picture urls retrieved as the "profile_pic_url" in
 the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
+If a username is a number without '@' at the begining, it will be
+considered as an id.
+
 positional arguments:
-  value_or_column_name        Single username or user url to process or name of
-                              the CSV column containing usernames or user urls
-                              when using -i/--input.
+  value_or_column_name        Single username, user url or user id to process or
+                              name of the CSV column containing usernames, user
+                              urls or user ids when using -i/--input.
 
 optional arguments:
   -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
@@ -2376,8 +2383,9 @@ optional arguments:
   -l LIMIT, --limit LIMIT     Maximum number of accounts to retrieve per user.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -i INPUT, --input INPUT     CSV file containing all the usernames or user urls
-                              you want to process. Will consider `-` as stdin.
+  -i INPUT, --input INPUT     CSV file containing all the usernames, user urls
+                              or user ids you want to process. Will consider `-`
+                              as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -2417,7 +2425,7 @@ usage: minet instagram user-infos [-h] [-c COOKIE] [--rcfile RCFILE] [-i INPUT]
 Instagram user-infos
 ====================
 
-Scrape Instagram infos with a given username or user url.
+Scrape Instagram infos with a given username, user url or user id.
 
 This requires to be logged in to an Instagram account, so
 by default this command will attempt to grab the relevant
@@ -2432,10 +2440,13 @@ for profile picture urls retrieved as the "profile_pic_url_hd" in
 the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
+If a username is a number without '@' at the begining, it will be
+considered as an id.
+
 positional arguments:
-  value_or_column_name        Single username or user url to process or name of
-                              the CSV column containing usernames or user urls
-                              when using -i/--input.
+  value_or_column_name        Single username, user url or user id to process or
+                              name of the CSV column containing usernames, user
+                              urls or user ids when using -i/--input.
 
 optional arguments:
   -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
@@ -2446,8 +2457,9 @@ optional arguments:
                               MINET_INSTAGRAM_COOKIE env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -i INPUT, --input INPUT     CSV file containing all the usernames or user urls
-                              you want to process. Will consider `-` as stdin.
+  -i INPUT, --input INPUT     CSV file containing all the usernames, user urls
+                              or user ids you want to process. Will consider `-`
+                              as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -2487,7 +2499,7 @@ usage: minet instagram user-posts [-h] [-c COOKIE] [--rcfile RCFILE] [-l LIMIT]
 Instagram User Posts Command
 ============================
 
-Scrape Instagram posts with a given username or user url.
+Scrape Instagram posts with a given username, user url or user id.
 
 This requires to be logged in to an Instagram account, so
 by default this command will attempt to grab the relevant
@@ -2504,10 +2516,13 @@ media is a video). Be sure to download them fast if you need
 them (you can use the `minet fetch` command for that, and
 won't need to use cookies).
 
+If a username is a number without '@' at the begining, it will be
+considered as an id.
+
 positional arguments:
-  value_or_column_name        Single username or user url to process or name of
-                              the CSV column containing usernames or user urls
-                              when using -i/--input.
+  value_or_column_name        Single username, user url or user id to process or
+                              name of the CSV column containing usernames, user
+                              urls or user ids when using -i/--input.
 
 optional arguments:
   -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
@@ -2519,8 +2534,9 @@ optional arguments:
   -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve per user.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  -i INPUT, --input INPUT     CSV file containing all the usernames or user urls
-                              you want to process. Will consider `-` as stdin.
+  -i INPUT, --input INPUT     CSV file containing all the usernames, user urls
+                              or user ids you want to process. Will consider `-`
+                              as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.

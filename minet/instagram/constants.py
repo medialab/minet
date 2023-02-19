@@ -62,7 +62,7 @@ INSTAGRAM_USER_POST_CSV_HEADERS = [
 ]
 
 INSTAGRAM_USER_CSV_HEADERS = [
-    "pk",
+    "id",
     "username",
     "full_name",
     "is_private",

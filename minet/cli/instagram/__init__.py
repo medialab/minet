@@ -47,7 +47,7 @@ INSTAGRAM_USER_FOLLOWERS_SUBCOMMAND = subcommand(
     "minet.cli.instagram.user_followers",
     title="Instagram User Followers Command",
     description="""
-        Scrape Instagram followers with a given username or user url.
+        Scrape Instagram followers with a given username, user url or user id.
         On verified accounts, you may be unable to get all of them.
 
         This requires to be logged in to an Instagram account, so
@@ -62,6 +62,9 @@ INSTAGRAM_USER_FOLLOWERS_SUBCOMMAND = subcommand(
         for profile picture urls retrieved as the "profile_pic_url" in
         the result. Be sure to download them fast if you need them (you can
         use the `minet fetch` command for that, and won't need to use cookies).
+
+        If a username is a number without '@' at the begining, it will be
+        considered as an id.
     """,
     epilog="""
         example:
@@ -71,8 +74,8 @@ INSTAGRAM_USER_FOLLOWERS_SUBCOMMAND = subcommand(
     """,
     variadic_input={
         "dummy_column": "user",
-        "item_label": "username or user url",
-        "item_label_plural": "usernames or user urls",
+        "item_label": "username, user url or user id",
+        "item_label_plural": "usernames, user urls or user ids",
     },
     select=True,
     arguments=[
@@ -89,7 +92,7 @@ INSTAGRAM_USER_FOLLOWING_SUBCOMMAND = subcommand(
     "minet.cli.instagram.user_following",
     title="Instagram User Following Command",
     description="""
-        Scrape Instagram accounts followed with a given username.
+        Scrape Instagram accounts followed with a given username, user url or user id.
 
         This requires to be logged in to an Instagram account, so
         by default this command will attempt to grab the relevant
@@ -103,6 +106,9 @@ INSTAGRAM_USER_FOLLOWING_SUBCOMMAND = subcommand(
         for profile picture urls retrieved as the "profile_pic_url" in
         the result. Be sure to download them fast if you need them (you can
         use the `minet fetch` command for that, and won't need to use cookies).
+
+        If a username is a number without '@' at the begining, it will be
+        considered as an id.
     """,
     epilog="""
         example:
@@ -112,8 +118,8 @@ INSTAGRAM_USER_FOLLOWING_SUBCOMMAND = subcommand(
     """,
     variadic_input={
         "dummy_column": "user",
-        "item_label": "username or user url",
-        "item_label_plural": "usernames or user urls",
+        "item_label": "username, user url or user id",
+        "item_label_plural": "usernames, user urls or user ids",
     },
     select=True,
     arguments=[
@@ -130,7 +136,7 @@ INSTAGRAM_USER_INFOS_SUBCOMMAND = subcommand(
     "minet.cli.instagram.user_infos",
     title="Instagram user-infos",
     description="""
-        Scrape Instagram infos with a given username or user url.
+        Scrape Instagram infos with a given username, user url or user id.
 
         This requires to be logged in to an Instagram account, so
         by default this command will attempt to grab the relevant
@@ -144,6 +150,9 @@ INSTAGRAM_USER_INFOS_SUBCOMMAND = subcommand(
         for profile picture urls retrieved as the "profile_pic_url_hd" in
         the result. Be sure to download them fast if you need them (you can
         use the `minet fetch` command for that, and won't need to use cookies).
+
+        If a username is a number without '@' at the begining, it will be
+        considered as an id.
     """,
     epilog="""
         example:
@@ -153,8 +162,8 @@ INSTAGRAM_USER_INFOS_SUBCOMMAND = subcommand(
     """,
     variadic_input={
         "dummy_column": "user",
-        "item_label": "username or user url",
-        "item_label_plural": "usernames or user urls",
+        "item_label": "username, user url or user id",
+        "item_label_plural": "usernames, user urls or user ids",
     },
     select=True,
 )
@@ -164,7 +173,7 @@ INSTAGRAM_USER_POSTS_SUBCOMMAND = subcommand(
     "minet.cli.instagram.user_posts",
     title="Instagram User Posts Command",
     description="""
-        Scrape Instagram posts with a given username or user url.
+        Scrape Instagram posts with a given username, user url or user id.
 
         This requires to be logged in to an Instagram account, so
         by default this command will attempt to grab the relevant
@@ -180,6 +189,9 @@ INSTAGRAM_USER_POSTS_SUBCOMMAND = subcommand(
         media is a video). Be sure to download them fast if you need
         them (you can use the `minet fetch` command for that, and
         won't need to use cookies).
+
+        If a username is a number without '@' at the begining, it will be
+        considered as an id.
     """,
     epilog="""
         example:
@@ -189,8 +201,8 @@ INSTAGRAM_USER_POSTS_SUBCOMMAND = subcommand(
     """,
     variadic_input={
         "dummy_column": "user",
-        "item_label": "username or user url",
-        "item_label_plural": "usernames or user urls",
+        "item_label": "username, user url or user id",
+        "item_label_plural": "usernames, user urls or user ids",
     },
     select=True,
     arguments=[
