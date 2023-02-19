@@ -4,10 +4,10 @@
 #
 # Logic of the `bz limit` action.
 #
-from termcolor import colored
 from ebbe import format_int
 
 from minet.buzzsumo import BuzzSumoAPIClient
+from minet.cli.utils import colored
 from minet.cli.buzzsumo.utils import with_buzzsumo_fatal_errors
 
 

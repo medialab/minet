@@ -16,7 +16,6 @@ from os.path import join, expanduser, isfile, relpath
 from collections import namedtuple
 from collections.abc import Mapping
 from functools import wraps
-from termcolor import colored
 from datetime import datetime
 from logging import Handler
 from ebbe import noop, format_seconds
@@ -24,6 +23,10 @@ from ebbe import noop, format_seconds
 from minet.cli.loading_bar import LoadingBar
 from minet.cli.exceptions import MissingColumnError, FatalError
 from minet.utils import fuzzy_int
+
+
+def colored(string, color):
+    return "[{color}]{string}[/{color}]".format(string=string, color=color)
 
 
 def with_cli_exceptions(fn):

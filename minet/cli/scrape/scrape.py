@@ -8,7 +8,6 @@ import csv
 import ndjson
 import casanova
 from casanova import DictLikeRow
-from termcolor import colored
 from collections import namedtuple
 from os.path import basename, isdir
 
@@ -34,6 +33,7 @@ from minet.cli.utils import (
     dummy_csv_file_from_glob,
     create_report_iterator,
     LoadingBar,
+    colored,
 )
 from minet.cli.exceptions import FatalError
 from minet.cli.constants import DEFAULT_CONTENT_FOLDER

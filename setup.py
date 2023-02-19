@@ -24,7 +24,6 @@ setup(
     python_requires=">=3.7",
     packages=find_packages(exclude=["ftest", "scripts", "test"]),
     install_requires=[
-        "alive_progress>=3,<4",
         "beautifulsoup4>=4.7.1",
         "browser-cookie3==0.16.5",
         "casanova>=0.19.2,<0.20",
@@ -38,9 +37,9 @@ setup(
         "persist-queue>=0.7.0",
         "pyyaml",
         "quenouille>=1.4.3,<2",
+        "rich>=13,<14",
         "soupsieve>=2.1",
         "tenacity>=7.0.0",
-        "termcolor>=1.0.0",
         "trafilatura>=1.2.0,<1.3",
         "twitwi>=0.16.1,<0.17",
         "ural>=0.37.0,<0.38",

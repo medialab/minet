@@ -6,7 +6,6 @@
 # labels in CSV format, for instance.
 #
 from io import StringIO
-from termcolor import colored
 from functools import partial
 from urllib3.exceptions import (
     ConnectTimeoutError,
@@ -41,6 +40,7 @@ from minet.scrape.exceptions import (
     ScraperValidationUnknownKeyError,
     ScraperEvalError,
 )
+from minet.cli.utils import colored
 
 
 def max_retry_error_reporter(error):
