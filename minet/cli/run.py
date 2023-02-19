@@ -13,7 +13,6 @@ import multiprocessing
 import casanova
 from casanova.exceptions import EmptyFileError
 from contextlib import ExitStack
-from colorama import init as colorama_init
 from encodings import idna  # NOTE: this is necessary for pyinstaller build
 
 from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
@@ -32,9 +31,6 @@ from minet.cli.exceptions import NotResumableError, InvalidArgumentsError, Fatal
 def run(name, version, commands):
     # Freezing multiprocessing support for pyinstaller etc.
     multiprocessing.freeze_support()
-
-    # Colorama initialization hook
-    colorama_init()
 
     # Increasing max CSV file limit to avoid pesky issues
     csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))

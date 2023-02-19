@@ -12,7 +12,6 @@ beautifulsoup4==4.11.1
 browser-cookie3==0.16.5
 casanova==0.19.2
 charset-normalizer==3.0.1
-colorama==0.4.6
 dateparser==1.1.6
 ebbe==1.10.0
 json5==0.9.11

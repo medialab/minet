@@ -29,7 +29,6 @@ setup(
         "browser-cookie3==0.16.5",
         "casanova>=0.19.2,<0.20",
         "charset-normalizer>=3,<4",
-        "colorama>=0.4.0",
         "dateparser>=1.1.1",
         "ebbe>=1.10.0,<2",
         "json5>=0.8.5",
