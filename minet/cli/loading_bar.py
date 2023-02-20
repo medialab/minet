@@ -315,6 +315,7 @@ class LoadingBar(object):
 
             if self.bar_column is not None:
                 self.bar_column.complete_style = "warning"
+                self.bar_column.finished_style = "warning"
             if self.spinner_column is not None:
                 self.spinner_column.set_spinner("minetDots2", "warning")
 
