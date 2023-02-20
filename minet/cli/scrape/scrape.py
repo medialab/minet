@@ -144,7 +144,7 @@ def action(cli_args, loading_bar):
     if cli_args.glob is not None:
         input_data = dummy_csv_file_from_glob(cli_args.glob, cli_args.input_dir)
 
-    reader = casanova.reader(input_data)
+    reader = casanova.reader(input_data, total=cli_args.total)
 
     if (
         cli_args.glob is None
@@ -175,6 +175,7 @@ def action(cli_args, loading_bar):
     )
 
     loading_bar.set_title("Scraping (p=%i)" % pool.processes)
+    loading_bar.set_total(reader.total)
 
     with pool:
         for error, items in pool.imap_unordered(worker, files):

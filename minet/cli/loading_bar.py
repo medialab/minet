@@ -18,53 +18,22 @@ from rich.progress import (
     TextColumn,
     BarColumn,
     SpinnerColumn,
-    TaskProgressColumn,
     Task,
 )
-from rich._spinners import SPINNERS
 from about_time import HumanDuration, HumanThroughput
 from ebbe import format_int
 
 from minet.utils import message_flatmap
 from minet.cli.console import console
 
-SPINNERS["minetDots1"] = {
-    "interval": 100,
-    "frames": [
-        "|=======   |",
-        "| =======  |",
-        "|  ======= |",
-        "|   =======|",
-        "|=   ======|",
-        "|==   =====|",
-        "|===   ====|",
-        "|====   ===|",
-        "|=====   ==|",
-        "|======   =|",
-    ],
-}
-
-SPINNERS["minetDots2"] = {
-    "interval": 150,
-    "frames": [
-        "|====      |",
-        "| ====     |",
-        "|  ====    |",
-        "|   ====   |",
-        "|    ====  |",
-        "|     ==== |",
-        "|      ====|",
-        "|     ==== |",
-        "|    ====  |",
-        "|   ====   |",
-        "|  ====    |",
-        "| ====     |",
-    ],
-}
-
 
 class CautiousBarColumn(BarColumn):
     def render(self, task: Task):
+        if task.total is None or task.total == 1:
+            self.bar_width = 15
+        else:
+            self.bar_width = 40
+
         if task.total is not None and task.completed > task.total:
             self.finished_style = "warning"
 
@@ -72,17 +41,17 @@ class CautiousBarColumn(BarColumn):
 
 
 class TimeElapsedColumn(ProgressColumn):
-    def render(self, task: Task) -> Optional[Text]:
+    def render(self, task: Task) -> Text:
         elapsed = task.finished_time if task.finished else task.elapsed
 
         if not elapsed:
-            return None
+            return Text("")
 
         return Text("in " + str(HumanDuration(elapsed)), style="progress.elapsed")
 
 
 class CompletionColumn(ProgressColumn):
-    def render(self, task: Task) -> Optional[Text]:
+    def render(self, task: Task) -> Text:
         total = format_int(task.total) if task.total is not None else "?"
         completed = format_int(task.completed).rjust(len(total))
 
@@ -92,8 +61,17 @@ class CompletionColumn(ProgressColumn):
         return Text(f"{completed}/{total}{unit_text}")
 
 
+class PercentageColumn(ProgressColumn):
+    def render(self, task: Task) -> Text:
+        if task.total is None or task.total == 1:
+            return Text("-")
+
+        txt = "[progress.percentage][{task.percentage:>3.0f}%]".format(task=task)
+        return Text.from_markup(txt)
+
+
 class ThroughputColumn(ProgressColumn):
-    def render(self, task: Task) -> Optional[Text]:
+    def render(self, task: Task) -> Text:
         elapsed = task.finished_time if task.finished else task.elapsed
 
         if not elapsed or not task.completed:
@@ -117,11 +95,11 @@ class StatsColumn(ProgressColumn):
         super().__init__(table_column=table_column)
         self.sort_key = sort_key
 
-    def render(self, task: Task) -> Optional[Text]:
+    def render(self, task: Task) -> Text:
         stats = task.fields.get("stats")
 
         if stats is None:
-            return None
+            return Text("")
 
         total = 0
 
@@ -157,7 +135,7 @@ class StatsColumn(ProgressColumn):
 
 
 class NestedTotalColumn(ProgressColumn):
-    def render(self, task: Task) -> Optional[Text]:
+    def render(self, task: Task) -> Text:
         sub_total = task.fields.get("sub_total")
 
         if sub_total is None:
@@ -191,13 +169,11 @@ class LoadingBar(object):
         sub_unit: Optional[str] = None,
         transient: bool = False,
     ):
-        self.total = total
         self.sub_total = 0
         self.nested = nested
         self.transient = transient
 
         self.bar_column = None
-        self.spinner_column = None
         self.label_progress = None
         self.label_progress_task_id = None
         self.sub_progress = None
@@ -223,10 +199,7 @@ class LoadingBar(object):
             self.table.add_row(self.label_progress)
 
         # Main progress line
-        self.bar_column = CautiousBarColumn(
-            pulse_style="white",
-            bar_width=40 if total is not None and total > 1 else 15,
-        )
+        self.bar_column = CautiousBarColumn(pulse_style="white")
 
         columns = [
             TextColumn("[progress.description]{task.description}"),
@@ -238,10 +211,7 @@ class LoadingBar(object):
         if not nested:
             columns.append(SpinnerColumn("dots", style=None, finished_text="·"))
 
-            columns.append(
-                TaskProgressColumn("[progress.percentage][{task.percentage:>3.0f}%]")
-            )
-
+        columns.append(PercentageColumn())
         columns.append(TimeElapsedColumn())
         columns.append(ThroughputColumn())
 
@@ -250,7 +220,7 @@ class LoadingBar(object):
 
         self.task_id = self.progress.add_task(
             description=title or "",
-            total=self.total,
+            total=total,
             unit=unit,
             completed=completed or 0,
         )
@@ -259,7 +229,9 @@ class LoadingBar(object):
         if nested:
             sub_columns = [
                 SpinnerColumn("dots", style="", finished_text="·"),
-                TextColumn("{task.description}", table_column=Column(width=50)),
+                TextColumn(
+                    "{task.description}", table_column=Column(width=50, min_width=0)
+                ),
                 CompletionColumn(),
                 TimeElapsedColumn(),
                 ThroughputColumn(),
@@ -315,12 +287,11 @@ class LoadingBar(object):
             if self.bar_column is not None:
                 self.bar_column.complete_style = "warning"
                 self.bar_column.finished_style = "warning"
-            if self.spinner_column is not None:
-                self.spinner_column.set_spinner("minetDots2", "warning")
-
+                self.bar_column.pulse_style = "warning"
+                self.bar_column.style = "warning"
         else:
-            if self.spinner_column is not None:
-                self.spinner_column.set_spinner("minetDots2", "success")
+            self.bar_column.pulse_style = "success"
+            self.bar_column.style = "success"
 
         self.live.stop()
 
@@ -371,6 +342,9 @@ class LoadingBar(object):
 
     def set_title(self, title: str):
         self.progress.update(self.task_id, description=title)
+
+    def set_total(self, total: Optional[int] = None):
+        self.progress.update(self.task_id, total=total)
 
     def set_label(self, label: str):
         assert self.label_progress is not None
