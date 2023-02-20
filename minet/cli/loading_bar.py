@@ -71,14 +71,12 @@ class TimeElapsedColumn(ProgressColumn):
 
 
 class CompletionColumn(ProgressColumn):
-    def __init__(self, unit: Optional[str] = None, table_column=None):
-        self.unit = unit
-        super().__init__(table_column=table_column)
-
-    def render(self, task: Task) -> Text:
+    def render(self, task: Task) -> Optional[Text]:
         total = format_int(task.total) if task.total is not None else "?"
         completed = format_int(task.completed).rjust(len(total))
-        unit_text = f" {self.unit}" if self.unit is not None else ""
+
+        unit = task.fields.get("unit")
+        unit_text = f" {unit}" if unit is not None else ""
 
         return Text(f"{completed}/{total}{unit_text}")
 
@@ -143,7 +141,7 @@ class LoadingBar(object):
             ]
 
             if total > 1:
-                columns.append(CompletionColumn(unit=self.unit))
+                columns.append(CompletionColumn())
 
             if "secondary" not in self.features:
                 columns.append(SpinnerColumn("dots", style=None, finished_text="·"))
@@ -158,7 +156,7 @@ class LoadingBar(object):
             columns.append(TimeElapsedColumn())
 
             if total > 1:
-                columns.append(ThroughputColumn)
+                columns.append(ThroughputColumn())
         else:
             self.spinner_column = SpinnerColumn("minetDots2", style="info")
 
