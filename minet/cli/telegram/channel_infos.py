@@ -4,39 +4,27 @@
 #
 # Action retrieving the information of a Telegram channel.
 #
-import casanova
-
-from minet.cli.utils import LoadingBar
+from minet.cli.utils import with_enricher_and_loading_bar
 from minet.telegram import TelegramScraper
 from minet.telegram.constants import TELEGRAM_INFOS_CSV_HEADERS
 from minet.telegram.exceptions import TelegramInvalidTargetError
 
 
-def action(cli_args):
+@with_enricher_and_loading_bar(
+    headers=TELEGRAM_INFOS_CSV_HEADERS, title="Retrieving info", unit="channels"
+)
+def action(cli_args, enricher, loading_bar):
     scraper = TelegramScraper(throttle=cli_args.throttle)
-    enricher = casanova.enricher(
-        cli_args.input,
-        cli_args.output,
-        add=TELEGRAM_INFOS_CSV_HEADERS,
-        keep=cli_args.select,
-    )
-
-    loading_bar = LoadingBar("Retrieving infos", unit="channel")
 
     for i, (row, channel) in enumerate(
         enricher.cells(cli_args.column, with_rows=True), 1
     ):
-        loading_bar.inc("channels")
-
-        try:
-            infos = scraper.channel_infos(channel)
-
-            enricher.writerow(row, infos)
-
-            loading_bar.update()
-
-        except TelegramInvalidTargetError:
-            loading_bar.print(
-                "%s (line %i) is not a telegram channel or url, or is not accessible."
-                % (channel, i)
-            )
+        with loading_bar.tick():
+            try:
+                infos = scraper.channel_infos(channel)
+                enricher.writerow(row, infos)
+            except TelegramInvalidTargetError:
+                loading_bar.print(
+                    "%s (line %i) is not a telegram channel or url, or is not accessible."
+                    % (channel, i)
+                )
