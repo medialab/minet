@@ -4,19 +4,16 @@
 #
 # Logic of the `ct lists` action.
 #
-import csv
+import casanova
 
-from minet.cli.crowdtangle.utils import with_crowdtangle_fatal_errors
+from minet.cli.crowdtangle.utils import with_crowdtangle_utilities
 from minet.crowdtangle.constants import CROWDTANGLE_LIST_CSV_HEADERS
-from minet.crowdtangle.client import CrowdTangleAPIClient
 
 
-@with_crowdtangle_fatal_errors
-def action(cli_args):
+@with_crowdtangle_utilities
+def action(cli_args, client):
 
-    client = CrowdTangleAPIClient(cli_args.token, rate_limit=cli_args.rate_limit)
-    writer = csv.writer(cli_args.output)
-    writer.writerow(CROWDTANGLE_LIST_CSV_HEADERS)
+    writer = casanova.writer(cli_args.output, fieldnames=CROWDTANGLE_LIST_CSV_HEADERS)
 
     lists = client.lists()
 
