@@ -4,6 +4,9 @@
 #
 # Miscellaneous helpers related to CLI argument parsing.
 #
+from typing import Optional
+from typing_extensions import TypedDict, NotRequired
+
 import os
 import re
 import sys
@@ -495,13 +498,21 @@ def resolve_arg_dependencies(cli_args, config):
     return to_close
 
 
+class VariadicInputDefinition(TypedDict):
+    dummy_column: str
+    item_label: NotRequired[str]
+    item_label_plural: NotRequired[str]
+    column_help: NotRequired[str]
+    input_help: NotRequired[str]
+
+
 def resolve_typical_arguments(
     args,
     resumer=None,
     resumer_kwargs=None,
-    select=False,
-    total=False,
-    variadic_input=None,
+    select: bool = False,
+    total: bool = False,
+    variadic_input: Optional[VariadicInputDefinition] = None,
 ):
     args = [] if args is None else args.copy()
     epilog_addendum = None
@@ -603,9 +614,9 @@ def resolve_typical_arguments(
 
 
 def command(
-    name,
+    name: str,
     package=None,
-    title=None,
+    title: str = None,
     aliases=None,
     description=None,
     epilog=None,
@@ -617,7 +628,7 @@ def command(
     resumer_kwargs=None,
     select=False,
     total=False,
-    variadic_input=None,
+    variadic_input: Optional[VariadicInputDefinition] = None,
     **kwargs,
 ):
 
@@ -687,7 +698,7 @@ def subcommand(
     resumer_kwargs=None,
     select=False,
     total=False,
-    variadic_input=None,
+    variadic_input: Optional[VariadicInputDefinition] = None,
     **kwargs,
 ):
     data = {"name": name, "title": title, "package": package, "arguments": arguments}

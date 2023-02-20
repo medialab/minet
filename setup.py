@@ -42,6 +42,7 @@ setup(
         "soupsieve>=2.1",
         "tenacity>=7.0.0",
         "trafilatura>=1.2.0,<1.3",
+        "typing_extensions",
         "twitwi>=0.16.1,<0.17",
         "ural>=0.37.0,<0.38",
         "urllib3>=1.26.9,<2",

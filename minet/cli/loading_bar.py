@@ -4,8 +4,11 @@
 #
 # Various loading bar utilities used by minet CLI.
 #
+from typing import Optional, Iterable
+from typing_extensions import TypedDict, NotRequired
+
 from contextlib import contextmanager
-from typing import Optional
+from collections import OrderedDict
 from rich.live import Live
 from rich.text import Text
 from rich.table import Table
@@ -20,7 +23,7 @@ from rich.progress import (
 )
 from rich._spinners import SPINNERS
 from about_time import HumanDuration, HumanThroughput
-from ebbe import format_int
+from ebbe import format_int, with_is_last
 
 from minet.utils import message_flatmap
 from minet.cli.console import console
@@ -101,34 +104,96 @@ class ThroughputColumn(ProgressColumn):
         return Text(message)
 
 
+class StatsColumn(ProgressColumn):
+    def render(self, task: Task) -> Optional[Text]:
+        stats = task.fields.get("stats")
+
+        if stats is None:
+            return None
+
+        parts = []
+
+        total = 0
+
+        for is_last, item in with_is_last(stats.values()):
+            txt = Text()
+
+            count = item["count"]
+
+            if count == 0:
+                continue
+
+            total += count
+
+            txt.append(item["name"], style=item["style"])
+            txt.append(" ")
+            txt.append(format_int(count))
+
+            if not is_last:
+                txt.append(", ")
+
+            parts.append(txt)
+
+        if task.description and total:
+            parts.insert(0, Text("- "))
+
+        return Text.assemble(*parts)
+
+
+class StatsItem(TypedDict):
+    name: str
+    style: NotRequired[str]
+    initial: NotRequired[int]
+
+
 class LoadingBar(object):
     def __init__(
         self,
         title: Optional[str] = None,
         unit: Optional[str] = None,
         total: Optional[int] = None,
-        features=[],
+        show_label: bool = False,
+        label_format: str = "{task.description}",
+        stats: Optional[Iterable[StatsItem]] = None,
+        nested: bool = False,
     ):
         self.title = title
         self.unit = unit
         self.total = total
-        self.features = set(features)
 
         self.bar_column = None
         self.spinner_column = None
         self.upper_line = None
-        self.upper_line_task = None
+        self.upper_line_task_id = None
         self.sub_progress = None
         self.sub_task = None
 
         self.table = Table.grid(expand=True)
 
-        if "label" in self.features or "stats" in self.features:
-            self.upper_line = Progress(
-                TextColumn("[progress.description]{task.description}")
-            )
-            self.upper_line_task = self.upper_line.add_task(
-                description="Coucou", total=None
+        self.task_stats = None
+
+        if stats is not None:
+            self.task_stats = OrderedDict()
+
+            for item in stats:
+                self.task_stats[item["name"]] = {
+                    "name": item["name"],
+                    "style": item.get("style", ""),
+                    "count": item.get("count", 0),
+                }
+
+        if show_label or stats is not None:
+            upper_line_columns = []
+
+            if show_label:
+                upper_line_columns.append(TextColumn(label_format))
+
+            if stats is not None:
+                upper_line_columns.append(StatsColumn())
+
+            self.upper_line = Progress(*upper_line_columns)
+            self.upper_line_task_id = self.upper_line.add_task(
+                description="", total=None, stats=self.task_stats
             )
             self.table.add_row(self.upper_line)
 
@@ -143,7 +208,7 @@ class LoadingBar(object):
             if total > 1:
                 columns.append(CompletionColumn())
 
-            if "secondary" not in self.features:
+            if not nested:
                 columns.append(SpinnerColumn("dots", style=None, finished_text="·"))
 
             if total > 1:
@@ -174,11 +239,11 @@ class LoadingBar(object):
         self.progress = Progress(*columns, console=console)
         self.table.add_row(self.progress)
 
-        self.task = self.progress.add_task(
-            description=self.title, total=self.total, fields={"unit": self.unit}
+        self.task_id = self.progress.add_task(
+            description=self.title, total=self.total, unit=self.unit
         )
 
-        if "secondary" in self.features:
+        if nested:
             self.sub_progress = Progress(
                 SpinnerColumn("dots", style="", finished_text="·"),
                 TextColumn("{task.description}"),
@@ -223,15 +288,23 @@ class LoadingBar(object):
             self.update(count=1)
 
     def advance(self, count=1):
-        self.progress.update(self.task, advance=count)
+        self.progress.update(self.task_id, advance=count)
 
-    def update(self, count=None, label=None):
+    def update(self, count=None, label=None, **fields):
         if count is not None:
             self.advance(count)
 
         if label is not None:
             assert self.upper_line is not None
-            self.upper_line.update(self.upper_line_task, description=label)
+            self.upper_line.update(self.upper_line_task_id, description=label)
+
+        if fields:
+            assert self.task_stats is not None
+
+            for field, count in fields.items():
+                self.task_stats[field]["count"] += count
+
+            self.upper_line.update(self.upper_line_task_id, stats=self.task_stats)
 
     def print(self, *msg):
         console.pring(message_flatmap(*msg))
