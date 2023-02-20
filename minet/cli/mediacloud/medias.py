@@ -4,10 +4,9 @@
 #
 # Logic of the `mc medias` action.
 #
-import csv
 import casanova
 
-from minet.cli.utils import LoadingBar
+from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.mediacloud.utils import with_mediacloud_fatal_errors
 from minet.mediacloud import MediacloudAPIClient
 from minet.mediacloud.constants import (
@@ -17,21 +16,19 @@ from minet.mediacloud.constants import (
 
 
 @with_mediacloud_fatal_errors
-def action(cli_args):
+@with_enricher_and_loading_bar(
+    headers=MEDIACLOUD_MEDIA_CSV_HEADER[1:], title="Fetching medias", unit="medias"
+)
+def action(cli_args, enricher, loading_bar):
     added_headers = MEDIACLOUD_MEDIA_CSV_HEADER[1:]
 
     feeds_writer = None
 
     if cli_args.feeds:
         added_headers.append("feeds")
-        feeds_writer = csv.writer(cli_args.feeds)
-        feeds_writer.writerow(MEDIACLOUD_FEED_CSV_HEADER)
-
-    enricher = casanova.enricher(
-        cli_args.input, cli_args.output, keep=cli_args.select, add=added_headers
-    )
-
-    loading_bar = LoadingBar(desc="Fetching medias", unit="media", total=cli_args.total)
+        feeds_writer = casanova.writer(
+            cli_args.feeds, fieldnames=MEDIACLOUD_FEED_CSV_HEADER
+        )
 
     client = MediacloudAPIClient(cli_args.token)
 
@@ -49,4 +46,4 @@ def action(cli_args):
         else:
             enricher.writerow(row, result)
 
-        loading_bar.update()
+        loading_bar.advance()
