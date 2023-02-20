@@ -6,8 +6,8 @@
 #
 from bs4 import BeautifulSoup
 
-from minet.utils import load_definition
-from minet.scrape.interpreter import interpret_scraper, tabulate
+from minet.scrape.utils import load_definition
+from minet.scrape.interpreter import interpret_scraper
 from minet.scrape.analysis import analyse, validate
 from minet.scrape.straining import strainer_from_css
 from minet.scrape.exceptions import ScraperNotTabularError, InvalidScraperError

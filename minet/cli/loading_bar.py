@@ -6,7 +6,6 @@
 #
 from contextlib import contextmanager
 from typing import Optional
-from collections.abc import Iterable
 from rich.live import Live
 from rich.text import Text
 from rich.table import Table
@@ -23,6 +22,7 @@ from rich._spinners import SPINNERS
 from about_time import HumanDuration, HumanThroughput
 from ebbe import format_int
 
+from minet.utils import message_flatmap
 from minet.cli.console import console
 
 SPINNERS["minetDots1"] = {
@@ -233,12 +233,5 @@ class LoadingBar(object):
             assert self.upper_line is not None
             self.upper_line.update(self.upper_line_task, description=label)
 
-    def print(self, msg):
-        if not isinstance(msg, str):
-            if not isinstance(msg, Iterable):
-                raise TypeError("expecting a message")
-
-            for item in msg:
-                console.print(item)
-        else:
-            console.print(msg)
+    def print(self, *msg):
+        console.pring(message_flatmap(*msg))

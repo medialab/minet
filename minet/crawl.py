@@ -15,7 +15,7 @@ from shutil import rmtree
 from threading import Lock
 
 from minet.scrape import Scraper
-from minet.utils import load_definition
+from minet.scrape.utils import load_definition
 from minet.web import create_pool, request, extract_response_meta, EXPECTED_WEB_ERRORS
 from minet.utils import PseudoFStringFormatter
 

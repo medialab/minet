@@ -21,7 +21,7 @@ from ebbe import noop, format_seconds
 from minet.cli.console import console
 from minet.cli.loading_bar import LoadingBar
 from minet.cli.exceptions import MissingColumnError, FatalError
-from minet.utils import fuzzy_int
+from minet.utils import fuzzy_int, message_flatmap
 
 
 def colored(string, color):
@@ -66,31 +66,12 @@ def was_piped_something():
     return get_stdin_status() != "terminal" and not is_stdin_empty()
 
 
-def format_polymorphic_message(*args, sep=" "):
-    return sep.join(
-        str(item)
-        if not isinstance(item, list)
-        else "\n".join(str(subitem) for subitem in item)
-        for item in args
-    )
+def print_err(*messages):
+    print(message_flatmap(*messages), file=sys.stderr)
 
 
-def variadic_print(*args, file=sys.stdout, sep=" ", end="\n"):
-    for arg in args:
-        if isinstance(arg, list):
-            for msg in arg:
-                print(msg, end=end, sep=sep, file=file)
-        else:
-            print(arg, end=end, sep=sep, file=file)
-
-
-# NOTE: not using partial to avoid dynamic stream remapping
-def print_err(*args):
-    variadic_print(*args, file=sys.stderr)
-
-
-def die(*msg):
-    print_err(*msg)
+def die(*messages):
+    print_err(*messages)
 
     sys.exit(1)
 
