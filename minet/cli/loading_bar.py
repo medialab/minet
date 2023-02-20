@@ -209,6 +209,7 @@ class LoadingBar(object):
 
         self.table = Table.grid(expand=True)
 
+        # Label line
         if show_label:
             label_progress_columns = []
 
@@ -221,43 +222,28 @@ class LoadingBar(object):
             )
             self.table.add_row(self.label_progress)
 
-        if total is not None:
-            self.bar_column = CautiousBarColumn()
+        # Main progress line
+        self.bar_column = CautiousBarColumn(
+            pulse_style="white",
+            bar_width=40 if total is not None and total > 1 else 15,
+        )
 
-            columns = [
-                TextColumn("[progress.description]{task.description}"),
-                self.bar_column,
-            ]
+        columns = [
+            TextColumn("[progress.description]{task.description}"),
+            self.bar_column,
+        ]
 
-            if total > 1:
-                columns.append(CompletionColumn())
+        columns.append(CompletionColumn())
 
-            if not nested:
-                columns.append(SpinnerColumn("dots", style=None, finished_text="·"))
+        if not nested:
+            columns.append(SpinnerColumn("dots", style=None, finished_text="·"))
 
-            if total > 1:
-                columns.append(
-                    TaskProgressColumn(
-                        "[progress.percentage][{task.percentage:>3.0f}%]"
-                    )
-                )
+            columns.append(
+                TaskProgressColumn("[progress.percentage][{task.percentage:>3.0f}%]")
+            )
 
-            columns.append(TimeElapsedColumn())
-
-            if total > 1:
-                columns.append(ThroughputColumn())
-        else:
-            self.spinner_column = SpinnerColumn("minetDots2", style="info")
-
-            columns = [
-                TextColumn("[progress.description]{task.description}"),
-                self.spinner_column,
-                CompletionColumn(),
-                TimeElapsedColumn(),
-                ThroughputColumn(),
-            ]
-
-        columns = [c for c in columns if c]
+        columns.append(TimeElapsedColumn())
+        columns.append(ThroughputColumn())
 
         self.progress = Progress(*columns, console=console)
         self.table.add_row(self.progress)
@@ -269,6 +255,7 @@ class LoadingBar(object):
             completed=completed or 0,
         )
 
+        # Nested progress line
         if nested:
             sub_columns = [
                 SpinnerColumn("dots", style="", finished_text="·"),
@@ -289,6 +276,7 @@ class LoadingBar(object):
 
             self.table.add_row(self.sub_progress)
 
+        # Stats line
         if stats is not None:
             for item in stats:
                 count = item.get("count", 0)
@@ -308,6 +296,7 @@ class LoadingBar(object):
         if self.stats_are_shown:
             self.table.add_row(self.stats_progress)
 
+        # Internal live instance
         self.live = Live(
             self.table, refresh_per_second=10, console=console, transient=self.transient
         )
