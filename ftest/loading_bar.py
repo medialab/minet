@@ -1,5 +1,6 @@
 import time
 import sys
+from random import random
 
 from minet.cli.loading_bar import LoadingBar
 
@@ -9,9 +10,9 @@ SUB_N = 1_000
 try:
     with LoadingBar(
         title="Processing",
-        total=2,
+        total=N,
         unit="apples",
-        sub_unit="videos",
+        sub_unit="pears",
         stats=[
             {"name": "errors", "style": "error"},
             {"name": "warnings", "style": "warning"},
@@ -23,6 +24,12 @@ try:
                 for j in range(SUB_N):
                     time.sleep(0.001)
                     loading_bar.nested_advance()
+
+                    if random() < 0.001:
+                        loading_bar.inc_stat("errors")
+
+                    if random() < 0.005:
+                        loading_bar.inc_stat("warnings")
 
 except KeyboardInterrupt:
     sys.exit(1)
