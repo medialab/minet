@@ -11,6 +11,7 @@ try:
         title="Processing",
         total=None,
         unit="apples",
+        sub_unit="videos",
         stats=[
             {"name": "errors", "style": "error"},
             {"name": "warnings", "style": "warning"},
@@ -18,10 +19,10 @@ try:
         nested=True,
     ) as loading_bar:
         for i in range(N):
-            for j in range(SUB_N):
-                time.sleep(0.001)
-
-            loading_bar.advance()
+            with loading_bar.nested_task("Working on [info]%i[/info]" % i):
+                for j in range(SUB_N):
+                    time.sleep(0.001)
+                    loading_bar.nested_advance()
 
 except KeyboardInterrupt:
     sys.exit(1)

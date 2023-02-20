@@ -81,7 +81,12 @@ class CompletionColumn(ProgressColumn):
         unit = task.fields.get("unit")
         unit_text = f" {unit}" if unit is not None else ""
 
-        return Text(f"{completed}/{total}{unit_text}")
+        sub_total = task.fields.get("sub_total")
+        sub_total_text = (
+            f", total: {format_int(sub_total)}" if sub_total is not None else ""
+        )
+
+        return Text(f"{completed}/{total}{unit_text}{sub_total_text}")
 
 
 class ThroughputColumn(ProgressColumn):
@@ -155,11 +160,12 @@ class LoadingBar(object):
         label_format: str = "{task.description}",
         stats: Optional[Iterable[StatsItem]] = None,
         nested: bool = False,
+        sub_title: Optional[str] = None,
+        sub_unit: Optional[str] = None,
     ):
-        self.title = title
-        self.unit = unit
         self.total = total
         self.sub_total = 0
+        self.nested = nested
 
         self.bar_column = None
         self.spinner_column = None
@@ -239,13 +245,16 @@ class LoadingBar(object):
         self.table.add_row(self.progress)
 
         self.task_id = self.progress.add_task(
-            description=self.title, total=self.total, unit=self.unit
+            description=title or "", total=self.total, unit=unit
         )
 
         if nested:
             sub_columns = [
                 SpinnerColumn("dots", style="", finished_text="·"),
                 TextColumn("{task.description}"),
+                CompletionColumn(),
+                TimeElapsedColumn(),
+                ThroughputColumn(),
             ]
 
             if stats is not None:
@@ -253,7 +262,11 @@ class LoadingBar(object):
 
             self.sub_progress = Progress(*sub_columns)
             self.sub_task = self.sub_progress.add_task(
-                description="Sub task", total=None, stats=self.task_stats
+                description=sub_title or "",
+                total=None,
+                stats=self.task_stats,
+                sub_total=self.sub_total,
+                unit=sub_unit,
             )
             self.table.add_row(self.sub_progress)
 
@@ -289,14 +302,45 @@ class LoadingBar(object):
         try:
             yield
         finally:
+            self.advance()
+
+    @contextmanager
+    def nested_tick(self):
+        try:
+            yield
+        finally:
+            self.nested_advance()
+
+    @contextmanager
+    def nested_task(self, description):
+        assert self.nested
+
+        try:
+            self.reset_sub()
+            self.update(sub_title=description)
+            yield
+        finally:
             self.update(count=1)
 
     def advance(self, count=1):
         self.progress.update(self.task_id, advance=count)
 
-    def update(self, count=None, label=None, **fields):
+    def nested_advance(self, count=1):
+        self.sub_total += 1
+        self.sub_progress.update(self.sub_task, advance=count, sub_total=self.sub_total)
+
+    def reset_sub(self):
+        self.sub_progress.update(self.sub_task, completed=0)
+
+    def update(self, count=None, sub_title=None, sub_count=None, label=None, **fields):
         if count is not None:
             self.advance(count)
+
+        if sub_count is not None:
+            self.nested_advance(sub_count)
+
+        if sub_title is not None:
+            self.sub_progress.update(self.sub_task, description=sub_title)
 
         if label is not None:
             assert self.upper_line is not None
