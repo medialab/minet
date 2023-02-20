@@ -16,6 +16,7 @@ from collections import namedtuple
 from collections.abc import Mapping
 from functools import wraps
 from logging import Handler
+from contextlib import nullcontext
 from ebbe import noop, format_seconds
 
 from minet.cli.console import console
@@ -280,19 +281,49 @@ def with_enricher_and_loading_bar(
     def decorate(action):
         @wraps(action)
         def wrapper(cli_args, *args, **kwargs):
+            enricher_context = nullcontext()
+
+            completed = 0
+
+            # Do we need to display a transient resume progress?
+            if (
+                hasattr(cli_args, "resume")
+                and cli_args.resume
+                and isinstance(
+                    cli_args.output,
+                    (casanova.RowCountResumer, casanova.ThreadSafeResumer),
+                )
+                and cli_args.output.can_resume()
+            ):
+
+                resume_loading_bar = LoadingBar(
+                    title="Reading output to resume", unit="lines", transient=True
+                )
+                enricher_context = resume_loading_bar
+
+                def listener(event, _):
+                    nonlocal completed
+
+                    if event == "output.row.read":
+                        resume_loading_bar.advance()
+                        completed += 1
+
+                cli_args.output.set_listener(listener)
+
             enricher_fn = casanova.enricher
 
-            if enricher_type == 'threadsafe':
+            if enricher_type == "threadsafe":
                 enricher_fn = casanova.threadsafe_enricher
 
-            enricher = enricher_fn(
-                cli_args.input,
-                cli_args.output,
-                add=headers(cli_args) if callable(headers) else headers,
-                select=cli_args.select,
-                total=getattr(cli_args, "total", None),
-                multiplex=multiplex(cli_args) if callable(multiplex) else multiplex,
-            )
+            with enricher_context:
+                enricher = enricher_fn(
+                    cli_args.input,
+                    cli_args.output,
+                    add=headers(cli_args) if callable(headers) else headers,
+                    select=cli_args.select,
+                    total=getattr(cli_args, "total", None),
+                    multiplex=multiplex(cli_args) if callable(multiplex) else multiplex,
+                )
 
             with LoadingBar(
                 title=title,
@@ -302,6 +333,7 @@ def with_enricher_and_loading_bar(
                 nested=nested,
                 stats=stats,
                 show_label=show_label,
+                completed=completed,
             ) as loading_bar:
 
                 additional_kwargs = {

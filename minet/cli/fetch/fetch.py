@@ -8,8 +8,6 @@
 #
 import casanova
 from datetime import datetime
-from io import StringIO
-from collections import Counter
 from ural import is_shortened_url
 
 from minet.fetch import multithreaded_fetch, multithreaded_resolve
@@ -18,7 +16,7 @@ from minet.web import grab_cookies, parse_http_header
 from minet.exceptions import InvalidURLError, FilenameFormattingError
 from minet.cli.exceptions import InvalidArgumentsError, FatalError
 from minet.cli.reporters import report_error, report_filename_formatting_error
-from minet.cli.loading_bar import LoadingBar
+from minet.cli.utils import with_enricher_and_loading_bar
 
 
 FETCH_ADDITIONAL_HEADERS = [
@@ -34,20 +32,44 @@ FETCH_ADDITIONAL_HEADERS = [
 RESOLVE_ADDITIONAL_HEADERS = ["resolved", "status", "error", "redirects", "chain"]
 
 
-def action(cli_args, resolve=False):
+ERROR_STATUSES = {401, 403, 429, 500, 503}
 
-    # If we are hitting a single url we enable contents_in_report by default
-    if (
-        not resolve
-        and isinstance(cli_args.input, StringIO)
-        and cli_args.contents_in_report is None
-    ):
-        cli_args.contents_in_report = True
 
-    if not resolve and cli_args.contents_in_report and cli_args.compress:
-        raise InvalidArgumentsError(
-            "Cannot both --compress and output --contents-in-report!"
-        )
+def get_style_for_status(status):
+    if status < 400:
+        return "info"
+
+    if status in ERROR_STATUSES:
+        return "error"
+
+    return "warning"
+
+
+def get_headers(cli_args):
+    if cli_args.action == "resolve":
+        headers = RESOLVE_ADDITIONAL_HEADERS
+    else:
+        headers = FETCH_ADDITIONAL_HEADERS
+
+        if cli_args.contents_in_report:
+            headers = headers + ["raw_contents"]
+
+    return headers
+
+
+def get_multiplex(cli_args):
+    if cli_args.separator is not None:
+        return casanova.Multiplexer(cli_args.column, cli_args.separator)
+
+
+@with_enricher_and_loading_bar(
+    headers=get_headers,
+    multiplex=get_multiplex,
+    enricher_type="threadsafe",
+    title="Fetching",
+    unit="urls",
+)
+def action(cli_args, enricher, loading_bar, resolve=False):
 
     # HTTP method
     http_method = cli_args.method
@@ -65,50 +87,6 @@ def action(cli_args, resolve=False):
         for header in cli_args.headers:
             k, v = parse_http_header(header)
             global_headers[k] = v
-
-    # Resume listener
-    skipped_rows = 0
-    resuming_reader_loading = None
-
-    if cli_args.resume and cli_args.output.can_resume():
-        resuming_reader_loading = LoadingBar(desc="Resuming", unit="line")
-
-        def output_read_listener(event, row):
-            nonlocal skipped_rows
-
-            if event != "output.row":
-                return
-
-            skipped_rows += 1
-            resuming_reader_loading.update()
-
-        cli_args.output.listener = output_read_listener
-
-    if resolve:
-        additional_headers = RESOLVE_ADDITIONAL_HEADERS
-    else:
-        additional_headers = FETCH_ADDITIONAL_HEADERS
-
-        if cli_args.contents_in_report:
-            additional_headers = additional_headers + ["raw_contents"]
-
-    # Enricher
-    multiplex = None
-
-    if cli_args.separator is not None:
-        multiplex = (cli_args.column, cli_args.separator)
-
-    enricher = casanova.threadsafe_enricher(
-        cli_args.input,
-        cli_args.output,
-        add=additional_headers,
-        select=cli_args.select,
-        total=cli_args.total,
-        multiplex=multiplex,
-    )
-
-    if resuming_reader_loading is not None:
-        resuming_reader_loading.close()
 
     if cli_args.column not in enricher.headers:
         raise InvalidArgumentsError(
@@ -128,32 +106,6 @@ def action(cli_args, resolve=False):
             )
 
         filename_pos = enricher.headers[cli_args.filename]
-
-    # Loading bar
-    loading_bar = LoadingBar(
-        desc="Fetching pages", total=enricher.total, unit="url", initial=skipped_rows
-    )
-
-    def update_loading_bar(result):
-        nonlocal errors
-
-        if result.error is not None:
-            errors += 1
-        else:
-            if resolve:
-                status = result.stack[-1].status
-            else:
-                status = result.response.status
-            if status is not None and status >= 400:
-                status_codes[status] += 1
-
-        stats = {"errors": errors}
-
-        for code, count in status_codes.most_common(1):
-            stats[str(code)] = count
-
-        loading_bar.update_stats(**stats)
-        loading_bar.update()
 
     only_shortened = getattr(cli_args, "only_shortened", False)
 
@@ -301,9 +253,6 @@ def action(cli_args, resolve=False):
 
         enricher.writerow(index, row, addendum)
 
-    errors = 0
-    status_codes = Counter()
-
     common_kwargs = {
         "key": url_key,
         "insecure": cli_args.insecure,
@@ -329,20 +278,20 @@ def action(cli_args, resolve=False):
         )
 
         for result in multithreaded_iterator:
+            loading_bar.advance()
+
             index, row = result.item
 
             if not result.url:
-
                 write_fetch_output(index, row)
-
-                loading_bar.update()
                 continue
-
-            # Updating stats
-            update_loading_bar(result)
 
             # No error
             if result.error is None:
+                status = result.response.status
+
+                loading_bar.inc_stat(status, style=get_style_for_status(status))
+
                 meta = result.meta
 
                 # Final url target
@@ -356,7 +305,7 @@ def action(cli_args, resolve=False):
                     index,
                     row,
                     resolved=resolved_url,
-                    status=result.response.status,
+                    status=status,
                     datetime_utc=datetime.isoformat(meta.get("datetime_utc")),
                     filename=meta.get("filename"),
                     encoding=meta.get("encoding"),
@@ -368,15 +317,17 @@ def action(cli_args, resolve=False):
             else:
                 error_code = report_error(result.error)
 
-                resolved = None
+                loading_bar.inc_stat(error_code, style="error")
+
+                resolved_url = None
 
                 if isinstance(result.error, InvalidURLError):
-                    resolved = result.error.url
+                    resolved_url = result.error.url
 
                 if isinstance(result.error, FilenameFormattingError):
                     loading_bar.print(report_filename_formatting_error(result.error))
 
-                write_fetch_output(index, row, error=error_code, resolved=resolved)
+                write_fetch_output(index, row, error=error_code, resolved=resolved_url)
 
     # Resolve
     else:
@@ -392,17 +343,13 @@ def action(cli_args, resolve=False):
         )
 
         for result in multithreaded_iterator:
+            loading_bar.advance()
+
             index, row = result.item
 
             if not result.url:
-
                 write_resolve_output(index, row)
-
-                loading_bar.update()
                 continue
-
-            # Updating stats
-            update_loading_bar(result)
 
             # No error
             if result.error is None:
@@ -410,11 +357,15 @@ def action(cli_args, resolve=False):
                 # Reporting in output
                 last = result.stack[-1]
 
+                status = last.status
+
+                loading_bar.inc_stat(status, style=get_style_for_status(status))
+
                 write_resolve_output(
                     index,
                     row,
                     resolved=last.url,
-                    status=last.status,
+                    status=status,
                     redirects=len(result.stack) - 1,
                     chain="|".join(step.type for step in result.stack),
                 )
@@ -422,6 +373,8 @@ def action(cli_args, resolve=False):
             # Handling potential errors
             else:
                 error_code = report_error(result.error)
+
+                loading_bar.inc_stat(error_code, style="error")
 
                 write_resolve_output(
                     index,

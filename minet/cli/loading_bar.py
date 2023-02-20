@@ -133,7 +133,7 @@ class StatsColumn(ProgressColumn):
 
             total += count
 
-            txt.append(item["name"], style=item["style"])
+            txt.append(str(item["name"]), style=item["style"])
             txt.append(" ")
             txt.append(format_int(count))
 
@@ -144,7 +144,7 @@ class StatsColumn(ProgressColumn):
         if task.description and total:
             parts.append(Text("- "))
 
-        return Text.assemble(*parts, *Text(", ").join(item_parts))
+        return Text.assemble(*parts, *Text(" ").join(item_parts))
 
 
 class NestedTotalColumn(ProgressColumn):
@@ -172,16 +172,19 @@ class LoadingBar(object):
         title: Optional[str] = None,
         unit: Optional[str] = None,
         total: Optional[int] = None,
+        completed: Optional[int] = None,
         show_label: bool = False,
         label_format: str = "{task.description}",
         stats: Optional[Iterable[StatsItem]] = None,
         nested: bool = False,
         sub_title: Optional[str] = None,
         sub_unit: Optional[str] = None,
+        transient: bool = False,
     ):
         self.total = total
         self.sub_total = 0
         self.nested = nested
+        self.transient = transient
 
         self.bar_column = None
         self.spinner_column = None
@@ -191,7 +194,7 @@ class LoadingBar(object):
         self.sub_task = None
         self.stats_progress = None
         self.stats_task = None
-        self.stats = None
+        self.stats = OrderedDict()
         self.stats_are_shown = False
 
         self.table = Table.grid(expand=True)
@@ -250,7 +253,7 @@ class LoadingBar(object):
         self.table.add_row(self.progress)
 
         self.task_id = self.progress.add_task(
-            description=title or "", total=self.total, unit=unit
+            description=title or "", total=self.total, unit=unit, completed=completed or 0
         )
 
         if nested:
@@ -274,10 +277,6 @@ class LoadingBar(object):
             self.table.add_row(self.sub_progress)
 
         if stats is not None:
-            self.stats = OrderedDict()
-
-            should_show_on_start = False
-
             for item in stats:
                 count = item.get("count", 0)
 
@@ -288,19 +287,16 @@ class LoadingBar(object):
                 }
 
                 if count:
-                    should_show_on_start
+                    self.stats_are_shown = True
 
-            self.stats_progress = Progress(StatsColumn())
-            self.stats_task_id = self.stats_progress.add_task("", stats=self.stats)
+        self.stats_progress = Progress(StatsColumn())
+        self.stats_task_id = self.stats_progress.add_task("", stats=self.stats)
 
-            if should_show_on_start:
-                self.stats_are_shown = True
-                self.table.add_row(self.stats_progress)
+        if self.stats_are_shown:
+            self.table.add_row(self.stats_progress)
 
         self.live = Live(
-            self.table,
-            refresh_per_second=10,
-            console=console,
+            self.table, refresh_per_second=10, console=console, transient=self.transient
         )
 
     def __enter__(self):

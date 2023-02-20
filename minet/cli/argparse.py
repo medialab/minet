@@ -623,7 +623,7 @@ def command(
     common_arguments=None,
     arguments=None,
     subcommands=None,
-    validate=None,
+    resolve=None,
     resumer=None,
     resumer_kwargs=None,
     select=False,
@@ -678,8 +678,8 @@ def command(
             else:
                 data["epilog"] += "\n\n" + epilog_addendum
 
-    if validate is not None:
-        data["validate"] = validate
+    if resolve is not None:
+        data["resolve"] = resolve
 
     data.update(kwargs)
 
@@ -693,7 +693,7 @@ def subcommand(
     description=None,
     epilog=None,
     arguments=[],
-    validate=None,
+    resolve=None,
     resumer=None,
     resumer_kwargs=None,
     select=False,
@@ -724,8 +724,8 @@ def subcommand(
         else:
             data["epilog"] += "\n\n" + epilog_addendum
 
-    if validate is not None:
-        data["validate"] = validate
+    if resolve is not None:
+        data["resolve"] = resolve
 
     data.update(kwargs)
 

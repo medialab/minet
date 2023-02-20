@@ -239,6 +239,6 @@ def report_scraper_evaluation_error(error):
 
 
 def report_filename_formatting_error(error):
-    return "> error when formatting filename using: {template}".format(
-        template=colored(error.template, "cyan")
+    return "> error when formatting filename using: [cyan]{template}[/cyan]".format(
+        template=error.template
     )

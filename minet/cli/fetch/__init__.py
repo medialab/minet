@@ -2,6 +2,7 @@ from casanova import ThreadSafeResumer
 
 from minet.cli.argparse import command, BooleanAction
 from minet.cli.constants import DEFAULT_CONTENT_FOLDER
+from minet.cli.exceptions import InvalidArgumentsError
 
 # TODO: lazyloading issue
 from minet.constants import (
@@ -68,6 +69,18 @@ COMMON_ARGUMENTS = [
     },
 ]
 
+
+def resolve_fetch_arguments(cli_args):
+    # If we are hitting a single url we enable contents_in_report by default
+    if cli_args.has_dummy_csv and cli_args.contents_in_report is None:
+        cli_args.contents_in_report = True
+
+    if cli_args.contents_in_report and cli_args.compress:
+        raise InvalidArgumentsError(
+            "Cannot both --compress and get --contents-in-report!"
+        )
+
+
 FETCH_COMMAND = command(
     "fetch",
     "minet.cli.fetch.fetch",
@@ -123,6 +136,7 @@ FETCH_COMMAND = command(
         . Fetching a single url, useful to pipe into `minet scrape`:
             $ minet fetch http://google.com | minet scrape ./scrape.json - > scraped.csv
     """,
+    resolve=resolve_fetch_arguments,
     resumer=ThreadSafeResumer,
     select=True,
     total=True,

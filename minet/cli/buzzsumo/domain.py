@@ -4,8 +4,6 @@
 #
 # Logic of the `bz domain` action.
 #
-import casanova
-
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.buzzsumo.utils import with_buzzsumo_fatal_errors
 from minet.buzzsumo import BuzzSumoAPIClient
