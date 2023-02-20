@@ -32,15 +32,9 @@ FETCH_ADDITIONAL_HEADERS = [
 RESOLVE_ADDITIONAL_HEADERS = ["resolved", "status", "error", "redirects", "chain"]
 
 
-ERROR_STATUSES = {401, 403, 429, 500, 503}
-
-
 def get_style_for_status(status):
     if status < 400:
         return "info"
-
-    if status in ERROR_STATUSES:
-        return "error"
 
     return "warning"
 
