@@ -9,7 +9,7 @@ SUB_N = 1_000
 try:
     with LoadingBar(
         title="Processing",
-        total=None,
+        total=2,
         unit="apples",
         sub_unit="videos",
         stats=[

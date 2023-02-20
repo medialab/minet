@@ -63,6 +63,14 @@ SPINNERS["minetDots2"] = {
 }
 
 
+class CautiousBarColumn(BarColumn):
+    def render(self, task: Task):
+        if task.total is not None and task.completed > task.total:
+            self.finished_style = "warning"
+
+        return super().render(task)
+
+
 class TimeElapsedColumn(ProgressColumn):
     def render(self, task: Task) -> Optional[Text]:
         elapsed = task.finished_time if task.finished else task.elapsed
@@ -212,7 +220,7 @@ class LoadingBar(object):
             self.table.add_row(self.upper_line)
 
         if total is not None:
-            self.bar_column = BarColumn()
+            self.bar_column = CautiousBarColumn()
 
             columns = [
                 TextColumn("[progress.description]{task.description}"),
