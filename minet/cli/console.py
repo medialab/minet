@@ -27,7 +27,7 @@ MINET_STYLES = {
 }
 MINET_THEME = Theme(MINET_STYLES)
 
-console = Console(theme=MINET_THEME, stderr=True)
+console = Console(theme=MINET_THEME, stderr=True, highlight=False)
 
 if __name__ == "__main__":
     for color in MINET_COLORS:

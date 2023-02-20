@@ -320,7 +320,8 @@ class LoadingBar(object):
 
         if exc_type is not None:
             # NOTE: cursor 1up
-            console.file.write("\x1b[1A")
+            if exc_type is KeyboardInterrupt:
+                console.file.write("\x1b[1A")
 
             if self.bar_column is not None:
                 self.bar_column.complete_style = "warning"
@@ -419,4 +420,4 @@ class LoadingBar(object):
             self.__refresh_stats()
 
     def print(self, *msg):
-        console.pring(message_flatmap(*msg))
+        console.print(message_flatmap(*msg))

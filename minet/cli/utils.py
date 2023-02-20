@@ -266,6 +266,22 @@ def with_fatal_errors(mapping_or_hook):
     return decorate
 
 
+def with_loading_bar(**loading_bar_kwargs):
+    def decorate(action):
+        @wraps(action)
+        def wrapper(cli_args, *args, **kwargs):
+            with LoadingBar(**loading_bar_kwargs) as loading_bar:
+                additional_kwargs = {
+                    "loading_bar": loading_bar,
+                }
+
+                return action(cli_args, *args, **additional_kwargs, **kwargs)
+
+        return wrapper
+
+    return decorate
+
+
 def with_enricher_and_loading_bar(
     headers,
     enricher_type=None,

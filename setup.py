@@ -30,7 +30,7 @@ setup(
         "casanova>=1.1.3,<2",
         "charset-normalizer>=3,<4",
         "dateparser>=1.1.1",
-        "ebbe>=1.11.0,<2",
+        "ebbe>=1.11.1,<2",
         "json5>=0.8.5",
         "keyring<19.3",
         "lxml>=4.3.0",

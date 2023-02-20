@@ -330,7 +330,7 @@ class OutputOpener(object):
     def open(self, cli_args, resume=False):
         if self.path == "-":
             if resume:
-                raise RuntimeError
+                raise NotResumableError
 
             return acquire_cross_platform_stdout()
 
@@ -462,10 +462,6 @@ class ConfigAction(Action):
 def resolve_arg_dependencies(cli_args, config):
     to_close = []
 
-    # Validation
-    if getattr(cli_args, "resume", False) and cli_args.output.path is None:
-        raise NotResumableError
-
     # Unwrapping values
     # NOTE: I copy the dict from vars because we are going to add new
     # attributes from within the loop
@@ -508,6 +504,7 @@ class VariadicInputDefinition(TypedDict):
 
 def resolve_typical_arguments(
     args,
+    no_output=False,
     resumer=None,
     resumer_kwargs=None,
     select: bool = False,
@@ -608,7 +605,8 @@ def resolve_typical_arguments(
         if resumer_kwargs is not None:
             output_argument["resumer_kwargs"] = resumer_kwargs
 
-    args.append(output_argument)
+    if not no_output:
+        args.append(output_argument)
 
     return args, epilog_addendum
 
@@ -626,6 +624,7 @@ def command(
     resolve=None,
     resumer=None,
     resumer_kwargs=None,
+    no_output=False,
     select=False,
     total=False,
     variadic_input: Optional[VariadicInputDefinition] = None,
@@ -665,6 +664,7 @@ def command(
     elif arguments is not None:
         data["arguments"], epilog_addendum = resolve_typical_arguments(
             arguments,
+            no_output=no_output,
             resumer=resumer,
             resumer_kwargs=resumer_kwargs,
             select=select,
@@ -696,6 +696,7 @@ def subcommand(
     resolve=None,
     resumer=None,
     resumer_kwargs=None,
+    no_output=False,
     select=False,
     total=False,
     variadic_input: Optional[VariadicInputDefinition] = None,
@@ -711,6 +712,7 @@ def subcommand(
 
     data["arguments"], epilog_addendum = resolve_typical_arguments(
         arguments,
+        no_output=no_output,
         resumer=resumer,
         resumer_kwargs=resumer_kwargs,
         select=select,

@@ -17,6 +17,7 @@ CRAWL_COMMAND = command(
         . Running a crawler definition:
             $ minet crawl crawler.yml -O crawl-data
     """,
+    no_output=True,
     arguments=[
         {"name": "crawler", "help": "Path to the crawler definition file."},
         {
