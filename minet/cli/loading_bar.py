@@ -23,7 +23,7 @@ from rich.progress import (
 )
 from rich._spinners import SPINNERS
 from about_time import HumanDuration, HumanThroughput
-from ebbe import format_int, with_is_last
+from ebbe import format_int
 
 from minet.utils import message_flatmap
 from minet.cli.console import console
@@ -111,11 +111,11 @@ class StatsColumn(ProgressColumn):
         if stats is None:
             return None
 
-        parts = []
-
         total = 0
 
-        for is_last, item in with_is_last(stats.values()):
+        item_parts = []
+
+        for item in stats.values():
             txt = Text()
 
             count = item["count"]
@@ -129,15 +129,14 @@ class StatsColumn(ProgressColumn):
             txt.append(" ")
             txt.append(format_int(count))
 
-            if not is_last:
-                txt.append(", ")
+            item_parts.append(txt)
 
-            parts.append(txt)
+        parts = []
 
         if task.description and total:
-            parts.insert(0, Text("- "))
+            parts.append(Text("- "))
 
-        return Text.assemble(*parts)
+        return Text.assemble(*parts, *Text(", ").join(item_parts))
 
 
 class StatsItem(TypedDict):
@@ -160,6 +159,7 @@ class LoadingBar(object):
         self.title = title
         self.unit = unit
         self.total = total
+        self.sub_total = 0
 
         self.bar_column = None
         self.spinner_column = None
@@ -182,7 +182,7 @@ class LoadingBar(object):
                     "count": item.get("count", 0),
                 }
 
-        if show_label or stats is not None:
+        if show_label:
             upper_line_columns = []
 
             if show_label:
@@ -228,8 +228,7 @@ class LoadingBar(object):
             columns = [
                 TextColumn("[progress.description]{task.description}"),
                 self.spinner_column,
-                CompletionColumn(unit=self.unit),
-                TaskProgressColumn("[progress.percentage][{task.percentage:>3.0f}%]"),
+                CompletionColumn(),
                 TimeElapsedColumn(),
                 ThroughputColumn(),
             ]
@@ -244,12 +243,17 @@ class LoadingBar(object):
         )
 
         if nested:
-            self.sub_progress = Progress(
+            sub_columns = [
                 SpinnerColumn("dots", style="", finished_text="·"),
                 TextColumn("{task.description}"),
-            )
+            ]
+
+            if stats is not None:
+                sub_columns.append(StatsColumn())
+
+            self.sub_progress = Progress(*sub_columns)
             self.sub_task = self.sub_progress.add_task(
-                description="Sub task", total=None
+                description="Sub task", total=None, stats=self.task_stats
             )
             self.table.add_row(self.sub_progress)
 
@@ -304,7 +308,10 @@ class LoadingBar(object):
             for field, count in fields.items():
                 self.task_stats[field]["count"] += count
 
-            self.upper_line.update(self.upper_line_task_id, stats=self.task_stats)
+            if self.upper_line is not None:
+                self.upper_line.update(self.upper_line_task_id, stats=self.task_stats)
+            elif self.sub_progress is not None:
+                self.sub_progress.update(self.sub_task, stats=self.task_stats)
 
     def print(self, *msg):
         console.pring(message_flatmap(*msg))
