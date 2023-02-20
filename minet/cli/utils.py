@@ -274,6 +274,7 @@ def with_enricher_and_loading_bar(
     unit=None,
     sub_unit=None,
     stats=None,
+    stats_sort_key=None,
     nested=False,
     multiplex=None,
     show_label=False,
@@ -332,6 +333,7 @@ def with_enricher_and_loading_bar(
                 sub_unit=sub_unit,
                 nested=nested,
                 stats=stats,
+                stats_sort_key=stats_sort_key,
                 show_label=show_label,
                 completed=completed,
             ) as loading_bar:

@@ -113,6 +113,10 @@ class ThroughputColumn(ProgressColumn):
 
 
 class StatsColumn(ProgressColumn):
+    def __init__(self, table_column=None, sort_key=None):
+        super().__init__(table_column=table_column)
+        self.sort_key = sort_key
+
     def render(self, task: Task) -> Optional[Text]:
         stats = task.fields.get("stats")
 
@@ -123,7 +127,12 @@ class StatsColumn(ProgressColumn):
 
         item_parts = []
 
-        for item in stats.values():
+        values = stats.values()
+
+        if self.sort_key is not None:
+            values = sorted(values, key=self.sort_key)
+
+        for item in values:
             txt = Text()
 
             count = item["count"]
@@ -176,6 +185,7 @@ class LoadingBar(object):
         show_label: bool = False,
         label_format: str = "{task.description}",
         stats: Optional[Iterable[StatsItem]] = None,
+        stats_sort_key=None,
         nested: bool = False,
         sub_title: Optional[str] = None,
         sub_unit: Optional[str] = None,
@@ -253,7 +263,10 @@ class LoadingBar(object):
         self.table.add_row(self.progress)
 
         self.task_id = self.progress.add_task(
-            description=title or "", total=self.total, unit=unit, completed=completed or 0
+            description=title or "",
+            total=self.total,
+            unit=unit,
+            completed=completed or 0,
         )
 
         if nested:
@@ -289,7 +302,7 @@ class LoadingBar(object):
                 if count:
                     self.stats_are_shown = True
 
-        self.stats_progress = Progress(StatsColumn())
+        self.stats_progress = Progress(StatsColumn(sort_key=stats_sort_key))
         self.stats_task_id = self.stats_progress.add_task("", stats=self.stats)
 
         if self.stats_are_shown:

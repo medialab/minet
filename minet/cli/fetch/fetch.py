@@ -45,6 +45,15 @@ def get_style_for_status(status):
     return "warning"
 
 
+def loading_bar_stats_sort_key(item):
+    name = item["name"]
+
+    if isinstance(name, int):
+        return "aaa" + str(name)
+
+    return name
+
+
 def get_headers(cli_args):
     if cli_args.action == "resolve":
         headers = RESOLVE_ADDITIONAL_HEADERS
@@ -68,6 +77,7 @@ def get_multiplex(cli_args):
     enricher_type="threadsafe",
     title="Fetching",
     unit="urls",
+    stats_sort_key=loading_bar_stats_sort_key,
 )
 def action(cli_args, enricher, loading_bar, resolve=False):
 
