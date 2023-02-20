@@ -11,7 +11,6 @@ from datetime import datetime
 from io import StringIO
 from collections import Counter
 from ural import is_shortened_url
-from ebbe.decorators import with_defer
 
 from minet.fetch import multithreaded_fetch, multithreaded_resolve
 from minet.fs import FilenameBuilder, ThreadSafeFilesWriter
@@ -19,7 +18,7 @@ from minet.web import grab_cookies, parse_http_header
 from minet.exceptions import InvalidURLError, FilenameFormattingError
 from minet.cli.exceptions import InvalidArgumentsError, FatalError
 from minet.cli.reporters import report_error, report_filename_formatting_error
-from minet.cli.utils import LoadingBar
+from minet.cli.loading_bar import LoadingBar
 
 
 FETCH_ADDITIONAL_HEADERS = [
@@ -35,8 +34,7 @@ FETCH_ADDITIONAL_HEADERS = [
 RESOLVE_ADDITIONAL_HEADERS = ["resolved", "status", "error", "redirects", "chain"]
 
 
-@with_defer()
-def action(cli_args, resolve=False, defer=None):
+def action(cli_args, resolve=False):
 
     # If we are hitting a single url we enable contents_in_report by default
     if (
@@ -104,7 +102,7 @@ def action(cli_args, resolve=False, defer=None):
         cli_args.input,
         cli_args.output,
         add=additional_headers,
-        keep=cli_args.select,
+        select=cli_args.select,
         total=cli_args.total,
         multiplex=multiplex,
     )
@@ -135,9 +133,6 @@ def action(cli_args, resolve=False, defer=None):
     loading_bar = LoadingBar(
         desc="Fetching pages", total=enricher.total, unit="url", initial=skipped_rows
     )
-    defer(
-        loading_bar.close
-    )  # NOTE: it could be dangerous with multithreaded execution, not to close it ourselves
 
     def update_loading_bar(result):
         nonlocal errors

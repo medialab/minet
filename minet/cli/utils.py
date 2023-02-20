@@ -267,7 +267,9 @@ def with_fatal_errors(mapping_or_hook):
 
 def with_enricher_and_loading_bar(
     headers,
-    title,
+    enricher_type=None,
+    #
+    title=None,
     unit=None,
     sub_unit=None,
     stats=None,
@@ -278,7 +280,12 @@ def with_enricher_and_loading_bar(
     def decorate(action):
         @wraps(action)
         def wrapper(cli_args, *args, **kwargs):
-            enricher = casanova.enricher(
+            enricher_fn = casanova.enricher
+
+            if enricher_type == 'threadsafe':
+                enricher_fn = casanova.threadsafe_enricher
+
+            enricher = enricher_fn(
                 cli_args.input,
                 cli_args.output,
                 add=headers(cli_args) if callable(headers) else headers,
