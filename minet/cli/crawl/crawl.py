@@ -190,9 +190,6 @@ def action(cli_args, defer, loading_bar):
     )
     defer(reporter_pool.close)
 
-    # Starting crawler
-    crawler.start()
-
     # Running crawler
     for result in crawler:
         with loading_bar.tick():
