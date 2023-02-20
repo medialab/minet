@@ -4,14 +4,17 @@
 #
 # Logic of the extract action.
 #
-import casanova
 from os.path import isdir
 from trafilatura.core import bare_extraction
 
 from minet.multiprocessing import LazyPool
 from minet.encodings import is_supported_encoding
 from minet.fs import read_potentially_gzipped_path
-from minet.cli.utils import create_report_iterator, dummy_csv_file_from_glob, LoadingBar
+from minet.cli.utils import (
+    create_report_iterator,
+    dummy_csv_file_from_glob,
+    with_enricher_and_loading_bar,
+)
 from minet.cli.reporters import report_error
 from minet.exceptions import TrafilaturaError, UnknownEncodingError
 from minet.cli.constants import DEFAULT_CONTENT_FOLDER
@@ -106,32 +109,26 @@ def worker(payload):
     return None, row, format_trafilatura_result(result)
 
 
-def action(cli_args):
+def get_input(cli_args):
+    if cli_args.glob is not None:
+        return dummy_csv_file_from_glob(cli_args.glob, cli_args.input_dir)
+
+    return cli_args.report
+
+
+@with_enricher_and_loading_bar(
+    headers=OUTPUT_ADDITIONAL_HEADERS,
+    get_input=get_input,
+    title="Extracting content",
+    unit="docs",
+)
+def action(cli_args, enricher, loading_bar):
     if cli_args.glob is None and cli_args.input_dir is None:
         cli_args.input_dir = DEFAULT_CONTENT_FOLDER
 
-    input_data = cli_args.report
-
-    if cli_args.glob is not None:
-        input_data = dummy_csv_file_from_glob(cli_args.glob, cli_args.input_dir)
-
-    enricher = casanova.enricher(
-        input_data,
-        cli_args.output,
-        keep=cli_args.select,
-        add=OUTPUT_ADDITIONAL_HEADERS,
-        total=cli_args.total,
-    )
-
-    loading_bar = LoadingBar(
-        desc="Extracting content", total=enricher.total, unit="doc"
-    )
-
     def on_irrelevant_row(reason, row, i):
-        loading_bar.update()
-        loading_bar.print(
-            "Row n°{n} could not be processed: {reason}".format(n=i + 1, reason=reason)
-        )
+        loading_bar.advance()
+        loading_bar.inc_stat(reason, style="error")
         enricher.writerow(row, format_error(reason))
 
     if (
@@ -152,17 +149,20 @@ def action(cli_args):
 
     pool = LazyPool(cli_args.processes)
 
-    loading_bar.update_stats(p=pool.processes)
+    loading_bar.set_title("Extracting content (p=%i)" % pool.processes)
 
     with pool:
         for error, row, result in pool.imap_unordered(worker, files):
-            loading_bar.update()
+            loading_bar.advance()
 
             if error is not None:
-                enricher.writerow(row, format_error(report_error(error)))
+                error_code = report_error(error)
+                loading_bar.inc_stat(error_code, style="error")
+                enricher.writerow(row, format_error(error_code))
                 continue
 
             if result is None:
+                loading_bar.inc_stat("no-result", style="warning")
                 enricher.writerow(row, format_error("no-result"))
                 continue
 

@@ -150,7 +150,7 @@ def create_report_iterator(cli_args, reader, worker_args=None, on_irrelevant_row
     mimetype_pos = reader.headers.get("mimetype")
     raw_content_pos = reader.headers.get("raw_contents")
 
-    indexed_headers = reader.headers.as_dict()
+    indexed_headers = {n: i for i, n in enumerate(reader.headers)}
 
     def generator():
         for i, row in enumerate(reader):
@@ -270,7 +270,9 @@ def with_loading_bar(**loading_bar_kwargs):
     def decorate(action):
         @wraps(action)
         def wrapper(cli_args, *args, **kwargs):
-            with LoadingBar(**loading_bar_kwargs) as loading_bar:
+            total = getattr(cli_args, "total", None)
+
+            with LoadingBar(total=total, **loading_bar_kwargs) as loading_bar:
                 additional_kwargs = {
                     "loading_bar": loading_bar,
                 }
@@ -285,6 +287,7 @@ def with_loading_bar(**loading_bar_kwargs):
 def with_enricher_and_loading_bar(
     headers,
     enricher_type=None,
+    get_input=None,
     #
     title=None,
     unit=None,
@@ -334,7 +337,7 @@ def with_enricher_and_loading_bar(
 
             with enricher_context:
                 enricher = enricher_fn(
-                    cli_args.input,
+                    cli_args.input if not callable(get_input) else get_input(cli_args),
                     cli_args.output,
                     add=headers(cli_args) if callable(headers) else headers,
                     select=cli_args.select,

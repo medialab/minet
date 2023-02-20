@@ -380,9 +380,27 @@ class LoadingBar(object):
             self.stats_are_shown = True
             self.table.add_row(self.stats_progress)
 
+    def set_title(self, title: str):
+        self.progress.update(self.task_id, description=title)
+
     def set_label(self, label: str):
         assert self.label_progress is not None
         self.label_progress.update(self.label_progress_task_id, description=label)
+
+    # TODO: factorize
+    def set_stat(self, name: str, count: int, style: str = None):
+        assert self.stats is not None
+
+        if name not in self.stats:
+            self.stats[name] = {"name": name, "count": count, "style": style or ""}
+        else:
+            item = self.stats[name]
+            item["count"] = count
+
+            if style is not None:
+                item["style"] = style
+
+        self.__refresh_stats()
 
     def inc_stat(self, name: str, style: str = None, count=1):
         assert self.stats is not None

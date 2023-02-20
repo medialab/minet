@@ -32,8 +32,7 @@ from minet.cli.utils import (
     print_err,
     dummy_csv_file_from_glob,
     create_report_iterator,
-    LoadingBar,
-    colored,
+    with_loading_bar,
 )
 from minet.cli.exceptions import FatalError
 from minet.cli.constants import DEFAULT_CONTENT_FOLDER
@@ -87,7 +86,8 @@ def worker(payload):
     return ScrapeWorkerResult(None, items)
 
 
-def action(cli_args):
+@with_loading_bar(title="Scraping", unit="pages")
+def action(cli_args, loading_bar):
     if cli_args.glob is None and cli_args.input_dir is None:
         cli_args.input_dir = DEFAULT_CONTENT_FOLDER
 
@@ -114,8 +114,8 @@ def action(cli_args):
     except CSSSelectorTooComplex:
         raise FatalError(
             [
-                "Your strainer's CSS selector %s is too complex."
-                % colored(cli_args.strain, "blue"),
+                "Your strainer's CSS selector [info]%s[/info] is too complex."
+                % cli_args.strain,
                 "You cannot use relations to create a strainer.",
                 "Try to simplify the selector you passed to --strain.",
             ]
@@ -133,15 +133,11 @@ def action(cli_args):
             ]
         )
 
-    loading_bar = LoadingBar(desc="Scraping pages", total=cli_args.total, unit="page")
-
     worker_args = (cli_args.format, cli_args.separator)
 
     def on_irrelevant_row(reason, row, i):
-        loading_bar.print(
-            "Row n°{n} could not be processed: {reason}".format(n=i + 1, reason=reason)
-        )
-        loading_bar.update()
+        loading_bar.inc_stat(reason, style="error")
+        loading_bar.advance()
 
     input_data = cli_args.report
 
@@ -178,11 +174,11 @@ def action(cli_args):
         initargs=(scraper.definition, cli_args.strain),
     )
 
-    loading_bar.update_stats(p=pool.processes)
+    loading_bar.set_title("Scraping (p=%i)" % pool.processes)
 
     with pool:
         for error, items in pool.imap_unordered(worker, files):
-            loading_bar.update()
+            loading_bar.advance()
 
             if error is not None:
                 if isinstance(
@@ -192,7 +188,7 @@ def action(cli_args):
                     loading_bar.print(report_scraper_evaluation_error(error), end="")
                 else:
                     loading_bar.print(error, repr(error))
-                loading_bar.inc("errors")
+                loading_bar.inc("errors", style="error")
                 continue
 
             for item in items:
