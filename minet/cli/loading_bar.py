@@ -88,8 +88,8 @@ class ThroughputColumn(ProgressColumn):
     def render(self, task: Task) -> Optional[Text]:
         elapsed = task.finished_time if task.finished else task.elapsed
 
-        if not elapsed:
-            return None
+        if not elapsed or not task.completed:
+            return Text("(?/s)")
 
         throughput = HumanThroughput(task.completed / elapsed, "s")
 
@@ -339,7 +339,7 @@ class LoadingBar(object):
         self.sub_progress.update(self.sub_task, advance=count, sub_total=self.sub_total)
 
     def reset_sub(self):
-        self.sub_progress.update(self.sub_task, completed=0)
+        self.sub_progress.reset(self.sub_task)
 
     def update(self, count=None, sub_title=None, sub_count=None, label=None, **fields):
         if count is not None:
