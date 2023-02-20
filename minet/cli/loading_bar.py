@@ -81,12 +81,7 @@ class CompletionColumn(ProgressColumn):
         unit = task.fields.get("unit")
         unit_text = f" {unit}" if unit is not None else ""
 
-        sub_total = task.fields.get("sub_total")
-        sub_total_text = (
-            f", total: {format_int(sub_total)}" if sub_total is not None else ""
-        )
-
-        return Text(f"{completed}/{total}{unit_text}{sub_total_text}")
+        return Text(f"{completed}/{total}{unit_text}")
 
 
 class ThroughputColumn(ProgressColumn):
@@ -142,6 +137,19 @@ class StatsColumn(ProgressColumn):
             parts.append(Text("- "))
 
         return Text.assemble(*parts, *Text(", ").join(item_parts))
+
+
+class NestedTotalColumn(ProgressColumn):
+    def render(self, task: Task) -> Optional[Text]:
+        sub_total = task.fields.get("sub_total")
+
+        if sub_total is None:
+            return None
+
+        unit = task.fields.get("unit")
+        unit_text = f" {unit}" if unit is not None else ""
+
+        return Text(f", total: {format_int(sub_total)}{unit_text}")
 
 
 class StatsItem(TypedDict):
@@ -255,6 +263,7 @@ class LoadingBar(object):
                 CompletionColumn(),
                 TimeElapsedColumn(),
                 ThroughputColumn(),
+                NestedTotalColumn(),
             ]
 
             if stats is not None:

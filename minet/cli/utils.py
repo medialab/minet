@@ -269,6 +269,9 @@ def with_enricher_and_loading_bar(
     headers,
     title,
     unit=None,
+    sub_unit=None,
+    stats=None,
+    nested=False,
     multiplex=None,
 ):
     def decorate(action):
@@ -297,6 +300,9 @@ def with_enricher_and_loading_bar(
                 title=title,
                 total=enricher.total,
                 unit=unit(cli_args) if callable(unit) else unit,
+                sub_unit=sub_unit,
+                nested=nested,
+                stats=stats,
             ) as loading_bar:
 
                 additional_kwargs = {

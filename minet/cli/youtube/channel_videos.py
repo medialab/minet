@@ -14,18 +14,15 @@ from minet.youtube.constants import YOUTUBE_PLAYLIST_VIDEO_SNIPPET_CSV_HEADERS
     headers=YOUTUBE_PLAYLIST_VIDEO_SNIPPET_CSV_HEADERS,
     title="Retrieving channel videos",
     unit="channels",
-    dual_line=True,
-    initial_stats={"videos": 0},
-    stats_colors={"videos": "cyan"},
+    sub_unit="videos",
+    nested=True,
 )
 def action(cli_args, enricher, loading_bar):
     client = YouTubeAPIClient(cli_args.key)
 
     for row, channel_id in enricher.cells(cli_args.column, with_rows=True):
-        loading_bar.set_text("Channel: %s" % channel_id)
+        with loading_bar.nested_task("[info]%s" % channel_id):
 
-        for video in client.channel_videos(channel_id):
-            loading_bar.inc_stat("videos")
-            enricher.writerow(row, video.as_csv_row())
-
-        loading_bar.update()
+            for video in client.channel_videos(channel_id):
+                enricher.writerow(row, video.as_csv_row())
+                loading_bar.nested_advance()
