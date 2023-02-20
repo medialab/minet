@@ -22,18 +22,20 @@ from minet.facebook.exceptions import FacebookInvalidTargetError
         {"name": "calls", "style": "info"},
         {"name": "q", "style": "info"},
         {"name": "replies", "style": "info"},
-        {"name": "invalid targets", "style": "error"},
     ],
 )
 def action(cli_args, enricher, loading_bar):
     scraper = FacebookMobileScraper(cli_args.cookie, throttle=cli_args.throttle)
 
-    for row, url in enricher.cells(cli_args.column, with_rows=True):
+    for i, (row, url) in enumerate(enricher.cells(cli_args.column, with_rows=True), 1):
         with loading_bar.nested_task(url):
             try:
                 batches = scraper.comments(url, per_call=True, detailed=True)
             except FacebookInvalidTargetError:
-                loading_bar.inc_stat("invalid targets")
+                loading_bar.print(
+                    "Given url (line %i) is probably not a Facebook group post: %s"
+                    % (i, url)
+                )
                 continue
 
             for _, batch in batches:

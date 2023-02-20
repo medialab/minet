@@ -7,7 +7,6 @@
 import re
 import sys
 import soupsieve
-from bs4 import BeautifulSoup
 from collections import deque
 from urllib.parse import urljoin
 from ural import force_protocol
@@ -224,7 +223,7 @@ def scrape_comments(html, direction=None, in_reply_to=None):
 
 
 def scrape_posts(html):
-    soup = BeautifulSoup(html, "lxml")
+    soup = BeautifulSoupWithoutXHTMLWarnings(html, "lxml")
 
     next_link = soup.select_one('a[href*="?bacr="], a[href*="&bacr="]')
 
@@ -514,7 +513,7 @@ def scrape_photo(soup):
 
 
 def scrape_post(html):
-    soup = BeautifulSoup(html, "lxml")
+    soup = BeautifulSoupWithoutXHTMLWarnings(html, "lxml")
 
     # with open("./dump.html", "w") as f:
     #     f.write(html)
@@ -756,7 +755,7 @@ class FacebookMobileScraper(object):
         url = convert_url_to_mobile(url)
 
         html = self.request_page(url)
-        soup = BeautifulSoup(html, "lxml")
+        soup = BeautifulSoupWithoutXHTMLWarnings(html, "lxml")
 
         user_item = soup.select_one("[data-ft] h3 a[href]")
 
