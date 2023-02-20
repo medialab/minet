@@ -7,7 +7,7 @@
 import casanova
 from urllib.parse import unquote
 
-from minet.cli.utils import LoadingBar
+from minet.cli.loading_bar import LoadingBar
 from minet.cli.exceptions import InvalidArgumentsError
 from minet.cli.hyphe.utils import with_hyphe_fatal_errors
 from minet.hyphe import HypheAPIClient
@@ -62,55 +62,50 @@ def action(cli_args):
 
     corpus.ensure_is_started()
 
-    loading_bar = LoadingBar(
-        desc="Declaring web entities",
-        unit="webentity",
-        unit_plural="webentities",
-        total=reader.total,
-    )
+    with LoadingBar(
+        title="Declaring web entities", unit="webentities", total=reader.total
+    ) as loading_bar:
+        for row in reader:
+            with loading_bar.tick():
+                startpages_cell = row[startpages_pos]
 
-    for row in reader:
-        loading_bar.update()
+                name = row[name_pos]
 
-        startpages_cell = row[startpages_pos]
+                # TODO: bug on hyphe's side
+                if "h:localhost|" in row[prefixes_pos]:
+                    loading_bar.print("Dropping %s because of localhost issue" % name)
+                    continue
 
-        name = row[name_pos]
+                homepage = row[homepage_pos]
+                prefixes = row[prefixes_pos].split(" ")
+                startpages = startpages_cell.split(" ") if startpages_cell else []
+                startpages = list(set(startpages))  # TODO: dedupe because of hyphe issues
+                tags = extract_tags(row, tag_pos_list)
 
-        # TODO: bug on hyphe's side
-        if "h:localhost|" in row[prefixes_pos]:
-            loading_bar.print("Dropping %s because of localhost issue" % name)
-            continue
+                # 1. Declaring the entities
+                result = corpus.call(
+                    "store.declare_webentity_by_lrus",
+                    list_lrus=prefixes,
+                    name=name,
+                    status=row[status_pos],
+                    lruVariations=False,
+                    startpages=startpages,
+                    tags=tags,
+                )
 
-        homepage = row[homepage_pos]
-        prefixes = row[prefixes_pos].split(" ")
-        startpages = startpages_cell.split(" ") if startpages_cell else []
-        startpages = list(set(startpages))  # TODO: dedupe because of hyphe issues
-        tags = extract_tags(row, tag_pos_list)
+                webentity_id = result["result"]["id"]
 
-        # 1. Declaring the entities
-        result = corpus.call(
-            "store.declare_webentity_by_lrus",
-            list_lrus=prefixes,
-            name=name,
-            status=row[status_pos],
-            lruVariations=False,
-            startpages=startpages,
-            tags=tags,
-        )
-
-        webentity_id = result["result"]["id"]
-
-        # 2. Setting the homepage
-        try:
-            corpus.call(
-                "store.set_webentity_homepage",
-                webentity_id=webentity_id,
-                homepage=unquote(
-                    homepage
-                ),  # TODO: drop unquote, linked to hyphe issue #447
-            )
-        except HypheRequestFailError as e:
-            if "belong" in str(e):
-                loading_bar.print("Homepage error with %s %s" % (name, homepage))
-            else:
-                raise
+                # 2. Setting the homepage
+                try:
+                    corpus.call(
+                        "store.set_webentity_homepage",
+                        webentity_id=webentity_id,
+                        homepage=unquote(
+                            homepage
+                        ),  # TODO: drop unquote, linked to hyphe issue #447
+                    )
+                except HypheRequestFailError as e:
+                    if "belong" in str(e):
+                        loading_bar.print("Homepage error with %s %s" % (name, homepage))
+                    else:
+                        raise
