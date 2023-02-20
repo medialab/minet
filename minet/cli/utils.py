@@ -286,16 +286,6 @@ def with_enricher_and_loading_bar(
                 multiplex=multiplex(cli_args) if callable(multiplex) else multiplex,
             )
 
-            # NOTE: if we know that stdout is piped somewhere, we don't
-            # bother to wrap it either
-            # if (
-            #     hasattr(cli_args.output, "fileno")
-            #     and callable(cli_args.output.fileno)
-            #     and cli_args.output.fileno() == sys.__stdout__.fileno()
-            #     and sys.__stdout__.isatty()
-            # ):
-            #     enricher.writer = csv.writer(sys.stdout)
-
             with LoadingBar(
                 title=title,
                 total=enricher.total,

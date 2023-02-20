@@ -314,6 +314,12 @@ class LoadingBar(object):
 
         self.live.stop()
 
+    def __refresh_stats(self):
+        if self.upper_line is not None:
+            self.upper_line.update(self.upper_line_task_id, stats=self.task_stats)
+        elif self.sub_progress is not None:
+            self.sub_progress.update(self.sub_task, stats=self.task_stats)
+
     @contextmanager
     def tick(self):
         try:
@@ -349,6 +355,13 @@ class LoadingBar(object):
     def reset_sub(self):
         self.sub_progress.reset(self.sub_task)
 
+    def inc_stat(self, name):
+        assert self.task_stats is not None
+
+        self.task_stats[name]["count"] += 1
+
+        self.__refresh_stats()
+
     def update(self, count=None, sub_title=None, sub_count=None, label=None, **fields):
         if count is not None:
             self.advance(count)
@@ -369,10 +382,7 @@ class LoadingBar(object):
             for field, count in fields.items():
                 self.task_stats[field]["count"] += count
 
-            if self.upper_line is not None:
-                self.upper_line.update(self.upper_line_task_id, stats=self.task_stats)
-            elif self.sub_progress is not None:
-                self.sub_progress.update(self.sub_task, stats=self.task_stats)
+            self.__refresh_stats()
 
     def print(self, *msg):
         console.pring(message_flatmap(*msg))
