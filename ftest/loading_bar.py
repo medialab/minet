@@ -21,6 +21,7 @@ try:
             {"name": "warnings", "style": "warning"},
         ],
         nested=NESTED,
+        sub_title_style="",
     ) as loading_bar:
 
         if not NESTED:

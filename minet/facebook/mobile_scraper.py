@@ -30,6 +30,7 @@ from minet.utils import (
     clean_human_readable_numbers,
 )
 from minet.web import create_pool, request, create_request_retryer, retrying_method
+from minet.scrape.utils import BeautifulSoupWithoutXHTMLWarnings
 from minet.scrape.std import get_display_text
 from minet.facebook.utils import grab_facebook_cookie
 from minet.facebook.formatters import (
@@ -76,7 +77,7 @@ def resolve_relative_url(url):
 
 
 def scrape_comments(html, direction=None, in_reply_to=None):
-    soup = BeautifulSoup(html, "lxml")
+    soup = BeautifulSoupWithoutXHTMLWarnings(html, "lxml")
 
     data = {
         "direction": direction,

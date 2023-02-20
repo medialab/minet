@@ -166,6 +166,7 @@ class LoadingBar(object):
         stats_sort_key=None,
         nested: bool = False,
         sub_title: Optional[str] = None,
+        sub_title_style: str = "info",
         sub_unit: Optional[str] = None,
         transient: bool = False,
     ):
@@ -230,7 +231,9 @@ class LoadingBar(object):
             sub_columns = [
                 SpinnerColumn("dots", style="", finished_text="·"),
                 TextColumn(
-                    "{task.description}", table_column=Column(width=50, min_width=0)
+                    "{task.description}",
+                    table_column=Column(width=50, min_width=0),
+                    style=sub_title_style,
                 ),
                 CompletionColumn(),
                 TimeElapsedColumn(),
@@ -396,7 +399,7 @@ class LoadingBar(object):
             assert self.stats is not None
 
             for field, count in fields.items():
-                self.stats[field]["count"] += count
+                self.stats[field]["count"] = count
 
             self.__refresh_stats()
 

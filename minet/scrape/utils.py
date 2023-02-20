@@ -6,6 +6,8 @@
 #
 import json
 import yaml
+import warnings
+from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
 from os import PathLike
 from functools import partial
 from ebbe.decorators import with_defer
@@ -51,3 +53,9 @@ def get_aliases(aliases, target, with_key=False):
 
 get_sel = partial(get_aliases, SELECT_ALIASES)
 get_iterator = partial(get_aliases, ITERATOR_ALIASES)
+
+
+def BeautifulSoupWithoutXHTMLWarnings(html, engine):
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=XMLParsedAsHTMLWarning)
+        return BeautifulSoup(html, engine)

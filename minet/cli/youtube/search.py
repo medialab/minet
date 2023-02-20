@@ -22,7 +22,7 @@ def action(cli_args, enricher, loading_bar):
     client = YouTubeAPIClient(cli_args.key)
 
     for row, query in enricher.cells(cli_args.column, with_rows=True):
-        with loading_bar.nested_task("[info]%s" % query):
+        with loading_bar.nested_task(query):
             searcher = client.search(query, order=cli_args.order)
 
             if cli_args.limit:
