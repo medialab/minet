@@ -273,6 +273,7 @@ def with_enricher_and_loading_bar(
     stats=None,
     nested=False,
     multiplex=None,
+    show_label=False,
 ):
     def decorate(action):
         @wraps(action)
@@ -293,6 +294,7 @@ def with_enricher_and_loading_bar(
                 sub_unit=sub_unit,
                 nested=nested,
                 stats=stats,
+                show_label=show_label,
             ) as loading_bar:
 
                 additional_kwargs = {

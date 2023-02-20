@@ -12,19 +12,22 @@ from minet.youtube.constants import YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS
 
 
 @with_enricher_and_loading_bar(
-    headers=YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS, desc="Searching videos", unit="video"
+    headers=YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS,
+    title="Searching videos",
+    unit="queries",
+    sub_unit="videos",
+    nested=True,
 )
 def action(cli_args, enricher, loading_bar):
     client = YouTubeAPIClient(cli_args.key)
 
     for row, query in enricher.cells(cli_args.column, with_rows=True):
-        loading_bar.print('Searching for "%s"' % query)
+        with loading_bar.nested_task("[info]%s" % query):
+            searcher = client.search(query, order=cli_args.order)
 
-        searcher = client.search(query, order=cli_args.order)
+            if cli_args.limit:
+                searcher = islice(searcher, cli_args.limit)
 
-        if cli_args.limit:
-            searcher = islice(searcher, cli_args.limit)
-
-        for video in searcher:
-            loading_bar.update()
-            enricher.writerow(row, video.as_csv_row())
+            for video in searcher:
+                loading_bar.nested_advance()
+                enricher.writerow(row, video.as_csv_row())

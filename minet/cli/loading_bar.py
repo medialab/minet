@@ -325,11 +325,14 @@ class LoadingBar(object):
         self.live.stop()
 
     @contextmanager
-    def tick(self):
+    def tick(self, label=None):
         try:
             yield
         finally:
             self.advance()
+
+            if label is not None:
+                self.set_label(label)
 
     @contextmanager
     def nested_tick(self):
@@ -359,7 +362,6 @@ class LoadingBar(object):
     def reset_sub(self):
         self.sub_progress.reset(self.sub_task)
 
-
     def __refresh_stats(self):
         self.stats_progress.update(self.stats_task_id, stats=self.stats)
 
@@ -367,10 +369,21 @@ class LoadingBar(object):
             self.stats_are_shown = True
             self.table.add_row(self.stats_progress)
 
-    def inc_stat(self, name):
+    def set_label(self, label: str):
+        assert self.label_progress is not None
+        self.label_progress.update(self.label_progress_task_id, description=label)
+
+    def inc_stat(self, name: str, style: str = None, count=1):
         assert self.stats is not None
 
-        self.stats[name]["count"] += 1
+        if name not in self.stats:
+            self.stats[name] = {"name": name, "count": count, "style": style or ""}
+        else:
+            item = self.stats[name]
+            item["count"] += count
+
+            if style is not None:
+                item["style"] = style
 
         self.__refresh_stats()
 
@@ -385,8 +398,7 @@ class LoadingBar(object):
             self.sub_progress.update(self.sub_task, description=sub_title)
 
         if label is not None:
-            assert self.label_progress is not None
-            self.label_progress.update(self.label_progress_task_id, description=label)
+            self.set_label(label)
 
         if fields:
             assert self.stats is not None
