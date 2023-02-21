@@ -4,36 +4,31 @@
 #
 # Logic of the `url-extract` action.
 #
-import casanova
 from ural import urls_from_text, urls_from_html
 from urllib.parse import urljoin
 
-from minet.cli.utils import LoadingBar
+from minet.cli.utils import with_enricher_and_loading_bar
 
 REPORT_HEADERS = ["extracted_url"]
 
 EXTRACTORS = {"html": urls_from_html, "text": urls_from_text}
 
 
-def action(cli_args):
-    enricher = casanova.enricher(
-        cli_args.input, cli_args.output, add=REPORT_HEADERS, keep=cli_args.select
-    )
-
+@with_enricher_and_loading_bar(
+    headers=REPORT_HEADERS, title="Extracting urls", unit="docs"
+)
+def action(cli_args, enricher, loading_bar):
     extract = EXTRACTORS[getattr(cli_args, "from")]
 
-    loading_bar = LoadingBar(desc="Extracting", unit="row", total=cli_args.total)
-
     for row, content in enricher.cells(cli_args.column, with_rows=True):
-        loading_bar.update()
+        with loading_bar.tick():
+            content = content.strip()
 
-        content = content.strip()
+            if not content:
+                continue
 
-        if not content:
-            continue
+            for url in extract(content):
+                if cli_args.base_url is not None:
+                    url = urljoin(cli_args.base_url, url)
 
-        for url in extract(content):
-            if cli_args.base_url is not None:
-                url = urljoin(cli_args.base_url, url)
-
-            enricher.writerow(row, [url])
+                enricher.writerow(row, [url])
