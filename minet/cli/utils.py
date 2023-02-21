@@ -335,6 +335,12 @@ def with_enricher_and_loading_bar(
             if enricher_type == "threadsafe":
                 enricher_fn = casanova.threadsafe_enricher
 
+            elif enricher_type == "batch":
+                enricher_fn = casanova.batch_enricher
+
+            elif enricher_type is not None:
+                raise TypeError("wrong enricher type")
+
             with enricher_context:
                 enricher = enricher_fn(
                     cli_args.input if not callable(get_input) else get_input(cli_args),
@@ -346,10 +352,10 @@ def with_enricher_and_loading_bar(
                 )
 
             with LoadingBar(
-                title=title,
+                title=title(cli_args) if callable(title) else title,
                 total=enricher.total,
                 unit=unit(cli_args) if callable(unit) else unit,
-                sub_unit=sub_unit,
+                sub_unit=sub_unit(cli_args) if callable(sub_unit) else sub_unit,
                 nested=nested,
                 stats=stats,
                 stats_sort_key=stats_sort_key,

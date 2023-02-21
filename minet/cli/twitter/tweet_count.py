@@ -4,12 +4,10 @@
 #
 # Logic of the `tw tweet-count` action.
 #
-import casanova
 from twitter import TwitterHTTPError
 
-from minet.cli.utils import LoadingBar
-from minet.cli.twitter.utils import validate_query_boundaries
-from minet.twitter import TwitterAPIClient
+from minet.cli.utils import with_enricher_and_loading_bar
+from minet.cli.twitter.utils import validate_query_boundaries, with_twitter_client
 
 ITEMS_PER_PAGE = 100
 
@@ -17,87 +15,68 @@ COUNT_FIELDS = ["tweet_count"]
 GRANULARIZED_COUNT_FIELDS = ["start_time", "end_time", "tweet_count"]
 
 
-def action(cli_args):
+def get_headers(cli_args):
+    return (
+        GRANULARIZED_COUNT_FIELDS if cli_args.granularity is not None else COUNT_FIELDS
+    )
+
+
+@with_enricher_and_loading_bar(
+    headers=get_headers, title="Counting tweets", unit="queries"
+)
+@with_twitter_client(api_version="2")
+def action(cli_args, client, enricher, loading_bar):
     validate_query_boundaries(cli_args)
 
-    client = TwitterAPIClient(
-        cli_args.access_token,
-        cli_args.access_token_secret,
-        cli_args.api_key,
-        cli_args.api_secret_key,
-        api_version="2",
-    )
-
-    enricher = casanova.enricher(
-        cli_args.input,
-        cli_args.output,
-        keep=cli_args.select,
-        add=GRANULARIZED_COUNT_FIELDS
-        if cli_args.granularity is not None
-        else COUNT_FIELDS,
-        total=cli_args.total,
-    )
-
-    loading_bar = LoadingBar(
-        "Counting tweets", total=enricher.total, unit="query", unit_plural="queries"
-    )
-
     for row, query in enricher.cells(cli_args.column, with_rows=True):
+        with loading_bar.step():
+            kwargs = {"query": query}
 
-        kwargs = {"query": query}
+            # Because we are greedy, we want stuff from the beginning of Twitter
+            if cli_args.academic and not cli_args.start_time:
+                kwargs["start_time"] = "2006-03-21T00:00:00Z"
 
-        loading_bar.print('Counting tweets for "%s"' % query)
+            if cli_args.start_time:
+                kwargs["start_time"] = cli_args.start_time
+            if cli_args.end_time:
+                kwargs["end_time"] = cli_args.end_time
+            if cli_args.since_id:
+                kwargs["since_id"] = cli_args.since_id
+            if cli_args.until_id:
+                kwargs["until_id"] = cli_args.until_id
 
-        # Because we are greedy, we want stuff from the beginning of Twitter
-        if cli_args.academic and not cli_args.start_time:
-            kwargs["start_time"] = "2006-03-21T00:00:00Z"
+            kwargs["granularity"] = cli_args.granularity or "day"
 
-        if cli_args.start_time:
-            kwargs["start_time"] = cli_args.start_time
-        if cli_args.end_time:
-            kwargs["end_time"] = cli_args.end_time
-        if cli_args.since_id:
-            kwargs["since_id"] = cli_args.since_id
-        if cli_args.until_id:
-            kwargs["until_id"] = cli_args.until_id
+            route = (
+                ["tweets", "counts", "all"]
+                if cli_args.academic
+                else ["tweets", "counts", "recent"]
+            )
 
-        kwargs["granularity"] = cli_args.granularity or "day"
+            total_count = 0
 
-        route = (
-            ["tweets", "counts", "all"]
-            if cli_args.academic
-            else ["tweets", "counts", "recent"]
-        )
+            while True:
+                try:
+                    result = client.call(route, **kwargs)
+                except TwitterHTTPError as e:
+                    if e.e.code == 404:
+                        enricher.writerow(row)
+                    else:
+                        raise e
 
-        total_count = 0
+                    continue
 
-        while True:
-            try:
-                result = client.call(route, **kwargs)
-                loading_bar.inc("calls")
-            except TwitterHTTPError as e:
-                loading_bar.inc("errors")
+                for count in result["data"]:
+                    total_count += count["tweet_count"]
 
-                if e.e.code == 404:
-                    enricher.writerow(row)
+                    if cli_args.granularity is not None:
+                        addendum = [count["start"], count["end"], count["tweet_count"]]
+                        enricher.writerow(row, addendum)
+
+                if "next_token" in result["meta"]:
+                    kwargs["next_token"] = result["meta"]["next_token"]
                 else:
-                    raise e
+                    break
 
-                continue
-
-            for count in result["data"]:
-                total_count += count["tweet_count"]
-
-                if cli_args.granularity is not None:
-                    addendum = [count["start"], count["end"], count["tweet_count"]]
-                    enricher.writerow(row, addendum)
-
-            if "next_token" in result["meta"]:
-                kwargs["next_token"] = result["meta"]["next_token"]
-            else:
-                break
-
-        loading_bar.update()
-
-        if cli_args.granularity is None:
-            enricher.writerow(row, [total_count])
+            if cli_args.granularity is None:
+                enricher.writerow(row, [total_count])

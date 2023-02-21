@@ -302,7 +302,7 @@ class LoadingBar(object):
         self.live.stop()
 
     @contextmanager
-    def step(self, label=None):
+    def step(self, label=None, count=1):
         try:
             if self.nested:
                 self.reset_sub()
@@ -314,16 +314,16 @@ class LoadingBar(object):
                     self.set_label(label)
             yield
         finally:
-            self.advance()
+            self.advance(count)
 
     @contextmanager
-    def nested_step(self):
+    def nested_step(self, count=1):
         assert self.nested
 
         try:
             yield
         finally:
-            self.nested_advance()
+            self.nested_advance(count)
 
     def advance(self, count=1):
         self.progress.update(self.task_id, advance=count)

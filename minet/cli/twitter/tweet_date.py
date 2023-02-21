@@ -5,48 +5,38 @@
 # Logic of the `tw tweet-date` action.
 #
 import re
-import casanova
 
-from minet.cli.utils import LoadingBar
+from minet.cli.utils import with_enricher_and_loading_bar
 from twitwi.utils import get_dates_from_id
 from ural.twitter import parse_twitter_url, TwitterTweet, TwitterUser, TwitterList
 
 ID_RE = re.compile(r"^[0-9]+$")
 
 
-def action(cli_args):
-
-    enricher = casanova.enricher(
-        cli_args.input,
-        cli_args.output,
-        keep=cli_args.select,
-        add=["timestamp_utc", "locale_time"],
-    )
-
-    loading_bar = LoadingBar("Getting tweets timestamp and date", unit="tweet")
-
+@with_enricher_and_loading_bar(
+    headers=["timestamp_utc", "locale_time"],
+    title="Inferring tweet dates",
+    unit="tweets",
+)
+def action(cli_args, enricher, loading_bar):
     for row, tweet in enricher.cells(cli_args.column, with_rows=True):
-        loading_bar.update()
+        with loading_bar.step():
+            tweet_id = tweet
 
-        tweet_id = tweet
+            tweet_parsed = parse_twitter_url(tweet)
+            if isinstance(tweet_parsed, TwitterTweet):
+                tweet_id = tweet_parsed.id
+            elif isinstance(tweet_parsed, (TwitterUser, TwitterList)) or (
+                not tweet_parsed and not ID_RE.match(tweet)
+            ):
+                loading_bar.print("%s is not a tweet id or url." % tweet)
+                continue
 
-        tweet_parsed = parse_twitter_url(tweet)
-        if isinstance(tweet_parsed, TwitterTweet):
-            tweet_id = tweet_parsed.id
-        elif isinstance(tweet_parsed, (TwitterUser, TwitterList)) or (
-            not tweet_parsed and not ID_RE.match(tweet)
-        ):
-            loading_bar.inc("errors")
-            loading_bar.print("%s is not a tweet id or url." % tweet)
-            continue
+            try:
+                result = get_dates_from_id(tweet_id, locale=cli_args.timezone)
 
-        try:
-            result = get_dates_from_id(tweet_id, locale=cli_args.timezone)
+            except (ValueError, TypeError):
+                enricher.writerow(row)
+                continue
 
-        except (ValueError, TypeError):
-            loading_bar.inc("errors")
-            enricher.writerow(row)
-
-            continue
-
-        enricher.writerow(row, list(result))
+            enricher.writerow(row, list(result))
