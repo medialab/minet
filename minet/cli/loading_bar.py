@@ -173,6 +173,7 @@ class LoadingBar(object):
         self.sub_total = 0
         self.nested = nested
         self.transient = transient
+        self.known_total = total is not None
 
         self.bar_column = None
         self.label_progress = None
@@ -294,7 +295,9 @@ class LoadingBar(object):
                 self.bar_column.complete_style = style
                 self.bar_column.finished_style = style
                 self.bar_column.pulse_style = style
-                self.bar_column.style = style
+
+                if not self.known_total:
+                    self.bar_column.style = style
         else:
             self.bar_column.pulse_style = "success"
             self.bar_column.style = "success"
@@ -303,6 +306,8 @@ class LoadingBar(object):
 
     @contextmanager
     def step(self, label=None, count=1):
+        interrupted = False
+
         try:
             if self.nested:
                 self.reset_sub()
@@ -313,17 +318,26 @@ class LoadingBar(object):
                 if label is not None:
                     self.set_label(label)
             yield
+        except BaseException:
+            interrupted = True
+            raise
         finally:
-            self.advance(count)
+            if not interrupted:
+                self.advance(count)
 
     @contextmanager
     def nested_step(self, count=1):
         assert self.nested
+        interrupted = False
 
         try:
             yield
+        except BaseException:
+            interrupted = True
+            raise
         finally:
-            self.nested_advance(count)
+            if not interrupted:
+                self.nested_advance(count)
 
     def advance(self, count=1):
         self.progress.update(self.task_id, advance=count)
@@ -347,6 +361,7 @@ class LoadingBar(object):
 
     def set_total(self, total: Optional[int] = None):
         self.progress.update(self.task_id, total=total)
+        self.known_total = total is not None
 
     def set_label(self, label: str):
         assert self.label_progress is not None
