@@ -5,7 +5,10 @@
 # Logic of the `fb posts` action.
 #
 from minet.cli.utils import with_enricher_and_loading_bar
-from minet.cli.facebook.utils import with_facebook_fatal_errors
+from minet.cli.facebook.utils import (
+    with_facebook_fatal_errors,
+    print_translation_warning_if_needed,
+)
 from minet.facebook import FacebookMobileScraper
 from minet.facebook.constants import FACEBOOK_POST_CSV_HEADERS
 from minet.facebook.exceptions import FacebookInvalidTargetError
@@ -36,23 +39,6 @@ def action(cli_args, enricher, loading_bar):
                 continue
 
             for post in posts:
-                if (
-                    post.translated_text
-                    and post.translated_from not in translated_langs
-                ):
-                    translated_langs.add(post.translated_from)
-                    lines = [
-                        "[warning]Found text translated from %s![/warning]"
-                        % post.translated_from,
-                        "Since it means original text may not be entirely retrieved you might want",
-                        'to edit your Facebook language settings to add "%s" to'
-                        % post.translated_from,
-                        'the "Languages you don\'t want to be offered translations for" list here:',
-                        "https://www.facebook.com/settings/?tab=language",
-                        "",
-                    ]
-
-                    loading_bar.print(lines)
-
+                print_translation_warning_if_needed(loading_bar, translated_langs, post)
                 loading_bar.nested_advance()
                 enricher.writerow(row, post.as_csv_row())
