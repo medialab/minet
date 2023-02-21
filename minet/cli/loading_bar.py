@@ -29,10 +29,10 @@ from minet.cli.console import console
 
 class CautiousBarColumn(BarColumn):
     def render(self, task: Task):
-        if task.total is None or task.total == 1:
+        if task.total is None:
             self.bar_width = 15
         else:
-            self.bar_width = 40
+            self.bar_width = min(40, 10 + task.total)
 
         if task.total is not None and task.completed > task.total:
             self.finished_style = "warning"
