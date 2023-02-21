@@ -50,6 +50,18 @@ def plural(result, key):
     items = []
 
     for item in l:
+        if isinstance(item, dict):
+            item = item.get("name")
+
+            if item is None:
+                continue
+
+        if isinstance(item, (int, float)):
+            item = str(item)
+
+        if not isinstance(item, str):
+            continue
+
         for subitem in item.split(","):
             subitem = subitem.strip()
 
