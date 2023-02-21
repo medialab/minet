@@ -173,7 +173,7 @@ def attempt_to_catch(catch, exc, item, index=None) -> bool:
         return True
 
     if msg_format is not None:
-        msg = msg_format.format(item=item) if item is not None else msg_format
+        msg = msg_format.format(item=item, index=index)
 
     if index is not None:
         console.logh("Line %i" % (index + 1), msg)
