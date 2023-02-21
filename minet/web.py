@@ -32,7 +32,7 @@ from tenacity import (
 )
 from tenacity.wait import wait_base
 
-from minet.encodings import is_supported_encoding
+from minet.encodings import is_supported_encoding, normalize_encoding
 from minet.loggers import sleepers_logger
 from minet.utils import is_binary_mimetype
 from minet.exceptions import (
@@ -53,6 +53,7 @@ from minet.constants import (
 mimetypes.init()
 
 # Handy regexes
+BINARY_BOM_RE = re.compile(rb"\xef\xbb\xbf")
 CHARSET_RE = re.compile(rb'<meta.*?charset=["\']*(.+?)["\'>]', flags=re.I)
 PRAGMA_RE = re.compile(rb'<meta.*?content=["\']*;?charset=(.+?)["\'>]', flags=re.I)
 XML_RE = re.compile(rb'^<\?xml.*?encoding=["\']*(.+?)["\'>]', flags=re.I)
@@ -103,6 +104,9 @@ def prebuffer_response_up_to(response, target):
 
 
 # TODO: add a version that tallies the possibilities
+# NOTE: utf-16 is handled differently to account for endianness
+# NOTE: file starting with a BOM are inferred preferentially
+# See: https://github.com/medialab/minet/issues/550
 def guess_response_encoding(response, is_xml=False, infer=False):
     """
     Function taking an urllib3 response object and attempting to guess its
@@ -112,6 +116,11 @@ def guess_response_encoding(response, is_xml=False, infer=False):
 
     suboptimal_charset = None
 
+    # TODO: think about prebuffering
+    data = response.data
+
+    has_bom = bool(BINARY_BOM_RE.match(data[:10]))
+
     if content_type_header is not None:
         parsed_header = cgi.parse_header(content_type_header)
 
@@ -119,12 +128,15 @@ def guess_response_encoding(response, is_xml=False, infer=False):
             charset = parsed_header[1].get("charset")
 
             if charset is not None:
-                if is_supported_encoding(charset):
+                if (
+                    is_supported_encoding(charset)
+                    and normalize_encoding(charset) != "utf16"
+                    and not has_bom
+                ):
                     return charset.lower()
                 else:
                     suboptimal_charset = charset
 
-    data = response.data
     chunk = data[:CONTENT_CHUNK_SIZE]
 
     # Data is empty
@@ -146,7 +158,11 @@ def guess_response_encoding(response, is_xml=False, infer=False):
         if len(matches) != 0:
             charset = matches[-1].lower().decode()
 
-            if is_supported_encoding(charset):
+            if (
+                is_supported_encoding(charset)
+                and normalize_encoding(charset) != "utf16"
+                and not has_bom
+            ):
                 return charset
             else:
                 suboptimal_charset = charset
