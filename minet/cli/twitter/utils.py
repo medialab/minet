@@ -30,15 +30,23 @@ def validate_query_boundaries(cli_args):
             raise InvalidArgumentsError("--until-id should be greater than --since-id!")
 
 
-def with_twitter_client():
+def with_twitter_client(api_version=None):
     def decorate(action):
         @wraps(action)
         def wrapper(cli_args, *args, **kwargs):
+            nonlocal api_version
+
+            v2_flag = getattr(cli_args, "v2", False)
+
+            if api_version is None:
+                api_version = "1.1" if not v2_flag else "2"
+
             client = TwitterAPIClient(
                 cli_args.access_token,
                 cli_args.access_token_secret,
                 cli_args.api_key,
                 cli_args.api_secret_key,
+                api_version=api_version,
             )
 
             return action(cli_args, *args, **{"client": client}, **kwargs)

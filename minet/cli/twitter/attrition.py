@@ -21,7 +21,7 @@ ATTRITION_ADDITIONAL_HEADERS = ["tweet_current_status"]
 
 @with_enricher_and_loading_bar(
     headers=ATTRITION_ADDITIONAL_HEADERS,
-    desc="Retrieving attrition reason",
+    title="Retrieving attrition reason",
     unit="tweet",
 )
 @with_twitter_client()
@@ -113,14 +113,15 @@ def action(cli_args, client, enricher, loading_bar):
             result = client.call(["statuses", "lookup"], **kwargs)
 
         except TwitterHTTPError as e:
-            loading_bar.inc("errors")
+            loading_bar.inc_stat("errors", style="error")
+            loading_bar.advance(len(chunk))
             raise e
 
         for tw in result:
             available_tweets.add(tw["id_str"])
 
         for row, tweet, user in chunk:
-            loading_bar.update()
+            loading_bar.advance()
 
             if tweet is None:
                 enricher.writerow(row)

@@ -283,15 +283,18 @@ class LoadingBar(object):
     def __exit__(self, exc_type, exc_value, exc_traceback):
 
         if exc_type is not None:
+            style = "error"
+
             # NOTE: cursor 1up
             if exc_type is KeyboardInterrupt:
                 console.file.write("\x1b[1A")
+                style = "warning"
 
             if self.bar_column is not None:
-                self.bar_column.complete_style = "warning"
-                self.bar_column.finished_style = "warning"
-                self.bar_column.pulse_style = "warning"
-                self.bar_column.style = "warning"
+                self.bar_column.complete_style = style
+                self.bar_column.finished_style = style
+                self.bar_column.pulse_style = style
+                self.bar_column.style = style
         else:
             self.bar_column.pulse_style = "success"
             self.bar_column.style = "success"
