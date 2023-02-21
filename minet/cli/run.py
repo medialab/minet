@@ -84,9 +84,9 @@ def run(name, version, commands):
         if hasattr(cli_args, "subcommand") and cli_args.subcommand:
             meta = action["command"]["subparsers"]["commands"][cli_args.subcommand]
 
-        if "validate" in meta:
+        if "resolve" in meta:
             try:
-                meta["validate"](cli_args)
+                meta["resolve"](cli_args)
             except InvalidArgumentsError as e:
                 parser.error(e.message)
 

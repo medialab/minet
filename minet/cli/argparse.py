@@ -735,7 +735,7 @@ def subcommand(
 
 
 def template_readme(tpl, commands):
-    parser, subparser_index = build_parser("", "", commands)
+    _, subparser_index = build_parser("", "", commands)
 
     def replacer(match):
         keys = match.group(1).split("/")
