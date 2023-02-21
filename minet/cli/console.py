@@ -35,23 +35,23 @@ MINET_THEME = Theme(MINET_STYLES)
 
 
 class MinetConsole(Console):
-    def logh(self, header: str, *messages) -> None:
+    def logh(self, header: str, *messages, style=None) -> None:
         txt = message_flatmap(*messages)
 
         table = Table.grid(padding=(0, 1), expand=True)
 
         table.add_column(style="log.time")
-        table.add_column(ratio=1, overflow="fold")
+        table.add_column(ratio=1, overflow="fold", style=style)
 
         table.add_row(header, txt)
 
         self.print(table)
 
-    def log_with_time(self, *messages, full=False):
+    def log_with_time(self, *messages, full=False, style=None):
         now = datetime.now().strftime(NOW_DATETIME_FORMAT if full else NOW_TIME_FORMAT)
         now = "[%s]" % now
 
-        self.logh(now, *messages)
+        self.logh(now, *messages, style=style)
 
 
 console = MinetConsole(theme=MINET_THEME, stderr=True, highlight=False)

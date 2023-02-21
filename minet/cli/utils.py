@@ -95,14 +95,15 @@ class CLIRetryerHandler(Handler):
 
             msg = [
                 "Will now wait for %s because of following exception:" % pretty_time,
-                ("%s (%s)" % (exc_name, exc_msg)) if exc_msg else exc_name,
+                exc_name,
+                "Exception message: %s" % exc_msg,
                 "",
             ]
 
         else:
             msg = [record.msg, ""]
 
-        console.log("\n".join(msg), style="warning")
+        console.log_with_time("\n".join(msg), style="warning")
 
 
 def acquire_cross_platform_stdout():
