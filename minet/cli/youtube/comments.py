@@ -32,7 +32,7 @@ def action(cli_args, enricher, loading_bar):
     client = YouTubeAPIClient(cli_args.key)
 
     for row, video in enricher.cells(cli_args.column, with_rows=True):
-        with loading_bar.nested_task(video):
+        with loading_bar.tick(video):
             generator = client.comments(video)
 
             try:

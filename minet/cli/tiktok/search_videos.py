@@ -22,7 +22,7 @@ def action(cli_args, enricher, loading_bar):
     client = TiktokAPIScraper(cookie=cli_args.cookie)
 
     for row, query in enricher.cells(cli_args.column, with_rows=True):
-        with loading_bar.nested_task(query):
+        with loading_bar.tick(query):
             generator = client.search_videos(query)
 
             if cli_args.limit:

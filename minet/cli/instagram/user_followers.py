@@ -29,7 +29,7 @@ def action(cli_args, enricher, loading_bar):
     client = InstagramAPIScraper(cookie=cli_args.cookie)
 
     for i, (row, user) in enumerate(enricher.cells(cli_args.column, with_rows=True)):
-        with loading_bar.nested_task(user):
+        with loading_bar.tick(user):
             try:
                 generator = client.user_followers(user)
 

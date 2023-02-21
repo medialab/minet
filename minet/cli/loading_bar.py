@@ -301,30 +301,26 @@ class LoadingBar(object):
     @contextmanager
     def tick(self, label=None):
         try:
+            if self.nested:
+                self.reset_sub()
+
+                if label is not None:
+                    self.update(sub_title=label)
+            else:
+                if label is not None:
+                    self.set_label(label)
             yield
         finally:
             self.advance()
 
-            if label is not None:
-                self.set_label(label)
-
     @contextmanager
     def nested_tick(self):
+        assert self.nested
+
         try:
             yield
         finally:
             self.nested_advance()
-
-    @contextmanager
-    def nested_task(self, description):
-        assert self.nested
-
-        try:
-            self.reset_sub()
-            self.update(sub_title=description)
-            yield
-        finally:
-            self.update(count=1)
 
     def advance(self, count=1):
         self.progress.update(self.task_id, advance=count)
