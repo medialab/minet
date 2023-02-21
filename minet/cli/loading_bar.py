@@ -172,6 +172,7 @@ class LoadingBar(object):
     ):
         self.sub_total = 0
         self.nested = nested
+        self.show_label = show_label
         self.transient = transient
         self.known_total = total is not None
 
@@ -305,7 +306,7 @@ class LoadingBar(object):
         self.live.stop()
 
     @contextmanager
-    def step(self, label=None, count=1):
+    def step(self, label=None, count=1, index=None, catch=None):
         interrupted = False
 
         try:
@@ -315,7 +316,7 @@ class LoadingBar(object):
                 if label is not None:
                     self.update(sub_title=label)
             else:
-                if label is not None:
+                if self.show_label and label is not None:
                     self.set_label(label)
             yield
         except BaseException:
