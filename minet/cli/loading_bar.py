@@ -310,7 +310,7 @@ class LoadingBar(object):
 
         try:
             if self.nested:
-                self.reset_sub()
+                self.nested_reset()
 
                 if label is not None:
                     self.update(sub_title=label)
@@ -346,7 +346,7 @@ class LoadingBar(object):
         self.sub_total += 1
         self.sub_progress.update(self.sub_task, advance=count, sub_total=self.sub_total)
 
-    def reset_sub(self):
+    def nested_reset(self):
         self.sub_progress.reset(self.sub_task)
 
     def __refresh_stats(self):
