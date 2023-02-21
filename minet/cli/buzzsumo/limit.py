@@ -17,7 +17,7 @@ def action(cli_args):
 
     limit = client.limit()
 
-    console.log(
+    console.log_with_time(
         "With your token, you can still make",
         "[info]%s[/info]" % format_int(limit),
         "calls to the BuzzSumo API until the end of the month.",
