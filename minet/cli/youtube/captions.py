@@ -13,7 +13,7 @@ from minet.youtube.constants import YOUTUBE_CAPTIONS_CSV_HEADERS
     headers=YOUTUBE_CAPTIONS_CSV_HEADERS, title="Retrieving captions", unit="videos"
 )
 def action(cli_args, enricher, loading_bar):
-    with loading_bar.tick():
+    with loading_bar.step():
         for row, video in enricher.cells(cli_args.column, with_rows=True):
             result = get_video_captions(video, langs=cli_args.lang)
 

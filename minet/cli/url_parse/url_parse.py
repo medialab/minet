@@ -181,7 +181,7 @@ def get_multiplex(cli_args):
 def action(cli_args, enricher, loading_bar):
     for row, url in enricher.cells(cli_args.column, with_rows=True):
 
-        with loading_bar.tick():
+        with loading_bar.step():
             url = url.strip()
 
             if not is_url(url, allow_spaces_in_path=True, require_protocol=False):

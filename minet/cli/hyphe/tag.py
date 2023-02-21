@@ -43,7 +43,7 @@ def action(cli_args):
         for row, webentity_id in reader.cells(
             cli_args.webentity_id_column, with_rows=True
         ):
-            with loading_bar.tick():
+            with loading_bar.step():
                 webentity_id = webentity_id.strip()
 
                 if not webentity_id:

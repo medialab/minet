@@ -192,7 +192,7 @@ def action(cli_args, defer, loading_bar):
 
     # Running crawler
     for result in crawler:
-        with loading_bar.tick():
+        with loading_bar.step():
             jobs_writer.writerow(format_job_for_csv(result))
 
             if result.error is not None:

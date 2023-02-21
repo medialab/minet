@@ -28,7 +28,7 @@ def action(cli_args, enricher, loading_bar):
     scraper = FacebookMobileScraper(cli_args.cookie, throttle=cli_args.throttle)
 
     for i, (row, url) in enumerate(enricher.cells(cli_args.column, with_rows=True), 1):
-        with loading_bar.tick(url):
+        with loading_bar.step(url):
             try:
                 batches = scraper.comments(url, per_call=True, detailed=True)
             except FacebookInvalidTargetError:

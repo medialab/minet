@@ -66,7 +66,7 @@ def action(cli_args):
         title="Declaring web entities", unit="webentities", total=reader.total
     ) as loading_bar:
         for row in reader:
-            with loading_bar.tick():
+            with loading_bar.step():
                 startpages_cell = row[startpages_pos]
 
                 name = row[name_pos]
@@ -79,7 +79,9 @@ def action(cli_args):
                 homepage = row[homepage_pos]
                 prefixes = row[prefixes_pos].split(" ")
                 startpages = startpages_cell.split(" ") if startpages_cell else []
-                startpages = list(set(startpages))  # TODO: dedupe because of hyphe issues
+                startpages = list(
+                    set(startpages)
+                )  # TODO: dedupe because of hyphe issues
                 tags = extract_tags(row, tag_pos_list)
 
                 # 1. Declaring the entities
@@ -106,6 +108,8 @@ def action(cli_args):
                     )
                 except HypheRequestFailError as e:
                     if "belong" in str(e):
-                        loading_bar.print("Homepage error with %s %s" % (name, homepage))
+                        loading_bar.print(
+                            "Homepage error with %s %s" % (name, homepage)
+                        )
                     else:
                         raise

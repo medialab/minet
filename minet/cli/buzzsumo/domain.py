@@ -21,7 +21,7 @@ def action(cli_args, enricher, loading_bar):
     client = BuzzSumoAPIClient(cli_args.token)
 
     for row, domain_name in enricher.cells(cli_args.column, with_rows=True):
-        with loading_bar.tick(domain_name):
+        with loading_bar.step(domain_name):
 
             for article in client.domain_articles(
                 domain_name, cli_args.begin_date, cli_args.end_date

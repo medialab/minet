@@ -25,7 +25,7 @@ def action(cli_args, enricher, loading_bar):
     translated_langs = set()
 
     for i, (row, url) in enumerate(enricher.cells(cli_args.column, with_rows=True), 1):
-        with loading_bar.tick(url):
+        with loading_bar.step(url):
             try:
                 posts = scraper.posts(url)
             except FacebookInvalidTargetError:

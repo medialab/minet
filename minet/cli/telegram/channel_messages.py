@@ -23,7 +23,7 @@ def action(cli_args, enricher, loading_bar):
     for i, (row, channel) in enumerate(
         enricher.cells(cli_args.column, with_rows=True), 1
     ):
-        with loading_bar.tick(channel):
+        with loading_bar.step(channel):
             try:
                 messages = scraper.channel_messages(channel)
 

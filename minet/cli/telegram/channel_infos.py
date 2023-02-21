@@ -19,7 +19,7 @@ def action(cli_args, enricher, loading_bar):
     for i, (row, channel) in enumerate(
         enricher.cells(cli_args.column, with_rows=True), 1
     ):
-        with loading_bar.tick():
+        with loading_bar.step():
             try:
                 infos = scraper.channel_infos(channel)
                 enricher.writerow(row, infos)

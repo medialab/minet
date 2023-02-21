@@ -299,7 +299,7 @@ class LoadingBar(object):
         self.live.stop()
 
     @contextmanager
-    def tick(self, label=None):
+    def step(self, label=None):
         try:
             if self.nested:
                 self.reset_sub()
@@ -314,7 +314,7 @@ class LoadingBar(object):
             self.advance()
 
     @contextmanager
-    def nested_tick(self):
+    def nested_step(self):
         assert self.nested
 
         try:

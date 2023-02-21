@@ -21,7 +21,7 @@ def action(cli_args, enricher, loading_bar):
     extract = EXTRACTORS[getattr(cli_args, "from")]
 
     for row, content in enricher.cells(cli_args.column, with_rows=True):
-        with loading_bar.tick():
+        with loading_bar.step():
             content = content.strip()
 
             if not content:

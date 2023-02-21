@@ -60,7 +60,7 @@ def scrape(data):
 def action(cli_args, enricher, loading_bar):
     for row, url in enricher.cells(cli_args.column, with_rows=True):
 
-        with loading_bar.tick():
+        with loading_bar.step():
             url = url.strip()
 
             if not url or not is_url(url, require_protocol=False):

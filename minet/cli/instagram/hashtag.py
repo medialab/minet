@@ -25,7 +25,7 @@ def action(cli_args, enricher, loading_bar):
     client = InstagramAPIScraper(cookie=cli_args.cookie)
 
     for i, (row, hashtag) in enumerate(enricher.cells(cli_args.column, with_rows=True)):
-        with loading_bar.tick(hashtag):
+        with loading_bar.step(hashtag):
             try:
                 generator = client.search_hashtag(hashtag)
 
