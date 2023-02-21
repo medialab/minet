@@ -8,7 +8,7 @@ from typing import Optional, Iterable
 from typing_extensions import TypedDict, NotRequired
 
 from contextlib import contextmanager
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 from rich.live import Live
 from rich.text import Text
 from rich.table import Table, Column
@@ -153,6 +153,36 @@ class StatsItem(TypedDict):
     initial: NotRequired[int]
 
 
+CatchAttempt = namedtuple("CatchAttempt", ["item", "index", "exception"])
+
+
+def attempt_to_catch(catch, exc, item, index=None) -> bool:
+    if catch is None:
+        return True
+
+    msg = None
+
+    # Callable version
+    if callable(catch):
+        return catch(CatchAttempt(item, index, exc))
+
+    # Mapping version
+    msg_format = catch.get(type(exc))
+
+    if msg_format is None:
+        return True
+
+    if msg_format is not None:
+        msg = msg_format.format(item=item) if item is not None else msg_format
+
+    if index is not None:
+        console.logh("Line %i" % (index + 1), msg)
+    else:
+        console.print(msg)
+
+    return False
+
+
 class LoadingBar(object):
     def __init__(
         self,
@@ -218,7 +248,7 @@ class LoadingBar(object):
         columns.append(TimeElapsedColumn())
         columns.append(ThroughputColumn())
 
-        self.progress = Progress(*columns, console=console)
+        self.progress = Progress(*columns)
         self.table.add_row(self.progress)
 
         self.task_id = self.progress.add_task(
@@ -306,22 +336,27 @@ class LoadingBar(object):
         self.live.stop()
 
     @contextmanager
-    def step(self, label=None, count=1, index=None, catch=None):
+    def step(self, item=None, count=1, index=None, catch=None):
         interrupted = False
+
+        # TODO: we could add some key kwarg if needed
 
         try:
             if self.nested:
                 self.nested_reset()
 
-                if label is not None:
-                    self.update(sub_title=label)
+                if item is not None:
+                    self.update(sub_title=item)
             else:
-                if self.show_label and label is not None:
-                    self.set_label(label)
+                if self.show_label and item is not None:
+                    self.set_label(item)
             yield
-        except BaseException:
-            interrupted = True
-            raise
+
+        except BaseException as exc:
+            interrupted = attempt_to_catch(catch, exc, item, index)
+
+            if interrupted:
+                raise
         finally:
             if not interrupted:
                 self.advance(count)
