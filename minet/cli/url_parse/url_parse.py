@@ -28,6 +28,7 @@ from ural.facebook import (
 )
 from ural.youtube import (
     parse_youtube_url,
+    normalize_youtube_url,
     YoutubeVideo,
     YoutubeUser,
     YoutubeChannel,
@@ -56,7 +57,12 @@ FACEBOOK_REPORT_HEADERS = [
     "facebook_normalized_url",
 ]
 
-YOUTUBE_REPORT_HEADERS = ["youtube_type", "youtube_id", "youtube_name"]
+YOUTUBE_REPORT_HEADERS = [
+    "youtube_type",
+    "youtube_id",
+    "youtube_name",
+    "youtube_normalize_url",
+]
 
 TWITTER_REPORT_HEADERS = ["twitter_type", "twitter_user_screen_name", "tweet_id"]
 
@@ -110,7 +116,12 @@ def extract_youtube_addendum(url):
     if parsed is None:
         return None
 
-    return [YOUTUBE_TYPES.get(type(parsed)), parsed.id, getattr(parsed, "name", "")]
+    return [
+        YOUTUBE_TYPES.get(type(parsed)),
+        parsed.id,
+        getattr(parsed, "name", ""),
+        normalize_youtube_url(url),
+    ]
 
 
 def extract_facebook_addendum(url):
