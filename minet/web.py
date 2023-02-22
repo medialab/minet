@@ -4,7 +4,7 @@
 #
 # Miscellaneous web-related functions used throughout the library.
 #
-from typing import Optional
+from typing import Optional, Tuple
 
 import re
 import cgi
@@ -20,7 +20,6 @@ import functools
 import charset_normalizer as chardet
 from datetime import datetime
 from timeit import default_timer as timer
-from contextlib import contextmanager
 from io import BytesIO
 from threading import Event
 from collections import OrderedDict
@@ -86,11 +85,12 @@ HREF_RE = re.compile(rb'href=(\"[^"]+|\'[^\']+|[^\s]+)>?\s?', flags=re.I)
 # Constants
 CHARSET_DETECTION_CONFIDENCE_THRESHOLD = 0.9
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
-CONTENT_CHUNK_SIZE = 1024
-LARGE_CONTENT_CHUNK_SIZE = 2**16
+CONTENT_PREBUFFER_UP_TO = 1024
+STREAMING_CHUNK_SIZE = 2**12
+LARGE_CONTENT_PREBUFFER_UP_TO = 2**16
 EXPECTED_WEB_ERRORS = (HTTPError, RedirectError, InvalidURLError)
 
-assert CONTENT_CHUNK_SIZE < LARGE_CONTENT_CHUNK_SIZE
+assert CONTENT_PREBUFFER_UP_TO < LARGE_CONTENT_PREBUFFER_UP_TO
 
 
 def prebuffer_response_up_to(response, target):
@@ -145,7 +145,7 @@ def guess_response_encoding(response, is_xml=False, infer=False):
                 else:
                     suboptimal_charset = charset
 
-    chunk = data[:CONTENT_CHUNK_SIZE]
+    chunk = data[:CONTENT_PREBUFFER_UP_TO]
 
     # Data is empty
     if not chunk.strip():
@@ -328,39 +328,90 @@ def create_pool(
 DEFAULT_POOL = create_pool(maxsize=10, num_pools=10)
 
 
-@contextmanager
-def closing_response(response):
-    try:
-        yield
-    finally:
-        response.release_conn()
-        response.close()
-
-
 def stream_request_body(
-    response,
-    chunk_size: int = 2**12,
+    response: urllib3.HTTPResponse,
+    body: BytesIO,
+    chunk_size: int = STREAMING_CHUNK_SIZE,
     cancel_event: Optional[Event] = None,
     end_time: Optional[float] = None,
-    buffer: Optional[BytesIO] = None,
-) -> BytesIO:
-    with closing_response(response):
-        body = BytesIO() if buffer is None else buffer
+    up_to: Optional[int] = None,
+) -> bool:
+    if up_to is not None and body.tell() >= up_to:
+        return False
+
+    for data in response.stream(chunk_size):
+        body.write(data)
+
+        if up_to is not None and body.tell() >= up_to:
+            return False
 
         if cancel_event is not None and cancel_event.is_set():
             raise CancelledRequestError
 
-        for data in response.stream(chunk_size):
-            body.write(data)
+        if end_time is not None:
+            if timer() >= end_time:
+                raise FinalTimeoutError
 
-            if cancel_event is not None and cancel_event.is_set():
-                raise CancelledRequestError
+    # This is the only place we know the body has been fully read
+    return True
 
-            if end_time is not None:
-                if timer() >= end_time:
-                    raise FinalTimeoutError
 
-        return body
+class BufferedResponse(object):
+    __slots__ = ("__inner", "__body", "__cancel_event", "__end_time", "__finished")
+
+    def __init__(
+        self,
+        response: urllib3.HTTPResponse,
+        cancel_event: Optional[Event],
+        end_time: Optional[float] = None,
+    ):
+        self.__inner = response
+        self.__cancel_event = cancel_event
+        self.__end_time = end_time
+        self.__body = BytesIO()
+        self.__finished = False
+
+    def __len__(self) -> int:
+        return self.__body.getbuffer().nbytes
+
+    def __stream(
+        self, chunk_size: int = STREAMING_CHUNK_SIZE, up_to: Optional[int] = None
+    ):
+        if self.__finished:
+            return
+
+        fully_read = False
+
+        try:
+            stream_request_body(
+                self.__inner,
+                chunk_size=chunk_size,
+                cancel_event=self.__cancel_event,
+                end_time=self.__end_time,
+                body=self.__body,
+                up_to=up_to,
+            )
+        finally:
+            if fully_read:
+                self.__finished = fully_read
+                self.close()
+
+    def close(self) -> None:
+        # NOTE: releasing and closing is a noop if already done
+        self.__inner.release_conn()
+        self.__inner.close()
+
+    def unwrap(self) -> Tuple[urllib3.HTTPResponse, bytes]:
+        self.read()
+        return self.__inner, self.__body.getvalue()
+
+    def read(self, chunk_size: int = STREAMING_CHUNK_SIZE) -> None:
+        self.__stream(chunk_size=chunk_size)
+
+    def prebuffer_up_to(
+        self, amount: int, chunk_size: int = STREAMING_CHUNK_SIZE
+    ) -> None:
+        self.__stream(chunk_size=chunk_size, up_to=amount)
 
 
 def make_request(
@@ -501,7 +552,7 @@ def make_resolve(
                 # Reading a small chunk of the html
                 if location is None and (follow_meta_refresh or follow_js_relocation):
                     prebuffer_error = prebuffer_response_up_to(
-                        response, CONTENT_CHUNK_SIZE
+                        response, CONTENT_PREBUFFER_UP_TO
                     )
 
                     if prebuffer_error is not None:
@@ -532,7 +583,7 @@ def make_resolve(
             if redirection.type == "hit":
                 if canonicalize:
                     prebuffer_error = prebuffer_response_up_to(
-                        response, LARGE_CONTENT_CHUNK_SIZE
+                        response, LARGE_CONTENT_PREBUFFER_UP_TO
                     )
 
                     if prebuffer_error is not None:
@@ -758,7 +809,9 @@ def extract_response_meta(response, guess_encoding=True, guess_extension=True):
             if parsed_header and parsed_header[0].strip():
                 mimetype = parsed_header[0].strip()
 
-        if mimetype is None and looks_like_html(response.data[:CONTENT_CHUNK_SIZE]):
+        if mimetype is None and looks_like_html(
+            response.data[:CONTENT_PREBUFFER_UP_TO]
+        ):
             mimetype = "text/html"
 
         if mimetype is not None:
