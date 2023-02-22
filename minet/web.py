@@ -4,7 +4,7 @@
 #
 # Miscellaneous web-related functions used throughout the library.
 #
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, OrderedDict, List
 
 import re
 import cgi
@@ -22,7 +22,6 @@ from datetime import datetime
 from timeit import default_timer as timer
 from io import BytesIO
 from threading import Event
-from collections import OrderedDict
 from urllib.parse import urljoin
 from urllib3 import HTTPResponse
 from urllib3.exceptions import HTTPError
@@ -58,6 +57,9 @@ from minet.constants import (
 )
 
 mimetypes.init()
+
+# Types
+AnyTimeout = Union[float, urllib3.Timeout]
 
 # Handy regexes
 BINARY_BOM_RE = re.compile(rb"\xef\xbb\xbf")
@@ -233,7 +235,7 @@ def extract_href(value):
     return url.strip("\"'") or None
 
 
-def find_canonical_link(html_chunk):
+def find_canonical_link(html_chunk: bytes):
     m = CANONICAL_LINK_RE.search(html_chunk)
 
     if not m:
@@ -242,7 +244,7 @@ def find_canonical_link(html_chunk):
     return extract_href(m.group())
 
 
-def find_meta_refresh(html_chunk):
+def find_meta_refresh(html_chunk: bytes):
     m = META_REFRESH_RE.search(html_chunk)
 
     if not m:
@@ -251,7 +253,7 @@ def find_meta_refresh(html_chunk):
     return parse_http_refresh(m.group(1))
 
 
-def find_javascript_relocation(html_chunk):
+def find_javascript_relocation(html_chunk: bytes):
     m = JAVASCRIPT_LOCATION_RE.search(html_chunk)
 
     if not m:
@@ -356,7 +358,7 @@ def stream_request_body(
     return True
 
 
-def timeout_to_final_time(timeout: Union[float, urllib3.Timeout]) -> float:
+def timeout_to_final_time(timeout: AnyTimeout) -> float:
     seconds = timeout
 
     if isinstance(timeout, urllib3.Timeout):
@@ -369,6 +371,21 @@ def timeout_to_final_time(timeout: Union[float, urllib3.Timeout]) -> float:
     seconds += 0.01
 
     return timer() + seconds
+
+
+def pool_manager_aware_timeout_to_final_time(
+    pool_manager: urllib3.PoolManager, timeout: AnyTimeout
+) -> Optional[float]:
+    if timeout is not None:
+        return timeout_to_final_time(timeout)
+
+    else:
+        pool_manager_timeout = pool_manager.connection_pool_kw.get("timeout")
+
+        if pool_manager_timeout is not None:
+            return timeout_to_final_time(pool_manager_timeout)
+
+    return None
 
 
 class BufferedResponse(object):
@@ -425,6 +442,9 @@ class BufferedResponse(object):
     def geturl(self) -> str:
         return self.__inner.geturl()
 
+    def getheader(self, name: str, default: Optional[str] = None) -> Optional[str]:
+        return self.__inner.getheader(name, default)
+
     @property
     def status(self) -> int:
         return self.__inner.status
@@ -452,7 +472,7 @@ class BufferedResponse(object):
         self.__stream(chunk_size=chunk_size, up_to=amount)
 
 
-def make_request(
+def atomic_request(
     pool_manager: urllib3.PoolManager,
     url: str,
     method="GET",
@@ -485,14 +505,8 @@ def make_request(
     if timeout is not None:
         request_kwargs["timeout"] = timeout
 
-        if final_time is None:
-            final_time = timeout_to_final_time(timeout)
-
-    elif final_time is None:
-        pool_manager_timeout = pool_manager.connection_pool_kw.get("timeout")
-
-        if pool_manager_timeout is not None:
-            final_time = timeout_to_final_time(pool_manager_timeout)
+    if final_time is None:
+        final_time = pool_manager_aware_timeout_to_final_time(pool_manager, timeout)
 
     response = pool_manager.request(method, url, **request_kwargs)
 
@@ -518,28 +532,32 @@ class Redirection(object):
         }
 
 
-def make_resolve(
-    pool_manager,
-    url,
-    method="GET",
+def atomic_resolve(
+    pool_manager: urllib3.PoolManager,
+    url: str,
+    method: str = "GET",
     headers=None,
-    max_redirects=5,
-    follow_refresh_header=True,
-    follow_meta_refresh=False,
-    follow_js_relocation=False,
-    return_response=False,
-    infer_redirection=False,
-    timeout=None,
+    max_redirects: int = 5,
+    follow_refresh_header: bool = True,
+    follow_meta_refresh: bool = False,
+    follow_js_relocation: bool = False,
+    infer_redirection: bool = False,
+    timeout: Optional[AnyTimeout] = None,
+    cancel_event: Optional[Event] = None,
+    final_time: Optional[float] = None,
     body=None,
-    canonicalize=False,
-):
+    canonicalize: bool = False,
+) -> Tuple[List[Tuple[Redirection]], BufferedResponse]:
     """
     Helper function attempting to resolve the given url.
     """
 
-    url_stack = OrderedDict()
-    error = None
-    response = None
+    url_stack: OrderedDict[str, Redirection] = OrderedDict()
+    error: Optional[Exception] = None
+    buffered_response: Optional[BufferedResponse] = None
+
+    if final_time is None:
+        final_time = pool_manager_aware_timeout_to_final_time(pool_manager, timeout)
 
     for _ in range(max_redirects):
         if infer_redirection:
@@ -550,14 +568,14 @@ def make_resolve(
                 url = target
                 continue
 
-        if response:
-            response.release_conn()
-            response.close()
+        # We close last buffered_response as it won't be used anymore
+        if buffered_response:
+            buffered_response.close()
 
         redirection = Redirection(url)
 
         try:
-            response = make_request(
+            buffered_response = atomic_request(
                 pool_manager,
                 url,
                 method=method,
@@ -566,11 +584,12 @@ def make_resolve(
                 preload_content=False,
                 release_conn=False,
                 timeout=timeout,
+                final_time=final_time,
+                cancel_event=cancel_event,
             )
 
         # Request error
         except HTTPError as e:
-            redirection.type = "error"
             url_stack[url] = redirection
             error = e
             break
@@ -580,16 +599,19 @@ def make_resolve(
             error = InfiniteRedirectsError("Infinite redirects")
             break
 
-        redirection.status = response.status
+        redirection.status = buffered_response.status
         url_stack[url] = redirection
+
+        # Attempting to find next location
         location = None
 
-        if response.status not in REDIRECT_STATUSES:
+        if buffered_response.status not in REDIRECT_STATUSES:
 
-            if response.status < 400:
+            if buffered_response.status < 400:
 
+                # Refresh header
                 if follow_refresh_header:
-                    refresh = response.getheader("refresh")
+                    refresh = buffered_response.getheader("refresh")
 
                     if refresh is not None:
                         p = parse_http_refresh(refresh)
@@ -600,17 +622,15 @@ def make_resolve(
 
                 # Reading a small chunk of the html
                 if location is None and (follow_meta_refresh or follow_js_relocation):
-                    prebuffer_error = prebuffer_response_up_to(
-                        response, CONTENT_PREBUFFER_UP_TO
-                    )
-
-                    if prebuffer_error is not None:
-                        redirection.type = "error"
+                    try:
+                        buffered_response.prebuffer_up_to(CONTENT_PREBUFFER_UP_TO)
+                    except Exception as e:
+                        error = e
                         break
 
                 # Meta refresh
                 if location is None and follow_meta_refresh:
-                    meta_refresh = find_meta_refresh(response._body)
+                    meta_refresh = find_meta_refresh(buffered_response.body)
 
                     if meta_refresh is not None:
                         location = meta_refresh[1]
@@ -618,7 +638,7 @@ def make_resolve(
 
                 # JavaScript relocation
                 if location is None and follow_js_relocation:
-                    js_relocation = find_javascript_relocation(response._body)
+                    js_relocation = find_javascript_relocation(buffered_response.body)
 
                     if js_relocation is not None:
                         location = js_relocation
@@ -631,15 +651,13 @@ def make_resolve(
             # Canonical url
             if redirection.type == "hit":
                 if canonicalize:
-                    prebuffer_error = prebuffer_response_up_to(
-                        response, LARGE_CONTENT_PREBUFFER_UP_TO
-                    )
-
-                    if prebuffer_error is not None:
-                        redirection.type = "error"
+                    try:
+                        buffered_response.prebuffer_up_to(LARGE_CONTENT_PREBUFFER_UP_TO)
+                    except Exception as e:
+                        error = e
                         break
 
-                    canonical = find_canonical_link(response._body)
+                    canonical = find_canonical_link(buffered_response.body)
 
                     if canonical is not None and canonical != url:
                         canonical = urljoin(url, canonical)
@@ -650,7 +668,7 @@ def make_resolve(
 
         else:
             redirection.type = "location-header"
-            location = response.getheader("location")
+            location = buffered_response.getheader("location")
 
         # Invalid redirection
         if not location:
@@ -689,22 +707,16 @@ def make_resolve(
     else:
         error = MaxRedirectsError("Maximum number of redirects exceeded")
 
-    # Cleanup
-    if response and not return_response:
-        response.release_conn()
-        response.close()
-
     # NOTE: error is raised that late to be sure we cleanup resources attached
     # to the connection
     if error is not None:
+        if buffered_response is not None:
+            buffered_response.close()
         raise error
 
     compiled_stack = list(url_stack.values())
 
-    if return_response:
-        return compiled_stack, response
-
-    return compiled_stack
+    return compiled_stack, buffered_response
 
 
 def build_request_headers(headers=None, cookie=None, spoof_ua=False, json_body=False):
@@ -768,7 +780,7 @@ def request(
         final_body = json.dumps(json_body, ensure_ascii=False).encode("utf-8")
 
     if not follow_redirects:
-        return make_request(
+        return atomic_request(
             pool_manager,
             url,
             method,
@@ -777,7 +789,7 @@ def request(
             timeout=timeout,
         )
     else:
-        _, response = make_resolve(
+        _, response = atomic_resolve(
             pool_manager,
             url,
             method,
@@ -822,7 +834,7 @@ def resolve(
         headers=headers, cookie=cookie, spoof_ua=spoof_ua
     )
 
-    return make_resolve(
+    return atomic_resolve(
         pool_manager,
         url,
         method,

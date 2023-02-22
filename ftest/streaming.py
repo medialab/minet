@@ -2,7 +2,7 @@ from threading import Timer, Event
 from argparse import ArgumentParser
 from ebbe import Timer as BenchTimer
 
-from minet.web import DEFAULT_POOL_MANAGER, make_request
+from minet.web import DEFAULT_POOL_MANAGER, atomic_request
 
 parser = ArgumentParser()
 parser.add_argument("--cancel-after", type=int)
@@ -21,8 +21,8 @@ def cancel():
 if cli_args.cancel_after is not None:
     Timer(cli_args.cancel_after, cancel).start()
 
-with BenchTimer("make_request"):
-    buffered_response = make_request(
+with BenchTimer("atomic_request"):
+    buffered_response = atomic_request(
         DEFAULT_POOL_MANAGER,
         "http://100poursciences.fr/stream",
         timeout=cli_args.timeout,
