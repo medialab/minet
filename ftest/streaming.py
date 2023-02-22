@@ -1,9 +1,8 @@
 from threading import Timer, Event
-from timeit import default_timer as timer
 from urllib3 import Timeout
 from argparse import ArgumentParser
 
-from minet.web import DEFAULT_POOL, BufferedResponse, timeout_to_end_time
+from minet.web import DEFAULT_POOL, BufferedResponse, timeout_to_final_time
 
 parser = ArgumentParser()
 parser.add_argument("--cancel-after", type=int)
@@ -13,7 +12,7 @@ cli_args = parser.parse_args()
 
 cancel_event = Event()
 final_timeout = cli_args.timeout
-end_time = timeout_to_end_time(final_timeout) if final_timeout is not None else None
+final_time = timeout_to_final_time(final_timeout) if final_timeout is not None else None
 
 
 def cancel():
@@ -33,7 +32,7 @@ response = DEFAULT_POOL.request(
 
 print("Status:", response.status)
 
-buffered = BufferedResponse(response, cancel_event=cancel_event, end_time=end_time)
+buffered = BufferedResponse(response, cancel_event=cancel_event, final_time=final_time)
 buffered.read()
 
 print("Finished")

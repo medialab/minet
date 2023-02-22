@@ -333,7 +333,7 @@ def stream_request_body(
     body: BytesIO,
     chunk_size: int = STREAMING_CHUNK_SIZE,
     cancel_event: Optional[Event] = None,
-    end_time: Optional[float] = None,
+    final_time: Optional[float] = None,
     up_to: Optional[int] = None,
 ) -> bool:
     if up_to is not None and body.tell() >= up_to:
@@ -348,16 +348,16 @@ def stream_request_body(
         if cancel_event is not None and cancel_event.is_set():
             raise CancelledRequestError
 
-        if end_time is not None:
-            if timer() >= end_time:
+        if final_time is not None:
+            if timer() >= final_time:
                 raise FinalTimeoutError
 
     # This is the only place we know the body has been fully read
     return True
 
 
-def timeout_to_end_time(timeout: Union[float, urllib3.Timeout]) -> float:
-    seconds = None
+def timeout_to_final_time(timeout: Union[float, urllib3.Timeout]) -> float:
+    seconds = timeout
 
     if isinstance(timeout, urllib3.Timeout):
         if timeout.total is not None:
@@ -372,17 +372,17 @@ def timeout_to_end_time(timeout: Union[float, urllib3.Timeout]) -> float:
 
 
 class BufferedResponse(object):
-    __slots__ = ("__inner", "__body", "__cancel_event", "__end_time", "__finished")
+    __slots__ = ("__inner", "__body", "__cancel_event", "__final_time", "__finished")
 
     def __init__(
         self,
         response: urllib3.HTTPResponse,
         cancel_event: Optional[Event],
-        end_time: Optional[float] = None,
+        final_time: Optional[float] = None,
     ):
         self.__inner = response
         self.__cancel_event = cancel_event
-        self.__end_time = end_time
+        self.__final_time = final_time
         self.__body = BytesIO()
         self.__finished = False
 
@@ -402,7 +402,7 @@ class BufferedResponse(object):
                 self.__inner,
                 chunk_size=chunk_size,
                 cancel_event=self.__cancel_event,
-                end_time=self.__end_time,
+                final_time=self.__final_time,
                 body=self.__body,
                 up_to=up_to,
             )
