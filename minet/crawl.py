@@ -4,12 +4,24 @@
 #
 # Functions related to the crawling utilities of minet.
 #
+from typing import (
+    NamedTuple,
+    Any,
+    Optional,
+    List,
+    TypeVar,
+    Union,
+    Callable,
+    Dict,
+    Generator,
+)
+
+import urllib3
 from queue import Queue
 from persistqueue import SQLiteQueue
 from quenouille import imap_unordered
 from bs4 import BeautifulSoup
 from ural import get_domain_name
-from collections import namedtuple
 from urllib.parse import urljoin
 from shutil import rmtree
 from threading import Lock
@@ -20,6 +32,7 @@ from minet.web import (
     create_pool_manager,
     request,
     extract_response_meta,
+    ResponseMeta,
     EXPECTED_WEB_ERRORS,
 )
 from minet.utils import PseudoFStringFormatter
@@ -34,13 +47,10 @@ from minet.constants import (
 
 FORMATTER = PseudoFStringFormatter()
 
-CrawlWorkerResult = namedtuple(
-    "CrawlWorkerResult",
-    ["job", "scraped", "error", "response", "meta", "content", "next_jobs"],
-)
+T = TypeVar("T")
 
 
-def ensure_list(value):
+def ensure_list(value: Union[T, List[T]]) -> List[T]:
     if not isinstance(value, list):
         return [value]
     return value
@@ -49,13 +59,17 @@ def ensure_list(value):
 class CrawlJob(object):
     __slots__ = ("url", "level", "spider", "data")
 
-    def __init__(self, url, level=0, spider="default", data=None):
+    url: str
+    level: int
+    spider: str
+
+    def __init__(self, url: str, level: int = 0, spider: str = "default", data=None):
         self.url = url
         self.level = level
         self.spider = spider
         self.data = data
 
-    def id(self):
+    def id(self) -> str:
         return "%x" % id(self)
 
     def __repr__(self):
@@ -68,9 +82,9 @@ class CrawlJob(object):
             "spider": self.spider,
         }
 
-    @staticmethod
-    def grouper(job):
-        return get_domain_name(job.url)
+
+def crawl_job_grouper(job: CrawlJob):
+    return get_domain_name(job.url)
 
 
 def ensure_job(url_or_job):
@@ -80,7 +94,23 @@ def ensure_job(url_or_job):
     return CrawlJob(url=url_or_job)
 
 
+class CrawlWorkerResult(NamedTuple):
+    job: CrawlJob
+    scraped: Any
+    error: Optional[Exception]
+    response: Optional[urllib3.HTTPResponse]
+    meta: Optional[ResponseMeta]
+    body: Optional[bytes]
+    content: Optional[Any]
+    next_jobs: Optional[List[CrawlJob]]
+
+
 class CrawlerState(object):
+    jobs_done: int
+    jobs_doing: int
+    jobs_queued: int
+    __lock: Lock
+
     def __init__(self):
         self.__lock = Lock()
 
@@ -88,32 +118,32 @@ class CrawlerState(object):
         self.jobs_doing = 0
         self.jobs_queued = 0
 
-    def inc_queued(self):
+    def inc_queued(self) -> None:
         with self.__lock:
             self.jobs_queued += 1
 
-    def dec_queued(self):
+    def dec_queued(self) -> None:
         with self.__lock:
             self.jobs_queued -= 1
 
-    def inc_done(self):
+    def inc_done(self) -> None:
         with self.__lock:
             self.jobs_done += 1
 
-    def inc_doing(self):
+    def inc_doing(self) -> None:
         with self.__lock:
             self.jobs_doing += 1
 
-    def dec_doing(self):
+    def dec_doing(self) -> None:
         with self.__lock:
             self.jobs_doing -= 1
 
-    def inc_working(self):
+    def inc_working(self) -> None:
         with self.__lock:
             self.jobs_queued -= 1
             self.jobs_doing += 1
 
-    def dec_working(self):
+    def dec_working(self) -> None:
         with self.__lock:
             self.jobs_done += 1
             self.jobs_doing -= 1
@@ -132,22 +162,44 @@ class CrawlerState(object):
 
 
 class Spider(object):
-    def __init__(self, name="default"):
+    name: str
+
+    def __init__(self, name: str = "default"):
         self.name = name
 
     def start_jobs(self):
         return None
 
-    def extract_meta_from_response(self, job, response):
-        return extract_response_meta(response)
+    def extract_meta_from_response(
+        self, job: CrawlJob, response: urllib3.HTTPResponse, body: bytes
+    ) -> ResponseMeta:
+        return extract_response_meta(response, body)
 
-    def process_content(self, job, response, meta=None):
-        return response.data.decode(meta["encoding"], errors="replace")
+    def parse_content(
+        self,
+        job: CrawlJob,
+        response: urllib3.HTTPResponse,
+        body: bytes,
+        meta: ResponseMeta,
+    ) -> str:
+        return body.decode(meta["encoding"] or "utf8", errors="replace")
 
-    def scrape(self, job, response, content, meta=None):
+    def scrape(
+        self,
+        job: CrawlJob,
+        response: urllib3.HTTPResponse,
+        content: str,
+        meta: Optional[ResponseMeta] = None,
+    ):
         return None
 
-    def next_jobs(self, job, response, content, meta=None):
+    def next_jobs(
+        self,
+        job: CrawlJob,
+        response: urllib3.HTTPResponse,
+        content: str,
+        meta: Optional[ResponseMeta] = None,
+    ):
         return None
 
     def __repr__(self):
@@ -160,21 +212,37 @@ class Spider(object):
 
 
 class FunctionSpider(Spider):
-    def __init__(self, fn, name="default"):
+    fn: Callable[[CrawlJob, urllib3.HTTPResponse, str, Optional[ResponseMeta]], Any]
+
+    def __init__(self, fn, name: str = "default"):
         super().__init__(name)
         self.fn = fn
 
-    def process(self, job, response, content, meta=None):
+    def process(
+        self,
+        job: CrawlJob,
+        response: urllib3.HTTPResponse,
+        content: str,
+        meta: Optional[ResponseMeta] = None,
+    ):
         return self.fn(job, response, content, meta)
 
 
 class BeautifulSoupSpider(Spider):
-    def __init__(self, name="default", engine="lxml"):
+    engine: str
+
+    def __init__(self, name: str = "default", engine: str = "lxml"):
         super().__init__(name)
         self.engine = engine
 
-    def process_content(self, job, response, meta=None):
-        decoded_content = super().process_content(job, response, meta)
+    def process_content(
+        self,
+        job: CrawlJob,
+        response: urllib3.HTTPResponse,
+        body: bytes,
+        meta: ResponseMeta,
+    ) -> BeautifulSoup:
+        decoded_content = super().parse_content(job, response, body, meta)
 
         soup = BeautifulSoup(decoded_content, self.engine)
 
@@ -182,7 +250,16 @@ class BeautifulSoupSpider(Spider):
 
 
 class DefinitionSpider(Spider):
-    def __init__(self, definition, name="default"):
+    name: str
+    definition: Dict[str, Any]
+    next_definition: Optional[Dict[str, Any]]
+    max_level: int
+    scraper: Optional[Scraper]
+    scrapers: Dict[str, Scraper]
+    next_scraper: Optional[Scraper]
+    next_scrapers: Dict[str, Scraper]
+
+    def __init__(self, definition: Dict[str, Any], name: str = "default"):
 
         # Descriptors
         self.name = name
@@ -213,7 +290,7 @@ class DefinitionSpider(Spider):
                 for name, scraper in self.next_definition["scrapers"].items():
                     self.next_scrapers[name] = Scraper(scraper)
 
-    def start_jobs(self):
+    def start_jobs(self) -> Generator[CrawlJob, None, None]:
 
         # TODO: possibility to name this as jobs
         start_urls = ensure_list(self.definition.get("start_url", [])) + ensure_list(
@@ -223,7 +300,7 @@ class DefinitionSpider(Spider):
         for url in start_urls:
             yield CrawlJob(url, spider=self.name)
 
-    def next_targets(self, content, next_level):
+    def next_targets(self, content, next_level: int):
 
         # Scraping next results
         if self.next_scraper is not None:
