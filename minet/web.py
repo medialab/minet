@@ -342,9 +342,10 @@ def stream_request_body(
     chunk_size: int = 2**12,
     cancel_event: Optional[Event] = None,
     end_time: Optional[float] = None,
+    buffer: Optional[BytesIO] = None,
 ) -> BytesIO:
     with closing_response(response):
-        body = BytesIO()
+        body = BytesIO() if buffer is None else buffer
 
         if cancel_event is not None and cancel_event.is_set():
             raise CancelledRequestError
