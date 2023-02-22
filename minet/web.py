@@ -398,7 +398,7 @@ class BufferedResponse(object):
         fully_read = False
 
         try:
-            stream_request_body(
+            fully_read = stream_request_body(
                 self.__inner,
                 chunk_size=chunk_size,
                 cancel_event=self.__cancel_event,
