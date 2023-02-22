@@ -154,7 +154,7 @@ def create_report_iterator(cli_args, reader, worker_args=None, on_irrelevant_row
     indexed_headers = {n: i for i, n in enumerate(reader.headers)}
 
     def generator():
-        for i, row in enumerate(reader):
+        for i, row in reader.enumerate():
             error = getdefault(row, error_pos)
 
             if error is not None:

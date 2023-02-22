@@ -20,8 +20,8 @@ from minet.telegram.exceptions import TelegramInvalidTargetError
 def action(cli_args, enricher, loading_bar):
     scraper = TelegramScraper(throttle=cli_args.throttle)
 
-    for i, (row, channel) in enumerate(
-        enricher.cells(cli_args.column, with_rows=True), 1
+    for i, row, channel in enricher.enumerate_cells(
+        cli_args.column, with_rows=True, start=1
     ):
         with loading_bar.step(channel):
             try:

@@ -18,8 +18,8 @@ from minet.facebook.exceptions import FacebookInvalidTargetError
 def action(cli_args, enricher, loading_bar):
     scraper = FacebookMobileScraper(cli_args.cookie, throttle=cli_args.throttle)
 
-    for i, (row, post_url) in enumerate(
-        enricher.cells(cli_args.column, with_rows=True), 1
+    for i, row, post_url in enricher.enumerate_cells(
+        cli_args.column, with_rows=True, start=1
     ):
         with loading_bar.step():
             try:

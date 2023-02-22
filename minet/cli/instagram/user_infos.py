@@ -18,7 +18,9 @@ from minet.instagram.exceptions import InstagramInvalidTargetError
 def action(cli_args, enricher, loading_bar):
     client = InstagramAPIScraper(cookie=cli_args.cookie)
 
-    for i, (row, user) in enumerate(enricher.cells(cli_args.column, with_rows=True)):
+    for i, row, user in enricher.enumerate_cells(
+        cli_args.column, with_rows=True, start=1
+    ):
         with loading_bar.step():
             try:
                 result = client.user_infos(user)
