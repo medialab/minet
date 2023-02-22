@@ -4,7 +4,8 @@
 #
 # Miscellaneous web-related functions used throughout the library.
 #
-from typing import Optional, Tuple, Union, OrderedDict, List
+from typing import Optional, Tuple, Union, OrderedDict, List, Any
+from typing_extensions import TypedDict
 
 import re
 import cgi
@@ -62,7 +63,7 @@ mimetypes.init()
 AnyTimeout = Union[float, urllib3.Timeout]
 
 # Handy regexes
-BINARY_BOM_RE = re.compile(rb"\xef\xbb\xbf")
+BINARY_BOM_RE = re.compile(rb"^\xef\xbb\xbf")
 CHARSET_RE = re.compile(rb'<meta.*?charset=["\']*(.+?)["\'>]', flags=re.I)
 PRAGMA_RE = re.compile(rb'<meta.*?content=["\']*;?charset=(.+?)["\'>]', flags=re.I)
 XML_RE = re.compile(rb'^<\?xml.*?encoding=["\']*(.+?)["\'>]', flags=re.I)
@@ -95,29 +96,13 @@ EXPECTED_WEB_ERRORS = (HTTPError, RedirectError, InvalidURLError)
 assert CONTENT_PREBUFFER_UP_TO < LARGE_CONTENT_PREBUFFER_UP_TO
 
 
-def prebuffer_response_up_to(response, target):
-    try:
-        if response._body is None:
-            response._body = response.read(target)
-        else:
-            target -= len(response._body)
-
-            if target <= 0:
-                return None
-
-            response._body += response.read(target)
-
-    except Exception as e:
-        return e
-
-    return None
-
-
 # TODO: add a version that tallies the possibilities
 # NOTE: utf-16 is handled differently to account for endianness
 # NOTE: file starting with a BOM are inferred preferentially
 # See: https://github.com/medialab/minet/issues/550
-def guess_response_encoding(response, is_xml=False, infer=False):
+def guess_response_encoding(
+    response: urllib3.HTTPResponse, body: bytes, is_xml=False, infer=False
+) -> Optional[str]:
     """
     Function taking an urllib3 response object and attempting to guess its
     encoding.
@@ -126,10 +111,7 @@ def guess_response_encoding(response, is_xml=False, infer=False):
 
     suboptimal_charset = None
 
-    # TODO: think about prebuffering
-    data = response.data
-
-    has_bom = bool(BINARY_BOM_RE.match(data[:10]))
+    has_bom = bool(BINARY_BOM_RE.match(body))
 
     if content_type_header is not None:
         parsed_header = cgi.parse_header(content_type_header)
@@ -147,7 +129,7 @@ def guess_response_encoding(response, is_xml=False, infer=False):
                 else:
                     suboptimal_charset = charset
 
-    chunk = data[:CONTENT_PREBUFFER_UP_TO]
+    chunk = body[:CONTENT_PREBUFFER_UP_TO]
 
     # Data is empty
     if not chunk.strip():
@@ -178,7 +160,7 @@ def guess_response_encoding(response, is_xml=False, infer=False):
                 suboptimal_charset = charset
 
     if infer:
-        inferrence_result = chardet.detect(data)
+        inferrence_result = chardet.detect(body)
 
         # Could not detect anything
         if not inferrence_result or inferrence_result.get("confidence") is None:
@@ -190,11 +172,11 @@ def guess_response_encoding(response, is_xml=False, infer=False):
     return suboptimal_charset
 
 
-def looks_like_html(html_chunk):
+def looks_like_html(html_chunk: bytes) -> bool:
     return HTML_RE.match(html_chunk) is not None
 
 
-def parse_http_header(header):
+def parse_http_header(header: str) -> Tuple[str, str]:
     key, value = header.split(":", 1)
 
     return key.strip(), value.strip()
@@ -202,7 +184,7 @@ def parse_http_header(header):
 
 # TODO: take more cases into account...
 #   http://www.otsukare.info/2015/03/26/refresh-http-header
-def parse_http_refresh(value):
+def parse_http_refresh(value) -> Optional[Tuple[int, str]]:
     try:
 
         if isinstance(value, bytes):
@@ -853,17 +835,27 @@ def resolve(
     return stack
 
 
-def extract_response_meta(response, guess_encoding=True, guess_extension=True):
-    meta = {
+class ResponseMeta(TypedDict):
+    ext: Optional[str]
+    mimetype: Optional[str]
+    encoding: Optional[str]
+    is_text: Optional[bool]
+    datetime_utc: datetime
+
+
+def extract_response_meta(
+    response: urllib3.HTTPResponse,
+    body: bytes,
+    guess_encoding: bool = True,
+    guess_extension: bool = True,
+) -> ResponseMeta:
+    meta: ResponseMeta = {
         "ext": None,
         "mimetype": None,
         "encoding": None,
         "is_text": None,
-        "datetime_utc": None,
+        "datetime_utc": datetime.utcnow(),
     }
-
-    # Marking time at which the fetch result object was created
-    meta["datetime_utc"] = datetime.utcnow()
 
     # Guessing extension
     if guess_extension:
@@ -879,9 +871,7 @@ def extract_response_meta(response, guess_encoding=True, guess_extension=True):
             if parsed_header and parsed_header[0].strip():
                 mimetype = parsed_header[0].strip()
 
-        if mimetype is None and looks_like_html(
-            response.data[:CONTENT_PREBUFFER_UP_TO]
-        ):
+        if mimetype is None and looks_like_html(body):
             mimetype = "text/html"
 
         if mimetype is not None:
@@ -903,12 +893,20 @@ def extract_response_meta(response, guess_encoding=True, guess_extension=True):
 
     # Guessing encoding
     if guess_encoding:
-        meta["encoding"] = guess_response_encoding(response, is_xml=True, infer=True)
+        meta["encoding"] = guess_response_encoding(
+            response, body, is_xml=True, infer=True
+        )
 
     return meta
 
 
-def request_jsonrpc(url, method, pool_manager=DEFAULT_POOL_MANAGER, *args, **kwargs):
+def request_jsonrpc(
+    url: str,
+    method: str,
+    pool_manager: urllib3.PoolManager = DEFAULT_POOL_MANAGER,
+    *args,
+    **kwargs
+) -> Tuple[urllib3.HTTPResponse, Any]:
     params = []
 
     if len(args) > 0:
@@ -916,29 +914,28 @@ def request_jsonrpc(url, method, pool_manager=DEFAULT_POOL_MANAGER, *args, **kwa
     elif len(kwargs) > 0:
         params = kwargs
 
-    response = request(
+    response, body = request(
         url,
         pool_manager=pool_manager,
         method="POST",
         json_body={"method": method, "params": params},
     )
 
-    data = json.loads(response.data)
+    data = json.loads(body)
 
     return response, data
 
 
-def request_json(url, pool_manager=DEFAULT_POOL_MANAGER, *args, **kwargs):
-    response = request(url, pool_manager=pool_manager, *args, **kwargs)
-
-    return response, json.loads(response.data.decode())
+def request_json(url, *args, **kwargs) -> Tuple[urllib3.HTTPResponse, Any]:
+    response, body = request(url, *args, **kwargs)
+    return response, json.loads(body)
 
 
 def request_text(
-    url, pool_manager=DEFAULT_POOL_MANAGER, *args, encoding="utf-8", **kwargs
-):
-    response = request(url, pool_manager=pool_manager, *args, **kwargs)
-    return response, response.data.decode(encoding)
+    url, *args, encoding="utf-8", **kwargs
+) -> Tuple[urllib3.HTTPResponse, str]:
+    response, body = request(url, *args, **kwargs)
+    return response, body.decode(encoding)
 
 
 ONE_DAY = 24 * 60 * 60
