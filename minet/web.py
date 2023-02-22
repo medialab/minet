@@ -273,8 +273,12 @@ def dict_to_cookie_string(d):
 
 
 def create_pool_manager(
-    proxy=None, threads=None, insecure=False, spoof_tls_ciphers=False, **kwargs
-):
+    proxy: Optional[str] = None,
+    threads: Optional[int] = None,
+    insecure: bool = False,
+    spoof_tls_ciphers: bool = False,
+    **kwargs
+) -> urllib3.PoolManager:
     """
     Helper function returning a urllib3 pool manager with sane defaults.
     """
@@ -516,7 +520,7 @@ class Redirection(object):
         }
 
 
-RedirectionStack = List[Tuple[Redirection]]
+RedirectionStack = List[Redirection]
 
 
 def atomic_resolve(

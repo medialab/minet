@@ -5,8 +5,9 @@
 # Exposing a specialized quenouille wrapper grabbing various urls from the
 # web in a multithreaded fashion.
 #
-from collections import namedtuple
-from datetime import datetime
+from typing import NamedTuple, Any, Optional, Generator, Callable
+
+import urllib3
 from quenouille import ThreadPoolExecutor
 from ural import get_domain_name, ensure_protocol
 
@@ -15,6 +16,9 @@ from minet.web import (
     request,
     resolve,
     extract_response_meta,
+    ResponseMeta,
+    RedirectionStack,
+    AnyTimeout,
     EXPECTED_WEB_ERRORS,
 )
 from minet.heuristics import should_spoof_ua_when_resolving
@@ -28,19 +32,31 @@ from minet.constants import (
 )
 
 
-FetchWorkerPayload = namedtuple("FetchWorkerPayload", ["item", "domain", "url"])
+class FetchWorkerPayload(NamedTuple):
+    item: Any
+    domain: Optional[str]
+    url: Optional[str]
 
 
 class FetchResult(object):
-    __slots__ = ("item", "domain", "url", "error", "response", "meta")
+    __slots__ = ("item", "domain", "url", "error", "response", "body", "meta")
 
-    def __init__(self, item, domain, url):
+    item: Any
+    domain: Optional[str]
+    url: Optional[str]
+    error: Optional[Exception]
+    response: Optional[urllib3.HTTPResponse]
+    body: Optional[bytes]
+    meta: Optional[ResponseMeta]
+
+    def __init__(self, item, domain: Optional[str], url: Optional[str]):
         self.item = item
         self.domain = domain
         self.url = url
         self.error = None
         self.response = None
-        self.meta = {}
+        self.body = None
+        self.meta = None
 
     def __repr__(self):
         name = self.__class__.__name__
@@ -52,24 +68,41 @@ class FetchResult(object):
             name=name,
             url=self.url,
             status=self.response.status if self.response else None,
-            datetime_utc=datetime.isoformat(self.meta.get("datetime_utc")),
-            ext=self.meta.get("ext"),
-            encoding=self.meta.get("encoding"),
+            ext=self.meta.get("ext") if self.meta is not None else None,
+            encoding=self.meta.get("encoding") if self.meta is not None else None,
             errored=" errored!" if self.error else "",
         )
 
     @property
-    def resolved(self):
+    def resolved(self) -> Optional[str]:
         if self.response is None:
             return None
 
         return self.response.geturl()
 
+    @property
+    def decode(self) -> str:
+        if self.body is not None:
+            encoding = self.meta.get("encoding") if self.meta else None
+
+            if encoding is None:
+                raise TypeError("cannot decode because we did not infer and encoding")
+
+            return self.body.decode(encoding)
+
+        raise TypeError("cannot decode because the response did not have a body")
+
 
 class ResolveResult(object):
     __slots__ = ("item", "domain", "url", "error", "stack")
 
-    def __init__(self, item, domain, url):
+    item: Any
+    domain: Optional[str]
+    url: Optional[str]
+    error: Optional[Exception]
+    stack: Optional[RedirectionStack]
+
+    def __init__(self, item, domain: Optional[str], url: Optional[str]):
         self.item = item
         self.domain = domain
         self.url = url
@@ -95,7 +128,7 @@ def key_by_domain_name(payload):
     return payload.domain
 
 
-def payloads_iter(iterator, key=None):
+def payloads_iter(iterator, key=None) -> Generator[FetchWorkerPayload, None, None]:
     for item in iterator:
         url = item if key is None else key(item)
 
@@ -111,24 +144,28 @@ def payloads_iter(iterator, key=None):
 
 
 class FetchWorker(object):
+    pool_manager: urllib3.PoolManager
+    callback: Optional[Callable[[FetchResult], None]]
+
     def __init__(
         self,
-        pool_manager,
+        pool_manager: urllib3.PoolManager,
         *,
         request_args=None,
-        max_redirects=DEFAULT_FETCH_MAX_REDIRECTS,
-        callback=None
+        max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
+        callback: Optional[Callable[[FetchResult], None]] = None
     ):
         self.pool_manager = pool_manager
         self.request_args = request_args
         self.max_redirects = max_redirects
         self.callback = callback
 
-    def __call__(self, payload):
+    def __call__(self, payload: FetchWorkerPayload) -> FetchResult:
         item, domain, url = payload
 
         result = FetchResult(*payload)
 
+        # Noop
         if url is None:
             return result
 
@@ -139,7 +176,7 @@ class FetchWorker(object):
             kwargs = self.request_args(domain, url, item)
 
         try:
-            response = request(
+            response, body = request(
                 url,
                 pool_manager=self.pool_manager,
                 max_redirects=self.max_redirects,
@@ -150,14 +187,11 @@ class FetchWorker(object):
             result.error = error
 
         else:
-            # Forcing urllib3 to read data in thread
-            # TODO: this is probably useless and should be replaced by preload_content at the right place
-            _ = response.data
-
             # Meta
-            meta = extract_response_meta(response)
+            meta = extract_response_meta(response, body)
 
             result.response = response
+            result.body = body
             result.meta = meta
 
             if self.callback is not None:
@@ -167,17 +201,25 @@ class FetchWorker(object):
 
 
 class ResolveWorker(object):
+    pool_manager: urllib3.PoolManager
+    max_redirects: int
+    follow_refresh_header: bool
+    follow_meta_refresh: bool
+    follow_js_relocation: bool
+    infer_redirection: bool
+    canonicalize: bool
+
     def __init__(
         self,
-        pool_manager,
+        pool_manager: urllib3.PoolManager,
         *,
         resolve_args=None,
-        max_redirects=DEFAULT_RESOLVE_MAX_REDIRECTS,
-        follow_refresh_header=True,
-        follow_meta_refresh=False,
-        follow_js_relocation=False,
-        infer_redirection=False,
-        canonicalize=False
+        max_redirects: int = DEFAULT_RESOLVE_MAX_REDIRECTS,
+        follow_refresh_header: bool = True,
+        follow_meta_refresh: bool = False,
+        follow_js_relocation: bool = False,
+        infer_redirection: bool = False,
+        canonicalize: bool = False
     ):
 
         self.pool_manager = pool_manager
@@ -189,9 +231,10 @@ class ResolveWorker(object):
         self.infer_redirection = infer_redirection
         self.canonicalize = canonicalize
 
-    def __call__(self, payload):
+    def __call__(self, payload: FetchWorkerPayload) -> ResolveResult:
         item, domain, url = payload
 
+        # Noop
         result = ResolveResult(*payload)
 
         if url is None:
@@ -204,7 +247,7 @@ class ResolveWorker(object):
             kwargs = self.resolve_args(domain, url, item)
 
         # NOTE: should it be just in the CLI?
-        if "spoof_ua" not in kwargs:
+        if "spoof_ua" not in kwargs and domain is not None:
             kwargs["spoof_ua"] = should_spoof_ua_when_resolving(domain)
 
         try:
@@ -228,11 +271,13 @@ class ResolveWorker(object):
 
 
 class HTTPThreadPoolExecutor(ThreadPoolExecutor):
+    # pool_manager = urllib3.PoolManager
+
     def __init__(
         self,
-        max_workers=None,
-        insecure=False,
-        timeout=DEFAULT_URLLIB3_TIMEOUT,
+        max_workers: Optional[int] = None,
+        insecure: bool = False,
+        timeout: AnyTimeout = DEFAULT_URLLIB3_TIMEOUT,
         **kwargs
     ):
         super().__init__(max_workers, **kwargs)
@@ -253,12 +298,12 @@ class FetchThreadPoolExecutor(HTTPThreadPoolExecutor):
         self,
         iterator,
         *,
-        key=None,
-        throttle=DEFAULT_THROTTLE,
+        key: Optional[Callable[[Any], Optional[str]]] = None,
+        throttle: float = DEFAULT_THROTTLE,
         request_args=None,
-        buffer_size=DEFAULT_IMAP_BUFFER_SIZE,
-        domain_parallelism=DEFAULT_DOMAIN_PARALLELISM,
-        max_redirects=DEFAULT_FETCH_MAX_REDIRECTS,
+        buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
+        domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
+        max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         callback=None
     ):
 
@@ -286,17 +331,17 @@ class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor):
         self,
         iterator,
         *,
-        key=None,
-        throttle=DEFAULT_THROTTLE,
+        key: Optional[Callable[[Any], Optional[str]]] = None,
+        throttle: float = DEFAULT_THROTTLE,
         resolve_args=None,
-        buffer_size=DEFAULT_IMAP_BUFFER_SIZE,
-        domain_parallelism=DEFAULT_DOMAIN_PARALLELISM,
-        max_redirects=DEFAULT_FETCH_MAX_REDIRECTS,
-        follow_refresh_header=True,
-        follow_meta_refresh=False,
-        follow_js_relocation=False,
-        infer_redirection=False,
-        canonicalize=False
+        buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
+        domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
+        max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
+        follow_refresh_header: bool = True,
+        follow_meta_refresh: bool = False,
+        follow_js_relocation: bool = False,
+        infer_redirection: bool = False,
+        canonicalize: bool = False
     ):
 
         # TODO: validate
@@ -324,17 +369,17 @@ class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor):
 
 def multithreaded_fetch(
     iterator,
-    key=None,
+    key: Optional[Callable[[Any], Optional[str]]] = None,
     request_args=None,
-    threads=25,
-    throttle=DEFAULT_THROTTLE,
-    buffer_size=DEFAULT_IMAP_BUFFER_SIZE,
-    insecure=False,
-    timeout=DEFAULT_URLLIB3_TIMEOUT,
-    domain_parallelism=DEFAULT_DOMAIN_PARALLELISM,
-    max_redirects=5,
-    wait=True,
-    daemonic=False,
+    threads: int = 25,
+    throttle: float = DEFAULT_THROTTLE,
+    buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
+    insecure: bool = False,
+    timeout: AnyTimeout = DEFAULT_URLLIB3_TIMEOUT,
+    domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
+    max_redirects: int = 5,
+    wait: bool = True,
+    daemonic: bool = False,
     callback=None,
 ):
     """
@@ -389,22 +434,22 @@ def multithreaded_fetch(
 
 def multithreaded_resolve(
     iterator,
-    key=None,
+    key: Optional[Callable[[Any], Optional[str]]] = None,
     resolve_args=None,
-    threads=25,
-    throttle=DEFAULT_THROTTLE,
-    max_redirects=5,
-    follow_refresh_header=True,
-    follow_meta_refresh=False,
-    follow_js_relocation=False,
-    infer_redirection=False,
-    canonicalize=False,
-    buffer_size=DEFAULT_IMAP_BUFFER_SIZE,
-    insecure=False,
-    timeout=DEFAULT_URLLIB3_TIMEOUT,
-    domain_parallelism=DEFAULT_DOMAIN_PARALLELISM,
-    wait=True,
-    daemonic=False,
+    threads: int = 25,
+    throttle: float = DEFAULT_THROTTLE,
+    max_redirects: int = 5,
+    follow_refresh_header: bool = True,
+    follow_meta_refresh: bool = False,
+    follow_js_relocation: bool = False,
+    infer_redirection: bool = False,
+    canonicalize: bool = False,
+    buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
+    insecure: bool = False,
+    timeout: AnyTimeout = DEFAULT_URLLIB3_TIMEOUT,
+    domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
+    wait: bool = True,
+    daemonic: bool = False,
 ):
     """
     Function returning a multithreaded iterator over resolved urls.
