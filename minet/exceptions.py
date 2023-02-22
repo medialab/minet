@@ -13,9 +13,12 @@ class MinetError(Exception):
         if message is not None:
             message = message_flatmap(message)
 
-        super().__init__(message)
-
         self.message = message
+
+        if message is None:
+            super().__init__()
+        else:
+            super().__init__(message)
 
     def __repr__(self):
         representation = "<" + self.__class__.__name__
@@ -53,6 +56,14 @@ class InvalidURLError(MinetError):
     def __init__(self, message=None, url=None):
         self.url = url
         super().__init__(message)
+
+
+class CancelledRequestError(MinetError):
+    pass
+
+
+class FinalTimeoutError(MinetError):
+    pass
 
 
 # Redirection errors

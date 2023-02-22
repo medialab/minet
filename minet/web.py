@@ -4,11 +4,12 @@
 #
 # Miscellaneous web-related functions used throughout the library.
 #
+from typing import Optional
+
 import re
 import cgi
 import certifi
 import random
-from datetime import datetime
 import browser_cookie3
 import urllib3
 import urllib.error
@@ -17,6 +18,11 @@ import json
 import mimetypes
 import functools
 import charset_normalizer as chardet
+from datetime import datetime
+from timeit import default_timer as timer
+from contextlib import contextmanager
+from io import BytesIO
+from threading import Event
 from collections import OrderedDict
 from urllib.parse import urljoin
 from urllib3 import HTTPResponse
@@ -42,6 +48,8 @@ from minet.exceptions import (
     InvalidRedirectError,
     InvalidURLError,
     SelfRedirectError,
+    CancelledRequestError,
+    FinalTimeoutError,
 )
 from minet.constants import (
     DEFAULT_SPOOFED_UA,
@@ -320,9 +328,43 @@ def create_pool(
 DEFAULT_POOL = create_pool(maxsize=10, num_pools=10)
 
 
+@contextmanager
+def closing_response(response):
+    try:
+        yield
+    finally:
+        response.release_conn()
+        response.close()
+
+
+def stream_request_body(
+    response,
+    chunk_size: int = 2**12,
+    cancel_event: Optional[Event] = None,
+    end_time: Optional[float] = None,
+) -> BytesIO:
+    with closing_response(response):
+        body = BytesIO()
+
+        if cancel_event is not None and cancel_event.is_set():
+            raise CancelledRequestError
+
+        for data in response.stream(chunk_size):
+            body.write(data)
+
+            if cancel_event is not None and cancel_event.is_set():
+                raise CancelledRequestError
+
+            if end_time is not None:
+                if timer() >= end_time:
+                    raise FinalTimeoutError
+
+        return body
+
+
 def make_request(
     pool,
-    url,
+    url: str,
     method="GET",
     headers=None,
     preload_content=True,
