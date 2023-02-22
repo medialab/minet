@@ -319,6 +319,8 @@ class LoadingBar(object):
 
             # NOTE: cursor 1up
             if exc_type is KeyboardInterrupt:
+
+                # NOTE: broken pipe are often subsequent
                 console.file.write("\x1b[1A")
                 style = "warning"
 

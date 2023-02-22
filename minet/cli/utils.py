@@ -29,20 +29,20 @@ def colored(string, color):
     return "[{color}]{string}[/{color}]".format(string=string, color=color)
 
 
+def redirect_to_devnull():
+    # Taken from: https://docs.python.org/3/library/signal.html
+    devnull = os.open(os.devnull, os.O_WRONLY)
+    os.dup2(devnull, sys.stdout.fileno())
+
+
 def with_cli_exceptions(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         try:
             fn(*args, **kwargs)
 
-        except KeyboardInterrupt:
-            sys.exit(1)
-
-        except BrokenPipeError:
-
-            # Taken from: https://docs.python.org/3/library/signal.html
-            devnull = os.open(os.devnull, os.O_WRONLY)
-            os.dup2(devnull, sys.stdout.fileno())
+        except (KeyboardInterrupt, BrokenPipeError):
+            redirect_to_devnull()
             sys.exit(1)
 
     return wrapper
