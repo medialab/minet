@@ -747,21 +747,22 @@ def build_request_headers(headers=None, cookie=None, spoof_ua=False, json_body=F
 
 
 def request(
-    url,
-    pool_manager=DEFAULT_POOL_MANAGER,
-    method="GET",
+    url: str,
+    pool_manager: urllib3.PoolManager = DEFAULT_POOL_MANAGER,
+    method: str = "GET",
     headers=None,
     cookie=None,
-    spoof_ua=True,
-    follow_redirects=True,
-    max_redirects=5,
-    follow_refresh_header=True,
-    follow_meta_refresh=False,
-    follow_js_relocation=False,
-    timeout=None,
+    spoof_ua: bool = True,
+    follow_redirects: bool = True,
+    max_redirects: int = 5,
+    follow_refresh_header: bool = True,
+    follow_meta_refresh: bool = False,
+    follow_js_relocation: bool = False,
+    timeout: Optional[AnyTimeout] = None,
     body=None,
     json_body=None,
-):
+    cancel_event: Optional[Event] = None,
+) -> Tuple[urllib3.HTTPResponse, bytes]:
 
     # Formatting headers
     final_headers = build_request_headers(
@@ -783,38 +784,32 @@ def request(
         final_body = json.dumps(json_body, ensure_ascii=False).encode("utf-8")
 
     if not follow_redirects:
-        return atomic_request(
+        buffered_response = atomic_request(
             pool_manager,
             url,
             method,
             headers=final_headers,
             body=final_body,
             timeout=timeout,
+            cancel_event=cancel_event,
         )
     else:
-        _, response = atomic_resolve(
+        _, buffered_response = atomic_resolve(
             pool_manager,
             url,
             method,
             headers=final_headers,
             body=final_body,
             max_redirects=max_redirects,
-            return_response=True,
             follow_refresh_header=follow_refresh_header,
             follow_meta_refresh=follow_meta_refresh,
             follow_js_relocation=follow_js_relocation,
             timeout=timeout,
+            cancel_event=cancel_event,
         )
 
-        # Finishing reading body
-        try:
-            response._body = (response._body or b"") + response.read()
-        finally:
-            if response is not None:
-                response.close()
-                response.release_conn()
-
-        return response
+    buffered_response.read()
+    return buffered_response.unwrap()
 
 
 def resolve(
