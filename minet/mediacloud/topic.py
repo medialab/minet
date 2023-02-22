@@ -34,7 +34,13 @@ def url_forge(
 
 
 def mediacloud_topic_stories(
-    pool, token, topic_id, link_id=None, media_id=None, from_media_id=None, raw=False
+    pool_manager,
+    token,
+    topic_id,
+    link_id=None,
+    media_id=None,
+    from_media_id=None,
+    raw=False,
 ):
 
     while True:
@@ -46,7 +52,7 @@ def mediacloud_topic_stories(
             from_media_id=from_media_id,
         )
 
-        _, data = request_json(url, pool=pool)
+        _, data = request_json(url, pool_manager=pool_manager)
 
         if "stories" not in data or len(data["stories"]) == 0:
             return

@@ -106,7 +106,7 @@ def url_forge(
 
 
 def mediacloud_search(
-    pool,
+    pool_manager,
     token,
     query,
     filter_query=None,
@@ -135,7 +135,7 @@ def mediacloud_search(
                 last_processed_stories_id=last_processed_stories_id,
             )
 
-            response, data = request_json(url, pool=pool)
+            response, data = request_json(url, pool_manager=pool_manager)
 
             if response.status >= 500:
                 raise MediacloudServerError(server_error=data.get("error"))

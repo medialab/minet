@@ -288,7 +288,7 @@ def dict_to_cookie_string(d):
     return "; ".join("%s=%s" % r for r in d.items())
 
 
-def create_pool(
+def create_pool_manager(
     proxy=None, threads=None, insecure=False, spoof_tls_ciphers=False, **kwargs
 ):
     """
@@ -325,7 +325,7 @@ def create_pool(
     return urllib3.PoolManager(**manager_kwargs)
 
 
-DEFAULT_POOL = create_pool(maxsize=10, num_pools=10)
+DEFAULT_POOL_MANAGER = create_pool_manager(maxsize=10, num_pools=10)
 
 
 def stream_request_body(
@@ -430,7 +430,7 @@ class BufferedResponse(object):
 
 
 def make_request(
-    pool,
+    pool_manager,
     url: str,
     method="GET",
     headers=None,
@@ -440,7 +440,7 @@ def make_request(
     body=None,
 ):
     """
-    Generic request helpers using a urllib3 pool to access some resource.
+    Generic request helpers using a urllib3 pool_manager to access some resource.
     """
 
     # Validating URL
@@ -462,7 +462,7 @@ def make_request(
     if timeout is not None:
         request_kwargs["timeout"] = timeout
 
-    return pool.request(method, url, **request_kwargs)
+    return pool_manager.request(method, url, **request_kwargs)
 
 
 class Redirection(object):
@@ -485,7 +485,7 @@ class Redirection(object):
 
 
 def make_resolve(
-    pool,
+    pool_manager,
     url,
     method="GET",
     headers=None,
@@ -524,7 +524,7 @@ def make_resolve(
 
         try:
             response = make_request(
-                pool,
+                pool_manager,
                 url,
                 method=method,
                 headers=headers,
@@ -699,7 +699,7 @@ def build_request_headers(headers=None, cookie=None, spoof_ua=False, json_body=F
 
 def request(
     url,
-    pool=DEFAULT_POOL,
+    pool_manager=DEFAULT_POOL_MANAGER,
     method="GET",
     headers=None,
     cookie=None,
@@ -735,11 +735,16 @@ def request(
 
     if not follow_redirects:
         return make_request(
-            pool, url, method, headers=final_headers, body=final_body, timeout=timeout
+            pool_manager,
+            url,
+            method,
+            headers=final_headers,
+            body=final_body,
+            timeout=timeout,
         )
     else:
         _, response = make_resolve(
-            pool,
+            pool_manager,
             url,
             method,
             headers=final_headers,
@@ -765,7 +770,7 @@ def request(
 
 def resolve(
     url,
-    pool=DEFAULT_POOL,
+    pool_manager=DEFAULT_POOL_MANAGER,
     method="GET",
     headers=None,
     cookie=None,
@@ -784,7 +789,7 @@ def resolve(
     )
 
     return make_resolve(
-        pool,
+        pool_manager,
         url,
         method,
         headers=final_headers,
@@ -853,7 +858,7 @@ def extract_response_meta(response, guess_encoding=True, guess_extension=True):
     return meta
 
 
-def request_jsonrpc(url, method, pool=DEFAULT_POOL, *args, **kwargs):
+def request_jsonrpc(url, method, pool_manager=DEFAULT_POOL_MANAGER, *args, **kwargs):
     params = []
 
     if len(args) > 0:
@@ -862,7 +867,10 @@ def request_jsonrpc(url, method, pool=DEFAULT_POOL, *args, **kwargs):
         params = kwargs
 
     response = request(
-        url, pool=pool, method="POST", json_body={"method": method, "params": params}
+        url,
+        pool_manager=pool_manager,
+        method="POST",
+        json_body={"method": method, "params": params},
     )
 
     data = json.loads(response.data)
@@ -870,14 +878,16 @@ def request_jsonrpc(url, method, pool=DEFAULT_POOL, *args, **kwargs):
     return response, data
 
 
-def request_json(url, pool=DEFAULT_POOL, *args, **kwargs):
-    response = request(url, pool=pool, *args, **kwargs)
+def request_json(url, pool_manager=DEFAULT_POOL_MANAGER, *args, **kwargs):
+    response = request(url, pool_manager=pool_manager, *args, **kwargs)
 
     return response, json.loads(response.data.decode())
 
 
-def request_text(url, pool=DEFAULT_POOL, *args, encoding="utf-8", **kwargs):
-    response = request(url, pool=pool, *args, **kwargs)
+def request_text(
+    url, pool_manager=DEFAULT_POOL_MANAGER, *args, encoding="utf-8", **kwargs
+):
+    response = request(url, pool_manager=pool_manager, *args, **kwargs)
     return response, response.data.decode(encoding)
 
 

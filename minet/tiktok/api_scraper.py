@@ -10,7 +10,7 @@ from urllib.parse import quote
 from minet.constants import COOKIE_BROWSERS
 from minet.utils import sleep_with_entropy
 from minet.web import (
-    create_pool,
+    create_pool_manager,
     create_request_retryer,
     request_json,
     grab_cookies,
@@ -44,7 +44,9 @@ def forge_video_search_url(query, offset):
 
 class TiktokAPIScraper(object):
     def __init__(self, cookie="firefox"):
-        self.pool = create_pool(timeout=TIKTOK_PUBLIC_API_DEFAULT_TIMEOUT)
+        self.pool_manacreate_pool_manager = create_pool_manager(
+            timeout=TIKTOK_PUBLIC_API_DEFAULT_TIMEOUT
+        )
 
         if cookie in COOKIE_BROWSERS:
             get_cookie_for_url = grab_cookies(cookie)
@@ -64,7 +66,7 @@ class TiktokAPIScraper(object):
 
         response, data = request_json(
             url,
-            pool=self.pool,
+            pool_manacreate_pool_manager=self.pool_manacreate_pool_manager,
             spoof_ua=True,
             headers=headers,
         )
