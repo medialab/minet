@@ -359,13 +359,15 @@ def stream_request_body(
 
 
 def timeout_to_final_time(timeout: AnyTimeout) -> float:
-    seconds = timeout
+    seconds: float
 
     if isinstance(timeout, urllib3.Timeout):
         if timeout.total is not None:
             seconds = timeout.total
         else:
             seconds = timeout.connect_timeout + timeout.read_timeout
+    else:
+        seconds = timeout
 
     # Some epsilon so sockets can timeout themselves properly
     seconds += 0.01
@@ -374,7 +376,7 @@ def timeout_to_final_time(timeout: AnyTimeout) -> float:
 
 
 def pool_manager_aware_timeout_to_final_time(
-    pool_manager: urllib3.PoolManager, timeout: AnyTimeout
+    pool_manager: urllib3.PoolManager, timeout: Optional[AnyTimeout]
 ) -> Optional[float]:
     if timeout is not None:
         return timeout_to_final_time(timeout)
@@ -439,7 +441,7 @@ class BufferedResponse(object):
                 self.__finished = fully_read
                 self.close()
 
-    def geturl(self) -> str:
+    def geturl(self) -> Optional[str]:
         return self.__inner.geturl()
 
     def getheader(self, name: str, default: Optional[str] = None) -> Optional[str]:
@@ -516,10 +518,10 @@ def atomic_request(
 class Redirection(object):
     __slots__ = ("status", "type", "url")
 
-    def __init__(self, url, _type="hit"):
-        self.status = None
-        self.url = url
-        self.type = _type
+    def __init__(self, url: str, _type="hit"):
+        self.status: Optional[int] = None
+        self.url: str = url
+        self.type: str = _type
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -530,6 +532,9 @@ class Redirection(object):
             "status": self.status,
             "url": self.url,
         }
+
+
+RedirectionStack = List[Tuple[Redirection]]
 
 
 def atomic_resolve(
@@ -547,7 +552,7 @@ def atomic_resolve(
     final_time: Optional[float] = None,
     body=None,
     canonicalize: bool = False,
-) -> Tuple[List[Tuple[Redirection]], BufferedResponse]:
+) -> Tuple[RedirectionStack, BufferedResponse]:
     """
     Helper function attempting to resolve the given url.
     """
@@ -581,8 +586,6 @@ def atomic_resolve(
                 method=method,
                 headers=headers,
                 body=body,
-                preload_content=False,
-                release_conn=False,
                 timeout=timeout,
                 final_time=final_time,
                 cancel_event=cancel_event,
@@ -815,26 +818,27 @@ def request(
 
 
 def resolve(
-    url,
-    pool_manager=DEFAULT_POOL_MANAGER,
-    method="GET",
+    url: str,
+    pool_manager: urllib3.PoolManager = DEFAULT_POOL_MANAGER,
+    method: str = "GET",
     headers=None,
     cookie=None,
-    spoof_ua=True,
-    max_redirects=5,
-    follow_refresh_header=True,
-    follow_meta_refresh=False,
-    follow_js_relocation=False,
-    infer_redirection=False,
-    timeout=None,
-    canonicalize=False,
-):
+    spoof_ua: bool = True,
+    max_redirects: int = 5,
+    follow_refresh_header: bool = True,
+    follow_meta_refresh: bool = False,
+    follow_js_relocation: bool = False,
+    infer_redirection: bool = False,
+    timeout: Optional[AnyTimeout] = None,
+    canonicalize: bool = False,
+    cancel_event: Optional[Event] = None,
+) -> RedirectionStack:
 
     final_headers = build_request_headers(
         headers=headers, cookie=cookie, spoof_ua=spoof_ua
     )
 
-    return atomic_resolve(
+    stack, buffered_response = atomic_resolve(
         pool_manager,
         url,
         method,
@@ -846,7 +850,12 @@ def resolve(
         infer_redirection=infer_redirection,
         timeout=timeout,
         canonicalize=canonicalize,
+        cancel_event=cancel_event,
     )
+
+    buffered_response.close()
+
+    return stack
 
 
 def extract_response_meta(response, guess_encoding=True, guess_extension=True):

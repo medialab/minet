@@ -41,7 +41,7 @@ for url in URLS:
         stack = resolve(
             url, follow_meta_refresh=True, infer_redirection=True, canonicalize=True
         )
-    except RedirectError as error:
+    except Exception as error:
         print(type(error), error)
         continue
 
