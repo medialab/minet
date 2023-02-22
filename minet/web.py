@@ -4,7 +4,7 @@
 #
 # Miscellaneous web-related functions used throughout the library.
 #
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 import re
 import cgi
@@ -354,6 +354,21 @@ def stream_request_body(
 
     # This is the only place we know the body has been fully read
     return True
+
+
+def timeout_to_end_time(timeout: Union[float, urllib3.Timeout]) -> float:
+    seconds = None
+
+    if isinstance(timeout, urllib3.Timeout):
+        if timeout.total is not None:
+            seconds = timeout.total
+        else:
+            seconds = timeout.connect_timeout + timeout.read_timeout
+
+    # Some epsilon so sockets can timeout themselves properly
+    seconds += 0.01
+
+    return timer() + seconds
 
 
 class BufferedResponse(object):

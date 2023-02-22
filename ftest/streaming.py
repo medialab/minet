@@ -3,17 +3,17 @@ from timeit import default_timer as timer
 from urllib3 import Timeout
 from argparse import ArgumentParser
 
+from minet.web import DEFAULT_POOL, BufferedResponse, timeout_to_end_time
+
 parser = ArgumentParser()
 parser.add_argument("--cancel-after", type=int)
 parser.add_argument("--timeout", type=int)
 
 cli_args = parser.parse_args()
 
-from minet.web import DEFAULT_POOL, BufferedResponse
-
 cancel_event = Event()
 final_timeout = cli_args.timeout
-end_time = (timer() + final_timeout) if final_timeout is not None else None
+end_time = timeout_to_end_time(final_timeout) if final_timeout is not None else None
 
 
 def cancel():
