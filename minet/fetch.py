@@ -235,6 +235,10 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         super().__init__(max_workers, **kwargs)
         self.pool = create_pool(threads=max_workers, insecure=insecure, timeout=timeout)
 
+    def shutdown(self, wait=True):
+        self.pool.clear()
+        return super().shutdown(wait=wait)
+
     def imap(self, *args, **kwargs):
         raise NotImplementedError
 
