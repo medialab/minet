@@ -372,7 +372,14 @@ def timeout_to_final_time(timeout: Union[float, urllib3.Timeout]) -> float:
 
 
 class BufferedResponse(object):
-    __slots__ = ("__inner", "__body", "__cancel_event", "__final_time", "__finished")
+    __slots__ = (
+        "__inner",
+        "__body",
+        "__cancel_event",
+        "__final_time",
+        "__finished",
+        "__unwrapped",
+    )
 
     def __init__(
         self,
@@ -385,13 +392,17 @@ class BufferedResponse(object):
         self.__final_time = final_time
         self.__body = BytesIO()
         self.__finished = False
+        self.__unwrapped = False
 
     def __len__(self) -> int:
         return self.__body.getbuffer().nbytes
 
     def __stream(
         self, chunk_size: int = STREAMING_CHUNK_SIZE, up_to: Optional[int] = None
-    ):
+    ) -> None:
+        if self.__unwrapped:
+            raise TypeError("buffered response was already unwrapped")
+
         if self.__finished:
             return
 
@@ -411,13 +422,25 @@ class BufferedResponse(object):
                 self.__finished = fully_read
                 self.close()
 
+    def geturl(self) -> str:
+        return self.__inner.geturl()
+
+    @property
+    def status(self) -> int:
+        return self.__inner.status
+
+    @property
+    def body(self) -> bytes:
+        return self.__body.getvalue()
+
     def close(self) -> None:
         # NOTE: releasing and closing is a noop if already done
         self.__inner.release_conn()
         self.__inner.close()
 
     def unwrap(self) -> Tuple[urllib3.HTTPResponse, bytes]:
-        self.read()
+        self.__unwrapped = True
+        self.close()
         return self.__inner, self.__body.getvalue()
 
     def read(self, chunk_size: int = STREAMING_CHUNK_SIZE) -> None:
@@ -430,15 +453,15 @@ class BufferedResponse(object):
 
 
 def make_request(
-    pool_manager,
+    pool_manager: urllib3.PoolManager,
     url: str,
     method="GET",
     headers=None,
-    preload_content=True,
-    release_conn=True,
     timeout=None,
     body=None,
-):
+    cancel_event: Optional[Event] = None,
+    final_time: Optional[float] = None,
+) -> BufferedResponse:
     """
     Generic request helpers using a urllib3 pool_manager to access some resource.
     """
@@ -453,8 +476,8 @@ def make_request(
     request_kwargs = {
         "headers": headers,
         "body": body,
-        "preload_content": preload_content,
-        "release_conn": release_conn,
+        "preload_content": False,
+        "release_conn": False,
         "redirect": False,
         "retries": False,
     }
@@ -462,7 +485,18 @@ def make_request(
     if timeout is not None:
         request_kwargs["timeout"] = timeout
 
-    return pool_manager.request(method, url, **request_kwargs)
+        if final_time is None:
+            final_time = timeout_to_final_time(timeout)
+
+    elif final_time is None:
+        pool_manager_timeout = pool_manager.connection_pool_kw.get("timeout")
+
+        if pool_manager_timeout is not None:
+            final_time = timeout_to_final_time(pool_manager_timeout)
+
+    response = pool_manager.request(method, url, **request_kwargs)
+
+    return BufferedResponse(response, cancel_event=cancel_event, final_time=final_time)
 
 
 class Redirection(object):
