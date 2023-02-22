@@ -5,7 +5,8 @@
 # Exposing a specialized quenouille wrapper grabbing various urls from the
 # web in a multithreaded fashion.
 #
-from typing import NamedTuple, Any, Optional, Generator, Callable
+from dataclasses import dataclass
+from typing import Any, Optional, Iterator, Callable, TypeVar, Generic, Iterable
 
 import urllib3
 from quenouille import ThreadPoolExecutor
@@ -31,17 +32,20 @@ from minet.constants import (
     DEFAULT_RESOLVE_MAX_REDIRECTS,
 )
 
+ItemType = TypeVar("ItemType")
 
-class FetchWorkerPayload(NamedTuple):
-    item: Any
+
+@dataclass
+class FetchWorkerPayload(Generic[ItemType]):
+    item: ItemType
     domain: Optional[str]
     url: Optional[str]
 
 
-class FetchResult(object):
+class FetchResult(Generic[ItemType]):
     __slots__ = ("item", "domain", "url", "error", "response", "body", "meta")
 
-    item: Any
+    item: ItemType
     domain: Optional[str]
     url: Optional[str]
     error: Optional[Exception]
@@ -49,7 +53,7 @@ class FetchResult(object):
     body: Optional[bytes]
     meta: Optional[ResponseMeta]
 
-    def __init__(self, item, domain: Optional[str], url: Optional[str]):
+    def __init__(self, item: ItemType, domain: Optional[str], url: Optional[str]):
         self.item = item
         self.domain = domain
         self.url = url
@@ -93,16 +97,16 @@ class FetchResult(object):
         raise TypeError("cannot decode because the response did not have a body")
 
 
-class ResolveResult(object):
+class ResolveResult(Generic[ItemType]):
     __slots__ = ("item", "domain", "url", "error", "stack")
 
-    item: Any
+    item: ItemType
     domain: Optional[str]
     url: Optional[str]
     error: Optional[Exception]
     stack: Optional[RedirectionStack]
 
-    def __init__(self, item, domain: Optional[str], url: Optional[str]):
+    def __init__(self, item: ItemType, domain: Optional[str], url: Optional[str]):
         self.item = item
         self.domain = domain
         self.url = url
@@ -124,11 +128,14 @@ class ResolveResult(object):
         )
 
 
-def key_by_domain_name(payload):
+def key_by_domain_name(payload: FetchWorkerPayload) -> Optional[str]:
     return payload.domain
 
 
-def payloads_iter(iterator, key=None) -> Generator[FetchWorkerPayload, None, None]:
+def payloads_iter(
+    iterator: Iterable[ItemType],
+    key: Optional[Callable[[ItemType], Optional[str]]] = None,
+) -> Iterator[FetchWorkerPayload[ItemType]]:
     for item in iterator:
         url = item if key is None else key(item)
 
@@ -143,9 +150,9 @@ def payloads_iter(iterator, key=None) -> Generator[FetchWorkerPayload, None, Non
         yield FetchWorkerPayload(item=item, domain=get_domain_name(url), url=url)
 
 
-class FetchWorker(object):
+class FetchWorker(Generic[ItemType]):
     pool_manager: urllib3.PoolManager
-    callback: Optional[Callable[[FetchResult], None]]
+    callback: Optional[Callable[[FetchResult[ItemType]], None]]
 
     def __init__(
         self,
@@ -153,17 +160,17 @@ class FetchWorker(object):
         *,
         request_args=None,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
-        callback: Optional[Callable[[FetchResult], None]] = None
+        callback: Optional[Callable[[FetchResult[ItemType]], None]] = None
     ):
         self.pool_manager = pool_manager
         self.request_args = request_args
         self.max_redirects = max_redirects
         self.callback = callback
 
-    def __call__(self, payload: FetchWorkerPayload) -> FetchResult:
-        item, domain, url = payload
+    def __call__(self, payload: FetchWorkerPayload[ItemType]) -> FetchResult[ItemType]:
+        item, domain, url = payload.item, payload.domain, payload.url
 
-        result = FetchResult(*payload)
+        result = FetchResult(item, domain, url)
 
         # Noop
         if url is None:
@@ -200,7 +207,7 @@ class FetchWorker(object):
         return result
 
 
-class ResolveWorker(object):
+class ResolveWorker(Generic[ItemType]):
     pool_manager: urllib3.PoolManager
     max_redirects: int
     follow_refresh_header: bool
@@ -231,12 +238,14 @@ class ResolveWorker(object):
         self.infer_redirection = infer_redirection
         self.canonicalize = canonicalize
 
-    def __call__(self, payload: FetchWorkerPayload) -> ResolveResult:
-        item, domain, url = payload
+    def __call__(
+        self, payload: FetchWorkerPayload[ItemType]
+    ) -> ResolveResult[ItemType]:
+        item, domain, url = payload.item, payload.domain, payload.url
+
+        result = ResolveResult(item, domain, url)
 
         # Noop
-        result = ResolveResult(*payload)
-
         if url is None:
             return result
 
@@ -293,19 +302,19 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         raise NotImplementedError
 
 
-class FetchThreadPoolExecutor(HTTPThreadPoolExecutor):
+class FetchThreadPoolExecutor(HTTPThreadPoolExecutor, Generic[ItemType]):
     def imap_unordered(
         self,
-        iterator,
+        iterator: Iterable[ItemType],
         *,
-        key: Optional[Callable[[Any], Optional[str]]] = None,
+        key: Optional[Callable[[ItemType], Optional[str]]] = None,
         throttle: float = DEFAULT_THROTTLE,
         request_args=None,
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
-        callback=None
-    ):
+        callback: Optional[Callable[[FetchResult[ItemType]], None]] = None
+    ) -> Iterator[FetchResult[ItemType]]:
 
         # TODO: validate
         iterator = payloads_iter(iterator, key=key)
@@ -326,12 +335,12 @@ class FetchThreadPoolExecutor(HTTPThreadPoolExecutor):
         )
 
 
-class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor):
+class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor, Generic[ItemType]):
     def imap_unordered(
         self,
-        iterator,
+        iterator: Iterable[ItemType],
         *,
-        key: Optional[Callable[[Any], Optional[str]]] = None,
+        key: Optional[Callable[[ItemType], Optional[str]]] = None,
         throttle: float = DEFAULT_THROTTLE,
         resolve_args=None,
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
@@ -342,7 +351,7 @@ class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor):
         follow_js_relocation: bool = False,
         infer_redirection: bool = False,
         canonicalize: bool = False
-    ):
+    ) -> Iterator[ResolveResult[ItemType]]:
 
         # TODO: validate
         iterator = payloads_iter(iterator, key=key)
@@ -368,8 +377,8 @@ class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor):
 
 
 def multithreaded_fetch(
-    iterator,
-    key: Optional[Callable[[Any], Optional[str]]] = None,
+    iterator: Iterable[ItemType],
+    key: Optional[Callable[[ItemType], Optional[str]]] = None,
     request_args=None,
     threads: int = 25,
     throttle: float = DEFAULT_THROTTLE,
@@ -381,7 +390,7 @@ def multithreaded_fetch(
     wait: bool = True,
     daemonic: bool = False,
     callback=None,
-):
+) -> Iterator[FetchResult[ItemType]]:
     """
     Function returning a multithreaded iterator over fetched urls.
 
@@ -410,7 +419,7 @@ def multithreaded_fetch(
 
     """
 
-    def generator():
+    def generator() -> Iterator[FetchResult[ItemType]]:
         with FetchThreadPoolExecutor(
             max_workers=threads,
             insecure=insecure,
@@ -433,8 +442,8 @@ def multithreaded_fetch(
 
 
 def multithreaded_resolve(
-    iterator,
-    key: Optional[Callable[[Any], Optional[str]]] = None,
+    iterator: Iterable[ItemType],
+    key: Optional[Callable[[ItemType], Optional[str]]] = None,
     resolve_args=None,
     threads: int = 25,
     throttle: float = DEFAULT_THROTTLE,
@@ -450,7 +459,7 @@ def multithreaded_resolve(
     domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
     wait: bool = True,
     daemonic: bool = False,
-):
+) -> ResolveResult[ItemType]:
     """
     Function returning a multithreaded iterator over resolved urls.
 
@@ -489,7 +498,7 @@ def multithreaded_resolve(
 
     """
 
-    def generator():
+    def generator() -> Iterator[ResolveResult[ItemType]]:
         with ResolveThreadPoolExecutor(
             max_workers=threads,
             insecure=insecure,
