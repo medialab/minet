@@ -17,8 +17,7 @@ from minet.web import (
     create_pool_manager,
     request,
     resolve,
-    extract_response_meta,
-    ResponseMeta,
+    Response,
     RedirectionStack,
     AnyTimeout,
     EXPECTED_WEB_ERRORS,
@@ -46,15 +45,13 @@ class FetchWorkerPayload(Generic[ItemType]):
 
 
 class FetchResult(Generic[ItemType]):
-    __slots__ = ("item", "domain", "url", "error", "response", "body", "meta")
+    __slots__ = ("item", "domain", "url", "error", "response")
 
     item: ItemType
     domain: Optional[str]
     url: Optional[str]
     error: Optional[Exception]
-    response: Optional[urllib3.HTTPResponse]
-    body: Optional[bytes]
-    meta: Optional[ResponseMeta]
+    response: Optional[Response]
 
     def __init__(self, item: ItemType, domain: Optional[str], url: Optional[str]):
         self.item = item
@@ -62,42 +59,26 @@ class FetchResult(Generic[ItemType]):
         self.url = url
         self.error = None
         self.response = None
-        self.body = None
-        self.meta = None
 
     def __repr__(self):
         name = self.__class__.__name__
 
         if not self.url:
-            return "<{name} empty!>".format(name=name)
+            return "<{name} null!>".format(name=name)
 
-        return "<{name}{errored} url={url!r} status={status!r} datetime_utc={datetime_utc!r} ext={ext!r} encoding={encoding!r}>".format(
-            name=name,
-            url=self.url,
-            status=self.response.status if self.response else None,
-            ext=self.meta.get("ext") if self.meta is not None else None,
-            encoding=self.meta.get("encoding") if self.meta is not None else None,
-            errored=" errored!" if self.error else "",
+        if not self.response:
+            return "<{name} url={url!r} pending!>".format(name=name, url=self.url)
+
+        if self.error:
+            return "<{name} url={url!r} error={error}>".format(
+                name=name, url=self.url, error=self.error.__class__.__name__
+            )
+
+        assert self.response is not None
+
+        return "<{name} url={url!r} status={status!r}>".format(
+            name=name, url=self.url, status=self.response.status
         )
-
-    @property
-    def resolved(self) -> Optional[str]:
-        if self.response is None:
-            return None
-
-        return self.response.geturl()
-
-    @property
-    def decode(self) -> str:
-        if self.body is not None:
-            encoding = self.meta.get("encoding") if self.meta else None
-
-            if encoding is None:
-                raise TypeError("cannot decode because we did not infer and encoding")
-
-            return self.body.decode(encoding)
-
-        raise TypeError("cannot decode because the response did not have a body")
 
 
 class ResolveResult(Generic[ItemType]):
@@ -120,14 +101,20 @@ class ResolveResult(Generic[ItemType]):
         name = self.__class__.__name__
 
         if not self.url:
-            return "<{name} empty!>".format(name=name)
+            return "<{name} null!>".format(name=name)
 
-        return "<{name}{errored} url={url!r} status={status!r} redirects={redirects!r}>".format(
+        if self.error:
+            return "<{name} url={url!r} error={error}>".format(
+                name=name, url=self.url, error=self.error.__class__.__name__
+            )
+
+        assert self.stack is not None
+
+        return "<{name} url={url!r} status={status!r} redirects={redirects!r}>".format(
             name=name,
             url=self.url,
-            status=self.stack[-1].status if self.stack else None,
-            redirects=(len(self.stack) - 1) if self.stack else 0,
-            errored=" errored!" if self.error else "",
+            status=self.stack[-1].status,
+            redirects=len(self.stack),
         )
 
 
@@ -185,7 +172,7 @@ class FetchWorker(Generic[ItemType]):
             kwargs = self.request_args(domain, url, item)
 
         try:
-            response, body = request(
+            response = request(
                 url,
                 pool_manager=self.pool_manager,
                 max_redirects=self.max_redirects,
@@ -196,12 +183,7 @@ class FetchWorker(Generic[ItemType]):
             result.error = error
 
         else:
-            # Meta
-            meta = extract_response_meta(response, body)
-
             result.response = response
-            result.body = body
-            result.meta = meta
 
             if self.callback is not None:
                 self.callback(result)

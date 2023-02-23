@@ -5,7 +5,6 @@
 # Miscellaneous web-related functions used throughout the library.
 #
 from typing import Optional, Tuple, Union, OrderedDict, List, Any, Dict
-from typing_extensions import TypedDict
 
 import re
 import cgi
@@ -19,6 +18,7 @@ import json
 import mimetypes
 import functools
 import charset_normalizer as chardet
+from bs4 import BeautifulSoup
 from datetime import datetime
 from timeit import default_timer as timer
 from io import BytesIO
@@ -765,6 +765,7 @@ class Response(object):
         "__stack",
         "__body",
         "__text",
+        "__soup",
         "__url",
         "__datetime_utc",
         "__is_text",
@@ -774,10 +775,11 @@ class Response(object):
         "__has_guessed_extension",
         "__has_guessed_encoding",
         "__has_decoded_text",
+        "__has_soup",
     )
 
     __response: urllib3.HTTPResponse
-    __stack: RedirectionStack
+    __stack: Optional[RedirectionStack]
     __body: bytes
     __text: Optional[str]
     __url: str
@@ -790,11 +792,12 @@ class Response(object):
     __has_guessed_extension: bool
     __has_guessed_encoding: bool
     __has_decoded_text: bool
+    __has_soup: bool
 
     def __init__(
         self,
         url: str,
-        stack: RedirectionStack,
+        stack: Optional[RedirectionStack],
         response: urllib3.HTTPResponse,
         body: bytes,
     ):
@@ -803,6 +806,7 @@ class Response(object):
         self.__response = response
         self.__body = body
         self.__text = None
+        self.__soup = None
         self.__datetime_utc = datetime.utcnow()
         self.__is_text = None
         self.__encoding = None
@@ -812,6 +816,7 @@ class Response(object):
         self.__has_guessed_extension = False
         self.__has_guessed_encoding = False
         self.__has_decoded_text = False
+        self.__has_soup = False
 
     def __guess_extension(self) -> None:
         if self.__has_guessed_extension:
@@ -878,16 +883,34 @@ class Response(object):
         self.__text = self.__body.decode(self.__encoding or "utf-8", errors=errors)
         self.__has_decoded_text = True
 
+    def __parse_as_soup(self, engine: str = "lxml") -> None:
+        if self.__has_soup:
+            return
+
+        self.__decode()
+
+        assert self.__text is not None
+
+        self.__soup = BeautifulSoup(self.__text, engine)
+
+        self.__has_soup = True
+
     @property
     def url(self) -> str:
         return self.__url
 
     @property
-    def resolved_url(self) -> str:
+    def start_url(self) -> str:
+        return self.__url
+
+    @property
+    def end_url(self) -> str:
+        if self.__stack is None:
+            return self.__url
         return self.__stack[-1].url
 
     @property
-    def stack(self) -> RedirectionStack:
+    def stack(self) -> Optional[RedirectionStack]:
         return self.__stack
 
     @property
@@ -929,6 +952,10 @@ class Response(object):
     def json(self):
         return json.loads(self.text())
 
+    def soup(self) -> BeautifulSoup:
+        self.__parse_as_soup()
+        return self.__soup  # type: ignore # If we don't raise, this IS a soup
+
 
 def request(
     url: str,
@@ -942,11 +969,12 @@ def request(
     follow_refresh_header: bool = True,
     follow_meta_refresh: bool = False,
     follow_js_relocation: bool = False,
+    canonicalize: bool = False,
     timeout: Optional[AnyTimeout] = None,
     body=None,
     json_body=None,
     cancel_event: Optional[Event] = None,
-) -> Tuple[urllib3.HTTPResponse, bytes]:
+) -> Response:
 
     # Formatting headers
     final_headers = build_request_headers(
@@ -967,6 +995,8 @@ def request(
     if json_body is not None:
         final_body = json.dumps(json_body, ensure_ascii=False).encode("utf-8")
 
+    stack: Optional[RedirectionStack] = None
+
     if not follow_redirects:
         buffered_response = atomic_request(
             pool_manager,
@@ -978,7 +1008,7 @@ def request(
             cancel_event=cancel_event,
         )
     else:
-        _, buffered_response = atomic_resolve(
+        stack, buffered_response = atomic_resolve(
             pool_manager,
             url,
             method,
@@ -988,12 +1018,15 @@ def request(
             follow_refresh_header=follow_refresh_header,
             follow_meta_refresh=follow_meta_refresh,
             follow_js_relocation=follow_js_relocation,
+            canonicalize=canonicalize,
             timeout=timeout,
             cancel_event=cancel_event,
         )
 
     buffered_response.read()
-    return buffered_response.unwrap()
+    response, body = buffered_response.unwrap()
+
+    return Response(url, stack, response, body)
 
 
 def resolve(
@@ -1037,80 +1070,13 @@ def resolve(
     return stack
 
 
-class ResponseMeta(TypedDict):
-    ext: Optional[str]
-    mimetype: Optional[str]
-    encoding: Optional[str]
-    is_text: Optional[bool]
-    datetime_utc: datetime
-
-
-def extract_response_meta(
-    response: urllib3.HTTPResponse,
-    body: bytes,
-    guess_encoding: bool = True,
-    guess_extension: bool = True,
-) -> ResponseMeta:
-    meta: ResponseMeta = {
-        "ext": None,
-        "mimetype": None,
-        "encoding": None,
-        "is_text": None,
-        "datetime_utc": datetime.utcnow(),
-    }
-
-    # Guessing extension
-    if guess_extension:
-
-        # Guessing mime type
-        # TODO: validate mime type string?
-        url = response.geturl()
-        assert url is not None
-        mimetype, _ = mimetypes.guess_type(url)
-
-        if "Content-Type" in response.headers:
-            content_type = response.headers["Content-Type"]
-            parsed_header = cgi.parse_header(content_type)
-
-            if parsed_header and parsed_header[0].strip():
-                mimetype = parsed_header[0].strip()
-
-        if mimetype is None and looks_like_html(body):
-            mimetype = "text/html"
-
-        if mimetype is not None:
-            ext = mimetypes.guess_extension(mimetype)
-
-            if ext == ".htm":
-                ext = ".html"
-            elif ext == ".jpe":
-                ext = ".jpg"
-
-            meta["mimetype"] = mimetype
-            meta["ext"] = ext
-
-    if meta["mimetype"] is not None:
-        meta["is_text"] = not is_binary_mimetype(meta["mimetype"])
-
-        if not meta["is_text"]:
-            guess_encoding = False
-
-    # Guessing encoding
-    if guess_encoding:
-        meta["encoding"] = guess_response_encoding(
-            response, body, is_xml=True, infer=True
-        )
-
-    return meta
-
-
 def request_jsonrpc(
     url: str,
     method: str,
     pool_manager: urllib3.PoolManager = DEFAULT_POOL_MANAGER,
     *args,
     **kwargs
-) -> Tuple[urllib3.HTTPResponse, Any]:
+) -> Response:
     params = []
 
     if len(args) > 0:
@@ -1118,28 +1084,12 @@ def request_jsonrpc(
     elif len(kwargs) > 0:
         params = kwargs
 
-    response, body = request(
+    return request(
         url,
         pool_manager=pool_manager,
         method="POST",
         json_body={"method": method, "params": params},
     )
-
-    data = json.loads(body)
-
-    return response, data
-
-
-def request_json(url, *args, **kwargs) -> Tuple[urllib3.HTTPResponse, Any]:
-    response, body = request(url, *args, **kwargs)
-    return response, json.loads(body)
-
-
-def request_text(
-    url, *args, encoding="utf-8", **kwargs
-) -> Tuple[urllib3.HTTPResponse, str]:
-    response, body = request(url, *args, **kwargs)
-    return response, body.decode(encoding)
 
 
 ONE_DAY = 24 * 60 * 60

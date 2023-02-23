@@ -4,23 +4,26 @@
 #
 # Functions related to the crawling utilities of minet.
 #
+from dataclasses import dataclass
 from typing import (
-    NamedTuple,
     Any,
     Optional,
     List,
+    Tuple,
     TypeVar,
     Union,
     Callable,
     Dict,
-    Generator,
+    Iterator,
+    Iterable,
+    Generic,
+    Mapping,
 )
+from typing_extensions import TypedDict, NotRequired
 
-import urllib3
 from queue import Queue
 from persistqueue import SQLiteQueue
 from quenouille import imap_unordered
-from bs4 import BeautifulSoup
 from ural import get_domain_name
 from urllib.parse import urljoin
 from shutil import rmtree
@@ -31,8 +34,7 @@ from minet.scrape.utils import load_definition
 from minet.web import (
     create_pool_manager,
     request,
-    extract_response_meta,
-    ResponseMeta,
+    Response,
     EXPECTED_WEB_ERRORS,
 )
 from minet.utils import PseudoFStringFormatter
@@ -48,6 +50,8 @@ from minet.constants import (
 FORMATTER = PseudoFStringFormatter()
 
 T = TypeVar("T")
+CrawlJobDataType = TypeVar("CrawlJobDataType", bound=Mapping)
+ScrapedDataType = TypeVar("ScrapedDataType")
 
 
 def ensure_list(value: Union[T, List[T]]) -> List[T]:
@@ -56,14 +60,21 @@ def ensure_list(value: Union[T, List[T]]) -> List[T]:
     return value
 
 
-class CrawlJob(object):
+class CrawlJob(Generic[CrawlJobDataType]):
     __slots__ = ("url", "level", "spider", "data")
 
     url: str
     level: int
     spider: str
+    data: Optional[CrawlJobDataType]
 
-    def __init__(self, url: str, level: int = 0, spider: str = "default", data=None):
+    def __init__(
+        self,
+        url: str,
+        level: int = 0,
+        spider: str = "default",
+        data: Optional[CrawlJobDataType] = None,
+    ):
         self.url = url
         self.level = level
         self.spider = spider
@@ -83,26 +94,30 @@ class CrawlJob(object):
         }
 
 
+UrlOrCrawlJob = Union[str, CrawlJob[CrawlJobDataType]]
+
+
 def crawl_job_grouper(job: CrawlJob):
     return get_domain_name(job.url)
 
 
-def ensure_job(url_or_job):
+def ensure_job(
+    url_or_job: UrlOrCrawlJob[CrawlJobDataType],
+) -> CrawlJob[CrawlJobDataType]:
     if isinstance(url_or_job, CrawlJob):
         return url_or_job
 
     return CrawlJob(url=url_or_job)
 
 
-class CrawlWorkerResult(NamedTuple):
-    job: CrawlJob
-    scraped: Any
+# TODO: is this needed?
+@dataclass
+class CrawlWorkerResult(Generic[CrawlJobDataType, ScrapedDataType]):
+    job: CrawlJob[CrawlJobDataType]
+    scraped: ScrapedDataType
     error: Optional[Exception]
-    response: Optional[urllib3.HTTPResponse]
-    meta: Optional[ResponseMeta]
-    body: Optional[bytes]
-    content: Optional[Any]
-    next_jobs: Optional[List[CrawlJob]]
+    response: Optional[Response]
+    # next_jobs: Optional[List[CrawlJob[CrawlJobDataType]]]
 
 
 class CrawlerState(object):
@@ -161,96 +176,70 @@ class CrawlerState(object):
         }
 
 
-class Spider(object):
+SpiderNextJobs = Optional[Iterable[CrawlJob[CrawlJobDataType]]]
+SpiderResult = Tuple[ScrapedDataType, SpiderNextJobs[CrawlJobDataType]]
+
+
+class Spider(Generic[CrawlJobDataType, ScrapedDataType]):
     name: str
 
     def __init__(self, name: str = "default"):
         self.name = name
 
-    def start_jobs(self):
+    def start_jobs(self) -> Optional[Iterable[UrlOrCrawlJob[CrawlJobDataType]]]:
         return None
 
-    def extract_meta_from_response(
-        self, job: CrawlJob, response: urllib3.HTTPResponse, body: bytes
-    ) -> ResponseMeta:
-        return extract_response_meta(response, body)
-
-    def parse_content(
-        self,
-        job: CrawlJob,
-        response: urllib3.HTTPResponse,
-        body: bytes,
-        meta: ResponseMeta,
-    ) -> str:
-        return body.decode(meta["encoding"] or "utf8", errors="replace")
-
-    def scrape(
-        self,
-        job: CrawlJob,
-        response: urllib3.HTTPResponse,
-        content: str,
-        meta: Optional[ResponseMeta] = None,
-    ):
-        return None
-
-    def next_jobs(
-        self,
-        job: CrawlJob,
-        response: urllib3.HTTPResponse,
-        content: str,
-        meta: Optional[ResponseMeta] = None,
-    ):
-        return None
+    def __call__(
+        self, job: CrawlJob[CrawlJobDataType], response: Response
+    ) -> SpiderResult[ScrapedDataType, CrawlJobDataType]:
+        raise NotImplementedError
 
     def __repr__(self):
         class_name = self.__class__.__name__
 
-        return ("<%(class_name)s name=%(name)s>") % {
+        return "<%(class_name)s name=%(name)s>" % {
             "class_name": class_name,
             "name": self.name,
         }
 
 
-class FunctionSpider(Spider):
-    fn: Callable[[CrawlJob, urllib3.HTTPResponse, str, Optional[ResponseMeta]], Any]
+class FunctionSpider(Spider[CrawlJobDataType, ScrapedDataType]):
+    fn: Callable[
+        [CrawlJob[CrawlJobDataType], Response],
+        SpiderResult[ScrapedDataType, CrawlJobDataType],
+    ]
 
-    def __init__(self, fn, name: str = "default"):
+    def __init__(
+        self,
+        fn: Callable[
+            [CrawlJob[CrawlJobDataType], Response],
+            SpiderResult[ScrapedDataType, CrawlJobDataType],
+        ],
+        name: str = "default",
+    ):
         super().__init__(name)
         self.fn = fn
 
-    def process(
-        self,
-        job: CrawlJob,
-        response: urllib3.HTTPResponse,
-        content: str,
-        meta: Optional[ResponseMeta] = None,
-    ):
-        return self.fn(job, response, content, meta)
+    def __call__(
+        self, job: CrawlJob[CrawlJobDataType], response: Response
+    ) -> SpiderResult[ScrapedDataType, CrawlJobDataType]:
+        return self.fn(job, response)
 
 
-class BeautifulSoupSpider(Spider):
-    engine: str
-
-    def __init__(self, name: str = "default", engine: str = "lxml"):
-        super().__init__(name)
-        self.engine = engine
-
-    def process_content(
-        self,
-        job: CrawlJob,
-        response: urllib3.HTTPResponse,
-        body: bytes,
-        meta: ResponseMeta,
-    ) -> BeautifulSoup:
-        decoded_content = super().parse_content(job, response, body, meta)
-
-        soup = BeautifulSoup(decoded_content, self.engine)
-
-        return soup
+class DefinitionSpiderScrapedDataType(TypedDict, Generic[ScrapedDataType]):
+    single: Optional[ScrapedDataType]
+    multiple: Dict[str, ScrapedDataType]
 
 
-class DefinitionSpider(Spider):
-    name: str
+class DefinitionSpiderTarget(TypedDict, Generic[CrawlJobDataType]):
+    url: str
+    spider: NotRequired[str]
+    data: NotRequired[CrawlJobDataType]
+
+
+class DefinitionSpider(
+    Spider[CrawlJobDataType, DefinitionSpiderScrapedDataType[ScrapedDataType]]
+):
     definition: Dict[str, Any]
     next_definition: Optional[Dict[str, Any]]
     max_level: int
@@ -262,7 +251,7 @@ class DefinitionSpider(Spider):
     def __init__(self, definition: Dict[str, Any], name: str = "default"):
 
         # Descriptors
-        self.name = name
+        super().__init__(name)
         self.definition = definition
         self.next_definition = definition.get("next")
 
@@ -290,7 +279,7 @@ class DefinitionSpider(Spider):
                 for name, scraper in self.next_definition["scrapers"].items():
                     self.next_scrapers[name] = Scraper(scraper)
 
-    def start_jobs(self) -> Generator[CrawlJob, None, None]:
+    def start_jobs(self) -> Iterable[UrlOrCrawlJob[CrawlJobDataType]]:
 
         # TODO: possibility to name this as jobs
         start_urls = ensure_list(self.definition.get("start_url", [])) + ensure_list(
@@ -300,33 +289,32 @@ class DefinitionSpider(Spider):
         for url in start_urls:
             yield CrawlJob(url, spider=self.name)
 
-    def next_targets(self, content, next_level: int):
+    def __scrape(
+        self, job: CrawlJob[CrawlJobDataType], response: Response
+    ) -> DefinitionSpiderScrapedDataType[ScrapedDataType]:
+        scraped: DefinitionSpiderScrapedDataType[ScrapedDataType] = {
+            "single": None,
+            "multiple": {},
+        }
 
-        # Scraping next results
-        if self.next_scraper is not None:
-            scraped = self.next_scraper(content)
+        context = {"job": job.id(), "url": job.url}
 
-            if scraped is not None:
-                if isinstance(scraped, list):
-                    yield from scraped
-                else:
-                    yield scraped
+        text = response.text()
 
-        if self.next_scrapers:
-            for scraper in self.next_scrapers.values():
-                scraped = scraper(content)
+        if self.scraper is not None:
+            scraped["single"] = self.scraper(text, context=context)
 
-                if scraped is not None:
-                    if isinstance(scraped, list):
-                        yield from scraped
-                    else:
-                        yield scraped
+        for name, scraper in self.scrapers.items():
+            scraped["multiple"][name] = scraper(text, context=context)
 
-        # Formatting next url
-        if "format" in self.next_definition:
-            yield FORMATTER.format(self.next_definition["format"], level=next_level)
+        return scraped
 
-    def job_from_target(self, current_url, target, next_level):
+    def __job_from_target(
+        self,
+        current_url: str,
+        target: Union[str, DefinitionSpiderTarget[CrawlJobDataType]],
+        next_level: int,
+    ) -> CrawlJob[CrawlJobDataType]:
         if isinstance(target, str):
             return CrawlJob(
                 url=urljoin(current_url, target), spider=self.name, level=next_level
@@ -342,7 +330,37 @@ class DefinitionSpider(Spider):
                 data=target.get("data"),
             )
 
-    def next_jobs(self, job, response, content, meta=None):
+    def __next_targets(
+        self, response: Response, next_level: int
+    ) -> Iterator[Union[str, DefinitionSpiderTarget[CrawlJobDataType]]]:
+
+        text = response.text()
+
+        # Scraping next results
+        if self.next_scraper is not None:
+            scraped = self.next_scraper(text)
+
+            if scraped is not None:
+                if isinstance(scraped, list):
+                    yield from scraped
+                else:
+                    yield scraped
+
+        if self.next_scrapers:
+            for scraper in self.next_scrapers.values():
+                scraped = scraper(text)
+
+                if scraped is not None:
+                    if isinstance(scraped, list):
+                        yield from scraped
+                    else:
+                        yield scraped
+
+        # Formatting next url
+        if self.next_definition is not None and "format" in self.next_definition:
+            yield FORMATTER.format(self.next_definition["format"], level=next_level)
+
+    def __next_jobs(self, job: CrawlJob[CrawlJobDataType], response: Response):
         if not self.next_definition:
             return
 
@@ -351,21 +369,15 @@ class DefinitionSpider(Spider):
         if next_level > self.max_level:
             return
 
-        for target in self.next_targets(content, next_level):
-            yield self.job_from_target(response.geturl(), target, next_level)
+        for target in self.__next_targets(response, next_level):
+            yield self.__job_from_target(response.url, target, next_level)
 
-    def scrape(self, job, response, content, meta=None):
-        scraped = {"single": None, "multiple": {}}
-
-        context = {"job": job.id(), "url": job.url}
-
-        if self.scraper is not None:
-            scraped["single"] = self.scraper(content, context=context)
-
-        for name, scraper in self.scrapers.items():
-            scraped["multiple"][name] = scraper(content, context=context)
-
-        return scraped
+    def __call__(
+        self, job: CrawlJob[CrawlJobDataType], response: Response
+    ) -> SpiderResult[
+        DefinitionSpiderScrapedDataType[ScrapedDataType], CrawlJobDataType
+    ]:
+        return self.__scrape(job, response), self.__next_jobs(job, response)
 
 
 class Crawler(object):
