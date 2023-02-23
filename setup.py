@@ -37,7 +37,7 @@ setup(
         "ndjson>=0.3.1",
         "persist-queue>=0.7.0",
         "pyyaml",
-        "quenouille>=1.4.3,<2",
+        "quenouille>=1.5.0,<2",
         "rich>=13,<14",
         "soupsieve>=2.1",
         "tenacity>=7.0.0",

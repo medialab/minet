@@ -6,9 +6,10 @@
 # web in a multithreaded fashion.
 #
 from dataclasses import dataclass
-from typing import Any, Optional, Iterator, Callable, TypeVar, Generic, Iterable
+from typing import Optional, Iterator, Callable, TypeVar, Generic, Iterable, Dict
 
 import urllib3
+from threading import Event
 from quenouille import ThreadPoolExecutor
 from ural import get_domain_name, ensure_protocol
 
@@ -33,6 +34,8 @@ from minet.constants import (
 )
 
 ItemType = TypeVar("ItemType")
+ResultType = TypeVar("ResultType")
+RequestArgsType = Callable[[Optional[str], Optional[str], ItemType], Dict]
 
 
 @dataclass
@@ -133,19 +136,18 @@ def key_by_domain_name(payload: FetchWorkerPayload) -> Optional[str]:
 
 
 def payloads_iter(
-    iterator: Iterable[ItemType],
+    iterable: Iterable[ItemType],
     key: Optional[Callable[[ItemType], Optional[str]]] = None,
 ) -> Iterator[FetchWorkerPayload[ItemType]]:
-    for item in iterator:
+    for item in iterable:
         url = item if key is None else key(item)
 
         if not url:
             yield FetchWorkerPayload(item=item, domain=None, url=None)
-
             continue
 
         # Url cleanup
-        url = ensure_protocol(url.strip())
+        url = ensure_protocol(url.strip())  # type: ignore
 
         yield FetchWorkerPayload(item=item, domain=get_domain_name(url), url=url)
 
@@ -158,7 +160,7 @@ class FetchWorker(Generic[ItemType]):
         self,
         pool_manager: urllib3.PoolManager,
         *,
-        request_args=None,
+        request_args: Optional[RequestArgsType[ItemType]] = None,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         callback: Optional[Callable[[FetchResult[ItemType]], None]] = None
     ):
@@ -220,7 +222,7 @@ class ResolveWorker(Generic[ItemType]):
         self,
         pool_manager: urllib3.PoolManager,
         *,
-        resolve_args=None,
+        resolve_args: Optional[RequestArgsType[ItemType]] = None,
         max_redirects: int = DEFAULT_RESOLVE_MAX_REDIRECTS,
         follow_refresh_header: bool = True,
         follow_meta_refresh: bool = False,
@@ -279,9 +281,7 @@ class ResolveWorker(Generic[ItemType]):
         return result
 
 
-class HTTPThreadPoolExecutor(ThreadPoolExecutor):
-    # pool_manager = urllib3.PoolManager
-
+class HTTPThreadPoolExecutor(ThreadPoolExecutor[ItemType, Optional[str], ResultType]):
     def __init__(
         self,
         max_workers: Optional[int] = None,
@@ -293,8 +293,13 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         self.pool_manager = create_pool_manager(
             threads=max_workers, insecure=insecure, timeout=timeout
         )
+        self.cancel_event = Event()
 
-    def shutdown(self, wait=True):
+    def cancel(self) -> None:
+        self.cancel_event.set()
+
+    def shutdown(self, wait=True) -> None:
+        self.cancel()
         self.pool_manager.clear()
         return super().shutdown(wait=wait)
 
@@ -302,14 +307,16 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         raise NotImplementedError
 
 
-class FetchThreadPoolExecutor(HTTPThreadPoolExecutor, Generic[ItemType]):
+class FetchThreadPoolExecutor(
+    HTTPThreadPoolExecutor[FetchWorkerPayload[ItemType], FetchResult[ItemType]]
+):
     def imap_unordered(
         self,
         iterator: Iterable[ItemType],
         *,
         key: Optional[Callable[[ItemType], Optional[str]]] = None,
         throttle: float = DEFAULT_THROTTLE,
-        request_args=None,
+        request_args: Optional[RequestArgsType[ItemType]] = None,
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
@@ -317,7 +324,6 @@ class FetchThreadPoolExecutor(HTTPThreadPoolExecutor, Generic[ItemType]):
     ) -> Iterator[FetchResult[ItemType]]:
 
         # TODO: validate
-        iterator = payloads_iter(iterator, key=key)
         worker = FetchWorker(
             self.pool_manager,
             request_args=request_args,
@@ -326,7 +332,7 @@ class FetchThreadPoolExecutor(HTTPThreadPoolExecutor, Generic[ItemType]):
         )
 
         return super().imap_unordered(
-            iterator,
+            payloads_iter(iterator, key=key),
             worker,
             key=key_by_domain_name,
             parallelism=domain_parallelism,
@@ -335,14 +341,16 @@ class FetchThreadPoolExecutor(HTTPThreadPoolExecutor, Generic[ItemType]):
         )
 
 
-class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor, Generic[ItemType]):
+class ResolveThreadPoolExecutor(
+    HTTPThreadPoolExecutor[FetchWorkerPayload[ItemType], ResolveResult[ItemType]]
+):
     def imap_unordered(
         self,
         iterator: Iterable[ItemType],
         *,
         key: Optional[Callable[[ItemType], Optional[str]]] = None,
         throttle: float = DEFAULT_THROTTLE,
-        resolve_args=None,
+        resolve_args: Optional[RequestArgsType[ItemType]] = None,
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
@@ -354,7 +362,6 @@ class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor, Generic[ItemType]):
     ) -> Iterator[ResolveResult[ItemType]]:
 
         # TODO: validate
-        iterator = payloads_iter(iterator, key=key)
         worker = ResolveWorker(
             self.pool_manager,
             resolve_args=resolve_args,
@@ -367,7 +374,7 @@ class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor, Generic[ItemType]):
         )
 
         return super().imap_unordered(
-            iterator,
+            payloads_iter(iterator, key=key),
             worker,
             key=key_by_domain_name,
             parallelism=domain_parallelism,
@@ -379,7 +386,7 @@ class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor, Generic[ItemType]):
 def multithreaded_fetch(
     iterator: Iterable[ItemType],
     key: Optional[Callable[[ItemType], Optional[str]]] = None,
-    request_args=None,
+    request_args: Optional[RequestArgsType[ItemType]] = None,
     threads: int = 25,
     throttle: float = DEFAULT_THROTTLE,
     buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
@@ -419,7 +426,7 @@ def multithreaded_fetch(
 
     """
 
-    def generator() -> Iterator[FetchResult[ItemType]]:
+    def generator():
         with FetchThreadPoolExecutor(
             max_workers=threads,
             insecure=insecure,
@@ -444,7 +451,7 @@ def multithreaded_fetch(
 def multithreaded_resolve(
     iterator: Iterable[ItemType],
     key: Optional[Callable[[ItemType], Optional[str]]] = None,
-    resolve_args=None,
+    resolve_args: Optional[RequestArgsType[ItemType]] = None,
     threads: int = 25,
     throttle: float = DEFAULT_THROTTLE,
     max_redirects: int = 5,
@@ -459,7 +466,7 @@ def multithreaded_resolve(
     domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
     wait: bool = True,
     daemonic: bool = False,
-) -> ResolveResult[ItemType]:
+) -> Iterator[ResolveResult[ItemType]]:
     """
     Function returning a multithreaded iterator over resolved urls.
 
@@ -498,7 +505,7 @@ def multithreaded_resolve(
 
     """
 
-    def generator() -> Iterator[ResolveResult[ItemType]]:
+    def generator():
         with ResolveThreadPoolExecutor(
             max_workers=threads,
             insecure=insecure,
