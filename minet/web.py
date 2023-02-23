@@ -765,7 +765,6 @@ class Response(object):
         "__stack",
         "__body",
         "__text",
-        "__soup",
         "__url",
         "__datetime_utc",
         "__is_text",
@@ -775,7 +774,6 @@ class Response(object):
         "__has_guessed_extension",
         "__has_guessed_encoding",
         "__has_decoded_text",
-        "__has_soup",
     )
 
     __response: urllib3.HTTPResponse
@@ -800,23 +798,22 @@ class Response(object):
         stack: Optional[RedirectionStack],
         response: urllib3.HTTPResponse,
         body: bytes,
+        known_encoding: Optional[str] = None,
     ):
         self.__url = url
         self.__stack = stack
         self.__response = response
         self.__body = body
         self.__text = None
-        self.__soup = None
         self.__datetime_utc = datetime.utcnow()
         self.__is_text = None
-        self.__encoding = None
+        self.__encoding = known_encoding
         self.__ext = None
         self.__mimetype = None
 
         self.__has_guessed_extension = False
-        self.__has_guessed_encoding = False
+        self.__has_guessed_encoding = known_encoding is not None
         self.__has_decoded_text = False
-        self.__has_soup = False
 
     def __guess_extension(self) -> None:
         if self.__has_guessed_extension:
@@ -875,25 +872,16 @@ class Response(object):
         if self.__has_decoded_text:
             return
 
+        self.__guess_extension()
         self.__guess_encoding()
+
+        assert self.__is_text is not None
 
         if not self.__is_text:
             raise TypeError("response is binary and cannot be decoded")
 
         self.__text = self.__body.decode(self.__encoding or "utf-8", errors=errors)
         self.__has_decoded_text = True
-
-    def __parse_as_soup(self, engine: str = "lxml") -> None:
-        if self.__has_soup:
-            return
-
-        self.__decode()
-
-        assert self.__text is not None
-
-        self.__soup = BeautifulSoup(self.__text, engine)
-
-        self.__has_soup = True
 
     @property
     def url(self) -> str:
@@ -957,8 +945,7 @@ class Response(object):
         return json.loads(self.text())
 
     def soup(self, engine: str = "lxml") -> BeautifulSoup:
-        self.__parse_as_soup(engine)
-        return self.__soup  # type: ignore # If we don't raise, this IS a soup
+        return BeautifulSoup(self.text(), engine)
 
 
 def request(
@@ -974,6 +961,7 @@ def request(
     follow_meta_refresh: bool = False,
     follow_js_relocation: bool = False,
     canonicalize: bool = False,
+    known_encoding: Optional[str] = None,
     timeout: Optional[AnyTimeout] = None,
     body=None,
     json_body=None,
@@ -1030,7 +1018,7 @@ def request(
     buffered_response.read()
     response, body = buffered_response.unwrap()
 
-    return Response(url, stack, response, body)
+    return Response(url, stack, response, body, known_encoding=known_encoding)
 
 
 def resolve(
@@ -1093,6 +1081,7 @@ def request_jsonrpc(
         pool_manager=pool_manager,
         method="POST",
         json_body={"method": method, "params": params},
+        known_encoding="utf-8",
     )
 
 
@@ -1137,9 +1126,9 @@ class request_retryer_custom_exponential_backoff(wait_base):
 
 
 def create_request_retryer(
-    min=10,
-    max=ONE_DAY,
-    max_attempts=9,
+    min: float=10,
+    max: float=ONE_DAY,
+    max_attempts: int=9,
     before_sleep=noop,
     additional_exceptions=None,
     predicate=None,

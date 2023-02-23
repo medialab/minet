@@ -21,7 +21,7 @@ from minet.web import (
     create_pool_manager,
     create_request_retryer,
     grab_cookies,
-    request_text,
+    request,
     retrying_method,
     request,
 )
@@ -173,9 +173,10 @@ class InstagramAPIScraper(object):
             pool_manager=self.pool_manager,
             spoof_ua=True,
             headers=headers,
+            known_encoding="utf-8",
         )
 
-        text = response.data.decode()
+        text = response.text()
 
         if (
             "the link you followed may be broken, or the page may have been removed"
@@ -186,7 +187,7 @@ class InstagramAPIScraper(object):
         try:
             data = json.loads(text)
         except JSONDecodeError:
-            raise JSONDecodeError("HTML for the request to " + url + " : " + text)
+            raise RuntimeError("HTML for the request to " + url + " : " + text)
 
         if response.status == 429:
             raise InstagramTooManyRequestsError
@@ -225,12 +226,12 @@ class InstagramAPIScraper(object):
         return data
 
     def get_magic_token(self):
-        response, html = request_text("https://www.instagram.com/disney")
+        response = request("https://www.instagram.com/disney", known_encoding="utf-8")
 
         if response.status >= 400:
             return None
 
-        t = INSTAGRAM_MAGIC_TOKEN_PATTERN.search(html)
+        t = INSTAGRAM_MAGIC_TOKEN_PATTERN.search(response.text())
         if t is None:
             return None
 

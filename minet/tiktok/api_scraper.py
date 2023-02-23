@@ -12,7 +12,7 @@ from minet.utils import sleep_with_entropy
 from minet.web import (
     create_pool_manager,
     create_request_retryer,
-    request_json,
+    request,
     grab_cookies,
     retrying_method,
 )
@@ -44,7 +44,7 @@ def forge_video_search_url(query, offset):
 
 class TiktokAPIScraper(object):
     def __init__(self, cookie="firefox"):
-        self.pool_manacreate_pool_manager = create_pool_manager(
+        self.pool_manager = create_pool_manager(
             timeout=TIKTOK_PUBLIC_API_DEFAULT_TIMEOUT
         )
 
@@ -64,19 +64,22 @@ class TiktokAPIScraper(object):
     def request_json(self, url):
         headers = {"Cookie": self.cookie}
 
-        response, data = request_json(
+        response = request(
             url,
-            pool_manacreate_pool_manager=self.pool_manacreate_pool_manager,
+            pool_manager=self.pool_manager,
             spoof_ua=True,
             headers=headers,
+            known_encoding="utf-8",
         )
 
         if response.status >= 400:
-            raise TiktokPublicAPIInvalidResponseError(url, response.status, data)
+            raise TiktokPublicAPIInvalidResponseError(
+                url, response.status, response.text()
+            )
 
         sleep_with_entropy(TIKTOK_DEFAULT_THROTTLE, TIKTOK_MAX_RANDOM_ADDENDUM)
 
-        return data
+        return response.json()
 
     def search_videos(self, query):
         cursor = None

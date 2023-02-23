@@ -4,7 +4,7 @@
 #
 # Miscellaneous utility function used throughout the mediacloud package.
 #
-from minet.web import request_json
+from minet.web import request
 from minet.mediacloud.constants import MEDIACLOUD_API_BASE_URL
 from minet.mediacloud.exceptions import MediacloudServerError
 
@@ -57,7 +57,8 @@ def make_simple_call(
     if query is not None:
         url += "&" + ("&".join("%s=%s" % (str(k), str(v)) for k, v in query.items()))
 
-    response, data = request_json(url, pool_manager=pool_manager)
+    response = request(url, pool_manager=pool_manager, known_encoding="utf-8")
+    data = response.json()
 
     if response.status >= 500:
         raise MediacloudServerError(server_error=data.get("error"))
