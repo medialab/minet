@@ -910,6 +910,10 @@ class Response(object):
         return self.__stack[-1].url
 
     @property
+    def headers(self):
+        return self.__response.headers
+
+    @property
     def stack(self) -> Optional[RedirectionStack]:
         return self.__stack
 
@@ -952,8 +956,8 @@ class Response(object):
     def json(self):
         return json.loads(self.text())
 
-    def soup(self) -> BeautifulSoup:
-        self.__parse_as_soup()
+    def soup(self, engine: str = "lxml") -> BeautifulSoup:
+        self.__parse_as_soup(engine)
         return self.__soup  # type: ignore # If we don't raise, this IS a soup
 
 

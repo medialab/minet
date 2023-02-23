@@ -6,7 +6,6 @@
 #
 import re
 import json
-from bs4 import BeautifulSoup
 from urllib.parse import urlsplit, parse_qsl, urljoin
 from ural.facebook import (
     convert_facebook_url_to_mobile,
@@ -15,7 +14,7 @@ from ural.facebook import (
 )
 
 from minet.utils import rate_limited_from_state
-from minet.web import request_text
+from minet.web import request
 from minet.facebook.constants import (
     FACEBOOK_URL,
     FACEBOOK_MOBILE_URL,
@@ -30,12 +29,12 @@ GROUP_ID_PATTERN = re.compile(r"fb://group/(\d+)")
 def page_id_from_handle(handle):
     url = urljoin(FACEBOOK_MOBILE_URL, handle)
 
-    response, html = request_text(url, headers={"User-Agent": "curl/7.68.0"})
+    response = request(url, headers={"User-Agent": "curl/7.68.0"})
 
     if response.status >= 400:
         return None
 
-    m = PAGE_ID_PATTERN.search(html)
+    m = PAGE_ID_PATTERN.search(response.text())
 
     if m is None:
         return None
@@ -47,12 +46,12 @@ def page_id_from_handle(handle):
 def group_id_from_handle(handle):
     url = urljoin(FACEBOOK_MOBILE_URL, "groups/%s" % handle)
 
-    response, html = request_text(url, headers={"User-Agent": "curl/7.68.0"})
+    response = request(url, headers={"User-Agent": "curl/7.68.0"})
 
     if response.status >= 400:
         return None
 
-    m = GROUP_ID_PATTERN.search(html)
+    m = GROUP_ID_PATTERN.search(response.text())
 
     if m is None:
         return None
@@ -64,9 +63,7 @@ def group_id_from_handle(handle):
 def scrape_post_id(post_url):
     post_mobile_url = convert_facebook_url_to_mobile(post_url)
 
-    _, html = request_text(post_mobile_url)
-
-    soup = BeautifulSoup(html, "lxml")
+    soup = request(post_mobile_url).soup()
 
     root_element = soup.select_one("#m_story_permalink_view [data-ft]")
 
