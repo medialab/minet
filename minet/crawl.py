@@ -4,7 +4,6 @@
 #
 # Functions related to the crawling utilities of minet.
 #
-from dataclasses import dataclass
 from typing import (
     cast,
     Any,
@@ -22,10 +21,9 @@ from typing import (
 )
 from typing_extensions import TypedDict, NotRequired
 
-import urllib3
 from queue import Queue
 from persistqueue import SQLiteQueue
-from quenouille import imap_unordered
+from contextlib import contextmanager
 from ural import get_domain_name
 from urllib.parse import urljoin
 from shutil import rmtree
@@ -34,22 +32,19 @@ from threading import Lock
 from minet.scrape import Scraper
 from minet.scrape.utils import load_definition
 from minet.web import (
-    create_pool_manager,
     request,
     Response,
-    AnyTimeout,
     EXPECTED_WEB_ERRORS,
 )
 from minet.fetch import HTTPThreadPoolExecutor
 from minet.utils import PseudoFStringFormatter
 
-from minet.exceptions import UnknownSpiderError
+from minet.exceptions import UnknownSpiderError, SpiderError
 
 from minet.constants import (
     DEFAULT_DOMAIN_PARALLELISM,
     DEFAULT_IMAP_BUFFER_SIZE,
     DEFAULT_THROTTLE,
-    DEFAULT_URLLIB3_TIMEOUT,
     DEFAULT_FETCH_MAX_REDIRECTS,
 )
 
@@ -88,6 +83,15 @@ class CrawlJob(Generic[CrawlJobDataType]):
         self.level = level
         self.spider = spider
         self.data = data
+
+    def __getstate__(self):
+        return (self.url, self.level, self.spider, self.data)
+
+    def __setstate__(self, state):
+        self.url = state[0]
+        self.level = state[1]
+        self.spider = state[2]
+        self.data = state[3]
 
     def id(self) -> str:
         return "%x" % id(self)
@@ -173,6 +177,14 @@ class CrawlerState(object):
         with self.__lock:
             self.jobs_done += 1
             self.jobs_doing -= 1
+
+    @contextmanager
+    def working(self):
+        try:
+            self.inc_working()
+            yield
+        finally:
+            self.dec_working()
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -391,9 +403,6 @@ class DefinitionSpider(
         return self.__scrape(job, response), self.__next_jobs(job, response)
 
 
-ItemType = TypeVar("ItemType")
-
-
 class CrawlResult(Generic[CrawlJobDataType, ScrapedDataType]):
     __slots__ = ("job", "scraped", "error", "response")
 
@@ -432,13 +441,9 @@ RequestArgsType = Callable[[CrawlJob[CrawlJobDataType]], Dict]
 
 
 class CrawlWorker(Generic[CrawlJobDataType, ScrapedDataType]):
-    pool_manager: urllib3.PoolManager
-
     def __init__(
         self,
-        pool_manager: urllib3.PoolManager,
-        state: CrawlerState,
-        queue: "Queue[CrawlJob[CrawlJobDataTypes]]",
+        crawler: "Crawler",
         *,
         request_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
@@ -446,9 +451,7 @@ class CrawlWorker(Generic[CrawlJobDataType, ScrapedDataType]):
             Callable[[CrawlResult[CrawlJobDataType, ScrapedDataType]], None]
         ] = None,
     ):
-        self.pool_manager = pool_manager
-        self.state = state
-        self.queue = queue
+        self.crawler = crawler
         self.request_args = request_args
         self.max_redirects = max_redirects
         self.callback = callback
@@ -456,42 +459,63 @@ class CrawlWorker(Generic[CrawlJobDataType, ScrapedDataType]):
     def __call__(
         self, job: CrawlJob[CrawlJobDataType]
     ) -> CrawlResult[CrawlJobDataType, ScrapedDataType]:
-        result = CrawlResult(job)
 
-        # NOTE: crawl job must have a url
-        assert job.url is not None
+        # Registering work
+        with self.crawler.state.working():
+            result = CrawlResult(job)
 
-        # NOTE: request_args must be threadsafe
-        kwargs = {}
+            spider = self.crawler.spiders.get(job.spider)
 
-        if self.request_args is not None:
-            kwargs = self.request_args(job)
+            if spider is None:
+                result.error = UnknownSpiderError(spider=job.spider)
+                return result
 
-        try:
-            response = request(
-                job.url,
-                pool_manager=self.pool_manager,
-                max_redirects=self.max_redirects,
-                **kwargs,
-            )
+            # NOTE: crawl job must have a url
+            assert job.url is not None
 
-        except EXPECTED_WEB_ERRORS as error:
-            result.error = error
+            # NOTE: request_args must be threadsafe
+            kwargs = {}
 
-        else:
+            if self.request_args is not None:
+                kwargs = self.request_args(job)
+
+            try:
+                response = request(
+                    job.url,
+                    pool_manager=self.crawler.pool_manager,
+                    max_redirects=self.max_redirects,
+                    **kwargs,
+                )
+
+            except EXPECTED_WEB_ERRORS as error:
+                result.error = error
+                return result
+
             result.response = response
 
-        # TODO: scrape and acquire next jobs here
+            try:
+                scraped, next_jobs = spider(job, response)
+                result.scraped = scraped
 
-        return result
+                if next_jobs is not None:
+                    for job in next_jobs:
+                        self.crawler.enqueue(job)
+
+            except Exception as error:
+                result.error = SpiderError(reason=error)
+
+            return result
 
 
 CrawlJobDataTypes = TypeVar("CrawlJobDataTypes", bound=Mapping)
 ScrapedDataTypes = TypeVar("ScrapedDataTypes")
 
 # TODO: try creating a kwarg type for those
+# TODO: Definition vs. spiders should not be done by the class itself -> DefinitionCrawler
 class Crawler(
-    HTTPThreadPoolExecutor[ItemType, CrawlResult[CrawlJobDataTypes, ScrapedDataTypes]]
+    HTTPThreadPoolExecutor[
+        CrawlJob[CrawlJobDataTypes], CrawlResult[CrawlJobDataTypes, ScrapedDataTypes]
+    ]
 ):
     queue: "Queue[CrawlJob[CrawlJobDataTypes]]"
 
@@ -504,11 +528,19 @@ class Crawler(
         ] = None,
         start_jobs: Optional[Iterable[UrlOrCrawlJob[CrawlJobDataTypes]]] = None,
         queue_path: Optional[str] = None,
+        buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
+        domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
+        throttle: float = DEFAULT_THROTTLE,
         **kwargs,
     ):
         super().__init__(**kwargs)
 
         # NOTE: crawling could work depth-first if we wanted
+
+        # Imap params
+        self.buffer_size = buffer_size
+        self.domain_parallelism = domain_parallelism
+        self.throttle = throttle
 
         # Params
         self.start_jobs = start_jobs
@@ -584,95 +616,42 @@ class Crawler(
 
         self.started = True
 
-    def enqueue(self, job: UrlOrCrawlJob[CrawlJobDataTypes]) -> None:
-        self.queue.put(ensure_job(job))
-        self.state.inc_queued()
+    def __cleanup(self) -> None:
+        # Releasing queue (needed by persistqueue)
+        if self.using_persistent_queue and self.queue_path is not None:
+            del self.queue
+            rmtree(self.queue_path, ignore_errors=True)
 
+    def __enter__(self):
+        super().__enter__()
+        self.__start()
 
-class OldCrawler(object):
-    def work(self, job):
-        self.state.inc_working()
-
-        spider = self.spiders.get(job.spider)
-
-        if spider is None:
-            raise UnknownSpiderError('Unknown spider "%s"' % job.spider)
-
-        try:
-            response = request(job.url, pool_manager=self.pool_manager)
-        except EXPECTED_WEB_ERRORS as err:
-            return CrawlWorkerResult(
-                job=job,
-                scraped=None,
-                error=err,
-                response=None,
-                meta=None,
-                content=None,
-                next_jobs=None,
-            )
-
-        meta = spider.extract_meta_from_response(job, response)
-
-        # Decoding response content
-        content = spider.process_content(job, response, meta)
-
-        if isinstance(spider, FunctionSpider):
-            scraped, next_jobs = spider.process(job, response, content, meta)
-        else:
-
-            # Scraping items
-            scraped = spider.scrape(job, response, content, meta)
-
-            # Finding next jobs
-            next_jobs = spider.next_jobs(job, response, content, meta)
-
-        # Enqueuing next jobs
-        if next_jobs is not None:
-
-            # Consuming so that multiple agents may act on this
-            next_jobs = list(next_jobs)
-            self.enqueue(next_jobs)
-
-        self.state.dec_working()
-
-        return CrawlWorkerResult(
-            job=job,
-            scraped=scraped,
-            error=None,
-            response=response,
-            meta=meta,
-            content=content,
-            next_jobs=next_jobs,
-        )
+        return self
 
     def __iter__(self):
+        worker = CrawlWorker(self)
 
-        self.start()
+        def key_by_domain_name(job: CrawlJob) -> Optional[str]:
+            return job.domain
 
-        multithreaded_iterator = imap_unordered(
+        multithreaded_iterator = super().imap_unordered(
             self.queue,
-            self.work,
-            self.threads,
-            key=CrawlJob.grouper,
-            parallelism=DEFAULT_DOMAIN_PARALLELISM,
+            worker,
+            key=key_by_domain_name,
             buffer_size=self.buffer_size,
+            parallelism=self.domain_parallelism,
             throttle=self.throttle,
-            wait=self.wait,
-            daemonic=self.daemonic,
         )
 
-        def generator():
+        def safe_wrapper():
             for result in multithreaded_iterator:
                 yield result
                 self.queue.task_done()
 
-            self.cleanup()
+            self.__cleanup()
 
-        return generator()
+        return safe_wrapper()
 
-    def cleanup(self):
-
-        # Releasing queue (needed by persistqueue)
-        if self.using_persistent_queue:
-            del self.queue
-            rmtree(self.queue_path, ignore_errors=True)
+    def enqueue(self, job: UrlOrCrawlJob[CrawlJobDataTypes]) -> None:
+        self.queue.put(ensure_job(job))
+        self.state.inc_queued()

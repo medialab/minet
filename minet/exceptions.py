@@ -4,6 +4,8 @@
 #
 # Collection of handy custom exceptions.
 #
+from typing import Optional
+
 from minet.utils import message_flatmap
 
 
@@ -98,7 +100,15 @@ class CrawlError(MinetError):
 
 
 class UnknownSpiderError(CrawlError):
-    pass
+    def __init__(self, msg=None, spider=None):
+        super().__init__(msg)
+        self.spider = spider
+
+
+class SpiderError(CrawlError):
+    def __init__(self, msg=None, reason: Optional[Exception] = None):
+        super().__init__(msg)
+        self.reason = reason
 
 
 # Extraction errors
