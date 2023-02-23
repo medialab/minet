@@ -4,7 +4,7 @@
 #
 # Miscellaneous web-related functions used throughout the library.
 #
-from typing import Optional, Tuple, Union, OrderedDict, List, Any
+from typing import Optional, Tuple, Union, OrderedDict, List, Any, Dict
 from typing_extensions import TypedDict
 
 import re
@@ -283,7 +283,7 @@ def create_pool_manager(
     Helper function returning a urllib3 pool manager with sane defaults.
     """
 
-    manager_kwargs = {"timeout": DEFAULT_URLLIB3_TIMEOUT}
+    manager_kwargs: Dict[str, Any] = {"timeout": DEFAULT_URLLIB3_TIMEOUT}
 
     if not insecure:
         manager_kwargs["cert_reqs"] = "CERT_REQUIRED"
@@ -377,6 +377,18 @@ def pool_manager_aware_timeout_to_final_time(
 
 
 class BufferedResponse(object):
+    """
+    Class wrapping a urllib3.HTTPResponse and representing a response whose
+    body has not been yet fully read.
+
+    It is a low-level representation used in the minet.web module that should
+    not leak outside normally.
+
+    It is able to stream a response's body safely all while keeping track of
+    a "final" timeout correctly enforced to bypass python socket race condition
+    issues on read loops and is also able to be cancelled if required.
+    """
+
     __slots__ = (
         "__inner",
         "__body",
@@ -705,6 +717,8 @@ def atomic_resolve(
 
     compiled_stack = list(url_stack.values())
 
+    assert buffered_response is not None
+
     return compiled_stack, buffered_response
 
 
@@ -866,7 +880,9 @@ def extract_response_meta(
 
         # Guessing mime type
         # TODO: validate mime type string?
-        mimetype, _ = mimetypes.guess_type(response.geturl())
+        url = response.geturl()
+        assert url is not None
+        mimetype, _ = mimetypes.guess_type(url)
 
         if "Content-Type" in response.headers:
             content_type = response.headers["Content-Type"]
