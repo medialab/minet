@@ -746,6 +746,190 @@ def build_request_headers(headers=None, cookie=None, spoof_ua=False, json_body=F
     return final_headers
 
 
+class Response(object):
+    """
+    Class representing a finalized HTTP response.
+
+    It wraps a urllib3.HTTPResponse as well as its raw body and exposes a
+    variety of useful utilities that will be used downstream.
+
+    This class is used by high-level function of this module and is expected
+    to be found elsewhere.
+
+    Note that it will lazily compute required items when asked for certain
+    properties.
+    """
+
+    __slots__ = (
+        "__response",
+        "__stack",
+        "__body",
+        "__text",
+        "__url",
+        "__datetime_utc",
+        "__is_text",
+        "__encoding",
+        "__ext",
+        "__mimetype",
+        "__has_guessed_extension",
+        "__has_guessed_encoding",
+        "__has_decoded_text",
+    )
+
+    __response: urllib3.HTTPResponse
+    __stack: RedirectionStack
+    __body: bytes
+    __text: Optional[str]
+    __url: str
+    __datetime_utc: datetime
+    __is_text: Optional[bool]
+    __encoding: Optional[str]
+    __ext: Optional[str]
+    __mimetype: Optional[str]
+
+    __has_guessed_extension: bool
+    __has_guessed_encoding: bool
+    __has_decoded_text: bool
+
+    def __init__(
+        self,
+        url: str,
+        stack: RedirectionStack,
+        response: urllib3.HTTPResponse,
+        body: bytes,
+    ):
+        self.__url = url
+        self.__stack = stack
+        self.__response = response
+        self.__body = body
+        self.__text = None
+        self.__datetime_utc = datetime.utcnow()
+        self.__is_text = None
+        self.__encoding = None
+        self.__ext = None
+        self.__mimetype = None
+
+        self.__has_guessed_extension = False
+        self.__has_guessed_encoding = False
+        self.__has_decoded_text = False
+
+    def __guess_extension(self) -> None:
+        if self.__has_guessed_extension:
+            return
+
+        # Guessing mime type
+        # TODO: validate mime type string?
+        url = self.__url
+        assert url is not None
+        mimetype, _ = mimetypes.guess_type(url)
+
+        response = self.__response
+
+        if "Content-Type" in response.headers:
+            content_type = response.headers["Content-Type"]
+            parsed_header = cgi.parse_header(content_type)
+
+            if parsed_header and parsed_header[0].strip():
+                mimetype = parsed_header[0].strip()
+
+        if mimetype is None and looks_like_html(self.__body):
+            mimetype = "text/html"
+
+        if mimetype is not None:
+            ext = mimetypes.guess_extension(mimetype)
+
+            if ext == ".htm":
+                ext = ".html"
+            elif ext == ".jpe":
+                ext = ".jpg"
+
+            self.__mimetype = mimetype
+            self.__ext = ext
+
+        if mimetype is not None:
+            self.__is_text = not is_binary_mimetype(mimetype)
+
+        self.__has_guessed_extension = True
+
+    def __guess_encoding(self) -> None:
+        if self.__has_guessed_encoding:
+            return
+
+        self.__guess_extension()
+
+        if not self.__is_text:
+            return
+
+        self.__encoding = guess_response_encoding(
+            self.__response, self.__body, is_xml=True, infer=True
+        )
+
+        self.__has_guessed_encoding = True
+
+    def __decode(self, errors: str = "replace") -> None:
+        if self.__has_decoded_text:
+            return
+
+        self.__guess_encoding()
+
+        if not self.__is_text:
+            raise TypeError("response is binary and cannot be decoded")
+
+        self.__text = self.__body.decode(self.__encoding or "utf-8", errors=errors)
+        self.__has_decoded_text = True
+
+    @property
+    def url(self) -> str:
+        return self.__url
+
+    @property
+    def resolved_url(self) -> str:
+        return self.__stack[-1].url
+
+    @property
+    def stack(self) -> RedirectionStack:
+        return self.__stack
+
+    @property
+    def status(self) -> int:
+        return self.__response.status
+
+    @property
+    def end_datetime(self) -> datetime:
+        return self.__datetime_utc
+
+    @property
+    def ext(self) -> Optional[str]:
+        self.__guess_extension()
+        return self.__ext
+
+    @property
+    def mimetype(self) -> Optional[str]:
+        self.__guess_extension()
+        return self.__mimetype
+
+    @property
+    def is_text(self) -> bool:
+        self.__guess_extension()
+        return self.__is_text  # type: ignore # At that point we know it's a bool
+
+    @property
+    def encoding(self) -> Optional[str]:
+        self.__guess_encoding()
+        return self.__encoding
+
+    @property
+    def body(self) -> bytes:
+        return self.__body
+
+    def text(self) -> str:
+        self.__decode()
+        return self.__text  # type: ignore # If we don't raise, this IS a string
+
+    def json(self):
+        return json.loads(self.text())
+
+
 def request(
     url: str,
     pool_manager: urllib3.PoolManager = DEFAULT_POOL_MANAGER,
