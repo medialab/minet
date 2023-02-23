@@ -6,6 +6,7 @@
 #
 from dataclasses import dataclass
 from typing import (
+    cast,
     Any,
     Optional,
     List,
@@ -21,6 +22,7 @@ from typing import (
 )
 from typing_extensions import TypedDict, NotRequired
 
+import urllib3
 from queue import Queue
 from persistqueue import SQLiteQueue
 from quenouille import imap_unordered
@@ -35,8 +37,10 @@ from minet.web import (
     create_pool_manager,
     request,
     Response,
+    AnyTimeout,
     EXPECTED_WEB_ERRORS,
 )
+from minet.fetch import HTTPThreadPoolExecutor
 from minet.utils import PseudoFStringFormatter
 
 from minet.exceptions import UnknownSpiderError
@@ -45,6 +49,8 @@ from minet.constants import (
     DEFAULT_DOMAIN_PARALLELISM,
     DEFAULT_IMAP_BUFFER_SIZE,
     DEFAULT_THROTTLE,
+    DEFAULT_URLLIB3_TIMEOUT,
+    DEFAULT_FETCH_MAX_REDIRECTS,
 )
 
 FORMATTER = PseudoFStringFormatter()
@@ -61,12 +67,15 @@ def ensure_list(value: Union[T, List[T]]) -> List[T]:
 
 
 class CrawlJob(Generic[CrawlJobDataType]):
-    __slots__ = ("url", "level", "spider", "data")
+    __slots__ = ("url", "level", "spider", "data", "__has_cached_domain", "__domain")
 
     url: str
     level: int
     spider: str
     data: Optional[CrawlJobDataType]
+
+    __has_cached_domain: bool
+    __domain: Optional[str]
 
     def __init__(
         self,
@@ -82,6 +91,18 @@ class CrawlJob(Generic[CrawlJobDataType]):
 
     def id(self) -> str:
         return "%x" % id(self)
+
+    @property
+    def domain(self) -> Optional[str]:
+        if self.__has_cached_domain:
+            return self.__domain
+
+        if self.url is not None:
+            self.__domain = get_domain_name(self.url)
+
+        self.__has_cached_domain = True
+
+        return self.__domain
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -108,16 +129,6 @@ def ensure_job(
         return url_or_job
 
     return CrawlJob(url=url_or_job)
-
-
-# TODO: is this needed?
-@dataclass
-class CrawlWorkerResult(Generic[CrawlJobDataType, ScrapedDataType]):
-    job: CrawlJob[CrawlJobDataType]
-    scraped: ScrapedDataType
-    error: Optional[Exception]
-    response: Optional[Response]
-    # next_jobs: Optional[List[CrawlJob[CrawlJobDataType]]]
 
 
 class CrawlerState(object):
@@ -380,37 +391,130 @@ class DefinitionSpider(
         return self.__scrape(job, response), self.__next_jobs(job, response)
 
 
-class Crawler(object):
+ItemType = TypeVar("ItemType")
 
-    # TODO: start_jobs with multiple spiders
+
+class CrawlResult(Generic[CrawlJobDataType, ScrapedDataType]):
+    __slots__ = ("job", "scraped", "error", "response")
+
+    job: CrawlJob[CrawlJobDataType]
+    scraped: Optional[ScrapedDataType]
+    error: Optional[Exception]
+    response: Optional[Response]
+    # next_jobs: Optional[List[CrawlJob[CrawlJobDataType]]]
+
+    def __init__(self, job: CrawlJob[CrawlJobDataType]):
+        self.job = job
+        self.scraped = None
+        self.error = None
+        self.response = None
+        # self.next_jobs = None
+
+    def __repr__(self):
+        name = self.__class__.__name__
+
+        if not self.response:
+            return "<{name} url={url!r} pending!>".format(name=name, url=self.job.url)
+
+        if self.error:
+            return "<{name} url={url!r} error={error}>".format(
+                name=name, url=self.job.url, error=self.error.__class__.__name__
+            )
+
+        assert self.response is not None
+
+        return "<{name} url={url!r} status={status!r}>".format(
+            name=name, url=self.job.url, status=self.response.status
+        )
+
+
+RequestArgsType = Callable[[CrawlJob[CrawlJobDataType]], Dict]
+
+
+class CrawlWorker(Generic[CrawlJobDataType, ScrapedDataType]):
+    pool_manager: urllib3.PoolManager
+
+    def __init__(
+        self,
+        pool_manager: urllib3.PoolManager,
+        state: CrawlerState,
+        queue: "Queue[CrawlJob[CrawlJobDataTypes]]",
+        *,
+        request_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
+        max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
+        callback: Optional[
+            Callable[[CrawlResult[CrawlJobDataType, ScrapedDataType]], None]
+        ] = None,
+    ):
+        self.pool_manager = pool_manager
+        self.state = state
+        self.queue = queue
+        self.request_args = request_args
+        self.max_redirects = max_redirects
+        self.callback = callback
+
+    def __call__(
+        self, job: CrawlJob[CrawlJobDataType]
+    ) -> CrawlResult[CrawlJobDataType, ScrapedDataType]:
+        result = CrawlResult(job)
+
+        # NOTE: crawl job must have a url
+        assert job.url is not None
+
+        # NOTE: request_args must be threadsafe
+        kwargs = {}
+
+        if self.request_args is not None:
+            kwargs = self.request_args(job)
+
+        try:
+            response = request(
+                job.url,
+                pool_manager=self.pool_manager,
+                max_redirects=self.max_redirects,
+                **kwargs,
+            )
+
+        except EXPECTED_WEB_ERRORS as error:
+            result.error = error
+
+        else:
+            result.response = response
+
+        # TODO: scrape and acquire next jobs here
+
+        return result
+
+
+CrawlJobDataTypes = TypeVar("CrawlJobDataTypes", bound=Mapping)
+ScrapedDataTypes = TypeVar("ScrapedDataTypes")
+
+# TODO: try creating a kwarg type for those
+class Crawler(
+    HTTPThreadPoolExecutor[ItemType, CrawlResult[CrawlJobDataTypes, ScrapedDataTypes]]
+):
+    queue: "Queue[CrawlJob[CrawlJobDataTypes]]"
+
     def __init__(
         self,
         spec=None,
-        spider=None,
-        spiders=None,
-        start_jobs=None,
-        queue_path=None,
-        threads=25,
-        buffer_size=DEFAULT_IMAP_BUFFER_SIZE,
-        throttle=DEFAULT_THROTTLE,
-        wait=True,
-        daemonic=False,
+        spider: Optional[Spider[CrawlJobDataTypes, ScrapedDataTypes]] = None,
+        spiders: Optional[
+            Dict[str, Spider[CrawlJobDataTypes, ScrapedDataTypes]]
+        ] = None,
+        start_jobs: Optional[Iterable[UrlOrCrawlJob[CrawlJobDataTypes]]] = None,
+        queue_path: Optional[str] = None,
+        **kwargs,
     ):
+        super().__init__(**kwargs)
 
-        # NOTE: crawling could work depth-first but:
-        # buffer_size should be 0 (requires to fix quenouille issue #1)
+        # NOTE: crawling could work depth-first if we wanted
 
         # Params
         self.start_jobs = start_jobs
         self.queue_path = queue_path
-        self.threads = threads
-        self.buffer_size = buffer_size
-        self.throttle = throttle
-        self.wait = wait
-        self.daemonic = daemonic
 
         self.using_persistent_queue = queue_path is not None
-        self.pool_manager = create_pool_manager(threads=threads)
         self.state = CrawlerState()
         self.started = False
 
@@ -431,10 +535,10 @@ class Crawler(object):
                 spiders = {
                     name: DefinitionSpider(s, name=name)
                     for name, s in spec["spiders"].items()
-                }
+                }  # type: ignore
                 self.single_spider = False
             else:
-                spiders = {"default": DefinitionSpider(spec)}
+                spiders = {"default": DefinitionSpider(spec)}  # type: ignore
                 self.single_spider = True
 
         elif spider is not None:
@@ -445,28 +549,20 @@ class Crawler(object):
                 "minet.Crawler: expecting either `spec`, `spider` or `spiders`."
             )
 
+        assert spiders is not None
+
         # Solving function spiders
         for name, s in spiders.items():
             if callable(s) and not isinstance(s, Spider):
                 spiders[name] = FunctionSpider(s, name)
 
-        self.queue = queue
+        self.queue = cast("Queue", queue)
         self.spiders = spiders
 
-    def enqueue(self, job_or_jobs):
-        if not isinstance(job_or_jobs, (CrawlJob, str)):
-            for job in job_or_jobs:
-                assert isinstance(job, (CrawlJob, str))
-                self.queue.put(ensure_job(job))
-                self.state.inc_queued()
-        else:
-            self.queue.put(ensure_job(job_or_jobs))
-            self.state.inc_queued()
-
-    def start(self):
+    def __start(self):
 
         if self.started:
-            return
+            raise RuntimeError("already started")
 
         # Collecting start jobs - we only add those if queue is not pre-existing
         if self.queue.qsize() == 0:
@@ -475,16 +571,25 @@ class Crawler(object):
             # We could use a blocking queue with max size but this could prove
             # difficult to resume crawls based upon lazy iterators
             if self.start_jobs:
-                self.enqueue(self.start_jobs)
+                for job in self.start_jobs:
+                    self.enqueue(job)
 
-            for spider in self.spiders.values():
-                spider_start_jobs = spider.start_jobs()
+            if self.spiders is not None:
+                for spider in self.spiders.values():
+                    spider_start_jobs = spider.start_jobs()
 
-                if spider_start_jobs is not None:
-                    self.enqueue(spider_start_jobs)
+                    if spider_start_jobs is not None:
+                        for job in spider_start_jobs:
+                            self.enqueue(job)
 
         self.started = True
 
+    def enqueue(self, job: UrlOrCrawlJob[CrawlJobDataTypes]) -> None:
+        self.queue.put(ensure_job(job))
+        self.state.inc_queued()
+
+
+class OldCrawler(object):
     def work(self, job):
         self.state.inc_working()
 

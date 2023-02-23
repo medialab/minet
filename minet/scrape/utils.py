@@ -17,11 +17,11 @@ from minet.exceptions import DefinitionInvalidFormatError
 
 
 @with_defer()
-def load_definition(f, defer, encoding="utf-8"):
+def load_definition(f, *, defer=None, encoding="utf-8"):
     if isinstance(f, (str, PathLike)):
-        path = f
+        path = str(f)
         f = open(path, encoding=encoding)
-        defer(f.close)
+        defer(f.close)  # type: ignore
     else:
         path = f.name
 

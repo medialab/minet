@@ -5,7 +5,6 @@
 # Exposing a specialized quenouille wrapper grabbing various urls from the
 # web in a multithreaded fashion.
 #
-from dataclasses import dataclass
 from typing import Optional, Iterator, Callable, TypeVar, Generic, Iterable, Dict
 
 import urllib3
@@ -34,28 +33,49 @@ from minet.constants import (
 
 ItemType = TypeVar("ItemType")
 ResultType = TypeVar("ResultType")
-RequestArgsType = Callable[[Optional[str], Optional[str], ItemType], Dict]
 
 
-@dataclass
 class FetchWorkerPayload(Generic[ItemType]):
+    __slots__ = ("item", "url", "__has_cached_domain", "__domain")
+
     item: ItemType
-    domain: Optional[str]
     url: Optional[str]
+
+    __has_cached_domain: bool
+    __domain: Optional[str]
+
+    def __init__(self, item: ItemType, url: Optional[str]):
+        self.item = item
+        self.url = url
+        self.__has_cached_domain = False
+        self.__domain = None
+
+    @property
+    def domain(self) -> Optional[str]:
+        if self.__has_cached_domain:
+            return self.__domain
+
+        if self.url is not None:
+            self.__domain = get_domain_name(self.url)
+
+        self.__has_cached_domain = True
+
+        return self.__domain
+
+
+RequestArgsType = Callable[[FetchWorkerPayload[ItemType]], Dict]
 
 
 class FetchResult(Generic[ItemType]):
-    __slots__ = ("item", "domain", "url", "error", "response")
+    __slots__ = ("item", "url", "error", "response")
 
     item: ItemType
-    domain: Optional[str]
     url: Optional[str]
     error: Optional[Exception]
     response: Optional[Response]
 
-    def __init__(self, item: ItemType, domain: Optional[str], url: Optional[str]):
+    def __init__(self, item: ItemType, url: Optional[str]):
         self.item = item
-        self.domain = domain
         self.url = url
         self.error = None
         self.response = None
@@ -82,17 +102,15 @@ class FetchResult(Generic[ItemType]):
 
 
 class ResolveResult(Generic[ItemType]):
-    __slots__ = ("item", "domain", "url", "error", "stack")
+    __slots__ = ("item", "url", "error", "stack")
 
     item: ItemType
-    domain: Optional[str]
     url: Optional[str]
     error: Optional[Exception]
     stack: Optional[RedirectionStack]
 
-    def __init__(self, item: ItemType, domain: Optional[str], url: Optional[str]):
+    def __init__(self, item: ItemType, url: Optional[str]):
         self.item = item
-        self.domain = domain
         self.url = url
         self.error = None
         self.stack = None
@@ -130,13 +148,13 @@ def payloads_iter(
         url = item if key is None else key(item)
 
         if not url:
-            yield FetchWorkerPayload(item=item, domain=None, url=None)
+            yield FetchWorkerPayload(item=item, url=None)
             continue
 
         # Url cleanup
         url = ensure_protocol(url.strip())  # type: ignore
 
-        yield FetchWorkerPayload(item=item, domain=get_domain_name(url), url=url)
+        yield FetchWorkerPayload(item=item, url=url)
 
 
 class FetchWorker(Generic[ItemType]):
@@ -157,9 +175,9 @@ class FetchWorker(Generic[ItemType]):
         self.callback = callback
 
     def __call__(self, payload: FetchWorkerPayload[ItemType]) -> FetchResult[ItemType]:
-        item, domain, url = payload.item, payload.domain, payload.url
+        item, url = payload.item, payload.url
 
-        result = FetchResult(item, domain, url)
+        result = FetchResult(item, url)
 
         # Noop
         if url is None:
@@ -169,7 +187,7 @@ class FetchWorker(Generic[ItemType]):
         kwargs = {}
 
         if self.request_args is not None:
-            kwargs = self.request_args(domain, url, item)
+            kwargs = self.request_args(payload)
 
         try:
             response = request(
@@ -225,9 +243,9 @@ class ResolveWorker(Generic[ItemType]):
     def __call__(
         self, payload: FetchWorkerPayload[ItemType]
     ) -> ResolveResult[ItemType]:
-        item, domain, url = payload.item, payload.domain, payload.url
+        item, url = payload.item, payload.url
 
-        result = ResolveResult(item, domain, url)
+        result = ResolveResult(item, url)
 
         # Noop
         if url is None:
@@ -237,11 +255,11 @@ class ResolveWorker(Generic[ItemType]):
         kwargs = {}
 
         if self.resolve_args is not None:
-            kwargs = self.resolve_args(domain, url, item)
+            kwargs = self.resolve_args(payload)
 
         # NOTE: should it be just in the CLI?
-        if "spoof_ua" not in kwargs and domain is not None:
-            kwargs["spoof_ua"] = should_spoof_ua_when_resolving(domain)
+        if "spoof_ua" not in kwargs and payload.domain is not None:
+            kwargs["spoof_ua"] = should_spoof_ua_when_resolving(payload.domain)
 
         try:
             stack = resolve(
