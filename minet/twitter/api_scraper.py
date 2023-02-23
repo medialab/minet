@@ -15,7 +15,6 @@ from json import JSONDecodeError
 from minet.web import (
     create_pool_manager,
     request,
-    request_json,
     create_request_retryer,
     retrying_method,
 )
@@ -312,16 +311,14 @@ class TwitterAPIScraper(object):
         self.guest_token = None
         self.cookie = None
 
-    def request(self, url):
-        return request(url, pool_manager=self.pool_manager, spoof_ua=True)
-
-    def request_json(self, url, headers=None, method="GET"):
-        return request_json(
+    def request(self, url, headers=None, method="GET"):
+        return request(
             url,
             pool_manager=self.pool_manager,
             spoof_ua=True,
             method=method,
             headers=headers,
+            known_encoding="utf-8",
         )
 
     def acquire_guest_token(self):
@@ -330,16 +327,14 @@ class TwitterAPIScraper(object):
             "Accept-Language": "en-US,en;q=0.5",
         }
 
-        could_not_decode_json = False
+        response = self.request(TWITTER_GUEST_ACTIVATE_ENDPOINT, headers, method="POST")
+
+        if response.status >= 400:
+            raise TwitterPublicAPIInvalidResponseError
 
         try:
-            response, api_token_response = self.request_json(
-                TWITTER_GUEST_ACTIVATE_ENDPOINT, headers, method="POST"
-            )
+            api_token_response = response.json()
         except JSONDecodeError:
-            could_not_decode_json = True
-
-        if could_not_decode_json or response.status >= 400:
             raise TwitterPublicAPIInvalidResponseError
 
         guest_token = api_token_response.get("guest_token")
@@ -364,11 +359,13 @@ class TwitterAPIScraper(object):
             "Accept-Language": "en-US,en;q=0.5",
         }
 
-        response, data = self.request_json(url, headers=headers)
+        response = self.request(url, headers=headers)
 
         if response.status in [403, 429]:
             self.reset()
             raise TwitterPublicAPIRateLimitError
+
+        data = response.json()
 
         if response.status >= 400:
             error = getpath(data, ["errors", 0])
