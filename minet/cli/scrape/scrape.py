@@ -11,7 +11,7 @@ from casanova import DictLikeRow
 from collections import namedtuple
 from os.path import basename, isdir
 
-from minet import Scraper
+from minet.scrape import Scraper
 from minet.multiprocessing import LazyPool
 from minet.exceptions import (
     DefinitionInvalidFormatError,

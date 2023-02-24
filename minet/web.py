@@ -758,6 +758,8 @@ class Response(object):
 
     Note that it will lazily compute required items when asked for certain
     properties.
+
+    It also works as a kind of dict that can bring around meta information.
     """
 
     __slots__ = (
@@ -766,6 +768,7 @@ class Response(object):
         "__body",
         "__text",
         "__url",
+        "__meta",
         "__datetime_utc",
         "__is_text",
         "__encoding",
@@ -781,6 +784,7 @@ class Response(object):
     __body: bytes
     __text: Optional[str]
     __url: str
+    __meta: Dict[str, Any]
     __datetime_utc: datetime
     __is_text: Optional[bool]
     __encoding: Optional[str]
@@ -790,7 +794,6 @@ class Response(object):
     __has_guessed_extension: bool
     __has_guessed_encoding: bool
     __has_decoded_text: bool
-    __has_soup: bool
 
     def __init__(
         self,
@@ -805,6 +808,7 @@ class Response(object):
         self.__response = response
         self.__body = body
         self.__text = None
+        self.__meta = {}
         self.__datetime_utc = datetime.utcnow()
         self.__is_text = None
         self.__encoding = known_encoding
@@ -906,6 +910,10 @@ class Response(object):
         return self.__stack
 
     @property
+    def was_redirected(self) -> bool:
+        return self.start_url != self.end_url
+
+    @property
     def status(self) -> int:
         return self.__response.status
 
@@ -934,6 +942,15 @@ class Response(object):
         return self.__encoding
 
     @property
+    def likely_encoding(self) -> str:
+        encoding = self.encoding
+
+        if encoding is None:
+            return "utf-8"
+
+        return encoding
+
+    @property
     def body(self) -> bytes:
         return self.__body
 
@@ -946,6 +963,21 @@ class Response(object):
 
     def soup(self, engine: str = "lxml") -> BeautifulSoup:
         return BeautifulSoup(self.text(), engine)
+
+    def __getitem__(self, name: str) -> Any:
+        return self.__meta[name]
+
+    def __setitem__(self, name: str, value: Any) -> None:
+        self.__meta[name] = value
+
+    def __contains__(self, name: str) -> bool:
+        return name in self.__meta
+
+    def get(self, name: str, default=None) -> Optional[Any]:
+        return self.__meta.get(name, default)
+
+    def set(self, name: str, value: Any) -> None:
+        self.__meta[name] = value
 
 
 def request(
@@ -1126,9 +1158,9 @@ class request_retryer_custom_exponential_backoff(wait_base):
 
 
 def create_request_retryer(
-    min: float=10,
-    max: float=ONE_DAY,
-    max_attempts: int=9,
+    min: float = 10,
+    max: float = ONE_DAY,
+    max_attempts: int = 9,
     before_sleep=noop,
     additional_exceptions=None,
     predicate=None,

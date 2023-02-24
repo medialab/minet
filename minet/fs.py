@@ -4,6 +4,8 @@
 #
 # Multiple helper functions related to reading and writing files.
 #
+from typing import Union
+
 import gzip
 from os import makedirs
 from os.path import basename, join, splitext, abspath, normpath, dirname
@@ -162,12 +164,8 @@ class ThreadSafeFilesWriter(object):
         with self.folder_locks[directory]:
             makedirs(directory, exist_ok=True)
 
-    def write(self, filename, contents, binary=True, compress=False):
-        if binary and not isinstance(contents, bytes):
-            raise TypeError("contents must be bytes if binary=True")
-
-        if not binary and not isinstance(contents, str):
-            raise TypeError("contents must be str if binary=False")
+    def write(self, filename: str, contents: Union[str, bytes], compress: bool = False):
+        binary = isinstance(contents, bytes)
 
         if compress and not binary:
             raise NotImplementedError
