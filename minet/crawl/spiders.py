@@ -1,0 +1,240 @@
+# =============================================================================
+# Minet Spiders
+# =============================================================================
+#
+#
+from typing import (
+    Any,
+    Optional,
+    List,
+    Tuple,
+    TypeVar,
+    Union,
+    Callable,
+    Dict,
+    Iterator,
+    Iterable,
+    Generic,
+)
+from typing_extensions import TypedDict, NotRequired
+
+from urllib.parse import urljoin
+
+from minet.crawl.types import UrlOrCrawlJob, CrawlJob, CrawlJobDataType, ScrapedDataType
+from minet.scrape import Scraper
+from minet.web import Response
+from minet.utils import PseudoFStringFormatter
+
+FORMATTER = PseudoFStringFormatter()
+
+T = TypeVar("T")
+
+
+def ensure_list(value: Union[T, List[T]]) -> List[T]:
+    if not isinstance(value, list):
+        return [value]
+    return value
+
+
+SpiderNextJobs = Optional[Iterable[CrawlJob[CrawlJobDataType]]]
+SpiderResult = Tuple[ScrapedDataType, SpiderNextJobs[CrawlJobDataType]]
+
+
+class Spider(Generic[CrawlJobDataType, ScrapedDataType]):
+    name: str
+
+    def __init__(self, name: str = "default"):
+        self.name = name
+
+    def start_jobs(self) -> Optional[Iterable[UrlOrCrawlJob[CrawlJobDataType]]]:
+        return None
+
+    def __call__(
+        self, job: CrawlJob[CrawlJobDataType], response: Response
+    ) -> SpiderResult[ScrapedDataType, CrawlJobDataType]:
+        raise NotImplementedError
+
+    def __repr__(self):
+        class_name = self.__class__.__name__
+
+        return "<%(class_name)s name=%(name)s>" % {
+            "class_name": class_name,
+            "name": self.name,
+        }
+
+
+class FunctionSpider(Spider[CrawlJobDataType, ScrapedDataType]):
+    fn: Callable[
+        [CrawlJob[CrawlJobDataType], Response],
+        SpiderResult[ScrapedDataType, CrawlJobDataType],
+    ]
+
+    def __init__(
+        self,
+        fn: Callable[
+            [CrawlJob[CrawlJobDataType], Response],
+            SpiderResult[ScrapedDataType, CrawlJobDataType],
+        ],
+        name: str = "default",
+    ):
+        super().__init__(name)
+        self.fn = fn
+
+    def __call__(
+        self, job: CrawlJob[CrawlJobDataType], response: Response
+    ) -> SpiderResult[ScrapedDataType, CrawlJobDataType]:
+        return self.fn(job, response)
+
+
+class DefinitionSpiderScrapedDataType(TypedDict, Generic[ScrapedDataType]):
+    single: Optional[ScrapedDataType]
+    multiple: Dict[str, ScrapedDataType]
+
+
+class DefinitionSpiderTarget(TypedDict, Generic[CrawlJobDataType]):
+    url: str
+    spider: NotRequired[str]
+    data: NotRequired[CrawlJobDataType]
+
+
+class DefinitionSpider(
+    Spider[CrawlJobDataType, DefinitionSpiderScrapedDataType[ScrapedDataType]]
+):
+    definition: Dict[str, Any]
+    next_definition: Optional[Dict[str, Any]]
+    max_level: int
+    scraper: Optional[Scraper]
+    scrapers: Dict[str, Scraper]
+    next_scraper: Optional[Scraper]
+    next_scrapers: Dict[str, Scraper]
+
+    def __init__(self, definition: Dict[str, Any], name: str = "default"):
+
+        # Descriptors
+        super().__init__(name)
+        self.definition = definition
+        self.next_definition = definition.get("next")
+
+        # Settings
+        self.max_level = definition.get("max_level", float("inf"))
+
+        # Scrapers
+        self.scraper = None
+        self.scrapers = {}
+        self.next_scraper = None
+        self.next_scrapers = {}
+
+        if "scraper" in definition:
+            self.scraper = Scraper(definition["scraper"])
+
+        if "scrapers" in definition:
+            for name, scraper in definition["scrapers"].items():
+                self.scrapers[name] = Scraper(scraper)
+
+        if self.next_definition is not None:
+            if "scraper" in self.next_definition:
+                self.next_scraper = Scraper(self.next_definition["scraper"])
+
+            if "scrapers" in self.next_definition:
+                for name, scraper in self.next_definition["scrapers"].items():
+                    self.next_scrapers[name] = Scraper(scraper)
+
+    def start_jobs(self) -> Iterable[UrlOrCrawlJob[CrawlJobDataType]]:
+
+        # TODO: possibility to name this as jobs
+        start_urls = ensure_list(self.definition.get("start_url", [])) + ensure_list(
+            self.definition.get("start_urls", [])
+        )
+
+        for url in start_urls:
+            yield CrawlJob(url, spider=self.name)
+
+    def __scrape(
+        self, job: CrawlJob[CrawlJobDataType], response: Response
+    ) -> DefinitionSpiderScrapedDataType[ScrapedDataType]:
+        scraped: DefinitionSpiderScrapedDataType[ScrapedDataType] = {
+            "single": None,
+            "multiple": {},
+        }
+
+        context = {"job": job.id(), "url": job.url}
+
+        text = response.text()
+
+        if self.scraper is not None:
+            scraped["single"] = self.scraper(text, context=context)
+
+        for name, scraper in self.scrapers.items():
+            scraped["multiple"][name] = scraper(text, context=context)
+
+        return scraped
+
+    def __job_from_target(
+        self,
+        current_url: str,
+        target: Union[str, DefinitionSpiderTarget[CrawlJobDataType]],
+        next_level: int,
+    ) -> CrawlJob[CrawlJobDataType]:
+        if isinstance(target, str):
+            return CrawlJob(
+                url=urljoin(current_url, target), spider=self.name, level=next_level
+            )
+
+        else:
+
+            # TODO: validate target
+            return CrawlJob(
+                url=urljoin(current_url, target["url"]),
+                spider=target.get("spider", self.name),
+                level=next_level,
+                data=target.get("data"),
+            )
+
+    def __next_targets(
+        self, response: Response, next_level: int
+    ) -> Iterator[Union[str, DefinitionSpiderTarget[CrawlJobDataType]]]:
+
+        text = response.text()
+
+        # Scraping next results
+        if self.next_scraper is not None:
+            scraped = self.next_scraper(text)
+
+            if scraped is not None:
+                if isinstance(scraped, list):
+                    yield from scraped
+                else:
+                    yield scraped
+
+        if self.next_scrapers:
+            for scraper in self.next_scrapers.values():
+                scraped = scraper(text)
+
+                if scraped is not None:
+                    if isinstance(scraped, list):
+                        yield from scraped
+                    else:
+                        yield scraped
+
+        # Formatting next url
+        if self.next_definition is not None and "format" in self.next_definition:
+            yield FORMATTER.format(self.next_definition["format"], level=next_level)
+
+    def __next_jobs(self, job: CrawlJob[CrawlJobDataType], response: Response):
+        if not self.next_definition:
+            return
+
+        next_level = job.level + 1
+
+        if next_level > self.max_level:
+            return
+
+        for target in self.__next_targets(response, next_level):
+            yield self.__job_from_target(response.url, target, next_level)
+
+    def __call__(
+        self, job: CrawlJob[CrawlJobDataType], response: Response
+    ) -> SpiderResult[
+        DefinitionSpiderScrapedDataType[ScrapedDataType], CrawlJobDataType
+    ]:
+        return self.__scrape(job, response), self.__next_jobs(job, response)

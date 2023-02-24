@@ -21,9 +21,8 @@ from minet.fs import FilenameBuilder, ThreadSafeFilesWriter
 from minet.web import grab_cookies, parse_http_header
 from minet.exceptions import InvalidURLError, FilenameFormattingError
 from minet.cli.exceptions import InvalidArgumentsError, FatalError
-from minet.cli.console import console
 from minet.cli.reporters import report_error, report_filename_formatting_error
-from minet.cli.utils import with_enricher_and_loading_bar
+from minet.cli.utils import with_enricher_and_loading_bar, with_ctrl_c_warning
 
 
 FETCH_ADDITIONAL_HEADERS = [
@@ -70,24 +69,6 @@ def get_headers(cli_args):
 def get_multiplex(cli_args):
     if cli_args.separator is not None:
         return casanova.Multiplexer(cli_args.column, cli_args.separator)
-
-
-def with_ctrl_c_warning(fn):
-    def wrapper(cli_args, loading_bar, enricher, **kwargs):
-        try:
-            fn(cli_args, loading_bar=loading_bar, enricher=enricher, **kwargs)
-        except KeyboardInterrupt:
-            if hasattr(cli_args.output, "flush"):
-                cli_args.output.flush()
-
-            loading_bar.erase()
-            loading_bar.stop()
-            console.print("Performing clean shutdown by cancelling ongoing calls...")
-            console.print("This may take some seconds if you are hitting slow servers.")
-            console.print("Ctrl-C again if you want to force exit.")
-            raise
-
-    return wrapper
 
 
 @with_enricher_and_loading_bar(

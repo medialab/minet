@@ -374,3 +374,21 @@ def with_enricher_and_loading_bar(
         return wrapper
 
     return decorate
+
+
+def with_ctrl_c_warning(fn):
+    def wrapper(cli_args, loading_bar, enricher, **kwargs):
+        try:
+            fn(cli_args, loading_bar=loading_bar, enricher=enricher, **kwargs)
+        except KeyboardInterrupt:
+            if hasattr(cli_args.output, "flush"):
+                cli_args.output.flush()
+
+            loading_bar.erase()
+            loading_bar.stop()
+            console.print("Performing clean shutdown by cancelling ongoing calls...")
+            console.print("This may take some seconds if you are hitting slow servers.")
+            console.print("Ctrl-C again if you want to force exit.")
+            raise
+
+    return wrapper
