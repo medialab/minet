@@ -32,7 +32,7 @@ from minet.crawl.spiders import Spider
 from minet.crawl.state import CrawlerState
 from minet.web import request, EXPECTED_WEB_ERRORS
 from minet.fetch import HTTPThreadPoolExecutor, CANCELLED
-from minet.exceptions import UnknownSpiderError, SpiderError, CancelledRequestError
+from minet.exceptions import UnknownSpiderError, CancelledRequestError
 from minet.constants import (
     DEFAULT_DOMAIN_PARALLELISM,
     DEFAULT_IMAP_BUFFER_SIZE,
@@ -134,7 +134,7 @@ class CrawlWorker(Generic[CrawlJobDataType, ScrapedDataType]):
                     self.crawler.enqueue_many(next_jobs)
 
             except Exception as error:
-                result.error = SpiderError(reason=error)
+                result.error = error
 
             return result
 

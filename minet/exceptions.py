@@ -105,12 +105,6 @@ class UnknownSpiderError(CrawlError):
         self.spider = spider
 
 
-class SpiderError(CrawlError):
-    def __init__(self, msg=None, reason: Optional[Exception] = None):
-        super().__init__(msg)
-        self.reason = reason
-
-
 # Extraction errors
 class TrafilaturaError(MinetError):
     def __init__(self, msg=None, reason=None):

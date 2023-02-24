@@ -19,6 +19,6 @@ with Crawler(EchoJSSpider()) as crawler:
         print(result)
 
         if result.error:
-            print(result.error.reason)
+            print(result.error)
         elif result.scraped:
             print(result.scraped)
