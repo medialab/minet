@@ -10,7 +10,7 @@ from itertools import islice
 from minet.cli.utils import LoadingBar
 from minet.cli.instagram.utils import with_instagram_fatal_errors
 from minet.instagram import InstagramAPIScraper
-from minet.instagram.constants import INSTAGRAM_USER_POST_CSV_HEADERS
+from minet.instagram.constants import INSTAGRAM_POST_CSV_HEADERS
 from minet.instagram.exceptions import (
     InstagramNoPublicationError,
     InstagramPrivateOrNonExistentAccountError,
@@ -25,7 +25,7 @@ def action(cli_args):
     enricher = casanova.enricher(
         cli_args.input,
         cli_args.output,
-        add=INSTAGRAM_USER_POST_CSV_HEADERS,
+        add=INSTAGRAM_POST_CSV_HEADERS,
     )
 
     loading_bar = LoadingBar("Retrieving posts", unit="user", stats={"posts": 0})

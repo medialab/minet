@@ -39,7 +39,7 @@ INSTAGRAM_HASHTAG_POST_CSV_HEADERS = [
     "display_url",
 ]
 
-INSTAGRAM_USER_POST_CSV_HEADERS = [
+INSTAGRAM_POST_CSV_HEADERS = [
     "username",
     "full_name",
     "is_verified",

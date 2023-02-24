@@ -12,8 +12,10 @@ from json.decoder import JSONDecodeError
 from ural.instagram import (
     parse_instagram_url,
     is_instagram_username,
+    is_instagram_post_shortcode,
     InstagramPost as ParsedInstagramPost,
     InstagramUser as ParsedInstagramUser,
+    InstagramReel as ParsedInstagramReel,
 )
 from minet.constants import COOKIE_BROWSERS
 from minet.utils import sleep_with_entropy
@@ -52,8 +54,8 @@ from minet.instagram.exceptions import (
 )
 from minet.instagram.formatters import (
     format_hashtag_post,
+    format_post,
     format_user,
-    format_user_post,
     format_user_info,
 )
 
@@ -61,7 +63,7 @@ INSTAGRAM_GRAPHQL_ENDPOINT = "https://www.instagram.com/graphql/query/"
 INSTAGRAM_HASHTAG_QUERY_HASH = "9b498c08113f1e09617a1703c22b2f32"
 INSTAGRAM_USER_ID_QUERY_HASH = "c9100bf9110dd6361671f113dd02e7d6"
 INSTAGRAM_MAGIC_TOKEN_PATTERN = re.compile(r"\"X-IG-App-ID\"\s*:\s*\"(\d+)\"")
-INSTAGRAM_USER_ID_PATTERN = re.compile(r"\d+")
+INSTAGRAM_ID_PATTERN = re.compile(r"\d+")
 INSTAGRAM_GET_USER_ID_PATTERN = re.compile(r"\d+_(\d+)")
 
 
@@ -77,6 +79,14 @@ def forge_hashtag_search_url(name, cursor=None, count=50):
     )
 
     return url
+
+
+def forge_post_url_from_id(post_id):
+    return "https://www.instagram.com/api/v1/media/%s/info/" % post_id
+
+
+def forge_post_url_from_shortcode(post_shortcode):
+    return "https://www.instagram.com/p/%s/?__a=1&__d=dis" % post_shortcode
 
 
 def forge_username_url(user_id):
@@ -206,6 +216,9 @@ class InstagramAPIScraper(object):
             raise InstagramError500
 
         if response.status >= 400:
+            if data["message"].lower().strip() == "media not found or unavailable":
+                raise InstagramInvalidTargetError
+
             raise InstagramPublicAPIInvalidResponseError(url, response.status, data)
 
         if self.nb_calls != 0 and (self.nb_calls % INSTAGRAM_NB_REQUEST_BIG_WAIT) == 0:
@@ -287,11 +300,36 @@ class InstagramAPIScraper(object):
 
             cursor = getpath(data, ["page_info", "end_cursor"])
 
+    @ensure_magic_token
+    def post_infos(self, name):
+        if INSTAGRAM_ID_PATTERN.match(name):
+            url = forge_post_url_from_id(name)
+
+        else:
+            parsed = parse_instagram_url(name)
+            if isinstance(parsed, (ParsedInstagramPost, ParsedInstagramReel)):
+                shortcode = parsed.id
+
+            elif is_instagram_post_shortcode(name):
+                shortcode = name
+
+            else:
+                raise InstagramInvalidTargetError
+
+            url = forge_post_url_from_shortcode(shortcode)
+
+        data = self.request_json(url, magic_token=True)
+
+        if not data:
+            raise InstagramInvalidTargetError
+
+        return format_post(getpath(data, ["items", 0]))
+
     def get_username(self, name):
-        if INSTAGRAM_USER_ID_PATTERN.match(name):
+        if INSTAGRAM_ID_PATTERN.match(name):
             url = forge_username_url(name)
 
-            data_user_id = self.request_json(url, magic_token=True)
+            data_user_id = self.request_json(url)
 
             if not data_user_id:
                 raise InstagramInvalidTargetError
@@ -415,7 +453,7 @@ class InstagramAPIScraper(object):
                 raise InstagramPrivateOrNonExistentAccountError
 
             for item in items:
-                yield format_user_post(item)
+                yield format_post(item)
 
             more_available = data.get("more_available")
 

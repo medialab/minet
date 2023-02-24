@@ -87,6 +87,40 @@ INSTAGRAM_USER_FOLLOWERS_SUBCOMMAND = subcommand(
     ],
 )
 
+INSTAGRAM_POST_INFOS_SUBCOMMAND = subcommand(
+    "post-infos",
+    "minet.cli.instagram.post_infos",
+    title="Instagram post-infos",
+    description="""
+        Scrape Instagram infos with a given post url, post shortcode or post id.
+
+        This requires to be logged in to an Instagram account, so
+        by default this command will attempt to grab the relevant
+        authentication cookies from a local Firefox browser.
+
+        If you want to grab cookies from another browser or want
+        to directly pass the cookie as a string, check out the
+        -c/--cookie flag.
+
+        Beware, instagram only provides temporary links, not permalinks,
+        for profile picture urls retrieved as the "profile_pic_url_hd" in
+        the result. Be sure to download them fast if you need them (you can
+        use the `minet fetch` command for that, and won't need to use cookies).
+    """,
+    epilog="""
+        example:
+
+        . Searching infos for the post https://www.instagram.com/p/CpA46rmU26Y/:
+            $ minet instagram post-infos https://www.instagram.com/p/CpA46rmU26Y/ > post_infos.csv
+    """,
+    variadic_input={
+        "dummy_column": "post",
+        "item_label": "post url, post shortcode or post id",
+        "item_label_plural": "post urls, post shortcodes or post ids",
+    },
+    select=True,
+)
+
 INSTAGRAM_USER_FOLLOWING_SUBCOMMAND = subcommand(
     "user-following",
     "minet.cli.instagram.user_following",
@@ -233,6 +267,7 @@ INSTAGRAM_COMMAND = command(
     ],
     subcommands=[
         INSTAGRAM_HASHTAG_SUBCOMMAND,
+        INSTAGRAM_POST_INFOS_SUBCOMMAND,
         INSTAGRAM_USER_FOLLOWERS_SUBCOMMAND,
         INSTAGRAM_USER_FOLLOWING_SUBCOMMAND,
         INSTAGRAM_USER_INFOS_SUBCOMMAND,

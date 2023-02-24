@@ -2166,7 +2166,7 @@ examples:
 
 ```
 usage: minet instagram [-h] [-c COOKIE] [--rcfile RCFILE]
-                       {hashtag,user-followers,user-following,user-infos,user-posts}
+                       {hashtag,post-infos,user-followers,user-following,user-infos,user-posts}
                        ...
 
 Minet Instagram Command
@@ -2187,7 +2187,7 @@ optional arguments:
   -h, --help                    show this help message and exit
 
 subcommands:
-  {hashtag,user-followers,user-following,user-infos,user-posts}
+  {hashtag,post-infos,user-followers,user-following,user-infos,user-posts}
                                 Subcommand to use.
 ```
 

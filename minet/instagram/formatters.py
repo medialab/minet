@@ -9,7 +9,7 @@ from ebbe import getpath
 
 from minet.instagram.constants import (
     INSTAGRAM_HASHTAG_POST_CSV_HEADERS,
-    INSTAGRAM_USER_POST_CSV_HEADERS,
+    INSTAGRAM_POST_CSV_HEADERS,
     INSTAGRAM_MEDIA_TYPE,
     INSTAGRAM_USER_CSV_HEADERS,
     INSTAGRAM_USER_INFO_CSV_HEADERS,
@@ -35,7 +35,7 @@ InstagramHashtagPost = namedrecord(
 
 InstagramUserPost = namedrecord(
     "InstagramUserPost",
-    INSTAGRAM_USER_POST_CSV_HEADERS,
+    INSTAGRAM_POST_CSV_HEADERS,
     boolean=["like_and_view_counts_disabled", "is_verified"],
     plural=[
         "medias_type",
@@ -132,7 +132,7 @@ def format_hashtag_post(item):
     return row
 
 
-def format_user_post(item):
+def format_post(item):
 
     media_type = INSTAGRAM_MEDIA_TYPE.get(item["media_type"])
     if media_type is None:
