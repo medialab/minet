@@ -31,8 +31,8 @@ from minet.crawl.types import (
 from minet.crawl.spiders import Spider
 from minet.crawl.state import CrawlerState
 from minet.web import request, EXPECTED_WEB_ERRORS
-from minet.fetch import HTTPThreadPoolExecutor
-from minet.exceptions import UnknownSpiderError, SpiderError
+from minet.fetch import HTTPThreadPoolExecutor, CANCELLED
+from minet.exceptions import UnknownSpiderError, SpiderError, CancelledRequestError
 from minet.constants import (
     DEFAULT_DOMAIN_PARALLELISM,
     DEFAULT_IMAP_BUFFER_SIZE,
@@ -73,10 +73,12 @@ class CrawlWorker(Generic[CrawlJobDataType, ScrapedDataType]):
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType]
-    ) -> CrawlResult[CrawlJobDataType, ScrapedDataType]:
+    ) -> Union[object, CrawlResult[CrawlJobDataType, ScrapedDataType]]:
 
         # Registering work
         with self.crawler.state.working():
+            cancel_event = self.crawler.cancel_event
+
             result = CrawlResult(job)
             spider_name = job.spider or DEFAULT_SPIDER_KEY
 
@@ -92,8 +94,14 @@ class CrawlWorker(Generic[CrawlJobDataType, ScrapedDataType]):
             # NOTE: request_args must be threadsafe
             kwargs = {}
 
+            if cancel_event.is_set():
+                return CANCELLED
+
             if self.request_args is not None:
                 kwargs = self.request_args(job)
+
+            if cancel_event.is_set():
+                return CANCELLED
 
             try:
                 response = request(
@@ -103,15 +111,24 @@ class CrawlWorker(Generic[CrawlJobDataType, ScrapedDataType]):
                     **kwargs,
                 )
 
+            except CancelledRequestError:
+                return CANCELLED
+
             except EXPECTED_WEB_ERRORS as error:
                 result.error = error
                 return result
 
             result.response = response
 
+            if cancel_event.is_set():
+                return CANCELLED
+
             try:
                 scraped, next_jobs = spider(job, response)
                 result.scraped = scraped
+
+                if cancel_event.is_set():
+                    return CANCELLED
 
                 if next_jobs is not None:
                     self.crawler.enqueue_many(next_jobs)
@@ -227,7 +244,7 @@ class Crawler(
         def key_by_domain_name(job: CrawlJob) -> Optional[str]:
             return job.domain
 
-        multithreaded_iterator = super().imap_unordered(
+        imap_unordered = super().imap_unordered(
             self.queue,
             worker,
             key=key_by_domain_name,
@@ -237,7 +254,10 @@ class Crawler(
         )
 
         def safe_wrapper():
-            for result in multithreaded_iterator:
+            for result in imap_unordered:
+                if result is CANCELLED:
+                    continue
+
                 yield result
                 self.queue.task_done()
 
