@@ -17,7 +17,7 @@ from typing import (
     Union,
 )
 
-from queue import Queue
+from queue import Queue, Empty
 from persistqueue import SQLiteQueue
 from shutil import rmtree
 from threading import Lock
@@ -220,10 +220,10 @@ class Crawler(
         else:
             raise TypeError("expecting a single spider or a mapping of spiders")
 
-    def __start(self):
+    def start(self):
 
         if self.started:
-            raise RuntimeError("already started")
+            raise RuntimeError("Crawler already started")
 
         # Collecting start jobs - we only add those if queue is not pre-existing
         if self.queue.qsize() == 0:
@@ -240,17 +240,29 @@ class Crawler(
 
         self.started = True
 
-    def __cleanup(self) -> None:
-        # Releasing queue (needed by persistqueue)
-        if self.using_persistent_queue and self.queue_path is not None:
+    def stop(self):
+        if not self.started:
+            raise RuntimeError("Cannot stop a crawler that has not yet started")
+
+        self.started = False
+
+        if (
+            self.using_persistent_queue
+            and self.queue_path is not None
+            and self.queue.qsize() == 0
+        ):
             del self.queue
             rmtree(self.queue_path, ignore_errors=True)
 
     def __enter__(self):
         super().__enter__()
-        self.__start()
+        self.start()
 
         return self
+
+    def __exit__(self, *exc):
+        self.stop()
+        return super().__exit__(*exc)
 
     def __iter__(self):
         worker = CrawlWorker(self)
@@ -273,9 +285,8 @@ class Crawler(
                     continue
 
                 yield result
-                self.queue.task_done()
 
-            self.__cleanup()
+                self.queue.task_done()
 
         return safe_wrapper()
 
@@ -302,6 +313,21 @@ class Crawler(
 
                 self.queue.put(job)
                 self.state.inc_queued()
+
+    # NOTE: this is clearly not threadsafe lol. This is for debug only.
+    def dump_queue(self):
+        jobs = []
+
+        while True:
+            try:
+                jobs.append(self.queue.get_nowait())
+            except Empty:
+                break
+
+        for job in jobs:
+            self.queue.put_nowait(job)
+
+        return jobs
 
     @classmethod
     def from_callable(
