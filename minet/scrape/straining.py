@@ -45,7 +45,7 @@ def match_selector(selector, tag, attrs):
     return True
 
 
-def strainer_from_css(css, ignore_relations=False):
+def strainer_from_css(css: str, ignore_relations: bool = False) -> SoupStrainer:
     try:
         selector_list = CSSParser(css).process_selectors()
     except (SelectorSyntaxError, NotImplementedError) as e:

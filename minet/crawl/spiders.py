@@ -20,6 +20,7 @@ from typing import (
 from typing_extensions import TypedDict, NotRequired
 
 from urllib.parse import urljoin
+from bs4 import BeautifulSoup
 
 from minet.crawl.types import (
     UrlOrCrawlJob,
@@ -161,7 +162,7 @@ class DefinitionSpider(
             yield url
 
     def __scrape(
-        self, job: CrawlJob[CrawlJobDataType], response: Response
+        self, job: CrawlJob[CrawlJobDataType], response: Response, soup: BeautifulSoup
     ) -> DefinitionSpiderCrawlJobOutputDataType[CrawlJobOutputDataType]:
         scraped: DefinitionSpiderCrawlJobOutputDataType[CrawlJobOutputDataType] = {
             "single": None,
@@ -170,13 +171,11 @@ class DefinitionSpider(
 
         context = {"job": job.id(), "url": job.url}
 
-        text = response.text()
-
         if self.scraper is not None:
-            scraped["single"] = self.scraper(text, context=context)
+            scraped["single"] = self.scraper(soup, context=context)
 
         for name, scraper in self.scrapers.items():
-            scraped["multiple"][name] = scraper(text, context=context)
+            scraped["multiple"][name] = scraper(soup, context=context)
 
         return scraped
 
@@ -200,14 +199,12 @@ class DefinitionSpider(
             )
 
     def __next_targets(
-        self, response: Response, next_level: int
+        self, response: Response, soup: BeautifulSoup, next_level: int
     ) -> Iterator[Union[str, DefinitionSpiderTarget[CrawlJobDataType]]]:
-
-        text = response.text()
 
         # Scraping next results
         if self.next_scraper is not None:
-            scraped = self.next_scraper(text)
+            scraped = self.next_scraper(soup)
 
             if scraped is not None:
                 if isinstance(scraped, list):
@@ -217,7 +214,7 @@ class DefinitionSpider(
 
         if self.next_scrapers:
             for scraper in self.next_scrapers.values():
-                scraped = scraper(text)
+                scraped = scraper(soup)
 
                 if scraped is not None:
                     if isinstance(scraped, list):
@@ -229,7 +226,9 @@ class DefinitionSpider(
         if self.next_definition is not None and "format" in self.next_definition:
             yield FORMATTER.format(self.next_definition["format"], level=next_level)
 
-    def __next_jobs(self, job: CrawlJob[CrawlJobDataType], response: Response):
+    def __next_jobs(
+        self, job: CrawlJob[CrawlJobDataType], response: Response, soup: BeautifulSoup
+    ):
         if not self.next_definition:
             return
 
@@ -238,7 +237,7 @@ class DefinitionSpider(
         if next_level > self.max_level:
             return
 
-        for target in self.__next_targets(response, next_level):
+        for target in self.__next_targets(response, soup, next_level):
             yield self.__job_from_target(response.url, target, next_level)
 
     def __call__(
@@ -246,4 +245,6 @@ class DefinitionSpider(
     ) -> SpiderResult[
         DefinitionSpiderCrawlJobOutputDataType[CrawlJobOutputDataType], CrawlJobDataType
     ]:
-        return self.__scrape(job, response), self.__next_jobs(job, response)
+        soup = response.soup()
+
+        return self.__scrape(job, response, soup), self.__next_jobs(job, response, soup)

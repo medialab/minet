@@ -10,8 +10,8 @@ def scrape_articles(job: CrawlJob, response: Response):
     return titles, None
 
 
-with Crawler.from_callable(
-    scrape_articles, start_jobs=["https://www.echojs.com/"], wait=False, daemonic=True
+with Crawler.from_definition(
+    "./ftest/crawlers/echojs_scraper.yml", wait=False, daemonic=True
 ) as crawler:
     for result in crawler:
         print(result)
