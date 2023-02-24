@@ -11,64 +11,55 @@
 # that were already seen, again. Hence the not-straigtforward-looking code
 # below to handle pagination in spite of the API's shortcomings.
 #
-import casanova
 import math
 from twitwi import normalize_user, format_user_as_csv_row
 from twitwi.constants import USER_FIELDS
 
-from minet.cli.utils import LoadingBar
-from minet.twitter import TwitterAPIClient
+from minet.cli.utils import with_enricher_and_loading_bar
+from minet.cli.twitter.utils import with_twitter_client
 
 ITEMS_PER_PAGE = 20
 MAX_ITEM_COUNT = 1020  # NOTE: API docs say it's 1000, but reality begs to differ
 RANGE_UPPER_BOUND = math.ceil(MAX_ITEM_COUNT / ITEMS_PER_PAGE) + 1
 
 
-def action(cli_args):
-
-    client = TwitterAPIClient(
-        cli_args.access_token,
-        cli_args.access_token_secret,
-        cli_args.api_key,
-        cli_args.api_secret_key,
-    )
-
-    enricher = casanova.enricher(
-        cli_args.input, cli_args.output, keep=cli_args.select, add=USER_FIELDS
-    )
-
-    loading_bar = LoadingBar(desc="Retrieving users", total=cli_args.total, unit="user")
+@with_enricher_and_loading_bar(
+    headers=USER_FIELDS,
+    title="Searching users",
+    unit="queries",
+    nested=True,
+    sub_unit="users",
+)
+@with_twitter_client()
+def action(cli_args, client, enricher, loading_bar):
 
     for row, query in enricher.cells(cli_args.column, with_rows=True):
+        with loading_bar.step(query):
+            kwargs = {"q": query, "count": ITEMS_PER_PAGE, "include_entities": True}
 
-        kwargs = {"q": query, "count": ITEMS_PER_PAGE, "include_entities": True}
+            already_seen_users = set()
 
-        loading_bar.print('Searching for "%s"' % query)
-        loading_bar.inc("queries")
+            for page in range(1, RANGE_UPPER_BOUND):
+                kwargs["page"] = page
 
-        already_seen_users = set()
+                result = client.call(["users", "search"], **kwargs)
+                new_user_count = 0
 
-        for page in range(1, RANGE_UPPER_BOUND):
-            kwargs["page"] = page
+                for user in result:
+                    user = normalize_user(user)
 
-            result = client.call(["users", "search"], **kwargs)
-            new_user_count = 0
+                    if user["id"] in already_seen_users:
+                        continue
 
-            for user in result:
-                user = normalize_user(user)
+                    loading_bar.nested_advance()
 
-                if user["id"] in already_seen_users:
-                    continue
+                    new_user_count += 1
+                    already_seen_users.add(user["id"])
+                    user_row = format_user_as_csv_row(user)
+                    enricher.writerow(row, user_row)
 
-                loading_bar.update()
-
-                new_user_count += 1
-                already_seen_users.add(user["id"])
-                user_row = format_user_as_csv_row(user)
-                enricher.writerow(row, user_row)
-
-            # If we did not see a single new user, we can safely stop
-            # If the number of results is strictly less than the expected number of
-            # items per page, we can safely stop
-            if new_user_count == 0 or len(result) < ITEMS_PER_PAGE:
-                break
+                # If we did not see a single new user, we can safely stop
+                # If the number of results is strictly less than the expected number of
+                # items per page, we can safely stop
+                if new_user_count == 0 or len(result) < ITEMS_PER_PAGE:
+                    break

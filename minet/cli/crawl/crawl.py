@@ -12,7 +12,7 @@ from ebbe.decorators import with_defer
 
 from minet.crawl import Crawler
 from minet.cli.reporters import report_error
-from minet.cli.utils import print_err, LoadingBar
+from minet.cli.utils import with_loading_bar
 
 JOBS_HEADERS = [
     "spider",
@@ -156,13 +156,14 @@ class ScraperReporterPool(object):
 
 
 @with_defer()
-def action(cli_args, defer):
+@with_loading_bar(title="Crawling", unit="pages")
+def action(cli_args, defer, loading_bar):
 
     # Loading crawler definition
     queue_path = join(cli_args.output_dir, "queue")
 
     if cli_args.resume:
-        print_err("Resuming crawl...")
+        loading_bar.print("[info]Will now resume…")
     else:
         rmtree(queue_path, ignore_errors=True)
 
@@ -177,7 +178,11 @@ def action(cli_args, defer):
 
     # Creating crawler
     crawler = Crawler(
-        cli_args.crawler, throttle=cli_args.throttle, queue_path=queue_path, wait=False
+        cli_args.crawler,
+        throttle=cli_args.throttle,
+        queue_path=queue_path,
+        wait=False,
+        daemonic=True,
     )
 
     reporter_pool = ScraperReporterPool(
@@ -185,28 +190,12 @@ def action(cli_args, defer):
     )
     defer(reporter_pool.close)
 
-    # Loading bar
-    loading_bar = LoadingBar(desc="Crawling", unit="page")
-
-    def update_loading_bar(result):
-        state = crawler.state
-
-        loading_bar.update_stats(
-            queued=state.jobs_queued,
-            doing=state.jobs_doing + 1,
-            spider=result.job.spider,
-        )
-        loading_bar.update()
-
-    # Starting crawler
-    crawler.start()
-
     # Running crawler
     for result in crawler:
-        update_loading_bar(result)
-        jobs_writer.writerow(format_job_for_csv(result))
+        with loading_bar.step():
+            jobs_writer.writerow(format_job_for_csv(result))
 
-        if result.error is not None:
-            continue
+            if result.error is not None:
+                continue
 
-        reporter_pool.write(result.job.spider, result.scraped)
+            reporter_pool.write(result.job.spider, result.scraped)

@@ -107,7 +107,7 @@ def twitter_api_subcommand(*args, arguments=[], **kwargs):
     return subcommand(
         *args,
         arguments=arguments + TWITTER_API_COMMON_ARGUMENTS,
-        validate=check_credentials,
+        resolve=check_credentials,
         **kwargs
     )
 

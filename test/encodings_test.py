@@ -1,7 +1,7 @@
 # =============================================================================
 # Minet Encodings Unit Tests
 # =============================================================================
-from minet.encodings import is_supported_encoding
+from minet.encodings import is_supported_encoding, normalize_encoding
 
 SUPPORT_TESTS = [
     ("utf8", True),
@@ -13,6 +13,10 @@ SUPPORT_TESTS = [
 
 
 class TestEncodings(object):
+    def test_normalize_encoding(self):
+        assert normalize_encoding("UTF-8") == "utf8"
+        assert normalize_encoding("utf8") == "utf8"
+
     def test_is_supported_encoding(self):
         for value, result in SUPPORT_TESTS:
             assert is_supported_encoding(value) == result

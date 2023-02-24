@@ -4,18 +4,21 @@
 #
 # Collection of handy custom exceptions.
 #
-from collections.abc import Iterable
+from minet.utils import message_flatmap
 
 
 # Base minet error
 class MinetError(Exception):
     def __init__(self, message=None):
-        if not isinstance(message, str):
-            if isinstance(message, Iterable):
-                message = "\n".join(message)
+        if message is not None:
+            message = message_flatmap(message)
 
-        super().__init__("" if message is None else message)
         self.message = message
+
+        if message is None:
+            super().__init__()
+        else:
+            super().__init__(message)
 
     def __repr__(self):
         representation = "<" + self.__class__.__name__
@@ -53,6 +56,14 @@ class InvalidURLError(MinetError):
     def __init__(self, message=None, url=None):
         self.url = url
         super().__init__(message)
+
+
+class CancelledRequestError(MinetError):
+    pass
+
+
+class FinalTimeoutError(MinetError):
+    pass
 
 
 # Redirection errors

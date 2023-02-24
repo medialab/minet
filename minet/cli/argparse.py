@@ -4,6 +4,9 @@
 #
 # Miscellaneous helpers related to CLI argument parsing.
 #
+from typing import Optional
+from typing_extensions import TypedDict, NotRequired
+
 import os
 import re
 import sys
@@ -19,7 +22,6 @@ from argparse import (
 )
 from gettext import gettext
 from textwrap import dedent
-from tqdm.contrib import DummyTqdmFile
 from casanova import Resumer, CsvCellIO
 from ebbe import getpath, omit
 from datetime import datetime
@@ -281,7 +283,7 @@ class SingleColumnDummyCSVInput(DummyCSVInput):
 
     def resolve(self, cli_args):
         value = getattr(cli_args, self.dest)
-        f = CsvCellIO(self.column, value)
+        f = CsvCellIO(value, column=self.column)
         setattr(cli_args, self.dest, self.column)
         setattr(cli_args, "has_dummy_csv", True)
 
@@ -328,9 +330,9 @@ class OutputOpener(object):
     def open(self, cli_args, resume=False):
         if self.path == "-":
             if resume:
-                raise RuntimeError
+                raise NotResumableError
 
-            return DummyTqdmFile(acquire_cross_platform_stdout())
+            return acquire_cross_platform_stdout()
 
         if resume and self.resumer_class is not None:
             resumer_kwargs = self.resumer_kwargs
@@ -460,10 +462,6 @@ class ConfigAction(Action):
 def resolve_arg_dependencies(cli_args, config):
     to_close = []
 
-    # Validation
-    if getattr(cli_args, "resume", False) and cli_args.output.path is None:
-        raise NotResumableError
-
     # Unwrapping values
     # NOTE: I copy the dict from vars because we are going to add new
     # attributes from within the loop
@@ -496,13 +494,22 @@ def resolve_arg_dependencies(cli_args, config):
     return to_close
 
 
+class VariadicInputDefinition(TypedDict):
+    dummy_column: str
+    item_label: NotRequired[str]
+    item_label_plural: NotRequired[str]
+    column_help: NotRequired[str]
+    input_help: NotRequired[str]
+
+
 def resolve_typical_arguments(
     args,
+    no_output=False,
     resumer=None,
     resumer_kwargs=None,
-    select=False,
-    total=False,
-    variadic_input=None,
+    select: bool = False,
+    total: bool = False,
+    variadic_input: Optional[VariadicInputDefinition] = None,
 ):
     args = [] if args is None else args.copy()
     epilog_addendum = None
@@ -566,11 +573,12 @@ def resolve_typical_arguments(
         """
 
     if select:
+
+        # TODO: actually one can use xsv mini dsl here
         args.append(
             {
                 "flags": ["-s", "--select"],
                 "help": "Columns of input CSV file to include in the output (separated by `,`).",
-                "type": SplitterType(),
             },
         )
 
@@ -597,27 +605,29 @@ def resolve_typical_arguments(
         if resumer_kwargs is not None:
             output_argument["resumer_kwargs"] = resumer_kwargs
 
-    args.append(output_argument)
+    if not no_output:
+        args.append(output_argument)
 
     return args, epilog_addendum
 
 
 def command(
-    name,
+    name: str,
     package=None,
-    title=None,
+    title: str = None,
     aliases=None,
     description=None,
     epilog=None,
     common_arguments=None,
     arguments=None,
     subcommands=None,
-    validate=None,
+    resolve=None,
     resumer=None,
     resumer_kwargs=None,
+    no_output=False,
     select=False,
     total=False,
-    variadic_input=None,
+    variadic_input: Optional[VariadicInputDefinition] = None,
     **kwargs,
 ):
 
@@ -654,6 +664,7 @@ def command(
     elif arguments is not None:
         data["arguments"], epilog_addendum = resolve_typical_arguments(
             arguments,
+            no_output=no_output,
             resumer=resumer,
             resumer_kwargs=resumer_kwargs,
             select=select,
@@ -667,8 +678,8 @@ def command(
             else:
                 data["epilog"] += "\n\n" + epilog_addendum
 
-    if validate is not None:
-        data["validate"] = validate
+    if resolve is not None:
+        data["resolve"] = resolve
 
     data.update(kwargs)
 
@@ -682,12 +693,13 @@ def subcommand(
     description=None,
     epilog=None,
     arguments=[],
-    validate=None,
+    resolve=None,
     resumer=None,
     resumer_kwargs=None,
+    no_output=False,
     select=False,
     total=False,
-    variadic_input=None,
+    variadic_input: Optional[VariadicInputDefinition] = None,
     **kwargs,
 ):
     data = {"name": name, "title": title, "package": package, "arguments": arguments}
@@ -700,6 +712,7 @@ def subcommand(
 
     data["arguments"], epilog_addendum = resolve_typical_arguments(
         arguments,
+        no_output=no_output,
         resumer=resumer,
         resumer_kwargs=resumer_kwargs,
         select=select,
@@ -713,8 +726,8 @@ def subcommand(
         else:
             data["epilog"] += "\n\n" + epilog_addendum
 
-    if validate is not None:
-        data["validate"] = validate
+    if resolve is not None:
+        data["resolve"] = resolve
 
     data.update(kwargs)
 
@@ -722,7 +735,7 @@ def subcommand(
 
 
 def template_readme(tpl, commands):
-    parser, subparser_index = build_parser("", "", commands)
+    _, subparser_index = build_parser("", "", commands)
 
     def replacer(match):
         keys = match.group(1).split("/")

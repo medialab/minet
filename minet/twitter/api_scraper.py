@@ -13,7 +13,7 @@ from ebbe import getpath, pathgetter
 from json import JSONDecodeError
 
 from minet.web import (
-    create_pool,
+    create_pool_manager,
     request,
     request_json,
     create_request_retryer,
@@ -294,7 +294,7 @@ def tweets_payload_iter(payload):
 # =============================================================================
 class TwitterAPIScraper(object):
     def __init__(self):
-        self.pool = create_pool(
+        self.pool_manager = create_pool_manager(
             timeout=TWITTER_PUBLIC_API_DEFAULT_TIMEOUT, spoof_tls_ciphers=True
         )
         self.reset()
@@ -313,11 +313,15 @@ class TwitterAPIScraper(object):
         self.cookie = None
 
     def request(self, url):
-        return request(url, pool=self.pool, spoof_ua=True)
+        return request(url, pool_manager=self.pool_manager, spoof_ua=True)
 
     def request_json(self, url, headers=None, method="GET"):
         return request_json(
-            url, pool=self.pool, spoof_ua=True, method=method, headers=headers
+            url,
+            pool_manager=self.pool_manager,
+            spoof_ua=True,
+            method=method,
+            headers=headers,
         )
 
     def acquire_guest_token(self):

@@ -4,10 +4,10 @@
 #
 # Logic of the `bz limit` action.
 #
-from termcolor import colored
 from ebbe import format_int
 
 from minet.buzzsumo import BuzzSumoAPIClient
+from minet.cli.console import console
 from minet.cli.buzzsumo.utils import with_buzzsumo_fatal_errors
 
 
@@ -17,8 +17,8 @@ def action(cli_args):
 
     limit = client.limit()
 
-    print(
+    console.log_with_time(
         "With your token, you can still make",
-        colored(format_int(limit), "green"),
+        "[info]%s[/info]" % format_int(limit),
         "calls to the BuzzSumo API until the end of the month.",
     )

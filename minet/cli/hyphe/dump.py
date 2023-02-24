@@ -12,7 +12,7 @@ import gzip
 from os.path import join, dirname
 
 from minet.utils import md5
-from minet.cli.utils import LoadingBar
+from minet.cli.loading_bar import LoadingBar
 from minet.cli.hyphe.utils import with_hyphe_fatal_errors
 from minet.hyphe import HypheAPIClient
 from minet.hyphe.formatters import format_webentity_for_csv, format_page_for_csv
@@ -59,22 +59,17 @@ def action(cli_args):
     webentities_writer = csv.writer(webentities_file)
     webentities_writer.writerow(WEBENTITY_CSV_HEADERS)
 
-    loading_bar = LoadingBar(
-        desc="Paginating web entities",
-        unit="webentity",
-        unit_plural="webentities",
-        total=counts["webentities"],
-    )
+    with LoadingBar(
+        title="Paginating web entities", unit="webentities", total=counts["webentities"]
+    ) as loading_bar:
+        webentities = {}
 
-    webentities = {}
+        for webentity in corpus.webentities(statuses=cli_args.statuses):
+            webentities[webentity["id"]] = webentity
+            webentities_writer.writerow(format_webentity_for_csv(webentity))
+            loading_bar.advance()
 
-    for webentity in corpus.webentities(statuses=cli_args.statuses):
-        loading_bar.update()
-        webentities[webentity["id"]] = webentity
-        webentities_writer.writerow(format_webentity_for_csv(webentity))
-
-    webentities_file.close()
-    loading_bar.close()
+        webentities_file.close()
 
     # Finally we paginate pages
     pages_file = open(pages_output_path, "w", encoding="utf-8")
@@ -83,26 +78,29 @@ def action(cli_args):
         PAGE_CSV_HEADERS + (ADDITIONAL_PAGE_HEADERS if cli_args.body else [])
     )
 
-    loading_bar = LoadingBar(desc="Fetching pages", unit="page", total=counts["pages"])
+    with LoadingBar(
+        title="Downloading pages", unit="pages", total=counts["pages"]
+    ) as loading_bar:
+        for webentity in webentities.values():
+            for page in corpus.webentity_pages(
+                webentity["id"], include_body=cli_args.body
+            ):
+                filename = None
 
-    for webentity in webentities.values():
-        for page in corpus.webentity_pages(webentity["id"], include_body=cli_args.body):
-            loading_bar.update()
+                if cli_args.body and "body" in page:
+                    filename = format_page_filename(webentity, page)
+                    filepath = join(body_output_dir, filename)
+                    os.makedirs(dirname(filepath), exist_ok=True)
 
-            filename = None
+                    with open(filter, "wb") as f:
+                        binary = base64.b64decode(page["body"])
+                        binary = zlib.decompress(binary)
+                        binary = gzip.compress(binary)  # TODO: use gzip.open rather
 
-            if cli_args.body and "body" in page:
-                filename = format_page_filename(webentity, page)
-                filepath = join(body_output_dir, filename)
-                os.makedirs(dirname(filepath), exist_ok=True)
+                        f.write(binary)
 
-                with open(filter, "wb") as f:
-                    binary = base64.b64decode(page["body"])
-                    binary = zlib.decompress(binary)
-                    binary = gzip.compress(binary)  # TODO: use gzip.open rather
+                pages_writer.writerow(
+                    format_page_for_csv(webentity, page, filename=filename)
+                )
 
-                    f.write(binary)
-
-            pages_writer.writerow(
-                format_page_for_csv(webentity, page, filename=filename)
-            )
+                loading_bar.advance()

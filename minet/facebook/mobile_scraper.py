@@ -7,7 +7,6 @@
 import re
 import sys
 import soupsieve
-from bs4 import BeautifulSoup
 from collections import deque
 from urllib.parse import urljoin
 from ural import force_protocol
@@ -29,7 +28,13 @@ from minet.utils import (
     parse_date,
     clean_human_readable_numbers,
 )
-from minet.web import create_pool, request, create_request_retryer, retrying_method
+from minet.web import (
+    create_pool_manager,
+    request,
+    create_request_retryer,
+    retrying_method,
+)
+from minet.scrape.utils import BeautifulSoupWithoutXHTMLWarnings
 from minet.scrape.std import get_display_text
 from minet.facebook.utils import grab_facebook_cookie
 from minet.facebook.formatters import (
@@ -76,7 +81,7 @@ def resolve_relative_url(url):
 
 
 def scrape_comments(html, direction=None, in_reply_to=None):
-    soup = BeautifulSoup(html, "lxml")
+    soup = BeautifulSoupWithoutXHTMLWarnings(html, "lxml")
 
     data = {
         "direction": direction,
@@ -223,7 +228,7 @@ def scrape_comments(html, direction=None, in_reply_to=None):
 
 
 def scrape_posts(html):
-    soup = BeautifulSoup(html, "lxml")
+    soup = BeautifulSoupWithoutXHTMLWarnings(html, "lxml")
 
     next_link = soup.select_one('a[href*="?bacr="], a[href*="&bacr="]')
 
@@ -513,7 +518,7 @@ def scrape_photo(soup):
 
 
 def scrape_post(html):
-    soup = BeautifulSoup(html, "lxml")
+    soup = BeautifulSoupWithoutXHTMLWarnings(html, "lxml")
 
     # with open("./dump.html", "w") as f:
     #     f.write(html)
@@ -627,7 +632,7 @@ class FacebookMobileScraper(object):
         if self.cookie is None:
             raise FacebookInvalidCookieError(target=cookie)
 
-        self.pool = create_pool()
+        self.pool_manager = create_pool_manager()
 
         self.rate_limiter_state = RateLimiterState(1, throttle)
         self.retryer = create_request_retryer()
@@ -637,7 +642,7 @@ class FacebookMobileScraper(object):
     def request_page(self, url):
         result = request(
             url,
-            pool=self.pool,
+            pool_manager=self.pool_manager,
             cookie=self.cookie,
             headers={"User-Agent": "curl/7.68.0", "Accept-Language": "en"},
         )
@@ -755,7 +760,7 @@ class FacebookMobileScraper(object):
         url = convert_url_to_mobile(url)
 
         html = self.request_page(url)
-        soup = BeautifulSoup(html, "lxml")
+        soup = BeautifulSoupWithoutXHTMLWarnings(html, "lxml")
 
         user_item = soup.select_one("[data-ft] h3 a[href]")
 

@@ -45,7 +45,7 @@ def get_last_processed_stories_id(data):
 
 
 def make_simple_call(
-    pool, token, route, formatter, raw=False, arg=None, query=None, single=False
+    pool_manager, token, route, formatter, raw=False, arg=None, query=None, single=False
 ):
     url = MEDIACLOUD_API_BASE_URL + route
 
@@ -57,7 +57,7 @@ def make_simple_call(
     if query is not None:
         url += "&" + ("&".join("%s=%s" % (str(k), str(v)) for k, v in query.items()))
 
-    response, data = request_json(url, pool=pool)
+    response, data = request_json(url, pool_manager=pool_manager)
 
     if response.status >= 500:
         raise MediacloudServerError(server_error=data.get("error"))

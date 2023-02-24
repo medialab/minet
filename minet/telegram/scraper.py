@@ -12,7 +12,12 @@ from minet.utils import (
     RateLimiterState,
     clean_human_readable_numbers,
 )
-from minet.web import create_pool, request, create_request_retryer, retrying_method
+from minet.web import (
+    create_pool_manager,
+    request,
+    create_request_retryer,
+    retrying_method,
+)
 
 from minet.telegram.constants import (
     TELEGRAM_URL,
@@ -316,7 +321,7 @@ def scrape_channel_messages(html):
 
 class TelegramScraper(object):
     def __init__(self, throttle=TELEGRAM_DEFAULT_THROTTLE):
-        self.pool = create_pool()
+        self.pool_manager = create_pool_manager()
 
         self.rate_limiter_state = RateLimiterState(1, throttle)
         self.retryer = create_request_retryer()
@@ -326,7 +331,7 @@ class TelegramScraper(object):
     def request_page(self, url):
         response = request(
             url,
-            pool=self.pool,
+            pool_manager=self.pool_manager,
         )
 
         return response.data.decode("utf-8")

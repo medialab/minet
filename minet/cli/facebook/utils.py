@@ -18,3 +18,19 @@ def fatal_errors_hook(_, e):
 
 def with_facebook_fatal_errors(fn):
     return with_fatal_errors(fatal_errors_hook)(fn)
+
+
+def print_translation_warning_if_needed(loading_bar, translated_langs, post):
+    if post.translated_text and post.translated_from not in translated_langs:
+        translated_langs.add(post.translated_from)
+        lines = [
+            "[warning]Found text translated from %s![/warning]" % post.translated_from,
+            "Since it means original text may not be entirely retrieved you might want",
+            'to edit your Facebook language settings to add "%s" to'
+            % post.translated_from,
+            'the "Languages you don\'t want to be offered translations for" list here:',
+            "https://www.facebook.com/settings/?tab=language",
+            "",
+        ]
+
+        loading_bar.print(lines)

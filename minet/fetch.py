@@ -11,7 +11,7 @@ from quenouille import ThreadPoolExecutor
 from ural import get_domain_name, ensure_protocol
 
 from minet.web import (
-    create_pool,
+    create_pool_manager,
     request,
     resolve,
     extract_response_meta,
@@ -113,13 +113,13 @@ def payloads_iter(iterator, key=None):
 class FetchWorker(object):
     def __init__(
         self,
-        pool,
+        pool_manager,
         *,
         request_args=None,
         max_redirects=DEFAULT_FETCH_MAX_REDIRECTS,
         callback=None
     ):
-        self.pool = pool
+        self.pool_manager = pool_manager
         self.request_args = request_args
         self.max_redirects = max_redirects
         self.callback = callback
@@ -140,7 +140,10 @@ class FetchWorker(object):
 
         try:
             response = request(
-                url, pool=self.pool, max_redirects=self.max_redirects, **kwargs
+                url,
+                pool_manager=self.pool_manager,
+                max_redirects=self.max_redirects,
+                **kwargs
             )
 
         except EXPECTED_WEB_ERRORS as error:
@@ -166,7 +169,7 @@ class FetchWorker(object):
 class ResolveWorker(object):
     def __init__(
         self,
-        pool,
+        pool_manager,
         *,
         resolve_args=None,
         max_redirects=DEFAULT_RESOLVE_MAX_REDIRECTS,
@@ -177,7 +180,7 @@ class ResolveWorker(object):
         canonicalize=False
     ):
 
-        self.pool = pool
+        self.pool_manager = pool_manager
         self.resolve_args = resolve_args
         self.max_redirects = max_redirects
         self.follow_refresh_header = follow_refresh_header
@@ -207,7 +210,7 @@ class ResolveWorker(object):
         try:
             stack = resolve(
                 url,
-                pool=self.pool,
+                pool_manager=self.pool_manager,
                 max_redirects=self.max_redirects,
                 follow_refresh_header=self.follow_refresh_header,
                 follow_meta_refresh=self.follow_meta_refresh,
@@ -233,7 +236,13 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         **kwargs
     ):
         super().__init__(max_workers, **kwargs)
-        self.pool = create_pool(threads=max_workers, insecure=insecure, timeout=timeout)
+        self.pool_manager = create_pool_manager(
+            threads=max_workers, insecure=insecure, timeout=timeout
+        )
+
+    def shutdown(self, wait=True):
+        self.pool_manager.clear()
+        return super().shutdown(wait=wait)
 
     def imap(self, *args, **kwargs):
         raise NotImplementedError
@@ -256,7 +265,7 @@ class FetchThreadPoolExecutor(HTTPThreadPoolExecutor):
         # TODO: validate
         iterator = payloads_iter(iterator, key=key)
         worker = FetchWorker(
-            self.pool,
+            self.pool_manager,
             request_args=request_args,
             max_redirects=max_redirects,
             callback=callback,
@@ -293,7 +302,7 @@ class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor):
         # TODO: validate
         iterator = payloads_iter(iterator, key=key)
         worker = ResolveWorker(
-            self.pool,
+            self.pool_manager,
             resolve_args=resolve_args,
             max_redirects=max_redirects,
             follow_refresh_header=follow_refresh_header,

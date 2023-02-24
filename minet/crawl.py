@@ -15,8 +15,13 @@ from shutil import rmtree
 from threading import Lock
 
 from minet.scrape import Scraper
-from minet.utils import load_definition
-from minet.web import create_pool, request, extract_response_meta, EXPECTED_WEB_ERRORS
+from minet.scrape.utils import load_definition
+from minet.web import (
+    create_pool_manager,
+    request,
+    extract_response_meta,
+    EXPECTED_WEB_ERRORS,
+)
 from minet.utils import PseudoFStringFormatter
 
 from minet.exceptions import UnknownSpiderError
@@ -316,7 +321,7 @@ class Crawler(object):
         self.daemonic = daemonic
 
         self.using_persistent_queue = queue_path is not None
-        self.pool = create_pool(threads=threads)
+        self.pool_manager = create_pool_manager(threads=threads)
         self.state = CrawlerState()
         self.started = False
 
@@ -400,7 +405,7 @@ class Crawler(object):
             raise UnknownSpiderError('Unknown spider "%s"' % job.spider)
 
         try:
-            response = request(job.url, pool=self.pool)
+            response = request(job.url, pool_manager=self.pool_manager)
         except EXPECTED_WEB_ERRORS as err:
             return CrawlWorkerResult(
                 job=job,

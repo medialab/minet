@@ -247,7 +247,9 @@ ENCODINGS = set(
 CLEANER_RE = re.compile(r"[\s\-_]")
 
 
-def is_supported_encoding(encoding):
-    encoding = re.sub(CLEANER_RE, "", encoding).lower()
+def normalize_encoding(encoding: str) -> str:
+    return re.sub(CLEANER_RE, "", encoding).lower()
 
-    return encoding in ENCODINGS
+
+def is_supported_encoding(encoding):
+    return normalize_encoding(encoding) in ENCODINGS

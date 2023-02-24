@@ -4,6 +4,7 @@
 #
 # Logic of the `url-parse` action.
 #
+from casanova import Multiplexer
 from ural import (
     is_url,
     is_shortened_url,
@@ -27,6 +28,7 @@ from ural.facebook import (
 )
 from ural.youtube import (
     parse_youtube_url,
+    normalize_youtube_url,
     YoutubeVideo,
     YoutubeUser,
     YoutubeChannel,
@@ -55,7 +57,12 @@ FACEBOOK_REPORT_HEADERS = [
     "facebook_normalized_url",
 ]
 
-YOUTUBE_REPORT_HEADERS = ["youtube_type", "youtube_id", "youtube_name"]
+YOUTUBE_REPORT_HEADERS = [
+    "youtube_type",
+    "youtube_id",
+    "youtube_name",
+    "youtube_normalize_url",
+]
 
 TWITTER_REPORT_HEADERS = ["twitter_type", "twitter_user_screen_name", "tweet_id"]
 
@@ -109,7 +116,12 @@ def extract_youtube_addendum(url):
     if parsed is None:
         return None
 
-    return [YOUTUBE_TYPES.get(type(parsed)), parsed.id, getattr(parsed, "name", "")]
+    return [
+        YOUTUBE_TYPES.get(type(parsed)),
+        parsed.id,
+        getattr(parsed, "name", ""),
+        normalize_youtube_url(url),
+    ]
 
 
 def extract_facebook_addendum(url):
@@ -169,35 +181,35 @@ def get_headers(cli_args):
 
 def get_multiplex(cli_args):
     if cli_args.separator is not None:
-        return (cli_args.column, cli_args.separator)
+        return Multiplexer(column=cli_args.column, separator=cli_args.separator)
 
     return None
 
 
 @with_enricher_and_loading_bar(
-    headers=get_headers, desc="Parsing", unit="row", multiplex=get_multiplex
+    headers=get_headers, title="Parsing", unit="urls", multiplex=get_multiplex
 )
 def action(cli_args, enricher, loading_bar):
     for row, url in enricher.cells(cli_args.column, with_rows=True):
-        loading_bar.update()
 
-        url = url.strip()
+        with loading_bar.step():
+            url = url.strip()
 
-        if not is_url(url, allow_spaces_in_path=True, require_protocol=False):
-            enricher.writerow(row)
-            continue
+            if not is_url(url, allow_spaces_in_path=True, require_protocol=False):
+                enricher.writerow(row)
+                continue
 
-        if cli_args.facebook:
-            addendum = extract_facebook_addendum(url)
-        elif cli_args.youtube:
-            addendum = extract_youtube_addendum(url)
-        elif cli_args.twitter:
-            addendum = extract_twitter_addendum(url)
-        else:
-            addendum = extract_standard_addendum(cli_args, url)
+            if cli_args.facebook:
+                addendum = extract_facebook_addendum(url)
+            elif cli_args.youtube:
+                addendum = extract_youtube_addendum(url)
+            elif cli_args.twitter:
+                addendum = extract_twitter_addendum(url)
+            else:
+                addendum = extract_standard_addendum(cli_args, url)
 
-        if addendum is None:
-            enricher.writerow(row)
-            continue
+            if addendum is None:
+                enricher.writerow(row)
+                continue
 
-        enricher.writerow(row, addendum)
+            enricher.writerow(row, addendum)

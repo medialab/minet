@@ -7,7 +7,7 @@
 import casanova
 from ural.lru import NormalizedLRUTrie
 
-from minet.cli.utils import LoadingBar
+from minet.cli.loading_bar import LoadingBar
 
 
 def action(cli_args):
@@ -26,46 +26,44 @@ def action(cli_args):
         cli_args.input2, cli_args.output, add=left_headers
     )
 
-    loading_bar = LoadingBar(desc="Indexing left file", unit="line")
-
     # First step is to index left file
     trie = NormalizedLRUTrie()
 
-    for row, cell in left_reader.cells(cli_args.column1, with_rows=True):
-        loading_bar.update()
+    with LoadingBar(
+        title="Indexing first file", unit="lines", total=left_reader.total
+    ) as loading_bar:
+        for row, cell in left_reader.cells(cli_args.column1, with_rows=True):
+            with loading_bar.step():
+                if left_idx is not None:
+                    row = [row[i] for i in left_idx]
 
-        if left_idx is not None:
-            row = [row[i] for i in left_idx]
+                urls = [cell]
 
-        urls = [cell]
+                if cli_args.separator is not None:
+                    urls = cell.split(cli_args.separator)
 
-        if cli_args.separator is not None:
-            urls = cell.split(cli_args.separator)
+                for url in urls:
+                    url = url.strip()
 
-        for url in urls:
-            url = url.strip()
+                    # NOTE: should we filter invalid urls here?
+                    if url:
+                        trie.set(url, row)
 
-            # NOTE: should we filter invalid urls here?
-            if url:
-                trie.set(url, row)
+    with LoadingBar(
+        title="Matching lines in second file", unit="lines", total=right_enricher.total
+    ) as loading_bar:
+        for row, url in right_enricher.cells(cli_args.column2, with_rows=True):
+            with loading_bar.step():
+                url = url.strip()
 
-    loading_bar.close()
+                match = None
 
-    loading_bar = LoadingBar(desc="Matching right file", unit="line")
+                # NOTE: should we filter invalid urls here?
+                if url:
+                    match = trie.match(url)
 
-    for row, url in right_enricher.cells(cli_args.column2, with_rows=True):
-        loading_bar.update()
+                if match is None:
+                    right_enricher.writerow(row)
+                    continue
 
-        url = url.strip()
-
-        match = None
-
-        # NOTE: should we filter invalid urls here?
-        if url:
-            match = trie.match(url)
-
-        if match is None:
-            right_enricher.writerow(row)
-            continue
-
-        right_enricher.writerow(row, match)
+                right_enricher.writerow(row, match)

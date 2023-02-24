@@ -14,14 +14,25 @@ from glob import iglob
 from os.path import join, expanduser, isfile, relpath
 from collections import namedtuple
 from collections.abc import Mapping
-from functools import wraps, partial
-from datetime import datetime
+from functools import wraps
 from logging import Handler
-from tqdm import tqdm
+from contextlib import nullcontext
 from ebbe import noop, format_seconds
 
+from minet.cli.console import console
+from minet.cli.loading_bar import LoadingBar
 from minet.cli.exceptions import MissingColumnError, FatalError
-from minet.utils import fuzzy_int
+from minet.utils import fuzzy_int, message_flatmap
+
+
+def colored(string, color):
+    return "[{color}]{string}[/{color}]".format(string=string, color=color)
+
+
+def redirect_to_devnull():
+    # Taken from: https://docs.python.org/3/library/signal.html
+    devnull = os.open(os.devnull, os.O_WRONLY)
+    os.dup2(devnull, sys.stdout.fileno())
 
 
 def with_cli_exceptions(fn):
@@ -30,18 +41,8 @@ def with_cli_exceptions(fn):
         try:
             fn(*args, **kwargs)
 
-        except BrokenPipeError:
-
-            # Taken from: https://docs.python.org/3/library/signal.html
-            devnull = os.open(os.devnull, os.O_WRONLY)
-            os.dup2(devnull, sys.stdout.fileno())
-            sys.exit(1)
-
-        except KeyboardInterrupt:
-            # Leaving loading bars to avoid duplication
-            cleanup_loading_bars()
-
-            # Exiting right now to avoid stack frames
+        except (KeyboardInterrupt, BrokenPipeError):
+            redirect_to_devnull()
             sys.exit(1)
 
     return wrapper
@@ -66,39 +67,14 @@ def was_piped_something():
     return get_stdin_status() != "terminal" and not is_stdin_empty()
 
 
-def format_polymorphic_message(*args, sep=" "):
-    return sep.join(
-        str(item)
-        if not isinstance(item, list)
-        else "\n".join(str(subitem) for subitem in item)
-        for item in args
-    )
+def print_err(*messages):
+    print(message_flatmap(*messages), file=sys.stderr)
 
 
-def better_and_tqdm_aware_print(*args, file=sys.stdout, sep=" ", end="\n"):
-    msg = format_polymorphic_message(*args)
-    tqdm.write(msg, file=file, end=end)
-
-
-print_out = partial(better_and_tqdm_aware_print, file=sys.stdout)
-print_err = partial(better_and_tqdm_aware_print, file=sys.stderr)
-
-
-def die(msg=None):
-    if msg is not None:
-        if not isinstance(msg, list):
-            msg = [msg]
-
-        for m in msg:
-            print_err(m)
+def die(*messages):
+    print_err(*messages)
 
     sys.exit(1)
-
-
-def cleanup_loading_bars(leave=False):
-    for bar in list(tqdm._instances):
-        bar.leave = leave
-        bar.close()
 
 
 def safe_index(l, e):
@@ -110,8 +86,6 @@ def safe_index(l, e):
 
 class CLIRetryerHandler(Handler):
     def emit(self, record):
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
         if record.source == "request_retryer":
             exc = record.exception
             pretty_time = format_seconds(record.sleep_time)
@@ -120,61 +94,16 @@ class CLIRetryerHandler(Handler):
             exc_msg = str(exc)
 
             msg = [
-                "%s" % now,
                 "Will now wait for %s because of following exception:" % pretty_time,
-                ("%s (%s)" % (exc_name, exc_msg)) if exc_msg else exc_name,
+                exc_name,
+                "Exception message: %s" % exc_msg,
                 "",
             ]
 
         else:
-            msg = ["%s" % now, record.msg, ""]
+            msg = [record.msg, ""]
 
-        print_err(msg)
-
-
-class LoadingBar(tqdm):
-    def __init__(
-        self, desc, stats=None, unit=None, unit_plural=None, total=None, **kwargs
-    ):
-
-        if unit is not None and total is None:
-            if unit_plural is not None:
-                unit = " " + unit_plural
-            else:
-                unit = " " + unit + "s"
-
-        self.__stats = stats or {}
-
-        if unit is not None:
-            kwargs["unit"] = unit
-
-        super().__init__(desc=desc, total=total, **kwargs)
-
-    def update_total(self, total):
-        self.total = total
-
-    def update_stats(self, **kwargs):
-        for key, value in kwargs.items():
-            self.__stats[key] = value
-
-        return self.set_postfix(**self.__stats)
-
-    def inc(self, name, amount=1):
-        if name not in self.__stats:
-            self.__stats[name] = 0
-
-        self.__stats[name] += amount
-        return self.update_stats()
-
-    def print(self, *args, end="\n"):
-        self.write(format_polymorphic_message(*args), file=sys.stderr, end=end)
-
-    def close(self):
-        super().close()
-
-    def die(self, msg):
-        self.close()
-        die(msg)
+        console.log_with_time("\n".join(msg), style="warning")
 
 
 def acquire_cross_platform_stdout():
@@ -222,10 +151,10 @@ def create_report_iterator(cli_args, reader, worker_args=None, on_irrelevant_row
     mimetype_pos = reader.headers.get("mimetype")
     raw_content_pos = reader.headers.get("raw_contents")
 
-    indexed_headers = reader.headers.as_dict()
+    indexed_headers = {n: i for i, n in enumerate(reader.headers)}
 
     def generator():
-        for i, row in enumerate(reader):
+        for i, row in reader.enumerate():
             error = getdefault(row, error_pos)
 
             if error is not None:
@@ -338,45 +267,109 @@ def with_fatal_errors(mapping_or_hook):
     return decorate
 
 
-def get_enricher_and_loading_bar(
-    cli_args, headers, desc, unit=None, multiplex=None, stats=None
-):
-    if callable(headers):
-        headers = headers(cli_args)
-
-    if callable(multiplex):
-        multiplex = multiplex(cli_args)
-
-    enricher = casanova.enricher(
-        cli_args.input,
-        cli_args.output,
-        add=headers,
-        keep=cli_args.select,
-        total=getattr(cli_args, "total", None),
-        multiplex=multiplex,
-    )
-
-    loading_bar = LoadingBar(desc=desc, unit=unit, total=enricher.total, stats=stats)
-
-    return enricher, loading_bar
-
-
-def with_enricher_and_loading_bar(headers, desc, unit=None, multiplex=None, stats=None):
+def with_loading_bar(**loading_bar_kwargs):
     def decorate(action):
         @wraps(action)
         def wrapper(cli_args, *args, **kwargs):
-            enricher, loading_bar = get_enricher_and_loading_bar(
-                cli_args,
-                headers=headers,
-                desc=desc,
-                unit=unit,
-                multiplex=multiplex,
+            total = getattr(cli_args, "total", None)
+
+            with LoadingBar(total=total, **loading_bar_kwargs) as loading_bar:
+                additional_kwargs = {
+                    "loading_bar": loading_bar,
+                }
+
+                return action(cli_args, *args, **additional_kwargs, **kwargs)
+
+        return wrapper
+
+    return decorate
+
+
+def with_enricher_and_loading_bar(
+    headers,
+    enricher_type=None,
+    get_input=None,
+    #
+    title=None,
+    unit=None,
+    sub_unit=None,
+    stats=None,
+    stats_sort_key=None,
+    nested=False,
+    multiplex=None,
+    show_label=False,
+):
+    def decorate(action):
+        @wraps(action)
+        def wrapper(cli_args, *args, **kwargs):
+            enricher_context = nullcontext()
+
+            completed = 0
+
+            # Do we need to display a transient resume progress?
+            if (
+                hasattr(cli_args, "resume")
+                and cli_args.resume
+                and isinstance(
+                    cli_args.output,
+                    (casanova.RowCountResumer, casanova.ThreadSafeResumer),
+                )
+                and cli_args.output.can_resume()
+            ):
+
+                resume_loading_bar = LoadingBar(
+                    title="Reading output to resume", unit="lines", transient=True
+                )
+                enricher_context = resume_loading_bar
+
+                def listener(event, _):
+                    nonlocal completed
+
+                    if event == "output.row.read":
+                        resume_loading_bar.advance()
+                        completed += 1
+
+                cli_args.output.set_listener(listener)
+
+            enricher_fn = casanova.enricher
+
+            if enricher_type == "threadsafe":
+                enricher_fn = casanova.threadsafe_enricher
+
+            elif enricher_type == "batch":
+                enricher_fn = casanova.batch_enricher
+
+            elif enricher_type is not None:
+                raise TypeError("wrong enricher type")
+
+            with enricher_context:
+                enricher = enricher_fn(
+                    cli_args.input if not callable(get_input) else get_input(cli_args),
+                    cli_args.output,
+                    add=headers(cli_args) if callable(headers) else headers,
+                    select=cli_args.select,
+                    total=getattr(cli_args, "total", None),
+                    multiplex=multiplex(cli_args) if callable(multiplex) else multiplex,
+                )
+
+            with LoadingBar(
+                title=title(cli_args) if callable(title) else title,
+                total=enricher.total,
+                unit=unit(cli_args) if callable(unit) else unit,
+                sub_unit=sub_unit(cli_args) if callable(sub_unit) else sub_unit,
+                nested=nested,
                 stats=stats,
-            )
+                stats_sort_key=stats_sort_key,
+                show_label=show_label,
+                completed=completed,
+            ) as loading_bar:
 
-            additional_kwargs = {"enricher": enricher, "loading_bar": loading_bar}
+                additional_kwargs = {
+                    "enricher": enricher,
+                    "loading_bar": loading_bar,
+                }
 
-            return action(cli_args, *args, **additional_kwargs, **kwargs)
+                return action(cli_args, *args, **additional_kwargs, **kwargs)
 
         return wrapper
 

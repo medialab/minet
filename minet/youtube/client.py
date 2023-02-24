@@ -11,7 +11,12 @@ from urllib.parse import quote
 from ural import urls_from_text
 from ebbe import getpath
 
-from minet.web import create_pool, create_request_retryer, request_json, retrying_method
+from minet.web import (
+    create_pool_manager,
+    create_request_retryer,
+    request_json,
+    retrying_method,
+)
 from minet.loggers import sleepers_logger
 from minet.youtube.utils import (
     ensure_video_id,
@@ -172,14 +177,17 @@ class YouTubeAPIClient(object):
 
         self.keys = {k: True for k in key}
         self.current_key = key[0]
-        self.pool = create_pool()
+        self.pool_managercreate_pool_manager = create_pool_manager()
         self.retryer = create_request_retryer()
 
     @retrying_method()
     def request_json(self, url):
         while True:
             final_url = url + "&key=%s" % self.current_key
-            response, data = request_json(final_url, pool=self.pool)
+            response, data = request_json(
+                final_url,
+                pool_managercreate_pool_manager=self.pool_managercreate_pool_manager,
+            )
 
             if response.status == 403:
 

@@ -6,13 +6,12 @@
 # likes count by scraping Facebook's like button plugin.
 #
 import re
-import casanova
 from urllib.parse import quote
 from ural import is_url
 
 from minet.utils import rate_limited
 from minet.web import request
-from minet.cli.utils import LoadingBar
+from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.exceptions import FatalError
 
 REPORT_HEADERS = ["approx_likes", "approx_likes_int"]
@@ -55,41 +54,36 @@ def scrape(data):
     return [approx_likes, approx_likes_int]
 
 
-def action(cli_args):
-    enricher = casanova.enricher(
-        cli_args.input,
-        cli_args.output,
-        keep=cli_args.select,
-        add=REPORT_HEADERS,
-        total=cli_args.total,
-    )
-
-    loading_bar = LoadingBar(desc="Retrieving likes", unit="url", total=enricher.total)
-
+@with_enricher_and_loading_bar(
+    headers=REPORT_HEADERS, title="Scraping likes", unit="urls"
+)
+def action(cli_args, enricher, loading_bar):
     for row, url in enricher.cells(cli_args.column, with_rows=True):
-        loading_bar.update()
 
-        url = url.strip()
+        with loading_bar.step():
+            url = url.strip()
 
-        if not url or not is_url(url, require_protocol=False):
-            enricher.writerow(row)
-            continue
+            if not url or not is_url(url, require_protocol=False):
+                enricher.writerow(row)
+                continue
 
-        try:
-            html = make_request(url)
-        except Exception:
-            raise FatalError(
-                "An error occurred while fetching like button for this url: %s" % url
-            )
+            try:
+                html = make_request(url)
+            except Exception:
+                raise FatalError(
+                    "An error occurred while fetching like button for this url: %s"
+                    % url
+                )
 
-        if html is None:
-            raise FatalError("Could not find data for this url: %s" % url)
+            if html is None:
+                raise FatalError("Could not find data for this url: %s" % url)
 
-        scraped = scrape(html)
+            scraped = scrape(html)
 
-        if scraped is None:
-            raise FatalError(
-                "Could not extract Facebook likes from this url's like button: %s" % url
-            )
+            if scraped is None:
+                raise FatalError(
+                    "Could not extract Facebook likes from this url's like button: %s"
+                    % url
+                )
 
-        enricher.writerow(row, scraped)
+            enricher.writerow(row, scraped)

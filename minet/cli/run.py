@@ -11,9 +11,7 @@ import ctypes
 import importlib
 import multiprocessing
 import casanova
-from casanova.exceptions import EmptyFileError
 from contextlib import ExitStack
-from colorama import init as colorama_init
 from encodings import idna  # NOTE: this is necessary for pyinstaller build
 
 from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
@@ -21,8 +19,6 @@ from minet.loggers import sleepers_logger
 from minet.cli.utils import (
     die,
     get_rcfile,
-    print_err,
-    cleanup_loading_bars,
     CLIRetryerHandler,
     with_cli_exceptions,
 )
@@ -35,15 +31,15 @@ def run(name, version, commands):
     # Freezing multiprocessing support for pyinstaller etc.
     multiprocessing.freeze_support()
 
-    # Colorama initialization hook
-    colorama_init()
-
     # Increasing max CSV file limit to avoid pesky issues
     csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
 
     # Casanova global defaults
-    casanova.set_default_prebuffer_bytes(DEFAULT_PREBUFFER_BYTES)
-    casanova.set_default_ignore_null_bytes(True)
+    casanova.set_defaults(
+        prebuffer_bytes=DEFAULT_PREBUFFER_BYTES,
+        strip_null_bytes_on_read=True,
+        strip_null_bytes_on_write=True,
+    )
 
     # Adding handlers for sleepers
     sleepers_logger.addHandler(CLIRetryerHandler())
@@ -88,9 +84,9 @@ def run(name, version, commands):
         if hasattr(cli_args, "subcommand") and cli_args.subcommand:
             meta = action["command"]["subparsers"]["commands"][cli_args.subcommand]
 
-        if "validate" in meta:
+        if "resolve" in meta:
             try:
-                meta["validate"](cli_args)
+                meta["resolve"](cli_args)
             except InvalidArgumentsError as e:
                 parser.error(e.message)
 
@@ -109,14 +105,8 @@ def run(name, version, commands):
                 fn(cli_args)
             except InvalidArgumentsError as e:
                 parser.error(e.message)
-            except EmptyFileError as e:
-                cleanup_loading_bars(leave=True)
-                print_err("Some empty CSV file was given to the command!")
-                sys.exit(1)
             except FatalError as e:
-                cleanup_loading_bars(leave=True)
-                print_err(e.message)
-                sys.exit(1)
+                die(e.message)
 
     elif cli_args.action == "help":
 

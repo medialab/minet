@@ -7,15 +7,12 @@
 import re
 import hashlib
 import json
-import yaml
 import time
 import string
 import functools
 import dateparser
 from random import uniform
 from datetime import datetime
-
-from minet.exceptions import DefinitionInvalidFormatError
 
 
 def fuzzy_int(value):
@@ -257,30 +254,6 @@ class PseudoFStringFormatter(string.Formatter):
         return result, None
 
 
-def load_definition(f, encoding="utf-8"):
-    string_path = isinstance(f, str)
-
-    if string_path:
-        path = f
-        f = open(path, encoding=encoding)
-    else:
-        path = f.name
-
-    if path.endswith(".json"):
-        definition = json.load(f)
-
-    elif path.endswith(".yml") or path.endswith(".yaml"):
-        definition = yaml.safe_load(f)
-
-    else:
-        raise DefinitionInvalidFormatError
-
-    if string_path:
-        f.close()
-
-    return definition
-
-
 def sleep_with_entropy(seconds, max_random_addendum):
     random_addendum = uniform(0, max_random_addendum)
     time.sleep(seconds + random_addendum)
@@ -343,3 +316,10 @@ def clean_human_readable_numbers(text):
 
 def timestamp_to_isoformat(timestamp):
     return datetime.utcfromtimestamp(timestamp).isoformat()
+
+
+def message_flatmap(*messages, sep=" ", end="\n"):
+    return sep.join(
+        end.join(m for m in message) if not isinstance(message, str) else message
+        for message in messages
+    )

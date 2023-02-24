@@ -4,11 +4,12 @@
 #
 # Miscellaneous web-related functions used throughout the library.
 #
+from typing import Optional, Tuple, Union
+
 import re
 import cgi
 import certifi
 import random
-from datetime import datetime
 import browser_cookie3
 import urllib3
 import urllib.error
@@ -17,6 +18,10 @@ import json
 import mimetypes
 import functools
 import charset_normalizer as chardet
+from datetime import datetime
+from timeit import default_timer as timer
+from io import BytesIO
+from threading import Event
 from collections import OrderedDict
 from urllib.parse import urljoin
 from urllib3 import HTTPResponse
@@ -32,7 +37,7 @@ from tenacity import (
 )
 from tenacity.wait import wait_base
 
-from minet.encodings import is_supported_encoding
+from minet.encodings import is_supported_encoding, normalize_encoding
 from minet.loggers import sleepers_logger
 from minet.utils import is_binary_mimetype
 from minet.exceptions import (
@@ -42,6 +47,8 @@ from minet.exceptions import (
     InvalidRedirectError,
     InvalidURLError,
     SelfRedirectError,
+    CancelledRequestError,
+    FinalTimeoutError,
 )
 from minet.constants import (
     DEFAULT_SPOOFED_UA,
@@ -53,6 +60,7 @@ from minet.constants import (
 mimetypes.init()
 
 # Handy regexes
+BINARY_BOM_RE = re.compile(rb"\xef\xbb\xbf")
 CHARSET_RE = re.compile(rb'<meta.*?charset=["\']*(.+?)["\'>]', flags=re.I)
 PRAGMA_RE = re.compile(rb'<meta.*?content=["\']*;?charset=(.+?)["\'>]', flags=re.I)
 XML_RE = re.compile(rb'^<\?xml.*?encoding=["\']*(.+?)["\'>]', flags=re.I)
@@ -77,11 +85,12 @@ HREF_RE = re.compile(rb'href=(\"[^"]+|\'[^\']+|[^\s]+)>?\s?', flags=re.I)
 # Constants
 CHARSET_DETECTION_CONFIDENCE_THRESHOLD = 0.9
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
-CONTENT_CHUNK_SIZE = 1024
-LARGE_CONTENT_CHUNK_SIZE = 2**16
+CONTENT_PREBUFFER_UP_TO = 1024
+STREAMING_CHUNK_SIZE = 2**12
+LARGE_CONTENT_PREBUFFER_UP_TO = 2**16
 EXPECTED_WEB_ERRORS = (HTTPError, RedirectError, InvalidURLError)
 
-assert CONTENT_CHUNK_SIZE < LARGE_CONTENT_CHUNK_SIZE
+assert CONTENT_PREBUFFER_UP_TO < LARGE_CONTENT_PREBUFFER_UP_TO
 
 
 def prebuffer_response_up_to(response, target):
@@ -103,6 +112,9 @@ def prebuffer_response_up_to(response, target):
 
 
 # TODO: add a version that tallies the possibilities
+# NOTE: utf-16 is handled differently to account for endianness
+# NOTE: file starting with a BOM are inferred preferentially
+# See: https://github.com/medialab/minet/issues/550
 def guess_response_encoding(response, is_xml=False, infer=False):
     """
     Function taking an urllib3 response object and attempting to guess its
@@ -112,6 +124,11 @@ def guess_response_encoding(response, is_xml=False, infer=False):
 
     suboptimal_charset = None
 
+    # TODO: think about prebuffering
+    data = response.data
+
+    has_bom = bool(BINARY_BOM_RE.match(data[:10]))
+
     if content_type_header is not None:
         parsed_header = cgi.parse_header(content_type_header)
 
@@ -119,13 +136,16 @@ def guess_response_encoding(response, is_xml=False, infer=False):
             charset = parsed_header[1].get("charset")
 
             if charset is not None:
-                if is_supported_encoding(charset):
+                if (
+                    is_supported_encoding(charset)
+                    and normalize_encoding(charset) != "utf16"
+                    and not has_bom
+                ):
                     return charset.lower()
                 else:
                     suboptimal_charset = charset
 
-    data = response.data
-    chunk = data[:CONTENT_CHUNK_SIZE]
+    chunk = data[:CONTENT_PREBUFFER_UP_TO]
 
     # Data is empty
     if not chunk.strip():
@@ -146,7 +166,11 @@ def guess_response_encoding(response, is_xml=False, infer=False):
         if len(matches) != 0:
             charset = matches[-1].lower().decode()
 
-            if is_supported_encoding(charset):
+            if (
+                is_supported_encoding(charset)
+                and normalize_encoding(charset) != "utf16"
+                and not has_bom
+            ):
                 return charset
             else:
                 suboptimal_charset = charset
@@ -264,7 +288,7 @@ def dict_to_cookie_string(d):
     return "; ".join("%s=%s" % r for r in d.items())
 
 
-def create_pool(
+def create_pool_manager(
     proxy=None, threads=None, insecure=False, spoof_tls_ciphers=False, **kwargs
 ):
     """
@@ -301,12 +325,113 @@ def create_pool(
     return urllib3.PoolManager(**manager_kwargs)
 
 
-DEFAULT_POOL = create_pool(maxsize=10, num_pools=10)
+DEFAULT_POOL_MANAGER = create_pool_manager(maxsize=10, num_pools=10)
+
+
+def stream_request_body(
+    response: urllib3.HTTPResponse,
+    body: BytesIO,
+    chunk_size: int = STREAMING_CHUNK_SIZE,
+    cancel_event: Optional[Event] = None,
+    final_time: Optional[float] = None,
+    up_to: Optional[int] = None,
+) -> bool:
+    if up_to is not None and body.tell() >= up_to:
+        return False
+
+    for data in response.stream(chunk_size):
+        body.write(data)
+
+        if up_to is not None and body.tell() >= up_to:
+            return False
+
+        if cancel_event is not None and cancel_event.is_set():
+            raise CancelledRequestError
+
+        if final_time is not None:
+            if timer() >= final_time:
+                raise FinalTimeoutError
+
+    # This is the only place we know the body has been fully read
+    return True
+
+
+def timeout_to_final_time(timeout: Union[float, urllib3.Timeout]) -> float:
+    seconds = timeout
+
+    if isinstance(timeout, urllib3.Timeout):
+        if timeout.total is not None:
+            seconds = timeout.total
+        else:
+            seconds = timeout.connect_timeout + timeout.read_timeout
+
+    # Some epsilon so sockets can timeout themselves properly
+    seconds += 0.01
+
+    return timer() + seconds
+
+
+class BufferedResponse(object):
+    __slots__ = ("__inner", "__body", "__cancel_event", "__final_time", "__finished")
+
+    def __init__(
+        self,
+        response: urllib3.HTTPResponse,
+        cancel_event: Optional[Event],
+        final_time: Optional[float] = None,
+    ):
+        self.__inner = response
+        self.__cancel_event = cancel_event
+        self.__final_time = final_time
+        self.__body = BytesIO()
+        self.__finished = False
+
+    def __len__(self) -> int:
+        return self.__body.getbuffer().nbytes
+
+    def __stream(
+        self, chunk_size: int = STREAMING_CHUNK_SIZE, up_to: Optional[int] = None
+    ):
+        if self.__finished:
+            return
+
+        fully_read = False
+
+        try:
+            fully_read = stream_request_body(
+                self.__inner,
+                chunk_size=chunk_size,
+                cancel_event=self.__cancel_event,
+                final_time=self.__final_time,
+                body=self.__body,
+                up_to=up_to,
+            )
+        finally:
+            if fully_read:
+                self.__finished = fully_read
+                self.close()
+
+    def close(self) -> None:
+        # NOTE: releasing and closing is a noop if already done
+        self.__inner.release_conn()
+        self.__inner.close()
+
+    def unwrap(self) -> Tuple[urllib3.HTTPResponse, bytes]:
+        self.read()
+        return self.__inner, self.__body.getvalue()
+
+    def read(self, chunk_size: int = STREAMING_CHUNK_SIZE) -> None:
+        self.__stream(chunk_size=chunk_size)
+
+    def prebuffer_up_to(
+        self, amount: int, chunk_size: int = STREAMING_CHUNK_SIZE
+    ) -> None:
+        self.__stream(chunk_size=chunk_size, up_to=amount)
 
 
 def make_request(
-    pool,
-    url,
+    pool_manager,
+    url: str,
     method="GET",
     headers=None,
     preload_content=True,
@@ -315,7 +440,7 @@ def make_request(
     body=None,
 ):
     """
-    Generic request helpers using a urllib3 pool to access some resource.
+    Generic request helpers using a urllib3 pool_manager to access some resource.
     """
 
     # Validating URL
@@ -337,7 +462,7 @@ def make_request(
     if timeout is not None:
         request_kwargs["timeout"] = timeout
 
-    return pool.request(method, url, **request_kwargs)
+    return pool_manager.request(method, url, **request_kwargs)
 
 
 class Redirection(object):
@@ -360,7 +485,7 @@ class Redirection(object):
 
 
 def make_resolve(
-    pool,
+    pool_manager,
     url,
     method="GET",
     headers=None,
@@ -399,7 +524,7 @@ def make_resolve(
 
         try:
             response = make_request(
-                pool,
+                pool_manager,
                 url,
                 method=method,
                 headers=headers,
@@ -442,7 +567,7 @@ def make_resolve(
                 # Reading a small chunk of the html
                 if location is None and (follow_meta_refresh or follow_js_relocation):
                     prebuffer_error = prebuffer_response_up_to(
-                        response, CONTENT_CHUNK_SIZE
+                        response, CONTENT_PREBUFFER_UP_TO
                     )
 
                     if prebuffer_error is not None:
@@ -473,7 +598,7 @@ def make_resolve(
             if redirection.type == "hit":
                 if canonicalize:
                     prebuffer_error = prebuffer_response_up_to(
-                        response, LARGE_CONTENT_CHUNK_SIZE
+                        response, LARGE_CONTENT_PREBUFFER_UP_TO
                     )
 
                     if prebuffer_error is not None:
@@ -574,7 +699,7 @@ def build_request_headers(headers=None, cookie=None, spoof_ua=False, json_body=F
 
 def request(
     url,
-    pool=DEFAULT_POOL,
+    pool_manager=DEFAULT_POOL_MANAGER,
     method="GET",
     headers=None,
     cookie=None,
@@ -610,11 +735,16 @@ def request(
 
     if not follow_redirects:
         return make_request(
-            pool, url, method, headers=final_headers, body=final_body, timeout=timeout
+            pool_manager,
+            url,
+            method,
+            headers=final_headers,
+            body=final_body,
+            timeout=timeout,
         )
     else:
         _, response = make_resolve(
-            pool,
+            pool_manager,
             url,
             method,
             headers=final_headers,
@@ -640,7 +770,7 @@ def request(
 
 def resolve(
     url,
-    pool=DEFAULT_POOL,
+    pool_manager=DEFAULT_POOL_MANAGER,
     method="GET",
     headers=None,
     cookie=None,
@@ -659,7 +789,7 @@ def resolve(
     )
 
     return make_resolve(
-        pool,
+        pool_manager,
         url,
         method,
         headers=final_headers,
@@ -699,7 +829,9 @@ def extract_response_meta(response, guess_encoding=True, guess_extension=True):
             if parsed_header and parsed_header[0].strip():
                 mimetype = parsed_header[0].strip()
 
-        if mimetype is None and looks_like_html(response.data[:CONTENT_CHUNK_SIZE]):
+        if mimetype is None and looks_like_html(
+            response.data[:CONTENT_PREBUFFER_UP_TO]
+        ):
             mimetype = "text/html"
 
         if mimetype is not None:
@@ -726,7 +858,7 @@ def extract_response_meta(response, guess_encoding=True, guess_extension=True):
     return meta
 
 
-def request_jsonrpc(url, method, pool=DEFAULT_POOL, *args, **kwargs):
+def request_jsonrpc(url, method, pool_manager=DEFAULT_POOL_MANAGER, *args, **kwargs):
     params = []
 
     if len(args) > 0:
@@ -735,7 +867,10 @@ def request_jsonrpc(url, method, pool=DEFAULT_POOL, *args, **kwargs):
         params = kwargs
 
     response = request(
-        url, pool=pool, method="POST", json_body={"method": method, "params": params}
+        url,
+        pool_manager=pool_manager,
+        method="POST",
+        json_body={"method": method, "params": params},
     )
 
     data = json.loads(response.data)
@@ -743,14 +878,16 @@ def request_jsonrpc(url, method, pool=DEFAULT_POOL, *args, **kwargs):
     return response, data
 
 
-def request_json(url, pool=DEFAULT_POOL, *args, **kwargs):
-    response = request(url, pool=pool, *args, **kwargs)
+def request_json(url, pool_manager=DEFAULT_POOL_MANAGER, *args, **kwargs):
+    response = request(url, pool_manager=pool_manager, *args, **kwargs)
 
     return response, json.loads(response.data.decode())
 
 
-def request_text(url, pool=DEFAULT_POOL, *args, encoding="utf-8", **kwargs):
-    response = request(url, pool=pool, *args, **kwargs)
+def request_text(
+    url, pool_manager=DEFAULT_POOL_MANAGER, *args, encoding="utf-8", **kwargs
+):
+    response = request(url, pool_manager=pool_manager, *args, **kwargs)
     return response, response.data.decode(encoding)
 
 

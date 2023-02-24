@@ -1,6 +1,6 @@
 # =============================================================================
 # Minet CrowdTangle API Client
-# =============================================================================
+# ================================s=============================================
 #
 # A unified CrowdTangle API client that can be used to keep an eye on the
 # rate limit and the used token etc.
@@ -8,7 +8,12 @@
 import json
 
 from minet.utils import RateLimiterState, rate_limited_method
-from minet.web import create_pool, create_request_retryer, retrying_method, request
+from minet.web import (
+    create_pool_manager,
+    create_request_retryer,
+    retrying_method,
+    request,
+)
 from minet.crowdtangle.constants import (
     CROWDTANGLE_DEFAULT_TIMEOUT,
     CROWDTANGLE_DEFAULT_RATE_LIMIT,
@@ -44,14 +49,14 @@ class CrowdTangleAPIClient(object):
         self.summary_rate_limiter_state = RateLimiterState(
             summary_rate_limit, period=60
         )
-        self.pool = create_pool(timeout=CROWDTANGLE_DEFAULT_TIMEOUT)
+        self.pool_manager = create_pool_manager(timeout=CROWDTANGLE_DEFAULT_TIMEOUT)
         self.retryer = create_request_retryer(
             additional_exceptions=[CrowdTangleInvalidJSONError, CrowdTangleServerError]
         )
 
     @retrying_method()
     def __request(self, url):
-        response = request(url, pool=self.pool)
+        response = request(url, pool_manager=self.pool_manager)
 
         # Bad auth
         if response.status == 401:

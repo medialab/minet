@@ -4,6 +4,9 @@
 #
 # Logic of the `fb post-stats` action.
 #
+
+# NOTE: this command is probably defunct, and even if it still works it needs
+# to be ported to new loading bar scheme
 import re
 import json5
 import casanova

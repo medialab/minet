@@ -20,7 +20,7 @@ from ural.instagram import (
 from minet.constants import COOKIE_BROWSERS
 from minet.utils import sleep_with_entropy
 from minet.web import (
-    create_pool,
+    create_pool_manager,
     create_request_retryer,
     grab_cookies,
     request_text,
@@ -166,7 +166,9 @@ def forge_user_posts_url(
 
 class InstagramAPIScraper(object):
     def __init__(self, cookie="firefox"):
-        self.pool = create_pool(timeout=INSTAGRAM_PUBLIC_API_DEFAULT_TIMEOUT)
+        self.pool_manager = create_pool_manager(
+            timeout=INSTAGRAM_PUBLIC_API_DEFAULT_TIMEOUT
+        )
 
         if cookie in COOKIE_BROWSERS:
             get_cookie_for_url = grab_cookies(cookie)
@@ -191,7 +193,7 @@ class InstagramAPIScraper(object):
 
         response = request(
             url,
-            pool=self.pool,
+            pool_manager=self.pool_manager,
             spoof_ua=True,
             headers=headers,
         )
