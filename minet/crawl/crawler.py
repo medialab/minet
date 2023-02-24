@@ -203,8 +203,13 @@ class Crawler(
         # Spiders
         if isinstance(spiders, Spider):
             self.spiders = {DEFAULT_SPIDER_KEY: spiders}
+        elif isinstance(spiders, Mapping):
+            self.spiders = {}
+
+            for name, spider in spiders.items():
+                self.spiders[name] = spider
         else:
-            self.spiders = spiders.copy()
+            raise TypeError("expecting a single spider or a mapping of spiders")
 
     def __start(self):
 

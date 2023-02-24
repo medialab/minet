@@ -31,6 +31,9 @@ class CrawlJob(Generic[CrawlJobDataType]):
         self.spider = spider
         self.data = data
 
+        self.__has_cached_domain = False
+        self.__domain = None
+
     def __getstate__(self):
         return (self.url, self.level, self.spider, self.data)
 
