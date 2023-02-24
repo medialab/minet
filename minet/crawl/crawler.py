@@ -10,14 +10,16 @@ from typing import (
     TypeVar,
     Callable,
     Dict,
-    Iterable,
     Generic,
     Mapping,
+    Iterable,
+    Union,
 )
 
 from queue import Queue
 from persistqueue import SQLiteQueue
 from shutil import rmtree
+from threading import Lock
 
 from minet.crawl.types import (
     CrawlJob,
@@ -26,9 +28,8 @@ from minet.crawl.types import (
     ScrapedDataType,
     CrawlResult,
 )
-from minet.crawl.spiders import Spider, FunctionSpider, DefinitionSpider
+from minet.crawl.spiders import Spider
 from minet.crawl.state import CrawlerState
-from minet.scrape.utils import load_definition
 from minet.web import request, EXPECTED_WEB_ERRORS
 from minet.fetch import HTTPThreadPoolExecutor
 from minet.exceptions import UnknownSpiderError, SpiderError
@@ -38,6 +39,8 @@ from minet.constants import (
     DEFAULT_THROTTLE,
     DEFAULT_FETCH_MAX_REDIRECTS,
 )
+
+DEFAULT_SPIDER_KEY = "$$DEFAULT_MINET_SPIDER$$"
 
 
 def ensure_job(
@@ -75,8 +78,9 @@ class CrawlWorker(Generic[CrawlJobDataType, ScrapedDataType]):
         # Registering work
         with self.crawler.state.working():
             result = CrawlResult(job)
+            spider_name = job.spider or DEFAULT_SPIDER_KEY
 
-            spider = self.crawler.spiders.get(job.spider)
+            spider = self.crawler.spiders.get(spider_name)
 
             if spider is None:
                 result.error = UnknownSpiderError(spider=job.spider)
@@ -110,8 +114,7 @@ class CrawlWorker(Generic[CrawlJobDataType, ScrapedDataType]):
                 result.scraped = scraped
 
                 if next_jobs is not None:
-                    for job in next_jobs:
-                        self.crawler.enqueue(job)
+                    self.crawler.enqueue_many(next_jobs)
 
             except Exception as error:
                 result.error = SpiderError(reason=error)
@@ -121,24 +124,32 @@ class CrawlWorker(Generic[CrawlJobDataType, ScrapedDataType]):
 
 CrawlJobDataTypes = TypeVar("CrawlJobDataTypes", bound=Mapping)
 ScrapedDataTypes = TypeVar("ScrapedDataTypes")
+Spiders = Union[
+    Spider[CrawlJobDataTypes, ScrapedDataTypes],
+    Dict[str, Spider[CrawlJobDataTypes, ScrapedDataTypes]],
+]
 
 # TODO: try creating a kwarg type for those
-# TODO: Definition vs. spiders should not be done by the class itself -> DefinitionCrawler
 class Crawler(
     HTTPThreadPoolExecutor[
         CrawlJob[CrawlJobDataTypes], CrawlResult[CrawlJobDataTypes, ScrapedDataTypes]
     ]
 ):
+    buffer_size: int
+    domain_parallelism: int
+    throttle: float
+
     queue: "Queue[CrawlJob[CrawlJobDataTypes]]"
+    lock: Lock
+
+    using_persistent_queue: bool
+    state: CrawlerState
+    started: bool
+    spiders: Dict[str, Spider[CrawlJobDataTypes, ScrapedDataTypes]]
 
     def __init__(
         self,
-        spec=None,
-        spider: Optional[Spider[CrawlJobDataTypes, ScrapedDataTypes]] = None,
-        spiders: Optional[
-            Dict[str, Spider[CrawlJobDataTypes, ScrapedDataTypes]]
-        ] = None,
-        start_jobs: Optional[Iterable[UrlOrCrawlJob[CrawlJobDataTypes]]] = None,
+        spiders: Spiders[CrawlJobDataTypes, ScrapedDataTypes],
         queue_path: Optional[str] = None,
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
@@ -153,9 +164,9 @@ class Crawler(
         self.buffer_size = buffer_size
         self.domain_parallelism = domain_parallelism
         self.throttle = throttle
+        self.lock = Lock()
 
         # Params
-        self.start_jobs = start_jobs
         self.queue_path = queue_path
 
         self.using_persistent_queue = queue_path is not None
@@ -170,38 +181,13 @@ class Crawler(
         else:
             queue = SQLiteQueue(queue_path, multithreading=True, auto_commit=False)
 
-        # Creating spiders
-        if spec is not None:
-            if not isinstance(spec, dict):
-                spec = load_definition(spec)
+        self.queue = cast("Queue[CrawlJob[CrawlJobDataTypes]]", queue)
 
-            if "spiders" in spec:
-                spiders = {
-                    name: DefinitionSpider(s, name=name)
-                    for name, s in spec["spiders"].items()
-                }  # type: ignore
-                self.single_spider = False
-            else:
-                spiders = {"default": DefinitionSpider(spec)}  # type: ignore
-                self.single_spider = True
-
-        elif spider is not None:
-            spiders = {"default": spider}
-
-        elif spiders is None:
-            raise TypeError(
-                "minet.Crawler: expecting either `spec`, `spider` or `spiders`."
-            )
-
-        assert spiders is not None
-
-        # Solving function spiders
-        for name, s in spiders.items():
-            if callable(s) and not isinstance(s, Spider):
-                spiders[name] = FunctionSpider(s, name)
-
-        self.queue = cast("Queue", queue)
-        self.spiders = spiders
+        # Spiders
+        if isinstance(spiders, Spider):
+            self.spiders = {DEFAULT_SPIDER_KEY: spiders}
+        else:
+            self.spiders = spiders.copy()
 
     def __start(self):
 
@@ -214,17 +200,12 @@ class Crawler(
             # NOTE: start jobs are all buffered into memory
             # We could use a blocking queue with max size but this could prove
             # difficult to resume crawls based upon lazy iterators
-            if self.start_jobs:
-                for job in self.start_jobs:
-                    self.enqueue(job)
-
             if self.spiders is not None:
                 for spider in self.spiders.values():
                     spider_start_jobs = spider.start_jobs()
 
                     if spider_start_jobs is not None:
-                        for job in spider_start_jobs:
-                            self.enqueue(job)
+                        self.enqueue_many(spider_start_jobs)
 
         self.started = True
 
@@ -265,5 +246,38 @@ class Crawler(
         return safe_wrapper()
 
     def enqueue(self, job: UrlOrCrawlJob[CrawlJobDataTypes]) -> None:
-        self.queue.put(ensure_job(job))
-        self.state.inc_queued()
+        with self.lock:
+            self.queue.put(ensure_job(job))
+            self.state.inc_queued()
+
+    def enqueue_many(self, jobs: Iterable[UrlOrCrawlJob[CrawlJobDataTypes]]) -> None:
+        with self.lock:
+            for job in jobs:
+                self.queue.put(ensure_job(job))
+                self.state.inc_queued()
+
+
+# NOTE: code below to create crawler from definition file
+
+# Creating spiders
+# if spec is not None:
+#     if not isinstance(spec, dict):
+#         spec = load_definition(spec)
+
+#     if "spiders" in spec:
+#         spiders = {
+#             name: DefinitionSpider(s, name=name)
+#             for name, s in spec["spiders"].items()
+#         }  # type: ignore
+#         self.single_spider = False
+#     else:
+#         spiders = {"default": DefinitionSpider(spec)}  # type: ignore
+#         self.single_spider = True
+
+# elif spider is not None:
+#     spiders = {"default": spider}
+
+# elif spiders is None:
+#     raise TypeError(
+#         "minet.Crawler: expecting either `spec`, `spider` or `spiders`."
+#     )

@@ -13,7 +13,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
 
     url: str
     level: int
-    spider: str
+    spider: Optional[str]
     data: Optional[CrawlJobDataType]
 
     __has_cached_domain: bool
@@ -23,7 +23,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
         self,
         url: str,
         level: int = 0,
-        spider: str = "default",
+        spider: Optional[str] = None,
         data: Optional[CrawlJobDataType] = None,
     ):
         self.url = url
