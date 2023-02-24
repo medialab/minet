@@ -6,7 +6,7 @@
 #
 from bs4 import BeautifulSoup
 
-from minet.scrape.utils import load_definition
+from minet.fs import load_definition
 from minet.scrape.interpreter import interpret_scraper
 from minet.scrape.analysis import analyse, validate
 from minet.scrape.straining import strainer_from_css

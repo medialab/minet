@@ -10,6 +10,7 @@ from typing import (
     TypeVar,
     Callable,
     Dict,
+    Any,
     Generic,
     Mapping,
     Iterable,
@@ -21,6 +22,8 @@ from persistqueue import SQLiteQueue
 from shutil import rmtree
 from threading import Lock
 
+from minet.types import AnyFileTarget
+from minet.fs import load_definition
 from minet.crawl.types import (
     CrawlJob,
     UrlOrCrawlJob,
@@ -28,7 +31,12 @@ from minet.crawl.types import (
     CrawlJobOutputDataType,
     CrawlResult,
 )
-from minet.crawl.spiders import Spider
+from minet.crawl.spiders import (
+    Spider,
+    FunctionSpider,
+    FunctionSpiderCallable,
+    DefinitionSpider,
+)
 from minet.crawl.state import CrawlerState
 from minet.web import request, EXPECTED_WEB_ERRORS
 from minet.fetch import HTTPThreadPoolExecutor, CANCELLED
@@ -298,28 +306,30 @@ class Crawler(
                 self.queue.put(job)
                 self.state.inc_queued()
 
+    @classmethod
+    def from_callable(
+        cls,
+        fn: FunctionSpiderCallable,
+        start_jobs: Optional[Iterable[UrlOrCrawlJob]] = None,
+        **kwargs,
+    ):
+        return cls(FunctionSpider(fn, start_jobs=start_jobs), **kwargs)
 
-# NOTE: code below to create crawler from definition file
+    @classmethod
+    def from_definition(
+        cls, definition: Union[Dict[str, Any], AnyFileTarget], **kwargs
+    ):
+        if not isinstance(definition, dict):
+            definition = load_definition(definition)
 
-# Creating spiders
-# if spec is not None:
-#     if not isinstance(spec, dict):
-#         spec = load_definition(spec)
+        definition = cast(Dict[str, Any], definition)
 
-#     if "spiders" in spec:
-#         spiders = {
-#             name: DefinitionSpider(s, name=name)
-#             for name, s in spec["spiders"].items()
-#         }  # type: ignore
-#         self.single_spider = False
-#     else:
-#         spiders = {"default": DefinitionSpider(spec)}  # type: ignore
-#         self.single_spider = True
+        # Do we have a single spider or multiple spiders?
+        if "spiders" in definition:
+            spiders = {
+                name: DefinitionSpider(s) for name, s in definition["spiders"].items()
+            }
+        else:
+            spiders = DefinitionSpider(definition)
 
-# elif spider is not None:
-#     spiders = {"default": spider}
-
-# elif spiders is None:
-#     raise TypeError(
-#         "minet.Crawler: expecting either `spec`, `spider` or `spiders`."
-#     )
+        return cls(spiders, **kwargs)

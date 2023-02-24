@@ -1,4 +1,4 @@
-from minet.crawl import Crawler, Spider, FunctionSpider, DefinitionSpider, CrawlJob
+from minet.crawl import Crawler, FunctionSpider, CrawlJob
 from minet.web import Response
 
 
@@ -10,11 +10,9 @@ def scrape_articles(job: CrawlJob, response: Response):
     return titles, None
 
 
-spider = FunctionSpider(scrape_articles, start_jobs=["https://www.echojs.com/"])
-definition_spider = DefinitionSpider("./ftest/crawlers/echojs_scraper.yml")
-
-
-with Crawler(definition_spider) as crawler:
+with Crawler.from_callable(
+    scrape_articles, start_jobs=["https://www.echojs.com/"], wait=False, daemonic=True
+) as crawler:
     for result in crawler:
         print(result)
 

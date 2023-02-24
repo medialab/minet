@@ -4,37 +4,11 @@
 #
 # Miscellaneous helper functions used throughout the minet.scrape package.
 #
-import json
-import yaml
 import warnings
 from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
-from os import PathLike
 from functools import partial
-from ebbe.decorators import with_defer
 
 from minet.scrape.constants import SELECT_ALIASES, ITERATOR_ALIASES
-from minet.exceptions import DefinitionInvalidFormatError
-
-
-@with_defer()
-def load_definition(f, *, defer=None, encoding="utf-8"):
-    if isinstance(f, (str, PathLike)):
-        path = str(f)
-        f = open(path, encoding=encoding)
-        defer(f.close)  # type: ignore
-    else:
-        path = f.name
-
-    if path.endswith(".json"):
-        definition = json.load(f)
-
-    elif path.endswith(".yml") or path.endswith(".yaml"):
-        definition = yaml.safe_load(f)
-
-    else:
-        raise DefinitionInvalidFormatError
-
-    return definition
 
 
 def get_aliases(aliases, target, with_key=False):

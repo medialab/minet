@@ -7,12 +7,15 @@
 from typing import Union
 
 import gzip
-from os import makedirs
+import json
+import yaml
+from ebbe.decorators import with_defer
+from os import makedirs, PathLike
 from os.path import basename, join, splitext, abspath, normpath, dirname
 from ural import get_hostname, get_normalized_hostname
 from quenouille import NamedLocks
 
-from minet.exceptions import FilenameFormattingError
+from minet.exceptions import FilenameFormattingError, DefinitionInvalidFormatError
 from minet.utils import md5, PseudoFStringFormatter
 
 
@@ -26,6 +29,27 @@ def read_potentially_gzipped_path(path, encoding="utf-8"):
 
     with open_fn(path, flag, encoding=encoding, errors="replace") as f:
         return f.read()
+
+
+@with_defer()
+def load_definition(f, *, defer=None, encoding="utf-8"):
+    if isinstance(f, (str, PathLike)):
+        path = str(f)
+        f = open(path, encoding=encoding)
+        defer(f.close)  # type: ignore
+    else:
+        path = f.name
+
+    if path.endswith(".json"):
+        definition = json.load(f)
+
+    elif path.endswith(".yml") or path.endswith(".yaml"):
+        definition = yaml.safe_load(f)
+
+    else:
+        raise DefinitionInvalidFormatError
+
+    return definition
 
 
 class FolderStrategy(object):

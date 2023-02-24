@@ -28,7 +28,8 @@ from minet.crawl.types import (
     CrawlJobOutputDataType,
 )
 from minet.types import AnyFileTarget
-from minet.scrape import Scraper, load_definition
+from minet.fs import load_definition
+from minet.scrape import Scraper
 from minet.web import Response
 from minet.utils import PseudoFStringFormatter
 
@@ -62,18 +63,18 @@ class Spider(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
         return "<%(class_name)s>" % {"class_name": class_name}
 
 
+FunctionSpiderCallable = Callable[
+    [CrawlJob[CrawlJobDataType], Response],
+    SpiderResult[CrawlJobOutputDataType, CrawlJobDataType],
+]
+
+
 class FunctionSpider(Spider[CrawlJobDataType, CrawlJobOutputDataType]):
-    fn: Callable[
-        [CrawlJob[CrawlJobDataType], Response],
-        SpiderResult[CrawlJobOutputDataType, CrawlJobDataType],
-    ]
+    fn: FunctionSpiderCallable[CrawlJobDataType, CrawlJobOutputDataType]
 
     def __init__(
         self,
-        fn: Callable[
-            [CrawlJob[CrawlJobDataType], Response],
-            SpiderResult[CrawlJobOutputDataType, CrawlJobDataType],
-        ],
+        fn: FunctionSpiderCallable[CrawlJobDataType, CrawlJobOutputDataType],
         start_jobs: Optional[Iterable[UrlOrCrawlJob[CrawlJobDataType]]] = None,
     ):
         self.fn = fn
