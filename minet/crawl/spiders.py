@@ -4,6 +4,7 @@
 #
 #
 from typing import (
+    cast,
     Any,
     Optional,
     List,
@@ -26,7 +27,8 @@ from minet.crawl.types import (
     CrawlJobDataType,
     CrawlJobOutputDataType,
 )
-from minet.scrape import Scraper
+from minet.types import AnyFileTarget
+from minet.scrape import Scraper, load_definition
 from minet.web import Response
 from minet.utils import PseudoFStringFormatter
 
@@ -112,7 +114,12 @@ class DefinitionSpider(
     next_scraper: Optional[Scraper]
     next_scrapers: Dict[str, Scraper]
 
-    def __init__(self, definition: Dict[str, Any]):
+    def __init__(self, definition: Union[AnyFileTarget, Dict[str, Any]]):
+
+        if not isinstance(definition, dict):
+            definition = load_definition(definition)
+
+        definition = cast(Dict[str, Any], definition)
 
         # Descriptors
         self.definition = definition

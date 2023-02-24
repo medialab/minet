@@ -4,8 +4,6 @@
 #
 # Collection of handy custom exceptions.
 #
-from typing import Optional
-
 from minet.utils import message_flatmap
 
 
