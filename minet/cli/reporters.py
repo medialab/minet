@@ -27,6 +27,7 @@ from minet.exceptions import (
     InvalidRedirectError,
     TrafilaturaError,
     FilenameFormattingError,
+    FinalTimeoutError,
 )
 from minet.scrape.constants import BURROWING_KEYS, LEAF_KEYS
 from minet.scrape.exceptions import (
@@ -103,6 +104,7 @@ ERROR_REPORTERS = {
     ProtocolError: protocol_error_reporter,
     ConnectTimeoutError: "connect-timeout",
     ReadTimeoutError: "read-timeout",
+    FinalTimeoutError: "final-timeout",
     MaxRedirectsError: "max-redirects",
     InfiniteRedirectsError: "infinite-redirects",
     SelfRedirectError: "self-redirect",

@@ -91,7 +91,7 @@ REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
 CONTENT_PREBUFFER_UP_TO = 1024
 STREAMING_CHUNK_SIZE = 2**12
 LARGE_CONTENT_PREBUFFER_UP_TO = 2**16
-EXPECTED_WEB_ERRORS = (HTTPError, RedirectError, InvalidURLError)
+EXPECTED_WEB_ERRORS = (HTTPError, RedirectError, InvalidURLError, FinalTimeoutError)
 
 assert CONTENT_PREBUFFER_UP_TO < LARGE_CONTENT_PREBUFFER_UP_TO
 
@@ -1168,6 +1168,7 @@ def create_request_retryer(
     global GLOBAL_RETRYER_BEFORE_SLEEP
 
     retryable_exception_types = [
+        FinalTimeoutError,
         urllib3.exceptions.TimeoutError,
         urllib3.exceptions.ProtocolError,
         urllib.error.URLError,
