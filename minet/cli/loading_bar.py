@@ -308,8 +308,17 @@ class LoadingBar(object):
             self.table, refresh_per_second=10, console=console, transient=self.transient
         )
 
-    def __enter__(self):
+    def erase(self):
+        console.file.write("\x1b[1A")
+
+    def start(self):
         self.live.start()
+
+    def stop(self):
+        self.live.stop()
+
+    def __enter__(self):
+        self.start()
         return self
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
@@ -321,7 +330,7 @@ class LoadingBar(object):
             if exc_type is KeyboardInterrupt:
 
                 # NOTE: broken pipe are often subsequent
-                console.file.write("\x1b[1A")
+                self.erase()
                 style = "warning"
 
             if self.bar_column is not None:
@@ -335,7 +344,7 @@ class LoadingBar(object):
             self.bar_column.pulse_style = "success"
             self.bar_column.style = "success"
 
-        self.live.stop()
+        self.stop
 
     @contextmanager
     def step(self, item=None, count=1, index=None, catch=None):

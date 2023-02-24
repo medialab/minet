@@ -5,13 +5,14 @@
 # Exposing a specialized quenouille wrapper grabbing various urls from the
 # web in a multithreaded fashion.
 #
-from typing import Optional, Iterator, Callable, TypeVar, Generic, Iterable, Dict
+from typing import Optional, Iterator, Callable, TypeVar, Generic, Iterable, Dict, Union
 
 import urllib3
 from threading import Event
 from quenouille import ThreadPoolExecutor
 from ural import get_domain_name, ensure_protocol
 
+from minet.exceptions import CancelledRequestError
 from minet.web import (
     create_pool_manager,
     request,
@@ -33,6 +34,8 @@ from minet.constants import (
 
 ItemType = TypeVar("ItemType")
 ResultType = TypeVar("ResultType")
+
+CANCELLED = object()
 
 
 class FetchWorkerPayload(Generic[ItemType]):
@@ -158,23 +161,24 @@ def payloads_iter(
 
 
 class FetchWorker(Generic[ItemType]):
-    pool_manager: urllib3.PoolManager
-    callback: Optional[Callable[[FetchResult[ItemType]], None]]
-
     def __init__(
         self,
         pool_manager: urllib3.PoolManager,
+        cancel_event: Event,
         *,
         request_args: Optional[RequestArgsType[ItemType]] = None,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         callback: Optional[Callable[[FetchResult[ItemType]], None]] = None
     ):
         self.pool_manager = pool_manager
+        self.cancel_event = cancel_event
         self.request_args = request_args
         self.max_redirects = max_redirects
         self.callback = callback
 
-    def __call__(self, payload: FetchWorkerPayload[ItemType]) -> FetchResult[ItemType]:
+    def __call__(
+        self, payload: FetchWorkerPayload[ItemType]
+    ) -> Union[object, FetchResult[ItemType]]:
         item, url = payload.item, payload.url
 
         result = FetchResult(item, url)
@@ -186,16 +190,26 @@ class FetchWorker(Generic[ItemType]):
         # NOTE: request_args must be threadsafe
         kwargs = {}
 
+        if self.cancel_event.is_set():
+            return CANCELLED
+
         if self.request_args is not None:
             kwargs = self.request_args(payload)
+
+        if self.cancel_event.is_set():
+            return CANCELLED
 
         try:
             response = request(
                 url,
                 pool_manager=self.pool_manager,
                 max_redirects=self.max_redirects,
+                cancel_event=self.cancel_event,
                 **kwargs
             )
+
+        except CancelledRequestError:
+            return CANCELLED
 
         except EXPECTED_WEB_ERRORS as error:
             result.error = error
@@ -204,23 +218,19 @@ class FetchWorker(Generic[ItemType]):
             result.response = response
 
             if self.callback is not None:
+                if self.cancel_event.is_set():
+                    return CANCELLED
+
                 self.callback(result)
 
         return result
 
 
 class ResolveWorker(Generic[ItemType]):
-    pool_manager: urllib3.PoolManager
-    max_redirects: int
-    follow_refresh_header: bool
-    follow_meta_refresh: bool
-    follow_js_relocation: bool
-    infer_redirection: bool
-    canonicalize: bool
-
     def __init__(
         self,
         pool_manager: urllib3.PoolManager,
+        cancel_event: Event,
         *,
         resolve_args: Optional[RequestArgsType[ItemType]] = None,
         max_redirects: int = DEFAULT_RESOLVE_MAX_REDIRECTS,
@@ -230,8 +240,8 @@ class ResolveWorker(Generic[ItemType]):
         infer_redirection: bool = False,
         canonicalize: bool = False
     ):
-
         self.pool_manager = pool_manager
+        self.cancel_event = cancel_event
         self.resolve_args = resolve_args
         self.max_redirects = max_redirects
         self.follow_refresh_header = follow_refresh_header
@@ -242,7 +252,7 @@ class ResolveWorker(Generic[ItemType]):
 
     def __call__(
         self, payload: FetchWorkerPayload[ItemType]
-    ) -> ResolveResult[ItemType]:
+    ) -> Union[object, ResolveResult[ItemType]]:
         item, url = payload.item, payload.url
 
         result = ResolveResult(item, url)
@@ -254,8 +264,14 @@ class ResolveWorker(Generic[ItemType]):
         # NOTE: resolve_args must be threadsafe
         kwargs = {}
 
+        if self.cancel_event.is_set():
+            return CANCELLED
+
         if self.resolve_args is not None:
             kwargs = self.resolve_args(payload)
+
+        if self.cancel_event.is_set():
+            return CANCELLED
 
         # NOTE: should it be just in the CLI?
         if "spoof_ua" not in kwargs and payload.domain is not None:
@@ -273,6 +289,8 @@ class ResolveWorker(Generic[ItemType]):
                 canonicalize=self.canonicalize,
                 **kwargs
             )
+        except CancelledRequestError:
+            return CANCELLED
         except EXPECTED_WEB_ERRORS as error:
             result.error = error
         else:
@@ -326,12 +344,13 @@ class FetchThreadPoolExecutor(
         # TODO: validate
         worker = FetchWorker(
             self.pool_manager,
+            self.cancel_event,
             request_args=request_args,
             max_redirects=max_redirects,
             callback=callback,
         )
 
-        return super().imap_unordered(
+        imap_unordered = super().imap_unordered(
             payloads_iter(iterator, key=key),
             worker,
             key=key_by_domain_name,
@@ -339,6 +358,8 @@ class FetchThreadPoolExecutor(
             buffer_size=buffer_size,
             throttle=throttle,
         )
+
+        return (item for item in imap_unordered if item is not CANCELLED)
 
 
 class ResolveThreadPoolExecutor(
@@ -364,6 +385,7 @@ class ResolveThreadPoolExecutor(
         # TODO: validate
         worker = ResolveWorker(
             self.pool_manager,
+            self.cancel_event,
             resolve_args=resolve_args,
             max_redirects=max_redirects,
             follow_refresh_header=follow_refresh_header,
@@ -373,7 +395,7 @@ class ResolveThreadPoolExecutor(
             canonicalize=canonicalize,
         )
 
-        return super().imap_unordered(
+        imap_unordered = super().imap_unordered(
             payloads_iter(iterator, key=key),
             worker,
             key=key_by_domain_name,
@@ -381,6 +403,8 @@ class ResolveThreadPoolExecutor(
             buffer_size=buffer_size,
             throttle=throttle,
         )
+
+        return (item for item in imap_unordered if item is not CANCELLED)
 
 
 def multithreaded_fetch(
