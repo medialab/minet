@@ -25,7 +25,7 @@ from minet.crawl.types import (
     CrawlJob,
     UrlOrCrawlJob,
     CrawlJobDataType,
-    ScrapedDataType,
+    CrawlJobOutputDataType,
     CrawlResult,
 )
 from minet.crawl.spiders import Spider
@@ -55,7 +55,7 @@ def ensure_job(
 RequestArgsType = Callable[[CrawlJob[CrawlJobDataType]], Dict]
 
 
-class CrawlWorker(Generic[CrawlJobDataType, ScrapedDataType]):
+class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
     def __init__(
         self,
         crawler: "Crawler",
@@ -63,7 +63,7 @@ class CrawlWorker(Generic[CrawlJobDataType, ScrapedDataType]):
         request_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         callback: Optional[
-            Callable[[CrawlResult[CrawlJobDataType, ScrapedDataType]], None]
+            Callable[[CrawlResult[CrawlJobDataType, CrawlJobOutputDataType]], None]
         ] = None,
     ):
         self.crawler = crawler
@@ -73,7 +73,7 @@ class CrawlWorker(Generic[CrawlJobDataType, ScrapedDataType]):
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType]
-    ) -> Union[object, CrawlResult[CrawlJobDataType, ScrapedDataType]]:
+    ) -> Union[object, CrawlResult[CrawlJobDataType, CrawlJobOutputDataType]]:
 
         # Registering work
         with self.crawler.state.working():
@@ -124,14 +124,14 @@ class CrawlWorker(Generic[CrawlJobDataType, ScrapedDataType]):
                 return CANCELLED
 
             try:
-                scraped, next_jobs = spider(job, response)
-                result.scraped = scraped
+                output, next_jobs = spider(job, response)
+                result.output = output
 
                 if cancel_event.is_set():
                     return CANCELLED
 
                 if next_jobs is not None:
-                    self.crawler.enqueue_many(next_jobs)
+                    self.crawler.enqueue_many(next_jobs, spider=spider_name)
 
             except Exception as error:
                 result.error = error
@@ -140,16 +140,17 @@ class CrawlWorker(Generic[CrawlJobDataType, ScrapedDataType]):
 
 
 CrawlJobDataTypes = TypeVar("CrawlJobDataTypes", bound=Mapping)
-ScrapedDataTypes = TypeVar("ScrapedDataTypes")
+CrawlJobOutputDataTypes = TypeVar("CrawlJobOutputDataTypes")
 Spiders = Union[
-    Spider[CrawlJobDataTypes, ScrapedDataTypes],
-    Dict[str, Spider[CrawlJobDataTypes, ScrapedDataTypes]],
+    Spider[CrawlJobDataTypes, CrawlJobOutputDataTypes],
+    Dict[str, Spider[CrawlJobDataTypes, CrawlJobOutputDataTypes]],
 ]
 
 # TODO: try creating a kwarg type for those
 class Crawler(
     HTTPThreadPoolExecutor[
-        CrawlJob[CrawlJobDataTypes], CrawlResult[CrawlJobDataTypes, ScrapedDataTypes]
+        CrawlJob[CrawlJobDataTypes],
+        CrawlResult[CrawlJobDataTypes, CrawlJobOutputDataTypes],
     ]
 ):
     buffer_size: int
@@ -162,11 +163,11 @@ class Crawler(
     using_persistent_queue: bool
     state: CrawlerState
     started: bool
-    spiders: Dict[str, Spider[CrawlJobDataTypes, ScrapedDataTypes]]
+    spiders: Dict[str, Spider[CrawlJobDataTypes, CrawlJobOutputDataTypes]]
 
     def __init__(
         self,
-        spiders: Spiders[CrawlJobDataTypes, ScrapedDataTypes],
+        spiders: Spiders[CrawlJobDataTypes, CrawlJobOutputDataTypes],
         queue_path: Optional[str] = None,
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
@@ -223,11 +224,11 @@ class Crawler(
             # We could use a blocking queue with max size but this could prove
             # difficult to resume crawls based upon lazy iterators
             if self.spiders is not None:
-                for spider in self.spiders.values():
+                for name, spider in self.spiders.items():
                     spider_start_jobs = spider.start_jobs()
 
                     if spider_start_jobs is not None:
-                        self.enqueue_many(spider_start_jobs)
+                        self.enqueue_many(spider_start_jobs, spider=name)
 
         self.started = True
 
@@ -270,15 +271,31 @@ class Crawler(
 
         return safe_wrapper()
 
-    def enqueue(self, job: UrlOrCrawlJob[CrawlJobDataTypes]) -> None:
+    def enqueue(
+        self, job: UrlOrCrawlJob[CrawlJobDataTypes], spider: Optional[str] = None
+    ) -> None:
         with self.lock:
-            self.queue.put(ensure_job(job))
+            job = ensure_job(job)
+
+            if spider is not None and job.spider is None:
+                job.spider = spider
+
+            self.queue.put(job)
             self.state.inc_queued()
 
-    def enqueue_many(self, jobs: Iterable[UrlOrCrawlJob[CrawlJobDataTypes]]) -> None:
+    def enqueue_many(
+        self,
+        jobs: Iterable[UrlOrCrawlJob[CrawlJobDataTypes]],
+        spider: Optional[str] = None,
+    ) -> None:
         with self.lock:
             for job in jobs:
-                self.queue.put(ensure_job(job))
+                job = ensure_job(job)
+
+                if spider is not None and job.spider is None:
+                    job.spider = spider
+
+                self.queue.put(job)
                 self.state.inc_queued()
 
 

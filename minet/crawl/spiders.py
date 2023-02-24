@@ -20,7 +20,12 @@ from typing_extensions import TypedDict, NotRequired
 
 from urllib.parse import urljoin
 
-from minet.crawl.types import UrlOrCrawlJob, CrawlJob, CrawlJobDataType, ScrapedDataType
+from minet.crawl.types import (
+    UrlOrCrawlJob,
+    CrawlJob,
+    CrawlJobDataType,
+    CrawlJobOutputDataType,
+)
 from minet.scrape import Scraper
 from minet.web import Response
 from minet.utils import PseudoFStringFormatter
@@ -37,58 +42,55 @@ def ensure_list(value: Union[T, List[T]]) -> List[T]:
 
 
 SpiderNextJobs = Optional[Iterable[CrawlJob[CrawlJobDataType]]]
-SpiderResult = Tuple[ScrapedDataType, SpiderNextJobs[CrawlJobDataType]]
+SpiderResult = Tuple[CrawlJobOutputDataType, SpiderNextJobs[CrawlJobDataType]]
 
 
-class Spider(Generic[CrawlJobDataType, ScrapedDataType]):
-    name: str
-
-    def __init__(self, name: str = "default"):
-        self.name = name
-
+class Spider(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
     def start_jobs(self) -> Optional[Iterable[UrlOrCrawlJob[CrawlJobDataType]]]:
         return None
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType], response: Response
-    ) -> SpiderResult[ScrapedDataType, CrawlJobDataType]:
+    ) -> SpiderResult[CrawlJobOutputDataType, CrawlJobDataType]:
         raise NotImplementedError
 
     def __repr__(self):
         class_name = self.__class__.__name__
 
-        return "<%(class_name)s name=%(name)s>" % {
-            "class_name": class_name,
-            "name": self.name,
-        }
+        return "<%(class_name)s>" % {"class_name": class_name}
 
 
-class FunctionSpider(Spider[CrawlJobDataType, ScrapedDataType]):
+class FunctionSpider(Spider[CrawlJobDataType, CrawlJobOutputDataType]):
     fn: Callable[
         [CrawlJob[CrawlJobDataType], Response],
-        SpiderResult[ScrapedDataType, CrawlJobDataType],
+        SpiderResult[CrawlJobOutputDataType, CrawlJobDataType],
     ]
 
     def __init__(
         self,
         fn: Callable[
             [CrawlJob[CrawlJobDataType], Response],
-            SpiderResult[ScrapedDataType, CrawlJobDataType],
+            SpiderResult[CrawlJobOutputDataType, CrawlJobDataType],
         ],
-        name: str = "default",
+        start_jobs: Optional[Iterable[UrlOrCrawlJob[CrawlJobDataType]]] = None,
     ):
-        super().__init__(name)
         self.fn = fn
+        self.__start_jobs = start_jobs
+
+    def start_jobs(self) -> Optional[Iterable[UrlOrCrawlJob[CrawlJobDataType]]]:
+        return self.__start_jobs
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType], response: Response
-    ) -> SpiderResult[ScrapedDataType, CrawlJobDataType]:
+    ) -> SpiderResult[CrawlJobOutputDataType, CrawlJobDataType]:
         return self.fn(job, response)
 
 
-class DefinitionSpiderScrapedDataType(TypedDict, Generic[ScrapedDataType]):
-    single: Optional[ScrapedDataType]
-    multiple: Dict[str, ScrapedDataType]
+class DefinitionSpiderCrawlJobOutputDataType(
+    TypedDict, Generic[CrawlJobOutputDataType]
+):
+    single: Optional[CrawlJobOutputDataType]
+    multiple: Dict[str, CrawlJobOutputDataType]
 
 
 class DefinitionSpiderTarget(TypedDict, Generic[CrawlJobDataType]):
@@ -98,7 +100,9 @@ class DefinitionSpiderTarget(TypedDict, Generic[CrawlJobDataType]):
 
 
 class DefinitionSpider(
-    Spider[CrawlJobDataType, DefinitionSpiderScrapedDataType[ScrapedDataType]]
+    Spider[
+        CrawlJobDataType, DefinitionSpiderCrawlJobOutputDataType[CrawlJobOutputDataType]
+    ]
 ):
     definition: Dict[str, Any]
     next_definition: Optional[Dict[str, Any]]
@@ -108,10 +112,9 @@ class DefinitionSpider(
     next_scraper: Optional[Scraper]
     next_scrapers: Dict[str, Scraper]
 
-    def __init__(self, definition: Dict[str, Any], name: str = "default"):
+    def __init__(self, definition: Dict[str, Any]):
 
         # Descriptors
-        super().__init__(name)
         self.definition = definition
         self.next_definition = definition.get("next")
 
@@ -141,18 +144,18 @@ class DefinitionSpider(
 
     def start_jobs(self) -> Iterable[UrlOrCrawlJob[CrawlJobDataType]]:
 
-        # TODO: possibility to name this as jobs
+        # TODO: possibility to name this as jobs and get additional metadata
         start_urls = ensure_list(self.definition.get("start_url", [])) + ensure_list(
             self.definition.get("start_urls", [])
         )
 
         for url in start_urls:
-            yield CrawlJob(url, spider=self.name)
+            yield url
 
     def __scrape(
         self, job: CrawlJob[CrawlJobDataType], response: Response
-    ) -> DefinitionSpiderScrapedDataType[ScrapedDataType]:
-        scraped: DefinitionSpiderScrapedDataType[ScrapedDataType] = {
+    ) -> DefinitionSpiderCrawlJobOutputDataType[CrawlJobOutputDataType]:
+        scraped: DefinitionSpiderCrawlJobOutputDataType[CrawlJobOutputDataType] = {
             "single": None,
             "multiple": {},
         }
@@ -176,16 +179,14 @@ class DefinitionSpider(
         next_level: int,
     ) -> CrawlJob[CrawlJobDataType]:
         if isinstance(target, str):
-            return CrawlJob(
-                url=urljoin(current_url, target), spider=self.name, level=next_level
-            )
+            return CrawlJob(url=urljoin(current_url, target), level=next_level)
 
         else:
 
             # TODO: validate target
             return CrawlJob(
                 url=urljoin(current_url, target["url"]),
-                spider=target.get("spider", self.name),
+                spider=target.get("spider"),
                 level=next_level,
                 data=target.get("data"),
             )
@@ -235,6 +236,6 @@ class DefinitionSpider(
     def __call__(
         self, job: CrawlJob[CrawlJobDataType], response: Response
     ) -> SpiderResult[
-        DefinitionSpiderScrapedDataType[ScrapedDataType], CrawlJobDataType
+        DefinitionSpiderCrawlJobOutputDataType[CrawlJobOutputDataType], CrawlJobDataType
     ]:
         return self.__scrape(job, response), self.__next_jobs(job, response)

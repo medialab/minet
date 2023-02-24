@@ -1,24 +1,23 @@
-from minet.crawl import Crawler, Spider, CrawlJob
+from minet.crawl import Crawler, Spider, FunctionSpider, CrawlJob
 from minet.web import Response
 
 
-class EchoJSSpider(Spider):
-    def start_jobs(self):
-        yield "https://www.echojs.com/"
+def scrape_articles(job: CrawlJob, response: Response):
+    articles = response.soup().select("article")
 
-    def __call__(self, job: CrawlJob, response: Response):
-        articles = response.soup().select("article")
+    titles = [a.select_one("h2").get_text().strip() for a in articles]
 
-        titles = [a.select_one("h2").get_text().strip() for a in articles]
-
-        return titles, None
+    return titles, None
 
 
-with Crawler(EchoJSSpider()) as crawler:
+spider = FunctionSpider(scrape_articles, start_jobs=["https://www.echojs.com/"])
+
+
+with Crawler(spider) as crawler:
     for result in crawler:
         print(result)
 
         if result.error:
             print(result.error)
-        elif result.scraped:
-            print(result.scraped)
+        elif result.output:
+            print(result.output)

@@ -5,7 +5,7 @@ from ural import get_domain_name
 from minet.web import Response
 
 CrawlJobDataType = TypeVar("CrawlJobDataType", bound=Mapping)
-ScrapedDataType = TypeVar("ScrapedDataType")
+CrawlJobOutputDataType = TypeVar("CrawlJobOutputDataType")
 
 
 class CrawlJob(Generic[CrawlJobDataType]):
@@ -15,6 +15,8 @@ class CrawlJob(Generic[CrawlJobDataType]):
     level: int
     spider: Optional[str]
     data: Optional[CrawlJobDataType]
+
+    # TODO: we should add headers, cookies and such here in the future
 
     __has_cached_domain: bool
     __domain: Optional[str]
@@ -72,21 +74,19 @@ class CrawlJob(Generic[CrawlJobDataType]):
 UrlOrCrawlJob = Union[str, CrawlJob[CrawlJobDataType]]
 
 
-class CrawlResult(Generic[CrawlJobDataType, ScrapedDataType]):
-    __slots__ = ("job", "scraped", "error", "response")
+class CrawlResult(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
+    __slots__ = ("job", "output", "error", "response")
 
     job: CrawlJob[CrawlJobDataType]
-    scraped: Optional[ScrapedDataType]
+    output: Optional[CrawlJobOutputDataType]
     error: Optional[Exception]
     response: Optional[Response]
-    # next_jobs: Optional[List[CrawlJob[CrawlJobDataType]]]
 
     def __init__(self, job: CrawlJob[CrawlJobDataType]):
         self.job = job
-        self.scraped = None
+        self.output = None
         self.error = None
         self.response = None
-        # self.next_jobs = None
 
     def __repr__(self):
         name = self.__class__.__name__
