@@ -139,7 +139,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
                     return CANCELLED
 
                 if next_jobs is not None:
-                    self.crawler.enqueue_many(next_jobs, spider=spider_name)
+                    self.crawler.enqueue(next_jobs, spider=spider_name)
 
             except Exception as error:
                 result.error = error
@@ -236,7 +236,7 @@ class Crawler(
                     spider_start_jobs = spider.start_jobs()
 
                     if spider_start_jobs is not None:
-                        self.enqueue_many(spider_start_jobs, spider=name)
+                        self.enqueue(spider_start_jobs, spider=name)
 
         self.started = True
 
@@ -280,23 +280,20 @@ class Crawler(
         return safe_wrapper()
 
     def enqueue(
-        self, job: UrlOrCrawlJob[CrawlJobDataTypes], spider: Optional[str] = None
-    ) -> None:
-        with self.lock:
-            job = ensure_job(job)
-
-            if spider is not None and job.spider is None:
-                job.spider = spider
-
-            self.queue.put(job)
-            self.state.inc_queued()
-
-    def enqueue_many(
         self,
-        jobs: Iterable[UrlOrCrawlJob[CrawlJobDataTypes]],
+        job_or_jobs: Union[
+            UrlOrCrawlJob[CrawlJobDataTypes], Iterable[UrlOrCrawlJob[CrawlJobDataType]]
+        ],
         spider: Optional[str] = None,
     ) -> None:
         with self.lock:
+            if isinstance(job_or_jobs, (str, CrawlJob)):
+                jobs = [job_or_jobs]
+            else:
+                jobs = job_or_jobs
+
+            jobs = cast(Iterable[UrlOrCrawlJob[CrawlJobDataTypes]], jobs)
+
             for job in jobs:
                 job = ensure_job(job)
 
