@@ -127,6 +127,9 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
                 result.error = error
                 return result
 
+            finally:
+                job.attempts += 1
+
             result.response = response
 
             if cancel_event.is_set():
