@@ -5,7 +5,7 @@
 # Miscellaneous generic functions used throughout the CrowdTangle actions.
 #
 import casanova
-import ndjson
+import casanova.ndjson as ndjson
 
 from minet.cli.utils import print_err, with_fatal_errors
 from minet.cli.loading_bar import LoadingBar

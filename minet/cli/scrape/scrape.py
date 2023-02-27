@@ -5,8 +5,8 @@
 # Logic of the scrape action.
 #
 import csv
-import ndjson
 import casanova
+import casanova.ndjson as ndjson
 from casanova import DictLikeRow
 from collections import namedtuple
 from os.path import basename, isdir
