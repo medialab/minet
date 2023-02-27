@@ -183,10 +183,9 @@ class DefinitionSpider(
         self,
         current_url: str,
         target: Union[str, DefinitionSpiderTarget[CrawlJobDataType]],
-        next_depth: int,
     ) -> CrawlJob[CrawlJobDataType]:
         if isinstance(target, str):
-            return CrawlJob(url=urljoin(current_url, target), depth=next_depth)
+            return CrawlJob(url=urljoin(current_url, target))
 
         else:
 
@@ -194,12 +193,11 @@ class DefinitionSpider(
             return CrawlJob(
                 url=urljoin(current_url, target["url"]),
                 spider=target.get("spider"),
-                depth=next_depth,
                 data=target.get("data"),
             )
 
     def __next_targets(
-        self, response: Response, soup: BeautifulSoup, next_depth: int
+        self, response: Response, soup: BeautifulSoup
     ) -> Iterator[Union[str, DefinitionSpiderTarget[CrawlJobDataType]]]:
 
         # Scraping next results
@@ -224,7 +222,7 @@ class DefinitionSpider(
 
         # Formatting next url
         if self.next_definition is not None and "format" in self.next_definition:
-            yield FORMATTER.format(self.next_definition["format"], depth=next_depth)
+            yield FORMATTER.format(self.next_definition["format"])
 
     def __next_jobs(
         self, job: CrawlJob[CrawlJobDataType], response: Response, soup: BeautifulSoup
@@ -232,13 +230,15 @@ class DefinitionSpider(
         if not self.next_definition:
             return
 
+        assert job.depth is not None
+
         next_depth = job.depth + 1
 
         if next_depth > self.max_depth:
             return
 
-        for target in self.__next_targets(response, soup, next_depth):
-            yield self.__job_from_target(response.url, target, next_depth)
+        for target in self.__next_targets(response, soup):
+            yield self.__job_from_target(response.url, target)
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType], response: Response

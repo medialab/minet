@@ -96,8 +96,9 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
                 result.error = UnknownSpiderError(spider=job.spider)
                 return result
 
-            # NOTE: crawl job must have a url
+            # NOTE: crawl job must have a url and a depth at that point
             assert job.url is not None
+            assert job.depth is not None
 
             # NOTE: request_args must be threadsafe
             kwargs = {}
@@ -139,7 +140,9 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
                     return CANCELLED
 
                 if next_jobs is not None:
-                    self.crawler.enqueue(next_jobs, spider=spider_name)
+                    self.crawler.enqueue(
+                        next_jobs, spider=spider_name, depth=job.depth + 1
+                    )
 
             except Exception as error:
                 result.error = error
@@ -296,6 +299,7 @@ class Crawler(
             UrlOrCrawlJob[CrawlJobDataTypes], Iterable[UrlOrCrawlJob[CrawlJobDataType]]
         ],
         spider: Optional[str] = None,
+        depth: int = 0,
     ) -> None:
         with self.lock:
             if isinstance(job_or_jobs, (str, CrawlJob)):
@@ -310,6 +314,9 @@ class Crawler(
 
                 if spider is not None and job.spider is None:
                     job.spider = spider
+
+                if job.depth is None:
+                    job.depth = depth
 
                 self.queue.put(job)
                 self.state.inc_queued()

@@ -12,7 +12,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
     __slots__ = ("url", "depth", "spider", "data", "__has_cached_domain", "__domain")
 
     url: str
-    depth: int
+    depth: Optional[int]
     spider: Optional[str]
     data: Optional[CrawlJobDataType]
 
@@ -24,7 +24,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
     def __init__(
         self,
         url: str,
-        depth: int = 0,
+        depth: Optional[int] = None,
         spider: Optional[str] = None,
         data: Optional[CrawlJobDataType] = None,
     ):
