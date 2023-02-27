@@ -205,6 +205,7 @@ class LoadingBar(object):
         self.show_label = show_label
         self.transient = transient
         self.known_total = total is not None
+        self.already_stopped = False
 
         self.bar_column = None
         self.label_progress = None
@@ -309,6 +310,7 @@ class LoadingBar(object):
         )
 
     def erase(self):
+        # NOTE: cursor 1up
         console.file.write("\x1b[1A")
 
     def start(self):
@@ -316,6 +318,7 @@ class LoadingBar(object):
 
     def stop(self):
         self.live.stop()
+        self.already_stopped = True
 
     def __enter__(self):
         self.start()
@@ -326,12 +329,13 @@ class LoadingBar(object):
         if exc_type is not None:
             style = "error"
 
-            # NOTE: cursor 1up
             if exc_type is KeyboardInterrupt:
+                if not self.already_stopped:
+                    self.erase()
 
-                # NOTE: broken pipe are often subsequent
-                self.erase()
                 style = "warning"
+
+                # NOTE: broken pipe often arrive after that point
 
             if self.bar_column is not None:
                 self.bar_column.complete_style = style
