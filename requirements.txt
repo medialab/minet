@@ -9,13 +9,12 @@ wheel
 # Dependencies
 about-time==4.2.1
 beautifulsoup4==4.11.1
-browser-cookie3==0.16.5
+browser-cookie3==0.17.0
 casanova==1.5.0
 charset-normalizer==3.0.1
 dateparser==1.1.6
 ebbe==1.11.1
 json5==0.9.11
-keyring<19.3
 lxml==4.9.2
 persist-queue==0.8.0
 pyyaml==5.4.1
