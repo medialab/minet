@@ -27,5 +27,5 @@ tenacity==8.1.0
 trafilatura==1.4.1
 typing_extensions
 twitwi==0.16.1
-ural==0.37.0
+ural==0.38.0
 urllib3==1.26.14

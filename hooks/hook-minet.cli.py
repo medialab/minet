@@ -1,5 +1,4 @@
 import re
-import tld
 import trafilatura
 import justext
 from glob import iglob
@@ -25,7 +24,6 @@ hiddenimports.extend(collect_submodules("pkg_resources"))
 hiddenimports.append("charset_normalizer.md__mypyc")
 
 datas = [
-    (join(dirname(tld.__file__), "res", "effective_tld_names.dat.txt"), "tld/res"),
     (join(dirname(trafilatura.__file__), "settings.cfg"), "trafilatura"),
 ]
 
