@@ -52,7 +52,7 @@ class CrawlerState(object):
             self.jobs_doing -= 1
 
     @contextmanager
-    def working(self):
+    def task(self):
         try:
             self.inc_working()
             yield

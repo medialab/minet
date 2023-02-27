@@ -9,10 +9,10 @@ CrawlJobOutputDataType = TypeVar("CrawlJobOutputDataType")
 
 
 class CrawlJob(Generic[CrawlJobDataType]):
-    __slots__ = ("url", "level", "spider", "data", "__has_cached_domain", "__domain")
+    __slots__ = ("url", "depth", "spider", "data", "__has_cached_domain", "__domain")
 
     url: str
-    level: int
+    depth: int
     spider: Optional[str]
     data: Optional[CrawlJobDataType]
 
@@ -24,12 +24,12 @@ class CrawlJob(Generic[CrawlJobDataType]):
     def __init__(
         self,
         url: str,
-        level: int = 0,
+        depth: int = 0,
         spider: Optional[str] = None,
         data: Optional[CrawlJobDataType] = None,
     ):
         self.url = ensure_protocol(url).strip()
-        self.level = level
+        self.depth = depth
         self.spider = spider
         self.data = data
 
@@ -37,11 +37,11 @@ class CrawlJob(Generic[CrawlJobDataType]):
         self.__domain = None
 
     def __getstate__(self):
-        return (self.url, self.level, self.spider, self.data)
+        return (self.url, self.depth, self.spider, self.data)
 
     def __setstate__(self, state):
         self.url = state[0]
-        self.level = state[1]
+        self.depth = state[1]
         self.spider = state[2]
         self.data = state[3]
 
@@ -63,10 +63,10 @@ class CrawlJob(Generic[CrawlJobDataType]):
     def __repr__(self):
         class_name = self.__class__.__name__
 
-        return ("<%(class_name)s level=%(level)s url=%(url)s spider=%(spider)s>") % {
+        return ("<%(class_name)s depth=%(depth)s url=%(url)s spider=%(spider)s>") % {
             "class_name": class_name,
             "url": self.url,
-            "level": self.level,
+            "depth": self.depth,
             "spider": self.spider,
         }
 

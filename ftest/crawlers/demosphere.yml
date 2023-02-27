@@ -1,12 +1,11 @@
 ---
 spiders:
-
   # Retrieving links to the month pages
   archive:
     start_url: https://paris.demosphere.net/?selectStartTime=1172703601&endTime=1175378401&limit=1000&showArchiveLinks=1
     next:
       scraper:
-        sel: '#archive > table td > a'
+        sel: "#archive > table td > a"
         fields:
           url:
             attr: href
@@ -30,7 +29,6 @@ spiders:
   # Retrieving the actual events
   rv:
     scrapers:
-
       # Scraping events
       events:
         fields:
@@ -40,19 +38,19 @@ spiders:
             sel: link[rel=canonical]
             attr: href
           date:
-            sel: '#dateContents > .date'
+            sel: "#dateContents > .date"
             attr: data-val
           time:
-            sel: '#dateContents > .time'
+            sel: "#dateContents > .time"
             attr: data-val
           themes:
             it: .topicsList > a
-            join: '|'
+            join: "|"
           comments:
             sel: .actionBoxLinkText
             eval: "re.sub(r'[^0-9]', '', value)"
           parts:
-            sel: '#textPart0 .textNav > a'
+            sel: "#textPart0 .textNav > a"
             eval: len(elements)
             default: 1
           address:
@@ -121,8 +119,8 @@ spiders:
           links:
             it: .demosphere-source-link > a
             item: href
-            join: '|'
+            join: "|"
           sources:
             it: .demosphere-sources > a
             item: href
-            join: '|'
+            join: "|"

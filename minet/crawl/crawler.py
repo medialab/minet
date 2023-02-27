@@ -84,7 +84,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
     ) -> Union[object, CrawlResult[CrawlJobDataType, CrawlJobOutputDataType]]:
 
         # Registering work
-        with self.crawler.state.working():
+        with self.crawler.state.task():
             cancel_event = self.crawler.cancel_event
 
             result = CrawlResult(job)

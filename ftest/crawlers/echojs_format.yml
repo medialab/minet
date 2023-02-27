@@ -1,8 +1,8 @@
 ---
 start_url: https://echojs.com/latest
 next:
-  format: 'https://echojs.com/latest/{level * 30}'
-max_level: 2
+  format: "https://echojs.com/latest/{level * 30}"
+max_depth: 2
 scraper:
   iterator: article > h2 > a
   fields:
