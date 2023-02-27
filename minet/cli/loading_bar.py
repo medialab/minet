@@ -344,7 +344,7 @@ class LoadingBar(object):
             self.bar_column.pulse_style = "success"
             self.bar_column.style = "success"
 
-        self.stop
+        self.stop()
 
     @contextmanager
     def step(self, item=None, count=1, index=None, catch=None):
