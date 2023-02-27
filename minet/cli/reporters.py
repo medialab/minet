@@ -16,6 +16,8 @@ from urllib3.exceptions import (
     NewConnectionError,
     ProtocolError,
     DecodeError,
+    LocationValueError,
+    LocationParseError,
 )
 
 from minet.exceptions import (
@@ -99,6 +101,8 @@ ERROR_REPORTERS = {
     FileNotFoundError: "file-not-found",
     MaxRetryError: max_retry_error_reporter,
     InvalidURLError: "invalid-url",
+    LocationValueError: "invalid-url",
+    LocationParseError: "invalid-url",
     SSLError: "ssl",
     NewConnectionError: new_connection_error_reporter,
     ProtocolError: protocol_error_reporter,
