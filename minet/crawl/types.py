@@ -1,6 +1,6 @@
 from typing import TypeVar, Mapping, Union, Generic, Optional
 
-from ural import get_domain_name
+from ural import get_domain_name, ensure_protocol
 
 from minet.web import Response
 
@@ -28,7 +28,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
         spider: Optional[str] = None,
         data: Optional[CrawlJobDataType] = None,
     ):
-        self.url = url
+        self.url = ensure_protocol(url).strip()
         self.level = level
         self.spider = spider
         self.data = data
