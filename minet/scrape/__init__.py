@@ -7,6 +7,7 @@
 from typing import Dict, Optional, Union
 
 from bs4 import BeautifulSoup, SoupStrainer
+from casanova import CSVSerializer
 
 from minet.types import AnyFileTarget
 from minet.fs import load_definition
@@ -41,16 +42,6 @@ def scrape(
     return interpret_scraper(scraper, soup, root=soup, context=context)
 
 
-def format_value_for_csv(value, plural_separator="|"):
-    if isinstance(value, list):
-        return plural_separator.join(str(v) for v in value)
-
-    if isinstance(value, bool):
-        return "true" if value else "false"
-
-    return value
-
-
 class Scraper(object):
     def __init__(
         self, definition: Union[Dict, AnyFileTarget], strain: Optional[str] = None
@@ -72,6 +63,9 @@ class Scraper(object):
         self.headers = analysis.headers
         self.plural = analysis.plural
         self.output_type = analysis.output_type
+
+        # Serializer
+        self.serializer = CSVSerializer()
 
         # Strainer
         self.strainer = None
@@ -108,12 +102,10 @@ class Scraper(object):
             for item in result:
                 if isinstance(item, dict):
                     for k, v in item.items():
-                        item[k] = format_value_for_csv(
-                            v, plural_separator=plural_separator
-                        )
+                        item[k] = self.serializer(v, plural_separator=plural_separator)
                 else:
                     item = {
-                        "value": format_value_for_csv(
+                        "value": self.serializer(
                             item, plural_separator=plural_separator
                         )
                     }
