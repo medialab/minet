@@ -88,18 +88,20 @@ UrlOrCrawlJob = Union[str, CrawlJob[CrawlJobDataType]]
 
 
 class CrawlResult(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
-    __slots__ = ("job", "output", "error", "response")
+    __slots__ = ("job", "output", "error", "response", "degree")
 
     job: CrawlJob[CrawlJobDataType]
     output: Optional[CrawlJobOutputDataType]
     error: Optional[Exception]
     response: Optional[Response]
+    degree: int
 
     def __init__(self, job: CrawlJob[CrawlJobDataType]):
         self.job = job
         self.output = None
         self.error = None
         self.response = None
+        self.degree = 0
 
     def __repr__(self):
         name = self.__class__.__name__

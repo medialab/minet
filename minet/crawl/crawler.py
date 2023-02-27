@@ -143,7 +143,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
                     return CANCELLED
 
                 if next_jobs is not None:
-                    self.crawler.enqueue(
+                    result.degree = self.crawler.enqueue(
                         next_jobs, spider=spider_name, depth=job.depth + 1
                     )
 
@@ -174,9 +174,10 @@ class Crawler(
     queue: "Queue[CrawlJob[CrawlJobDataTypes]]"
     lock: Lock
 
-    using_persistent_queue: bool
+    persistent: bool
     state: CrawlerState
     started: bool
+    singular: bool
     spiders: Dict[str, Spider[CrawlJobDataTypes, CrawlJobOutputDataTypes]]
 
     def __init__(
@@ -201,12 +202,12 @@ class Crawler(
         # Params
         self.queue_path = queue_path
 
-        self.using_persistent_queue = queue_path is not None
+        self.persistent = queue_path is not None
         self.state = CrawlerState()
         self.started = False
 
         # Memory queue
-        if not self.using_persistent_queue:
+        if not self.persistent:
             queue = Queue()
 
         # Persistent queue
@@ -218,15 +219,21 @@ class Crawler(
         # Spiders
         if isinstance(spiders, Spider):
             self.spiders = {DEFAULT_SPIDER_KEY: spiders}
+            self.singular = True
         elif isinstance(spiders, Mapping):
             self.spiders = {}
+            self.singular = False
 
             for name, spider in spiders.items():
                 self.spiders[name] = spider
         else:
             raise TypeError("expecting a single spider or a mapping of spiders")
 
-    def start(self):
+    @property
+    def plural(self) -> bool:
+        return not self.singular
+
+    def start(self) -> None:
 
         if self.started:
             raise RuntimeError("Crawler already started")
@@ -252,11 +259,7 @@ class Crawler(
 
         self.started = False
 
-        if (
-            self.using_persistent_queue
-            and self.queue_path is not None
-            and self.queue.qsize() == 0
-        ):
+        if self.persistent and self.queue_path is not None and self.queue.qsize() == 0:
             del self.queue
             rmtree(self.queue_path, ignore_errors=True)
 
@@ -303,8 +306,10 @@ class Crawler(
         ],
         spider: Optional[str] = None,
         depth: int = 0,
-    ) -> None:
+    ) -> int:
         with self.lock:
+            count = 0
+
             if isinstance(job_or_jobs, (str, CrawlJob)):
                 jobs = [job_or_jobs]
             else:
@@ -321,8 +326,11 @@ class Crawler(
                 if job.depth is None:
                     job.depth = depth
 
+                count += 1
                 self.queue.put(job)
                 self.state.inc_queued()
+
+            return count
 
     # NOTE: this is clearly not threadsafe lol. This is for debug only.
     def dump_queue(self):

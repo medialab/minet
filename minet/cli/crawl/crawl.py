@@ -4,13 +4,16 @@
 #
 # Logic of the crawl action.
 #
+from typing import List, Any, Optional, Union, TextIO, Tuple
+
 import os
-import csv
+import casanova
 from os.path import join, isfile, dirname
 from shutil import rmtree
 from ebbe.decorators import with_defer
 
-from minet.crawl import Crawler
+from minet.scrape import Scraper
+from minet.crawl import Crawler, CrawlResult, DefinitionSpiderOutput
 from minet.cli.reporters import report_error
 from minet.cli.utils import with_loading_bar
 
@@ -23,11 +26,13 @@ JOBS_HEADERS = [
     "filename",
     "encoding",
     "next",
-    "level",
+    "depth",
 ]
 
 
-def format_job_for_csv(result):
+def format_job_for_csv(
+    result: CrawlResult[Any, DefinitionSpiderOutput]
+) -> List[Optional[Union[str, int]]]:
     if result.error is not None:
         return [
             result.job.spider,
@@ -38,25 +43,29 @@ def format_job_for_csv(result):
             "",
             "",
             "0",
-            result.job.level,
+            result.job.depth,
         ]
 
-    resolved = result.response.geturl()
+    response = result.response
+
+    assert response is not None
 
     return [
         result.job.spider,
         result.job.url,
-        resolved if resolved != result.job.url else "",
-        result.response.status,
+        response.end_url if response.was_redirected else "",
+        response.status,
         "",
         "",
-        result.meta.get("encoding", ""),
-        len(result.next_jobs) if result.next_jobs is not None else "0",
-        result.job.level,
+        response.encoding,
+        result.degree,
+        result.job.depth,
     ]
 
 
-def open_report(path, headers, resume=False):
+def open_report(
+    path: str, headers: List[str], resume: bool = False
+) -> Tuple[TextIO, casanova.Writer]:
     flag = "w"
 
     if resume and isfile(path):
@@ -65,7 +74,7 @@ def open_report(path, headers, resume=False):
     os.makedirs(dirname(path), exist_ok=True)
 
     f = open(path, flag, encoding="utf-8")
-    writer = csv.writer(f)
+    writer = casanova.writer(f)
 
     if flag == "w":
         writer.writerow(headers)
@@ -74,7 +83,7 @@ def open_report(path, headers, resume=False):
 
 
 class ScraperReporter(object):
-    def __init__(self, path, scraper, resume=False):
+    def __init__(self, path: str, scraper: Scraper, resume=False):
         if scraper.headers is None:
             raise NotImplementedError("Scraper headers could not be inferred.")
 
@@ -103,12 +112,12 @@ class ScraperReporter(object):
 
 
 class ScraperReporterPool(object):
-    SINGLE_SCRAPER = "$SINGLE_SCRAPER$"
+    SINGULAR = "$SINGULAR$"
 
-    def __init__(self, crawler, output_dir, resume=False):
+    def __init__(self, crawler: Crawler, output_dir: str, resume=False):
         self.reporters = {}
 
-        if crawler.single_spider:
+        if crawler.singular:
             spider = crawler.spiders["default"]
 
             self.reporters["default"] = {}
@@ -116,7 +125,7 @@ class ScraperReporterPool(object):
             if spider.scraper is not None:
                 path = join(output_dir, "scraped.csv")
                 reporter = ScraperReporter(path, spider.scraper, resume)
-                self.reporters["default"][ScraperReporterPool.SINGLE_SCRAPER] = reporter
+                self.reporters["default"][ScraperReporterPool.SINGULAR] = reporter
 
             for name, scraper in spider.scrapers.items():
                 path = join(output_dir, "scraped", "%s.csv" % name)
@@ -130,9 +139,7 @@ class ScraperReporterPool(object):
                 if spider.scraper is not None:
                     path = join(output_dir, "scraped", spider_name, "scraped.csv")
                     reporter = ScraperReporter(path, spider.scraper, resume)
-                    self.reporters[spider_name][
-                        ScraperReporterPool.SINGLE_SCRAPER
-                    ] = reporter
+                    self.reporters[spider_name][ScraperReporterPool.SINGULAR] = reporter
 
                 for name, scraper in spider.scrapers.items():
                     path = join(output_dir, "scraped", spider_name, "%s.csv" % name)
@@ -144,7 +151,7 @@ class ScraperReporterPool(object):
         reporter = self.reporters[spider_name]
 
         if scraped["single"] is not None:
-            reporter[ScraperReporterPool.SINGLE_SCRAPER].write(scraped["single"])
+            reporter[ScraperReporterPool.SINGULAR].write(scraped["single"])
 
         for name, items in scraped["multiple"].items():
             reporter[name].write(items)

@@ -4,7 +4,7 @@
 #
 # Module exposing utilities related to minet's scraping DSL.
 #
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, List
 
 from bs4 import BeautifulSoup, SoupStrainer
 from casanova import CSVSerializer
@@ -12,7 +12,7 @@ from casanova import CSVSerializer
 from minet.types import AnyFileTarget
 from minet.fs import load_definition
 from minet.scrape.interpreter import interpret_scraper
-from minet.scrape.analysis import analyse, validate
+from minet.scrape.analysis import analyse, validate, ScraperAnalysisOutputType
 from minet.scrape.straining import strainer_from_css
 from minet.scrape.exceptions import ScraperNotTabularError, InvalidScraperError
 
@@ -43,6 +43,11 @@ def scrape(
 
 
 class Scraper(object):
+    definition: Dict
+    headers: Optional[List[str]]
+    plural: bool
+    output_type: ScraperAnalysisOutputType
+
     def __init__(
         self, definition: Union[Dict, AnyFileTarget], strain: Optional[str] = None
     ):
