@@ -9,12 +9,21 @@ CrawlJobOutputDataType = TypeVar("CrawlJobOutputDataType")
 
 
 class CrawlJob(Generic[CrawlJobDataType]):
-    __slots__ = ("url", "depth", "spider", "data", "__has_cached_domain", "__domain")
+    __slots__ = (
+        "url",
+        "depth",
+        "spider",
+        "data",
+        "attempts",
+        "__has_cached_domain",
+        "__domain",
+    )
 
     url: str
     depth: Optional[int]
     spider: Optional[str]
     data: Optional[CrawlJobDataType]
+    attempts: int
 
     # TODO: we should add headers, cookies and such here in the future
 
@@ -32,6 +41,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
         self.depth = depth
         self.spider = spider
         self.data = data
+        self.attempts = 0
 
         self.__has_cached_domain = False
         self.__domain = None
@@ -63,12 +73,15 @@ class CrawlJob(Generic[CrawlJobDataType]):
     def __repr__(self):
         class_name = self.__class__.__name__
 
-        return ("<%(class_name)s depth=%(depth)s url=%(url)s spider=%(spider)s>") % {
-            "class_name": class_name,
-            "url": self.url,
-            "depth": self.depth,
-            "spider": self.spider,
-        }
+        return (
+            "<{class_name} depth={depth!r}url={url!r} spider={spider!r} attempts={attempts!r}>"
+        ).format(
+            class_name=class_name,
+            url=self.url,
+            depth=self.depth,
+            spider=self.spider,
+            attempts=self.attempts,
+        )
 
 
 UrlOrCrawlJob = Union[str, CrawlJob[CrawlJobDataType]]
