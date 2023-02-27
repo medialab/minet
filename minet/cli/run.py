@@ -12,7 +12,6 @@ import importlib
 import multiprocessing
 import casanova
 from contextlib import ExitStack
-from encodings import idna  # NOTE: this is necessary for pyinstaller build
 
 from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
 from minet.loggers import sleepers_logger
