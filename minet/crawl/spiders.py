@@ -90,11 +90,12 @@ class FunctionSpider(Spider[CrawlJobDataType, CrawlJobOutputDataType]):
         return self.fn(job, response)
 
 
-class DefinitionSpiderCrawlJobOutputDataType(
-    TypedDict, Generic[CrawlJobOutputDataType]
-):
-    single: Optional[CrawlJobOutputDataType]
-    multiple: Dict[str, CrawlJobOutputDataType]
+class DefinitionSpiderOutput(Generic[CrawlJobOutputDataType]):
+    __slots__ = ("default", "named")
+
+    def __init__(self):
+        self.default = None
+        self.named = {}
 
 
 class DefinitionSpiderTarget(TypedDict, Generic[CrawlJobDataType]):
@@ -104,9 +105,7 @@ class DefinitionSpiderTarget(TypedDict, Generic[CrawlJobDataType]):
 
 
 class DefinitionSpider(
-    Spider[
-        CrawlJobDataType, DefinitionSpiderCrawlJobOutputDataType[CrawlJobOutputDataType]
-    ]
+    Spider[CrawlJobDataType, DefinitionSpiderOutput[CrawlJobOutputDataType]]
 ):
     definition: Dict[str, Any]
     next_definition: Optional[Dict[str, Any]]
@@ -163,19 +162,16 @@ class DefinitionSpider(
 
     def __scrape(
         self, job: CrawlJob[CrawlJobDataType], response: Response, soup: BeautifulSoup
-    ) -> DefinitionSpiderCrawlJobOutputDataType[CrawlJobOutputDataType]:
-        scraped: DefinitionSpiderCrawlJobOutputDataType[CrawlJobOutputDataType] = {
-            "single": None,
-            "multiple": {},
-        }
+    ) -> DefinitionSpiderOutput[CrawlJobOutputDataType]:
+        scraped = DefinitionSpiderOutput[CrawlJobOutputDataType]()
 
         context = {"job": job.id(), "url": job.url}
 
         if self.scraper is not None:
-            scraped["single"] = self.scraper(soup, context=context)
+            scraped.default = self.scraper(soup, context=context)
 
         for name, scraper in self.scrapers.items():
-            scraped["multiple"][name] = scraper(soup, context=context)
+            scraped.named[name] = scraper(soup, context=context)
 
         return scraped
 
@@ -242,9 +238,7 @@ class DefinitionSpider(
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType], response: Response
-    ) -> SpiderResult[
-        DefinitionSpiderCrawlJobOutputDataType[CrawlJobOutputDataType], CrawlJobDataType
-    ]:
+    ) -> SpiderResult[DefinitionSpiderOutput[CrawlJobOutputDataType], CrawlJobDataType]:
         soup = response.soup()
 
         return self.__scrape(job, response, soup), self.__next_jobs(job, response, soup)
