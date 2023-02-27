@@ -6,7 +6,7 @@
 #
 from urllib.parse import quote_plus
 
-from minet.web import request_json
+from minet.web import request
 from minet.mediacloud.constants import MEDIACLOUD_API_BASE_URL, MEDIACLOUD_DEFAULT_BATCH
 from minet.mediacloud.exceptions import MediacloudServerError
 from minet.mediacloud.formatters import format_story
@@ -135,7 +135,8 @@ def mediacloud_search(
                 last_processed_stories_id=last_processed_stories_id,
             )
 
-            response, data = request_json(url, pool_manager=pool_manager)
+            response = request(url, pool_manager=pool_manager, known_encoding="utf-8")
+            data = response.json()
 
             if response.status >= 500:
                 raise MediacloudServerError(server_error=data.get("error"))

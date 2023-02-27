@@ -4,7 +4,7 @@
 #
 # Function related to topics.
 #
-from minet.web import request_json
+from minet.web import request
 from minet.mediacloud.constants import MEDIACLOUD_API_BASE_URL, MEDIACLOUD_DEFAULT_BATCH
 from minet.mediacloud.utils import get_next_link_id
 from minet.mediacloud.formatters import format_topic_story
@@ -52,7 +52,8 @@ def mediacloud_topic_stories(
             from_media_id=from_media_id,
         )
 
-        _, data = request_json(url, pool_manager=pool_manager)
+        response = request(url, pool_manager=pool_manager, known_encoding="utf-8")
+        data = response.json()
 
         if "stories" not in data or len(data["stories"]) == 0:
             return
