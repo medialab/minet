@@ -10,9 +10,11 @@ def scrape_articles(job: CrawlJob, response: Response):
     return titles, None
 
 
-with Crawler.from_definition(
+crawler = Crawler.from_definition(
     "./ftest/crawlers/echojs_scraper.yml", wait=False, daemonic=True
-) as crawler:
+)
+
+with crawler:
     for result in crawler:
         print(result)
 

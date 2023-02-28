@@ -72,7 +72,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
         class_name = self.__class__.__name__
 
         return (
-            "<{class_name} depth={depth!r}url={url!r} spider={spider!r} attempts={attempts!r}>"
+            "<{class_name} depth={depth!r} url={url!r} spider={spider!r} attempts={attempts!r}>"
         ).format(
             class_name=class_name,
             url=self.url,

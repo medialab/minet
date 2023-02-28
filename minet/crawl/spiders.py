@@ -165,7 +165,7 @@ class DefinitionSpider(
     ) -> DefinitionSpiderOutput[CrawlJobOutputDataType]:
         scraped = DefinitionSpiderOutput[CrawlJobOutputDataType]()
 
-        context = {"job": job.id(), "url": job.url}
+        context = {"url": job.url}
 
         if self.scraper is not None:
             scraped.default = self.scraper(soup, context=context)

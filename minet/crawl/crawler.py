@@ -90,9 +90,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
             cancel_event = self.crawler.cancel_event
 
             result = CrawlResult(job)
-            spider_name = job.spider or DEFAULT_SPIDER_KEY
-
-            spider = self.crawler.get_spider(spider_name)
+            spider = self.crawler.get_spider(job.spider)
 
             if spider is None:
                 result.error = UnknownSpiderError(spider=job.spider)
@@ -146,7 +144,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
 
                 if next_jobs is not None:
                     result.degree = self.crawler.enqueue(
-                        next_jobs, spider=spider_name, depth=job.depth + 1
+                        next_jobs, spider=job.spider, depth=job.depth + 1
                     )
 
             except Exception as error:
@@ -231,16 +229,23 @@ class Crawler(
         else:
             raise TypeError("expecting a single spider or a mapping of spiders")
 
+    def __repr__(self):
+        class_name = self.__class__.__name__
+
+        return "<{class_name} {number}>".format(
+            class_name=class_name, number="singular" if self.singular else "plural"
+        )
+
     @property
     def plural(self) -> bool:
         return not self.singular
 
     def get_spider(self, name: Optional[str] = None) -> Spider:
         if name is None and self.plural:
-            raise TypeError("singular crawler cannot return a spider by name")
+            raise TypeError("plural crawler cannot return default spider")
 
         if name is not None and self.singular:
-            raise TypeError("plural crawler cannot return default spider")
+            raise TypeError("singular crawler cannot return a spider by name")
 
         if name is None:
             name = DEFAULT_SPIDER_KEY
@@ -269,6 +274,9 @@ class Crawler(
             # difficult to resume crawls based upon lazy iterators
             for name, spider in self.__spiders.items():
                 spider_start_jobs = spider.start_jobs()
+
+                if self.singular:
+                    name = None
 
                 if spider_start_jobs is not None:
                     self.enqueue(spider_start_jobs, spider=name)
