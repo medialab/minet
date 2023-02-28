@@ -98,6 +98,9 @@ def run(name, version, commands):
             fn = getattr(m, "action")
 
         with ExitStack() as stack:
+            stack.callback(sys.stdout.flush)
+            stack.callback(sys.stderr.flush)
+
             for buffer in to_close:
                 stack.callback(buffer.close)
 

@@ -381,9 +381,6 @@ def with_ctrl_c_warning(fn):
         try:
             fn(cli_args, loading_bar=loading_bar, **kwargs)
         except KeyboardInterrupt:
-            if hasattr(cli_args.output, "flush"):
-                cli_args.output.flush()
-
             loading_bar.erase()
             loading_bar.stop()
             console.print("Performing clean shutdown by cancelling ongoing calls...")
