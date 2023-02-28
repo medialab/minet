@@ -284,26 +284,11 @@ class Crawler(
 
         self.started = True
 
-    def stop(self):
-        if not self.started:
-            raise RuntimeError("Cannot stop a crawler that has not yet started")
-
-        self.started = False
-
-        if self.persistent and self.queue.qsize() == 0:
-            assert self.queue_path is not None
-            del self.queue
-            rmtree(self.queue_path, ignore_errors=True)
-
     def __enter__(self):
         super().__enter__()
         self.start()
 
         return self
-
-    def __exit__(self, *exc):
-        self.stop()
-        return super().__exit__(*exc)
 
     def __iter__(self):
         worker = CrawlWorker(self)
@@ -328,6 +313,12 @@ class Crawler(
                 yield result
 
                 self.queue.task_done()
+
+            # If we finished iteration
+            if self.persistent and self.queue.qsize() == 0:
+                assert self.queue_path is not None
+                del self.queue
+                rmtree(self.queue_path, ignore_errors=True)
 
         return safe_wrapper()
 
