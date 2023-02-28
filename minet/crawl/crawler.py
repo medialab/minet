@@ -19,6 +19,7 @@ from typing import (
     Union,
 )
 
+from os.path import exists
 from queue import Queue, Empty
 from persistqueue import SQLiteQueue
 from shutil import rmtree
@@ -185,6 +186,7 @@ class Crawler(
         self,
         spiders: Spiders[CrawlJobDataTypes, CrawlJobOutputDataTypes],
         queue_path: Optional[str] = None,
+        resume: bool = False,
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         throttle: float = DEFAULT_THROTTLE,
@@ -202,12 +204,22 @@ class Crawler(
 
         # Params
         self.queue_path = queue_path
-
         self.persistent = queue_path is not None
-        self.state = CrawlerState()
         self.started = False
+        self.resuming = False
 
-        # Memory queue
+        # Resuming?
+        if self.persistent:
+            assert self.queue_path is not None
+
+            if not resume:
+                if self.persistent:
+                    rmtree(self.queue_path, ignore_errors=True)
+            else:
+                if exists(self.queue_path):
+                    self.resuming = True
+
+        # Memory queue)
         if not self.persistent:
             queue = Queue()
 
@@ -216,6 +228,9 @@ class Crawler(
             queue = SQLiteQueue(queue_path, multithreading=True, auto_commit=False)
 
         self.queue = cast("Queue[CrawlJob[CrawlJobDataTypes]]", queue)
+
+        # Initializing state
+        self.state = CrawlerState(jobs_queued=self.queue.qsize())
 
         # Spiders
         if isinstance(spiders, Spider):
@@ -267,8 +282,8 @@ class Crawler(
         if self.started:
             raise RuntimeError("Crawler already started")
 
-        # Collecting start jobs - we only add those if queue is not pre-existing
-        if self.queue.qsize() == 0:
+        # Collecting start jobs - we only add those if we are not resuming
+        if not self.resuming:
 
             # NOTE: start jobs are all buffered into memory
             # We could use a blocking queue with max size but this could prove

@@ -8,8 +8,7 @@ from typing import List, Any, Optional, Union, TextIO, Tuple
 
 import os
 import casanova
-from os.path import join, isfile, dirname, exists
-from shutil import rmtree
+from os.path import join, isfile, dirname
 from ebbe.decorators import with_defer
 
 from minet.cli.exceptions import FatalError
@@ -185,12 +184,6 @@ def action(cli_args, defer, loading_bar: LoadingBar):
     # Loading crawler definition
     queue_path = join(cli_args.output_dir, "queue")
 
-    if cli_args.resume:
-        if exists(queue_path):
-            loading_bar.print("[log.time]Will now resume…")
-    else:
-        rmtree(queue_path, ignore_errors=True)
-
     # Scaffolding output directory
     os.makedirs(cli_args.output_dir, exist_ok=True)
 
@@ -206,6 +199,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
             cli_args.crawler,
             throttle=cli_args.throttle,
             queue_path=queue_path,
+            resume=cli_args.resume,
             wait=False,
             daemonic=False,
         )
@@ -226,6 +220,9 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         console.print("Total:", "[success]{}".format(len(jobs)))
         crawler.shutdown()
         return
+
+    if crawler.resuming:
+        loading_bar.print("[log.time]Will now resume…")
 
     with crawler:
 

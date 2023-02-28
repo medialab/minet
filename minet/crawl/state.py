@@ -21,12 +21,16 @@ class CrawlerState(object):
 
     __lock: Lock
 
-    def __init__(self, listener: Optional[CrawlerStateListener] = None):
+    def __init__(
+        self,
+        jobs_queued: Optional[int] = None,
+        listener: Optional[CrawlerStateListener] = None,
+    ):
         self.__lock = Lock()
 
         self.jobs_done = 0
         self.jobs_doing = 0
-        self.jobs_queued = 0
+        self.jobs_queued = jobs_queued if jobs_queued is not None else 0
 
         self.listener = listener
 
