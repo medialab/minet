@@ -35,7 +35,7 @@ setup(
         "lxml>=4.3.0",
         "persist-queue>=0.7.0",
         "pyyaml",
-        "quenouille>=1.5.0,<2",
+        "quenouille>=1.5.1,<2",
         "rich>=13,<14",
         "soupsieve>=2.1,<3",
         "tenacity>=8,<9",
