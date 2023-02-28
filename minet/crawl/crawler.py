@@ -290,7 +290,8 @@ class Crawler(
 
         self.started = False
 
-        if self.persistent and self.queue_path is not None and self.queue.qsize() == 0:
+        if self.persistent and self.queue.qsize() == 0:
+            assert self.queue_path is not None
             del self.queue
             rmtree(self.queue_path, ignore_errors=True)
 
