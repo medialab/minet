@@ -47,13 +47,14 @@ class CrawlJob(Generic[CrawlJobDataType]):
         self.__domain = None
 
     def __getstate__(self):
-        return (self.url, self.depth, self.spider, self.data)
+        return (self.url, self.depth, self.spider, self.data, self.attempts)
 
     def __setstate__(self, state):
         self.url = state[0]
         self.depth = state[1]
         self.spider = state[2]
         self.data = state[3]
+        self.attempts = state[4]
 
     @property
     def domain(self) -> Optional[str]:
