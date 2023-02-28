@@ -169,7 +169,15 @@ class ScraperReporterPool(object):
 
 
 @with_defer()
-@with_loading_bar(title="Crawling", unit="pages")
+@with_loading_bar(
+    title="Crawling",
+    unit="pages",
+    stats=[
+        {"name": "queued", "style": "info"},
+        {"name": "doing", "style": "warning"},
+        {"name": "done", "style": "success"},
+    ],
+)
 @with_ctrl_c_warning
 def action(cli_args, defer, loading_bar: LoadingBar):
 
@@ -218,6 +226,9 @@ def action(cli_args, defer, loading_bar: LoadingBar):
 
         def on_state_update(state: CrawlerState):
             loading_bar.set_total(state.total)
+            loading_bar.set_stat("queued", state.jobs_queued)
+            loading_bar.set_stat("doing", state.jobs_doing)
+            loading_bar.set_stat("done", state.jobs_done)
 
         crawler.state.set_listener(on_state_update)
 
