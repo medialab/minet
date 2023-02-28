@@ -13,6 +13,7 @@ from shutil import rmtree
 from ebbe.decorators import with_defer
 
 from minet.cli.exceptions import FatalError
+from minet.cli.console import console
 from minet.scrape import Scraper
 from minet.scrape.exceptions import InvalidScraperError
 from minet.crawl import Crawler, CrawlResult, CrawlerState, DefinitionSpiderOutput
@@ -215,6 +216,16 @@ def action(cli_args, defer, loading_bar: LoadingBar):
                 report_scraper_validation_errors(error.validation_errors),
             ]
         )
+
+    if cli_args.dump_queue:
+        loading_bar.stop()
+        jobs = crawler.dump_queue()
+        for job in jobs:
+            console.print("[info_background]depth={}".format(job.depth), job.url)
+
+        console.print("Total:", "[success]{}".format(len(jobs)))
+        crawler.shutdown()
+        return
 
     with crawler:
 
