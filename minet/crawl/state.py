@@ -4,52 +4,80 @@
 #
 # Simple class representing a miner Crawler's state.
 #
+from typing import Callable, Optional
+
 from threading import Lock
 from contextlib import contextmanager
+
+CrawlerStateListener = Callable[["CrawlerState"], None]
 
 
 class CrawlerState(object):
     jobs_done: int
     jobs_doing: int
     jobs_queued: int
+
+    listener: Optional[CrawlerStateListener]
+
     __lock: Lock
 
-    def __init__(self):
+    def __init__(self, listener: Optional[CrawlerStateListener] = None):
         self.__lock = Lock()
 
         self.jobs_done = 0
         self.jobs_doing = 0
         self.jobs_queued = 0
 
+        self.listener = listener
+
+    @property
+    def total(self) -> int:
+        return self.jobs_done + self.jobs_doing + self.jobs_queued
+
+    def __notify(self):
+        if callable(self.listener):
+            self.listener(self)
+
+    def set_listener(self, listener: CrawlerStateListener):
+        with self.__lock:
+            self.listener = listener
+
     def inc_queued(self) -> None:
         with self.__lock:
             self.jobs_queued += 1
+            self.__notify()
 
     def dec_queued(self) -> None:
         with self.__lock:
             self.jobs_queued -= 1
+            self.__notify()
 
     def inc_done(self) -> None:
         with self.__lock:
             self.jobs_done += 1
+            self.__notify()
 
     def inc_doing(self) -> None:
         with self.__lock:
             self.jobs_doing += 1
+            self.__notify()
 
     def dec_doing(self) -> None:
         with self.__lock:
             self.jobs_doing -= 1
+            self.__notify()
 
     def inc_working(self) -> None:
         with self.__lock:
             self.jobs_queued -= 1
             self.jobs_doing += 1
+            self.__notify()
 
     def dec_working(self) -> None:
         with self.__lock:
             self.jobs_done += 1
             self.jobs_doing -= 1
+            self.__notify()
 
     @contextmanager
     def task(self):

@@ -15,8 +15,9 @@ from ebbe.decorators import with_defer
 from minet.cli.exceptions import FatalError
 from minet.scrape import Scraper
 from minet.scrape.exceptions import InvalidScraperError
-from minet.crawl import Crawler, CrawlResult, DefinitionSpiderOutput
+from minet.crawl import Crawler, CrawlResult, CrawlerState, DefinitionSpiderOutput
 from minet.cli.reporters import report_error, report_scraper_validation_errors
+from minet.cli.loading_bar import LoadingBar
 from minet.cli.utils import with_loading_bar, with_ctrl_c_warning
 
 JOBS_HEADERS = [
@@ -170,7 +171,7 @@ class ScraperReporterPool(object):
 @with_defer()
 @with_loading_bar(title="Crawling", unit="pages")
 @with_ctrl_c_warning
-def action(cli_args, defer, loading_bar):
+def action(cli_args, defer, loading_bar: LoadingBar):
 
     # Loading crawler definition
     queue_path = join(cli_args.output_dir, "queue")
@@ -214,7 +215,10 @@ def action(cli_args, defer, loading_bar):
         )
         defer(reporter_pool.close)
 
-        # TODO: update loading bar total using crawler state
+        def on_state_update(state: CrawlerState):
+            loading_bar.set_total(state.total)
+
+        crawler.state.set_listener(on_state_update)
 
         # Running crawler
         for result in crawler:
