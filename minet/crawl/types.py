@@ -56,6 +56,9 @@ class CrawlJob(Generic[CrawlJobDataType]):
         self.data = state[3]
         self.attempts = state[4]
 
+        self.__has_cached_domain = False
+        self.__domain = None
+
     @property
     def domain(self) -> Optional[str]:
         if self.__has_cached_domain:

@@ -11,7 +11,7 @@ def scrape_articles(job: CrawlJob, response: Response):
 
 
 crawler = Crawler.from_definition(
-    "./ftest/crawlers/echojs_scraper.yml", wait=False, daemonic=True
+    "./ftest/crawlers/echojs_crawl.yml", wait=False, daemonic=True
 )
 
 with crawler:
