@@ -12,10 +12,12 @@ from os.path import join, isfile, dirname
 from shutil import rmtree
 from ebbe.decorators import with_defer
 
+from minet.cli.exceptions import FatalError
 from minet.scrape import Scraper
+from minet.scrape.exceptions import InvalidScraperError
 from minet.crawl import Crawler, CrawlResult, DefinitionSpiderOutput
-from minet.cli.reporters import report_error
-from minet.cli.utils import with_loading_bar
+from minet.cli.reporters import report_error, report_scraper_validation_errors
+from minet.cli.utils import with_loading_bar, with_ctrl_c_warning
 
 JOBS_HEADERS = [
     "spider",
@@ -118,7 +120,7 @@ class ScraperReporterPool(object):
         self.reporters = {}
 
         if crawler.singular:
-            spider = crawler.spiders["default"]
+            spider = crawler.get_spider()
 
             self.reporters["default"] = {}
 
@@ -147,16 +149,19 @@ class ScraperReporterPool(object):
                     reporter = ScraperReporter(path, scraper, resume)
                     self.reporters[spider_name][name] = reporter
 
-    def write(self, spider_name, scraped):
+    def write(self, spider_name: Optional[str], scraped: DefinitionSpiderOutput):
+        if spider_name is None:
+            spider_name = "default"
+
         reporter = self.reporters[spider_name]
 
-        if scraped["single"] is not None:
-            reporter[ScraperReporterPool.SINGULAR].write(scraped["single"])
+        if scraped.default is not None:
+            reporter[ScraperReporterPool.SINGULAR].write(scraped.default)
 
-        for name, items in scraped["multiple"].items():
+        for name, items in scraped.named.items():
             reporter[name].write(items)
 
-    def close(self):
+    def close(self) -> None:
         for spider_reporters in self.reporters.values():
             for reporter in spider_reporters.values():
                 reporter.close()
@@ -164,6 +169,7 @@ class ScraperReporterPool(object):
 
 @with_defer()
 @with_loading_bar(title="Crawling", unit="pages")
+@with_ctrl_c_warning
 def action(cli_args, defer, loading_bar):
 
     # Loading crawler definition
@@ -184,25 +190,39 @@ def action(cli_args, defer, loading_bar):
     defer(jobs_output.close)
 
     # Creating crawler
-    crawler = Crawler(
-        cli_args.crawler,
-        throttle=cli_args.throttle,
-        queue_path=queue_path,
-        wait=False,
-        daemonic=True,
-    )
+    try:
+        crawler = Crawler.from_definition(
+            cli_args.crawler,
+            throttle=cli_args.throttle,
+            queue_path=queue_path,
+            wait=False,
+            daemonic=False,
+        )
+    except InvalidScraperError as error:
+        raise FatalError(
+            [
+                "Your scraper is invalid! You need to fix the following errors:\n",
+                report_scraper_validation_errors(error.validation_errors),
+            ]
+        )
 
-    reporter_pool = ScraperReporterPool(
-        crawler, cli_args.output_dir, resume=cli_args.resume
-    )
-    defer(reporter_pool.close)
+    with crawler:
 
-    # Running crawler
-    for result in crawler:
-        with loading_bar.step():
-            jobs_writer.writerow(format_job_for_csv(result))
+        # Reporter pool
+        reporter_pool = ScraperReporterPool(
+            crawler, cli_args.output_dir, resume=cli_args.resume
+        )
+        defer(reporter_pool.close)
 
-            if result.error is not None:
-                continue
+        # TODO: update loading bar total using crawler state
 
-            reporter_pool.write(result.job.spider, result.scraped)
+        # Running crawler
+        for result in crawler:
+            with loading_bar.step():
+                jobs_writer.writerow(format_job_for_csv(result))
+
+                if result.error is not None:
+                    loading_bar.inc_stat("errors", style="error")
+                    continue
+
+                reporter_pool.write(result.job.spider, result.output)

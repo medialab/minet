@@ -267,12 +267,11 @@ class Crawler(
             # NOTE: start jobs are all buffered into memory
             # We could use a blocking queue with max size but this could prove
             # difficult to resume crawls based upon lazy iterators
-            if self.spiders is not None:
-                for name, spider in self.spiders.items():
-                    spider_start_jobs = spider.start_jobs()
+            for name, spider in self.__spiders.items():
+                spider_start_jobs = spider.start_jobs()
 
-                    if spider_start_jobs is not None:
-                        self.enqueue(spider_start_jobs, spider=name)
+                if spider_start_jobs is not None:
+                    self.enqueue(spider_start_jobs, spider=name)
 
         self.started = True
 

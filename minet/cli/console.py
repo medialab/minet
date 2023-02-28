@@ -35,6 +35,10 @@ MINET_THEME = Theme(MINET_STYLES)
 
 
 class MinetConsole(Console):
+    def vprint(self, *messages):
+        txt = message_flatmap(*messages)
+        self.print(txt)
+
     def logh(self, header: str, *messages, style=None) -> None:
         txt = message_flatmap(*messages)
 

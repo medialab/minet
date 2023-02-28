@@ -15,6 +15,7 @@ from contextlib import ExitStack
 
 from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
 from minet.loggers import sleepers_logger
+from minet.cli.console import console
 from minet.cli.utils import (
     die,
     get_rcfile,
@@ -105,7 +106,8 @@ def run(name, version, commands):
             except InvalidArgumentsError as e:
                 parser.error(e.message)
             except FatalError as e:
-                die(e.message)
+                console.vprint(e.message)
+                sys.exit(1)
 
     elif cli_args.action == "help":
 

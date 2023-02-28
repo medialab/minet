@@ -377,9 +377,9 @@ def with_enricher_and_loading_bar(
 
 
 def with_ctrl_c_warning(fn):
-    def wrapper(cli_args, loading_bar, enricher, **kwargs):
+    def wrapper(cli_args, loading_bar, **kwargs):
         try:
-            fn(cli_args, loading_bar=loading_bar, enricher=enricher, **kwargs)
+            fn(cli_args, loading_bar=loading_bar, **kwargs)
         except KeyboardInterrupt:
             if hasattr(cli_args.output, "flush"):
                 cli_args.output.flush()

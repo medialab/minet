@@ -148,7 +148,7 @@ def report_scraper_validation_errors(errors):
             "> {error} n°{n} at path {path}{root}".format(
                 error=red_alert,
                 n=n,
-                path=colored(path, "blue"),
+                path=colored(path, "green"),
                 root=(" (root)" if not error.path else ""),
             )
         )
