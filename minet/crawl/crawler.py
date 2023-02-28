@@ -357,11 +357,15 @@ class Crawler(
 
     # NOTE: this is clearly not threadsafe lol. This is for debug only.
     def dump_queue(self):
+        if self.started:
+            raise TypeError("cannot dump queue while crawler is running")
+
         jobs = []
 
         while True:
             try:
                 jobs.append(self.queue.get_nowait())
+                self.queue.task_done()
             except Empty:
                 break
 
