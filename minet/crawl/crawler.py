@@ -10,10 +10,12 @@ from typing import (
     TypeVar,
     Callable,
     Dict,
+    Tuple,
     Any,
     Generic,
     Mapping,
     Iterable,
+    Iterator,
     Union,
 )
 
@@ -90,7 +92,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
             result = CrawlResult(job)
             spider_name = job.spider or DEFAULT_SPIDER_KEY
 
-            spider = self.crawler.spiders.get(spider_name)
+            spider = self.crawler.get_spider(spider_name)
 
             if spider is None:
                 result.error = UnknownSpiderError(spider=job.spider)
@@ -178,7 +180,7 @@ class Crawler(
     state: CrawlerState
     started: bool
     singular: bool
-    spiders: Dict[str, Spider[CrawlJobDataTypes, CrawlJobOutputDataTypes]]
+    __spiders: Dict[str, Spider[CrawlJobDataTypes, CrawlJobOutputDataTypes]]
 
     def __init__(
         self,
@@ -218,20 +220,41 @@ class Crawler(
 
         # Spiders
         if isinstance(spiders, Spider):
-            self.spiders = {DEFAULT_SPIDER_KEY: spiders}
+            self.__spiders = {DEFAULT_SPIDER_KEY: spiders}
             self.singular = True
         elif isinstance(spiders, Mapping):
-            self.spiders = {}
+            self.__spiders = {}
             self.singular = False
 
             for name, spider in spiders.items():
-                self.spiders[name] = spider
+                self.__spiders[name] = spider
         else:
             raise TypeError("expecting a single spider or a mapping of spiders")
 
     @property
     def plural(self) -> bool:
         return not self.singular
+
+    def get_spider(self, name: Optional[str] = None) -> Spider:
+        if name is None and self.plural:
+            raise TypeError("singular crawler cannot return a spider by name")
+
+        if name is not None and self.singular:
+            raise TypeError("plural crawler cannot return default spider")
+
+        if name is None:
+            name = DEFAULT_SPIDER_KEY
+
+        return self.__spiders[name]
+
+    def spiders(self) -> Iterator[Tuple[str, Spider]]:
+        if self.singular:
+            raise TypeError(
+                "singular crawler cannot iterate over its spiders (it only has the default one, use #.get_spider to get it)"
+            )
+
+        for name, spiders in self.__spiders.items():
+            yield name, spiders
 
     def start(self) -> None:
 
