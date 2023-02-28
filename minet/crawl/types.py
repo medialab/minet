@@ -55,9 +55,6 @@ class CrawlJob(Generic[CrawlJobDataType]):
         self.spider = state[2]
         self.data = state[3]
 
-    def id(self) -> str:
-        return "%x" % id(self)
-
     @property
     def domain(self) -> Optional[str]:
         if self.__has_cached_domain:
