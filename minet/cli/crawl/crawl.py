@@ -8,7 +8,7 @@ from typing import List, Any, Optional, Union, TextIO, Tuple
 
 import os
 import casanova
-from os.path import join, isfile, dirname
+from os.path import join, isfile, dirname, exists
 from shutil import rmtree
 from ebbe.decorators import with_defer
 
@@ -177,7 +177,8 @@ def action(cli_args, defer, loading_bar: LoadingBar):
     queue_path = join(cli_args.output_dir, "queue")
 
     if cli_args.resume:
-        loading_bar.print("[info]Will now resume…")
+        if exists(queue_path):
+            loading_bar.print("[log.time]Will now resume…")
     else:
         rmtree(queue_path, ignore_errors=True)
 

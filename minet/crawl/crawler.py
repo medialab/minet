@@ -117,6 +117,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
                     job.url,
                     pool_manager=self.crawler.pool_manager,
                     max_redirects=self.max_redirects,
+                    cancel_event=cancel_event,
                     **kwargs,
                 )
 
