@@ -71,6 +71,9 @@ def new_connection_error_reporter(error):
     if "connection refused" in msg:
         return "connection-refused"
 
+    if "temporary failure in name resolution" in msg or "errno -3" in msg:
+        return "name-resolution-failure"
+
     return msg
 
 

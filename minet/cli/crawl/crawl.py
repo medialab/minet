@@ -33,7 +33,7 @@ JOBS_HEADERS = [
 ]
 
 
-def format_job_for_csv(
+def format_result_for_csv(
     result: CrawlResult[Any, DefinitionSpiderOutput]
 ) -> List[Optional[Union[str, int]]]:
     if result.error is not None:
@@ -110,6 +110,9 @@ class ScraperReporter(object):
             row = [item.get(k, "") for k in self.headers]
             self.writer.writerow(row)
 
+    def flush(self):
+        self.file.flush()
+
     def close(self):
         self.file.close()
 
@@ -162,10 +165,18 @@ class ScraperReporterPool(object):
         for name, items in scraped.named.items():
             reporter[name].write(items)
 
-    def close(self) -> None:
+    def __iter__(self):
         for spider_reporters in self.reporters.values():
             for reporter in spider_reporters.values():
-                reporter.close()
+                yield reporter
+
+    def flush(self) -> None:
+        for reporter in self:
+            reporter.flush()
+
+    def close(self) -> None:
+        for reporter in self:
+            reporter.close()
 
 
 @with_defer()
@@ -251,10 +262,14 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         # Running crawler
         for result in crawler:
             with loading_bar.step():
-                jobs_writer.writerow(format_job_for_csv(result))
+                jobs_writer.writerow(format_result_for_csv(result))
 
                 if result.error is not None:
                     loading_bar.inc_stat("errors", style="error")
                     continue
 
                 reporter_pool.write(result.job.spider, result.output)
+
+                # Flushing to avoid sync issues as well as possible
+                jobs_output.flush()
+                reporter_pool.flush()
