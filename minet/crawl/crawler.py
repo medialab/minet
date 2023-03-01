@@ -19,11 +19,7 @@ from typing import (
     Union,
 )
 
-from os.path import exists
-from queue import Queue, Empty
-from persistqueue import SQLiteQueue
-from shutil import rmtree
-from threading import Lock, Event
+from threading import Event
 from urllib3 import PoolManager
 
 from minet.types import AnyFileTarget
@@ -41,6 +37,7 @@ from minet.crawl.spiders import (
     FunctionSpiderCallable,
     DefinitionSpider,
 )
+from minet.crawl.queue import CrawlerQueue, DumpType
 from minet.crawl.state import CrawlerState
 from minet.web import request, EXPECTED_WEB_ERRORS, AnyTimeout
 from minet.fetch import HTTPThreadPoolExecutor, CANCELLED
@@ -179,18 +176,16 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
         CrawlJob[CrawlJobDataTypes],
         CrawlResult[CrawlJobDataTypes, CrawlJobOutputDataTypes],
     ]
-
-    queue: "Queue[CrawlJob[CrawlJobDataTypes]]"
-    lock: Lock
-
-    __spiders: Dict[str, Spider[CrawlJobDataTypes, CrawlJobOutputDataTypes]]
-
+    queue: CrawlerQueue[CrawlJob[CrawlJobDataTypes]]
     persistent: bool
     state: CrawlerState
     started: bool
     stopped: bool
+    resuming: bool
     finished: bool
     singular: bool
+
+    __spiders: Dict[str, Spider[CrawlJobDataTypes, CrawlJobOutputDataTypes]]
 
     def __init__(
         self,
@@ -222,9 +217,6 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
             "throttle": throttle,
         }
 
-        # Threading
-        self.lock = Lock()
-
         # Params
         self.queue_path = queue_path
         self.persistent = queue_path is not None
@@ -235,26 +227,13 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
         self.resuming = False
         self.finished = False
 
-        # Resuming?
-        if self.persistent:
-            assert self.queue_path is not None
+        # Queue
+        self.queue = CrawlerQueue(queue_path, resume=resume)
+        self.persistent = self.queue.persistent
+        self.resuming = self.queue.resuming
 
-            if not resume:
-                if self.persistent:
-                    rmtree(self.queue_path, ignore_errors=True)
-            else:
-                if exists(self.queue_path):
-                    self.resuming = True
-
-        # Memory queue)
-        if not self.persistent:
-            queue = Queue()
-
-        # Persistent queue
-        else:
-            queue = SQLiteQueue(queue_path, multithreading=True, auto_commit=False)
-
-        self.queue = cast("Queue[CrawlJob[CrawlJobDataTypes]]", queue)
+        if self.resuming and self.queue.qsize() == 0:
+            self.finished = True
 
         # Initializing state
         self.state = CrawlerState(jobs_queued=self.queue.qsize())
@@ -311,6 +290,9 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
             # TODO: we could but we need to mind the condition below
             raise RuntimeError("Cannot restart a crawler")
 
+        if self.finished:
+            raise RuntimeError("Cannot start an already finished crawler")
+
         if self.started:
             raise RuntimeError("Crawler has already started")
 
@@ -363,28 +345,24 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
 
                 yield result
 
-                self.queue.task_done()
+                self.queue.ack(result.job)
 
         return safe_wrapper()
 
     def enqueue(
         self,
         job_or_jobs: Union[
-            UrlOrCrawlJob[CrawlJobDataTypes], Iterable[UrlOrCrawlJob[CrawlJobDataType]]
+            UrlOrCrawlJob[CrawlJobDataTypes], Iterable[UrlOrCrawlJob[CrawlJobDataTypes]]
         ],
         spider: Optional[str] = None,
         depth: int = 0,
     ) -> int:
-        with self.lock:
-            count = 0
+        if isinstance(job_or_jobs, (str, CrawlJob)):
+            jobs = [job_or_jobs]
+        else:
+            jobs = job_or_jobs
 
-            if isinstance(job_or_jobs, (str, CrawlJob)):
-                jobs = [job_or_jobs]
-            else:
-                jobs = job_or_jobs
-
-            jobs = cast(Iterable[UrlOrCrawlJob[CrawlJobDataTypes]], jobs)
-
+        def proper_jobs():
             for job in jobs:
                 job = ensure_job(job)
 
@@ -394,30 +372,20 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
                 if job.depth is None:
                     job.depth = depth
 
-                count += 1
-                self.queue.put(job)
-                self.state.inc_queued()
+                yield job
 
-            return count
+        count = self.queue.put_many(proper_jobs())
+
+        self.state.inc_queued(count)
+
+        return count
 
     # NOTE: this is clearly not threadsafe lol. This is for debug only.
-    def dump_queue(self):
+    def dump_queue(self) -> DumpType[CrawlJob[CrawlJobDataTypes]]:
         if self.started:
             raise TypeError("cannot dump queue while crawler is running")
 
-        jobs = []
-
-        while True:
-            try:
-                jobs.append(self.queue.get_nowait())
-                self.queue.task_done()
-            except Empty:
-                break
-
-        for job in jobs:
-            self.queue.put_nowait(job)
-
-        return jobs
+        return self.queue.dump()
 
     @classmethod
     def from_callable(

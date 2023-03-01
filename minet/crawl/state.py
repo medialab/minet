@@ -46,9 +46,9 @@ class CrawlerState(object):
         with self.__lock:
             self.listener = listener
 
-    def inc_queued(self) -> None:
+    def inc_queued(self, count=1) -> None:
         with self.__lock:
-            self.jobs_queued += 1
+            self.jobs_queued += count
             self.__notify()
 
     def dec_queued(self) -> None:
