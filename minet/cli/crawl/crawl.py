@@ -226,9 +226,8 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         return
 
     if crawler.finished:
-        loading_bar.print("[error]Crawler has already finished!")
         crawler.stop()
-        return
+        raise FatalError("[error]Crawler has already finished!")
 
     if crawler.resuming:
         loading_bar.print("[log.time]Will now resume…")

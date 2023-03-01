@@ -344,6 +344,8 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
 
                 self.queue.ack(result.job)
 
+            self.queue.cleanup()
+
         return safe_wrapper()
 
     def enqueue(
