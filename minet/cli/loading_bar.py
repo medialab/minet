@@ -439,7 +439,7 @@ class LoadingBar(object):
 
         self.__refresh_stats()
 
-    def inc_stat(self, name: str, style: str = None, count=1):
+    def inc_stat(self, name: str, count: int = 1, style: Optional[str] = None):
         assert self.stats is not None
 
         if name not in self.stats:

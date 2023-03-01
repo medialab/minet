@@ -228,7 +228,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
         self.finished = False
 
         # Queue
-        self.queue = CrawlerQueue(queue_path, resume=resume)
+        self.queue = CrawlerQueue(queue_path, resume=resume, cleanup_interval=2)
         self.persistent = self.queue.persistent
         self.resuming = self.queue.resuming
 
@@ -344,6 +344,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
 
                 self.queue.ack(result.job)
 
+            # If iterator ended properly we cleanup the queue
             self.queue.cleanup()
 
         return safe_wrapper()

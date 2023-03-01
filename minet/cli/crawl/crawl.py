@@ -22,14 +22,13 @@ from minet.cli.utils import with_loading_bar, with_ctrl_c_warning
 
 JOBS_HEADERS = [
     "spider",
+    "depth",
     "url",
-    "resolved",
-    "status",
     "error",
-    "filename",
+    "status",
     "encoding",
     "degree",
-    "depth",
+    "scraped",
 ]
 
 STATUS_TO_STYLE = {
@@ -41,19 +40,19 @@ STATUS_TO_STYLE = {
 
 
 def format_result_for_csv(
-    result: CrawlResult[Any, DefinitionSpiderOutput]
+    result: CrawlResult[Any, DefinitionSpiderOutput], count: Optional[int] = None
 ) -> List[Optional[Union[str, int]]]:
     if result.error is not None:
         return [
             result.job.spider,
+            result.job.depth,
             result.job.url,
-            "",
-            "",
             report_error(result.error),
             "",
             "",
-            "0",
-            result.job.depth,
+            "",
+            "",
+            "",
         ]
 
     response = result.response
@@ -62,14 +61,13 @@ def format_result_for_csv(
 
     return [
         result.job.spider,
+        result.job.depth,
         result.job.url,
-        response.end_url if response.was_redirected else "",
+        "",
         response.status,
-        "",
-        "",
         response.encoding,
         result.degree,
-        result.job.depth,
+        count,
     ]
 
 
@@ -103,19 +101,24 @@ class ScraperReporter(object):
         self.file = f
         self.writer = writer
 
-    def write(self, items):
+    def write(self, items) -> int:
+        count = 0
 
         # TODO: maybe abstract this once step above
         if not isinstance(items, list):
             items = [items]
 
         for item in items:
+            count += 1
+
             if not isinstance(item, dict):
                 self.writer.writerow([item])
                 continue
 
             row = [item.get(k, "") for k in self.headers]
             self.writer.writerow(row)
+
+        return count
 
     def flush(self):
         self.file.flush()
@@ -160,17 +163,21 @@ class ScraperReporterPool(object):
                     reporter = ScraperReporter(path, scraper, resume)
                     self.reporters[spider_name][name] = reporter
 
-    def write(self, spider_name: Optional[str], scraped: DefinitionSpiderOutput):
+    def write(self, spider_name: Optional[str], scraped: DefinitionSpiderOutput) -> int:
+        count = 0
+
         if spider_name is None:
             spider_name = "default"
 
         reporter = self.reporters[spider_name]
 
         if scraped.default is not None:
-            reporter[ScraperReporterPool.SINGULAR].write(scraped.default)
+            count += reporter[ScraperReporterPool.SINGULAR].write(scraped.default)
 
         for name, items in scraped.named.items():
-            reporter[name].write(items)
+            count += reporter[name].write(items)
+
+        return count
 
     def __iter__(self):
         for spider_reporters in self.reporters.values():
@@ -279,13 +286,14 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         # Running crawler
         for result in crawler:
             with loading_bar.step():
-                jobs_writer.writerow(format_result_for_csv(result))
-
                 if result.error is not None:
-                    loading_bar.inc_stat("errors", style="error")
+                    loading_bar.inc_stat(report_error(result.error), style="error")
+                    jobs_writer.writerow(format_result_for_csv(result))
                     continue
 
-                reporter_pool.write(result.job.spider, result.output)
+                count = reporter_pool.write(result.job.spider, result.output)
+                jobs_writer.writerow(format_result_for_csv(result, count=count))
+                loading_bar.inc_stat("scraped", count=count, style="success")
 
                 # Flushing to avoid sync issues as well as possible
                 jobs_output.flush()
