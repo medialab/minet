@@ -1,8 +1,8 @@
 from threading import Timer, Event
-from urllib3 import Timeout
 from argparse import ArgumentParser
+from ebbe import Timer as BenchTimer
 
-from minet.web import DEFAULT_POOL, BufferedResponse, timeout_to_final_time
+from minet.web import request
 
 parser = ArgumentParser()
 parser.add_argument("--cancel-after", type=int)
@@ -11,8 +11,6 @@ parser.add_argument("--timeout", type=int)
 cli_args = parser.parse_args()
 
 cancel_event = Event()
-final_timeout = cli_args.timeout
-final_time = timeout_to_final_time(final_timeout) if final_timeout is not None else None
 
 
 def cancel():
@@ -23,16 +21,12 @@ def cancel():
 if cli_args.cancel_after is not None:
     Timer(cli_args.cancel_after, cancel).start()
 
-response = DEFAULT_POOL.request(
-    "GET",
-    "http://100poursciences.fr/stream",
-    timeout=Timeout(connect=1, read=1),
-    preload_content=False,
-)
+with BenchTimer("atomic_request"):
+    response, body = request(
+        "http://100poursciences.fr/stream",
+        timeout=cli_args.timeout,
+        cancel_event=cancel_event,
+    )
 
 print("Status:", response.status)
-
-buffered = BufferedResponse(response, cancel_event=cancel_event, final_time=final_time)
-buffered.read()
-
-print("Finished")
+print("Body:", body)

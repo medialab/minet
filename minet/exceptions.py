@@ -98,7 +98,9 @@ class CrawlError(MinetError):
 
 
 class UnknownSpiderError(CrawlError):
-    pass
+    def __init__(self, msg=None, spider=None):
+        super().__init__(msg)
+        self.spider = spider
 
 
 # Extraction errors

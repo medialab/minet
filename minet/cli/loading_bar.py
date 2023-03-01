@@ -205,6 +205,7 @@ class LoadingBar(object):
         self.show_label = show_label
         self.transient = transient
         self.known_total = total is not None
+        self.already_stopped = False
 
         self.bar_column = None
         self.label_progress = None
@@ -308,8 +309,25 @@ class LoadingBar(object):
             self.table, refresh_per_second=10, console=console, transient=self.transient
         )
 
-    def __enter__(self):
+    def cursor_up(self) -> None:
+        # NOTE: cursor 1up
+        console.file.write("\x1b[1A")
+
+    def start(self) -> None:
         self.live.start()
+
+    def stop(self, erase=False) -> None:
+        if erase:
+            self.live.transient = True
+
+        self.live.stop()
+        self.already_stopped = True
+
+    def erase(self) -> None:
+        self.stop(erase=True)
+
+    def __enter__(self):
+        self.start()
         return self
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
@@ -317,12 +335,13 @@ class LoadingBar(object):
         if exc_type is not None:
             style = "error"
 
-            # NOTE: cursor 1up
             if exc_type is KeyboardInterrupt:
+                if not self.already_stopped:
+                    self.cursor_up()
 
-                # NOTE: broken pipe are often subsequent
-                console.file.write("\x1b[1A")
                 style = "warning"
+
+                # NOTE: broken pipe often arrive after that point
 
             if self.bar_column is not None:
                 self.bar_column.complete_style = style
@@ -335,7 +354,7 @@ class LoadingBar(object):
             self.bar_column.pulse_style = "success"
             self.bar_column.style = "success"
 
-        self.live.stop()
+        self.stop()
 
     @contextmanager
     def step(self, item=None, count=1, index=None, catch=None):
@@ -420,7 +439,7 @@ class LoadingBar(object):
 
         self.__refresh_stats()
 
-    def inc_stat(self, name: str, style: str = None, count=1):
+    def inc_stat(self, name: str, count: int = 1, style: Optional[str] = None):
         assert self.stats is not None
 
         if name not in self.stats:

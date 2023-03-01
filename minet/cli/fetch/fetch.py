@@ -6,17 +6,23 @@
 # in the given column. This is done in a respectful multithreaded fashion to
 # optimize both running time & memory.
 #
-import casanova
-from datetime import datetime
-from ural import is_shortened_url
+from typing import Optional, List, Union
 
-from minet.fetch import multithreaded_fetch, multithreaded_resolve
+import casanova
+from ural import is_shortened_url, could_be_html
+
+from minet.fetch import (
+    multithreaded_fetch,
+    multithreaded_resolve,
+    FetchResult,
+    FetchWorkerPayload,
+)
 from minet.fs import FilenameBuilder, ThreadSafeFilesWriter
 from minet.web import grab_cookies, parse_http_header
 from minet.exceptions import InvalidURLError, FilenameFormattingError
 from minet.cli.exceptions import InvalidArgumentsError, FatalError
 from minet.cli.reporters import report_error, report_filename_formatting_error
-from minet.cli.utils import with_enricher_and_loading_bar
+from minet.cli.utils import with_enricher_and_loading_bar, with_ctrl_c_warning
 
 
 FETCH_ADDITIONAL_HEADERS = [
@@ -32,7 +38,7 @@ FETCH_ADDITIONAL_HEADERS = [
 RESOLVE_ADDITIONAL_HEADERS = ["resolved", "status", "error", "redirects", "chain"]
 
 
-def get_style_for_status(status):
+def get_style_for_status(status: int) -> str:
     if status < 400:
         return "info"
 
@@ -43,9 +49,12 @@ def loading_bar_stats_sort_key(item):
     name = item["name"]
 
     if isinstance(name, int):
-        return "aaa" + str(name)
+        return (0, str(name))
 
-    return name
+    if name == "filtered":
+        return (2, name)
+
+    return (1, name)
 
 
 def get_headers(cli_args):
@@ -73,6 +82,7 @@ def get_multiplex(cli_args):
     unit="urls",
     stats_sort_key=loading_bar_stats_sort_key,
 )
+@with_ctrl_c_warning
 def action(cli_args, enricher, loading_bar, resolve=False):
 
     # HTTP method
@@ -112,8 +122,9 @@ def action(cli_args, enricher, loading_bar, resolve=False):
         filename_pos = enricher.headers[cli_args.filename]
 
     only_shortened = getattr(cli_args, "only_shortened", False)
+    only_html = getattr(cli_args, "only_html", False)
 
-    def url_key(item):
+    def url_key(item) -> Optional[str]:
         url = item[1][url_pos].strip()
 
         if not url:
@@ -122,18 +133,21 @@ def action(cli_args, enricher, loading_bar, resolve=False):
         if only_shortened and not is_shortened_url(url):
             return
 
+        if only_html and not could_be_html(url):
+            return
+
         # Url templating
         if cli_args.url_template:
             return cli_args.url_template.format(value=url)
 
         return url
 
-    def request_args(domain, url, item):
+    def request_args(payload: FetchWorkerPayload):
         cookie = None
 
         # Cookie
         if get_cookie:
-            cookie = get_cookie(url)
+            cookie = get_cookie(payload.url)
 
         # Headers
         headers = None
@@ -164,11 +178,12 @@ def action(cli_args, enricher, loading_bar, resolve=False):
 
         files_writer = ThreadSafeFilesWriter(cli_args.output_dir)
 
-    def worker_callback(result):
+    def worker_callback(result: FetchResult[List]) -> None:
         # NOTE: at this point the callback is only fired on success
+        assert result.response
+
         row = result.item[1]
         response = result.response
-        meta = result.meta
 
         if cli_args.keep_failed_contents and response.status != 200:
             return
@@ -182,10 +197,12 @@ def action(cli_args, enricher, loading_bar, resolve=False):
             formatter_kwargs["line"] = enricher.wrap(row)
 
         try:
+            assert filename_builder is not None
+
             filename = filename_builder(
-                result.resolved,
+                response.end_url,
                 filename=filename_cell,
-                ext=meta.get("ext"),
+                ext=response.ext,
                 formatter_kwargs=formatter_kwargs,
                 compressed=cli_args.compress,
             )
@@ -193,28 +210,25 @@ def action(cli_args, enricher, loading_bar, resolve=False):
             result.error = e
             return
 
-        meta["filename"] = filename
+        response["filename"] = filename
 
         # Decoding the response data?
-        is_text = meta.get("is_text", False)
-        original_encoding = meta.get("encoding", "utf-8")
+        data: Union[str, bytes] = response.body
 
-        data = response.data
-        binary = True
-
-        if is_text and (cli_args.standardize_encoding or cli_args.contents_in_report):
-            data = data.decode(original_encoding, errors="replace")
-            binary = False
+        if response.is_text and (
+            cli_args.standardize_encoding or cli_args.contents_in_report
+        ):
+            data = response.body.decode(response.likely_encoding, errors="replace")
 
             if cli_args.contents_in_report:
-                meta["decoded_contents"] = data
+                response["decoded_contents"] = data
 
         # Writing the file?
         # TODO: specify what should happen when contents are empty (e.g. POST queries)
         if data and not cli_args.contents_in_report:
-            files_writer.write(
-                filename, data, binary=binary, compress=cli_args.compress
-            )
+            assert files_writer is not None
+
+            files_writer.write(filename, data, compress=cli_args.compress)
 
     def write_fetch_output(
         index,
@@ -265,7 +279,7 @@ def action(cli_args, enricher, loading_bar, resolve=False):
         "domain_parallelism": cli_args.domain_parallelism,
         "max_redirects": cli_args.max_redirects,
         "wait": False,
-        "daemonic": True,
+        "daemonic": False,
     }
 
     if cli_args.timeout is not None:
@@ -282,56 +296,57 @@ def action(cli_args, enricher, loading_bar, resolve=False):
         )
 
         for result in multithreaded_iterator:
-            loading_bar.advance()
+            with loading_bar.step():
+                index, row = result.item
 
-            index, row = result.item
+                if not result.url:
+                    write_fetch_output(index, row)
+                    loading_bar.inc_stat("filtered", style="warning")
+                    continue
 
-            if not result.url:
-                write_fetch_output(index, row)
-                continue
+                # No error
+                if result.error is None:
+                    assert result.response is not None
 
-            # No error
-            if result.error is None:
-                status = result.response.status
+                    response = result.response
+                    status = response.status
 
-                loading_bar.inc_stat(status, style=get_style_for_status(status))
+                    loading_bar.inc_stat(status, style=get_style_for_status(status))
 
-                meta = result.meta
+                    # Reporting in output
+                    write_fetch_output(
+                        index,
+                        row,
+                        resolved=response.end_url
+                        if response.was_redirected
+                        else response.url,
+                        status=status,
+                        datetime_utc=response.end_datetime,
+                        filename=response.get("filename"),
+                        encoding=response.encoding,
+                        mimetype=response.mimetype,
+                        data=response.get("decoded_contents"),
+                    )
 
-                # Final url target
-                resolved_url = result.resolved
+                # Handling potential errors
+                else:
+                    error_code = report_error(result.error)
 
-                if resolved_url == result.url:
+                    loading_bar.inc_stat(error_code, style="error")
+
                     resolved_url = None
 
-                # Reporting in output
-                write_fetch_output(
-                    index,
-                    row,
-                    resolved=resolved_url,
-                    status=status,
-                    datetime_utc=datetime.isoformat(meta.get("datetime_utc")),
-                    filename=meta.get("filename"),
-                    encoding=meta.get("encoding"),
-                    mimetype=meta.get("mimetype"),
-                    data=meta.get("decoded_contents"),
-                )
+                    if isinstance(result.error, InvalidURLError):
+                        resolved_url = result.error.url
 
-            # Handling potential errors
-            else:
-                error_code = report_error(result.error)
+                    if isinstance(result.error, FilenameFormattingError):
+                        loading_bar.print(
+                            report_filename_formatting_error(result.error)
+                        )
 
-                loading_bar.inc_stat(error_code, style="error")
-
-                resolved_url = None
-
-                if isinstance(result.error, InvalidURLError):
-                    resolved_url = result.error.url
-
-                if isinstance(result.error, FilenameFormattingError):
-                    loading_bar.print(report_filename_formatting_error(result.error))
-
-                write_fetch_output(index, row, error=error_code, resolved=resolved_url)
+                    write_fetch_output(
+                        index, row, error=error_code, resolved=resolved_url
+                    )
 
     # Resolve
     else:
@@ -347,45 +362,46 @@ def action(cli_args, enricher, loading_bar, resolve=False):
         )
 
         for result in multithreaded_iterator:
-            loading_bar.advance()
+            with loading_bar.step():
+                index, row = result.item
 
-            index, row = result.item
+                if not result.url:
+                    write_resolve_output(index, row)
+                    loading_bar.inc_stat("filtered", style="warning")
+                    continue
 
-            if not result.url:
-                write_resolve_output(index, row)
-                continue
+                # No error
+                if result.error is None:
+                    assert result.stack is not None
 
-            # No error
-            if result.error is None:
+                    # Reporting in output
+                    last = result.stack[-1]
 
-                # Reporting in output
-                last = result.stack[-1]
+                    status = last.status
 
-                status = last.status
+                    loading_bar.inc_stat(status, style=get_style_for_status(status))
 
-                loading_bar.inc_stat(status, style=get_style_for_status(status))
+                    write_resolve_output(
+                        index,
+                        row,
+                        resolved=last.url,
+                        status=status,
+                        redirects=len(result.stack) - 1,
+                        chain="|".join(step.type for step in result.stack),
+                    )
 
-                write_resolve_output(
-                    index,
-                    row,
-                    resolved=last.url,
-                    status=status,
-                    redirects=len(result.stack) - 1,
-                    chain="|".join(step.type for step in result.stack),
-                )
+                # Handling potential errors
+                else:
+                    error_code = report_error(result.error)
 
-            # Handling potential errors
-            else:
-                error_code = report_error(result.error)
+                    loading_bar.inc_stat(error_code, style="error")
 
-                loading_bar.inc_stat(error_code, style="error")
-
-                write_resolve_output(
-                    index,
-                    row,
-                    error=error_code,
-                    redirects=(len(result.stack) - 1) if result.stack else None,
-                    chain="|".join(step.type for step in result.stack)
-                    if result.stack
-                    else None,
-                )
+                    write_resolve_output(
+                        index,
+                        row,
+                        error=error_code,
+                        redirects=(len(result.stack) - 1) if result.stack else None,
+                        chain="|".join(step.type for step in result.stack)
+                        if result.stack
+                        else None,
+                    )

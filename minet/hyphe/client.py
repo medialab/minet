@@ -23,9 +23,11 @@ class HypheAPIClient(object):
         self.pool_manager = create_pool_manager()
 
     def call(self, method, *args, **kwargs):
-        _, result = request_jsonrpc(
+        response = request_jsonrpc(
             self.endpoint, method, pool_manager=self.pool_manager, *args, **kwargs
         )
+
+        result = response.json()
 
         if "fault" in result:
             return HypheJSONRPCError(result), None

@@ -16,6 +16,8 @@ from urllib3.exceptions import (
     NewConnectionError,
     ProtocolError,
     DecodeError,
+    LocationValueError,
+    LocationParseError,
 )
 
 from minet.exceptions import (
@@ -27,6 +29,7 @@ from minet.exceptions import (
     InvalidRedirectError,
     TrafilaturaError,
     FilenameFormattingError,
+    FinalTimeoutError,
 )
 from minet.scrape.constants import BURROWING_KEYS, LEAF_KEYS
 from minet.scrape.exceptions import (
@@ -68,6 +71,9 @@ def new_connection_error_reporter(error):
     if "connection refused" in msg:
         return "connection-refused"
 
+    if "temporary failure in name resolution" in msg or "errno -3" in msg:
+        return "name-resolution-failure"
+
     return msg
 
 
@@ -98,11 +104,14 @@ ERROR_REPORTERS = {
     FileNotFoundError: "file-not-found",
     MaxRetryError: max_retry_error_reporter,
     InvalidURLError: "invalid-url",
+    LocationValueError: "invalid-url",
+    LocationParseError: "invalid-url",
     SSLError: "ssl",
     NewConnectionError: new_connection_error_reporter,
     ProtocolError: protocol_error_reporter,
     ConnectTimeoutError: "connect-timeout",
     ReadTimeoutError: "read-timeout",
+    FinalTimeoutError: "final-timeout",
     MaxRedirectsError: "max-redirects",
     InfiniteRedirectsError: "infinite-redirects",
     SelfRedirectError: "self-redirect",
@@ -142,7 +151,7 @@ def report_scraper_validation_errors(errors):
             "> {error} n°{n} at path {path}{root}".format(
                 error=red_alert,
                 n=n,
-                path=colored(path, "blue"),
+                path=colored(path, "green"),
                 root=(" (root)" if not error.path else ""),
             )
         )

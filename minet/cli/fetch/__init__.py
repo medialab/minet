@@ -189,6 +189,11 @@ FETCH_COMMAND = command(
             "help": "Whether to systematically convert retrieved text to UTF-8.",
             "action": "store_true",
         },
+        {
+            "flag": "--only-html",
+            "help": "Only download pages whose url looks like it could be HTML (e.g. a url without extension or ending in .html, .php etc.). Or, said differently, don't download pages whose url clearly indicate you won't get HTML (e.g. a url ending in .pdf or .json url).",
+            "action": "store_true",
+        },
     ],
 )
 

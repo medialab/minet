@@ -640,14 +640,15 @@ class FacebookMobileScraper(object):
     @rate_limited_method()
     @retrying_method()
     def request_page(self, url):
-        result = request(
+        response = request(
             url,
             pool_manager=self.pool_manager,
             cookie=self.cookie,
             headers={"User-Agent": "curl/7.68.0", "Accept-Language": "en"},
+            known_encoding='utf-8'
         )
 
-        return result.data.decode("utf-8")
+        return response.text()
 
     def comments(self, url, detailed=False, per_call=False):
 

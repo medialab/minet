@@ -4,6 +4,9 @@
 #
 # Functions performing analysis of scraper definitions.
 #
+from typing import Optional, List
+from minet.types import Literal
+
 import ast
 import soupsieve
 from soupsieve import SelectorSyntaxError
@@ -27,11 +30,22 @@ from minet.scrape.exceptions import (
     ScraperValidationUnknownKeyError,
 )
 
+ScraperAnalysisOutputType = Literal["scalar", "unknown", "collection", "dict", "list"]
+
 
 class ScraperAnalysis(object):
+    headers: Optional[List[str]]
+    plural: bool
+    output_type: ScraperAnalysisOutputType
+
     __slots__ = ("headers", "plural", "output_type")
 
-    def __init__(self, headers=None, plural=False, output_type="scalar"):
+    def __init__(
+        self,
+        headers: Optional[List[str]] = None,
+        plural: bool = False,
+        output_type: ScraperAnalysisOutputType = "scalar",
+    ):
         self.headers = headers
         self.plural = plural
         self.output_type = output_type
@@ -40,7 +54,10 @@ class ScraperAnalysis(object):
         return (
             self.plural == other.plural
             and self.output_type == other.output_type
-            and set(self.headers) == set(other.headers)
+            and (
+                (self.headers is None and other.headers is None)
+                or (set(self.headers) == set(other.headers))
+            )
         )
 
     def __repr__(self):

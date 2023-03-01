@@ -14,7 +14,7 @@ from ebbe import getpath
 from minet.web import (
     create_pool_manager,
     create_request_retryer,
-    request_json,
+    request,
     retrying_method,
 )
 from minet.loggers import sleepers_logger
@@ -177,17 +177,17 @@ class YouTubeAPIClient(object):
 
         self.keys = {k: True for k in key}
         self.current_key = key[0]
-        self.pool_managercreate_pool_manager = create_pool_manager()
+        self.pool_manager = create_pool_manager()
         self.retryer = create_request_retryer()
 
     @retrying_method()
     def request_json(self, url):
         while True:
             final_url = url + "&key=%s" % self.current_key
-            response, data = request_json(
-                final_url,
-                pool_managercreate_pool_manager=self.pool_managercreate_pool_manager,
+            response = request(
+                final_url, pool_manager=self.pool_manager, known_encoding="utf-8"
             )
+            data = response.json()
 
             if response.status == 403:
 

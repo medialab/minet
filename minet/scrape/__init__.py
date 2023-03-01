@@ -4,16 +4,24 @@
 #
 # Module exposing utilities related to minet's scraping DSL.
 #
-from bs4 import BeautifulSoup
+from typing import Dict, Optional, Union, List
 
-from minet.scrape.utils import load_definition
+from bs4 import BeautifulSoup, SoupStrainer
+from casanova import CSVSerializer
+
+from minet.types import AnyFileTarget
+from minet.fs import load_definition
 from minet.scrape.interpreter import interpret_scraper
-from minet.scrape.analysis import analyse, validate
+from minet.scrape.analysis import analyse, validate, ScraperAnalysisOutputType
 from minet.scrape.straining import strainer_from_css
 from minet.scrape.exceptions import ScraperNotTabularError, InvalidScraperError
 
 
-def ensure_soup(html_or_soup, engine="lxml", strainer=None):
+def ensure_soup(
+    html_or_soup: Union[str, BeautifulSoup],
+    engine: str = "lxml",
+    strainer: Optional[SoupStrainer] = None,
+) -> BeautifulSoup:
     is_already_soup = isinstance(html_or_soup, BeautifulSoup)
 
     if not is_already_soup:
@@ -22,24 +30,27 @@ def ensure_soup(html_or_soup, engine="lxml", strainer=None):
     return html_or_soup
 
 
-def scrape(scraper, html, engine="lxml", context=None, strainer=None):
-    soup = ensure_soup(html, strainer=strainer)
+def scrape(
+    scraper: Dict,
+    html: Union[str, BeautifulSoup],
+    engine: str = "lxml",
+    context: Optional[Dict] = None,
+    strainer: Optional[SoupStrainer] = None,
+):
+    soup = ensure_soup(html, strainer=strainer, engine=engine)
 
     return interpret_scraper(scraper, soup, root=soup, context=context)
 
 
-def format_value_for_csv(value, plural_separator="|"):
-    if isinstance(value, list):
-        return plural_separator.join(str(v) for v in value)
-
-    if isinstance(value, bool):
-        return "true" if value else "false"
-
-    return value
-
-
 class Scraper(object):
-    def __init__(self, definition, strain=None):
+    definition: Dict
+    headers: Optional[List[str]]
+    plural: bool
+    output_type: ScraperAnalysisOutputType
+
+    def __init__(
+        self, definition: Union[Dict, AnyFileTarget], strain: Optional[str] = None
+    ):
         if not isinstance(definition, dict):
             definition = load_definition(definition)
 
@@ -58,6 +69,9 @@ class Scraper(object):
         self.plural = analysis.plural
         self.output_type = analysis.output_type
 
+        # Serializer
+        self.serializer = CSVSerializer()
+
         # Strainer
         self.strainer = None
 
@@ -73,7 +87,7 @@ class Scraper(object):
             headers=self.headers,
         )
 
-    def __call__(self, html, context=None):
+    def __call__(self, html, context: Optional[Dict] = None):
         return scrape(self.definition, html, context=context, strainer=self.strainer)
 
     def as_csv_dict_rows(self, html, context=None, plural_separator="|"):
@@ -93,12 +107,10 @@ class Scraper(object):
             for item in result:
                 if isinstance(item, dict):
                     for k, v in item.items():
-                        item[k] = format_value_for_csv(
-                            v, plural_separator=plural_separator
-                        )
+                        item[k] = self.serializer(v, plural_separator=plural_separator)
                 else:
                     item = {
-                        "value": format_value_for_csv(
+                        "value": self.serializer(
                             item, plural_separator=plural_separator
                         )
                     }

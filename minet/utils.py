@@ -4,6 +4,8 @@
 #
 # Miscellaneous helper function used throughout the library.
 #
+from typing import Optional
+
 import re
 import hashlib
 import json
@@ -11,6 +13,7 @@ import time
 import string
 import functools
 import dateparser
+import charset_normalizer
 from random import uniform
 from datetime import datetime
 
@@ -36,6 +39,24 @@ def fix_ensure_ascii_json_string(s):
         return json.loads('"%s"' % DOUBLE_QUOTES_RE.sub('\\"', s))
     except json.decoder.JSONDecodeError:
         return s
+
+
+def infer_charset(data: bytes) -> Optional[charset_normalizer.CharsetMatch]:
+    best = charset_normalizer.from_bytes(data).best()
+
+    if best is None:
+        return None
+
+    return best
+
+
+def infer_encoding(data: bytes) -> Optional[str]:
+    charset = infer_charset(data)
+
+    if charset is None:
+        return None
+
+    return charset.encoding
 
 
 class RateLimiter(object):

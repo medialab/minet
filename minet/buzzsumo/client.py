@@ -8,7 +8,7 @@ from json import JSONDecodeError
 from urllib.parse import quote
 
 from minet.utils import RateLimiterState, rate_limited_method
-from minet.web import create_request_retryer, retrying_method, request_json
+from minet.web import create_request_retryer, retrying_method, request
 
 from minet.buzzsumo.formatters import format_article
 from minet.buzzsumo.exceptions import (
@@ -79,7 +79,8 @@ class BuzzSumoAPIClient(object):
     @rate_limited_method()
     def request(self, url):
         try:
-            response, data = request_json(url)
+            response = request(url, known_encoding="utf-8")
+            data = response.json()
         except JSONDecodeError:
             raise BuzzSumoBadRequestError
 

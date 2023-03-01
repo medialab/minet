@@ -5,7 +5,7 @@ next:
     iterator: a.more
     item:
       attr: href
-max_level: 10
+max_depth: 10
 scraper:
   iterator: article > h2 > a
   fields:

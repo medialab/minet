@@ -4,6 +4,8 @@
 #
 # Miscellaneous helpers used by the CLI tools.
 #
+from typing import Optional, Iterable
+
 import os
 import sys
 import stat
@@ -20,7 +22,7 @@ from contextlib import nullcontext
 from ebbe import noop, format_seconds
 
 from minet.cli.console import console
-from minet.cli.loading_bar import LoadingBar
+from minet.cli.loading_bar import LoadingBar, StatsItem
 from minet.cli.exceptions import MissingColumnError, FatalError
 from minet.utils import fuzzy_int, message_flatmap
 
@@ -267,13 +269,15 @@ def with_fatal_errors(mapping_or_hook):
     return decorate
 
 
-def with_loading_bar(**loading_bar_kwargs):
+def with_loading_bar(stats: Optional[Iterable[StatsItem]] = None, **loading_bar_kwargs):
     def decorate(action):
         @wraps(action)
         def wrapper(cli_args, *args, **kwargs):
             total = getattr(cli_args, "total", None)
 
-            with LoadingBar(total=total, **loading_bar_kwargs) as loading_bar:
+            with LoadingBar(
+                total=total, stats=stats, **loading_bar_kwargs
+            ) as loading_bar:
                 additional_kwargs = {
                     "loading_bar": loading_bar,
                 }
@@ -293,7 +297,7 @@ def with_enricher_and_loading_bar(
     title=None,
     unit=None,
     sub_unit=None,
-    stats=None,
+    stats: Optional[Iterable[StatsItem]] = None,
     stats_sort_key=None,
     nested=False,
     multiplex=None,
@@ -374,3 +378,18 @@ def with_enricher_and_loading_bar(
         return wrapper
 
     return decorate
+
+
+def with_ctrl_c_warning(fn):
+    def wrapper(cli_args, loading_bar, **kwargs):
+        try:
+            fn(cli_args, loading_bar=loading_bar, **kwargs)
+        except KeyboardInterrupt:
+            loading_bar.cursor_up()
+            loading_bar.stop()
+            console.print("Performing clean shutdown by cancelling ongoing calls...")
+            console.print("This may take some seconds if you are hitting slow servers.")
+            console.print("Ctrl-C again if you want to force exit.")
+            raise
+
+    return wrapper

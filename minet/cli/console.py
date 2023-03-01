@@ -23,8 +23,14 @@ MINET_COLORS = {
     "success": "green",
 }
 
+MINET_COLOR_BACKGROUNDS = {}
+
+for name, style in MINET_COLORS.items():
+    MINET_COLOR_BACKGROUNDS[name + "_background"] = "on " + style
+
 MINET_STYLES = {
     **MINET_COLORS,
+    **MINET_COLOR_BACKGROUNDS,
     # Progress bar
     "bar.complete": MINET_COLORS["info"],
     "bar.finished": MINET_COLORS["success"],
@@ -35,6 +41,10 @@ MINET_THEME = Theme(MINET_STYLES)
 
 
 class MinetConsole(Console):
+    def vprint(self, *messages):
+        txt = message_flatmap(*messages)
+        self.print(txt)
+
     def logh(self, header: str, *messages, style=None) -> None:
         txt = message_flatmap(*messages)
 
