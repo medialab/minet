@@ -23,7 +23,8 @@ from os.path import exists
 from queue import Queue, Empty
 from persistqueue import SQLiteQueue
 from shutil import rmtree
-from threading import Lock
+from threading import Lock, Event
+from urllib3 import PoolManager
 
 from minet.types import AnyFileTarget
 from minet.fs import load_definition
@@ -41,7 +42,7 @@ from minet.crawl.spiders import (
     DefinitionSpider,
 )
 from minet.crawl.state import CrawlerState
-from minet.web import request, EXPECTED_WEB_ERRORS
+from minet.web import request, EXPECTED_WEB_ERRORS, AnyTimeout
 from minet.fetch import HTTPThreadPoolExecutor, CANCELLED
 from minet.exceptions import UnknownSpiderError, CancelledRequestError
 from minet.constants import (
@@ -49,6 +50,7 @@ from minet.constants import (
     DEFAULT_IMAP_BUFFER_SIZE,
     DEFAULT_THROTTLE,
     DEFAULT_FETCH_MAX_REDIRECTS,
+    DEFAULT_URLLIB3_TIMEOUT,
 )
 
 DEFAULT_SPIDER_KEY = "$$DEFAULT_MINET_SPIDER$$"
@@ -82,13 +84,21 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
         self.max_redirects = max_redirects
         self.callback = callback
 
+    @property
+    def cancel_event(self) -> Event:
+        return self.crawler.executor.cancel_event
+
+    @property
+    def pool_manager(self) -> PoolManager:
+        return self.crawler.executor.pool_manager
+
     def __call__(
         self, job: CrawlJob[CrawlJobDataType]
     ) -> Union[object, CrawlResult[CrawlJobDataType, CrawlJobOutputDataType]]:
 
         # Registering work
         with self.crawler.state.task():
-            cancel_event = self.crawler.cancel_event
+            cancel_event = self.cancel_event
 
             result = CrawlResult(job)
             spider = self.crawler.get_spider(job.spider)
@@ -116,7 +126,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
             try:
                 response = request(
                     job.url,
-                    pool_manager=self.crawler.pool_manager,
+                    pool_manager=self.pool_manager,
                     max_redirects=self.max_redirects,
                     cancel_event=cancel_event,
                     **kwargs,
@@ -163,24 +173,24 @@ Spiders = Union[
 ]
 
 # TODO: try creating a kwarg type for those
-class Crawler(
-    HTTPThreadPoolExecutor[
+# NOTE: crawling could work depth-first if we wanted
+class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
+    executor: HTTPThreadPoolExecutor[
         CrawlJob[CrawlJobDataTypes],
         CrawlResult[CrawlJobDataTypes, CrawlJobOutputDataTypes],
     ]
-):
-    buffer_size: int
-    domain_parallelism: int
-    throttle: float
 
     queue: "Queue[CrawlJob[CrawlJobDataTypes]]"
     lock: Lock
 
+    __spiders: Dict[str, Spider[CrawlJobDataTypes, CrawlJobOutputDataTypes]]
+
     persistent: bool
     state: CrawlerState
     started: bool
+    stopped: bool
+    finished: bool
     singular: bool
-    __spiders: Dict[str, Spider[CrawlJobDataTypes, CrawlJobOutputDataTypes]]
 
     def __init__(
         self,
@@ -190,23 +200,40 @@ class Crawler(
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         throttle: float = DEFAULT_THROTTLE,
-        **kwargs,
+        max_workers: Optional[int] = None,
+        insecure: bool = False,
+        timeout: AnyTimeout = DEFAULT_URLLIB3_TIMEOUT,
+        wait: bool = True,
+        daemonic: bool = False,
     ):
-        super().__init__(**kwargs)
 
-        # NOTE: crawling could work depth-first if we wanted
+        # Own executor and imap params
+        self.executor = HTTPThreadPoolExecutor(
+            max_workers=max_workers,
+            insecure=insecure,
+            timeout=timeout,
+            wait=wait,
+            daemonic=daemonic,
+        )
 
-        # Imap params
-        self.buffer_size = buffer_size
-        self.domain_parallelism = domain_parallelism
-        self.throttle = throttle
+        self.imap_kwargs = {
+            "buffer_size": buffer_size,
+            "parallelism": domain_parallelism,
+            "throttle": throttle,
+        }
+
+        # Threading
         self.lock = Lock()
 
         # Params
         self.queue_path = queue_path
         self.persistent = queue_path is not None
+
+        # Lifecycle
         self.started = False
+        self.stopped = False
         self.resuming = False
+        self.finished = False
 
         # Resuming?
         if self.persistent:
@@ -278,9 +305,14 @@ class Crawler(
             yield name, spiders
 
     def start(self) -> None:
+        # TODO: maybe start the executor ourselves if required when quenouille moves
+
+        if self.stopped:
+            # TODO: we could but we need to mind the condition below
+            raise RuntimeError("Cannot restart a crawler")
 
         if self.started:
-            raise RuntimeError("Crawler already started")
+            raise RuntimeError("Crawler has already started")
 
         # Collecting start jobs - we only add those if we are not resuming
         if not self.resuming:
@@ -299,11 +331,20 @@ class Crawler(
 
         self.started = True
 
-    def __enter__(self):
-        super().__enter__()
-        self.start()
+    def stop(self):
+        if not self.started:
+            raise TypeError("Crawler has not started yet")
 
+        self.stopped = True
+        self.executor.shutdown(wait=self.executor.wait)
+        del self.queue
+
+    def __enter__(self):
+        self.start()
         return self
+
+    def __exit__(self, *exc):
+        self.stop()
 
     def __iter__(self):
         worker = CrawlWorker(self)
@@ -311,13 +352,8 @@ class Crawler(
         def key_by_domain_name(job: CrawlJob) -> Optional[str]:
             return job.domain
 
-        imap_unordered = super().imap_unordered(
-            self.queue,
-            worker,
-            key=key_by_domain_name,
-            buffer_size=self.buffer_size,
-            parallelism=self.domain_parallelism,
-            throttle=self.throttle,
+        imap_unordered = self.executor.imap_unordered(
+            self.queue, worker, key=key_by_domain_name, **self.imap_kwargs
         )
 
         def safe_wrapper():
@@ -328,12 +364,6 @@ class Crawler(
                 yield result
 
                 self.queue.task_done()
-
-            # If we finished iteration
-            if self.persistent and self.queue.qsize() == 0:
-                assert self.queue_path is not None
-                del self.queue
-                rmtree(self.queue_path, ignore_errors=True)
 
         return safe_wrapper()
 
