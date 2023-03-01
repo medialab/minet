@@ -314,9 +314,6 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
         self.started = True
 
     def stop(self):
-        if not self.started:
-            raise TypeError("Crawler has not started yet")
-
         self.stopped = True
         self.executor.shutdown(wait=self.executor.wait)
         del self.queue

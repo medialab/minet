@@ -213,12 +213,21 @@ def action(cli_args, defer, loading_bar: LoadingBar):
 
     if cli_args.dump_queue:
         loading_bar.stop()
-        jobs = crawler.dump_queue()
-        for job in jobs:
-            console.print("[info_background]depth={}".format(job.depth), job.url)
+        dump = crawler.dump_queue()
+        for (status, job) in dump:
+            console.print(
+                "[warning_background]status={}".format(status),
+                "[info_background]depth={}".format(job.depth),
+                job.url,
+            )
 
-        console.print("Total:", "[success]{}".format(len(jobs)))
-        crawler.shutdown()
+        console.print("Total:", "[success]{}".format(len(dump)))
+        crawler.stop()
+        return
+
+    if crawler.finished:
+        loading_bar.print("[error]Crawler has already finished!")
+        crawler.stop()
         return
 
     if crawler.resuming:
