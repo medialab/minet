@@ -838,6 +838,10 @@ class Response(object):
             if parsed_header and parsed_header[0].strip():
                 mimetype = parsed_header[0].strip()
 
+                # Dropping charset info
+                if "," in mimetype:
+                    mimetype = mimetype.split(",", 1)[0]
+
         if mimetype is None and looks_like_html(self.__body):
             mimetype = "text/html"
 
