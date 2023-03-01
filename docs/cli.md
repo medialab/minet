@@ -202,9 +202,7 @@ examples:
 ## crawl
 
 ```
-usage: minet crawl [-h] [-O OUTPUT_DIR] [--resume] [--throttle THROTTLE]
-                   [-o OUTPUT]
-                   crawler
+usage: minet crawl [-h] [-O OUTPUT_DIR] [--resume] [--throttle THROTTLE] crawler
 
 Minet Crawl Command
 ===================
@@ -220,9 +218,6 @@ optional arguments:
                                 Output directory.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to 0.2.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
   --resume                      Whether to resume an interrupted crawl.
   -h, --help                    show this help message and exit
 
@@ -2166,7 +2161,7 @@ examples:
 
 ```
 usage: minet instagram [-h] [-c COOKIE] [--rcfile RCFILE]
-                       {hashtag,post-infos,user-followers,user-following,user-infos,user-posts}
+                       {comments,hashtag,post-infos,user-followers,user-following,user-infos,user-posts}
                        ...
 
 Minet Instagram Command
@@ -2187,7 +2182,7 @@ optional arguments:
   -h, --help                    show this help message and exit
 
 subcommands:
-  {hashtag,post-infos,user-followers,user-following,user-infos,user-posts}
+  {comments,hashtag,post-infos,user-followers,user-following,user-infos,user-posts}
                                 Subcommand to use.
 ```
 

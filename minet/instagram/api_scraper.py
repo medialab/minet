@@ -53,6 +53,7 @@ from minet.instagram.exceptions import (
     InstagramPrivateAccountError,
 )
 from minet.instagram.formatters import (
+    format_comment,
     format_hashtag_post,
     format_post,
     format_user,
@@ -65,6 +66,30 @@ INSTAGRAM_USER_ID_QUERY_HASH = "c9100bf9110dd6361671f113dd02e7d6"
 INSTAGRAM_MAGIC_TOKEN_PATTERN = re.compile(r"\"X-IG-App-ID\"\s*:\s*\"(\d+)\"")
 INSTAGRAM_ID_PATTERN = re.compile(r"\d+")
 INSTAGRAM_GET_USER_ID_PATTERN = re.compile(r"\d+_(\d+)")
+
+
+def forge_comments_url(
+    post,
+    comment_id=None,
+    min_or_max_id=None,
+):
+    if comment_id is not None and min_or_max_id is not None:
+        url = "https://www.instagram.com/api/v1/media/%s/comments/%s/child_comments/?max_id=%s" % (
+            post,
+            comment_id,
+            min_or_max_id
+        )
+        return url
+
+    if min_or_max_id is not None:
+        url = "https://www.instagram.com/api/v1/media/%s/comments/?min_id=%s&can_support_threading=true&permalink_enabled=false" % (
+            post,
+            min_or_max_id
+        )
+        return url
+
+    url = "https://www.instagram.com/api/v1/media/%s/comments/?can_support_threading=true&permalink_enabled=false" % post
+    return url
 
 
 def forge_hashtag_search_url(name, cursor=None, count=50):
@@ -272,6 +297,78 @@ class InstagramAPIScraper(object):
             return method(self, *args, **kwargs)
 
         return wrapped
+
+    @ensure_magic_token
+    def comments(self, post):
+        if not INSTAGRAM_ID_PATTERN.match(post):
+            parsed = parse_instagram_url(post)
+            if isinstance(parsed, (ParsedInstagramPost, ParsedInstagramReel)):
+                shortcode = parsed.id
+
+            elif is_instagram_post_shortcode(post):
+                shortcode = post
+
+            else:
+                raise InstagramInvalidTargetError
+
+            url = forge_post_url_from_shortcode(shortcode)
+
+            data_post = self.request_json(url, magic_token=True)
+            if not data_post:
+                raise InstagramInvalidTargetError
+
+            post = getpath(data_post, ["items", 0, "pk"])
+
+        min_id = None
+
+        while True:
+            url = forge_comments_url(post, min_or_max_id=min_id)
+
+            data = self.request_json(url, magic_token=True)
+
+            if not data:
+                break
+
+            items = data.get("comments")
+
+            if not items:
+                break
+
+            for item in items:
+
+                if item.get("type") == 2:
+                    continue
+
+                yield format_comment(item)
+
+                if item.get("child_comment_count") > 0:
+
+                    max_id = ""
+
+                    while True:
+                        url = forge_comments_url(post, comment_id=item.get("pk"), min_or_max_id=max_id)
+
+                        data_comment = self.request_json(url, magic_token=True)
+
+                        if not data_comment:
+                            break
+
+                        children_items = data_comment.get("child_comments")
+
+                        for children_item in children_items:
+                            yield format_comment(children_item)
+
+                        more_available = data_comment.get("has_more_tail_child_comments")
+
+                        if not more_available:
+                            break
+
+                        max_id = data_comment.get("next_max_child_cursor")
+
+            min_id = data.get("next_min_id")
+
+            if not min_id:
+                break
 
     def search_hashtag(self, hashtag):
         hashtag = hashtag.lstrip("#")

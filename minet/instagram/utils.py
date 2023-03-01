@@ -8,7 +8,7 @@
 import re
 
 HASHTAGS_RE = re.compile(r"[^\w#]+")
-HANDLES_RE = re.compile(r"[^\w@]+")
+HANDLES_RE = re.compile(r"[^\w\.@]+")
 
 
 def extract_hashtags(text):

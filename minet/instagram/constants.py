@@ -19,6 +19,31 @@ INSTAGRAM_DEFAULT_THROTTLE_BIG_WAIT = 1800.0
 INSTAGRAM_MAX_RANDOM_ADDENDUM_BIG_WAIT = 1800.0
 INSTAGRAM_MIN_TIME_RETRYER = 600.0
 
+INSTAGRAM_COMMENT_CSV_HEADERS = [
+    "id",
+    "index",
+    "parent_id",
+    "child_index",
+    "text",
+    "hashtags",
+    "mentioned_names",
+    "has_translation",
+    "comment_like_count",
+    "is_liked_by_media_owner",
+    "child_comment_count",
+    "created_at_utc",
+    "utc_time",
+    "username",
+    "user_id",
+    "user_full_name",
+    "user_is_private",
+    "user_is_mentionable",
+    "user_is_verified",
+    "user_profile_pic_id",
+    "user_profile_pic_url",
+    "user_fbid_v2",
+]
+
 INSTAGRAM_HASHTAG_POST_CSV_HEADERS = [
     "id",
     "media_type",

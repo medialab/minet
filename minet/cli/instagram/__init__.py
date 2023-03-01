@@ -6,6 +6,42 @@
 #
 from minet.cli.argparse import command, subcommand, ConfigAction
 
+INSTAGRAM_COMMENTS_SUBCOMMAND = subcommand(
+    "comments",
+    "minet.cli.instagram.comments",
+    title="Instagram Comments Command",
+    description="""
+        Scrape Instagram comments with a given post url, post shortcode or post id.
+
+        This requires to be logged in to an Instagram account, so
+        by default this command will attempt to grab the relevant
+        authentication cookies from a local Firefox browser.
+
+        If you want to grab cookies from another browser or want
+        to directly pass the cookie as a string, check out the
+        -c/--cookie flag.
+    """,
+    epilog="""
+        example:
+
+        . Searching comments from the post https://www.instagram.com/p/CpA46rmU26Y/:
+            $ minet instagram comments https://www.instagram.com/p/CpA46rmU26Y/ > comments.csv
+    """,
+    variadic_input={
+        "dummy_column": "post",
+        "item_label": "post url, post shortcode or post id",
+        "item_label_plural": "post urls, post shortcodes or post ids",
+    },
+    select=True,
+    arguments=[
+        {
+            "flags": ["-l", "--limit"],
+            "help": "Maximum number of comments to retrieve per post.",
+            "type": int,
+        }
+    ],
+)
+
 INSTAGRAM_HASHTAG_SUBCOMMAND = subcommand(
     "hashtag",
     "minet.cli.instagram.hashtag",
@@ -266,6 +302,7 @@ INSTAGRAM_COMMAND = command(
         }
     ],
     subcommands=[
+        INSTAGRAM_COMMENTS_SUBCOMMAND,
         INSTAGRAM_HASHTAG_SUBCOMMAND,
         INSTAGRAM_POST_INFOS_SUBCOMMAND,
         INSTAGRAM_USER_FOLLOWERS_SUBCOMMAND,
