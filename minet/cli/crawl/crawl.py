@@ -8,7 +8,7 @@ from typing import List, Any, Optional, Union, TextIO, Tuple
 
 import os
 import casanova
-from os.path import join, isfile, dirname
+from os.path import join, isfile, isdir, dirname
 from ebbe.decorators import with_defer
 
 from minet.cli.exceptions import FatalError
@@ -199,6 +199,10 @@ class ScraperReporterPool(object):
 @with_ctrl_c_warning
 def action(cli_args, defer, loading_bar: LoadingBar):
 
+    if cli_args.dump_queue and not isdir(cli_args.output_dir):
+        loading_bar.erase()
+        raise FatalError("Cannot dump crawl not started yet!")
+
     # Loading crawler definition
     queue_path = join(cli_args.output_dir, "queue")
 
@@ -230,15 +234,18 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         )
 
     if cli_args.dump_queue:
-        loading_bar.stop(erase=True)
+        loading_bar.erase()
         dump = crawler.dump_queue()
         for (status, job) in dump:
             console.print(
-                "[{style}]{status}".format(
-                    style=STATUS_TO_STYLE.get(status, "log.time"), status=status
+                "[{style}]{status}[/{style}] depth=[warning]{depth}[/warning] {url}".format(
+                    style=STATUS_TO_STYLE.get(status, "log.time"),
+                    status=status,
+                    depth=job.depth,
+                    url=job.url,
                 ),
-                "depth=[warning]{}[/warning]".format(job.depth),
-                job.url,
+                no_wrap=True,
+                overflow="ellipsis",
             )
 
         console.print("Total:", "[success]{}".format(len(dump)))
@@ -246,7 +253,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         return
 
     if crawler.finished:
-        loading_bar.stop(erase=True)
+        loading_bar.erase()
         crawler.stop()
         raise FatalError("[error]Crawler has already finished!")
 

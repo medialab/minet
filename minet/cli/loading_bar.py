@@ -309,19 +309,22 @@ class LoadingBar(object):
             self.table, refresh_per_second=10, console=console, transient=self.transient
         )
 
-    def cursor_up(self):
+    def cursor_up(self) -> None:
         # NOTE: cursor 1up
         console.file.write("\x1b[1A")
 
-    def start(self):
+    def start(self) -> None:
         self.live.start()
 
-    def stop(self, erase=False):
+    def stop(self, erase=False) -> None:
         if erase:
             self.live.transient = True
 
         self.live.stop()
         self.already_stopped = True
+
+    def erase(self) -> None:
+        self.stop(erase=True)
 
     def __enter__(self):
         self.start()
