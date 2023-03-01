@@ -385,7 +385,7 @@ def with_ctrl_c_warning(fn):
         try:
             fn(cli_args, loading_bar=loading_bar, **kwargs)
         except KeyboardInterrupt:
-            loading_bar.erase()
+            loading_bar.cursor_up()
             loading_bar.stop()
             console.print("Performing clean shutdown by cancelling ongoing calls...")
             console.print("This may take some seconds if you are hitting slow servers.")

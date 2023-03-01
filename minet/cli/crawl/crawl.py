@@ -28,9 +28,16 @@ JOBS_HEADERS = [
     "error",
     "filename",
     "encoding",
-    "next",
+    "degree",
     "depth",
 ]
+
+STATUS_TO_STYLE = {
+    "acked": "success_background",
+    "ready": "info_background",
+    "unack": "warning_background",
+    "ack_failed": "error_background",
+}
 
 
 def format_result_for_csv(
@@ -223,12 +230,14 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         )
 
     if cli_args.dump_queue:
-        loading_bar.stop()
+        loading_bar.stop(erase=True)
         dump = crawler.dump_queue()
         for (status, job) in dump:
             console.print(
-                "[warning_background]status={}".format(status),
-                "[info_background]depth={}".format(job.depth),
+                "[{style}]{status}".format(
+                    style=STATUS_TO_STYLE.get(status, "log.time"), status=status
+                ),
+                "depth=[warning]{}[/warning]".format(job.depth),
                 job.url,
             )
 
@@ -237,6 +246,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         return
 
     if crawler.finished:
+        loading_bar.stop(erase=True)
         crawler.stop()
         raise FatalError("[error]Crawler has already finished!")
 

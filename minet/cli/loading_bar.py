@@ -309,14 +309,17 @@ class LoadingBar(object):
             self.table, refresh_per_second=10, console=console, transient=self.transient
         )
 
-    def erase(self):
+    def cursor_up(self):
         # NOTE: cursor 1up
         console.file.write("\x1b[1A")
 
     def start(self):
         self.live.start()
 
-    def stop(self):
+    def stop(self, erase=False):
+        if erase:
+            self.live.transient = True
+
         self.live.stop()
         self.already_stopped = True
 
@@ -331,7 +334,7 @@ class LoadingBar(object):
 
             if exc_type is KeyboardInterrupt:
                 if not self.already_stopped:
-                    self.erase()
+                    self.cursor_up()
 
                 style = "warning"
 

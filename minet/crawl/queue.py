@@ -15,7 +15,7 @@ ACK_STATUS_TO_NAME = {
     0: "inited",
     1: "ready",
     2: "unack",
-    3: "acked",
+    5: "acked",
     9: "acked_failed",
 }
 
@@ -133,7 +133,7 @@ class CrawlerQueue(Generic[ItemType]):
             items = []
 
             for record in records:
-                items.append((record["status"], record["data"]))
+                items.append((ACK_STATUS_TO_NAME[record["status"]], record["data"]))
 
             return items
 
