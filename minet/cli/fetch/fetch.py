@@ -9,7 +9,7 @@
 from typing import Optional, List, Union
 
 import casanova
-from ural import is_shortened_url
+from ural import is_shortened_url, could_be_html
 
 from minet.fetch import (
     multithreaded_fetch,
@@ -50,6 +50,9 @@ def loading_bar_stats_sort_key(item):
 
     if isinstance(name, int):
         return (0, str(name))
+
+    if name == "filtered":
+        return (2, name)
 
     return (1, name)
 
@@ -119,6 +122,7 @@ def action(cli_args, enricher, loading_bar, resolve=False):
         filename_pos = enricher.headers[cli_args.filename]
 
     only_shortened = getattr(cli_args, "only_shortened", False)
+    only_html = getattr(cli_args, "only_html", False)
 
     def url_key(item) -> Optional[str]:
         url = item[1][url_pos].strip()
@@ -127,6 +131,9 @@ def action(cli_args, enricher, loading_bar, resolve=False):
             return
 
         if only_shortened and not is_shortened_url(url):
+            return
+
+        if only_html and not could_be_html(url):
             return
 
         # Url templating
@@ -294,6 +301,7 @@ def action(cli_args, enricher, loading_bar, resolve=False):
 
                 if not result.url:
                     write_fetch_output(index, row)
+                    loading_bar.inc_stat("filtered", style="warning")
                     continue
 
                 # No error
@@ -359,6 +367,7 @@ def action(cli_args, enricher, loading_bar, resolve=False):
 
                 if not result.url:
                     write_resolve_output(index, row)
+                    loading_bar.inc_stat("filtered", style="warning")
                     continue
 
                 # No error
