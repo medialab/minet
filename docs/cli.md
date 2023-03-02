@@ -202,8 +202,8 @@ examples:
 ## crawl
 
 ```
-usage: minet crawl [-h] [-O OUTPUT_DIR] [--resume] [--throttle THROTTLE]
-                   [-o OUTPUT]
+usage: minet crawl [-h] [-O OUTPUT_DIR] [--resume] [--dump-queue]
+                   [--throttle THROTTLE]
                    crawler
 
 Minet Crawl Command
@@ -216,13 +216,13 @@ positional arguments:
   crawler                       Path to the crawler definition file.
 
 optional arguments:
+  --dump-queue                  Print the contents of the persistent queue.
+                                (This is for debug only, don't use this flag
+                                unless you know what you are doing).
   -O OUTPUT_DIR, --output-dir OUTPUT_DIR
                                 Output directory.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to 0.2.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
   --resume                      Whether to resume an interrupted crawl.
   -h, --help                    show this help message and exit
 
@@ -244,7 +244,7 @@ usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM]
                    [--contents-in-report] [-O OUTPUT_DIR] [-f FILENAME]
                    [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [--keep-failed-contents]
-                   [--standardize-encoding] [-i INPUT] [-s SELECT]
+                   [--standardize-encoding] [--only-html] [-i INPUT] [-s SELECT]
                    [--total TOTAL] [--resume] [-o OUTPUT]
                    value_or_column_name
 
@@ -299,6 +299,12 @@ optional arguments:
   --max-redirects MAX_REDIRECTS
                                 Maximum number of redirections to follow before
                                 breaking. Defaults to 5.
+  --only-html                   Only download pages whose url looks like it
+                                could be HTML (e.g. a url without extension or
+                                ending in .html, .php etc.). Or, said
+                                differently, don't download pages whose url
+                                clearly indicate you won't get HTML (e.g. a url
+                                ending in .pdf or .json url).
   -O OUTPUT_DIR, --output-dir OUTPUT_DIR
                                 Directory where the fetched files will be
                                 written. Defaults to "downloaded".
@@ -2988,10 +2994,10 @@ optional arguments:
 examples:
 
 . Finding out if tweets in a CSV files are still available or not using tweet ids:
-    $ minet tw attrition tweet_url deleted_tweets.csv > attrition-report.csv
+    $ minet tw attrition tweet_url -i deleted_tweets.csv > attrition-report.csv
 
 . Finding out if tweets are still available or not using tweet & user ids:
-    $ minet tw attrition tweet_id deleted_tweets.csv --user user_id --ids > attrition-report.csv
+    $ minet tw attrition tweet_id -i deleted_tweets.csv --user user_id --ids > attrition-report.csv
 
 how to use the command with a CSV file?
 
@@ -3074,7 +3080,7 @@ optional arguments:
 examples:
 
 . Getting followers of a list of user:
-    $ minet tw followers screen_name users.csv > followers.csv
+    $ minet tw followers screen_name -i users.csv > followers.csv
 
 how to use the command with a CSV file?
 
@@ -3156,7 +3162,7 @@ optional arguments:
 examples:
 
 . Getting friends of a list of user:
-    $ minet tw friends screen_name users.csv > friends.csv
+    $ minet tw friends screen_name -i users.csv > friends.csv
 
 how to use the command with a CSV file?
 
@@ -3231,7 +3237,7 @@ optional arguments:
 examples:
 
 . Getting followers of a list of lists:
-    $ minet tw list-followers id lists.csv > followers.csv
+    $ minet tw list-followers id -i lists.csv > followers.csv
 
 how to use the command with a CSV file?
 
@@ -3306,7 +3312,7 @@ optional arguments:
 examples:
 
 . Getting members of a list of lists:
-    $ minet tw list-members id lists.csv > members.csv
+    $ minet tw list-members id -i lists.csv > members.csv
 
 how to use the command with a CSV file?
 
@@ -3380,7 +3386,7 @@ optional arguments:
 examples:
 
 . Getting the users who retweeted a list of tweets:
-    $ minet tw retweeters tweet_id tweets.csv > retweeters.csv
+    $ minet tw retweeters tweet_id -i tweets.csv > retweeters.csv
 
 how to use the command with a CSV file?
 
@@ -3455,10 +3461,10 @@ examples:
     $ minet tw scrape tweets "from:@jack" --limit 500 > tweets.csv
 
 . Collecting the tweets from multiple Twitter queries listed in a CSV file:
-    $ minet tw scrape tweets query queries.csv > tweets.csv
+    $ minet tw scrape tweets query -i queries.csv > tweets.csv
 
 . Templating the given CSV column to query tweets by users:
-    $ minet tw scrape tweets user users.csv --query-template 'from:@{value}' > tweets.csv
+    $ minet tw scrape tweets user -i users.csv --query-template 'from:@{value}' > tweets.csv
 
 . Tip: You can add a "OR @aNotExistingHandle" to your query to avoid searching
   for your query terms in usernames or handles.
@@ -3519,7 +3525,7 @@ optional arguments:
 
 examples:
 
-    $ minet tw tweet-date url tweets.csv --timezone 'Europe/Paris'> tweets_timestamp_date.csv
+    $ minet tw tweet-date url -i tweets.csv --timezone 'Europe/Paris'> tweets_timestamp_date.csv
 
 how to use the command with a CSV file?
 
@@ -3621,7 +3627,7 @@ examples:
     $ minet tw tweet-search cancer > tweets.csv
 
 . Running multiple queries in series:
-    $ minet tw tweet-search query queries.csv > tweets.csv
+    $ minet tw tweet-search query -i queries.csv > tweets.csv
 
 how to use the command with a CSV file?
 
@@ -3728,7 +3734,7 @@ examples:
     $ minet tw tweet-count cancer
 
 . Running multiple queries in series:
-    $ minet tw tweet-count query queries.csv > counts.csv
+    $ minet tw tweet-count query -i queries.csv > counts.csv
 
 . Number of tweets matching the query per day:
     $ minet tw tweet-count "query" --granularity day > counts.csv
@@ -3809,7 +3815,7 @@ optional arguments:
 examples:
 
 . Getting metadata from tweets in a CSV file:
-    $ minet tw tweets tweet_id tweets.csv > tweets_metadata.csv
+    $ minet tw tweets tweet_id -i tweets.csv > tweets_metadata.csv
 
 how to use the command with a CSV file?
 
@@ -3889,7 +3895,7 @@ optional arguments:
 examples:
 
 . Getting friends of a list of user:
-    $ minet tw users screen_name users.csv > data_users.csv
+    $ minet tw users screen_name -i users.csv > data_users.csv
 
 how to use the command with a CSV file?
 
@@ -3969,7 +3975,7 @@ examples:
     $ minet tw user-search cancer > users.csv
 
 . Running multiple queries in series:
-    $ minet tw user-search query queries.csv > users.csv
+    $ minet tw user-search query -i queries.csv > users.csv
 
 how to use the command with a CSV file?
 
@@ -4056,7 +4062,7 @@ optional arguments:
 examples:
 
 . Getting tweets from users in a CSV file:
-    $ minet tw user-tweets screen_name users.csv > tweets.csv
+    $ minet tw user-tweets screen_name -i users.csv > tweets.csv
 
 how to use the command with a CSV file?
 

@@ -156,10 +156,10 @@ TWITTER_ATTRITION_SUBCOMMAND = twitter_api_subcommand(
         examples:
 
         . Finding out if tweets in a CSV files are still available or not using tweet ids:
-            $ minet tw attrition tweet_url deleted_tweets.csv > attrition-report.csv
+            $ minet tw attrition tweet_url -i deleted_tweets.csv > attrition-report.csv
 
         . Finding out if tweets are still available or not using tweet & user ids:
-            $ minet tw attrition tweet_id deleted_tweets.csv --user user_id --ids > attrition-report.csv
+            $ minet tw attrition tweet_id -i deleted_tweets.csv --user user_id --ids > attrition-report.csv
     """,
     variadic_input={
         "dummy_column": "tweet_url_or_id",
@@ -193,7 +193,7 @@ TWITTER_FOLLOWERS_SUBCOMMAND = twitter_api_subcommand(
         examples:
 
         . Getting followers of a list of user:
-            $ minet tw followers screen_name users.csv > followers.csv
+            $ minet tw followers screen_name -i users.csv > followers.csv
     """,
     variadic_input={
         "dummy_column": "user",
@@ -221,7 +221,7 @@ TWITTER_FRIENDS_SUBCOMMAND = twitter_api_subcommand(
         examples:
 
         . Getting friends of a list of user:
-            $ minet tw friends screen_name users.csv > friends.csv
+            $ minet tw friends screen_name -i users.csv > friends.csv
     """,
     variadic_input={
         "dummy_column": "user",
@@ -249,7 +249,7 @@ TWITTER_LIST_FOLLOWERS_SUBCOMMAND = twitter_api_subcommand(
         examples:
 
         . Getting followers of a list of lists:
-            $ minet tw list-followers id lists.csv > followers.csv
+            $ minet tw list-followers id -i lists.csv > followers.csv
     """,
     variadic_input={
         "dummy_column": "list",
@@ -271,7 +271,7 @@ TWITTER_LIST_MEMBERS_SUBCOMMAND = twitter_api_subcommand(
         examples:
 
         . Getting members of a list of lists:
-            $ minet tw list-members id lists.csv > members.csv
+            $ minet tw list-members id -i lists.csv > members.csv
     """,
     variadic_input={
         "dummy_column": "list",
@@ -293,7 +293,7 @@ TWITTER_RETWEETERS_SUBCOMMAND = twitter_api_subcommand(
         examples:
 
         . Getting the users who retweeted a list of tweets:
-            $ minet tw retweeters tweet_id tweets.csv > retweeters.csv
+            $ minet tw retweeters tweet_id -i tweets.csv > retweeters.csv
     """,
     variadic_input={"dummy_column": "tweet_id", "item_label": "tweet id"},
     select=True,
@@ -326,10 +326,10 @@ TWITTER_SCRAPE_SUBCOMMAND = subcommand(
             $ minet tw scrape tweets "from:@jack" --limit 500 > tweets.csv
 
         . Collecting the tweets from multiple Twitter queries listed in a CSV file:
-            $ minet tw scrape tweets query queries.csv > tweets.csv
+            $ minet tw scrape tweets query -i queries.csv > tweets.csv
 
         . Templating the given CSV column to query tweets by users:
-            $ minet tw scrape tweets user users.csv --query-template 'from:@{value}' > tweets.csv
+            $ minet tw scrape tweets user -i users.csv --query-template 'from:@{value}' > tweets.csv
 
         . Tip: You can add a "OR @aNotExistingHandle" to your query to avoid searching
           for your query terms in usernames or handles.
@@ -392,7 +392,7 @@ TWITTER_TWEET_COUNT_SUBCOMMAND = twitter_api_subcommand(
             $ minet tw tweet-count cancer
 
         . Running multiple queries in series:
-            $ minet tw tweet-count query queries.csv > counts.csv
+            $ minet tw tweet-count query -i queries.csv > counts.csv
 
         . Number of tweets matching the query per day:
             $ minet tw tweet-count "query" --granularity day > counts.csv
@@ -421,7 +421,7 @@ TWITTER_TWEET_DATE_SUBCOMMAND = subcommand(
     epilog="""
         examples:
 
-            $ minet tw tweet-date url tweets.csv --timezone 'Europe/Paris'> tweets_timestamp_date.csv
+            $ minet tw tweet-date url -i tweets.csv --timezone 'Europe/Paris'> tweets_timestamp_date.csv
     """,
     variadic_input={
         "dummy_column": "tweet",
@@ -456,7 +456,7 @@ TWITTER_TWEET_SEARCH_SUBCOMMAND = twitter_api_subcommand(
             $ minet tw tweet-search cancer > tweets.csv
 
         . Running multiple queries in series:
-            $ minet tw tweet-search query queries.csv > tweets.csv
+            $ minet tw tweet-search query -i queries.csv > tweets.csv
     """,
     variadic_input={"dummy_column": "query", "item_label_plural": "queries"},
     select=True,
@@ -484,7 +484,7 @@ TWITTER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
         examples:
 
         . Getting metadata from tweets in a CSV file:
-            $ minet tw tweets tweet_id tweets.csv > tweets_metadata.csv
+            $ minet tw tweets tweet_id -i tweets.csv > tweets_metadata.csv
     """,
     variadic_input={"dummy_column": "tweet_id", "item_label": "tweet id"},
     resumer=RowCountResumer,
@@ -511,7 +511,7 @@ TWITTER_USER_SEARCH_SUBCOMMAND = twitter_api_subcommand(
             $ minet tw user-search cancer > users.csv
 
         . Running multiple queries in series:
-            $ minet tw user-search query queries.csv > users.csv
+            $ minet tw user-search query -i queries.csv > users.csv
     """,
     variadic_input={"dummy_column": "query", "item_label_plural": "queries"},
     select=True,
@@ -530,7 +530,7 @@ TWITTER_USER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
         examples:
 
         . Getting tweets from users in a CSV file:
-            $ minet tw user-tweets screen_name users.csv > tweets.csv
+            $ minet tw user-tweets screen_name -i users.csv > tweets.csv
     """,
     variadic_input={
         "dummy_column": "user",
@@ -566,7 +566,7 @@ TWITTER_USERS_SUBCOMMAND = twitter_api_subcommand(
         examples:
 
         . Getting friends of a list of user:
-            $ minet tw users screen_name users.csv > data_users.csv
+            $ minet tw users screen_name -i users.csv > data_users.csv
     """,
     resumer=RowCountResumer,
     select=True,
