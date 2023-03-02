@@ -10,7 +10,6 @@ meta_package = {}
 with open("./minet/__version__.py") as f:
     exec(f.read(), meta_package)
 
-
 setup(
     name="minet",
     version=meta_package["__version__"],
@@ -19,7 +18,7 @@ setup(
     long_description_content_type="text/markdown",
     url="http://github.com/medialab/minet",
     license="MIT",
-    author="Jules Farjas, Guillaume Plique, Pauline Breteau",
+    author="Guillaume Plique, Pauline Breteau, Jules Farjas, Héloïse Théro, Jean Descamps, Amélie Pellé, Laura Miguel",
     keywords="webmining",
     python_requires=">=3.7",
     packages=find_packages(exclude=["ftest", "scripts", "test"]),
