@@ -77,7 +77,7 @@ class ThroughputColumn(ProgressColumn):
         if not elapsed or not task.completed:
             return Text("(?/s)")
 
-        throughput = HumanThroughput(task.completed / elapsed, "s")
+        throughput = HumanThroughput(task.completed / elapsed, "")
 
         eta = ""
 
