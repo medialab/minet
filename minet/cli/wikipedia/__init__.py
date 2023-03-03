@@ -49,7 +49,7 @@ WIKIPEDIA_PAGEVIEWS_SUBCOMMAND = subcommand(
             "default": "all-access",
         },
         {
-            "flag": "--threads",
+            "flags": ["-t", "--threads"],
             "help": "Number of threads to use. Defaults to 10.",
             "type": int,
             "default": 10,
