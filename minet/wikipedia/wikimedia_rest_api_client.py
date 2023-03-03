@@ -7,7 +7,7 @@ from minet.fetch import multithreaded_fetch
 from minet.wikipedia.types import Granularity, Agent, Access, WikipediaPageViewsItem
 
 BASE_URL = "https://wikimedia.org/api/rest_v1"
-DEFAULT_THREADS = 10
+DEFAULT_THREADS = 20
 
 ItemType = TypeVar("ItemType")
 
