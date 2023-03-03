@@ -179,6 +179,9 @@ def action(cli_args, enricher, loading_bar, resolve=False):
         files_writer = ThreadSafeFilesWriter(cli_args.output_dir)
 
     def worker_callback(result: FetchResult[List]) -> None:
+        if cli_args.dont_save:
+            return
+
         # NOTE: at this point the callback is only fired on success
         assert result.response
 

@@ -162,7 +162,7 @@ Finally note that command line arguments and flags will take precedence over env
 ## cookies
 
 ```
-Usage: minet cookies [-h] [--csv] [--url URL] [-o OUTPUT]
+Usage: minet cookies [-h] [--silent] [--csv] [--url URL] [-o OUTPUT]
                      {chrome,chromium,edge,firefox,opera}
 
 # Minet Cookies Command
@@ -182,6 +182,8 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -202,7 +204,7 @@ examples:
 ## crawl
 
 ```
-Usage: minet crawl [-h] [-O OUTPUT_DIR] [--resume] [--dump-queue]
+Usage: minet crawl [-h] [--silent] [-O OUTPUT_DIR] [--resume] [--dump-queue]
                    [--throttle THROTTLE]
                    crawler
 
@@ -222,6 +224,8 @@ Optional Arguments:
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to 0.2.
   --resume                      Whether to resume an interrupted crawl.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -233,13 +237,13 @@ examples:
 ## fetch
 
 ```
-Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM]
+Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                    [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
                    [--insecure] [--separator SEPARATOR] [-t THREADS]
                    [--throttle THROTTLE] [--timeout TIMEOUT]
                    [--url-template URL_TEMPLATE] [-X METHOD]
-                   [--max-redirects MAX_REDIRECTS] [--compress]
-                   [--contents-in-report] [-O OUTPUT_DIR] [-f FILENAME]
+                   [--max-redirects MAX_REDIRECTS] [--compress] [-c] [-D]
+                   [-O OUTPUT_DIR] [-f FILENAME]
                    [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [--keep-failed-contents]
                    [--standardize-encoding] [--only-html] [-i INPUT] [-s SELECT]
@@ -259,12 +263,13 @@ Positional Arguments:
 
 Optional Arguments:
   --compress                    Whether to compress the contents.
-  --contents-in-report, --no-contents-in-report
+  -c, --contents-in-report, -w, --no-contents-in-report
                                 Whether to include retrieved contents, e.g.
                                 html, directly in the report and avoid writing
                                 them in a separate folder. This requires to
                                 standardize encoding and won't work on binary
-                                formats.
+                                formats. Note that --contents-in-report is the
+                                default when no input file is given.
   --domain-parallelism DOMAIN_PARALLELISM
                                 Max number of urls per domain to hit at the same
                                 time. Defaults to 1
@@ -304,6 +309,7 @@ Optional Arguments:
   -O, --output-dir OUTPUT_DIR   Directory where the fetched files will be
                                 written. Defaults to "downloaded".
   -X, --request METHOD          The http method to use. Will default to GET.
+  -D, --dont-save               Use not to write any downloaded file on disk.
   --separator SEPARATOR         Character used to split the url cell in the CSV
                                 file, if this one can in fact contain multiple
                                 urls.
@@ -330,6 +336,8 @@ Optional Arguments:
                                 printed to stdout.
   --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 columns being added to the output:
@@ -337,15 +345,15 @@ columns being added to the output:
 . "index": index of the line in the original file (the output will be
     arbitrarily ordered since multiple requests are performed concurrently).
 . "resolved": final resolved url (after solving redirects) if different
-    from requested url.
+    from starting url.
 . "status": HTTP status code of the request, e.g. 200, 404, 503 etc.
 . "error": an error code if anything went wrong when performing the request.
 . "filename": path to the downloaded file, relative to the folder given
     through -O/--output-dir.
 . "mimetype": detected mimetype of the requested file.
 . "encoding": detected encoding of the requested file if relevant.
-. "raw_contents": if --contents-in-report is set, will contain the
-    downloaded text and the file won't be written.
+. "body": if -c/--contents-in-report is set, will contain the
+    downloaded text and the files won't be written to disk.
 
 --folder-strategy options:
 
@@ -395,8 +403,8 @@ how to use the command with a CSV file?
 ## extract
 
 ```
-Usage: minet extract [-h] [-g GLOB] [-I INPUT_DIR] [-p PROCESSES] [-s SELECT]
-                     [--total TOTAL] [-o OUTPUT]
+Usage: minet extract [-h] [--silent] [-g GLOB] [-I INPUT_DIR] [-p PROCESSES]
+                     [-s SELECT] [--total TOTAL] [-o OUTPUT]
                      report_or_glob_pattern
 
 # Minet Extract Command
@@ -435,6 +443,8 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 columns being added to the output:
@@ -473,7 +483,7 @@ examples:
 ## resolve
 
 ```
-Usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM]
+Usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                      [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
                      [--insecure] [--separator SEPARATOR] [-t THREADS]
                      [--throttle THROTTLE] [--timeout TIMEOUT]
@@ -548,6 +558,8 @@ Optional Arguments:
                                 printed to stdout.
   --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 columns being added to the output:
@@ -590,7 +602,7 @@ how to use the command with a CSV file?
 For more documentation about minet's scraping DSL check this [page](../cookbook/scraping_dsl.md) from the Cookbook.
 
 ```
-Usage: minet scrape [-h] [-f {csv,jsonl}] [-g GLOB] [-I INPUT_DIR]
+Usage: minet scrape [-h] [--silent] [-f {csv,jsonl}] [-g GLOB] [-I INPUT_DIR]
                     [-p PROCESSES] [--separator SEPARATOR] [--strain STRAIN]
                     [--validate] [--total TOTAL] [-o OUTPUT]
                     scraper report
@@ -630,6 +642,8 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -659,8 +673,9 @@ examples:
 ## url-extract
 
 ```
-Usage: minet url-extract [-h] [--base-url BASE_URL] [--from {html,text}]
-                         [-s SELECT] [--total TOTAL] [-o OUTPUT]
+Usage: minet url-extract [-h] [--silent] [--base-url BASE_URL]
+                         [--from {html,text}] [-s SELECT] [--total TOTAL]
+                         [-o OUTPUT]
                          column input
 
 # Minet Url Extract Command
@@ -684,6 +699,8 @@ Optional Arguments:
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -698,8 +715,8 @@ examples:
 ## url-join
 
 ```
-Usage: minet url-join [-h] [-p MATCH_COLUMN_PREFIX] [--separator SEPARATOR]
-                      [-s SELECT] [-o OUTPUT]
+Usage: minet url-join [-h] [--silent] [-p MATCH_COLUMN_PREFIX]
+                      [--separator SEPARATOR] [-s SELECT] [-o OUTPUT]
                       column1 input1 column2 input2
 
 # Minet Url Join Command
@@ -728,6 +745,8 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -748,11 +767,12 @@ examples:
 ## url-parse
 
 ```
-Usage: minet url-parse [-h] [--separator SEPARATOR] [--facebook] [--twitter]
-                       [--youtube] [--infer-redirection] [--fix-common-mistakes]
-                       [--normalize-amp] [--quoted] [--sort-query]
-                       [--strip-authentication] [--strip-fragment]
-                       [--strip-index] [--strip-irrelevant-subdomains]
+Usage: minet url-parse [-h] [--separator SEPARATOR] [--silent] [--facebook]
+                       [--twitter] [--youtube] [--infer-redirection]
+                       [--fix-common-mistakes] [--normalize-amp] [--quoted]
+                       [--sort-query] [--strip-authentication]
+                       [--strip-fragment] [--strip-index]
+                       [--strip-irrelevant-subdomains]
                        [--strip-lang-query-items] [--strip-lang-subdomains]
                        [--strip-protocol] [--strip-trailing-slash] [-i INPUT]
                        [-s SELECT] [--total TOTAL] [-o OUTPUT]
@@ -842,6 +862,8 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 columns being added to the output:
@@ -924,7 +946,7 @@ how to use the command with a CSV file?
 ## BuzzSumo
 
 ```
-Usage: minet buzzsumo [-h] [-t TOKEN] [--rcfile RCFILE]
+Usage: minet buzzsumo [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
                       {limit,domain,domain-summary} ...
 
 # Minet Buzzsumo Command
@@ -939,6 +961,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 Subcommands:
@@ -949,7 +973,8 @@ Subcommands:
 <h3 id="buzzsumo-limit">limit</h3>
 
 ```
-Usage: minet buzzsumo limit [-h] [-t TOKEN] [--rcfile RCFILE] [-o OUTPUT]
+Usage: minet buzzsumo limit [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
+                            [-o OUTPUT]
 
 # Minet Buzzsumo Limit Command
 
@@ -967,6 +992,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -979,9 +1006,9 @@ examples:
 
 ```
 Usage: minet buzzsumo domain-summary [-h] [-t TOKEN] [--rcfile RCFILE]
-                                     --begin-date BEGIN_DATE --end-date END_DATE
-                                     [-i INPUT] [-s SELECT] [--total TOTAL]
-                                     [-o OUTPUT]
+                                     [--silent] --begin-date BEGIN_DATE
+                                     --end-date END_DATE [-i INPUT] [-s SELECT]
+                                     [--total TOTAL] [-o OUTPUT]
                                      value_or_column_name
 
 # Minet Buzzsumo Domain Summary Command
@@ -1018,6 +1045,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1047,9 +1076,9 @@ how to use the command with a CSV file?
 <h3 id="buzzsumo-domain">domain</h3>
 
 ```
-Usage: minet buzzsumo domain [-h] [-t TOKEN] [--rcfile RCFILE] --begin-date
-                             BEGIN_DATE --end-date END_DATE [-i INPUT]
-                             [-s SELECT] [--total TOTAL] [-o OUTPUT]
+Usage: minet buzzsumo domain [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
+                             --begin-date BEGIN_DATE --end-date END_DATE
+                             [-i INPUT] [-s SELECT] [--total TOTAL] [-o OUTPUT]
                              value_or_column_name
 
 # Minet Buzzsumo Domain Command
@@ -1086,6 +1115,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1116,7 +1147,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet crowdtangle [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
-                         [-t TOKEN]
+                         [--silent] [-t TOKEN]
                          {leaderboard,lists,posts-by-id,posts,search,summary}
                          ...
 
@@ -1138,6 +1169,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 Subcommands:
@@ -1149,9 +1182,9 @@ Subcommands:
 
 ```
 Usage: minet crowdtangle leaderboard [-h] [--rate-limit RATE_LIMIT]
-                                     [--rcfile RCFILE] [-t TOKEN]
-                                     [--no-breakdown] [-f {csv,jsonl}]
-                                     [-l LIMIT] [--list-id LIST_ID]
+                                     [--rcfile RCFILE] [--silent] [-t TOKEN]
+                                     [--breakdown] [-f {csv,jsonl}] [-l LIMIT]
+                                     [--list-id LIST_ID]
                                      [--start-date START_DATE] [-o OUTPUT]
 
 # Minet CrowdTangle Leaderboard Command
@@ -1161,7 +1194,7 @@ Gather information and aggregated stats about pages and groups of the designated
 For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Leaderboard.
 
 Optional Arguments:
-  --no-breakdown                Whether to skip statistics breakdown by post
+  --breakdown, --no-breakdown   Whether to skip statistics breakdown by post
                                 type in the CSV output.
   -f, --format {csv,jsonl}      Output format. Defaults to `csv`.
   -l, --limit LIMIT             Maximum number of accounts to retrieve. Will
@@ -1187,6 +1220,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -1199,7 +1234,7 @@ examples:
 
 ```
 Usage: minet crowdtangle lists [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
-                               [-t TOKEN] [-o OUTPUT]
+                               [--silent] [-t TOKEN] [-o OUTPUT]
 
 # Minet CrowdTangle Lists Command
 
@@ -1224,6 +1259,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1236,9 +1273,9 @@ examples:
 
 ```
 Usage: minet crowdtangle posts-by-id [-h] [--rate-limit RATE_LIMIT]
-                                     [--rcfile RCFILE] [-t TOKEN] [-i INPUT]
-                                     [-s SELECT] [--total TOTAL] [--resume]
-                                     [-o OUTPUT]
+                                     [--rcfile RCFILE] [--silent] [-t TOKEN]
+                                     [-i INPUT] [-s SELECT] [--total TOTAL]
+                                     [--resume] [-o OUTPUT]
                                      value_or_column_name
 
 # Minet CrowdTangle Post By Id Command
@@ -1279,6 +1316,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1309,7 +1348,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
-                               [-t TOKEN] [--chunk-size CHUNK_SIZE]
+                               [--silent] [-t TOKEN] [--chunk-size CHUNK_SIZE]
                                [--end-date END_DATE] [-f {csv,jsonl}]
                                [--language LANGUAGE] [-l LIMIT]
                                [--list-ids LIST_IDS]
@@ -1360,6 +1399,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -1381,9 +1422,9 @@ To know the different list ids associated with your dashboard:
 
 ```
 Usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
-                                [-t TOKEN] [--and AND] [--chunk-size CHUNK_SIZE]
-                                [--end-date END_DATE] [-f {csv,jsonl}]
-                                [--in-list-ids IN_LIST_IDS]
+                                [--silent] [-t TOKEN] [--and AND]
+                                [--chunk-size CHUNK_SIZE] [--end-date END_DATE]
+                                [-f {csv,jsonl}] [--in-list-ids IN_LIST_IDS]
                                 [--language LANGUAGE] [-l LIMIT]
                                 [--not-in-title] [--offset OFFSET]
                                 [-p PLATFORMS]
@@ -1448,6 +1489,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -1460,8 +1503,8 @@ examples:
 
 ```
 Usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT]
-                                 [--rcfile RCFILE] [-t TOKEN] [-p PLATFORMS]
-                                 [--posts POSTS]
+                                 [--rcfile RCFILE] [--silent] [-t TOKEN]
+                                 [-p PLATFORMS] [--posts POSTS]
                                  [--sort-by {date,subscriber_count,total_interactions}]
                                  --start-date START_DATE [-i INPUT] [-s SELECT]
                                  [--total TOTAL] [-o OUTPUT]
@@ -1511,6 +1554,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -1556,7 +1601,7 @@ Subcommands:
 <h3 id="facebook-comments">comments</h3>
 
 ```
-Usage: minet facebook comments [-h] [-c COOKIE] [--rcfile RCFILE]
+Usage: minet facebook comments [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                [--throttle THROTTLE] [-i INPUT] [-s SELECT]
                                [--total TOTAL] [-o OUTPUT]
                                value_or_column_name
@@ -1601,6 +1646,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1633,7 +1680,7 @@ how to use the command with a CSV file?
 <h3 id="facebook-post">post</h3>
 
 ```
-Usage: minet facebook post [-h] [-c COOKIE] [--rcfile RCFILE]
+Usage: minet facebook post [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                            [--throttle THROTTLE] [-i INPUT] [-s SELECT]
                            [--total TOTAL] [-o OUTPUT]
                            value_or_column_name
@@ -1699,6 +1746,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1731,7 +1780,7 @@ how to use the command with a CSV file?
 <h3 id="facebook-posts">posts</h3>
 
 ```
-Usage: minet facebook posts [-h] [-c COOKIE] [--rcfile RCFILE]
+Usage: minet facebook posts [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                             [--throttle THROTTLE] [-i INPUT] [-s SELECT]
                             [--total TOTAL] [-o OUTPUT]
                             value_or_column_name
@@ -1797,6 +1846,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1829,7 +1880,7 @@ how to use the command with a CSV file?
 <h3 id="facebook-post-authors">post-authors</h3>
 
 ```
-Usage: minet facebook post-authors [-h] [-c COOKIE] [--rcfile RCFILE]
+Usage: minet facebook post-authors [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                    [--throttle THROTTLE] [-i INPUT] [-s SELECT]
                                    [--total TOTAL] [-o OUTPUT]
                                    value_or_column_name
@@ -1869,6 +1920,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1895,8 +1948,8 @@ how to use the command with a CSV file?
 <h3 id="facebook-url-likes">url-likes</h3>
 
 ```
-Usage: minet facebook url-likes [-h] [-i INPUT] [-s SELECT] [--total TOTAL]
-                                [-o OUTPUT]
+Usage: minet facebook url-likes [-h] [--silent] [-i INPUT] [-s SELECT]
+                                [--total TOTAL] [-o OUTPUT]
                                 value_or_column_name
 
 # Minet Facebook Url Likes Command
@@ -1928,6 +1981,8 @@ Optional Arguments:
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -1972,7 +2027,8 @@ Subcommands:
 <h3 id="google-sheets">sheets</h3>
 
 ```
-Usage: minet google sheets [-h] [-a AUTHUSER] [-c COOKIE] [-o OUTPUT] url
+Usage: minet google sheets [-h] [--silent] [-a AUTHUSER] [-c COOKIE] [-o OUTPUT]
+                           url
 
 # Minet Google Sheets Command
 
@@ -2004,6 +2060,8 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -2020,7 +2078,7 @@ examples:
 <h3 id="hyphe-declare">declare</h3>
 
 ```
-Usage: minet hyphe declare [-h] [--password PASSWORD] [--total TOTAL]
+Usage: minet hyphe declare [-h] [--silent] [--password PASSWORD] [--total TOTAL]
                            [-o OUTPUT]
                            url corpus webentities
 
@@ -2046,6 +2104,8 @@ Optional Arguments:
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2057,7 +2117,8 @@ examples:
 <h3 id="hyphe-destroy">destroy</h3>
 
 ```
-Usage: minet hyphe destroy [-h] [--password PASSWORD] [-o OUTPUT] url corpus
+Usage: minet hyphe destroy [-h] [--silent] [--password PASSWORD] [-o OUTPUT]
+                           url corpus
 
 # Minet Hyphe Destroy Command
 
@@ -2072,6 +2133,8 @@ Optional Arguments:
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2083,8 +2146,8 @@ examples:
 <h3 id="hyphe-dump">dump</h3>
 
 ```
-Usage: minet hyphe dump [-h] [-O OUTPUT_DIR] [--body] [--statuses STATUSES]
-                        [--password PASSWORD] [-o OUTPUT]
+Usage: minet hyphe dump [-h] [--silent] [-O OUTPUT_DIR] [--body]
+                        [--statuses STATUSES] [--password PASSWORD] [-o OUTPUT]
                         url corpus
 
 # Minet Hyphe Dump Command
@@ -2107,6 +2170,8 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -2118,7 +2183,8 @@ examples:
 <h3 id="hyphe-reset">reset</h3>
 
 ```
-Usage: minet hyphe reset [-h] [--password PASSWORD] [-o OUTPUT] url corpus
+Usage: minet hyphe reset [-h] [--silent] [--password PASSWORD] [-o OUTPUT]
+                         url corpus
 
 # Minet Hyphe Reset Command
 
@@ -2133,6 +2199,8 @@ Optional Arguments:
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2144,8 +2212,8 @@ examples:
 <h3 id="hyphe-tag">tag</h3>
 
 ```
-Usage: minet hyphe tag [-h] [--separator SEPARATOR] [--password PASSWORD]
-                       [--total TOTAL] [-o OUTPUT]
+Usage: minet hyphe tag [-h] [--silent] [--separator SEPARATOR]
+                       [--password PASSWORD] [--total TOTAL] [-o OUTPUT]
                        url corpus webentity_id_column tag_columns data
 
 # Minet Hyphe Tag Command
@@ -2172,6 +2240,8 @@ Optional Arguments:
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2183,7 +2253,7 @@ examples:
 ## Instagram
 
 ```
-Usage: minet instagram [-h] [-c COOKIE] [--rcfile RCFILE]
+Usage: minet instagram [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                        {hashtag,user-followers,user-following,user-infos,user-posts}
                        ...
 
@@ -2202,6 +2272,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 Subcommands:
@@ -2212,8 +2284,8 @@ Subcommands:
 ### hashtag
 
 ```
-Usage: minet instagram hashtag [-h] [-c COOKIE] [--rcfile RCFILE] [-l LIMIT]
-                               [-i INPUT] [-s SELECT] [--total TOTAL]
+Usage: minet instagram hashtag [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                               [-l LIMIT] [-i INPUT] [-s SELECT] [--total TOTAL]
                                [-o OUTPUT]
                                value_or_column_name
 
@@ -2259,6 +2331,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -2286,8 +2360,8 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet instagram user-followers [-h] [-c COOKIE] [--rcfile RCFILE]
-                                      [-l LIMIT] [-i INPUT] [-s SELECT]
-                                      [--total TOTAL] [-o OUTPUT]
+                                      [--silent] [-l LIMIT] [-i INPUT]
+                                      [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                       value_or_column_name
 
 # Instagram User Followers Command
@@ -2336,6 +2410,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -2363,8 +2439,8 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet instagram user-following [-h] [-c COOKIE] [--rcfile RCFILE]
-                                      [-l LIMIT] [-i INPUT] [-s SELECT]
-                                      [--total TOTAL] [-o OUTPUT]
+                                      [--silent] [-l LIMIT] [-i INPUT]
+                                      [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                       value_or_column_name
 
 # Instagram User Following Command
@@ -2412,6 +2488,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -2438,8 +2516,9 @@ how to use the command with a CSV file?
 ### user-infos
 
 ```
-Usage: minet instagram user-infos [-h] [-c COOKIE] [--rcfile RCFILE] [-i INPUT]
-                                  [-s SELECT] [--total TOTAL] [-o OUTPUT]
+Usage: minet instagram user-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                                  [-i INPUT] [-s SELECT] [--total TOTAL]
+                                  [-o OUTPUT]
                                   value_or_column_name
 
 # Instagram user-infos
@@ -2486,6 +2565,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -2512,9 +2593,9 @@ how to use the command with a CSV file?
 ### user-posts
 
 ```
-Usage: minet instagram user-posts [-h] [-c COOKIE] [--rcfile RCFILE] [-l LIMIT]
-                                  [-i INPUT] [-s SELECT] [--total TOTAL]
-                                  [-o OUTPUT]
+Usage: minet instagram user-posts [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                                  [-l LIMIT] [-i INPUT] [-s SELECT]
+                                  [--total TOTAL] [-o OUTPUT]
                                   value_or_column_name
 
 # Instagram User Posts Command
@@ -2564,6 +2645,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -2592,9 +2675,9 @@ how to use the command with a CSV file?
 <h3 id="mc-medias">medias</h3>
 
 ```
-Usage: minet mediacloud medias [-h] [-t TOKEN] [--rcfile RCFILE] [--feeds FEEDS]
-                               [-i INPUT] [-s SELECT] [--total TOTAL]
-                               [-o OUTPUT]
+Usage: minet mediacloud medias [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
+                               [--feeds FEEDS] [-i INPUT] [-s SELECT]
+                               [--total TOTAL] [-o OUTPUT]
                                value_or_column_name
 
 # Minet Mediacloud Medias Command
@@ -2628,6 +2711,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 how to use the command with a CSV file?
@@ -2649,7 +2734,7 @@ how to use the command with a CSV file?
 <h3 id="mc-search">search</h3>
 
 ```
-Usage: minet mediacloud search [-h] [-t TOKEN] [--rcfile RCFILE]
+Usage: minet mediacloud search [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
                                [-c COLLECTIONS] [--filter-query FILTER_QUERY]
                                [-m MEDIAS] [--publish-day PUBLISH_DAY]
                                [--publish-month PUBLISH_MONTH]
@@ -2694,6 +2779,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 ```
 
@@ -2703,7 +2790,7 @@ Optional Arguments:
 
 ```
 Usage: minet mediacloud topic stories [-h] [-t TOKEN] [--rcfile RCFILE]
-                                      [--media-id MEDIA_ID]
+                                      [--silent] [--media-id MEDIA_ID]
                                       [--from-media-id FROM_MEDIA_ID]
                                       topic_id
 
@@ -2728,6 +2815,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 ```
 
@@ -2736,8 +2825,9 @@ Optional Arguments:
 ### channel-infos
 
 ```
-Usage: minet telegram channel-infos [-h] [--throttle THROTTLE] [-i INPUT]
-                                    [-s SELECT] [--total TOTAL] [-o OUTPUT]
+Usage: minet telegram channel-infos [-h] [--throttle THROTTLE] [--silent]
+                                    [-i INPUT] [-s SELECT] [--total TOTAL]
+                                    [-o OUTPUT]
                                     value_or_column_name
 
 # Minet Telegram Channel-Infos Command
@@ -2763,6 +2853,8 @@ Optional Arguments:
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2788,8 +2880,9 @@ how to use the command with a CSV file?
 ### channel-messages
 
 ```
-Usage: minet telegram channel-messages [-h] [--throttle THROTTLE] [-i INPUT]
-                                       [-s SELECT] [--total TOTAL] [-o OUTPUT]
+Usage: minet telegram channel-messages [-h] [--throttle THROTTLE] [--silent]
+                                       [-i INPUT] [-s SELECT] [--total TOTAL]
+                                       [-o OUTPUT]
                                        value_or_column_name
 
 # Minet Telegram Channel-Messages Command
@@ -2815,6 +2908,8 @@ Optional Arguments:
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2856,9 +2951,9 @@ Subcommands:
 ### search-videos
 
 ```
-Usage: minet tiktok search-videos [-h] [-c COOKIE] [--rcfile RCFILE] [-l LIMIT]
-                                  [-i INPUT] [-s SELECT] [--total TOTAL]
-                                  [-o OUTPUT]
+Usage: minet tiktok search-videos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                                  [-l LIMIT] [-i INPUT] [-s SELECT]
+                                  [--total TOTAL] [-o OUTPUT]
                                   value_or_column_name
 
 # Tiktok Search Videos Command
@@ -2911,6 +3006,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -2939,8 +3036,9 @@ how to use the command with a CSV file?
 ### attrition
 
 ```
-Usage: minet twitter attrition [-h] [--user USER] [--retweeted-id RETWEETED_ID]
-                               [--ids] [--api-key API_KEY] [--rcfile RCFILE]
+Usage: minet twitter attrition [-h] [--user USER] [--silent]
+                               [--retweeted-id RETWEETED_ID] [--ids]
+                               [--api-key API_KEY] [--rcfile RCFILE]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -3034,6 +3132,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -3063,8 +3163,8 @@ how to use the command with a CSV file?
 ### followers
 
 ```
-Usage: minet twitter followers [-h] [--ids] [--v2] [--api-key API_KEY]
-                               [--rcfile RCFILE]
+Usage: minet twitter followers [-h] [--ids] [--silent] [--v2]
+                               [--api-key API_KEY] [--rcfile RCFILE]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -3122,6 +3222,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -3148,7 +3250,7 @@ how to use the command with a CSV file?
 ### friends
 
 ```
-Usage: minet twitter friends [-h] [--ids] [--v2] [--api-key API_KEY]
+Usage: minet twitter friends [-h] [--ids] [--silent] [--v2] [--api-key API_KEY]
                              [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
                              [--access-token ACCESS_TOKEN]
                              [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -3206,6 +3308,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -3233,7 +3337,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter list-followers [-h] [--api-key API_KEY] [--rcfile RCFILE]
-                                    [--api-secret-key API_SECRET_KEY]
+                                    [--silent] [--api-secret-key API_SECRET_KEY]
                                     [--access-token ACCESS_TOKEN]
                                     [--access-token-secret ACCESS_TOKEN_SECRET]
                                     [-i INPUT] [-s SELECT] [--total TOTAL]
@@ -3283,6 +3387,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -3310,7 +3416,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter list-members [-h] [--api-key API_KEY] [--rcfile RCFILE]
-                                  [--api-secret-key API_SECRET_KEY]
+                                  [--silent] [--api-secret-key API_SECRET_KEY]
                                   [--access-token ACCESS_TOKEN]
                                   [--access-token-secret ACCESS_TOKEN_SECRET]
                                   [-i INPUT] [-s SELECT] [--total TOTAL]
@@ -3360,6 +3466,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -3387,7 +3495,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter retweeters [-h] [--api-key API_KEY] [--rcfile RCFILE]
-                                [--api-secret-key API_SECRET_KEY]
+                                [--silent] [--api-secret-key API_SECRET_KEY]
                                 [--access-token ACCESS_TOKEN]
                                 [--access-token-secret ACCESS_TOKEN_SECRET]
                                 [-i INPUT] [-s SELECT] [--total TOTAL]
@@ -3436,6 +3544,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -3462,7 +3572,7 @@ how to use the command with a CSV file?
 <h3 id="twitter-scrape">scrape</h3>
 
 ```
-Usage: minet twitter scrape [-h] [--include-refs] [-l LIMIT]
+Usage: minet twitter scrape [-h] [--silent] [--include-refs] [-l LIMIT]
                             [--query-template QUERY_TEMPLATE] [-i INPUT]
                             [-s SELECT] [--total TOTAL] [-o OUTPUT]
                             {tweets,users} value_or_column_name
@@ -3511,6 +3621,8 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -3555,7 +3667,7 @@ how to use the command with a CSV file?
 ### tweet-date
 
 ```
-Usage: minet twitter tweet-date [-h] [--timezone TIMEZONE] [-i INPUT]
+Usage: minet twitter tweet-date [-h] [--timezone TIMEZONE] [--silent] [-i INPUT]
                                 [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                 value_or_column_name
 
@@ -3582,6 +3694,8 @@ Optional Arguments:
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -3607,7 +3721,7 @@ how to use the command with a CSV file?
 ### tweet-search
 
 ```
-Usage: minet twitter tweet-search [-h] [--since-id SINCE_ID]
+Usage: minet twitter tweet-search [-h] [--since-id SINCE_ID] [--silent]
                                   [--until-id UNTIL_ID]
                                   [--start-time START_TIME]
                                   [--end-time END_TIME] [--academic]
@@ -3682,6 +3796,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -3712,10 +3828,10 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter tweet-count [-h] [--granularity {day,hour,minute}]
-                                 [--since-id SINCE_ID] [--until-id UNTIL_ID]
-                                 [--start-time START_TIME] [--end-time END_TIME]
-                                 [--academic] [--api-key API_KEY]
-                                 [--rcfile RCFILE]
+                                 [--silent] [--since-id SINCE_ID]
+                                 [--until-id UNTIL_ID] [--start-time START_TIME]
+                                 [--end-time END_TIME] [--academic]
+                                 [--api-key API_KEY] [--rcfile RCFILE]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -3791,6 +3907,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -3823,8 +3941,8 @@ how to use the command with a CSV file?
 ### tweets
 
 ```
-Usage: minet twitter tweets [-h] [--v2] [--api-key API_KEY] [--rcfile RCFILE]
-                            [--api-secret-key API_SECRET_KEY]
+Usage: minet twitter tweets [-h] [--v2] [--silent] [--api-key API_KEY]
+                            [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
                             [--access-token ACCESS_TOKEN]
                             [--access-token-secret ACCESS_TOKEN_SECRET]
                             [-i INPUT] [-s SELECT] [--total TOTAL] [--resume]
@@ -3877,6 +3995,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -3903,7 +4023,7 @@ how to use the command with a CSV file?
 ### users
 
 ```
-Usage: minet twitter users [-h] [--ids] [--v2] [--api-key API_KEY]
+Usage: minet twitter users [-h] [--ids] [--silent] [--v2] [--api-key API_KEY]
                            [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
                            [--access-token ACCESS_TOKEN]
                            [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -3959,6 +4079,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -3986,7 +4108,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter user-search [-h] [--api-key API_KEY] [--rcfile RCFILE]
-                                 [--api-secret-key API_SECRET_KEY]
+                                 [--silent] [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
                                  [-i INPUT] [-s SELECT] [--total TOTAL]
@@ -4038,6 +4160,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -4067,7 +4191,7 @@ how to use the command with a CSV file?
 ### user-tweets
 
 ```
-Usage: minet twitter user-tweets [-h] [--ids] [--min-date MIN_DATE]
+Usage: minet twitter user-tweets [-h] [--ids] [--silent] [--min-date MIN_DATE]
                                  [--exclude-retweets] [--v2] [--api-key API_KEY]
                                  [--rcfile RCFILE]
                                  [--api-secret-key API_SECRET_KEY]
@@ -4130,6 +4254,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -4158,13 +4284,13 @@ how to use the command with a CSV file?
 ### pageviews
 
 ```
-Usage: minet wikipedia pageviews [-h] --start-date START_DATE --end-date
-                                 END_DATE [--agent AGENT] [--access ACCESS]
-                                 [-t THREADS] [--granularity GRANULARITY]
-                                 [--sum] [--lang LANG]
-                                 [--lang-column LANG_COLUMN] [-i INPUT]
-                                 [-s SELECT] [--total TOTAL] [--resume]
-                                 [-o OUTPUT]
+Usage: minet wikipedia pageviews [-h] --start-date START_DATE [--silent]
+                                 --end-date END_DATE [--agent AGENT]
+                                 [--access ACCESS] [-t THREADS]
+                                 [--granularity GRANULARITY] [--sum]
+                                 [--lang LANG] [--lang-column LANG_COLUMN]
+                                 [-i INPUT] [-s SELECT] [--total TOTAL]
+                                 [--resume] [-o OUTPUT]
                                  value_or_column_name
 
 # Minet Wikipedia Pageviews Command
@@ -4207,6 +4333,8 @@ Optional Arguments:
                                 printed to stdout.
   --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 how to use the command with a CSV file?
@@ -4230,8 +4358,8 @@ how to use the command with a CSV file?
 ### captions
 
 ```
-Usage: minet youtube captions [-h] [--lang LANG] [-i INPUT] [-s SELECT]
-                              [--total TOTAL] [-o OUTPUT]
+Usage: minet youtube captions [-h] [--lang LANG] [--silent] [-i INPUT]
+                              [-s SELECT] [--total TOTAL] [-o OUTPUT]
                               value_or_column_name
 
 # Youtube captions
@@ -4259,6 +4387,8 @@ Optional Arguments:
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -4288,8 +4418,9 @@ how to use the command with a CSV file?
 ### channel-videos
 
 ```
-Usage: minet youtube channel-videos [-h] [-k KEY] [--rcfile RCFILE] [-i INPUT]
-                                    [-s SELECT] [--total TOTAL] [-o OUTPUT]
+Usage: minet youtube channel-videos [-h] [-k KEY] [--rcfile RCFILE] [--silent]
+                                    [-i INPUT] [-s SELECT] [--total TOTAL]
+                                    [-o OUTPUT]
                                     value_or_column_name
 
 # Youtube channel videos
@@ -4325,6 +4456,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -4359,8 +4492,8 @@ how to use the command with a CSV file?
 ### channels
 
 ```
-Usage: minet youtube channels [-h] [-k KEY] [--rcfile RCFILE] [-i INPUT]
-                              [-s SELECT] [--total TOTAL] [-o OUTPUT]
+Usage: minet youtube channels [-h] [-k KEY] [--rcfile RCFILE] [--silent]
+                              [-i INPUT] [-s SELECT] [--total TOTAL] [-o OUTPUT]
                               value_or_column_name
 
 # Youtube Channels Command
@@ -4395,6 +4528,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -4425,8 +4560,8 @@ how to use the command with a CSV file?
 ```
 
 ```
-Usage: minet youtube comments [-h] [-k KEY] [--rcfile RCFILE] [-i INPUT]
-                              [-s SELECT] [--total TOTAL] [-o OUTPUT]
+Usage: minet youtube comments [-h] [-k KEY] [--rcfile RCFILE] [--silent]
+                              [-i INPUT] [-s SELECT] [--total TOTAL] [-o OUTPUT]
                               value_or_column_name
 
 # Youtube comments
@@ -4457,6 +4592,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -4483,7 +4620,7 @@ how to use the command with a CSV file?
 <h3 id="youtube-search">search</h3>
 
 ```
-Usage: minet youtube search [-h] [-l LIMIT]
+Usage: minet youtube search [-h] [-l LIMIT] [--silent]
                             [--order {date,rating,relevance,title,videoCount,viewCount}]
                             [-k KEY] [--rcfile RCFILE] [-i INPUT] [-s SELECT]
                             [--total TOTAL] [-o OUTPUT]
@@ -4524,6 +4661,8 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 example:
@@ -4550,8 +4689,8 @@ how to use the command with a CSV file?
 ### videos
 
 ```
-Usage: minet youtube videos [-h] [-k KEY] [--rcfile RCFILE] [-i INPUT]
-                            [-s SELECT] [--total TOTAL] [-o OUTPUT]
+Usage: minet youtube videos [-h] [-k KEY] [--rcfile RCFILE] [--silent]
+                            [-i INPUT] [-s SELECT] [--total TOTAL] [-o OUTPUT]
                             value_or_column_name
 
 # Youtube videos
@@ -4582,6 +4721,8 @@ Optional Arguments:
                               info about this here:
                               https://github.com/medialab/minet/blob/master/docs
                               /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 how to use the command with a CSV file?

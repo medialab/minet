@@ -75,6 +75,9 @@ def resolve_fetch_arguments(cli_args):
     if cli_args.has_dummy_csv and cli_args.contents_in_report is None:
         cli_args.contents_in_report = True
 
+    if cli_args.dont_save:
+        cli_args.contents_in_report = False
+
     if cli_args.contents_in_report and cli_args.compress:
         raise InvalidArgumentsError(
             "Cannot both --compress and get --contents-in-report!"
@@ -157,6 +160,11 @@ FETCH_COMMAND = command(
             "help": "Whether to include retrieved contents, e.g. html, directly in the report and avoid writing them in a separate folder. This requires to standardize encoding and won't work on binary formats. Note that --contents-in-report is the default when no input file is given.",
             "dest": "contents_in_report",
             "action": BooleanAction,
+        },
+        {
+            "flags": ["-D", "--dont-save"],
+            "help": "Use not to write any downloaded file on disk.",
+            "action": "store_true",
         },
         {
             "flags": ["-O", "--output-dir"],
