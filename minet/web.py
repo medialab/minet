@@ -67,7 +67,7 @@ AnyTimeout = Union[float, urllib3.Timeout]
 # Handy regexes
 CHARSET_RE = re.compile(rb'<meta.*?charset=["\']*(.+?)["\'>]', flags=re.I)
 PRAGMA_RE = re.compile(rb'<meta.*?content=["\']*;?charset=(.+?)["\'>]', flags=re.I)
-XML_RE = re.compile(rb'^\s+<\?xml.*?encoding=["\']*(.+?)["\'>]', flags=re.I)
+XML_RE = re.compile(rb'^\s*<\?xml.*?encoding=["\']*(.+?)["\'>]', flags=re.I)
 NOSCRIPT_RE = re.compile(rb"<noscript[^>]*>.*</noscript[^>]*>", flags=re.I)
 META_REFRESH_RE = re.compile(
     rb"""<meta\s+http-equiv=['"]?refresh['"]?\s+content=['"]?([^"']+)['">]?""",
@@ -78,7 +78,7 @@ JAVASCRIPT_LOCATION_RE = re.compile(
 )
 ESCAPED_SLASH_RE = re.compile(rb"\\\/")
 HTML_RE = re.compile(
-    rb"^<(?:html|head|body|title|meta|link|span|div|img|ul|ol|[ap!?])", flags=re.I
+    rb"^\s*<(?:html|head|body|title|meta|link|span|div|img|ul|ol|[ap!?])", flags=re.I
 )
 CANONICAL_LINK_RE = re.compile(
     rb'<link\s*[^>]*\s+rel=(?:"\s*canonical\s*"|canonical|\'\s*canonical\s*\')\s+[^>]*\s?/?>'
