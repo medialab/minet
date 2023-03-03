@@ -901,6 +901,15 @@ class Response(object):
         return self.__is_text  # type: ignore # At that point we know it's a bool
 
     @property
+    def could_be_html(self) -> bool:
+        mime = self.mimetype
+        return mime is not None and "html" in mime
+
+    @property
+    def is_html(self) -> bool:
+        return self.is_text and looks_like_html(self.__body)
+
+    @property
     def encoding(self) -> Optional[str]:
         self.__guess_encoding()
         return self.__encoding
@@ -913,6 +922,12 @@ class Response(object):
             return "utf-8"
 
         return encoding
+
+    @property
+    def encoding_from_headers(self) -> Optional[str]:
+        return infer_encoding_from_headers(self.__response)
+
+    # TODO: add encoding_from_xml & possible_encodings when required
 
     @property
     def body(self) -> bytes:
