@@ -36,6 +36,7 @@ setup(
         "pyyaml",
         "quenouille>=1.5.1,<2",
         "rich>=13,<14",
+        "rich-argparse>1,<2",
         "soupsieve>=2.1,<3",
         "tenacity>=8,<9",
         "trafilatura>=1.4.1,<1.5",

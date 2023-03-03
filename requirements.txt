@@ -20,6 +20,7 @@ persist-queue==0.8.0
 pyyaml==5.4.1
 quenouille==1.5.1
 rich==13.3.1
+rich-argparse==1.0.0
 soupsieve>=2.1,<3
 tenacity==8.2.1
 trafilatura==1.4.1
