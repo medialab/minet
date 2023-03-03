@@ -572,7 +572,7 @@ def resolve_typical_arguments(
             $ xsv search -s col . | minet cmd column_name -i -
         """
 
-    if select:
+    if select or variadic_input is not None:
 
         # TODO: actually one can use xsv mini dsl here
         args.append(
@@ -582,11 +582,11 @@ def resolve_typical_arguments(
             },
         )
 
-    if total:
+    if total or variadic_input is not None:
         args.append(
             {
                 "flag": "--total",
-                "help": "Total number of items to process. Necessary if you want to display a finite progress indicator.",
+                "help": "Total number of items to process. Might be necessary when you want to display a finite progress indicator for large files given as input to the command.",
                 "type": int,
             }
         )

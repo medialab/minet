@@ -138,8 +138,6 @@ FETCH_COMMAND = command(
     """,
     resolve=resolve_fetch_arguments,
     resumer=ThreadSafeResumer,
-    select=True,
-    total=True,
     variadic_input={"dummy_column": "url"},
     arguments=[
         *COMMON_ARGUMENTS,
@@ -227,8 +225,6 @@ RESOLVE_COMMAND = command(
             $ minet resolve https://lemonde.fr
     """,
     resumer=ThreadSafeResumer,
-    select=True,
-    total=True,
     variadic_input={"dummy_column": "url"},
     arguments=[
         *COMMON_ARGUMENTS,

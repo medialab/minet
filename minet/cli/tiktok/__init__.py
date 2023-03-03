@@ -38,7 +38,6 @@ TIKTOK_SEARCH_VIDEOS_SUBCOMMAND = subcommand(
             $ minet tiktok search-videos paris > paris_videos.csv
     """,
     variadic_input={"dummy_column": "query", "item_label": "tiktok keyword"},
-    select=True,
     arguments=[
         {
             "flags": ["-c", "--cookie"],

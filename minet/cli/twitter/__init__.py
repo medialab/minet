@@ -167,8 +167,6 @@ TWITTER_ATTRITION_SUBCOMMAND = twitter_api_subcommand(
         "item_label_plural": "tweet urls or ids",
     },
     resumer=RowCountResumer,
-    select=True,
-    total=True,
     arguments=[
         {
             "flag": "--user",
@@ -202,8 +200,6 @@ TWITTER_FOLLOWERS_SUBCOMMAND = twitter_api_subcommand(
     },
     resumer=BatchResumer,
     resumer_kwargs=lambda args: ({"value_column": args.column}),
-    select=True,
-    total=True,
     arguments=[
         IDS_ARGUMENT,
         V2_ARGUMENT,
@@ -230,8 +226,6 @@ TWITTER_FRIENDS_SUBCOMMAND = twitter_api_subcommand(
     },
     resumer=BatchResumer,
     resumer_kwargs=lambda args: ({"value_column": args.column}),
-    select=True,
-    total=True,
     arguments=[
         IDS_ARGUMENT,
         V2_ARGUMENT,
@@ -256,8 +250,6 @@ TWITTER_LIST_FOLLOWERS_SUBCOMMAND = twitter_api_subcommand(
         "item_label": "Twitter list id or url",
         "item_label_plural": "Twitter list ids or urls",
     },
-    select=True,
-    total=True,
 )
 
 TWITTER_LIST_MEMBERS_SUBCOMMAND = twitter_api_subcommand(
@@ -278,8 +270,6 @@ TWITTER_LIST_MEMBERS_SUBCOMMAND = twitter_api_subcommand(
         "item_label": "Twitter list id or url",
         "item_label_plural": "Twitter list ids or urls",
     },
-    select=True,
-    total=True,
 )
 
 TWITTER_RETWEETERS_SUBCOMMAND = twitter_api_subcommand(
@@ -296,8 +286,6 @@ TWITTER_RETWEETERS_SUBCOMMAND = twitter_api_subcommand(
             $ minet tw retweeters tweet_id -i tweets.csv > retweeters.csv
     """,
     variadic_input={"dummy_column": "tweet_id", "item_label": "tweet id"},
-    select=True,
-    total=True,
 )
 
 TWITTER_SCRAPE_SUBCOMMAND = subcommand(
@@ -343,7 +331,6 @@ TWITTER_SCRAPE_SUBCOMMAND = subcommand(
         . Collecting users with "adam" in their user_name or user_description:
             $ minet tw scrape users adam > users.csv
     """,
-    select=True,
     variadic_input={"dummy_column": "query", "item_label_plural": "queries"},
     arguments=[
         {
@@ -398,8 +385,6 @@ TWITTER_TWEET_COUNT_SUBCOMMAND = twitter_api_subcommand(
             $ minet tw tweet-count "query" --granularity day > counts.csv
     """,
     variadic_input={"dummy_column": "query", "item_label_plural": "queries"},
-    select=True,
-    total=True,
     arguments=[
         {
             "flag": "--granularity",
@@ -428,7 +413,6 @@ TWITTER_TWEET_DATE_SUBCOMMAND = subcommand(
         "item_label": "tweet url or id",
         "item_label_plural": "tweet urls or ids",
     },
-    select=True,
     arguments=[
         {
             "flag": "--timezone",
@@ -459,8 +443,6 @@ TWITTER_TWEET_SEARCH_SUBCOMMAND = twitter_api_subcommand(
             $ minet tw tweet-search query -i queries.csv > tweets.csv
     """,
     variadic_input={"dummy_column": "query", "item_label_plural": "queries"},
-    select=True,
-    total=True,
     arguments=[
         *COMMON_V2_SEARCH_ARGUMENTS,
         ACADEMIC_ARGUMENT,
@@ -488,8 +470,6 @@ TWITTER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
     """,
     variadic_input={"dummy_column": "tweet_id", "item_label": "tweet id"},
     resumer=RowCountResumer,
-    select=True,
-    total=True,
     arguments=[V2_ARGUMENT],
 )
 
@@ -514,8 +494,6 @@ TWITTER_USER_SEARCH_SUBCOMMAND = twitter_api_subcommand(
             $ minet tw user-search query -i queries.csv > users.csv
     """,
     variadic_input={"dummy_column": "query", "item_label_plural": "queries"},
-    select=True,
-    total=True,
 )
 
 TWITTER_USER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
@@ -537,8 +515,6 @@ TWITTER_USER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
         "item_label": "Twitter account screen name or id",
         "item_label_plural": "Twitter account screen names or ids",
     },
-    select=True,
-    total=True,
     arguments=[
         IDS_ARGUMENT,
         {
@@ -569,8 +545,6 @@ TWITTER_USERS_SUBCOMMAND = twitter_api_subcommand(
             $ minet tw users screen_name -i users.csv > data_users.csv
     """,
     resumer=RowCountResumer,
-    select=True,
-    total=True,
     variadic_input={"dummy_column": "user", "item_label": "Twitter user"},
     arguments=[
         IDS_ARGUMENT,

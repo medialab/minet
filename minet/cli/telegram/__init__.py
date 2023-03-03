@@ -33,7 +33,6 @@ TELEGRAM_CHANNEL_INFOS_SUBCOMMAND = subcommand(
         "item_label": "channel name / url",
         "item_label_plural": "channel names / urls",
     },
-    select=True,
     arguments=[THROTTLE_ARGUMENT],
 )
 
@@ -54,7 +53,6 @@ TELEGRAM_CHANNEL_MESSAGES_SUBCOMMAND = subcommand(
         "item_label": "channel name / url",
         "item_label_plural": "channel names / urls",
     },
-    select=True,
     arguments=[THROTTLE_ARGUMENT],
 )
 
