@@ -4,10 +4,14 @@ from urllib.parse import quote, unquote
 
 from minet.fetch import multithreaded_fetch
 
+from minet.wikipedia.exceptions import (
+    WikimediaRESTAPIThrottledError,
+    WikimediaRESTAPIServerError,
+)
 from minet.wikipedia.types import Granularity, Agent, Access, WikipediaPageViewsItem
 
 BASE_URL = "https://wikimedia.org/api/rest_v1"
-DEFAULT_THREADS = 20
+DEFAULT_THREADS = 10
 
 ItemType = TypeVar("ItemType")
 
@@ -73,7 +77,7 @@ class WikimediaRestAPIClient(object):
                 else:
                     page = (lang, page[1])
 
-            return build_pageviews_url(
+            url = build_pageviews_url(
                 lang=page[0],
                 name=page[1],
                 start_date=start_date,
@@ -82,6 +86,8 @@ class WikimediaRestAPIClient(object):
                 granularity=granularity,
                 agent=agent,
             )
+
+            return url
 
         for result in multithreaded_fetch(
             pages,
@@ -94,6 +100,12 @@ class WikimediaRestAPIClient(object):
                 raise result.error
 
             response = result.response
+
+            if response.status == 429:
+                raise WikimediaRESTAPIThrottledError
+
+            if response.status >= 500:
+                raise WikimediaRESTAPIServerError
 
             if response.status == 404:
                 yield result.item, []

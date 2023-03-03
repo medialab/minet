@@ -4199,7 +4199,7 @@ how to use the command with a CSV file?
 ```
 usage: minet wikipedia pageviews [-h] --start-date START_DATE --end-date
                                  END_DATE [--agent AGENT] [--access ACCESS]
-                                 [--threads THREADS] [--granularity GRANULARITY]
+                                 [-t THREADS] [--granularity GRANULARITY]
                                  [--sum] [--lang LANG]
                                  [--lang-column LANG_COLUMN] [-i INPUT]
                                  [-s SELECT] [--total TOTAL] [--resume]
@@ -4216,37 +4216,39 @@ See API documentation here for more details:
 https://wikitech.wikimedia.org/wiki/Analytics/AQS/Pageviews
 
 positional arguments:
-  value_or_column_name        Single page to process or name of the CSV column
-                              containing pages when using -i/--input.
+  value_or_column_name          Single page to process or name of the CSV column
+                                containing pages when using -i/--input.
 
 optional arguments:
-  --access ACCESS             Get pageviews by access. Defaults to "all-access".
-  --agent AGENT               Get pageviews by target agent. Defaults to "all-
-                              agents".
-  --end-date END_DATE         End date. Must be of format YYYYMMDD (e.g.
-                              20151031) or YYYYMMDDHH (e.g. 2015103100)
-  --granularity GRANULARITY   Pageviews granularity. Defaults to "monthly".
-  --lang LANG                 Lang for the given pages.
-  --lang-column LANG_COLUMN   Name of a CSV column containing page lang.
-  --start-date START_DATE     Starting date. Must be of format YYYYMMDD (e.g.
-                              20151031) or YYYYMMDDHH (e.g. 2015103100)
-  --sum                       Whether to sum the collected pageviews rather than
-                              outputting them by timestamp.
-  --threads THREADS           Number of threads to use. Defaults to 10.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
-                              (separated by `,`).
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -i INPUT, --input INPUT     CSV file containing all the pages you want to
-                              process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --resume                    Whether to resume from an aborted collection. Need
-                              -o to be set.
-  -h, --help                  show this help message and exit
+  --access ACCESS               Get pageviews by access. Defaults to "all-
+                                access".
+  --agent AGENT                 Get pageviews by target agent. Defaults to "all-
+                                agents".
+  --end-date END_DATE           End date. Must be of format YYYYMMDD (e.g.
+                                20151031) or YYYYMMDDHH (e.g. 2015103100)
+  --granularity GRANULARITY     Pageviews granularity. Defaults to "monthly".
+  --lang LANG                   Lang for the given pages.
+  --lang-column LANG_COLUMN     Name of a CSV column containing page lang.
+  --start-date START_DATE       Starting date. Must be of format YYYYMMDD (e.g.
+                                20151031) or YYYYMMDDHH (e.g. 2015103100)
+  --sum                         Whether to sum the collected pageviews rather
+                                than outputting them by timestamp.
+  -t THREADS, --threads THREADS
+                                Number of threads to use. Defaults to 10.
+  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+                                output (separated by `,`).
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i INPUT, --input INPUT       CSV file containing all the pages you want to
+                                process. Will consider `-` as stdin.
+  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --resume                      Whether to resume from an aborted collection.
+                                Need -o to be set.
+  -h, --help                    show this help message and exit
 
 how to use the command with a CSV file?
 

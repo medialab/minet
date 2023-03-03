@@ -50,9 +50,9 @@ WIKIPEDIA_PAGEVIEWS_SUBCOMMAND = subcommand(
         },
         {
             "flags": ["-t", "--threads"],
-            "help": "Number of threads to use. Defaults to 20.",
+            "help": "Number of threads to use. Defaults to 10.",
             "type": int,
-            "default": 20,
+            "default": 10,
         },
         {
             "flag": "--granularity",
