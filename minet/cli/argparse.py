@@ -290,6 +290,8 @@ class BooleanAction(Action):
         elif len(option_strings) == 4:
             self.true_options = [option_strings[0], option_strings[1]]
             self.false_options = [option_strings[2], option_strings[3]]
+        else:
+            raise TypeError("expecting 2 or 4 flags")
 
     def __call__(self, parser, cli_args, values, option_string=None):
         setattr(

@@ -151,7 +151,7 @@ def create_report_iterator(cli_args, reader, worker_args=None, on_irrelevant_row
     filename_pos = reader.headers.get("filename")
     encoding_pos = reader.headers.get("encoding")
     mimetype_pos = reader.headers.get("mimetype")
-    raw_content_pos = reader.headers.get("raw_contents")
+    raw_content_pos = reader.headers.get("body")
 
     indexed_headers = {n: i for i, n in enumerate(reader.headers)}
 

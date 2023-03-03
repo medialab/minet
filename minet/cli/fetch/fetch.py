@@ -64,7 +64,7 @@ def get_headers(cli_args):
         headers = FETCH_ADDITIONAL_HEADERS
 
         if cli_args.contents_in_report:
-            headers = headers + ["raw_contents"]
+            headers = headers + ["body"]
 
     return headers
 

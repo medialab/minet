@@ -145,7 +145,7 @@ def action(cli_args, enricher, loading_bar):
 
     if (
         cli_args.glob is None
-        and "raw_contents" not in enricher.headers
+        and "body" not in enricher.headers
         and not isdir(cli_args.input_dir)
     ):
         raise FatalError(
