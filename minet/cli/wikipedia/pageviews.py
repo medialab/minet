@@ -40,6 +40,7 @@ def action(cli_args, enricher, loading_bar):
         granularity=cli_args.granularity,
         access=cli_args.access,
         agent=cli_args.agent,
+        threads=cli_args.threads,
     ):
         with loading_bar.step():
 

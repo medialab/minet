@@ -47,14 +47,15 @@ class TimeElapsedColumn(ProgressColumn):
         if not elapsed:
             return Text("")
 
-        return Text("in " + str(HumanDuration(elapsed)), style="progress.elapsed")
+        return Text(
+            "in " + HumanDuration(elapsed).as_human(2), style="progress.elapsed"
+        )
 
 
 class CompletionColumn(ProgressColumn):
     def render(self, task: Task) -> Text:
         total = format_int(task.total) if task.total is not None else "?"
-        # completed = format_int(task.completed).rjust(len(total))
-        completed = format_int(task.completed)
+        completed = format_int(task.completed).rjust(len(total))
 
         unit = task.fields.get("unit")
         unit_text = f" {unit}" if unit is not None else ""
@@ -78,12 +79,12 @@ class ThroughputColumn(ProgressColumn):
         if not elapsed or not task.completed:
             return Text("(?/s)")
 
-        throughput = HumanThroughput(task.completed / elapsed, "")
+        throughput = HumanThroughput(task.completed / elapsed, "").as_human(2)
 
         eta = ""
 
         if task.total is not None and task.time_remaining:
-            remaining = HumanDuration(task.time_remaining)
+            remaining = HumanDuration(task.time_remaining).as_human(2)
             eta = f" eta: {remaining}"
 
         message = f"({throughput}{eta})"
@@ -241,14 +242,14 @@ class LoadingBar(object):
             self.bar_column,
         ]
 
-        columns.append(CompletionColumn())
+        columns.append(CompletionColumn(Column(overflow="ellipsis", no_wrap=True)))
 
         if not nested:
             columns.append(SpinnerColumn("dots", style=None, finished_text="·"))
 
         columns.append(PercentageColumn())
         columns.append(TimeElapsedColumn())
-        columns.append(ThroughputColumn())
+        columns.append(ThroughputColumn(Column(overflow="ellipsis", no_wrap=True)))
 
         self.progress = Progress(*columns)
         self.table.add_row(self.progress)
