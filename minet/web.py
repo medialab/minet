@@ -18,7 +18,8 @@ import json
 import mimetypes
 import functools
 import charset_normalizer as chardet
-from bs4 import BeautifulSoup
+import warnings
+from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning, SoupStrainer
 from datetime import datetime
 from timeit import default_timer as timer
 from io import BytesIO
@@ -965,8 +966,17 @@ class Response(object):
     def json(self):
         return json.loads(self.text())
 
-    def soup(self, engine: str = "lxml") -> BeautifulSoup:
-        return BeautifulSoup(self.text(), engine)
+    def soup(
+        self,
+        engine: str = "lxml",
+        ignore_xhtml_warning=False,
+        strainer: Optional[SoupStrainer] = None,
+    ) -> BeautifulSoup:
+        with warnings.catch_warnings():
+            if ignore_xhtml_warning:
+                warnings.simplefilter("ignore", category=XMLParsedAsHTMLWarning)
+
+            return BeautifulSoup(self.text(), engine, parse_only=strainer)
 
     def __getitem__(self, name: str) -> Any:
         return self.__meta[name]
