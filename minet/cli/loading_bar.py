@@ -53,7 +53,8 @@ class TimeElapsedColumn(ProgressColumn):
 class CompletionColumn(ProgressColumn):
     def render(self, task: Task) -> Text:
         total = format_int(task.total) if task.total is not None else "?"
-        completed = format_int(task.completed).rjust(len(total))
+        # completed = format_int(task.completed).rjust(len(total))
+        completed = format_int(task.completed)
 
         unit = task.fields.get("unit")
         unit_text = f" {unit}" if unit is not None else ""
@@ -136,15 +137,15 @@ class StatsColumn(ProgressColumn):
 
 class NestedTotalColumn(ProgressColumn):
     def render(self, task: Task) -> Text:
-        sub_total = task.fields.get("sub_total")
+        sub_total_sum = task.fields.get("sub_total_sum")
 
-        if sub_total is None:
+        if sub_total_sum is None:
             return None
 
         unit = task.fields.get("unit")
         unit_text = f" {unit}" if unit is not None else ""
 
-        return Text(f"total: {format_int(sub_total)}{unit_text}")
+        return Text(f"total: {format_int(sub_total_sum)}{unit_text}")
 
 
 class StatsItem(TypedDict):
@@ -200,7 +201,7 @@ class LoadingBar(object):
         sub_unit: Optional[str] = None,
         transient: bool = False,
     ):
-        self.sub_total = 0
+        self.sub_total_sum = 0
         self.nested = nested
         self.show_label = show_label
         self.transient = transient
@@ -211,7 +212,7 @@ class LoadingBar(object):
         self.label_progress = None
         self.label_progress_task_id = None
         self.sub_progress = None
-        self.sub_task = None
+        self.sub_task_id = None
         self.stats_progress = None
         self.stats_task = None
         self.stats = OrderedDict()
@@ -265,7 +266,7 @@ class LoadingBar(object):
                 SpinnerColumn("dots", style="", finished_text="·"),
                 TextColumn(
                     "{task.description}",
-                    table_column=Column(width=50, min_width=0),
+                    table_column=Column(max_width=50),
                     style=sub_title_style,
                 ),
                 CompletionColumn(),
@@ -275,10 +276,10 @@ class LoadingBar(object):
             ]
 
             self.sub_progress = Progress(*sub_columns)
-            self.sub_task = self.sub_progress.add_task(
+            self.sub_task_id = self.sub_progress.add_task(
                 description=sub_title or "",
                 total=None,
-                sub_total=self.sub_total,
+                sub_total_sum=self.sub_total_sum,
                 unit=sub_unit,
             )
 
@@ -357,7 +358,7 @@ class LoadingBar(object):
         self.stop()
 
     @contextmanager
-    def step(self, item=None, count=1, index=None, catch=None):
+    def step(self, item=None, count=1, index=None, catch=None, sub_total=None):
         interrupted = False
 
         # TODO: we could add some key kwarg if needed
@@ -368,6 +369,8 @@ class LoadingBar(object):
 
                 if item is not None:
                     self.update(sub_title=item)
+
+                self.set_sub_total(sub_total)
             else:
                 if self.show_label and item is not None:
                     self.set_label(item)
@@ -400,11 +403,13 @@ class LoadingBar(object):
         self.progress.update(self.task_id, advance=count)
 
     def nested_advance(self, count=1):
-        self.sub_total += 1
-        self.sub_progress.update(self.sub_task, advance=count, sub_total=self.sub_total)
+        self.sub_total_sum += 1
+        self.sub_progress.update(
+            self.sub_task_id, advance=count, sub_total_sum=self.sub_total_sum
+        )
 
     def nested_reset(self):
-        self.sub_progress.reset(self.sub_task)
+        self.sub_progress.reset(self.sub_task_id)
 
     def __refresh_stats(self):
         self.stats_progress.update(self.stats_task_id, stats=self.stats)
@@ -419,6 +424,9 @@ class LoadingBar(object):
     def set_total(self, total: Optional[int] = None):
         self.progress.update(self.task_id, total=total)
         self.known_total = total is not None
+
+    def set_sub_total(self, total: Optional[int] = None):
+        self.sub_progress.update(self.sub_task_id, total=total)
 
     def set_label(self, label: str):
         assert self.label_progress is not None
@@ -461,7 +469,7 @@ class LoadingBar(object):
             self.nested_advance(sub_count)
 
         if sub_title is not None:
-            self.sub_progress.update(self.sub_task, description=sub_title)
+            self.sub_progress.update(self.sub_task_id, description=sub_title)
 
         if label is not None:
             self.set_label(label)
