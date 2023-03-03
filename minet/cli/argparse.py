@@ -284,15 +284,18 @@ class BooleanAction(Action):
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         super().__init__(option_strings, dest, nargs=0, **kwargs)
 
+        if len(option_strings) == 2:
+            self.true_options = [option_strings[0]]
+            self.false_options = [option_strings[1]]
+        elif len(option_strings) == 4:
+            self.true_options = [option_strings[0], option_strings[1]]
+            self.false_options = [option_strings[2], option_strings[3]]
+
     def __call__(self, parser, cli_args, values, option_string=None):
         setattr(
             cli_args,
             self.dest,
-            False
-            if (
-                option_string.startswith("--no-") or option_string.startswith("--dont-")
-            )
-            else True,
+            False if option_string in self.false_options else True,
         )
 
 

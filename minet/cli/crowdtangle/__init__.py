@@ -43,7 +43,7 @@ CROWDTANGLE_LEADERBOARD_SUBCOMMAND = subcommand(
     """,
     arguments=[
         {
-            "flag": "--no-breakdown",
+            "flags": ["--breakdown", "--no-breakdown"],
             "help": "Whether to skip statistics breakdown by post type in the CSV output.",
             "dest": "breakdown",
             "action": BooleanAction,
