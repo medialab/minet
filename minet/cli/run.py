@@ -50,6 +50,10 @@ def run(name, version, commands):
     # Parsing arguments and triggering commands
     cli_args = parser.parse_args()
 
+    # Suppressing console?
+    if cli_args.silent:
+        console.quiet = True
+
     action = subparser_index.get(cli_args.action)
 
     if action is not None:

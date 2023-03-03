@@ -45,6 +45,7 @@ FLAG_SORTING_PRIORITIES = {
             "output",
             "resume",
             "rcfile",
+            "silent",
             "help",
         ],
         1,
@@ -155,6 +156,15 @@ def add_arguments(subparser, arguments):
                 )
             except ArgumentError:
                 pass
+
+        try:
+            subparser.add_argument(
+                "--silent",
+                help="Whether to suppress all the log and progress bars. Can be useful when piping.",
+                action="store_true",
+            )
+        except ArgumentError:
+            pass
 
 
 def build_description(command):
