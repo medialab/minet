@@ -2,91 +2,92 @@
 
 ## Summary
 
-*Global utilities*
+_Global utilities_
 
-* [-h/--help/help](#help-flag)
-* [--version](#version-flag)
-* [minetrc config files](#minetrc)
-* [minet environment variables](#envvars)
+- [-h/--help/help](#help-flag)
+- [--version](#version-flag)
+- [minetrc config files](#minetrc)
+- [minet environment variables](#envvars)
 
-*Generic commands*
+_Generic commands_
 
-* [cookies](#cookies)
-* [crawl](#crawl)
-* [fetch](#fetch)
-* [extract](#extract)
-* [resolve](#resolve)
-* [scrape](#scrape)
-* [url-extract](#url-extract)
-* [url-join](#url-join)
-* [url-parse](#url-parse)
+- [cookies](#cookies)
+- [crawl](#crawl)
+- [fetch](#fetch)
+- [extract](#extract)
+- [resolve](#resolve)
+- [scrape](#scrape)
+- [url-extract](#url-extract)
+- [url-join](#url-join)
+- [url-parse](#url-parse)
 
-*Platform-related commands*
+_Platform-related commands_
 
-* [buzzsumo (bz)](#buzzsumo)
-  * [limit](#buzzsumo-limit)
-  * [domain-summary](#buzzsumo-domain-summary)
-  * [domain](#buzzsumo-domain)
-* [crowdtangle (ct)](#crowdtangle)
-  * [leaderboard](#leaderboard)
-  * [lists](#lists)
-  * [posts-by-id](#posts-by-id)
-  * [posts](#posts)
-  * [search](#ct-search)
-  * [summary](#summary)
-* [facebook (fb)](#facebook)
-  * [comments](#facebook-comments)
-  * [post](#facebook-post)
-  * [posts](#facebook-posts)
-  * [post-authors](#facebook-post-authors)
-  * [url-likes](#facebook-url-likes)
-* [google](#google)
-  * [sheets](#google-sheets)
-* [hyphe](#hyphe)
-  * [declare](#hyphe-declare)
-  * [destroy](#hyphe-destroy)
-  * [dump](#hyphe-dump)
-  * [reset](#hyphe-reset)
-  * [tag](#hyphe-tag)
-* [instagram (insta)](#instagram)
-  * [hashtag](#hashtag)
-  * [user-followers](#user-followers)
-  * [user-following](#user-following)
-  * [user-infos](#user-infos)
-  * [user-posts](#user-posts)
-* [mediacloud (mc)](#mediacloud)
-  * [medias](#mc-medias)
-  * [search](#mc-search)
-  * [topic](#topic)
-    * [stories](#stories)
-* [telegram (tl)](#telegram)
-  * [channel-infos](#channel-infos)
-  * [channel-messages](#channel-messages)
-* [tiktok (tk)](#tiktok)
-  * [search-videos](#search-videos)
-* [twitter](#twitter)
-  * [attrition](#attrition)
-  * [followers](#followers)
-  * [friends](#friends)
-  * [list-followers](#list-followers)
-  * [list-members](#list-members)
-  * [retweeters](#retweeters)
-  * [scrape](#twitter-scrape)
-  * [tweet-date](#tweet-date)
-  * [tweet-search](#tweet-search)
-  * [tweet-count](#tweet-count)
-  * [tweets](#tweets)
-  * [users](#users)
-  * [user-search](#user-search)
-  * [user-tweets](#user-tweets)
-* [youtube (yt)](#youtube)
-  * [captions](#captions)
-  * [channel-videos](#channel-videos)
-  * [channels](#channels)
-  * [comments](#youtube-comments)
-  * [search](#youtube-search)
-  * [videos](#videos)
-
+- [buzzsumo (bz)](#buzzsumo)
+  - [limit](#buzzsumo-limit)
+  - [domain-summary](#buzzsumo-domain-summary)
+  - [domain](#buzzsumo-domain)
+- [crowdtangle (ct)](#crowdtangle)
+  - [leaderboard](#leaderboard)
+  - [lists](#lists)
+  - [posts-by-id](#posts-by-id)
+  - [posts](#posts)
+  - [search](#ct-search)
+  - [summary](#summary)
+- [facebook (fb)](#facebook)
+  - [comments](#facebook-comments)
+  - [post](#facebook-post)
+  - [posts](#facebook-posts)
+  - [post-authors](#facebook-post-authors)
+  - [url-likes](#facebook-url-likes)
+- [google](#google)
+  - [sheets](#google-sheets)
+- [hyphe](#hyphe)
+  - [declare](#hyphe-declare)
+  - [destroy](#hyphe-destroy)
+  - [dump](#hyphe-dump)
+  - [reset](#hyphe-reset)
+  - [tag](#hyphe-tag)
+- [instagram (insta)](#instagram)
+  - [hashtag](#hashtag)
+  - [user-followers](#user-followers)
+  - [user-following](#user-following)
+  - [user-infos](#user-infos)
+  - [user-posts](#user-posts)
+- [mediacloud (mc)](#mediacloud)
+  - [medias](#mc-medias)
+  - [search](#mc-search)
+  - [topic](#topic)
+    - [stories](#stories)
+- [telegram (tl)](#telegram)
+  - [channel-infos](#channel-infos)
+  - [channel-messages](#channel-messages)
+- [tiktok (tk)](#tiktok)
+  - [search-videos](#search-videos)
+- [twitter](#twitter)
+  - [attrition](#attrition)
+  - [followers](#followers)
+  - [friends](#friends)
+  - [list-followers](#list-followers)
+  - [list-members](#list-members)
+  - [retweeters](#retweeters)
+  - [scrape](#twitter-scrape)
+  - [tweet-date](#tweet-date)
+  - [tweet-search](#tweet-search)
+  - [tweet-count](#tweet-count)
+  - [tweets](#tweets)
+  - [users](#users)
+  - [user-search](#user-search)
+  - [user-tweets](#user-tweets)
+- [wikipedia (wiki)](#wikipedia)
+  - [pageviews](#pageviews)
+- [youtube (yt)](#youtube)
+  - [captions](#captions)
+  - [channel-videos](#channel-videos)
+  - [channels](#channels)
+  - [comments](#youtube-comments)
+  - [search](#youtube-search)
+  - [videos](#videos)
 
 <h2 id="help-flag">-h/--help</h2>
 
@@ -115,10 +116,10 @@ Minet supports configuration files so you can skip some tedious command line arg
 
 Those configuration files can be written in YAML or JSON and can either be passed to minet using the `--rcfile` argument or will be searched at the following paths (with this precedence):
 
-* `./.minetrc{,.yml,.yaml,.json}`
-* `~/.minetrc{,.yml,.yaml,.json}`
+- `./.minetrc{,.yml,.yaml,.json}`
+- `~/.minetrc{,.yml,.yaml,.json}`
 
-*Configuration file*
+_Configuration file_
 
 ```yml
 ---
@@ -325,8 +326,10 @@ optional arguments:
                                 you need to build urls from ids etc.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the urls you want to
                                 process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
@@ -435,8 +438,10 @@ optional arguments:
                                 half of the available CPUs.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -544,8 +549,10 @@ optional arguments:
                                 you need to build urls from ids etc.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the urls you want to
                                 process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
@@ -632,8 +639,10 @@ optional arguments:
                                 parse matched tags in the parsed html files in
                                 order to optimize performance.
   --validate                    Just validate the given scraper then exit.
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -685,8 +694,10 @@ optional arguments:
   --from {html,text}          Extract urls from which kind of source?
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -840,8 +851,10 @@ optional arguments:
                                 coming from YouTube.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the urls you want to
                                 process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
@@ -985,7 +998,8 @@ examples:
 ```
 usage: minet buzzsumo domain-summary [-h] [-t TOKEN] [--rcfile RCFILE]
                                      --begin-date BEGIN_DATE --end-date END_DATE
-                                     [-i INPUT] [-s SELECT] [-o OUTPUT]
+                                     [-i INPUT] [-s SELECT] [--total TOTAL]
+                                     [-o OUTPUT]
                                      value_or_column_name
 
 Minet Buzzsumo Domain Summary Command
@@ -1010,6 +1024,10 @@ optional arguments:
                               MINET_BUZZSUMO_TOKEN env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the domain names you want
                               to process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -1049,7 +1067,7 @@ how to use the command with a CSV file?
 ```
 usage: minet buzzsumo domain [-h] [-t TOKEN] [--rcfile RCFILE] --begin-date
                              BEGIN_DATE --end-date END_DATE [-i INPUT]
-                             [-s SELECT] [-o OUTPUT]
+                             [-s SELECT] [--total TOTAL] [-o OUTPUT]
                              value_or_column_name
 
 Minet Buzzsumo Domain Command
@@ -1074,6 +1092,10 @@ optional arguments:
                               MINET_BUZZSUMO_TOKEN env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the domain names you want
                               to process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -1262,8 +1284,10 @@ optional arguments:
                               the MINET_CROWDTANGLE_TOKEN env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the URLs or ids you want
                               to process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -1498,8 +1522,10 @@ optional arguments:
                                 from the MINET_CROWDTANGLE_TOKEN env variable.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the URLs you want to
                                 process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
@@ -1556,7 +1582,7 @@ subcommands:
 ```
 usage: minet facebook comments [-h] [-c COOKIE] [--rcfile RCFILE]
                                [--throttle THROTTLE] [-i INPUT] [-s SELECT]
-                               [-o OUTPUT]
+                               [--total TOTAL] [-o OUTPUT]
                                value_or_column_name
 
 Minet Facebook Comments Command
@@ -1587,6 +1613,10 @@ optional arguments:
                               request.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the post urls you want to
                               process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -1629,7 +1659,7 @@ how to use the command with a CSV file?
 ```
 usage: minet facebook post [-h] [-c COOKIE] [--rcfile RCFILE]
                            [--throttle THROTTLE] [-i INPUT] [-s SELECT]
-                           [-o OUTPUT]
+                           [--total TOTAL] [-o OUTPUT]
                            value_or_column_name
 
 Minet Facebook Post Command
@@ -1681,6 +1711,10 @@ optional arguments:
                               request.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the post urls you want to
                               process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -1723,7 +1757,7 @@ how to use the command with a CSV file?
 ```
 usage: minet facebook posts [-h] [-c COOKIE] [--rcfile RCFILE]
                             [--throttle THROTTLE] [-i INPUT] [-s SELECT]
-                            [-o OUTPUT]
+                            [--total TOTAL] [-o OUTPUT]
                             value_or_column_name
 
 Minet Facebook Posts Command
@@ -1775,6 +1809,10 @@ optional arguments:
                               request.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the group urls you want to
                               process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -1843,8 +1881,10 @@ optional arguments:
                               request.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the posts you want to
                               process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -1904,8 +1944,10 @@ positional arguments:
 optional arguments:
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the urls you want to
                               process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -2026,8 +2068,10 @@ positional arguments:
 
 optional arguments:
   --password PASSWORD         The corpus's password if required.
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -2155,8 +2199,10 @@ optional arguments:
   --password PASSWORD         The corpus's password if required.
   --separator SEPARATOR       Separator use to split multiple tag values in the
                               same column. Defaults to "|".
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -2235,8 +2281,10 @@ optional arguments:
   -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve per hashtag.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the hashtags you want to
                               process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -2273,7 +2321,7 @@ how to use the command with a CSV file?
 ```
 usage: minet instagram user-followers [-h] [-c COOKIE] [--rcfile RCFILE]
                                       [-l LIMIT] [-i INPUT] [-s SELECT]
-                                      [-o OUTPUT]
+                                      [--total TOTAL] [-o OUTPUT]
                                       value_or_column_name
 
 Instagram User Followers Command
@@ -2310,6 +2358,10 @@ optional arguments:
   -l LIMIT, --limit LIMIT     Maximum number of followers to retrieve per user.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the usernames or user urls
                               you want to process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -2346,7 +2398,7 @@ how to use the command with a CSV file?
 ```
 usage: minet instagram user-following [-h] [-c COOKIE] [--rcfile RCFILE]
                                       [-l LIMIT] [-i INPUT] [-s SELECT]
-                                      [-o OUTPUT]
+                                      [--total TOTAL] [-o OUTPUT]
                                       value_or_column_name
 
 Instagram User Following Command
@@ -2382,6 +2434,10 @@ optional arguments:
   -l LIMIT, --limit LIMIT     Maximum number of accounts to retrieve per user.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the usernames or user urls
                               you want to process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -2417,7 +2473,7 @@ how to use the command with a CSV file?
 
 ```
 usage: minet instagram user-infos [-h] [-c COOKIE] [--rcfile RCFILE] [-i INPUT]
-                                  [-s SELECT] [-o OUTPUT]
+                                  [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                   value_or_column_name
 
 Instagram user-infos
@@ -2452,6 +2508,10 @@ optional arguments:
                               MINET_INSTAGRAM_COOKIE env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the usernames or user urls
                               you want to process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -2487,7 +2547,8 @@ how to use the command with a CSV file?
 
 ```
 usage: minet instagram user-posts [-h] [-c COOKIE] [--rcfile RCFILE] [-l LIMIT]
-                                  [-i INPUT] [-s SELECT] [-o OUTPUT]
+                                  [-i INPUT] [-s SELECT] [--total TOTAL]
+                                  [-o OUTPUT]
                                   value_or_column_name
 
 Instagram User Posts Command
@@ -2525,6 +2586,10 @@ optional arguments:
   -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve per user.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the usernames or user urls
                               you want to process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -2585,8 +2650,10 @@ optional arguments:
                               MINET_MEDIACLOUD_TOKEN env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the Mediacloud media ids
                               you want to process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -2704,7 +2771,7 @@ optional arguments:
 
 ```
 usage: minet telegram channel-infos [-h] [--throttle THROTTLE] [-i INPUT]
-                                    [-s SELECT] [-o OUTPUT]
+                                    [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                     value_or_column_name
 
 Minet Telegram Channel-Infos Command
@@ -2722,6 +2789,10 @@ optional arguments:
                               request.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the channel names / urls
                               you want to process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -2753,7 +2824,7 @@ how to use the command with a CSV file?
 
 ```
 usage: minet telegram channel-messages [-h] [--throttle THROTTLE] [-i INPUT]
-                                       [-s SELECT] [-o OUTPUT]
+                                       [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                        value_or_column_name
 
 Minet Telegram Channel-Messages Command
@@ -2771,6 +2842,10 @@ optional arguments:
                               request.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the channel names / urls
                               you want to process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -2819,7 +2894,8 @@ subcommands:
 
 ```
 usage: minet tiktok search-videos [-h] [-c COOKIE] [--rcfile RCFILE] [-l LIMIT]
-                                  [-i INPUT] [-s SELECT] [-o OUTPUT]
+                                  [-i INPUT] [-s SELECT] [--total TOTAL]
+                                  [-o OUTPUT]
                                   value_or_column_name
 
 Tiktok Search Videos Command
@@ -2860,6 +2936,10 @@ optional arguments:
   -l LIMIT, --limit LIMIT     Maximum number of videos to retrieve per query.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the tiktok keywords you
                               want to process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -2977,8 +3057,10 @@ optional arguments:
                                 unavailability.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the tweet urls or ids
                                 you want to process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
@@ -3062,8 +3144,10 @@ optional arguments:
                                 v1.1.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the Twitter account
                                 screen names or ids you want to process. Will
                                 consider `-` as stdin.
@@ -3144,8 +3228,10 @@ optional arguments:
                                 v1.1.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the Twitter account
                                 screen names or ids you want to process. Will
                                 consider `-` as stdin.
@@ -3221,8 +3307,10 @@ optional arguments:
                                 env variable.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the Twitter list ids or
                                 urls you want to process. Will consider `-` as
                                 stdin.
@@ -3296,8 +3384,10 @@ optional arguments:
                                 env variable.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the Twitter list ids or
                                 urls you want to process. Will consider `-` as
                                 stdin.
@@ -3371,8 +3461,10 @@ optional arguments:
                                 env variable.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the tweet ids you want
                                 to process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
@@ -3409,7 +3501,7 @@ how to use the command with a CSV file?
 ```
 usage: minet twitter scrape [-h] [--include-refs] [-l LIMIT]
                             [--query-template QUERY_TEMPLATE] [-i INPUT]
-                            [-s SELECT] [-o OUTPUT]
+                            [-s SELECT] [--total TOTAL] [-o OUTPUT]
                             {tweets,users} value_or_column_name
 
 Minet Twitter Scrape Command
@@ -3448,6 +3540,10 @@ optional arguments:
                                 into from:@user queries.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the queries you want to
                                 process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
@@ -3498,7 +3594,7 @@ how to use the command with a CSV file?
 
 ```
 usage: minet twitter tweet-date [-h] [--timezone TIMEZONE] [-i INPUT]
-                                [-s SELECT] [-o OUTPUT]
+                                [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                 value_or_column_name
 
 Minet Twitter Tweet Date Command
@@ -3516,6 +3612,10 @@ optional arguments:
                               Default to UTC.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the tweet urls or ids you
                               want to process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -3609,8 +3709,10 @@ optional arguments:
                                 with the specified id.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the queries you want to
                                 process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
@@ -3716,8 +3818,10 @@ optional arguments:
                                 with the specified id.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the queries you want to
                                 process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
@@ -3798,8 +3902,10 @@ optional arguments:
                                 v1.1.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the tweet ids you want
                                 to process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
@@ -3878,8 +3984,10 @@ optional arguments:
                                 v1.1.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the Twitter users you
                                 want to process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
@@ -3957,8 +4065,10 @@ optional arguments:
                                 env variable.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the queries you want to
                                 process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
@@ -4046,8 +4156,10 @@ optional arguments:
                                 v1.1.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the Twitter account
                                 screen names or ids you want to process. Will
                                 consider `-` as stdin.
@@ -4063,6 +4175,78 @@ examples:
 
 . Getting tweets from users in a CSV file:
     $ minet tw user-tweets screen_name -i users.csv > tweets.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
+```
+
+## Wikipedia
+
+### pageviews
+
+```
+usage: minet wikipedia pageviews [-h] --start-date START_DATE --end-date
+                                 END_DATE [--agent AGENT] [--access ACCESS]
+                                 [--threads THREADS] [--granularity GRANULARITY]
+                                 [--sum] [--lang LANG]
+                                 [--lang-column LANG_COLUMN] [-i INPUT]
+                                 [-s SELECT] [--total TOTAL] [--resume]
+                                 [-o OUTPUT]
+                                 value_or_column_name
+
+Minet Wikipedia Pageviews Command
+=================================
+
+Command using the Wikimedia REST API to collect
+pageviews for a given amount of Wikipedia pages.
+
+See API documentation here for more details:
+https://wikitech.wikimedia.org/wiki/Analytics/AQS/Pageviews
+
+positional arguments:
+  value_or_column_name        Single page to process or name of the CSV column
+                              containing pages when using -i/--input.
+
+optional arguments:
+  --access ACCESS             Get pageviews by access. Defaults to "all-access".
+  --agent AGENT               Get pageviews by target agent. Defaults to "all-
+                              agents".
+  --end-date END_DATE         End date. Must be of format YYYYMMDD (e.g.
+                              20151031) or YYYYMMDDHH (e.g. 2015103100)
+  --granularity GRANULARITY   Pageviews granularity. Defaults to "monthly".
+  --lang LANG                 Lang for the given pages.
+  --lang-column LANG_COLUMN   Name of a CSV column containing page lang.
+  --start-date START_DATE     Starting date. Must be of format YYYYMMDD (e.g.
+                              20151031) or YYYYMMDDHH (e.g. 2015103100)
+  --sum                       Whether to sum the collected pageviews rather than
+                              outputting them by timestamp.
+  --threads THREADS           Number of threads to use. Defaults to 10.
+  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i INPUT, --input INPUT     CSV file containing all the pages you want to
+                              process. Will consider `-` as stdin.
+  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
+  --resume                    Whether to resume from an aborted collection. Need
+                              -o to be set.
+  -h, --help                  show this help message and exit
 
 how to use the command with a CSV file?
 
@@ -4106,8 +4290,10 @@ optional arguments:
                               "en".
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the video urls or ids you
                               want to process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -4167,8 +4353,10 @@ optional arguments:
                               MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the channels you want to
                               process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -4235,8 +4423,10 @@ optional arguments:
                               MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the channels you want to
                               process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -4295,8 +4485,10 @@ optional arguments:
                               MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the videos you want to
                               process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
@@ -4360,8 +4552,10 @@ optional arguments:
                                 one is relevance.
   -s SELECT, --select SELECT    Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
   -i INPUT, --input INPUT       CSV file containing all the queries you want to
                                 process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
@@ -4416,8 +4610,10 @@ optional arguments:
                               MINET_YOUTUBE_KEY env variable.
   -s SELECT, --select SELECT  Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
   -i INPUT, --input INPUT     CSV file containing all the videos you want to
                               process. Will consider `-` as stdin.
   -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as

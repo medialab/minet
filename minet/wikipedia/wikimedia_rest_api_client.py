@@ -7,7 +7,7 @@ from minet.fetch import multithreaded_fetch
 from minet.wikipedia.types import Granularity, Agent, Access, WikipediaPageViewsItem
 
 BASE_URL = "https://wikimedia.org/api/rest_v1"
-THREADS = 10
+DEFAULT_THREADS = 10
 
 ItemType = TypeVar("ItemType")
 
@@ -18,6 +18,13 @@ def ensure_is_quoted(string: str) -> str:
         return string
 
     return quote(string)
+
+
+def fix_date(string: str) -> str:
+    if len(string) == 8:
+        return string + "00"
+
+    return string
 
 
 def build_pageviews_url(
@@ -52,7 +59,11 @@ class WikimediaRestAPIClient(object):
         granularity: Granularity = "monthly",
         key: Optional[Callable[[ItemType], Tuple[str, str]]] = None,
         lang: Optional[str] = None,
+        threads: int = DEFAULT_THREADS,
     ) -> Iterator[Tuple[ItemType, List[WikipediaPageViewsItem]]]:
+        start_date = fix_date(start_date)
+        end_date = fix_date(end_date)
+
         def api_url_from_item(page) -> str:
             page = page if not callable(key) else key(page)
 
@@ -73,14 +84,24 @@ class WikimediaRestAPIClient(object):
             )
 
         for result in multithreaded_fetch(
-            pages, key=api_url_from_item, threads=THREADS
+            pages,
+            key=api_url_from_item,
+            threads=threads,
+            domain_parallelism=threads,
+            throttle=0,
         ):
             if result.error:
                 raise result.error
 
+            response = result.response
+
+            if response.status == 404:
+                yield result.item, []
+                continue
+
             pageviews = []
 
-            for item in result.response.json()["items"]:
+            for item in response.json()["items"]:
                 pageviews.append(
                     WikipediaPageViewsItem(
                         project=item["project"],
