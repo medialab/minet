@@ -51,6 +51,10 @@ class UnknownEncodingError(MinetError):
     pass
 
 
+class CouldNotInferEncodingError(MinetError):
+    pass
+
+
 # Miscellaneous HTTP errors
 class InvalidURLError(MinetError):
     def __init__(self, message=None, url=None):

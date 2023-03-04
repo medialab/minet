@@ -4,7 +4,7 @@
 #
 # Multiple helper functions related to reading and writing files.
 #
-from typing import Union
+from typing import Union, Optional
 
 import gzip
 import json
@@ -15,19 +15,35 @@ from os.path import basename, join, splitext, abspath, normpath, dirname
 from ural import get_hostname, get_normalized_hostname
 from quenouille import NamedLocks
 
-from minet.exceptions import FilenameFormattingError, DefinitionInvalidFormatError
-from minet.utils import md5, PseudoFStringFormatter
+from minet.exceptions import (
+    FilenameFormattingError,
+    DefinitionInvalidFormatError,
+    CouldNotInferEncodingError,
+)
+from minet.utils import md5, PseudoFStringFormatter, infer_encoding
 
 
-def read_potentially_gzipped_path(path, encoding="utf-8"):
+def read_potentially_gzipped_path(
+    path, encoding: Optional[str] = None, errors: str = "replace"
+):
     open_fn = open
-    flag = "r"
+    flag = "r" if encoding is not None else "rb"
 
     if path.endswith(".gz"):
         open_fn = gzip.open
-        flag = "rt"
+        flag = "rt" if encoding is not None else "r"
 
-    with open_fn(path, flag, encoding=encoding, errors="replace") as f:
+    if encoding is None:
+        with open_fn(path, flag) as f:
+            binary = f.read()
+            encoding = infer_encoding(binary)
+
+            if encoding is None:
+                raise CouldNotInferEncodingError
+
+            return binary.decode(encoding, errors=errors)
+
+    with open_fn(path, flag, encoding=encoding, errors=errors) as f:
         return f.read()
 
 

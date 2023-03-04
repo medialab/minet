@@ -539,6 +539,9 @@ class VariadicInputDefinition(TypedDict):
     item_label_plural: NotRequired[str]
     column_help: NotRequired[str]
     input_help: NotRequired[str]
+    no_help: NotRequired[bool]
+    optional: NotRequired[bool]
+    metavar: NotRequired[str]
 
 
 def resolve_typical_arguments(
@@ -558,13 +561,13 @@ def resolve_typical_arguments(
     if variadic_input is not None:
         variadic_input = variadic_input.copy()
 
+        if "item_label" not in variadic_input:
+            variadic_input["item_label"] = variadic_input["dummy_column"]
+
+        if "item_label_plural" not in variadic_input:
+            variadic_input["item_label_plural"] = variadic_input["item_label"] + "s"
+
         if "column_help" not in variadic_input:
-            if "item_label" not in variadic_input:
-                variadic_input["item_label"] = variadic_input["dummy_column"]
-
-            if "item_label_plural" not in variadic_input:
-                variadic_input["item_label_plural"] = variadic_input["item_label"] + "s"
-
             variadic_input["column_help"] = (
                 "Single %(singular)s to process or name of the CSV column containing %(plural)s when using -i/--input."
                 % {
@@ -572,18 +575,23 @@ def resolve_typical_arguments(
                     "plural": variadic_input["item_label_plural"],
                 }
             )
+
+        if "input_help" not in variadic_input:
             variadic_input["input_help"] = (
                 "CSV file containing all the %s you want to process. Will consider `-` as stdin."
                 % variadic_input["item_label_plural"]
             )
 
-        args.append(
-            {
-                "name": "column",
-                "metavar": "value_or_column_name",
-                "help": variadic_input["column_help"],
-            }
-        )
+        column_arg = {
+            "name": "column",
+            "metavar": variadic_input.get("metavar", "value_or_column_name"),
+            "help": variadic_input["column_help"],
+        }
+
+        if variadic_input.get("optional", False):
+            column_arg["nargs"] = "?"
+
+        args.append(column_arg)
 
         input_argument = {
             "flags": ["-i", "--input"],
@@ -594,7 +602,8 @@ def resolve_typical_arguments(
 
         args.append(input_argument)
 
-        epilog_addendum = """
+        if not variadic_input.get("no_help", False):
+            epilog_addendum = """
         how to use the command with a CSV file?
 
         > A lot of minet commands, including this one, can both be

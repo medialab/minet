@@ -903,7 +903,7 @@ class Response(object):
     @property
     def could_be_html(self) -> bool:
         mime = self.mimetype
-        return mime is not None and "html" in mime
+        return mime is not None and "/htm" in mime
 
     @property
     def is_html(self) -> bool:
