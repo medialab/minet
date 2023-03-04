@@ -26,7 +26,7 @@ setup(
         "about-time>=4,<5",
         "beautifulsoup4>=4.7.1,<5",
         "browser-cookie3==0.17.0",
-        "casanova>=1.5.0,<2",
+        "casanova>=1.6.0,<2",
         "charset-normalizer>=3,<4",
         "dateparser>=1.1.1",
         "ebbe>=1.11.1,<2",
