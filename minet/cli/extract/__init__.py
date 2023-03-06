@@ -1,21 +1,4 @@
-from minet.cli.argparse import command, InputAction
-from minet.cli.exceptions import InvalidArgumentsError
-from minet.cli.constants import DEFAULT_CONTENT_FOLDER
-
-
-def resolve_args(cli_args):
-    if cli_args.glob is None and cli_args.input is None:
-        if cli_args.filename is None:
-            raise InvalidArgumentsError(
-                "must provide a single filename else use -i/--input or -g/--glob"
-            )
-
-    if cli_args.glob is not None and cli_args.input is not None:
-        raise InvalidArgumentsError("cannot use both -i/--input and -g/--glob")
-
-    if cli_args.glob is None and cli_args.input_dir is None:
-        cli_args.input_dir = DEFAULT_CONTENT_FOLDER
-
+from minet.cli.argparse import command
 
 EXTRACT_COMMAND = command(
     "extract",
@@ -57,21 +40,25 @@ EXTRACT_COMMAND = command(
 
         examples:
 
-        TODO: redo them
-
         . Extracting content from a single file on disk:
             $ minet extract ./path/to/file.html
 
         . Extracting content from a `minet fetch` report:
-            $ minet extract -i report.csv > extracted.csv
+            $ minet extract -i report.csv -I downloaded > extracted.csv
+
+        . Extracting content from a single url:
+            $ minet fetch "https://lemonde.fr" | minet extract
+
+        . Extracting content from a CSV colum containing the HTML itself:
+            $ minet extract -i report.csv --body-column html > extracted.csv
 
         . Extracting content from a bunch of files using a glob pattern:
-            $ minet extract --glob "./content/**/*.html" > extracted.csv
+            $ minet extract "./content/**/*.html" --glob > extracted.csv
 
         . Working on a report from stdin (mind the `-`):
-            $ minet fetch url file.csv | minet extract -i - > extracted.csv
+            $ minet fetch url file.csv | minet extract filename -i - -I downloaded > extracted.csv
     """,
-    variadic_input={"dummy_column": "filename"},
+    variadic_input={"dummy_column": "filename", "optional": True, "no_help": True},
     arguments=[
         {
             "flags": ["-g", "--glob"],

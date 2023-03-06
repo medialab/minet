@@ -123,11 +123,7 @@ def action(cli_args, enricher: Enricher, loading_bar):
     # TODO: making sure input-dir exists?
     # TODO: resuming
     # TODO: test chunksize
-    # TODO: optional input dir
-    # TODO: remake examples
-    # TODO: add three cases to ftest array
-    # TODO: think about filename glob instead and glob as boolean flag: bof
-    # TODO: think about nargs=* for variadic input?
+    # TODO: add cases to ftest array
 
     def payloads() -> Iterator[ExtractWorkerPayload]:
         for item in items:

@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 MINET="python -m minet.cli"
+EXTRACT_DIR=ftest/resources/extraction
 
 echo "Minet version:"
 $MINET --version
@@ -10,19 +11,28 @@ echo "Cookies:"
 $MINET cookies firefox --url https://www.lemonde.fr
 echo
 
-echo "Fetch & Scrape"
-$MINET fetch https://news.ycombinator.com/ | $MINET scrape ftest/scrapers/hackernews.json - | wc -l
-echo
+# echo "Fetch & Scrape"
+# $MINET fetch https://news.ycombinator.com/ | $MINET scrape ftest/scrapers/hackernews.json - | wc -l
+# echo
 
-echo "Fetch & Extract"
-$MINET fetch https://github.com/medialab/minet | $MINET extract - | wc -l
+echo "Extract"
+echo "  - Single HTML file"
+$MINET extract $EXTRACT_DIR/article.html | wc -l
+echo "  - Single glob pattern"
+$MINET extract "$EXTRACT_DIR/*.html" -g | wc -l
+echo "  - CSV input"
+$MINET extract name -i $EXTRACT_DIR/articles.csv -I $EXTRACT_DIR | wc -l
+echo "  - CSV bodies"
+$MINET extract -i $EXTRACT_DIR/bodies.csv --body-column html | wc -l
+echo "  - Piping fetch"
+$MINET fetch https://github.com/medialab/minet | $MINET extract -i - | wc -l
 echo
 
 echo "Resolve"
 $MINET resolve https://medialab.sciencespo.fr/ | grep hit
 echo
 
-echo "Extract"
+echo "Url Extract"
 $MINET fetch https://news.ycombinator.com/ | $MINET url-extract body - --from html | wc -l
 echo
 

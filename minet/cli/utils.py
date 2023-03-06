@@ -150,7 +150,7 @@ def create_fetch_like_report_iterator(
     # TODO: deal with no_headers
     assert headers is not None
 
-    filename_pos = headers.get(cli_args.filename_column)
+    filename_pos = headers.get(cli_args.column) if cli_args.column is not None else None
     error_pos = headers.get(cli_args.error_column)
     status_pos = headers.get(cli_args.status_column)
     encoding_pos = headers.get(cli_args.encoding_column)
@@ -193,7 +193,7 @@ def create_fetch_like_report_iterator(
         if body_pos is not None:
             body = get(row, body_pos)
 
-            if body is None:
+            if body is not None:
                 item.text = body
 
         if item.path is None and item.text is None:

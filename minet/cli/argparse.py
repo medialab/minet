@@ -576,6 +576,9 @@ def resolve_typical_arguments(
                 }
             )
 
+            if variadic_input.get('optional', False):
+                variadic_input['column_help'] += ' Defaults to "{}".'.format(variadic_input['dummy_column'])
+
         if "input_help" not in variadic_input:
             variadic_input["input_help"] = (
                 "CSV file containing all the %s you want to process. Will consider `-` as stdin."
@@ -584,7 +587,10 @@ def resolve_typical_arguments(
 
         column_arg = {
             "name": "column",
-            "metavar": variadic_input.get("metavar", "value_or_column_name"),
+            "metavar": variadic_input.get(
+                "metavar",
+                "{item}_or_{item}_column".format(item=variadic_input["dummy_column"]),
+            ),
             "help": variadic_input["column_help"],
         }
 
