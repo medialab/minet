@@ -205,7 +205,7 @@ class FetchWorker(Generic[ItemType]):
                 pool_manager=self.pool_manager,
                 max_redirects=self.max_redirects,
                 cancel_event=self.cancel_event,
-                **kwargs
+                **kwargs,
             )
 
         except CancelledRequestError:
@@ -287,7 +287,8 @@ class ResolveWorker(Generic[ItemType]):
                 follow_js_relocation=self.follow_js_relocation,
                 infer_redirection=self.infer_redirection,
                 canonicalize=self.canonicalize,
-                **kwargs
+                cancel_event=self.cancel_event,
+                **kwargs,
             )
         except CancelledRequestError:
             return CANCELLED

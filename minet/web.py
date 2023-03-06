@@ -287,6 +287,9 @@ def stream_request_body(
     final_time: Optional[float] = None,
     up_to: Optional[int] = None,
 ) -> bool:
+    if cancel_event is not None and cancel_event.is_set():
+        raise CancelledRequestError
+
     if up_to is not None and body.tell() >= up_to:
         return False
 
@@ -538,6 +541,10 @@ def atomic_resolve(
         if buffered_response:
             buffered_response.close()
 
+        # We check for cancellation
+        if cancel_event is not None and cancel_event.is_set():
+            raise CancelledRequestError
+
         redirection = Redirection(url)
 
         try:
@@ -589,6 +596,8 @@ def atomic_resolve(
                     try:
                         buffered_response.prebuffer_up_to(CONTENT_PREBUFFER_UP_TO)
                     except Exception as e:
+                        if isinstance(e, CancelledRequestError):
+                            raise
                         error = e
                         break
 
@@ -618,6 +627,8 @@ def atomic_resolve(
                     try:
                         buffered_response.prebuffer_up_to(LARGE_CONTENT_PREBUFFER_UP_TO)
                     except Exception as e:
+                        if isinstance(e, CancelledRequestError):
+                            raise
                         error = e
                         break
 
