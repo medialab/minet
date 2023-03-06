@@ -1,5 +1,11 @@
 from minet.cli.argparse import command
 
+
+def resolve_arguments(cli_args):
+    if cli_args.column is None:
+        cli_args.column = "filename"
+
+
 EXTRACT_COMMAND = command(
     "extract",
     "minet.cli.extract.extract",
@@ -58,6 +64,7 @@ EXTRACT_COMMAND = command(
         . Working on a report from stdin (mind the `-`):
             $ minet fetch url file.csv | minet extract filename -i - -I downloaded > extracted.csv
     """,
+    resolve=resolve_arguments,
     variadic_input={"dummy_column": "filename", "optional": True, "no_help": True},
     arguments=[
         {
@@ -76,32 +83,32 @@ EXTRACT_COMMAND = command(
         },
         {
             "flag": "--body-column",
-            "help": "Name of the CSV column containing html bodies. Only relevant if -i/--input was given.",
+            "help": "Name of the CSV column containing html bodies.",
             "default": "body",
         },
         {
             "flag": "--error-column",
-            "help": "Name of the CSV column containing a fetch error. Only relevant if -i/--input was given.",
+            "help": "Name of the CSV column containing a fetch error.",
             "default": "fetch_error",
         },
         {
             "flag": "--status-column",
-            "help": "Name of the CSV column containing HTTP status. Only relevant if -i/--input was given.",
+            "help": "Name of the CSV column containing HTTP status.",
             "default": "http_status",
         },
         {
             "flag": "--encoding-column",
-            "help": "Name of the CSV column containing file encoding. Only relevant if -i/--input was given.",
+            "help": "Name of the CSV column containing file encoding.",
             "default": "encoding",
         },
         {
             "flag": "--mimetype-column",
-            "help": "Name of the CSV column containing file mimetype. Only relevant if -i/--input was given.",
+            "help": "Name of the CSV column containing file mimetype.",
             "default": "mimetype",
         },
         {
             "flag": "--encoding",
-            "help": "Name of the default encoding to use. Defaults to none, i.e. the command will try to infer it for you.",
+            "help": "Name of the default encoding to use. If not given the command will infer it for you.",
         },
     ],
 )

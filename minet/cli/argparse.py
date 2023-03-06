@@ -322,6 +322,10 @@ class SingleColumnDummyCSVInput(DummyCSVInput):
 
     def resolve(self, cli_args):
         value = getattr(cli_args, self.dest)
+
+        if not value:
+            raise InvalidArgumentsError("the command was given nothing!")
+
         f = CsvCellIO(value, column=self.column)
         setattr(cli_args, self.dest, self.column)
         setattr(cli_args, "has_dummy_csv", True)
@@ -576,8 +580,10 @@ def resolve_typical_arguments(
                 }
             )
 
-            if variadic_input.get('optional', False):
-                variadic_input['column_help'] += ' Defaults to "{}".'.format(variadic_input['dummy_column'])
+            if variadic_input.get("optional", False):
+                variadic_input["column_help"] += ' Defaults to "{}".'.format(
+                    variadic_input["dummy_column"]
+                )
 
         if "input_help" not in variadic_input:
             variadic_input["input_help"] = (

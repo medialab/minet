@@ -169,7 +169,10 @@ def create_fetch_like_report_iterator(
                 continue
 
         if status_pos is not None:
-            status = fuzzy_int(get(row, status_pos, "200"))
+            status = get(row, status_pos)
+
+            if status:
+                status = fuzzy_int(status)
 
             if status != 200:
                 item.error = "invalid-status"

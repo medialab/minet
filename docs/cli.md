@@ -431,26 +431,20 @@ Positional Arguments:
 
 Optional Arguments:
   --body-column BODY_COLUMN     Name of the CSV column containing html bodies.
-                                Only relevant if -i/--input was given.
-  --encoding ENCODING           Name of the default encoding to use. Defaults to
-                                none, i.e. the command will try to infer it for
-                                you.
+  --encoding ENCODING           Name of the default encoding to use. If not
+                                given the command will infer it for you.
   --encoding-column ENCODING_COLUMN
                                 Name of the CSV column containing file encoding.
-                                Only relevant if -i/--input was given.
   --error-column ERROR_COLUMN   Name of the CSV column containing a fetch error.
-                                Only relevant if -i/--input was given.
   -g, --glob                    Will interpret given filename as glob patterns
                                 to resolve if given.
   -I, --input-dir INPUT_DIR     Directory where the HTML files are stored.
   --mimetype-column MIMETYPE_COLUMN
                                 Name of the CSV column containing file mimetype.
-                                Only relevant if -i/--input was given.
   -p, --processes PROCESSES     Number of processes to use. Defaults to roughly
                                 half of the available CPUs.
   --status-column STATUS_COLUMN
                                 Name of the CSV column containing HTTP status.
-                                Only relevant if -i/--input was given.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
   --total TOTAL                 Total number of items to process. Might be
@@ -493,7 +487,7 @@ examples:
     $ minet extract ./path/to/file.html
 
 . Extracting content from a `minet fetch` report:
-    $ minet extract filename -i report.csv -I downloaded > extracted.csv
+    $ minet extract -i report.csv -I downloaded > extracted.csv
 
 . Extracting content from a single url:
     $ minet fetch "https://lemonde.fr" | minet extract

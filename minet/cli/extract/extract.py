@@ -124,6 +124,7 @@ def action(cli_args, enricher: Enricher, loading_bar):
     # TODO: resuming
     # TODO: test chunksize
     # TODO: add cases to ftest array
+    # TODO: warning about too many file-not-found
 
     def payloads() -> Iterator[ExtractWorkerPayload]:
         for item in items:
