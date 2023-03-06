@@ -414,15 +414,30 @@ Usage: minet extract [-h] [-g] [--silent] [-I INPUT_DIR] [-p PROCESSES]
 
 # Minet Extract Command
 
-Use multiple processes to extract text content and various metadata
-from a batch of HTML files.
+Use multiple processes to extract the main textual content and various
+metadata item from large batches of HTML files easily and efficiently.
 
-Extraction is performed using the `trafilatura` library by Adrien
-Barbaresi. Note that this kind of extraction was geared towards press
-articles and might not be suited to other kinds of web pages.
+Extraction of main content is performed using the `trafilatura` library
+by Adrien Barbaresi.
+
+Please note that this kind of main content extraction is heavily geared
+towards press articles and might not be suited to other kinds of web pages.
 
 More information about the library can be found here:
 https://github.com/adbar/trafilatura
+
+Note that this command has been geared towards working in tandem with
+the fetch command. This means the command expects, by default, CSV files
+containing columns like "filename", "http_status", "encoding" etc. as
+you can find in a fetch command CSV report.
+
+This said, you can of course feed this command any kind of CSV data,
+and use dedicated flags such as --filename-column, --body-column to
+to inform the command about your specific table.
+
+The comand is also able to work on glob patterns, such as: "downloaded/**/*.html",
+and can also be fed CSV columns containing HTML content directly if
+required.
 
 Positional Arguments:
   filename_or_filename_column   Single filename to process or name of the CSV
@@ -490,16 +505,19 @@ examples:
     $ minet extract -i report.csv -I downloaded > extracted.csv
 
 . Extracting content from a single url:
-    $ minet fetch "https://lemonde.fr" | minet extract
+    $ minet fetch "https://lemonde.fr" | minet extract -i -
 
-. Extracting content from a CSV colum containing the HTML itself:
+. Extracting content from a CSV colum containing HTML directly:
     $ minet extract -i report.csv --body-column html > extracted.csv
 
 . Extracting content from a bunch of files using a glob pattern:
     $ minet extract "./content/**/*.html" --glob > extracted.csv
 
-. Working on a report from stdin (mind the `-`):
-    $ minet fetch url file.csv | minet extract filename -i - -I downloaded > extracted.csv
+. Extracting content using a CSV file containing glob patterns:
+    $ minet extract pattern -i patterns.csv --glob > extracted.csv
+
+. Working on a fetch report from stdin (mind the `-`):
+    $ minet fetch url file.csv | minet extract -i - -I downloaded > extracted.csv
 ```
 
 ## resolve

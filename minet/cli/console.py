@@ -45,17 +45,23 @@ class MinetConsole(Console):
         txt = message_flatmap(*messages)
         self.print(txt)
 
-    def logh(self, header: str, *messages, style=None) -> None:
+    def logh(self, header: str, *messages, style=None, header_style="log.time") -> None:
         txt = message_flatmap(*messages)
 
         table = Table.grid(padding=(0, 1), expand=True)
 
-        table.add_column(style="log.time")
+        table.add_column(style=header_style)
         table.add_column(ratio=1, overflow="fold", style=style)
 
         table.add_row(header, txt)
 
         self.print(table)
+
+    def error(self, *messages):
+        self.logh("error", *messages, header_style="error")
+
+    def warning(self, *messages):
+        self.logh("warning", *messages, header_style="warning")
 
     def log_with_time(self, *messages, full=False, style=None):
         now = datetime.now().strftime(NOW_DATETIME_FORMAT if full else NOW_TIME_FORMAT)

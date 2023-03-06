@@ -9,6 +9,7 @@ from typing import Optional, List, Dict, Iterator, Any
 from os.path import isdir
 from trafilatura.core import bare_extraction
 from dataclasses import dataclass
+from itertools import count
 from casanova import TabularRecord, Enricher
 
 from minet.multiprocessing import LazyPool
@@ -17,6 +18,7 @@ from minet.cli.utils import (
     create_fetch_like_report_iterator,
     with_enricher_and_loading_bar,
 )
+from minet.cli.console import console
 from minet.cli.reporters import report_error
 from minet.exceptions import TrafilaturaError
 from minet.cli.exceptions import FatalError
@@ -116,70 +118,94 @@ def worker(payload: ExtractWorkerPayload) -> ExtractResult:
     unit="docs",
 )
 def action(cli_args, enricher: Enricher, loading_bar):
+    if cli_args.input_dir is not None and not isdir(cli_args.input_dir):
+        raise FatalError(
+            'Could not find the [cyan]-I/--input-dir "{}"[/cyan] directory!'.format(
+                cli_args.input_dir
+            )
+        )
+
     items = create_fetch_like_report_iterator(cli_args, enricher)
 
     worked_on: Dict[int, List[str]] = {}
 
-    # TODO: making sure input-dir exists?
     # TODO: resuming
     # TODO: test chunksize
-    # TODO: add cases to ftest array
-    # TODO: warning about too many file-not-found
 
     def payloads() -> Iterator[ExtractWorkerPayload]:
+        current_id = count()
+
         for item in items:
 
-            # TODO: is this the correct spot?
-            with loading_bar.step():
+            # Items we cannot process
+            if item.error is not None:
+                loading_bar.advance()
+                loading_bar.inc_stat(item.error, style="error")
+                enricher.writerow(item.row)
+                continue
 
-                # Items we cannot process
-                if item.error is not None:
-                    loading_bar.inc_stat(item.error, style="error")
-                    enricher.writerow(item.row)
-                    continue
+            item_id = next(current_id)
 
-                item_id = id(item)
+            worked_on[item_id] = item.row
 
-                worked_on[item_id] = item.row
-
-                yield ExtractWorkerPayload(
-                    id=item_id, encoding=item.encoding, path=item.path, text=item.text
-                )
+            yield ExtractWorkerPayload(
+                id=item_id, encoding=item.encoding, path=item.path, text=item.text
+            )
 
     pool = LazyPool(cli_args.processes)
 
     loading_bar.set_title("Extracting text (p=%i)" % pool.processes)
 
+    warned_about_input_dir = False
+
     with pool:
         for result in pool.imap_unordered(worker, payloads()):
-            assert isinstance(result, ExtractResult)
+            with loading_bar.step():
+                assert isinstance(result, ExtractResult)
 
-            row = worked_on.pop(result.id)
+                row = worked_on.pop(result.id)
 
-            if result.error is not None:
-                error_code = report_error(result.error)
-                loading_bar.inc_stat(error_code, style="error")
+                if result.error is not None:
+                    error_code = report_error(result.error)
+                    loading_bar.inc_stat(error_code, style="error")
 
-                addendum = ExtractAddendum(extract_error=error_code)
+                    if not warned_about_input_dir and error_code == "file-not-found":
+                        warned_about_input_dir = True
+
+                        if cli_args.input_dir is None:
+                            console.warning(
+                                "did you forget to give [cyan]-I/--input-dir[/cyan]? "
+                            )
+                        else:
+                            console.warning(
+                                'are you sure [cyan]-I/--input-dir "{}"[/cyan] is the correct path?'.format(
+                                    cli_args.input_dir
+                                )
+                            )
+
+                    addendum = ExtractAddendum(extract_error=error_code)
+                    enricher.writerow(row, addendum)
+
+                    continue
+
+                meta = result.meta
+
+                if meta is None:
+                    loading_bar.inc_stat("no-trafilatura-result", style="error")
+                    console.warning("did you forget to use [cyan]-i/--input[/cyan]?")
+                    addendum = ExtractAddendum(extract_error="no-trafilatura-result")
+                else:
+                    addendum = ExtractAddendum(
+                        canonical_url=meta.get("url"),
+                        title=meta.get("title"),
+                        description=meta.get("description"),
+                        content=meta.get("text"),
+                        comments=meta.get("comments"),
+                        author=meta.get("author"),
+                        categories=plural(meta, "categories"),
+                        tags=plural(meta, "tags"),
+                        date=meta.get("date"),
+                        sitename=meta.get("sitename"),
+                    )
+
                 enricher.writerow(row, addendum)
-
-                continue
-
-            meta = result.meta
-
-            assert meta is not None
-
-            addendum = ExtractAddendum(
-                canonical_url=meta.get("url"),
-                title=meta.get("title"),
-                description=meta.get("description"),
-                content=meta.get("text"),
-                comments=meta.get("comments"),
-                author=meta.get("author"),
-                categories=plural(meta, "categories"),
-                tags=plural(meta, "tags"),
-                date=meta.get("date"),
-                sitename=meta.get("sitename"),
-            )
-
-            enricher.writerow(row, addendum)

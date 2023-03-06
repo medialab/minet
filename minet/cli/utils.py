@@ -164,7 +164,7 @@ def create_fetch_like_report_iterator(
             error = get(row, error_pos, "").strip()
 
             if error:
-                item.error = "errored"
+                item.error = "http-errored"
                 yield item
                 continue
 
