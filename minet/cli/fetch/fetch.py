@@ -301,13 +301,12 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar, resolve
             with loading_bar.step():
                 index, row = result.item
 
-                # TODO: move after continue when casanova is fixed
-                addendum = Addendum()
-
                 if not result.url:
-                    enricher.writerow(index, row, addendum)
+                    enricher.writerow(index, row)
                     loading_bar.inc_stat("filtered", style="warning")
                     continue
+
+                addendum = Addendum()
 
                 # No error
                 if result.error is None:
@@ -359,13 +358,12 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar, resolve
             with loading_bar.step():
                 index, row = result.item
 
-                # TODO: move after continue when casanova is fixed
-                addendum = ResolveAddendum()
-
                 if not result.url:
-                    enricher.writerow(index, row, addendum)
+                    enricher.writerow(index, row)
                     loading_bar.inc_stat("filtered", style="warning")
                     continue
+
+                addendum = ResolveAddendum()
 
                 # No error
                 if result.error is None:
