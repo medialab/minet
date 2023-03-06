@@ -305,7 +305,7 @@ def with_enricher_and_loading_bar(
     get_input=None,
     index_column: Optional[str] = None,
     #
-    title: Optional[str] = None,
+    title=None,
     unit: Optional[str] = None,
     sub_unit: Optional[str] = None,
     stats: Optional[Iterable[StatsItem]] = None,

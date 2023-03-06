@@ -206,7 +206,7 @@ FETCH_COMMAND = command(
 
 RESOLVE_COMMAND = command(
     "resolve",
-    "minet.cli.fetch.resolve",
+    "minet.cli.fetch.fetch",
     title="Minet Resolve Command",
     description="""
         Use multiple threads to resolve batches of urls from a CSV file. The

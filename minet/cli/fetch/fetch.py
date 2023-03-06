@@ -109,17 +109,26 @@ def get_multiplex(cli_args):
         return casanova.Multiplexer(cli_args.column, cli_args.separator)
 
 
+def get_title(cli_args):
+    if cli_args.action == "resolve":
+        return "Resolving"
+
+    return "Fetching"
+
+
 @with_enricher_and_loading_bar(
     headers=get_headers,
     multiplex=get_multiplex,
     enricher_type="threadsafe",
     index_column="original_index",
-    title="Fetching",
+    title=get_title,
     unit="urls",
     stats_sort_key=loading_bar_stats_sort_key,
 )
 @with_ctrl_c_warning
-def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar, resolve=False):
+def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
+    # Resolving or fetching?
+    resolve = cli_args.action == "resolve"
 
     # HTTP method
     http_method = cli_args.method
