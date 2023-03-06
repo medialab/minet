@@ -10,7 +10,7 @@ wheel
 about-time==4.2.1
 beautifulsoup4==4.11.1
 browser-cookie3==0.17.0
-casanova==1.6.0
+casanova==1.6.2
 charset-normalizer==3.0.1
 dateparser==1.1.6
 ebbe==1.11.1
@@ -26,5 +26,5 @@ tenacity==8.2.1
 trafilatura==1.4.1
 typing_extensions; python_version < '3.10'
 twitwi==0.16.1
-ural==0.38.0
+ural==0.39.1
 urllib3==1.26.14

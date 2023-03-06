@@ -9,6 +9,9 @@
 from typing import Optional, List, Union
 
 import casanova
+from casanova import TabularRecord
+from dataclasses import dataclass
+from datetime import datetime
 from ural import is_shortened_url, could_be_html
 
 from minet.fetch import (
@@ -18,30 +21,56 @@ from minet.fetch import (
     FetchWorkerPayload,
 )
 from minet.fs import FilenameBuilder, ThreadSafeFilesWriter
-from minet.web import grab_cookies, parse_http_header
+from minet.web import grab_cookies, parse_http_header, Response, RedirectionStack
 from minet.exceptions import InvalidURLError, FilenameFormattingError
 from minet.cli.exceptions import InvalidArgumentsError, FatalError
 from minet.cli.reporters import report_error, report_filename_formatting_error
 from minet.cli.utils import with_enricher_and_loading_bar, with_ctrl_c_warning
 
 
-FETCH_ADDITIONAL_HEADERS = [
-    "resolved_url",
-    "http_status",
-    "datetime_utc",
-    "fetch_error",
-    "filename",
-    "mimetype",
-    "encoding",
-]
+@dataclass
+class FetchAddendum(TabularRecord):
+    resolved_url: Optional[str] = None
+    http_status: Optional[int] = None
+    datetime_utc: Optional[datetime] = None
+    fetch_error: Optional[str] = None
+    filename: Optional[str] = None
+    mimetype: Optional[str] = None
+    encoding: Optional[str] = None
 
-RESOLVE_ADDITIONAL_HEADERS = [
-    "resolved_url",
-    "http_status",
-    "resolution_error",
-    "redirect_count",
-    "redirect_chain",
-]
+    def infos_from_response(self, response: Response) -> None:
+        self.resolved_url = response.end_url if response.was_redirected else None
+        self.http_status = response.status
+        self.datetime_utc = response.end_datetime
+        self.filename = response.get("filename")
+        self.encoding = response.encoding
+        self.mimetype = response.mimetype
+
+
+@dataclass
+class FetchAddendumWithBody(FetchAddendum):
+    body: Optional[str] = None
+
+    def infos_from_response(self, response: Response) -> None:
+        super().infos_from_response(response)
+        self.body = response.get("decoded_contents")
+
+
+@dataclass
+class ResolveAddendum(TabularRecord):
+    resolved_url: Optional[str] = None
+    http_status: Optional[int] = None
+    resolution_error: Optional[str] = None
+    redirect_count: Optional[int] = None
+    redirect_chain: Optional[List[str]] = None
+
+    def infos_from_stack(self, stack: RedirectionStack):
+        last = stack[-1]
+
+        self.resolved_url = last.url
+        self.status = last.status
+        self.redirect_count = len(stack) - 1
+        self.redirect_chain = [step.type for step in stack]
 
 
 def get_style_for_status(status: int) -> str:
@@ -65,12 +94,12 @@ def loading_bar_stats_sort_key(item):
 
 def get_headers(cli_args):
     if cli_args.action == "resolve":
-        headers = RESOLVE_ADDITIONAL_HEADERS
+        headers = ResolveAddendum
     else:
-        headers = FETCH_ADDITIONAL_HEADERS
+        headers = FetchAddendum
 
         if cli_args.contents_in_report:
-            headers = headers + ["body"]
+            headers = FetchAddendumWithBody
 
     return headers
 
@@ -84,12 +113,13 @@ def get_multiplex(cli_args):
     headers=get_headers,
     multiplex=get_multiplex,
     enricher_type="threadsafe",
+    index_column="original_index",
     title="Fetching",
     unit="urls",
     stats_sort_key=loading_bar_stats_sort_key,
 )
 @with_ctrl_c_warning
-def action(cli_args, enricher, loading_bar, resolve=False):
+def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar, resolve=False):
 
     # HTTP method
     http_method = cli_args.method
@@ -239,47 +269,6 @@ def action(cli_args, enricher, loading_bar, resolve=False):
 
             files_writer.write(filename, data, compress=cli_args.compress)
 
-    def write_fetch_output(
-        index,
-        row,
-        resolved=None,
-        status=None,
-        datetime_utc=None,
-        error=None,
-        filename=None,
-        encoding=None,
-        mimetype=None,
-        data=None,
-    ):
-
-        addendum = [
-            resolved or "",
-            status or "",
-            datetime_utc or "",
-            error or "",
-            filename or "",
-            mimetype or "",
-            encoding or "",
-        ]
-
-        if cli_args.contents_in_report:
-            addendum.append(data or "")
-
-        enricher.writerow(index, row, addendum)
-
-    def write_resolve_output(
-        index, row, resolved=None, status=None, error=None, redirects=None, chain=None
-    ):
-        addendum = [
-            resolved or "",
-            status or "",
-            error or "",
-            redirects or "",
-            chain or "",
-        ]
-
-        enricher.writerow(index, row, addendum)
-
     common_kwargs = {
         "key": url_key,
         "insecure": cli_args.insecure,
@@ -304,12 +293,19 @@ def action(cli_args, enricher, loading_bar, resolve=False):
             **common_kwargs
         )
 
+        Addendum = (
+            FetchAddendum if not cli_args.contents_in_report else FetchAddendumWithBody
+        )
+
         for result in multithreaded_iterator:
             with loading_bar.step():
                 index, row = result.item
 
+                # TODO: move after continue when casanova is fixed
+                addendum = Addendum()
+
                 if not result.url:
-                    write_fetch_output(index, row)
+                    enricher.writerow(index, row, addendum)
                     loading_bar.inc_stat("filtered", style="warning")
                     continue
 
@@ -322,20 +318,8 @@ def action(cli_args, enricher, loading_bar, resolve=False):
 
                     loading_bar.inc_stat(status, style=get_style_for_status(status))
 
-                    # Reporting in output
-                    write_fetch_output(
-                        index,
-                        row,
-                        resolved=response.end_url
-                        if response.was_redirected
-                        else response.url,
-                        status=status,
-                        datetime_utc=response.end_datetime,
-                        filename=response.get("filename"),
-                        encoding=response.encoding,
-                        mimetype=response.mimetype,
-                        data=response.get("decoded_contents"),
-                    )
+                    addendum.infos_from_response(response)
+                    enricher.writerow(index, row, addendum)
 
                 # Handling potential errors
                 else:
@@ -353,9 +337,10 @@ def action(cli_args, enricher, loading_bar, resolve=False):
                             report_filename_formatting_error(result.error)
                         )
 
-                    write_fetch_output(
-                        index, row, error=error_code, resolved=resolved_url
-                    )
+                    addendum.fetch_error = error_code
+                    addendum.resolved_url = resolved_url
+
+                    enricher.writerow(index, row, addendum)
 
     # Resolve
     else:
@@ -374,8 +359,11 @@ def action(cli_args, enricher, loading_bar, resolve=False):
             with loading_bar.step():
                 index, row = result.item
 
+                # TODO: move after continue when casanova is fixed
+                addendum = ResolveAddendum()
+
                 if not result.url:
-                    write_resolve_output(index, row)
+                    enricher.writerow(index, row, addendum)
                     loading_bar.inc_stat("filtered", style="warning")
                     continue
 
@@ -385,32 +373,16 @@ def action(cli_args, enricher, loading_bar, resolve=False):
 
                     # Reporting in output
                     last = result.stack[-1]
-
                     status = last.status
-
                     loading_bar.inc_stat(status, style=get_style_for_status(status))
 
-                    write_resolve_output(
-                        index,
-                        row,
-                        resolved=last.url,
-                        status=status,
-                        redirects=len(result.stack) - 1,
-                        chain="|".join(step.type for step in result.stack),
-                    )
+                    addendum.infos_from_stack(result.stack)
+                    enricher.writerow(index, row, addendum)
 
                 # Handling potential errors
                 else:
                     error_code = report_error(result.error)
-
                     loading_bar.inc_stat(error_code, style="error")
 
-                    write_resolve_output(
-                        index,
-                        row,
-                        error=error_code,
-                        redirects=(len(result.stack) - 1) if result.stack else None,
-                        chain="|".join(step.type for step in result.stack)
-                        if result.stack
-                        else None,
-                    )
+                    addendum.resolution_error = error_code
+                    enricher.writerow(index, row, addendum)

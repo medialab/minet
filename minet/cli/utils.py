@@ -303,15 +303,16 @@ def with_enricher_and_loading_bar(
     headers,
     enricher_type=None,
     get_input=None,
+    index_column: Optional[str] = None,
     #
-    title=None,
-    unit=None,
-    sub_unit=None,
+    title: Optional[str] = None,
+    unit: Optional[str] = None,
+    sub_unit: Optional[str] = None,
     stats: Optional[Iterable[StatsItem]] = None,
     stats_sort_key=None,
-    nested=False,
+    nested: bool = False,
     multiplex=None,
-    show_label=False,
+    show_label: bool = False,
 ):
     def decorate(action):
         @wraps(action)
@@ -356,6 +357,11 @@ def with_enricher_and_loading_bar(
             elif enricher_type is not None:
                 raise TypeError("wrong enricher type")
 
+            enricher_kwargs = {}
+
+            if index_column is not None:
+                enricher_kwargs["index_column"] = index_column
+
             with enricher_context:
                 enricher = enricher_fn(
                     cli_args.input if not callable(get_input) else get_input(cli_args),
@@ -366,6 +372,7 @@ def with_enricher_and_loading_bar(
                     select=cli_args.select,
                     total=getattr(cli_args, "total", None),
                     multiplex=multiplex(cli_args) if callable(multiplex) else multiplex,
+                    **enricher_kwargs
                 )
 
             with LoadingBar(

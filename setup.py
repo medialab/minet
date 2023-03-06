@@ -26,7 +26,7 @@ setup(
         "about-time>=4,<5",
         "beautifulsoup4>=4.7.1,<5",
         "browser-cookie3==0.17.0",
-        "casanova>=1.6.0,<2",
+        "casanova>=1.6.2,<2",
         "charset-normalizer>=3,<4",
         "dateparser>=1.1.1",
         "ebbe>=1.11.1,<2",
@@ -41,7 +41,7 @@ setup(
         "tenacity>=8,<9",
         "trafilatura>=1.4.1,<1.5",
         "twitwi>=0.16.1,<0.17",
-        "ural>=0.38,<0.39",
+        "ural>=0.39,<0.40",
         "urllib3>=1.26.9,<2",
     ],
     extras_require={
