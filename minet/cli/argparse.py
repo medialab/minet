@@ -18,8 +18,8 @@ from argparse import (
     ArgumentError,
     ArgumentTypeError,
     ArgumentParser,
+    RawDescriptionHelpFormatter,
 )
-from rich_argparse import RawDescriptionRichHelpFormatter
 from gettext import gettext
 from textwrap import dedent
 from casanova import Resumer, CsvCellIO
@@ -28,7 +28,6 @@ from datetime import datetime
 from pytz import timezone
 from pytz.exceptions import UnknownTimeZoneError
 
-from minet.cli.console import MINET_COLORS
 from minet.cli.exceptions import NotResumableError, InvalidArgumentsError
 from minet.cli.utils import acquire_cross_platform_stdout
 
@@ -45,35 +44,11 @@ FLAG_SORTING_PRIORITIES = {
             "output",
             "resume",
             "rcfile",
-            "silent",
             "help",
         ],
         1,
     )
 }
-
-# NOTE: custom style for rich_argparse
-RawDescriptionRichHelpFormatter.styles["argparse.groups"] = MINET_COLORS["warning"]
-RawDescriptionRichHelpFormatter.styles["argparse.dim"] = "dim"
-RawDescriptionRichHelpFormatter.styles["argparse.emphasis"] = (
-    "italic " + MINET_COLORS["warning"]
-)
-RawDescriptionRichHelpFormatter.styles["argparse.title"] = (
-    "bold " + MINET_COLORS["error"]
-)
-
-# NOTE: custom highlighting for rich_argparse
-RawDescriptionRichHelpFormatter.highlights = [
-    r"(?P<args>-[a-zA-Z])[\s/.]",  # -f flags
-    r"(?P<args>--[a-z]+(-[a-z]+)*)[\s/.]",  # --flag flags
-    r"(?P<title>^#\s+.+)",  # command title
-    r"\s+\$\s+(?P<args>.+)",  # examples
-    r"(?P<dim>\n>\s+.+)",  # caret sections
-    r'"(?P<metavar>[^"]+)"',  # double-quote literals
-    r"`(?P<metavar>[^`]+)`",  # backtick literals
-    r"(?P<emphasis>how to use the command with.+)",  # emphasis
-    r"(?P<args>https?://\S+)",  # urls
-]
 
 
 def normalize_argument_name(name: str) -> str:
@@ -97,7 +72,7 @@ def arguments_sort_key(option_strings):
     return (priority, longest_name)
 
 
-class SortingRawTextHelpFormatter(RawDescriptionRichHelpFormatter):
+class SortingRawTextHelpFormatter(RawDescriptionHelpFormatter):
     def add_arguments(self, actions) -> None:
         actions = sorted(actions, key=lambda a: arguments_sort_key(a.option_strings))
         return super().add_arguments(actions)
@@ -157,18 +132,9 @@ def add_arguments(subparser, arguments):
             except ArgumentError:
                 pass
 
-        try:
-            subparser.add_argument(
-                "--silent",
-                help="Whether to suppress all the log and progress bars. Can be useful when piping.",
-                action="store_true",
-            )
-        except ArgumentError:
-            pass
-
 
 def build_description(command):
-    description = "# " + command["title"]
+    description = command["title"] + "\n" + ("=" * len(command["title"]))
 
     text = dedent(command.get("description", ""))
     description += "\n\n" + text
@@ -294,20 +260,15 @@ class BooleanAction(Action):
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         super().__init__(option_strings, dest, nargs=0, **kwargs)
 
-        if len(option_strings) == 2:
-            self.true_options = [option_strings[0]]
-            self.false_options = [option_strings[1]]
-        elif len(option_strings) == 4:
-            self.true_options = [option_strings[0], option_strings[1]]
-            self.false_options = [option_strings[2], option_strings[3]]
-        else:
-            raise TypeError("expecting 2 or 4 flags")
-
     def __call__(self, parser, cli_args, values, option_string=None):
         setattr(
             cli_args,
             self.dest,
-            False if option_string in self.false_options else True,
+            False
+            if (
+                option_string.startswith("--no-") or option_string.startswith("--dont-")
+            )
+            else True,
         )
 
 
@@ -611,7 +572,7 @@ def resolve_typical_arguments(
             $ xsv search -s col . | minet cmd column_name -i -
         """
 
-    if select or variadic_input is not None:
+    if select:
 
         # TODO: actually one can use xsv mini dsl here
         args.append(
@@ -621,11 +582,11 @@ def resolve_typical_arguments(
             },
         )
 
-    if total or variadic_input is not None:
+    if total:
         args.append(
             {
                 "flag": "--total",
-                "help": "Total number of items to process. Might be necessary when you want to display a finite progress indicator for large files given as input to the command.",
+                "help": "Total number of items to process. Necessary if you want to display a finite progress indicator.",
                 "type": int,
             }
         )

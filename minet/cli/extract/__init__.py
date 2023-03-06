@@ -28,7 +28,7 @@ EXTRACT_COMMAND = command(
         . "title": title of the web page, from <title> usually.
         . "description": description of the web page, as found in its
             metadata.
-        . "body": main content of the web page as extracted.
+        . "raw_content": main content of the web page as extracted.
         . "comments": comment text whenever the heuristics succeeds in
             identifying them.
         . "author": inferred author of the web page article when found in

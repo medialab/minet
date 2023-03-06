@@ -1,1 +1,0 @@
-from minet.wikipedia.wikimedia_rest_api_client import WikimediaRestAPIClient

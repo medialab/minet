@@ -7,7 +7,6 @@ from minet.web import (
     parse_http_refresh,
     find_meta_refresh,
     find_javascript_relocation,
-    infer_encodings_from_xml,
     JAVASCRIPT_LOCATION_RE,
 )
 
@@ -181,14 +180,3 @@ class TestWeb(object):
     def test_find_canonical_link(self):
         canonical_link = find_canonical_link(HTML_CANONICAL_TESTS)
         assert canonical_link == "https://www.corriere.it/"
-
-    def test_infer_encodings_from_xml(self):
-        html = b"""
-            <?xml version="1.0" encoding="UTF-16"?>
-            <meta charset="UTF-8">
-            <meta charset="utf8">
-        """
-
-        encodings = infer_encodings_from_xml(html)
-
-        assert encodings == {"utf-16": 1, "utf-8": 2}

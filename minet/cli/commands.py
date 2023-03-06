@@ -17,7 +17,6 @@ from minet.cli.mediacloud import MEDIACLOUD_COMMAND
 from minet.cli.telegram import TELEGRAM_COMMAND
 from minet.cli.tiktok import TIKTOK_COMMAND
 from minet.cli.twitter import TWITTER_COMMAND
-from minet.cli.wikipedia import WIKIPEDIA_COMMAND
 from minet.cli.youtube import YOUTUBE_COMMAND
 
 MINET_COMMANDS = [
@@ -41,6 +40,5 @@ MINET_COMMANDS = [
     TELEGRAM_COMMAND,
     TIKTOK_COMMAND,
     TWITTER_COMMAND,
-    WIKIPEDIA_COMMAND,
     YOUTUBE_COMMAND,
 ]

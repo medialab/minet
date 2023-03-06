@@ -67,6 +67,8 @@ INSTAGRAM_HASHTAG_SUBCOMMAND = subcommand(
             $ minet instagram hashtag paris > paris_posts.csv
     """,
     variadic_input={"dummy_column": "hashtag"},
+    select=True,
+    total=True,
     arguments=[
         {
             "flags": ["-l", "--limit"],
@@ -111,6 +113,7 @@ INSTAGRAM_USER_FOLLOWERS_SUBCOMMAND = subcommand(
         "item_label": "username, user url or user id",
         "item_label_plural": "usernames, user urls or user ids",
     },
+    select=True,
     arguments=[
         {
             "flags": ["-l", "--limit"],
@@ -188,6 +191,7 @@ INSTAGRAM_USER_FOLLOWING_SUBCOMMAND = subcommand(
         "item_label": "username, user url or user id",
         "item_label_plural": "usernames, user urls or user ids",
     },
+    select=True,
     arguments=[
         {
             "flags": ["-l", "--limit"],
@@ -231,6 +235,7 @@ INSTAGRAM_USER_INFOS_SUBCOMMAND = subcommand(
         "item_label": "username, user url or user id",
         "item_label_plural": "usernames, user urls or user ids",
     },
+    select=True,
 )
 
 INSTAGRAM_USER_POSTS_SUBCOMMAND = subcommand(
@@ -269,6 +274,7 @@ INSTAGRAM_USER_POSTS_SUBCOMMAND = subcommand(
         "item_label": "username, user url or user id",
         "item_label_plural": "usernames, user urls or user ids",
     },
+    select=True,
     arguments=[
         {
             "flags": ["-l", "--limit"],

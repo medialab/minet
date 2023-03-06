@@ -43,7 +43,7 @@ CROWDTANGLE_LEADERBOARD_SUBCOMMAND = subcommand(
     """,
     arguments=[
         {
-            "flags": ["--breakdown", "--no-breakdown"],
+            "flag": "--no-breakdown",
             "help": "Whether to skip statistics breakdown by post type in the CSV output.",
             "dest": "breakdown",
             "action": BooleanAction,
@@ -106,7 +106,9 @@ CROWDTANGLE_POSTS_BY_ID_SUBCOMMAND = subcommand(
         "item_label": "URL or id",
         "item_label_plural": "URLs or ids",
     },
+    select=True,
     resumer=RowCountResumer,
+    total=True,
 )
 
 CROWDTANGLE_POSTS_SUBCOMMAND = subcommand(
@@ -272,6 +274,8 @@ CROWDTANGLE_SUMMARY_SUBCOMMAND = subcommand(
             $ minet ct summary url urls.csv --token YOUR_TOKEN --start-date 2019-01-01 > summary.csv
     """,
     variadic_input={"dummy_column": "url", "item_label": "URL"},
+    select=True,
+    total=True,
     arguments=[
         {
             "flags": ["-p", "--platforms"],

@@ -75,9 +75,6 @@ def resolve_fetch_arguments(cli_args):
     if cli_args.has_dummy_csv and cli_args.contents_in_report is None:
         cli_args.contents_in_report = True
 
-    if cli_args.dont_save:
-        cli_args.contents_in_report = False
-
     if cli_args.contents_in_report and cli_args.compress:
         raise InvalidArgumentsError(
             "Cannot both --compress and get --contents-in-report!"
@@ -100,15 +97,15 @@ FETCH_COMMAND = command(
         . "index": index of the line in the original file (the output will be
             arbitrarily ordered since multiple requests are performed concurrently).
         . "resolved": final resolved url (after solving redirects) if different
-            from starting url.
+            from requested url.
         . "status": HTTP status code of the request, e.g. 200, 404, 503 etc.
         . "error": an error code if anything went wrong when performing the request.
         . "filename": path to the downloaded file, relative to the folder given
             through -O/--output-dir.
         . "mimetype": detected mimetype of the requested file.
         . "encoding": detected encoding of the requested file if relevant.
-        . "body": if -c/--contents-in-report is set, will contain the
-            downloaded text and the files won't be written to disk.
+        . "raw_contents": if --contents-in-report is set, will contain the
+            downloaded text and the file won't be written.
 
         --folder-strategy options:
 
@@ -141,6 +138,8 @@ FETCH_COMMAND = command(
     """,
     resolve=resolve_fetch_arguments,
     resumer=ThreadSafeResumer,
+    select=True,
+    total=True,
     variadic_input={"dummy_column": "url"},
     arguments=[
         *COMMON_ARGUMENTS,
@@ -156,15 +155,10 @@ FETCH_COMMAND = command(
             "action": "store_true",
         },
         {
-            "flags": ["-c", "--contents-in-report", "-w", "--no-contents-in-report"],
-            "help": "Whether to include retrieved contents, e.g. html, directly in the report and avoid writing them in a separate folder. This requires to standardize encoding and won't work on binary formats. Note that --contents-in-report is the default when no input file is given.",
+            "flags": ["--contents-in-report", "--no-contents-in-report"],
+            "help": "Whether to include retrieved contents, e.g. html, directly in the report\nand avoid writing them in a separate folder. This requires to standardize\nencoding and won't work on binary formats.",
             "dest": "contents_in_report",
             "action": BooleanAction,
-        },
-        {
-            "flags": ["-D", "--dont-save"],
-            "help": "Use not to write any downloaded file on disk.",
-            "action": "store_true",
         },
         {
             "flags": ["-O", "--output-dir"],
@@ -233,6 +227,8 @@ RESOLVE_COMMAND = command(
             $ minet resolve https://lemonde.fr
     """,
     resumer=ThreadSafeResumer,
+    select=True,
+    total=True,
     variadic_input={"dummy_column": "url"},
     arguments=[
         *COMMON_ARGUMENTS,

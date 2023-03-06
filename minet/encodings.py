@@ -253,7 +253,3 @@ def normalize_encoding(encoding: str) -> str:
 
 def is_supported_encoding(encoding):
     return normalize_encoding(encoding) in ENCODINGS
-
-
-def encoding_sort_key(encoding):
-    return (normalize_encoding(encoding), -len(encoding))

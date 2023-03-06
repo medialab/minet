@@ -25,7 +25,7 @@ OUTPUT_ADDITIONAL_HEADERS = [
     "canonical_url",
     "title",
     "description",
-    "text_content",
+    "raw_content",
     "comments",
     "author",
     "categories",
@@ -131,7 +131,7 @@ def get_input(cli_args):
 @with_enricher_and_loading_bar(
     headers=OUTPUT_ADDITIONAL_HEADERS,
     get_input=get_input,
-    title="Extracting text",
+    title="Extracting content",
     unit="docs",
 )
 def action(cli_args, enricher, loading_bar):
@@ -145,7 +145,7 @@ def action(cli_args, enricher, loading_bar):
 
     if (
         cli_args.glob is None
-        and "body" not in enricher.headers
+        and "raw_contents" not in enricher.headers
         and not isdir(cli_args.input_dir)
     ):
         raise FatalError(
@@ -161,7 +161,7 @@ def action(cli_args, enricher, loading_bar):
 
     pool = LazyPool(cli_args.processes)
 
-    loading_bar.set_title("Extracting text (p=%i)" % pool.processes)
+    loading_bar.set_title("Extracting content (p=%i)" % pool.processes)
 
     with pool:
         for error, row, result in pool.imap_unordered(worker, files):

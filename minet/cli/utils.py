@@ -12,7 +12,6 @@ import stat
 import yaml
 import platform
 import casanova
-from casanova.namedrecord import is_tabular_record_class
 from glob import iglob
 from os.path import join, expanduser, isfile, relpath
 from collections import namedtuple
@@ -152,7 +151,7 @@ def create_report_iterator(cli_args, reader, worker_args=None, on_irrelevant_row
     filename_pos = reader.headers.get("filename")
     encoding_pos = reader.headers.get("encoding")
     mimetype_pos = reader.headers.get("mimetype")
-    body_post = reader.headers.get("body")
+    raw_content_pos = reader.headers.get("raw_contents")
 
     indexed_headers = {n: i for i, n in enumerate(reader.headers)}
 
@@ -182,13 +181,13 @@ def create_report_iterator(cli_args, reader, worker_args=None, on_irrelevant_row
                 on_irrelevant_row("invalid-mimetype", row, i)
                 continue
 
-            if body_post is not None:
+            if raw_content_pos is not None:
                 yield WorkerPayload(
                     row=row,
                     headers=indexed_headers,
                     path=None,
                     encoding=encoding,
-                    content=row[body_post],
+                    content=row[raw_content_pos],
                     args=worker_args,
                 )
 
@@ -351,9 +350,7 @@ def with_enricher_and_loading_bar(
                 enricher = enricher_fn(
                     cli_args.input if not callable(get_input) else get_input(cli_args),
                     cli_args.output,
-                    add=headers(cli_args)
-                    if callable(headers) and not is_tabular_record_class(headers)
-                    else headers,
+                    add=headers(cli_args) if callable(headers) else headers,
                     select=cli_args.select,
                     total=getattr(cli_args, "total", None),
                     multiplex=multiplex(cli_args) if callable(multiplex) else multiplex,

@@ -37,9 +37,7 @@ try:
 
         else:
             for i in range(N):
-                with loading_bar.step(
-                    "Working on [info]%i[/info]" % i, sub_total=SUB_N
-                ):
+                with loading_bar.step("Working on [info]%i[/info]" % i):
                     for j in range(SUB_N):
                         time.sleep(0.001)
                         loading_bar.nested_advance()

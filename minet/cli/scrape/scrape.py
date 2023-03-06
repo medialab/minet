@@ -148,7 +148,7 @@ def action(cli_args, loading_bar):
 
     if (
         cli_args.glob is None
-        and "body" not in reader.headers
+        and "raw_contents" not in reader.headers
         and not isdir(cli_args.input_dir)
     ):
         raise FatalError(
