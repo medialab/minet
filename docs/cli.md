@@ -202,7 +202,9 @@ examples:
 ## crawl
 
 ```
-usage: minet crawl [-h] [-O OUTPUT_DIR] [--resume] [--throttle THROTTLE] crawler
+usage: minet crawl [-h] [-O OUTPUT_DIR] [--resume] [--dump-queue]
+                   [--throttle THROTTLE]
+                   crawler
 
 Minet Crawl Command
 ===================
@@ -214,6 +216,9 @@ positional arguments:
   crawler                       Path to the crawler definition file.
 
 optional arguments:
+  --dump-queue                  Print the contents of the persistent queue.
+                                (This is for debug only, don't use this flag
+                                unless you know what you are doing).
   -O OUTPUT_DIR, --output-dir OUTPUT_DIR
                                 Output directory.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
@@ -239,7 +244,7 @@ usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM]
                    [--contents-in-report] [-O OUTPUT_DIR] [-f FILENAME]
                    [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [--keep-failed-contents]
-                   [--standardize-encoding] [-i INPUT] [-s SELECT]
+                   [--standardize-encoding] [--only-html] [-i INPUT] [-s SELECT]
                    [--total TOTAL] [--resume] [-o OUTPUT]
                    value_or_column_name
 
@@ -294,6 +299,12 @@ optional arguments:
   --max-redirects MAX_REDIRECTS
                                 Maximum number of redirections to follow before
                                 breaking. Defaults to 5.
+  --only-html                   Only download pages whose url looks like it
+                                could be HTML (e.g. a url without extension or
+                                ending in .html, .php etc.). Or, said
+                                differently, don't download pages whose url
+                                clearly indicate you won't get HTML (e.g. a url
+                                ending in .pdf or .json url).
   -O OUTPUT_DIR, --output-dir OUTPUT_DIR
                                 Directory where the fetched files will be
                                 written. Defaults to "downloaded".
