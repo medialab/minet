@@ -15,7 +15,6 @@ from minet.multiprocessing import LazyPool
 from minet.fs import read_potentially_gzipped_path
 from minet.cli.utils import (
     create_fetch_like_report_iterator,
-    dummy_csv_file_from_glob,
     with_enricher_and_loading_bar,
 )
 from minet.cli.reporters import report_error
@@ -111,16 +110,8 @@ def worker(payload: ExtractWorkerPayload) -> ExtractResult:
     return result
 
 
-def get_input(cli_args):
-    if cli_args.glob is not None:
-        return dummy_csv_file_from_glob(cli_args.glob, cli_args.input_dir)
-
-    return cli_args.input
-
-
 @with_enricher_and_loading_bar(
     headers=ExtractAddendum,
-    get_input=get_input,
     title="Extracting text",
     unit="docs",
 )

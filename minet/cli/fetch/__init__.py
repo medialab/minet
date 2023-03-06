@@ -97,12 +97,13 @@ FETCH_COMMAND = command(
     epilog="""
         columns being added to the output:
 
-        . "index": index of the line in the original file (the output will be
+        . "original_index": index of the line in the original file (the output will be
             arbitrarily ordered since multiple requests are performed concurrently).
-        . "resolved": final resolved url (after solving redirects) if different
+        . "resolved_url": final resolved url (after solving redirects) if different
             from starting url.
-        . "status": HTTP status code of the request, e.g. 200, 404, 503 etc.
-        . "error": an error code if anything went wrong when performing the request.
+        . "http_status": HTTP status code of the request, e.g. 200, 404, 503 etc.
+        . "datetime_utc": datetime when the response was finished.
+        . "fetch_error": an error code if anything went wrong when performing the request.
         . "filename": path to the downloaded file, relative to the folder given
             through -O/--output-dir.
         . "mimetype": detected mimetype of the requested file.
@@ -215,11 +216,13 @@ RESOLVE_COMMAND = command(
     epilog="""
         columns being added to the output:
 
-        . "resolved": final resolved url (after solving redirects).
-        . "status": HTTP status code of the request, e.g. 200, 404, 503 etc.
-        . "error": an error code if anything went wrong when performing the request.
-        . "redirects": total number of redirections to reach the final url.
-        . "chain": list of redirection types separated by "|".
+        . "original_index": index of the line in the original file (the output will be
+            arbitrarily ordered since multiple requests are performed concurrently).
+        . "resolved_url": final resolved url (after solving redirects).
+        . "http_status": HTTP status code of the request, e.g. 200, 404, 503 etc.
+        . "resolution_error": an error code if anything went wrong when performing the request.
+        . "redirect_count": total number of redirections to reach the final url.
+        . "redirect_chain": list of redirection types separated by "|".
 
         examples:
 

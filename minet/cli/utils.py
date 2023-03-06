@@ -15,6 +15,7 @@ import casanova
 from casanova.namedrecord import is_tabular_record_class
 from dataclasses import dataclass
 from glob import iglob
+from copy import copy
 from os.path import join, expanduser, isfile, relpath
 from collections.abc import Mapping
 from functools import wraps
@@ -129,17 +130,6 @@ def acquire_cross_platform_stdout():
     return sys.stdout
 
 
-def dummy_csv_file_from_glob(pattern: str, base_dir: Optional[str] = None):
-    if base_dir is not None:
-        pattern = join(base_dir, pattern)
-
-    # Headers
-    yield ["filename"]
-
-    for p in iglob(pattern, recursive=True):
-        yield [relpath(p, start=base_dir or "")]
-
-
 @dataclass
 class FetchReportLikeItem:
     index: int
@@ -155,6 +145,7 @@ def create_fetch_like_report_iterator(
 ) -> Iterator[FetchReportLikeItem]:
 
     headers = reader.headers
+    input_dir = cli_args.input_dir or ""
 
     # TODO: deal with no_headers
     assert headers is not None
@@ -197,7 +188,7 @@ def create_fetch_like_report_iterator(
             filename = get(row, filename_pos, "").strip()
 
             if filename:
-                item.path = join(cli_args.input_dir or "", filename)
+                item.path = join(input_dir, filename)
 
         if body_pos is not None:
             body = get(row, body_pos)
@@ -224,6 +215,14 @@ def create_fetch_like_report_iterator(
                     continue
 
                 item.encoding = encoding
+
+        if cli_args.glob:
+            for p in iglob(item.path, recursive=True):
+                new_item = copy(item)
+                new_item.path = relpath(p, start=input_dir)
+                yield new_item
+
+            continue
 
         yield item
 

@@ -26,16 +26,22 @@ from minet.cli.utils import with_enricher_and_loading_bar, with_ctrl_c_warning
 
 
 FETCH_ADDITIONAL_HEADERS = [
-    "resolved",
-    "status",
+    "resolved_url",
+    "http_status",
     "datetime_utc",
-    "error",
+    "fetch_error",
     "filename",
     "mimetype",
     "encoding",
 ]
 
-RESOLVE_ADDITIONAL_HEADERS = ["resolved", "status", "error", "redirects", "chain"]
+RESOLVE_ADDITIONAL_HEADERS = [
+    "resolved_url",
+    "http_status",
+    "resolution_error",
+    "redirect_count",
+    "redirect_chain",
+]
 
 
 def get_style_for_status(status: int) -> str:

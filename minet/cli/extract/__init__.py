@@ -57,6 +57,8 @@ EXTRACT_COMMAND = command(
 
         examples:
 
+        TODO: redo them
+
         . Extracting content from a single file on disk:
             $ minet extract ./path/to/file.html
 
@@ -69,32 +71,21 @@ EXTRACT_COMMAND = command(
         . Working on a report from stdin (mind the `-`):
             $ minet fetch url file.csv | minet extract -i - > extracted.csv
     """,
-    variadic_input={
-        "dummy_column": "filename",
-        "metavar": "single_filename",
-        "no_help": True,
-        "optional": True,
-        "column_help": "Optional single HTML filename from which to extract text content.",
-    },
+    variadic_input={"dummy_column": "filename"},
     arguments=[
         {
             "flags": ["-g", "--glob"],
-            "help": "Whether to extract text from a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.",
+            "help": "Will interpret given filename as glob patterns to resolve if given.",
+            "action": "store_true",
         },
         {
             "flags": ["-I", "--input-dir"],
-            "help": 'Directory where the HTML files are stored. Defaults to "%s" if --glob is not set.'
-            % DEFAULT_CONTENT_FOLDER,
+            "help": "Directory where the HTML files are stored.",
         },
         {
             "flags": ["-p", "--processes"],
             "help": "Number of processes to use. Defaults to roughly half of the available CPUs.",
             "type": int,
-        },
-        {
-            "flag": "--filename-column",
-            "help": "Name of the CSV column containing filenames. Only relevant if -i/--input was given.",
-            "default": "filename",
         },
         {
             "flag": "--body-column",
@@ -104,12 +95,12 @@ EXTRACT_COMMAND = command(
         {
             "flag": "--error-column",
             "help": "Name of the CSV column containing a fetch error. Only relevant if -i/--input was given.",
-            "default": "error",
+            "default": "fetch_error",
         },
         {
             "flag": "--status-column",
             "help": "Name of the CSV column containing HTTP status. Only relevant if -i/--input was given.",
-            "default": "status",
+            "default": "http_status",
         },
         {
             "flag": "--encoding-column",
