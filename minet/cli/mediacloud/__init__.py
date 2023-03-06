@@ -20,8 +20,6 @@ MEDIACLOUD_MEDIAS_SUBCOMMAND = subcommand(
         Retrieve metadata about a list of Mediacloud medias.
     """,
     variadic_input={"dummy_column": "media", "item_label": "Mediacloud media id"},
-    select=True,
-    total=True,
     arguments=[
         {
             "flag": "--feeds",

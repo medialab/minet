@@ -79,7 +79,6 @@ BUZZSUMO_DOMAIN_COMMAND = subcommand(
             $ minet bz domain domain_name domain_names.csv --select domain_name --begin-date 2019-01-01 --end-date 2020-12-31 --token YOUR_TOKEN > domain_name_articles.csv
     """,
     variadic_input={"dummy_column": "domain_name", "item_label": "domain name"},
-    select=True,
     arguments=[
         *DATE_ARGUMENTS,
     ],
@@ -105,7 +104,6 @@ BUZZSUMO_DOMAIN_SUMMARY_COMMAND = subcommand(
             $ minet bz domain-summary domain_name domain_names.csv --begin-date 2020-01-01 --end-date 2021-06-15 --token YOUR_TOKEN  > domain_name_summary.csv
     """,
     variadic_input={"dummy_column": "domain_name", "item_label": "domain name"},
-    select=True,
     arguments=[
         *DATE_ARGUMENTS,
     ],

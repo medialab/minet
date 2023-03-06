@@ -1,6 +1,5 @@
 # Variables
 SOURCE = minet
-PEP8_IGNORE = E501,E722,E741,W503,W504
 
 # Functions
 define clean

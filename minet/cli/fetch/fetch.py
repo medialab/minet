@@ -64,7 +64,7 @@ def get_headers(cli_args):
         headers = FETCH_ADDITIONAL_HEADERS
 
         if cli_args.contents_in_report:
-            headers = headers + ["raw_contents"]
+            headers = headers + ["body"]
 
     return headers
 
@@ -179,6 +179,9 @@ def action(cli_args, enricher, loading_bar, resolve=False):
         files_writer = ThreadSafeFilesWriter(cli_args.output_dir)
 
     def worker_callback(result: FetchResult[List]) -> None:
+        if cli_args.dont_save:
+            return
+
         # NOTE: at this point the callback is only fired on success
         assert result.response
 

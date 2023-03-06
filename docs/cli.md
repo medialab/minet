@@ -2,91 +2,92 @@
 
 ## Summary
 
-*Global utilities*
+_Global utilities_
 
-* [-h/--help/help](#help-flag)
-* [--version](#version-flag)
-* [minetrc config files](#minetrc)
-* [minet environment variables](#envvars)
+- [-h/--help/help](#help-flag)
+- [--version](#version-flag)
+- [minetrc config files](#minetrc)
+- [minet environment variables](#envvars)
 
-*Generic commands*
+_Generic commands_
 
-* [cookies](#cookies)
-* [crawl](#crawl)
-* [fetch](#fetch)
-* [extract](#extract)
-* [resolve](#resolve)
-* [scrape](#scrape)
-* [url-extract](#url-extract)
-* [url-join](#url-join)
-* [url-parse](#url-parse)
+- [cookies](#cookies)
+- [crawl](#crawl)
+- [fetch](#fetch)
+- [extract](#extract)
+- [resolve](#resolve)
+- [scrape](#scrape)
+- [url-extract](#url-extract)
+- [url-join](#url-join)
+- [url-parse](#url-parse)
 
-*Platform-related commands*
+_Platform-related commands_
 
-* [buzzsumo (bz)](#buzzsumo)
-  * [limit](#buzzsumo-limit)
-  * [domain-summary](#buzzsumo-domain-summary)
-  * [domain](#buzzsumo-domain)
-* [crowdtangle (ct)](#crowdtangle)
-  * [leaderboard](#leaderboard)
-  * [lists](#lists)
-  * [posts-by-id](#posts-by-id)
-  * [posts](#posts)
-  * [search](#ct-search)
-  * [summary](#summary)
-* [facebook (fb)](#facebook)
-  * [comments](#facebook-comments)
-  * [post](#facebook-post)
-  * [posts](#facebook-posts)
-  * [post-authors](#facebook-post-authors)
-  * [url-likes](#facebook-url-likes)
-* [google](#google)
-  * [sheets](#google-sheets)
-* [hyphe](#hyphe)
-  * [declare](#hyphe-declare)
-  * [destroy](#hyphe-destroy)
-  * [dump](#hyphe-dump)
-  * [reset](#hyphe-reset)
-  * [tag](#hyphe-tag)
-* [instagram (insta)](#instagram)
-  * [hashtag](#hashtag)
-  * [user-followers](#user-followers)
-  * [user-following](#user-following)
-  * [user-infos](#user-infos)
-  * [user-posts](#user-posts)
-* [mediacloud (mc)](#mediacloud)
-  * [medias](#mc-medias)
-  * [search](#mc-search)
-  * [topic](#topic)
-    * [stories](#stories)
-* [telegram (tl)](#telegram)
-  * [channel-infos](#channel-infos)
-  * [channel-messages](#channel-messages)
-* [tiktok (tk)](#tiktok)
-  * [search-videos](#search-videos)
-* [twitter](#twitter)
-  * [attrition](#attrition)
-  * [followers](#followers)
-  * [friends](#friends)
-  * [list-followers](#list-followers)
-  * [list-members](#list-members)
-  * [retweeters](#retweeters)
-  * [scrape](#twitter-scrape)
-  * [tweet-date](#tweet-date)
-  * [tweet-search](#tweet-search)
-  * [tweet-count](#tweet-count)
-  * [tweets](#tweets)
-  * [users](#users)
-  * [user-search](#user-search)
-  * [user-tweets](#user-tweets)
-* [youtube (yt)](#youtube)
-  * [captions](#captions)
-  * [channel-videos](#channel-videos)
-  * [channels](#channels)
-  * [comments](#youtube-comments)
-  * [search](#youtube-search)
-  * [videos](#videos)
-
+- [buzzsumo (bz)](#buzzsumo)
+  - [limit](#buzzsumo-limit)
+  - [domain-summary](#buzzsumo-domain-summary)
+  - [domain](#buzzsumo-domain)
+- [crowdtangle (ct)](#crowdtangle)
+  - [leaderboard](#leaderboard)
+  - [lists](#lists)
+  - [posts-by-id](#posts-by-id)
+  - [posts](#posts)
+  - [search](#ct-search)
+  - [summary](#summary)
+- [facebook (fb)](#facebook)
+  - [comments](#facebook-comments)
+  - [post](#facebook-post)
+  - [posts](#facebook-posts)
+  - [post-authors](#facebook-post-authors)
+  - [url-likes](#facebook-url-likes)
+- [google](#google)
+  - [sheets](#google-sheets)
+- [hyphe](#hyphe)
+  - [declare](#hyphe-declare)
+  - [destroy](#hyphe-destroy)
+  - [dump](#hyphe-dump)
+  - [reset](#hyphe-reset)
+  - [tag](#hyphe-tag)
+- [instagram (insta)](#instagram)
+  - [hashtag](#hashtag)
+  - [user-followers](#user-followers)
+  - [user-following](#user-following)
+  - [user-infos](#user-infos)
+  - [user-posts](#user-posts)
+- [mediacloud (mc)](#mediacloud)
+  - [medias](#mc-medias)
+  - [search](#mc-search)
+  - [topic](#topic)
+    - [stories](#stories)
+- [telegram (tl)](#telegram)
+  - [channel-infos](#channel-infos)
+  - [channel-messages](#channel-messages)
+- [tiktok (tk)](#tiktok)
+  - [search-videos](#search-videos)
+- [twitter](#twitter)
+  - [attrition](#attrition)
+  - [followers](#followers)
+  - [friends](#friends)
+  - [list-followers](#list-followers)
+  - [list-members](#list-members)
+  - [retweeters](#retweeters)
+  - [scrape](#twitter-scrape)
+  - [tweet-date](#tweet-date)
+  - [tweet-search](#tweet-search)
+  - [tweet-count](#tweet-count)
+  - [tweets](#tweets)
+  - [users](#users)
+  - [user-search](#user-search)
+  - [user-tweets](#user-tweets)
+- [wikipedia (wiki)](#wikipedia)
+  - [pageviews](#pageviews)
+- [youtube (yt)](#youtube)
+  - [captions](#captions)
+  - [channel-videos](#channel-videos)
+  - [channels](#channels)
+  - [comments](#youtube-comments)
+  - [search](#youtube-search)
+  - [videos](#videos)
 
 <h2 id="help-flag">-h/--help</h2>
 
@@ -115,10 +116,10 @@ Minet supports configuration files so you can skip some tedious command line arg
 
 Those configuration files can be written in YAML or JSON and can either be passed to minet using the `--rcfile` argument or will be searched at the following paths (with this precedence):
 
-* `./.minetrc{,.yml,.yaml,.json}`
-* `~/.minetrc{,.yml,.yaml,.json}`
+- `./.minetrc{,.yml,.yaml,.json}`
+- `~/.minetrc{,.yml,.yaml,.json}`
 
-*Configuration file*
+_Configuration file_
 
 ```yml
 ---
@@ -161,27 +162,28 @@ Finally note that command line arguments and flags will take precedence over env
 ## cookies
 
 ```
-usage: minet cookies [-h] [--csv] [--url URL] [-o OUTPUT]
+Usage: minet cookies [-h] [--silent] [--csv] [--url URL] [-o OUTPUT]
                      {chrome,chromium,edge,firefox,opera}
 
-Minet Cookies Command
-=====================
+# Minet Cookies Command
 
 Grab cookies directly from your browsers to use them easily later
 in python scripts, for instance.
 
-positional arguments:
+Positional Arguments:
   {chrome,chromium,edge,firefox,opera}
                                 Name of the browser from which to grab cookies.
 
-optional arguments:
+Optional Arguments:
   --csv                         Whether to format the output as CSV. If --url is
                                 set, will output the cookie's morsels as CSV.
   --url URL                     If given, only returns full cookie header value
                                 for this url.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -202,23 +204,28 @@ examples:
 ## crawl
 
 ```
-usage: minet crawl [-h] [-O OUTPUT_DIR] [--resume] [--throttle THROTTLE] crawler
+Usage: minet crawl [-h] [--silent] [-O OUTPUT_DIR] [--resume] [--dump-queue]
+                   [--throttle THROTTLE]
+                   crawler
 
-Minet Crawl Command
-===================
+# Minet Crawl Command
 
 Use multiple threads to crawl the web using minet crawling and
 scraping DSL.
 
-positional arguments:
+Positional Arguments:
   crawler                       Path to the crawler definition file.
 
-optional arguments:
-  -O OUTPUT_DIR, --output-dir OUTPUT_DIR
-                                Output directory.
+Optional Arguments:
+  --dump-queue                  Print the contents of the persistent queue.
+                                (This is for debug only, don't use this flag
+                                unless you know what you are doing).
+  -O, --output-dir OUTPUT_DIR   Output directory.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to 0.2.
   --resume                      Whether to resume an interrupted crawl.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -230,44 +237,43 @@ examples:
 ## fetch
 
 ```
-usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM]
+Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                    [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
                    [--insecure] [--separator SEPARATOR] [-t THREADS]
                    [--throttle THROTTLE] [--timeout TIMEOUT]
                    [--url-template URL_TEMPLATE] [-X METHOD]
-                   [--max-redirects MAX_REDIRECTS] [--compress]
-                   [--contents-in-report] [-O OUTPUT_DIR] [-f FILENAME]
+                   [--max-redirects MAX_REDIRECTS] [--compress] [-c] [-D]
+                   [-O OUTPUT_DIR] [-f FILENAME]
                    [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [--keep-failed-contents]
-                   [--standardize-encoding] [-i INPUT] [-s SELECT]
+                   [--standardize-encoding] [--only-html] [-i INPUT] [-s SELECT]
                    [--total TOTAL] [--resume] [-o OUTPUT]
                    value_or_column_name
 
-Minet Fetch Command
-===================
+# Minet Fetch Command
 
 Use multiple threads to fetch batches of urls from a CSV file. The
 command outputs a CSV report with additional metadata about the
 HTTP calls and will generally write the retrieved files in a folder
 given by the user.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name          Single url to process or name of the CSV column
                                 containing urls when using -i/--input.
 
-optional arguments:
+Optional Arguments:
   --compress                    Whether to compress the contents.
-  --contents-in-report, --no-contents-in-report
+  -c, --contents-in-report, -w, --no-contents-in-report
                                 Whether to include retrieved contents, e.g.
                                 html, directly in the report and avoid writing
                                 them in a separate folder. This requires to
                                 standardize encoding and won't work on binary
-                                formats.
+                                formats. Note that --contents-in-report is the
+                                default when no input file is given.
   --domain-parallelism DOMAIN_PARALLELISM
                                 Max number of urls per domain to hit at the same
                                 time. Defaults to 1
-  -f FILENAME, --filename FILENAME
-                                Name of the column used to build retrieved file
+  -f, --filename FILENAME       Name of the column used to build retrieved file
                                 names. Defaults to a md5 hash of final url. If
                                 the provided file names have no extension (e.g.
                                 ".jpg", ".pdf", etc.) the correct extension will
@@ -282,11 +288,11 @@ optional arguments:
                                 top of --filename-template. Defaults to "flat".
                                 All of the strategies are described at the end
                                 of this help.
-  -g {chrome,chromium,edge,firefox,opera}, --grab-cookies {chrome,chromium,edge,firefox,opera}
+  -g, --grab-cookies {chrome,chromium,edge,firefox,opera}
                                 Whether to attempt to grab cookies from your
                                 computer's browser (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
-  -H HEADERS, --header HEADERS  Custom headers used with every requests.
+  -H, --header HEADERS          Custom headers used with every requests.
   --insecure                    Whether to allow ssl errors when performing
                                 requests or not.
   --keep-failed-contents        Whether to keep & write contents for failed
@@ -294,17 +300,22 @@ optional arguments:
   --max-redirects MAX_REDIRECTS
                                 Maximum number of redirections to follow before
                                 breaking. Defaults to 5.
-  -O OUTPUT_DIR, --output-dir OUTPUT_DIR
-                                Directory where the fetched files will be
+  --only-html                   Only download pages whose url looks like it
+                                could be HTML (e.g. a url without extension or
+                                ending in .html, .php etc.). Or, said
+                                differently, don't download pages whose url
+                                clearly indicate you won't get HTML (e.g. a url
+                                ending in .pdf or .json url).
+  -O, --output-dir OUTPUT_DIR   Directory where the fetched files will be
                                 written. Defaults to "downloaded".
-  -X METHOD, --request METHOD   The http method to use. Will default to GET.
+  -X, --request METHOD          The http method to use. Will default to GET.
+  -D, --dont-save               Use not to write any downloaded file on disk.
   --separator SEPARATOR         Character used to split the url cell in the CSV
                                 file, if this one can in fact contain multiple
                                 urls.
   --standardize-encoding        Whether to systematically convert retrieved text
                                 to UTF-8.
-  -t THREADS, --threads THREADS
-                                Number of threads to use. Defaults to 25.
+  -t, --threads THREADS         Number of threads to use. Defaults to 25.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to 0.2.
   --timeout TIMEOUT             Maximum time - in seconds - to spend for each
@@ -312,17 +323,21 @@ optional arguments:
                                 ~30s.
   --url-template URL_TEMPLATE   A template for the urls to fetch. Handy e.g. if
                                 you need to build urls from ids etc.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -i INPUT, --input INPUT       CSV file containing all the urls you want to
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the urls you want to
                                 process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 columns being added to the output:
@@ -330,15 +345,15 @@ columns being added to the output:
 . "index": index of the line in the original file (the output will be
     arbitrarily ordered since multiple requests are performed concurrently).
 . "resolved": final resolved url (after solving redirects) if different
-    from requested url.
+    from starting url.
 . "status": HTTP status code of the request, e.g. 200, 404, 503 etc.
 . "error": an error code if anything went wrong when performing the request.
 . "filename": path to the downloaded file, relative to the folder given
     through -O/--output-dir.
 . "mimetype": detected mimetype of the requested file.
 . "encoding": detected encoding of the requested file if relevant.
-. "raw_contents": if --contents-in-report is set, will contain the
-    downloaded text and the file won't be written.
+. "body": if -c/--contents-in-report is set, will contain the
+    downloaded text and the files won't be written to disk.
 
 --folder-strategy options:
 
@@ -388,12 +403,11 @@ how to use the command with a CSV file?
 ## extract
 
 ```
-usage: minet extract [-h] [-g GLOB] [-I INPUT_DIR] [-p PROCESSES] [-s SELECT]
-                     [--total TOTAL] [-o OUTPUT]
+Usage: minet extract [-h] [--silent] [-g GLOB] [-I INPUT_DIR] [-p PROCESSES]
+                     [-s SELECT] [--total TOTAL] [-o OUTPUT]
                      report_or_glob_pattern
 
-Minet Extract Command
-=====================
+# Minet Extract Command
 
 Use multiple processes to extract raw content and various metadata
 from a batch of HTML files. This command can either work on a
@@ -407,39 +421,41 @@ https://github.com/adbar/trafilatura
 Note that this methodology mainly targets news article and may fail
 to extract relevant content from other kind of web pages.
 
-positional arguments:
+Positional Arguments:
   report_or_glob_pattern        Report CSV file from `minet fetch` or glob
                                 pattern if used with --glob. Will understand `-`
                                 as stdin.
 
-optional arguments:
-  -g GLOB, --glob GLOB          Whether to extract text from a bunch of html
+Optional Arguments:
+  -g, --glob GLOB               Whether to extract text from a bunch of html
                                 files on disk matched by a glob pattern rather
                                 than sourcing them from a CSV report.
-  -I INPUT_DIR, --input-dir INPUT_DIR
-                                Directory where the HTML files are stored.
+  -I, --input-dir INPUT_DIR     Directory where the HTML files are stored.
                                 Defaults to "downloaded" if --glob is not set.
-  -p PROCESSES, --processes PROCESSES
-                                Number of processes to use. Defaults to roughly
+  -p, --processes PROCESSES     Number of processes to use. Defaults to roughly
                                 half of the available CPUs.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 columns being added to the output:
 
 . "extract_error": any error that happened when extracting content.
 . "canonical_url": canonical url of target html, extracted from
-    link[rel=canonical].
+    link.
 . "title": title of the web page, from <title> usually.
 . "description": description of the web page, as found in its
     metadata.
-. "raw_content": main content of the web page as extracted.
+. "body": main content of the web page as extracted.
 . "comments": comment text whenever the heuristics succeeds in
     identifying them.
 . "author": inferred author of the web page article when found in
@@ -467,7 +483,7 @@ examples:
 ## resolve
 
 ```
-usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM]
+Usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                      [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
                      [--insecure] [--separator SEPARATOR] [-t THREADS]
                      [--throttle THROTTLE] [--timeout TIMEOUT]
@@ -478,18 +494,17 @@ usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM]
                      [--total TOTAL] [--resume] [-o OUTPUT]
                      value_or_column_name
 
-Minet Resolve Command
-=====================
+# Minet Resolve Command
 
 Use multiple threads to resolve batches of urls from a CSV file. The
 command outputs a CSV report with additional metadata about the
 HTTP calls and the followed redirections.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name          Single url to process or name of the CSV column
                                 containing urls when using -i/--input.
 
-optional arguments:
+Optional Arguments:
   --canonicalize                Whether to extract the canonical url from the
                                 html source code of the web page if found.
                                 Requires to buffer part of the response body, so
@@ -503,11 +518,11 @@ optional arguments:
   --follow-meta-refresh         Whether to follow meta refresh tags. Requires to
                                 buffer part of the response body, so it will
                                 slow things down.
-  -g {chrome,chromium,edge,firefox,opera}, --grab-cookies {chrome,chromium,edge,firefox,opera}
+  -g, --grab-cookies {chrome,chromium,edge,firefox,opera}
                                 Whether to attempt to grab cookies from your
                                 computer's browser (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
-  -H HEADERS, --header HEADERS  Custom headers used with every requests.
+  -H, --header HEADERS          Custom headers used with every requests.
   --infer-redirection           Whether to try to heuristically infer
                                 redirections from the urls themselves, without
                                 requiring a HTTP call.
@@ -518,12 +533,11 @@ optional arguments:
                                 breaking. Defaults to 20.
   --only-shortened              Whether to only attempt to resolve urls that are
                                 probably shortened.
-  -X METHOD, --request METHOD   The http method to use. Will default to GET.
+  -X, --request METHOD          The http method to use. Will default to GET.
   --separator SEPARATOR         Character used to split the url cell in the CSV
                                 file, if this one can in fact contain multiple
                                 urls.
-  -t THREADS, --threads THREADS
-                                Number of threads to use. Defaults to 25.
+  -t, --threads THREADS         Number of threads to use. Defaults to 25.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to 0.2.
   --timeout TIMEOUT             Maximum time - in seconds - to spend for each
@@ -531,17 +545,21 @@ optional arguments:
                                 ~30s.
   --url-template URL_TEMPLATE   A template for the urls to fetch. Handy e.g. if
                                 you need to build urls from ids etc.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -i INPUT, --input INPUT       CSV file containing all the urls you want to
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the urls you want to
                                 process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 columns being added to the output:
@@ -584,13 +602,12 @@ how to use the command with a CSV file?
 For more documentation about minet's scraping DSL check this [page](../cookbook/scraping_dsl.md) from the Cookbook.
 
 ```
-usage: minet scrape [-h] [-f {csv,jsonl}] [-g GLOB] [-I INPUT_DIR]
+Usage: minet scrape [-h] [--silent] [-f {csv,jsonl}] [-g GLOB] [-I INPUT_DIR]
                     [-p PROCESSES] [--separator SEPARATOR] [--strain STRAIN]
                     [--validate] [--total TOTAL] [-o OUTPUT]
                     scraper report
 
-Minet Scrape Command
-====================
+# Minet Scrape Command
 
 Use multiple processes to scrape data from a batch of HTML files.
 This command can either work on a `minet fetch` report or on a bunch
@@ -598,22 +615,19 @@ of files filtered using a glob pattern.
 
 It will output the scraped items as a CSV file.
 
-positional arguments:
+Positional Arguments:
   scraper                       Path to a scraper definition file.
   report                        Report CSV file from `minet fetch`. Will
                                 understand `-` as stdin.
 
-optional arguments:
-  -f {csv,jsonl}, --format {csv,jsonl}
-                                Output format.
-  -g GLOB, --glob GLOB          Whether to scrape a bunch of html files on disk
+Optional Arguments:
+  -f, --format {csv,jsonl}      Output format.
+  -g, --glob GLOB               Whether to scrape a bunch of html files on disk
                                 matched by a glob pattern rather than sourcing
                                 them from a CSV report.
-  -I INPUT_DIR, --input-dir INPUT_DIR
-                                Directory where the HTML files are stored.
+  -I, --input-dir INPUT_DIR     Directory where the HTML files are stored.
                                 Defaults to "downloaded".
-  -p PROCESSES, --processes PROCESSES
-                                Number of processes to use. Defaults to roughly
+  -p, --processes PROCESSES     Number of processes to use. Defaults to roughly
                                 half of the available CPUs.
   --separator SEPARATOR         Separator use to join lists of values when
                                 output format is CSV. Defaults to "|".
@@ -621,11 +635,15 @@ optional arguments:
                                 parse matched tags in the parsed html files in
                                 order to optimize performance.
   --validate                    Just validate the given scraper then exit.
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -649,36 +667,40 @@ examples:
     $ minet scraper --validate scraper.yml
 
 . Using a strainer to optimize performance:
-    $ minet scraper links-scraper.yml --strain "a[href]" report.csv > links.csv
+    $ minet scraper links-scraper.yml --strain "a" report.csv > links.csv
 ```
 
 ## url-extract
 
 ```
-usage: minet url-extract [-h] [--base-url BASE_URL] [--from {html,text}]
-                         [-s SELECT] [--total TOTAL] [-o OUTPUT]
+Usage: minet url-extract [-h] [--silent] [--base-url BASE_URL]
+                         [--from {html,text}] [-s SELECT] [--total TOTAL]
+                         [-o OUTPUT]
                          column input
 
-Minet Url Extract Command
-=========================
+# Minet Url Extract Command
 
 Extract urls from a CSV column containing either raw text or raw
 HTML.
 
-positional arguments:
+Positional Arguments:
   column                      Name of the column containing text or html.
   input                       Target CSV file.
 
-optional arguments:
+Optional Arguments:
   --base-url BASE_URL         Base url used to resolve relative urls.
   --from {html,text}          Extract urls from which kind of source?
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -693,18 +715,17 @@ examples:
 ## url-join
 
 ```
-usage: minet url-join [-h] [-p MATCH_COLUMN_PREFIX] [--separator SEPARATOR]
-                      [-s SELECT] [-o OUTPUT]
+Usage: minet url-join [-h] [--silent] [-p MATCH_COLUMN_PREFIX]
+                      [--separator SEPARATOR] [-s SELECT] [-o OUTPUT]
                       column1 input1 column2 input2
 
-Minet Url Join Command
-======================
+# Minet Url Join Command
 
 Join two CSV files by matching them on columns containing urls. It
 works by indexing the first file's urls in a specialized
 URL trie to match them with the second file's urls.
 
-positional arguments:
+Positional Arguments:
   column1                       Name of the column containing urls in the
                                 indexed file.
   input1                        Path to the file to index. Will understand `-`
@@ -714,16 +735,18 @@ positional arguments:
   input2                        Path to the second file. Will understand `-` as
                                 stdin.
 
-optional arguments:
-  -p MATCH_COLUMN_PREFIX, --match-column-prefix MATCH_COLUMN_PREFIX
+Optional Arguments:
+  -p, --match-column-prefix MATCH_COLUMN_PREFIX
                                 Optional prefix to add to the first file's
                                 column names to avoid conflicts.
   --separator SEPARATOR         Split indexed url column by a separator?
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -744,28 +767,28 @@ examples:
 ## url-parse
 
 ```
-usage: minet url-parse [-h] [--separator SEPARATOR] [--facebook] [--twitter]
-                       [--youtube] [--infer-redirection] [--fix-common-mistakes]
-                       [--normalize-amp] [--quoted] [--sort-query]
-                       [--strip-authentication] [--strip-fragment]
-                       [--strip-index] [--strip-irrelevant-subdomains]
+Usage: minet url-parse [-h] [--separator SEPARATOR] [--silent] [--facebook]
+                       [--twitter] [--youtube] [--infer-redirection]
+                       [--fix-common-mistakes] [--normalize-amp] [--quoted]
+                       [--sort-query] [--strip-authentication]
+                       [--strip-fragment] [--strip-index]
+                       [--strip-irrelevant-subdomains]
                        [--strip-lang-query-items] [--strip-lang-subdomains]
                        [--strip-protocol] [--strip-trailing-slash] [-i INPUT]
                        [-s SELECT] [--total TOTAL] [-o OUTPUT]
                        value_or_column_name
 
-Minet Url Parse Command
-=======================
+# Minet Url Parse Command
 
 Parse the urls contained in a CSV file using the python `ural`
 library to extract useful information about them such as their
 normalized version, domain name, etc.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name          Single url to process or name of the CSV column
                                 containing urls when using -i/--input.
 
-optional arguments:
+Optional Arguments:
   --facebook                    Whether to consider and parse the given urls as
                                 coming from Facebook.
   --fix-common-mistakes, --dont-fix-common-mistakes
@@ -794,18 +817,19 @@ optional arguments:
                                 authentication.
   --strip-fragment, --dont-strip-fragment, --strip-fragment-except-routing
                                 Whether or not to strip the url's fragment when
-                                normalizing url. If set to `--strip-fragment-
-                                except-routing`, will only strip the fragment if
-                                the fragment is not deemed to be js routing
-                                (i.e. if it contains a `/`). Defaults to strip
-                                fragment except routing.
+                                normalizing url. If set to
+                                `--strip-fragment-except-routing`, will only
+                                strip the fragment if the fragment is not deemed
+                                to be js routing (i.e. if it contains a `/`).
+                                Defaults to strip fragment except routing.
   --strip-index, --dont-strip-index
                                 Whether or not to strip trailing index when
                                 normalizing url. Defaults to strip index.
   --strip-irrelevant-subdomains, --dont-strip-irrelevant-subdomains
-                                Whether or not to strip trailing irrelevant-
-                                subdomains such as `www` etc. when normalizing
-                                url. Defaults to no strip irrelevantsubdomains.
+                                Whether or not to strip trailing
+                                irrelevant-subdomains such as `www` etc. when
+                                normalizing url. Defaults to no strip
+                                irrelevantsubdomains.
   --strip-lang-query-items, --dont-strip-lang-query-items
                                 Whether or not to strip language query items
                                 (ex: `gl=pt_BR`) when normalizing url. Defaults
@@ -827,15 +851,19 @@ optional arguments:
                                 coming from Twitter.
   --youtube                     Whether to consider and parse the given urls as
                                 coming from YouTube.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -i INPUT, --input INPUT       CSV file containing all the urls you want to
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the urls you want to
                                 process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 columns being added to the output:
@@ -918,24 +946,26 @@ how to use the command with a CSV file?
 ## BuzzSumo
 
 ```
-usage: minet buzzsumo [-h] [-t TOKEN] [--rcfile RCFILE]
+Usage: minet buzzsumo [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
                       {limit,domain,domain-summary} ...
 
-Minet Buzzsumo Command
-======================
+# Minet Buzzsumo Command
 
 Gather data from the BuzzSumo APIs easily and efficiently.
 
-optional arguments:
-  -t TOKEN, --token TOKEN       BuzzSumo API token. Can also be configured in a
+Optional Arguments:
+  -t, --token TOKEN             BuzzSumo API token. Can also be configured in a
                                 .minetrc file as "buzzsumo.token" or read from
                                 the MINET_BUZZSUMO_TOKEN env variable.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-subcommands:
+Subcommands:
   {limit,domain,domain-summary}
                                 Subcommand to use.
 ```
@@ -943,24 +973,27 @@ subcommands:
 <h3 id="buzzsumo-limit">limit</h3>
 
 ```
-usage: minet buzzsumo limit [-h] [-t TOKEN] [--rcfile RCFILE] [-o OUTPUT]
+Usage: minet buzzsumo limit [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
+                            [-o OUTPUT]
 
-Minet Buzzsumo Limit Command
-============================
+# Minet Buzzsumo Limit Command
 
 Call BuzzSumo for a given request and return the remaining number
 of calls for this month contained in the request's headers.
 
-optional arguments:
-  -t TOKEN, --token TOKEN     BuzzSumo API token. Can also be configured in a
+Optional Arguments:
+  -t, --token TOKEN           BuzzSumo API token. Can also be configured in a
                               .minetrc file as "buzzsumo.token" or read from the
                               MINET_BUZZSUMO_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -972,41 +1005,48 @@ examples:
 <h3 id="buzzsumo-domain-summary">domain-summary</h3>
 
 ```
-usage: minet buzzsumo domain-summary [-h] [-t TOKEN] [--rcfile RCFILE]
-                                     --begin-date BEGIN_DATE --end-date END_DATE
-                                     [-i INPUT] [-s SELECT] [-o OUTPUT]
+Usage: minet buzzsumo domain-summary [-h] [-t TOKEN] [--rcfile RCFILE]
+                                     [--silent] --begin-date BEGIN_DATE
+                                     --end-date END_DATE [-i INPUT] [-s SELECT]
+                                     [--total TOTAL] [-o OUTPUT]
                                      value_or_column_name
 
-Minet Buzzsumo Domain Summary Command
-=====================================
+# Minet Buzzsumo Domain Summary Command
 
 Gather information about the quantity of articles crawled by BuzzSumo for certain domain names and a given period.
 
 Inform the user about the number of calls (corresponding to the number of pages) needed to request BuzzSumo about those domain names.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single domain name to process or name of the CSV
                               column containing domain names when using
                               -i/--input.
 
-optional arguments:
+Optional Arguments:
   --begin-date BEGIN_DATE     The date you wish to fetch articles from. UTC date
                               should have the following format : YYYY-MM-DD
   --end-date END_DATE         The date you wish to fetch articles to. UTC date
                               should have the following format : YYYY-MM-DD
-  -t TOKEN, --token TOKEN     BuzzSumo API token. Can also be configured in a
+  -t, --token TOKEN           BuzzSumo API token. Can also be configured in a
                               .minetrc file as "buzzsumo.token" or read from the
                               MINET_BUZZSUMO_TOKEN env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  -i INPUT, --input INPUT     CSV file containing all the domain names you want
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the domain names you want
                               to process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1036,41 +1076,47 @@ how to use the command with a CSV file?
 <h3 id="buzzsumo-domain">domain</h3>
 
 ```
-usage: minet buzzsumo domain [-h] [-t TOKEN] [--rcfile RCFILE] --begin-date
-                             BEGIN_DATE --end-date END_DATE [-i INPUT]
-                             [-s SELECT] [-o OUTPUT]
+Usage: minet buzzsumo domain [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
+                             --begin-date BEGIN_DATE --end-date END_DATE
+                             [-i INPUT] [-s SELECT] [--total TOTAL] [-o OUTPUT]
                              value_or_column_name
 
-Minet Buzzsumo Domain Command
-=============================
+# Minet Buzzsumo Domain Command
 
 Gather social media information about all the articles crawled by BuzzSumo for one or a list of domain names and over a given period.
 
 The link to the official documentation: https://developers.buzzsumo.com/reference/articles.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single domain name to process or name of the CSV
                               column containing domain names when using
                               -i/--input.
 
-optional arguments:
+Optional Arguments:
   --begin-date BEGIN_DATE     The date you wish to fetch articles from. UTC date
                               should have the following format : YYYY-MM-DD
   --end-date END_DATE         The date you wish to fetch articles to. UTC date
                               should have the following format : YYYY-MM-DD
-  -t TOKEN, --token TOKEN     BuzzSumo API token. Can also be configured in a
+  -t, --token TOKEN           BuzzSumo API token. Can also be configured in a
                               .minetrc file as "buzzsumo.token" or read from the
                               MINET_BUZZSUMO_TOKEN env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  -i INPUT, --input INPUT     CSV file containing all the domain names you want
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the domain names you want
                               to process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1100,32 +1146,34 @@ how to use the command with a CSV file?
 ## CrowdTangle
 
 ```
-usage: minet crowdtangle [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
-                         [-t TOKEN]
+Usage: minet crowdtangle [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
+                         [--silent] [-t TOKEN]
                          {leaderboard,lists,posts-by-id,posts,search,summary}
                          ...
 
-Minet Crowdtangle Command
-=========================
+# Minet Crowdtangle Command
 
 Gather data from the CrowdTangle APIs easily and efficiently.
 
-optional arguments:
+Optional Arguments:
   --rate-limit RATE_LIMIT       Authorized number of hits by minutes. Defaults
                                 to 6. Rcfile key: crowdtangle.rate_limit. Can
                                 also be configured in a .minetrc file as
                                 "crowdtangle.rate_limit" or read from the
                                 MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  -t TOKEN, --token TOKEN       CrowdTangle dashboard API token. Rcfile key:
+  -t, --token TOKEN             CrowdTangle dashboard API token. Rcfile key:
                                 crowdtangle.token. Can also be configured in a
                                 .minetrc file as "crowdtangle.token" or read
                                 from the MINET_CROWDTANGLE_TOKEN env variable.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-subcommands:
+Subcommands:
   {leaderboard,lists,posts-by-id,posts,search,summary}
                                 Subcommand to use.
 ```
@@ -1133,25 +1181,23 @@ subcommands:
 ### leaderboard
 
 ```
-usage: minet crowdtangle leaderboard [-h] [--rate-limit RATE_LIMIT]
-                                     [--rcfile RCFILE] [-t TOKEN]
-                                     [--no-breakdown] [-f {csv,jsonl}]
-                                     [-l LIMIT] [--list-id LIST_ID]
+Usage: minet crowdtangle leaderboard [-h] [--rate-limit RATE_LIMIT]
+                                     [--rcfile RCFILE] [--silent] [-t TOKEN]
+                                     [--breakdown] [-f {csv,jsonl}] [-l LIMIT]
+                                     [--list-id LIST_ID]
                                      [--start-date START_DATE] [-o OUTPUT]
 
-Minet CrowdTangle Leaderboard Command
-=====================================
+# Minet CrowdTangle Leaderboard Command
 
 Gather information and aggregated stats about pages and groups of the designated dashboard (indicated by a given token).
 
 For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Leaderboard.
 
-optional arguments:
-  --no-breakdown                Whether to skip statistics breakdown by post
+Optional Arguments:
+  --breakdown, --no-breakdown   Whether to skip statistics breakdown by post
                                 type in the CSV output.
-  -f {csv,jsonl}, --format {csv,jsonl}
-                                Output format. Defaults to `csv`.
-  -l LIMIT, --limit LIMIT       Maximum number of accounts to retrieve. Will
+  -f, --format {csv,jsonl}      Output format. Defaults to `csv`.
+  -l, --limit LIMIT             Maximum number of accounts to retrieve. Will
                                 fetch every account by default.
   --list-id LIST_ID             Optional list id from which to retrieve
                                 accounts.
@@ -1163,16 +1209,19 @@ optional arguments:
   --start-date START_DATE       The earliest date at which to start aggregating
                                 statistics (UTC!). You can pass just a year or a
                                 year-month for convenience.
-  -t TOKEN, --token TOKEN       CrowdTangle dashboard API token. Rcfile key:
+  -t, --token TOKEN             CrowdTangle dashboard API token. Rcfile key:
                                 crowdtangle.token. Can also be configured in a
                                 .minetrc file as "crowdtangle.token" or read
                                 from the MINET_CROWDTANGLE_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -1184,32 +1233,34 @@ examples:
 ### lists
 
 ```
-usage: minet crowdtangle lists [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
-                               [-t TOKEN] [-o OUTPUT]
+Usage: minet crowdtangle lists [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
+                               [--silent] [-t TOKEN] [-o OUTPUT]
 
-Minet CrowdTangle Lists Command
-===============================
+# Minet CrowdTangle Lists Command
 
 Retrieve the lists from a CrowdTangle dashboard (indicated by a given token).
 
 For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Lists.
 
-optional arguments:
+Optional Arguments:
   --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to
                               6. Rcfile key: crowdtangle.rate_limit. Can also be
                               configured in a .minetrc file as
                               "crowdtangle.rate_limit" or read from the
                               MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key:
+  -t, --token TOKEN           CrowdTangle dashboard API token. Rcfile key:
                               crowdtangle.token. Can also be configured in a
                               .minetrc file as "crowdtangle.token" or read from
                               the MINET_CROWDTANGLE_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1221,48 +1272,52 @@ examples:
 ### posts-by-id
 
 ```
-usage: minet crowdtangle posts-by-id [-h] [--rate-limit RATE_LIMIT]
-                                     [--rcfile RCFILE] [-t TOKEN] [-i INPUT]
-                                     [-s SELECT] [--total TOTAL] [--resume]
-                                     [-o OUTPUT]
+Usage: minet crowdtangle posts-by-id [-h] [--rate-limit RATE_LIMIT]
+                                     [--rcfile RCFILE] [--silent] [-t TOKEN]
+                                     [-i INPUT] [-s SELECT] [--total TOTAL]
+                                     [--resume] [-o OUTPUT]
                                      value_or_column_name
 
-Minet CrowdTangle Post By Id Command
-====================================
+# Minet CrowdTangle Post By Id Command
 
 Retrieve metadata about batches of posts using Crowdtangle's API.
 
 For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Posts#get-postid.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single URL or id to process or name of the CSV
                               column containing URLs or ids when using
                               -i/--input.
 
-optional arguments:
+Optional Arguments:
   --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to
                               6. Rcfile key: crowdtangle.rate_limit. Can also be
                               configured in a .minetrc file as
                               "crowdtangle.rate_limit" or read from the
                               MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  -t TOKEN, --token TOKEN     CrowdTangle dashboard API token. Rcfile key:
+  -t, --token TOKEN           CrowdTangle dashboard API token. Rcfile key:
                               crowdtangle.token. Can also be configured in a
                               .minetrc file as "crowdtangle.token" or read from
                               the MINET_CROWDTANGLE_TOKEN env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
-  -i INPUT, --input INPUT     CSV file containing all the URLs or ids you want
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the URLs or ids you want
                               to process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --resume                    Whether to resume from an aborted collection. Need
                               -o to be set.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1292,22 +1347,21 @@ how to use the command with a CSV file?
 ### posts
 
 ```
-usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
-                               [-t TOKEN] [--chunk-size CHUNK_SIZE]
+Usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
+                               [--silent] [-t TOKEN] [--chunk-size CHUNK_SIZE]
                                [--end-date END_DATE] [-f {csv,jsonl}]
                                [--language LANGUAGE] [-l LIMIT]
                                [--list-ids LIST_IDS]
                                [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
                                [--start-date START_DATE] [--resume] [-o OUTPUT]
 
-Minet CrowdTangle Posts Command
-===============================
+# Minet CrowdTangle Posts Command
 
 Gather post data from the designated dashboard (indicated by a given token).
 
 For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Posts.
 
-optional arguments:
+Optional Arguments:
   --chunk-size CHUNK_SIZE       When sorting by date (default), the number of
                                 items to retrieve before shifting the inital
                                 query to circumvent the APIs limitations.
@@ -1315,10 +1369,9 @@ optional arguments:
   --end-date END_DATE           The latest date at which a post could be posted
                                 (UTC!). You can pass just a year or a year-month
                                 for convenience.
-  -f {csv,jsonl}, --format {csv,jsonl}
-                                Output format. Defaults to `csv`.
+  -f, --format {csv,jsonl}      Output format. Defaults to `csv`.
   --language LANGUAGE           Language of posts to retrieve.
-  -l LIMIT, --limit LIMIT       Maximum number of posts to retrieve. Will fetch
+  -l, --limit LIMIT             Maximum number of posts to retrieve. Will fetch
                                 every post by default.
   --list-ids LIST_IDS           Ids of the lists from which to retrieve posts,
                                 separated by commas.
@@ -1333,18 +1386,21 @@ optional arguments:
   --start-date START_DATE       The earliest date at which a post could be
                                 posted (UTC!). You can pass just a year or a
                                 year-month for convenience. Defaults to `2010`.
-  -t TOKEN, --token TOKEN       CrowdTangle dashboard API token. Rcfile key:
+  -t, --token TOKEN             CrowdTangle dashboard API token. Rcfile key:
                                 crowdtangle.token. Can also be configured in a
                                 .minetrc file as "crowdtangle.token" or read
                                 from the MINET_CROWDTANGLE_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -1365,10 +1421,10 @@ To know the different list ids associated with your dashboard:
 <h3 id="ct-search">search</h3>
 
 ```
-usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
-                                [-t TOKEN] [--and AND] [--chunk-size CHUNK_SIZE]
-                                [--end-date END_DATE] [-f {csv,jsonl}]
-                                [--in-list-ids IN_LIST_IDS]
+Usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
+                                [--silent] [-t TOKEN] [--and AND]
+                                [--chunk-size CHUNK_SIZE] [--end-date END_DATE]
+                                [-f {csv,jsonl}] [--in-list-ids IN_LIST_IDS]
                                 [--language LANGUAGE] [-l LIMIT]
                                 [--not-in-title] [--offset OFFSET]
                                 [-p PLATFORMS]
@@ -1378,17 +1434,16 @@ usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
                                 [-o OUTPUT]
                                 terms
 
-Minet CrowdTangle Search Command
-================================
+# Minet CrowdTangle Search Command
 
 Search posts on the whole CrowdTangle platform.
 
 For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Search.
 
-positional arguments:
+Positional Arguments:
   terms                         The search query term or terms.
 
-optional arguments:
+Optional Arguments:
   --and AND                     AND clause to add to the query terms.
   --chunk-size CHUNK_SIZE       When sorting by date (default), the number of
                                 items to retrieve before shifting the inital
@@ -1397,17 +1452,15 @@ optional arguments:
   --end-date END_DATE           The latest date at which a post could be posted
                                 (UTC!). You can pass just a year or a year-month
                                 for convenience.
-  -f {csv,jsonl}, --format {csv,jsonl}
-                                Output format. Defaults to `csv`.
+  -f, --format {csv,jsonl}      Output format. Defaults to `csv`.
   --in-list-ids IN_LIST_IDS     Ids of the lists in which to search, separated
                                 by commas.
   --language LANGUAGE           Language ISO code like "fr" or "zh-CN".
-  -l LIMIT, --limit LIMIT       Maximum number of posts to retrieve. Will fetch
+  -l, --limit LIMIT             Maximum number of posts to retrieve. Will fetch
                                 every post by default.
   --not-in-title                Whether to search terms in account titles also.
   --offset OFFSET               Count offset.
-  -p PLATFORMS, --platforms PLATFORMS
-                                The platforms from which to retrieve links
+  -p, --platforms PLATFORMS     The platforms from which to retrieve links
                                 (facebook, instagram, or reddit). This value can
                                 be comma-separated.
   --rate-limit RATE_LIMIT       Authorized number of hits by minutes. Defaults
@@ -1424,17 +1477,20 @@ optional arguments:
   --start-date START_DATE       The earliest date at which a post could be
                                 posted (UTC!). You can pass just a year or a
                                 year-month for convenience. Defaults to `2010`.
-  -t TOKEN, --token TOKEN       CrowdTangle dashboard API token. Rcfile key:
+  -t, --token TOKEN             CrowdTangle dashboard API token. Rcfile key:
                                 crowdtangle.token. Can also be configured in a
                                 .minetrc file as "crowdtangle.token" or read
                                 from the MINET_CROWDTANGLE_TOKEN env variable.
   --types TYPES                 Types of post to include, separated by comma.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -1446,28 +1502,26 @@ examples:
 ### summary
 
 ```
-usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT]
-                                 [--rcfile RCFILE] [-t TOKEN] [-p PLATFORMS]
-                                 [--posts POSTS]
+Usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT]
+                                 [--rcfile RCFILE] [--silent] [-t TOKEN]
+                                 [-p PLATFORMS] [--posts POSTS]
                                  [--sort-by {date,subscriber_count,total_interactions}]
                                  --start-date START_DATE [-i INPUT] [-s SELECT]
                                  [--total TOTAL] [-o OUTPUT]
                                  value_or_column_name
 
-Minet CrowdTangle Link Summary Command
-======================================
+# Minet CrowdTangle Link Summary Command
 
 Retrieve aggregated statistics about link sharing on the Crowdtangle API and by platform.
 
 For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Links.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name          Single URL to process or name of the CSV column
                                 containing URLs when using -i/--input.
 
-optional arguments:
-  -p PLATFORMS, --platforms PLATFORMS
-                                The platforms from which to retrieve links
+Optional Arguments:
+  -p, --platforms PLATFORMS     The platforms from which to retrieve links
                                 (facebook, instagram, or reddit). This value can
                                 be comma-separated.
   --posts POSTS                 Path to a file containing the retrieved posts.
@@ -1481,22 +1535,27 @@ optional arguments:
   --start-date START_DATE       The earliest date at which a post could be
                                 posted (UTC!). You can pass just a year or a
                                 year-month for convenience. Defaults to `2010`.
-  -t TOKEN, --token TOKEN       CrowdTangle dashboard API token. Rcfile key:
+  -t, --token TOKEN             CrowdTangle dashboard API token. Rcfile key:
                                 crowdtangle.token. Can also be configured in a
                                 .minetrc file as "crowdtangle.token" or read
                                 from the MINET_CROWDTANGLE_TOKEN env variable.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -i INPUT, --input INPUT       CSV file containing all the URLs you want to
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the URLs you want to
                                 process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -1523,19 +1582,18 @@ how to use the command with a CSV file?
 ## Facebook
 
 ```
-usage: minet facebook [-h]
+Usage: minet facebook [-h]
                       {comments,post-authors,post-stats,post,posts,url-likes}
                       ...
 
-Minet Facebook Command
-======================
+# Minet Facebook Command
 
 Collect data from Facebook.
 
-optional arguments:
+Optional Arguments:
   -h, --help                    show this help message and exit
 
-subcommands:
+Subcommands:
   {comments,post-authors,post-stats,post,posts,url-likes}
                                 Subcommand to use.
 ```
@@ -1543,13 +1601,12 @@ subcommands:
 <h3 id="facebook-comments">comments</h3>
 
 ```
-usage: minet facebook comments [-h] [-c COOKIE] [--rcfile RCFILE]
+Usage: minet facebook comments [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                [--throttle THROTTLE] [-i INPUT] [-s SELECT]
-                               [-o OUTPUT]
+                               [--total TOTAL] [-o OUTPUT]
                                value_or_column_name
 
-Minet Facebook Comments Command
-===============================
+# Minet Facebook Comments Command
 
 Scrape a Facebook post's comments.
 
@@ -1561,12 +1618,12 @@ If you want to grab cookies from another browser or want
 to directly pass the cookie as a string, check out the
 -c/--cookie flag.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single post url to process or name of the CSV
                               column containing post urls when using -i/--input.
 
-optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+Optional Arguments:
+  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
                               "firefox". Can also be configured in a .minetrc
@@ -1574,16 +1631,23 @@ optional arguments:
                               MINET_FACEBOOK_COOKIE env variable.
   --throttle THROTTLE         Throttling time, in seconds, to wait between each
                               request.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  -i INPUT, --input INPUT     CSV file containing all the post urls you want to
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the post urls you want to
                               process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1616,13 +1680,12 @@ how to use the command with a CSV file?
 <h3 id="facebook-post">post</h3>
 
 ```
-usage: minet facebook post [-h] [-c COOKIE] [--rcfile RCFILE]
+Usage: minet facebook post [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                            [--throttle THROTTLE] [-i INPUT] [-s SELECT]
-                           [-o OUTPUT]
+                           [--total TOTAL] [-o OUTPUT]
                            value_or_column_name
 
-Minet Facebook Post Command
-===========================
+# Minet Facebook Post Command
 
 Scrape Facebook post.
 
@@ -1655,12 +1718,12 @@ Finally, some post text is always truncated on Facebook
 when displayed in lists. This text is not yet entirely
 scraped by minet at this time.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single post url to process or name of the CSV
                               column containing post urls when using -i/--input.
 
-optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+Optional Arguments:
+  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
                               "firefox". Can also be configured in a .minetrc
@@ -1668,16 +1731,23 @@ optional arguments:
                               MINET_FACEBOOK_COOKIE env variable.
   --throttle THROTTLE         Throttling time, in seconds, to wait between each
                               request.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  -i INPUT, --input INPUT     CSV file containing all the post urls you want to
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the post urls you want to
                               process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1710,13 +1780,12 @@ how to use the command with a CSV file?
 <h3 id="facebook-posts">posts</h3>
 
 ```
-usage: minet facebook posts [-h] [-c COOKIE] [--rcfile RCFILE]
+Usage: minet facebook posts [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                             [--throttle THROTTLE] [-i INPUT] [-s SELECT]
-                            [-o OUTPUT]
+                            [--total TOTAL] [-o OUTPUT]
                             value_or_column_name
 
-Minet Facebook Posts Command
-============================
+# Minet Facebook Posts Command
 
 Scrape Facebook posts.
 
@@ -1748,13 +1817,13 @@ Finally, some post text is always truncated on Facebook
 when displayed in lists. This text is not yet entirely
 scraped by minet at this time.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single group url to process or name of the CSV
                               column containing group urls when using
                               -i/--input.
 
-optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+Optional Arguments:
+  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
                               "firefox". Can also be configured in a .minetrc
@@ -1762,16 +1831,23 @@ optional arguments:
                               MINET_FACEBOOK_COOKIE env variable.
   --throttle THROTTLE         Throttling time, in seconds, to wait between each
                               request.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  -i INPUT, --input INPUT     CSV file containing all the group urls you want to
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the group urls you want to
                               process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1804,25 +1880,24 @@ how to use the command with a CSV file?
 <h3 id="facebook-post-authors">post-authors</h3>
 
 ```
-usage: minet facebook post-authors [-h] [-c COOKIE] [--rcfile RCFILE]
+Usage: minet facebook post-authors [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                    [--throttle THROTTLE] [-i INPUT] [-s SELECT]
                                    [--total TOTAL] [-o OUTPUT]
                                    value_or_column_name
 
-Minet Facebook Post Authors Command
-===================================
+# Minet Facebook Post Authors Command
 
 Retrieve the author of the given Facebook posts.
 
 Note that it is only relevant for group posts since
 only administrators can post something on pages.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single post to process or name of the CSV column
                               containing posts when using -i/--input.
 
-optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+Optional Arguments:
+  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
                               "firefox". Can also be configured in a .minetrc
@@ -1830,18 +1905,23 @@ optional arguments:
                               MINET_FACEBOOK_COOKIE env variable.
   --throttle THROTTLE         Throttling time, in seconds, to wait between each
                               request.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
-  -i INPUT, --input INPUT     CSV file containing all the posts you want to
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the posts you want to
                               process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -1868,12 +1948,11 @@ how to use the command with a CSV file?
 <h3 id="facebook-url-likes">url-likes</h3>
 
 ```
-usage: minet facebook url-likes [-h] [-i INPUT] [-s SELECT] [--total TOTAL]
-                                [-o OUTPUT]
+Usage: minet facebook url-likes [-h] [--silent] [-i INPUT] [-s SELECT]
+                                [--total TOTAL] [-o OUTPUT]
                                 value_or_column_name
 
-Minet Facebook Url Likes Command
-================================
+# Minet Facebook Url Likes Command
 
 Retrieve the approximate number of "likes" (actually an aggregated engagement metric)
 that a url got on Facebook. The command can also be used with a list of urls stored in a CSV file.
@@ -1886,20 +1965,24 @@ reactions plus the number of comments and shares that the URL got on Facebook
 (here is the official documentation: https://developers.facebook.com/docs/plugins/faqs
 explaining "What makes up the number shown next to my Share button?").
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single url to process or name of the CSV column
                               containing urls when using -i/--input.
 
-optional arguments:
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+Optional Arguments:
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
-  -i INPUT, --input INPUT     CSV file containing all the urls you want to
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the urls you want to
                               process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -1928,27 +2011,26 @@ how to use the command with a CSV file?
 ## Google
 
 ```
-usage: minet google [-h] {sheets} ...
+Usage: minet google [-h] {sheets} ...
 
-Minet Google Command
-====================
+# Minet Google Command
 
 Collect data from Google.
 
-optional arguments:
+Optional Arguments:
   -h, --help  show this help message and exit
 
-subcommands:
+Subcommands:
   {sheets}    Subcommand to use.
 ```
 
 <h3 id="google-sheets">sheets</h3>
 
 ```
-usage: minet google sheets [-h] [-a AUTHUSER] [-c COOKIE] [-o OUTPUT] url
+Usage: minet google sheets [-h] [--silent] [-a AUTHUSER] [-c COOKIE] [-o OUTPUT]
+                           url
 
-Minet Google Sheets Command
-===========================
+# Minet Google Sheets Command
 
 Grab the given google spreadsheet as a CSV file from
 its url, its sharing url or id.
@@ -1966,19 +2048,20 @@ If you have more connected accounts or know beforehand
 to which account some spreadsheets are tied to, be sure
 to give --authuser.
 
-positional arguments:
+Positional Arguments:
   url                           Url, sharing url or id of the spreadsheet to
                                 export.
 
-optional arguments:
-  -a AUTHUSER, --authuser AUTHUSER
-                                Connected google account number to use.
-  -c COOKIE, --cookie COOKIE    Google Drive cookie or browser from which to
+Optional Arguments:
+  -a, --authuser AUTHUSER       Connected google account number to use.
+  -c, --cookie COOKIE           Google Drive cookie or browser from which to
                                 extract it (supports "firefox", "chrome",
                                 "chromium", "opera" and "edge").
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -1995,12 +2078,11 @@ examples:
 <h3 id="hyphe-declare">declare</h3>
 
 ```
-usage: minet hyphe declare [-h] [--password PASSWORD] [--total TOTAL]
+Usage: minet hyphe declare [-h] [--silent] [--password PASSWORD] [--total TOTAL]
                            [-o OUTPUT]
                            url corpus webentities
 
-Minet Hyphe Declare Command
-===========================
+# Minet Hyphe Declare Command
 
 Command that can be used to declare series of webentities
 in a corpus.
@@ -2008,18 +2090,22 @@ in a corpus.
 It is ideal to start or restart a corpus using the same exact
 webentity declarations as another one.
 
-positional arguments:
+Positional Arguments:
   url                         Url of the Hyphe API.
   corpus                      Id of the corpus.
   webentities                 CSV file of webentities (exported from Hyphe).
 
-optional arguments:
+Optional Arguments:
   --password PASSWORD         The corpus's password if required.
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2031,22 +2117,24 @@ examples:
 <h3 id="hyphe-destroy">destroy</h3>
 
 ```
-usage: minet hyphe destroy [-h] [--password PASSWORD] [-o OUTPUT] url corpus
+Usage: minet hyphe destroy [-h] [--silent] [--password PASSWORD] [-o OUTPUT]
+                           url corpus
 
-Minet Hyphe Destroy Command
-===========================
+# Minet Hyphe Destroy Command
 
 Command that can be used to destroy a corpus entirely.
 
-positional arguments:
+Positional Arguments:
   url                         Url of the Hyphe API.
   corpus                      Id of the corpus.
 
-optional arguments:
+Optional Arguments:
   --password PASSWORD         The corpus's password if required.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2058,32 +2146,32 @@ examples:
 <h3 id="hyphe-dump">dump</h3>
 
 ```
-usage: minet hyphe dump [-h] [-O OUTPUT_DIR] [--body] [--statuses STATUSES]
-                        [--password PASSWORD] [-o OUTPUT]
+Usage: minet hyphe dump [-h] [--silent] [-O OUTPUT_DIR] [--body]
+                        [--statuses STATUSES] [--password PASSWORD] [-o OUTPUT]
                         url corpus
 
-Minet Hyphe Dump Command
-========================
+# Minet Hyphe Dump Command
 
 Command dumping page-level information from a given
 Hyphe corpus.
 
-positional arguments:
+Positional Arguments:
   url                           Url of the Hyphe API.
   corpus                        Id of the corpus.
 
-optional arguments:
+Optional Arguments:
   --body                        Whether to download pages body.
-  -O OUTPUT_DIR, --output-dir OUTPUT_DIR
-                                Output directory for dumped files. Will default
+  -O, --output-dir OUTPUT_DIR   Output directory for dumped files. Will default
                                 to some name based on corpus name.
   --password PASSWORD           The corpus's password if required.
   --statuses STATUSES           Webentity statuses to dump, separated by comma.
                                 Possible statuses being "IN", "OUT", "UNDECIDED"
                                 and "DISCOVERED".
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -2095,22 +2183,24 @@ examples:
 <h3 id="hyphe-reset">reset</h3>
 
 ```
-usage: minet hyphe reset [-h] [--password PASSWORD] [-o OUTPUT] url corpus
+Usage: minet hyphe reset [-h] [--silent] [--password PASSWORD] [-o OUTPUT]
+                         url corpus
 
-Minet Hyphe Reset Command
-=========================
+# Minet Hyphe Reset Command
 
 Command that can be used to reset a corpus entirely.
 
-positional arguments:
+Positional Arguments:
   url                         Url of the Hyphe API.
   corpus                      Id of the corpus.
 
-optional arguments:
+Optional Arguments:
   --password PASSWORD         The corpus's password if required.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2122,17 +2212,16 @@ examples:
 <h3 id="hyphe-tag">tag</h3>
 
 ```
-usage: minet hyphe tag [-h] [--separator SEPARATOR] [--password PASSWORD]
-                       [--total TOTAL] [-o OUTPUT]
+Usage: minet hyphe tag [-h] [--silent] [--separator SEPARATOR]
+                       [--password PASSWORD] [--total TOTAL] [-o OUTPUT]
                        url corpus webentity_id_column tag_columns data
 
-Minet Hyphe Tag Command
-=======================
+# Minet Hyphe Tag Command
 
 Command that can be used to tag webentities in batch using
 metadata recorded in a CSV file.
 
-positional arguments:
+Positional Arguments:
   url                         Url of the Hyphe API.
   corpus                      Id of the corpus.
   webentity_id_column         Column of the CSV file containing the webentity
@@ -2140,15 +2229,19 @@ positional arguments:
   tag_columns                 Columns, separated by comma, to use as tags.
   data                        CSV file of webentities (exported from Hyphe).
 
-optional arguments:
+Optional Arguments:
   --password PASSWORD         The corpus's password if required.
   --separator SEPARATOR       Separator use to split multiple tag values in the
                               same column. Defaults to "|".
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2160,28 +2253,30 @@ examples:
 ## Instagram
 
 ```
-usage: minet instagram [-h] [-c COOKIE] [--rcfile RCFILE]
+Usage: minet instagram [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                        {comments,hashtag,post-infos,user-followers,user-following,user-infos,user-posts}
                        ...
 
-Minet Instagram Command
-=======================
+# Minet Instagram Command
 
 Gather data from Instagram.
 
-optional arguments:
-  -c COOKIE, --cookie COOKIE    Authenticated cookie to use or browser from
+Optional Arguments:
+  -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
                                 Defaults to "firefox". Can also be configured in
                                 a .minetrc file as "instagram.cookie" or read
                                 from the MINET_INSTAGRAM_COOKIE env variable.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-subcommands:
+Subcommands:
   {comments,hashtag,post-infos,user-followers,user-following,user-infos,user-posts}
                                 Subcommand to use.
 ```
@@ -2189,13 +2284,12 @@ subcommands:
 ### hashtag
 
 ```
-usage: minet instagram hashtag [-h] [-c COOKIE] [--rcfile RCFILE] [-l LIMIT]
-                               [-i INPUT] [-s SELECT] [--total TOTAL]
+Usage: minet instagram hashtag [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                               [-l LIMIT] [-i INPUT] [-s SELECT] [--total TOTAL]
                                [-o OUTPUT]
                                value_or_column_name
 
-Instagram hashtag
-=================
+# Instagram hashtag
 
 Scrape Instagram posts with a given hashtag.
 
@@ -2210,30 +2304,35 @@ to directly pass the cookie as a string, check out the
 display_url is not the media url, but a thumbnail of the post.
 There is no way with this command to get the media urls.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single hashtag to process or name of the CSV
                               column containing hashtags when using -i/--input.
 
-optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+Optional Arguments:
+  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
                               "firefox". Can also be configured in a .minetrc
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
-  -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve per hashtag.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -l, --limit LIMIT           Maximum number of posts to retrieve per hashtag.
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
-  -i INPUT, --input INPUT     CSV file containing all the hashtags you want to
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the hashtags you want to
                               process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -2260,13 +2359,12 @@ how to use the command with a CSV file?
 ### user-followers
 
 ```
-usage: minet instagram user-followers [-h] [-c COOKIE] [--rcfile RCFILE]
-                                      [-l LIMIT] [-i INPUT] [-s SELECT]
-                                      [-o OUTPUT]
+Usage: minet instagram user-followers [-h] [-c COOKIE] [--rcfile RCFILE]
+                                      [--silent] [-l LIMIT] [-i INPUT]
+                                      [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                       value_or_column_name
 
-Instagram User Followers Command
-================================
+# Instagram User Followers Command
 
 Scrape Instagram followers with a given username, user url or user id.
 On verified accounts, you may be unable to get all of them.
@@ -2287,30 +2385,37 @@ use the `minet fetch` command for that, and won't need to use cookies).
 If a username is a number without '@' at the begining, it will be
 considered as an id.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single username, user url or user id to process or
                               name of the CSV column containing usernames, user
                               urls or user ids when using -i/--input.
 
-optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+Optional Arguments:
+  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
                               "firefox". Can also be configured in a .minetrc
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
-  -l LIMIT, --limit LIMIT     Maximum number of followers to retrieve per user.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -l, --limit LIMIT           Maximum number of followers to retrieve per user.
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  -i INPUT, --input INPUT     CSV file containing all the usernames, user urls
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the usernames, user urls
                               or user ids you want to process. Will consider `-`
                               as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -2337,13 +2442,12 @@ how to use the command with a CSV file?
 ### user-following
 
 ```
-usage: minet instagram user-following [-h] [-c COOKIE] [--rcfile RCFILE]
-                                      [-l LIMIT] [-i INPUT] [-s SELECT]
-                                      [-o OUTPUT]
+Usage: minet instagram user-following [-h] [-c COOKIE] [--rcfile RCFILE]
+                                      [--silent] [-l LIMIT] [-i INPUT]
+                                      [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                       value_or_column_name
 
-Instagram User Following Command
-================================
+# Instagram User Following Command
 
 Scrape Instagram accounts followed with a given username, user url or user id.
 
@@ -2363,30 +2467,37 @@ use the `minet fetch` command for that, and won't need to use cookies).
 If a username is a number without '@' at the begining, it will be
 considered as an id.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single username, user url or user id to process or
                               name of the CSV column containing usernames, user
                               urls or user ids when using -i/--input.
 
-optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+Optional Arguments:
+  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
                               "firefox". Can also be configured in a .minetrc
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
-  -l LIMIT, --limit LIMIT     Maximum number of accounts to retrieve per user.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -l, --limit LIMIT           Maximum number of accounts to retrieve per user.
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  -i INPUT, --input INPUT     CSV file containing all the usernames, user urls
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the usernames, user urls
                               or user ids you want to process. Will consider `-`
                               as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -2413,12 +2524,12 @@ how to use the command with a CSV file?
 ### user-infos
 
 ```
-usage: minet instagram user-infos [-h] [-c COOKIE] [--rcfile RCFILE] [-i INPUT]
-                                  [-s SELECT] [-o OUTPUT]
+Usage: minet instagram user-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                                  [-i INPUT] [-s SELECT] [--total TOTAL]
+                                  [-o OUTPUT]
                                   value_or_column_name
 
-Instagram user-infos
-====================
+# Instagram user-infos
 
 Scrape Instagram infos with a given username, user url or user id.
 
@@ -2438,29 +2549,36 @@ use the `minet fetch` command for that, and won't need to use cookies).
 If a username is a number without '@' at the begining, it will be
 considered as an id.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single username, user url or user id to process or
                               name of the CSV column containing usernames, user
                               urls or user ids when using -i/--input.
 
-optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+Optional Arguments:
+  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
                               "firefox". Can also be configured in a .minetrc
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  -i INPUT, --input INPUT     CSV file containing all the usernames, user urls
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the usernames, user urls
                               or user ids you want to process. Will consider `-`
                               as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -2487,12 +2605,12 @@ how to use the command with a CSV file?
 ### user-posts
 
 ```
-usage: minet instagram user-posts [-h] [-c COOKIE] [--rcfile RCFILE] [-l LIMIT]
-                                  [-i INPUT] [-s SELECT] [-o OUTPUT]
+Usage: minet instagram user-posts [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                                  [-l LIMIT] [-i INPUT] [-s SELECT]
+                                  [--total TOTAL] [-o OUTPUT]
                                   value_or_column_name
 
-Instagram User Posts Command
-============================
+# Instagram User Posts Command
 
 Scrape Instagram posts with a given username, user url or user id.
 
@@ -2514,30 +2632,37 @@ won't need to use cookies).
 If a username is a number without '@' at the begining, it will be
 considered as an id.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single username, user url or user id to process or
                               name of the CSV column containing usernames, user
                               urls or user ids when using -i/--input.
 
-optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+Optional Arguments:
+  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
                               "firefox". Can also be configured in a .minetrc
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
-  -l LIMIT, --limit LIMIT     Maximum number of posts to retrieve per user.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -l, --limit LIMIT           Maximum number of posts to retrieve per user.
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  -i INPUT, --input INPUT     CSV file containing all the usernames, user urls
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the usernames, user urls
                               or user ids you want to process. Will consider `-`
                               as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -2566,40 +2691,44 @@ how to use the command with a CSV file?
 <h3 id="mc-medias">medias</h3>
 
 ```
-usage: minet mediacloud medias [-h] [-t TOKEN] [--rcfile RCFILE] [--feeds FEEDS]
-                               [-i INPUT] [-s SELECT] [--total TOTAL]
-                               [-o OUTPUT]
+Usage: minet mediacloud medias [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
+                               [--feeds FEEDS] [-i INPUT] [-s SELECT]
+                               [--total TOTAL] [-o OUTPUT]
                                value_or_column_name
 
-Minet Mediacloud Medias Command
-===============================
+# Minet Mediacloud Medias Command
 
 Retrieve metadata about a list of Mediacloud medias.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single Mediacloud media id to process or name of
                               the CSV column containing Mediacloud media ids
                               when using -i/--input.
 
-optional arguments:
+Optional Arguments:
   --feeds FEEDS               If given, path of the CSV file listing media RSS
                               feeds.
-  -t TOKEN, --token TOKEN     Mediacloud API token (also called "key"
+  -t, --token TOKEN           Mediacloud API token (also called "key"
                               sometimes). Can also be configured in a .minetrc
                               file as "mediacloud.token" or read from the
                               MINET_MEDIACLOUD_TOKEN env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
-  -i INPUT, --input INPUT     CSV file containing all the Mediacloud media ids
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the Mediacloud media ids
                               you want to process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 how to use the command with a CSV file?
@@ -2621,7 +2750,7 @@ how to use the command with a CSV file?
 <h3 id="mc-search">search</h3>
 
 ```
-usage: minet mediacloud search [-h] [-t TOKEN] [--rcfile RCFILE]
+Usage: minet mediacloud search [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
                                [-c COLLECTIONS] [--filter-query FILTER_QUERY]
                                [-m MEDIAS] [--publish-day PUBLISH_DAY]
                                [--publish-month PUBLISH_MONTH]
@@ -2629,23 +2758,22 @@ usage: minet mediacloud search [-h] [-t TOKEN] [--rcfile RCFILE]
                                [-o OUTPUT]
                                query
 
-Minet Mediacloud Search Command
-===============================
+# Minet Mediacloud Search Command
 
 Search stories on the Mediacloud platform.
 To learn how to compose more relevant queries, check out this guide:
 https://mediacloud.org/support/query-guide
 
-positional arguments:
+Positional Arguments:
   query                         Search query.
 
-optional arguments:
-  -c COLLECTIONS, --collections COLLECTIONS
+Optional Arguments:
+  -c, --collections COLLECTIONS
                                 List of collection ids to search, separated by
                                 commas.
   --filter-query FILTER_QUERY   Solr filter query `fq` to use. Can be used to
                                 optimize some parts of the query.
-  -m MEDIAS, --medias MEDIAS    List of media ids to search, separated by
+  -m, --medias MEDIAS           List of media ids to search, separated by
                                 commas.
   --publish-day PUBLISH_DAY     Only search stories published on provided day
                                 (iso format, e.g. "2018-03-24").
@@ -2656,16 +2784,19 @@ optional arguments:
                                 (iso format, e.g. "2018").
   --skip-count                  Whether to skip the first API call counting the
                                 number of posts for the progress bar.
-  -t TOKEN, --token TOKEN       Mediacloud API token (also called "key"
+  -t, --token TOKEN             Mediacloud API token (also called "key"
                                 sometimes). Can also be configured in a .minetrc
                                 file as "mediacloud.token" or read from the
                                 MINET_MEDIACLOUD_TOKEN env variable.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 ```
 
@@ -2674,32 +2805,34 @@ optional arguments:
 #### stories
 
 ```
-usage: minet mediacloud topic stories [-h] [-t TOKEN] [--rcfile RCFILE]
-                                      [--media-id MEDIA_ID]
+Usage: minet mediacloud topic stories [-h] [-t TOKEN] [--rcfile RCFILE]
+                                      [--silent] [--media-id MEDIA_ID]
                                       [--from-media-id FROM_MEDIA_ID]
                                       topic_id
 
-Minet Mediacloud Topic Stories Command
-======================================
+# Minet Mediacloud Topic Stories Command
 
 Retrieves the list of stories from a mediacloud topic.
 
-positional arguments:
+Positional Arguments:
   topic_id                      Id of the topic.
 
-optional arguments:
+Optional Arguments:
   --from-media-id FROM_MEDIA_ID
                                 Return only stories that are linked from stories
                                 in the given media_id.
   --media-id MEDIA_ID           Return only stories belonging to the given
                                 media_ids.
-  -t TOKEN, --token TOKEN       Mediacloud API token (also called "key"
+  -t, --token TOKEN             Mediacloud API token (also called "key"
                                 sometimes). Can also be configured in a .minetrc
                                 file as "mediacloud.token" or read from the
                                 MINET_MEDIACLOUD_TOKEN env variable.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 ```
 
@@ -2708,30 +2841,36 @@ optional arguments:
 ### channel-infos
 
 ```
-usage: minet telegram channel-infos [-h] [--throttle THROTTLE] [-i INPUT]
-                                    [-s SELECT] [-o OUTPUT]
+Usage: minet telegram channel-infos [-h] [--throttle THROTTLE] [--silent]
+                                    [-i INPUT] [-s SELECT] [--total TOTAL]
+                                    [-o OUTPUT]
                                     value_or_column_name
 
-Minet Telegram Channel-Infos Command
-====================================
+# Minet Telegram Channel-Infos Command
 
 Scrape a Telegram channel's infos.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single channel name / url to process or name of
                               the CSV column containing channel names / urls
                               when using -i/--input.
 
-optional arguments:
+Optional Arguments:
   --throttle THROTTLE         Throttling time, in seconds, to wait between each
                               request.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  -i INPUT, --input INPUT     CSV file containing all the channel names / urls
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the channel names / urls
                               you want to process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2757,30 +2896,36 @@ how to use the command with a CSV file?
 ### channel-messages
 
 ```
-usage: minet telegram channel-messages [-h] [--throttle THROTTLE] [-i INPUT]
-                                       [-s SELECT] [-o OUTPUT]
+Usage: minet telegram channel-messages [-h] [--throttle THROTTLE] [--silent]
+                                       [-i INPUT] [-s SELECT] [--total TOTAL]
+                                       [-o OUTPUT]
                                        value_or_column_name
 
-Minet Telegram Channel-Messages Command
-=======================================
+# Minet Telegram Channel-Messages Command
 
 Scrape Telegram channel messages.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single channel name / url to process or name of
                               the CSV column containing channel names / urls
                               when using -i/--input.
 
-optional arguments:
+Optional Arguments:
   --throttle THROTTLE         Throttling time, in seconds, to wait between each
                               request.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  -i INPUT, --input INPUT     CSV file containing all the channel names / urls
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the channel names / urls
                               you want to process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -2806,29 +2951,28 @@ how to use the command with a CSV file?
 ## Tiktok
 
 ```
-usage: minet tiktok [-h] {search-videos} ...
+Usage: minet tiktok [-h] {search-videos} ...
 
-Minet Tiktok Command
-====================
+# Minet Tiktok Command
 
 Gather data from Tiktok.
 
-optional arguments:
+Optional Arguments:
   -h, --help       show this help message and exit
 
-subcommands:
+Subcommands:
   {search-videos}  Subcommand to use.
 ```
 
 ### search-videos
 
 ```
-usage: minet tiktok search-videos [-h] [-c COOKIE] [--rcfile RCFILE] [-l LIMIT]
-                                  [-i INPUT] [-s SELECT] [-o OUTPUT]
+Usage: minet tiktok search-videos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                                  [-l LIMIT] [-i INPUT] [-s SELECT]
+                                  [--total TOTAL] [-o OUTPUT]
                                   value_or_column_name
 
-Tiktok Search Videos Command
-============================
+# Tiktok Search Videos Command
 
 Scrape Tiktok videos with given keyword(s).
 
@@ -2850,29 +2994,36 @@ This command allows you to get about 450 results, ordered by user
 relevance (a mix of most popular, and most relevant according to your
 profile).
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single tiktok keyword to process or name of the
                               CSV column containing tiktok keywords when using
                               -i/--input.
 
-optional arguments:
-  -c COOKIE, --cookie COOKIE  Authenticated cookie to use or browser from which
+Optional Arguments:
+  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
                               "firefox". Can also be configured in a .minetrc
                               file as "tiktok.cookie" or read from the
                               MINET_TIKTOK_COOKIE env variable.
-  -l LIMIT, --limit LIMIT     Maximum number of videos to retrieve per query.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -l, --limit LIMIT           Maximum number of videos to retrieve per query.
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  -i INPUT, --input INPUT     CSV file containing all the tiktok keywords you
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the tiktok keywords you
                               want to process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -2901,8 +3052,9 @@ how to use the command with a CSV file?
 ### attrition
 
 ```
-usage: minet twitter attrition [-h] [--user USER] [--retweeted-id RETWEETED_ID]
-                               [--ids] [--api-key API_KEY] [--rcfile RCFILE]
+Usage: minet twitter attrition [-h] [--user USER] [--silent]
+                               [--retweeted-id RETWEETED_ID] [--ids]
+                               [--api-key API_KEY] [--rcfile RCFILE]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -2910,8 +3062,7 @@ usage: minet twitter attrition [-h] [--user USER] [--retweeted-id RETWEETED_ID]
                                [-o OUTPUT]
                                value_or_column_name
 
-Minet Twitter Attrition Command
-===============================
+# Minet Twitter Attrition Command
 
 Using Twitter API to find whether batches of tweets are still
 available today and if they aren't, attempt to find a reason why.
@@ -2948,12 +3099,12 @@ the following values:
     - "suspended_retweeted_user": tweet cannot be found because it is a retweet of a suspended user.
     - "blocked_by_original_tweet_author": tweet cannot be found because it is a retweet of a user who blocked you.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name          Single tweet url or id to process or name of the
                                 CSV column containing tweet urls or ids when
                                 using -i/--input.
 
-optional arguments:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -2980,29 +3131,34 @@ optional arguments:
                                 (given as ids or screen names). This is useful
                                 to have more information on a tweet's
                                 unavailability.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -i INPUT, --input INPUT       CSV file containing all the tweet urls or ids
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the tweet urls or ids
                                 you want to process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
 
 . Finding out if tweets in a CSV files are still available or not using tweet ids:
-    $ minet tw attrition tweet_url deleted_tweets.csv > attrition-report.csv
+    $ minet tw attrition tweet_url -i deleted_tweets.csv > attrition-report.csv
 
 . Finding out if tweets are still available or not using tweet & user ids:
-    $ minet tw attrition tweet_id deleted_tweets.csv --user user_id --ids > attrition-report.csv
+    $ minet tw attrition tweet_id -i deleted_tweets.csv --user user_id --ids > attrition-report.csv
 
 how to use the command with a CSV file?
 
@@ -3023,8 +3179,8 @@ how to use the command with a CSV file?
 ### followers
 
 ```
-usage: minet twitter followers [-h] [--ids] [--v2] [--api-key API_KEY]
-                               [--rcfile RCFILE]
+Usage: minet twitter followers [-h] [--ids] [--silent] [--v2]
+                               [--api-key API_KEY] [--rcfile RCFILE]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -3032,18 +3188,17 @@ usage: minet twitter followers [-h] [--ids] [--v2] [--api-key API_KEY]
                                [-o OUTPUT]
                                value_or_column_name
 
-Minet Twitter Followers Command
-===============================
+# Minet Twitter Followers Command
 
 Retrieve followers, i.e. followed users, of given user.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name          Single Twitter account screen name or id to
                                 process or name of the CSV column containing
                                 Twitter account screen names or ids when using
                                 -i/--input.
 
-optional arguments:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -3065,27 +3220,32 @@ optional arguments:
                                 screen names.
   --v2                          Whether to use latest Twitter API v2 rather than
                                 v1.1.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -i INPUT, --input INPUT       CSV file containing all the Twitter account
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the Twitter account
                                 screen names or ids you want to process. Will
                                 consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
 
 . Getting followers of a list of user:
-    $ minet tw followers screen_name users.csv > followers.csv
+    $ minet tw followers screen_name -i users.csv > followers.csv
 
 how to use the command with a CSV file?
 
@@ -3106,7 +3266,7 @@ how to use the command with a CSV file?
 ### friends
 
 ```
-usage: minet twitter friends [-h] [--ids] [--v2] [--api-key API_KEY]
+Usage: minet twitter friends [-h] [--ids] [--silent] [--v2] [--api-key API_KEY]
                              [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
                              [--access-token ACCESS_TOKEN]
                              [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -3114,18 +3274,17 @@ usage: minet twitter friends [-h] [--ids] [--v2] [--api-key API_KEY]
                              [-o OUTPUT]
                              value_or_column_name
 
-Minet Twitter Friends Command
-=============================
+# Minet Twitter Friends Command
 
 Retrieve friends, i.e. followed users, of given user.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name          Single Twitter account screen name or id to
                                 process or name of the CSV column containing
                                 Twitter account screen names or ids when using
                                 -i/--input.
 
-optional arguments:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -3147,27 +3306,32 @@ optional arguments:
                                 screen names.
   --v2                          Whether to use latest Twitter API v2 rather than
                                 v1.1.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -i INPUT, --input INPUT       CSV file containing all the Twitter account
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the Twitter account
                                 screen names or ids you want to process. Will
                                 consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
 
 . Getting friends of a list of user:
-    $ minet tw friends screen_name users.csv > friends.csv
+    $ minet tw friends screen_name -i users.csv > friends.csv
 
 how to use the command with a CSV file?
 
@@ -3188,25 +3352,24 @@ how to use the command with a CSV file?
 ### list-followers
 
 ```
-usage: minet twitter list-followers [-h] [--api-key API_KEY] [--rcfile RCFILE]
-                                    [--api-secret-key API_SECRET_KEY]
+Usage: minet twitter list-followers [-h] [--api-key API_KEY] [--rcfile RCFILE]
+                                    [--silent] [--api-secret-key API_SECRET_KEY]
                                     [--access-token ACCESS_TOKEN]
                                     [--access-token-secret ACCESS_TOKEN_SECRET]
                                     [-i INPUT] [-s SELECT] [--total TOTAL]
                                     [-o OUTPUT]
                                     value_or_column_name
 
-Minet Twitter List Followers Command
-====================================
+# Minet Twitter List Followers Command
 
 Retrieve followers of given list using Twitter API v2.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name          Single Twitter list id or url to process or name
                                 of the CSV column containing Twitter list ids or
                                 urls when using -i/--input.
 
-optional arguments:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -3224,25 +3387,30 @@ optional arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -i INPUT, --input INPUT       CSV file containing all the Twitter list ids or
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the Twitter list ids or
                                 urls you want to process. Will consider `-` as
                                 stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
 
 . Getting followers of a list of lists:
-    $ minet tw list-followers id lists.csv > followers.csv
+    $ minet tw list-followers id -i lists.csv > followers.csv
 
 how to use the command with a CSV file?
 
@@ -3263,25 +3431,24 @@ how to use the command with a CSV file?
 ### list-members
 
 ```
-usage: minet twitter list-members [-h] [--api-key API_KEY] [--rcfile RCFILE]
-                                  [--api-secret-key API_SECRET_KEY]
+Usage: minet twitter list-members [-h] [--api-key API_KEY] [--rcfile RCFILE]
+                                  [--silent] [--api-secret-key API_SECRET_KEY]
                                   [--access-token ACCESS_TOKEN]
                                   [--access-token-secret ACCESS_TOKEN_SECRET]
                                   [-i INPUT] [-s SELECT] [--total TOTAL]
                                   [-o OUTPUT]
                                   value_or_column_name
 
-Minet Twitter List Members Command
-==================================
+# Minet Twitter List Members Command
 
 Retrieve members of given list using Twitter API v2.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name          Single Twitter list id or url to process or name
                                 of the CSV column containing Twitter list ids or
                                 urls when using -i/--input.
 
-optional arguments:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -3299,25 +3466,30 @@ optional arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -i INPUT, --input INPUT       CSV file containing all the Twitter list ids or
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the Twitter list ids or
                                 urls you want to process. Will consider `-` as
                                 stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
 
 . Getting members of a list of lists:
-    $ minet tw list-members id lists.csv > members.csv
+    $ minet tw list-members id -i lists.csv > members.csv
 
 how to use the command with a CSV file?
 
@@ -3338,25 +3510,24 @@ how to use the command with a CSV file?
 ### retweeters
 
 ```
-usage: minet twitter retweeters [-h] [--api-key API_KEY] [--rcfile RCFILE]
-                                [--api-secret-key API_SECRET_KEY]
+Usage: minet twitter retweeters [-h] [--api-key API_KEY] [--rcfile RCFILE]
+                                [--silent] [--api-secret-key API_SECRET_KEY]
                                 [--access-token ACCESS_TOKEN]
                                 [--access-token-secret ACCESS_TOKEN_SECRET]
                                 [-i INPUT] [-s SELECT] [--total TOTAL]
                                 [-o OUTPUT]
                                 value_or_column_name
 
-Minet Twitter Retweeters Command
-================================
+# Minet Twitter Retweeters Command
 
 Retrieve retweeters of given tweet using Twitter API v2.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name          Single tweet id to process or name of the CSV
                                 column containing tweet ids when using
                                 -i/--input.
 
-optional arguments:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -3374,24 +3545,29 @@ optional arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -i INPUT, --input INPUT       CSV file containing all the tweet ids you want
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the tweet ids you want
                                 to process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
 
 . Getting the users who retweeted a list of tweets:
-    $ minet tw retweeters tweet_id tweets.csv > retweeters.csv
+    $ minet tw retweeters tweet_id -i tweets.csv > retweeters.csv
 
 how to use the command with a CSV file?
 
@@ -3412,13 +3588,12 @@ how to use the command with a CSV file?
 <h3 id="twitter-scrape">scrape</h3>
 
 ```
-usage: minet twitter scrape [-h] [--include-refs] [-l LIMIT]
+Usage: minet twitter scrape [-h] [--silent] [--include-refs] [-l LIMIT]
                             [--query-template QUERY_TEMPLATE] [-i INPUT]
-                            [-s SELECT] [-o OUTPUT]
+                            [-s SELECT] [--total TOTAL] [-o OUTPUT]
                             {tweets,users} value_or_column_name
 
-Minet Twitter Scrape Command
-============================
+# Minet Twitter Scrape Command
 
 Scrape Twitter's public facing search API to collect tweets or users.
 
@@ -3434,30 +3609,36 @@ BEWARE: the web search results seem to become inconsistent when
 queries return vast amounts of tweets. In which case you are
 strongly advised to segment your queries using temporal filters.
 
-positional arguments:
+Positional Arguments:
   {tweets,users}                What to scrape. Currently only allows for
                                 `tweets` or `users`.
   value_or_column_name          Single query to process or name of the CSV
                                 column containing queries when using -i/--input.
 
-optional arguments:
+Optional Arguments:
   --include-refs                Whether to emit referenced tweets (quoted,
                                 retweeted & replied) in the CSV output. Note
                                 that it consumes a memory proportional to the
                                 total number of unique tweets retrieved.
-  -l LIMIT, --limit LIMIT       Maximum number of tweets or users to collect per
+  -l, --limit LIMIT             Maximum number of tweets or users to collect per
                                 query.
   --query-template QUERY_TEMPLATE
                                 Query template. Can be useful for instance to
                                 change a column of twitter user screen names
                                 into from:@user queries.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  -i INPUT, --input INPUT       CSV file containing all the queries you want to
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the queries you want to
                                 process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -3466,10 +3647,10 @@ examples:
     $ minet tw scrape tweets "from:@jack" --limit 500 > tweets.csv
 
 . Collecting the tweets from multiple Twitter queries listed in a CSV file:
-    $ minet tw scrape tweets query queries.csv > tweets.csv
+    $ minet tw scrape tweets query -i queries.csv > tweets.csv
 
 . Templating the given CSV column to query tweets by users:
-    $ minet tw scrape tweets user users.csv --query-template 'from:@{value}' > tweets.csv
+    $ minet tw scrape tweets user -i users.csv --query-template 'from:@{value}' > tweets.csv
 
 . Tip: You can add a "OR @aNotExistingHandle" to your query to avoid searching
   for your query terms in usernames or handles.
@@ -3502,35 +3683,40 @@ how to use the command with a CSV file?
 ### tweet-date
 
 ```
-usage: minet twitter tweet-date [-h] [--timezone TIMEZONE] [-i INPUT]
-                                [-s SELECT] [-o OUTPUT]
+Usage: minet twitter tweet-date [-h] [--timezone TIMEZONE] [--silent] [-i INPUT]
+                                [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                 value_or_column_name
 
-Minet Twitter Tweet Date Command
-================================
+# Minet Twitter Tweet Date Command
 
 Getting timestamp and date from tweet url or id.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single tweet url or id to process or name of the
                               CSV column containing tweet urls or ids when using
                               -i/--input.
 
-optional arguments:
+Optional Arguments:
   --timezone TIMEZONE         Timezone for the date, for example 'Europe/Paris'.
                               Default to UTC.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  -i INPUT, --input INPUT     CSV file containing all the tweet urls or ids you
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the tweet urls or ids you
                               want to process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
 
-    $ minet tw tweet-date url tweets.csv --timezone 'Europe/Paris'> tweets_timestamp_date.csv
+    $ minet tw tweet-date url -i tweets.csv --timezone 'Europe/Paris'> tweets_timestamp_date.csv
 
 how to use the command with a CSV file?
 
@@ -3551,7 +3737,7 @@ how to use the command with a CSV file?
 ### tweet-search
 
 ```
-usage: minet twitter tweet-search [-h] [--since-id SINCE_ID]
+Usage: minet twitter tweet-search [-h] [--since-id SINCE_ID] [--silent]
                                   [--until-id UNTIL_ID]
                                   [--start-time START_TIME]
                                   [--end-time END_TIME] [--academic]
@@ -3564,8 +3750,7 @@ usage: minet twitter tweet-search [-h] [--since-id SINCE_ID]
                                   [-o OUTPUT]
                                   value_or_column_name
 
-Minet Twitter Tweets Search Command
-===================================
+# Minet Twitter Tweets Search Command
 
 Search Twitter tweets using API v2.
 
@@ -3573,11 +3758,11 @@ This will only return the last 8 days of results maximum per query (unless you h
 
 To search the full archive of public tweets, use --academic if you have academic research access.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name          Single query to process or name of the CSV
                                 column containing queries when using -i/--input.
 
-optional arguments:
+Optional Arguments:
   --academic                    Flag to add if you want to use your academic
                                 research access (in order to search the complete
                                 history of public tweets).
@@ -3612,18 +3797,23 @@ optional arguments:
                                 YYYY-MM-DDTHH:mm:ssZ
   --until-id UNTIL_ID           Will return tweets that are older than the tweet
                                 with the specified id.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -i INPUT, --input INPUT       CSV file containing all the queries you want to
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the queries you want to
                                 process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -3632,7 +3822,7 @@ examples:
     $ minet tw tweet-search cancer > tweets.csv
 
 . Running multiple queries in series:
-    $ minet tw tweet-search query queries.csv > tweets.csv
+    $ minet tw tweet-search query -i queries.csv > tweets.csv
 
 how to use the command with a CSV file?
 
@@ -3653,11 +3843,11 @@ how to use the command with a CSV file?
 ### tweet-count
 
 ```
-usage: minet twitter tweet-count [-h] [--granularity {day,hour,minute}]
-                                 [--since-id SINCE_ID] [--until-id UNTIL_ID]
-                                 [--start-time START_TIME] [--end-time END_TIME]
-                                 [--academic] [--api-key API_KEY]
-                                 [--rcfile RCFILE]
+Usage: minet twitter tweet-count [-h] [--granularity {day,hour,minute}]
+                                 [--silent] [--since-id SINCE_ID]
+                                 [--until-id UNTIL_ID] [--start-time START_TIME]
+                                 [--end-time END_TIME] [--academic]
+                                 [--api-key API_KEY] [--rcfile RCFILE]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -3665,8 +3855,7 @@ usage: minet twitter tweet-count [-h] [--granularity {day,hour,minute}]
                                  [-o OUTPUT]
                                  value_or_column_name
 
-Minet Twitter Tweets Count Command
-==================================
+# Minet Twitter Tweets Count Command
 
 Count the number of tweets matching the given query using Twitter's
 latest API v2. The count's granularity can be at the level of tweets
@@ -3680,11 +3869,11 @@ Be advised that, for now, results are returned unordered
 by Twitter's API if you choose a time granularity for the
 results.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name          Single query to process or name of the CSV
                                 column containing queries when using -i/--input.
 
-optional arguments:
+Optional Arguments:
   --academic                    Flag to add if you want to use your academic
                                 research access (in order to search the complete
                                 history of public tweets).
@@ -3719,18 +3908,23 @@ optional arguments:
                                 YYYY-MM-DDTHH:mm:ssZ
   --until-id UNTIL_ID           Will return tweets that are older than the tweet
                                 with the specified id.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -i INPUT, --input INPUT       CSV file containing all the queries you want to
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the queries you want to
                                 process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -3739,7 +3933,7 @@ examples:
     $ minet tw tweet-count cancer
 
 . Running multiple queries in series:
-    $ minet tw tweet-count query queries.csv > counts.csv
+    $ minet tw tweet-count query -i queries.csv > counts.csv
 
 . Number of tweets matching the query per day:
     $ minet tw tweet-count "query" --granularity day > counts.csv
@@ -3763,25 +3957,24 @@ how to use the command with a CSV file?
 ### tweets
 
 ```
-usage: minet twitter tweets [-h] [--v2] [--api-key API_KEY] [--rcfile RCFILE]
-                            [--api-secret-key API_SECRET_KEY]
+Usage: minet twitter tweets [-h] [--v2] [--silent] [--api-key API_KEY]
+                            [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
                             [--access-token ACCESS_TOKEN]
                             [--access-token-secret ACCESS_TOKEN_SECRET]
                             [-i INPUT] [-s SELECT] [--total TOTAL] [--resume]
                             [-o OUTPUT]
                             value_or_column_name
 
-Minet Twitter Tweets Command
-============================
+# Minet Twitter Tweets Command
 
 Collecting tweet metadata from the given tweet ids, using the API.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name          Single tweet id to process or name of the CSV
                                 column containing tweet ids when using
                                 -i/--input.
 
-optional arguments:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -3801,26 +3994,31 @@ optional arguments:
                                 env variable.
   --v2                          Whether to use latest Twitter API v2 rather than
                                 v1.1.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -i INPUT, --input INPUT       CSV file containing all the tweet ids you want
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the tweet ids you want
                                 to process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
 
 . Getting metadata from tweets in a CSV file:
-    $ minet tw tweets tweet_id tweets.csv > tweets_metadata.csv
+    $ minet tw tweets tweet_id -i tweets.csv > tweets_metadata.csv
 
 how to use the command with a CSV file?
 
@@ -3841,7 +4039,7 @@ how to use the command with a CSV file?
 ### users
 
 ```
-usage: minet twitter users [-h] [--ids] [--v2] [--api-key API_KEY]
+Usage: minet twitter users [-h] [--ids] [--silent] [--v2] [--api-key API_KEY]
                            [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
                            [--access-token ACCESS_TOKEN]
                            [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -3849,17 +4047,16 @@ usage: minet twitter users [-h] [--ids] [--v2] [--api-key API_KEY]
                            [-o OUTPUT]
                            value_or_column_name
 
-Minet Twitter Users Command
-===========================
+# Minet Twitter Users Command
 
 Retrieve Twitter user metadata using the API.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name          Single Twitter user to process or name of the
                                 CSV column containing Twitter users when using
                                 -i/--input.
 
-optional arguments:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -3881,26 +4078,31 @@ optional arguments:
                                 screen names.
   --v2                          Whether to use latest Twitter API v2 rather than
                                 v1.1.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -i INPUT, --input INPUT       CSV file containing all the Twitter users you
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the Twitter users you
                                 want to process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
 
 . Getting friends of a list of user:
-    $ minet tw users screen_name users.csv > data_users.csv
+    $ minet tw users screen_name -i users.csv > data_users.csv
 
 how to use the command with a CSV file?
 
@@ -3921,16 +4123,15 @@ how to use the command with a CSV file?
 ### user-search
 
 ```
-usage: minet twitter user-search [-h] [--api-key API_KEY] [--rcfile RCFILE]
-                                 [--api-secret-key API_SECRET_KEY]
+Usage: minet twitter user-search [-h] [--api-key API_KEY] [--rcfile RCFILE]
+                                 [--silent] [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
                                  [-i INPUT] [-s SELECT] [--total TOTAL]
                                  [-o OUTPUT]
                                  value_or_column_name
 
-Minet Twitter Users Search Command
-==================================
+# Minet Twitter Users Search Command
 
 Search Twitter users using API v1.
 
@@ -3938,11 +4139,11 @@ This will only return ~1000 results maximum per query
 so you might want to find a way to segment your inquiry
 into smaller queries to find more users.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name          Single query to process or name of the CSV
                                 column containing queries when using -i/--input.
 
-optional arguments:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -3960,18 +4161,23 @@ optional arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -i INPUT, --input INPUT       CSV file containing all the queries you want to
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the queries you want to
                                 process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
@@ -3980,7 +4186,7 @@ examples:
     $ minet tw user-search cancer > users.csv
 
 . Running multiple queries in series:
-    $ minet tw user-search query queries.csv > users.csv
+    $ minet tw user-search query -i queries.csv > users.csv
 
 how to use the command with a CSV file?
 
@@ -4001,7 +4207,7 @@ how to use the command with a CSV file?
 ### user-tweets
 
 ```
-usage: minet twitter user-tweets [-h] [--ids] [--min-date MIN_DATE]
+Usage: minet twitter user-tweets [-h] [--ids] [--silent] [--min-date MIN_DATE]
                                  [--exclude-retweets] [--v2] [--api-key API_KEY]
                                  [--rcfile RCFILE]
                                  [--api-secret-key API_SECRET_KEY]
@@ -4011,19 +4217,18 @@ usage: minet twitter user-tweets [-h] [--ids] [--min-date MIN_DATE]
                                  [-o OUTPUT]
                                  value_or_column_name
 
-Minet Twitter User Tweets Command
-=================================
+# Minet Twitter User Tweets Command
 
 Retrieve the last ~3200 tweets, including retweets from
 the given Twitter users, using the API.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name          Single Twitter account screen name or id to
                                 process or name of the CSV column containing
                                 Twitter account screen names or ids when using
                                 -i/--input.
 
-optional arguments:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -4049,25 +4254,104 @@ optional arguments:
                                 following format : YYYY-MM-DD
   --v2                          Whether to use latest Twitter API v2 rather than
                                 v1.1.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -i INPUT, --input INPUT       CSV file containing all the Twitter account
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the Twitter account
                                 screen names or ids you want to process. Will
                                 consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 examples:
 
 . Getting tweets from users in a CSV file:
-    $ minet tw user-tweets screen_name users.csv > tweets.csv
+    $ minet tw user-tweets screen_name -i users.csv > tweets.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
+```
+
+## Wikipedia
+
+### pageviews
+
+```
+Usage: minet wikipedia pageviews [-h] --start-date START_DATE [--silent]
+                                 --end-date END_DATE [--agent AGENT]
+                                 [--access ACCESS] [-t THREADS]
+                                 [--granularity GRANULARITY] [--sum]
+                                 [--lang LANG] [--lang-column LANG_COLUMN]
+                                 [-i INPUT] [-s SELECT] [--total TOTAL]
+                                 [--resume] [-o OUTPUT]
+                                 value_or_column_name
+
+# Minet Wikipedia Pageviews Command
+
+Command using the Wikimedia REST API to collect
+pageviews for a given amount of Wikipedia pages.
+
+See API documentation here for more details:
+https://wikitech.wikimedia.org/wiki/Analytics/AQS/Pageviews
+
+Positional Arguments:
+  value_or_column_name          Single page to process or name of the CSV column
+                                containing pages when using -i/--input.
+
+Optional Arguments:
+  --access ACCESS               Get pageviews by access. Defaults to
+                                "all-access".
+  --agent AGENT                 Get pageviews by target agent. Defaults to
+                                "all-agents".
+  --end-date END_DATE           End date. Must be of format YYYYMMDD (e.g.
+                                20151031) or YYYYMMDDHH (e.g. 2015103100)
+  --granularity GRANULARITY     Pageviews granularity. Defaults to "monthly".
+  --lang LANG                   Lang for the given pages.
+  --lang-column LANG_COLUMN     Name of a CSV column containing page lang.
+  --start-date START_DATE       Starting date. Must be of format YYYYMMDD (e.g.
+                                20151031) or YYYYMMDDHH (e.g. 2015103100)
+  --sum                         Whether to sum the collected pageviews rather
+                                than outputting them by timestamp.
+  -t, --threads THREADS         Number of threads to use. Defaults to 10.
+  -s, --select SELECT           Columns of input CSV file to include in the
+                                output (separated by `,`).
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the pages you want to
+                                process. Will consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --resume                      Whether to resume from an aborted collection.
+                                Need -o to be set.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 how to use the command with a CSV file?
 
@@ -4090,34 +4374,37 @@ how to use the command with a CSV file?
 ### captions
 
 ```
-usage: minet youtube captions [-h] [--lang LANG] [-i INPUT] [-s SELECT]
-                              [--total TOTAL] [-o OUTPUT]
+Usage: minet youtube captions [-h] [--lang LANG] [--silent] [-i INPUT]
+                              [-s SELECT] [--total TOTAL] [-o OUTPUT]
                               value_or_column_name
 
-Youtube captions
-================
+# Youtube captions
 
 Retrieve captions for the given YouTube videos.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single video url or id to process or name of the
                               CSV column containing video urls or ids when using
                               -i/--input.
 
-optional arguments:
+Optional Arguments:
   --lang LANG                 Language (ISO code like "en") of captions to
                               retrieve. You can specify several languages by
                               preferred order separated by commas. Defaults to
                               "en".
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
-  -i INPUT, --input INPUT     CSV file containing all the video urls or ids you
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the video urls or ids you
                               want to process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 examples:
@@ -4147,12 +4434,12 @@ how to use the command with a CSV file?
 ### channel-videos
 
 ```
-usage: minet youtube channel-videos [-h] [-k KEY] [--rcfile RCFILE] [-i INPUT]
-                                    [-s SELECT] [--total TOTAL] [-o OUTPUT]
+Usage: minet youtube channel-videos [-h] [-k KEY] [--rcfile RCFILE] [--silent]
+                                    [-i INPUT] [-s SELECT] [--total TOTAL]
+                                    [-o OUTPUT]
                                     value_or_column_name
 
-Youtube channel videos
-======================
+# Youtube channel videos
 
 Retrieve metadata about all Youtube videos from one or many channel(s) using the API.
 
@@ -4161,27 +4448,32 @@ website to find it if necessary. Then the command uses the API to retrieve
 information about videos stored in the main playlist of the channel
 supposed to contain all the channel's videos.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single channel to process or name of the CSV
                               column containing channels when using -i/--input.
 
-optional arguments:
-  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used
+Optional Arguments:
+  -k, --key KEY               YouTube API Data dashboard API key. Can be used
                               more than once. Can also be configured in a
                               .minetrc file as "youtube.key" or read from the
                               MINET_YOUTUBE_KEY env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
-  -i INPUT, --input INPUT     CSV file containing all the channels you want to
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the channels you want to
                               process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -4216,12 +4508,11 @@ how to use the command with a CSV file?
 ### channels
 
 ```
-usage: minet youtube channels [-h] [-k KEY] [--rcfile RCFILE] [-i INPUT]
-                              [-s SELECT] [--total TOTAL] [-o OUTPUT]
+Usage: minet youtube channels [-h] [-k KEY] [--rcfile RCFILE] [--silent]
+                              [-i INPUT] [-s SELECT] [--total TOTAL] [-o OUTPUT]
                               value_or_column_name
 
-Youtube Channels Command
-========================
+# Youtube Channels Command
 
 Retrieve metadata about Youtube channel from one or many name(s) using the API.
 
@@ -4229,27 +4520,32 @@ Under the hood, this command extract the channel id from the given url or scrape
 website to find it if necessary. Then the command uses the API to retrieve
 information about the channel.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single channel to process or name of the CSV
                               column containing channels when using -i/--input.
 
-optional arguments:
-  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used
+Optional Arguments:
+  -k, --key KEY               YouTube API Data dashboard API key. Can be used
                               more than once. Can also be configured in a
                               .minetrc file as "youtube.key" or read from the
                               MINET_YOUTUBE_KEY env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
-  -i INPUT, --input INPUT     CSV file containing all the channels you want to
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the channels you want to
                               process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -4280,36 +4576,40 @@ how to use the command with a CSV file?
 ```
 
 ```
-usage: minet youtube comments [-h] [-k KEY] [--rcfile RCFILE] [-i INPUT]
-                              [-s SELECT] [--total TOTAL] [-o OUTPUT]
+Usage: minet youtube comments [-h] [-k KEY] [--rcfile RCFILE] [--silent]
+                              [-i INPUT] [-s SELECT] [--total TOTAL] [-o OUTPUT]
                               value_or_column_name
 
-Youtube comments
-================
+# Youtube comments
 
 Retrieve metadata about Youtube comments using the API.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single video to process or name of the CSV column
                               containing videos when using -i/--input.
 
-optional arguments:
-  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used
+Optional Arguments:
+  -k, --key KEY               YouTube API Data dashboard API key. Can be used
                               more than once. Can also be configured in a
                               .minetrc file as "youtube.key" or read from the
                               MINET_YOUTUBE_KEY env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
-  -i INPUT, --input INPUT     CSV file containing all the videos you want to
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the videos you want to
                               process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 example:
@@ -4336,45 +4636,49 @@ how to use the command with a CSV file?
 <h3 id="youtube-search">search</h3>
 
 ```
-usage: minet youtube search [-h] [-l LIMIT]
+Usage: minet youtube search [-h] [-l LIMIT] [--silent]
                             [--order {date,rating,relevance,title,videoCount,viewCount}]
                             [-k KEY] [--rcfile RCFILE] [-i INPUT] [-s SELECT]
                             [--total TOTAL] [-o OUTPUT]
                             value_or_column_name
 
-Youtube search
-==============
+# Youtube search
 
 Search videos using the YouTube API.
 
 Note that, even if undocumented, the API will never return
 more than approx. 500 videos for a given query.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name          Single query to process or name of the CSV
                                 column containing queries when using -i/--input.
 
-optional arguments:
-  -k KEY, --key KEY             YouTube API Data dashboard API key. Can be used
+Optional Arguments:
+  -k, --key KEY                 YouTube API Data dashboard API key. Can be used
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
                                 MINET_YOUTUBE_KEY env variable.
-  -l LIMIT, --limit LIMIT       Maximum number of videos to retrieve per query.
+  -l, --limit LIMIT             Maximum number of videos to retrieve per query.
   --order {date,rating,relevance,title,videoCount,viewCount}
                                 Order in which videos are retrieved. The default
                                 one is relevance.
-  -s SELECT, --select SELECT    Columns of input CSV file to include in the
+  -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
-  --total TOTAL                 Total number of items to process. Necessary if
-                                you want to display a finite progress indicator.
-  -i INPUT, --input INPUT       CSV file containing all the queries you want to
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file containing all the queries you want to
                                 process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT    Path to the output file. Will consider `-` as
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here: https://github.com/mediala
-                                b/minet/blob/master/docs/cli.md#minetrc
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 example:
@@ -4401,36 +4705,40 @@ how to use the command with a CSV file?
 ### videos
 
 ```
-usage: minet youtube videos [-h] [-k KEY] [--rcfile RCFILE] [-i INPUT]
-                            [-s SELECT] [--total TOTAL] [-o OUTPUT]
+Usage: minet youtube videos [-h] [-k KEY] [--rcfile RCFILE] [--silent]
+                            [-i INPUT] [-s SELECT] [--total TOTAL] [-o OUTPUT]
                             value_or_column_name
 
-Youtube videos
-==============
+# Youtube videos
 
 Retrieve metadata about Youtube videos using the API.
 
-positional arguments:
+Positional Arguments:
   value_or_column_name        Single video to process or name of the CSV column
                               containing videos when using -i/--input.
 
-optional arguments:
-  -k KEY, --key KEY           YouTube API Data dashboard API key. Can be used
+Optional Arguments:
+  -k, --key KEY               YouTube API Data dashboard API key. Can be used
                               more than once. Can also be configured in a
                               .minetrc file as "youtube.key" or read from the
                               MINET_YOUTUBE_KEY env variable.
-  -s SELECT, --select SELECT  Columns of input CSV file to include in the output
+  -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
-  --total TOTAL               Total number of items to process. Necessary if you
-                              want to display a finite progress indicator.
-  -i INPUT, --input INPUT     CSV file containing all the videos you want to
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the videos you want to
                               process. Will consider `-` as stdin.
-  -o OUTPUT, --output OUTPUT  Path to the output file. Will consider `-` as
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
   --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here: https://github.com/medialab/
-                              minet/blob/master/docs/cli.md#minetrc
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
   -h, --help                  show this help message and exit
 
 how to use the command with a CSV file?

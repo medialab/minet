@@ -45,8 +45,6 @@ YOUTUBE_CAPTIONS_SUBCOMMAND = subcommand(
         "item_label": "video url or id",
         "item_label_plural": "video urls or ids",
     },
-    select=True,
-    total=True,
     arguments=[
         {
             "flag": "--lang",
@@ -82,8 +80,6 @@ YOUTUBE_CHANNEL_VIDEOS_SUBCOMMAND = youtube_api_subcommand(
             $ minet youtube channel-videos channel_url channels_url.csv -k my-api-key > channels_videos.csv
     """,
     variadic_input={"dummy_column": "channel"},
-    select=True,
-    total=True,
 )
 
 YOUTUBE_CHANNELS_SUBCOMMAND = youtube_api_subcommand(
@@ -110,8 +106,6 @@ YOUTUBE_CHANNELS_SUBCOMMAND = youtube_api_subcommand(
             $ minet youtube channels channel_url channels_url.csv -k my-api-key > channels.csv
     """,
     variadic_input={"dummy_column": "channel"},
-    select=True,
-    total=True,
 )
 
 YOUTUBE_COMMENTS_SUBCOMMAND = youtube_api_subcommand(
@@ -126,8 +120,6 @@ YOUTUBE_COMMENTS_SUBCOMMAND = youtube_api_subcommand(
             $ minet yt comments https://www.youtube.com/watch?v=7JTb2vf1OQQ -k my-api-key > comments.csv
     """,
     variadic_input={"dummy_column": "video"},
-    select=True,
-    total=True,
 )
 
 YOUTUBE_SEARCH_SUBCOMMAND = youtube_api_subcommand(
@@ -147,8 +139,6 @@ YOUTUBE_SEARCH_SUBCOMMAND = youtube_api_subcommand(
             $ minet youtube search bird -k my-api-key > bird_videos.csv
     """,
     variadic_input={"dummy_column": "query", "item_label_plural": "queries"},
-    select=True,
-    total=True,
     arguments=[
         {
             "flags": ["-l", "--limit"],
@@ -170,8 +160,6 @@ YOUTUBE_VIDEOS_SUBCOMMAND = youtube_api_subcommand(
     title="Youtube videos",
     description="Retrieve metadata about Youtube videos using the API.",
     variadic_input={"dummy_column": "video"},
-    select=True,
-    total=True,
 )
 
 YOUTUBE_COMMAND = command(

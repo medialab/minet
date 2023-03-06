@@ -23,7 +23,7 @@ $MINET resolve https://medialab.sciencespo.fr/ | grep hit
 echo
 
 echo "Extract"
-$MINET fetch https://news.ycombinator.com/ | $MINET url-extract raw_contents - --from html | wc -l
+$MINET fetch https://news.ycombinator.com/ | $MINET url-extract body - --from html | wc -l
 echo
 
 echo "Url Join"

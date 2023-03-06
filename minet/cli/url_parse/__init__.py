@@ -96,8 +96,6 @@ URL_PARSE_COMMAND = command(
             $ minet url-parse url tweets.csv --twitter > report.csv
     """,
     variadic_input={"dummy_column": "url", "item_label": "url"},
-    select=True,
-    total=True,
     arguments=[
         {"flag": "--separator", "help": "Split url column by a separator?"},
         {
