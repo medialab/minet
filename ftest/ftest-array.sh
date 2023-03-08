@@ -14,28 +14,28 @@ echo
 # echo "Fetch & Scrape"
 echo "Scrape"
 echo "  - Single HTML file"
-$MINET scrape $EXTRACT_DIR/scraper.yml $EXTRACT_DIR/article.html | wc -l
+$MINET scrape -p 1 $EXTRACT_DIR/scraper.yml $EXTRACT_DIR/article.html | wc -l
 echo "  - Single glob pattern"
-$MINET scrape $EXTRACT_DIR/scraper.yml "$EXTRACT_DIR/*.html" -g | wc -l
+$MINET scrape -p 1 $EXTRACT_DIR/scraper.yml "$EXTRACT_DIR/*.html" -g | wc -l
 echo "  - CSV input"
-$MINET scrape $EXTRACT_DIR/scraper.yml name -i $EXTRACT_DIR/articles.csv -I $EXTRACT_DIR | wc -l
+$MINET scrape -p 1 $EXTRACT_DIR/scraper.yml name -i $EXTRACT_DIR/articles.csv -I $EXTRACT_DIR | wc -l
 echo "  - CSV bodies"
-$MINET scrape $EXTRACT_DIR/scraper.yml -i $EXTRACT_DIR/bodies.csv --body-column html | wc -l
+$MINET scrape -p 1 $EXTRACT_DIR/scraper.yml -i $EXTRACT_DIR/bodies.csv --body-column html | wc -l
 echo "  - Piping fetch"
-$MINET fetch https://github.com/medialab/minet | $MINET scrape $EXTRACT_DIR/scraper.yml -i - | wc -l
+$MINET fetch https://github.com/medialab/minet | $MINET scrape -p 1 $EXTRACT_DIR/scraper.yml -i - | wc -l
 echo
 
 echo "Extract"
 echo "  - Single HTML file"
-$MINET extract $EXTRACT_DIR/article.html | wc -l
+$MINET extract -p 1 $EXTRACT_DIR/article.html | wc -l
 echo "  - Single glob pattern"
-$MINET extract "$EXTRACT_DIR/*.html" -g | wc -l
+$MINET extract -p 1 "$EXTRACT_DIR/*.html" -g | wc -l
 echo "  - CSV input"
-$MINET extract name -i $EXTRACT_DIR/articles.csv -I $EXTRACT_DIR | wc -l
+$MINET extract -p 1 name -i $EXTRACT_DIR/articles.csv -I $EXTRACT_DIR | wc -l
 echo "  - CSV bodies"
-$MINET extract -i $EXTRACT_DIR/bodies.csv --body-column html | wc -l
+$MINET extract -p 1 -i $EXTRACT_DIR/bodies.csv --body-column html | wc -l
 echo "  - Piping fetch"
-$MINET fetch https://github.com/medialab/minet | $MINET extract -i - | wc -l
+$MINET fetch https://github.com/medialab/minet | $MINET extract -p 1 -i - | wc -l
 echo
 
 echo "Resolve"

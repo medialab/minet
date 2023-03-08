@@ -304,13 +304,26 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor[ItemType, Optional[str], ResultT
     def __init__(
         self,
         max_workers: Optional[int] = None,
+        wait: bool = True,
+        daemonic: bool = False,
         insecure: bool = False,
         timeout: AnyTimeout = DEFAULT_URLLIB3_TIMEOUT,
+        spoof_tls_ciphers: bool = False,
+        proxy: Optional[str] = None,
         **kwargs
     ):
-        super().__init__(max_workers, **kwargs)
+        super().__init__(
+            max_workers,
+            wait=wait,
+            daemonic=daemonic,
+            **kwargs,
+        )
         self.pool_manager = create_pool_manager(
-            threads=max_workers, insecure=insecure, timeout=timeout
+            threads=self.max_workers,
+            insecure=insecure,
+            timeout=timeout,
+            spoof_tls_ciphers=spoof_tls_ciphers,
+            proxy=proxy,
         )
         self.cancel_event = Event()
 
