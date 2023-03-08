@@ -12,6 +12,7 @@ import certifi
 import random
 import browser_cookie3
 import urllib3
+import urllib3.exceptions as urllib3_exceptions
 import urllib.error
 import ural
 import json
@@ -1162,16 +1163,21 @@ def create_request_retryer(
     max_attempts: int = 9,
     before_sleep=noop,
     additional_exceptions=None,
+    retry_on_timeout: bool = True,
     predicate=None,
 ):
-    global GLOBAL_RETRYER_BEFORE_SLEEP
 
+    # By default we only retry network issues, such as Internet being cut off etc.
     retryable_exception_types = [
-        FinalTimeoutError,
-        urllib3.exceptions.TimeoutError,  # type: ignore
-        urllib3.exceptions.ProtocolError,  # type: ignore
+        urllib3_exceptions.ProtocolError,
         urllib.error.URLError,
     ]
+
+    # We also usually include most timeout errors
+    if retry_on_timeout:
+        retryable_exception_types.extend(
+            [FinalTimeoutError, urllib3_exceptions.TimeoutError]
+        )
 
     if additional_exceptions:
         for exc in additional_exceptions:
