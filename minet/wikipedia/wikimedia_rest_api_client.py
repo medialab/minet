@@ -2,7 +2,7 @@ from typing import Iterable, Iterator, TypeVar, Callable, Tuple, List, Optional
 
 from urllib.parse import quote, unquote
 
-from minet.fetch import multithreaded_fetch
+from minet.fetch import FetchThreadPoolExecutor
 
 from minet.wikipedia.exceptions import (
     WikimediaRESTAPIThrottledError,
@@ -89,41 +89,43 @@ class WikimediaRestAPIClient(object):
 
             return url
 
-        for result in multithreaded_fetch(
-            pages,
-            key=api_url_from_item,
-            threads=threads,
-            domain_parallelism=threads,
-            throttle=0,
-        ):
-            if result.error:
-                raise result.error
+        with FetchThreadPoolExecutor(max_workers=threads) as executor:
+            for result in executor.imap_unordered(
+                pages,
+                key=api_url_from_item,
+                domain_parallelism=threads,
+                throttle=0,
+            ):
+                if result.error:
+                    raise result.error
 
-            response = result.response
+                response = result.response
 
-            if response.status == 429:
-                raise WikimediaRESTAPIThrottledError
+                assert response is not None
 
-            if response.status >= 500:
-                raise WikimediaRESTAPIServerError
+                if response.status == 429:
+                    raise WikimediaRESTAPIThrottledError
 
-            if response.status == 404:
-                yield result.item, []
-                continue
+                if response.status >= 500:
+                    raise WikimediaRESTAPIServerError
 
-            pageviews = []
+                if response.status == 404:
+                    yield result.item, []
+                    continue
 
-            for item in response.json()["items"]:
-                pageviews.append(
-                    WikipediaPageViewsItem(
-                        project=item["project"],
-                        article=item["article"],
-                        granularity=item["granularity"],
-                        timestamp=int(item["timestamp"]),
-                        access=item["access"],
-                        agent=item["agent"],
-                        views=item["views"],
+                pageviews = []
+
+                for item in response.json()["items"]:
+                    pageviews.append(
+                        WikipediaPageViewsItem(
+                            project=item["project"],
+                            article=item["article"],
+                            granularity=item["granularity"],
+                            timestamp=int(item["timestamp"]),
+                            access=item["access"],
+                            agent=item["agent"],
+                            views=item["views"],
+                        )
                     )
-                )
 
-            yield result.item, pageviews
+                yield result.item, pageviews
