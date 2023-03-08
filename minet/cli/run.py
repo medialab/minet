@@ -32,6 +32,9 @@ def run(name, version, commands):
     # Freezing multiprocessing support for pyinstaller etc.
     multiprocessing.freeze_support()
 
+    # Default spawn context for multiprocessing
+    multiprocessing.set_start_method("spawn")
+
     # Increasing max CSV file limit to avoid pesky issues
     csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
 

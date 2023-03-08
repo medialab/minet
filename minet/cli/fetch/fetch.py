@@ -120,7 +120,7 @@ def get_title(cli_args):
     headers=get_headers,
     multiplex=get_multiplex,
     enricher_type="threadsafe",
-    index_column="original_index",
+    index_column="fetch_original_index",
     title=get_title,
     unit="urls",
     stats_sort_key=loading_bar_stats_sort_key,

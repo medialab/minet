@@ -97,7 +97,7 @@ FETCH_COMMAND = command(
     epilog="""
         columns being added to the output:
 
-        . "original_index": index of the line in the original file (the output will be
+        . "fetch_original_index": index of the line in the original file (the output will be
             arbitrarily ordered since multiple requests are performed concurrently).
         . "resolved_url": final resolved url (after solving redirects) if different
             from starting url.
