@@ -77,17 +77,19 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
         ] = None,
     ):
         self.crawler = crawler
+
         self.request_args = request_args
         self.max_redirects = max_redirects
         self.callback = callback
 
-    @property
-    def cancel_event(self) -> Event:
-        return self.crawler.executor.cancel_event
+        self.cancel_event = self.crawler.executor.cancel_event
+        self.local_context = self.crawler.executor.local_context
 
-    @property
-    def pool_manager(self) -> PoolManager:
-        return self.crawler.executor.pool_manager
+        self.default_request_kwargs = {
+            "pool_manager": crawler.executor.pool_manager,
+            "max_redirects": max_redirects,
+            "cancel_event": crawler.executor.cancel_event,
+        }
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType]
@@ -108,26 +110,26 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
             assert job.url is not None
             assert job.depth is not None
 
-            # NOTE: request_args must be threadsafe
             kwargs = {}
 
             if cancel_event.is_set():
                 return CANCELLED
 
             if self.request_args is not None:
+                # NOTE: request_args must be threadsafe
                 kwargs = self.request_args(job)
 
             if cancel_event.is_set():
                 return CANCELLED
 
             try:
-                response = request(
-                    job.url,
-                    pool_manager=self.pool_manager,
-                    max_redirects=self.max_redirects,
-                    cancel_event=cancel_event,
-                    **kwargs,
-                )
+                retryer = getattr(self.local_context, "retryer", None)
+                kwargs.update(self.default_request_kwargs)
+
+                if retryer is not None:
+                    response = retryer(request, job.url, **kwargs)
+                else:
+                    response = request(job.url, **kwargs)
 
             except CancelledRequestError:
                 return CANCELLED
