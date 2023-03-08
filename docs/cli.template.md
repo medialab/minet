@@ -49,7 +49,9 @@ _Platform-related commands_
   - [reset](#hyphe-reset)
   - [tag](#hyphe-tag)
 - [instagram (insta)](#instagram)
+  - [comments](#insta-comments)
   - [hashtag](#hashtag)
+  - [post-infos](#insta-post-infos)
   - [user-followers](#user-followers)
   - [user-following](#user-following)
   - [user-infos](#user-infos)
@@ -299,9 +301,17 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% insta %>
 
+<h3 id="insta-comments">comments</h3>
+
+<% insta/comments %>
+
 ### hashtag
 
 <% insta/hashtag %>
+
+<h3 id="insta-post-infos">post-infos</h3>
+
+<% insta/post-infos %>
 
 ### user-followers
 
