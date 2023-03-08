@@ -100,6 +100,12 @@ EXTRACT_COMMAND = command(
             "type": int,
         },
         {
+            "flags": ["--chunk-size"],
+            "help": "Chunk size for multiprocessing. Defaults to `1`.",
+            "type": int,
+            "default": 1,
+        },
+        {
             "flag": "--body-column",
             "help": "Name of the CSV column containing html bodies.",
             "default": "body",

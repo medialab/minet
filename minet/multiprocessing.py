@@ -61,9 +61,11 @@ class LazyPool(object):
             if initializer is not None:
                 initializer(*initargs)
 
-    def imap_unordered(self, worker, tasks):
+    def imap_unordered(self, worker, tasks, chunksize: int = 1):
         if self.actually_multiprocessed:
-            yield from self.inner_pool.imap_unordered(WorkerWrapper(worker), tasks)
+            yield from self.inner_pool.imap_unordered(
+                WorkerWrapper(worker), tasks, chunksize=chunksize
+            )
         else:
             for task in tasks:
                 yield worker(task)
