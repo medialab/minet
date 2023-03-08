@@ -184,12 +184,16 @@ class FetchWorker(Generic[ItemType]):
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         callback: Optional[Callable[[FetchResult[ItemType]], None]] = None,
     ):
-        self.pool_manager = pool_manager
         self.cancel_event = cancel_event
         self.local_context = local_context
         self.request_args = request_args
-        self.max_redirects = max_redirects
         self.callback = callback
+
+        self.default_request_kwargs = {
+            "pool_manager": pool_manager,
+            "max_redirects": max_redirects,
+            "cancel_event": cancel_event,
+        }
 
     def __call__(
         self, payload: FetchWorkerPayload[ItemType]
@@ -216,10 +220,7 @@ class FetchWorker(Generic[ItemType]):
 
         try:
             retryer = getattr(self.local_context, "retryer", None)
-
-            kwargs["pool_manager"] = self.pool_manager
-            kwargs["max_redirects"] = self.max_redirects
-            kwargs["cancel_event"] = self.cancel_event
+            kwargs.update(self.default_request_kwargs)
 
             if retryer is not None:
                 response = retryer(request, url, **kwargs)
@@ -259,16 +260,20 @@ class ResolveWorker(Generic[ItemType]):
         infer_redirection: bool = False,
         canonicalize: bool = False,
     ):
-        self.pool_manager = pool_manager
         self.cancel_event = cancel_event
         self.local_context = local_context
         self.resolve_args = resolve_args
-        self.max_redirects = max_redirects
-        self.follow_refresh_header = follow_refresh_header
-        self.follow_meta_refresh = follow_meta_refresh
-        self.follow_js_relocation = follow_js_relocation
-        self.infer_redirection = infer_redirection
-        self.canonicalize = canonicalize
+
+        self.default_resolve_kwargs = {
+            "pool_manager": pool_manager,
+            "max_redirects": max_redirects,
+            "cancel_event": cancel_event,
+            "follow_refresh_header": follow_refresh_header,
+            "follow_meta_refresh": follow_meta_refresh,
+            "follow_js_relocation": follow_js_relocation,
+            "infer_redirection": infer_redirection,
+            "canonicalize": canonicalize,
+        }
 
     def __call__(
         self, payload: FetchWorkerPayload[ItemType]
@@ -281,13 +286,13 @@ class ResolveWorker(Generic[ItemType]):
         if url is None:
             return result
 
-        # NOTE: resolve_args must be threadsafe
         kwargs = {}
 
         if self.cancel_event.is_set():
             return CANCELLED
 
         if self.resolve_args is not None:
+            # NOTE: resolve_args must be threadsafe
             kwargs = self.resolve_args(payload)
 
         if self.cancel_event.is_set():
@@ -298,18 +303,14 @@ class ResolveWorker(Generic[ItemType]):
             kwargs["spoof_ua"] = should_spoof_ua_when_resolving(payload.domain)
 
         try:
-            stack = resolve(
-                url,
-                pool_manager=self.pool_manager,
-                max_redirects=self.max_redirects,
-                follow_refresh_header=self.follow_refresh_header,
-                follow_meta_refresh=self.follow_meta_refresh,
-                follow_js_relocation=self.follow_js_relocation,
-                infer_redirection=self.infer_redirection,
-                canonicalize=self.canonicalize,
-                cancel_event=self.cancel_event,
-                **kwargs,
-            )
+            retryer = getattr(self.local_context, "retryer", None)
+            kwargs.update(self.default_resolve_kwargs)
+
+            if retryer is not None:
+                stack = retryer(resolve, url, **kwargs)
+            else:
+                stack = resolve(url, **kwargs)
+
         except CancelledRequestError:
             return CANCELLED
         except EXPECTED_WEB_ERRORS as error:
@@ -346,7 +347,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
                 "retry_on_timeout": False,
                 "cancel_event": self.cancel_event,
                 "max_attempts": 3,
-                'epilog': epilog
+                "epilog": epilog,
             }
 
             default_retryer_kwargs.update(retryer_kwargs or {})
