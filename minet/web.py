@@ -27,7 +27,6 @@ from threading import Event
 from itertools import chain
 from urllib.parse import urljoin
 from urllib3 import HTTPResponse
-from urllib3.exceptions import HTTPError
 from urllib3.util.ssl_ import create_urllib3_context
 from urllib.request import Request
 from ebbe import rcompose, noop
@@ -37,6 +36,7 @@ from tenacity import (
     retry_if_exception_type,
     retry_if_exception,
     stop_after_attempt,
+    stop_when_event_set,
     sleep_using_event,
 )
 from tenacity.wait import wait_base
@@ -92,7 +92,12 @@ REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
 CONTENT_PREBUFFER_UP_TO = 1024
 STREAMING_CHUNK_SIZE: int = 2**12
 LARGE_CONTENT_PREBUFFER_UP_TO = 2**16
-EXPECTED_WEB_ERRORS = (HTTPError, RedirectError, InvalidURLError, FinalTimeoutError)
+EXPECTED_WEB_ERRORS = (
+    urllib3_exceptions.HTTPError,
+    RedirectError,
+    InvalidURLError,
+    FinalTimeoutError,
+)
 
 assert CONTENT_PREBUFFER_UP_TO < LARGE_CONTENT_PREBUFFER_UP_TO
 
@@ -562,7 +567,7 @@ def atomic_resolve(
             )
 
         # Request error
-        except HTTPError as e:
+        except urllib3_exceptions.HTTPError as e:
             url_stack[url] = redirection
             error = e
             break
@@ -1193,6 +1198,7 @@ def create_request_retryer(
         retry_condition |= retry_if_exception(predicate)
 
     retrying_kwargs = {
+        "reraise": True,
         "wait": request_retryer_custom_exponential_backoff(min=min, max=max),
         "retry": retry_condition,
         "stop": stop_after_attempt(max_attempts),
@@ -1205,6 +1211,10 @@ def create_request_retryer(
             raise TypeError("cannot retry using an already set cancel_event")
 
         retrying_kwargs["sleep"] = sleep_using_event(cancel_event)
+        retrying_kwargs["stop"] |= stop_when_event_set(cancel_event)
+        # retrying_kwargs["retry"] &= retry_if_exception(
+        #     lambda _: not cancel_event.is_set()
+        # )
 
     return Retrying(**retrying_kwargs)
 

@@ -5,9 +5,20 @@
 # Exposing a specialized quenouille wrapper grabbing various urls from the
 # web in a multithreaded fashion.
 #
-from typing import Optional, Iterator, Callable, TypeVar, Generic, Iterable, Dict, Union
+from typing import (
+    Optional,
+    Iterator,
+    Callable,
+    TypeVar,
+    Generic,
+    Iterable,
+    Dict,
+    Union,
+    Any,
+)
 
 import urllib3
+import threading
 from threading import Event
 from quenouille import ThreadPoolExecutor
 from ural import get_domain_name, ensure_protocol
@@ -15,6 +26,7 @@ from ural import get_domain_name, ensure_protocol
 from minet.exceptions import CancelledRequestError
 from minet.web import (
     create_pool_manager,
+    create_request_retryer,
     request,
     resolve,
     Response,
@@ -165,13 +177,15 @@ class FetchWorker(Generic[ItemType]):
         self,
         pool_manager: urllib3.PoolManager,
         cancel_event: Event,
+        local_context: threading.local,
         *,
         request_args: Optional[RequestArgsType[ItemType]] = None,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
-        callback: Optional[Callable[[FetchResult[ItemType]], None]] = None
+        callback: Optional[Callable[[FetchResult[ItemType]], None]] = None,
     ):
         self.pool_manager = pool_manager
         self.cancel_event = cancel_event
+        self.local_context = local_context
         self.request_args = request_args
         self.max_redirects = max_redirects
         self.callback = callback
@@ -187,26 +201,29 @@ class FetchWorker(Generic[ItemType]):
         if url is None:
             return result
 
-        # NOTE: request_args must be threadsafe
         kwargs = {}
 
         if self.cancel_event.is_set():
             return CANCELLED
 
         if self.request_args is not None:
+            # NOTE: request_args must be threadsafe
             kwargs = self.request_args(payload)
 
         if self.cancel_event.is_set():
             return CANCELLED
 
         try:
-            response = request(
-                url,
-                pool_manager=self.pool_manager,
-                max_redirects=self.max_redirects,
-                cancel_event=self.cancel_event,
-                **kwargs,
-            )
+            retryer = getattr(self.local_context, "retryer", None)
+
+            kwargs["pool_manager"] = self.pool_manager
+            kwargs["max_redirects"] = self.max_redirects
+            kwargs["cancel_event"] = self.cancel_event
+
+            if retryer is not None:
+                response = retryer(request, url, **kwargs)
+            else:
+                response = request(url, **kwargs)
 
         except CancelledRequestError:
             return CANCELLED
@@ -231,6 +248,7 @@ class ResolveWorker(Generic[ItemType]):
         self,
         pool_manager: urllib3.PoolManager,
         cancel_event: Event,
+        local_context: threading.local,
         *,
         resolve_args: Optional[RequestArgsType[ItemType]] = None,
         max_redirects: int = DEFAULT_RESOLVE_MAX_REDIRECTS,
@@ -238,10 +256,11 @@ class ResolveWorker(Generic[ItemType]):
         follow_meta_refresh: bool = False,
         follow_js_relocation: bool = False,
         infer_redirection: bool = False,
-        canonicalize: bool = False
+        canonicalize: bool = False,
     ):
         self.pool_manager = pool_manager
         self.cancel_event = cancel_event
+        self.local_context = local_context
         self.resolve_args = resolve_args
         self.max_redirects = max_redirects
         self.follow_refresh_header = follow_refresh_header
@@ -310,8 +329,29 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         timeout: AnyTimeout = DEFAULT_URLLIB3_TIMEOUT,
         spoof_tls_ciphers: bool = False,
         proxy: Optional[str] = None,
-        **kwargs
+        retry: bool = False,
+        retryer_kwargs: Optional[Dict[str, Any]] = None,
+        **kwargs,
     ):
+        self.cancel_event = Event()
+        self.local_context = threading.local()
+
+        if retry:
+            default_retryer_kwargs = {
+                "retry_on_timeout": False,
+                "cancel_event": self.cancel_event,
+                "max_attempts": 3,
+            }
+
+            default_retryer_kwargs.update(retryer_kwargs or {})
+
+            def init_local_context():
+                self.local_context.retryer = create_request_retryer(
+                    **default_retryer_kwargs
+                )
+
+            kwargs["initializer"] = init_local_context
+
         super().__init__(
             max_workers,
             wait=wait,
@@ -325,7 +365,6 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
             spoof_tls_ciphers=spoof_tls_ciphers,
             proxy=proxy,
         )
-        self.cancel_event = Event()
 
     def cancel(self) -> None:
         self.cancel_event.set()
@@ -350,13 +389,14 @@ class FetchThreadPoolExecutor(HTTPThreadPoolExecutor):
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
-        callback: Optional[Callable[[FetchResult[ItemType]], None]] = None
+        callback: Optional[Callable[[FetchResult[ItemType]], None]] = None,
     ) -> Iterator[FetchResult[ItemType]]:
 
         # TODO: validate
         worker = FetchWorker(
             self.pool_manager,
             self.cancel_event,
+            self.local_context,
             request_args=request_args,
             max_redirects=max_redirects,
             callback=callback,
@@ -389,13 +429,14 @@ class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor):
         follow_meta_refresh: bool = False,
         follow_js_relocation: bool = False,
         infer_redirection: bool = False,
-        canonicalize: bool = False
+        canonicalize: bool = False,
     ) -> Iterator[ResolveResult[ItemType]]:
 
         # TODO: validate
         worker = ResolveWorker(
             self.pool_manager,
             self.cancel_event,
+            self.local_context,
             resolve_args=resolve_args,
             max_redirects=max_redirects,
             follow_refresh_header=follow_refresh_header,

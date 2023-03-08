@@ -89,7 +89,7 @@ class WikimediaRestAPIClient(object):
 
             return url
 
-        with FetchThreadPoolExecutor(max_workers=threads) as executor:
+        with FetchThreadPoolExecutor(max_workers=threads, retry=True) as executor:
             for result in executor.imap_unordered(
                 pages,
                 key=api_url_from_item,
