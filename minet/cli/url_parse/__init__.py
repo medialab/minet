@@ -34,7 +34,7 @@ URL_PARSE_COMMAND = command(
         normalized version, domain name, etc.
     """,
     epilog="""
-        columns being added to the output:
+        Columns being added to the output:
 
         . "normalized_url": urls aggressively normalized by removing any part
           that is not useful to determine which resource it is actually
@@ -75,29 +75,27 @@ URL_PARSE_COMMAND = command(
         . "twitter_user_screen_name": Twitter user's screen name.
         . "tweet_id": id of tweet.
 
-        examples:
+        Examples:
 
         . Creating a report about a file's urls:
-            $ minet url-parse url posts.csv > report.csv
+            $ minet url-parse url -i posts.csv > report.csv
 
         . Keeping only selected columns from the input file:
-            $ minet url-parse url posts.csv -s id,url,title > report.csv
+            $ minet url-parse url -i posts.csv -s id,url,title > report.csv
 
         . Multiple urls joined by separator:
-            $ minet url-parse urls posts.csv --separator "|" > report.csv
+            $ minet url-parse urls -i posts.csv --separator "|" > report.csv
 
         . Parsing Facebook urls:
-            $ minet url-parse url fbposts.csv --facebook > report.csv
+            $ minet url-parse url -i fbposts.csv --facebook > report.csv
 
         . Parsing YouTube urls:
-            $ minet url-parse url ytvideos.csv --youtube > report.csv
+            $ minet url-parse url -i ytvideos.csv --youtube > report.csv
 
         . Parsing Twitter urls:
-            $ minet url-parse url tweets.csv --twitter > report.csv
+            $ minet url-parse url -i tweets.csv --twitter > report.csv
     """,
     variadic_input={"dummy_column": "url", "item_label": "url"},
-    select=True,
-    total=True,
     arguments=[
         {"flag": "--separator", "help": "Split url column by a separator?"},
         {

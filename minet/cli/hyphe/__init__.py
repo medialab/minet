@@ -38,7 +38,7 @@ HYPHE_DECLARE_SUBCOMMAND = hyphe_corpus_subcommand(
         webentity declarations as another one.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Declaring webentities from a Hyphe export:
             $ minet hyphe declare http://myhyphe.com/api/ target-corpus export.csv
@@ -61,7 +61,7 @@ HYPHE_DESTROY_SUBCOMMAND = hyphe_corpus_subcommand(
         Command that can be used to destroy a corpus entirely.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Destroying a corpus:
             $ minet hyphe destroy http://myhyphe.com/api/ my-corpus
@@ -77,7 +77,7 @@ HYPHE_DUMP_SUBCOMMAND = hyphe_corpus_subcommand(
         Hyphe corpus.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Dumping a corpus into the ./corpus directory:
             $ minet hyphe dump http://myhyphe.com/api/ corpus-name -O corpus
@@ -108,7 +108,7 @@ HYPHE_RESET_SUBCOMMAND = hyphe_corpus_subcommand(
         Command that can be used to reset a corpus entirely.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Resetting a corpus:
             $ minet hyphe reset http://myhyphe.com/api/ my-corpus
@@ -124,7 +124,7 @@ HYPHE_TAG_SUBCOMMAND = hyphe_corpus_subcommand(
         metadata recorded in a CSV file.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Tag webentities from two columns of CSV file:
             $ minet hyphe tag http://myhyphe.com/api/ my-corpus webentity_id type,creator metadata.csv

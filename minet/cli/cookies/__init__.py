@@ -12,7 +12,7 @@ COOKIES_COMMAND = command(
         in python scripts, for instance.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Dumping cookie jar from firefox:
             $ minet cookies firefox > jar.txt

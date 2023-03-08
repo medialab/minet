@@ -30,6 +30,7 @@ from minet.exceptions import (
     TrafilaturaError,
     FilenameFormattingError,
     FinalTimeoutError,
+    CouldNotInferEncodingError,
 )
 from minet.scrape.constants import BURROWING_KEYS, LEAF_KEYS
 from minet.scrape.exceptions import (
@@ -119,6 +120,7 @@ ERROR_REPORTERS = {
     DecodeError: decode_error_reporter,
     TrafilaturaError: "trafilatura-error",
     FilenameFormattingError: "filename-formatting-error",
+    CouldNotInferEncodingError: "could-not-infer-encoding",
 }
 
 

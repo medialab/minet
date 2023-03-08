@@ -2,91 +2,92 @@
 
 ## Summary
 
-*Global utilities*
+_Global utilities_
 
-* [-h/--help/help](#help-flag)
-* [--version](#version-flag)
-* [minetrc config files](#minetrc)
-* [minet environment variables](#envvars)
+- [-h/--help/help](#help-flag)
+- [--version](#version-flag)
+- [minetrc config files](#minetrc)
+- [minet environment variables](#envvars)
 
-*Generic commands*
+_Generic commands_
 
-* [cookies](#cookies)
-* [crawl](#crawl)
-* [fetch](#fetch)
-* [extract](#extract)
-* [resolve](#resolve)
-* [scrape](#scrape)
-* [url-extract](#url-extract)
-* [url-join](#url-join)
-* [url-parse](#url-parse)
+- [cookies](#cookies)
+- [crawl](#crawl)
+- [fetch](#fetch)
+- [extract](#extract)
+- [resolve](#resolve)
+- [scrape](#scrape)
+- [url-extract](#url-extract)
+- [url-join](#url-join)
+- [url-parse](#url-parse)
 
-*Platform-related commands*
+_Platform-related commands_
 
-* [buzzsumo (bz)](#buzzsumo)
-  * [limit](#buzzsumo-limit)
-  * [domain-summary](#buzzsumo-domain-summary)
-  * [domain](#buzzsumo-domain)
-* [crowdtangle (ct)](#crowdtangle)
-  * [leaderboard](#leaderboard)
-  * [lists](#lists)
-  * [posts-by-id](#posts-by-id)
-  * [posts](#posts)
-  * [search](#ct-search)
-  * [summary](#summary)
-* [facebook (fb)](#facebook)
-  * [comments](#facebook-comments)
-  * [post](#facebook-post)
-  * [posts](#facebook-posts)
-  * [post-authors](#facebook-post-authors)
-  * [url-likes](#facebook-url-likes)
-* [google](#google)
-  * [sheets](#google-sheets)
-* [hyphe](#hyphe)
-  * [declare](#hyphe-declare)
-  * [destroy](#hyphe-destroy)
-  * [dump](#hyphe-dump)
-  * [reset](#hyphe-reset)
-  * [tag](#hyphe-tag)
-* [instagram (insta)](#instagram)
-  * [hashtag](#hashtag)
-  * [user-followers](#user-followers)
-  * [user-following](#user-following)
-  * [user-infos](#user-infos)
-  * [user-posts](#user-posts)
-* [mediacloud (mc)](#mediacloud)
-  * [medias](#mc-medias)
-  * [search](#mc-search)
-  * [topic](#topic)
-    * [stories](#stories)
-* [telegram (tl)](#telegram)
-  * [channel-infos](#channel-infos)
-  * [channel-messages](#channel-messages)
-* [tiktok (tk)](#tiktok)
-  * [search-videos](#search-videos)
-* [twitter](#twitter)
-  * [attrition](#attrition)
-  * [followers](#followers)
-  * [friends](#friends)
-  * [list-followers](#list-followers)
-  * [list-members](#list-members)
-  * [retweeters](#retweeters)
-  * [scrape](#twitter-scrape)
-  * [tweet-date](#tweet-date)
-  * [tweet-search](#tweet-search)
-  * [tweet-count](#tweet-count)
-  * [tweets](#tweets)
-  * [users](#users)
-  * [user-search](#user-search)
-  * [user-tweets](#user-tweets)
-* [youtube (yt)](#youtube)
-  * [captions](#captions)
-  * [channel-videos](#channel-videos)
-  * [channels](#channels)
-  * [comments](#youtube-comments)
-  * [search](#youtube-search)
-  * [videos](#videos)
-
+- [buzzsumo (bz)](#buzzsumo)
+  - [limit](#buzzsumo-limit)
+  - [domain-summary](#buzzsumo-domain-summary)
+  - [domain](#buzzsumo-domain)
+- [crowdtangle (ct)](#crowdtangle)
+  - [leaderboard](#leaderboard)
+  - [lists](#lists)
+  - [posts-by-id](#posts-by-id)
+  - [posts](#posts)
+  - [search](#ct-search)
+  - [summary](#summary)
+- [facebook (fb)](#facebook)
+  - [comments](#facebook-comments)
+  - [post](#facebook-post)
+  - [posts](#facebook-posts)
+  - [post-authors](#facebook-post-authors)
+  - [url-likes](#facebook-url-likes)
+- [google](#google)
+  - [sheets](#google-sheets)
+- [hyphe](#hyphe)
+  - [declare](#hyphe-declare)
+  - [destroy](#hyphe-destroy)
+  - [dump](#hyphe-dump)
+  - [reset](#hyphe-reset)
+  - [tag](#hyphe-tag)
+- [instagram (insta)](#instagram)
+  - [hashtag](#hashtag)
+  - [user-followers](#user-followers)
+  - [user-following](#user-following)
+  - [user-infos](#user-infos)
+  - [user-posts](#user-posts)
+- [mediacloud (mc)](#mediacloud)
+  - [medias](#mc-medias)
+  - [search](#mc-search)
+  - [topic](#topic)
+    - [stories](#stories)
+- [telegram (tl)](#telegram)
+  - [channel-infos](#channel-infos)
+  - [channel-messages](#channel-messages)
+- [tiktok (tk)](#tiktok)
+  - [search-videos](#search-videos)
+- [twitter](#twitter)
+  - [attrition](#attrition)
+  - [followers](#followers)
+  - [friends](#friends)
+  - [list-followers](#list-followers)
+  - [list-members](#list-members)
+  - [retweeters](#retweeters)
+  - [scrape](#twitter-scrape)
+  - [tweet-date](#tweet-date)
+  - [tweet-search](#tweet-search)
+  - [tweet-count](#tweet-count)
+  - [tweets](#tweets)
+  - [users](#users)
+  - [user-search](#user-search)
+  - [user-tweets](#user-tweets)
+- [wikipedia (wiki)](#wikipedia)
+  - [pageviews](#pageviews)
+- [youtube (yt)](#youtube)
+  - [captions](#captions)
+  - [channel-videos](#channel-videos)
+  - [channels](#channels)
+  - [comments](#youtube-comments)
+  - [search](#youtube-search)
+  - [videos](#videos)
 
 <h2 id="help-flag">-h/--help</h2>
 
@@ -115,10 +116,10 @@ Minet supports configuration files so you can skip some tedious command line arg
 
 Those configuration files can be written in YAML or JSON and can either be passed to minet using the `--rcfile` argument or will be searched at the following paths (with this precedence):
 
-* `./.minetrc{,.yml,.yaml,.json}`
-* `~/.minetrc{,.yml,.yaml,.json}`
+- `./.minetrc{,.yml,.yaml,.json}`
+- `~/.minetrc{,.yml,.yaml,.json}`
 
-*Configuration file*
+_Configuration file_
 
 ```yml
 ---
@@ -409,6 +410,12 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### user-tweets
 
 <% twitter/user-tweets %>
+
+## Wikipedia
+
+### pageviews
+
+<% wikipedia/pageviews %>
 
 ## Youtube
 

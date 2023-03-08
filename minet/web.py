@@ -17,18 +17,20 @@ import ural
 import json
 import mimetypes
 import functools
-import charset_normalizer as chardet
-from bs4 import BeautifulSoup
+import warnings
+from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning, SoupStrainer
 from datetime import datetime
 from timeit import default_timer as timer
 from io import BytesIO
 from threading import Event
+from itertools import chain
 from urllib.parse import urljoin
 from urllib3 import HTTPResponse
 from urllib3.exceptions import HTTPError
 from urllib3.util.ssl_ import create_urllib3_context
 from urllib.request import Request
 from ebbe import rcompose, noop
+from collections import defaultdict
 from tenacity import (
     Retrying,
     retry_if_exception_type,
@@ -37,9 +39,9 @@ from tenacity import (
 )
 from tenacity.wait import wait_base
 
-from minet.encodings import is_supported_encoding, normalize_encoding
+from minet.encodings import normalize_encoding
 from minet.loggers import sleepers_logger
-from minet.utils import is_binary_mimetype
+from minet.utils import is_binary_mimetype, infer_encoding
 from minet.exceptions import (
     RedirectError,
     MaxRedirectsError,
@@ -63,10 +65,9 @@ mimetypes.init()
 AnyTimeout = Union[float, urllib3.Timeout]
 
 # Handy regexes
-BINARY_BOM_RE = re.compile(rb"^\xef\xbb\xbf")
 CHARSET_RE = re.compile(rb'<meta.*?charset=["\']*(.+?)["\'>]', flags=re.I)
 PRAGMA_RE = re.compile(rb'<meta.*?content=["\']*;?charset=(.+?)["\'>]', flags=re.I)
-XML_RE = re.compile(rb'^<\?xml.*?encoding=["\']*(.+?)["\'>]', flags=re.I)
+XML_RE = re.compile(rb'^\s*<\?xml.*?encoding=["\']*(.+?)["\'>]', flags=re.I)
 NOSCRIPT_RE = re.compile(rb"<noscript[^>]*>.*</noscript[^>]*>", flags=re.I)
 META_REFRESH_RE = re.compile(
     rb"""<meta\s+http-equiv=['"]?refresh['"]?\s+content=['"]?([^"']+)['">]?""",
@@ -76,9 +77,8 @@ JAVASCRIPT_LOCATION_RE = re.compile(
     rb"""(?:window\.)?location(?:\s*=\s*|\.replace\(\s*)['"`](.*?)['"`]"""
 )
 ESCAPED_SLASH_RE = re.compile(rb"\\\/")
-ASCII_RE = re.compile(r"^[ -~]*$")
 HTML_RE = re.compile(
-    rb"^<(?:html|head|body|title|meta|link|span|div|img|ul|ol|[ap!?])", flags=re.I
+    rb"^\s*<(?:html|head|body|title|meta|link|span|div|img|ul|ol|[ap!?])", flags=re.I
 )
 CANONICAL_LINK_RE = re.compile(
     rb'<link\s*[^>]*\s+rel=(?:"\s*canonical\s*"|canonical|\'\s*canonical\s*\')\s+[^>]*\s?/?>'
@@ -86,7 +86,6 @@ CANONICAL_LINK_RE = re.compile(
 HREF_RE = re.compile(rb'href=(\"[^"]+|\'[^\']+|[^\s]+)>?\s?', flags=re.I)
 
 # Constants
-CHARSET_DETECTION_CONFIDENCE_THRESHOLD = 0.9
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
 CONTENT_PREBUFFER_UP_TO = 1024
 STREAMING_CHUNK_SIZE = 2**12
@@ -96,80 +95,44 @@ EXPECTED_WEB_ERRORS = (HTTPError, RedirectError, InvalidURLError, FinalTimeoutEr
 assert CONTENT_PREBUFFER_UP_TO < LARGE_CONTENT_PREBUFFER_UP_TO
 
 
-# TODO: add a version that tallies the possibilities
-# NOTE: utf-16 is handled differently to account for endianness
-# NOTE: file starting with a BOM are inferred preferentially
-# See: https://github.com/medialab/minet/issues/550
-def guess_response_encoding(
-    response: urllib3.HTTPResponse, body: bytes, is_xml=False, infer=False
-) -> Optional[str]:
-    """
-    Function taking an urllib3 response object and attempting to guess its
-    encoding.
-    """
+def infer_encoding_from_headers(response: urllib3.HTTPResponse) -> Optional[str]:
     content_type_header = response.getheader("content-type")
 
-    suboptimal_charset = None
-
-    has_bom = bool(BINARY_BOM_RE.match(body))
-
-    if content_type_header is not None:
-        parsed_header = cgi.parse_header(content_type_header)
-
-        if len(parsed_header) > 1:
-            charset = parsed_header[1].get("charset")
-
-            if charset is not None:
-                if (
-                    is_supported_encoding(charset)
-                    and normalize_encoding(charset) != "utf16"
-                    and not has_bom
-                ):
-                    return charset.lower()
-                else:
-                    suboptimal_charset = charset
-
-    chunk = body[:CONTENT_PREBUFFER_UP_TO]
-
-    # Data is empty
-    if not chunk.strip():
+    if content_type_header is None:
         return None
 
-    # TODO: use re.search to go faster!
-    if is_xml:
-        matches = re.findall(CHARSET_RE, chunk)
+    parsed_header = cgi.parse_header(content_type_header)
 
-        if len(matches) == 0:
-            matches = re.findall(PRAGMA_RE, chunk)
+    if len(parsed_header) > 1:
+        charset = parsed_header[1].get("charset")
 
-        if len(matches) == 0:
-            matches = re.findall(XML_RE, chunk)
+        if charset is not None:
+            return charset.lower()
 
-        # NOTE: here we are returning the last one, but we could also use
-        # frequency at the expense of performance
-        if len(matches) != 0:
-            charset = matches[-1].lower().decode()
+    return None
 
-            if (
-                is_supported_encoding(charset)
-                and normalize_encoding(charset) != "utf16"
-                and not has_bom
-            ):
-                return charset
-            else:
-                suboptimal_charset = charset
 
-    if infer:
-        inferrence_result = chardet.detect(body)
+def infer_encodings_from_xml(
+    body: bytes, chunk_size: Optional[int] = CONTENT_PREBUFFER_UP_TO
+) -> Dict[str, int]:
+    possibilities = defaultdict(list)
 
-        # Could not detect anything
-        if not inferrence_result or inferrence_result.get("confidence") is None:
-            return None
+    chunk = body
 
-        if inferrence_result["confidence"] >= CHARSET_DETECTION_CONFIDENCE_THRESHOLD:
-            return inferrence_result["encoding"].lower()
+    if chunk_size is not None:
+        chunk = body[:chunk_size]
 
-    return suboptimal_charset
+    matches = chain(
+        re.findall(CHARSET_RE, chunk),
+        re.findall(PRAGMA_RE, chunk),
+        re.findall(XML_RE, chunk),
+    )
+
+    for match in matches:
+        encoding = match.decode().lower()
+        possibilities[normalize_encoding(encoding)].append(encoding)
+
+    return {max(names, key=len): len(names) for names in possibilities.values()}
 
 
 def looks_like_html(html_chunk: bytes) -> bool:
@@ -324,6 +287,9 @@ def stream_request_body(
     final_time: Optional[float] = None,
     up_to: Optional[int] = None,
 ) -> bool:
+    if cancel_event is not None and cancel_event.is_set():
+        raise CancelledRequestError
+
     if up_to is not None and body.tell() >= up_to:
         return False
 
@@ -575,6 +541,10 @@ def atomic_resolve(
         if buffered_response:
             buffered_response.close()
 
+        # We check for cancellation
+        if cancel_event is not None and cancel_event.is_set():
+            raise CancelledRequestError
+
         redirection = Redirection(url)
 
         try:
@@ -626,6 +596,8 @@ def atomic_resolve(
                     try:
                         buffered_response.prebuffer_up_to(CONTENT_PREBUFFER_UP_TO)
                     except Exception as e:
+                        if isinstance(e, CancelledRequestError):
+                            raise
                         error = e
                         break
 
@@ -655,6 +627,8 @@ def atomic_resolve(
                     try:
                         buffered_response.prebuffer_up_to(LARGE_CONTENT_PREBUFFER_UP_TO)
                     except Exception as e:
+                        if isinstance(e, CancelledRequestError):
+                            raise
                         error = e
                         break
 
@@ -678,18 +652,17 @@ def atomic_resolve(
 
         # Location badly encoded?
         try:
-            if not ASCII_RE.match(location):
+            if not location.isascii():
                 byte_location = location.encode("latin1")
-                detection = chardet.detect(byte_location)
-                guessed_encoding = detection["encoding"].lower()
+                encoding = infer_encoding(byte_location)
 
                 if (
-                    guessed_encoding != "iso-8859-1"
-                    and guessed_encoding != "ascii"
-                    and detection["confidence"]
-                    >= CHARSET_DETECTION_CONFIDENCE_THRESHOLD
+                    encoding is not None
+                    and encoding != "iso-8859-1"
+                    and encoding != "latin1"
+                    and encoding != "ascii"
                 ):
-                    location = byte_location.decode(guessed_encoding)
+                    location = byte_location.decode(encoding)
         except Exception:
             pass
 
@@ -870,9 +843,7 @@ class Response(object):
         if not self.__is_text:
             return
 
-        self.__encoding = guess_response_encoding(
-            self.__response, self.__body, is_xml=True, infer=True
-        )
+        self.__encoding = infer_encoding(self.__body)
 
         self.__has_guessed_encoding = True
 
@@ -941,6 +912,15 @@ class Response(object):
         return self.__is_text  # type: ignore # At that point we know it's a bool
 
     @property
+    def could_be_html(self) -> bool:
+        mime = self.mimetype
+        return mime is not None and "/htm" in mime
+
+    @property
+    def is_html(self) -> bool:
+        return self.is_text and looks_like_html(self.__body)
+
+    @property
     def encoding(self) -> Optional[str]:
         self.__guess_encoding()
         return self.__encoding
@@ -955,6 +935,12 @@ class Response(object):
         return encoding
 
     @property
+    def encoding_from_headers(self) -> Optional[str]:
+        return infer_encoding_from_headers(self.__response)
+
+    # TODO: add encoding_from_xml & possible_encodings when required
+
+    @property
     def body(self) -> bytes:
         return self.__body
 
@@ -965,8 +951,17 @@ class Response(object):
     def json(self):
         return json.loads(self.text())
 
-    def soup(self, engine: str = "lxml") -> BeautifulSoup:
-        return BeautifulSoup(self.text(), engine)
+    def soup(
+        self,
+        engine: str = "lxml",
+        ignore_xhtml_warning=False,
+        strainer: Optional[SoupStrainer] = None,
+    ) -> BeautifulSoup:
+        with warnings.catch_warnings():
+            if ignore_xhtml_warning:
+                warnings.simplefilter("ignore", category=XMLParsedAsHTMLWarning)
+
+            return BeautifulSoup(self.text(), engine, parse_only=strainer)
 
     def __getitem__(self, name: str) -> Any:
         return self.__meta[name]
@@ -1142,7 +1137,7 @@ def log_request_retryer_before_sleep(retry_state):
 
 
 class request_retryer_custom_exponential_backoff(wait_base):
-    def __init__(self, min=10, max=ONE_DAY, exp_base=4) -> None:
+    def __init__(self, min: float = 10, max: float = ONE_DAY, exp_base=4) -> None:
         self.min = min
         self.max = max
         self.exp_base = exp_base
@@ -1173,8 +1168,8 @@ def create_request_retryer(
 
     retryable_exception_types = [
         FinalTimeoutError,
-        urllib3.exceptions.TimeoutError,
-        urllib3.exceptions.ProtocolError,
+        urllib3.exceptions.TimeoutError,  # type: ignore
+        urllib3.exceptions.ProtocolError,  # type: ignore
         urllib.error.URLError,
     ]
 

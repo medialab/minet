@@ -1,69 +1,82 @@
-from argparse import FileType
+from minet.cli.argparse import command
 
-from minet.cli.argparse import command, InputAction
-from minet.cli.constants import DEFAULT_CONTENT_FOLDER
+
+def resolve_arguments(cli_args):
+    if cli_args.column is None:
+        cli_args.column = "filename"
+
+
+# TODO: is --validate working?
 
 SCRAPE_COMMAND = command(
     "scrape",
     "minet.cli.scrape.scrape",
     title="Minet Scrape Command",
     description="""
-        Use multiple processes to scrape data from a batch of HTML files.
-        This command can either work on a `minet fetch` report or on a bunch
-        of files filtered using a glob pattern.
+        Use multiple processes to scrape data from a batch of HTML files using
+        minet scraping DSL documented here:
+        https://github.com/medialab/minet/blob/master/docs/cookbook/scraping_dsl.md
 
-        It will output the scraped items as a CSV file.
+        It will output the scraped items as a CSV or NDJSON file.
+
+        Note that this command has been geared towards working in tandem with
+        the fetch command. This means the command expects, by default, CSV files
+        containing columns like "filename", "http_status", "encoding" etc. as
+        you can find in a fetch command CSV report.
+
+        This said, you can of course feed this command any kind of CSV data,
+        and use dedicated flags such as --filename-column, --body-column to
+        to inform the command about your specific table.
+
+        The comand is also able to work on glob patterns, such as: "downloaded/**/*.html",
+        and can also be fed CSV columns containing HTML content directly if
+        required.
     """,
     epilog="""
-        examples:
+        Examples:
 
-        . Scraping item from a `minet fetch` report:
-            $ minet scrape scraper.yml report.csv > scraped.csv
+        . Scraping a single file on disk:
+            $ minet scrape scraper.yml ./path/to/file.html
 
-        . Working on a report from stdin (mind the `-`):
-            $ minet fetch url_column file.csv | minet scrape scraper.yml - > scraped.csv
+        . Scraping a `minet fetch` report:
+            $ minet scrape scraper.yml -i report.csv -I downloaded > scraped.csv
 
-        . Scraping a single page from the web:
-            $ minet fetch https://news.ycombinator.com/ | minet scrape scraper.yml - > scraped.csv
+        . Scraping a single url:
+            $ minet fetch "https://lemonde.fr" | minet scrape scraper.yml -i -
 
-        . Scraping items from a bunch of files:
-            $ minet scrape scraper.yml --glob "./content/**/*.html" > scraped.csv
+        . Indicating a custom `filename` column:
+            $ minet scrape scraper.yml -i report.csv -I downloaded --filename-column path > scraped.csv
+
+        . Scraping a CSV colum containing HTML directly:
+            $ minet scrape scraper.yml -i report.csv --body-column html > scraped.csv
+
+        . Scraping a bunch of files using a glob pattern:
+            $ minet scrape scraper.yml "./content/**/*.html" --glob > scraped.csv
+
+        . Scraping using a CSV file containing glob patterns:
+            $ minet scrape scraper.yml pattern -i patterns.csv --glob > scraped.csv
+
+        . Working on a fetch report from stdin (mind the `-`):
+            $ minet fetch url file.csv | minet scrape scraper.yml -i - -I downloaded > scraped.csv
 
         . Yielding items as newline-delimited JSON (jsonl):
-            $ minet scrape scraper.yml report.csv --format jsonl > scraped.jsonl
-
-        . Only validating the scraper definition and exit:
-            $ minet scraper --validate scraper.yml
+            $ minet scrape scraper.yml -i report.csv --format jsonl > scraped.jsonl
 
         . Using a strainer to optimize performance:
-            $ minet scraper links-scraper.yml --strain "a[href]" report.csv > links.csv
+            $ minet scrape links-scraper.yml --strain "a[href]" -i report.csv > links.csv
     """,
-    total=True,
+    resolve=resolve_arguments,
+    variadic_input={"dummy_column": "filename", "optional": True, "no_help": True},
     arguments=[
-        {
-            "name": "scraper",
-            "help": "Path to a scraper definition file.",
-            "type": FileType("r", encoding="utf-8"),
-        },
-        {
-            "name": "report",
-            "help": "Report CSV file from `minet fetch`. Will understand `-` as stdin.",
-            "action": InputAction,
-        },
-        {
-            "flags": ["-f", "--format"],
-            "help": "Output format.",
-            "choices": ["csv", "jsonl"],
-            "default": "csv",
-        },
+        {"name": "scraper", "help": "Path to a scraper definition file."},
         {
             "flags": ["-g", "--glob"],
-            "help": "Whether to scrape a bunch of html files on disk matched by a glob pattern rather than sourcing them from a CSV report.",
+            "help": "Will interpret given filename as glob patterns to resolve if given.",
+            "action": "store_true",
         },
         {
             "flags": ["-I", "--input-dir"],
-            "help": 'Directory where the HTML files are stored. Defaults to "%s".'
-            % DEFAULT_CONTENT_FOLDER,
+            "help": "Directory where the HTML files are stored.",
         },
         {
             "flags": ["-p", "--processes"],
@@ -71,18 +84,54 @@ SCRAPE_COMMAND = command(
             "type": int,
         },
         {
-            "flag": "--separator",
-            "help": 'Separator use to join lists of values when output format is CSV. Defaults to "|".',
+            "flags": ["--chunk-size"],
+            "help": "Chunk size for multiprocessing. Defaults to `1`.",
+            "type": int,
+            "default": 1,
+        },
+        {
+            "flag": "--body-column",
+            "help": "Name of the CSV column containing html bodies.",
+            "default": "body",
+        },
+        {
+            "flag": "--error-column",
+            "help": "Name of the CSV column containing a fetch error.",
+            "default": "fetch_error",
+        },
+        {
+            "flag": "--status-column",
+            "help": "Name of the CSV column containing HTTP status.",
+            "default": "http_status",
+        },
+        {
+            "flag": "--encoding-column",
+            "help": "Name of the CSV column containing file encoding.",
+            "default": "encoding",
+        },
+        {
+            "flag": "--mimetype-column",
+            "help": "Name of the CSV column containing file mimetype.",
+            "default": "mimetype",
+        },
+        {
+            "flag": "--encoding",
+            "help": "Name of the default encoding to use. If not given the command will infer it for you.",
+        },
+        {
+            "flags": ["-f", "--format"],
+            "help": "Output format. Defaults to `csv`.",
+            "choices": ["csv", "jsonl", "ndjson"],
+            "default": "csv",
+        },
+        {
+            "flag": "--plural-separator",
+            "help": 'Separator use to join lists of values when serializing to CSV. Defaults to "|".',
             "default": "|",
         },
         {
             "flag": "--strain",
             "help": "Optional CSS selector used to strain, i.e. only parse matched tags in the parsed html files in order to optimize performance.",
-        },
-        {
-            "flag": "--validate",
-            "help": "Just validate the given scraper then exit.",
-            "action": "store_true",
         },
     ],
 )

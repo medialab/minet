@@ -41,7 +41,7 @@ FACEBOOK_COMMENTS_SUBCOMMAND = subcommand(
         -c/--cookie flag.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Scraping a post's comments:
             $ minet fb comments https://www.facebook.com/groups/186982532676569/permalink/4096995827030341/ > comments.csv
@@ -53,7 +53,6 @@ FACEBOOK_COMMENTS_SUBCOMMAND = subcommand(
             $ minet fb comments post_url posts.csv > comments.csv
     """,
     variadic_input={"dummy_column": "post_url", "item_label": "post url"},
-    select=True,
     arguments=[*MOBILE_ARGUMENTS],
 )
 
@@ -68,14 +67,12 @@ FACEBOOK_POST_AUTHORS_SUBCOMMAND = subcommand(
         only administrators can post something on pages.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Fetching authors of a series of posts in a CSV file:
             $ minet fb post-authors post_url fb-posts.csv > authors.csv
     """,
     variadic_input={"dummy_column": "post_url", "item_label": "post"},
-    select=True,
-    total=True,
     arguments=[*MOBILE_ARGUMENTS],
 )
 
@@ -87,14 +84,12 @@ FACEBOOK_POST_STATS_SUBCOMMAND = subcommand(
         Retrieve statistics about a given list of Facebook posts.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Fetching stats about lists of posts in a CSV file:
             $ minet fb post-stats post_url fb-posts.csv > stats.csv
     """,
     variadic_input={"dummy_column": "post_url", "item_label": "post url"},
-    select=True,
-    total=True,
 )
 
 FACEBOOK_POST_SUBCOMMAND = subcommand(
@@ -134,7 +129,7 @@ FACEBOOK_POST_SUBCOMMAND = subcommand(
         scraped by minet at this time.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Scraping a post:
             $ minet fb post https://m.facebook.com/watch/?v=448540820705115 > post.csv
@@ -146,7 +141,6 @@ FACEBOOK_POST_SUBCOMMAND = subcommand(
             $ minet fb post url urls.csv > post.csv
     """,
     variadic_input={"dummy_column": "post_url", "item_label": "post url"},
-    select=True,
     arguments=[*MOBILE_ARGUMENTS],
 )
 
@@ -186,7 +180,7 @@ FACEBOOK_POSTS_SUBCOMMAND = subcommand(
         scraped by minet at this time.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Scraping a group's posts:
             $ minet fb posts https://www.facebook.com/groups/444175323127747 > posts.csv
@@ -199,7 +193,6 @@ FACEBOOK_POSTS_SUBCOMMAND = subcommand(
     """,
     variadic_input={"dummy_column": "group_url", "item_label": "group url"},
     arguments=[*MOBILE_ARGUMENTS],
-    select=True,
 )
 
 FACEBOOK_URL_LIKES_SUBCOMMAND = subcommand(
@@ -227,8 +220,6 @@ FACEBOOK_URL_LIKES_SUBCOMMAND = subcommand(
             $ minet fb url-likes url url.csv > url_likes.csv
     """,
     variadic_input={"dummy_column": "url", "item_label": "url"},
-    select=True,
-    total=True,
 )
 
 FACEBOOK_COMMAND = command(

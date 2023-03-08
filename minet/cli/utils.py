@@ -4,7 +4,7 @@
 #
 # Miscellaneous helpers used by the CLI tools.
 #
-from typing import Optional, Iterable
+from typing import Optional, Iterable, List, Iterator
 
 import os
 import sys
@@ -12,18 +12,22 @@ import stat
 import yaml
 import platform
 import casanova
+from casanova.namedrecord import is_tabular_record_class
+from dataclasses import dataclass
 from glob import iglob
+from copy import copy
 from os.path import join, expanduser, isfile, relpath
-from collections import namedtuple
 from collections.abc import Mapping
 from functools import wraps
 from logging import Handler
 from contextlib import nullcontext
-from ebbe import noop, format_seconds
+from ebbe import format_seconds, get
+from types import SimpleNamespace
 
+from minet.encodings import is_supported_encoding
 from minet.cli.console import console
 from minet.cli.loading_bar import LoadingBar, StatsItem
-from minet.cli.exceptions import MissingColumnError, FatalError
+from minet.cli.exceptions import FatalError
 from minet.utils import fuzzy_int, message_flatmap
 
 
@@ -126,95 +130,104 @@ def acquire_cross_platform_stdout():
     return sys.stdout
 
 
-WorkerPayload = namedtuple(
-    "WorkerPayload", ["row", "headers", "path", "encoding", "content", "args"]
-)
+@dataclass
+class FetchReportLikeItem:
+    index: int
+    row: List[str]
+    path: Optional[str] = None
+    encoding: Optional[str] = None
+    text: Optional[str] = None
+    error: Optional[str] = None
 
 
-def getdefault(row, pos, default=None):
-    if pos is None:
-        return default
+def create_fetch_like_report_iterator(
+    cli_args: SimpleNamespace, reader: casanova.Reader
+) -> Iterator[FetchReportLikeItem]:
 
-    try:
-        return row[pos] or default
-    except IndexError:
-        return default
+    headers = reader.headers
+    input_dir = cli_args.input_dir or ""
 
+    # TODO: deal with no_headers
+    assert headers is not None
 
-def create_report_iterator(cli_args, reader, worker_args=None, on_irrelevant_row=noop):
-    if "filename" not in reader.headers:
-        raise MissingColumnError
+    filename_pos = headers.get(cli_args.column) if cli_args.column is not None else None
+    error_pos = headers.get(cli_args.error_column)
+    status_pos = headers.get(cli_args.status_column)
+    encoding_pos = headers.get(cli_args.encoding_column)
+    mimetype_pos = headers.get(cli_args.mimetype_column)
+    body_pos = headers.get(cli_args.body_column)
 
-    filename_pos = reader.headers.filename
-    error_pos = reader.headers.get("error")
-    status_pos = reader.headers.get("status")
-    filename_pos = reader.headers.get("filename")
-    encoding_pos = reader.headers.get("encoding")
-    mimetype_pos = reader.headers.get("mimetype")
-    raw_content_pos = reader.headers.get("raw_contents")
+    for i, row in reader.enumerate():
+        item = FetchReportLikeItem(index=i, row=row)
 
-    indexed_headers = {n: i for i, n in enumerate(reader.headers)}
+        if error_pos is not None:
+            error = get(row, error_pos, "").strip()
 
-    def generator():
-        for i, row in reader.enumerate():
-            error = getdefault(row, error_pos)
-
-            if error is not None:
-                on_irrelevant_row("errored", row, i)
+            if error:
+                item.error = "http-errored"
+                yield item
                 continue
 
-            status = fuzzy_int(getdefault(row, status_pos, "200"))
+        if status_pos is not None:
+            status = get(row, status_pos)
 
-            mimetype = getdefault(row, mimetype_pos, "text/html").strip()
-            filename = row[filename_pos]
-            encoding = getdefault(row, encoding_pos, "utf-8").strip()
+            if status:
+                status = fuzzy_int(status)
 
             if status != 200:
-                on_irrelevant_row("invalid-status", row, i)
+                item.error = "invalid-status"
+                yield item
                 continue
 
-            if not filename:
-                on_irrelevant_row("no-filename", row, i)
-                continue
+        if mimetype_pos is not None:
+            mimetype = get(row, mimetype_pos, "text/html").strip()
 
             if "/htm" not in mimetype:
-                on_irrelevant_row("invalid-mimetype", row, i)
+                item.error = "invalid-mimetype"
+                yield item
                 continue
 
-            if raw_content_pos is not None:
-                yield WorkerPayload(
-                    row=row,
-                    headers=indexed_headers,
-                    path=None,
-                    encoding=encoding,
-                    content=row[raw_content_pos],
-                    args=worker_args,
-                )
+        if filename_pos is not None:
+            filename = get(row, filename_pos, "").strip()
 
-                continue
+            if filename:
+                item.path = join(input_dir, filename)
 
-            path = join(cli_args.input_dir or "", filename)
+        if body_pos is not None:
+            body = get(row, body_pos)
 
-            yield WorkerPayload(
-                row=row,
-                headers=indexed_headers,
-                path=path,
-                encoding=encoding,
-                content=None,
-                args=worker_args,
-            )
+            if body is not None:
+                item.text = body
 
-    return generator()
+        if item.path is None and item.text is None:
+            item.error = "no-filename-nor-body"
+            yield item
+            continue
 
+        # NOTE: can be None, which means we will guess
+        item.encoding = cli_args.encoding
 
-def dummy_csv_file_from_glob(pattern, root_directory=None):
-    if root_directory is not None:
-        pattern = join(root_directory, pattern)
+        if encoding_pos is not None:
+            encoding = get(row, encoding_pos, "").strip()
 
-    yield ["filename"]
+            if encoding:
 
-    for p in iglob(pattern, recursive=True):
-        yield [relpath(p, start=root_directory or "")]
+                if not is_supported_encoding(encoding):
+                    item.error = "encoding-not-supported"
+                    yield item
+                    continue
+
+                item.encoding = encoding
+
+        if cli_args.glob:
+            for p in iglob(item.path, recursive=True):
+                new_item = copy(item)
+                new_item.path = relpath(p, start=input_dir)
+                yield new_item
+
+            continue
+
+        yield item
 
 
 def get_rcfile(rcfile_path=None):
@@ -293,15 +306,16 @@ def with_enricher_and_loading_bar(
     headers,
     enricher_type=None,
     get_input=None,
+    index_column: Optional[str] = None,
     #
     title=None,
-    unit=None,
-    sub_unit=None,
+    unit: Optional[str] = None,
+    sub_unit: Optional[str] = None,
     stats: Optional[Iterable[StatsItem]] = None,
     stats_sort_key=None,
-    nested=False,
+    nested: bool = False,
     multiplex=None,
-    show_label=False,
+    show_label: bool = False,
 ):
     def decorate(action):
         @wraps(action)
@@ -346,14 +360,22 @@ def with_enricher_and_loading_bar(
             elif enricher_type is not None:
                 raise TypeError("wrong enricher type")
 
+            enricher_kwargs = {}
+
+            if index_column is not None:
+                enricher_kwargs["index_column"] = index_column
+
             with enricher_context:
                 enricher = enricher_fn(
                     cli_args.input if not callable(get_input) else get_input(cli_args),
                     cli_args.output,
-                    add=headers(cli_args) if callable(headers) else headers,
+                    add=headers(cli_args)
+                    if callable(headers) and not is_tabular_record_class(headers)
+                    else headers,
                     select=cli_args.select,
                     total=getattr(cli_args, "total", None),
                     multiplex=multiplex(cli_args) if callable(multiplex) else multiplex,
+                    **enricher_kwargs
                 )
 
             with LoadingBar(

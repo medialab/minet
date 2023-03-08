@@ -11,6 +11,7 @@ import ctypes
 import importlib
 import multiprocessing
 import casanova
+from casanova.exceptions import MissingColumnError
 from contextlib import ExitStack
 
 from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
@@ -31,6 +32,9 @@ def run(name, version, commands):
     # Freezing multiprocessing support for pyinstaller etc.
     multiprocessing.freeze_support()
 
+    # Default spawn context for multiprocessing
+    multiprocessing.set_start_method("spawn")
+
     # Increasing max CSV file limit to avoid pesky issues
     csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
 
@@ -49,6 +53,10 @@ def run(name, version, commands):
 
     # Parsing arguments and triggering commands
     cli_args = parser.parse_args()
+
+    # Suppressing console?
+    if cli_args.silent:
+        console.quiet = True
 
     action = subparser_index.get(cli_args.action)
 
@@ -108,6 +116,9 @@ def run(name, version, commands):
                 fn(cli_args)
             except InvalidArgumentsError as e:
                 parser.error(e.message)
+            except MissingColumnError as e:
+                console.print("Missing column", "[error]{}[/error]!".format(str(e)))
+                sys.exit(1)
             except FatalError as e:
                 console.vprint(e.message)
                 sys.exit(1)

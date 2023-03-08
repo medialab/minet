@@ -75,6 +75,9 @@ def resolve_fetch_arguments(cli_args):
     if cli_args.has_dummy_csv and cli_args.contents_in_report is None:
         cli_args.contents_in_report = True
 
+    if cli_args.dont_save:
+        cli_args.contents_in_report = False
+
     if cli_args.contents_in_report and cli_args.compress:
         raise InvalidArgumentsError(
             "Cannot both --compress and get --contents-in-report!"
@@ -92,20 +95,21 @@ FETCH_COMMAND = command(
         given by the user.
     """,
     epilog="""
-        columns being added to the output:
+        Columns being added to the output:
 
-        . "index": index of the line in the original file (the output will be
+        . "fetch_original_index": index of the line in the original file (the output will be
             arbitrarily ordered since multiple requests are performed concurrently).
-        . "resolved": final resolved url (after solving redirects) if different
-            from requested url.
-        . "status": HTTP status code of the request, e.g. 200, 404, 503 etc.
-        . "error": an error code if anything went wrong when performing the request.
+        . "resolved_url": final resolved url (after solving redirects) if different
+            from starting url.
+        . "http_status": HTTP status code of the request, e.g. 200, 404, 503 etc.
+        . "datetime_utc": datetime when the response was finished.
+        . "fetch_error": an error code if anything went wrong when performing the request.
         . "filename": path to the downloaded file, relative to the folder given
             through -O/--output-dir.
         . "mimetype": detected mimetype of the requested file.
         . "encoding": detected encoding of the requested file if relevant.
-        . "raw_contents": if --contents-in-report is set, will contain the
-            downloaded text and the file won't be written.
+        . "body": if -c/--contents-in-report is set, will contain the
+            downloaded text and the files won't be written to disk.
 
         --folder-strategy options:
 
@@ -125,21 +129,22 @@ FETCH_COMMAND = command(
             their url's hostname stripped of some undesirable parts (such as
             "www.", or "m." or "fr.", for instance).
 
-        examples:
+        Examples:
+
+        . Fetching a single url (can be useful when piping):
+            $ minet fetch "https://www.lemonde.fr"
 
         . Fetching a batch of url from existing CSV file:
-            $ minet fetch url_column file.csv > report.csv
+            $ minet fetch url file.csv > report.csv
 
         . CSV input from stdin (mind the `-`):
-            $ xsv select url_column file.csv | minet fetch url_column -i i > report.csv
+            $ xsv select url file.csv | minet fetch url -i - > report.csv
 
-        . Fetching a single url, useful to pipe into `minet scrape`:
-            $ minet fetch http://google.com | minet scrape ./scrape.json - > scraped.csv
+        . Dowloading files in specific output directory:
+            $ minet fetch url file.csv -O html > report.csv
     """,
     resolve=resolve_fetch_arguments,
     resumer=ThreadSafeResumer,
-    select=True,
-    total=True,
     variadic_input={"dummy_column": "url"},
     arguments=[
         *COMMON_ARGUMENTS,
@@ -155,10 +160,15 @@ FETCH_COMMAND = command(
             "action": "store_true",
         },
         {
-            "flags": ["--contents-in-report", "--no-contents-in-report"],
-            "help": "Whether to include retrieved contents, e.g. html, directly in the report\nand avoid writing them in a separate folder. This requires to standardize\nencoding and won't work on binary formats.",
+            "flags": ["-c", "--contents-in-report", "-w", "--no-contents-in-report"],
+            "help": "Whether to include retrieved contents, e.g. html, directly in the report and avoid writing them in a separate folder. This requires to standardize encoding and won't work on binary formats. Note that --contents-in-report is the default when no input file is given.",
             "dest": "contents_in_report",
             "action": BooleanAction,
+        },
+        {
+            "flags": ["-D", "--dont-save"],
+            "help": "Use not to write any downloaded file on disk.",
+            "action": "store_true",
         },
         {
             "flags": ["-O", "--output-dir"],
@@ -199,7 +209,7 @@ FETCH_COMMAND = command(
 
 RESOLVE_COMMAND = command(
     "resolve",
-    "minet.cli.fetch.resolve",
+    "minet.cli.fetch.fetch",
     title="Minet Resolve Command",
     description="""
         Use multiple threads to resolve batches of urls from a CSV file. The
@@ -207,15 +217,17 @@ RESOLVE_COMMAND = command(
         HTTP calls and the followed redirections.
     """,
     epilog="""
-        columns being added to the output:
+        Columns being added to the output:
 
-        . "resolved": final resolved url (after solving redirects).
-        . "status": HTTP status code of the request, e.g. 200, 404, 503 etc.
-        . "error": an error code if anything went wrong when performing the request.
-        . "redirects": total number of redirections to reach the final url.
-        . "chain": list of redirection types separated by "|".
+        . "original_index": index of the line in the original file (the output will be
+            arbitrarily ordered since multiple requests are performed concurrently).
+        . "resolved_url": final resolved url (after solving redirects).
+        . "http_status": HTTP status code of the request, e.g. 200, 404, 503 etc.
+        . "resolution_error": an error code if anything went wrong when performing the request.
+        . "redirect_count": total number of redirections to reach the final url.
+        . "redirect_chain": list of redirection types separated by "|".
 
-        examples:
+        Examples:
 
         . Resolving a batch of url from existing CSV file:
             $ minet resolve url_column file.csv > report.csv
@@ -227,8 +239,6 @@ RESOLVE_COMMAND = command(
             $ minet resolve https://lemonde.fr
     """,
     resumer=ThreadSafeResumer,
-    select=True,
-    total=True,
     variadic_input={"dummy_column": "url"},
     arguments=[
         *COMMON_ARGUMENTS,

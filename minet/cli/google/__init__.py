@@ -28,7 +28,7 @@ GOOGLE_SHEETS_SUBCOMMAND = subcommand(
         to give --authuser.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Exporting from the spreadsheet id:
             $ minet google sheets 1QXQ1yaNYrVUlMt6LQ4jrLGt_PvZI9goozYiBTgaC4RI > file.csv

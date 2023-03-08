@@ -18,8 +18,8 @@ from argparse import (
     ArgumentError,
     ArgumentTypeError,
     ArgumentParser,
-    RawDescriptionHelpFormatter,
 )
+from rich_argparse import RawDescriptionRichHelpFormatter
 from gettext import gettext
 from textwrap import dedent
 from casanova import Resumer, CsvCellIO
@@ -28,6 +28,7 @@ from datetime import datetime
 from pytz import timezone
 from pytz.exceptions import UnknownTimeZoneError
 
+from minet.cli.console import MINET_COLORS
 from minet.cli.exceptions import NotResumableError, InvalidArgumentsError
 from minet.cli.utils import acquire_cross_platform_stdout
 
@@ -44,11 +45,36 @@ FLAG_SORTING_PRIORITIES = {
             "output",
             "resume",
             "rcfile",
+            "silent",
             "help",
         ],
         1,
     )
 }
+
+# NOTE: custom style for rich_argparse
+RawDescriptionRichHelpFormatter.styles["argparse.groups"] = MINET_COLORS["warning"]
+RawDescriptionRichHelpFormatter.styles["argparse.dim"] = "dim"
+RawDescriptionRichHelpFormatter.styles["argparse.emphasis"] = (
+    "italic " + MINET_COLORS["warning"]
+)
+RawDescriptionRichHelpFormatter.styles["argparse.title"] = (
+    "bold " + MINET_COLORS["error"]
+)
+
+# NOTE: custom highlighting for rich_argparse
+RawDescriptionRichHelpFormatter.highlights = [
+    r"(?P<args>-[a-zA-Z])[\s/.]",  # -f flags
+    r"(?P<args>--[a-z]+(-[a-z]+)*)[\s/.]",  # --flag flags
+    r"(?P<title>^#\s+.+)",  # command title
+    r"\s+\$\s+(?P<args>.+)",  # examples
+    r"(?P<dim>\n>\s+.+)",  # caret sections
+    r'"(?P<metavar>[^"]+)"',  # double-quote literals
+    r"`(?P<metavar>[^`]+)`",  # backtick literals
+    r"(?P<emphasis>how to use the command with.+)",  # emphasis
+    r"(?P<args>https?://\S+)",  # urls
+    r"(?P<groups>Columns being added to the output:|--folder-strategy options:|Examples:)",  # various titles
+]
 
 
 def normalize_argument_name(name: str) -> str:
@@ -72,7 +98,7 @@ def arguments_sort_key(option_strings):
     return (priority, longest_name)
 
 
-class SortingRawTextHelpFormatter(RawDescriptionHelpFormatter):
+class SortingRawTextHelpFormatter(RawDescriptionRichHelpFormatter):
     def add_arguments(self, actions) -> None:
         actions = sorted(actions, key=lambda a: arguments_sort_key(a.option_strings))
         return super().add_arguments(actions)
@@ -132,9 +158,18 @@ def add_arguments(subparser, arguments):
             except ArgumentError:
                 pass
 
+        try:
+            subparser.add_argument(
+                "--silent",
+                help="Whether to suppress all the log and progress bars. Can be useful when piping.",
+                action="store_true",
+            )
+        except ArgumentError:
+            pass
+
 
 def build_description(command):
-    description = command["title"] + "\n" + ("=" * len(command["title"]))
+    description = "# " + command["title"]
 
     text = dedent(command.get("description", ""))
     description += "\n\n" + text
@@ -260,15 +295,20 @@ class BooleanAction(Action):
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         super().__init__(option_strings, dest, nargs=0, **kwargs)
 
+        if len(option_strings) == 2:
+            self.true_options = [option_strings[0]]
+            self.false_options = [option_strings[1]]
+        elif len(option_strings) == 4:
+            self.true_options = [option_strings[0], option_strings[1]]
+            self.false_options = [option_strings[2], option_strings[3]]
+        else:
+            raise TypeError("expecting 2 or 4 flags")
+
     def __call__(self, parser, cli_args, values, option_string=None):
         setattr(
             cli_args,
             self.dest,
-            False
-            if (
-                option_string.startswith("--no-") or option_string.startswith("--dont-")
-            )
-            else True,
+            False if option_string in self.false_options else True,
         )
 
 
@@ -283,6 +323,10 @@ class SingleColumnDummyCSVInput(DummyCSVInput):
 
     def resolve(self, cli_args):
         value = getattr(cli_args, self.dest)
+
+        if not value:
+            raise InvalidArgumentsError("the command was given nothing!")
+
         f = CsvCellIO(value, column=self.column)
         setattr(cli_args, self.dest, self.column)
         setattr(cli_args, "has_dummy_csv", True)
@@ -500,6 +544,9 @@ class VariadicInputDefinition(TypedDict):
     item_label_plural: NotRequired[str]
     column_help: NotRequired[str]
     input_help: NotRequired[str]
+    no_help: NotRequired[bool]
+    optional: NotRequired[bool]
+    metavar: NotRequired[str]
 
 
 def resolve_typical_arguments(
@@ -519,13 +566,13 @@ def resolve_typical_arguments(
     if variadic_input is not None:
         variadic_input = variadic_input.copy()
 
+        if "item_label" not in variadic_input:
+            variadic_input["item_label"] = variadic_input["dummy_column"]
+
+        if "item_label_plural" not in variadic_input:
+            variadic_input["item_label_plural"] = variadic_input["item_label"] + "s"
+
         if "column_help" not in variadic_input:
-            if "item_label" not in variadic_input:
-                variadic_input["item_label"] = variadic_input["dummy_column"]
-
-            if "item_label_plural" not in variadic_input:
-                variadic_input["item_label_plural"] = variadic_input["item_label"] + "s"
-
             variadic_input["column_help"] = (
                 "Single %(singular)s to process or name of the CSV column containing %(plural)s when using -i/--input."
                 % {
@@ -533,18 +580,31 @@ def resolve_typical_arguments(
                     "plural": variadic_input["item_label_plural"],
                 }
             )
+
+            if variadic_input.get("optional", False):
+                variadic_input["column_help"] += ' Defaults to "{}".'.format(
+                    variadic_input["dummy_column"]
+                )
+
+        if "input_help" not in variadic_input:
             variadic_input["input_help"] = (
                 "CSV file containing all the %s you want to process. Will consider `-` as stdin."
                 % variadic_input["item_label_plural"]
             )
 
-        args.append(
-            {
-                "name": "column",
-                "metavar": "value_or_column_name",
-                "help": variadic_input["column_help"],
-            }
-        )
+        column_arg = {
+            "name": "column",
+            "metavar": variadic_input.get(
+                "metavar",
+                "{item}_or_{item}_column".format(item=variadic_input["dummy_column"]),
+            ),
+            "help": variadic_input["column_help"],
+        }
+
+        if variadic_input.get("optional", False):
+            column_arg["nargs"] = "?"
+
+        args.append(column_arg)
 
         input_argument = {
             "flags": ["-i", "--input"],
@@ -555,7 +615,8 @@ def resolve_typical_arguments(
 
         args.append(input_argument)
 
-        epilog_addendum = """
+        if not variadic_input.get("no_help", False):
+            epilog_addendum = """
         how to use the command with a CSV file?
 
         > A lot of minet commands, including this one, can both be
@@ -572,7 +633,7 @@ def resolve_typical_arguments(
             $ xsv search -s col . | minet cmd column_name -i -
         """
 
-    if select:
+    if select or variadic_input is not None:
 
         # TODO: actually one can use xsv mini dsl here
         args.append(
@@ -582,11 +643,11 @@ def resolve_typical_arguments(
             },
         )
 
-    if total:
+    if total or variadic_input is not None:
         args.append(
             {
                 "flag": "--total",
-                "help": "Total number of items to process. Necessary if you want to display a finite progress indicator.",
+                "help": "Total number of items to process. Might be necessary when you want to display a finite progress indicator for large files given as input to the command.",
                 "type": int,
             }
         )

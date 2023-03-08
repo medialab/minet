@@ -59,6 +59,13 @@ def infer_encoding(data: bytes) -> Optional[str]:
     return charset.encoding
 
 
+UTF8_BOM = b"\xef\xbb\xbf"
+UTF16_LE_BOM = b"\xff\xfe"
+UTF16_BE_BOM = b"\xfe\xff"
+UTF32_LE_BOM = b"\xff\xfe\x00\x00"
+UTF32_BE_BOM = b"\x00\x00\xfe\xff"
+
+
 class RateLimiter(object):
     """
     Naive rate limiter context manager with smooth output.
