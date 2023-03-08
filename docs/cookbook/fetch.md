@@ -216,16 +216,17 @@ Maybe CLI is not your tool of choice and you prefer scripting right away. Maybe 
 
 ```python
 import csv
-from minet import multithreaded_fetch
+from minet import FetchThreadPoolExecutor
 
 with open('./urls.csv') as f:
     reader = csv.DictReader(f)
 
-    for result in multithreaded_fetch(reader, key=lambda line: line['url']):
-        if result.error is not None:
-            print('Something went wrong', result.error)
-        else:
-            print(result.response.status)
+    with FetchThreadPoolExecutor() as executor:
+        for result in executor.imap_unordered(reader, key=lambda line: line['url']):
+            if result.error is not None:
+                print('Something went wrong', result.error)
+            else:
+                print(result.response.status)
 ```
 
 Check out full documentation about this API [here](/README.md#multithreaded_fetch)
