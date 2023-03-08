@@ -172,10 +172,7 @@ Spiders = Union[
 # TODO: try creating a kwarg type for those
 # NOTE: crawling could work depth-first if we wanted
 class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
-    executor: HTTPThreadPoolExecutor[
-        CrawlJob[CrawlJobDataTypes],
-        CrawlResult[CrawlJobDataTypes, CrawlJobOutputDataTypes],
-    ]
+    executor: HTTPThreadPoolExecutor
     queue: CrawlerQueue[CrawlJob[CrawlJobDataTypes]]
     persistent: bool
     state: CrawlerState
@@ -325,7 +322,9 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
     def __exit__(self, *exc):
         self.stop()
 
-    def __iter__(self):
+    def __iter__(
+        self,
+    ) -> Iterator[CrawlResult[CrawlJobDataTypes, CrawlJobOutputDataTypes]]:
         worker = CrawlWorker(self)
 
         def key_by_domain_name(job: CrawlJob) -> Optional[str]:

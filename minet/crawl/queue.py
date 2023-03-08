@@ -85,6 +85,9 @@ class CrawlerQueue(Generic[ItemType]):
     def get(self, block=True) -> ItemType:
         return self.__queue.get(block=block)
 
+    def get_nowait(self) -> ItemType:
+        return self.get(False)
+
     def ack(self, item: ItemType) -> None:
         self.__current_task_done_count += 1
 
@@ -95,10 +98,6 @@ class CrawlerQueue(Generic[ItemType]):
 
         if self.__current_task_done_count >= self.cleanup_interval:
             self.cleanup()
-
-    # Noop. Here only to satisfie quenouille's duck typing
-    def task_done(self) -> None:
-        pass
 
     def cleanup(self):
         with self.__write_lock:

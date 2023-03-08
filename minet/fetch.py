@@ -300,7 +300,7 @@ class ResolveWorker(Generic[ItemType]):
         return result
 
 
-class HTTPThreadPoolExecutor(ThreadPoolExecutor[ItemType, Optional[str], ResultType]):
+class HTTPThreadPoolExecutor(ThreadPoolExecutor):
     def __init__(
         self,
         max_workers: Optional[int] = None,
@@ -339,9 +339,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor[ItemType, Optional[str], ResultT
         raise NotImplementedError
 
 
-class FetchThreadPoolExecutor(
-    HTTPThreadPoolExecutor[FetchWorkerPayload[ItemType], FetchResult[ItemType]]
-):
+class FetchThreadPoolExecutor(HTTPThreadPoolExecutor):
     def imap_unordered(
         self,
         iterator: Iterable[ItemType],
@@ -376,9 +374,7 @@ class FetchThreadPoolExecutor(
         return (item for item in imap_unordered if item is not CANCELLED)
 
 
-class ResolveThreadPoolExecutor(
-    HTTPThreadPoolExecutor[FetchWorkerPayload[ItemType], ResolveResult[ItemType]]
-):
+class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor):
     def imap_unordered(
         self,
         iterator: Iterable[ItemType],
