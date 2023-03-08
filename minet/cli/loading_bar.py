@@ -483,5 +483,5 @@ class LoadingBar(object):
 
             self.__refresh_stats()
 
-    def print(self, *msg):
-        console.print(message_flatmap(*msg))
+    def print(self, *msg, end="\n"):
+        console.print(message_flatmap(*msg), end=end)

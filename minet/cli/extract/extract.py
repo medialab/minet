@@ -129,9 +129,6 @@ def action(cli_args, enricher: Enricher, loading_bar):
 
     worked_on: Dict[int, List[str]] = {}
 
-    # TODO: resuming
-    # TODO: test chunksize
-
     def payloads() -> Iterator[ExtractWorkerPayload]:
         current_id = count()
 

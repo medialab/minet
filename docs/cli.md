@@ -660,8 +660,7 @@ Usage: minet scrape [-h] [--silent] [-g] [-I INPUT_DIR] [-p PROCESSES]
                     [--mimetype-column MIMETYPE_COLUMN] [--encoding ENCODING]
                     [-f {csv,jsonl,ndjson}]
                     [--plural-separator PLURAL_SEPARATOR] [--strain STRAIN]
-                    [--validate] [-i INPUT] [-s SELECT] [--total TOTAL]
-                    [-o OUTPUT]
+                    [-i INPUT] [-s SELECT] [--total TOTAL] [-o OUTPUT]
                     scraper [filename_or_filename_column]
 
 # Minet Scrape Command
@@ -716,7 +715,6 @@ Optional Arguments:
   --strain STRAIN               Optional CSS selector used to strain, i.e. only
                                 parse matched tags in the parsed html files in
                                 order to optimize performance.
-  --validate                    Just validate the given scraper then exit.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
   --total TOTAL                 Total number of items to process. Might be
@@ -760,9 +758,6 @@ Examples:
 
 . Yielding items as newline-delimited JSON (jsonl):
     $ minet scrape scraper.yml -i report.csv --format jsonl > scraped.jsonl
-
-. Only validating the scraper definition and exit:
-    $ minet scrape scraper.yml --validate
 
 . Using a strainer to optimize performance:
     $ minet scrape links-scraper.yml --strain "a" -i report.csv > links.csv

@@ -62,9 +62,6 @@ SCRAPE_COMMAND = command(
         . Yielding items as newline-delimited JSON (jsonl):
             $ minet scrape scraper.yml -i report.csv --format jsonl > scraped.jsonl
 
-        . Only validating the scraper definition and exit:
-            $ minet scrape scraper.yml --validate
-
         . Using a strainer to optimize performance:
             $ minet scrape links-scraper.yml --strain "a[href]" -i report.csv > links.csv
     """,
@@ -135,11 +132,6 @@ SCRAPE_COMMAND = command(
         {
             "flag": "--strain",
             "help": "Optional CSS selector used to strain, i.e. only parse matched tags in the parsed html files in order to optimize performance.",
-        },
-        {
-            "flag": "--validate",
-            "help": "Just validate the given scraper then exit.",
-            "action": "store_true",
         },
     ],
 )
