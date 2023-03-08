@@ -24,7 +24,7 @@ TELEGRAM_CHANNEL_INFOS_SUBCOMMAND = subcommand(
         Scrape a Telegram channel's infos.
     """,
     epilog="""
-        examples:
+        Examples:
         . Scraping a channel's infos:
             $ minet telegram channel-infos nytimes > infos.csv
     """,
@@ -44,7 +44,7 @@ TELEGRAM_CHANNEL_MESSAGES_SUBCOMMAND = subcommand(
         Scrape Telegram channel messages.
     """,
     epilog="""
-        examples:
+        Examples:
         . Scraping a group's posts:
             $ minet telegram channel-messages nytimes > messages.csv
     """,

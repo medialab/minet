@@ -32,7 +32,7 @@ YOUTUBE_CAPTIONS_SUBCOMMAND = subcommand(
     title="Youtube captions",
     description="Retrieve captions for the given YouTube videos.",
     epilog="""
-        examples:
+        Examples:
 
         . Fetching captions for a list of videos:
             $ minet yt captions video_id videos.csv > captions.csv

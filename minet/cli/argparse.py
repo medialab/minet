@@ -73,6 +73,7 @@ RawDescriptionRichHelpFormatter.highlights = [
     r"`(?P<metavar>[^`]+)`",  # backtick literals
     r"(?P<emphasis>how to use the command with.+)",  # emphasis
     r"(?P<args>https?://\S+)",  # urls
+    r"(?P<groups>Columns being added to the output:|--folder-strategy options:|Examples:)",  # various titles
 ]
 
 

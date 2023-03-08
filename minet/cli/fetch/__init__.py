@@ -95,7 +95,7 @@ FETCH_COMMAND = command(
         given by the user.
     """,
     epilog="""
-        columns being added to the output:
+        Columns being added to the output:
 
         . "fetch_original_index": index of the line in the original file (the output will be
             arbitrarily ordered since multiple requests are performed concurrently).
@@ -129,16 +129,19 @@ FETCH_COMMAND = command(
             their url's hostname stripped of some undesirable parts (such as
             "www.", or "m." or "fr.", for instance).
 
-        examples:
+        Examples:
+
+        . Fetching a single url (can be useful when piping):
+            $ minet fetch "https://www.lemonde.fr"
 
         . Fetching a batch of url from existing CSV file:
-            $ minet fetch url_column file.csv > report.csv
+            $ minet fetch url file.csv > report.csv
 
         . CSV input from stdin (mind the `-`):
-            $ xsv select url_column file.csv | minet fetch url_column -i i > report.csv
+            $ xsv select url file.csv | minet fetch url -i - > report.csv
 
-        . Fetching a single url, useful to pipe into `minet scrape`:
-            $ minet fetch http://google.com | minet scrape ./scrape.json - > scraped.csv
+        . Dowloading files in specific output directory:
+            $ minet fetch url file.csv -O html > report.csv
     """,
     resolve=resolve_fetch_arguments,
     resumer=ThreadSafeResumer,
@@ -214,7 +217,7 @@ RESOLVE_COMMAND = command(
         HTTP calls and the followed redirections.
     """,
     epilog="""
-        columns being added to the output:
+        Columns being added to the output:
 
         . "original_index": index of the line in the original file (the output will be
             arbitrarily ordered since multiple requests are performed concurrently).
@@ -224,7 +227,7 @@ RESOLVE_COMMAND = command(
         . "redirect_count": total number of redirections to reach the final url.
         . "redirect_chain": list of redirection types separated by "|".
 
-        examples:
+        Examples:
 
         . Resolving a batch of url from existing CSV file:
             $ minet resolve url_column file.csv > report.csv

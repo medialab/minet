@@ -38,7 +38,7 @@ EXTRACT_COMMAND = command(
     """,
     epilog="""
 
-        columns being added to the output:
+        Columns being added to the output:
 
         . "extract_error": any error that happened when extracting content.
         . "canonical_url": canonical url of target html, extracted from
@@ -59,7 +59,7 @@ EXTRACT_COMMAND = command(
             its metadata.
         . "sitename": canonical name as declared by the website.
 
-        examples:
+        Examples:
 
         . Extracting content from a single file on disk:
             $ minet extract ./path/to/file.html
@@ -69,6 +69,9 @@ EXTRACT_COMMAND = command(
 
         . Extracting content from a single url:
             $ minet fetch "https://lemonde.fr" | minet extract -i -
+
+        . Indicating a custom `filename` column:
+            $ minet extract -i report.csv -I downloaded --filename-column path > extracted.csv
 
         . Extracting content from a CSV colum containing HTML directly:
             $ minet extract -i report.csv --body-column html > extracted.csv

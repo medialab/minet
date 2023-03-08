@@ -38,7 +38,7 @@ BUZZSUMO_LIMIT_SUBCOMMAND = subcommand(
         of calls for this month contained in the request's headers.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Returning the remaining number of calls for this month:
             $ minet bz limit --token YOUR_TOKEN
@@ -70,7 +70,7 @@ BUZZSUMO_DOMAIN_COMMAND = subcommand(
         The link to the official documentation: https://developers.buzzsumo.com/reference/articles.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Returning social media information for one domain name:
             $ minet bz domain 'trump-feed.com' --begin-date 2021-01-01 --end-date 2021-06-30 --token YOUR_TOKEN > trump_feed_articles.csv
@@ -95,7 +95,7 @@ BUZZSUMO_DOMAIN_SUMMARY_COMMAND = subcommand(
         Inform the user about the number of calls (corresponding to the number of pages) needed to request BuzzSumo about those domain names.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Returning the number of articles and pages found in BuzzSumo for one domain name:
             $ minet bz domain-summary 'nytimes.com' --begin-date 2019-01-01 --end-date 2019-03-01 --token YOUR_TOKEN

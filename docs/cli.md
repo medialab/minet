@@ -186,7 +186,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Dumping cookie jar from firefox:
     $ minet cookies firefox > jar.txt
@@ -228,7 +228,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Running a crawler definition:
     $ minet crawl crawler.yml -O crawl-data
@@ -340,9 +340,9 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-columns being added to the output:
+Columns being added to the output:
 
-. "original_index": index of the line in the original file (the output will be
+. "fetch_original_index": index of the line in the original file (the output will be
     arbitrarily ordered since multiple requests are performed concurrently).
 . "resolved_url": final resolved url (after solving redirects) if different
     from starting url.
@@ -374,16 +374,19 @@ columns being added to the output:
     their url's hostname stripped of some undesirable parts (such as
     "www.", or "m." or "fr.", for instance).
 
-examples:
+Examples:
+
+. Fetching a single url (can be useful when piping):
+    $ minet fetch "https://www.lemonde.fr"
 
 . Fetching a batch of url from existing CSV file:
-    $ minet fetch url_column file.csv > report.csv
+    $ minet fetch url file.csv > report.csv
 
 . CSV input from stdin (mind the `-`):
-    $ xsv select url_column file.csv | minet fetch url_column -i i > report.csv
+    $ xsv select url file.csv | minet fetch url -i - > report.csv
 
-. Fetching a single url, useful to pipe into `minet scrape`:
-    $ minet fetch http://google.com | minet scrape ./scrape.json - > scraped.csv
+. Dowloading files in specific output directory:
+    $ minet fetch url file.csv -O html > report.csv
 
 how to use the command with a CSV file?
 
@@ -405,7 +408,8 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet extract [-h] [-g] [--silent] [-I INPUT_DIR] [-p PROCESSES]
-                     [--body-column BODY_COLUMN] [--error-column ERROR_COLUMN]
+                     [--chunk-size CHUNK_SIZE] [--body-column BODY_COLUMN]
+                     [--error-column ERROR_COLUMN]
                      [--status-column STATUS_COLUMN]
                      [--encoding-column ENCODING_COLUMN]
                      [--mimetype-column MIMETYPE_COLUMN] [--encoding ENCODING]
@@ -446,6 +450,7 @@ Positional Arguments:
 
 Optional Arguments:
   --body-column BODY_COLUMN     Name of the CSV column containing html bodies.
+  --chunk-size CHUNK_SIZE       Chunk size for multiprocessing. Defaults to `1`.
   --encoding ENCODING           Name of the default encoding to use. If not
                                 given the command will infer it for you.
   --encoding-column ENCODING_COLUMN
@@ -475,7 +480,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-columns being added to the output:
+Columns being added to the output:
 
 . "extract_error": any error that happened when extracting content.
 . "canonical_url": canonical url of target html, extracted from
@@ -496,7 +501,7 @@ columns being added to the output:
     its metadata.
 . "sitename": canonical name as declared by the website.
 
-examples:
+Examples:
 
 . Extracting content from a single file on disk:
     $ minet extract ./path/to/file.html
@@ -506,6 +511,9 @@ examples:
 
 . Extracting content from a single url:
     $ minet fetch "https://lemonde.fr" | minet extract -i -
+
+. Indicating a custom `filename` column:
+    $ minet extract -i report.csv -I downloaded --filename-column path > extracted.csv
 
 . Extracting content from a CSV colum containing HTML directly:
     $ minet extract -i report.csv --body-column html > extracted.csv
@@ -602,7 +610,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-columns being added to the output:
+Columns being added to the output:
 
 . "original_index": index of the line in the original file (the output will be
     arbitrarily ordered since multiple requests are performed concurrently).
@@ -612,7 +620,7 @@ columns being added to the output:
 . "redirect_count": total number of redirections to reach the final url.
 . "redirect_chain": list of redirection types separated by "|".
 
-examples:
+Examples:
 
 . Resolving a batch of url from existing CSV file:
     $ minet resolve url_column file.csv > report.csv
@@ -644,43 +652,79 @@ how to use the command with a CSV file?
 For more documentation about minet's scraping DSL check this [page](../cookbook/scraping_dsl.md) from the Cookbook.
 
 ```
-Usage: minet scrape [-h] [--silent] [-f {csv,jsonl}] [-g GLOB] [-I INPUT_DIR]
-                    [-p PROCESSES] [--separator SEPARATOR] [--strain STRAIN]
-                    [--validate] [--total TOTAL] [-o OUTPUT]
-                    scraper report
+Usage: minet scrape [-h] [--silent] [-g] [-I INPUT_DIR] [-p PROCESSES]
+                    [--chunk-size CHUNK_SIZE] [--body-column BODY_COLUMN]
+                    [--error-column ERROR_COLUMN]
+                    [--status-column STATUS_COLUMN]
+                    [--encoding-column ENCODING_COLUMN]
+                    [--mimetype-column MIMETYPE_COLUMN] [--encoding ENCODING]
+                    [-f {csv,jsonl,ndjson}]
+                    [--plural-separator PLURAL_SEPARATOR] [--strain STRAIN]
+                    [--validate] [-i INPUT] [-s SELECT] [--total TOTAL]
+                    [-o OUTPUT]
+                    scraper [filename_or_filename_column]
 
 # Minet Scrape Command
 
-Use multiple processes to scrape data from a batch of HTML files.
-This command can either work on a `minet fetch` report or on a bunch
-of files filtered using a glob pattern.
+Use multiple processes to scrape data from a batch of HTML files using
+minet scraping DSL documented here:
+https://github.com/medialab/minet/blob/master/docs/cookbook/scraping_dsl.md
 
-It will output the scraped items as a CSV file.
+It will output the scraped items as a CSV or NDJSON file.
+
+Note that this command has been geared towards working in tandem with
+the fetch command. This means the command expects, by default, CSV files
+containing columns like "filename", "http_status", "encoding" etc. as
+you can find in a fetch command CSV report.
+
+This said, you can of course feed this command any kind of CSV data,
+and use dedicated flags such as --filename-column, --body-column to
+to inform the command about your specific table.
+
+The comand is also able to work on glob patterns, such as: "downloaded/**/*.html",
+and can also be fed CSV columns containing HTML content directly if
+required.
 
 Positional Arguments:
   scraper                       Path to a scraper definition file.
-  report                        Report CSV file from `minet fetch`. Will
-                                understand `-` as stdin.
+  filename_or_filename_column   Single filename to process or name of the CSV
+                                column containing filenames when using
+                                -i/--input. Defaults to "filename".
 
 Optional Arguments:
-  -f, --format {csv,jsonl}      Output format.
-  -g, --glob GLOB               Whether to scrape a bunch of html files on disk
-                                matched by a glob pattern rather than sourcing
-                                them from a CSV report.
+  --body-column BODY_COLUMN     Name of the CSV column containing html bodies.
+  --chunk-size CHUNK_SIZE       Chunk size for multiprocessing. Defaults to `1`.
+  --encoding ENCODING           Name of the default encoding to use. If not
+                                given the command will infer it for you.
+  --encoding-column ENCODING_COLUMN
+                                Name of the CSV column containing file encoding.
+  --error-column ERROR_COLUMN   Name of the CSV column containing a fetch error.
+  -f, --format {csv,jsonl,ndjson}
+                                Output format. Defaults to `csv`.
+  -g, --glob                    Will interpret given filename as glob patterns
+                                to resolve if given.
   -I, --input-dir INPUT_DIR     Directory where the HTML files are stored.
-                                Defaults to "downloaded".
+  --mimetype-column MIMETYPE_COLUMN
+                                Name of the CSV column containing file mimetype.
+  --plural-separator PLURAL_SEPARATOR
+                                Separator use to join lists of values when
+                                serializing to CSV. Defaults to "|".
   -p, --processes PROCESSES     Number of processes to use. Defaults to roughly
                                 half of the available CPUs.
-  --separator SEPARATOR         Separator use to join lists of values when
-                                output format is CSV. Defaults to "|".
+  --status-column STATUS_COLUMN
+                                Name of the CSV column containing HTTP status.
   --strain STRAIN               Optional CSS selector used to strain, i.e. only
                                 parse matched tags in the parsed html files in
                                 order to optimize performance.
   --validate                    Just validate the given scraper then exit.
+  -s, --select SELECT           Columns of input CSV file to include in the
+                                output (separated by `,`).
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
+  -i, --input INPUT             CSV file containing all the filenames you want
+                                to process. Will consider `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -688,28 +732,40 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
-. Scraping item from a `minet fetch` report:
-    $ minet scrape scraper.yml report.csv > scraped.csv
+. Scraping a single file on disk:
+    $ minet scrape scraper.yml ./path/to/file.html
 
-. Working on a report from stdin (mind the `-`):
-    $ minet fetch url_column file.csv | minet scrape scraper.yml - > scraped.csv
+. Scraping a `minet fetch` report:
+    $ minet scrape scraper.yml -i report.csv -I downloaded > scraped.csv
 
-. Scraping a single page from the web:
-    $ minet fetch https://news.ycombinator.com/ | minet scrape scraper.yml - > scraped.csv
+. Scraping a single url:
+    $ minet fetch "https://lemonde.fr" | minet scrape scraper.yml -i -
 
-. Scraping items from a bunch of files:
-    $ minet scrape scraper.yml --glob "./content/**/*.html" > scraped.csv
+. Indicating a custom `filename` column:
+    $ minet scrape scraper.yml -i report.csv -I downloaded --filename-column path > scraped.csv
+
+. Scraping a CSV colum containing HTML directly:
+    $ minet scrape scraper.yml -i report.csv --body-column html > scraped.csv
+
+. Scraping a bunch of files using a glob pattern:
+    $ minet scrape scraper.yml "./content/**/*.html" --glob > scraped.csv
+
+. Scraping using a CSV file containing glob patterns:
+    $ minet scrape scraper.yml pattern -i patterns.csv --glob > scraped.csv
+
+. Working on a fetch report from stdin (mind the `-`):
+    $ minet fetch url file.csv | minet scrape scraper.yml -i - -I downloaded > scraped.csv
 
 . Yielding items as newline-delimited JSON (jsonl):
-    $ minet scrape scraper.yml report.csv --format jsonl > scraped.jsonl
+    $ minet scrape scraper.yml -i report.csv --format jsonl > scraped.jsonl
 
 . Only validating the scraper definition and exit:
-    $ minet scraper --validate scraper.yml
+    $ minet scrape scraper.yml --validate
 
 . Using a strainer to optimize performance:
-    $ minet scraper links-scraper.yml --strain "a" report.csv > links.csv
+    $ minet scrape links-scraper.yml --strain "a" -i report.csv > links.csv
 ```
 
 ## url-extract
@@ -745,7 +801,7 @@ Optional Arguments:
                               Can be useful when piping.
   -h, --help                  show this help message and exit
 
-examples:
+Examples:
 
 . Extracting urls from a text column:
     $ minet url-extract text posts.csv > urls.csv
@@ -791,7 +847,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Joining two files:
     $ minet url-join url webentities.csv post_url posts.csv > joined.csv
@@ -908,7 +964,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-columns being added to the output:
+Columns being added to the output:
 
 . "normalized_url": urls aggressively normalized by removing any part
   that is not useful to determine which resource it is actually
@@ -949,25 +1005,25 @@ columns being added with --twitter:
 . "twitter_user_screen_name": Twitter user's screen name.
 . "tweet_id": id of tweet.
 
-examples:
+Examples:
 
 . Creating a report about a file's urls:
-    $ minet url-parse url posts.csv > report.csv
+    $ minet url-parse url -i posts.csv > report.csv
 
 . Keeping only selected columns from the input file:
-    $ minet url-parse url posts.csv -s id,url,title > report.csv
+    $ minet url-parse url -i posts.csv -s id,url,title > report.csv
 
 . Multiple urls joined by separator:
-    $ minet url-parse urls posts.csv --separator "|" > report.csv
+    $ minet url-parse urls -i posts.csv --separator "|" > report.csv
 
 . Parsing Facebook urls:
-    $ minet url-parse url fbposts.csv --facebook > report.csv
+    $ minet url-parse url -i fbposts.csv --facebook > report.csv
 
 . Parsing YouTube urls:
-    $ minet url-parse url ytvideos.csv --youtube > report.csv
+    $ minet url-parse url -i ytvideos.csv --youtube > report.csv
 
 . Parsing Twitter urls:
-    $ minet url-parse url tweets.csv --twitter > report.csv
+    $ minet url-parse url -i tweets.csv --twitter > report.csv
 
 how to use the command with a CSV file?
 
@@ -1038,7 +1094,7 @@ Optional Arguments:
                               Can be useful when piping.
   -h, --help                  show this help message and exit
 
-examples:
+Examples:
 
 . Returning the remaining number of calls for this month:
     $ minet bz limit --token YOUR_TOKEN
@@ -1093,7 +1149,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Returning the number of articles and pages found in BuzzSumo for one domain name:
     $ minet bz domain-summary 'nytimes.com' --begin-date 2019-01-01 --end-date 2019-03-01 --token YOUR_TOKEN
@@ -1165,7 +1221,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Returning social media information for one domain name:
     $ minet bz domain 'trump-feed.com' --begin-date 2021-01-01 --end-date 2021-06-30 --token YOUR_TOKEN > trump_feed_articles.csv
@@ -1270,7 +1326,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Fetching accounts statistics for every account in your dashboard:
     $ minet ct leaderboard --token YOUR_TOKEN > accounts-stats.csv
@@ -1309,7 +1365,7 @@ Optional Arguments:
                               Can be useful when piping.
   -h, --help                  show this help message and exit
 
-examples:
+Examples:
 
 . Fetching a dashboard's lists:
     $ minet ct lists --token YOUR_TOKEN > lists.csv
@@ -1367,7 +1423,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Retrieving information about a batch of posts:
     $ minet ct posts-by-id post-url posts.csv --token YOUR_TOKEN > metadata.csv
@@ -1450,7 +1506,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Fetching the 500 most latest posts from a dashboard (a start date must be precised):
     $ minet ct posts --token YOUR_TOKEN --limit 500 --start-date 2021-01-01 > latest-posts.csv
@@ -1540,7 +1596,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Fetching all the 2021 posts containing the words 'acetylsalicylic acid':
     $ minet ct search 'acetylsalicylic acid' --start-date 2021-01-01 --token YOUR_TOKEN > posts.csv
@@ -1605,7 +1661,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Computing a summary of aggregated stats for urls contained in a CSV row:
     $ minet ct summary url urls.csv --token YOUR_TOKEN --start-date 2019-01-01 > summary.csv
@@ -1698,7 +1754,7 @@ Optional Arguments:
                                bars. Can be useful when piping.
   -h, --help                   show this help message and exit
 
-examples:
+Examples:
 
 . Scraping a post's comments:
     $ minet fb comments https://www.facebook.com/groups/186982532676569/permalink/4096995827030341/ > comments.csv
@@ -1799,7 +1855,7 @@ Optional Arguments:
                                bars. Can be useful when piping.
   -h, --help                   show this help message and exit
 
-examples:
+Examples:
 
 . Scraping a post:
     $ minet fb post https://m.facebook.com/watch/?v=448540820705115 > post.csv
@@ -1900,7 +1956,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Scraping a group's posts:
     $ minet fb posts https://www.facebook.com/groups/444175323127747 > posts.csv
@@ -1974,7 +2030,7 @@ Optional Arguments:
                                bars. Can be useful when piping.
   -h, --help                   show this help message and exit
 
-examples:
+Examples:
 
 . Fetching authors of a series of posts in a CSV file:
     $ minet fb post-authors post_url fb-posts.csv > authors.csv
@@ -2114,7 +2170,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Exporting from the spreadsheet id:
     $ minet google sheets 1QXQ1yaNYrVUlMt6LQ4jrLGt_PvZI9goozYiBTgaC4RI > file.csv
@@ -2158,7 +2214,7 @@ Optional Arguments:
                               Can be useful when piping.
   -h, --help                  show this help message and exit
 
-examples:
+Examples:
 
 . Declaring webentities from a Hyphe export:
     $ minet hyphe declare http://myhyphe.com/api/ target-corpus export.csv
@@ -2187,7 +2243,7 @@ Optional Arguments:
                               Can be useful when piping.
   -h, --help                  show this help message and exit
 
-examples:
+Examples:
 
 . Destroying a corpus:
     $ minet hyphe destroy http://myhyphe.com/api/ my-corpus
@@ -2224,7 +2280,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Dumping a corpus into the ./corpus directory:
     $ minet hyphe dump http://myhyphe.com/api/ corpus-name -O corpus
@@ -2253,7 +2309,7 @@ Optional Arguments:
                               Can be useful when piping.
   -h, --help                  show this help message and exit
 
-examples:
+Examples:
 
 . Resetting a corpus:
     $ minet hyphe reset http://myhyphe.com/api/ my-corpus
@@ -2294,7 +2350,7 @@ Optional Arguments:
                               Can be useful when piping.
   -h, --help                  show this help message and exit
 
-examples:
+Examples:
 
 . Tag webentities from two columns of CSV file:
     $ minet hyphe tag http://myhyphe.com/api/ my-corpus webentity_id type,creator metadata.csv
@@ -2908,7 +2964,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 . Scraping a channel's infos:
     $ minet telegram channel-infos nytimes > infos.csv
 
@@ -2964,7 +3020,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 . Scraping a group's posts:
     $ minet telegram channel-messages nytimes > messages.csv
 
@@ -3189,7 +3245,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Finding out if tweets in a CSV files are still available or not using tweet ids:
     $ minet tw attrition tweet_url -i deleted_tweets.csv > attrition-report.csv
@@ -3279,7 +3335,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Getting followers of a list of user:
     $ minet tw followers screen_name -i users.csv > followers.csv
@@ -3365,7 +3421,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Getting friends of a list of user:
     $ minet tw friends screen_name -i users.csv > friends.csv
@@ -3444,7 +3500,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Getting followers of a list of lists:
     $ minet tw list-followers id -i lists.csv > followers.csv
@@ -3523,7 +3579,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Getting members of a list of lists:
     $ minet tw list-members id -i lists.csv > members.csv
@@ -3601,7 +3657,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Getting the users who retweeted a list of tweets:
     $ minet tw retweeters tweet_id -i tweets.csv > retweeters.csv
@@ -3678,7 +3734,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Collecting the latest 500 tweets of a given Twitter user:
     $ minet tw scrape tweets "from:@jack" --limit 500 > tweets.csv
@@ -3751,7 +3807,7 @@ Optional Arguments:
                               Can be useful when piping.
   -h, --help                  show this help message and exit
 
-examples:
+Examples:
 
     $ minet tw tweet-date url -i tweets.csv --timezone 'Europe/Paris'> tweets_timestamp_date.csv
 
@@ -3853,7 +3909,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Searching tweets using "cancer" as a query:
     $ minet tw tweet-search cancer > tweets.csv
@@ -3964,7 +4020,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Counting tweets using "cancer" as a query:
     $ minet tw tweet-count cancer
@@ -4052,7 +4108,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Getting metadata from tweets in a CSV file:
     $ minet tw tweets tweet_id -i tweets.csv > tweets_metadata.csv
@@ -4136,7 +4192,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Getting friends of a list of user:
     $ minet tw users screen_name -i users.csv > data_users.csv
@@ -4217,7 +4273,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Searching user using "cancer" as a query:
     $ minet tw user-search cancer > users.csv
@@ -4311,7 +4367,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-examples:
+Examples:
 
 . Getting tweets from users in a CSV file:
     $ minet tw user-tweets screen_name -i users.csv > tweets.csv
@@ -4444,7 +4500,7 @@ Optional Arguments:
                               Can be useful when piping.
   -h, --help                  show this help message and exit
 
-examples:
+Examples:
 
 . Fetching captions for a list of videos:
     $ minet yt captions video_id videos.csv > captions.csv

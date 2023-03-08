@@ -9,7 +9,7 @@ URL_EXTRACT_COMMAND = command(
         HTML.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Extracting urls from a text column:
             $ minet url-extract text posts.csv > urls.csv

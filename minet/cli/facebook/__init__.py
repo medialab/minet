@@ -41,7 +41,7 @@ FACEBOOK_COMMENTS_SUBCOMMAND = subcommand(
         -c/--cookie flag.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Scraping a post's comments:
             $ minet fb comments https://www.facebook.com/groups/186982532676569/permalink/4096995827030341/ > comments.csv
@@ -67,7 +67,7 @@ FACEBOOK_POST_AUTHORS_SUBCOMMAND = subcommand(
         only administrators can post something on pages.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Fetching authors of a series of posts in a CSV file:
             $ minet fb post-authors post_url fb-posts.csv > authors.csv
@@ -84,7 +84,7 @@ FACEBOOK_POST_STATS_SUBCOMMAND = subcommand(
         Retrieve statistics about a given list of Facebook posts.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Fetching stats about lists of posts in a CSV file:
             $ minet fb post-stats post_url fb-posts.csv > stats.csv
@@ -129,7 +129,7 @@ FACEBOOK_POST_SUBCOMMAND = subcommand(
         scraped by minet at this time.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Scraping a post:
             $ minet fb post https://m.facebook.com/watch/?v=448540820705115 > post.csv
@@ -180,7 +180,7 @@ FACEBOOK_POSTS_SUBCOMMAND = subcommand(
         scraped by minet at this time.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Scraping a group's posts:
             $ minet fb posts https://www.facebook.com/groups/444175323127747 > posts.csv

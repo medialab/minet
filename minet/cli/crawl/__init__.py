@@ -12,7 +12,7 @@ CRAWL_COMMAND = command(
         scraping DSL.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Running a crawler definition:
             $ minet crawl crawler.yml -O crawl-data

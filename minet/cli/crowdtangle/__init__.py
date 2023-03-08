@@ -36,7 +36,7 @@ CROWDTANGLE_LEADERBOARD_SUBCOMMAND = subcommand(
         For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Leaderboard.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Fetching accounts statistics for every account in your dashboard:
             $ minet ct leaderboard --token YOUR_TOKEN > accounts-stats.csv
@@ -76,7 +76,7 @@ CROWDTANGLE_LISTS_SUBCOMMAND = subcommand(
         For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Lists.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Fetching a dashboard's lists:
             $ minet ct lists --token YOUR_TOKEN > lists.csv
@@ -93,7 +93,7 @@ CROWDTANGLE_POSTS_BY_ID_SUBCOMMAND = subcommand(
         For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Posts#get-postid.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Retrieving information about a batch of posts:
             $ minet ct posts-by-id post-url posts.csv --token YOUR_TOKEN > metadata.csv
@@ -119,7 +119,7 @@ CROWDTANGLE_POSTS_SUBCOMMAND = subcommand(
         For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Posts.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Fetching the 500 most latest posts from a dashboard (a start date must be precised):
             $ minet ct posts --token YOUR_TOKEN --limit 500 --start-date 2021-01-01 > latest-posts.csv
@@ -185,7 +185,7 @@ CROWDTANGLE_SEARCH_SUBCOMMAND = subcommand(
         For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Search.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Fetching all the 2021 posts containing the words 'acetylsalicylic acid':
             $ minet ct search 'acetylsalicylic acid' --start-date 2021-01-01 --token YOUR_TOKEN > posts.csv
@@ -266,7 +266,7 @@ CROWDTANGLE_SUMMARY_SUBCOMMAND = subcommand(
         For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Links.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Computing a summary of aggregated stats for urls contained in a CSV row:
             $ minet ct summary url urls.csv --token YOUR_TOKEN --start-date 2019-01-01 > summary.csv

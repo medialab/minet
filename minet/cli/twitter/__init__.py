@@ -153,7 +153,7 @@ TWITTER_ATTRITION_SUBCOMMAND = twitter_api_subcommand(
             - "blocked_by_original_tweet_author": tweet cannot be found because it is a retweet of a user who blocked you.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Finding out if tweets in a CSV files are still available or not using tweet ids:
             $ minet tw attrition tweet_url -i deleted_tweets.csv > attrition-report.csv
@@ -188,7 +188,7 @@ TWITTER_FOLLOWERS_SUBCOMMAND = twitter_api_subcommand(
         Retrieve followers, i.e. followed users, of given user.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Getting followers of a list of user:
             $ minet tw followers screen_name -i users.csv > followers.csv
@@ -214,7 +214,7 @@ TWITTER_FRIENDS_SUBCOMMAND = twitter_api_subcommand(
         Retrieve friends, i.e. followed users, of given user.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Getting friends of a list of user:
             $ minet tw friends screen_name -i users.csv > friends.csv
@@ -240,7 +240,7 @@ TWITTER_LIST_FOLLOWERS_SUBCOMMAND = twitter_api_subcommand(
         Retrieve followers of given list using Twitter API v2.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Getting followers of a list of lists:
             $ minet tw list-followers id -i lists.csv > followers.csv
@@ -260,7 +260,7 @@ TWITTER_LIST_MEMBERS_SUBCOMMAND = twitter_api_subcommand(
         Retrieve members of given list using Twitter API v2.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Getting members of a list of lists:
             $ minet tw list-members id -i lists.csv > members.csv
@@ -280,7 +280,7 @@ TWITTER_RETWEETERS_SUBCOMMAND = twitter_api_subcommand(
         Retrieve retweeters of given tweet using Twitter API v2.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Getting the users who retweeted a list of tweets:
             $ minet tw retweeters tweet_id -i tweets.csv > retweeters.csv
@@ -308,7 +308,7 @@ TWITTER_SCRAPE_SUBCOMMAND = subcommand(
         strongly advised to segment your queries using temporal filters.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Collecting the latest 500 tweets of a given Twitter user:
             $ minet tw scrape tweets "from:@jack" --limit 500 > tweets.csv
@@ -373,7 +373,7 @@ TWITTER_TWEET_COUNT_SUBCOMMAND = twitter_api_subcommand(
         results.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Counting tweets using "cancer" as a query:
             $ minet tw tweet-count cancer
@@ -404,7 +404,7 @@ TWITTER_TWEET_DATE_SUBCOMMAND = subcommand(
         Getting timestamp and date from tweet url or id.
     """,
     epilog="""
-        examples:
+        Examples:
 
             $ minet tw tweet-date url -i tweets.csv --timezone 'Europe/Paris'> tweets_timestamp_date.csv
     """,
@@ -434,7 +434,7 @@ TWITTER_TWEET_SEARCH_SUBCOMMAND = twitter_api_subcommand(
         To search the full archive of public tweets, use --academic if you have academic research access.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Searching tweets using "cancer" as a query:
             $ minet tw tweet-search cancer > tweets.csv
@@ -463,7 +463,7 @@ TWITTER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
         Collecting tweet metadata from the given tweet ids, using the API.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Getting metadata from tweets in a CSV file:
             $ minet tw tweets tweet_id -i tweets.csv > tweets_metadata.csv
@@ -485,7 +485,7 @@ TWITTER_USER_SEARCH_SUBCOMMAND = twitter_api_subcommand(
         into smaller queries to find more users.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Searching user using "cancer" as a query:
             $ minet tw user-search cancer > users.csv
@@ -505,7 +505,7 @@ TWITTER_USER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
         the given Twitter users, using the API.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Getting tweets from users in a CSV file:
             $ minet tw user-tweets screen_name -i users.csv > tweets.csv
@@ -539,7 +539,7 @@ TWITTER_USERS_SUBCOMMAND = twitter_api_subcommand(
         Retrieve Twitter user metadata using the API.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Getting friends of a list of user:
             $ minet tw users screen_name -i users.csv > data_users.csv

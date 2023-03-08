@@ -10,7 +10,7 @@ URL_JOIN_COMMAND = command(
         URL trie to match them with the second file's urls.
     """,
     epilog="""
-        examples:
+        Examples:
 
         . Joining two files:
             $ minet url-join url webentities.csv post_url posts.csv > joined.csv
