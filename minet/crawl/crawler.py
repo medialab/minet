@@ -19,9 +19,6 @@ from typing import (
     Union,
 )
 
-from threading import Event
-from urllib3 import PoolManager
-
 from minet.types import AnyFileTarget
 from minet.fs import load_definition
 from minet.crawl.types import (
