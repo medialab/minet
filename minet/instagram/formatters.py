@@ -8,8 +8,9 @@ from casanova import namedrecord
 from ebbe import getpath
 
 from minet.instagram.constants import (
+    INSTAGRAM_COMMENT_CSV_HEADERS,
     INSTAGRAM_HASHTAG_POST_CSV_HEADERS,
-    INSTAGRAM_USER_POST_CSV_HEADERS,
+    INSTAGRAM_POST_CSV_HEADERS,
     INSTAGRAM_MEDIA_TYPE,
     INSTAGRAM_USER_CSV_HEADERS,
     INSTAGRAM_USER_INFO_CSV_HEADERS,
@@ -24,6 +25,22 @@ from minet.utils import timestamp_to_isoformat
 INSTAGRAM_PATH_TO_MEDIA_IMAGE = ["image_versions2", "candidates", 0, "url"]
 INSTAGRAM_PATH_TO_MEDIA_VIDEO = ["video_versions", 0, "url"]
 
+InstagramComment = namedrecord(
+    "InstagramComment",
+    INSTAGRAM_COMMENT_CSV_HEADERS,
+    boolean=[
+        "has_translation",
+        "is_liked_by_media_owner",
+        "user_is_private",
+        "user_is_mentionable",
+        "user_is_verified",
+    ],
+    plural=[
+        "hashtags",
+        "mentioned_names"
+    ],
+)
+
 InstagramHashtagPost = namedrecord(
     "InstagramHashtagPost",
     INSTAGRAM_HASHTAG_POST_CSV_HEADERS,
@@ -33,9 +50,9 @@ InstagramHashtagPost = namedrecord(
     plural=["hashtags", "mentioned_names"],
 )
 
-InstagramUserPost = namedrecord(
-    "InstagramUserPost",
-    INSTAGRAM_USER_POST_CSV_HEADERS,
+InstagramPost = namedrecord(
+    "InstagramPost",
+    INSTAGRAM_POST_CSV_HEADERS,
     boolean=["like_and_view_counts_disabled", "is_verified"],
     plural=[
         "medias_type",
@@ -98,6 +115,44 @@ def get_usertags(item):
     return usertags
 
 
+def format_comment(comment):
+    text = comment.get("text")
+
+    hashtags = []
+    mentioned_names = []
+
+    if comment.get("text"):
+        hashtags = extract_hashtags(text)
+        mentioned_names = extract_handles(text)
+
+    row = InstagramComment(
+        comment.get("pk"),
+        comment.get("comment_index"),
+        comment.get("parent_comment_id"),
+        comment.get("child_comment_index"),
+        comment.get("text"),
+        hashtags,
+        mentioned_names,
+        comment.get("has_translation", False),
+        comment.get("comment_like_count"),
+        comment.get("is_liked_by_media_owner"),
+        comment.get("child_comment_count"),
+        comment.get("created_at_utc"),
+        timestamp_to_isoformat(comment.get("created_at_utc")),
+        getpath(comment, ["user", "username"]),
+        comment.get("user_id"),
+        getpath(comment, ["user", "full_name"]),
+        getpath(comment, ["user", "is_private"]),
+        getpath(comment, ["user", "is_mentionable"]),
+        getpath(comment, ["user", "is_verified"]),
+        getpath(comment, ["user", "profile_pic_id"]),
+        getpath(comment, ["user", "profile_pic_url"]),
+        getpath(comment, ["user", "fbid_v2"]),
+    )
+
+    return row
+
+
 def format_hashtag_post(item):
 
     text = getpath(item, ["edge_media_to_caption", "edges", 0, "node", "text"])
@@ -132,7 +187,7 @@ def format_hashtag_post(item):
     return row
 
 
-def format_user_post(item):
+def format_post(item):
 
     media_type = INSTAGRAM_MEDIA_TYPE.get(item["media_type"])
     if media_type is None:
@@ -178,11 +233,11 @@ def format_user_post(item):
         item_usertags = get_usertags(item)
         usertags_medias = usertags_medias.union(item_usertags)
 
-    row = InstagramUserPost(
+    row = InstagramPost(
         getpath(item, ["user", "username"]),
         getpath(item, ["user", "full_name"]),
         getpath(item, ["user", "is_verified"]),
-        item["id"],
+        item["pk"],
         media_type,
         item["code"],
         short_code_to_url(item["code"]),

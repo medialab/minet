@@ -9,7 +9,7 @@ from itertools import islice
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.instagram.utils import with_instagram_fatal_errors
 from minet.instagram import InstagramAPIScraper
-from minet.instagram.constants import INSTAGRAM_USER_POST_CSV_HEADERS
+from minet.instagram.constants import INSTAGRAM_POST_CSV_HEADERS
 from minet.instagram.exceptions import (
     InstagramNoPublicationError,
     InstagramPrivateOrNonExistentAccountError,
@@ -19,7 +19,7 @@ from minet.instagram.exceptions import (
 
 @with_instagram_fatal_errors
 @with_enricher_and_loading_bar(
-    headers=INSTAGRAM_USER_POST_CSV_HEADERS,
+    headers=INSTAGRAM_POST_CSV_HEADERS,
     title="Scraping posts",
     unit="users",
     nested=True,

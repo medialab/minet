@@ -49,7 +49,9 @@ _Platform-related commands_
   - [reset](#hyphe-reset)
   - [tag](#hyphe-tag)
 - [instagram (insta)](#instagram)
+  - [comments](#insta-comments)
   - [hashtag](#hashtag)
+  - [post-infos](#insta-post-infos)
   - [user-followers](#user-followers)
   - [user-following](#user-following)
   - [user-infos](#user-infos)
@@ -2355,7 +2357,7 @@ Examples:
 
 ```
 Usage: minet instagram [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                       {hashtag,user-followers,user-following,user-infos,user-posts}
+                       {comments,hashtag,post-infos,user-followers,user-following,user-infos,user-posts}
                        ...
 
 # Minet Instagram Command
@@ -2378,8 +2380,83 @@ Optional Arguments:
   -h, --help                    show this help message and exit
 
 Subcommands:
-  {hashtag,user-followers,user-following,user-infos,user-posts}
+  {comments,hashtag,post-infos,user-followers,user-following,user-infos,user-posts}
                                 Subcommand to use.
+```
+
+<h3 id="insta-comments">comments</h3>
+
+```
+Usage: minet instagram comments [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                                [-l LIMIT] [-i INPUT] [-s SELECT]
+                                [--total TOTAL] [-o OUTPUT]
+                                post_or_post_column
+
+# Instagram Comments Command
+
+Scrape Instagram comments with a given post url, post shortcode or post id.
+
+This requires to be logged in to an Instagram account, so
+by default this command will attempt to grab the relevant
+authentication cookies from a local Firefox browser.
+
+If you want to grab cookies from another browser or want
+to directly pass the cookie as a string, check out the
+-c/--cookie flag.
+
+Positional Arguments:
+  post_or_post_column         Single post url, post shortcode or post id to
+                              process or name of the CSV column containing post
+                              urls, post shortcodes or post ids when using
+                              -i/--input.
+
+Optional Arguments:
+  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
+                              to extract it (supports "firefox", "chrome",
+                              "chromium", "opera" and "edge"). Defaults to
+                              "firefox". Can also be configured in a .minetrc
+                              file as "instagram.cookie" or read from the
+                              MINET_INSTAGRAM_COOKIE env variable.
+  -l, --limit LIMIT           Maximum number of comments to retrieve per post.
+  -s, --select SELECT         Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the post urls, post
+                              shortcodes or post ids you want to process. Will
+                              consider `-` as stdin.
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
+  -h, --help                  show this help message and exit
+
+example:
+
+. Searching comments from the post https://www.instagram.com/p/CpA46rmU26Y/:
+    $ minet instagram comments https://www.instagram.com/p/CpA46rmU26Y/ > comments.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
 ```
 
 ### hashtag
@@ -2457,6 +2534,85 @@ how to use the command with a CSV file?
     $ xsv search -s col . | minet cmd column_name -i -
 ```
 
+<h3 id="insta-post-infos">post-infos</h3>
+
+```
+Usage: minet instagram post-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                                  [-i INPUT] [-s SELECT] [--total TOTAL]
+                                  [-o OUTPUT]
+                                  post_or_post_column
+
+# Instagram post-infos
+
+Scrape Instagram infos with a given post url, post shortcode or post id.
+
+This requires to be logged in to an Instagram account, so
+by default this command will attempt to grab the relevant
+authentication cookies from a local Firefox browser.
+
+If you want to grab cookies from another browser or want
+to directly pass the cookie as a string, check out the
+-c/--cookie flag.
+
+Beware, instagram only provides temporary links, not permalinks,
+for profile picture urls retrieved as the "profile_pic_url_hd" in
+the result. Be sure to download them fast if you need them (you can
+use the `minet fetch` command for that, and won't need to use cookies).
+
+Positional Arguments:
+  post_or_post_column         Single post url, post shortcode or post id to
+                              process or name of the CSV column containing post
+                              urls, post shortcodes or post ids when using
+                              -i/--input.
+
+Optional Arguments:
+  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
+                              to extract it (supports "firefox", "chrome",
+                              "chromium", "opera" and "edge"). Defaults to
+                              "firefox". Can also be configured in a .minetrc
+                              file as "instagram.cookie" or read from the
+                              MINET_INSTAGRAM_COOKIE env variable.
+  -s, --select SELECT         Columns of input CSV file to include in the output
+                              (separated by `,`).
+  --total TOTAL               Total number of items to process. Might be
+                              necessary when you want to display a finite
+                              progress indicator for large files given as input
+                              to the command.
+  -i, --input INPUT           CSV file containing all the post urls, post
+                              shortcodes or post ids you want to process. Will
+                              consider `-` as stdin.
+  -o, --output OUTPUT         Path to the output file. Will consider `-` as
+                              stdout. If not given, results will also be printed
+                              to stdout.
+  --rcfile RCFILE             Custom path to a minet configuration file. More
+                              info about this here:
+                              https://github.com/medialab/minet/blob/master/docs
+                              /cli.md#minetrc
+  --silent                    Whether to suppress all the log and progress bars.
+                              Can be useful when piping.
+  -h, --help                  show this help message and exit
+
+example:
+
+. Searching infos for the post https://www.instagram.com/p/CpA46rmU26Y/:
+    $ minet instagram post-infos https://www.instagram.com/p/CpA46rmU26Y/ > post_infos.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+. Here is how to use a command with a single value:
+    $ minet cmd "value"
+
+. Here is how to use a command with a csv file:
+    $ minet cmd column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet cmd column_name -i -
+```
+
 ### user-followers
 
 ```
@@ -2467,7 +2623,7 @@ Usage: minet instagram user-followers [-h] [-c COOKIE] [--rcfile RCFILE]
 
 # Instagram User Followers Command
 
-Scrape Instagram followers with a given username or user url.
+Scrape Instagram followers with a given username, user url or user id.
 On verified accounts, you may be unable to get all of them.
 
 This requires to be logged in to an Instagram account, so
@@ -2483,10 +2639,13 @@ for profile picture urls retrieved as the "profile_pic_url" in
 the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
+If a username is a number without '@' at the begining, it will be
+considered as an id.
+
 Positional Arguments:
-  user_or_user_column         Single username or user url to process or name of
-                              the CSV column containing usernames or user urls
-                              when using -i/--input.
+  user_or_user_column         Single username, user url or user id to process or
+                              name of the CSV column containing usernames, user
+                              urls or user ids when using -i/--input.
 
 Optional Arguments:
   -c, --cookie COOKIE         Authenticated cookie to use or browser from which
@@ -2502,8 +2661,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the usernames or user urls
-                              you want to process. Will consider `-` as stdin.
+  -i, --input INPUT           CSV file containing all the usernames, user urls
+                              or user ids you want to process. Will consider `-`
+                              as stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -2546,7 +2706,7 @@ Usage: minet instagram user-following [-h] [-c COOKIE] [--rcfile RCFILE]
 
 # Instagram User Following Command
 
-Scrape Instagram accounts followed with a given username.
+Scrape Instagram accounts followed with a given username, user url or user id.
 
 This requires to be logged in to an Instagram account, so
 by default this command will attempt to grab the relevant
@@ -2561,10 +2721,13 @@ for profile picture urls retrieved as the "profile_pic_url" in
 the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
+If a username is a number without '@' at the begining, it will be
+considered as an id.
+
 Positional Arguments:
-  user_or_user_column         Single username or user url to process or name of
-                              the CSV column containing usernames or user urls
-                              when using -i/--input.
+  user_or_user_column         Single username, user url or user id to process or
+                              name of the CSV column containing usernames, user
+                              urls or user ids when using -i/--input.
 
 Optional Arguments:
   -c, --cookie COOKIE         Authenticated cookie to use or browser from which
@@ -2580,8 +2743,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the usernames or user urls
-                              you want to process. Will consider `-` as stdin.
+  -i, --input INPUT           CSV file containing all the usernames, user urls
+                              or user ids you want to process. Will consider `-`
+                              as stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -2624,7 +2788,7 @@ Usage: minet instagram user-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
 
 # Instagram user-infos
 
-Scrape Instagram infos with a given username or user url.
+Scrape Instagram infos with a given username, user url or user id.
 
 This requires to be logged in to an Instagram account, so
 by default this command will attempt to grab the relevant
@@ -2639,10 +2803,13 @@ for profile picture urls retrieved as the "profile_pic_url_hd" in
 the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
+If a username is a number without '@' at the begining, it will be
+considered as an id.
+
 Positional Arguments:
-  user_or_user_column         Single username or user url to process or name of
-                              the CSV column containing usernames or user urls
-                              when using -i/--input.
+  user_or_user_column         Single username, user url or user id to process or
+                              name of the CSV column containing usernames, user
+                              urls or user ids when using -i/--input.
 
 Optional Arguments:
   -c, --cookie COOKIE         Authenticated cookie to use or browser from which
@@ -2657,8 +2824,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the usernames or user urls
-                              you want to process. Will consider `-` as stdin.
+  -i, --input INPUT           CSV file containing all the usernames, user urls
+                              or user ids you want to process. Will consider `-`
+                              as stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -2701,7 +2869,7 @@ Usage: minet instagram user-posts [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
 
 # Instagram User Posts Command
 
-Scrape Instagram posts with a given username or user url.
+Scrape Instagram posts with a given username, user url or user id.
 
 This requires to be logged in to an Instagram account, so
 by default this command will attempt to grab the relevant
@@ -2718,10 +2886,13 @@ media is a video). Be sure to download them fast if you need
 them (you can use the `minet fetch` command for that, and
 won't need to use cookies).
 
+If a username is a number without '@' at the begining, it will be
+considered as an id.
+
 Positional Arguments:
-  user_or_user_column         Single username or user url to process or name of
-                              the CSV column containing usernames or user urls
-                              when using -i/--input.
+  user_or_user_column         Single username, user url or user id to process or
+                              name of the CSV column containing usernames, user
+                              urls or user ids when using -i/--input.
 
 Optional Arguments:
   -c, --cookie COOKIE         Authenticated cookie to use or browser from which
@@ -2737,8 +2908,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the usernames or user urls
-                              you want to process. Will consider `-` as stdin.
+  -i, --input INPUT           CSV file containing all the usernames, user urls
+                              or user ids you want to process. Will consider `-`
+                              as stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.

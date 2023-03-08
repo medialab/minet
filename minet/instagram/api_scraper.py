@@ -12,8 +12,10 @@ from json.decoder import JSONDecodeError
 from ural.instagram import (
     parse_instagram_url,
     is_instagram_username,
+    is_instagram_post_shortcode,
     InstagramPost as ParsedInstagramPost,
     InstagramUser as ParsedInstagramUser,
+    InstagramReel as ParsedInstagramReel,
 )
 from minet.constants import COOKIE_BROWSERS
 from minet.utils import sleep_with_entropy
@@ -51,16 +53,43 @@ from minet.instagram.exceptions import (
     InstagramPrivateAccountError,
 )
 from minet.instagram.formatters import (
+    format_comment,
     format_hashtag_post,
+    format_post,
     format_user,
-    format_user_post,
     format_user_info,
 )
 
 INSTAGRAM_GRAPHQL_ENDPOINT = "https://www.instagram.com/graphql/query/"
 INSTAGRAM_HASHTAG_QUERY_HASH = "9b498c08113f1e09617a1703c22b2f32"
+INSTAGRAM_USER_ID_QUERY_HASH = "c9100bf9110dd6361671f113dd02e7d6"
 INSTAGRAM_MAGIC_TOKEN_PATTERN = re.compile(r"\"X-IG-App-ID\"\s*:\s*\"(\d+)\"")
-INSTAGRAM_USER_ID_PATTERN = re.compile(r"\d+_(\d+)")
+INSTAGRAM_ID_PATTERN = re.compile(r"\d+")
+INSTAGRAM_GET_USER_ID_PATTERN = re.compile(r"\d+_(\d+)")
+
+
+def forge_comments_url(
+    post,
+    comment_id=None,
+    min_or_max_id=None,
+):
+    if comment_id is not None and min_or_max_id is not None:
+        url = "https://www.instagram.com/api/v1/media/%s/comments/%s/child_comments/?max_id=%s" % (
+            post,
+            comment_id,
+            min_or_max_id
+        )
+        return url
+
+    if min_or_max_id is not None:
+        url = "https://www.instagram.com/api/v1/media/%s/comments/?min_id=%s&can_support_threading=true&permalink_enabled=false" % (
+            post,
+            min_or_max_id
+        )
+        return url
+
+    url = "https://www.instagram.com/api/v1/media/%s/comments/?can_support_threading=true&permalink_enabled=false" % post
+    return url
 
 
 def forge_hashtag_search_url(name, cursor=None, count=50):
@@ -71,6 +100,25 @@ def forge_hashtag_search_url(name, cursor=None, count=50):
 
     url = INSTAGRAM_GRAPHQL_ENDPOINT + "?query_hash=%s&variables=%s" % (
         INSTAGRAM_HASHTAG_QUERY_HASH,
+        quote(json.dumps(params)),
+    )
+
+    return url
+
+
+def forge_post_url_from_id(post_id):
+    return "https://www.instagram.com/api/v1/media/%s/info/" % post_id
+
+
+def forge_post_url_from_shortcode(post_shortcode):
+    return "https://www.instagram.com/p/%s/?__a=1&__d=dis" % post_shortcode
+
+
+def forge_username_url(user_id):
+    params = {"user_id": user_id, "include_reel": True}
+
+    url = INSTAGRAM_GRAPHQL_ENDPOINT + "?query_hash=%s&variables=%s" % (
+        INSTAGRAM_USER_ID_QUERY_HASH,
         quote(json.dumps(params)),
     )
 
@@ -123,7 +171,7 @@ def forge_user_posts_url(
     max_id=None,
 ):
     if max_id is not None:
-        u = INSTAGRAM_USER_ID_PATTERN.search(max_id)
+        u = INSTAGRAM_GET_USER_ID_PATTERN.search(max_id)
 
         if u is not None:
             user = u.group(1)
@@ -196,6 +244,9 @@ class InstagramAPIScraper(object):
             raise InstagramError500
 
         if response.status >= 400:
+            if data["message"].lower().strip() == "media not found or unavailable":
+                raise InstagramInvalidTargetError
+
             raise InstagramPublicAPIInvalidResponseError(url, response.status, data)
 
         if self.nb_calls != 0 and (self.nb_calls % INSTAGRAM_NB_REQUEST_BIG_WAIT) == 0:
@@ -248,6 +299,78 @@ class InstagramAPIScraper(object):
 
         return wrapped
 
+    @ensure_magic_token
+    def comments(self, post):
+        if not INSTAGRAM_ID_PATTERN.match(post):
+            parsed = parse_instagram_url(post)
+            if isinstance(parsed, (ParsedInstagramPost, ParsedInstagramReel)):
+                shortcode = parsed.id
+
+            elif is_instagram_post_shortcode(post):
+                shortcode = post
+
+            else:
+                raise InstagramInvalidTargetError
+
+            url = forge_post_url_from_shortcode(shortcode)
+
+            data_post = self.request_json(url, magic_token=True)
+            if not data_post:
+                raise InstagramInvalidTargetError
+
+            post = getpath(data_post, ["items", 0, "pk"])
+
+        min_id = None
+
+        while True:
+            url = forge_comments_url(post, min_or_max_id=min_id)
+
+            data = self.request_json(url, magic_token=True)
+
+            if not data:
+                break
+
+            items = data.get("comments")
+
+            if not items:
+                break
+
+            for item in items:
+
+                if item.get("type") == 2:
+                    continue
+
+                yield format_comment(item)
+
+                if item.get("child_comment_count") > 0:
+
+                    max_id = ""
+
+                    while True:
+                        url = forge_comments_url(post, comment_id=item.get("pk"), min_or_max_id=max_id)
+
+                        data_comment = self.request_json(url, magic_token=True)
+
+                        if not data_comment:
+                            break
+
+                        children_items = data_comment.get("child_comments")
+
+                        for children_item in children_items:
+                            yield format_comment(children_item)
+
+                        more_available = data_comment.get("has_more_tail_child_comments")
+
+                        if not more_available:
+                            break
+
+                        max_id = data_comment.get("next_max_child_cursor")
+
+            min_id = data.get("next_min_id")
+
+            if not min_id:
+                break
+
     def search_hashtag(self, hashtag):
         hashtag = hashtag.lstrip("#")
         cursor = None
@@ -278,6 +401,59 @@ class InstagramAPIScraper(object):
             cursor = getpath(data, ["page_info", "end_cursor"])
 
     @ensure_magic_token
+    def post_infos(self, name):
+        if INSTAGRAM_ID_PATTERN.match(name):
+            url = forge_post_url_from_id(name)
+
+        else:
+            parsed = parse_instagram_url(name)
+            if isinstance(parsed, (ParsedInstagramPost, ParsedInstagramReel)):
+                shortcode = parsed.id
+
+            elif is_instagram_post_shortcode(name):
+                shortcode = name
+
+            else:
+                raise InstagramInvalidTargetError
+
+            url = forge_post_url_from_shortcode(shortcode)
+
+        data = self.request_json(url, magic_token=True)
+
+        if not data:
+            raise InstagramInvalidTargetError
+
+        return format_post(getpath(data, ["items", 0]))
+
+    def get_username(self, name):
+        if INSTAGRAM_ID_PATTERN.match(name):
+            url = forge_username_url(name)
+
+            data_user_id = self.request_json(url)
+
+            if not data_user_id:
+                raise InstagramInvalidTargetError
+
+            name = getpath(data_user_id, ["data", "user", "reel", "user", "username"])
+
+        else:
+            parsed = parse_instagram_url(name)
+
+            if isinstance(parsed, (ParsedInstagramPost, ParsedInstagramUser)):
+                if not parsed.name:
+                    raise InstagramInvalidTargetError
+
+                name = parsed.name
+
+            else:
+                name = name.lstrip("@")
+
+                if not is_instagram_username(name):
+                    raise InstagramInvalidTargetError
+
+        return name
+
+    @ensure_magic_token
     def get_user(self, name):
         url = forge_user_url(name)
 
@@ -285,20 +461,7 @@ class InstagramAPIScraper(object):
 
     @ensure_magic_token
     def user_followers(self, name):
-
-        parsed = parse_instagram_url(name)
-
-        if isinstance(parsed, (ParsedInstagramPost, ParsedInstagramUser)):
-            if not parsed.name:
-                raise InstagramInvalidTargetError
-
-            name = parsed.name
-
-        else:
-            name = name.lstrip("@")
-
-            if not is_instagram_username(name):
-                raise InstagramInvalidTargetError
+        name = self.get_username(name)
 
         max_id = None
         data_user = self.get_user(name)
@@ -333,20 +496,7 @@ class InstagramAPIScraper(object):
 
     @ensure_magic_token
     def user_following(self, name):
-
-        parsed = parse_instagram_url(name)
-
-        if isinstance(parsed, (ParsedInstagramPost, ParsedInstagramUser)):
-            if not parsed.name:
-                raise InstagramInvalidTargetError
-
-            name = parsed.name
-
-        else:
-            name = name.lstrip("@")
-
-            if not is_instagram_username(name):
-                raise InstagramInvalidTargetError
+        name = self.get_username(name)
 
         max_id = None
         data_user = self.get_user(name)
@@ -381,20 +531,7 @@ class InstagramAPIScraper(object):
 
     @ensure_magic_token
     def user_posts(self, name):
-
-        parsed = parse_instagram_url(name)
-
-        if isinstance(parsed, (ParsedInstagramPost, ParsedInstagramUser)):
-            if not parsed.name:
-                raise InstagramInvalidTargetError
-
-            name = parsed.name
-
-        else:
-            name = name.lstrip("@")
-
-            if not is_instagram_username(name):
-                raise InstagramInvalidTargetError
+        name = self.get_username(name)
 
         max_id = None
 
@@ -416,7 +553,7 @@ class InstagramAPIScraper(object):
                 raise InstagramPrivateOrNonExistentAccountError
 
             for item in items:
-                yield format_user_post(item)
+                yield format_post(item)
 
             more_available = data.get("more_available")
 
@@ -427,20 +564,7 @@ class InstagramAPIScraper(object):
 
     @ensure_magic_token
     def user_infos(self, name):
-
-        parsed = parse_instagram_url(name)
-
-        if isinstance(parsed, (ParsedInstagramPost, ParsedInstagramUser)):
-            if not parsed.name:
-                raise InstagramInvalidTargetError
-
-            name = parsed.name
-
-        else:
-            name = name.lstrip("@")
-
-            if not is_instagram_username(name):
-                raise InstagramInvalidTargetError
+        name = self.get_username(name)
 
         data = self.get_user(name)
 
