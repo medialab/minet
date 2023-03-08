@@ -90,7 +90,7 @@ HREF_RE = re.compile(rb'href=(\"[^"]+|\'[^\']+|[^\s]+)>?\s?', flags=re.I)
 # Constants
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
 CONTENT_PREBUFFER_UP_TO = 1024
-STREAMING_CHUNK_SIZE = 2**12
+STREAMING_CHUNK_SIZE: int = 2**12
 LARGE_CONTENT_PREBUFFER_UP_TO = 2**16
 EXPECTED_WEB_ERRORS = (HTTPError, RedirectError, InvalidURLError, FinalTimeoutError)
 
