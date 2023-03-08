@@ -4,7 +4,7 @@
 #
 # Miscellaneous web-related functions used throughout the library.
 #
-from typing import Optional, Tuple, Union, OrderedDict, List, Any, Dict
+from typing import Optional, Callable, Tuple, Union, OrderedDict, List, Any, Dict
 
 import re
 import cgi
@@ -37,6 +37,7 @@ from tenacity import (
     retry_if_exception_type,
     retry_if_exception,
     stop_after_attempt,
+    sleep_using_event,
 )
 from tenacity.wait import wait_base
 
@@ -1164,7 +1165,8 @@ def create_request_retryer(
     before_sleep=noop,
     additional_exceptions=None,
     retry_on_timeout: bool = True,
-    predicate=None,
+    predicate: Optional[Callable[[BaseException], bool]] = None,
+    cancel_event: Optional[Event] = None,
 ):
 
     # By default we only retry network issues, such as Internet being cut off etc.
@@ -1190,12 +1192,21 @@ def create_request_retryer(
     if callable(predicate):
         retry_condition |= retry_if_exception(predicate)
 
-    return Retrying(
-        wait=request_retryer_custom_exponential_backoff(min=min, max=max),
-        retry=retry_condition,
-        stop=stop_after_attempt(max_attempts),
-        before_sleep=rcompose(log_request_retryer_before_sleep, before_sleep),
-    )
+    retrying_kwargs = {
+        "wait": request_retryer_custom_exponential_backoff(min=min, max=max),
+        "retry": retry_condition,
+        "stop": stop_after_attempt(max_attempts),
+        "before_sleep": rcompose(log_request_retryer_before_sleep, before_sleep),
+    }
+
+    # Cancellable sleep?
+    if cancel_event is not None:
+        if cancel_event.is_set():
+            raise TypeError("cannot retry using an already set cancel_event")
+
+        retrying_kwargs["sleep"] = sleep_using_event(cancel_event)
+
+    return Retrying(**retrying_kwargs)
 
 
 def retrying_method(attr="retryer"):

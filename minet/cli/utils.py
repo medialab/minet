@@ -102,9 +102,12 @@ class CLIRetryerHandler(Handler):
             msg = [
                 "Will now wait for %s because of following exception:" % pretty_time,
                 exc_name,
-                "Exception message: %s" % exc_msg,
-                "",
             ]
+
+            if exc_msg:
+                msg.append("Exception message: %s" % exc_msg)
+
+            msg.append("")
 
         else:
             msg = [record.msg, ""]
