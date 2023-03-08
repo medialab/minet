@@ -22,6 +22,7 @@ import threading
 from threading import Event
 from quenouille import ThreadPoolExecutor
 from ural import get_domain_name, ensure_protocol
+from tenacity import RetryCallState
 
 from minet.exceptions import CancelledRequestError
 from minet.web import (
@@ -337,10 +338,15 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         self.local_context = threading.local()
 
         if retry:
+
+            def epilog(retry_state: RetryCallState) -> str:
+                return retry_state.args[0]
+
             default_retryer_kwargs = {
                 "retry_on_timeout": False,
                 "cancel_event": self.cancel_event,
                 "max_attempts": 3,
+                'epilog': epilog
             }
 
             default_retryer_kwargs.update(retryer_kwargs or {})

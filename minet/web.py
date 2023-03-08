@@ -33,6 +33,7 @@ from ebbe import rcompose, noop
 from collections import defaultdict
 from tenacity import (
     Retrying,
+    RetryCallState,
     retry_if_exception_type,
     retry_if_exception,
     stop_after_attempt,
@@ -1126,21 +1127,35 @@ def request_jsonrpc(
 ONE_DAY = 24 * 60 * 60
 
 
-def log_request_retryer_before_sleep(retry_state):
-    if not retry_state.outcome.failed:
-        raise NotImplementedError
+class log_request_retryer_before_sleep:
+    def __init__(
+        self, epilog_builder: Optional[Callable[[RetryCallState], str]] = None
+    ):
+        if epilog_builder is not None and not callable(epilog_builder):
+            raise TypeError("epilog_builder should be None or callable")
 
-    exception = retry_state.outcome.exception()
+        self.epilog_builder = epilog_builder
 
-    sleepers_logger.warn(
-        "request_retryer starts sleeping",
-        extra={
-            "source": "request_retryer",
-            "retry_state": retry_state,
-            "exception": exception,
-            "sleep_time": retry_state.next_action.sleep,
-        },
-    )
+    def __call__(self, retry_state: RetryCallState) -> None:
+        assert retry_state.outcome is not None
+
+        if not retry_state.outcome.failed:
+            raise NotImplementedError
+
+        exception = retry_state.outcome.exception()
+
+        sleepers_logger.warn(
+            "request_retryer starts sleeping",
+            extra={
+                "source": "request_retryer",
+                "retry_state": retry_state,
+                "exception": exception,
+                "sleep_time": retry_state.next_action.sleep,
+                "epilog": self.epilog_builder(retry_state)
+                if self.epilog_builder is not None
+                else None,
+            },
+        )
 
 
 class request_retryer_custom_exponential_backoff(wait_base):
@@ -1149,7 +1164,7 @@ class request_retryer_custom_exponential_backoff(wait_base):
         self.max = max
         self.exp_base = exp_base
 
-    def __call__(self, retry_state):
+    def __call__(self, retry_state: RetryCallState) -> float:
         # NOTE: we add/subtract randomly up to 1/4 of expected sleep time
         jitter = 0.5 - random.random()
 
@@ -1171,6 +1186,7 @@ def create_request_retryer(
     additional_exceptions=None,
     retry_on_timeout: bool = True,
     predicate: Optional[Callable[[BaseException], bool]] = None,
+    epilog: Optional[Callable[[RetryCallState], str]] = None,
     cancel_event: Optional[Event] = None,
 ):
 
@@ -1202,7 +1218,9 @@ def create_request_retryer(
         "wait": request_retryer_custom_exponential_backoff(min=min, max=max),
         "retry": retry_condition,
         "stop": stop_after_attempt(max_attempts),
-        "before_sleep": rcompose(log_request_retryer_before_sleep, before_sleep),
+        "before_sleep": rcompose(
+            log_request_retryer_before_sleep(epilog), before_sleep
+        ),
     }
 
     # Cancellable sleep?
@@ -1212,9 +1230,9 @@ def create_request_retryer(
 
         retrying_kwargs["sleep"] = sleep_using_event(cancel_event)
         retrying_kwargs["stop"] |= stop_when_event_set(cancel_event)
-        # retrying_kwargs["retry"] &= retry_if_exception(
-        #     lambda _: not cancel_event.is_set()
-        # )
+        retrying_kwargs["retry"] &= retry_if_exception(
+            lambda _: not cancel_event.is_set()
+        )
 
     return Retrying(**retrying_kwargs)
 

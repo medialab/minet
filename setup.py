@@ -34,7 +34,7 @@ setup(
         "lxml>=4.3.0",
         "persist-queue>=0.7,<0.9",
         "pyyaml",
-        "quenouille>=1.7.0,<2",
+        "quenouille>=1.7.1,<2",
         "rich>=13,<14",
         "rich-argparse>1,<2",
         "soupsieve>=2.1,<3",

@@ -107,6 +107,9 @@ class CLIRetryerHandler(Handler):
             if exc_msg:
                 msg.append("Exception message: %s" % exc_msg)
 
+            if record.epilog:
+                msg.append("[dim]%s[/dim]" % record.epilog)
+
             msg.append("")
 
         else:
