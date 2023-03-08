@@ -15,10 +15,10 @@ from datetime import datetime
 from ural import is_shortened_url, could_be_html
 
 from minet.fetch import (
-    multithreaded_fetch,
-    multithreaded_resolve,
     FetchResult,
     FetchWorkerPayload,
+    FetchThreadPoolExecutor,
+    ResolveThreadPoolExecutor,
 )
 from minet.fs import FilenameBuilder, ThreadSafeFilesWriter
 from minet.web import grab_cookies, parse_http_header, Response, RedirectionStack
@@ -278,118 +278,118 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
             files_writer.write(filename, data, compress=cli_args.compress)
 
-    common_kwargs = {
-        "key": url_key,
+    common_executor_kwargs = {
         "insecure": cli_args.insecure,
-        "threads": cli_args.threads,
-        "throttle": cli_args.throttle,
-        "domain_parallelism": cli_args.domain_parallelism,
-        "max_redirects": cli_args.max_redirects,
+        "max_workers": cli_args.threads,
         "wait": False,
         "daemonic": False,
     }
+    common_imap_kwargs = {
+        "key": url_key,
+        "throttle": cli_args.throttle,
+        "domain_parallelism": cli_args.domain_parallelism,
+        "max_redirects": cli_args.max_redirects,
+    }
 
     if cli_args.timeout is not None:
-        common_kwargs["timeout"] = cli_args.timeout
+        common_executor_kwargs["timeout"] = cli_args.timeout
 
     # Normal fetch
     if not resolve:
-
-        multithreaded_iterator = multithreaded_fetch(
-            enricher,
-            request_args=request_args,
-            callback=worker_callback,
-            **common_kwargs
-        )
 
         Addendum = (
             FetchAddendum if not cli_args.contents_in_report else FetchAddendumWithBody
         )
 
-        for result in multithreaded_iterator:
-            with loading_bar.step():
-                index, row = result.item
+        with FetchThreadPoolExecutor(**common_executor_kwargs) as executor:
+            for result in executor.imap_unordered(
+                enricher,
+                request_args=request_args,
+                callback=worker_callback,
+                **common_imap_kwargs
+            ):
+                with loading_bar.step():
+                    index, row = result.item
 
-                if not result.url:
-                    enricher.writerow(index, row)
-                    loading_bar.inc_stat("filtered", style="warning")
-                    continue
+                    if not result.url:
+                        enricher.writerow(index, row)
+                        loading_bar.inc_stat("filtered", style="warning")
+                        continue
 
-                addendum = Addendum()
+                    addendum = Addendum()
 
-                # No error
-                if result.error is None:
-                    assert result.response is not None
+                    # No error
+                    if result.error is None:
+                        assert result.response is not None
 
-                    response = result.response
-                    status = response.status
+                        response = result.response
+                        status = response.status
 
-                    loading_bar.inc_stat(status, style=get_style_for_status(status))
+                        loading_bar.inc_stat(status, style=get_style_for_status(status))
 
-                    addendum.infos_from_response(response)
-                    enricher.writerow(index, row, addendum)
+                        addendum.infos_from_response(response)
+                        enricher.writerow(index, row, addendum)
 
-                # Handling potential errors
-                else:
-                    error_code = report_error(result.error)
+                    # Handling potential errors
+                    else:
+                        error_code = report_error(result.error)
 
-                    loading_bar.inc_stat(error_code, style="error")
+                        loading_bar.inc_stat(error_code, style="error")
 
-                    resolved_url = None
+                        resolved_url = None
 
-                    if isinstance(result.error, InvalidURLError):
-                        resolved_url = result.error.url
+                        if isinstance(result.error, InvalidURLError):
+                            resolved_url = result.error.url
 
-                    if isinstance(result.error, FilenameFormattingError):
-                        loading_bar.print(
-                            report_filename_formatting_error(result.error)
-                        )
+                        if isinstance(result.error, FilenameFormattingError):
+                            loading_bar.print(
+                                report_filename_formatting_error(result.error)
+                            )
 
-                    addendum.fetch_error = error_code
-                    addendum.resolved_url = resolved_url
+                        addendum.fetch_error = error_code
+                        addendum.resolved_url = resolved_url
 
-                    enricher.writerow(index, row, addendum)
+                        enricher.writerow(index, row, addendum)
 
     # Resolve
     else:
 
-        multithreaded_iterator = multithreaded_resolve(
-            enricher,
-            resolve_args=request_args,
-            follow_meta_refresh=cli_args.follow_meta_refresh,
-            follow_js_relocation=cli_args.follow_js_relocation,
-            infer_redirection=cli_args.infer_redirection,
-            canonicalize=cli_args.canonicalize,
-            **common_kwargs
-        )
+        with ResolveThreadPoolExecutor(**common_executor_kwargs) as executor:
+            for result in executor.imap_unordered(
+                enricher,
+                resolve_args=request_args,
+                follow_meta_refresh=cli_args.follow_meta_refresh,
+                follow_js_relocation=cli_args.follow_js_relocation,
+                infer_redirection=cli_args.infer_redirection,
+                canonicalize=cli_args.canonicalize,
+                **common_imap_kwargs
+            ):
+                with loading_bar.step():
+                    index, row = result.item
 
-        for result in multithreaded_iterator:
-            with loading_bar.step():
-                index, row = result.item
+                    if not result.url:
+                        enricher.writerow(index, row)
+                        loading_bar.inc_stat("filtered", style="warning")
+                        continue
 
-                if not result.url:
-                    enricher.writerow(index, row)
-                    loading_bar.inc_stat("filtered", style="warning")
-                    continue
+                    addendum = ResolveAddendum()
 
-                addendum = ResolveAddendum()
+                    # No error
+                    if result.error is None:
+                        assert result.stack is not None
 
-                # No error
-                if result.error is None:
-                    assert result.stack is not None
+                        # Reporting in output
+                        last = result.stack[-1]
+                        status = last.status
+                        loading_bar.inc_stat(status, style=get_style_for_status(status))
 
-                    # Reporting in output
-                    last = result.stack[-1]
-                    status = last.status
-                    loading_bar.inc_stat(status, style=get_style_for_status(status))
+                        addendum.infos_from_stack(result.stack)
+                        enricher.writerow(index, row, addendum)
 
-                    addendum.infos_from_stack(result.stack)
-                    enricher.writerow(index, row, addendum)
+                    # Handling potential errors
+                    else:
+                        error_code = report_error(result.error)
+                        loading_bar.inc_stat(error_code, style="error")
 
-                # Handling potential errors
-                else:
-                    error_code = report_error(result.error)
-                    loading_bar.inc_stat(error_code, style="error")
-
-                    addendum.resolution_error = error_code
-                    enricher.writerow(index, row, addendum)
+                        addendum.resolution_error = error_code
+                        enricher.writerow(index, row, addendum)
