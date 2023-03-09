@@ -90,6 +90,37 @@ class Scraper(object):
     def __call__(self, html: Union[str, BeautifulSoup], context: Optional[Dict] = None):
         return scrape(self.definition, html, context=context, strainer=self.strainer)
 
+    def as_csv_rows(
+        self,
+        html: Union[str, BeautifulSoup],
+        context: Optional[Dict] = None,
+        plural_separator="|",
+    ):
+        if self.fieldnames is None:
+            raise ScraperNotTabularError
+
+        def generator():
+
+            result = self.__call__(html, context=context)
+
+            if result is None:
+                return
+
+            if not self.plural:
+                result = [result]
+
+            for item in result:
+                if isinstance(item, dict):
+                    item = self.serializer.serialize_dict_row(
+                        item, self.fieldnames, plural_separator=plural_separator
+                    )
+                else:
+                    item = [self.serializer(item, plural_separator=plural_separator)]
+
+                yield item
+
+        return generator()
+
     def as_csv_dict_rows(
         self,
         html: Union[str, BeautifulSoup],

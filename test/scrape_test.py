@@ -965,9 +965,11 @@ class TestScrape(object):
 
         scraper = Scraper({"iterator": "li"})
 
-        rows = list(scraper.as_csv_dict_rows(BASIC_HTML))
-
-        assert rows == [{"value": "One"}, {"value": "Two"}]
+        assert list(scraper.as_csv_dict_rows(BASIC_HTML)) == [
+            {"value": "One"},
+            {"value": "Two"},
+        ]
+        assert list(scraper.as_csv_rows(BASIC_HTML)) == [["One"], ["Two"]]
 
         scraper = Scraper(
             {
@@ -981,18 +983,22 @@ class TestScrape(object):
             }
         )
 
-        rows = list(scraper.as_csv_dict_rows(BASIC_HTML))
-
-        assert rows == [
+        assert list(scraper.as_csv_dict_rows(BASIC_HTML)) == [
             {"text": "One", "list": "1|2", "false": "false", "true": "true"},
             {"text": "Two", "list": "1|2", "false": "false", "true": "true"},
         ]
+        assert list(scraper.as_csv_rows(BASIC_HTML)) == [
+            ["One", "1|2", "false", "true"],
+            ["Two", "1|2", "false", "true"],
+        ]
 
-        rows = list(scraper.as_csv_dict_rows(BASIC_HTML, plural_separator="§"))
-
-        assert rows == [
+        assert list(scraper.as_csv_dict_rows(BASIC_HTML, plural_separator="§")) == [
             {"text": "One", "list": "1§2", "false": "false", "true": "true"},
             {"text": "Two", "list": "1§2", "false": "false", "true": "true"},
+        ]
+        assert list(scraper.as_csv_rows(BASIC_HTML, plural_separator="§")) == [
+            ["One", "1§2", "false", "true"],
+            ["Two", "1§2", "false", "true"],
         ]
 
     def test_get_display_test(self):
