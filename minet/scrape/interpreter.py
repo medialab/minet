@@ -5,6 +5,8 @@
 # Function taking a scraper definition and applying its logic recursively
 # to yield its result.
 #
+from typing import Optional
+
 import textwrap
 import soupsieve
 from bs4 import Tag
@@ -149,7 +151,7 @@ def eval_expression(
     return result
 
 
-def tabulate(element, headers_inference="th", headers=None, path=None):
+def tabulate(element, headers_inference: Optional[str] = "th", headers=None, path=None):
     if element.name != "table":
         raise NotATableError(path=path)
 

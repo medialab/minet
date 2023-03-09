@@ -34,19 +34,19 @@ ScraperAnalysisOutputType = Literal["scalar", "unknown", "collection", "dict", "
 
 
 class ScraperAnalysis(object):
-    headers: Optional[List[str]]
+    fieldnames: Optional[List[str]]
     plural: bool
     output_type: ScraperAnalysisOutputType
 
-    __slots__ = ("headers", "plural", "output_type")
+    __slots__ = ("fieldnames", "plural", "output_type")
 
     def __init__(
         self,
-        headers: Optional[List[str]] = None,
+        fieldnames: Optional[List[str]] = None,
         plural: bool = False,
         output_type: ScraperAnalysisOutputType = "scalar",
     ):
-        self.headers = headers
+        self.fieldnames = fieldnames
         self.plural = plural
         self.output_type = output_type
 
@@ -55,21 +55,21 @@ class ScraperAnalysis(object):
             self.plural == other.plural
             and self.output_type == other.output_type
             and (
-                (self.headers is None and other.headers is None)
-                or (set(self.headers) == set(other.headers))
+                (self.fieldnames is None and other.fieldnames is None)
+                or (set(self.fieldnames) == set(other.fieldnames))
             )
         )
 
     def __repr__(self):
-        return "<{name} headers={headers!r} plural={plural} output_type={output_type}>".format(
+        return "<{name} fieldnames={fieldnames!r} plural={plural} output_type={output_type}>".format(
             name=self.__class__.__name__,
-            headers=self.headers,
+            fieldnames=self.fieldnames,
             plural=self.plural,
             output_type=self.output_type,
         )
 
 
-def headers_from_definition(scraper):
+def fieldnames_from_definition(scraper):
     tabulate = scraper.get("tabulate")
 
     if tabulate is not None:
@@ -93,7 +93,7 @@ def headers_from_definition(scraper):
 def analyse(scraper):
     analysis = ScraperAnalysis()
 
-    analysis.headers = headers_from_definition(scraper)
+    analysis.fieldnames = fieldnames_from_definition(scraper)
 
     iterator = get_iterator(scraper)
 

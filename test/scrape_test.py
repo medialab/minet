@@ -7,7 +7,7 @@ from textwrap import dedent
 
 from minet.scrape import scrape, Scraper
 from minet.scrape.analysis import (
-    headers_from_definition,
+    fieldnames_from_definition,
     validate,
     analyse,
     ScraperAnalysis,
@@ -499,42 +499,44 @@ class TestScrape(object):
         with pytest.raises(NotATableError):
             tabulate(soup.select_one("tr"))
 
-    def test_headers(self):
-        headers = headers_from_definition({"iterator": "li"})
+    def test_fieldnames(self):
+        fieldnames = fieldnames_from_definition({"iterator": "li"})
 
-        assert headers == ["value"]
+        assert fieldnames == ["value"]
 
-        headers = headers_from_definition({"iterator": "li", "item": "id"})
+        fieldnames = fieldnames_from_definition({"iterator": "li", "item": "id"})
 
-        assert headers == ["value"]
+        assert fieldnames == ["value"]
 
-        headers = headers_from_definition({"iterator": "li", "fields": {"id": "id"}})
+        fieldnames = fieldnames_from_definition(
+            {"iterator": "li", "fields": {"id": "id"}}
+        )
 
-        assert headers == ["id"]
+        assert fieldnames == ["id"]
 
-        headers = headers_from_definition(
+        fieldnames = fieldnames_from_definition(
             {"sel": "table", "tabulate": {"headers": ["id"]}}
         )
 
-        assert headers == ["id"]
+        assert fieldnames == ["id"]
 
-        headers = headers_from_definition({"sel": "table", "tabulate": True})
+        fieldnames = fieldnames_from_definition({"sel": "table", "tabulate": True})
 
         scraper = Scraper({"iterator": "li", "fields": {"id": "id"}})
 
-        assert scraper.headers == ["id"]
+        assert scraper.fieldnames == ["id"]
 
     def test_analysis(self):
         analysis = analyse({"item": "href"})
 
         assert analysis == ScraperAnalysis(
-            plural=False, headers=["value"], output_type="scalar"
+            plural=False, fieldnames=["value"], output_type="scalar"
         )
 
         analysis = analyse({"fields": {"url": "href", "title": "text"}})
 
         assert analysis == ScraperAnalysis(
-            plural=False, headers=["url", "title"], output_type="dict"
+            plural=False, fieldnames=["url", "title"], output_type="dict"
         )
 
         analysis = analyse(
@@ -542,7 +544,7 @@ class TestScrape(object):
         )
 
         assert analysis == ScraperAnalysis(
-            plural=True, headers=["url", "title"], output_type="collection"
+            plural=True, fieldnames=["url", "title"], output_type="collection"
         )
 
     def test_absent_tail_call(self):

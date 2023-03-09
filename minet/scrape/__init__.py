@@ -44,7 +44,7 @@ def scrape(
 
 class Scraper(object):
     definition: Dict
-    headers: Optional[List[str]]
+    fieldnames: Optional[List[str]]
     plural: bool
     output_type: ScraperAnalysisOutputType
 
@@ -65,7 +65,7 @@ class Scraper(object):
         # Analysis of the definition
         analysis = analyse(definition)
 
-        self.headers = analysis.headers
+        self.fieldnames = analysis.fieldnames
         self.plural = analysis.plural
         self.output_type = analysis.output_type
 
@@ -79,19 +79,24 @@ class Scraper(object):
             self.strainer = strainer_from_css(strain)
 
     def __repr__(self):
-        return "<{name} plural={plural} output_type={output_type} strain={strain} headers={headers!r}>".format(
+        return "<{name} plural={plural} output_type={output_type} strain={strain} fieldnames={fieldnames!r}>".format(
             name=self.__class__.__name__,
             plural=self.plural,
             strain=self.strainer.css if self.strainer else None,
             output_type=self.output_type,
-            headers=self.headers,
+            fieldnames=self.fieldnames,
         )
 
-    def __call__(self, html, context: Optional[Dict] = None):
+    def __call__(self, html: Union[str, BeautifulSoup], context: Optional[Dict] = None):
         return scrape(self.definition, html, context=context, strainer=self.strainer)
 
-    def as_csv_dict_rows(self, html, context=None, plural_separator="|"):
-        if self.headers is None:
+    def as_csv_dict_rows(
+        self,
+        html: Union[str, BeautifulSoup],
+        context: Optional[Dict] = None,
+        plural_separator="|",
+    ):
+        if self.fieldnames is None:
             raise ScraperNotTabularError
 
         def generator():
@@ -119,14 +124,17 @@ class Scraper(object):
 
         return generator()
 
-    def as_records(self, html, context=None):
+    def as_records(
+        self, html: Union[str, BeautifulSoup], context: Optional[Dict] = None
+    ):
         result = self.__call__(html, context=context)
 
         if result is None:
             return
 
         if not self.plural:
-            result = [result]
+            yield result
+            return
 
         yield from result
 
