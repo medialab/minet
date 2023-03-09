@@ -236,6 +236,9 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
         if cli_args.keep_failed_contents and response.status != 200:
             return
 
+        if cli_args.only_html and not response.is_html:
+            return
+
         # First we need to build a filename
         filename_cell = row[filename_pos] if filename_pos is not None else None
 

@@ -302,12 +302,11 @@ Optional Arguments:
   --max-redirects MAX_REDIRECTS
                                 Maximum number of redirections to follow before
                                 breaking. Defaults to 5.
-  --only-html                   Only download pages whose url looks like it
-                                could be HTML (e.g. a url without extension or
-                                ending in .html, .php etc.). Or, said
-                                differently, don't download pages whose url
-                                clearly indicate you won't get HTML (e.g. a url
-                                ending in .pdf or .json url).
+  --only-html                   Only download urls if they are not unambiguously
+                                not html (e.g. if the url has the .pdf or .jpg
+                                extension etc.). Then, if the url was
+                                downloaded, it will only be written on disk if
+                                the http body actually looks like html.
   -O, --output-dir OUTPUT_DIR   Directory where the fetched files will be
                                 written. Defaults to "downloaded".
   -X, --request METHOD          The http method to use. Will default to GET.
@@ -415,7 +414,8 @@ Usage: minet extract [-h] [-g] [--silent] [-I INPUT_DIR] [-p PROCESSES]
                      [--status-column STATUS_COLUMN]
                      [--encoding-column ENCODING_COLUMN]
                      [--mimetype-column MIMETYPE_COLUMN] [--encoding ENCODING]
-                     [-i INPUT] [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                     [-i INPUT] [-s SELECT] [--total TOTAL] [--resume]
+                     [-o OUTPUT]
                      [filename_or_filename_column]
 
 # Minet Extract Command
@@ -478,12 +478,16 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --resume                      Whether to resume from an aborted collection.
+                                Need -o to be set.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
 Columns being added to the output:
 
+. "extract_original_index": index of the line in the original file (the output will be
+    arbitrarily ordered since multiple requests are performed concurrently).
 . "extract_error": any error that happened when extracting content.
 . "canonical_url": canonical url of target html, extracted from
     link.

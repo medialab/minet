@@ -201,7 +201,10 @@ FETCH_COMMAND = command(
         },
         {
             "flag": "--only-html",
-            "help": "Only download pages whose url looks like it could be HTML (e.g. a url without extension or ending in .html, .php etc.). Or, said differently, don't download pages whose url clearly indicate you won't get HTML (e.g. a url ending in .pdf or .json url).",
+            "help": (
+                "Only download urls if they are not unambiguously not html (e.g. if the url has the .pdf or .jpg extension etc.). "
+                "Then, if the url was downloaded, it will only be written on disk if the http body actually looks like html."
+            ),
             "action": "store_true",
         },
     ],
