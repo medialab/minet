@@ -58,13 +58,13 @@ PLURAL_SEPARATOR: Optional[str] = None
 HEADERS: Optional[casanova.headers] = None
 
 
-def init_process(definition, strain, options):
+def init_process(options):
     global SCRAPER
     global FORMAT
     global PLURAL_SEPARATOR
     global HEADERS
 
-    SCRAPER = Scraper(definition, strain=strain)
+    SCRAPER = Scraper(options["definition"], strain=options["strain"])
     FORMAT = options["format"]
     PLURAL_SEPARATOR = options["plural_separator"]
     HEADERS = casanova.headers(options["fieldnames"])
@@ -220,9 +220,9 @@ def action(cli_args):
             cli_args.processes,
             initializer=init_process,
             initargs=(
-                scraper.definition,
-                cli_args.strain,
                 {
+                    "definition": scraper.definition,
+                    "strain": cli_args.strain,
                     "format": cli_args.format,
                     "plural_separator": cli_args.plural_separator,
                     "fieldnames": reader.fieldnames,

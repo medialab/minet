@@ -33,6 +33,10 @@ SCRAPE_COMMAND = command(
         required.
     """,
     epilog="""
+        Builtin scrapers:
+
+        . "title": scrape the <title> tag if any.
+
         Examples:
 
         . Scraping a single file on disk:
@@ -64,11 +68,17 @@ SCRAPE_COMMAND = command(
 
         . Using a strainer to optimize performance:
             $ minet scrape links-scraper.yml --strain "a[href]" -i report.csv > links.csv
+
+        . Keeping some columns from input CSV file:
+            $ minet scrape scraper.yml -i report.csv -s name,url > scraped.csv
     """,
     resolve=resolve_arguments,
     variadic_input={"dummy_column": "filename", "optional": True, "no_help": True},
     arguments=[
-        {"name": "scraper", "help": "Path to a scraper definition file."},
+        {
+            "name": "scraper",
+            "help": 'Path to a scraper definition file, or name of a builtin scraper like "title". See the complete list below.',
+        },
         {
             "flags": ["-g", "--glob"],
             "help": "Will interpret given filename as glob patterns to resolve if given.",

@@ -73,6 +73,7 @@ RawDescriptionRichHelpFormatter.highlights = [
     r"(?P<dim>\n>\s+.+)",  # caret sections
     r'"(?P<metavar>[^"]+)"',  # double-quote literals
     r"`(?P<metavar>[^`]+)`",  # backtick literals
+    r"(?P<metavar><[a-z]+>)", # tags
     r"(?P<emphasis>how to use the command with.+)",  # emphasis
     r"(?P<args>https?://\S+)",  # urls
     r"(?P<groups>\n(?:--[a-z]|[A-Z]).+:\n)",  # various titles

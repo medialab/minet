@@ -6,33 +6,22 @@
 #
 from typing import Dict, Optional, Union, List
 
-from bs4 import BeautifulSoup, SoupStrainer
+from bs4 import SoupStrainer
 from casanova import CSVSerializer
 
-from minet.types import AnyFileTarget
+from minet.types import AnyFileTarget, AnyScrapableTarget
 from minet.fs import load_definition
 from minet.scrape.interpreter import interpret_scraper
 from minet.scrape.analysis import analyse, validate, ScraperAnalysisOutputType
 from minet.scrape.straining import strainer_from_css
-from minet.scrape.exceptions import ScraperNotTabularError, InvalidScraperError
-
-
-def ensure_soup(
-    html_or_soup: Union[str, BeautifulSoup],
-    engine: str = "lxml",
-    strainer: Optional[SoupStrainer] = None,
-) -> BeautifulSoup:
-    is_already_soup = isinstance(html_or_soup, BeautifulSoup)
-
-    if not is_already_soup:
-        return BeautifulSoup(html_or_soup, engine, parse_only=strainer)
-
-    return html_or_soup
+from minet.scrape.exceptions import InvalidScraperError
+from minet.scrape.mixin import ScraperMixin
+from minet.scrape.utils import ensure_soup
 
 
 def scrape(
     scraper: Dict,
-    html: Union[str, BeautifulSoup],
+    html: AnyScrapableTarget,
     engine: str = "lxml",
     context: Optional[Dict] = None,
     strainer: Optional[SoupStrainer] = None,
@@ -42,7 +31,7 @@ def scrape(
     return interpret_scraper(scraper, soup, root=soup, context=context)
 
 
-class Scraper(object):
+class Scraper(ScraperMixin):
     definition: Dict
     fieldnames: Optional[List[str]]
     plural: bool
@@ -80,96 +69,8 @@ class Scraper(object):
         if strain is not None:
             self.strainer = strainer_from_css(strain)
 
-    def __repr__(self):
-        return "<{name} plural={plural} output_type={output_type} strain={strain} fieldnames={fieldnames!r}>".format(
-            name=self.__class__.__name__,
-            plural=self.plural,
-            strain=self.strainer.css if self.strainer else None,
-            output_type=self.output_type,
-            fieldnames=self.fieldnames,
-        )
-
-    def __call__(self, html: Union[str, BeautifulSoup], context: Optional[Dict] = None):
+    def __call__(self, html: AnyScrapableTarget, context: Optional[Dict] = None):
         return scrape(self.definition, html, context=context, strainer=self.strainer)
-
-    def as_csv_rows(
-        self,
-        html: Union[str, BeautifulSoup],
-        context: Optional[Dict] = None,
-        plural_separator="|",
-    ):
-        if self.fieldnames is None:
-            raise ScraperNotTabularError
-
-        def generator():
-
-            result = self.__call__(html, context=context)
-
-            if result is None:
-                return
-
-            if not self.plural:
-                result = [result]
-
-            for item in result:
-                if isinstance(item, dict):
-                    item = self.serializer.serialize_dict_row(
-                        item, self.fieldnames, plural_separator=plural_separator
-                    )
-                else:
-                    item = [self.serializer(item, plural_separator=plural_separator)]
-
-                yield item
-
-        return generator()
-
-    def as_csv_dict_rows(
-        self,
-        html: Union[str, BeautifulSoup],
-        context: Optional[Dict] = None,
-        plural_separator="|",
-    ):
-        if self.fieldnames is None:
-            raise ScraperNotTabularError
-
-        def generator():
-
-            result = self.__call__(html, context=context)
-
-            if result is None:
-                return
-
-            if not self.plural:
-                result = [result]
-
-            for item in result:
-                if isinstance(item, dict):
-                    for k, v in item.items():
-                        item[k] = self.serializer(v, plural_separator=plural_separator)
-                else:
-                    item = {
-                        "value": self.serializer(
-                            item, plural_separator=plural_separator
-                        )
-                    }
-
-                yield item
-
-        return generator()
-
-    def as_records(
-        self, html: Union[str, BeautifulSoup], context: Optional[Dict] = None
-    ):
-        result = self.__call__(html, context=context)
-
-        if result is None:
-            return
-
-        if not self.plural:
-            yield result
-            return
-
-        yield from result
 
 
 __all__ = ["Scraper", "validate"]

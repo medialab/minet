@@ -712,7 +712,9 @@ and can also be fed CSV columns containing HTML content directly if
 required.
 
 Positional Arguments:
-  scraper                       Path to a scraper definition file.
+  scraper                       Path to a scraper definition file, or name of a
+                                builtin scraper like "title". See the complete
+                                list below.
   filename_or_filename_column   Single filename to process or name of the CSV
                                 column containing filenames when using
                                 -i/--input. Defaults to "filename".
@@ -761,6 +763,10 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
+Builtin scrapers:
+
+. "title": scrape the <title> tag if any.
+
 Examples:
 
 . Scraping a single file on disk:
@@ -792,6 +798,9 @@ Examples:
 
 . Using a strainer to optimize performance:
     $ minet scrape links-scraper.yml --strain "a" -i report.csv > links.csv
+
+. Keeping some columns from input CSV file:
+    $ minet scrape scraper.yml -i report.csv -s name,url > scraped.csv
 ```
 
 ## url-extract
