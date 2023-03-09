@@ -675,7 +675,7 @@ def resolve_typical_arguments(
 def command(
     name: str,
     package=None,
-    title: str = None,
+    title: Optional[str] = None,
     aliases=None,
     description=None,
     epilog=None,
@@ -691,6 +691,9 @@ def command(
     variadic_input: Optional[VariadicInputDefinition] = None,
     **kwargs,
 ):
+
+    if resumer is not None and not issubclass(resumer, Resumer):
+        raise TypeError("given resumer is not a Resumer class")
 
     if arguments is not None and subcommands is not None:
         raise TypeError(

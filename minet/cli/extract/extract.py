@@ -10,13 +10,14 @@ from os.path import isdir
 from trafilatura.core import bare_extraction
 from dataclasses import dataclass
 from itertools import count
-from casanova import TabularRecord, Enricher
+from casanova import TabularRecord, ThreadSafeEnricher
 
 from minet.multiprocessing import LazyPool
 from minet.fs import read_potentially_gzipped_path
 from minet.cli.utils import (
     create_fetch_like_report_iterator,
     with_enricher_and_loading_bar,
+    FetchReportLikeItem,
 )
 from minet.cli.console import console
 from minet.cli.reporters import report_error
@@ -114,10 +115,12 @@ def worker(payload: ExtractWorkerPayload) -> ExtractResult:
 
 @with_enricher_and_loading_bar(
     headers=ExtractAddendum,
+    enricher_type="threadsafe",
+    index_column="extract_original_index",
     title="Extracting text",
     unit="docs",
 )
-def action(cli_args, enricher: Enricher, loading_bar):
+def action(cli_args, enricher: ThreadSafeEnricher, loading_bar):
     if cli_args.input_dir is not None and not isdir(cli_args.input_dir):
         raise FatalError(
             'Could not find the [cyan]-I/--input-dir "{}"[/cyan] directory!'.format(
@@ -127,7 +130,7 @@ def action(cli_args, enricher: Enricher, loading_bar):
 
     items = create_fetch_like_report_iterator(cli_args, enricher)
 
-    worked_on: Dict[int, List[str]] = {}
+    worked_on: Dict[int, FetchReportLikeItem] = {}
 
     def payloads() -> Iterator[ExtractWorkerPayload]:
         current_id = count()
@@ -138,12 +141,12 @@ def action(cli_args, enricher: Enricher, loading_bar):
             if item.error is not None:
                 loading_bar.advance()
                 loading_bar.inc_stat(item.error, style="error")
-                enricher.writerow(item.row)
+                enricher.writerow(item.index, item.row)
                 continue
 
             item_id = next(current_id)
 
-            worked_on[item_id] = item.row
+            worked_on[item_id] = item
 
             yield ExtractWorkerPayload(
                 id=item_id, encoding=item.encoding, path=item.path, text=item.text
@@ -162,7 +165,8 @@ def action(cli_args, enricher: Enricher, loading_bar):
             with loading_bar.step():
                 assert isinstance(result, ExtractResult)
 
-                row = worked_on.pop(result.id)
+                item = worked_on.pop(result.id)
+                row = item.row
 
                 if result.error is not None:
                     error_code = report_error(result.error)
@@ -183,7 +187,7 @@ def action(cli_args, enricher: Enricher, loading_bar):
                             )
 
                     addendum = ExtractAddendum(extract_error=error_code)
-                    enricher.writerow(row, addendum)
+                    enricher.writerow(item.index, row, addendum)
 
                     continue
 
@@ -207,4 +211,4 @@ def action(cli_args, enricher: Enricher, loading_bar):
                         sitename=meta.get("sitename"),
                     )
 
-                enricher.writerow(row, addendum)
+                enricher.writerow(item.index, row, addendum)

@@ -1,3 +1,5 @@
+from casanova import ThreadSafeResumer
+
 from minet.cli.argparse import command
 
 
@@ -40,6 +42,8 @@ EXTRACT_COMMAND = command(
 
         Columns being added to the output:
 
+        . "extract_original_index": index of the line in the original file (the output will be
+            arbitrarily ordered since multiple requests are performed concurrently).
         . "extract_error": any error that happened when extracting content.
         . "canonical_url": canonical url of target html, extracted from
             link[rel=canonical].
@@ -87,6 +91,7 @@ EXTRACT_COMMAND = command(
     """,
     resolve=resolve_arguments,
     variadic_input={"dummy_column": "filename", "optional": True, "no_help": True},
+    resumer=ThreadSafeResumer,
     arguments=[
         {
             "flags": ["-g", "--glob"],
