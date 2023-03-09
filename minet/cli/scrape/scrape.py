@@ -13,6 +13,7 @@ from itertools import count
 from os.path import basename, isdir
 
 from minet.scrape import Scraper
+from minet.scrape.typical import TYPICAL_SCRAPERS
 from minet.multiprocessing import LazyPool
 from minet.exceptions import (
     DefinitionInvalidFormatError,
@@ -64,7 +65,10 @@ def init_process(options):
     global PLURAL_SEPARATOR
     global HEADERS
 
-    SCRAPER = Scraper(options["definition"], strain=options["strain"])
+    if options["name"] is not None:
+        SCRAPER = TYPICAL_SCRAPERS[options["name"]]()
+    else:
+        SCRAPER = Scraper(options["definition"], strain=options["strain"])
     FORMAT = options["format"]
     PLURAL_SEPARATOR = options["plural_separator"]
     HEADERS = casanova.headers(options["fieldnames"])
@@ -115,9 +119,15 @@ def worker(payload: ScrapeWorkerPayload) -> ScrapeResult:
 
 def action(cli_args):
 
+    using_typical_scraper = False
+
     # Parsing scraper definition
     try:
-        scraper = Scraper(cli_args.scraper, strain=cli_args.strain)
+        if cli_args.scraper in TYPICAL_SCRAPERS:
+            using_typical_scraper = True
+            scraper = TYPICAL_SCRAPERS[cli_args.scraper]()
+        else:
+            scraper = Scraper(cli_args.scraper, strain=cli_args.strain)
 
     except DefinitionInvalidFormatError:
         raise FatalError(
@@ -221,8 +231,11 @@ def action(cli_args):
             initializer=init_process,
             initargs=(
                 {
-                    "definition": scraper.definition,
-                    "strain": cli_args.strain,
+                    "name": cli_args.scraper if using_typical_scraper else None,
+                    "definition": scraper.definition
+                    if not using_typical_scraper
+                    else None,
+                    "strain": cli_args.strain if not using_typical_scraper else None,
                     "format": cli_args.format,
                     "plural_separator": cli_args.plural_separator,
                     "fieldnames": reader.fieldnames,
