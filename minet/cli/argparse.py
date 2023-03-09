@@ -68,13 +68,14 @@ RawDescriptionRichHelpFormatter.highlights = [
     r"(?P<args>-[a-zA-Z])[\s/.]",  # -f flags
     r"(?P<args>--[a-z]+(-[a-z]+)*)[\s/.]",  # --flag flags
     r"(?P<title>^#\s+.+)",  # command title
+    r"(?P<title>BEWARE):",  # beware
     r"\s+\$\s+(?P<args>.+)",  # examples
     r"(?P<dim>\n>\s+.+)",  # caret sections
     r'"(?P<metavar>[^"]+)"',  # double-quote literals
     r"`(?P<metavar>[^`]+)`",  # backtick literals
     r"(?P<emphasis>how to use the command with.+)",  # emphasis
     r"(?P<args>https?://\S+)",  # urls
-    r"(?P<groups>Columns being added to the output:|--folder-strategy options:|Examples:)",  # various titles
+    r"(?P<groups>\n(?:--[a-z]|[A-Z]).+:\n)",  # various titles
 ]
 
 

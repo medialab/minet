@@ -4193,7 +4193,8 @@ mentions, boolean etc.):
 https://twitter.com/search-advanced?f=live
 
 Useful operators include "since" and "until" to search specific
-time ranges like so: "since:2014-01-01 until:2017-12-31".
+time ranges like so: "since:2014-01-01 until:2017-12-31", or "from" that
+let you search all tweets from a given user like so: "from:medialab_ScPo".
 
 BEWARE: the web search results seem to become inconsistent when
 queries return vast amounts of tweets. In which case you are
@@ -4246,17 +4247,20 @@ Examples:
 . Templating the given CSV column to query tweets by users:
     $ minet tw scrape tweets user -i users.csv --query-template 'from:@{value}' > tweets.csv
 
-. Tip: You can add a "OR @aNotExistingHandle" to your query to avoid searching
-  for your query terms in usernames or handles.
-  Note that this is a temporary hack which might stop working at any time so be
-  sure to double check before relying on this trick.
-  For more information see the related discussion here:
-  https://webapps.stackexchange.com/questions/127425/how-to-exclude-usernames-and-handles-while-searching-twitter
+. Collecting users with "adam" in their user_name or user_description:
+    $ minet tw scrape users adam > users.csv
+
+Tips:
+
+- You can add a "OR @aNotExistingHandle" to your query to avoid searching
+  for your query terms in usernames or handles. Note that this is a temporary hack
+  which might stop working at any time so be sure to double check before relying on
+  this trick.
 
     $ minet tw scrape tweets "keyword OR @anObviouslyNotExistingHandle"
 
-. Collecting users with "adam" in their user_name or user_description:
-    $ minet tw scrape users adam > users.csv
+  For more information see the related discussion here:
+  https://webapps.stackexchange.com/questions/127425/how-to-exclude-usernames-and-handles-while-searching-twitter
 
 how to use the command with a CSV file?
 
