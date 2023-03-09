@@ -238,8 +238,8 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
         formatter_kwargs = {}
 
-        if cli_args.filename_template and "line" in cli_args.filename_template:
-            formatter_kwargs["line"] = enricher.wrap(row)
+        if cli_args.filename_template and "row" in cli_args.filename_template:
+            formatter_kwargs["row"] = enricher.wrap(row)
 
         try:
             assert filename_builder is not None
