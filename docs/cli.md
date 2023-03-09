@@ -346,8 +346,7 @@ Columns being added to the output:
 
 . "fetch_original_index": index of the line in the original file (the output will be
     arbitrarily ordered since multiple requests are performed concurrently).
-. "resolved_url": final resolved url (after solving redirects) if different
-    from starting url.
+. "resolved_url": final resolved url (after templating & solving redirects).
 . "http_status": HTTP status code of the request, e.g. 200, 404, 503 etc.
 . "datetime_utc": datetime when the response was finished.
 . "fetch_error": an error code if anything went wrong when performing the request.
@@ -713,7 +712,7 @@ required.
 
 Positional Arguments:
   scraper                       Path to a scraper definition file, or name of a
-                                builtin scraper like "title". See the complete
+                                builtin scraper, e.g. "title". See the complete
                                 list below.
   filename_or_filename_column   Single filename to process or name of the CSV
                                 column containing filenames when using
@@ -765,6 +764,7 @@ Optional Arguments:
 
 Builtin scrapers:
 
+. "canonical": scrape the <link rel="canonical"> tag href if any.
 . "title": scrape the <title> tag if any.
 
 Examples:
@@ -801,6 +801,9 @@ Examples:
 
 . Keeping some columns from input CSV file:
     $ minet scrape scraper.yml -i report.csv -s name,url > scraped.csv
+
+. Using a builtin scraper:
+    $ minet scrape title -i report.csv > titles.csv
 ```
 
 ## url-extract
