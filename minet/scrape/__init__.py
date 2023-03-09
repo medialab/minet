@@ -47,6 +47,8 @@ class Scraper(object):
     fieldnames: Optional[List[str]]
     plural: bool
     output_type: ScraperAnalysisOutputType
+    serializer: CSVSerializer
+    strainer: Optional[SoupStrainer]
 
     def __init__(
         self, definition: Union[Dict, AnyFileTarget], strain: Optional[str] = None
