@@ -95,8 +95,7 @@ FETCH_COMMAND = command(
 
         . "fetch_original_index": index of the line in the original file (the output will be
             arbitrarily ordered since multiple requests are performed concurrently).
-        . "resolved_url": final resolved url (after solving redirects) if different
-            from starting url.
+        . "resolved_url": final resolved url (after templating & solving redirects).
         . "http_status": HTTP status code of the request, e.g. 200, 404, 503 etc.
         . "datetime_utc": datetime when the response was finished.
         . "fetch_error": an error code if anything went wrong when performing the request.

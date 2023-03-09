@@ -39,7 +39,7 @@ class FetchAddendum(TabularRecord):
     encoding: Optional[str] = None
 
     def infos_from_response(self, response: Response) -> None:
-        self.resolved_url = response.end_url if response.was_redirected else None
+        self.resolved_url = response.end_url
         self.http_status = response.status
         self.datetime_utc = response.end_datetime
         self.filename = response.get("filename")
