@@ -11,7 +11,10 @@ from minet.utils import PseudoFStringFormatter
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.exceptions import FatalError
 from minet.twitter import TwitterAPIScraper
-from minet.twitter.exceptions import TwitterPublicAPIOverCapacityError
+from minet.twitter.exceptions import (
+    TwitterPublicAPIOverCapacityError,
+    TwitterPublicAPIQueryTooLongError,
+)
 from minet.twitter.constants import ADDITIONAL_TWEET_FIELDS
 
 CUSTOM_FORMATTER = PseudoFStringFormatter()
@@ -74,6 +77,9 @@ def action(cli_args, enricher, loading_bar):
 
                     enricher.writerow(row, addendum)
                     loading_bar.nested_advance()
+
+            except TwitterPublicAPIQueryTooLongError:
+                loading_bar.error("Query too long [dim]%s[/dim]" % query)
 
             except TwitterPublicAPIOverCapacityError:
                 raise FatalError('Got an "Over Capacity" error. Shutting down...')

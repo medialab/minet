@@ -485,3 +485,9 @@ class LoadingBar(object):
 
     def print(self, *msg, end="\n"):
         console.print(message_flatmap(*msg), end=end)
+
+    def error(self, *args, **kwargs):
+        console.error(*args, **kwargs)
+
+    def warning(self, *args, **kwargs):
+        console.warning(*args, **kwargs)
