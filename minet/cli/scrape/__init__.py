@@ -6,8 +6,6 @@ def resolve_arguments(cli_args):
         cli_args.column = "filename"
 
 
-# TODO: is --validate working?
-
 SCRAPE_COMMAND = command(
     "scrape",
     "minet.cli.scrape.scrape",
@@ -35,6 +33,7 @@ SCRAPE_COMMAND = command(
     epilog="""
         Builtin scrapers:
 
+        . "canonical": scrape the <link rel="canonical"> tag href if any.
         . "title": scrape the <title> tag if any.
 
         Examples:
@@ -71,13 +70,16 @@ SCRAPE_COMMAND = command(
 
         . Keeping some columns from input CSV file:
             $ minet scrape scraper.yml -i report.csv -s name,url > scraped.csv
+
+        . Using a builtin scraper:
+            $ minet scrape title -i report.csv > titles.csv
     """,
     resolve=resolve_arguments,
     variadic_input={"dummy_column": "filename", "optional": True, "no_help": True},
     arguments=[
         {
             "name": "scraper",
-            "help": 'Path to a scraper definition file, or name of a builtin scraper like "title". See the complete list below.',
+            "help": 'Path to a scraper definition file, or name of a builtin scraper, e.g. "title". See the complete list below.',
         },
         {
             "flags": ["-g", "--glob"],

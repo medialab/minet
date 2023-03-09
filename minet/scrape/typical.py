@@ -10,6 +10,7 @@ from minet.scrape.mixin import ScraperMixin
 
 
 class NamedScraper(ScraperMixin):
+    name: str
     fieldnames: List[str]
     plural: bool
     output_type: ScraperAnalysisOutputType
@@ -21,6 +22,7 @@ class NamedScraper(ScraperMixin):
 
 
 class TitleScraper(NamedScraper):
+    name = "title"
     fieldnames = ["title"]
     plural = False
     output_type = "scalar"
@@ -37,4 +39,32 @@ class TitleScraper(NamedScraper):
         return title_elem.get_text().strip()
 
 
-TYPICAL_SCRAPERS = {"title": TitleScraper}
+class CanonicalScraper(NamedScraper):
+    name = "canonical"
+    fieldnames = ["canonical_url"]
+    plural = False
+    output_type = "scalar"
+    strainer = SoupStrainer(name="link", attrs={"rel": "canonical"})
+
+    def __call__(self, html: AnyScrapableTarget, context=None) -> Any:
+        soup = ensure_soup(html, strainer=self.strainer)
+
+        link_elem = soup.select_one("link[rel=canonical][href]")
+
+        if link_elem is None:
+            return None
+
+        url = link_elem.get("href")
+
+        if url is None:
+            return None
+
+        url = url.strip()
+
+        if not url:
+            return None
+
+        return url
+
+
+TYPICAL_SCRAPERS = {s.name: s for s in [TitleScraper, CanonicalScraper]}
