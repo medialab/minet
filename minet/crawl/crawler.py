@@ -192,10 +192,14 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         throttle: float = DEFAULT_THROTTLE,
         max_workers: Optional[int] = None,
-        insecure: bool = False,
-        timeout: AnyTimeout = DEFAULT_URLLIB3_TIMEOUT,
         wait: bool = True,
         daemonic: bool = False,
+        insecure: bool = False,
+        timeout: AnyTimeout = DEFAULT_URLLIB3_TIMEOUT,
+        spoof_tls_ciphers: bool = False,
+        proxy: Optional[str] = None,
+        retry: bool = False,
+        retryer_kwargs: Optional[Dict[str, Any]] = None,
     ):
 
         # Own executor and imap params
@@ -205,6 +209,10 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
             timeout=timeout,
             wait=wait,
             daemonic=daemonic,
+            spoof_tls_ciphers=spoof_tls_ciphers,
+            proxy=proxy,
+            retry=retry,
+            retryer_kwargs=retryer_kwargs,
         )
 
         self.imap_kwargs = {
