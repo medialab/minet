@@ -31,7 +31,7 @@ from minet.cli.reporters import (
 from minet.cli.console import console
 from minet.fs import read_potentially_gzipped_path
 from minet.cli.loading_bar import LoadingBar
-from minet.cli.utils import create_fetch_like_report_iterator
+from minet.cli.utils import create_fetch_like_report_iterator, FetchReportLikeItem
 from minet.cli.reporters import report_error
 from minet.cli.exceptions import FatalError
 
@@ -163,14 +163,35 @@ def action(cli_args):
     reader = casanova.reader(cli_args.input, total=cli_args.total)
 
     if cli_args.format == "csv":
-        writer = casanova.writer(cli_args.output, fieldnames=scraper.fieldnames)
+        output_fieldnames = scraper.fieldnames
+
+        if cli_args.select is None:
+
+            def writerow(row, item):
+                writer.writerow(item)
+
+        else:
+            selected_indices = reader.headers.select(cli_args.select)
+            output_fieldnames = [
+                reader.fieldnames[i] for i in selected_indices
+            ] + output_fieldnames
+
+            def writerow(row, item):
+                keep = [row[i] for i in selected_indices]
+                writer.writerow(keep + item)
+
+        writer = casanova.writer(cli_args.output, fieldnames=output_fieldnames)
+
     else:
         writer = ndjson.writer(cli_args.output)
+
+        def writerow(row, item):
+            writer.writerow(item)
 
     with LoadingBar("Scraping", unit="pages", total=reader.total) as loading_bar:
         items = create_fetch_like_report_iterator(cli_args, reader)
 
-        worked_on: Dict[int, List[str]] = {}
+        worked_on: Dict[int, FetchReportLikeItem] = {}
 
         def payloads() -> Iterator[ScrapeWorkerPayload]:
             current_id = count()
@@ -185,7 +206,7 @@ def action(cli_args):
 
                 item_id = next(current_id)
 
-                worked_on[item_id] = item.row
+                worked_on[item_id] = item
 
                 yield ScrapeWorkerPayload(
                     id=item_id,
@@ -218,7 +239,7 @@ def action(cli_args):
                 worker, payloads(), chunksize=cli_args.chunk_size
             ):
                 with loading_bar.step():
-                    _ = worked_on.pop(result.id)
+                    original_item = worked_on.pop(result.id)
 
                     if result.error is not None:
                         if isinstance(
@@ -260,7 +281,7 @@ def action(cli_args):
                     items = result.items
 
                     for item in items:
-                        writer.writerow(item)
+                        writerow(original_item.row, item)
 
                     loading_bar.inc_stat(
                         "scraped-items", count=len(items), style="info"
