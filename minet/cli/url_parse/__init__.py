@@ -83,9 +83,6 @@ URL_PARSE_COMMAND = command(
         . Keeping only selected columns from the input file:
             $ minet url-parse url -i posts.csv -s id,url,title > report.csv
 
-        . Multiple urls joined by separator:
-            $ minet url-parse urls -i posts.csv --separator "|" > report.csv
-
         . Parsing Facebook urls:
             $ minet url-parse url -i fbposts.csv --facebook > report.csv
 
@@ -97,7 +94,6 @@ URL_PARSE_COMMAND = command(
     """,
     variadic_input={"dummy_column": "url", "item_label": "url"},
     arguments=[
-        {"flag": "--separator", "help": "Split url column by a separator?"},
         {
             "flag": "--facebook",
             "help": "Whether to consider and parse the given urls as coming from Facebook.",

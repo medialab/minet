@@ -241,15 +241,15 @@ Examples:
 ```
 Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                    [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
-                   [--insecure] [--separator SEPARATOR] [-t THREADS]
-                   [--throttle THROTTLE] [--timeout TIMEOUT]
-                   [--url-template URL_TEMPLATE] [-X METHOD]
+                   [--insecure] [-t THREADS] [--throttle THROTTLE]
+                   [--timeout TIMEOUT] [--url-template URL_TEMPLATE] [-X METHOD]
                    [--max-redirects MAX_REDIRECTS] [--compress] [-c] [-D]
                    [-O OUTPUT_DIR] [-f FILENAME]
                    [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [--keep-failed-contents]
-                   [--standardize-encoding] [--only-html] [-i INPUT] [-s SELECT]
-                   [--total TOTAL] [--resume] [-o OUTPUT]
+                   [--standardize-encoding] [--only-html] [-i INPUT]
+                   [--explode EXPLODE] [-s SELECT] [--total TOTAL] [--resume]
+                   [-o OUTPUT]
                    url_or_url_column
 
 # Minet Fetch Command
@@ -311,9 +311,6 @@ Optional Arguments:
                                 written. Defaults to "downloaded".
   -X, --request METHOD          The http method to use. Will default to GET.
   -D, --dont-save               Use not to write any downloaded file on disk.
-  --separator SEPARATOR         Character used to split the url cell in the CSV
-                                file, if this one can in fact contain multiple
-                                urls.
   --standardize-encoding        Whether to systematically convert retrieved text
                                 to UTF-8.
   -t, --threads THREADS         Number of threads to use. Defaults to 25.
@@ -326,6 +323,10 @@ Optional Arguments:
                                 you need to build urls from ids etc.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -403,6 +404,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ## extract
@@ -414,8 +422,8 @@ Usage: minet extract [-h] [-g] [--silent] [-I INPUT_DIR] [-p PROCESSES]
                      [--status-column STATUS_COLUMN]
                      [--encoding-column ENCODING_COLUMN]
                      [--mimetype-column MIMETYPE_COLUMN] [--encoding ENCODING]
-                     [-i INPUT] [-s SELECT] [--total TOTAL] [--resume]
-                     [-o OUTPUT]
+                     [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                     [--resume] [-o OUTPUT]
                      [filename_or_filename_column]
 
 # Minet Extract Command
@@ -469,6 +477,10 @@ Optional Arguments:
                                 Name of the CSV column containing HTTP status.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -539,13 +551,13 @@ Examples:
 ```
 Usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                      [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
-                     [--insecure] [--separator SEPARATOR] [-t THREADS]
-                     [--throttle THROTTLE] [--timeout TIMEOUT]
-                     [--url-template URL_TEMPLATE] [-X METHOD]
-                     [--max-redirects MAX_REDIRECTS] [--follow-meta-refresh]
-                     [--follow-js-relocation] [--infer-redirection]
-                     [--canonicalize] [--only-shortened] [-i INPUT] [-s SELECT]
-                     [--total TOTAL] [--resume] [-o OUTPUT]
+                     [--insecure] [-t THREADS] [--throttle THROTTLE]
+                     [--timeout TIMEOUT] [--url-template URL_TEMPLATE]
+                     [-X METHOD] [--max-redirects MAX_REDIRECTS]
+                     [--follow-meta-refresh] [--follow-js-relocation]
+                     [--infer-redirection] [--canonicalize] [--only-shortened]
+                     [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                     [--resume] [-o OUTPUT]
                      url_or_url_column
 
 # Minet Resolve Command
@@ -588,9 +600,6 @@ Optional Arguments:
   --only-shortened              Whether to only attempt to resolve urls that are
                                 probably shortened.
   -X, --request METHOD          The http method to use. Will default to GET.
-  --separator SEPARATOR         Character used to split the url cell in the CSV
-                                file, if this one can in fact contain multiple
-                                urls.
   -t, --threads THREADS         Number of threads to use. Defaults to 25.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to 0.2.
@@ -601,6 +610,10 @@ Optional Arguments:
                                 you need to build urls from ids etc.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -651,6 +664,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ## scrape
@@ -666,7 +686,8 @@ Usage: minet scrape [-h] [--silent] [-g] [-I INPUT_DIR] [-p PROCESSES]
                     [--mimetype-column MIMETYPE_COLUMN] [--encoding ENCODING]
                     [-f {csv,jsonl,ndjson}]
                     [--plural-separator PLURAL_SEPARATOR] [--strain STRAIN]
-                    [-i INPUT] [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                    [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                    [-o OUTPUT]
                     scraper [filename_or_filename_column]
 
 # Minet Scrape Command
@@ -723,6 +744,10 @@ Optional Arguments:
                                 order to optimize performance.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -866,15 +891,15 @@ Examples:
 ## url-parse
 
 ```
-Usage: minet url-parse [-h] [--separator SEPARATOR] [--silent] [--facebook]
-                       [--twitter] [--youtube] [--infer-redirection]
-                       [--fix-common-mistakes] [--normalize-amp] [--quoted]
-                       [--sort-query] [--strip-authentication]
-                       [--strip-fragment] [--strip-index]
-                       [--strip-irrelevant-subdomains]
+Usage: minet url-parse [-h] [--facebook] [--silent] [--twitter] [--youtube]
+                       [--infer-redirection] [--fix-common-mistakes]
+                       [--normalize-amp] [--quoted] [--sort-query]
+                       [--strip-authentication] [--strip-fragment]
+                       [--strip-index] [--strip-irrelevant-subdomains]
                        [--strip-lang-query-items] [--strip-lang-subdomains]
                        [--strip-protocol] [--strip-trailing-slash] [-i INPUT]
-                       [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                       [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                       [-o OUTPUT]
                        url_or_url_column
 
 # Minet Url Parse Command
@@ -906,7 +931,6 @@ Optional Arguments:
   --quoted, --no-quoted         Whether or not to normalize to a quoted or
                                 unquoted version of the url when normalizing
                                 url. Defaults to quoted.
-  --separator SEPARATOR         Split url column by a separator?
   --sort-query, --dont-sort-query
                                 Whether or not to sort query items when
                                 normalizing url. Defaults to sort query.
@@ -952,6 +976,10 @@ Optional Arguments:
                                 coming from YouTube.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -1014,9 +1042,6 @@ Examples:
 . Keeping only selected columns from the input file:
     $ minet url-parse url -i posts.csv -s id,url,title > report.csv
 
-. Multiple urls joined by separator:
-    $ minet url-parse urls -i posts.csv --separator "|" > report.csv
-
 . Parsing Facebook urls:
     $ minet url-parse url -i fbposts.csv --facebook > report.csv
 
@@ -1040,6 +1065,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ## BuzzSumo
@@ -1106,7 +1138,8 @@ Examples:
 ```
 Usage: minet buzzsumo domain-summary [-h] [-t TOKEN] [--rcfile RCFILE]
                                      [--silent] --begin-date BEGIN_DATE
-                                     --end-date END_DATE [-i INPUT] [-s SELECT]
+                                     --end-date END_DATE [-i INPUT]
+                                     [--explode EXPLODE] [-s SELECT]
                                      [--total TOTAL] [-o OUTPUT]
                                      domain_name_or_domain_name_column
 
@@ -1133,6 +1166,10 @@ Optional Arguments:
                                 the MINET_BUZZSUMO_TOKEN env variable.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -1172,6 +1209,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 <h3 id="buzzsumo-domain">domain</h3>
@@ -1179,7 +1223,8 @@ how to use the command with a CSV file?
 ```
 Usage: minet buzzsumo domain [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
                              --begin-date BEGIN_DATE --end-date END_DATE
-                             [-i INPUT] [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                             [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                             [--total TOTAL] [-o OUTPUT]
                              domain_name_or_domain_name_column
 
 # Minet Buzzsumo Domain Command
@@ -1205,6 +1250,10 @@ Optional Arguments:
                                 the MINET_BUZZSUMO_TOKEN env variable.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -1244,6 +1293,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ## CrowdTangle
@@ -1377,8 +1433,8 @@ Examples:
 ```
 Usage: minet crowdtangle posts-by-id [-h] [--rate-limit RATE_LIMIT]
                                      [--rcfile RCFILE] [--silent] [-t TOKEN]
-                                     [-i INPUT] [-s SELECT] [--total TOTAL]
-                                     [--resume] [-o OUTPUT]
+                                     [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                     [--total TOTAL] [--resume] [-o OUTPUT]
                                      post_url_or_id_or_post_url_or_id_column
 
 # Minet CrowdTangle Post By Id Command
@@ -1405,6 +1461,10 @@ Optional Arguments:
                                 from the MINET_CROWDTANGLE_TOKEN env variable.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -1446,6 +1506,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### posts
@@ -1610,8 +1677,9 @@ Usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT]
                                  [--rcfile RCFILE] [--silent] [-t TOKEN]
                                  [-p PLATFORMS] [--posts POSTS]
                                  [--sort-by {date,subscriber_count,total_interactions}]
-                                 --start-date START_DATE [-i INPUT] [-s SELECT]
-                                 [--total TOTAL] [-o OUTPUT]
+                                 --start-date START_DATE [-i INPUT]
+                                 [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                                 [-o OUTPUT]
                                  url_or_url_column
 
 # Minet CrowdTangle Link Summary Command
@@ -1645,6 +1713,10 @@ Optional Arguments:
                                 from the MINET_CROWDTANGLE_TOKEN env variable.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -1681,6 +1753,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ## Facebook
@@ -1706,8 +1785,9 @@ Subcommands:
 
 ```
 Usage: minet facebook comments [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                               [--throttle THROTTLE] [-i INPUT] [-s SELECT]
-                               [--total TOTAL] [-o OUTPUT]
+                               [--throttle THROTTLE] [-i INPUT]
+                               [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                               [-o OUTPUT]
                                post_url_or_post_url_column
 
 # Minet Facebook Comments Command
@@ -1738,6 +1818,10 @@ Optional Arguments:
                                request.
   -s, --select SELECT          Columns of input CSV file to include in the
                                output (separated by `,`).
+  --explode EXPLODE            Use to indicate the character used to separate
+                               multiple values in a single CSV cell. Defaults to
+                               none, i.e. CSV cells having a single values,
+                               which is usually the case.
   --total TOTAL                Total number of items to process. Might be
                                necessary when you want to display a finite
                                progress indicator for large files given as input
@@ -1780,14 +1864,21 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 <h3 id="facebook-post">post</h3>
 
 ```
 Usage: minet facebook post [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                           [--throttle THROTTLE] [-i INPUT] [-s SELECT]
-                           [--total TOTAL] [-o OUTPUT]
+                           [--throttle THROTTLE] [-i INPUT] [--explode EXPLODE]
+                           [-s SELECT] [--total TOTAL] [-o OUTPUT]
                            post_url_or_post_url_column
 
 # Minet Facebook Post Command
@@ -1839,6 +1930,10 @@ Optional Arguments:
                                request.
   -s, --select SELECT          Columns of input CSV file to include in the
                                output (separated by `,`).
+  --explode EXPLODE            Use to indicate the character used to separate
+                               multiple values in a single CSV cell. Defaults to
+                               none, i.e. CSV cells having a single values,
+                               which is usually the case.
   --total TOTAL                Total number of items to process. Might be
                                necessary when you want to display a finite
                                progress indicator for large files given as input
@@ -1881,14 +1976,21 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 <h3 id="facebook-posts">posts</h3>
 
 ```
 Usage: minet facebook posts [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                            [--throttle THROTTLE] [-i INPUT] [-s SELECT]
-                            [--total TOTAL] [-o OUTPUT]
+                            [--throttle THROTTLE] [-i INPUT] [--explode EXPLODE]
+                            [-s SELECT] [--total TOTAL] [-o OUTPUT]
                             group_url_or_group_url_column
 
 # Minet Facebook Posts Command
@@ -1940,6 +2042,10 @@ Optional Arguments:
                                 each request.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -1982,13 +2088,21 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 <h3 id="facebook-post-authors">post-authors</h3>
 
 ```
 Usage: minet facebook post-authors [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                                   [--throttle THROTTLE] [-i INPUT] [-s SELECT]
+                                   [--throttle THROTTLE] [-i INPUT]
+                                   [--explode EXPLODE] [-s SELECT]
                                    [--total TOTAL] [-o OUTPUT]
                                    post_url_or_post_url_column
 
@@ -2014,6 +2128,10 @@ Optional Arguments:
                                request.
   -s, --select SELECT          Columns of input CSV file to include in the
                                output (separated by `,`).
+  --explode EXPLODE            Use to indicate the character used to separate
+                               multiple values in a single CSV cell. Defaults to
+                               none, i.e. CSV cells having a single values,
+                               which is usually the case.
   --total TOTAL                Total number of items to process. Might be
                                necessary when you want to display a finite
                                progress indicator for large files given as input
@@ -2050,13 +2168,20 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 <h3 id="facebook-url-likes">url-likes</h3>
 
 ```
-Usage: minet facebook url-likes [-h] [--silent] [-i INPUT] [-s SELECT]
-                                [--total TOTAL] [-o OUTPUT]
+Usage: minet facebook url-likes [-h] [--silent] [-i INPUT] [--explode EXPLODE]
+                                [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                 url_or_url_column
 
 # Minet Facebook Url Likes Command
@@ -2079,6 +2204,10 @@ Positional Arguments:
 Optional Arguments:
   -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
+  --explode EXPLODE           Use to indicate the character used to separate
+                              multiple values in a single CSV cell. Defaults to
+                              none, i.e. CSV cells having a single values, which
+                              is usually the case.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -2113,6 +2242,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ## Google
@@ -2392,8 +2528,8 @@ Subcommands:
 
 ```
 Usage: minet instagram comments [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                                [-l LIMIT] [-i INPUT] [-s SELECT]
-                                [--total TOTAL] [-o OUTPUT]
+                                [-l LIMIT] [-i INPUT] [--explode EXPLODE]
+                                [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                 post_or_post_column
 
 # Instagram Comments Command
@@ -2424,6 +2560,10 @@ Optional Arguments:
   -l, --limit LIMIT           Maximum number of comments to retrieve per post.
   -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
+  --explode EXPLODE           Use to indicate the character used to separate
+                              multiple values in a single CSV cell. Defaults to
+                              none, i.e. CSV cells having a single values, which
+                              is usually the case.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -2461,14 +2601,21 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### hashtag
 
 ```
 Usage: minet instagram hashtag [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                               [-l LIMIT] [-i INPUT] [-s SELECT] [--total TOTAL]
-                               [-o OUTPUT]
+                               [-l LIMIT] [-i INPUT] [--explode EXPLODE]
+                               [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                hashtag_or_hashtag_column
 
 # Instagram hashtag
@@ -2500,6 +2647,10 @@ Optional Arguments:
   -l, --limit LIMIT           Maximum number of posts to retrieve per hashtag.
   -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
+  --explode EXPLODE           Use to indicate the character used to separate
+                              multiple values in a single CSV cell. Defaults to
+                              none, i.e. CSV cells having a single values, which
+                              is usually the case.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -2536,14 +2687,21 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 <h3 id="insta-post-infos">post-infos</h3>
 
 ```
 Usage: minet instagram post-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                                  [-i INPUT] [-s SELECT] [--total TOTAL]
-                                  [-o OUTPUT]
+                                  [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                  [--total TOTAL] [-o OUTPUT]
                                   post_or_post_column
 
 # Instagram post-infos
@@ -2578,6 +2736,10 @@ Optional Arguments:
                               MINET_INSTAGRAM_COOKIE env variable.
   -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
+  --explode EXPLODE           Use to indicate the character used to separate
+                              multiple values in a single CSV cell. Defaults to
+                              none, i.e. CSV cells having a single values, which
+                              is usually the case.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -2615,6 +2777,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### user-followers
@@ -2622,7 +2791,8 @@ how to use the command with a CSV file?
 ```
 Usage: minet instagram user-followers [-h] [-c COOKIE] [--rcfile RCFILE]
                                       [--silent] [-l LIMIT] [-i INPUT]
-                                      [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                                      [--explode EXPLODE] [-s SELECT]
+                                      [--total TOTAL] [-o OUTPUT]
                                       user_or_user_column
 
 # Instagram User Followers Command
@@ -2661,6 +2831,10 @@ Optional Arguments:
   -l, --limit LIMIT           Maximum number of followers to retrieve per user.
   -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
+  --explode EXPLODE           Use to indicate the character used to separate
+                              multiple values in a single CSV cell. Defaults to
+                              none, i.e. CSV cells having a single values, which
+                              is usually the case.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -2698,6 +2872,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### user-following
@@ -2705,7 +2886,8 @@ how to use the command with a CSV file?
 ```
 Usage: minet instagram user-following [-h] [-c COOKIE] [--rcfile RCFILE]
                                       [--silent] [-l LIMIT] [-i INPUT]
-                                      [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                                      [--explode EXPLODE] [-s SELECT]
+                                      [--total TOTAL] [-o OUTPUT]
                                       user_or_user_column
 
 # Instagram User Following Command
@@ -2743,6 +2925,10 @@ Optional Arguments:
   -l, --limit LIMIT           Maximum number of accounts to retrieve per user.
   -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
+  --explode EXPLODE           Use to indicate the character used to separate
+                              multiple values in a single CSV cell. Defaults to
+                              none, i.e. CSV cells having a single values, which
+                              is usually the case.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -2780,14 +2966,21 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### user-infos
 
 ```
 Usage: minet instagram user-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                                  [-i INPUT] [-s SELECT] [--total TOTAL]
-                                  [-o OUTPUT]
+                                  [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                  [--total TOTAL] [-o OUTPUT]
                                   user_or_user_column
 
 # Instagram user-infos
@@ -2824,6 +3017,10 @@ Optional Arguments:
                               MINET_INSTAGRAM_COOKIE env variable.
   -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
+  --explode EXPLODE           Use to indicate the character used to separate
+                              multiple values in a single CSV cell. Defaults to
+                              none, i.e. CSV cells having a single values, which
+                              is usually the case.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -2861,14 +3058,21 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### user-posts
 
 ```
 Usage: minet instagram user-posts [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                                  [-l LIMIT] [-i INPUT] [-s SELECT]
-                                  [--total TOTAL] [-o OUTPUT]
+                                  [-l LIMIT] [-i INPUT] [--explode EXPLODE]
+                                  [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                   user_or_user_column
 
 # Instagram User Posts Command
@@ -2908,6 +3112,10 @@ Optional Arguments:
   -l, --limit LIMIT           Maximum number of posts to retrieve per user.
   -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
+  --explode EXPLODE           Use to indicate the character used to separate
+                              multiple values in a single CSV cell. Defaults to
+                              none, i.e. CSV cells having a single values, which
+                              is usually the case.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -2945,6 +3153,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ## Mediacloud
@@ -2953,8 +3168,8 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet mediacloud medias [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
-                               [--feeds FEEDS] [-i INPUT] [-s SELECT]
-                               [--total TOTAL] [-o OUTPUT]
+                               [--feeds FEEDS] [-i INPUT] [--explode EXPLODE]
+                               [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                media_or_media_column
 
 # Minet Mediacloud Medias Command
@@ -2975,6 +3190,10 @@ Optional Arguments:
                               MINET_MEDIACLOUD_TOKEN env variable.
   -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
+  --explode EXPLODE           Use to indicate the character used to separate
+                              multiple values in a single CSV cell. Defaults to
+                              none, i.e. CSV cells having a single values, which
+                              is usually the case.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -3006,6 +3225,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 <h3 id="mc-search">search</h3>
@@ -3103,8 +3329,8 @@ Optional Arguments:
 
 ```
 Usage: minet telegram channel-infos [-h] [--throttle THROTTLE] [--silent]
-                                    [-i INPUT] [-s SELECT] [--total TOTAL]
-                                    [-o OUTPUT]
+                                    [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                    [--total TOTAL] [-o OUTPUT]
                                     channel_name_or_channel_name_column
 
 # Minet Telegram Channel-Infos Command
@@ -3122,6 +3348,10 @@ Optional Arguments:
                                 each request.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -3153,14 +3383,21 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### channel-messages
 
 ```
 Usage: minet telegram channel-messages [-h] [--throttle THROTTLE] [--silent]
-                                       [-i INPUT] [-s SELECT] [--total TOTAL]
-                                       [-o OUTPUT]
+                                       [-i INPUT] [--explode EXPLODE]
+                                       [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                        channel_name_or_channel_name_column
 
 # Minet Telegram Channel-Messages Command
@@ -3178,6 +3415,10 @@ Optional Arguments:
                                 each request.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -3209,6 +3450,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ## Tiktok
@@ -3231,8 +3479,8 @@ Subcommands:
 
 ```
 Usage: minet tiktok search-videos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                                  [-l LIMIT] [-i INPUT] [-s SELECT]
-                                  [--total TOTAL] [-o OUTPUT]
+                                  [-l LIMIT] [-i INPUT] [--explode EXPLODE]
+                                  [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                   query_or_query_column
 
 # Tiktok Search Videos Command
@@ -3272,6 +3520,10 @@ Optional Arguments:
   -l, --limit LIMIT           Maximum number of videos to retrieve per query.
   -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
+  --explode EXPLODE           Use to indicate the character used to separate
+                              multiple values in a single CSV cell. Defaults to
+                              none, i.e. CSV cells having a single values, which
+                              is usually the case.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -3308,6 +3560,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ## Twitter
@@ -3321,8 +3580,8 @@ Usage: minet twitter attrition [-h] [--user USER] [--silent]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
-                               [-i INPUT] [-s SELECT] [--total TOTAL] [--resume]
-                               [-o OUTPUT]
+                               [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                               [--total TOTAL] [--resume] [-o OUTPUT]
                                tweet_url_or_id_or_tweet_url_or_id_column
 
 # Minet Twitter Attrition Command
@@ -3397,6 +3656,10 @@ Optional Arguments:
                                 unavailability.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -3438,6 +3701,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### followers
@@ -3448,8 +3718,8 @@ Usage: minet twitter followers [-h] [--ids] [--silent] [--v2]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
-                               [-i INPUT] [-s SELECT] [--total TOTAL] [--resume]
-                               [-o OUTPUT]
+                               [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                               [--total TOTAL] [--resume] [-o OUTPUT]
                                user_or_user_column
 
 # Minet Twitter Followers Command
@@ -3486,6 +3756,10 @@ Optional Arguments:
                                 v1.1.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -3525,6 +3799,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### friends
@@ -3534,8 +3815,8 @@ Usage: minet twitter friends [-h] [--ids] [--silent] [--v2] [--api-key API_KEY]
                              [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
                              [--access-token ACCESS_TOKEN]
                              [--access-token-secret ACCESS_TOKEN_SECRET]
-                             [-i INPUT] [-s SELECT] [--total TOTAL] [--resume]
-                             [-o OUTPUT]
+                             [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                             [--total TOTAL] [--resume] [-o OUTPUT]
                              user_or_user_column
 
 # Minet Twitter Friends Command
@@ -3572,6 +3853,10 @@ Optional Arguments:
                                 v1.1.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -3611,6 +3896,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### list-followers
@@ -3620,8 +3912,8 @@ Usage: minet twitter list-followers [-h] [--api-key API_KEY] [--rcfile RCFILE]
                                     [--silent] [--api-secret-key API_SECRET_KEY]
                                     [--access-token ACCESS_TOKEN]
                                     [--access-token-secret ACCESS_TOKEN_SECRET]
-                                    [-i INPUT] [-s SELECT] [--total TOTAL]
-                                    [-o OUTPUT]
+                                    [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                    [--total TOTAL] [-o OUTPUT]
                                     list_or_list_column
 
 # Minet Twitter List Followers Command
@@ -3653,6 +3945,10 @@ Optional Arguments:
                                 env variable.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -3690,6 +3986,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### list-members
@@ -3699,8 +4002,8 @@ Usage: minet twitter list-members [-h] [--api-key API_KEY] [--rcfile RCFILE]
                                   [--silent] [--api-secret-key API_SECRET_KEY]
                                   [--access-token ACCESS_TOKEN]
                                   [--access-token-secret ACCESS_TOKEN_SECRET]
-                                  [-i INPUT] [-s SELECT] [--total TOTAL]
-                                  [-o OUTPUT]
+                                  [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                  [--total TOTAL] [-o OUTPUT]
                                   list_or_list_column
 
 # Minet Twitter List Members Command
@@ -3732,6 +4035,10 @@ Optional Arguments:
                                 env variable.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -3769,6 +4076,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### retweeters
@@ -3778,8 +4092,8 @@ Usage: minet twitter retweeters [-h] [--api-key API_KEY] [--rcfile RCFILE]
                                 [--silent] [--api-secret-key API_SECRET_KEY]
                                 [--access-token ACCESS_TOKEN]
                                 [--access-token-secret ACCESS_TOKEN_SECRET]
-                                [-i INPUT] [-s SELECT] [--total TOTAL]
-                                [-o OUTPUT]
+                                [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                [--total TOTAL] [-o OUTPUT]
                                 tweet_id_or_tweet_id_column
 
 # Minet Twitter Retweeters Command
@@ -3811,6 +4125,10 @@ Optional Arguments:
                                 env variable.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -3847,6 +4165,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 <h3 id="twitter-scrape">scrape</h3>
@@ -3854,7 +4179,8 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter scrape [-h] [--silent] [--include-refs] [-l LIMIT]
                             [--query-template QUERY_TEMPLATE] [-i INPUT]
-                            [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                            [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                            [-o OUTPUT]
                             {tweets,users} query_or_query_column
 
 # Minet Twitter Scrape Command
@@ -3892,6 +4218,10 @@ Optional Arguments:
                                 into from:@user queries.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -3942,13 +4272,21 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### tweet-date
 
 ```
 Usage: minet twitter tweet-date [-h] [--timezone TIMEZONE] [--silent] [-i INPUT]
-                                [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                                [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                                [-o OUTPUT]
                                 tweet_or_tweet_column
 
 # Minet Twitter Tweet Date Command
@@ -3965,6 +4303,10 @@ Optional Arguments:
                               Default to UTC.
   -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
+  --explode EXPLODE           Use to indicate the character used to separate
+                              multiple values in a single CSV cell. Defaults to
+                              none, i.e. CSV cells having a single values, which
+                              is usually the case.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -3996,6 +4338,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### tweet-search
@@ -4010,8 +4359,8 @@ Usage: minet twitter tweet-search [-h] [--since-id SINCE_ID] [--silent]
                                   [--api-secret-key API_SECRET_KEY]
                                   [--access-token ACCESS_TOKEN]
                                   [--access-token-secret ACCESS_TOKEN_SECRET]
-                                  [-i INPUT] [-s SELECT] [--total TOTAL]
-                                  [-o OUTPUT]
+                                  [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                  [--total TOTAL] [-o OUTPUT]
                                   query_or_query_column
 
 # Minet Twitter Tweets Search Command
@@ -4063,6 +4412,10 @@ Optional Arguments:
                                 with the specified id.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -4102,6 +4455,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### tweet-count
@@ -4115,8 +4475,8 @@ Usage: minet twitter tweet-count [-h] [--granularity {day,hour,minute}]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
-                                 [-i INPUT] [-s SELECT] [--total TOTAL]
-                                 [-o OUTPUT]
+                                 [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                 [--total TOTAL] [-o OUTPUT]
                                  query_or_query_column
 
 # Minet Twitter Tweets Count Command
@@ -4174,6 +4534,10 @@ Optional Arguments:
                                 with the specified id.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -4216,6 +4580,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### tweets
@@ -4225,8 +4596,8 @@ Usage: minet twitter tweets [-h] [--v2] [--silent] [--api-key API_KEY]
                             [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
                             [--access-token ACCESS_TOKEN]
                             [--access-token-secret ACCESS_TOKEN_SECRET]
-                            [-i INPUT] [-s SELECT] [--total TOTAL] [--resume]
-                            [-o OUTPUT]
+                            [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                            [--total TOTAL] [--resume] [-o OUTPUT]
                             tweet_id_or_tweet_id_column
 
 # Minet Twitter Tweets Command
@@ -4260,6 +4631,10 @@ Optional Arguments:
                                 v1.1.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -4298,6 +4673,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### users
@@ -4307,8 +4689,8 @@ Usage: minet twitter users [-h] [--ids] [--silent] [--v2] [--api-key API_KEY]
                            [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
                            [--access-token ACCESS_TOKEN]
                            [--access-token-secret ACCESS_TOKEN_SECRET]
-                           [-i INPUT] [-s SELECT] [--total TOTAL] [--resume]
-                           [-o OUTPUT]
+                           [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                           [--total TOTAL] [--resume] [-o OUTPUT]
                            user_or_user_column
 
 # Minet Twitter Users Command
@@ -4344,6 +4726,10 @@ Optional Arguments:
                                 v1.1.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -4382,6 +4768,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### user-search
@@ -4391,8 +4784,8 @@ Usage: minet twitter user-search [-h] [--api-key API_KEY] [--rcfile RCFILE]
                                  [--silent] [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
-                                 [-i INPUT] [-s SELECT] [--total TOTAL]
-                                 [-o OUTPUT]
+                                 [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                 [--total TOTAL] [-o OUTPUT]
                                  query_or_query_column
 
 # Minet Twitter Users Search Command
@@ -4427,6 +4820,10 @@ Optional Arguments:
                                 env variable.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -4466,6 +4863,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### user-tweets
@@ -4477,8 +4881,8 @@ Usage: minet twitter user-tweets [-h] [--ids] [--silent] [--min-date MIN_DATE]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
-                                 [-i INPUT] [-s SELECT] [--total TOTAL]
-                                 [-o OUTPUT]
+                                 [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                 [--total TOTAL] [-o OUTPUT]
                                  user_or_user_column
 
 # Minet Twitter User Tweets Command
@@ -4520,6 +4924,10 @@ Optional Arguments:
                                 v1.1.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -4557,6 +4965,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ## Wikipedia
@@ -4569,8 +4984,8 @@ Usage: minet wikipedia pageviews [-h] --start-date START_DATE [--silent]
                                  [--access ACCESS] [-t THREADS]
                                  [--granularity GRANULARITY] [--sum]
                                  [--lang LANG] [--lang-column LANG_COLUMN]
-                                 [-i INPUT] [-s SELECT] [--total TOTAL]
-                                 [--resume] [-o OUTPUT]
+                                 [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                 [--total TOTAL] [--resume] [-o OUTPUT]
                                  page_or_page_column
 
 # Minet Wikipedia Pageviews Command
@@ -4602,6 +5017,10 @@ Optional Arguments:
   -t, --threads THREADS         Number of threads to use. Defaults to 10.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -4631,6 +5050,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ## Youtube
@@ -4639,7 +5065,8 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet youtube captions [-h] [--lang LANG] [--silent] [-i INPUT]
-                              [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                              [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                              [-o OUTPUT]
                               video_or_video_column
 
 # Youtube captions
@@ -4658,6 +5085,10 @@ Optional Arguments:
                               "en".
   -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
+  --explode EXPLODE           Use to indicate the character used to separate
+                              multiple values in a single CSV cell. Defaults to
+                              none, i.e. CSV cells having a single values, which
+                              is usually the case.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -4693,14 +5124,21 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### channel-videos
 
 ```
 Usage: minet youtube channel-videos [-h] [-k KEY] [--rcfile RCFILE] [--silent]
-                                    [-i INPUT] [-s SELECT] [--total TOTAL]
-                                    [-o OUTPUT]
+                                    [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                    [--total TOTAL] [-o OUTPUT]
                                     channel_or_channel_column
 
 # Youtube channel videos
@@ -4723,6 +5161,10 @@ Optional Arguments:
                               MINET_YOUTUBE_KEY env variable.
   -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
+  --explode EXPLODE           Use to indicate the character used to separate
+                              multiple values in a single CSV cell. Defaults to
+                              none, i.e. CSV cells having a single values, which
+                              is usually the case.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -4765,6 +5207,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 <h3 id="youtube-comments">comments</h3>
@@ -4773,7 +5222,8 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet youtube channels [-h] [-k KEY] [--rcfile RCFILE] [--silent]
-                              [-i INPUT] [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                              [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                              [--total TOTAL] [-o OUTPUT]
                               channel_or_channel_column
 
 # Youtube Channels Command
@@ -4795,6 +5245,10 @@ Optional Arguments:
                               MINET_YOUTUBE_KEY env variable.
   -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
+  --explode EXPLODE           Use to indicate the character used to separate
+                              multiple values in a single CSV cell. Defaults to
+                              none, i.e. CSV cells having a single values, which
+                              is usually the case.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -4837,11 +5291,19 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ```
 Usage: minet youtube comments [-h] [-k KEY] [--rcfile RCFILE] [--silent]
-                              [-i INPUT] [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                              [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                              [--total TOTAL] [-o OUTPUT]
                               video_or_video_column
 
 # Youtube comments
@@ -4859,6 +5321,10 @@ Optional Arguments:
                               MINET_YOUTUBE_KEY env variable.
   -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
+  --explode EXPLODE           Use to indicate the character used to separate
+                              multiple values in a single CSV cell. Defaults to
+                              none, i.e. CSV cells having a single values, which
+                              is usually the case.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -4895,6 +5361,13 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 <h3 id="youtube-search">search</h3>
@@ -4902,8 +5375,9 @@ how to use the command with a CSV file?
 ```
 Usage: minet youtube search [-h] [-l LIMIT] [--silent]
                             [--order {date,rating,relevance,title,videoCount,viewCount}]
-                            [-k KEY] [--rcfile RCFILE] [-i INPUT] [-s SELECT]
-                            [--total TOTAL] [-o OUTPUT]
+                            [-k KEY] [--rcfile RCFILE] [-i INPUT]
+                            [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                            [-o OUTPUT]
                             query_or_query_column
 
 # Youtube search
@@ -4928,6 +5402,10 @@ Optional Arguments:
                                 one is relevance.
   -s, --select SELECT           Columns of input CSV file to include in the
                                 output (separated by `,`).
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -4964,13 +5442,21 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 
 ### videos
 
 ```
 Usage: minet youtube videos [-h] [-k KEY] [--rcfile RCFILE] [--silent]
-                            [-i INPUT] [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                            [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                            [--total TOTAL] [-o OUTPUT]
                             video_or_video_column
 
 # Youtube videos
@@ -4988,6 +5474,10 @@ Optional Arguments:
                               MINET_YOUTUBE_KEY env variable.
   -s, --select SELECT         Columns of input CSV file to include in the output
                               (separated by `,`).
+  --explode EXPLODE           Use to indicate the character used to separate
+                              multiple values in a single CSV cell. Defaults to
+                              none, i.e. CSV cells having a single values, which
+                              is usually the case.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -5019,5 +5509,12 @@ how to use the command with a CSV file?
 
 . Here is how to read CSV file from stdin using `-`:
     $ xsv search -s col . | minet cmd column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet cmd column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet cmd "value1,value2" --explode ","
 ```
 

@@ -4,7 +4,6 @@
 #
 # Logic of the `url-parse` action.
 #
-from casanova import Multiplexer
 from ural import (
     is_url,
     is_shortened_url,
@@ -179,16 +178,7 @@ def get_headers(cli_args):
     return REPORT_HEADERS
 
 
-def get_multiplex(cli_args):
-    if cli_args.separator is not None:
-        return Multiplexer(column=cli_args.column, separator=cli_args.separator)
-
-    return None
-
-
-@with_enricher_and_loading_bar(
-    headers=get_headers, title="Parsing", unit="urls", multiplex=get_multiplex
-)
+@with_enricher_and_loading_bar(headers=get_headers, title="Parsing", unit="urls")
 def action(cli_args, enricher, loading_bar):
     for row, url in enricher.cells(cli_args.column, with_rows=True):
 

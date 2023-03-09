@@ -40,6 +40,7 @@ FLAG_SORTING_PRIORITIES = {
     for i, name in enumerate(
         [
             "select",
+            "explode",
             "total",
             "input",
             "output",
@@ -615,6 +616,13 @@ def resolve_typical_arguments(
 
         args.append(input_argument)
 
+        args.append(
+            {
+                "flags": ["--explode"],
+                "help": "Use to indicate the character used to separate multiple values in a single CSV cell. Defaults to none, i.e. CSV cells having a single values, which is usually the case.",
+            }
+        )
+
         if not variadic_input.get("no_help", False):
             epilog_addendum = """
         how to use the command with a CSV file?
@@ -631,6 +639,13 @@ def resolve_typical_arguments(
 
         . Here is how to read CSV file from stdin using `-`:
             $ xsv search -s col . | minet cmd column_name -i -
+
+        . Here is how to indicate that the CSV column may contain multiple
+          values separated by a special character:
+            $ minet cmd column_name -i file.csv --explode "|"
+
+        . This also works with single values:
+            $ minet cmd "value1,value2" --explode ","
         """
 
     if select or variadic_input is not None:

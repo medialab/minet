@@ -320,7 +320,6 @@ def with_enricher_and_loading_bar(
     stats: Optional[Iterable[StatsItem]] = None,
     stats_sort_key=None,
     nested: bool = False,
-    multiplex=None,
     show_label: bool = False,
 ):
     def decorate(action):
@@ -371,6 +370,11 @@ def with_enricher_and_loading_bar(
             if index_column is not None:
                 enricher_kwargs["index_column"] = index_column
 
+            multiplex = None
+
+            if getattr(cli_args, "explode", None) is not None:
+                multiplex = casanova.Multiplexer(cli_args.column, cli_args.explode)
+
             with enricher_context:
                 enricher = enricher_fn(
                     cli_args.input if not callable(get_input) else get_input(cli_args),
@@ -380,7 +384,7 @@ def with_enricher_and_loading_bar(
                     else headers,
                     select=cli_args.select,
                     total=getattr(cli_args, "total", None),
-                    multiplex=multiplex(cli_args) if callable(multiplex) else multiplex,
+                    multiplex=multiplex,
                     **enricher_kwargs
                 )
 

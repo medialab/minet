@@ -104,11 +104,6 @@ def get_headers(cli_args):
     return headers
 
 
-def get_multiplex(cli_args):
-    if cli_args.separator is not None:
-        return casanova.Multiplexer(cli_args.column, cli_args.separator)
-
-
 def get_title(cli_args):
     if cli_args.action == "resolve":
         return "Resolving"
@@ -118,7 +113,6 @@ def get_title(cli_args):
 
 @with_enricher_and_loading_bar(
     headers=get_headers,
-    multiplex=get_multiplex,
     enricher_type="threadsafe",
     index_column="fetch_original_index",
     title=get_title,

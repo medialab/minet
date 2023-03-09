@@ -54,6 +54,10 @@ echo "Url Parse"
 $MINET url-parse url -i ftest/resources/medias.csv | wc -l
 echo
 
+echo "Url Parse --explode"
+$MINET url-parse url -i ftest/resources/plural_urls.csv --explode '|' | wc -l
+echo
+
 echo "Scraping Twitter"
 $MINET twitter scrape tweets "from:medialab_ScPo" --limit 40 | wc -l
 echo

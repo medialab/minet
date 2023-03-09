@@ -36,10 +36,6 @@ COMMON_ARGUMENTS = [
         "action": "store_true",
     },
     {
-        "flags": ["--separator"],
-        "help": "Character used to split the url cell in the CSV file, if this one can in fact contain multiple urls.",
-    },
-    {
         "flags": ["-t", "--threads"],
         "help": "Number of threads to use. Defaults to 25.",
         "type": int,
