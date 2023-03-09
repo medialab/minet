@@ -6,10 +6,8 @@
 #
 from typing import Optional, Any, List, Dict, Iterator
 
-import csv
 import casanova
 import casanova.ndjson as ndjson
-from casanova import DictLikeRow
 from dataclasses import dataclass
 from itertools import count
 from os.path import basename, isdir
@@ -54,22 +52,22 @@ class ScrapeResult:
     items: Optional[Any] = None
 
 
-SCRAPER = None
-FORMAT = None
-PLURAL_SEPARATOR = None
-MAPPING = None
+SCRAPER: Optional[Scraper] = None
+FORMAT: Optional[str] = None
+PLURAL_SEPARATOR: Optional[str] = None
+HEADERS: Optional[casanova.headers] = None
 
 
 def init_process(definition, strain, options):
     global SCRAPER
     global FORMAT
     global PLURAL_SEPARATOR
-    global MAPPING
+    global HEADERS
 
     SCRAPER = Scraper(definition, strain=strain)
     FORMAT = options["format"]
     PLURAL_SEPARATOR = options["plural_separator"]
-    MAPPING = options["mapping"]
+    HEADERS = casanova.headers(options["fieldnames"])
 
 
 def worker(payload: ScrapeWorkerPayload) -> ScrapeResult:
@@ -88,9 +86,8 @@ def worker(payload: ScrapeWorkerPayload) -> ScrapeResult:
             return result
 
     # Building context
-    row = DictLikeRow(MAPPING, payload.row)
-
-    context: Dict[str, Any] = {"line": row, "row": row}
+    row = HEADERS.wrap(payload.row, transient=True)
+    context: Dict[str, Any] = {"row": row}
 
     if payload.path:
         context["path"] = payload.path
@@ -98,7 +95,7 @@ def worker(payload: ScrapeWorkerPayload) -> ScrapeResult:
 
     # Attempting to scrape
     if FORMAT == "csv":
-        items = SCRAPER.as_csv_dict_rows(
+        items = SCRAPER.as_csv_rows(
             text, context=context, plural_separator=PLURAL_SEPARATOR
         )
     else:
@@ -148,7 +145,7 @@ def action(cli_args):
             ]
         )
 
-    if scraper.headers is None and cli_args.format == "csv":
+    if scraper.fieldnames is None and cli_args.format == "csv":
         raise FatalError(
             [
                 "Your scraper does not yield tabular data.",
@@ -166,7 +163,7 @@ def action(cli_args):
     reader = casanova.reader(cli_args.input, total=cli_args.total)
 
     if cli_args.format == "csv":
-        writer = csv.DictWriter(cli_args.output, fieldnames=scraper.headers)
+        writer = casanova.writer(cli_args.output, fieldnames=scraper.fieldnames)
     else:
         writer = ndjson.writer(cli_args.output)
 
@@ -207,7 +204,7 @@ def action(cli_args):
                 {
                     "format": cli_args.format,
                     "plural_separator": cli_args.plural_separator,
-                    "mapping": {n: i for i, n in enumerate(reader.fieldnames)},
+                    "fieldnames": reader.fieldnames,
                 },
             ),
         )
@@ -259,6 +256,7 @@ def action(cli_args):
                         continue
 
                     # No errors
+                    assert result.items is not None
                     items = result.items
 
                     for item in items:

@@ -1,8 +1,8 @@
 ---
 fields:
-    id:
-        get_context: ['line', 'id']
-    file:
-        get_context: basename
-    title:
-        sel: title
+  id:
+    get_context: ["line", "id"]
+  file:
+    get_context: basename
+  title:
+    sel: title

@@ -25,7 +25,7 @@ from minet.utils import md5, PseudoFStringFormatter, infer_encoding
 
 def read_potentially_gzipped_path(
     path, encoding: Optional[str] = None, errors: str = "replace"
-):
+) -> str:
     open_fn = open
     flag = "r" if encoding is not None else "rb"
 
