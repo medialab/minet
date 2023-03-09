@@ -975,7 +975,7 @@ to obtain:
 
 This can be very useful to give access to some extraneous data to the scraper if required. As such when using the `minet scrape` command, useful information is always given to the scraper through context:
 
-* **line** *dict*: the CSV line representing a line in a `minet fetch` report.
+* **row** *dict*: the CSV row representing a row in a `minet fetch` report.
 * **path** *str*: the path to the html file currently being scraped.
 * **basename** *str*: the html file path's base name.
 
