@@ -145,7 +145,8 @@ FETCH_COMMAND = command(
         *COMMON_ARGUMENTS,
         {
             "flag": "--max-redirects",
-            "help": "Maximum number of redirections to follow before breaking. Defaults to 5.",
+            "help": "Maximum number of redirections to follow before breaking. Defaults to %i."
+            % DEFAULT_FETCH_MAX_REDIRECTS,
             "type": int,
             "default": DEFAULT_FETCH_MAX_REDIRECTS,
         },
@@ -242,7 +243,8 @@ RESOLVE_COMMAND = command(
         *COMMON_ARGUMENTS,
         {
             "flag": "--max-redirects",
-            "help": "Maximum number of redirections to follow before breaking. Defaults to 20.",
+            "help": "Maximum number of redirections to follow before breaking. Defaults to %i."
+            % DEFAULT_RESOLVE_MAX_REDIRECTS,
             "type": int,
             "default": DEFAULT_RESOLVE_MAX_REDIRECTS,
         },

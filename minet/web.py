@@ -15,6 +15,7 @@ from typing import (
     Dict,
     Container,
 )
+from minet.types import Literal
 
 import re
 import cgi
@@ -513,13 +514,30 @@ def atomic_request(
     return BufferedResponse(response, cancel_event=cancel_event, final_time=final_time)
 
 
+RedirectionType = Literal[
+    "hit",
+    "location-header",
+    "js-relocation",
+    "refresh-header",
+    "meta-refresh",
+    "infer",
+    "canonical",
+]
+
+
 class Redirection(object):
     __slots__ = ("status", "type", "url")
 
-    def __init__(self, url: str, _type="hit"):
-        self.status: Optional[int] = None
-        self.url: str = url
-        self.type: str = _type
+    status: Optional[int]
+    url: str
+    type: RedirectionType
+
+    def __init__(
+        self, url: str, _type: RedirectionType = "hit", status: Optional[int] = None
+    ):
+        self.status = status
+        self.url = url
+        self.type = _type
 
     def __repr__(self):
         class_name = self.__class__.__name__

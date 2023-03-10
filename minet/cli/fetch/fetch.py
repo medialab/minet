@@ -68,7 +68,7 @@ class ResolveAddendum(TabularRecord):
         last = stack[-1]
 
         self.resolved_url = last.url
-        self.status = last.status
+        self.http_status = last.status
         self.redirect_count = len(stack) - 1
         self.redirect_chain = [step.type for step in stack]
 
