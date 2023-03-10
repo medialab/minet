@@ -27,7 +27,7 @@ class NamedScraper(ScraperMixin):
 
 
 class TitleScraper(NamedScraper):
-    name = "title"
+    name = "page_title"
     fieldnames = ["title"]
     plural = False
     output_type = "scalar"
@@ -70,7 +70,7 @@ class CanonicalScraper(NamedScraper):
 
 class UrlsScraper(NamedScraper):
     name = "urls"
-    fieldnames = ["url"]
+    fieldnames = ["scraped_url"]
     plural = True
     output_type = "list"
     strainer = SoupStrainer(name="a")
