@@ -1243,6 +1243,7 @@ def create_request_retryer(
     before_sleep=noop,
     additional_exceptions=None,
     retry_on_timeout: bool = True,
+    retry_on_statuses: Optional[Container[int]] = None,
     predicate: Optional[Callable[[BaseException], bool]] = None,
     epilog: Optional[Callable[[RetryCallState], str]] = None,
     cancel_event: Optional[Event] = None,
@@ -1267,6 +1268,16 @@ def create_request_retryer(
     retry_condition = retry_if_exception_type(
         exception_types=tuple(retryable_exception_types)
     )
+
+    if retry_on_statuses is not None:
+
+        def status_predicate(exc: BaseException) -> bool:
+            if isinstance(exc, InvalidStatusError) and exc.status in retry_on_statuses:
+                return True
+
+            return False
+
+        retry_condition |= retry_if_exception(status_predicate)
 
     if callable(predicate):
         retry_condition |= retry_if_exception(predicate)
