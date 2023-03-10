@@ -1236,6 +1236,20 @@ class request_retryer_custom_exponential_backoff(wait_base):
         return max(0, min(result, self.max))
 
 
+class RequestRetrying(Retrying):
+    def __init__(
+        self, *args, invalid_statuses: Optional[Container[int]] = None, **kwargs
+    ):
+        self._invalid_statuses = invalid_statuses
+        super().__init__(*args, **kwargs)
+
+    def __call__(self, *args, **kwargs):
+        if self._invalid_statuses is not None:
+            kwargs["raise_on_statuses"] = self._invalid_statuses
+
+        return super().__call__(*args, **kwargs)
+
+
 def create_request_retryer(
     min: float = 10,
     max: float = ONE_DAY,
@@ -1260,6 +1274,9 @@ def create_request_retryer(
         retryable_exception_types.extend(
             [FinalTimeoutError, urllib3_exceptions.TimeoutError]
         )
+
+    if retry_on_statuses is not None:
+        retryable_exception_types.append(InvalidStatusError)
 
     if additional_exceptions:
         for exc in additional_exceptions:
@@ -1303,7 +1320,7 @@ def create_request_retryer(
             lambda _: not cancel_event.is_set()
         )
 
-    return Retrying(**retrying_kwargs)
+    return RequestRetrying(invalid_statuses=retry_on_statuses, **retrying_kwargs)
 
 
 def retrying_method(attr="retryer"):
