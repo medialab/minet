@@ -4,7 +4,17 @@
 #
 # Miscellaneous web-related functions used throughout the library.
 #
-from typing import Optional, Callable, Tuple, Union, OrderedDict, List, Any, Dict
+from typing import (
+    Optional,
+    Callable,
+    Tuple,
+    Union,
+    OrderedDict,
+    List,
+    Any,
+    Dict,
+    Container,
+)
 
 import re
 import cgi
@@ -51,6 +61,7 @@ from minet.exceptions import (
     InfiniteRedirectsError,
     InvalidRedirectError,
     InvalidURLError,
+    InvalidStatusError,
     SelfRedirectError,
     CancelledRequestError,
     FinalTimeoutError,
@@ -361,6 +372,10 @@ class BufferedResponse(object):
     It is able to stream a response's body safely all while keeping track of
     a "final" timeout correctly enforced to bypass python socket race condition
     issues on read loops and is also able to be cancelled if required.
+
+    NOTE: this is the user's responsability to close or unwrap the response
+    after use. This will be done by __del__ in any case, but don't rely
+    on it too much.
     """
 
     __slots__ = (
@@ -369,7 +384,7 @@ class BufferedResponse(object):
         "__cancel_event",
         "__final_time",
         "__finished",
-        "__unwrapped",
+        "__closed",
     )
 
     def __init__(
@@ -383,7 +398,7 @@ class BufferedResponse(object):
         self.__final_time = final_time
         self.__body = BytesIO()
         self.__finished = False
-        self.__unwrapped = False
+        self.__closed = False
 
     def __len__(self) -> int:
         return self.__body.getbuffer().nbytes
@@ -391,8 +406,8 @@ class BufferedResponse(object):
     def __stream(
         self, chunk_size: int = STREAMING_CHUNK_SIZE, up_to: Optional[int] = None
     ) -> None:
-        if self.__unwrapped:
-            raise TypeError("buffered response was already unwrapped")
+        if self.__closed:
+            raise TypeError("buffered response was already closed")
 
         if self.__finished:
             return
@@ -411,7 +426,6 @@ class BufferedResponse(object):
         finally:
             if fully_read:
                 self.__finished = fully_read
-                self.close()
 
     def geturl(self) -> Optional[str]:
         return self.__inner.geturl()
@@ -428,17 +442,29 @@ class BufferedResponse(object):
         return self.__body.getvalue()
 
     def close(self) -> None:
+        if self.__closed:
+            raise TypeError("already closed")
+
+        self.__closed = True
         # NOTE: releasing and closing is a noop if already done
         self.__inner.release_conn()
         self.__inner.close()
 
+    def __del__(self):
+        if not self.__closed:
+            # warnings.warn("BufferedResponse instance was not properly closed!")
+            self.close()
+
     def unwrap(self) -> Tuple[urllib3.HTTPResponse, bytes]:
-        self.__unwrapped = True
         self.close()
         return self.__inner, self.__body.getvalue()
 
     def read(self, chunk_size: int = STREAMING_CHUNK_SIZE) -> None:
         self.__stream(chunk_size=chunk_size)
+
+    def read_and_unwrap(self) -> Tuple[urllib3.HTTPResponse, bytes]:
+        self.read()
+        return self.unwrap()
 
     def prebuffer_up_to(
         self, amount: int, chunk_size: int = STREAMING_CHUNK_SIZE
@@ -1005,6 +1031,7 @@ def request(
     body=None,
     json_body=None,
     cancel_event: Optional[Event] = None,
+    raise_on_statuses: Optional[Container[int]] = None,
 ) -> Response:
 
     # Formatting headers
@@ -1054,8 +1081,12 @@ def request(
             cancel_event=cancel_event,
         )
 
-    buffered_response.read()
-    response, body = buffered_response.unwrap()
+    if raise_on_statuses is not None:
+        if buffered_response.status in raise_on_statuses:
+            buffered_response.close()
+            raise InvalidStatusError(buffered_response.status)
+
+    response, body = buffered_response.read_and_unwrap()
 
     return Response(url, stack, response, body, known_encoding=known_encoding)
 
@@ -1075,6 +1106,7 @@ def resolve(
     timeout: Optional[AnyTimeout] = None,
     canonicalize: bool = False,
     cancel_event: Optional[Event] = None,
+    raise_on_statuses: Optional[Container[int]] = None,
 ) -> RedirectionStack:
 
     final_headers = build_request_headers(
@@ -1097,6 +1129,12 @@ def resolve(
     )
 
     buffered_response.close()
+
+    if raise_on_statuses is not None and stack:
+        last = stack[-1]
+
+        if last.status is not None and last.status in raise_on_statuses:
+            raise InvalidStatusError(last.status)
 
     return stack
 

@@ -62,6 +62,12 @@ class InvalidURLError(MinetError):
         super().__init__(message)
 
 
+class InvalidStatusError(MinetError):
+    def __init__(self, status: int):
+        super().__init__(str(status))
+        self.status = status
+
+
 class CancelledRequestError(MinetError):
     pass
 
