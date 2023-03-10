@@ -31,6 +31,7 @@ from minet.exceptions import (
     FilenameFormattingError,
     FinalTimeoutError,
     CouldNotInferEncodingError,
+    InvalidStatusError,
 )
 from minet.scrape.constants import BURROWING_KEYS, LEAF_KEYS
 from minet.scrape.exceptions import (
@@ -99,6 +100,10 @@ def decode_error_reporter(error):
     return "invalid-encoding"
 
 
+def invalid_status_reporter(error: InvalidStatusError):
+    return "invalid-status-%i" % error.status
+
+
 ERROR_REPORTERS = {
     UnicodeDecodeError: "wrong-encoding",
     UnknownEncodingError: "unknown-encoding",
@@ -121,6 +126,7 @@ ERROR_REPORTERS = {
     TrafilaturaError: "trafilatura-error",
     FilenameFormattingError: "filename-formatting-error",
     CouldNotInferEncodingError: "could-not-infer-encoding",
+    InvalidStatusError: invalid_status_reporter,
 }
 
 

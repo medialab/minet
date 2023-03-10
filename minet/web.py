@@ -106,9 +106,11 @@ CONTENT_PREBUFFER_UP_TO = 1024
 STREAMING_CHUNK_SIZE: int = 2**12
 LARGE_CONTENT_PREBUFFER_UP_TO = 2**16
 EXPECTED_WEB_ERRORS = (
+    urllib.error.URLError,
     urllib3_exceptions.HTTPError,
     RedirectError,
     InvalidURLError,
+    InvalidStatusError,
     FinalTimeoutError,
 )
 
