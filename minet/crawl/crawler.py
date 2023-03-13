@@ -37,7 +37,7 @@ from minet.crawl.spiders import (
 from minet.crawl.queue import CrawlerQueue, DumpType
 from minet.crawl.state import CrawlerState
 from minet.web import request, EXPECTED_WEB_ERRORS, AnyTimeout
-from minet.fetch import HTTPThreadPoolExecutor, CANCELLED
+from minet.executors import HTTPThreadPoolExecutor, CANCELLED
 from minet.exceptions import UnknownSpiderError, CancelledRequestError
 from minet.constants import (
     DEFAULT_DOMAIN_PARALLELISM,

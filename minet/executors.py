@@ -1,5 +1,5 @@
 # =============================================================================
-# Minet Multithreaded Fetch
+# Minet HTTP Multithreaded Executors
 # =============================================================================
 #
 # Exposing a specialized quenouille wrapper grabbing various urls from the
@@ -51,7 +51,7 @@ ResultType = TypeVar("ResultType")
 CANCELLED = object()
 
 
-class FetchWorkerPayload(Generic[ItemType]):
+class RequestWorkerPayload(Generic[ItemType]):
     __slots__ = ("item", "url", "__has_cached_domain", "__domain")
 
     item: ItemType
@@ -79,10 +79,10 @@ class FetchWorkerPayload(Generic[ItemType]):
         return self.__domain
 
 
-RequestArgsType = Callable[[FetchWorkerPayload[ItemType]], Dict]
+RequestArgsType = Callable[[RequestWorkerPayload[ItemType]], Dict]
 
 
-class FetchResult(Generic[ItemType]):
+class RequestResult(Generic[ItemType]):
     __slots__ = ("item", "url", "error", "response")
 
     item: ItemType
@@ -152,28 +152,28 @@ class ResolveResult(Generic[ItemType]):
         )
 
 
-def key_by_domain_name(payload: FetchWorkerPayload) -> Optional[str]:
+def key_by_domain_name(payload: RequestWorkerPayload) -> Optional[str]:
     return payload.domain
 
 
 def payloads_iter(
     iterable: Iterable[ItemType],
     key: Optional[Callable[[ItemType], Optional[str]]] = None,
-) -> Iterator[FetchWorkerPayload[ItemType]]:
+) -> Iterator[RequestWorkerPayload[ItemType]]:
     for item in iterable:
         url = item if key is None else key(item)
 
         if not url:
-            yield FetchWorkerPayload(item=item, url=None)
+            yield RequestWorkerPayload(item=item, url=None)
             continue
 
         # Url cleanup
         url = ensure_protocol(url.strip())  # type: ignore
 
-        yield FetchWorkerPayload(item=item, url=url)
+        yield RequestWorkerPayload(item=item, url=url)
 
 
-class FetchWorker(Generic[ItemType]):
+class RequestWorker(Generic[ItemType]):
     def __init__(
         self,
         pool_manager: urllib3.PoolManager,
@@ -182,7 +182,7 @@ class FetchWorker(Generic[ItemType]):
         *,
         request_args: Optional[RequestArgsType[ItemType]] = None,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
-        callback: Optional[Callable[[FetchResult[ItemType]], None]] = None,
+        callback: Optional[Callable[[RequestResult[ItemType]], None]] = None,
     ):
         self.cancel_event = cancel_event
         self.local_context = local_context
@@ -196,11 +196,11 @@ class FetchWorker(Generic[ItemType]):
         }
 
     def __call__(
-        self, payload: FetchWorkerPayload[ItemType]
-    ) -> Union[object, FetchResult[ItemType]]:
+        self, payload: RequestWorkerPayload[ItemType]
+    ) -> Union[object, RequestResult[ItemType]]:
         item, url = payload.item, payload.url
 
-        result = FetchResult(item, url)
+        result = RequestResult(item, url)
 
         # Noop
         if url is None:
@@ -276,7 +276,7 @@ class ResolveWorker(Generic[ItemType]):
         }
 
     def __call__(
-        self, payload: FetchWorkerPayload[ItemType]
+        self, payload: RequestWorkerPayload[ItemType]
     ) -> Union[object, ResolveResult[ItemType]]:
         item, url = payload.item, payload.url
 
@@ -396,11 +396,11 @@ class RequestThreadPoolExecutor(HTTPThreadPoolExecutor):
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
-        callback: Optional[Callable[[FetchResult[ItemType]], None]] = None,
-    ) -> Iterator[FetchResult[ItemType]]:
+        callback: Optional[Callable[[RequestResult[ItemType]], None]] = None,
+    ) -> Iterator[RequestResult[ItemType]]:
 
         # TODO: validate
-        worker = FetchWorker(
+        worker = RequestWorker(
             self.pool_manager,
             self.cancel_event,
             self.local_context,

@@ -14,9 +14,9 @@ from dataclasses import dataclass
 from datetime import datetime
 from ural import is_shortened_url, could_be_html
 
-from minet.fetch import (
-    FetchResult,
-    FetchWorkerPayload,
+from minet.executors import (
+    RequestResult,
+    RequestWorkerPayload,
     RequestThreadPoolExecutor,
     ResolveThreadPoolExecutor,
 )
@@ -181,7 +181,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
         return url
 
-    def request_args(payload: FetchWorkerPayload):
+    def request_args(payload: RequestWorkerPayload):
         cookie = None
 
         # Cookie
@@ -217,7 +217,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
         files_writer = ThreadSafeFilesWriter(cli_args.output_dir)
 
-    def worker_callback(result: FetchResult[List]) -> None:
+    def worker_callback(result: RequestResult[List]) -> None:
         if cli_args.dont_save:
             return
 

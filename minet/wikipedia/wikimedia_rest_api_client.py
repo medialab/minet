@@ -2,7 +2,7 @@ from typing import Iterable, Iterator, TypeVar, Callable, Tuple, List, Optional
 
 from urllib.parse import quote, unquote
 
-from minet.fetch import RequestThreadPoolExecutor
+from minet.executors import RequestThreadPoolExecutor
 
 from minet.wikipedia.exceptions import (
     WikimediaRESTAPIThrottledError,
