@@ -629,7 +629,7 @@ def resolve_typical_arguments(
         if not variadic_input.get("no_help", False):
             split = package.split(".")
             name = split[0]
-            cmd = split[-1].replace("_", "-")
+            cmd = " ".join([s for s in split[1:] if s != "cli"]).replace("_", "-")
 
             epilog_addendum = """
         how to use the command with a CSV file?
