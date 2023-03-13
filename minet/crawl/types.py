@@ -5,7 +5,7 @@ from ural import get_domain_name, ensure_protocol
 from minet.web import Response
 
 CrawlJobDataType = TypeVar("CrawlJobDataType", bound=Mapping)
-CrawlJobOutputDataType = TypeVar("CrawlJobOutputDataType")
+CrawlResultDataType = TypeVar("CrawlResultDataType")
 
 
 class CrawlJob(Generic[CrawlJobDataType]):
@@ -88,18 +88,18 @@ class CrawlJob(Generic[CrawlJobDataType]):
 UrlOrCrawlJob = Union[str, CrawlJob[CrawlJobDataType]]
 
 
-class CrawlResult(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
-    __slots__ = ("job", "output", "error", "response", "degree")
+class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
+    __slots__ = ("job", "data", "error", "response", "degree")
 
     job: CrawlJob[CrawlJobDataType]
-    output: Optional[CrawlJobOutputDataType]
+    data: Optional[CrawlResultDataType]
     error: Optional[Exception]
     response: Optional[Response]
     degree: int
 
     def __init__(self, job: CrawlJob[CrawlJobDataType]):
         self.job = job
-        self.output = None
+        self.data = None
         self.error = None
         self.response = None
         self.degree = 0

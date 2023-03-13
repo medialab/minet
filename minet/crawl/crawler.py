@@ -25,7 +25,7 @@ from minet.crawl.types import (
     CrawlJob,
     UrlOrCrawlJob,
     CrawlJobDataType,
-    CrawlJobOutputDataType,
+    CrawlResultDataType,
     CrawlResult,
 )
 from minet.crawl.spiders import (
@@ -72,7 +72,7 @@ def coerce_spider(target):
 RequestArgsType = Callable[[CrawlJob[CrawlJobDataType]], Dict]
 
 
-class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
+class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
     def __init__(
         self,
         crawler: "Crawler",
@@ -96,7 +96,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType]
-    ) -> Union[object, CrawlResult[CrawlJobDataType, CrawlJobOutputDataType]]:
+    ) -> Union[object, CrawlResult[CrawlJobDataType, CrawlResultDataType]]:
 
         # Registering work
         with self.crawler.state.task():
@@ -150,8 +150,8 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
                 return CANCELLED
 
             try:
-                output, next_jobs = spider(job, response)
-                result.output = output
+                data, next_jobs = spider(job, response)
+                result.data = data
 
                 if cancel_event.is_set():
                     return CANCELLED
@@ -168,16 +168,16 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
 
 
 CrawlJobDataTypes = TypeVar("CrawlJobDataTypes", bound=Mapping)
-CrawlJobOutputDataTypes = TypeVar("CrawlJobOutputDataTypes")
+CrawlResultDataTypes = TypeVar("CrawlResultDataTypes")
 Spiders = Union[
-    FunctionSpiderCallable[CrawlJobDataTypes, CrawlJobOutputDataTypes],
-    Spider[CrawlJobDataTypes, CrawlJobOutputDataTypes],
-    Dict[str, Spider[CrawlJobDataTypes, CrawlJobOutputDataTypes]],
+    FunctionSpiderCallable[CrawlJobDataTypes, CrawlResultDataTypes],
+    Spider[CrawlJobDataTypes, CrawlResultDataTypes],
+    Dict[str, Spider[CrawlJobDataTypes, CrawlResultDataTypes]],
 ]
 
 # TODO: try creating a kwarg type for those
 # NOTE: crawling could work depth-first if we wanted
-class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
+class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
     executor: HTTPThreadPoolExecutor
     queue: CrawlerQueue[CrawlJob[CrawlJobDataTypes]]
     persistent: bool
@@ -188,11 +188,11 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
     finished: bool
     singular: bool
 
-    __spiders: Dict[str, Spider[CrawlJobDataTypes, CrawlJobOutputDataTypes]]
+    __spiders: Dict[str, Spider[CrawlJobDataTypes, CrawlResultDataTypes]]
 
     def __init__(
         self,
-        spider_or_spiders: Spiders[CrawlJobDataTypes, CrawlJobOutputDataTypes],
+        spider_or_spiders: Spiders[CrawlJobDataTypes, CrawlResultDataTypes],
         queue_path: Optional[str] = None,
         resume: bool = False,
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
@@ -338,7 +338,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
 
     def __iter__(
         self,
-    ) -> Iterator[CrawlResult[CrawlJobDataTypes, CrawlJobOutputDataTypes]]:
+    ) -> Iterator[CrawlResult[CrawlJobDataTypes, CrawlResultDataTypes]]:
         worker = CrawlWorker(self)
 
         def key_by_domain_name(job: CrawlJob) -> Optional[str]:

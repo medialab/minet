@@ -291,7 +291,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
                     jobs_writer.writerow(format_result_for_csv(result))
                     continue
 
-                count = reporter_pool.write(result.job.spider, result.output)
+                count = reporter_pool.write(result.job.spider, result.data)
                 jobs_writer.writerow(format_result_for_csv(result, count=count))
                 loading_bar.inc_stat("scraped", count=count, style="success")
 

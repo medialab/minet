@@ -26,7 +26,7 @@ from minet.crawl.types import (
     UrlOrCrawlJob,
     CrawlJob,
     CrawlJobDataType,
-    CrawlJobOutputDataType,
+    CrawlResultDataType,
 )
 from minet.types import AnyFileTarget
 from minet.fs import load_definition
@@ -46,16 +46,16 @@ def ensure_list(value: Union[T, List[T]]) -> List[T]:
 
 
 SpiderNextJobs = Optional[Iterable[Union[str, CrawlJob[CrawlJobDataType]]]]
-SpiderResult = Tuple[CrawlJobOutputDataType, SpiderNextJobs[CrawlJobDataType]]
+SpiderResult = Tuple[CrawlResultDataType, SpiderNextJobs[CrawlJobDataType]]
 
 
-class Spider(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
+class Spider(Generic[CrawlJobDataType, CrawlResultDataType]):
     def start_jobs(self) -> Optional[Iterable[UrlOrCrawlJob[CrawlJobDataType]]]:
         return None
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType], response: Response
-    ) -> SpiderResult[CrawlJobOutputDataType, CrawlJobDataType]:
+    ) -> SpiderResult[CrawlResultDataType, CrawlJobDataType]:
         raise NotImplementedError
 
     def __repr__(self):
@@ -66,16 +66,16 @@ class Spider(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
 
 FunctionSpiderCallable = Callable[
     [CrawlJob[CrawlJobDataType], Response],
-    SpiderResult[CrawlJobOutputDataType, CrawlJobDataType],
+    SpiderResult[CrawlResultDataType, CrawlJobDataType],
 ]
 
 
-class FunctionSpider(Spider[CrawlJobDataType, CrawlJobOutputDataType]):
-    fn: FunctionSpiderCallable[CrawlJobDataType, CrawlJobOutputDataType]
+class FunctionSpider(Spider[CrawlJobDataType, CrawlResultDataType]):
+    fn: FunctionSpiderCallable[CrawlJobDataType, CrawlResultDataType]
 
     def __init__(
         self,
-        fn: FunctionSpiderCallable[CrawlJobDataType, CrawlJobOutputDataType],
+        fn: FunctionSpiderCallable[CrawlJobDataType, CrawlResultDataType],
         start_jobs: Optional[Iterable[UrlOrCrawlJob[CrawlJobDataType]]] = None,
     ):
         self.fn = fn
@@ -86,11 +86,11 @@ class FunctionSpider(Spider[CrawlJobDataType, CrawlJobOutputDataType]):
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType], response: Response
-    ) -> SpiderResult[CrawlJobOutputDataType, CrawlJobDataType]:
+    ) -> SpiderResult[CrawlResultDataType, CrawlJobDataType]:
         return self.fn(job, response)
 
 
-class DefinitionSpiderOutput(Generic[CrawlJobOutputDataType]):
+class DefinitionSpiderOutput(Generic[CrawlResultDataType]):
     __slots__ = ("default", "named")
 
     def __init__(self):
@@ -105,7 +105,7 @@ class DefinitionSpiderTarget(TypedDict, Generic[CrawlJobDataType]):
 
 
 class DefinitionSpider(
-    Spider[CrawlJobDataType, DefinitionSpiderOutput[CrawlJobOutputDataType]]
+    Spider[CrawlJobDataType, DefinitionSpiderOutput[CrawlResultDataType]]
 ):
     definition: Dict[str, Any]
     next_definition: Optional[Dict[str, Any]]
@@ -162,8 +162,8 @@ class DefinitionSpider(
 
     def __scrape(
         self, job: CrawlJob[CrawlJobDataType], response: Response, soup: BeautifulSoup
-    ) -> DefinitionSpiderOutput[CrawlJobOutputDataType]:
-        scraped = DefinitionSpiderOutput[CrawlJobOutputDataType]()
+    ) -> DefinitionSpiderOutput[CrawlResultDataType]:
+        scraped = DefinitionSpiderOutput[CrawlResultDataType]()
 
         context = {"url": job.url}
 
@@ -238,7 +238,7 @@ class DefinitionSpider(
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType], response: Response
-    ) -> SpiderResult[DefinitionSpiderOutput[CrawlJobOutputDataType], CrawlJobDataType]:
+    ) -> SpiderResult[DefinitionSpiderOutput[CrawlResultDataType], CrawlJobDataType]:
         soup = response.soup()
 
         return self.__scrape(job, response, soup), self.__next_jobs(job, response, soup)
