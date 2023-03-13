@@ -404,7 +404,7 @@ class LoadingBar(object):
         self.progress.update(self.task_id, advance=count)
 
     def nested_advance(self, count=1):
-        self.sub_total_sum += 1
+        self.sub_total_sum += count
         self.sub_progress.update(
             self.sub_task_id, advance=count, sub_total_sum=self.sub_total_sum
         )
