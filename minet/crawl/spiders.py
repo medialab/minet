@@ -45,7 +45,7 @@ def ensure_list(value: Union[T, List[T]]) -> List[T]:
     return value
 
 
-SpiderNextJobs = Optional[Iterable[CrawlJob[CrawlJobDataType]]]
+SpiderNextJobs = Optional[Iterable[Union[str, CrawlJob[CrawlJobDataType]]]]
 SpiderResult = Tuple[CrawlJobOutputDataType, SpiderNextJobs[CrawlJobDataType]]
 
 
