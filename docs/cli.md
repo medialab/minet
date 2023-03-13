@@ -301,7 +301,7 @@ Optional Arguments:
                                 (i.e. non-200) http requests.
   --max-redirects MAX_REDIRECTS
                                 Maximum number of redirections to follow before
-                                breaking. Defaults to 5.
+                                breaking. Defaults to 10.
   --only-html                   Only download urls if they are not unambiguously
                                 not html (e.g. if the url has the .pdf or .jpg
                                 extension etc.). Then, if the url was
@@ -396,20 +396,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet fetch "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet fetch column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet fetch column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet fetch column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet fetch "value1,value2" --explode ","
 ```
 
 ## extract
@@ -656,20 +656,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet fetch "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet fetch column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet fetch column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet fetch column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet fetch "value1,value2" --explode ","
 ```
 
 ## scrape
@@ -1070,20 +1070,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet url-parse "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet url-parse column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet url-parse column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet url-parse column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet url-parse "value1,value2" --explode ","
 ```
 
 ## BuzzSumo
@@ -1214,20 +1214,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet domain-summary "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet domain-summary column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet domain-summary column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet domain-summary column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet domain-summary "value1,value2" --explode ","
 ```
 
 <h3 id="buzzsumo-domain">domain</h3>
@@ -1298,20 +1298,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet domain "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet domain column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet domain column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet domain column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet domain "value1,value2" --explode ","
 ```
 
 ## CrowdTangle
@@ -1511,20 +1511,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet posts-by-id "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet posts-by-id column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet posts-by-id column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet posts-by-id column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet posts-by-id "value1,value2" --explode ","
 ```
 
 ### posts
@@ -1758,20 +1758,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet summary "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet summary column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet summary column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet summary column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet summary "value1,value2" --explode ","
 ```
 
 ## Facebook
@@ -1869,20 +1869,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet comments "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet comments column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet comments column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet comments column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet comments "value1,value2" --explode ","
 ```
 
 <h3 id="facebook-post">post</h3>
@@ -1981,20 +1981,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet post "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet post column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet post column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet post column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet post "value1,value2" --explode ","
 ```
 
 <h3 id="facebook-posts">posts</h3>
@@ -2093,20 +2093,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet posts "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet posts column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet posts column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet posts column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet posts "value1,value2" --explode ","
 ```
 
 <h3 id="facebook-post-authors">post-authors</h3>
@@ -2173,20 +2173,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet post-authors "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet post-authors column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet post-authors column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet post-authors column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet post-authors "value1,value2" --explode ","
 ```
 
 <h3 id="facebook-url-likes">url-likes</h3>
@@ -2247,20 +2247,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet url-likes "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet url-likes column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet url-likes column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet url-likes column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet url-likes "value1,value2" --explode ","
 ```
 
 ## Google
@@ -2606,20 +2606,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet comments "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet comments column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet comments column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet comments column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet comments "value1,value2" --explode ","
 ```
 
 ### hashtag
@@ -2692,20 +2692,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet hashtag "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet hashtag column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet hashtag column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet hashtag column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet hashtag "value1,value2" --explode ","
 ```
 
 <h3 id="insta-post-infos">post-infos</h3>
@@ -2782,20 +2782,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet post-infos "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet post-infos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet post-infos column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet post-infos column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet post-infos "value1,value2" --explode ","
 ```
 
 ### user-followers
@@ -2877,20 +2877,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet user-followers "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet user-followers column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet user-followers column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet user-followers column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet user-followers "value1,value2" --explode ","
 ```
 
 ### user-following
@@ -2971,20 +2971,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet user-following "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet user-following column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet user-following column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet user-following column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet user-following "value1,value2" --explode ","
 ```
 
 ### user-infos
@@ -3063,20 +3063,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet user-infos "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet user-infos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet user-infos column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet user-infos column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet user-infos "value1,value2" --explode ","
 ```
 
 ### user-posts
@@ -3158,20 +3158,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet user-posts "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet user-posts column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet user-posts column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet user-posts column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet user-posts "value1,value2" --explode ","
 ```
 
 ## Mediacloud
@@ -3230,20 +3230,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet medias "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet medias column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet medias column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet medias column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet medias "value1,value2" --explode ","
 ```
 
 <h3 id="mc-search">search</h3>
@@ -3388,20 +3388,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet channel-infos "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet channel-infos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet channel-infos column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet channel-infos column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet channel-infos "value1,value2" --explode ","
 ```
 
 ### channel-messages
@@ -3455,20 +3455,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet channel-messages "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet channel-messages column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet channel-messages column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet channel-messages column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet channel-messages "value1,value2" --explode ","
 ```
 
 ## Tiktok
@@ -3565,20 +3565,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet search-videos "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet search-videos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet search-videos column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet search-videos column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet search-videos "value1,value2" --explode ","
 ```
 
 ## Twitter
@@ -3706,20 +3706,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet attrition "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet attrition column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet attrition column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet attrition column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet attrition "value1,value2" --explode ","
 ```
 
 ### followers
@@ -3804,20 +3804,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet followers "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet followers column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet followers column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet followers column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet followers "value1,value2" --explode ","
 ```
 
 ### friends
@@ -3901,20 +3901,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet friends "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet friends column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet friends column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet friends column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet friends "value1,value2" --explode ","
 ```
 
 ### list-followers
@@ -3991,20 +3991,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet list-followers "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet list-followers column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet list-followers column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet list-followers column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet list-followers "value1,value2" --explode ","
 ```
 
 ### list-members
@@ -4081,20 +4081,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet list-members "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet list-members column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet list-members column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet list-members column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet list-members "value1,value2" --explode ","
 ```
 
 ### retweeters
@@ -4170,20 +4170,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet retweeters "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet retweeters column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet retweeters column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet retweeters column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet retweeters "value1,value2" --explode ","
 ```
 
 <h3 id="twitter-scrape">scrape</h3>
@@ -4281,20 +4281,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet scrape "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet scrape column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet scrape column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet scrape column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet scrape "value1,value2" --explode ","
 ```
 
 ### tweet-date
@@ -4347,20 +4347,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet tweet-date "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet tweet-date column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet tweet-date column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet tweet-date column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet tweet-date "value1,value2" --explode ","
 ```
 
 ### tweet-search
@@ -4464,20 +4464,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet tweet-search "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet tweet-search column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet tweet-search column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet tweet-search column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet tweet-search "value1,value2" --explode ","
 ```
 
 ### tweet-count
@@ -4589,20 +4589,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet tweet-count "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet tweet-count column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet tweet-count column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet tweet-count column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet tweet-count "value1,value2" --explode ","
 ```
 
 ### tweets
@@ -4682,20 +4682,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet tweets "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet tweets column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet tweets column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet tweets column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet tweets "value1,value2" --explode ","
 ```
 
 ### users
@@ -4777,20 +4777,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet users "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet users column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet users column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet users column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet users "value1,value2" --explode ","
 ```
 
 ### user-search
@@ -4872,20 +4872,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet user-search "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet user-search column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet user-search column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet user-search column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet user-search "value1,value2" --explode ","
 ```
 
 ### user-tweets
@@ -4974,20 +4974,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet user-tweets "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet user-tweets column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet user-tweets column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet user-tweets column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet user-tweets "value1,value2" --explode ","
 ```
 
 ## Wikipedia
@@ -5059,20 +5059,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet pageviews "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet pageviews column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet pageviews column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet pageviews column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet pageviews "value1,value2" --explode ","
 ```
 
 ## Youtube
@@ -5133,20 +5133,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet captions "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet captions column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet captions column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet captions column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet captions "value1,value2" --explode ","
 ```
 
 ### channel-videos
@@ -5216,20 +5216,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet channel-videos "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet channel-videos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet channel-videos column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet channel-videos column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet channel-videos "value1,value2" --explode ","
 ```
 
 <h3 id="youtube-comments">comments</h3>
@@ -5300,20 +5300,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet channels "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet channels column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet channels column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet channels column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet channels "value1,value2" --explode ","
 ```
 
 ```
@@ -5370,20 +5370,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet comments "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet comments column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet comments column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet comments column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet comments "value1,value2" --explode ","
 ```
 
 <h3 id="youtube-search">search</h3>
@@ -5451,20 +5451,20 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet search "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet search column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet search column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet search column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet search "value1,value2" --explode ","
 ```
 
 ### videos
@@ -5518,19 +5518,19 @@ how to use the command with a CSV file?
 > given the column of a CSV file passed to -i/--input instead.
 
 . Here is how to use a command with a single value:
-    $ minet cmd "value"
+    $ minet videos "value"
 
 . Here is how to use a command with a csv file:
-    $ minet cmd column_name -i file.csv
+    $ minet videos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet cmd column_name -i -
+    $ xsv search -s col . | minet videos column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet cmd column_name -i file.csv --explode "|"
+    $ minet videos column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet cmd "value1,value2" --explode ","
+    $ minet videos "value1,value2" --explode ","
 ```
 

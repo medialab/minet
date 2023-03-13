@@ -553,6 +553,7 @@ class VariadicInputDefinition(TypedDict):
 
 
 def resolve_typical_arguments(
+    package: str,
     args,
     no_output=False,
     resumer=None,
@@ -626,29 +627,35 @@ def resolve_typical_arguments(
         )
 
         if not variadic_input.get("no_help", False):
+            split = package.split(".")
+            name = split[0]
+            cmd = split[-1].replace("_", "-")
+
             epilog_addendum = """
         how to use the command with a CSV file?
 
-        > A lot of minet commands, including this one, can both be
+        > A lot of {name} commands, including this one, can both be
         > given a single value to process or a bunch of them if
         > given the column of a CSV file passed to -i/--input instead.
 
         . Here is how to use a command with a single value:
-            $ minet cmd "value"
+            $ {name} {cmd} "value"
 
         . Here is how to use a command with a csv file:
-            $ minet cmd column_name -i file.csv
+            $ {name} {cmd} column_name -i file.csv
 
         . Here is how to read CSV file from stdin using `-`:
-            $ xsv search -s col . | minet cmd column_name -i -
+            $ xsv search -s col . | {name} {cmd} column_name -i -
 
         . Here is how to indicate that the CSV column may contain multiple
           values separated by a special character:
-            $ minet cmd column_name -i file.csv --explode "|"
+            $ {name} {cmd} column_name -i file.csv --explode "|"
 
         . This also works with single values:
-            $ minet cmd "value1,value2" --explode ","
-        """
+            $ {name} {cmd} "value1,value2" --explode ","
+        """.format(
+                name=name, cmd=cmd
+            )
 
     if select or variadic_input is not None:
 
@@ -691,7 +698,7 @@ def resolve_typical_arguments(
 
 def command(
     name: str,
-    package=None,
+    package: str,
     title: Optional[str] = None,
     aliases=None,
     description=None,
@@ -744,6 +751,7 @@ def command(
 
     elif arguments is not None:
         data["arguments"], epilog_addendum = resolve_typical_arguments(
+            package,
             arguments,
             no_output=no_output,
             resumer=resumer,
@@ -768,9 +776,9 @@ def command(
 
 
 def subcommand(
-    name,
-    package,
-    title,
+    name: str,
+    package: str,
+    title: str,
     description=None,
     epilog=None,
     arguments=[],
@@ -792,6 +800,7 @@ def subcommand(
         data["epilog"] = epilog
 
     data["arguments"], epilog_addendum = resolve_typical_arguments(
+        package,
         arguments,
         no_output=no_output,
         resumer=resumer,
