@@ -104,19 +104,58 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
         self.response = None
         self.degree = 0
 
+
+class ErroredCrawlResult(CrawlResult[CrawlJobDataType, None]):
+    job: CrawlJob[CrawlJobDataType]
+    data: None
+    error: Exception
+    response: None
+    degree: int
+
+    def __init__(self, job: CrawlJob[CrawlJobDataType], error: Exception):
+        self.job = job
+        self.data = None
+        self.error = error
+        self.response = None
+        self.degree = 0
+
     def __repr__(self):
         name = self.__class__.__name__
 
-        if not self.response:
-            return "<{name} url={url!r} pending!>".format(name=name, url=self.job.url)
-
-        if self.error:
-            return "<{name} url={url!r} error={error}>".format(
-                name=name, url=self.job.url, error=self.error.__class__.__name__
-            )
-
-        assert self.response is not None
-
-        return "<{name} url={url!r} status={status!r}>".format(
-            name=name, url=self.job.url, status=self.response.status
+        return "<{name} url={url!r} error={error}>".format(
+            name=name, url=self.job.url, error=self.error.__class__.__name__
         )
+
+
+class SuccessfulCrawlResult(CrawlResult[CrawlJobDataType, CrawlResultDataType]):
+    job: CrawlJob[CrawlJobDataType]
+    data: CrawlResultDataType
+    error: None
+    response: Response
+    degree: int
+
+    def __init__(
+        self,
+        job: CrawlJob[CrawlJobDataType],
+        response: Response,
+        data: CrawlResultDataType,
+        degree: int,
+    ):
+        self.job = job
+        self.data = data
+        self.error = None
+        self.response = response
+        self.degree = degree
+
+    def __repr__(self):
+        name = self.__class__.__name__
+
+        return "<{name} url={url!r} status={status!r} degree={degree!r}>".format(
+            name=name, url=self.job.url, status=self.response.status, degree=self.degree
+        )
+
+
+SomeCrawlResult = Union[
+    ErroredCrawlResult[CrawlJobDataType],
+    SuccessfulCrawlResult[CrawlJobDataType, CrawlResultDataType],
+]

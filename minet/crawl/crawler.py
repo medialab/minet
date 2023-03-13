@@ -27,6 +27,7 @@ from minet.crawl.types import (
     CrawlJobDataType,
     CrawlResultDataType,
     CrawlResult,
+    SomeCrawlResult,
 )
 from minet.crawl.spiders import (
     Spider,
@@ -338,7 +339,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
     def __iter__(
         self,
-    ) -> Iterator[CrawlResult[CrawlJobDataTypes, CrawlResultDataTypes]]:
+    ) -> Iterator[SomeCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes]]:
         worker = CrawlWorker(self)
 
         def key_by_domain_name(job: CrawlJob) -> Optional[str]:
