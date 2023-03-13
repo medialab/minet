@@ -20,7 +20,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
     )
 
     url: str
-    depth: Optional[int]
+    depth: int
     spider: Optional[str]
     data: Optional[CrawlJobDataType]
     attempts: int
@@ -38,7 +38,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
         data: Optional[CrawlJobDataType] = None,
     ):
         self.url = ensure_protocol(url).strip()
-        self.depth = depth
+        self.depth = depth if depth is not None else 0
         self.spider = spider
         self.data = data
         self.attempts = 0

@@ -368,7 +368,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             UrlOrCrawlJob[CrawlJobDataTypes], Iterable[UrlOrCrawlJob[CrawlJobDataTypes]]
         ],
         spider: Optional[str] = None,
-        depth: int = 0,
+        depth: Optional[int] = None,
     ) -> int:
         if isinstance(job_or_jobs, (str, CrawlJob)):
             jobs = [job_or_jobs]
@@ -382,7 +382,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
                 if spider is not None and job.spider is None:
                     job.spider = spider
 
-                if job.depth is None:
+                if depth is not None:
                     job.depth = depth
 
                 yield job
