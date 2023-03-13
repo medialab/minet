@@ -14,10 +14,11 @@ from dataclasses import dataclass
 from datetime import datetime
 from ural import is_shortened_url, could_be_html
 
-from minet.executors import RequestResult, RequestWorkerPayload, HTTPThreadPoolExecutor
+from minet.executors import RequestResult, HTTPWorkerPayload, HTTPThreadPoolExecutor
 from minet.fs import FilenameBuilder, ThreadSafeFilesWriter
 from minet.web import grab_cookies, parse_http_header, Response, RedirectionStack
 from minet.exceptions import InvalidURLError, FilenameFormattingError
+from minet.heuristics import should_spoof_ua_when_resolving
 from minet.cli.exceptions import InvalidArgumentsError, FatalError
 from minet.cli.reporters import report_error, report_filename_formatting_error
 from minet.cli.utils import with_enricher_and_loading_bar, with_ctrl_c_warning
@@ -176,7 +177,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
         return url
 
-    def request_args(payload: RequestWorkerPayload):
+    def request_args(payload: HTTPWorkerPayload):
         cookie = None
 
         # Cookie
@@ -189,7 +190,12 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
         if global_headers:
             headers = global_headers
 
-        return {"method": http_method, "cookie": cookie, "headers": headers}
+        return {
+            "method": http_method,
+            "cookie": cookie,
+            "headers": headers,
+            "spoof_ua": resolve and should_spoof_ua_when_resolving(payload.domain),
+        }
 
     # Worker callback internals
     filename_builder = None
@@ -212,7 +218,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
         files_writer = ThreadSafeFilesWriter(cli_args.output_dir)
 
-    def worker_callback(result: RequestResult[Tuple[int, List[str]]]) -> None:
+    def worker_callback(result: RequestResult[Tuple[int, List[str]], None]) -> None:
         if cli_args.dont_save:
             return
 

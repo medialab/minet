@@ -35,7 +35,6 @@ from minet.web import (
     AnyTimeout,
     EXPECTED_WEB_ERRORS,
 )
-from minet.heuristics import should_spoof_ua_when_resolving
 from minet.constants import (
     DEFAULT_DOMAIN_PARALLELISM,
     DEFAULT_IMAP_BUFFER_SIZE,
@@ -47,11 +46,12 @@ from minet.constants import (
 
 ItemType = TypeVar("ItemType")
 ResultType = TypeVar("ResultType")
+AddendumType = TypeVar("AddendumType")
 
 CANCELLED = object()
 
 
-class RequestWorkerPayload(Generic[ItemType]):
+class HTTPWorkerPayload(Generic[ItemType]):
     __slots__ = ("item", "url", "__has_cached_domain", "__domain")
 
     item: ItemType
@@ -79,22 +79,24 @@ class RequestWorkerPayload(Generic[ItemType]):
         return self.__domain
 
 
-RequestArgsType = Callable[[RequestWorkerPayload[ItemType]], Dict]
+ArgsCallbackType = Callable[[HTTPWorkerPayload[ItemType]], Dict]
 
 
-class RequestResult(Generic[ItemType]):
-    __slots__ = ("item", "url", "error", "response")
+class RequestResult(Generic[ItemType, AddendumType]):
+    __slots__ = ("item", "url", "error", "response", "addendum")
 
     item: ItemType
     url: Optional[str]
     error: Optional[Exception]
     response: Optional[Response]
+    addendum: Optional[AddendumType]
 
     def __init__(self, item: ItemType, url: Optional[str]):
         self.item = item
         self.url = url
         self.error = None
         self.response = None
+        self.addendum = None
 
     def __repr__(self):
         name = self.__class__.__name__
@@ -117,19 +119,21 @@ class RequestResult(Generic[ItemType]):
         )
 
 
-class ResolveResult(Generic[ItemType]):
-    __slots__ = ("item", "url", "error", "stack")
+class ResolveResult(Generic[ItemType, AddendumType]):
+    __slots__ = ("item", "url", "error", "stack", "addendum")
 
     item: ItemType
     url: Optional[str]
     error: Optional[Exception]
     stack: Optional[RedirectionStack]
+    addendum: Optional[AddendumType]
 
     def __init__(self, item: ItemType, url: Optional[str]):
         self.item = item
         self.url = url
         self.error = None
         self.stack = None
+        self.addendum = None
 
     def __repr__(self):
         name = self.__class__.__name__
@@ -152,119 +156,56 @@ class ResolveResult(Generic[ItemType]):
         )
 
 
-def key_by_domain_name(payload: RequestWorkerPayload) -> Optional[str]:
+def key_by_domain_name(payload: HTTPWorkerPayload) -> Optional[str]:
     return payload.domain
 
 
 def payloads_iter(
     iterable: Iterable[ItemType],
     key: Optional[Callable[[ItemType], Optional[str]]] = None,
-) -> Iterator[RequestWorkerPayload[ItemType]]:
+) -> Iterator[HTTPWorkerPayload[ItemType]]:
     for item in iterable:
         url = item if key is None else key(item)
 
         if not url:
-            yield RequestWorkerPayload(item=item, url=None)
+            yield HTTPWorkerPayload(item=item, url=None)
             continue
 
         # Url cleanup
         url = ensure_protocol(url.strip())  # type: ignore
 
-        yield RequestWorkerPayload(item=item, url=url)
+        yield HTTPWorkerPayload(item=item, url=url)
 
 
-class RequestWorker(Generic[ItemType]):
+class HTTPWorker(Generic[ItemType, AddendumType]):
     def __init__(
         self,
         pool_manager: urllib3.PoolManager,
         cancel_event: Event,
         local_context: threading.local,
         *,
-        request_args: Optional[RequestArgsType[ItemType]] = None,
+        resolving: bool = False,
+        get_args: Optional[ArgsCallbackType[ItemType]] = None,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
-        callback: Optional[Callable[[RequestResult[ItemType]], None]] = None,
-    ):
-        self.cancel_event = cancel_event
-        self.local_context = local_context
-        self.request_args = request_args
-        self.callback = callback
-
-        self.default_request_kwargs = {
-            "pool_manager": pool_manager,
-            "max_redirects": max_redirects,
-            "cancel_event": cancel_event,
-        }
-
-    def __call__(
-        self, payload: RequestWorkerPayload[ItemType]
-    ) -> Union[object, RequestResult[ItemType]]:
-        item, url = payload.item, payload.url
-
-        result = RequestResult(item, url)
-
-        # Noop
-        if url is None:
-            return result
-
-        kwargs = {}
-
-        if self.cancel_event.is_set():
-            return CANCELLED
-
-        if self.request_args is not None:
-            # NOTE: request_args must be threadsafe
-            kwargs = self.request_args(payload)
-
-        if self.cancel_event.is_set():
-            return CANCELLED
-
-        try:
-            retryer = getattr(self.local_context, "retryer", None)
-            kwargs.update(self.default_request_kwargs)
-
-            if retryer is not None:
-                response = retryer(request, url, **kwargs)
-            else:
-                response = request(url, **kwargs)
-
-        except CancelledRequestError:
-            return CANCELLED
-
-        except EXPECTED_WEB_ERRORS as error:
-            result.error = error
-
-        else:
-            result.response = response
-
-            if self.callback is not None:
-                if self.cancel_event.is_set():
-                    return CANCELLED
-
-                self.callback(result)
-
-        return result
-
-
-class ResolveWorker(Generic[ItemType]):
-    def __init__(
-        self,
-        pool_manager: urllib3.PoolManager,
-        cancel_event: Event,
-        local_context: threading.local,
-        *,
-        resolve_args: Optional[RequestArgsType[ItemType]] = None,
-        max_redirects: int = DEFAULT_RESOLVE_MAX_REDIRECTS,
         follow_refresh_header: bool = True,
         follow_meta_refresh: bool = False,
         follow_js_relocation: bool = False,
         infer_redirection: bool = False,
         canonicalize: bool = False,
+        callback: Optional[
+            Callable[[RequestResult[ItemType, AddendumType]], AddendumType]
+        ] = None,
     ):
         self.cancel_event = cancel_event
         self.local_context = local_context
-        self.resolve_args = resolve_args
+        self.get_args = get_args
+        self.callback = callback
 
-        self.default_resolve_kwargs = {
+        self.resolving = resolving
+        self.fn = request if not resolving else resolve
+        self.Result = RequestResult if not resolving else ResolveResult
+
+        self.default_kwargs = {
             "pool_manager": pool_manager,
             "max_redirects": max_redirects,
             "cancel_event": cancel_event,
@@ -276,11 +217,11 @@ class ResolveWorker(Generic[ItemType]):
         }
 
     def __call__(
-        self, payload: RequestWorkerPayload[ItemType]
-    ) -> Union[object, ResolveResult[ItemType]]:
+        self, payload: HTTPWorkerPayload[ItemType]
+    ) -> Union[object, RequestResult[ItemType, AddendumType]]:
         item, url = payload.item, payload.url
 
-        result = ResolveResult(item, url)
+        result = self.Result(item, url)
 
         # Noop
         if url is None:
@@ -291,32 +232,42 @@ class ResolveWorker(Generic[ItemType]):
         if self.cancel_event.is_set():
             return CANCELLED
 
-        if self.resolve_args is not None:
-            # NOTE: resolve_args must be threadsafe
-            kwargs = self.resolve_args(payload)
+        if self.get_args is not None:
+            # NOTE: given callback must be threadsafe
+            kwargs = self.get_args(payload)
 
         if self.cancel_event.is_set():
             return CANCELLED
 
-        # NOTE: should it be just in the CLI?
-        if "spoof_ua" not in kwargs and payload.domain is not None:
-            kwargs["spoof_ua"] = should_spoof_ua_when_resolving(payload.domain)
-
         try:
             retryer = getattr(self.local_context, "retryer", None)
-            kwargs.update(self.default_resolve_kwargs)
+            kwargs.update(self.default_kwargs)
 
             if retryer is not None:
-                stack = retryer(resolve, url, **kwargs)
+                output = retryer(self.fn, url, **kwargs)
             else:
-                stack = resolve(url, **kwargs)
+                output = self.fn(url, **kwargs)
 
         except CancelledRequestError:
             return CANCELLED
+
         except EXPECTED_WEB_ERRORS as error:
             result.error = error
+
         else:
-            result.stack = stack
+            if self.resolving:
+                result.stack = output
+            else:
+                result.response = output
+
+            if self.callback is not None:
+                if self.cancel_event.is_set():
+                    return CANCELLED
+
+                if retryer is not None:
+                    result.addendum = retryer(self.callback, result)
+                else:
+                    result.addendum = self.callback(result)
 
         return result
 
@@ -388,19 +339,21 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         ordered: bool = False,
         key: Optional[Callable[[ItemType], Optional[str]]] = None,
         throttle: float = DEFAULT_THROTTLE,
-        request_args: Optional[RequestArgsType[ItemType]] = None,
+        request_args: Optional[ArgsCallbackType[ItemType]] = None,
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
-        callback: Optional[Callable[[RequestResult[ItemType]], None]] = None,
-    ) -> Iterator[RequestResult[ItemType]]:
+        callback: Optional[
+            Callable[[RequestResult[ItemType, AddendumType]], None]
+        ] = None,
+    ) -> Iterator[RequestResult[ItemType, AddendumType]]:
 
         # TODO: validate
-        worker = RequestWorker(
+        worker = HTTPWorker(
             self.pool_manager,
             self.cancel_event,
             self.local_context,
-            request_args=request_args,
+            get_args=request_args,
             max_redirects=max_redirects,
             callback=callback,
         )
@@ -425,29 +378,34 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         ordered: bool = False,
         key: Optional[Callable[[ItemType], Optional[str]]] = None,
         throttle: float = DEFAULT_THROTTLE,
-        resolve_args: Optional[RequestArgsType[ItemType]] = None,
+        resolve_args: Optional[ArgsCallbackType[ItemType]] = None,
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
-        max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
+        max_redirects: int = DEFAULT_RESOLVE_MAX_REDIRECTS,
         follow_refresh_header: bool = True,
         follow_meta_refresh: bool = False,
         follow_js_relocation: bool = False,
         infer_redirection: bool = False,
         canonicalize: bool = False,
-    ) -> Iterator[ResolveResult[ItemType]]:
+        callback: Optional[
+            Callable[[ResolveResult[ItemType, AddendumType]], None]
+        ] = None,
+    ) -> Iterator[ResolveResult[ItemType, AddendumType]]:
 
         # TODO: validate
-        worker = ResolveWorker(
+        worker = HTTPWorker(
             self.pool_manager,
             self.cancel_event,
             self.local_context,
-            resolve_args=resolve_args,
+            resolving=True,
+            get_args=resolve_args,
             max_redirects=max_redirects,
             follow_refresh_header=follow_refresh_header,
             follow_meta_refresh=follow_meta_refresh,
             follow_js_relocation=follow_js_relocation,
             infer_redirection=infer_redirection,
             canonicalize=canonicalize,
+            callback=callback,
         )
 
         method = super().imap if ordered else super().imap_unordered
