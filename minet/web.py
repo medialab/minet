@@ -1248,11 +1248,11 @@ class RequestRetrying(Retrying):
         self._invalid_statuses = invalid_statuses
         super().__init__(*args, **kwargs)
 
-    def __call__(self, *args, **kwargs):
-        if self._invalid_statuses is not None:
+    def __call__(self, fn, *args, **kwargs):
+        if self._invalid_statuses is not None and fn in (request, resolve):
             kwargs["raise_on_statuses"] = self._invalid_statuses
 
-        return super().__call__(*args, **kwargs)
+        return super().__call__(fn, *args, **kwargs)
 
 
 def create_request_retryer(
