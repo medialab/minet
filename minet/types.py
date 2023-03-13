@@ -9,6 +9,11 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Literal
 
+if sys.version_info >= (3, 11):
+    from typing import TypedDict, Required, NotRequired
+else:
+    from typing_extensions import TypedDict, Required, NotRequired
+
 AnyPath = Union[str, PathLike]
 AnyFileTarget = Union[AnyPath, FileIO]
 AnyScrapableTarget = Union[str, BeautifulSoup]

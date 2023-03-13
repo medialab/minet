@@ -5,7 +5,7 @@
 # Various loading bar utilities used by minet CLI.
 #
 from typing import Optional, Iterable
-from typing_extensions import TypedDict, NotRequired
+from minet.types import TypedDict, NotRequired
 
 from contextlib import contextmanager
 from collections import OrderedDict, namedtuple

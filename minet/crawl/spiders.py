@@ -17,7 +17,7 @@ from typing import (
     Iterable,
     Generic,
 )
-from typing_extensions import TypedDict, NotRequired
+from minet.types import TypedDict, NotRequired
 
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup

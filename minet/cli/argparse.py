@@ -5,7 +5,7 @@
 # Miscellaneous helpers related to CLI argument parsing.
 #
 from typing import Optional
-from typing_extensions import TypedDict, NotRequired
+from minet.types import TypedDict, NotRequired
 
 import os
 import re
