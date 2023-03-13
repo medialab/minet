@@ -29,6 +29,7 @@ import ural
 import json
 import mimetypes
 import functools
+import threading
 import warnings
 from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning, SoupStrainer
 from datetime import datetime
@@ -1206,6 +1207,8 @@ class log_request_retryer_before_sleep:
             "request_retryer starts sleeping",
             extra={
                 "source": "request_retryer",
+                "from_thread": threading.current_thread()
+                is not threading.main_thread(),
                 "retry_state": retry_state,
                 "exception": exception,
                 "sleep_time": retry_state.next_action.sleep,

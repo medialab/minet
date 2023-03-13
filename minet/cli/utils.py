@@ -100,7 +100,8 @@ class CLIRetryerHandler(Handler):
             exc_msg = str(exc)
 
             msg = [
-                "Will now wait for %s because of following exception:" % pretty_time,
+                "%s now wait for %s because of following exception:"
+                % ("A thread will" if record.from_thread else "Will", pretty_time),
                 exc_name,
             ]
 
