@@ -1289,6 +1289,20 @@ def create_request_retryer(
         exception_types=tuple(retryable_exception_types)
     )
 
+    # By default we also retry subsets of new connection error
+    def temporary_failure_predicate(exc: BaseException) -> bool:
+        if not isinstance(exc, urllib3_exceptions.NewConnectionError):
+            return False
+
+        msg = str(exc).lower()
+
+        if "errno -3" in msg or "temporary failure in name resolution" in msg:
+            return True
+
+        return False
+
+    retry_condition |= retry_if_exception(temporary_failure_predicate)
+
     if retry_on_statuses is not None:
 
         def status_predicate(exc: BaseException) -> bool:
