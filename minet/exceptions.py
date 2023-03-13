@@ -68,6 +68,18 @@ class InvalidStatusError(MinetError):
         self.status = status
 
 
+class HTTPCallbackError(MinetError):
+    def __init__(self, reason: Exception):
+        super().__init__("HTTPCallbackError: " + str(reason))
+        self.reason = reason
+
+    def unwrap(self, allow) -> Exception:
+        if not isinstance(self.reason, allow):
+            raise self.reason
+
+        return self.reason
+
+
 class CancelledRequestError(MinetError):
     pass
 

@@ -17,11 +17,17 @@ from ural import is_shortened_url, could_be_html
 from minet.executors import RequestResult, HTTPWorkerPayload, HTTPThreadPoolExecutor
 from minet.fs import FilenameBuilder, ThreadSafeFilesWriter
 from minet.web import grab_cookies, parse_http_header, Response, RedirectionStack
-from minet.exceptions import InvalidURLError, FilenameFormattingError
+from minet.exceptions import InvalidURLError, FilenameFormattingError, HTTPCallbackError
 from minet.heuristics import should_spoof_ua_when_resolving
 from minet.cli.exceptions import InvalidArgumentsError, FatalError
 from minet.cli.reporters import report_error, report_filename_formatting_error
 from minet.cli.utils import with_enricher_and_loading_bar, with_ctrl_c_warning
+
+
+@dataclass
+class WorkerAddendum:
+    filename: Optional[str] = None
+    decoded_contents: Optional[str] = None
 
 
 @dataclass
@@ -34,11 +40,11 @@ class FetchAddendum(TabularRecord):
     mimetype: Optional[str] = None
     encoding: Optional[str] = None
 
-    def infos_from_response(self, response: Response) -> None:
+    def infos_from_response(self, response: Response, addendum: WorkerAddendum) -> None:
         self.resolved_url = response.end_url
         self.http_status = response.status
         self.datetime_utc = response.end_datetime
-        self.filename = response.get("filename")
+        self.filename = addendum.filename
         self.encoding = response.encoding
         self.mimetype = response.mimetype
 
@@ -47,9 +53,9 @@ class FetchAddendum(TabularRecord):
 class FetchAddendumWithBody(FetchAddendum):
     body: Optional[str] = None
 
-    def infos_from_response(self, response: Response) -> None:
-        super().infos_from_response(response)
-        self.body = response.get("decoded_contents")
+    def infos_from_response(self, response: Response, addendum: WorkerAddendum) -> None:
+        super().infos_from_response(response, addendum)
+        self.body = addendum.decoded_contents
 
 
 @dataclass
@@ -218,7 +224,9 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
         files_writer = ThreadSafeFilesWriter(cli_args.output_dir)
 
-    def worker_callback(result: RequestResult[Tuple[int, List[str]], None]) -> None:
+    def worker_callback(
+        result: RequestResult[Tuple[int, List[str]], None]
+    ) -> Optional[WorkerAddendum]:
         if cli_args.dont_save:
             return
 
@@ -234,6 +242,8 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
         if cli_args.only_html and not response.is_html:
             return
 
+        addendum = WorkerAddendum()
+
         # First we need to build a filename
         filename_cell = row[filename_pos] if filename_pos is not None else None
 
@@ -242,21 +252,17 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
         if cli_args.filename_template and "row" in cli_args.filename_template:
             formatter_kwargs["row"] = enricher.wrap(row)
 
-        try:
-            assert filename_builder is not None
+        assert filename_builder is not None
 
-            filename = filename_builder(
-                response.end_url,
-                filename=filename_cell,
-                ext=response.ext,
-                formatter_kwargs=formatter_kwargs,
-                compressed=cli_args.compress,
-            )
-        except FilenameFormattingError as e:
-            result.error = e
-            return
+        filename = filename_builder(
+            response.end_url,
+            filename=filename_cell,
+            ext=response.ext,
+            formatter_kwargs=formatter_kwargs,
+            compressed=cli_args.compress,
+        )
 
-        response["filename"] = filename
+        addendum.filename = filename
 
         # Decoding the response data?
         data: Union[str, bytes] = response.body
@@ -267,7 +273,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
             data = response.body.decode(response.likely_encoding, errors="replace")
 
             if cli_args.contents_in_report:
-                response["decoded_contents"] = data
+                addendum.decoded_contents = data
 
         # Writing the file?
         # TODO: specify what should happen when contents are empty (e.g. POST queries)
@@ -275,6 +281,8 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
             assert files_writer is not None
 
             files_writer.write(filename, data, compress=cli_args.compress)
+
+        return addendum
 
     common_executor_kwargs = {
         "insecure": cli_args.insecure,
@@ -319,30 +327,34 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                     # No error
                     if result.error is None:
                         assert result.response is not None
+                        assert result.addendum is not None
 
                         response = result.response
                         status = response.status
 
                         loading_bar.inc_stat(status, style=get_style_for_status(status))
 
-                        addendum.infos_from_response(response)
+                        addendum.infos_from_response(response, result.addendum)
                         enricher.writerow(index, row, addendum)
 
                     # Handling potential errors
                     else:
-                        error_code = report_error(result.error)
+                        error = result.error
+
+                        if isinstance(error, HTTPCallbackError):
+                            error.unwrap(FilenameFormattingError)
+
+                        error_code = report_error(error)
 
                         loading_bar.inc_stat(error_code, style="error")
 
                         resolved_url = None
 
-                        if isinstance(result.error, InvalidURLError):
-                            resolved_url = result.error.url
+                        if isinstance(error, InvalidURLError):
+                            resolved_url = error.url
 
-                        if isinstance(result.error, FilenameFormattingError):
-                            loading_bar.print(
-                                report_filename_formatting_error(result.error)
-                            )
+                        if isinstance(error, FilenameFormattingError):
+                            loading_bar.print(report_filename_formatting_error(error))
 
                         addendum.fetch_error = error_code
                         addendum.resolved_url = resolved_url

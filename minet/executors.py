@@ -24,7 +24,7 @@ from quenouille import ThreadPoolExecutor
 from ural import get_domain_name, ensure_protocol
 from tenacity import RetryCallState
 
-from minet.exceptions import CancelledRequestError
+from minet.exceptions import CancelledRequestError, HTTPCallbackError
 from minet.web import (
     create_pool_manager,
     create_request_retryer,
@@ -264,10 +264,13 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
                 if self.cancel_event.is_set():
                     return CANCELLED
 
-                if retryer is not None:
-                    result.addendum = retryer(self.callback, result)
-                else:
-                    result.addendum = self.callback(result)
+                try:
+                    if retryer is not None:
+                        result.addendum = retryer(self.callback, result)
+                    else:
+                        result.addendum = self.callback(result)
+                except Exception as reason:
+                    result.error = HTTPCallbackError(reason)
 
         return result
 
