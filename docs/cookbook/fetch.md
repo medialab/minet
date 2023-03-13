@@ -216,12 +216,12 @@ Maybe CLI is not your tool of choice and you prefer scripting right away. Maybe 
 
 ```python
 import csv
-from minet import FetchThreadPoolExecutor
+from minet import RequestThreadPoolExecutor
 
 with open('./urls.csv') as f:
     reader = csv.DictReader(f)
 
-    with FetchThreadPoolExecutor() as executor:
+    with RequestThreadPoolExecutor() as executor:
         for result in executor.imap_unordered(reader, key=lambda line: line['url']):
             if result.error is not None:
                 print('Something went wrong', result.error)

@@ -17,7 +17,7 @@ from ural import is_shortened_url, could_be_html
 from minet.fetch import (
     FetchResult,
     FetchWorkerPayload,
-    FetchThreadPoolExecutor,
+    RequestThreadPoolExecutor,
     ResolveThreadPoolExecutor,
 )
 from minet.fs import FilenameBuilder, ThreadSafeFilesWriter
@@ -298,7 +298,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
             FetchAddendum if not cli_args.contents_in_report else FetchAddendumWithBody
         )
 
-        with FetchThreadPoolExecutor(**common_executor_kwargs) as executor:
+        with RequestThreadPoolExecutor(**common_executor_kwargs) as executor:
             for result in executor.imap_unordered(
                 enricher,
                 request_args=request_args,

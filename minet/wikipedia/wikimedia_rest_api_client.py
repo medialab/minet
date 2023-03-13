@@ -2,7 +2,7 @@ from typing import Iterable, Iterator, TypeVar, Callable, Tuple, List, Optional
 
 from urllib.parse import quote, unquote
 
-from minet.fetch import FetchThreadPoolExecutor
+from minet.fetch import RequestThreadPoolExecutor
 
 from minet.wikipedia.exceptions import (
     WikimediaRESTAPIThrottledError,
@@ -89,7 +89,7 @@ class WikimediaRestAPIClient(object):
 
             return url
 
-        with FetchThreadPoolExecutor(max_workers=threads, retry=True) as executor:
+        with RequestThreadPoolExecutor(max_workers=threads, retry=True) as executor:
             for result in executor.imap_unordered(
                 pages,
                 key=api_url_from_item,

@@ -385,7 +385,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         raise NotImplementedError
 
 
-class FetchThreadPoolExecutor(HTTPThreadPoolExecutor):
+class RequestThreadPoolExecutor(HTTPThreadPoolExecutor):
     def imap_unordered(
         self,
         iterator: Iterable[ItemType],
