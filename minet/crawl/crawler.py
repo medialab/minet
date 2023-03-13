@@ -59,6 +59,16 @@ def ensure_job(
     return CrawlJob(url=url_or_job)
 
 
+def coerce_spider(target):
+    if isinstance(target, Spider):
+        return target
+
+    if callable(target):
+        return FunctionSpider(target)
+
+    raise TypeError("expecting a spider or a callable")
+
+
 RequestArgsType = Callable[[CrawlJob[CrawlJobDataType]], Dict]
 
 
@@ -68,7 +78,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
         crawler: "Crawler",
         *,
         request_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
-        max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS
+        max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
     ):
         self.crawler = crawler
 
@@ -160,6 +170,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
 CrawlJobDataTypes = TypeVar("CrawlJobDataTypes", bound=Mapping)
 CrawlJobOutputDataTypes = TypeVar("CrawlJobOutputDataTypes")
 Spiders = Union[
+    FunctionSpiderCallable[CrawlJobDataTypes, CrawlJobOutputDataTypes],
     Spider[CrawlJobDataTypes, CrawlJobOutputDataTypes],
     Dict[str, Spider[CrawlJobDataTypes, CrawlJobOutputDataTypes]],
 ]
@@ -181,7 +192,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
 
     def __init__(
         self,
-        spiders: Spiders[CrawlJobDataTypes, CrawlJobOutputDataTypes],
+        spider_or_spiders: Spiders[CrawlJobDataTypes, CrawlJobOutputDataTypes],
         queue_path: Optional[str] = None,
         resume: bool = False,
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
@@ -239,15 +250,15 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlJobOutputDataTypes]):
         self.state = CrawlerState(jobs_queued=self.queue.qsize())
 
         # Spiders
-        if isinstance(spiders, Spider):
-            self.__spiders = {DEFAULT_SPIDER_KEY: spiders}
-            self.singular = True
-        elif isinstance(spiders, Mapping):
+        if isinstance(spider_or_spiders, Mapping):
             self.__spiders = {}
             self.singular = False
 
-            for name, spider in spiders.items():
-                self.__spiders[name] = spider
+            for name, spider in spider_or_spiders.items():
+                self.__spiders[name] = coerce_spider(spider)
+        elif isinstance(spider_or_spiders, Spider) or callable(spider_or_spiders):
+            self.__spiders = {DEFAULT_SPIDER_KEY: coerce_spider(spider_or_spiders)}
+            self.singular = True
         else:
             raise TypeError("expecting a single spider or a mapping of spiders")
 
