@@ -6,7 +6,7 @@
 # in the given column. This is done in a respectful multithreaded fashion to
 # optimize both running time & memory.
 #
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Tuple
 
 import casanova
 from casanova import TabularRecord
@@ -14,12 +14,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from ural import is_shortened_url, could_be_html
 
-from minet.executors import (
-    RequestResult,
-    RequestWorkerPayload,
-    RequestThreadPoolExecutor,
-    ResolveThreadPoolExecutor,
-)
+from minet.executors import RequestResult, RequestWorkerPayload, HTTPThreadPoolExecutor
 from minet.fs import FilenameBuilder, ThreadSafeFilesWriter
 from minet.web import grab_cookies, parse_http_header, Response, RedirectionStack
 from minet.exceptions import InvalidURLError, FilenameFormattingError
@@ -217,7 +212,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
         files_writer = ThreadSafeFilesWriter(cli_args.output_dir)
 
-    def worker_callback(result: RequestResult[List]) -> None:
+    def worker_callback(result: RequestResult[Tuple[int, List[str]]]) -> None:
         if cli_args.dont_save:
             return
 
@@ -298,8 +293,8 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
             FetchAddendum if not cli_args.contents_in_report else FetchAddendumWithBody
         )
 
-        with RequestThreadPoolExecutor(**common_executor_kwargs) as executor:
-            for result in executor.imap_unordered(
+        with HTTPThreadPoolExecutor(**common_executor_kwargs) as executor:
+            for result in executor.request(
                 enricher,
                 request_args=request_args,
                 callback=worker_callback,
@@ -351,8 +346,8 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
     # Resolve
     else:
 
-        with ResolveThreadPoolExecutor(**common_executor_kwargs) as executor:
-            for result in executor.imap_unordered(
+        with HTTPThreadPoolExecutor(**common_executor_kwargs) as executor:
+            for result in executor.resolve(
                 enricher,
                 resolve_args=request_args,
                 follow_meta_refresh=cli_args.follow_meta_refresh,

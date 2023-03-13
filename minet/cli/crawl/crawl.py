@@ -92,12 +92,12 @@ def open_report(
 
 class ScraperReporter(object):
     def __init__(self, path: str, scraper: Scraper, resume=False):
-        if scraper.headers is None:
-            raise NotImplementedError("Scraper headers could not be inferred.")
+        if scraper.fieldnames is None:
+            raise NotImplementedError("Scraper fieldnames could not be inferred.")
 
-        f, writer = open_report(path, scraper.headers, resume)
+        f, writer = open_report(path, scraper.fieldnames, resume)
 
-        self.headers = scraper.headers
+        self.fieldnames = scraper.fieldnames
         self.file = f
         self.writer = writer
 
@@ -115,7 +115,7 @@ class ScraperReporter(object):
                 self.writer.writerow([item])
                 continue
 
-            row = [item.get(k, "") for k in self.headers]
+            row = [item.get(k, "") for k in self.fieldnames]
             self.writer.writerow(row)
 
         return count

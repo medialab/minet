@@ -381,15 +381,11 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         self.pool_manager.clear()
         return super().shutdown(wait=wait)
 
-    def imap(self, *args, **kwargs):
-        raise NotImplementedError
-
-
-class RequestThreadPoolExecutor(HTTPThreadPoolExecutor):
-    def imap_unordered(
+    def request(
         self,
         iterator: Iterable[ItemType],
         *,
+        ordered: bool = False,
         key: Optional[Callable[[ItemType], Optional[str]]] = None,
         throttle: float = DEFAULT_THROTTLE,
         request_args: Optional[RequestArgsType[ItemType]] = None,
@@ -409,7 +405,9 @@ class RequestThreadPoolExecutor(HTTPThreadPoolExecutor):
             callback=callback,
         )
 
-        imap_unordered = super().imap_unordered(
+        method = super().imap if ordered else super().imap_unordered
+
+        imap_unordered = method(
             payloads_iter(iterator, key=key),
             worker,
             key=key_by_domain_name,
@@ -418,14 +416,13 @@ class RequestThreadPoolExecutor(HTTPThreadPoolExecutor):
             throttle=throttle,
         )
 
-        return (item for item in imap_unordered if item is not CANCELLED)
+        return (item for item in imap_unordered if item is not CANCELLED)  # type: ignore
 
-
-class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor):
-    def imap_unordered(
+    def resolve(
         self,
         iterator: Iterable[ItemType],
         *,
+        ordered: bool = False,
         key: Optional[Callable[[ItemType], Optional[str]]] = None,
         throttle: float = DEFAULT_THROTTLE,
         resolve_args: Optional[RequestArgsType[ItemType]] = None,
@@ -453,7 +450,9 @@ class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor):
             canonicalize=canonicalize,
         )
 
-        imap_unordered = super().imap_unordered(
+        method = super().imap if ordered else super().imap_unordered
+
+        imap_unordered = method(
             payloads_iter(iterator, key=key),
             worker,
             key=key_by_domain_name,
@@ -462,4 +461,4 @@ class ResolveThreadPoolExecutor(HTTPThreadPoolExecutor):
             throttle=throttle,
         )
 
-        return (item for item in imap_unordered if item is not CANCELLED)
+        return (item for item in imap_unordered if item is not CANCELLED)  # type: ignore
