@@ -68,16 +68,12 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlJobOutputDataType]):
         crawler: "Crawler",
         *,
         request_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
-        max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
-        callback: Optional[
-            Callable[[CrawlResult[CrawlJobDataType, CrawlJobOutputDataType]], None]
-        ] = None,
+        max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS
     ):
         self.crawler = crawler
 
         self.request_args = request_args
         self.max_redirects = max_redirects
-        self.callback = callback
 
         self.cancel_event = self.crawler.executor.cancel_event
         self.local_context = self.crawler.executor.local_context
