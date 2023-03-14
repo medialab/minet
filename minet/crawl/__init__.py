@@ -1,4 +1,11 @@
-from minet.crawl.types import CrawlResult, CrawlJob, UrlOrCrawlJob
+from minet.crawl.types import (
+    CrawlResult,
+    SomeCrawlResult,
+    SuccessfulCrawlResult,
+    ErroredCrawlResult,
+    CrawlJob,
+    UrlOrCrawlJob,
+)
 from minet.crawl.state import CrawlerState
 from minet.crawl.spiders import (
     Spider,

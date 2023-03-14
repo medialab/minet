@@ -26,7 +26,8 @@ from minet.crawl.types import (
     UrlOrCrawlJob,
     CrawlJobDataType,
     CrawlResultDataType,
-    CrawlResult,
+    SuccessfulCrawlResult,
+    ErroredCrawlResult,
     SomeCrawlResult,
 )
 from minet.crawl.spiders import (
@@ -97,18 +98,16 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType]
-    ) -> Union[object, CrawlResult[CrawlJobDataType, CrawlResultDataType]]:
+    ) -> Union[object, SomeCrawlResult[CrawlJobDataType, CrawlResultDataType]]:
 
         # Registering work
         with self.crawler.state.task():
             cancel_event = self.cancel_event
 
-            result = CrawlResult(job)
             spider = self.crawler.get_spider(job.spider)
 
             if spider is None:
-                result.error = UnknownSpiderError(spider=job.spider)
-                return result
+                return ErroredCrawlResult(job, UnknownSpiderError(spider=job.spider))
 
             # NOTE: crawl job must have a url and a depth at that point
             assert job.url is not None
@@ -139,33 +138,31 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
                 return CANCELLED
 
             except EXPECTED_WEB_ERRORS as error:
-                result.error = error
-                return result
+                return ErroredCrawlResult(job, error)
 
             finally:
                 job.attempts += 1
-
-            result.response = response
 
             if cancel_event.is_set():
                 return CANCELLED
 
             try:
                 data, next_jobs = spider(job, response)
-                result.data = data
 
                 if cancel_event.is_set():
                     return CANCELLED
 
+                degree = 0
+
                 if next_jobs is not None:
-                    result.degree = self.crawler.enqueue(
+                    degree = self.crawler.enqueue(
                         next_jobs, spider=job.spider, depth=job.depth + 1
                     )
 
             except Exception as error:
-                result.error = error
+                return ErroredCrawlResult(job, error, response=response)
 
-            return result
+            return SuccessfulCrawlResult(job, response, data, degree)
 
 
 CrawlJobDataTypes = TypeVar("CrawlJobDataTypes", bound=Mapping)
