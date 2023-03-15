@@ -4,11 +4,44 @@
 
 **minet** is a webmining command line tool & library for python (>= 3.7) that can be used to collect and extract data from a large variety of web sources such as raw webpages, Facebook, CrowdTangle, YouTube, Twitter, Media Cloud etc.
 
-It adopts a very simple approach to various webmining problems by letting you perform a variety of actions from the comfort of the command line. No database needed: raw CSV files should be sufficient to do most of the work.
+It adopts a very simple approach to various webmining problems by letting you perform a wide array of tasks from the comfort of the command line. No database needed: raw CSV files should be sufficient to do most of the work.
 
-In addition, **minet** also exposes its high-level programmatic interface as a python library so you can tweak its behavior at will.
+In addition, **minet** also exposes its high-level programmatic interface as a python library so you use its utilities to suit your use-cases better.
+
+**minet** is developed by [médialab SciencesPo](https://github.com/medialab/) research engineers and is the consolidation of more than a decade of webmining practices targeted at social sciences.
+
+As such, it has been designed to be:
+
+1. low-tech, as it requires minimal resources such as memory, CPUs or hard drive space and should be able to work on any low-cost PC.
+2. fault-tolerant, as it is able to recover when network is bad and retry HTTP calls when suitable. What's more, most of minet commands can be resumed if aborted and are designed to run for a long time (think days or months) without leaking memory.
+3. unix-compliant, as it can be piped easily and know how to work with the usual streams.
 
 **Shortcuts**: [Command line documentation](./docs/cli.md), [Python library documentation](./docs/lib.md).
+
+## Whirlwind tour
+
+```bash
+# Downloading large amount of urls as fast as possible
+minet fetch url -i urls.csv > report.csv
+
+# Extracting raw text from the downloaded HTML files
+minet extract -i report.csv -I downloaded > extracted.csv
+
+# Scraping the urls found in the downloaded HTML files
+minet scrape urls -i report.csv -I downloaded > scraped_urls.csv
+
+# Parsing & normalizing the scraped urls
+minet url-parse scraped_url -i scraped_urls.csv > parsed_urls.csv
+
+# Scraping data from Twitter
+minet twitter scrape tweets "from:medialab_ScPo" > tweets.csv
+
+# Printing a command's help
+minet twitter scrape -h
+
+# Searching videos on YouTube
+minet youtube search -k <MY-YT-API-KEY> "médialab" > videos.csv
+```
 
 ## Summary
 
