@@ -3,6 +3,7 @@ from minet.cli.crawl import CRAWL_COMMAND
 from minet.cli.extract import EXTRACT_COMMAND
 from minet.cli.fetch import FETCH_COMMAND, RESOLVE_COMMAND
 from minet.cli.scrape import SCRAPE_COMMAND
+from minet.cli.preview import PREVIEW_COMMAND
 from minet.cli.url_extract import URL_EXTRACT_COMMAND
 from minet.cli.url_join import URL_JOIN_COMMAND
 from minet.cli.url_parse import URL_PARSE_COMMAND
@@ -30,6 +31,7 @@ MINET_COMMANDS = [
     URL_EXTRACT_COMMAND,
     URL_JOIN_COMMAND,
     URL_PARSE_COMMAND,
+    PREVIEW_COMMAND,
     #
     BUZZSUMO_COMMAND,
     CROWDTANGLE_COMMAND,
