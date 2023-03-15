@@ -44,6 +44,7 @@ class ScrapeWorkerPayload:
     path: Optional[str]
     encoding: Optional[str]
     text: Optional[str]
+    url: Optional[str]
 
 
 @dataclass
@@ -69,6 +70,7 @@ def init_process(options):
         SCRAPER = TYPICAL_SCRAPERS[options["name"]]()
     else:
         SCRAPER = Scraper(options["definition"], strain=options["strain"])
+
     FORMAT = options["format"]
     PLURAL_SEPARATOR = options["plural_separator"]
     HEADERS = casanova.headers(options["fieldnames"])
@@ -92,6 +94,9 @@ def worker(payload: ScrapeWorkerPayload) -> ScrapeResult:
     # Building context
     row = HEADERS.wrap(payload.row, transient=True)
     context: Dict[str, Any] = {"row": row}
+
+    if payload.url:
+        context["url"] = payload.url
 
     if payload.path:
         context["path"] = payload.path
@@ -224,6 +229,7 @@ def action(cli_args):
                     path=item.path,
                     text=item.text,
                     row=item.row,
+                    url=item.url,
                 )
 
         pool = LazyPool(

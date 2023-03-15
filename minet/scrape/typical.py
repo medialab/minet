@@ -3,6 +3,7 @@ from minet.types import AnyScrapableTarget
 
 from bs4 import SoupStrainer, BeautifulSoup
 from casanova import CSVSerializer
+from urllib.parse import urljoin
 from ural import should_follow_href
 
 from minet.scrape.analysis import ScraperAnalysisOutputType
@@ -23,7 +24,7 @@ class NamedScraper(ScraperMixin):
 
     def __call__(self, html: AnyScrapableTarget, context=None) -> Any:
         soup = ensure_soup(html, strainer=self.strainer)
-        return self.scrape(soup, context=None)
+        return self.scrape(soup, context=context)
 
 
 class TitleScraper(NamedScraper):
@@ -77,6 +78,7 @@ class UrlsScraper(NamedScraper):
 
     def scrape(self, soup: BeautifulSoup, context=None) -> Any:
         a_elems = soup.select("a[href]")
+        base_url = context.get("url") if context is not None else None
 
         urls = []
 
@@ -93,6 +95,9 @@ class UrlsScraper(NamedScraper):
 
             if not should_follow_href(url):
                 continue
+
+            if base_url:
+                url = urljoin(base_url, url)
 
             urls.append(url)
 

@@ -145,6 +145,7 @@ class FetchReportLikeItem:
     encoding: Optional[str] = None
     text: Optional[str] = None
     error: Optional[str] = None
+    url: Optional[str] = None
 
 
 def create_fetch_like_report_iterator(
@@ -157,15 +158,24 @@ def create_fetch_like_report_iterator(
     # TODO: deal with no_headers
     assert headers is not None
 
+    url_column = getattr(cli_args, "url_column", None)
+
     filename_pos = headers.get(cli_args.column) if cli_args.column is not None else None
     error_pos = headers.get(cli_args.error_column)
     status_pos = headers.get(cli_args.status_column)
     encoding_pos = headers.get(cli_args.encoding_column)
     mimetype_pos = headers.get(cli_args.mimetype_column)
     body_pos = headers.get(cli_args.body_column)
+    url_pos = headers.get(url_column) if url_column is not None else None
 
     for i, row in reader.enumerate():
         item = FetchReportLikeItem(index=i, row=row)
+
+        if url_pos is not None:
+            url = get(row, url_pos, "").strip()
+
+            if url:
+                item.url = url
 
         if error_pos is not None:
             error = get(row, error_pos, "").strip()

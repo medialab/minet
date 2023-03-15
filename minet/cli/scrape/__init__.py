@@ -35,6 +35,8 @@ SCRAPE_COMMAND = command(
 
         . "canonical": scrape the <link rel="canonical"> tag href if any.
         . "title": scrape the <title> tag if any.
+        . "urls": scrape all the relevant <a> tag href urls. Will join them
+            with the correct base url if --url-column was given.
 
         Examples:
 
@@ -105,6 +107,11 @@ SCRAPE_COMMAND = command(
             "flag": "--body-column",
             "help": "Name of the CSV column containing html bodies.",
             "default": "body",
+        },
+        {
+            "flag": "--url-column",
+            "help": "Name of the CSV column containing the url.",
+            "default": "resolved_url",
         },
         {
             "flag": "--error-column",

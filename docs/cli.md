@@ -692,7 +692,7 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ```
 Usage: minet scrape [-h] [--silent] [-g] [-I INPUT_DIR] [-p PROCESSES]
                     [--chunk-size CHUNK_SIZE] [--body-column BODY_COLUMN]
-                    [--error-column ERROR_COLUMN]
+                    [--url-column URL_COLUMN] [--error-column ERROR_COLUMN]
                     [--status-column STATUS_COLUMN]
                     [--encoding-column ENCODING_COLUMN]
                     [--mimetype-column MIMETYPE_COLUMN] [--encoding ENCODING]
@@ -756,6 +756,7 @@ Optional Arguments:
   --strain STRAIN               Optional CSS selector used to strain, i.e. only
                                 parse matched tags in the parsed html files in
                                 order to optimize performance.
+  --url-column URL_COLUMN       Name of the CSV column containing the url.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -780,6 +781,8 @@ Builtin scrapers:
 
 . "canonical": scrape the <link rel="canonical"> tag href if any.
 . "title": scrape the <title> tag if any.
+. "urls": scrape all the relevant <a> tag href urls. Will join them
+    with the correct base url if --url-column was given.
 
 Examples:
 
