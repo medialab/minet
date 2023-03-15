@@ -639,10 +639,15 @@ def resolve_typical_arguments(
         > given a single value to process or a bunch of them if
         > given the column of a CSV file passed to -i/--input instead.
 
+        > Note that when given a CSV file as input, {name} will
+        > concatenate the input file columns with the ones added
+        > by the command. You can always restrict the input file
+        > columns to keep by using the -s/--select flag.
+
         . Here is how to use a command with a single value:
             $ {name} {cmd} "value"
 
-        . Here is how to use a command with a csv file:
+        . Here is how to use a command with a CSV file:
             $ {name} {cmd} column_name -i file.csv
 
         . Here is how to read CSV file from stdin using `-`:

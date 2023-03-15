@@ -396,10 +396,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet fetch fetch "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet fetch fetch column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -658,10 +663,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet fetch fetch "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet fetch fetch column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -1076,10 +1086,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet url-parse url-parse "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet url-parse url-parse column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -1221,10 +1236,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet buzzsumo domain-summary "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet buzzsumo domain-summary column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -1306,10 +1326,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet buzzsumo domain "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet buzzsumo domain column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -1520,10 +1545,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet crowdtangle posts-by-id "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet crowdtangle posts-by-id column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -1768,10 +1798,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet crowdtangle summary "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet crowdtangle summary column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -1880,10 +1915,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet facebook comments "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet facebook comments column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -1993,10 +2033,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet facebook post "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet facebook post column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -2106,10 +2151,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet facebook posts "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet facebook posts column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -2187,10 +2237,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet facebook post-authors "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet facebook post-authors column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -2262,10 +2317,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet facebook url-likes "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet facebook url-likes column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -2622,10 +2682,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet instagram comments "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet instagram comments column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -2709,10 +2774,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet instagram hashtag "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet instagram hashtag column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -2800,10 +2870,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet instagram post-infos "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet instagram post-infos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -2896,10 +2971,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet instagram user-followers "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet instagram user-followers column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -2991,10 +3071,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet instagram user-following "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet instagram user-following column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -3084,10 +3169,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet instagram user-infos "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet instagram user-infos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -3180,10 +3270,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet instagram user-posts "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet instagram user-posts column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -3253,10 +3348,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet mediacloud medias "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet mediacloud medias column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -3412,10 +3512,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet telegram channel-infos "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet telegram channel-infos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -3480,10 +3585,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet telegram channel-messages "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet telegram channel-messages column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -3591,10 +3701,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet tiktok search-videos "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet tiktok search-videos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -3733,10 +3848,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet twitter attrition "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet twitter attrition column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -3832,10 +3952,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet twitter followers "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet twitter followers column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -3930,10 +4055,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet twitter friends "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet twitter friends column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -4021,10 +4151,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet twitter list-followers "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet twitter list-followers column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -4112,10 +4247,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet twitter list-members "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet twitter list-members column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -4202,10 +4342,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet twitter retweeters "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet twitter retweeters column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -4314,10 +4459,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet twitter scrape "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet twitter scrape column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -4381,10 +4531,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet twitter tweet-date "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet twitter tweet-date column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -4499,10 +4654,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet twitter tweet-search "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet twitter tweet-search column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -4625,10 +4785,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet twitter tweet-count "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet twitter tweet-count column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -4719,10 +4884,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet twitter tweets "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet twitter tweets column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -4815,10 +4985,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet twitter users "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet twitter users column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -4911,10 +5086,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet twitter user-search "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet twitter user-search column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -5014,10 +5194,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet twitter user-tweets "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet twitter user-tweets column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -5100,10 +5285,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet wikipedia pageviews "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet wikipedia pageviews column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -5175,10 +5365,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet youtube captions "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet youtube captions column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -5259,10 +5454,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet youtube channel-videos "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet youtube channel-videos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -5344,10 +5544,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet youtube channels "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet youtube channels column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -5415,10 +5620,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet youtube comments "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet youtube comments column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -5497,10 +5707,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet youtube search "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet youtube search column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
@@ -5565,10 +5780,15 @@ how to use the command with a CSV file?
 > given a single value to process or a bunch of them if
 > given the column of a CSV file passed to -i/--input instead.
 
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
 . Here is how to use a command with a single value:
     $ minet youtube videos "value"
 
-. Here is how to use a command with a csv file:
+. Here is how to use a command with a CSV file:
     $ minet youtube videos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
