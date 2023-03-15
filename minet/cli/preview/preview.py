@@ -16,7 +16,7 @@ class ViewHeader(Header):
 class TableFooter(Widget):
     DEFAULT_CSS = """
     TableFooter {
-        background: $accent;
+        background: $foreground 5%;
         color: $text;
         dock: bottom;
         height: 1;
