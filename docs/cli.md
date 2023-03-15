@@ -321,8 +321,9 @@ Optional Arguments:
                                 ~30s.
   --url-template URL_TEMPLATE   A template for the urls to fetch. Handy e.g. if
                                 you need to build urls from ids etc.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -474,8 +475,9 @@ Optional Arguments:
                                 half of the available CPUs.
   --status-column STATUS_COLUMN
                                 Name of the CSV column containing HTTP status.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -607,8 +609,9 @@ Optional Arguments:
                                 ~30s.
   --url-template URL_TEMPLATE   A template for the urls to fetch. Handy e.g. if
                                 you need to build urls from ids etc.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -743,8 +746,9 @@ Optional Arguments:
   --strain STRAIN               Optional CSS selector used to strain, i.e. only
                                 parse matched tags in the parsed html files in
                                 order to optimize performance.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -826,8 +830,9 @@ Positional Arguments:
 Optional Arguments:
   --base-url BASE_URL         Base url used to resolve relative urls.
   --from {html,text}          Extract urls from which kind of source?
-  -s, --select SELECT         Columns of input CSV file to include in the output
-                              (separated by `,`).
+  -s, --select SELECT         Columns of -i/--input CSV file to include in the
+                              output (separated by `,`). Use an empty string if
+                              you don't want to keep anything: --select ''.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -876,8 +881,9 @@ Optional Arguments:
                                 Optional prefix to add to the first file's
                                 column names to avoid conflicts.
   --separator SEPARATOR         Split indexed url column by a separator?
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -986,8 +992,9 @@ Optional Arguments:
                                 coming from Twitter.
   --youtube                     Whether to consider and parse the given urls as
                                 coming from YouTube.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -1176,8 +1183,9 @@ Optional Arguments:
   -t, --token TOKEN             BuzzSumo API token. Can also be configured in a
                                 .minetrc file as "buzzsumo.token" or read from
                                 the MINET_BUZZSUMO_TOKEN env variable.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -1260,8 +1268,9 @@ Optional Arguments:
   -t, --token TOKEN             BuzzSumo API token. Can also be configured in a
                                 .minetrc file as "buzzsumo.token" or read from
                                 the MINET_BUZZSUMO_TOKEN env variable.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -1471,8 +1480,9 @@ Optional Arguments:
                                 crowdtangle.token. Can also be configured in a
                                 .minetrc file as "crowdtangle.token" or read
                                 from the MINET_CROWDTANGLE_TOKEN env variable.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -1723,8 +1733,9 @@ Optional Arguments:
                                 crowdtangle.token. Can also be configured in a
                                 .minetrc file as "crowdtangle.token" or read
                                 from the MINET_CROWDTANGLE_TOKEN env variable.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -1828,8 +1839,9 @@ Optional Arguments:
                                MINET_FACEBOOK_COOKIE env variable.
   --throttle THROTTLE          Throttling time, in seconds, to wait between each
                                request.
-  -s, --select SELECT          Columns of input CSV file to include in the
-                               output (separated by `,`).
+  -s, --select SELECT          Columns of -i/--input CSV file to include in the
+                               output (separated by `,`). Use an empty string if
+                               you don't want to keep anything: --select ''.
   --explode EXPLODE            Use to indicate the character used to separate
                                multiple values in a single CSV cell. Defaults to
                                none, i.e. CSV cells having a single values,
@@ -1940,8 +1952,9 @@ Optional Arguments:
                                MINET_FACEBOOK_COOKIE env variable.
   --throttle THROTTLE          Throttling time, in seconds, to wait between each
                                request.
-  -s, --select SELECT          Columns of input CSV file to include in the
-                               output (separated by `,`).
+  -s, --select SELECT          Columns of -i/--input CSV file to include in the
+                               output (separated by `,`). Use an empty string if
+                               you don't want to keep anything: --select ''.
   --explode EXPLODE            Use to indicate the character used to separate
                                multiple values in a single CSV cell. Defaults to
                                none, i.e. CSV cells having a single values,
@@ -2052,8 +2065,9 @@ Optional Arguments:
                                 from the MINET_FACEBOOK_COOKIE env variable.
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -2138,8 +2152,9 @@ Optional Arguments:
                                MINET_FACEBOOK_COOKIE env variable.
   --throttle THROTTLE          Throttling time, in seconds, to wait between each
                                request.
-  -s, --select SELECT          Columns of input CSV file to include in the
-                               output (separated by `,`).
+  -s, --select SELECT          Columns of -i/--input CSV file to include in the
+                               output (separated by `,`). Use an empty string if
+                               you don't want to keep anything: --select ''.
   --explode EXPLODE            Use to indicate the character used to separate
                                multiple values in a single CSV cell. Defaults to
                                none, i.e. CSV cells having a single values,
@@ -2214,8 +2229,9 @@ Positional Arguments:
                               containing urls when using -i/--input.
 
 Optional Arguments:
-  -s, --select SELECT         Columns of input CSV file to include in the output
-                              (separated by `,`).
+  -s, --select SELECT         Columns of -i/--input CSV file to include in the
+                              output (separated by `,`). Use an empty string if
+                              you don't want to keep anything: --select ''.
   --explode EXPLODE           Use to indicate the character used to separate
                               multiple values in a single CSV cell. Defaults to
                               none, i.e. CSV cells having a single values, which
@@ -2570,8 +2586,9 @@ Optional Arguments:
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT           Maximum number of comments to retrieve per post.
-  -s, --select SELECT         Columns of input CSV file to include in the output
-                              (separated by `,`).
+  -s, --select SELECT         Columns of -i/--input CSV file to include in the
+                              output (separated by `,`). Use an empty string if
+                              you don't want to keep anything: --select ''.
   --explode EXPLODE           Use to indicate the character used to separate
                               multiple values in a single CSV cell. Defaults to
                               none, i.e. CSV cells having a single values, which
@@ -2657,8 +2674,9 @@ Optional Arguments:
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT           Maximum number of posts to retrieve per hashtag.
-  -s, --select SELECT         Columns of input CSV file to include in the output
-                              (separated by `,`).
+  -s, --select SELECT         Columns of -i/--input CSV file to include in the
+                              output (separated by `,`). Use an empty string if
+                              you don't want to keep anything: --select ''.
   --explode EXPLODE           Use to indicate the character used to separate
                               multiple values in a single CSV cell. Defaults to
                               none, i.e. CSV cells having a single values, which
@@ -2746,8 +2764,9 @@ Optional Arguments:
                               "firefox". Can also be configured in a .minetrc
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
-  -s, --select SELECT         Columns of input CSV file to include in the output
-                              (separated by `,`).
+  -s, --select SELECT         Columns of -i/--input CSV file to include in the
+                              output (separated by `,`). Use an empty string if
+                              you don't want to keep anything: --select ''.
   --explode EXPLODE           Use to indicate the character used to separate
                               multiple values in a single CSV cell. Defaults to
                               none, i.e. CSV cells having a single values, which
@@ -2841,8 +2860,9 @@ Optional Arguments:
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT           Maximum number of followers to retrieve per user.
-  -s, --select SELECT         Columns of input CSV file to include in the output
-                              (separated by `,`).
+  -s, --select SELECT         Columns of -i/--input CSV file to include in the
+                              output (separated by `,`). Use an empty string if
+                              you don't want to keep anything: --select ''.
   --explode EXPLODE           Use to indicate the character used to separate
                               multiple values in a single CSV cell. Defaults to
                               none, i.e. CSV cells having a single values, which
@@ -2935,8 +2955,9 @@ Optional Arguments:
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT           Maximum number of accounts to retrieve per user.
-  -s, --select SELECT         Columns of input CSV file to include in the output
-                              (separated by `,`).
+  -s, --select SELECT         Columns of -i/--input CSV file to include in the
+                              output (separated by `,`). Use an empty string if
+                              you don't want to keep anything: --select ''.
   --explode EXPLODE           Use to indicate the character used to separate
                               multiple values in a single CSV cell. Defaults to
                               none, i.e. CSV cells having a single values, which
@@ -3027,8 +3048,9 @@ Optional Arguments:
                               "firefox". Can also be configured in a .minetrc
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
-  -s, --select SELECT         Columns of input CSV file to include in the output
-                              (separated by `,`).
+  -s, --select SELECT         Columns of -i/--input CSV file to include in the
+                              output (separated by `,`). Use an empty string if
+                              you don't want to keep anything: --select ''.
   --explode EXPLODE           Use to indicate the character used to separate
                               multiple values in a single CSV cell. Defaults to
                               none, i.e. CSV cells having a single values, which
@@ -3122,8 +3144,9 @@ Optional Arguments:
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT           Maximum number of posts to retrieve per user.
-  -s, --select SELECT         Columns of input CSV file to include in the output
-                              (separated by `,`).
+  -s, --select SELECT         Columns of -i/--input CSV file to include in the
+                              output (separated by `,`). Use an empty string if
+                              you don't want to keep anything: --select ''.
   --explode EXPLODE           Use to indicate the character used to separate
                               multiple values in a single CSV cell. Defaults to
                               none, i.e. CSV cells having a single values, which
@@ -3200,8 +3223,9 @@ Optional Arguments:
                               sometimes). Can also be configured in a .minetrc
                               file as "mediacloud.token" or read from the
                               MINET_MEDIACLOUD_TOKEN env variable.
-  -s, --select SELECT         Columns of input CSV file to include in the output
-                              (separated by `,`).
+  -s, --select SELECT         Columns of -i/--input CSV file to include in the
+                              output (separated by `,`). Use an empty string if
+                              you don't want to keep anything: --select ''.
   --explode EXPLODE           Use to indicate the character used to separate
                               multiple values in a single CSV cell. Defaults to
                               none, i.e. CSV cells having a single values, which
@@ -3358,8 +3382,9 @@ Positional Arguments:
 Optional Arguments:
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -3425,8 +3450,9 @@ Positional Arguments:
 Optional Arguments:
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -3530,8 +3556,9 @@ Optional Arguments:
                               file as "tiktok.cookie" or read from the
                               MINET_TIKTOK_COOKIE env variable.
   -l, --limit LIMIT           Maximum number of videos to retrieve per query.
-  -s, --select SELECT         Columns of input CSV file to include in the output
-                              (separated by `,`).
+  -s, --select SELECT         Columns of -i/--input CSV file to include in the
+                              output (separated by `,`). Use an empty string if
+                              you don't want to keep anything: --select ''.
   --explode EXPLODE           Use to indicate the character used to separate
                               multiple values in a single CSV cell. Defaults to
                               none, i.e. CSV cells having a single values, which
@@ -3666,8 +3693,9 @@ Optional Arguments:
                                 (given as ids or screen names). This is useful
                                 to have more information on a tweet's
                                 unavailability.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -3766,8 +3794,9 @@ Optional Arguments:
                                 screen names.
   --v2                          Whether to use latest Twitter API v2 rather than
                                 v1.1.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -3863,8 +3892,9 @@ Optional Arguments:
                                 screen names.
   --v2                          Whether to use latest Twitter API v2 rather than
                                 v1.1.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -3955,8 +3985,9 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -4045,8 +4076,9 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -4135,8 +4167,9 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -4229,8 +4262,9 @@ Optional Arguments:
                                 Query template. Can be useful for instance to
                                 change a column of twitter user screen names
                                 into from:@user queries.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -4317,8 +4351,9 @@ Positional Arguments:
 Optional Arguments:
   --timezone TIMEZONE         Timezone for the date, for example 'Europe/Paris'.
                               Default to UTC.
-  -s, --select SELECT         Columns of input CSV file to include in the output
-                              (separated by `,`).
+  -s, --select SELECT         Columns of -i/--input CSV file to include in the
+                              output (separated by `,`). Use an empty string if
+                              you don't want to keep anything: --select ''.
   --explode EXPLODE           Use to indicate the character used to separate
                               multiple values in a single CSV cell. Defaults to
                               none, i.e. CSV cells having a single values, which
@@ -4426,8 +4461,9 @@ Optional Arguments:
                                 YYYY-MM-DDTHH:mm:ssZ
   --until-id UNTIL_ID           Will return tweets that are older than the tweet
                                 with the specified id.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -4548,8 +4584,9 @@ Optional Arguments:
                                 YYYY-MM-DDTHH:mm:ssZ
   --until-id UNTIL_ID           Will return tweets that are older than the tweet
                                 with the specified id.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -4645,8 +4682,9 @@ Optional Arguments:
                                 env variable.
   --v2                          Whether to use latest Twitter API v2 rather than
                                 v1.1.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -4740,8 +4778,9 @@ Optional Arguments:
                                 screen names.
   --v2                          Whether to use latest Twitter API v2 rather than
                                 v1.1.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -4834,8 +4873,9 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -4938,8 +4978,9 @@ Optional Arguments:
                                 following format : YYYY-MM-DD
   --v2                          Whether to use latest Twitter API v2 rather than
                                 v1.1.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -5031,8 +5072,9 @@ Optional Arguments:
   --sum                         Whether to sum the collected pageviews rather
                                 than outputting them by timestamp.
   -t, --threads THREADS         Number of threads to use. Defaults to 10.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -5099,8 +5141,9 @@ Optional Arguments:
                               retrieve. You can specify several languages by
                               preferred order separated by commas. Defaults to
                               "en".
-  -s, --select SELECT         Columns of input CSV file to include in the output
-                              (separated by `,`).
+  -s, --select SELECT         Columns of -i/--input CSV file to include in the
+                              output (separated by `,`). Use an empty string if
+                              you don't want to keep anything: --select ''.
   --explode EXPLODE           Use to indicate the character used to separate
                               multiple values in a single CSV cell. Defaults to
                               none, i.e. CSV cells having a single values, which
@@ -5175,8 +5218,9 @@ Optional Arguments:
                               more than once. Can also be configured in a
                               .minetrc file as "youtube.key" or read from the
                               MINET_YOUTUBE_KEY env variable.
-  -s, --select SELECT         Columns of input CSV file to include in the output
-                              (separated by `,`).
+  -s, --select SELECT         Columns of -i/--input CSV file to include in the
+                              output (separated by `,`). Use an empty string if
+                              you don't want to keep anything: --select ''.
   --explode EXPLODE           Use to indicate the character used to separate
                               multiple values in a single CSV cell. Defaults to
                               none, i.e. CSV cells having a single values, which
@@ -5259,8 +5303,9 @@ Optional Arguments:
                               more than once. Can also be configured in a
                               .minetrc file as "youtube.key" or read from the
                               MINET_YOUTUBE_KEY env variable.
-  -s, --select SELECT         Columns of input CSV file to include in the output
-                              (separated by `,`).
+  -s, --select SELECT         Columns of -i/--input CSV file to include in the
+                              output (separated by `,`). Use an empty string if
+                              you don't want to keep anything: --select ''.
   --explode EXPLODE           Use to indicate the character used to separate
                               multiple values in a single CSV cell. Defaults to
                               none, i.e. CSV cells having a single values, which
@@ -5335,8 +5380,9 @@ Optional Arguments:
                               more than once. Can also be configured in a
                               .minetrc file as "youtube.key" or read from the
                               MINET_YOUTUBE_KEY env variable.
-  -s, --select SELECT         Columns of input CSV file to include in the output
-                              (separated by `,`).
+  -s, --select SELECT         Columns of -i/--input CSV file to include in the
+                              output (separated by `,`). Use an empty string if
+                              you don't want to keep anything: --select ''.
   --explode EXPLODE           Use to indicate the character used to separate
                               multiple values in a single CSV cell. Defaults to
                               none, i.e. CSV cells having a single values, which
@@ -5416,8 +5462,9 @@ Optional Arguments:
   --order {date,rating,relevance,title,videoCount,viewCount}
                                 Order in which videos are retrieved. The default
                                 one is relevance.
-  -s, --select SELECT           Columns of input CSV file to include in the
-                                output (separated by `,`).
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
   --explode EXPLODE             Use to indicate the character used to separate
                                 multiple values in a single CSV cell. Defaults
                                 to none, i.e. CSV cells having a single values,
@@ -5488,8 +5535,9 @@ Optional Arguments:
                               more than once. Can also be configured in a
                               .minetrc file as "youtube.key" or read from the
                               MINET_YOUTUBE_KEY env variable.
-  -s, --select SELECT         Columns of input CSV file to include in the output
-                              (separated by `,`).
+  -s, --select SELECT         Columns of -i/--input CSV file to include in the
+                              output (separated by `,`). Use an empty string if
+                              you don't want to keep anything: --select ''.
   --explode EXPLODE           Use to indicate the character used to separate
                               multiple values in a single CSV cell. Defaults to
                               none, i.e. CSV cells having a single values, which

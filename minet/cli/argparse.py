@@ -664,7 +664,7 @@ def resolve_typical_arguments(
         args.append(
             {
                 "flags": ["-s", "--select"],
-                "help": "Columns of input CSV file to include in the output (separated by `,`).",
+                "help": "Columns of -i/--input CSV file to include in the output (separated by `,`). Use an empty string if you don't want to keep anything: --select ''.",
             },
         )
 
