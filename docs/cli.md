@@ -336,7 +336,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      Whether to resume from an aborted collection.
+  --resume                      "Whether to resume from an aborted collection.
                                 Need -o to be set.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
@@ -489,7 +489,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      Whether to resume from an aborted collection.
+  --resume                      "Whether to resume from an aborted collection.
                                 Need -o to be set.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
@@ -622,7 +622,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      Whether to resume from an aborted collection.
+  --resume                      "Whether to resume from an aborted collection.
                                 Need -o to be set.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
@@ -1486,7 +1486,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      Whether to resume from an aborted collection.
+  --resume                      "Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
@@ -1576,7 +1576,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      Whether to resume from an aborted collection.
+  --resume                      "Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
@@ -3681,7 +3681,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      Whether to resume from an aborted collection.
+  --resume                      "Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
@@ -3782,7 +3782,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      Whether to resume from an aborted collection.
+  --resume                      "Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
@@ -3879,7 +3879,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      Whether to resume from an aborted collection.
+  --resume                      "Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
@@ -4660,7 +4660,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      Whether to resume from an aborted collection.
+  --resume                      "Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
@@ -4755,7 +4755,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      Whether to resume from an aborted collection.
+  --resume                      "Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
@@ -5046,8 +5046,8 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      Whether to resume from an aborted collection.
-                                Need -o to be set.
+  --resume                      "Whether to resume from an aborted collection.
+                                Need -o to be set. Will only work with --sum.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit

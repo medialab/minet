@@ -27,6 +27,7 @@ WIKIPEDIA_PAGEVIEWS_SUBCOMMAND = subcommand(
     """,
     variadic_input={"dummy_column": "page"},
     resumer=RowCountResumer,
+    resumer_epilog="Will only work with --sum.",
     arguments=[
         {
             "flag": "--start-date",

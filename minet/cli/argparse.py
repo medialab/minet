@@ -557,6 +557,7 @@ def resolve_typical_arguments(
     args,
     no_output=False,
     resumer=None,
+    resumer_epilog: Optional[str] = None,
     resumer_kwargs=None,
     select: bool = False,
     total: bool = False,
@@ -677,10 +678,17 @@ def resolve_typical_arguments(
         )
 
     if resumer is not None:
+        resumer_arg_help = (
+            '"Whether to resume from an aborted collection. Need -o to be set.'
+        )
+
+        if resumer_epilog is not None:
+            resumer_arg_help += " " + resumer_epilog
+
         args.append(
             {
                 "flag": "--resume",
-                "help": "Whether to resume from an aborted collection. Need -o to be set.",
+                "help": resumer_arg_help,
                 "action": "store_true",
             },
         )
@@ -708,6 +716,7 @@ def command(
     subcommands=None,
     resolve=None,
     resumer=None,
+    resumer_epilog: Optional[str] = None,
     resumer_kwargs=None,
     no_output=False,
     select=False,
@@ -755,6 +764,7 @@ def command(
             arguments,
             no_output=no_output,
             resumer=resumer,
+            resumer_epilog=resumer_epilog,
             resumer_kwargs=resumer_kwargs,
             select=select,
             total=total,
@@ -784,6 +794,7 @@ def subcommand(
     arguments=[],
     resolve=None,
     resumer=None,
+    resumer_epilog: Optional[str] = None,
     resumer_kwargs=None,
     no_output=False,
     select=False,
@@ -804,6 +815,7 @@ def subcommand(
         arguments,
         no_output=no_output,
         resumer=resumer,
+        resumer_epilog=resumer_epilog,
         resumer_kwargs=resumer_kwargs,
         select=select,
         total=total,

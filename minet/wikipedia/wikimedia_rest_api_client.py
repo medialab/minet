@@ -100,6 +100,7 @@ class WikimediaRestAPIClient(object):
                 key=api_url_from_item,
                 domain_parallelism=threads,
                 throttle=0,
+                ordered=True,
             ):
                 if result.error:
                     raise result.error
