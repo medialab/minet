@@ -10,7 +10,7 @@ wheel
 about-time==4.2.1
 beautifulsoup4==4.11.1
 browser-cookie3==0.17.0
-casanova==1.7.3
+casanova==1.7.4
 charset-normalizer==3.0.1
 dateparser==1.1.6
 ebbe==1.11.1
