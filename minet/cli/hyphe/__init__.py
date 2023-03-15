@@ -147,7 +147,7 @@ HYPHE_TAG_SUBCOMMAND = hyphe_corpus_subcommand(
         },
         {
             "flag": "--separator",
-            "help": 'Separator use to split multiple tag values in the same column. Defaults to "|".',
+            "help": "Separator use to split multiple tag values in the same column.",
             "default": "|",
         },
     ],

@@ -48,7 +48,7 @@ YOUTUBE_CAPTIONS_SUBCOMMAND = subcommand(
     arguments=[
         {
             "flag": "--lang",
-            "help": 'Language (ISO code like "en") of captions to retrieve. You can specify several languages by preferred order separated by commas. Defaults to "en".',
+            "help": 'Language (ISO code like "en") of captions to retrieve. You can specify several languages by preferred order separated by commas.',
             "default": ["en"],
             "type": SplitterType(),
         }

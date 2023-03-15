@@ -37,8 +37,7 @@ CRAWL_COMMAND = command(
         },
         {
             "flag": "--throttle",
-            "help": "Time to wait - in seconds - between 2 calls to the same domain. Defaults to %s."
-            % DEFAULT_THROTTLE,
+            "help": "Time to wait - in seconds - between 2 calls to the same domain.",
             "type": float,
             "default": DEFAULT_THROTTLE,
         },

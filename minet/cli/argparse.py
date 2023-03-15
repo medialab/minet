@@ -142,6 +142,25 @@ def add_arguments(subparser, arguments):
 
         argument_kwargs = omit(argument, ARGUMENT_KEYS_TO_OMIT)
 
+        if "help" in argument_kwargs and "default" in argument_kwargs:
+            default_value = argument_kwargs["default"]
+            default_value_in_help = None
+
+            if isinstance(default_value, (str, int, float, bool)):
+                default_value_in_help = str(default_value)
+
+            if "type" in argument_kwargs and isinstance(
+                argument_kwargs["type"], SplitterType
+            ):
+                default_value_in_help = argument_kwargs["type"].splitchar.join(
+                    default_value
+                )
+
+            if default_value_in_help is not None:
+                argument_kwargs["help"] += (
+                    " Defaults to `" + default_value_in_help + "`."
+                )
+
         if "choices" in argument_kwargs:
             argument_kwargs["choices"] = sorted(argument_kwargs["choices"])
 

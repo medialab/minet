@@ -15,7 +15,7 @@ from minet.constants import (
 COMMON_ARGUMENTS = [
     {
         "flag": "--domain-parallelism",
-        "help": "Max number of urls per domain to hit at the same time. Defaults to 1",
+        "help": "Max number of urls per domain to hit at the same time.",
         "type": int,
         "default": 1,
     },
@@ -37,14 +37,13 @@ COMMON_ARGUMENTS = [
     },
     {
         "flags": ["-t", "--threads"],
-        "help": "Number of threads to use. Defaults to 25.",
+        "help": "Number of threads to use.",
         "type": int,
         "default": 25,
     },
     {
         "flag": "--throttle",
-        "help": "Time to wait - in seconds - between 2 calls to the same domain. Defaults to %s."
-        % DEFAULT_THROTTLE,
+        "help": "Time to wait - in seconds - between 2 calls to the same domain.",
         "type": float,
         "default": DEFAULT_THROTTLE,
     },
@@ -145,8 +144,7 @@ FETCH_COMMAND = command(
         *COMMON_ARGUMENTS,
         {
             "flag": "--max-redirects",
-            "help": "Maximum number of redirections to follow before breaking. Defaults to %i."
-            % DEFAULT_FETCH_MAX_REDIRECTS,
+            "help": "Maximum number of redirections to follow before breaking.",
             "type": int,
             "default": DEFAULT_FETCH_MAX_REDIRECTS,
         },
@@ -168,8 +166,7 @@ FETCH_COMMAND = command(
         },
         {
             "flags": ["-O", "--output-dir"],
-            "help": 'Directory where the fetched files will be written. Defaults to "%s".'
-            % DEFAULT_CONTENT_FOLDER,
+            "help": "Directory where the fetched files will be written.",
             "default": DEFAULT_CONTENT_FOLDER,
         },
         {
@@ -182,7 +179,7 @@ FETCH_COMMAND = command(
         },
         {
             "flag": "--folder-strategy",
-            "help": 'Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. Defaults to "flat". All of the strategies are described at the end of this help.',
+            "help": "Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. All of the strategies are described at the end of this help.",
             "default": "flat",
         },
         {
@@ -243,8 +240,7 @@ RESOLVE_COMMAND = command(
         *COMMON_ARGUMENTS,
         {
             "flag": "--max-redirects",
-            "help": "Maximum number of redirections to follow before breaking. Defaults to %i."
-            % DEFAULT_RESOLVE_MAX_REDIRECTS,
+            "help": "Maximum number of redirections to follow before breaking.",
             "type": int,
             "default": DEFAULT_RESOLVE_MAX_REDIRECTS,
         },

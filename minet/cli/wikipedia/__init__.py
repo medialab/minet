@@ -41,23 +41,23 @@ WIKIPEDIA_PAGEVIEWS_SUBCOMMAND = subcommand(
         },
         {
             "flag": "--agent",
-            "help": 'Get pageviews by target agent. Defaults to "all-agents".',
+            "help": "Get pageviews by target agent.",
             "default": "all-agents",
         },
         {
             "flag": "--access",
-            "help": 'Get pageviews by access. Defaults to "all-access".',
+            "help": "Get pageviews by access.",
             "default": "all-access",
         },
         {
             "flags": ["-t", "--threads"],
-            "help": "Number of threads to use. Defaults to 10.",
+            "help": "Number of threads to use.",
             "type": int,
             "default": 10,
         },
         {
             "flag": "--granularity",
-            "help": 'Pageviews granularity. Defaults to "monthly".',
+            "help": "Pageviews granularity.",
             "default": "monthly",
         },
         {

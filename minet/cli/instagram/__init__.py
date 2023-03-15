@@ -289,7 +289,7 @@ INSTAGRAM_COMMAND = command(
     common_arguments=[
         {
             "flags": ["-c", "--cookie"],
-            "help": 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge"). Defaults to "firefox".',
+            "help": 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge").',
             "default": "firefox",
             "rc_key": ["instagram", "cookie"],
             "action": ConfigAction,

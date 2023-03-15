@@ -99,7 +99,7 @@ SCRAPE_COMMAND = command(
         },
         {
             "flags": ["--chunk-size"],
-            "help": "Chunk size for multiprocessing. Defaults to `1`.",
+            "help": "Chunk size for multiprocessing.",
             "type": int,
             "default": 1,
         },
@@ -139,13 +139,13 @@ SCRAPE_COMMAND = command(
         },
         {
             "flags": ["-f", "--format"],
-            "help": "Output format. Defaults to `csv`.",
+            "help": "Output format.",
             "choices": ["csv", "jsonl", "ndjson"],
             "default": "csv",
         },
         {
             "flag": "--plural-separator",
-            "help": 'Separator use to join lists of values when serializing to CSV. Defaults to "|".',
+            "help": "Separator use to join lists of values when serializing to CSV.",
             "default": "|",
         },
         {

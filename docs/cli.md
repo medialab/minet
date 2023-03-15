@@ -222,9 +222,9 @@ Optional Arguments:
   --dump-queue                  Print the contents of the persistent queue.
                                 (This is for debug only, don't use this flag
                                 unless you know what you are doing).
-  -O, --output-dir OUTPUT_DIR   Output directory.
+  -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
-                                the same domain. Defaults to 0.2.
+                                the same domain. Defaults to `0.2`.
   --resume                      Whether to resume an interrupted crawl.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
@@ -274,7 +274,7 @@ Optional Arguments:
                                 default when no input file is given.
   --domain-parallelism DOMAIN_PARALLELISM
                                 Max number of urls per domain to hit at the same
-                                time. Defaults to 1
+                                time. Defaults to `1`.
   -f, --filename FILENAME       Name of the column used to build retrieved file
                                 names. Defaults to a md5 hash of final url. If
                                 the provided file names have no extension (e.g.
@@ -287,9 +287,9 @@ Optional Arguments:
                                 retrieved files into folders to alleviate issues
                                 on some filesystems when a folder contains too
                                 much files. Note that this will be applied on
-                                top of --filename-template. Defaults to "flat".
-                                All of the strategies are described at the end
-                                of this help.
+                                top of --filename-template. All of the
+                                strategies are described at the end of this
+                                help. Defaults to `flat`.
   -g, --grab-cookies {chrome,chromium,edge,firefox,opera}
                                 Whether to attempt to grab cookies from your
                                 computer's browser (supports "firefox",
@@ -301,21 +301,22 @@ Optional Arguments:
                                 (i.e. non-200) http requests.
   --max-redirects MAX_REDIRECTS
                                 Maximum number of redirections to follow before
-                                breaking. Defaults to 10.
+                                breaking. Defaults to `10`.
   --only-html                   Only download urls if they are not unambiguously
                                 not html (e.g. if the url has the .pdf or .jpg
                                 extension etc.). Then, if the url was
                                 downloaded, it will only be written on disk if
                                 the http body actually looks like html.
   -O, --output-dir OUTPUT_DIR   Directory where the fetched files will be
-                                written. Defaults to "downloaded".
+                                written. Defaults to `downloaded`.
   -X, --request METHOD          The http method to use. Will default to GET.
+                                Defaults to `GET`.
   -D, --dont-save               Use not to write any downloaded file on disk.
   --standardize-encoding        Whether to systematically convert retrieved text
                                 to UTF-8.
-  -t, --threads THREADS         Number of threads to use. Defaults to 25.
+  -t, --threads THREADS         Number of threads to use. Defaults to `25`.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
-                                the same domain. Defaults to 0.2.
+                                the same domain. Defaults to `0.2`.
   --timeout TIMEOUT             Maximum time - in seconds - to spend for each
                                 request before triggering a timeout. Defaults to
                                 ~30s.
@@ -465,21 +466,26 @@ Positional Arguments:
 
 Optional Arguments:
   --body-column BODY_COLUMN     Name of the CSV column containing html bodies.
+                                Defaults to `body`.
   --chunk-size CHUNK_SIZE       Chunk size for multiprocessing. Defaults to `1`.
   --encoding ENCODING           Name of the default encoding to use. If not
                                 given the command will infer it for you.
   --encoding-column ENCODING_COLUMN
                                 Name of the CSV column containing file encoding.
+                                Defaults to `encoding`.
   --error-column ERROR_COLUMN   Name of the CSV column containing a fetch error.
+                                Defaults to `fetch_error`.
   -g, --glob                    Will interpret given filename as glob patterns
                                 to resolve if given.
   -I, --input-dir INPUT_DIR     Directory where the HTML files are stored.
   --mimetype-column MIMETYPE_COLUMN
                                 Name of the CSV column containing file mimetype.
+                                Defaults to `mimetype`.
   -p, --processes PROCESSES     Number of processes to use. Defaults to roughly
                                 half of the available CPUs.
   --status-column STATUS_COLUMN
                                 Name of the CSV column containing HTTP status.
+                                Defaults to `http_status`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -583,7 +589,7 @@ Optional Arguments:
                                 it will slow things down.
   --domain-parallelism DOMAIN_PARALLELISM
                                 Max number of urls per domain to hit at the same
-                                time. Defaults to 1
+                                time. Defaults to `1`.
   --follow-js-relocation        Whether to follow typical JavaScript window
                                 relocation. Requires to buffer part of the
                                 response body, so it will slow things down.
@@ -602,13 +608,14 @@ Optional Arguments:
                                 requests or not.
   --max-redirects MAX_REDIRECTS
                                 Maximum number of redirections to follow before
-                                breaking. Defaults to 20.
+                                breaking. Defaults to `20`.
   --only-shortened              Whether to only attempt to resolve urls that are
                                 probably shortened.
   -X, --request METHOD          The http method to use. Will default to GET.
-  -t, --threads THREADS         Number of threads to use. Defaults to 25.
+                                Defaults to `GET`.
+  -t, --threads THREADS         Number of threads to use. Defaults to `25`.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
-                                the same domain. Defaults to 0.2.
+                                the same domain. Defaults to `0.2`.
   --timeout TIMEOUT             Maximum time - in seconds - to spend for each
                                 request before triggering a timeout. Defaults to
                                 ~30s.
@@ -733,12 +740,15 @@ Positional Arguments:
 
 Optional Arguments:
   --body-column BODY_COLUMN     Name of the CSV column containing html bodies.
+                                Defaults to `body`.
   --chunk-size CHUNK_SIZE       Chunk size for multiprocessing. Defaults to `1`.
   --encoding ENCODING           Name of the default encoding to use. If not
                                 given the command will infer it for you.
   --encoding-column ENCODING_COLUMN
                                 Name of the CSV column containing file encoding.
+                                Defaults to `encoding`.
   --error-column ERROR_COLUMN   Name of the CSV column containing a fetch error.
+                                Defaults to `fetch_error`.
   -f, --format {csv,jsonl,ndjson}
                                 Output format. Defaults to `csv`.
   -g, --glob                    Will interpret given filename as glob patterns
@@ -746,17 +756,20 @@ Optional Arguments:
   -I, --input-dir INPUT_DIR     Directory where the HTML files are stored.
   --mimetype-column MIMETYPE_COLUMN
                                 Name of the CSV column containing file mimetype.
+                                Defaults to `mimetype`.
   --plural-separator PLURAL_SEPARATOR
                                 Separator use to join lists of values when
-                                serializing to CSV. Defaults to "|".
+                                serializing to CSV. Defaults to `|`.
   -p, --processes PROCESSES     Number of processes to use. Defaults to roughly
                                 half of the available CPUs.
   --status-column STATUS_COLUMN
                                 Name of the CSV column containing HTTP status.
+                                Defaults to `http_status`.
   --strain STRAIN               Optional CSS selector used to strain, i.e. only
                                 parse matched tags in the parsed html files in
                                 order to optimize performance.
   --url-column URL_COLUMN       Name of the CSV column containing the url.
+                                Defaults to `resolved_url`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -842,7 +855,8 @@ Positional Arguments:
 
 Optional Arguments:
   --base-url BASE_URL         Base url used to resolve relative urls.
-  --from {html,text}          Extract urls from which kind of source?
+  --from {html,text}          Extract urls from which kind of source? Defaults
+                              to `text`.
   -s, --select SELECT         Columns of -i/--input CSV file to include in the
                               output (separated by `,`). Use an empty string if
                               you don't want to keep anything: --select ''.
@@ -892,7 +906,7 @@ Positional Arguments:
 Optional Arguments:
   -p, --match-column-prefix MATCH_COLUMN_PREFIX
                                 Optional prefix to add to the first file's
-                                column names to avoid conflicts.
+                                column names to avoid conflicts. Defaults to ``.
   --separator SEPARATOR         Split indexed url column by a separator?
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
@@ -948,59 +962,56 @@ Optional Arguments:
                                 coming from Facebook.
   --fix-common-mistakes, --dont-fix-common-mistakes
                                 Whether or not to attempt to fix common URL
-                                mistakes when normalizing url. Defaults to fix
-                                common mistakes.
+                                mistakes when normalizing url. Defaults to
+                                `True`.
   --infer-redirection, --dont-infer-redirection
                                 Whether or not to attempt resolving common
                                 redirects by leveraging well-known GET
                                 parameters when normalizing url. Defaults to
-                                infer redirection.
+                                `True`.
   --normalize-amp, --dont-normalize-amp
                                 Whether or not to attempt to normalize Google
                                 AMP urls when normalizing url. Defaults to
-                                normalize amp.
+                                `True`.
   --quoted, --no-quoted         Whether or not to normalize to a quoted or
                                 unquoted version of the url when normalizing
-                                url. Defaults to quoted.
+                                url. Defaults to `True`.
   --sort-query, --dont-sort-query
                                 Whether or not to sort query items when
-                                normalizing url. Defaults to sort query.
+                                normalizing url. Defaults to `True`.
   --strip-authentication, --dont-strip-authentication
                                 Whether or not to strip authentication when
-                                normalizing url. Defaults to strip
-                                authentication.
+                                normalizing url. Defaults to `True`.
   --strip-fragment, --dont-strip-fragment, --strip-fragment-except-routing
                                 Whether or not to strip the url's fragment when
                                 normalizing url. If set to
                                 `--strip-fragment-except-routing`, will only
                                 strip the fragment if the fragment is not deemed
                                 to be js routing (i.e. if it contains a `/`).
-                                Defaults to strip fragment except routing.
+                                Defaults to `except-routing`.
   --strip-index, --dont-strip-index
                                 Whether or not to strip trailing index when
-                                normalizing url. Defaults to strip index.
+                                normalizing url. Defaults to `True`.
   --strip-irrelevant-subdomains, --dont-strip-irrelevant-subdomains
                                 Whether or not to strip trailing
                                 irrelevant-subdomains such as `www` etc. when
-                                normalizing url. Defaults to no strip
-                                irrelevantsubdomains.
+                                normalizing url. Defaults to `True`.
   --strip-lang-query-items, --dont-strip-lang-query-items
                                 Whether or not to strip language query items
                                 (ex: `gl=pt_BR`) when normalizing url. Defaults
-                                to no strip lang query items.
+                                to `False`.
   --strip-lang-subdomains, --dont-strip-lang-subdomains
                                 Whether or not to strip language subdomains (ex:
                                 `fr-FR.lemonde.fr` to only `lemonde.fr` because
                                 `fr-FR` isn't a relevant subdomain, it indicates
                                 the language and the country) when normalizing
-                                url. Defaults to no strip lang subdomains.
+                                url. Defaults to `False`.
   --strip-protocol, --dont-strip-protocol
                                 Whether or not to strip the protocol when
-                                normalizing the url. Defaults to strip protocol.
+                                normalizing the url. Defaults to `True`.
   --strip-trailing-slash, --dont-strip-trailing-slash
                                 Whether or not to trailing slash when
-                                normalizing url. Defaults to strip trailing
-                                slash.
+                                normalizing url. Defaults to `True`.
   --twitter                     Whether to consider and parse the given urls as
                                 coming from Twitter.
   --youtube                     Whether to consider and parse the given urls as
@@ -1365,10 +1376,9 @@ Gather data from the CrowdTangle APIs easily and efficiently.
 
 Optional Arguments:
   --rate-limit RATE_LIMIT       Authorized number of hits by minutes. Defaults
-                                to 6. Rcfile key: crowdtangle.rate_limit. Can
-                                also be configured in a .minetrc file as
-                                "crowdtangle.rate_limit" or read from the
-                                MINET_CROWDTANGLE_RATE_LIMIT env variable.
+                                to `6`. Can also be configured in a .minetrc
+                                file as "crowdtangle.rate_limit" or read from
+                                the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -t, --token TOKEN             CrowdTangle dashboard API token. Rcfile key:
                                 crowdtangle.token. Can also be configured in a
                                 .minetrc file as "crowdtangle.token" or read
@@ -1403,17 +1413,16 @@ For more information, see the API endpoint documentation: https://github.com/Cro
 
 Optional Arguments:
   --breakdown, --no-breakdown   Whether to skip statistics breakdown by post
-                                type in the CSV output.
+                                type in the CSV output. Defaults to `True`.
   -f, --format {csv,jsonl}      Output format. Defaults to `csv`.
   -l, --limit LIMIT             Maximum number of accounts to retrieve. Will
                                 fetch every account by default.
   --list-id LIST_ID             Optional list id from which to retrieve
                                 accounts.
   --rate-limit RATE_LIMIT       Authorized number of hits by minutes. Defaults
-                                to 6. Rcfile key: crowdtangle.rate_limit. Can
-                                also be configured in a .minetrc file as
-                                "crowdtangle.rate_limit" or read from the
-                                MINET_CROWDTANGLE_RATE_LIMIT env variable.
+                                to `6`. Can also be configured in a .minetrc
+                                file as "crowdtangle.rate_limit" or read from
+                                the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   --start-date START_DATE       The earliest date at which to start aggregating
                                 statistics (UTC!). You can pass just a year or a
                                 year-month for convenience.
@@ -1452,8 +1461,7 @@ For more information, see the API endpoint documentation: https://github.com/Cro
 
 Optional Arguments:
   --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to
-                              6. Rcfile key: crowdtangle.rate_limit. Can also be
-                              configured in a .minetrc file as
+                              `6`. Can also be configured in a .minetrc file as
                               "crowdtangle.rate_limit" or read from the
                               MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -t, --token TOKEN           CrowdTangle dashboard API token. Rcfile key:
@@ -1500,10 +1508,9 @@ Positional Arguments:
 
 Optional Arguments:
   --rate-limit RATE_LIMIT       Authorized number of hits by minutes. Defaults
-                                to 6. Rcfile key: crowdtangle.rate_limit. Can
-                                also be configured in a .minetrc file as
-                                "crowdtangle.rate_limit" or read from the
-                                MINET_CROWDTANGLE_RATE_LIMIT env variable.
+                                to `6`. Can also be configured in a .minetrc
+                                file as "crowdtangle.rate_limit" or read from
+                                the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   -t, --token TOKEN             CrowdTangle dashboard API token. Rcfile key:
                                 crowdtangle.token. Can also be configured in a
                                 .minetrc file as "crowdtangle.token" or read
@@ -1591,7 +1598,7 @@ Optional Arguments:
   --chunk-size CHUNK_SIZE       When sorting by date (default), the number of
                                 items to retrieve before shifting the inital
                                 query to circumvent the APIs limitations.
-                                Defaults to 500.
+                                Defaults to `500`.
   --end-date END_DATE           The latest date at which a post could be posted
                                 (UTC!). You can pass just a year or a year-month
                                 for convenience.
@@ -1602,10 +1609,9 @@ Optional Arguments:
   --list-ids LIST_IDS           Ids of the lists from which to retrieve posts,
                                 separated by commas.
   --rate-limit RATE_LIMIT       Authorized number of hits by minutes. Defaults
-                                to 6. Rcfile key: crowdtangle.rate_limit. Can
-                                also be configured in a .minetrc file as
-                                "crowdtangle.rate_limit" or read from the
-                                MINET_CROWDTANGLE_RATE_LIMIT env variable.
+                                to `6`. Can also be configured in a .minetrc
+                                file as "crowdtangle.rate_limit" or read from
+                                the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                 The order in which to retrieve posts. Defaults
                                 to `date`.
@@ -1674,7 +1680,7 @@ Optional Arguments:
   --chunk-size CHUNK_SIZE       When sorting by date (default), the number of
                                 items to retrieve before shifting the inital
                                 query to circumvent the APIs limitations.
-                                Defaults to 500.
+                                Defaults to `500`.
   --end-date END_DATE           The latest date at which a post could be posted
                                 (UTC!). You can pass just a year or a year-month
                                 for convenience.
@@ -1690,10 +1696,9 @@ Optional Arguments:
                                 (facebook, instagram, or reddit). This value can
                                 be comma-separated.
   --rate-limit RATE_LIMIT       Authorized number of hits by minutes. Defaults
-                                to 6. Rcfile key: crowdtangle.rate_limit. Can
-                                also be configured in a .minetrc file as
-                                "crowdtangle.rate_limit" or read from the
-                                MINET_CROWDTANGLE_RATE_LIMIT env variable.
+                                to `6`. Can also be configured in a .minetrc
+                                file as "crowdtangle.rate_limit" or read from
+                                the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   --search-field {account_name_only,image_text_only,include_query_strings,text_fields_and_image_text,text_fields_only}
                                 In what to search the query. Defaults to
                                 `text_fields_and_image_text`.
@@ -1753,10 +1758,9 @@ Optional Arguments:
                                 be comma-separated.
   --posts POSTS                 Path to a file containing the retrieved posts.
   --rate-limit RATE_LIMIT       Authorized number of hits by minutes. Defaults
-                                to 6. Rcfile key: crowdtangle.rate_limit. Can
-                                also be configured in a .minetrc file as
-                                "crowdtangle.rate_limit" or read from the
-                                MINET_CROWDTANGLE_RATE_LIMIT env variable.
+                                to `6`. Can also be configured in a .minetrc
+                                file as "crowdtangle.rate_limit" or read from
+                                the MINET_CROWDTANGLE_RATE_LIMIT env variable.
   --sort-by {date,subscriber_count,total_interactions}
                                 How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE       The earliest date at which a post could be
@@ -1872,11 +1876,11 @@ Optional Arguments:
   -c, --cookie COOKIE          Authenticated cookie to use or browser from which
                                to extract it (supports "firefox", "chrome",
                                "chromium", "opera" and "edge"). Defaults to
-                               "firefox". Can also be configured in a .minetrc
+                               `firefox`. Can also be configured in a .minetrc
                                file as "facebook.cookie" or read from the
                                MINET_FACEBOOK_COOKIE env variable.
   --throttle THROTTLE          Throttling time, in seconds, to wait between each
-                               request.
+                               request. Defaults to `2.0`.
   -s, --select SELECT          Columns of -i/--input CSV file to include in the
                                output (separated by `,`). Use an empty string if
                                you don't want to keep anything: --select ''.
@@ -1990,11 +1994,11 @@ Optional Arguments:
   -c, --cookie COOKIE          Authenticated cookie to use or browser from which
                                to extract it (supports "firefox", "chrome",
                                "chromium", "opera" and "edge"). Defaults to
-                               "firefox". Can also be configured in a .minetrc
+                               `firefox`. Can also be configured in a .minetrc
                                file as "facebook.cookie" or read from the
                                MINET_FACEBOOK_COOKIE env variable.
   --throttle THROTTLE          Throttling time, in seconds, to wait between each
-                               request.
+                               request. Defaults to `2.0`.
   -s, --select SELECT          Columns of -i/--input CSV file to include in the
                                output (separated by `,`). Use an empty string if
                                you don't want to keep anything: --select ''.
@@ -2108,11 +2112,11 @@ Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
-                                Defaults to "firefox". Can also be configured in
+                                Defaults to `firefox`. Can also be configured in
                                 a .minetrc file as "facebook.cookie" or read
                                 from the MINET_FACEBOOK_COOKIE env variable.
   --throttle THROTTLE           Throttling time, in seconds, to wait between
-                                each request.
+                                each request. Defaults to `2.0`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -2200,11 +2204,11 @@ Optional Arguments:
   -c, --cookie COOKIE          Authenticated cookie to use or browser from which
                                to extract it (supports "firefox", "chrome",
                                "chromium", "opera" and "edge"). Defaults to
-                               "firefox". Can also be configured in a .minetrc
+                               `firefox`. Can also be configured in a .minetrc
                                file as "facebook.cookie" or read from the
                                MINET_FACEBOOK_COOKIE env variable.
   --throttle THROTTLE          Throttling time, in seconds, to wait between each
-                               request.
+                               request. Defaults to `2.0`.
   -s, --select SELECT          Columns of -i/--input CSV file to include in the
                                output (separated by `,`). Use an empty string if
                                you don't want to keep anything: --select ''.
@@ -2566,7 +2570,7 @@ Positional Arguments:
 Optional Arguments:
   --password PASSWORD         The corpus's password if required.
   --separator SEPARATOR       Separator use to split multiple tag values in the
-                              same column. Defaults to "|".
+                              same column. Defaults to `|`.
   --total TOTAL               Total number of items to process. Might be
                               necessary when you want to display a finite
                               progress indicator for large files given as input
@@ -2599,7 +2603,7 @@ Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
-                                Defaults to "firefox". Can also be configured in
+                                Defaults to `firefox`. Can also be configured in
                                 a .minetrc file as "instagram.cookie" or read
                                 from the MINET_INSTAGRAM_COOKIE env variable.
   --rcfile RCFILE               Custom path to a minet configuration file. More
@@ -2645,7 +2649,7 @@ Optional Arguments:
   -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
-                              "firefox". Can also be configured in a .minetrc
+                              `firefox`. Can also be configured in a .minetrc
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT           Maximum number of comments to retrieve per post.
@@ -2738,7 +2742,7 @@ Optional Arguments:
   -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
-                              "firefox". Can also be configured in a .minetrc
+                              `firefox`. Can also be configured in a .minetrc
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT           Maximum number of posts to retrieve per hashtag.
@@ -2834,7 +2838,7 @@ Optional Arguments:
   -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
-                              "firefox". Can also be configured in a .minetrc
+                              `firefox`. Can also be configured in a .minetrc
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
   -s, --select SELECT         Columns of -i/--input CSV file to include in the
@@ -2934,7 +2938,7 @@ Optional Arguments:
   -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
-                              "firefox". Can also be configured in a .minetrc
+                              `firefox`. Can also be configured in a .minetrc
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT           Maximum number of followers to retrieve per user.
@@ -3034,7 +3038,7 @@ Optional Arguments:
   -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
-                              "firefox". Can also be configured in a .minetrc
+                              `firefox`. Can also be configured in a .minetrc
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT           Maximum number of accounts to retrieve per user.
@@ -3133,7 +3137,7 @@ Optional Arguments:
   -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
-                              "firefox". Can also be configured in a .minetrc
+                              `firefox`. Can also be configured in a .minetrc
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
   -s, --select SELECT         Columns of -i/--input CSV file to include in the
@@ -3233,7 +3237,7 @@ Optional Arguments:
   -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
-                              "firefox". Can also be configured in a .minetrc
+                              `firefox`. Can also be configured in a .minetrc
                               file as "instagram.cookie" or read from the
                               MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT           Maximum number of posts to retrieve per user.
@@ -3484,7 +3488,7 @@ Positional Arguments:
 
 Optional Arguments:
   --throttle THROTTLE           Throttling time, in seconds, to wait between
-                                each request.
+                                each request. Defaults to `0.5`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -3557,7 +3561,7 @@ Positional Arguments:
 
 Optional Arguments:
   --throttle THROTTLE           Throttling time, in seconds, to wait between
-                                each request.
+                                each request. Defaults to `0.5`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -3665,7 +3669,7 @@ Optional Arguments:
   -c, --cookie COOKIE         Authenticated cookie to use or browser from which
                               to extract it (supports "firefox", "chrome",
                               "chromium", "opera" and "edge"). Defaults to
-                              "firefox". Can also be configured in a .minetrc
+                              `firefox`. Can also be configured in a .minetrc
                               file as "tiktok.cookie" or read from the
                               MINET_TIKTOK_COOKIE env variable.
   -l, --limit LIMIT           Maximum number of videos to retrieve per query.
@@ -4613,7 +4617,7 @@ Optional Arguments:
                                 --start-time.
   --sort-order {recency,relevancy}
                                 How to sort retrieved tweets. Defaults to
-                                "recency".
+                                `recency`.
   --start-time START_TIME       The oldest UTC stamp from which the tweets will
                                 be provided. The date should have the format :
                                 YYYY-MM-DDTHH:mm:ssZ
@@ -4738,7 +4742,7 @@ Optional Arguments:
                                 YYYY-MM-DDTHH:mm:ssZ
   --granularity {day,hour,minute}
                                 Granularity used to group the data by. Defaults
-                                to day.
+                                to `day`.
   --since-id SINCE_ID           Will return tweets with ids that are greater
                                 than the specified id. Takes precedence over
                                 --start-time.
@@ -5247,19 +5251,19 @@ Positional Arguments:
 
 Optional Arguments:
   --access ACCESS               Get pageviews by access. Defaults to
-                                "all-access".
+                                `all-access`.
   --agent AGENT                 Get pageviews by target agent. Defaults to
-                                "all-agents".
+                                `all-agents`.
   --end-date END_DATE           End date. Must be of format YYYYMMDD (e.g.
                                 20151031) or YYYYMMDDHH (e.g. 2015103100)
-  --granularity GRANULARITY     Pageviews granularity. Defaults to "monthly".
+  --granularity GRANULARITY     Pageviews granularity. Defaults to `monthly`.
   --lang LANG                   Lang for the given pages.
   --lang-column LANG_COLUMN     Name of a CSV column containing page lang.
   --start-date START_DATE       Starting date. Must be of format YYYYMMDD (e.g.
                                 20151031) or YYYYMMDDHH (e.g. 2015103100)
   --sum                         Whether to sum the collected pageviews rather
                                 than outputting them by timestamp.
-  -t, --threads THREADS         Number of threads to use. Defaults to 10.
+  -t, --threads THREADS         Number of threads to use. Defaults to `10`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -5333,7 +5337,7 @@ Optional Arguments:
   --lang LANG                 Language (ISO code like "en") of captions to
                               retrieve. You can specify several languages by
                               preferred order separated by commas. Defaults to
-                              "en".
+                              `en`.
   -s, --select SELECT         Columns of -i/--input CSV file to include in the
                               output (separated by `,`). Use an empty string if
                               you don't want to keep anything: --select ''.
@@ -5674,7 +5678,7 @@ Optional Arguments:
   -l, --limit LIMIT             Maximum number of videos to retrieve per query.
   --order {date,rating,relevance,title,videoCount,viewCount}
                                 Order in which videos are retrieved. The default
-                                one is relevance.
+                                one is relevance. Defaults to `relevance`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.

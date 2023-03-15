@@ -392,8 +392,9 @@ TWITTER_TWEET_COUNT_SUBCOMMAND = twitter_api_subcommand(
     arguments=[
         {
             "flag": "--granularity",
-            "help": "Granularity used to group the data by. Defaults to day.",
+            "help": "Granularity used to group the data by.",
             "choices": ["minute", "hour", "day"],
+            "default": "day",
         },
         *COMMON_V2_SEARCH_ARGUMENTS,
         ACADEMIC_ARGUMENT,
@@ -452,7 +453,7 @@ TWITTER_TWEET_SEARCH_SUBCOMMAND = twitter_api_subcommand(
         ACADEMIC_ARGUMENT,
         {
             "flag": "--sort-order",
-            "help": 'How to sort retrieved tweets. Defaults to "recency".',
+            "help": "How to sort retrieved tweets.",
             "choices": ["recency", "relevancy"],
             "default": "recency",
         },

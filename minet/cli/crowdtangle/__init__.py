@@ -21,7 +21,7 @@ from minet.cli.argparse import command, subcommand, ConfigAction
 
 FORMAT_ARGUMENT = {
     "flags": ["-f", "--format"],
-    "help": "Output format. Defaults to `csv`.",
+    "help": "Output format.",
     "choices": ["csv", "jsonl"],
     "default": "csv",
 }
@@ -138,7 +138,7 @@ CROWDTANGLE_POSTS_SUBCOMMAND = subcommand(
     arguments=[
         {
             "flag": "--chunk-size",
-            "help": "When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations. Defaults to 500.",
+            "help": "When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations.",
             "type": int,
             "default": 500,
         },
@@ -163,13 +163,13 @@ CROWDTANGLE_POSTS_SUBCOMMAND = subcommand(
         },
         {
             "flag": "--sort-by",
-            "help": "The order in which to retrieve posts. Defaults to `date`.",
+            "help": "The order in which to retrieve posts.",
             "choices": CROWDTANGLE_SORT_TYPES,
             "default": "date",
         },
         {
             "flag": "--start-date",
-            "help": "The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010`.",
+            "help": "The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.",
             "default": CROWDTANGLE_DEFAULT_START_DATE,
         },
     ],
@@ -198,7 +198,7 @@ CROWDTANGLE_SEARCH_SUBCOMMAND = subcommand(
         },
         {
             "flag": "--chunk-size",
-            "help": "When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations. Defaults to 500.",
+            "help": "When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations.",
             "type": int,
             "default": 500,
         },
@@ -234,18 +234,19 @@ CROWDTANGLE_SEARCH_SUBCOMMAND = subcommand(
         },
         {
             "flag": "--search-field",
-            "help": "In what to search the query. Defaults to `text_fields_and_image_text`.",
+            "help": "In what to search the query.",
             "choices": CROWDTANGLE_SEARCH_FIELDS,
+            "default": "text_fields_and_image_text",
         },
         {
             "flag": "--sort-by",
-            "help": "The order in which to retrieve posts. Defaults to `date`.",
+            "help": "The order in which to retrieve posts.",
             "choices": CROWDTANGLE_SORT_TYPES,
             "default": "date",
         },
         {
             "flag": "--start-date",
-            "help": "The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010`.",
+            "help": "The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.",
             "default": CROWDTANGLE_DEFAULT_START_DATE,
         },
         {
@@ -285,13 +286,13 @@ CROWDTANGLE_SUMMARY_SUBCOMMAND = subcommand(
         },
         {
             "flag": "--sort-by",
-            "help": "How to sort retrieved posts. Defaults to `date`.",
+            "help": "How to sort retrieved posts.",
             "choices": CROWDTANGLE_SUMMARY_SORT_TYPES,
             "default": "date",
         },
         {
             "flag": "--start-date",
-            "help": "The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience. Defaults to `2010`.",
+            "help": "The earliest date at which a post could be posted (UTC!). You can pass just a year or a year-month for convenience.",
             "default": CROWDTANGLE_DEFAULT_START_DATE,
             "required": True,
         },
@@ -310,8 +311,7 @@ CROWDTANGLE_COMMAND = command(
     common_arguments=[
         {
             "flag": "--rate-limit",
-            "help": "Authorized number of hits by minutes. Defaults to %i. Rcfile key: crowdtangle.rate_limit"
-            % CROWDTANGLE_DEFAULT_RATE_LIMIT,
+            "help": "Authorized number of hits by minutes.",
             "type": int,
             "default": CROWDTANGLE_DEFAULT_RATE_LIMIT,
             "rc_key": ["crowdtangle", "rate_limit"],
