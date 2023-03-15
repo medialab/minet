@@ -309,6 +309,7 @@ class TwitterAPIScraper(object):
             additional_exceptions=[
                 TwitterPublicAPIRateLimitError,
                 TwitterPublicAPIInvalidResponseError,
+                TwitterPublicAPIOverCapacityError,
                 TwitterPublicAPIHiccupError,  # TODO: I might want to drop this at some point
             ],
         )
