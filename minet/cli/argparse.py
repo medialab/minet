@@ -236,7 +236,7 @@ def build_subparsers(
 def build_parser(name, version, commands):
 
     # Building the argument parser
-    parser = ArgumentParser(prog="minet")
+    parser = ArgumentParser(prog="minet", formatter_class=custom_formatter)
 
     parser.add_argument(
         "--version", action="version", version="%s %s" % (name, version)

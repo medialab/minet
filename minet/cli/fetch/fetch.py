@@ -40,11 +40,13 @@ class FetchAddendum(TabularRecord):
     mimetype: Optional[str] = None
     encoding: Optional[str] = None
 
-    def infos_from_response(self, response: Response, addendum: WorkerAddendum) -> None:
+    def infos_from_response(
+        self, response: Response, addendum: Optional[WorkerAddendum]
+    ) -> None:
         self.resolved_url = response.end_url
         self.http_status = response.status
         self.datetime_utc = response.end_datetime
-        self.filename = addendum.filename
+        self.filename = addendum.filename if addendum else None
         self.encoding = response.encoding
         self.mimetype = response.mimetype
 
@@ -53,9 +55,11 @@ class FetchAddendum(TabularRecord):
 class FetchAddendumWithBody(FetchAddendum):
     body: Optional[str] = None
 
-    def infos_from_response(self, response: Response, addendum: WorkerAddendum) -> None:
+    def infos_from_response(
+        self, response: Response, addendum: Optional[WorkerAddendum]
+    ) -> None:
         super().infos_from_response(response, addendum)
-        self.body = addendum.decoded_contents
+        self.body = addendum.decoded_contents if addendum else None
 
 
 @dataclass
@@ -327,7 +331,6 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                     # No error
                     if result.error is None:
                         assert result.response is not None
-                        assert result.addendum is not None
 
                         response = result.response
                         status = response.status

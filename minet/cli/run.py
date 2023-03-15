@@ -55,7 +55,7 @@ def run(name, version, commands):
     cli_args = parser.parse_args()
 
     # Suppressing console?
-    if cli_args.silent:
+    if getattr(cli_args, "silent", False):
         console.quiet = True
 
     action = subparser_index.get(cli_args.action)
