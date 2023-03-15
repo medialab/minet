@@ -6,10 +6,9 @@
 #
 import time
 import datetime
-from ebbe import with_is_first
 from urllib.parse import urlencode, quote
 from twitwi import normalize_tweet, normalize_user
-from ebbe import getpath, pathgetter
+from ebbe import with_is_first, getpath, pathgetter
 from json import JSONDecodeError
 
 from minet.web import (
@@ -40,7 +39,7 @@ TWITTER_PUBLIC_SEARCH_ENDPOINT = "https://api.twitter.com/2/search/adaptive.json
 TWITTER_GUEST_ACTIVATE_ENDPOINT = "https://api.twitter.com/1.1/guest/activate.json"
 MAXIMUM_QUERY_LENGTH = 500
 DEFAULT_COUNT = 100  # NOTE: the actual upper limit seems to be 20, but I keep 100 just in case it changes in the future, who knows...
-
+MAX_GUEST_TOKEN_USE_COUNT = 100
 
 # =============================================================================
 # Helpers
@@ -50,11 +49,18 @@ def is_query_too_long(query):
 
 
 def ensure_guest_token(method):
-    def wrapped(self, *args, **kwargs):
+    def wrapped(self: "TwitterAPIScraper", *args, **kwargs):
 
-        if self.guest_token is None:
+        # NOTE: we refresh the guest token periodically to avoid
+        # losing time wrt failed request after expiration
+        if (
+            self.guest_token is None
+            or self.guest_token_use_count >= MAX_GUEST_TOKEN_USE_COUNT
+        ):
             self.acquire_guest_token()
+            self.guest_token_use_count = 0
 
+        self.guest_token_use_count += 1
         return method(self, *args, **kwargs)
 
     return wrapped
@@ -309,6 +315,7 @@ class TwitterAPIScraper(object):
 
     def reset(self):
         self.guest_token = None
+        self.guest_token_use_count = 0
         self.cookie = None
 
     def request(self, url, headers=None, method="GET"):
@@ -338,6 +345,7 @@ class TwitterAPIScraper(object):
             raise TwitterPublicAPIInvalidResponseError
 
         guest_token = api_token_response.get("guest_token")
+
         if guest_token is None:
             raise TwitterGuestTokenError
 
