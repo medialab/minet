@@ -12,9 +12,9 @@ In addition, **minet** also exposes its high-level programmatic interface as a p
 
 As such, it has been designed to be:
 
-1. low-tech, as it requires minimal resources such as memory, CPUs or hard drive space and should be able to work on any low-cost PC.
-2. fault-tolerant, as it is able to recover when network is bad and retry HTTP calls when suitable. What's more, most of minet commands can be resumed if aborted and are designed to run for a long time (think days or months) without leaking memory.
-3. unix-compliant, as it can be piped easily and know how to work with the usual streams.
+1. **low-tech**, as it requires minimal resources such as memory, CPUs or hard drive space and should be able to work on any low-cost PC.
+2. **fault-tolerant**, as it is able to recover when network is bad and retry HTTP calls when suitable. What's more, most of minet commands can be resumed if aborted and are designed to run for a long time (think days or months) without leaking memory.
+3. **unix-compliant**, as it can be piped easily and know how to work with the usual streams.
 
 **Shortcuts**: [Command line documentation](./docs/cli.md), [Python library documentation](./docs/lib.md).
 
@@ -40,7 +40,7 @@ minet twitter scrape tweets "from:medialab_ScPo" > tweets.csv
 minet twitter scrape -h
 
 # Searching videos on YouTube
-minet youtube search -k <MY-YT-API-KEY> "médialab" > videos.csv
+minet youtube search -k "MY-YT-API-KEY" "médialab" > videos.csv
 ```
 
 ## Summary
