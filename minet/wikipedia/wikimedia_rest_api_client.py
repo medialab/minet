@@ -89,7 +89,12 @@ class WikimediaRestAPIClient(object):
 
             return url
 
-        with HTTPThreadPoolExecutor(max_workers=threads, retry=True) as executor:
+        with HTTPThreadPoolExecutor(
+            max_workers=threads,
+            timeout=60,
+            retry=True,
+            retryer_kwargs={"retry_on_timeout": True},
+        ) as executor:
             for result in executor.request(
                 pages,
                 key=api_url_from_item,
