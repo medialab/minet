@@ -9,7 +9,7 @@ wheel
 # Dependencies
 about-time==4.2.1
 beautifulsoup4==4.11.1
-browser-cookie3==0.17.0
+browser-cookie3==0.17.1
 casanova==1.7.4
 charset-normalizer==3.0.1
 dateparser==1.1.6
