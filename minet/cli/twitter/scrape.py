@@ -9,10 +9,8 @@ from twitwi import format_tweet_as_csv_row, format_user_as_csv_row
 
 from minet.utils import PseudoFStringFormatter
 from minet.cli.utils import with_enricher_and_loading_bar
-from minet.cli.exceptions import FatalError
 from minet.twitter import TwitterAPIScraper
 from minet.twitter.exceptions import (
-    TwitterPublicAPIOverCapacityError,
     TwitterPublicAPIQueryTooLongError,
 )
 from minet.twitter.constants import ADDITIONAL_TWEET_FIELDS
@@ -80,6 +78,3 @@ def action(cli_args, enricher, loading_bar):
 
             except TwitterPublicAPIQueryTooLongError:
                 loading_bar.error("Query too long [dim]%s[/dim]" % query)
-
-            except TwitterPublicAPIOverCapacityError:
-                raise FatalError('Got an "Over Capacity" error. Shutting down...')
