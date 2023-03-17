@@ -93,7 +93,10 @@ class WikimediaRestAPIClient(object):
             max_workers=threads,
             timeout=60,
             retry=True,
-            retryer_kwargs={"retry_on_timeout": True},
+            retryer_kwargs={
+                "retry_on_timeout": True,
+                "additional_exceptions": (WikimediaRESTAPIThrottledError,),
+            },
         ) as executor:
             for result in executor.request(
                 pages,
