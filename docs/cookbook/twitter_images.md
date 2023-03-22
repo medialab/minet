@@ -51,7 +51,7 @@ We can now use minet `fetch` command to download them all as fast as possible:
 
 ```bash
 minet fetch media_urls -i tweets.csv \
-  --separator "|" \
+  --explode "|" \
   -O images \
   --throttle 0 \
   --domain-parallelism 5 > report.csv
@@ -60,7 +60,7 @@ minet fetch media_urls -i tweets.csv \
 Let's decompose the above command to understand what it does:
 
 - `minet fetch media_urls -i tweets.csv` means we want minet to read the `tweets.csv` file and then fetch, i.e. download, the urls found within the `media_urls` column.
-- The `--separator "|"` part is us telling minet that the url column may contain multiple urls, instead of a single one, and that those will be separated by the `|` character.
+- The `--explode "|"` part is us telling minet that the url column may contain multiple urls, instead of a single one, and that those will be separated by the `|` character.
 - The `-O images` part means that we want to store the downloaded images in the `images` folder (relative to our current working directory).
 - The `--throttle 0` part indicates minet that we don't want to wait between two requests on the same domain. By default, minet tries to wait a little bit between two requests on the same domain not to be too hard on servers and to avoid getting kicked. But here, `twitter.com` doesn't really care and can take the load.
 - The `--domain-parallelism 5` part tells minet we can accept making multiple requests on the same domain at once. For the same reasons as with `--throttle`, minet tries by default to avoid making multiple concurrent requests on the same domain but `twitter.com` can take it. So here, we will always be downloading at least 5 images at once. Feel free to increase or decrease this number based on your bandwith and Twitter's tolerance.
