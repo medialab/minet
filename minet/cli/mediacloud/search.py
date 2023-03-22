@@ -36,4 +36,4 @@ def action(cli_args):
 
         for story in iterator:
             writer.writerow(story.as_csv_row())
-            loading_bar.update()
+            loading_bar.advance()
