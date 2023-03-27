@@ -5,7 +5,11 @@
 # Client for the Hyphe API.
 #
 from minet.web import create_pool_manager, request_jsonrpc
-from minet.hyphe.constants import WEBENTITY_STATUSES, DEFAULT_PAGINATION_COUNT
+from minet.hyphe.constants import (
+    WEBENTITY_STATUSES,
+    DEFAULT_PAGINATION_COUNT,
+    DEFAULT_TIMEOUT,
+)
 from minet.hyphe.exceptions import (
     HypheCouldNotStartCorpusError,
     HypheJSONRPCError,
@@ -20,7 +24,7 @@ class HypheAPIClient(object):
             endpoint += "/"
 
         self.endpoint = endpoint
-        self.pool_manager = create_pool_manager()
+        self.pool_manager = create_pool_manager(timeout=DEFAULT_TIMEOUT)
 
     def call(self, method, *args, **kwargs):
         response = request_jsonrpc(
