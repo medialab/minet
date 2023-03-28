@@ -1914,7 +1914,7 @@ Examples:
     $ minet fb comments -c chrome https://www.facebook.com/groups/186982532676569/permalink/4096995827030341/ > comments.csv
 
 . Scraping comments from multiple posts listed in a CSV file:
-    $ minet fb comments post_url posts.csv > comments.csv
+    $ minet fb comments post_url -i posts.csv > comments.csv
 
 how to use the command with a CSV file?
 
