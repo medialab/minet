@@ -2032,7 +2032,7 @@ Examples:
     $ minet fb posts -c chrome https://m.facebook.com/watch/?v=448540820705115 > post.csv
 
 . Scraping post from multiple urls listed in a CSV file:
-    $ minet fb post url urls.csv > post.csv
+    $ minet fb post url -i urls.csv > post.csv
 
 how to use the command with a CSV file?
 
@@ -2150,7 +2150,7 @@ Examples:
     $ minet fb posts -c chrome https://www.facebook.com/groups/444175323127747 > posts.csv
 
 . Scraping posts from multiple groups listed in a CSV file:
-    $ minet fb posts group_url groups.csv > posts.csv
+    $ minet fb posts group_url -i groups.csv > posts.csv
 
 how to use the command with a CSV file?
 
@@ -2236,7 +2236,7 @@ Optional Arguments:
 Examples:
 
 . Fetching authors of a series of posts in a CSV file:
-    $ minet fb post-authors post_url fb-posts.csv > authors.csv
+    $ minet fb post-authors post_url -i fb-posts.csv > authors.csv
 
 how to use the command with a CSV file?
 
@@ -2316,7 +2316,7 @@ example:
     $ minet fb url-likes "www.example-url.com" > url_like.csv
 
 . Retrieving the "like" number for the urls listed in a CSV file:
-    $ minet fb url-likes url url.csv > url_likes.csv
+    $ minet fb url-likes url -i url.csv > url_likes.csv
 
 how to use the command with a CSV file?
 

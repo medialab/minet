@@ -50,7 +50,7 @@ FACEBOOK_COMMENTS_SUBCOMMAND = subcommand(
             $ minet fb comments -c chrome https://www.facebook.com/groups/186982532676569/permalink/4096995827030341/ > comments.csv
 
         . Scraping comments from multiple posts listed in a CSV file:
-            $ minet fb comments post_url posts.csv > comments.csv
+            $ minet fb comments post_url -i posts.csv > comments.csv
     """,
     variadic_input={"dummy_column": "post_url", "item_label": "post url"},
     arguments=[*MOBILE_ARGUMENTS],
@@ -70,7 +70,7 @@ FACEBOOK_POST_AUTHORS_SUBCOMMAND = subcommand(
         Examples:
 
         . Fetching authors of a series of posts in a CSV file:
-            $ minet fb post-authors post_url fb-posts.csv > authors.csv
+            $ minet fb post-authors post_url -i fb-posts.csv > authors.csv
     """,
     variadic_input={"dummy_column": "post_url", "item_label": "post"},
     arguments=[*MOBILE_ARGUMENTS],
@@ -87,7 +87,7 @@ FACEBOOK_POST_STATS_SUBCOMMAND = subcommand(
         Examples:
 
         . Fetching stats about lists of posts in a CSV file:
-            $ minet fb post-stats post_url fb-posts.csv > stats.csv
+            $ minet fb post-stats post_url -i fb-posts.csv > stats.csv
     """,
     variadic_input={"dummy_column": "post_url", "item_label": "post url"},
 )
@@ -138,7 +138,7 @@ FACEBOOK_POST_SUBCOMMAND = subcommand(
             $ minet fb posts -c chrome https://m.facebook.com/watch/?v=448540820705115 > post.csv
 
         . Scraping post from multiple urls listed in a CSV file:
-            $ minet fb post url urls.csv > post.csv
+            $ minet fb post url -i urls.csv > post.csv
     """,
     variadic_input={"dummy_column": "post_url", "item_label": "post url"},
     arguments=[*MOBILE_ARGUMENTS],
@@ -189,7 +189,7 @@ FACEBOOK_POSTS_SUBCOMMAND = subcommand(
             $ minet fb posts -c chrome https://www.facebook.com/groups/444175323127747 > posts.csv
 
         . Scraping posts from multiple groups listed in a CSV file:
-            $ minet fb posts group_url groups.csv > posts.csv
+            $ minet fb posts group_url -i groups.csv > posts.csv
     """,
     variadic_input={"dummy_column": "group_url", "item_label": "group url"},
     arguments=[*MOBILE_ARGUMENTS],
@@ -217,7 +217,7 @@ FACEBOOK_URL_LIKES_SUBCOMMAND = subcommand(
             $ minet fb url-likes "www.example-url.com" > url_like.csv
 
         . Retrieving the "like" number for the urls listed in a CSV file:
-            $ minet fb url-likes url url.csv > url_likes.csv
+            $ minet fb url-likes url -i url.csv > url_likes.csv
     """,
     variadic_input={"dummy_column": "url", "item_label": "url"},
 )
