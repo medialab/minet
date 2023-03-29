@@ -92,7 +92,7 @@ def action(cli_args):
                     filepath = join(body_output_dir, filename)
                     os.makedirs(dirname(filepath), exist_ok=True)
 
-                    with open(filter, "wb") as f:
+                    with open(filepath, "wb") as f:
                         binary = base64.b64decode(page["body"])
                         binary = zlib.decompress(binary)
                         binary = gzip.compress(binary)  # TODO: use gzip.open rather
