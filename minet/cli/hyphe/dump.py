@@ -87,17 +87,20 @@ def action(cli_args):
             ):
                 filename = None
 
-                if cli_args.body and "body" in page:
-                    filename = format_page_filename(webentity, page)
-                    filepath = join(body_output_dir, filename)
-                    os.makedirs(dirname(filepath), exist_ok=True)
+                if cli_args.body:
+                    if "body" in page:
+                        filename = format_page_filename(webentity, page)
+                        filepath = join(body_output_dir, filename)
+                        os.makedirs(dirname(filepath), exist_ok=True)
 
-                    with open(filepath, "wb") as f:
-                        binary = base64.b64decode(page["body"])
-                        binary = zlib.decompress(binary)
-                        binary = gzip.compress(binary)  # TODO: use gzip.open rather
+                        with open(filepath, "wb") as f:
+                            binary = base64.b64decode(page["body"])
+                            binary = zlib.decompress(binary)
+                            binary = gzip.compress(binary)  # TODO: use gzip.open rather
 
-                        f.write(binary)
+                            f.write(binary)
+                    else:
+                        filename = ""
 
                 pages_writer.writerow(
                     format_page_for_csv(webentity, page, filename=filename)
