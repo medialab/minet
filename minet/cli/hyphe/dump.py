@@ -83,7 +83,7 @@ def action(cli_args):
     ) as loading_bar:
         for webentity in webentities.values():
             for page in corpus.webentity_pages(
-                webentity["id"], include_body=cli_args.body
+                webentity["id"], include_body=cli_args.body, count=cli_args.page_count
             ):
                 filename = None
 
@@ -100,7 +100,12 @@ def action(cli_args):
                         f.write(binary)
 
                 pages_writer.writerow(
-                    format_page_for_csv(webentity, page, filename=filename)
+                    format_page_for_csv(
+                        webentity,
+                        page,
+                        expect_filename=cli_args.body,
+                        filename=filename,
+                    )
                 )
 
                 loading_bar.advance()

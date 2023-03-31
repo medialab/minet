@@ -22,7 +22,7 @@ def format_webentity_for_csv(webentity):
     ]
 
 
-def format_page_for_csv(webentity, page, filename=None):
+def format_page_for_csv(webentity, page, expect_filename: bool = False, filename=None):
     row = [
         page["url"],
         page["lru"],
@@ -42,7 +42,7 @@ def format_page_for_csv(webentity, page, filename=None):
         page.get("error", ""),
     ]
 
-    if filename:
+    if expect_filename:
         row.append(filename)
 
     return row

@@ -97,6 +97,12 @@ HYPHE_DUMP_SUBCOMMAND = hyphe_corpus_subcommand(
             "help": 'Webentity statuses to dump, separated by comma. Possible statuses being "IN", "OUT", "UNDECIDED" and "DISCOVERED".',
             "type": SplitterType(),
         },
+        {
+            "flag": "--page-count",
+            "help": "Number of pages to download per pagination call. Tweak if corpus has large pages or if the network is unreliable.",
+            "type": int,
+            "default": 500,
+        },
     ],
 )
 

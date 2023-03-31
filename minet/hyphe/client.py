@@ -7,7 +7,8 @@
 from minet.web import create_pool_manager, request_jsonrpc
 from minet.hyphe.constants import (
     WEBENTITY_STATUSES,
-    DEFAULT_PAGINATION_COUNT,
+    DEFAULT_WEBENTITY_PAGINATION_COUNT,
+    DEFAULT_PAGE_PAGINATION_COUNT,
     DEFAULT_TIMEOUT,
 )
 from minet.hyphe.exceptions import (
@@ -110,7 +111,9 @@ class HypheAPIClientCorpus(object):
 
         return info
 
-    def webentities(self, statuses=None):
+    def webentities(
+        self, statuses=None, count: int = DEFAULT_WEBENTITY_PAGINATION_COUNT
+    ):
         if not statuses:
             statuses = WEBENTITY_STATUSES
 
@@ -123,7 +126,7 @@ class HypheAPIClientCorpus(object):
                     result = self.call(
                         "store.get_webentities_by_status",
                         status=status,
-                        count=DEFAULT_PAGINATION_COUNT,
+                        count=count,
                     )
                 else:
                     result = self.call(
@@ -143,14 +146,19 @@ class HypheAPIClientCorpus(object):
                 else:
                     break
 
-    def webentity_pages(self, webentity_id, include_body=False):
+    def webentity_pages(
+        self,
+        webentity_id,
+        include_body: bool = False,
+        count: int = DEFAULT_PAGE_PAGINATION_COUNT,
+    ):
         token = None
 
         while True:
             result = self.call(
                 "store.paginate_webentity_pages",
                 webentity_id=webentity_id,
-                count=DEFAULT_PAGINATION_COUNT,
+                count=count,
                 pagination_token=token,
                 include_page_metas=True,
                 include_page_body=include_body,
