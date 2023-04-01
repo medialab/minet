@@ -13,6 +13,7 @@ import multiprocessing
 import casanova
 from casanova.exceptions import MissingColumnError
 from contextlib import ExitStack
+from encodings import idna  # NOTE: this is necessary for pyinstaller build still...
 
 from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
 from minet.loggers import sleepers_logger
