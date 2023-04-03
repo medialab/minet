@@ -17,12 +17,11 @@ from ural.instagram import (
     InstagramUser as ParsedInstagramUser,
     InstagramReel as ParsedInstagramReel,
 )
-from minet.constants import COOKIE_BROWSERS
 from minet.utils import sleep_with_entropy
 from minet.web import (
     create_pool_manager,
     create_request_retryer,
-    grab_cookies,
+    coerce_cookie_for_url_from_browser,
     request,
     retrying_method,
     request,
@@ -74,21 +73,23 @@ def forge_comments_url(
     min_or_max_id=None,
 ):
     if comment_id is not None and min_or_max_id is not None:
-        url = "https://www.instagram.com/api/v1/media/%s/comments/%s/child_comments/?max_id=%s" % (
-            post,
-            comment_id,
-            min_or_max_id
+        url = (
+            "https://www.instagram.com/api/v1/media/%s/comments/%s/child_comments/?max_id=%s"
+            % (post, comment_id, min_or_max_id)
         )
         return url
 
     if min_or_max_id is not None:
-        url = "https://www.instagram.com/api/v1/media/%s/comments/?min_id=%s&can_support_threading=true&permalink_enabled=false" % (
-            post,
-            min_or_max_id
+        url = (
+            "https://www.instagram.com/api/v1/media/%s/comments/?min_id=%s&can_support_threading=true&permalink_enabled=false"
+            % (post, min_or_max_id)
         )
         return url
 
-    url = "https://www.instagram.com/api/v1/media/%s/comments/?can_support_threading=true&permalink_enabled=false" % post
+    url = (
+        "https://www.instagram.com/api/v1/media/%s/comments/?can_support_threading=true&permalink_enabled=false"
+        % post
+    )
     return url
 
 
@@ -195,9 +196,7 @@ class InstagramAPIScraper(object):
             timeout=INSTAGRAM_PUBLIC_API_DEFAULT_TIMEOUT
         )
 
-        if cookie in COOKIE_BROWSERS:
-            get_cookie_for_url = grab_cookies(cookie)
-            cookie = get_cookie_for_url(INSTAGRAM_URL)
+        cookie = coerce_cookie_for_url_from_browser(cookie, INSTAGRAM_URL)
 
         if not cookie:
             raise InstagramInvalidCookieError
@@ -347,7 +346,9 @@ class InstagramAPIScraper(object):
                     max_id = ""
 
                     while True:
-                        url = forge_comments_url(post, comment_id=item.get("pk"), min_or_max_id=max_id)
+                        url = forge_comments_url(
+                            post, comment_id=item.get("pk"), min_or_max_id=max_id
+                        )
 
                         data_comment = self.request_json(url, magic_token=True)
 
@@ -359,7 +360,9 @@ class InstagramAPIScraper(object):
                         for children_item in children_items:
                             yield format_comment(children_item)
 
-                        more_available = data_comment.get("has_more_tail_child_comments")
+                        more_available = data_comment.get(
+                            "has_more_tail_child_comments"
+                        )
 
                         if not more_available:
                             break

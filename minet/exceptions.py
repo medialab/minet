@@ -55,6 +55,19 @@ class CouldNotInferEncodingError(MinetError):
     pass
 
 
+# Cookie errors
+class UnknownBrowserError(MinetError):
+    def __init__(self, browser: str):
+        super().__init__("Unkown browser: %s" % browser)
+        self.browser = browser
+
+
+class CookieGrabbingError(MinetError):
+    def __init__(self, browser: str):
+        super().__init__("Could not grab cookies from: %s" % browser)
+        self.browser = browser
+
+
 # Miscellaneous HTTP errors
 class InvalidURLError(MinetError):
     def __init__(self, message=None, url=None):

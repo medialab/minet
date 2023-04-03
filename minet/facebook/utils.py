@@ -6,8 +6,7 @@
 #
 from http.cookies import SimpleCookie
 
-from minet.web import grab_cookies
-from minet.constants import COOKIE_BROWSERS
+from minet.web import coerce_cookie_for_url_from_browser
 from minet.facebook.constants import FACEBOOK_URL
 
 
@@ -25,16 +24,7 @@ def fix_cookie(cookie_string):
 
 
 def grab_facebook_cookie(source):
-    if source in COOKIE_BROWSERS:
-        get_cookie_for_url = grab_cookies(source)
-
-        if get_cookie_for_url is None:
-            return None
-
-        cookie = get_cookie_for_url(FACEBOOK_URL + "/")
-
-    else:
-        cookie = source.strip()
+    cookie = coerce_cookie_for_url_from_browser(source, FACEBOOK_URL + "/")
 
     if not cookie or "c_user=" not in cookie.lower():
         return None

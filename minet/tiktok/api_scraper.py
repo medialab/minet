@@ -7,13 +7,12 @@
 from ebbe import getpath
 from urllib.parse import quote
 
-from minet.constants import COOKIE_BROWSERS
 from minet.utils import sleep_with_entropy
 from minet.web import (
     create_pool_manager,
     create_request_retryer,
     request,
-    grab_cookies,
+    coerce_cookie_for_url_from_browser,
     retrying_method,
 )
 from minet.tiktok.constants import (
@@ -48,9 +47,7 @@ class TiktokAPIScraper(object):
             timeout=TIKTOK_PUBLIC_API_DEFAULT_TIMEOUT
         )
 
-        if cookie in COOKIE_BROWSERS:
-            get_cookie_for_url = grab_cookies(cookie)
-            cookie = get_cookie_for_url(TIKTOK_URL)
+        cookie = coerce_cookie_for_url_from_browser(cookie, TIKTOK_URL)
 
         if not cookie:
             raise TiktokInvalidCookieError

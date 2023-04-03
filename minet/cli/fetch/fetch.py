@@ -16,7 +16,12 @@ from ural import is_shortened_url, could_be_html
 
 from minet.executors import RequestResult, HTTPWorkerPayload, HTTPThreadPoolExecutor
 from minet.fs import FilenameBuilder, ThreadSafeFilesWriter
-from minet.web import grab_cookies, parse_http_header, Response, RedirectionStack
+from minet.web import (
+    get_cookie_resolver_from_browser,
+    parse_http_header,
+    Response,
+    RedirectionStack,
+)
 from minet.exceptions import InvalidURLError, FilenameFormattingError, HTTPCallbackError
 from minet.heuristics import should_spoof_ua_when_resolving
 from minet.cli.exceptions import InvalidArgumentsError, FatalError
@@ -136,7 +141,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
     # Cookie grabber
     get_cookie = None
     if cli_args.grab_cookies:
-        get_cookie = grab_cookies(cli_args.grab_cookies)
+        get_cookie = get_cookie_resolver_from_browser(cli_args.grab_cookies)
 
     # Global headers
     global_headers = None

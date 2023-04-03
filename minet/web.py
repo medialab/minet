@@ -31,6 +31,7 @@ import mimetypes
 import functools
 import threading
 import warnings
+from http.cookiejar import CookieJar
 from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning, SoupStrainer
 from datetime import datetime
 from timeit import default_timer as timer
@@ -67,6 +68,8 @@ from minet.exceptions import (
     SelfRedirectError,
     CancelledRequestError,
     FinalTimeoutError,
+    UnknownBrowserError,
+    CookieGrabbingError,
 )
 from minet.constants import (
     DEFAULT_SPOOFED_UA,
@@ -234,25 +237,39 @@ def find_javascript_relocation(html_chunk: bytes):
 
 
 class CookieResolver(object):
-    def __init__(self, jar):
+    def __init__(self, jar: CookieJar):
         self.jar = jar
 
-    def __call__(self, url):
+    def __call__(self, url: str) -> Optional[str]:
         req = Request(url)
         self.jar.add_cookie_header(req)
 
         return req.get_header("Cookie") or None
 
 
-def grab_cookies(browser="firefox"):
-    if browser not in COOKIE_BROWSERS:
-        raise TypeError('minet.utils.grab_cookies: unknown "%s" browser.' % browser)
+def get_cookie_jar_from_browser(browser="firefox") -> CookieJar:
+    fn = getattr(browser_cookie3, browser, None)
+
+    if fn is None:
+        raise UnknownBrowserError(browser)
 
     try:
-        return CookieResolver(getattr(browser_cookie3, browser)())
-    except browser_cookie3.BrowserCookieError as e:
-        raise e
+        return fn()
+    except browser_cookie3.BrowserCookieError:
+        raise CookieGrabbingError(browser)
 
+
+def get_cookie_resolver_from_browser(browser="firefox") -> CookieResolver:
+    return CookieResolver(get_cookie_jar_from_browser(browser))
+
+
+def coerce_cookie_for_url_from_browser(target: str, url) -> Optional[str]:
+    if target in COOKIE_BROWSERS:
+        get = get_cookie_resolver_from_browser(target)
+
+        return get(url)
+
+    return target.strip()
 
 def dict_to_cookie_string(d):
     return "; ".join("%s=%s" % r for r in d.items())
