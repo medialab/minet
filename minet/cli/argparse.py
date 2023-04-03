@@ -76,7 +76,7 @@ RawDescriptionRichHelpFormatter.highlights = [
     r"(?P<metavar><[a-z\s=\"]+>)",  # tags
     r"(?P<emphasis>how to use the command with.+)",  # emphasis
     r"(?P<args>https?://\S+)",  # urls
-    r"(?P<groups>\n(?:--[a-z]|[A-Z]).+:\n)",  # various titles
+    r"(?P<groups>\n(?:--[a-z]|[A-Z]).+:\n\n)",  # various titles
 ]
 
 

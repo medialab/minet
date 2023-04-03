@@ -165,7 +165,7 @@ Finally note that command line arguments and flags will take precedence over env
 
 ```
 Usage: minet cookies [-h] [--silent] [--csv] [--url URL] [-o OUTPUT]
-                     {chrome,chromium,edge,firefox,opera}
+                     {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}
 
 # Minet Cookies Command
 
@@ -173,7 +173,7 @@ Grab cookies directly from your browsers to use them easily later
 in python scripts, for instance.
 
 Positional Arguments:
-  {chrome,chromium,edge,firefox,opera}
+  {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}
                                 Name of the browser from which to grab cookies.
 
 Optional Arguments:
@@ -240,8 +240,8 @@ Examples:
 
 ```
 Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
-                   [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
-                   [--insecure] [-t THREADS] [--throttle THROTTLE]
+                   [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
+                   [-H HEADERS] [--insecure] [-t THREADS] [--throttle THROTTLE]
                    [--timeout TIMEOUT] [--url-template URL_TEMPLATE] [-X METHOD]
                    [--max-redirects MAX_REDIRECTS] [--compress] [-c] [-D]
                    [-O OUTPUT_DIR] [-f FILENAME]
@@ -290,7 +290,7 @@ Optional Arguments:
                                 top of --filename-template. All of the
                                 strategies are described at the end of this
                                 help. Defaults to `flat`.
-  -g, --grab-cookies {chrome,chromium,edge,firefox,opera}
+  -g, --grab-cookies {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}
                                 Whether to attempt to grab cookies from your
                                 computer's browser (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -562,14 +562,15 @@ Examples:
 
 ```
 Usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
-                     [-g {chrome,chromium,edge,firefox,opera}] [-H HEADERS]
-                     [--insecure] [-t THREADS] [--throttle THROTTLE]
-                     [--timeout TIMEOUT] [--url-template URL_TEMPLATE]
-                     [-X METHOD] [--max-redirects MAX_REDIRECTS]
-                     [--follow-meta-refresh] [--follow-js-relocation]
-                     [--infer-redirection] [--canonicalize] [--only-shortened]
-                     [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
-                     [--resume] [-o OUTPUT]
+                     [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
+                     [-H HEADERS] [--insecure] [-t THREADS]
+                     [--throttle THROTTLE] [--timeout TIMEOUT]
+                     [--url-template URL_TEMPLATE] [-X METHOD]
+                     [--max-redirects MAX_REDIRECTS] [--follow-meta-refresh]
+                     [--follow-js-relocation] [--infer-redirection]
+                     [--canonicalize] [--only-shortened] [-i INPUT]
+                     [--explode EXPLODE] [-s SELECT] [--total TOTAL] [--resume]
+                     [-o OUTPUT]
                      url_or_url_column
 
 # Minet Resolve Command
@@ -596,7 +597,7 @@ Optional Arguments:
   --follow-meta-refresh         Whether to follow meta refresh tags. Requires to
                                 buffer part of the response body, so it will
                                 slow things down.
-  -g, --grab-cookies {chrome,chromium,edge,firefox,opera}
+  -g, --grab-cookies {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}
                                 Whether to attempt to grab cookies from your
                                 computer's browser (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -2485,7 +2486,8 @@ Examples:
 
 ```
 Usage: minet hyphe dump [-h] [--silent] [-O OUTPUT_DIR] [--body]
-                        [--statuses STATUSES] [--password PASSWORD] [-o OUTPUT]
+                        [--statuses STATUSES] [--page-count PAGE_COUNT]
+                        [--password PASSWORD] [-o OUTPUT]
                         url corpus
 
 # Minet Hyphe Dump Command
@@ -2501,6 +2503,9 @@ Optional Arguments:
   --body                        Whether to download pages body.
   -O, --output-dir OUTPUT_DIR   Output directory for dumped files. Will default
                                 to some name based on corpus name.
+  --page-count PAGE_COUNT       Number of pages to download per pagination call.
+                                Tweak if corpus has large pages or if the
+                                network is unreliable. Defaults to `500`.
   --password PASSWORD           The corpus's password if required.
   --statuses STATUSES           Webentity statuses to dump, separated by comma.
                                 Possible statuses being "IN", "OUT", "UNDECIDED"
@@ -3391,6 +3396,7 @@ Usage: minet mediacloud search [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
 # Minet Mediacloud Search Command
 
 Search stories on the Mediacloud platform.
+
 To learn how to compose more relevant queries, check out this guide:
 https://mediacloud.org/support/query-guide
 
