@@ -54,9 +54,9 @@ from tenacity import (
 )
 from tenacity.wait import wait_base
 
-from minet.encodings import normalize_encoding
+from minet.encodings import normalize_encoding, infer_encoding
 from minet.loggers import sleepers_logger
-from minet.utils import is_binary_mimetype, infer_encoding
+from minet.utils import is_binary_mimetype
 from minet.exceptions import (
     RedirectError,
     MaxRedirectsError,

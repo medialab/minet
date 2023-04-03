@@ -5,7 +5,10 @@
 # List of python-supported encodings so we can ensure we will be able to
 # correctly handle them.
 #
+from typing import Optional
+
 import re
+import charset_normalizer
 
 ENCODINGS = set(
     [
@@ -257,3 +260,28 @@ def is_supported_encoding(encoding):
 
 def encoding_sort_key(encoding):
     return (normalize_encoding(encoding), -len(encoding))
+
+
+def infer_charset(data: bytes) -> Optional[charset_normalizer.CharsetMatch]:
+    best = charset_normalizer.from_bytes(data).best()
+
+    if best is None:
+        return None
+
+    return best
+
+
+def infer_encoding(data: bytes) -> Optional[str]:
+    charset = infer_charset(data)
+
+    if charset is None:
+        return None
+
+    return charset.encoding
+
+
+UTF8_BOM = b"\xef\xbb\xbf"
+UTF16_LE_BOM = b"\xff\xfe"
+UTF16_BE_BOM = b"\xfe\xff"
+UTF32_LE_BOM = b"\xff\xfe\x00\x00"
+UTF32_BE_BOM = b"\x00\x00\xfe\xff"

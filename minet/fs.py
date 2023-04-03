@@ -20,7 +20,8 @@ from minet.exceptions import (
     DefinitionInvalidFormatError,
     CouldNotInferEncodingError,
 )
-from minet.utils import md5, PseudoFStringFormatter, infer_encoding
+from minet.utils import md5, PseudoFStringFormatter
+from minet.encodings import infer_encoding
 
 
 def read_potentially_gzipped_path(
