@@ -190,6 +190,17 @@ def forge_user_posts_url(
     return url
 
 
+def ensure_magic_token(method):
+    def wrapped(self, *args, **kwargs):
+
+        if self.magic_token is None:
+            self.get_magic_token()
+
+        return method(self, *args, **kwargs)
+
+    return wrapped
+
+
 class InstagramAPIScraper(object):
     def __init__(self, cookie="firefox"):
         self.pool_manager = create_pool_manager(
@@ -287,16 +298,6 @@ class InstagramAPIScraper(object):
 
         self.magic_token = t.group(1)
         return self.magic_token
-
-    def ensure_magic_token(method):
-        def wrapped(self, *args, **kwargs):
-
-            if self.magic_token is None:
-                self.get_magic_token()
-
-            return method(self, *args, **kwargs)
-
-        return wrapped
 
     @ensure_magic_token
     def comments(self, post):
