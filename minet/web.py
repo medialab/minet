@@ -271,6 +271,7 @@ def coerce_cookie_for_url_from_browser(target: str, url) -> Optional[str]:
 
     return target.strip()
 
+
 def dict_to_cookie_string(d):
     return "; ".join("%s=%s" % r for r in d.items())
 
@@ -601,6 +602,17 @@ def atomic_resolve(
         final_time = pool_manager_aware_timeout_to_final_time(pool_manager, timeout)
 
     for _ in range(max_redirects):
+
+        # We close last buffered_response as it won't be used anymore
+        # NOTE: this must always happen at the beginning of the loop to avoid leaks
+        if buffered_response:
+            buffered_response.close()
+
+        # Detecting cycles
+        if url in url_stack:
+            error = InfiniteRedirectsError("Infinite redirects")
+            break
+
         if infer_redirection:
             target = ural.infer_redirection(url, recursive=False)
 
@@ -608,10 +620,6 @@ def atomic_resolve(
                 url_stack[url] = Redirection(url, "infer")
                 url = target
                 continue
-
-        # We close last buffered_response as it won't be used anymore
-        if buffered_response:
-            buffered_response.close()
 
         # We check for cancellation
         if cancel_event is not None and cancel_event.is_set():
@@ -635,11 +643,6 @@ def atomic_resolve(
         except urllib3_exceptions.HTTPError as e:
             url_stack[url] = redirection
             error = e
-            break
-
-        # Cycle
-        if url in url_stack:
-            error = InfiniteRedirectsError("Infinite redirects")
             break
 
         redirection.status = buffered_response.status
