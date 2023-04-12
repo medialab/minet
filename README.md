@@ -6,7 +6,7 @@
 
 It adopts a very simple approach to various webmining problems by letting you perform a wide array of tasks from the comfort of the command line. No database needed: raw CSV files should be sufficient to do most of the work.
 
-In addition, **minet** also exposes its high-level programmatic interface as a python library so you use its utilities to suit your use-cases better.
+In addition, **minet** also exposes its high-level programmatic interface as a python library so you remain free to use its utilities to suit your use-cases better.
 
 **minet** is developed by [médialab SciencesPo](https://github.com/medialab/) research engineers and is the consolidation of more than a decade of webmining practices targeted at social sciences.
 
