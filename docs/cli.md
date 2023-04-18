@@ -4381,9 +4381,9 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter scrape [-h] [--silent] [--include-refs] [-l LIMIT]
-                            [--query-template QUERY_TEMPLATE] [-i INPUT]
-                            [--explode EXPLODE] [-s SELECT] [--total TOTAL]
-                            [-o OUTPUT]
+                            [--query-template QUERY_TEMPLATE]
+                            [--timezone TIMEZONE] [-i INPUT] [--explode EXPLODE]
+                            [-s SELECT] [--total TOTAL] [-o OUTPUT]
                             {tweets,users} query_or_query_column
 
 # Minet Twitter Scrape Command
@@ -4420,6 +4420,8 @@ Optional Arguments:
                                 Query template. Can be useful for instance to
                                 change a column of twitter user screen names
                                 into from:@user queries.
+  --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
+                                Defaults to UTC.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -4512,8 +4514,8 @@ Positional Arguments:
                               -i/--input.
 
 Optional Arguments:
-  --timezone TIMEZONE         Timezone for the date, for example 'Europe/Paris'.
-                              Default to UTC.
+  --timezone TIMEZONE         Timezone for dates, for example 'Europe/Paris'.
+                              Defaults to UTC.
   -s, --select SELECT         Columns of -i/--input CSV file to include in the
                               output (separated by `,`). Use an empty string if
                               you don't want to keep anything: --select ''.
@@ -4573,6 +4575,7 @@ Usage: minet twitter tweet-search [-h] [--since-id SINCE_ID] [--silent]
                                   [--until-id UNTIL_ID]
                                   [--start-time START_TIME]
                                   [--end-time END_TIME] [--academic]
+                                  [--timezone TIMEZONE]
                                   [--sort-order {recency,relevancy}]
                                   [--api-key API_KEY] [--rcfile RCFILE]
                                   [--api-secret-key API_SECRET_KEY]
@@ -4627,6 +4630,8 @@ Optional Arguments:
   --start-time START_TIME       The oldest UTC stamp from which the tweets will
                                 be provided. The date should have the format :
                                 YYYY-MM-DDTHH:mm:ssZ
+  --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
+                                Defaults to UTC.
   --until-id UNTIL_ID           Will return tweets that are older than the tweet
                                 with the specified id.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the

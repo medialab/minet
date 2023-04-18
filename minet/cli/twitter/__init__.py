@@ -60,6 +60,12 @@ ACADEMIC_ARGUMENT = {
     "action": "store_true",
 }
 
+TIMEZONE_ARGUMENT = {
+    "flag": "--timezone",
+    "help": "Timezone for dates, for example 'Europe/Paris'. Defaults to UTC.",
+    "type": TimezoneType()
+}
+
 COMMON_V2_SEARCH_ARGUMENTS = [
     {
         "flag": "--since-id",
@@ -356,6 +362,7 @@ TWITTER_SCRAPE_SUBCOMMAND = subcommand(
             "flag": "--query-template",
             "help": "Query template. Can be useful for instance to change a column of twitter user screen names into from:@user queries.",
         },
+        TIMEZONE_ARGUMENT
     ],
 )
 
@@ -419,11 +426,7 @@ TWITTER_TWEET_DATE_SUBCOMMAND = subcommand(
         "item_label_plural": "tweet urls or ids",
     },
     arguments=[
-        {
-            "flag": "--timezone",
-            "help": "Timezone for the date, for example 'Europe/Paris'. Default to UTC.",
-            "type": TimezoneType(),
-        }
+        TIMEZONE_ARGUMENT
     ],
 )
 
@@ -451,6 +454,7 @@ TWITTER_TWEET_SEARCH_SUBCOMMAND = twitter_api_subcommand(
     arguments=[
         *COMMON_V2_SEARCH_ARGUMENTS,
         ACADEMIC_ARGUMENT,
+        TIMEZONE_ARGUMENT,
         {
             "flag": "--sort-order",
             "help": "How to sort retrieved tweets.",

@@ -71,7 +71,7 @@ def action(cli_args, client, enricher, loading_bar):
                     continue
 
                 normalized_tweets = normalize_tweets_payload_v2(
-                    result, collection_source="api"
+                    result, locale=cli_args.timezone, collection_source="api"
                 )
 
                 for normalized_tweet in normalized_tweets:
