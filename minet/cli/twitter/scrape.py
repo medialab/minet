@@ -57,12 +57,13 @@ def action(cli_args, enricher, loading_bar):
             if cli_args.items == "tweets":
                 iterator = scraper.search_tweets(
                     query,
+                    locale=cli_args.timezone,
                     limit=cli_args.limit,
                     include_referenced_tweets=cli_args.include_refs,
                     with_meta=True,
                 )
             else:
-                iterator = scraper.search_users(query, limit=cli_args.limit)
+                iterator = scraper.search_users(query, locale=cli_args.timezone, limit=cli_args.limit)
 
             try:
                 for data in iterator:

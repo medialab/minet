@@ -46,7 +46,7 @@ def action(cli_args, client, enricher, loading_bar):
                 new_user_count = 0
 
                 for user in result:
-                    user = normalize_user(user)
+                    user = normalize_user(user, locale=cli_args.timezone)
 
                     if user["id"] in already_seen_users:
                         continue

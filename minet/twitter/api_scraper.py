@@ -389,10 +389,10 @@ class TwitterAPIScraper(object):
 
         return data
 
-    def request_tweet_search(self, query, cursor=None, refs=None, dump=False):
+    def request_tweet_search(self, query, locale, cursor=None, refs=None, dump=False):
         params = forge_search_params(query, cursor=cursor, target="tweets")
         url = "%s?%s" % (TWITTER_PUBLIC_SEARCH_ENDPOINT, params)
-
+        
         data = self.request_search(url)
 
         next_cursor = extract_cursor_from_tweets_payload(data)
@@ -404,6 +404,7 @@ class TwitterAPIScraper(object):
         for tweet, meta in tweets_payload_iter(data):
             result = normalize_tweet(
                 tweet,
+                locale=locale,
                 extract_referenced_tweets=refs is not None,
                 collection_source="scraping",
             )
@@ -441,7 +442,7 @@ class TwitterAPIScraper(object):
 
         return next_cursor, tweets
 
-    def request_user_search(self, query, cursor=None, dump=False):
+    def request_user_search(self, query, locale, cursor=None, dump=False):
         params = forge_search_params(query, cursor=cursor, target="users")
         url = "%s?%s" % (TWITTER_PUBLIC_SEARCH_ENDPOINT, params)
 
@@ -453,13 +454,13 @@ class TwitterAPIScraper(object):
             return data
 
         users = [
-            normalize_user(user) for user in data["globalObjects"]["users"].values()
+            normalize_user(user, locale=locale) for user in data["globalObjects"]["users"].values()
         ]
 
         return next_cursor, users
 
     def search_tweets(
-        self, query, limit=None, include_referenced_tweets=False, with_meta=False
+        self, query, locale=None, limit=None, include_referenced_tweets=False, with_meta=False,
     ):
 
         if is_query_too_long(query):
@@ -471,7 +472,7 @@ class TwitterAPIScraper(object):
         refs = set() if include_referenced_tweets else None
 
         while True:
-            new_cursor, tweets = self.request_tweet_search(query, cursor, refs=refs)
+            new_cursor, tweets = self.request_tweet_search(query, locale, cursor, refs=refs)
 
             for tweet, meta in tweets:
                 if with_meta:
@@ -493,7 +494,7 @@ class TwitterAPIScraper(object):
 
             cursor = new_cursor
 
-    def search_users(self, query, limit=None):
+    def search_users(self, query, locale=None, limit=None):
         if is_query_too_long(query):
             raise TwitterPublicAPIQueryTooLongError
 
@@ -501,7 +502,7 @@ class TwitterAPIScraper(object):
         i = 0
 
         while True:
-            new_cursor, users = self.request_user_search(query, cursor)
+            new_cursor, users = self.request_user_search(query, locale, cursor)
 
             if not users:
                 return
