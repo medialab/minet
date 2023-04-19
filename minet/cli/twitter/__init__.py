@@ -292,6 +292,7 @@ TWITTER_RETWEETERS_SUBCOMMAND = twitter_api_subcommand(
             $ minet tw retweeters tweet_id -i tweets.csv > retweeters.csv
     """,
     variadic_input={"dummy_column": "tweet_id", "item_label": "tweet id"},
+    arguments=[TIMEZONE_ARGUMENT]
 )
 
 TWITTER_SCRAPE_SUBCOMMAND = subcommand(
@@ -479,7 +480,10 @@ TWITTER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
     """,
     variadic_input={"dummy_column": "tweet_id", "item_label": "tweet id"},
     resumer=RowCountResumer,
-    arguments=[V2_ARGUMENT],
+    arguments=[
+        V2_ARGUMENT, 
+        TIMEZONE_ARGUMENT
+    ],
 )
 
 TWITTER_USER_SEARCH_SUBCOMMAND = twitter_api_subcommand(
@@ -503,6 +507,9 @@ TWITTER_USER_SEARCH_SUBCOMMAND = twitter_api_subcommand(
             $ minet tw user-search query -i queries.csv > users.csv
     """,
     variadic_input={"dummy_column": "query", "item_label_plural": "queries"},
+    arguments=[
+        TIMEZONE_ARGUMENT
+    ],
 )
 
 TWITTER_USER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
@@ -537,6 +544,7 @@ TWITTER_USER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
             "action": "store_true",
         },
         V2_ARGUMENT,
+        TIMEZONE_ARGUMENT
     ],
 )
 
@@ -558,6 +566,7 @@ TWITTER_USERS_SUBCOMMAND = twitter_api_subcommand(
     arguments=[
         IDS_ARGUMENT,
         V2_ARGUMENT,
+        TIMEZONE_ARGUMENT
     ],
 )
 

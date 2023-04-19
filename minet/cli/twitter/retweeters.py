@@ -62,7 +62,7 @@ def action(cli_args, client, enricher, loading_bar):
                     break
 
                 for user in result["data"]:
-                    user = normalize_user(user, v2=True)
+                    user = normalize_user(user, locale=cli_args.timezone, v2=True)
                     user_row = format_user_as_csv_row(user)
                     enricher.writerow(row, user_row)
                     loading_bar.nested_advance()

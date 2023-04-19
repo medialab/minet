@@ -4285,8 +4285,9 @@ how to use the command with a CSV file?
 ### retweeters
 
 ```
-Usage: minet twitter retweeters [-h] [--api-key API_KEY] [--rcfile RCFILE]
-                                [--silent] [--api-secret-key API_SECRET_KEY]
+Usage: minet twitter retweeters [-h] [--timezone TIMEZONE] [--silent]
+                                [--api-key API_KEY] [--rcfile RCFILE]
+                                [--api-secret-key API_SECRET_KEY]
                                 [--access-token ACCESS_TOKEN]
                                 [--access-token-secret ACCESS_TOKEN_SECRET]
                                 [-i INPUT] [--explode EXPLODE] [-s SELECT]
@@ -4320,6 +4321,8 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
+  --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
+                                Defaults to UTC.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -4828,8 +4831,9 @@ how to use the command with a CSV file?
 ### tweets
 
 ```
-Usage: minet twitter tweets [-h] [--v2] [--silent] [--api-key API_KEY]
-                            [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
+Usage: minet twitter tweets [-h] [--v2] [--silent] [--timezone TIMEZONE]
+                            [--api-key API_KEY] [--rcfile RCFILE]
+                            [--api-secret-key API_SECRET_KEY]
                             [--access-token ACCESS_TOKEN]
                             [--access-token-secret ACCESS_TOKEN_SECRET]
                             [-i INPUT] [--explode EXPLODE] [-s SELECT]
@@ -4863,6 +4867,8 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
+  --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
+                                Defaults to UTC.
   --v2                          Whether to use latest Twitter API v2 rather than
                                 v1.1.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -4927,8 +4933,9 @@ how to use the command with a CSV file?
 ### users
 
 ```
-Usage: minet twitter users [-h] [--ids] [--silent] [--v2] [--api-key API_KEY]
-                           [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
+Usage: minet twitter users [-h] [--ids] [--silent] [--v2] [--timezone TIMEZONE]
+                           [--api-key API_KEY] [--rcfile RCFILE]
+                           [--api-secret-key API_SECRET_KEY]
                            [--access-token ACCESS_TOKEN]
                            [--access-token-secret ACCESS_TOKEN_SECRET]
                            [-i INPUT] [--explode EXPLODE] [-s SELECT]
@@ -4964,6 +4971,8 @@ Optional Arguments:
                                 env variable.
   --ids                         Whether your users are given as ids rather than
                                 screen names.
+  --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
+                                Defaults to UTC.
   --v2                          Whether to use latest Twitter API v2 rather than
                                 v1.1.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -5028,8 +5037,9 @@ how to use the command with a CSV file?
 ### user-search
 
 ```
-Usage: minet twitter user-search [-h] [--api-key API_KEY] [--rcfile RCFILE]
-                                 [--silent] [--api-secret-key API_SECRET_KEY]
+Usage: minet twitter user-search [-h] [--timezone TIMEZONE] [--silent]
+                                 [--api-key API_KEY] [--rcfile RCFILE]
+                                 [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
                                  [-i INPUT] [--explode EXPLODE] [-s SELECT]
@@ -5066,6 +5076,8 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
+  --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
+                                Defaults to UTC.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -5130,7 +5142,8 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter user-tweets [-h] [--ids] [--silent] [--min-date MIN_DATE]
-                                 [--exclude-retweets] [--v2] [--api-key API_KEY]
+                                 [--exclude-retweets] [--v2]
+                                 [--timezone TIMEZONE] [--api-key API_KEY]
                                  [--rcfile RCFILE]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
@@ -5174,6 +5187,8 @@ Optional Arguments:
   --min-date MIN_DATE           Whether to add a date to stop at for user's
                                 tweets retrieval. UTC date should have the
                                 following format : YYYY-MM-DD
+  --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
+                                Defaults to UTC.
   --v2                          Whether to use latest Twitter API v2 rather than
                                 v1.1.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the

@@ -83,7 +83,7 @@ def action(cli_args, client, enricher, loading_bar):
             indexed_result = {}
 
             for user in users_raw_data:
-                user = normalize_user(user, v2=cli_args.v2)
+                user = normalize_user(user, locale=cli_args.timezone, v2=cli_args.v2)
                 user_row = format_user_as_csv_row(user)
                 indexed_result[user[key]] = user_row
 
