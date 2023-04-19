@@ -10,6 +10,7 @@ from urllib.parse import urlencode, quote
 from twitwi import normalize_tweet, normalize_user
 from ebbe import with_is_first, getpath, pathgetter
 from json import JSONDecodeError
+from tenacity import RetryCallState
 
 from minet.web import (
     create_pool_manager,
@@ -304,6 +305,14 @@ class TwitterAPIScraper(object):
         )
         self.reset()
 
+        def epilog_builder(retry_state: RetryCallState):
+            exc = retry_state.outcome.exception()
+
+            if isinstance(exc, TwitterPublicAPIInvalidResponseError):
+                return exc.format_epilog()
+
+            return None
+
         self.retryer = create_request_retryer(
             min=1,
             additional_exceptions=[
@@ -312,6 +321,7 @@ class TwitterAPIScraper(object):
                 TwitterPublicAPIOverCapacityError,
                 TwitterPublicAPIHiccupError,  # TODO: I might want to drop this at some point
             ],
+            epilog=epilog_builder,
         )
 
     def reset(self):
@@ -338,12 +348,16 @@ class TwitterAPIScraper(object):
         response = self.request(TWITTER_GUEST_ACTIVATE_ENDPOINT, headers, method="POST")
 
         if response.status >= 400:
-            raise TwitterPublicAPIInvalidResponseError
+            raise TwitterPublicAPIInvalidResponseError(
+                status=response.status, response_text=response.text
+            )
 
         try:
             api_token_response = response.json()
         except JSONDecodeError:
-            raise TwitterPublicAPIInvalidResponseError
+            raise TwitterPublicAPIInvalidResponseError(
+                status=response.status, response_text=response.text
+            )
 
         guest_token = api_token_response.get("guest_token")
 
@@ -374,7 +388,12 @@ class TwitterAPIScraper(object):
             self.reset()
             raise TwitterPublicAPIRateLimitError
 
-        data = response.json()
+        try:
+            data = response.json()
+        except JSONDecodeError:
+            raise TwitterPublicAPIInvalidResponseError(
+                status=response.status, response_text=response.text
+            )
 
         if response.status >= 400:
             error = getpath(data, ["errors", 0])
@@ -385,7 +404,9 @@ class TwitterAPIScraper(object):
             if error is not None and error.get("code") == 130:
                 raise TwitterPublicAPIOverCapacityError
 
-            raise TwitterPublicAPIInvalidResponseError
+            raise TwitterPublicAPIInvalidResponseError(
+                status=response.status, response_text=response.text
+            )
 
         return data
 

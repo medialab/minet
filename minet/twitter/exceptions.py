@@ -22,7 +22,21 @@ class TwitterPublicAPIRateLimitError(TwitterError):
 
 
 class TwitterPublicAPIInvalidResponseError(TwitterError):
-    pass
+    def __init__(self, message=None, response_text=None, status=None):
+        super().__init__(message)
+        self.response_text = response_text
+        self.status = status
+
+    def format_epilog(self):
+        epilog = []
+
+        if self.status is not None:
+            epilog.append("Status: %i" % self.status)
+
+        if self.response_text is not None:
+            epilog.append("Response: %s" % self.response_text)
+
+        return ", ".join(epilog) if epilog else ""
 
 
 class TwitterPublicAPIBadRequest(TwitterError):

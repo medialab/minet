@@ -1211,7 +1211,7 @@ ONE_DAY = 24 * 60 * 60
 
 class log_request_retryer_before_sleep:
     def __init__(
-        self, epilog_builder: Optional[Callable[[RetryCallState], str]] = None
+        self, epilog_builder: Optional[Callable[[RetryCallState], Optional[str]]] = None
     ):
         if epilog_builder is not None and not callable(epilog_builder):
             raise TypeError("epilog_builder should be None or callable")
@@ -1285,7 +1285,7 @@ def create_request_retryer(
     retry_on_timeout: bool = True,
     retry_on_statuses: Optional[Container[int]] = None,
     predicate: Optional[Callable[[BaseException], bool]] = None,
-    epilog: Optional[Callable[[RetryCallState], str]] = None,
+    epilog: Optional[Callable[[RetryCallState], Optional[str]]] = None,
     cancel_event: Optional[Event] = None,
 ):
 
