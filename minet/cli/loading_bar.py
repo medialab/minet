@@ -343,7 +343,8 @@ class LoadingBar(object):
 
                 style = "warning"
 
-                # NOTE: broken pipe often arrive after that point
+            if exc_type is BrokenPipeError:
+                style = "warning"
 
             if self.bar_column is not None:
                 self.bar_column.complete_style = style
