@@ -333,6 +333,7 @@ class LoadingBar(object):
         return self
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
+        erase = False
 
         if exc_type is not None:
             style = "error"
@@ -345,6 +346,7 @@ class LoadingBar(object):
 
             if exc_type is BrokenPipeError:
                 style = "warning"
+                erase = True
 
             if self.bar_column is not None:
                 self.bar_column.complete_style = style
@@ -357,7 +359,7 @@ class LoadingBar(object):
             self.bar_column.pulse_style = "success"
             self.bar_column.style = "success"
 
-        self.stop()
+        self.stop(erase=erase)
 
     @contextmanager
     def step(self, item=None, count=1, index=None, catch=None, sub_total=None):
