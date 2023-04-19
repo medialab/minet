@@ -63,7 +63,7 @@ ACADEMIC_ARGUMENT = {
 TIMEZONE_ARGUMENT = {
     "flag": "--timezone",
     "help": "Timezone for dates, for example 'Europe/Paris'. Defaults to UTC.",
-    "type": TimezoneType()
+    "type": TimezoneType(),
 }
 
 COMMON_V2_SEARCH_ARGUMENTS = [
@@ -292,7 +292,7 @@ TWITTER_RETWEETERS_SUBCOMMAND = twitter_api_subcommand(
             $ minet tw retweeters tweet_id -i tweets.csv > retweeters.csv
     """,
     variadic_input={"dummy_column": "tweet_id", "item_label": "tweet id"},
-    arguments=[TIMEZONE_ARGUMENT]
+    arguments=[TIMEZONE_ARGUMENT],
 )
 
 TWITTER_SCRAPE_SUBCOMMAND = subcommand(
@@ -363,7 +363,7 @@ TWITTER_SCRAPE_SUBCOMMAND = subcommand(
             "flag": "--query-template",
             "help": "Query template. Can be useful for instance to change a column of twitter user screen names into from:@user queries.",
         },
-        TIMEZONE_ARGUMENT
+        TIMEZONE_ARGUMENT,
     ],
 )
 
@@ -426,9 +426,7 @@ TWITTER_TWEET_DATE_SUBCOMMAND = subcommand(
         "item_label": "tweet url or id",
         "item_label_plural": "tweet urls or ids",
     },
-    arguments=[
-        TIMEZONE_ARGUMENT
-    ],
+    arguments=[TIMEZONE_ARGUMENT],
 )
 
 TWITTER_TWEET_SEARCH_SUBCOMMAND = twitter_api_subcommand(
@@ -480,10 +478,7 @@ TWITTER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
     """,
     variadic_input={"dummy_column": "tweet_id", "item_label": "tweet id"},
     resumer=RowCountResumer,
-    arguments=[
-        V2_ARGUMENT, 
-        TIMEZONE_ARGUMENT
-    ],
+    arguments=[V2_ARGUMENT, TIMEZONE_ARGUMENT],
 )
 
 TWITTER_USER_SEARCH_SUBCOMMAND = twitter_api_subcommand(
@@ -507,9 +502,7 @@ TWITTER_USER_SEARCH_SUBCOMMAND = twitter_api_subcommand(
             $ minet tw user-search query -i queries.csv > users.csv
     """,
     variadic_input={"dummy_column": "query", "item_label_plural": "queries"},
-    arguments=[
-        TIMEZONE_ARGUMENT
-    ],
+    arguments=[TIMEZONE_ARGUMENT],
 )
 
 TWITTER_USER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
@@ -544,7 +537,7 @@ TWITTER_USER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
             "action": "store_true",
         },
         V2_ARGUMENT,
-        TIMEZONE_ARGUMENT
+        TIMEZONE_ARGUMENT,
     ],
 )
 
@@ -563,11 +556,7 @@ TWITTER_USERS_SUBCOMMAND = twitter_api_subcommand(
     """,
     resumer=RowCountResumer,
     variadic_input={"dummy_column": "user", "item_label": "Twitter user"},
-    arguments=[
-        IDS_ARGUMENT,
-        V2_ARGUMENT,
-        TIMEZONE_ARGUMENT
-    ],
+    arguments=[IDS_ARGUMENT, V2_ARGUMENT, TIMEZONE_ARGUMENT],
 )
 
 TWITTER_COMMAND = command(

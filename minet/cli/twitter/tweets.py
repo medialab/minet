@@ -57,7 +57,9 @@ def action(cli_args, client, enricher, loading_bar):
 
             else:
                 for tweet in result:
-                    tweet = normalize_tweet(tweet, locale=cli_args.timezone, collection_source="api")
+                    tweet = normalize_tweet(
+                        tweet, locale=cli_args.timezone, collection_source="api"
+                    )
                     addendum = format_tweet_as_csv_row(tweet)
                     indexed_result[tweet["id"]] = addendum
 

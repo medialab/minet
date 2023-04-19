@@ -137,7 +137,9 @@ def action(cli_args, client, enricher, loading_bar):
                     max_id = min(int(tweet["id_str"]) for tweet in tweets) - 1
 
                     for tweet in tweets:
-                        tweet = normalize_tweet(tweet, locale=cli_args.timezone, collection_source="api")
+                        tweet = normalize_tweet(
+                            tweet, locale=cli_args.timezone, collection_source="api"
+                        )
                         addendum = format_tweet_as_csv_row(tweet)
 
                         if cli_args.min_date:

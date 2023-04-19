@@ -392,7 +392,7 @@ class TwitterAPIScraper(object):
     def request_tweet_search(self, query, locale, cursor=None, refs=None, dump=False):
         params = forge_search_params(query, cursor=cursor, target="tweets")
         url = "%s?%s" % (TWITTER_PUBLIC_SEARCH_ENDPOINT, params)
-        
+
         data = self.request_search(url)
 
         next_cursor = extract_cursor_from_tweets_payload(data)
@@ -454,13 +454,19 @@ class TwitterAPIScraper(object):
             return data
 
         users = [
-            normalize_user(user, locale=locale) for user in data["globalObjects"]["users"].values()
+            normalize_user(user, locale=locale)
+            for user in data["globalObjects"]["users"].values()
         ]
 
         return next_cursor, users
 
     def search_tweets(
-        self, query, locale=None, limit=None, include_referenced_tweets=False, with_meta=False,
+        self,
+        query,
+        locale=None,
+        limit=None,
+        include_referenced_tweets=False,
+        with_meta=False,
     ):
 
         if is_query_too_long(query):
@@ -472,7 +478,9 @@ class TwitterAPIScraper(object):
         refs = set() if include_referenced_tweets else None
 
         while True:
-            new_cursor, tweets = self.request_tweet_search(query, locale, cursor, refs=refs)
+            new_cursor, tweets = self.request_tweet_search(
+                query, locale, cursor, refs=refs
+            )
 
             for tweet, meta in tweets:
                 if with_meta:

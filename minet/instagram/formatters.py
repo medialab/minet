@@ -35,10 +35,7 @@ InstagramComment = namedrecord(
         "user_is_mentionable",
         "user_is_verified",
     ],
-    plural=[
-        "hashtags",
-        "mentioned_names"
-    ],
+    plural=["hashtags", "mentioned_names"],
 )
 
 InstagramHashtagPost = namedrecord(
