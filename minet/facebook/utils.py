@@ -18,7 +18,9 @@ def fix_cookie(cookie_string):
     cookie.pop("m_pixel_ratio", None)
     cookie.pop("wd", None)
     cookie.pop("fr", None)
-    cookie["locale"] = "en_US"
+
+    # NOTE: cookie mangling of the `locale` does not work anymore
+    # cookie["locale"] = "en_US"
 
     return "; ".join(key + "=" + morsel.coded_value for key, morsel in cookie.items())
 

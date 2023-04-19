@@ -9,7 +9,7 @@ import sys
 import soupsieve
 from collections import deque
 from urllib.parse import urljoin
-from ural import force_protocol
+from ural import force_protocol, add_query_argument
 from ural.facebook import (
     parse_facebook_url,
     convert_facebook_url_to_mobile,
@@ -640,12 +640,14 @@ class FacebookMobileScraper(object):
     @rate_limited_method()
     @retrying_method()
     def request_page(self, url):
+        url = add_query_argument(url, "locale", "en_US")
+
         response = request(
             url,
             pool_manager=self.pool_manager,
             cookie=self.cookie,
             headers={"User-Agent": "curl/7.68.0", "Accept-Language": "en"},
-            known_encoding='utf-8'
+            known_encoding="utf-8",
         )
 
         return response.text()
