@@ -344,7 +344,7 @@ class LoadingBar(object):
 
                 style = "warning"
 
-            if exc_type is BrokenPipeError:
+            elif exc_type is BrokenPipeError:
                 style = "warning"
                 erase = True
 

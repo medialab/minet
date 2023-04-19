@@ -47,9 +47,20 @@ def with_cli_exceptions(fn):
         try:
             fn(*args, **kwargs)
 
-        except (KeyboardInterrupt, BrokenPipeError):
+        except KeyboardInterrupt:
             redirect_to_devnull()
             sys.exit(1)
+
+        except BrokenPipeError:
+            console.print(
+                "[warning]minet process was stopped because piped command exited!"
+            )
+            redirect_to_devnull()
+            sys.exit(1)
+
+        except Exception:
+            console.print("[error]minet process was stopped because an error occurred!")
+            raise
 
     return wrapper
 
