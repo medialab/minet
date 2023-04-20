@@ -79,18 +79,15 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
         self,
         crawler: "Crawler",
         *,
-        request_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
+        get_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
     ):
         self.crawler = crawler
-
-        self.request_args = request_args
-        self.max_redirects = max_redirects
-
         self.cancel_event = self.crawler.executor.cancel_event
         self.local_context = self.crawler.executor.local_context
+        self.get_args = get_args
 
-        self.default_request_kwargs = {
+        self.default_kwargs = {
             "pool_manager": crawler.executor.pool_manager,
             "max_redirects": max_redirects,
             "cancel_event": crawler.executor.cancel_event,
@@ -118,16 +115,16 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
             if cancel_event.is_set():
                 return CANCELLED
 
-            if self.request_args is not None:
-                # NOTE: request_args must be threadsafe
-                kwargs = self.request_args(job)
+            if self.get_args is not None:
+                # NOTE: get_args must be threadsafe
+                kwargs = self.get_args(job)
 
             if cancel_event.is_set():
                 return CANCELLED
 
             try:
                 retryer = getattr(self.local_context, "retryer", None)
-                kwargs.update(self.default_request_kwargs)
+                kwargs.update(self.default_kwargs)
 
                 if retryer is not None:
                     response = retryer(request, job.url, **kwargs)
@@ -205,6 +202,8 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         proxy: Optional[str] = None,
         retry: bool = False,
         retryer_kwargs: Optional[Dict[str, Any]] = None,
+        get_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
+        max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
     ):
 
         # Own executor and imap params
@@ -225,6 +224,8 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             "parallelism": domain_parallelism,
             "throttle": throttle,
         }
+
+        self.worker_kwargs = {"get_args": get_args, "max_redirects": max_redirects}
 
         # Params
         self.queue_path = queue_path
@@ -342,7 +343,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
     def __iter__(
         self,
     ) -> Iterator[SomeCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes]]:
-        worker = CrawlWorker(self)
+        worker = CrawlWorker(self, **self.worker_kwargs)
 
         def key_by_domain_name(job: CrawlJob) -> Optional[str]:
             return job.domain
