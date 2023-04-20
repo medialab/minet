@@ -474,7 +474,7 @@ class BufferedResponse(object):
 
     def __del__(self):
         if not self.__closed:
-            # warnings.warn("BufferedResponse instance was not properly closed!")
+            warnings.warn("BufferedResponse instance was not properly closed!")
             self.close()
 
     def unwrap(self) -> Tuple[urllib3.HTTPResponse, bytes]:

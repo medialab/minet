@@ -319,6 +319,9 @@ class LoadingBar(object):
         self.live.start()
 
     def stop(self, erase=False) -> None:
+        if self.already_stopped:
+            return
+
         if erase:
             self.live.transient = True
 
