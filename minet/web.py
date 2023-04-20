@@ -63,6 +63,7 @@ from minet.exceptions import (
     MaxRedirectsError,
     InfiniteRedirectsError,
     InvalidRedirectError,
+    BadlyEncodedLocationHeaderError,
     InvalidURLError,
     InvalidStatusError,
     SelfRedirectError,
@@ -514,6 +515,10 @@ def atomic_request(
     ):
         raise InvalidURLError(url=url)
 
+    # We check for cancellation
+    if cancel_event is not None and cancel_event.is_set():
+        raise CancelledRequestError
+
     # Performing request
     request_kwargs = {
         "headers": headers,
@@ -596,39 +601,36 @@ def atomic_resolve(
     """
 
     url_stack: OrderedDict[str, Redirection] = OrderedDict()
-    error: Optional[Exception] = None
     buffered_response: Optional[BufferedResponse] = None
 
     if final_time is None:
         final_time = pool_manager_aware_timeout_to_final_time(pool_manager, timeout)
 
-    for _ in range(max_redirects):
+    try:
+        for _ in range(max_redirects):
 
-        # We close last buffered_response as it won't be used anymore
-        # NOTE: this must always happen at the beginning of the loop to avoid leaks
-        if buffered_response:
-            buffered_response.close()
+            # We close last buffered_response as it won't be used anymore
+            # NOTE: this should always happen at the beginning of the loop
+            if buffered_response is not None:
+                buffered_response.close()
+                # NOTE: resetting variable to avoid double free on errors
+                buffered_response = None
 
-        # Detecting cycles
-        if url in url_stack:
-            error = InfiniteRedirectsError("Infinite redirects")
-            break
+            # Detecting cycles
+            if url in url_stack:
+                raise InfiniteRedirectsError("Infinite redirects")
 
-        if infer_redirection:
-            target = ural.infer_redirection(url, recursive=False)
+            if infer_redirection:
+                target = ural.infer_redirection(url, recursive=False)
 
-            if target != url:
-                url_stack[url] = Redirection(url, "infer")
-                url = target
-                continue
+                if target != url:
+                    url_stack[url] = Redirection(url, "infer")
+                    url = target
+                    continue
 
-        # We check for cancellation
-        if cancel_event is not None and cancel_event.is_set():
-            raise CancelledRequestError
+            redirection = Redirection(url)
 
-        redirection = Redirection(url)
-
-        try:
+            # NOTE: atomic_request will check for cancellation
             buffered_response = atomic_request(
                 pool_manager,
                 url,
@@ -640,130 +642,123 @@ def atomic_resolve(
                 cancel_event=cancel_event,
             )
 
-        # Request error
-        except urllib3_exceptions.HTTPError as e:
+            redirection.status = buffered_response.status
             url_stack[url] = redirection
-            error = e
-            break
 
-        redirection.status = buffered_response.status
-        url_stack[url] = redirection
+            # Attempting to find next location
+            location = None
 
-        # Attempting to find next location
-        location = None
+            if buffered_response.status not in REDIRECT_STATUSES:
 
-        if buffered_response.status not in REDIRECT_STATUSES:
+                if buffered_response.status < 400:
 
-            if buffered_response.status < 400:
+                    # Refresh header
+                    if follow_refresh_header:
+                        refresh = buffered_response.getheader("refresh")
 
-                # Refresh header
-                if follow_refresh_header:
-                    refresh = buffered_response.getheader("refresh")
+                        if refresh is not None:
+                            p = parse_http_refresh(refresh)
 
-                    if refresh is not None:
-                        p = parse_http_refresh(refresh)
+                            if p is not None:
+                                location = p[1]
+                                redirection.type = "refresh-header"
 
-                        if p is not None:
-                            location = p[1]
-                            redirection.type = "refresh-header"
-
-                # Reading a small chunk of the html
-                if location is None and (follow_meta_refresh or follow_js_relocation):
-                    try:
+                    # Reading a small chunk of the html
+                    if location is None and (
+                        follow_meta_refresh or follow_js_relocation
+                    ):
                         buffered_response.prebuffer_up_to(CONTENT_PREBUFFER_UP_TO)
-                    except Exception as e:
-                        if isinstance(e, CancelledRequestError):
-                            raise
-                        error = e
-                        break
 
-                # Meta refresh
-                if location is None and follow_meta_refresh:
-                    meta_refresh = find_meta_refresh(buffered_response.body)
+                    # Meta refresh
+                    if location is None and follow_meta_refresh:
+                        meta_refresh = find_meta_refresh(buffered_response.body)
 
-                    if meta_refresh is not None:
-                        location = meta_refresh[1]
-                        redirection.type = "meta-refresh"
+                        if meta_refresh is not None:
+                            location = meta_refresh[1]
+                            redirection.type = "meta-refresh"
 
-                # JavaScript relocation
-                if location is None and follow_js_relocation:
-                    js_relocation = find_javascript_relocation(buffered_response.body)
+                    # JavaScript relocation
+                    if location is None and follow_js_relocation:
+                        js_relocation = find_javascript_relocation(
+                            buffered_response.body
+                        )
 
-                    if js_relocation is not None:
-                        location = js_relocation
-                        redirection.type = "js-relocation"
+                        if js_relocation is not None:
+                            location = js_relocation
+                            redirection.type = "js-relocation"
 
-            # Found the end
-            if location is None:
-                redirection.type = "hit"
+                # Found the end
+                if location is None:
+                    redirection.type = "hit"
 
-            # Canonical url
-            if redirection.type == "hit":
-                if canonicalize:
-                    try:
+                # Canonical url
+                if redirection.type == "hit":
+                    if canonicalize:
                         buffered_response.prebuffer_up_to(LARGE_CONTENT_PREBUFFER_UP_TO)
-                    except Exception as e:
-                        if isinstance(e, CancelledRequestError):
-                            raise
-                        error = e
-                        break
 
-                    canonical = find_canonical_link(buffered_response.body)
+                        canonical = find_canonical_link(buffered_response.body)
 
-                    if canonical is not None and canonical != url:
-                        canonical = urljoin(url, canonical)
-                        redirection = Redirection(canonical, "canonical")
-                        url_stack[canonical] = redirection
+                        if canonical is not None and canonical != url:
+                            canonical = urljoin(url, canonical)
+                            redirection = Redirection(canonical, "canonical")
+                            url_stack[canonical] = redirection
 
-                break
+                    break
 
+            else:
+                redirection.type = "location-header"
+                location = buffered_response.getheader("location")
+
+            # Invalid redirection
+            if not location:
+                raise InvalidRedirectError("Redirection is invalid")
+
+            # Location badly encoded?
+            # NOTE: we don't really have a way to consume headers as raw bytes
+            # which means we must rely on encoding duck-typing. I expect this
+            # to fail in a complicated manner in a distant future.
+            try:
+                if not location.isascii():
+                    byte_location = location.encode("latin1")
+                    encoding = infer_encoding(byte_location)
+
+                    if (
+                        encoding is not None
+                        and encoding != "iso-8859-1"
+                        and encoding != "latin1"
+                        and encoding != "ascii"
+                    ):
+                        location = byte_location.decode(encoding)
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                raise BadlyEncodedLocationHeaderError(
+                    "Location header has invalid encoding"
+                )
+
+            # Resolving next url
+            next_url = urljoin(url, location.strip())
+
+            # Self loop?
+            if next_url == url:
+                raise SelfRedirectError("Self redirection")
+
+            # Go to next
+            url = next_url
+
+        # We reached max redirects
         else:
-            redirection.type = "location-header"
-            location = buffered_response.getheader("location")
+            raise MaxRedirectsError("Maximum number of redirects exceeded")
 
-        # Invalid redirection
-        if not location:
-            error = InvalidRedirectError("Redirection is invalid")
-            break
+    # NOTE: using BaseException here to avoid leaks on e.g. KeyboardInterrupt
+    except BaseException:
 
-        # Location badly encoded?
-        try:
-            if not location.isascii():
-                byte_location = location.encode("latin1")
-                encoding = infer_encoding(byte_location)
-
-                if (
-                    encoding is not None
-                    and encoding != "iso-8859-1"
-                    and encoding != "latin1"
-                    and encoding != "ascii"
-                ):
-                    location = byte_location.decode(encoding)
-        except Exception:
-            pass
-
-        # Resolving next url
-        next_url = urljoin(url, location.strip())
-
-        # Self loop?
-        if next_url == url:
-            error = SelfRedirectError("Self redirection")
-            break
-
-        # Go to next
-        url = next_url
-
-    # We reached max redirects
-    else:
-        error = MaxRedirectsError("Maximum number of redirects exceeded")
-
-    # NOTE: error is raised that late to be sure we cleanup resources attached
-    # to the connection
-    if error is not None:
+        # NOTE: here we must make sure to cleanup any still alive
+        # buffered response to avoid leaks
         if buffered_response is not None:
             buffered_response.close()
-        raise error
 
+        raise
+
+    # Compiling the stack and returning the last buffered response, still livem
     compiled_stack = list(url_stack.values())
 
     assert buffered_response is not None

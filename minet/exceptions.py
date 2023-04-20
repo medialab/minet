@@ -122,6 +122,10 @@ class InvalidRedirectError(RedirectError):
     pass
 
 
+class BadlyEncodedLocationHeaderError(RedirectError):
+    pass
+
+
 # Definition errors
 class DefinitionInvalidFormatError(MinetError):
     pass
