@@ -31,6 +31,7 @@ from minet.twitter.exceptions import (
     TwitterPublicAPIQueryTooLongError,
     TwitterPublicAPIOverCapacityError,
     TwitterPublicAPIHiccupError,
+    TwitterPublicAPIncompleteTweetIndexError,
 )
 
 # =============================================================================
@@ -218,7 +219,13 @@ def extract_cursor_from_users_payload(payload):
 
 
 def process_single_tweet(tweet_id, tweet_index, user_index):
-    tweet = tweet_index[tweet_id]
+    try:
+        tweet = tweet_index[tweet_id]
+    except KeyError:
+        raise TwitterPublicAPIncompleteTweetIndexError(
+            tweet_id=tweet_id, tweet_index=tweet_index
+        )
+
     tweet["user"] = user_index[tweet["user_id_str"]]
 
     # Quoted?
@@ -308,7 +315,7 @@ class TwitterAPIScraper(object):
         def epilog_builder(retry_state: RetryCallState):
             exc = retry_state.outcome.exception()
 
-            if isinstance(exc, TwitterPublicAPIInvalidResponseError):
+            if hasattr(exc, "format_epilog") and callable(exc.format_epilog):
                 return exc.format_epilog()
 
             return None
@@ -319,6 +326,7 @@ class TwitterAPIScraper(object):
                 TwitterPublicAPIRateLimitError,
                 TwitterPublicAPIInvalidResponseError,
                 TwitterPublicAPIOverCapacityError,
+                TwitterPublicAPIncompleteTweetIndexError,
                 TwitterPublicAPIHiccupError,  # TODO: I might want to drop this at some point
             ],
             epilog=epilog_builder,
@@ -372,7 +380,6 @@ class TwitterAPIScraper(object):
             create_cookie_expiration(),
         )
 
-    @retrying_method()
     @ensure_guest_token
     def request_search(self, url):
         headers = {
@@ -410,6 +417,7 @@ class TwitterAPIScraper(object):
 
         return data
 
+    @retrying_method()
     def request_tweet_search(self, query, locale, cursor=None, refs=None, dump=False):
         params = forge_search_params(query, cursor=cursor, target="tweets")
         url = "%s?%s" % (TWITTER_PUBLIC_SEARCH_ENDPOINT, params)
@@ -463,6 +471,7 @@ class TwitterAPIScraper(object):
 
         return next_cursor, tweets
 
+    @retrying_method()
     def request_user_search(self, query, locale, cursor=None, dump=False):
         params = forge_search_params(query, cursor=cursor, target="users")
         url = "%s?%s" % (TWITTER_PUBLIC_SEARCH_ENDPOINT, params)

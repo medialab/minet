@@ -39,6 +39,24 @@ class TwitterPublicAPIInvalidResponseError(TwitterError):
         return ", ".join(epilog) if epilog else ""
 
 
+class TwitterPublicAPIncompleteTweetIndexError(TwitterError):
+    def __init__(self, message=None, tweet_id=None, tweet_index=None):
+        super().__init__(message)
+        self.tweet_id = tweet_id
+        self.tweet_index = tweet_index
+
+    def format_epilog(self):
+        epilog = []
+
+        if self.tweet_id is not None:
+            epilog.append("Tweet id: %s" % self.tweet_id)
+
+        if self.tweet_index is not None:
+            epilog.append("Tweet indexed: %s" % list(self.tweet_index.keys()))
+
+        return ", ".join(epilog) if epilog else ""
+
+
 class TwitterPublicAPIBadRequest(TwitterError):
     pass
 
