@@ -52,7 +52,25 @@ class TwitterPublicAPIncompleteTweetIndexError(TwitterError):
             epilog.append("Tweet id: %s" % self.tweet_id)
 
         if self.tweet_index is not None:
-            epilog.append("Tweet indexed: %s" % list(self.tweet_index.keys()))
+            epilog.append("Tweets indexed: %s" % list(self.tweet_index.keys()))
+
+        return ", ".join(epilog) if epilog else ""
+
+
+class TwitterPublicAPIncompleteUserIndexError(TwitterError):
+    def __init__(self, message=None, user_id=None, user_index=None):
+        super().__init__(message)
+        self.user_id = user_id
+        self.user_index = user_index
+
+    def format_epilog(self):
+        epilog = []
+
+        if self.user_id is not None:
+            epilog.append("User id: %s" % self.user_id)
+
+        if self.user_index is not None:
+            epilog.append("Users indexed: %s" % list(self.user_index.keys()))
 
         return ", ".join(epilog) if epilog else ""
 

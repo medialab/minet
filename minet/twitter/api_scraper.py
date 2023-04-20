@@ -32,6 +32,7 @@ from minet.twitter.exceptions import (
     TwitterPublicAPIOverCapacityError,
     TwitterPublicAPIHiccupError,
     TwitterPublicAPIncompleteTweetIndexError,
+    TwitterPublicAPIncompleteUserIndexError,
 )
 
 # =============================================================================
@@ -226,7 +227,12 @@ def process_single_tweet(tweet_id, tweet_index, user_index):
             tweet_id=tweet_id, tweet_index=tweet_index
         )
 
-    tweet["user"] = user_index[tweet["user_id_str"]]
+    try:
+        tweet["user"] = user_index[tweet["user_id_str"]]
+    except KeyError:
+        raise TwitterPublicAPIncompleteUserIndexError(
+            user_id=tweet["user_id_str"], user_index=user_index
+        )
 
     # Quoted?
     quoted_id = tweet.get("quoted_status_id_str")
@@ -327,6 +333,7 @@ class TwitterAPIScraper(object):
                 TwitterPublicAPIInvalidResponseError,
                 TwitterPublicAPIOverCapacityError,
                 TwitterPublicAPIncompleteTweetIndexError,
+                TwitterPublicAPIncompleteUserIndexError,
                 TwitterPublicAPIHiccupError,  # TODO: I might want to drop this at some point
             ],
             epilog=epilog_builder,
