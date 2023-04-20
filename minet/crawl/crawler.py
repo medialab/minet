@@ -312,7 +312,12 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             # We could use a blocking queue with max size but this could prove
             # difficult to resume crawls based upon lazy iterators
             for name, spider in self.__spiders.items():
-                spider_start_jobs = spider.start_jobs()
+                if spider.START_URL is not None:
+                    spider_start_jobs = [spider.START_URL]
+                elif spider.START_URLS is not None:
+                    spider_start_jobs = list(spider.START_URLS)
+                else:
+                    spider_start_jobs = spider.start_jobs()
 
                 if self.singular:
                     name = None

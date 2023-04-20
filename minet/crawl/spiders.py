@@ -50,6 +50,9 @@ SpiderResult = Tuple[CrawlResultDataType, SpiderNextJobs[CrawlJobDataType]]
 
 
 class Spider(Generic[CrawlJobDataType, CrawlResultDataType]):
+    START_URL: Optional[str] = None
+    START_URLS: Optional[List[str]] = None
+
     def start_jobs(self) -> Optional[Iterable[UrlOrCrawlJob[CrawlJobDataType]]]:
         return None
 
