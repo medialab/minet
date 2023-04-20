@@ -7,10 +7,10 @@
 from typing import Optional
 from minet.types import AnyScrapableTarget
 
-import warnings
-from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning, SoupStrainer
+from bs4 import BeautifulSoup, SoupStrainer
 from functools import partial
 
+from minet.shim import suppress_xml_parsed_as_html_warnings
 from minet.scrape.constants import SELECT_ALIASES, ITERATOR_ALIASES
 
 
@@ -33,8 +33,7 @@ get_iterator = partial(get_aliases, ITERATOR_ALIASES)
 
 
 def BeautifulSoupWithoutXHTMLWarnings(html, engine):
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", category=XMLParsedAsHTMLWarning)
+    with suppress_xml_parsed_as_html_warnings():
         return BeautifulSoup(html, engine)
 
 

@@ -32,7 +32,7 @@ import functools
 import threading
 import warnings
 from http.cookiejar import CookieJar
-from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning, SoupStrainer
+from bs4 import BeautifulSoup, SoupStrainer
 from datetime import datetime
 from timeit import default_timer as timer
 from io import BytesIO
@@ -55,6 +55,7 @@ from tenacity import (
 )
 from tenacity.wait import wait_base
 
+from minet.shim import suppress_xml_parsed_as_html_warnings
 from minet.encodings import normalize_encoding, infer_encoding
 from minet.loggers import sleepers_logger
 from minet.utils import is_binary_mimetype
@@ -1028,10 +1029,7 @@ class Response(object):
         ignore_xhtml_warning=False,
         strainer: Optional[SoupStrainer] = None,
     ) -> BeautifulSoup:
-        with warnings.catch_warnings():
-            if ignore_xhtml_warning:
-                warnings.simplefilter("ignore", category=XMLParsedAsHTMLWarning)
-
+        with suppress_xml_parsed_as_html_warnings(bypass=not ignore_xhtml_warning):
             return BeautifulSoup(self.text(), engine, parse_only=strainer)
 
     def __getitem__(self, name: str) -> Any:
