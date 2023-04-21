@@ -311,6 +311,19 @@ TWITTER_SCRAPE_SUBCOMMAND = subcommand(
         time ranges like so: "since:2014-01-01 until:2017-12-31", or "from" that
         let you search all tweets from a given user like so: "from:medialab_ScPo".
 
+        Note that since 2023-04-21, Twitter search is not available to
+        visitors of the website without being logged in. This means that
+        the scraper now requires some cookies to be able to work. So, by
+        default, the command will grab the relevant cookies from your
+        local Firefox browser (be sure to be logged in). But you can also
+        ask the command to grab the cookie from another browser or provide
+        the cookie string directly instead. Check the -c/--cookie docs to
+        figure out how to proceed.
+
+        Finally, be advised that since you are actually using your account
+        to scrape data, there is nothing preventing Twitter from banning your
+        account and it might very well happen in the future (who knows?).
+
         BEWARE: the web search results seem to become inconsistent when
         queries return vast amounts of tweets. In which case you are
         strongly advised to segment your queries using temporal filters.
