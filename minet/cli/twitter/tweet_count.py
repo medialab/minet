@@ -33,7 +33,7 @@ def action(cli_args, client, enricher, loading_bar):
             kwargs = {"query": query}
 
             # Because we are greedy, we want stuff from the beginning of Twitter
-            if cli_args.academic and not cli_args.start_time:
+            if cli_args.academic and not cli_args.start_time and not cli_args.since_id:
                 kwargs["start_time"] = "2006-03-21T00:00:00Z"
 
             if cli_args.start_time:
