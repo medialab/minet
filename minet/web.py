@@ -31,6 +31,7 @@ import mimetypes
 import functools
 import threading
 from http.cookiejar import CookieJar
+from http.cookies import SimpleCookie
 from bs4 import BeautifulSoup, SoupStrainer
 from datetime import datetime
 from timeit import default_timer as timer
@@ -264,13 +265,19 @@ def get_cookie_resolver_from_browser(browser="firefox") -> CookieResolver:
     return CookieResolver(get_cookie_jar_from_browser(browser))
 
 
-def coerce_cookie_for_url_from_browser(target: str, url) -> Optional[str]:
+def coerce_cookie_for_url_from_browser(target: str, url: str) -> Optional[str]:
     if target in COOKIE_BROWSERS:
         get = get_cookie_resolver_from_browser(target)
 
         return get(url)
 
     return target.strip()
+
+
+def get_cookie_morsel_value(cookie, key):
+    parsed = SimpleCookie()
+    parsed.load(cookie)
+    return parsed[key].value
 
 
 def dict_to_cookie_string(d):

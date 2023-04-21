@@ -139,6 +139,7 @@ mediacloud:
 tiktok:
   cookie: "MY_TIKTOK_COOKIE" # Used as --cookie for `minet tk` commands
 twitter:
+  cookie: "MY_TWITTER_COOKIE" # Used as --cookie for `minet tw scrape` command
   api_key: "MY_API_KEY" # Used as --api-key for `minet tw` commands
   api_secret_key: "MY_API_SECRET_KEY" # Used as --api-secret-key for `minet tw` commands
   access_token: "MY_ACCESS_TOKEN" # Used as --access-token for `minet tw` commands

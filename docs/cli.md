@@ -139,6 +139,7 @@ mediacloud:
 tiktok:
   cookie: "MY_TIKTOK_COOKIE" # Used as --cookie for `minet tk` commands
 twitter:
+  cookie: "MY_TWITTER_COOKIE" # Used as --cookie for `minet tw scrape` command
   api_key: "MY_API_KEY" # Used as --api-key for `minet tw` commands
   api_secret_key: "MY_API_SECRET_KEY" # Used as --api-secret-key for `minet tw` commands
   access_token: "MY_ACCESS_TOKEN" # Used as --access-token for `minet tw` commands
@@ -4384,9 +4385,10 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter scrape [-h] [--silent] [--include-refs] [-l LIMIT]
-                            [--query-template QUERY_TEMPLATE]
-                            [--timezone TIMEZONE] [-i INPUT] [--explode EXPLODE]
-                            [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                            [--query-template QUERY_TEMPLATE] [-c COOKIE]
+                            [--rcfile RCFILE] [--timezone TIMEZONE] [-i INPUT]
+                            [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                            [-o OUTPUT]
                             {tweets,users} query_or_query_column
 
 # Minet Twitter Scrape Command
@@ -4413,6 +4415,12 @@ Positional Arguments:
                                 column containing queries when using -i/--input.
 
 Optional Arguments:
+  -c, --cookie COOKIE           Authenticated cookie to use or browser from
+                                which to extract it (supports "firefox",
+                                "chrome", "chromium", "opera" and "edge").
+                                Defaults to `firefox`. Can also be configured in
+                                a .minetrc file as "twitter.cookie" or read from
+                                the MINET_TWITTER_COOKIE env variable.
   --include-refs                Whether to emit referenced tweets (quoted,
                                 retweeted & replied) in the CSV output. Note
                                 that it consumes a memory proportional to the
@@ -4441,6 +4449,10 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit

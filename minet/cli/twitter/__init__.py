@@ -363,6 +363,13 @@ TWITTER_SCRAPE_SUBCOMMAND = subcommand(
             "flag": "--query-template",
             "help": "Query template. Can be useful for instance to change a column of twitter user screen names into from:@user queries.",
         },
+        {
+            "flags": ["-c", "--cookie"],
+            "help": 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge").',
+            "default": "firefox",
+            "rc_key": ["twitter", "cookie"],
+            "action": ConfigAction,
+        },
         TIMEZONE_ARGUMENT,
     ],
 )

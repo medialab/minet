@@ -45,7 +45,7 @@ def get_headers(cli_args):
     sub_unit=lambda cli_args: cli_args.items,
 )
 def action(cli_args, enricher, loading_bar):
-    scraper = TwitterAPIScraper()
+    scraper = TwitterAPIScraper(cli_args.cookie)
 
     for row, query in enricher.cells(cli_args.column, with_rows=True):
 

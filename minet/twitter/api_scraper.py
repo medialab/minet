@@ -17,13 +17,15 @@ from minet.web import (
     request,
     create_request_retryer,
     retrying_method,
+    coerce_cookie_for_url_from_browser,
+    get_cookie_morsel_value,
 )
 from minet.twitter.constants import (
     TWITTER_PUBLIC_API_DEFAULT_TIMEOUT,
     TWITTER_PUBLIC_API_AUTH_HEADER,
 )
 from minet.twitter.exceptions import (
-    TwitterGuestTokenError,
+    # TwitterGuestTokenError,
     TwitterPublicAPIBadRequest,
     TwitterPublicAPIRateLimitError,
     TwitterPublicAPIInvalidResponseError,
@@ -51,22 +53,22 @@ def is_query_too_long(query):
     return len(quote(query)) > MAXIMUM_QUERY_LENGTH
 
 
-def ensure_guest_token(method):
-    def wrapped(self: "TwitterAPIScraper", *args, **kwargs):
+# def ensure_guest_token(method):
+#     def wrapped(self: "TwitterAPIScraper", *args, **kwargs):
 
-        # NOTE: we refresh the guest token periodically to avoid
-        # losing time wrt failed request after expiration
-        if (
-            self.guest_token is None
-            or self.guest_token_use_count >= MAX_GUEST_TOKEN_USE_COUNT
-        ):
-            self.acquire_guest_token()
-            self.guest_token_use_count = 0
+#         # NOTE: we refresh the guest token periodically to avoid
+#         # losing time wrt failed request after expiration
+#         if (
+#             self.guest_token is None
+#             or self.guest_token_use_count >= MAX_GUEST_TOKEN_USE_COUNT
+#         ):
+#             self.acquire_guest_token()
+#             self.guest_token_use_count = 0
 
-        self.guest_token_use_count += 1
-        return method(self, *args, **kwargs)
+#         self.guest_token_use_count += 1
+#         return method(self, *args, **kwargs)
 
-    return wrapped
+#     return wrapped
 
 
 def create_cookie_expiration():
@@ -312,11 +314,28 @@ def tweets_payload_iter(payload):
 # Main class
 # =============================================================================
 class TwitterAPIScraper(object):
-    def __init__(self):
+    def __init__(self, cookie: str):
         self.pool_manager = create_pool_manager(
             timeout=TWITTER_PUBLIC_API_DEFAULT_TIMEOUT, spoof_tls_ciphers=True
         )
-        self.reset()
+        # self.reset()
+
+        # NOTE: since 2023-04-21, Twitter search is not available anymore
+        # if you are not logged in to the website. This means that the old
+        # method of acquiring and rotating a guest token is now moot.
+        # An alternative is therefore to rely on the user's cookie to
+        # spoof the connection and scrape the search as before.
+        #
+        # The issue here is that Twitter knows who you are and I strongly
+        # expect them to kick accounts scraping in the near future as it
+        # would be quite easy to do so.
+        #
+        # They might also very well limit the number of search result
+        # returned to prevent scraping altogether, connected or not.
+        self.cookie = coerce_cookie_for_url_from_browser(
+            cookie, TWITTER_PUBLIC_SEARCH_ENDPOINT
+        )
+        self.csrf_token = get_cookie_morsel_value(self.cookie, "ct0")
 
         def epilog_builder(retry_state: RetryCallState):
             exc = retry_state.outcome.exception()
@@ -339,10 +358,10 @@ class TwitterAPIScraper(object):
             epilog=epilog_builder,
         )
 
-    def reset(self):
-        self.guest_token = None
-        self.guest_token_use_count = 0
-        self.cookie = None
+    # def reset(self):
+    #     self.guest_token = None
+    #     self.guest_token_use_count = 0
+    #     self.cookie = None
 
     def request(self, url, headers=None, method="GET"):
         return request(
@@ -354,52 +373,56 @@ class TwitterAPIScraper(object):
             known_encoding="utf-8",
         )
 
-    def acquire_guest_token(self):
-        headers = {
-            "Authorization": TWITTER_PUBLIC_API_AUTH_HEADER,
-            "Accept-Language": "en-US,en;q=0.5",
-        }
+    # def acquire_guest_token(self):
+    #     headers = {
+    #         "Authorization": TWITTER_PUBLIC_API_AUTH_HEADER,
+    #         "Accept-Language": "en-US,en;q=0.5",
+    #     }
 
-        response = self.request(TWITTER_GUEST_ACTIVATE_ENDPOINT, headers, method="POST")
+    #     response = self.request(TWITTER_GUEST_ACTIVATE_ENDPOINT, headers, method="POST")
 
-        if response.status >= 400:
-            raise TwitterPublicAPIInvalidResponseError(
-                status=response.status, response_text=response.text
-            )
+    #     if response.status >= 400:
+    #         raise TwitterPublicAPIInvalidResponseError(
+    #             status=response.status, response_text=response.text
+    #         )
 
-        try:
-            api_token_response = response.json()
-        except JSONDecodeError:
-            raise TwitterPublicAPIInvalidResponseError(
-                status=response.status, response_text=response.text
-            )
+    #     try:
+    #         api_token_response = response.json()
+    #     except JSONDecodeError:
+    #         raise TwitterPublicAPIInvalidResponseError(
+    #             status=response.status, response_text=response.text
+    #         )
 
-        guest_token = api_token_response.get("guest_token")
+    #     guest_token = api_token_response.get("guest_token")
 
-        if guest_token is None:
-            raise TwitterGuestTokenError
+    #     if guest_token is None:
+    #         raise TwitterGuestTokenError
 
-        self.guest_token = guest_token
-        self.cookie = response.headers[
-            "Set-Cookie"
-        ] + ", gt=%s; Domain=.twitter.com; Path=/; Secure ; Expires=%s" % (
-            guest_token,
-            create_cookie_expiration(),
-        )
+    #     self.guest_token = guest_token
+    #     self.cookie = response.headers[
+    #         "Set-Cookie"
+    #     ] + ", gt=%s; Domain=.twitter.com; Path=/; Secure ; Expires=%s" % (
+    #         guest_token,
+    #         create_cookie_expiration(),
+    #     )
 
-    @ensure_guest_token
+    # @ensure_guest_token
     def request_search(self, url):
         headers = {
             "Authorization": TWITTER_PUBLIC_API_AUTH_HEADER,
-            "X-Guest-Token": self.guest_token,
+            # "X-Guest-Token": self.guest_token,
             "Cookie": self.cookie,
             "Accept-Language": "en-US,en;q=0.5",
+            "X-Csrf-Token": self.csrf_token,
+            "X-Twitter-Active-User": "yes",
+            "X-Twitter-Auth-Type": "OAuth2Session",
+            "X-Twitter-Client-Language": "en",
         }
 
         response = self.request(url, headers=headers)
 
         if response.status in [403, 429]:
-            self.reset()
+            # self.reset()
             raise TwitterPublicAPIRateLimitError
 
         try:
