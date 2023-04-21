@@ -319,7 +319,10 @@ class TwitterAPIScraper(object):
         self.pool_manager = create_pool_manager(
             timeout=TWITTER_PUBLIC_API_DEFAULT_TIMEOUT, spoof_tls_ciphers=True
         )
-        self.rate_limiter_state = RateLimiterState(60, 15 * 60)
+
+        # NOTE: expressed as number of calls (returning ~20 tweets) per seconds
+        self.rate_limiter_state = RateLimiterState(20, 60)
+
         # self.reset()
 
         # NOTE: since 2023-04-21, Twitter search is not available anymore
