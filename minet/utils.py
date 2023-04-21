@@ -176,7 +176,7 @@ class RateLimitedIterator(object):
 
 
 class RateLimiterState(object):
-    def __init__(self, max_per_period, period=1.0):
+    def __init__(self, max_per_period: int, period: float = 1.0):
         max_per_second = max_per_period / period
         self.min_interval = 1.0 / max_per_second
         self.last_entry = None
@@ -227,7 +227,7 @@ def rate_limited_from_state(state):
     return decorate
 
 
-def rate_limited_method(attr="rate_limiter_state"):
+def rate_limited_method(attr: str = "rate_limiter_state"):
     def decorate(fn):
         @functools.wraps(fn)
         def decorated(self, *args, **kwargs):

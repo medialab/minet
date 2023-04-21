@@ -20,6 +20,7 @@ from minet.web import (
     coerce_cookie_for_url_from_browser,
     get_cookie_morsel_value,
 )
+from minet.utils import RateLimiterState, rate_limited_method
 from minet.twitter.constants import (
     TWITTER_PUBLIC_API_DEFAULT_TIMEOUT,
     TWITTER_PUBLIC_API_AUTH_HEADER,
@@ -318,6 +319,7 @@ class TwitterAPIScraper(object):
         self.pool_manager = create_pool_manager(
             timeout=TWITTER_PUBLIC_API_DEFAULT_TIMEOUT, spoof_tls_ciphers=True
         )
+        self.rate_limiter_state = RateLimiterState(60, 15 * 60)
         # self.reset()
 
         # NOTE: since 2023-04-21, Twitter search is not available anymore
@@ -363,6 +365,7 @@ class TwitterAPIScraper(object):
     #     self.guest_token_use_count = 0
     #     self.cookie = None
 
+    @rate_limited_method()
     def request(self, url, headers=None, method="GET"):
         return request(
             url,
