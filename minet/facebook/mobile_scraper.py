@@ -25,9 +25,9 @@ from ural.facebook import (
 from minet.utils import (
     rate_limited_method,
     RateLimiterState,
-    parse_date,
     clean_human_readable_numbers,
 )
+from minet.dates import parse_date
 from minet.web import (
     create_pool_manager,
     request,

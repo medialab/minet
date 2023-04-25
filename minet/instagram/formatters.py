@@ -20,7 +20,7 @@ from minet.instagram.utils import (
     extract_handles,
     short_code_to_url,
 )
-from minet.utils import timestamp_to_isoformat
+from minet.dates import timestamp_to_isoformat
 
 INSTAGRAM_PATH_TO_MEDIA_IMAGE = ["image_versions2", "candidates", 0, "url"]
 INSTAGRAM_PATH_TO_MEDIA_VIDEO = ["video_versions", 0, "url"]

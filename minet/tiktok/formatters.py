@@ -6,7 +6,7 @@
 #
 from casanova import namedrecord
 from ebbe import getpath
-from minet.utils import timestamp_to_isoformat
+from minet.dates import timestamp_to_isoformat
 
 from minet.tiktok.constants import (
     TIKTOK_VIDEO_CSV_HEADERS,

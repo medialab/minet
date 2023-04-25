@@ -10,7 +10,7 @@ import soupsieve
 from urllib.parse import urljoin
 from bs4 import Tag, NavigableString
 
-from minet.utils import parse_date
+from minet.dates import parse_date
 from minet.scrape.constants import BLOCK_ELEMENTS, CONTENT_BLOCK_ELEMENTS
 
 
