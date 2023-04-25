@@ -27,6 +27,8 @@ from datetime import datetime
 from pytz import timezone
 from pytz.exceptions import UnknownTimeZoneError
 
+from minet.dates import datetime_from_partial_iso_format
+
 from minet.cli.console import MINET_COLORS
 from minet.cli.exceptions import NotResumableError, InvalidArgumentsError
 from minet.cli.utils import acquire_cross_platform_stdout
@@ -273,7 +275,7 @@ def build_parser(name, version, commands):
     return parser, subparser_index
 
 
-class TimestampAsUTCDateType(object):
+class TimestampAsUTCDateType:
     def __call__(self, date):
         try:
             timestamp = int(datetime.strptime(date, "%Y-%m-%d").timestamp())
@@ -284,16 +286,35 @@ class TimestampAsUTCDateType(object):
         return timestamp
 
 
-class TimezoneType(object):
+class TimezoneType:
     def __call__(self, locale):
         try:
-            tz = timezone(locale)
+            return timezone(locale)
         except UnknownTimeZoneError:
             raise ArgumentTypeError("This timezone is not recognized.")
-        return tz
 
 
-class SplitterType(object):
+class PartialISODatetimeType:
+    def __init__(self, as_string: bool = False, upper_bound: bool = False):
+        self.as_string = as_string
+        self.upper_bound = upper_bound
+
+    def __call__(self, string):
+        try:
+            d = datetime_from_partial_iso_format(string, upper_bound=self.upper_bound)
+        except ValueError:
+            raise ArgumentTypeError("Invalid partial ISO datetime.")
+
+        if self.as_string:
+            d = d.isoformat()
+
+            if not d.endswith("Z"):
+                d += "Z"
+
+        return d
+
+
+class SplitterType:
     def __init__(self, splitchar=","):
         self.splitchar = splitchar
 

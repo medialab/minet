@@ -12,6 +12,7 @@ from minet.cli.argparse import (
     ConfigAction,
     TimezoneType,
     TimestampAsUTCDateType,
+    PartialISODatetimeType,
 )
 from minet.cli.exceptions import InvalidArgumentsError
 
@@ -79,11 +80,13 @@ COMMON_V2_SEARCH_ARGUMENTS = [
     },
     {
         "flag": "--start-time",
-        "help": "The oldest UTC stamp from which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ",
+        "help": 'The oldest UTC datetime from which the tweets will be counted. The date should have the format : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates will be completed for you e.g. "2002-04".',
+        "type": PartialISODatetimeType(as_string=True),
     },
     {
         "flag": "--end-time",
-        "help": "The UTC stamp to which the tweets will be provided. The date should have the format : YYYY-MM-DDTHH:mm:ssZ",
+        "help": 'The newest UTC datetime from which the tweets will be counted. The date should have the format : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates will be completed for you e.g. "2002-04".',
+        "type": PartialISODatetimeType(as_string=True, upper_bound=True),
     },
 ]
 
@@ -403,6 +406,12 @@ TWITTER_TWEET_COUNT_SUBCOMMAND = twitter_api_subcommand(
         Be advised that, for now, results are returned unordered
         by Twitter's API if you choose a time granularity for the
         results.
+
+        API docs for the relevant call:
+        https://developer.twitter.com/en/docs/twitter-api/tweets/counts/api-reference/get-tweets-counts-recent
+
+        API docs for the academic call:
+        https://developer.twitter.com/en/docs/twitter-api/tweets/counts/api-reference/get-tweets-counts-all
     """,
     epilog="""
         Examples:

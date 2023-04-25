@@ -4646,18 +4646,20 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
-  --end-time END_TIME           The UTC stamp to which the tweets will be
-                                provided. The date should have the format :
-                                YYYY-MM-DDTHH:mm:ssZ
+  --end-time END_TIME           The newest UTC datetime from which the tweets
+                                will be counted. The date should have the format
+                                : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates
+                                will be completed for you e.g. "2002-04".
   --since-id SINCE_ID           Will return tweets with ids that are greater
                                 than the specified id. Takes precedence over
                                 --start-time.
   --sort-order {recency,relevancy}
                                 How to sort retrieved tweets. Defaults to
                                 `recency`.
-  --start-time START_TIME       The oldest UTC stamp from which the tweets will
-                                be provided. The date should have the format :
-                                YYYY-MM-DDTHH:mm:ssZ
+  --start-time START_TIME       The oldest UTC datetime from which the tweets
+                                will be counted. The date should have the format
+                                : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates
+                                will be completed for you e.g. "2002-04".
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   --until-id UNTIL_ID           Will return tweets that are older than the tweet
@@ -4751,6 +4753,12 @@ Be advised that, for now, results are returned unordered
 by Twitter's API if you choose a time granularity for the
 results.
 
+API docs for the relevant call:
+https://developer.twitter.com/en/docs/twitter-api/tweets/counts/api-reference/get-tweets-counts-recent
+
+API docs for the academic call:
+https://developer.twitter.com/en/docs/twitter-api/tweets/counts/api-reference/get-tweets-counts-all
+
 Positional Arguments:
   query_or_query_column         Single query to process or name of the CSV
                                 column containing queries when using -i/--input.
@@ -4776,18 +4784,19 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
-  --end-time END_TIME           The UTC stamp to which the tweets will be
-                                provided. The date should have the format :
-                                YYYY-MM-DDTHH:mm:ssZ
+  --end-time END_TIME           The newest UTC datetime from which the tweets
+                                will be counted. The date should have the format
+                                : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates
+                                will be completed for you e.g. "2002-04".
   --granularity {day,hour,minute}
-                                Granularity used to group the data by. Defaults
-                                to `day`.
+                                Granularity used to group the data by.
   --since-id SINCE_ID           Will return tweets with ids that are greater
                                 than the specified id. Takes precedence over
                                 --start-time.
-  --start-time START_TIME       The oldest UTC stamp from which the tweets will
-                                be provided. The date should have the format :
-                                YYYY-MM-DDTHH:mm:ssZ
+  --start-time START_TIME       The oldest UTC datetime from which the tweets
+                                will be counted. The date should have the format
+                                : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates
+                                will be completed for you e.g. "2002-04".
   --until-id UNTIL_ID           Will return tweets that are older than the tweet
                                 with the specified id.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
