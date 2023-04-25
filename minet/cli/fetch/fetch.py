@@ -16,8 +16,8 @@ from ural import is_shortened_url, could_be_html
 
 from minet.executors import RequestResult, HTTPWorkerPayload, HTTPThreadPoolExecutor
 from minet.fs import FilenameBuilder, ThreadSafeFilesWriter
+from minet.cookies import get_cookie_resolver_from_browser
 from minet.web import (
-    get_cookie_resolver_from_browser,
     parse_http_header,
     Response,
     RedirectionStack,

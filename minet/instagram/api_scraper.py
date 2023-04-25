@@ -18,10 +18,10 @@ from ural.instagram import (
     InstagramReel as ParsedInstagramReel,
 )
 from minet.utils import sleep_with_entropy
+from minet.cookies import coerce_cookie_for_url_from_browser
 from minet.web import (
     create_pool_manager,
     create_request_retryer,
-    coerce_cookie_for_url_from_browser,
     request,
     retrying_method,
     request,

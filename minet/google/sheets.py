@@ -8,7 +8,8 @@ import browser_cookie3
 from ural import is_url
 from ural.google import parse_google_drive_url, GoogleDriveFile
 
-from minet.web import CookieResolver, request
+from minet.web import request
+from minet.cookies import CookieResolver
 from minet.constants import COOKIE_BROWSERS
 from minet.google.exceptions import (
     GoogleSheetsInvalidTargetError,

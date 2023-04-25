@@ -6,7 +6,7 @@
 #
 from http.cookies import SimpleCookie
 
-from minet.web import coerce_cookie_for_url_from_browser
+from minet.cookies import coerce_cookie_for_url_from_browser
 from minet.facebook.constants import FACEBOOK_URL
 
 

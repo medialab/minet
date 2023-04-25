@@ -21,7 +21,6 @@ import re
 import cgi
 import certifi
 import random
-import browser_cookie3
 import urllib3
 import urllib3.exceptions as urllib3_exceptions
 import urllib.error
@@ -30,8 +29,6 @@ import json
 import mimetypes
 import functools
 import threading
-from http.cookiejar import CookieJar
-from http.cookies import SimpleCookie
 from bs4 import BeautifulSoup, SoupStrainer
 from datetime import datetime
 from timeit import default_timer as timer
@@ -41,7 +38,6 @@ from itertools import chain
 from urllib.parse import urljoin
 from urllib3 import HTTPResponse
 from urllib3.util.ssl_ import create_urllib3_context
-from urllib.request import Request
 from ebbe import rcompose, noop
 from collections import defaultdict
 from tenacity import (
@@ -59,6 +55,7 @@ from minet.shim import suppress_xml_parsed_as_html_warnings
 from minet.encodings import normalize_encoding, infer_encoding
 from minet.loggers import sleepers_logger
 from minet.utils import is_binary_mimetype
+from minet.cookies import dict_to_cookie_string
 from minet.exceptions import (
     RedirectError,
     MaxRedirectsError,
@@ -70,14 +67,11 @@ from minet.exceptions import (
     SelfRedirectError,
     CancelledRequestError,
     FinalTimeoutError,
-    UnknownBrowserError,
-    CookieGrabbingError,
 )
 from minet.constants import (
     DEFAULT_SPOOFED_UA,
     DEFAULT_SPOOFED_TLS_CIPHERS,
     DEFAULT_URLLIB3_TIMEOUT,
-    COOKIE_BROWSERS,
 )
 
 mimetypes.init()
@@ -236,52 +230,6 @@ def find_javascript_relocation(html_chunk: bytes):
         return ESCAPED_SLASH_RE.sub(b"/", m.group(1)).decode()
     except Exception:
         return None
-
-
-class CookieResolver(object):
-    def __init__(self, jar: CookieJar):
-        self.jar = jar
-
-    def __call__(self, url: str) -> Optional[str]:
-        req = Request(url)
-        self.jar.add_cookie_header(req)
-
-        return req.get_header("Cookie") or None
-
-
-def get_cookie_jar_from_browser(browser="firefox") -> CookieJar:
-    fn = getattr(browser_cookie3, browser, None)
-
-    if fn is None:
-        raise UnknownBrowserError(browser)
-
-    try:
-        return fn()
-    except browser_cookie3.BrowserCookieError:
-        raise CookieGrabbingError(browser)
-
-
-def get_cookie_resolver_from_browser(browser="firefox") -> CookieResolver:
-    return CookieResolver(get_cookie_jar_from_browser(browser))
-
-
-def coerce_cookie_for_url_from_browser(target: str, url: str) -> Optional[str]:
-    if target in COOKIE_BROWSERS:
-        get = get_cookie_resolver_from_browser(target)
-
-        return get(url)
-
-    return target.strip()
-
-
-def get_cookie_morsel_value(cookie, key):
-    parsed = SimpleCookie()
-    parsed.load(cookie)
-    return parsed[key].value
-
-
-def dict_to_cookie_string(d):
-    return "; ".join("%s=%s" % r for r in d.items())
 
 
 def create_pool_manager(

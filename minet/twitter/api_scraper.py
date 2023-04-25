@@ -17,9 +17,8 @@ from minet.web import (
     request,
     create_request_retryer,
     retrying_method,
-    coerce_cookie_for_url_from_browser,
-    get_cookie_morsel_value,
 )
+from minet.cookies import coerce_cookie_for_url_from_browser, get_cookie_morsel_value
 from minet.utils import RateLimiterState, rate_limited_method
 from minet.twitter.constants import (
     TWITTER_PUBLIC_API_DEFAULT_TIMEOUT,

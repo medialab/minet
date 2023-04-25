@@ -8,11 +8,11 @@ from ebbe import getpath
 from urllib.parse import quote
 
 from minet.utils import sleep_with_entropy
+from minet.cookies import coerce_cookie_for_url_from_browser
 from minet.web import (
     create_pool_manager,
     create_request_retryer,
     request,
-    coerce_cookie_for_url_from_browser,
     retrying_method,
 )
 from minet.tiktok.constants import (
