@@ -28,13 +28,19 @@ def get_headers(cli_args):
 def action(cli_args, client, enricher, loading_bar):
     validate_query_boundaries(cli_args)
 
+    # Because we are greedy, if --academic is set and no other relevant bound exist,
+    # we set --start-time to be the beginning of Twitter
+    if (
+        cli_args.academic
+        and not cli_args.until_id
+        and not cli_args.since_id
+        and not cli_args.start_time
+    ):
+        cli_args.start_time = "2006-03-21T00:00:00Z"
+
     for row, query in enricher.cells(cli_args.column, with_rows=True):
         with loading_bar.step():
             kwargs = {"query": query}
-
-            # Because we are greedy, we want stuff from the beginning of Twitter
-            if cli_args.academic and not cli_args.start_time and not cli_args.since_id:
-                kwargs["start_time"] = "2006-03-21T00:00:00Z"
 
             if cli_args.start_time:
                 kwargs["start_time"] = cli_args.start_time
