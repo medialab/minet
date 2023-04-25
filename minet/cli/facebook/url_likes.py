@@ -5,6 +5,8 @@
 # Action reading an input CSV file line by line and retrieving approximate
 # likes count by scraping Facebook's like button plugin.
 #
+from typing import Optional
+
 import re
 from urllib.parse import quote
 from ural import is_url
@@ -26,16 +28,16 @@ def forge_url(url):
 
 
 @rate_limited(5)
-def make_request(url):
+def make_request(url: str) -> Optional[bytes]:
     response = request(forge_url(url), headers={"Accept-Language": "en"})
 
     if response.status == 404:
         return None
 
-    return response.data
+    return response.body
 
 
-def scrape(data):
+def scrape(data: bytes):
 
     match = NUMBER_RE.search(data)
 

@@ -134,7 +134,7 @@ def action(cli_args):
         if response.status >= 400:
             return "http-error", None
 
-        html = response.data
+        html = response.body
 
         if CAPTCHA in html:
             raise FatalError(["Rate limit reached!", "Last url: %s" % url])
