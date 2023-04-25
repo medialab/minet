@@ -28,8 +28,8 @@ class NamedScraper(ScraperMixin):
 
 
 class TitleScraper(NamedScraper):
-    name = "page_title"
-    fieldnames = ["title"]
+    name = "title"
+    fieldnames = ["page_title"]
     plural = False
     output_type = "scalar"
     strainer = SoupStrainer(name="title")
