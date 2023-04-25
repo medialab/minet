@@ -3,8 +3,8 @@ from minet.types import Literal
 
 from shutil import rmtree
 from os.path import isfile, join
-from queue import Queue, Empty
-from persistqueue import SQLiteAckQueue
+from queue import Queue, LifoQueue as Stack, Empty
+from persistqueue import SQLiteAckQueue, FILOSQLiteQueue as SQLiteAckStack
 from threading import Lock
 
 ItemType = TypeVar("ItemType")
@@ -39,6 +39,7 @@ class CrawlerQueue(Generic[ItemType]):
         path: Optional[str] = None,
         resume: bool = False,
         cleanup_interval: int = 5000,
+        dfs: bool = False,
     ):
         self.path = path
         self.resuming = False
@@ -56,12 +57,14 @@ class CrawlerQueue(Generic[ItemType]):
                 if isfile(join(path, DB_FILE_NAME)):
                     self.resuming = True
 
-            self.__queue = SQLiteAckQueue(
+            QueueCls = SQLiteAckStack if dfs else SQLiteAckQueue
+
+            self.__queue = QueueCls(
                 path, db_file_name=DB_FILE_NAME, multithreading=True, auto_resume=True
             )
 
         else:
-            self.__queue = Queue()
+            self.__queue = Stack() if dfs else Queue()
 
         self.__current_task_done_count = 0
 
