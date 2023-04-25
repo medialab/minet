@@ -11,6 +11,7 @@ import time
 import string
 import functools
 import dateparser
+import calendar
 from random import uniform
 from datetime import datetime
 
@@ -323,3 +324,40 @@ def message_flatmap(*messages, sep=" ", end="\n"):
         end.join(m for m in message) if not isinstance(message, str) else message
         for message in messages
     )
+
+
+PARTIAL_ISO_FORMATS = {
+    4: (r"%Y", "year"),
+    7: (r"%Y-%m", "month"),
+    10: (r"%Y-%m-%d", "day"),
+    13: (r"%Y-%m-%dT%H", "hour"),
+    16: (r"%Y-%m-%dT%H:%M", "minute"),
+    19: (r"%Y-%m-%dT%H:%M:%S", "second"),
+    20: (r"%Y-%m-%dT%H:%M:%SZ", "second"),
+}
+
+
+def datetime_from_partial_iso_format(
+    string: str, upper_bound: bool = False
+) -> datetime:
+    try:
+        possible_date_format, precision = PARTIAL_ISO_FORMATS[len(string)]
+    except KeyError:
+        raise ValueError("cannot parse date {!r}".format(string))
+
+    result = datetime.strptime(string, possible_date_format)
+
+    if upper_bound:
+        if precision == "year":
+            result = result.replace(month=12, day=31, hour=23, minute=59, second=59)
+        elif precision == "month":
+            _, last_day = calendar.monthrange(result.year, result.month)
+            result = result.replace(day=last_day, hour=23, minute=59, second=59)
+        elif precision == "day":
+            result = result.replace(hour=23, minute=59, second=59)
+        elif precision == "hour":
+            result = result.replace(minute=59, second=59)
+        elif precision == "minute":
+            result = result.replace(second=59)
+
+    return result
