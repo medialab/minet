@@ -71,6 +71,9 @@ def action(cli_args, client, enricher, loading_bar):
                     continue
 
                 # If no granularity was given we only return the total
+                # NOTE: this part of the code cannot be accessed by the CLI
+                # currently because `meta.total_tweet_count` has been
+                # found to be very inconsistent.
                 if cli_args.granularity is None:
                     enricher.writerow(row, [result["meta"]["total_tweet_count"]])
                     break

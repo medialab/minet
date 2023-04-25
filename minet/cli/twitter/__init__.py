@@ -395,17 +395,30 @@ TWITTER_TWEET_COUNT_SUBCOMMAND = twitter_api_subcommand(
     "minet.cli.twitter.tweet_count",
     title="Minet Twitter Tweets Count Command",
     description="""
-        Count the number of tweets matching the given query using Twitter's
-        latest API v2. The count's granularity can be at the level of tweets
-        per day, per hour, or per minute.
+        Count the number of tweets matching a given query using
+        Twitter API v2.
 
-        This will only return result for the last 8 days only, unless
-        you have Academic Research access in which case you
-        can use the --academic flag to retrieve the full count.
+        The counts can be granularized by day, hour or minute.
 
-        Be advised that, for now, results are returned unordered
-        by Twitter's API if you choose a time granularity for the
-        results.
+        The API is also meant to return the total number of tweets
+        matching the query but this has been found to be unreliable
+        and inconsistent so you will have to sum the granularized
+        counts instead.
+
+        The current command does not aggregate per month or year
+        because sometimes the order of counts does not seem
+        to be reliable either (even if they are found to be complete
+        in the final output).
+
+        Note that if you don't have an academic access, this command
+        will only return counts for the last ~7 days only.
+
+        If you have an academic access, don't forget to use the
+        --academic flag.
+
+        Finally note that sometimes, the API returns no data instead
+        of counts of 0, in which case no lines will be emitted in
+        the CSV output for the affected query.
 
         API docs for the relevant call:
         https://developer.twitter.com/en/docs/twitter-api/tweets/counts/api-reference/get-tweets-counts-recent
@@ -431,6 +444,7 @@ TWITTER_TWEET_COUNT_SUBCOMMAND = twitter_api_subcommand(
             "flag": "--granularity",
             "help": "Granularity used to group the data by.",
             "choices": ["minute", "hour", "day"],
+            "default": "day",
         },
         *COMMON_V2_SEARCH_ARGUMENTS,
         ACADEMIC_ARGUMENT,
