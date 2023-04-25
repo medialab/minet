@@ -4,6 +4,8 @@
 #
 # Collection of YouTube-related scrapers.
 #
+from typing import Optional
+
 import re
 import json
 from bs4 import BeautifulSoup
@@ -28,9 +30,11 @@ def get_caption_tracks(video_id):
     # First we try to retrieve it from video info
     url = "https://www.youtube.com/get_video_info?video_id=%s" % video_id
 
-    response = request(url)
+    response = request(
+        url, known_encoding="utf-8", pool_manager=YOUTUBE_SCRAPER_POOL_MANAGER
+    )
 
-    data = unquote(response.data.decode("utf-8"))
+    data = unquote(response.text())
 
     m = CAPTION_TRACKS_RE.search(data)
 
@@ -88,9 +92,13 @@ def get_video_captions(video_target, langs):
     if best_track is None:
         return
 
-    response = request(best_track.url, pool_manager=YOUTUBE_SCRAPER_POOL_MANAGER)
+    response = request(
+        best_track.url,
+        pool_manager=YOUTUBE_SCRAPER_POOL_MANAGER,
+        known_encoding="utf-8",
+    )
 
-    soup = BeautifulSoup(response.data.decode("utf-8"), "lxml")
+    soup = BeautifulSoup(response.text(), "lxml")
 
     captions = []
 
@@ -102,10 +110,13 @@ def get_video_captions(video_target, langs):
     return best_track, captions
 
 
-def scrape_channel_id(channel_url):
-    response = request(channel_url, pool_manager=YOUTUBE_SCRAPER_POOL_MANAGER)
+def scrape_channel_id(channel_url: str) -> Optional[str]:
+    response = request(
+        channel_url, pool_manager=YOUTUBE_SCRAPER_POOL_MANAGER, known_encoding="utf-8"
+    )
 
-    soup = BeautifulSoup(response.data.decode("utf-8"), "lxml")
+    soup = BeautifulSoup(response.text(), "lxml")
     tag = soup.find("meta", {"itemprop": "channelId"})
+
     if tag:
         return tag.get("content")
