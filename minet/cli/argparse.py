@@ -11,7 +11,6 @@ import os
 import re
 import sys
 import shutil
-from os.path import isdir
 from io import TextIOBase
 from argparse import (
     Action,
@@ -274,7 +273,7 @@ def build_parser(name, version, commands):
     return parser, subparser_index
 
 
-class TimestampType(object):
+class TimestampAsUTCDateType(object):
     def __call__(self, date):
         try:
             timestamp = int(datetime.strptime(date, "%Y-%m-%d").timestamp())
@@ -300,12 +299,6 @@ class SplitterType(object):
 
     def __call__(self, string):
         return string.split(self.splitchar)
-
-
-class ExistingDirectoryType(object):
-    def __call__(self, string):
-        if not isdir(string):
-            raise ArgumentTypeError('Could not find the "%s" directory!' % string)
 
 
 class BooleanAction(Action):

@@ -11,7 +11,7 @@ from minet.cli.argparse import (
     subcommand,
     ConfigAction,
     TimezoneType,
-    TimestampType,
+    TimestampAsUTCDateType,
 )
 from minet.cli.exceptions import InvalidArgumentsError
 
@@ -548,7 +548,7 @@ TWITTER_USER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
         {
             "flag": "--min-date",
             "help": "Whether to add a date to stop at for user's tweets retrieval. UTC date should have the following format : YYYY-MM-DD",
-            "type": TimestampType(),
+            "type": TimestampAsUTCDateType(),
         },
         {
             "flag": "--exclude-retweets",
