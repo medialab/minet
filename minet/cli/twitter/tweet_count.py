@@ -9,8 +9,6 @@ from twitter import TwitterHTTPError
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.twitter.utils import validate_query_boundaries, with_twitter_client
 
-ITEMS_PER_PAGE = 100
-
 COUNT_FIELDS = ["tweet_count"]
 GRANULARIZED_COUNT_FIELDS = ["start_time", "end_time", "tweet_count"]
 
