@@ -422,7 +422,6 @@ TWITTER_TWEET_COUNT_SUBCOMMAND = twitter_api_subcommand(
             "flag": "--granularity",
             "help": "Granularity used to group the data by.",
             "choices": ["minute", "hour", "day"],
-            "default": "day",
         },
         *COMMON_V2_SEARCH_ARGUMENTS,
         ACADEMIC_ARGUMENT,

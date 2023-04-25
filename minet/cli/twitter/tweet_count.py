@@ -51,6 +51,8 @@ def action(cli_args, client, enricher, loading_bar):
             if cli_args.until_id:
                 kwargs["until_id"] = cli_args.until_id
 
+            # NOTE: by default, is no granularity is given, we hit days, just
+            # to get the meta.total_tweet_count stuff
             kwargs["granularity"] = cli_args.granularity or "day"
 
             route = (
@@ -58,8 +60,6 @@ def action(cli_args, client, enricher, loading_bar):
                 if cli_args.academic
                 else ["tweets", "counts", "recent"]
             )
-
-            total_count = 0
 
             while True:
                 try:
@@ -72,17 +72,19 @@ def action(cli_args, client, enricher, loading_bar):
 
                     continue
 
-                for count in result["data"]:
-                    total_count += count["tweet_count"]
+                # If no granularity was given we only return the total
+                if cli_args.granularity is None:
+                    enricher.writerow(row, [result["meta"]["total_tweet_count"]])
+                    break
 
-                    if cli_args.granularity is not None:
-                        addendum = [count["start"], count["end"], count["tweet_count"]]
-                        enricher.writerow(row, addendum)
+                # Else we emit and we paginate
+                # NOTE: sometimes, typically when searching with --until-id/--since-id without --academic
+                # the "data" key cannot be found in the JSON payload...
+                for count in result.get("data", []):
+                    addendum = [count["start"], count["end"], count["tweet_count"]]
+                    enricher.writerow(row, addendum)
 
                 if "next_token" in result["meta"]:
                     kwargs["next_token"] = result["meta"]["next_token"]
                 else:
                     break
-
-            if cli_args.granularity is None:
-                enricher.writerow(row, [total_count])
