@@ -103,7 +103,7 @@ class StatsColumn(ProgressColumn):
         if stats is None:
             return Text("")
 
-        total = 0
+        stats_item_shown = 0
 
         item_parts = []
 
@@ -117,10 +117,10 @@ class StatsColumn(ProgressColumn):
 
             count = item["count"]
 
-            if count == 0:
+            if count is None:
                 continue
 
-            total += count
+            stats_item_shown += 1
 
             txt.append(str(item["name"]), style=item["style"])
             txt.append(" ")
@@ -130,7 +130,7 @@ class StatsColumn(ProgressColumn):
 
         parts = []
 
-        if task.description and total:
+        if task.description and stats_item_shown:
             parts.append(Text("- "))
 
         return Text.assemble(*parts, *Text(" ").join(item_parts))
@@ -289,7 +289,7 @@ class LoadingBar(object):
         # Stats line
         if stats is not None:
             for item in stats:
-                count = item.get("count", 0)
+                count = item.get("initial")
 
                 self.stats[item["name"]] = {
                     "name": item["name"],
@@ -297,7 +297,7 @@ class LoadingBar(object):
                     "count": count,
                 }
 
-                if count:
+                if count is not None:
                     self.stats_are_shown = True
 
         self.stats_progress = Progress(StatsColumn(sort_key=stats_sort_key))
@@ -440,7 +440,7 @@ class LoadingBar(object):
         self.label_progress.update(self.label_progress_task_id, description=label)
 
     # TODO: factorize
-    def set_stat(self, name: str, count: int, style: str = None):
+    def set_stat(self, name: str, count: Optional[int], style: str = None):
         assert self.stats is not None
 
         if name not in self.stats:
@@ -461,7 +461,10 @@ class LoadingBar(object):
             self.stats[name] = {"name": name, "count": count, "style": style or ""}
         else:
             item = self.stats[name]
-            item["count"] += count
+            if item["count"] is None:
+                item["count"] = count
+            else:
+                item["count"] += count
 
             if style is not None:
                 item["style"] = style
