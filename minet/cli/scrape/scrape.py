@@ -203,7 +203,9 @@ def action(cli_args):
         def writerow(row, item):
             writer.writerow(item)
 
-    with LoadingBar("Scraping", unit="pages", total=reader.total) as loading_bar:
+    with LoadingBar(
+        "Scraping", unit="pages", total=reader.total if not cli_args.glob else None
+    ) as loading_bar:
         items = create_fetch_like_report_iterator(cli_args, reader)
 
         worked_on: Dict[int, FetchReportLikeItem] = {}

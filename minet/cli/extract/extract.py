@@ -119,6 +119,7 @@ def worker(payload: ExtractWorkerPayload) -> ExtractResult:
     index_column="extract_original_index",
     title="Extracting text",
     unit="docs",
+    total_from_enricher=False,
 )
 def action(cli_args, enricher: ThreadSafeEnricher, loading_bar):
     if cli_args.input_dir is not None and not isdir(cli_args.input_dir):
@@ -127,6 +128,9 @@ def action(cli_args, enricher: ThreadSafeEnricher, loading_bar):
                 cli_args.input_dir
             )
         )
+
+    if not cli_args.glob:
+        loading_bar.set_total(enricher.total)
 
     items = create_fetch_like_report_iterator(cli_args, enricher)
 

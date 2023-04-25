@@ -343,6 +343,7 @@ def with_enricher_and_loading_bar(
     stats_sort_key=None,
     nested: bool = False,
     show_label: bool = False,
+    total_from_enricher: bool = True,
 ):
     def decorate(action):
         @wraps(action)
@@ -412,7 +413,7 @@ def with_enricher_and_loading_bar(
 
             with LoadingBar(
                 title=title(cli_args) if callable(title) else title,
-                total=enricher.total,
+                total=enricher.total if total_from_enricher else None,
                 unit=unit(cli_args) if callable(unit) else unit,
                 sub_unit=sub_unit(cli_args) if callable(sub_unit) else sub_unit,
                 nested=nested,
