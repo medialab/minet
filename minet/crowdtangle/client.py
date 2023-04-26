@@ -7,7 +7,7 @@
 #
 import json
 
-from minet.utils import RateLimiterState, rate_limited_method
+from minet.rate_limiting import RateLimiterState, rate_limited_method
 from minet.web import (
     create_pool_manager,
     create_request_retryer,

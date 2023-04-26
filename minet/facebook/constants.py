@@ -6,7 +6,7 @@
 #
 from collections import OrderedDict
 
-from minet.utils import RateLimiterState
+from minet.rate_limiting import RateLimiterState
 
 FACEBOOK_URL = "https://www.facebook.com"
 FACEBOOK_MOBILE_URL = "https://m.facebook.com"

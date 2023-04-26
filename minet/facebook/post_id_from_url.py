@@ -13,7 +13,7 @@ from ural.facebook import (
     FacebookPost,
 )
 
-from minet.utils import rate_limited_from_state
+from minet.rate_limiting import rate_limited_from_state
 from minet.web import request
 from minet.facebook.constants import (
     FACEBOOK_URL,

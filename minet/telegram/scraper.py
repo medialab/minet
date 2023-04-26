@@ -7,11 +7,11 @@
 from bs4 import BeautifulSoup
 import re
 
-from minet.utils import (
+from minet.rate_limiting import (
     rate_limited_method,
     RateLimiterState,
-    clean_human_readable_numbers,
 )
+from minet.utils import clean_human_readable_numbers
 from minet.web import (
     create_pool_manager,
     request,

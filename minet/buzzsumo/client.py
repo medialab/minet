@@ -7,7 +7,7 @@
 from json import JSONDecodeError
 from urllib.parse import quote
 
-from minet.utils import RateLimiterState, rate_limited_method
+from minet.rate_limiting import RateLimiterState, rate_limited_method
 from minet.web import create_request_retryer, retrying_method, request
 
 from minet.buzzsumo.formatters import format_article

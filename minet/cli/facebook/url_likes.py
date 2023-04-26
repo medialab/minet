@@ -11,7 +11,7 @@ import re
 from urllib.parse import quote
 from ural import is_url
 
-from minet.utils import rate_limited
+from minet.rate_limiting import rate_limited
 from minet.web import request
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.exceptions import FatalError

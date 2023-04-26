@@ -22,11 +22,11 @@ from ural.facebook import (
     FacebookPhoto as ParsedFacebookPhoto,
 )
 
-from minet.utils import (
+from minet.rate_limiting import (
     rate_limited_method,
     RateLimiterState,
-    clean_human_readable_numbers,
 )
+from minet.utils import clean_human_readable_numbers
 from minet.dates import parse_date
 from minet.web import (
     create_pool_manager,
