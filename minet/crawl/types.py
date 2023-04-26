@@ -160,7 +160,7 @@ class SuccessfulCrawlResult(CrawlResult[CrawlJobDataType, CrawlResultDataType]):
         )
 
 
-SomeCrawlResult = Union[
+AnyCrawlResult = Union[
     ErroredCrawlResult[CrawlJobDataType],
     SuccessfulCrawlResult[CrawlJobDataType, CrawlResultDataType],
 ]

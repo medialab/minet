@@ -28,7 +28,7 @@ from minet.crawl.types import (
     CrawlResultDataType,
     SuccessfulCrawlResult,
     ErroredCrawlResult,
-    SomeCrawlResult,
+    AnyCrawlResult,
 )
 from minet.crawl.spiders import (
     Spider,
@@ -95,7 +95,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType]
-    ) -> Union[object, SomeCrawlResult[CrawlJobDataType, CrawlResultDataType]]:
+    ) -> Union[object, AnyCrawlResult[CrawlJobDataType, CrawlResultDataType]]:
 
         # Registering work
         with self.crawler.state.task():
@@ -342,7 +342,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
     def __iter__(
         self,
-    ) -> Iterator[SomeCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes]]:
+    ) -> Iterator[AnyCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes]]:
         worker = CrawlWorker(self, **self.worker_kwargs)
 
         def key_by_domain_name(job: CrawlJob) -> Optional[str]:

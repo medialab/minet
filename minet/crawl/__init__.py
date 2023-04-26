@@ -1,6 +1,6 @@
 from minet.crawl.types import (
     CrawlResult,
-    SomeCrawlResult,
+    AnyCrawlResult,
     SuccessfulCrawlResult,
     ErroredCrawlResult,
     CrawlJob,
