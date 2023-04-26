@@ -39,6 +39,22 @@ class CrawlTarget(Generic[CrawlJobDataType]):
         self.spider = spider
         self.data = data
 
+    def __repr__(self):
+        class_name = self.__class__.__name__
+
+        data_repr = " data={!r}".format(self.data) if self.data is not None else ""
+        spider_repr = (
+            " spider={!r} ".format(self.spider) if self.spider is not None else ""
+        )
+
+        return ("<{class_name} {spider}depth={depth!r} url={url!r}{data}>").format(
+            class_name=class_name,
+            url=self.url,
+            depth=self.depth,
+            spider=spider_repr,
+            data=data_repr,
+        )
+
 
 UrlOrCrawlTarget = Union[str, CrawlTarget[CrawlJobDataType]]
 
@@ -110,14 +126,17 @@ class CrawlJob(Generic[CrawlJobDataType]):
         class_name = self.__class__.__name__
 
         data_repr = " data={!r}".format(self.data) if self.data is not None else ""
+        spider_repr = (
+            " spider={!r} ".format(self.spider) if self.spider is not None else ""
+        )
 
         return (
-            "<{class_name} depth={depth!r} url={url!r} spider={spider!r} attempts={attempts!r}{data}>"
+            "<{class_name} {spider}depth={depth!r} url={url!r} attempts={attempts!r}{data}>"
         ).format(
             class_name=class_name,
             url=self.url,
             depth=self.depth,
-            spider=self.spider,
+            spider=spider_repr,
             attempts=self.attempts,
             data=data_repr,
         )
