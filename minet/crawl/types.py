@@ -74,14 +74,17 @@ class CrawlJob(Generic[CrawlJobDataType]):
     def __repr__(self):
         class_name = self.__class__.__name__
 
+        data_repr = " data={!r}".format(self.data) if self.data is not None else ""
+
         return (
-            "<{class_name} depth={depth!r} url={url!r} spider={spider!r} attempts={attempts!r}>"
+            "<{class_name} depth={depth!r} url={url!r} spider={spider!r} attempts={attempts!r}{data}>"
         ).format(
             class_name=class_name,
             url=self.url,
             depth=self.depth,
             spider=self.spider,
             attempts=self.attempts,
+            data=data_repr,
         )
 
 
