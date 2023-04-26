@@ -107,6 +107,26 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
         self.response = None
         self.degree = 0
 
+    @property
+    def url(self) -> str:
+        return self.job.url
+
+    @property
+    def depth(self) -> int:
+        return self.job.depth
+
+    @property
+    def spider(self) -> Optional[str]:
+        return self.job.spider
+
+    def _repr_from_job(self) -> str:
+        r = "url={url!r} depth={depth!r}".format(url=self.job.url, depth=self.job.depth)
+
+        if self.job.spider is not None:
+            r += " spider={!r}".format(self.job.spider)
+
+        return r
+
 
 class ErroredCrawlResult(CrawlResult[CrawlJobDataType, None]):
     job: CrawlJob[CrawlJobDataType]
@@ -130,8 +150,8 @@ class ErroredCrawlResult(CrawlResult[CrawlJobDataType, None]):
     def __repr__(self):
         name = self.__class__.__name__
 
-        return "<{name} url={url!r} error={error}>".format(
-            name=name, url=self.job.url, error=self.error.__class__.__name__
+        return "<{name} {job} error={error}>".format(
+            name=name, job=self._repr_from_job(), error=self.error.__class__.__name__
         )
 
 
@@ -157,9 +177,16 @@ class SuccessfulCrawlResult(CrawlResult[CrawlJobDataType, CrawlResultDataType]):
 
     def __repr__(self):
         name = self.__class__.__name__
+        dtype = type(self.data).__name__
 
-        return "<{name} url={url!r} status={status!r} degree={degree!r}>".format(
-            name=name, url=self.job.url, status=self.response.status, degree=self.degree
+        return (
+            "<{name} {job} status={status!r} degree={degree!r} dtype={dtype}>".format(
+                name=name,
+                job=self._repr_from_job(),
+                status=self.response.status,
+                degree=self.degree,
+                dtype=dtype,
+            )
         )
 
 

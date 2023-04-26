@@ -190,6 +190,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         spider_or_spiders: Spiders[CrawlJobDataTypes, CrawlResultDataTypes],
         queue_path: Optional[str] = None,
         resume: bool = False,
+        dfs: bool = False,
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         throttle: float = DEFAULT_THROTTLE,
@@ -238,7 +239,9 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         self.finished = False
 
         # Queue
-        self.queue = CrawlerQueue(queue_path, resume=resume, cleanup_interval=2)
+        self.queue = CrawlerQueue(
+            queue_path, resume=resume, cleanup_interval=2, dfs=dfs
+        )
         self.persistent = self.queue.persistent
         self.resuming = self.queue.resuming
 

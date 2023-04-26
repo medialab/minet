@@ -15,7 +15,7 @@ from minet.cli.exceptions import FatalError
 from minet.cli.console import console
 from minet.scrape import Scraper
 from minet.scrape.exceptions import InvalidScraperError
-from minet.crawl import Crawler, CrawlResult, CrawlerState, DefinitionSpiderOutput
+from minet.crawl import Crawler, CrawlResult, DefinitionSpiderOutput
 from minet.cli.reporters import report_error, report_scraper_validation_errors
 from minet.cli.loading_bar import LoadingBar
 from minet.cli.utils import (
