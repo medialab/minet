@@ -29,7 +29,7 @@ from minet.cli.exceptions import NotResumableError, InvalidArgumentsError, Fatal
 
 
 @with_cli_exceptions
-def run(name, version, commands):
+def run(name: str, version: str, commands):
     # Freezing multiprocessing support for pyinstaller etc.
     multiprocessing.freeze_support()
 
