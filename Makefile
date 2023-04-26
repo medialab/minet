@@ -54,4 +54,14 @@ pyinstaller: clean
 		--name minet \
 		--clean \
 		--exclude-module IPython \
+		--exclude-module ipykernel \
+		--exclude-module ipywidgets \
+		--exclude-module jedi \
+		--exclude-module jupyter \
+		--exclude-module jupyter_client \
+		--exclude-module jupyter_core \
+		--exclude-module jupyter-server \
+		--exclude-module jupyterlab \
+		--exclude-module jupyterlab_server \
+		--exclude-module jupyterlab-widgets \
 		minet/cli/__main__.py

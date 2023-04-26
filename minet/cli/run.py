@@ -5,12 +5,15 @@
 #
 # CLI enpoint of the Minet library.
 #
+from typing import Optional, List
+
 import csv
 import sys
 import ctypes
 import importlib
 import multiprocessing
 import casanova
+import shlex
 from casanova.exceptions import MissingColumnError
 from contextlib import ExitStack
 from encodings import idna  # NOTE: this is necessary for pyinstaller build still...
@@ -29,7 +32,7 @@ from minet.cli.exceptions import NotResumableError, InvalidArgumentsError, Fatal
 
 
 @with_cli_exceptions
-def run(name: str, version: str, commands):
+def run(name: str, version: str, commands: List, args: Optional[str] = None):
     # Freezing multiprocessing support for pyinstaller etc.
     multiprocessing.freeze_support()
 
@@ -53,7 +56,7 @@ def run(name: str, version: str, commands):
     parser, subparser_index = build_parser(name, version, commands)
 
     # Parsing arguments and triggering commands
-    cli_args = parser.parse_args()
+    cli_args = parser.parse_args(shlex.split(args) if args is not None else None)
 
     # Suppressing console?
     if getattr(cli_args, "silent", False):
