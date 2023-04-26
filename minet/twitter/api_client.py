@@ -38,14 +38,16 @@ class TwitterAPIClient(object):
         api_secret_key,
         api_version="1.1",
     ):
-        self.wrapper = TwitterWrapper(
+        self.retryer = create_request_retryer(predicate=retryer_predicate)
+
+        self.wrapper = self.retryer(
+            TwitterWrapper,
             access_token,
             access_token_secret,
             api_key,
             api_secret_key,
             api_version=api_version,
         )
-        self.retryer = create_request_retryer(predicate=retryer_predicate)
 
     @retrying_method()
     def call(self, *args, **kwargs):
