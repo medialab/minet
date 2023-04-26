@@ -6,14 +6,24 @@
 #
 from json import JSONDecodeError
 from twitwi import TwitterWrapper
-from twitwi.exceptions import TwitterWrapperMaxAttemptsExceeded
+from twitwi.exceptions import (
+    TwitterWrapperMaxAttemptsExceeded,
+    TwitterPayloadV2IncompleteIncludesError,
+)
 from twitter import TwitterError
 
 from minet.web import create_request_retryer, retrying_method
 
 
 def retryer_predicate(exc):
-    if isinstance(exc, (JSONDecodeError, TwitterWrapperMaxAttemptsExceeded)):
+    if isinstance(
+        exc,
+        (
+            JSONDecodeError,
+            TwitterWrapperMaxAttemptsExceeded,
+            TwitterPayloadV2IncompleteIncludesError,
+        ),
+    ):
         return True
 
     if not isinstance(exc, TwitterError):
