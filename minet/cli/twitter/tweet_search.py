@@ -12,8 +12,6 @@ from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.twitter.utils import with_twitter_client
 from minet.cli.twitter.utils import validate_query_boundaries
 
-ITEMS_PER_PAGE = 100
-
 
 @with_enricher_and_loading_bar(
     headers=TWEET_FIELDS,
@@ -30,7 +28,7 @@ def action(cli_args, client, enricher, loading_bar):
         with loading_bar.step(query):
             kwargs = {
                 "query": query,
-                "max_results": ITEMS_PER_PAGE,
+                "max_results": 500 if cli_args.academic else 100,
                 "sort_order": cli_args.sort_order,
                 "expansions": ",".join(TWEET_EXPANSIONS),
                 "params": TWEET_PARAMS,
