@@ -40,7 +40,7 @@ setup(
         "soupsieve>=2.1,<3",
         "tenacity>=8,<9",
         "trafilatura>=1.4.1,<1.5",
-        "twitwi>=0.16.1,<0.17",
+        "twitwi>=0.18,<0.19",
         "ural>=0.40.2,<0.41",
         "urllib3>=1.26.9,<2",
     ],
