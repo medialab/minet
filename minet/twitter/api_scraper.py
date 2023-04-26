@@ -320,7 +320,7 @@ class TwitterAPIScraper(object):
         )
 
         # NOTE: expressed as number of calls (returning ~20 tweets) per seconds
-        self.rate_limiter_state = RateLimiterState(20, 60)
+        self.rate_limiter_state = RateLimiterState(25, 60)
 
         # self.reset()
 
