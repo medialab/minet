@@ -63,6 +63,25 @@ def coerce_spider(target):
     raise TypeError("expecting a spider or a callable")
 
 
+def spider_start_iter(spider: Spider) -> Iterable[UrlOrCrawlTarget]:
+    if spider.START_URL is not None:
+        yield spider.START_URL
+
+    if spider.START_URLS is not None:
+        yield from spider.START_URLS
+
+    if spider.START_TARGET is not None:
+        yield spider.START_TARGET
+
+    if spider.START_TARGETS is not None:
+        yield from spider.START_TARGETS
+
+    start = spider.start()
+
+    if start is not None:
+        yield from start
+
+
 RequestArgsType = Callable[[CrawlJob[CrawlJobDataType]], Dict]
 
 
@@ -307,25 +326,18 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         if self.started:
             raise RuntimeError("Crawler has already started")
 
-        # Collecting start jobs - we only add those if we are not resuming
+        # Enqueuing start jobs, only if we are not resuming
         if not self.resuming:
 
             # NOTE: start jobs are all buffered into memory
             # We could use a blocking queue with max size but this could prove
             # difficult to resume crawls based upon lazy iterators
             for name, spider in self.__spiders.items():
-                if spider.START_URL is not None:
-                    spider_start_targets = [spider.START_URL]
-                elif spider.START_URLS is not None:
-                    spider_start_targets = list(spider.START_URLS)
-                else:
-                    spider_start_targets = spider.start()
 
                 if self.singular:
                     name = None
 
-                if spider_start_targets is not None:
-                    self.enqueue(spider_start_targets, spider=name)
+                self.enqueue(spider_start_iter(spider), spider=name)
 
         self.started = True
 
