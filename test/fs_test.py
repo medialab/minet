@@ -3,7 +3,7 @@
 # =============================================================================
 import os
 import pytest
-from casanova import DictLikeRow
+from casanova import Headers, RowWrapper
 
 from minet.fs import (
     FolderStrategy,
@@ -127,7 +127,7 @@ class TestFS(object):
         )
 
         builder = FilenameBuilder(template="{line.name}{ext}")
-        row = DictLikeRow({"name": 0}, ["lefigaro"])
+        row = RowWrapper(Headers(["name"]), ["lefigaro"])
 
         with pytest.raises(FilenameFormattingError):
             builder("https://www.lefigaro.fr")
