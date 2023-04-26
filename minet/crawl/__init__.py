@@ -5,13 +5,13 @@ from minet.crawl.types import (
     ErroredCrawlResult,
     CrawlJob,
     CrawlTarget,
-    UrlOrCrawlJob,
+    UrlOrCrawlTarget,
 )
 from minet.crawl.state import CrawlerState
 from minet.crawl.spiders import (
     Spider,
     SpiderResult,
-    SpiderNextJobs,
+    SpiderNextTargets,
     FunctionSpider,
     DefinitionSpider,
     DefinitionSpiderOutput,

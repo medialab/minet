@@ -23,7 +23,8 @@ from minet.types import AnyFileTarget
 from minet.fs import load_definition
 from minet.crawl.types import (
     CrawlJob,
-    UrlOrCrawlJob,
+    CrawlTarget,
+    UrlOrCrawlTarget,
     CrawlJobDataType,
     CrawlResultDataType,
     SuccessfulCrawlResult,
@@ -50,15 +51,6 @@ from minet.constants import (
 )
 
 DEFAULT_SPIDER_KEY = "$$DEFAULT_MINET_SPIDER$$"
-
-
-def ensure_job(
-    url_or_job: UrlOrCrawlJob[CrawlJobDataType],
-) -> CrawlJob[CrawlJobDataType]:
-    if isinstance(url_or_job, CrawlJob):
-        return url_or_job
-
-    return CrawlJob(url=url_or_job)
 
 
 def coerce_spider(target):
@@ -144,7 +136,13 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
                 return CANCELLED
 
             try:
-                data, next_jobs = spider(job, response)
+                spider_result = spider(job, response)
+
+                if spider_result is not None:
+                    data, next_jobs = spider_result
+                else:
+                    data = None
+                    next_jobs = None
 
                 if cancel_event.is_set():
                     return CANCELLED
@@ -317,17 +315,17 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             # difficult to resume crawls based upon lazy iterators
             for name, spider in self.__spiders.items():
                 if spider.START_URL is not None:
-                    spider_start_jobs = [spider.START_URL]
+                    spider_start_targets = [spider.START_URL]
                 elif spider.START_URLS is not None:
-                    spider_start_jobs = list(spider.START_URLS)
+                    spider_start_targets = list(spider.START_URLS)
                 else:
-                    spider_start_jobs = spider.start_jobs()
+                    spider_start_targets = spider.start()
 
                 if self.singular:
                     name = None
 
-                if spider_start_jobs is not None:
-                    self.enqueue(spider_start_jobs, spider=name)
+                if spider_start_targets is not None:
+                    self.enqueue(spider_start_targets, spider=name)
 
         self.started = True
 
@@ -371,20 +369,29 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
     def enqueue(
         self,
-        job_or_jobs: Union[
-            UrlOrCrawlJob[CrawlJobDataTypes], Iterable[UrlOrCrawlJob[CrawlJobDataTypes]]
+        target_or_targets: Union[
+            UrlOrCrawlTarget[CrawlJobDataTypes],
+            Iterable[UrlOrCrawlTarget[CrawlJobDataTypes]],
         ],
         spider: Optional[str] = None,
         depth: Optional[int] = None,
     ) -> int:
-        if isinstance(job_or_jobs, (str, CrawlJob)):
-            jobs = [job_or_jobs]
+        if isinstance(target_or_targets, (str, CrawlTarget)):
+            targets = [target_or_targets]
         else:
-            jobs = job_or_jobs
+            targets = target_or_targets
 
-        def proper_jobs():
-            for job in jobs:
-                job = ensure_job(job)
+        def jobs():
+            for target in targets:
+                if isinstance(target, str):
+                    job = CrawlJob(url=target)
+                else:
+                    job = CrawlJob(
+                        url=target.url,
+                        depth=target.depth,
+                        spider=target.spider,
+                        data=target.data,
+                    )
 
                 if spider is not None and job.spider is None:
                     job.spider = spider
@@ -394,7 +401,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
                 yield job
 
-        count = self.queue.put_many(proper_jobs())
+        count = self.queue.put_many(jobs())
 
         self.state.inc_queued(count)
 
@@ -411,10 +418,10 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
     def from_callable(
         cls,
         fn: FunctionSpiderCallable,
-        start_jobs: Optional[Iterable[UrlOrCrawlJob]] = None,
+        start: Optional[Iterable[UrlOrCrawlTarget]] = None,
         **kwargs,
     ):
-        return cls(FunctionSpider(fn, start_jobs=start_jobs), **kwargs)
+        return cls(FunctionSpider(fn, start=start), **kwargs)
 
     @classmethod
     def from_definition(

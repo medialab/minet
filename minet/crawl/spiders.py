@@ -23,7 +23,8 @@ from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 
 from minet.crawl.types import (
-    UrlOrCrawlJob,
+    UrlOrCrawlTarget,
+    CrawlTarget,
     CrawlJob,
     CrawlJobDataType,
     CrawlResultDataType,
@@ -45,15 +46,15 @@ def ensure_list(value: Union[T, List[T]]) -> List[T]:
     return value
 
 
-SpiderNextJobs = Optional[Iterable[Union[str, CrawlJob[CrawlJobDataType]]]]
-SpiderResult = Tuple[CrawlResultDataType, SpiderNextJobs[CrawlJobDataType]]
+SpiderNextTargets = Optional[Iterable[UrlOrCrawlTarget[CrawlJobDataType]]]
+SpiderResult = Optional[Tuple[CrawlResultDataType, SpiderNextTargets[CrawlJobDataType]]]
 
 
 class Spider(Generic[CrawlJobDataType, CrawlResultDataType]):
     START_URL: Optional[str] = None
     START_URLS: Optional[List[str]] = None
 
-    def start_jobs(self) -> Optional[Iterable[UrlOrCrawlJob[CrawlJobDataType]]]:
+    def start(self) -> Optional[Iterable[UrlOrCrawlTarget[CrawlJobDataType]]]:
         return None
 
     def __call__(
@@ -79,13 +80,13 @@ class FunctionSpider(Spider[CrawlJobDataType, CrawlResultDataType]):
     def __init__(
         self,
         fn: FunctionSpiderCallable[CrawlJobDataType, CrawlResultDataType],
-        start_jobs: Optional[Iterable[UrlOrCrawlJob[CrawlJobDataType]]] = None,
+        start: Optional[Iterable[UrlOrCrawlTarget[CrawlJobDataType]]] = None,
     ):
         self.fn = fn
-        self.__start_jobs = start_jobs
+        self.__start_targets = start
 
-    def start_jobs(self) -> Optional[Iterable[UrlOrCrawlJob[CrawlJobDataType]]]:
-        return self.__start_jobs
+    def start(self) -> Optional[Iterable[UrlOrCrawlTarget[CrawlJobDataType]]]:
+        return self.__start_targets
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType], response: Response
@@ -153,7 +154,7 @@ class DefinitionSpider(
                 for name, scraper in self.next_definition["scrapers"].items():
                     self.next_scrapers[name] = Scraper(scraper)
 
-    def start_jobs(self) -> Iterable[UrlOrCrawlJob[CrawlJobDataType]]:
+    def start(self) -> Iterable[UrlOrCrawlTarget[CrawlJobDataType]]:
 
         # TODO: possibility to name this as jobs and get additional metadata
         start_urls = ensure_list(self.definition.get("start_url", [])) + ensure_list(
@@ -178,24 +179,24 @@ class DefinitionSpider(
 
         return scraped
 
-    def __job_from_target(
+    def __coerce(
         self,
         current_url: str,
         target: Union[str, DefinitionSpiderTarget[CrawlJobDataType]],
-    ) -> CrawlJob[CrawlJobDataType]:
+    ) -> CrawlTarget[CrawlJobDataType]:
         if isinstance(target, str):
-            return CrawlJob(url=urljoin(current_url, target))
+            return CrawlTarget(urljoin(current_url, target))
 
         else:
 
             # TODO: validate target
-            return CrawlJob(
+            return CrawlTarget(
                 url=urljoin(current_url, target["url"]),
                 spider=target.get("spider"),
                 data=target.get("data"),
             )
 
-    def __next_targets(
+    def __next(
         self, response: Response, soup: BeautifulSoup
     ) -> Iterator[Union[str, DefinitionSpiderTarget[CrawlJobDataType]]]:
 
@@ -223,7 +224,7 @@ class DefinitionSpider(
         if self.next_definition is not None and "format" in self.next_definition:
             yield FORMATTER.format(self.next_definition["format"])
 
-    def __next_jobs(
+    def __next_targets(
         self, job: CrawlJob[CrawlJobDataType], response: Response, soup: BeautifulSoup
     ):
         if not self.next_definition:
@@ -236,12 +237,14 @@ class DefinitionSpider(
         if next_depth > self.max_depth:
             return
 
-        for target in self.__next_targets(response, soup):
-            yield self.__job_from_target(response.url, target)
+        for target in self.__next(response, soup):
+            yield self.__coerce(response.url, target)
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType], response: Response
     ) -> SpiderResult[DefinitionSpiderOutput[CrawlResultDataType], CrawlJobDataType]:
         soup = response.soup()
 
-        return self.__scrape(job, response, soup), self.__next_jobs(job, response, soup)
+        return self.__scrape(job, response, soup), self.__next_targets(
+            job, response, soup
+        )

@@ -40,6 +40,9 @@ class CrawlTarget(Generic[CrawlJobDataType]):
         self.data = data
 
 
+UrlOrCrawlTarget = Union[str, CrawlTarget[CrawlJobDataType]]
+
+
 class CrawlJob(Generic[CrawlJobDataType]):
     __slots__ = (
         "url",
@@ -118,9 +121,6 @@ class CrawlJob(Generic[CrawlJobDataType]):
             attempts=self.attempts,
             data=data_repr,
         )
-
-
-UrlOrCrawlJob = Union[str, CrawlJob[CrawlJobDataType]]
 
 
 class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
