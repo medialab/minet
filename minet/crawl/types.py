@@ -8,6 +8,38 @@ CrawlJobDataType = TypeVar("CrawlJobDataType", bound=Mapping)
 CrawlResultDataType = TypeVar("CrawlResultDataType")
 
 
+class CrawlTarget(Generic[CrawlJobDataType]):
+    __slots__ = ("url", "depth", "spider", "data")
+
+    url: str
+    depth: Optional[int]
+    spider: Optional[str]
+    data: Optional[CrawlJobDataType]
+
+    def __init__(
+        self,
+        url: str,
+        depth: Optional[int] = None,
+        spider: Optional[str] = None,
+        data: Optional[CrawlJobDataType] = None,
+    ) -> None:
+        if not isinstance(url, str):
+            raise TypeError("url should be a string")
+
+        self.url = url
+
+        if depth is not None and not isinstance(depth, int):
+            raise TypeError("depth should be an int")
+
+        self.depth = depth
+
+        if spider is not None and not isinstance(depth, int):
+            raise TypeError("spider should be a string")
+
+        self.spider = spider
+        self.data = data
+
+
 class CrawlJob(Generic[CrawlJobDataType]):
     __slots__ = (
         "url",

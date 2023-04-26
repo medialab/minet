@@ -4,6 +4,7 @@ from minet.crawl.types import (
     SuccessfulCrawlResult,
     ErroredCrawlResult,
     CrawlJob,
+    CrawlTarget,
     UrlOrCrawlJob,
 )
 from minet.crawl.state import CrawlerState
