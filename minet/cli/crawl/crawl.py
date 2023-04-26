@@ -18,7 +18,11 @@ from minet.scrape.exceptions import InvalidScraperError
 from minet.crawl import Crawler, CrawlResult, CrawlerState, DefinitionSpiderOutput
 from minet.cli.reporters import report_error, report_scraper_validation_errors
 from minet.cli.loading_bar import LoadingBar
-from minet.cli.utils import with_loading_bar, with_ctrl_c_warning
+from minet.cli.utils import (
+    with_loading_bar,
+    with_ctrl_c_warning,
+    track_crawler_state_with_loading_bar,
+)
 
 JOBS_HEADERS = [
     "spider",
@@ -275,13 +279,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         )
         defer(reporter_pool.close)
 
-        def on_state_update(state: CrawlerState):
-            loading_bar.set_total(state.total)
-            loading_bar.set_stat("queued", state.jobs_queued)
-            loading_bar.set_stat("doing", state.jobs_doing)
-            loading_bar.set_stat("done", state.jobs_done)
-
-        crawler.state.set_listener(on_state_update)
+        track_crawler_state_with_loading_bar(loading_bar, crawler.state)
 
         # Running crawler
         for result in crawler:

@@ -24,6 +24,7 @@ from contextlib import nullcontext
 from ebbe import format_seconds, get
 from types import SimpleNamespace
 
+from minet.crawl import CrawlerState
 from minet.encodings import is_supported_encoding
 from minet.cli.console import console
 from minet.cli.loading_bar import LoadingBar, StatsItem
@@ -448,3 +449,15 @@ def with_ctrl_c_warning(fn):
             raise
 
     return wrapper
+
+
+def track_crawler_state_with_loading_bar(
+    loading_bar: LoadingBar, crawler_state: CrawlerState
+) -> None:
+    def on_state_update(state: CrawlerState):
+        loading_bar.set_total(state.total)
+        loading_bar.set_stat("queued", state.jobs_queued)
+        loading_bar.set_stat("doing", state.jobs_doing)
+        loading_bar.set_stat("done", state.jobs_done)
+
+    crawler_state.set_listener(on_state_update)
