@@ -32,6 +32,7 @@ setup(
         "ebbe>=1.11.1,<2",
         "json5>=0.8.5",
         "lxml>=4.3.0",
+        "nanoid>=2,<3",
         "persist-queue>=0.7,<0.9",
         "pyyaml",
         "quenouille>=1.7.1,<2",

@@ -1,5 +1,7 @@
 from typing import TypeVar, Mapping, Union, Generic, Optional
 
+from nanoid import generate
+from functools import partial
 from ural import get_domain_name, ensure_protocol
 
 from minet.web import Response
@@ -9,6 +11,13 @@ CrawlResultDataType = TypeVar("CrawlResultDataType")
 
 
 class CrawlTarget(Generic[CrawlJobDataType]):
+    """
+    This class represent a crawl target, i.e. at least a URL, and should be
+    used by end-users when they need to specify what they want to crawl more
+    precisely (i.e. if they need to switch spiders, have a custom depth or
+    rely on some necessary data that will be passed along).
+    """
+
     __slots__ = ("url", "depth", "spider", "data")
 
     url: str
@@ -59,8 +68,25 @@ class CrawlTarget(Generic[CrawlJobDataType]):
 UrlOrCrawlTarget = Union[str, CrawlTarget[CrawlJobDataType]]
 
 
+generate_crawl_job_id = partial(
+    generate,
+    alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+    size=12,
+)
+
+
 class CrawlJob(Generic[CrawlJobDataType]):
+    """
+    This class represents an actual job that will be queued by the crawler. It
+    should not be created by users themselves as they are inferred from
+    a CrawlTarget instead.
+
+    This class should be pickle-safe as it will be serialized by persistent
+    queues.
+    """
+
     __slots__ = (
+        "id",
         "url",
         "depth",
         "spider",
@@ -70,6 +96,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
         "__domain",
     )
 
+    id: str
     url: str
     depth: int
     spider: Optional[str]
@@ -88,6 +115,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
         spider: Optional[str] = None,
         data: Optional[CrawlJobDataType] = None,
     ):
+        self.id = generate_crawl_job_id()
         self.url = ensure_protocol(url).strip()
         self.depth = depth if depth is not None else 0
         self.spider = spider
@@ -98,14 +126,10 @@ class CrawlJob(Generic[CrawlJobDataType]):
         self.__domain = None
 
     def __getstate__(self):
-        return (self.url, self.depth, self.spider, self.data, self.attempts)
+        return (self.id, self.url, self.depth, self.spider, self.data, self.attempts)
 
     def __setstate__(self, state):
-        self.url = state[0]
-        self.depth = state[1]
-        self.spider = state[2]
-        self.data = state[3]
-        self.attempts = state[4]
+        self.id, self.url, self.depth, self.spider, self.data, self.attempts = state
 
         self.__has_cached_domain = False
         self.__domain = None
@@ -131,9 +155,10 @@ class CrawlJob(Generic[CrawlJobDataType]):
         )
 
         return (
-            "<{class_name} {spider}depth={depth!r} url={url!r} attempts={attempts!r}{data}>"
+            "<{class_name} id={id!r} {spider}depth={depth!r} url={url!r} attempts={attempts!r}{data}>"
         ).format(
             class_name=class_name,
+            id=self.id,
             url=self.url,
             depth=self.depth,
             spider=spider_repr,

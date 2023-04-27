@@ -20,4 +20,5 @@ from minet.cli.console import console
 
 with Crawler.from_definition("./ftest/crawlers/echojs_crawl.yml") as crawler:
     for result in crawler:
+        console.print(result.job, highlight=True)
         console.print(result, highlight=True)
