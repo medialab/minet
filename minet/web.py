@@ -276,37 +276,6 @@ def create_pool_manager(
 DEFAULT_POOL_MANAGER = create_pool_manager(maxsize=10, num_pools=10)
 
 
-def stream_request_body(
-    response: urllib3.HTTPResponse,
-    body: BytesIO,
-    chunk_size: int = STREAMING_CHUNK_SIZE,
-    cancel_event: Optional[Event] = None,
-    final_time: Optional[float] = None,
-    up_to: Optional[int] = None,
-) -> bool:
-    if cancel_event is not None and cancel_event.is_set():
-        raise CancelledRequestError
-
-    if up_to is not None and body.tell() >= up_to:
-        return False
-
-    for data in response.stream(chunk_size):
-        body.write(data)
-
-        if up_to is not None and body.tell() >= up_to:
-            return False
-
-        if cancel_event is not None and cancel_event.is_set():
-            raise CancelledRequestError
-
-        if final_time is not None:
-            if timer() >= final_time:
-                raise FinalTimeoutError
-
-    # This is the only place we know the body has been fully read
-    return True
-
-
 def timeout_to_final_time(timeout: AnyTimeout) -> float:
     seconds: float
 
@@ -337,6 +306,42 @@ def pool_manager_aware_timeout_to_final_time(
             return timeout_to_final_time(pool_manager_timeout)
 
     return None
+
+
+def stream_response_body(
+    response: urllib3.HTTPResponse,
+    body: BytesIO,
+    chunk_size: int = STREAMING_CHUNK_SIZE,
+    cancel_event: Optional[Event] = None,
+    final_time: Optional[float] = None,
+    up_to: Optional[int] = None,
+) -> bool:
+    if cancel_event is not None and cancel_event.is_set():
+        raise CancelledRequestError
+
+    if up_to is not None and body.tell() >= up_to:
+        return False
+
+    while True:
+        data = response.read(chunk_size)
+
+        if not data:
+            break
+
+        body.write(data)
+
+        if up_to is not None and body.tell() >= up_to:
+            return False
+
+        if cancel_event is not None and cancel_event.is_set():
+            raise CancelledRequestError
+
+        if final_time is not None:
+            if timer() >= final_time:
+                raise FinalTimeoutError
+
+    # This is the only place we know the body has been fully read
+    return True
 
 
 class BufferedResponse(object):
@@ -390,7 +395,7 @@ class BufferedResponse(object):
         if self.__finished:
             return
 
-        self.__finished = stream_request_body(
+        self.__finished = stream_response_body(
             self.__inner,
             chunk_size=chunk_size,
             cancel_event=self.__cancel_event,
