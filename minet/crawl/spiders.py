@@ -19,7 +19,6 @@ from typing import (
 )
 from minet.types import TypedDict, NotRequired
 
-from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 
 from minet.crawl.types import (
@@ -183,17 +182,16 @@ class DefinitionSpider(
 
     def __coerce(
         self,
-        current_url: str,
         target: Union[str, DefinitionSpiderTarget[CrawlJobDataType]],
     ) -> CrawlTarget[CrawlJobDataType]:
         if isinstance(target, str):
-            return CrawlTarget(urljoin(current_url, target))
+            return CrawlTarget(target)
 
         else:
 
             # TODO: validate target
             return CrawlTarget(
-                url=urljoin(current_url, target["url"]),
+                url=target["url"],
                 spider=target.get("spider"),
                 data=target.get("data"),
             )
@@ -240,7 +238,7 @@ class DefinitionSpider(
             return
 
         for target in self.__next(response, soup):
-            yield self.__coerce(response.url, target)
+            yield self.__coerce(target)
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType], response: Response

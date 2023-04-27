@@ -19,6 +19,7 @@ from typing import (
     Union,
 )
 
+from urllib.parse import urljoin
 from ural import ensure_protocol, is_url
 
 from minet.types import AnyFileTarget
@@ -172,7 +173,10 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
 
                 if next_jobs is not None:
                     degree = self.crawler.enqueue(
-                        next_jobs, spider=job.spider, depth=job.depth + 1
+                        next_jobs,
+                        spider=job.spider,
+                        depth=job.depth + 1,
+                        base_url=response.end_url,
                     )
 
             except Exception as error:
@@ -389,6 +393,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         ],
         spider: Optional[str] = None,
         depth: Optional[int] = None,
+        base_url: Optional[str] = None,
     ) -> int:
         if isinstance(target_or_targets, (str, CrawlTarget)):
             targets = [target_or_targets]
@@ -413,6 +418,9 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
                 )
 
             job.url = ensure_protocol(job.url.strip(), "https")
+
+            if base_url is not None:
+                job.url = urljoin(base_url, job.url)
 
             if not is_url(
                 job.url,
