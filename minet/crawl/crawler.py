@@ -19,6 +19,8 @@ from typing import (
     Union,
 )
 
+from ural import ensure_protocol, is_url
+
 from minet.types import AnyFileTarget
 from minet.fs import load_definition
 from minet.crawl.types import (
@@ -41,7 +43,7 @@ from minet.crawl.queue import CrawlerQueue, DumpType
 from minet.crawl.state import CrawlerState
 from minet.web import request, EXPECTED_WEB_ERRORS, AnyTimeout
 from minet.executors import HTTPThreadPoolExecutor, CANCELLED
-from minet.exceptions import UnknownSpiderError, CancelledRequestError
+from minet.exceptions import UnknownSpiderError, CancelledRequestError, InvalidURLError
 from minet.constants import (
     DEFAULT_DOMAIN_PARALLELISM,
     DEFAULT_IMAP_BUFFER_SIZE,
@@ -115,7 +117,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
             spider = self.crawler.get_spider(job.spider)
 
             if spider is None:
-                return ErroredCrawlResult(job, UnknownSpiderError(spider=job.spider))
+                return ErroredCrawlResult(job, UnknownSpiderError(job.spider))
 
             # NOTE: crawl job must have a url and a depth at that point
             assert job.url is not None
@@ -393,28 +395,47 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         else:
             targets = target_or_targets
 
-        def jobs():
-            for target in targets:
-                if isinstance(target, str):
-                    job = CrawlJob(url=target)
-                else:
-                    job = CrawlJob(
-                        url=target.url,
-                        depth=target.depth,
-                        spider=target.spider,
-                        data=target.data,
-                    )
+        # NOTE: we consume jobs early and before actually enqueuing to
+        # catch errors early.
+        # NOTE: this means that enqueue is basically the only place allowed
+        # to build CrawlJob instances and validate them.
+        jobs = []
 
-                if spider is not None and job.spider is None:
-                    job.spider = spider
+        for target in targets:
+            if isinstance(target, str):
+                job = CrawlJob(url=target)
+            else:
+                job = CrawlJob(
+                    url=target.url,
+                    depth=target.depth,
+                    spider=target.spider,
+                    data=target.data,
+                )
 
-                if depth is not None:
-                    job.depth = depth
+            job.url = ensure_protocol(job.url.strip(), "https")
 
-                yield job
+            if not is_url(
+                job.url,
+                require_protocol=True,
+                tld_aware=True,
+                allow_spaces_in_path=True,
+            ):
+                raise InvalidURLError(job.url)
 
-        count = self.queue.put_many(jobs())
+            if spider is not None and job.spider is None:
+                job.spider = spider
 
+            if job.spider is not None and job.spider not in self.__spiders:
+                raise UnknownSpiderError(job.spider)
+
+            if depth is not None:
+                job.depth = depth
+
+            jobs.append(job)
+
+        count = len(jobs)
+
+        self.queue.put_many(jobs)
         self.state.inc_queued(count)
 
         return count

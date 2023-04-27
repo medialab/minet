@@ -4,7 +4,7 @@
 #
 # Logic of the crawl action.
 #
-from typing import List, Optional, TextIO, Tuple
+from typing import List, TextIO, Tuple
 
 import os
 import casanova

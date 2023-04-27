@@ -2,7 +2,7 @@ from typing import TypeVar, Union, Generic, Optional
 
 from nanoid import generate
 from functools import partial
-from ural import get_domain_name, ensure_protocol
+from ural import get_domain_name
 
 from minet.web import Response
 from minet.serialization import serialize_error_as_slug
@@ -117,7 +117,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
         data: Optional[CrawlJobDataType] = None,
     ):
         self.id = generate_crawl_job_id()
-        self.url = ensure_protocol(url).strip()
+        self.url = url
         self.depth = depth if depth is not None else 0
         self.spider = spider
         self.data = data

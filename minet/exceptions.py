@@ -70,9 +70,9 @@ class CookieGrabbingError(MinetError):
 
 # Miscellaneous HTTP errors
 class InvalidURLError(MinetError):
-    def __init__(self, message=None, url=None):
+    def __init__(self, url: str):
         self.url = url
-        super().__init__(message)
+        super().__init__(url)
 
 
 class InvalidStatusError(MinetError):
@@ -137,8 +137,8 @@ class CrawlError(MinetError):
 
 
 class UnknownSpiderError(CrawlError):
-    def __init__(self, msg=None, spider=None):
-        super().__init__(msg)
+    def __init__(self, spider: str):
+        super().__init__(spider)
         self.spider = spider
 
 

@@ -468,7 +468,7 @@ def atomic_request(
     if not ural.is_url(
         url, require_protocol=True, tld_aware=True, allow_spaces_in_path=True
     ):
-        raise InvalidURLError(url=url)
+        raise InvalidURLError(url)
 
     # We check for cancellation
     if cancel_event is not None and cancel_event.is_set():
