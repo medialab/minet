@@ -1,4 +1,4 @@
-from typing import TypeVar, Mapping, Union, Generic, Optional
+from typing import TypeVar, Union, Generic, Optional
 
 from nanoid import generate
 from functools import partial
@@ -7,7 +7,7 @@ from ural import get_domain_name, ensure_protocol
 from minet.web import Response
 from minet.serialization import serialize_error_as_slug
 
-CrawlJobDataType = TypeVar("CrawlJobDataType", bound=Mapping)
+CrawlJobDataType = TypeVar("CrawlJobDataType")
 CrawlResultDataType = TypeVar("CrawlResultDataType")
 
 
