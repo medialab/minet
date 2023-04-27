@@ -10,9 +10,7 @@ from functools import partial
 from ebbe import and_join
 from urllib3.exceptions import (
     ConnectTimeoutError,
-    MaxRetryError,
     ReadTimeoutError,
-    ResponseError,
     SSLError,
     NewConnectionError,
     ProtocolError,
@@ -48,19 +46,6 @@ from minet.scrape.exceptions import (
     ScraperEvalError,
 )
 from minet.cli.utils import colored
-
-
-def max_retry_error_reporter(error):
-    if isinstance(error, ConnectTimeoutError):
-        return "connect-timeout"
-
-    if isinstance(error, ReadTimeoutError):
-        return "read-timeout"
-
-    if isinstance(error.reason, ResponseError) and "redirect" in repr(error.reason):
-        return "too-many-redirects"
-
-    return "max-retries-exceeded"
 
 
 def new_connection_error_reporter(error):
@@ -110,7 +95,6 @@ ERROR_REPORTERS = {
     UnicodeDecodeError: "wrong-encoding",
     UnknownEncodingError: "unknown-encoding",
     FileNotFoundError: "file-not-found",
-    MaxRetryError: max_retry_error_reporter,
     InvalidURLError: "invalid-url",
     LocationValueError: "invalid-url",
     LocationParseError: "invalid-url",
