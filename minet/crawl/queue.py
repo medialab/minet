@@ -4,7 +4,8 @@ from minet.types import Literal
 from shutil import rmtree
 from os.path import isfile, join
 from queue import Queue, LifoQueue as Stack, Empty
-from persistqueue import SQLiteAckQueue, FILOSQLiteQueue as SQLiteAckStack
+from persistqueue import SQLiteAckQueue
+from persistqueue.sqlackqueue import FILOSQLiteAckQueue as SQLiteAckStack
 from threading import Lock
 
 ItemType = TypeVar("ItemType")
