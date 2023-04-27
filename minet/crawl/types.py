@@ -43,7 +43,7 @@ class CrawlTarget(Generic[CrawlJobDataType]):
 
         self.depth = depth
 
-        if spider is not None and not isinstance(depth, int):
+        if spider is not None and not isinstance(spider, str):
             raise TypeError("spider should be a string")
 
         self.spider = spider
