@@ -101,6 +101,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
         "spider",
         "data",
         "attempts",
+        "parent",
         "__has_cached_domain",
         "__domain",
     )
@@ -111,6 +112,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
     spider: Optional[str]
     data: Optional[CrawlJobDataType]
     attempts: int
+    parent: Optional[str]
 
     # TODO: we should add headers, cookies and such here in the future
 
@@ -123,6 +125,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
         depth: Optional[int] = None,
         spider: Optional[str] = None,
         data: Optional[CrawlJobDataType] = None,
+        parent: Optional[str] = None,
     ):
         self.id = generate_crawl_job_id()
         self.url = url
@@ -130,6 +133,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
         self.spider = spider
         self.data = data
         self.attempts = 0
+        self.parent = parent
 
         self.__has_cached_domain = False
         self.__domain = None
@@ -138,10 +142,26 @@ class CrawlJob(Generic[CrawlJobDataType]):
         return hash(self.id)
 
     def __getstate__(self):
-        return (self.id, self.url, self.depth, self.spider, self.data, self.attempts)
+        return (
+            self.id,
+            self.url,
+            self.depth,
+            self.spider,
+            self.data,
+            self.attempts,
+            self.parent,
+        )
 
     def __setstate__(self, state):
-        self.id, self.url, self.depth, self.spider, self.data, self.attempts = state
+        (
+            self.id,
+            self.url,
+            self.depth,
+            self.spider,
+            self.data,
+            self.attempts,
+            self.parent,
+        ) = state
 
         self.__has_cached_domain = False
         self.__domain = None
@@ -184,6 +204,7 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
 
     FIELDNAMES = [
         "id",
+        "parent",
         "spider",
         "depth",
         "url",
@@ -227,6 +248,7 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
 
         return [
             job.id,
+            job.parent,
             job.spider,
             job.depth,
             job.url,

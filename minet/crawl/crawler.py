@@ -177,6 +177,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
                         spider=job.spider,
                         depth=job.depth + 1,
                         base_url=response.end_url,
+                        parent=job,
                     )
 
             except Exception as error:
@@ -394,6 +395,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         spider: Optional[str] = None,
         depth: Optional[int] = None,
         base_url: Optional[str] = None,
+        parent: Optional[CrawlJob[CrawlJobDataTypes]] = None,
     ) -> int:
         if isinstance(target_or_targets, (str, CrawlTarget)):
             targets = [target_or_targets]
@@ -438,6 +440,9 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
             if depth is not None:
                 job.depth = depth
+
+            if parent is not None:
+                job.parent = parent.id
 
             jobs.append(job)
 
