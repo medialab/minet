@@ -390,20 +390,14 @@ class BufferedResponse(object):
         if self.__finished:
             return
 
-        fully_read = False
-
-        try:
-            fully_read = stream_request_body(
-                self.__inner,
-                chunk_size=chunk_size,
-                cancel_event=self.__cancel_event,
-                final_time=self.__final_time,
-                body=self.__body,
-                up_to=up_to,
-            )
-        finally:
-            if fully_read:
-                self.__finished = fully_read
+        self.__finished = stream_request_body(
+            self.__inner,
+            chunk_size=chunk_size,
+            cancel_event=self.__cancel_event,
+            final_time=self.__final_time,
+            body=self.__body,
+            up_to=up_to,
+        )
 
     def geturl(self) -> Optional[str]:
         return self.__inner.geturl()
