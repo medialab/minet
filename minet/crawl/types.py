@@ -5,6 +5,7 @@ from functools import partial
 from ural import get_domain_name, ensure_protocol
 
 from minet.web import Response
+from minet.serialization import serialize_error_as_slug
 
 CrawlJobDataType = TypeVar("CrawlJobDataType", bound=Mapping)
 CrawlResultDataType = TypeVar("CrawlResultDataType")
@@ -195,6 +196,10 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
     def spider(self) -> Optional[str]:
         return self.job.spider
 
+    @property
+    def error_code(self) -> Optional[str]:
+        return serialize_error_as_slug(self.error) if self.error else None
+
     def _repr_from_job(self) -> str:
         r = "url={url!r} depth={depth!r}".format(url=self.job.url, depth=self.job.depth)
 
@@ -223,11 +228,15 @@ class ErroredCrawlResult(CrawlResult[CrawlJobDataType, None]):
         self.response = response
         self.degree = 0
 
+    @property
+    def error_code(self) -> str:
+        return serialize_error_as_slug(self.error)
+
     def __repr__(self):
         name = self.__class__.__name__
 
         return "<{name} {job} error={error}>".format(
-            name=name, job=self._repr_from_job(), error=self.error.__class__.__name__
+            name=name, job=self._repr_from_job(), error=self.error_code
         )
 
 
@@ -250,6 +259,10 @@ class SuccessfulCrawlResult(CrawlResult[CrawlJobDataType, CrawlResultDataType]):
         self.error = None
         self.response = response
         self.degree = degree
+
+    @property
+    def error_code(self) -> None:
+        return None
 
     def __repr__(self):
         name = self.__class__.__name__

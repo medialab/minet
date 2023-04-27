@@ -94,7 +94,7 @@ ERROR_REPORTERS = {
 }
 
 
-def serialize_error_as_slug(error):
+def serialize_error_as_slug(error: BaseException):
     reporter = ERROR_REPORTERS.get(type(error), repr)
 
     return reporter(error) if callable(reporter) else reporter
