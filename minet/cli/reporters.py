@@ -7,6 +7,7 @@
 #
 from io import StringIO
 from functools import partial
+from ebbe import and_join
 from urllib3.exceptions import (
     ConnectTimeoutError,
     MaxRetryError,
@@ -136,15 +137,6 @@ def report_error(error):
     reporter = ERROR_REPORTERS.get(type(error), repr)
 
     return reporter(error) if callable(reporter) else reporter
-
-
-def and_join(strings):
-    strings = [colored(s, "green") for s in strings]
-
-    if len(strings) < 2:
-        return strings[0]
-
-    return (", ".join(strings[:-1])) + " and " + strings[-1]
 
 
 def report_scraper_validation_errors(errors):
