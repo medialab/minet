@@ -15,7 +15,7 @@ from minet.cli.exceptions import FatalError
 from minet.cli.console import console
 from minet.scrape import Scraper
 from minet.scrape.exceptions import InvalidScraperError
-from minet.crawl import Crawler, CrawlResult, DefinitionSpiderOutput
+from minet.crawl import Crawler, CrawlResult, CrawlJob, DefinitionSpiderOutput
 from minet.serialization import serialize_error_as_slug
 from minet.cli.reporters import report_scraper_validation_errors
 from minet.cli.loading_bar import LoadingBar
@@ -59,13 +59,13 @@ class ScraperReporter(object):
         if scraper.fieldnames is None:
             raise NotImplementedError("Scraper fieldnames could not be inferred.")
 
-        f, writer = open_report(path, scraper.fieldnames, resume)
+        f, writer = open_report(path, ["job_id"] + scraper.fieldnames, resume)
 
         self.fieldnames = scraper.fieldnames
         self.file = f
         self.writer = writer
 
-    def write(self, items) -> int:
+    def write(self, job_id: str, items) -> int:
         count = 0
 
         # TODO: maybe abstract this once step above
@@ -76,10 +76,12 @@ class ScraperReporter(object):
             count += 1
 
             if not isinstance(item, dict):
-                self.writer.writerow([item])
-                continue
+                row = [item]
+            else:
+                row = [item.get(k, "") for k in self.fieldnames]
 
-            row = [item.get(k, "") for k in self.fieldnames]
+            row = [job_id] + row
+
             self.writer.writerow(row)
 
         return count
@@ -127,8 +129,10 @@ class ScraperReporterPool(object):
                     reporter = ScraperReporter(path, scraper, resume)
                     self.reporters[spider_name][name] = reporter
 
-    def write(self, spider_name: Optional[str], scraped: DefinitionSpiderOutput) -> int:
+    def write(self, job: CrawlJob, scraped: DefinitionSpiderOutput) -> int:
         count = 0
+
+        spider_name = job.spider
 
         if spider_name is None:
             spider_name = "default"
@@ -136,10 +140,12 @@ class ScraperReporterPool(object):
         reporter = self.reporters[spider_name]
 
         if scraped.default is not None:
-            count += reporter[ScraperReporterPool.SINGULAR].write(scraped.default)
+            count += reporter[ScraperReporterPool.SINGULAR].write(
+                job.id, scraped.default
+            )
 
         for name, items in scraped.named.items():
-            count += reporter[name].write(items)
+            count += reporter[name].write(job.id, items)
 
         return count
 
@@ -253,7 +259,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
                     jobs_writer.writerow(result.as_csv_row() + [0])
                     continue
 
-                count = reporter_pool.write(result.job.spider, result.data)
+                count = reporter_pool.write(result.job, result.data)
                 jobs_writer.writerow(result.as_csv_row() + [count])
                 loading_bar.inc_stat("scraped", count=count, style="success")
 
