@@ -171,6 +171,17 @@ class CrawlJob(Generic[CrawlJobDataType]):
 class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
     __slots__ = ("job", "data", "error", "response", "degree")
 
+    FIELDNAMES = [
+        "id",
+        "spider",
+        "depth",
+        "url",
+        "resolved_url",
+        "error",
+        "status",
+        "degree",
+    ]
+
     job: CrawlJob[CrawlJobDataType]
     data: Optional[CrawlResultDataType]
     error: Optional[Exception]
@@ -199,6 +210,20 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
     @property
     def error_code(self) -> Optional[str]:
         return serialize_error_as_slug(self.error) if self.error else None
+
+    def as_csv_row(self):
+        job = self.job
+
+        return [
+            job.id,
+            job.spider,
+            job.depth,
+            job.url,
+            self.response.end_url if self.response else None,
+            self.error_code,
+            self.response.status if self.response else None,
+            self.degree,
+        ]
 
     def _repr_from_job(self) -> str:
         r = "url={url!r} depth={depth!r}".format(url=self.job.url, depth=self.job.depth)

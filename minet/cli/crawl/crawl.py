@@ -4,7 +4,7 @@
 #
 # Logic of the crawl action.
 #
-from typing import List, Any, Optional, Union, TextIO, Tuple
+from typing import List, Optional, TextIO, Tuple
 
 import os
 import casanova
@@ -25,16 +25,7 @@ from minet.cli.utils import (
     track_crawler_state_with_loading_bar,
 )
 
-JOBS_HEADERS = [
-    "spider",
-    "depth",
-    "url",
-    "error",
-    "status",
-    "encoding",
-    "degree",
-    "scraped",
-]
+ADDITIONAL_JOBS_HEADERS = ["scraped"]
 
 STATUS_TO_STYLE = {
     "acked": "success_background",
@@ -42,38 +33,6 @@ STATUS_TO_STYLE = {
     "unack": "warning_background",
     "ack_failed": "error_background",
 }
-
-
-def format_result_for_csv(
-    result: CrawlResult[Any, DefinitionSpiderOutput], count: Optional[int] = None
-) -> List[Optional[Union[str, int]]]:
-    if result.error is not None:
-        return [
-            result.job.spider,
-            result.job.depth,
-            result.job.url,
-            serialize_error_as_slug(result.error),
-            "",
-            "",
-            "",
-            "",
-            "",
-        ]
-
-    response = result.response
-
-    assert response is not None
-
-    return [
-        result.job.spider,
-        result.job.depth,
-        result.job.url,
-        "",
-        response.status,
-        response.encoding,
-        result.degree,
-        count,
-    ]
 
 
 def open_report(
@@ -223,7 +182,9 @@ def action(cli_args, defer, loading_bar: LoadingBar):
 
     jobs_output_path = join(cli_args.output_dir, "jobs.csv")
     jobs_output, jobs_writer = open_report(
-        jobs_output_path, JOBS_HEADERS, resume=cli_args.resume
+        jobs_output_path,
+        CrawlResult.FIELDNAMES + ADDITIONAL_JOBS_HEADERS,
+        resume=cli_args.resume,
     )
     defer(jobs_output.close)
 
@@ -289,11 +250,11 @@ def action(cli_args, defer, loading_bar: LoadingBar):
                     loading_bar.inc_stat(
                         serialize_error_as_slug(result.error), style="error"
                     )
-                    jobs_writer.writerow(format_result_for_csv(result))
+                    jobs_writer.writerow(result.as_csv_row() + [0])
                     continue
 
                 count = reporter_pool.write(result.job.spider, result.data)
-                jobs_writer.writerow(format_result_for_csv(result, count=count))
+                jobs_writer.writerow(result.as_csv_row() + [count])
                 loading_bar.inc_stat("scraped", count=count, style="success")
 
                 # Flushing to avoid sync issues as well as possible
