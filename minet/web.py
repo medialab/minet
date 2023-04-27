@@ -658,6 +658,7 @@ def atomic_resolve(
                             redirection = Redirection(canonical, "canonical")
                             url_stack[canonical] = redirection
 
+                    # Breaking free of the retry loop because we have a hit
                     break
 
             else:
@@ -713,7 +714,7 @@ def atomic_resolve(
 
         raise
 
-    # Compiling the stack and returning the last buffered response, still livem
+    # Compiling the stack and returning the last buffered response, still alive
     compiled_stack = list(url_stack.values())
 
     assert buffered_response is not None
