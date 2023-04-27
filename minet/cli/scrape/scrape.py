@@ -29,11 +29,11 @@ from minet.cli.reporters import (
     report_scraper_validation_errors,
     report_scraper_evaluation_error,
 )
-from minet.cli.console import console
+from minet.serialization import serialize_error_as_slug
 from minet.fs import read_potentially_gzipped_path
+from minet.cli.console import console
 from minet.cli.loading_bar import LoadingBar
 from minet.cli.utils import create_fetch_like_report_iterator, FetchReportLikeItem
-from minet.cli.reporters import report_error
 from minet.cli.exceptions import FatalError
 
 
@@ -275,7 +275,7 @@ def action(cli_args):
                                 report_scraper_evaluation_error(result.error), end=""
                             )
                         else:
-                            error_code = report_error(result.error)
+                            error_code = serialize_error_as_slug(result.error)
                             loading_bar.inc_stat(error_code, style="error")
 
                             if (

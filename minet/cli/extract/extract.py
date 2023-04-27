@@ -13,6 +13,7 @@ from itertools import count
 from casanova import TabularRecord, ThreadSafeEnricher
 
 from minet.multiprocessing import LazyPool
+from minet.serialization import serialize_error_as_slug
 from minet.fs import read_potentially_gzipped_path
 from minet.cli.utils import (
     create_fetch_like_report_iterator,
@@ -20,7 +21,6 @@ from minet.cli.utils import (
     FetchReportLikeItem,
 )
 from minet.cli.console import console
-from minet.cli.reporters import report_error
 from minet.exceptions import TrafilaturaError
 from minet.cli.exceptions import FatalError
 
@@ -173,7 +173,7 @@ def action(cli_args, enricher: ThreadSafeEnricher, loading_bar):
                 row = item.row
 
                 if result.error is not None:
-                    error_code = report_error(result.error)
+                    error_code = serialize_error_as_slug(result.error)
                     loading_bar.inc_stat(error_code, style="error")
 
                     if not warned_about_input_dir and error_code == "file-not-found":

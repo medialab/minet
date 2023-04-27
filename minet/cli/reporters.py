@@ -1,38 +1,7 @@
-# =============================================================================
-# Minet CLI Reporters
-# =============================================================================
-#
-# Various reporters whose goal is to convert errors etc. into human-actionable
-# labels in CSV format, for instance.
-#
 from io import StringIO
 from functools import partial
 from ebbe import and_join
-from urllib3.exceptions import (
-    ConnectTimeoutError,
-    ReadTimeoutError,
-    SSLError,
-    NewConnectionError,
-    ProtocolError,
-    DecodeError,
-    LocationValueError,
-    LocationParseError,
-)
 
-from minet.exceptions import (
-    UnknownEncodingError,
-    InvalidURLError,
-    MaxRedirectsError,
-    InfiniteRedirectsError,
-    SelfRedirectError,
-    InvalidRedirectError,
-    BadlyEncodedLocationHeaderError,
-    TrafilaturaError,
-    FilenameFormattingError,
-    FinalTimeoutError,
-    CouldNotInferEncodingError,
-    InvalidStatusError,
-)
 from minet.scrape.constants import BURROWING_KEYS, LEAF_KEYS
 from minet.scrape.exceptions import (
     ScraperEvalSyntaxError,
@@ -46,81 +15,6 @@ from minet.scrape.exceptions import (
     ScraperEvalError,
 )
 from minet.cli.utils import colored
-
-
-def new_connection_error_reporter(error):
-    msg = repr(error).lower()
-
-    if "no route to host" in msg or "errno 113" in msg:
-        return "no-route-to-host"
-
-    if "name or service not known" in msg or "errno 8" in msg:
-        return "unknown-host"
-
-    if "connection refused" in msg:
-        return "connection-refused"
-
-    if "temporary failure in name resolution" in msg or "errno -3" in msg:
-        return "name-resolution-failure"
-
-    return msg
-
-
-def protocol_error_reporter(error):
-    msg = repr(error).lower()
-
-    if "connection aborted" in msg:
-        return "connection-aborted"
-
-    if "connection refused" in msg:
-        return "connection-refused"
-
-    return "connection-error"
-
-
-def decode_error_reporter(error):
-    msg = repr(error)
-
-    if "gzip" in msg:
-        return "invalid-gzip"
-
-    return "invalid-encoding"
-
-
-def invalid_status_reporter(error: InvalidStatusError):
-    return "invalid-status-%i" % error.status
-
-
-ERROR_REPORTERS = {
-    UnicodeDecodeError: "wrong-encoding",
-    UnknownEncodingError: "unknown-encoding",
-    FileNotFoundError: "file-not-found",
-    InvalidURLError: "invalid-url",
-    LocationValueError: "invalid-url",
-    LocationParseError: "invalid-url",
-    SSLError: "ssl",
-    NewConnectionError: new_connection_error_reporter,
-    ProtocolError: protocol_error_reporter,
-    ConnectTimeoutError: "connect-timeout",
-    ReadTimeoutError: "read-timeout",
-    FinalTimeoutError: "final-timeout",
-    MaxRedirectsError: "max-redirects",
-    InfiniteRedirectsError: "infinite-redirects",
-    SelfRedirectError: "self-redirect",
-    InvalidRedirectError: "invalid-redirect",
-    BadlyEncodedLocationHeaderError: "badly-encoded-location",
-    DecodeError: decode_error_reporter,
-    TrafilaturaError: "trafilatura-error",
-    FilenameFormattingError: "filename-formatting-error",
-    CouldNotInferEncodingError: "could-not-infer-encoding",
-    InvalidStatusError: invalid_status_reporter,
-}
-
-
-def report_error(error):
-    reporter = ERROR_REPORTERS.get(type(error), repr)
-
-    return reporter(error) if callable(reporter) else reporter
 
 
 def report_scraper_validation_errors(errors):
