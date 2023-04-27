@@ -93,13 +93,13 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
         self,
         crawler: "Crawler",
         *,
-        get_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
+        request_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
     ):
         self.crawler = crawler
         self.cancel_event = self.crawler.executor.cancel_event
         self.local_context = self.crawler.executor.local_context
-        self.get_args = get_args
+        self.request_args = request_args
 
         self.default_kwargs = {
             "pool_manager": crawler.executor.pool_manager,
@@ -129,9 +129,9 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
             if cancel_event.is_set():
                 return CANCELLED
 
-            if self.get_args is not None:
-                # NOTE: get_args must be threadsafe
-                kwargs = self.get_args(job)
+            if self.request_args is not None:
+                # NOTE: request_args must be threadsafe
+                kwargs = self.request_args(job)
 
             if cancel_event.is_set():
                 return CANCELLED
@@ -227,7 +227,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         proxy: Optional[str] = None,
         retry: bool = False,
         retryer_kwargs: Optional[Dict[str, Any]] = None,
-        get_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
+        request_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
     ):
 
@@ -250,7 +250,10 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             "throttle": throttle,
         }
 
-        self.worker_kwargs = {"get_args": get_args, "max_redirects": max_redirects}
+        self.worker_kwargs = {
+            "request_args": request_args,
+            "max_redirects": max_redirects,
+        }
 
         # Params
         self.queue_path = queue_path
