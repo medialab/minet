@@ -49,6 +49,14 @@ class CrawlTarget(Generic[CrawlJobDataType]):
         self.spider = spider
         self.data = data
 
+    def __eq__(self, other):
+        return (
+            self.url == other.url
+            and self.depth == other.depth
+            and self.spider == other.spider
+            and self.data == other.data
+        )
+
     def __repr__(self):
         class_name = self.__class__.__name__
 
@@ -125,6 +133,9 @@ class CrawlJob(Generic[CrawlJobDataType]):
 
         self.__has_cached_domain = False
         self.__domain = None
+
+    def __hash__(self) -> int:
+        return hash(self.id)
 
     def __getstate__(self):
         return (self.id, self.url, self.depth, self.spider, self.data, self.attempts)
