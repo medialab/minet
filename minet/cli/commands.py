@@ -14,6 +14,7 @@ from minet.cli.google import GOOGLE_COMMAND
 from minet.cli.hyphe import HYPHE_COMMAND
 from minet.cli.instagram import INSTAGRAM_COMMAND
 from minet.cli.mediacloud import MEDIACLOUD_COMMAND
+from minet.cli.spotify import SPOTIFY_COMMAND
 from minet.cli.telegram import TELEGRAM_COMMAND
 from minet.cli.tiktok import TIKTOK_COMMAND
 from minet.cli.twitter import TWITTER_COMMAND
@@ -43,4 +44,5 @@ MINET_COMMANDS = [
     TWITTER_COMMAND,
     WIKIPEDIA_COMMAND,
     YOUTUBE_COMMAND,
+    SPOTIFY_COMMAND
 ]
