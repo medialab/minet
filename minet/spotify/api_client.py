@@ -85,15 +85,23 @@ class SpotifyAPIClient(object):
         is_next_page = True
         while is_next_page:
             result = self.request_json(url)
-            if result.get('next'):
-                url = result['next']
-            else:
-                is_next_page = False
+            # If the result doesn't declare a type
+            # and the items are directly listed
             if result.get('items'):
                 items = result['items']
+                if result.get('next'):
+                    url = result['next']
+                else:
+                    is_next_page = False
+            # Or if the result declares what type of
+            # media is in the items list
             elif len(list(result.keys())) == 1:
                 type = list(result.keys())[0]
                 items = result[type].get('items')
+                if result[type].get('next'):
+                    url = result[type]['next']
+                else:
+                    is_next_page = False
             if isinstance(items, list) and len(items) > 0:
                 for item in items:
                     formatted_item = formatter(item)
