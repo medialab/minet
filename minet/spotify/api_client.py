@@ -37,6 +37,7 @@ def get_access_token(client_id:str, client_secret:str):
 def forge_search_url(search_kwargs):
     if search_kwargs.get('q'):
         q = '%20'.join(search_kwargs['q'].split())
+        q = '%3'.join(q.split(':'))
         search_kwargs['q'] = q
     args = [f'{k}={v}' for k,v in search_kwargs.items() if v]
     query = '&'.join(args)
@@ -84,6 +85,7 @@ class SpotifyAPIClient(object):
     def generator(self, url, formatter):
         is_next_page = True
         while is_next_page:
+            print(url)
             result = self.request_json(url)
             # If the result doesn't declare a type
             # and the items are directly listed
