@@ -39,6 +39,7 @@ def forge_search_url(search_kwargs):
         q = '%20'.join(search_kwargs['q'].split())
         q = '%3'.join(q.split(':'))
         search_kwargs['q'] = q
+    search_kwargs.update({"limit":50})
     args = [f'{k}={v}' for k,v in search_kwargs.items() if v]
     query = '&'.join(args)
     return BASE_API_ENDPOINT_V1+'search?'+query
@@ -51,7 +52,7 @@ class SpotifyAPIClient(object):
             client_secret=client_secret
         )
         self.retryer = create_request_retryer()
-        self.search_kwargs = kwargs
+        self.cli_search_kwargs = kwargs
 
     @retrying_method()
     def request_json(self, url):
@@ -72,39 +73,38 @@ class SpotifyAPIClient(object):
 
     def shows(self, query):
         search_kwargs = {"q":query, "type":"show"}
-        search_kwargs.update(self.search_kwargs)
+        search_kwargs.update(self.cli_search_kwargs)
         url = forge_search_url(search_kwargs)
         return self.generator(url, format_show)
 
     def episodes(self, query):
         search_kwargs = {"q":query, "type":"episode"}
-        search_kwargs.update(self.search_kwargs)
+        search_kwargs.update(self.cli_search_kwargs)
         url = forge_search_url(search_kwargs)
         return self.generator(url, format_episode)
 
     def generator(self, url, formatter):
-        is_next_page = True
-        while is_next_page:
-            print(url)
+        go_to_next_page = True
+        while go_to_next_page:
             result = self.request_json(url)
             # If the result doesn't declare a type
-            # and the items are directly listed
-            if result.get('items'):
-                items = result['items']
-                if result.get('next'):
-                    url = result['next']
-                else:
-                    is_next_page = False
-            # Or if the result declares what type of
-            # media is in the items list
+            if result.get("items"):
+                data = result
+            # Or if the result declares the media type
             elif len(list(result.keys())) == 1:
                 type = list(result.keys())[0]
-                items = result[type].get('items')
-                if result[type].get('next'):
-                    url = result[type]['next']
-                else:
-                    is_next_page = False
+                data = result[type]
+            else:
+                raise KeyError
+            # Determine the next results page
+            url = data.get("next")
+            if not url:
+                go_to_next_page = False
+            # Yield results in the items array
+            items = data.get("items")
             if isinstance(items, list) and len(items) > 0:
                 for item in items:
                     formatted_item = formatter(item)
                     yield formatted_item
+            else :
+                go_to_next_page = False
