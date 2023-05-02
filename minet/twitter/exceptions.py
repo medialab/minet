@@ -29,6 +29,12 @@ class TwitterPublicAPIRateLimitError(TwitterPublicAPIError):
     pass
 
 
+class TwitterPublicAPIBadAuthError(TwitterPublicAPIError):
+    def __init__(self, status: int):
+        self.status = status
+        super().__init__(str(status))
+
+
 class TwitterPublicAPIInvalidResponseError(TwitterPublicAPIError):
     def __init__(self, message=None, response_text=None, status=None):
         super().__init__(message)

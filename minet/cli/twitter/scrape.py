@@ -14,6 +14,7 @@ from minet.twitter import TwitterAPIScraper
 from minet.twitter.exceptions import (
     TwitterPublicAPIQueryTooLongError,
     TwitterPublicAPIInvalidCookieError,
+    TwitterPublicAPIBadAuthError,
 )
 from minet.twitter.constants import ADDITIONAL_TWEET_FIELDS
 
@@ -91,3 +92,9 @@ def action(cli_args, enricher, loading_bar):
 
             except TwitterPublicAPIQueryTooLongError:
                 loading_bar.error("Query too long [dim]%s[/dim]" % query)
+
+            except TwitterPublicAPIBadAuthError as error:
+                raise FatalError(
+                    "Bad authentication (%i). Double check your --cookie and make sure you are logged in."
+                    % error.status
+                )

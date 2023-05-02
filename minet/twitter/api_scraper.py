@@ -40,6 +40,7 @@ from minet.twitter.exceptions import (
     TwitterPublicAPIncompleteTweetIndexError,
     TwitterPublicAPIncompleteUserIndexError,
     TwitterPublicAPIInvalidCookieError,
+    TwitterPublicAPIBadAuthError,
 )
 
 # =============================================================================
@@ -445,9 +446,13 @@ class TwitterAPIScraper(object):
 
         response = self.request(url, headers=headers)
 
-        if response.status in [403, 429]:
+        if response.status == 429:
             # self.reset()
             raise TwitterPublicAPIRateLimitError
+
+        if response.status in [401, 403]:
+            # self.reset()
+            raise TwitterPublicAPIBadAuthError(response.status)
 
         try:
             data = response.json()
