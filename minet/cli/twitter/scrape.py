@@ -9,9 +9,11 @@ from twitwi import format_tweet_as_csv_row, format_user_as_csv_row
 
 from minet.utils import PseudoFStringFormatter
 from minet.cli.utils import with_enricher_and_loading_bar
+from minet.cli.exceptions import FatalError
 from minet.twitter import TwitterAPIScraper
 from minet.twitter.exceptions import (
     TwitterPublicAPIQueryTooLongError,
+    TwitterPublicAPIInvalidCookieError,
 )
 from minet.twitter.constants import ADDITIONAL_TWEET_FIELDS
 
@@ -45,7 +47,15 @@ def get_headers(cli_args):
     sub_unit=lambda cli_args: cli_args.items,
 )
 def action(cli_args, enricher, loading_bar):
-    scraper = TwitterAPIScraper(cli_args.cookie)
+    try:
+        scraper = TwitterAPIScraper(cli_args.cookie)
+    except TwitterPublicAPIInvalidCookieError:
+        raise FatalError(
+            [
+                "Invalid Twitter cookie!",
+                "Try giving another browser to --cookie and sure you are correctly logged in.",
+            ]
+        )
 
     for row, query in enricher.cells(cli_args.column, with_rows=True):
 

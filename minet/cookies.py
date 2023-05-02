@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Dict
 
 import browser_cookie3
 from urllib.request import Request
@@ -20,7 +20,7 @@ class CookieResolver(object):
         return req.get_header("Cookie") or None
 
 
-def get_cookie_jar_from_browser(browser="firefox") -> CookieJar:
+def get_cookie_jar_from_browser(browser: str = "firefox") -> CookieJar:
     fn = getattr(browser_cookie3, browser, None)
 
     if fn is None:
@@ -32,7 +32,7 @@ def get_cookie_jar_from_browser(browser="firefox") -> CookieJar:
         raise CookieGrabbingError(browser)
 
 
-def get_cookie_resolver_from_browser(browser="firefox") -> CookieResolver:
+def get_cookie_resolver_from_browser(browser: str = "firefox") -> CookieResolver:
     return CookieResolver(get_cookie_jar_from_browser(browser))
 
 
@@ -45,11 +45,23 @@ def coerce_cookie_for_url_from_browser(target: str, url: str) -> Optional[str]:
     return target.strip()
 
 
-def get_cookie_morsel_value(cookie, key):
+def get_cookie_morsel_value(cookie: str, key: str) -> str:
     parsed = SimpleCookie()
     parsed.load(cookie)
     return parsed[key].value
 
 
-def dict_to_cookie_string(d):
+def dict_to_cookie_string(d: Dict[str, str]) -> str:
     return "; ".join("%s=%s" % r for r in d.items())
+
+
+def cookie_string_to_dict(cookie: str) -> Dict[str, str]:
+    parsed = SimpleCookie()
+    parsed.load(cookie)
+
+    o = {}
+
+    for morsel in parsed.values():
+        o[morsel.key] = morsel.value
+
+    return o

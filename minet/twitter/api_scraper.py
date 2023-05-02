@@ -18,14 +18,18 @@ from minet.web import (
     create_request_retryer,
     retrying_method,
 )
-from minet.cookies import coerce_cookie_for_url_from_browser, get_cookie_morsel_value
+from minet.cookies import (
+    coerce_cookie_for_url_from_browser,
+    get_cookie_morsel_value,
+    cookie_string_to_dict,
+)
 from minet.rate_limiting import RateLimiterState, rate_limited_method
 from minet.twitter.constants import (
     TWITTER_PUBLIC_API_DEFAULT_TIMEOUT,
     TWITTER_PUBLIC_API_AUTH_HEADER,
 )
 from minet.twitter.exceptions import (
-    # TwitterGuestTokenError,
+    # TwitterPublicAPIGuestTokenError,
     TwitterPublicAPIBadRequest,
     TwitterPublicAPIRateLimitError,
     TwitterPublicAPIInvalidResponseError,
@@ -35,6 +39,7 @@ from minet.twitter.exceptions import (
     TwitterPublicAPIHiccupError,
     TwitterPublicAPIncompleteTweetIndexError,
     TwitterPublicAPIncompleteUserIndexError,
+    TwitterPublicAPIInvalidCookieError,
 )
 
 # =============================================================================
@@ -51,6 +56,16 @@ MAX_GUEST_TOKEN_USE_COUNT = 100
 # =============================================================================
 def is_query_too_long(query):
     return len(quote(query)) > MAXIMUM_QUERY_LENGTH
+
+
+def is_cookie_valid(cookie: str) -> bool:
+    dict_cookie = cookie_string_to_dict(cookie)
+
+    return bool(
+        dict_cookie.get("guest_id")
+        and dict_cookie.get("ct0")
+        and dict_cookie.get("auth_token")
+    )
 
 
 # def ensure_guest_token(method):
@@ -339,6 +354,10 @@ class TwitterAPIScraper(object):
         self.cookie = coerce_cookie_for_url_from_browser(
             cookie, TWITTER_PUBLIC_SEARCH_ENDPOINT
         )
+
+        if not is_cookie_valid(self.cookie):
+            raise TwitterPublicAPIInvalidCookieError
+
         self.csrf_token = get_cookie_morsel_value(self.cookie, "ct0")
 
         def epilog_builder(retry_state: RetryCallState):
@@ -401,7 +420,7 @@ class TwitterAPIScraper(object):
     #     guest_token = api_token_response.get("guest_token")
 
     #     if guest_token is None:
-    #         raise TwitterGuestTokenError
+    #         raise TwitterPublicAPIGuestTokenError
 
     #     self.guest_token = guest_token
     #     self.cookie = response.headers[
