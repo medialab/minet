@@ -31,7 +31,7 @@ SPOTIFY_SHOWS_SUBCOMMAND = subcommand(
         {
             "flags": ["--market"],
             "help": "Market in which the content is distributed.",
-            "type": str
+            "type": str,
         },
     ],
 )
@@ -60,7 +60,7 @@ SPOTIFY_EPISODES_SUBCOMMAND = subcommand(
         {
             "flags": ["--market"],
             "help": "Market in which the content is distributed.",
-            "type": str
+            "type": str,
         },
     ],
 )
@@ -74,7 +74,7 @@ SPOTIFY_COMMAND = command(
     description="""
         Gather data from Spotify.
     """,
-    common_arguments= [
+    common_arguments=[
         {
             "flag": "--client-id",
             "help": "Spotify API client id.",
@@ -86,10 +86,7 @@ SPOTIFY_COMMAND = command(
             "help": "Spotify API secret client id.",
             "rc_key": ["spotify", "client_secret"],
             "action": ConfigAction,
-        }
+        },
     ],
-    subcommands=[
-        SPOTIFY_SHOWS_SUBCOMMAND,
-        SPOTIFY_EPISODES_SUBCOMMAND
-    ],
+    subcommands=[SPOTIFY_SHOWS_SUBCOMMAND, SPOTIFY_EPISODES_SUBCOMMAND],
 )

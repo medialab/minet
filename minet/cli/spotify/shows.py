@@ -6,12 +6,11 @@
 #
 
 from minet.cli.utils import with_enricher_and_loading_bar
-from minet.spotify import SpotifyAPIClient
-from minet.spotify.constants import SPOTIFY_SHOW_HEADERS
+from minet.spotify import SpotifyAPIClient, SpotifyShow
 
 
 @with_enricher_and_loading_bar(
-    headers=SPOTIFY_SHOW_HEADERS,
+    headers=SpotifyShow.fieldnames(),
     title="Retrieving podcast shows",
     unit="queries",
     sub_unit="shows",
@@ -19,13 +18,11 @@ from minet.spotify.constants import SPOTIFY_SHOW_HEADERS
 )
 def action(cli_args, enricher, loading_bar):
     client = SpotifyAPIClient(
-        cli_args.client_id,
-        cli_args.client_secret,
-        {"market": cli_args.market}
+        cli_args.client_id, cli_args.client_secret, {"market": cli_args.market}
     )
 
     for row, query in enricher.cells(cli_args.column, with_rows=True):
         with loading_bar.step(query):
             for show in client.shows(query):
-                enricher.writerow(row, show.as_csv_row())
+                enricher.writerow(row, show)
                 loading_bar.nested_advance()
