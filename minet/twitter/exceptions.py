@@ -9,19 +9,33 @@ class TwitterError(MinetError):
     pass
 
 
-class TwitterGuestTokenError(TwitterError):
+class TwitterPublicAPIError(TwitterError):
     pass
 
 
-class TwitterPublicAPIQueryTooLongError(TwitterError):
+class TwitterPublicAPIGuestTokenError(TwitterPublicAPIError):
     pass
 
 
-class TwitterPublicAPIRateLimitError(TwitterError):
+class TwitterPublicAPIInvalidCookieError(TwitterPublicAPIError):
     pass
 
 
-class TwitterPublicAPIInvalidResponseError(TwitterError):
+class TwitterPublicAPIQueryTooLongError(TwitterPublicAPIError):
+    pass
+
+
+class TwitterPublicAPIRateLimitError(TwitterPublicAPIError):
+    pass
+
+
+class TwitterPublicAPIBadAuthError(TwitterPublicAPIError):
+    def __init__(self, status: int):
+        self.status = status
+        super().__init__(str(status))
+
+
+class TwitterPublicAPIInvalidResponseError(TwitterPublicAPIError):
     def __init__(self, message=None, response_text=None, status=None):
         super().__init__(message)
         self.response_text = response_text
@@ -39,7 +53,7 @@ class TwitterPublicAPIInvalidResponseError(TwitterError):
         return ", ".join(epilog) if epilog else ""
 
 
-class TwitterPublicAPIncompleteTweetIndexError(TwitterError):
+class TwitterPublicAPIncompleteTweetIndexError(TwitterPublicAPIError):
     def __init__(self, message=None, tweet_id=None, tweet_index=None):
         super().__init__(message)
         self.tweet_id = tweet_id
@@ -57,7 +71,7 @@ class TwitterPublicAPIncompleteTweetIndexError(TwitterError):
         return ", ".join(epilog) if epilog else ""
 
 
-class TwitterPublicAPIncompleteUserIndexError(TwitterError):
+class TwitterPublicAPIncompleteUserIndexError(TwitterPublicAPIError):
     def __init__(self, message=None, user_id=None, user_index=None):
         super().__init__(message)
         self.user_id = user_id
@@ -75,17 +89,17 @@ class TwitterPublicAPIncompleteUserIndexError(TwitterError):
         return ", ".join(epilog) if epilog else ""
 
 
-class TwitterPublicAPIBadRequest(TwitterError):
+class TwitterPublicAPIBadRequest(TwitterPublicAPIError):
     pass
 
 
-class TwitterPublicAPIOverCapacityError(TwitterError):
+class TwitterPublicAPIOverCapacityError(TwitterPublicAPIError):
     pass
 
 
-class TwitterPublicAPIParsingError(TwitterError):
+class TwitterPublicAPIParsingError(TwitterPublicAPIError):
     pass
 
 
-class TwitterPublicAPIHiccupError(TwitterError):
+class TwitterPublicAPIHiccupError(TwitterPublicAPIError):
     pass

@@ -4,6 +4,8 @@
 #
 # Rich console instance used by minet CLI.
 #
+from typing import Optional
+
 from datetime import datetime
 from rich.console import Console
 from rich.theme import Theme
@@ -41,9 +43,9 @@ MINET_THEME = Theme(MINET_STYLES)
 
 
 class MinetConsole(Console):
-    def vprint(self, *messages):
+    def vprint(self, *messages, style: Optional[str] = None):
         txt = message_flatmap(*messages)
-        self.print(txt)
+        self.print(txt, style=style)
 
     def logh(self, header: str, *messages, style=None, header_style="log.time") -> None:
         txt = message_flatmap(*messages)
