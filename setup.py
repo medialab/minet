@@ -46,7 +46,7 @@ setup(
         "urllib3>=1.26.9,<2",
     ],
     extras_require={
-        ":python_version<'3.11'": ["typing_extensions"],
+        ":python_version<'3.11'": ["typing_extensions>=4.3"],
     },
     entry_points={"console_scripts": ["minet=minet.cli.__main__:main"]},
     zip_safe=True,
