@@ -4,11 +4,13 @@
 #
 # A handy API client used by the CLI actions.
 #
+from typing import Optional
+
 import time
 from ebbe import as_chunks
 from collections import deque
 from urllib.parse import quote
-from ural import urls_from_text
+from ural import urls_from_text, URLFormatter, add_query_argument
 from ebbe import getpath
 
 from minet.web import (
@@ -52,6 +54,21 @@ from minet.youtube.formatters import (
     format_channel,
 )
 from minet.youtube.scrapers import scrape_channel_id
+
+
+class YouTubeAPIURLFormatter(URLFormatter):
+    BASE_URL = YOUTUBE_API_BASE_URL
+
+    def playlist_videos(self, playlist_id: str, token: Optional[str]) -> str:
+        return self.format(
+            path="playlistItems",
+            args={
+                "part": "snippet",
+                "playlistId": playlist_id,
+                "maxResults": YOUTUBE_API_MAX_VIDEOS_PER_CALL,
+                "pageToken": token,
+            },
+        )
 
 
 def forge_playlist_videos_url(playlist_id, token=None):
@@ -179,11 +196,12 @@ class YouTubeAPIClient(object):
         self.current_key = key[0]
         self.pool_manager = create_pool_manager()
         self.retryer = create_request_retryer()
+        self.url_formatter = YouTubeAPIURLFormatter()
 
     @retrying_method()
     def request_json(self, url):
         while True:
-            final_url = url + "&key=%s" % self.current_key
+            final_url = add_query_argument(url, 'key', self.current_key)
             response = request(
                 final_url, pool_manager=self.pool_manager, known_encoding="utf-8"
             )
