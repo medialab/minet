@@ -20,7 +20,7 @@ lxml==4.9.2
 nanoid==2.0.0
 persist-queue==0.8.0
 pyyaml==5.4.1
-quenouille==1.7.1
+quenouille==1.8.0
 rich==13.3.4
 rich-argparse==1.0.0
 soupsieve>=2.1,<3

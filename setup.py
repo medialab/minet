@@ -35,7 +35,7 @@ setup(
         "nanoid>=2,<3",
         "persist-queue>=0.7,<0.9",
         "pyyaml",
-        "quenouille>=1.7.1,<2",
+        "quenouille>=1.8.0,<2",
         "rich>=13,<14",
         "rich-argparse>=1,<2",
         "soupsieve>=2.1,<3",
