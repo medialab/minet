@@ -319,8 +319,11 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
             daemonic=daemonic,
             **kwargs,
         )
+
+        # NOTE: 0 workers means a synchronous pool in quenouille,
+        # so we reserve at least one connection for the pool.
         self.pool_manager = create_pool_manager(
-            threads=self.max_workers,
+            threads=max(1, self.max_workers),
             insecure=insecure,
             timeout=timeout,
             spoof_tls_ciphers=spoof_tls_ciphers,
