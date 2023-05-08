@@ -9,7 +9,10 @@ import json
 
 from minet.spotify.constants import BASE_API_ENDPOINT_V1
 from minet.web import create_request_retryer, request, retrying_method
-from minet.spotify.types import SpotifyShow, SpotifyShowEpisode
+from minet.spotify.exceptions import SpotifyAPIError
+from ural.format_url import URLFormatter
+
+LIMIT = 50
 
 
 def get_access_token(client_id: str, client_secret: str):
@@ -35,24 +38,13 @@ def get_access_token(client_id: str, client_secret: str):
             return access_token
 
 
-def forge_search_url(search_kwargs):
-    if search_kwargs.get("q"):
-        q = "%20".join(search_kwargs["q"].split())
-        q = "%3".join(q.split(":"))
-        search_kwargs["q"] = q
-    search_kwargs.update({"limit": 50})
-    args = [f"{k}={v}" for k, v in search_kwargs.items() if v]
-    query = "&".join(args)
-    return BASE_API_ENDPOINT_V1 + "search?" + query
-
-
 class SpotifyAPIClient(object):
-    def __init__(self, client_id, client_secret, kwargs):
+    def __init__(self, client_id, client_secret):
         self.access_token = get_access_token(
             client_id=client_id, client_secret=client_secret
         )
         self.retryer = create_request_retryer()
-        self.cli_search_kwargs = kwargs
+        self.spotify_url = URLFormatter(base_url=BASE_API_ENDPOINT_V1)
 
     @retrying_method()
     def request_json(self, url):
@@ -65,44 +57,63 @@ class SpotifyAPIClient(object):
                 url=url, headers={"Authorization": f"Bearer {self.access_token}"}
             )
         elif response.status != 200:
-            print(response.text())
-            raise KeyError
+            raise SpotifyAPIError(response.text(), url, response.status)
         return response.json()
 
-    def shows(self, query):
-        search_kwargs = {"q": query, "type": "show"}
-        search_kwargs.update(self.cli_search_kwargs)
-        url = forge_search_url(search_kwargs)
-        return self.generator(url, SpotifyShow.from_payload)
+    def search(self, query, type, market, method):
+        search_args = {"q": query, "type": type, "market": market, "limit": LIMIT}
+        url = self.spotify_url.format(path="search", args=search_args)
+        return self.generator(base_url=url, formatter=method, do_offset=True)
 
-    def episodes(self, query):
-        search_kwargs = {"q": query, "type": "episode"}
-        search_kwargs.update(self.cli_search_kwargs)
-        url = forge_search_url(search_kwargs)
-        return self.generator(url, SpotifyShowEpisode.from_payload)
+    def get_by_id(self, ids, type, market, method):
+        path = type
+        args = {"market": market, "limit": LIMIT}
+        url = self.spotify_url.format(path=path, args=args)
+        # Temporary fix for formatted string of IDs
+        id_string = "%2C".join(ids)
+        url += "&ids=" + id_string
+        return self.generator(base_url=url, formatter=method, do_offset=False)
 
-    def generator(self, url, formatter):
+    def get_episodes_by_show_id(self, id, market, method):
+        path = f"shows/{id}/episodes"
+        args = {"market": market, "limit": LIMIT}
+        url = self.spotify_url.format(path=path, args=args)
+        return self.generator(base_url=url, formatter=method, do_offset=True)
+
+    def generator(self, base_url, formatter, do_offset):
         go_to_next_page = True
+        offset = 0
         while go_to_next_page:
-            result = self.request_json(url)
-            # If the result doesn't declare a type
-            if result.get("items"):
-                data = result
-            # Or if the result declares the media type
-            elif len(list(result.keys())) == 1:
-                type = list(result.keys())[0]
-                data = result[type]
-            else:
-                raise KeyError
-            # Determine the next results page
-            url = data.get("next")
-            if not url:
+            # If the request type doesn't require offsetting to the next page,
+            # (i.e. it is requesting by ID) do not continue after client call
+            if not do_offset:
                 go_to_next_page = False
-            # Yield results in the items array
-            items = data.get("items")
+
+            # Update the URL with an offset if necessary
+            url = base_url + "&offset=" + str(offset)
+            result = self.request_json(url)
+            offset += LIMIT
+
+            # Get an array of the target data
+            items = []
+            if result.get("items"):
+                items = result["items"]
+            elif len(list(result.keys())) == 1:
+                data_type = list(result.keys())[0]
+                result = result[data_type]
+                if isinstance(result, dict):
+                    items = result.get("items")
+                elif isinstance(result, list):
+                    items = result
+
+            # Yield each item in the array of target data
             if isinstance(items, list) and len(items) > 0:
                 for item in items:
-                    formatted_item = formatter(item)
-                    yield formatted_item
+                    if not item:
+                        raise SpotifyAPIError(response=result, url=url)
+                    else:
+                        formatted_item = formatter(item)
+                        yield formatted_item
+            # If there are no more items in the returned array, do not continue
             else:
                 go_to_next_page = False
