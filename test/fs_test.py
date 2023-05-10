@@ -12,7 +12,7 @@ from minet.fs import (
     HostnameFolderStrategy,
     NormalizedHostnameFolderStrategy,
     FilenameBuilder,
-    ThreadSafeFilesWriter,
+    ThreadSafeFileWriter,
 )
 from minet.exceptions import FilenameFormattingError
 
@@ -176,12 +176,12 @@ class TestFS(object):
         if os.sep != "/":
             return
 
-        writer = ThreadSafeFilesWriter()
+        writer = ThreadSafeFileWriter()
 
         assert writer.resolve("test.html", relative=True) == "test.html"
         assert writer.resolve("test/test.html", relative=True) == "test/test.html"
 
-        writer = ThreadSafeFilesWriter("downloaded")
+        writer = ThreadSafeFileWriter("downloaded")
 
         assert writer.resolve("test.html", relative=True) == "downloaded/test.html"
         assert (

@@ -15,7 +15,7 @@ from datetime import datetime
 from ural import is_shortened_url, could_be_html
 
 from minet.executors import RequestResult, HTTPWorkerPayload, HTTPThreadPoolExecutor
-from minet.fs import FilenameBuilder, ThreadSafeFilesWriter
+from minet.fs import FilenameBuilder, ThreadSafeFileWriter
 from minet.cookies import get_cookie_resolver_from_browser
 from minet.web import (
     parse_http_header,
@@ -215,7 +215,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
     # Worker callback internals
     filename_builder = None
-    files_writer = None
+    file_writer = None
 
     if not resolve:
         try:
@@ -232,7 +232,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                 ]
             )
 
-        files_writer = ThreadSafeFilesWriter(cli_args.output_dir)
+        file_writer = ThreadSafeFileWriter(cli_args.output_dir)
 
     def worker_callback(
         result: RequestResult[Tuple[int, List[str]], None]
@@ -288,9 +288,9 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
         # Writing the file?
         # TODO: specify what should happen when contents are empty (e.g. POST queries)
         if data and not cli_args.contents_in_report:
-            assert files_writer is not None
+            assert file_writer is not None
 
-            files_writer.write(filename, data, compress=cli_args.compress)
+            file_writer.write(filename, data, compress=cli_args.compress)
 
         return addendum
 
