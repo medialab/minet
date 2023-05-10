@@ -19,6 +19,7 @@ from typing import (
     Union,
 )
 
+from threading import Lock
 from urllib.parse import urljoin
 from ural import ensure_protocol, is_url
 
@@ -195,12 +196,16 @@ Spiders = Union[
 ]
 
 # TODO: try creating a kwarg type for those
-# NOTE: crawling could work depth-first if we wanted
 class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
     executor: HTTPThreadPoolExecutor
+
+    enqueue_lock: Lock
+
     queue: CrawlerQueue[CrawlJob[CrawlJobDataTypes]]
     persistent: bool
+
     state: CrawlerState
+
     started: bool
     stopped: bool
     resuming: bool
@@ -258,6 +263,9 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         # Params
         self.queue_path = queue_path
         self.persistent = queue_path is not None
+
+        # Threading
+        self.enqueue_lock = Lock()
 
         # Lifecycle
         self.started = False
@@ -400,61 +408,62 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         base_url: Optional[str] = None,
         parent: Optional[CrawlJob[CrawlJobDataTypes]] = None,
     ) -> int:
-        if isinstance(target_or_targets, (str, CrawlTarget)):
-            targets = [target_or_targets]
-        else:
-            targets = target_or_targets
-
-        # NOTE: we consume jobs early and before actually enqueuing to
-        # catch errors early.
-        # NOTE: this means that enqueue is basically the only place allowed
-        # to build CrawlJob instances and validate them.
-        jobs = []
-
-        for target in targets:
-            if isinstance(target, str):
-                job = CrawlJob(url=target)
+        with self.enqueue_lock:
+            if isinstance(target_or_targets, (str, CrawlTarget)):
+                targets = [target_or_targets]
             else:
-                job = CrawlJob(
-                    url=target.url,
-                    depth=target.depth,
-                    spider=target.spider,
-                    data=target.data,
-                )
+                targets = target_or_targets
 
-            job.url = ensure_protocol(job.url.strip(), "https")
+            # NOTE: we consume jobs early and before actually enqueuing to
+            # catch errors early.
+            # NOTE: this means that enqueue is basically the only place allowed
+            # to build CrawlJob instances and validate them.
+            jobs = []
 
-            if base_url is not None:
-                job.url = urljoin(base_url, job.url)
+            for target in targets:
+                if isinstance(target, str):
+                    job = CrawlJob(url=target)
+                else:
+                    job = CrawlJob(
+                        url=target.url,
+                        depth=target.depth,
+                        spider=target.spider,
+                        data=target.data,
+                    )
 
-            if not is_url(
-                job.url,
-                require_protocol=True,
-                tld_aware=True,
-                allow_spaces_in_path=True,
-            ):
-                raise InvalidURLError(job.url)
+                job.url = ensure_protocol(job.url.strip(), "https")
 
-            if spider is not None and job.spider is None:
-                job.spider = spider
+                if base_url is not None:
+                    job.url = urljoin(base_url, job.url)
 
-            if job.spider is not None and job.spider not in self.__spiders:
-                raise UnknownSpiderError(job.spider)
+                if not is_url(
+                    job.url,
+                    require_protocol=True,
+                    tld_aware=True,
+                    allow_spaces_in_path=True,
+                ):
+                    raise InvalidURLError(job.url)
 
-            if depth is not None:
-                job.depth = depth
+                if spider is not None and job.spider is None:
+                    job.spider = spider
 
-            if parent is not None:
-                job.parent = parent.id
+                if job.spider is not None and job.spider not in self.__spiders:
+                    raise UnknownSpiderError(job.spider)
 
-            jobs.append(job)
+                if depth is not None:
+                    job.depth = depth
 
-        count = len(jobs)
+                if parent is not None:
+                    job.parent = parent.id
 
-        self.queue.put_many(jobs)
-        self.state.inc_queued(count)
+                jobs.append(job)
 
-        return count
+            count = len(jobs)
+
+            self.queue.put_many(jobs)
+            self.state.inc_queued(count)
+
+            return count
 
     # NOTE: this is clearly not threadsafe lol. This is for debug only.
     def dump_queue(self) -> DumpType[CrawlJob[CrawlJobDataTypes]]:
