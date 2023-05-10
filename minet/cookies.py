@@ -28,8 +28,8 @@ def get_cookie_jar_from_browser(browser: str = "firefox") -> CookieJar:
 
     try:
         return fn()
-    except browser_cookie3.BrowserCookieError:
-        raise CookieGrabbingError(browser)
+    except Exception as reason:
+        raise CookieGrabbingError(browser, reason=reason)
 
 
 def get_cookie_resolver_from_browser(browser: str = "firefox") -> CookieResolver:

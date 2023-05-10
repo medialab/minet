@@ -6,10 +6,10 @@
 #
 import csv
 import time
-import browser_cookie3
 from http.cookies import SimpleCookie
 
-from minet.cookies import CookieResolver
+from minet.cookies import CookieResolver, get_cookie_jar_from_browser
+from minet.exceptions import CookieGrabbingError, UnknownBrowserError
 from minet.cli.exceptions import FatalError
 
 
@@ -84,8 +84,10 @@ def action(cli_args):
         output_writer = csv.writer(cli_args.output)
 
     try:
-        jar = getattr(browser_cookie3, cli_args.browser)()
-    except browser_cookie3.BrowserCookieError:
+        jar = get_cookie_jar_from_browser(cli_args.browser)
+    except UnknownBrowserError:
+        raise FatalError('Unknown browser "%s"' % cli_args.browser)
+    except CookieGrabbingError:
         raise FatalError("Could not extract cookies from %s!" % cli_args.browser)
 
     if cli_args.url is not None:

@@ -63,9 +63,10 @@ class UnknownBrowserError(MinetError):
 
 
 class CookieGrabbingError(MinetError):
-    def __init__(self, browser: str):
+    def __init__(self, browser: str, reason: Exception):
         super().__init__("Could not grab cookies from: %s" % browser)
         self.browser = browser
+        self.reason = reason
 
 
 # Miscellaneous HTTP errors
