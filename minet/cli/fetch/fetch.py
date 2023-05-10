@@ -6,7 +6,7 @@
 # in the given column. This is done in a respectful multithreaded fashion to
 # optimize both running time & memory.
 #
-from typing import Optional, List, Union, Tuple
+from typing import Optional, List, Union
 
 import casanova
 from casanova import TabularRecord
@@ -14,7 +14,14 @@ from dataclasses import dataclass
 from datetime import datetime
 from ural import is_shortened_url, could_be_html
 
-from minet.executors import RequestResult, HTTPWorkerPayload, HTTPThreadPoolExecutor
+from minet.executors import (
+    HTTPWorkerPayload,
+    HTTPThreadPoolExecutor,
+    PassthroughRequestResult,
+    SuccessfulRequestResult,
+    PassthroughResolveResult,
+    SuccessfulResolveResult,
+)
 from minet.fs import FilenameBuilder, ThreadSafeFileWriter
 from minet.cookies import get_cookie_resolver_from_browser
 from minet.web import (
@@ -233,17 +240,11 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
         file_writer = ThreadSafeFileWriter(cli_args.output_dir)
 
-    def worker_callback(
-        result: RequestResult[Tuple[int, List[str]], None]
-    ) -> Optional[WorkerAddendum]:
+    def worker_callback(item, url: str, response: Response) -> Optional[WorkerAddendum]:
         if cli_args.dont_save:
             return
 
-        # NOTE: at this point the callback is only fired on success
-        assert result.response
-
-        row = result.item[1]
-        response = result.response
+        row = item[1]
 
         if cli_args.keep_failed_contents and response.status != 200:
             return
@@ -326,7 +327,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                 with loading_bar.step():
                     index, row = result.item
 
-                    if not result.url:
+                    if isinstance(result, PassthroughRequestResult):
                         enricher.writerow(index, row)
                         loading_bar.inc_stat("filtered", style="warning")
                         continue
@@ -334,9 +335,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                     addendum = Addendum()
 
                     # No error
-                    if result.error is None:
-                        assert result.response is not None
-
+                    if isinstance(result, SuccessfulRequestResult):
                         response = result.response
                         status = response.status
 
@@ -383,7 +382,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                 with loading_bar.step():
                     index, row = result.item
 
-                    if not result.url:
+                    if isinstance(result, PassthroughResolveResult):
                         enricher.writerow(index, row)
                         loading_bar.inc_stat("filtered", style="warning")
                         continue
@@ -391,8 +390,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                     addendum = ResolveAddendum()
 
                     # No error
-                    if result.error is None:
-                        assert result.stack is not None
+                    if isinstance(result, SuccessfulResolveResult):
 
                         # Reporting in output
                         last = result.stack[-1]

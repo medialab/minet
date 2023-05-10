@@ -52,6 +52,7 @@ AddendumType = TypeVar("AddendumType")
 CANCELLED = object()
 
 
+# TODO: split types to avoid issues with the callbacks
 class HTTPWorkerPayload(Generic[ItemType]):
     __slots__ = ("item", "url", "__has_cached_domain", "__domain")
 
@@ -124,6 +125,75 @@ class RequestResult(Generic[ItemType, AddendumType]):
         )
 
 
+class PassthroughRequestResult(RequestResult[ItemType, None]):
+    item: ItemType
+    url: None
+    error: None
+    response: None
+    addendum: None
+
+    def __init__(self, item: ItemType):
+        self.item = item
+        self.url = None
+        self.error = None
+        self.response = None
+        self.addendum = None
+
+    @property
+    def error_code(self) -> None:
+        return None
+
+
+class ErroredRequestResult(RequestResult[ItemType, None]):
+    item: ItemType
+    url: str
+    error: Exception
+    response: None
+    addendum: None
+
+    def __init__(self, item: ItemType, url: str, error: Exception):
+        self.item = item
+        self.url = url
+        self.error = error
+        self.response = None
+        self.addendum = None
+
+    @property
+    def error_code(self) -> str:
+        return serialize_error_as_slug(self.error)
+
+
+class SuccessfulRequestResult(RequestResult[ItemType, AddendumType]):
+    item: ItemType
+    url: str
+    error: None
+    response: Response
+    addendum: AddendumType
+
+    def __init__(
+        self, item: ItemType, url: str, response: Response, addendum: AddendumType
+    ):
+        self.item = item
+        self.url = url
+        self.error = None
+        self.response = response
+        self.addendum = addendum
+
+    @property
+    def error_code(self) -> None:
+        return None
+
+
+AnyRequestResult = Union[
+    PassthroughRequestResult[ItemType],
+    ErroredRequestResult[ItemType],
+    SuccessfulRequestResult[ItemType, AddendumType],
+]
+AnyActualRequestResult = Union[
+    ErroredRequestResult[ItemType], SuccessfulRequestResult[ItemType, AddendumType]
+]
+
+
 class ResolveResult(Generic[ItemType, AddendumType]):
     __slots__ = ("item", "url", "error", "stack", "addendum")
 
@@ -165,6 +235,75 @@ class ResolveResult(Generic[ItemType, AddendumType]):
         )
 
 
+class PassthroughResolveResult(ResolveResult[ItemType, None]):
+    item: ItemType
+    url: None
+    error: None
+    stack: None
+    addendum: None
+
+    def __init__(self, item: ItemType):
+        self.item = item
+        self.url = None
+        self.error = None
+        self.stack = None
+        self.addendum = None
+
+    @property
+    def error_code(self) -> None:
+        return None
+
+
+class ErroredResolveResult(ResolveResult[ItemType, None]):
+    item: ItemType
+    url: str
+    error: Exception
+    stack: None
+    addendum: None
+
+    def __init__(self, item: ItemType, url: str, error: Exception):
+        self.item = item
+        self.url = url
+        self.error = error
+        self.stack = None
+        self.addendum = None
+
+    @property
+    def error_code(self) -> str:
+        return serialize_error_as_slug(self.error)
+
+
+class SuccessfulResolveResult(ResolveResult[ItemType, AddendumType]):
+    item: ItemType
+    url: str
+    error: None
+    stack: RedirectionStack
+    addendum: AddendumType
+
+    def __init__(
+        self, item: ItemType, url: str, stack: RedirectionStack, addendum: AddendumType
+    ):
+        self.item = item
+        self.url = url
+        self.error = None
+        self.stack = stack
+        self.addendum = addendum
+
+    @property
+    def error_code(self) -> None:
+        return None
+
+
+AnyResolveResult = Union[
+    PassthroughResolveResult[ItemType],
+    ErroredResolveResult[ItemType],
+    SuccessfulResolveResult[ItemType, AddendumType],
+]
+AnyActualResolveResult = Union[
+    ErroredResolveResult[ItemType], SuccessfulResolveResult[ItemType, AddendumType]
+]
+
+
 def key_by_domain_name(payload: HTTPWorkerPayload) -> Optional[str]:
     return payload.domain
 
@@ -202,7 +341,7 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
         infer_redirection: bool = False,
         canonicalize: bool = False,
         callback: Optional[
-            Callable[[RequestResult[ItemType, AddendumType]], AddendumType]
+            Callable[[ItemType, str, Union[Response, RedirectionStack]], AddendumType]
         ] = None,
     ):
         self.cancel_event = cancel_event
@@ -212,7 +351,15 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
 
         self.resolving = resolving
         self.fn = request if not resolving else resolve
-        self.Result = RequestResult if not resolving else ResolveResult
+        self.PassthroughResult = (
+            PassthroughRequestResult if not resolving else PassthroughResolveResult
+        )
+        self.SuccessfulResult = (
+            SuccessfulRequestResult if not resolving else SuccessfulResolveResult
+        )
+        self.ErroredResult = (
+            ErroredRequestResult if not resolving else ErroredResolveResult
+        )
 
         self.default_kwargs = {
             "pool_manager": pool_manager,
@@ -230,11 +377,9 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
     ) -> Union[object, RequestResult[ItemType, AddendumType]]:
         item, url = payload.item, payload.url
 
-        result = self.Result(item, url)
-
         # Noop
         if url is None:
-            return result
+            return self.PassthroughResult(item)
 
         kwargs = {}
 
@@ -261,13 +406,10 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
             return CANCELLED
 
         except EXPECTED_WEB_ERRORS as error:
-            result.error = error
+            return self.ErroredResult(item, url, error)
 
         else:
-            if self.resolving:
-                result.stack = output
-            else:
-                result.response = output
+            addendum = None
 
             if self.callback is not None:
                 if self.cancel_event.is_set():
@@ -275,13 +417,13 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
 
                 try:
                     if retryer is not None:
-                        result.addendum = retryer(self.callback, result)
+                        addendum = retryer(self.callback, item, url, output)
                     else:
-                        result.addendum = self.callback(result)
+                        addendum = self.callback(item, url, output)
                 except Exception as reason:
-                    result.error = HTTPCallbackError(reason)
+                    return self.ErroredResult(item, url, HTTPCallbackError(reason))
 
-        return result
+        return self.SuccessfulResult(item, url, output, addendum)  # type: ignore
 
 
 class HTTPThreadPoolExecutor(ThreadPoolExecutor):
@@ -358,10 +500,8 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
-        callback: Optional[
-            Callable[[RequestResult[ItemType, AddendumType]], None]
-        ] = None,
-    ) -> Iterator[RequestResult[ItemType, AddendumType]]:
+        callback: Optional[Callable[[ItemType, str, Response], AddendumType]] = None,
+    ) -> Iterator[AnyRequestResult[ItemType, AddendumType]]:
 
         # TODO: validate
         worker = HTTPWorker(
@@ -403,9 +543,9 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         infer_redirection: bool = False,
         canonicalize: bool = False,
         callback: Optional[
-            Callable[[ResolveResult[ItemType, AddendumType]], None]
+            Callable[[ItemType, str, RedirectionStack], AddendumType]
         ] = None,
-    ) -> Iterator[ResolveResult[ItemType, AddendumType]]:
+    ) -> Iterator[AnyResolveResult[ItemType, AddendumType]]:
 
         # TODO: validate
         worker = HTTPWorker(
