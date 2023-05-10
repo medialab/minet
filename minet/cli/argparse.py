@@ -9,6 +9,7 @@ from minet.types import TypedDict, NotRequired
 
 import os
 import re
+import gzip
 import sys
 import shutil
 from io import TextIOBase
@@ -392,7 +393,10 @@ class InputAction(Action):
             f = sys.stdin
         else:
             try:
-                f = open(value, "r", encoding="utf-8")
+                if value.endswith(".gz"):
+                    f = gzip.open(value, "rt", encoding="utf-8")
+                else:
+                    f = open(value, "r", encoding="utf-8")
             except OSError as e:
                 args = {"filename": value, "error": e}
                 message = gettext("can't open '%(filename)s': %(error)s")
@@ -626,7 +630,7 @@ def resolve_typical_arguments(
 
         if "input_help" not in variadic_input:
             variadic_input["input_help"] = (
-                "CSV file containing all the %s you want to process. Will consider `-` as stdin."
+                "CSV file (potentially gzipped) containing all the %s you want to process. Will consider `-` as stdin."
                 % variadic_input["item_label_plural"]
             )
 

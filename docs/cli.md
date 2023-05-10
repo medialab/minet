@@ -334,8 +334,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the urls you want to
-                                process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the urls you want to process. Will consider `-`
+                                as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -498,8 +499,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the filenames you want
-                                to process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the filenames you want to process. Will consider
+                                `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -634,8 +636,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the urls you want to
-                                process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the urls you want to process. Will consider `-`
+                                as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -783,8 +786,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the filenames you want
-                                to process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the filenames you want to process. Will consider
+                                `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -1029,8 +1033,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the urls you want to
-                                process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the urls you want to process. Will consider `-`
+                                as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -1225,8 +1230,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the domain names you
-                                want to process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the domain names you want to process. Will
+                                consider `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -1315,8 +1321,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the domain names you
-                                want to process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the domain names you want to process. Will
+                                consider `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -1528,8 +1535,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the URLs or ids you want
-                                to process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the URLs or ids you want to process. Will
+                                consider `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -1783,8 +1791,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the URLs you want to
-                                process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the URLs you want to process. Will consider `-`
+                                as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -1894,8 +1903,9 @@ Optional Arguments:
                                necessary when you want to display a finite
                                progress indicator for large files given as input
                                to the command.
-  -i, --input INPUT            CSV file containing all the post urls you want to
-                               process. Will consider `-` as stdin.
+  -i, --input INPUT            CSV file (potentially gzipped) containing all the
+                               post urls you want to process. Will consider `-`
+                               as stdin.
   -o, --output OUTPUT          Path to the output file. Will consider `-` as
                                stdout. If not given, results will also be
                                printed to stdout.
@@ -2012,8 +2022,9 @@ Optional Arguments:
                                necessary when you want to display a finite
                                progress indicator for large files given as input
                                to the command.
-  -i, --input INPUT            CSV file containing all the post urls you want to
-                               process. Will consider `-` as stdin.
+  -i, --input INPUT            CSV file (potentially gzipped) containing all the
+                               post urls you want to process. Will consider `-`
+                               as stdin.
   -o, --output OUTPUT          Path to the output file. Will consider `-` as
                                stdout. If not given, results will also be
                                printed to stdout.
@@ -2130,8 +2141,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the group urls you want
-                                to process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the group urls you want to process. Will
+                                consider `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -2222,8 +2234,9 @@ Optional Arguments:
                                necessary when you want to display a finite
                                progress indicator for large files given as input
                                to the command.
-  -i, --input INPUT            CSV file containing all the posts you want to
-                               process. Will consider `-` as stdin.
+  -i, --input INPUT            CSV file (potentially gzipped) containing all the
+                               posts you want to process. Will consider `-` as
+                               stdin.
   -o, --output OUTPUT          Path to the output file. Will consider `-` as
                                stdout. If not given, results will also be
                                printed to stdout.
@@ -2304,8 +2317,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the urls you want to
-                              process. Will consider `-` as stdin.
+  -i, --input INPUT           CSV file (potentially gzipped) containing all the
+                              urls you want to process. Will consider `-` as
+                              stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -2670,9 +2684,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the post urls, post
-                              shortcodes or post ids you want to process. Will
-                              consider `-` as stdin.
+  -i, --input INPUT           CSV file (potentially gzipped) containing all the
+                              post urls, post shortcodes or post ids you want to
+                              process. Will consider `-` as stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -2763,8 +2777,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the hashtags you want to
-                              process. Will consider `-` as stdin.
+  -i, --input INPUT           CSV file (potentially gzipped) containing all the
+                              hashtags you want to process. Will consider `-` as
+                              stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -2858,9 +2873,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the post urls, post
-                              shortcodes or post ids you want to process. Will
-                              consider `-` as stdin.
+  -i, --input INPUT           CSV file (potentially gzipped) containing all the
+                              post urls, post shortcodes or post ids you want to
+                              process. Will consider `-` as stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -2959,9 +2974,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the usernames, user urls
-                              or user ids you want to process. Will consider `-`
-                              as stdin.
+  -i, --input INPUT           CSV file (potentially gzipped) containing all the
+                              usernames, user urls or user ids you want to
+                              process. Will consider `-` as stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -3059,9 +3074,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the usernames, user urls
-                              or user ids you want to process. Will consider `-`
-                              as stdin.
+  -i, --input INPUT           CSV file (potentially gzipped) containing all the
+                              usernames, user urls or user ids you want to
+                              process. Will consider `-` as stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -3157,9 +3172,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the usernames, user urls
-                              or user ids you want to process. Will consider `-`
-                              as stdin.
+  -i, --input INPUT           CSV file (potentially gzipped) containing all the
+                              usernames, user urls or user ids you want to
+                              process. Will consider `-` as stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -3258,9 +3273,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the usernames, user urls
-                              or user ids you want to process. Will consider `-`
-                              as stdin.
+  -i, --input INPUT           CSV file (potentially gzipped) containing all the
+                              usernames, user urls or user ids you want to
+                              process. Will consider `-` as stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -3342,8 +3357,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the Mediacloud media ids
-                              you want to process. Will consider `-` as stdin.
+  -i, --input INPUT           CSV file (potentially gzipped) containing all the
+                              Mediacloud media ids you want to process. Will
+                              consider `-` as stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -3507,8 +3523,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the channel names / urls
-                                you want to process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the channel names / urls you want to process.
+                                Will consider `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -3580,8 +3597,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the channel names / urls
-                                you want to process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the channel names / urls you want to process.
+                                Will consider `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -3691,8 +3709,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the tiktok keywords you
-                              want to process. Will consider `-` as stdin.
+  -i, --input INPUT           CSV file (potentially gzipped) containing all the
+                              tiktok keywords you want to process. Will consider
+                              `-` as stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -3833,8 +3852,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the tweet urls or ids
-                                you want to process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the tweet urls or ids you want to process. Will
+                                consider `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -3939,9 +3959,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the Twitter account
-                                screen names or ids you want to process. Will
-                                consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the Twitter account screen names or ids you want
+                                to process. Will consider `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -4042,9 +4062,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the Twitter account
-                                screen names or ids you want to process. Will
-                                consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the Twitter account screen names or ids you want
+                                to process. Will consider `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -4140,9 +4160,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the Twitter list ids or
-                                urls you want to process. Will consider `-` as
-                                stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the Twitter list ids or urls you want to
+                                process. Will consider `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -4236,9 +4256,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the Twitter list ids or
-                                urls you want to process. Will consider `-` as
-                                stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the Twitter list ids or urls you want to
+                                process. Will consider `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -4335,8 +4355,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the tweet ids you want
-                                to process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the tweet ids you want to process. Will consider
+                                `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -4457,8 +4478,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the queries you want to
-                                process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the queries you want to process. Will consider
+                                `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -4555,8 +4577,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the tweet urls or ids you
-                              want to process. Will consider `-` as stdin.
+  -i, --input INPUT           CSV file (potentially gzipped) containing all the
+                              tweet urls or ids you want to process. Will
+                              consider `-` as stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -4675,8 +4698,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the queries you want to
-                                process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the queries you want to process. Will consider
+                                `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -4824,8 +4848,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the queries you want to
-                                process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the queries you want to process. Will consider
+                                `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -4930,8 +4955,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the tweet ids you want
-                                to process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the tweet ids you want to process. Will consider
+                                `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -5034,8 +5060,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the Twitter users you
-                                want to process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the Twitter users you want to process. Will
+                                consider `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -5137,8 +5164,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the queries you want to
-                                process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the queries you want to process. Will consider
+                                `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -5250,9 +5278,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the Twitter account
-                                screen names or ids you want to process. Will
-                                consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the Twitter account screen names or ids you want
+                                to process. Will consider `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -5349,8 +5377,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the pages you want to
-                                process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the pages you want to process. Will consider `-`
+                                as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -5423,8 +5452,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the video urls or ids you
-                              want to process. Will consider `-` as stdin.
+  -i, --input INPUT           CSV file (potentially gzipped) containing all the
+                              video urls or ids you want to process. Will
+                              consider `-` as stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -5505,8 +5535,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the channels you want to
-                              process. Will consider `-` as stdin.
+  -i, --input INPUT           CSV file (potentially gzipped) containing all the
+                              channels you want to process. Will consider `-` as
+                              stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -5595,8 +5626,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the channels you want to
-                              process. Will consider `-` as stdin.
+  -i, --input INPUT           CSV file (potentially gzipped) containing all the
+                              channels you want to process. Will consider `-` as
+                              stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -5677,8 +5709,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the videos you want to
-                              process. Will consider `-` as stdin.
+  -i, --input INPUT           CSV file (potentially gzipped) containing all the
+                              videos you want to process. Will consider `-` as
+                              stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
@@ -5764,8 +5797,9 @@ Optional Arguments:
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
                                 input to the command.
-  -i, --input INPUT             CSV file containing all the queries you want to
-                                process. Will consider `-` as stdin.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the queries you want to process. Will consider
+                                `-` as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -5842,8 +5876,9 @@ Optional Arguments:
                               necessary when you want to display a finite
                               progress indicator for large files given as input
                               to the command.
-  -i, --input INPUT           CSV file containing all the videos you want to
-                              process. Will consider `-` as stdin.
+  -i, --input INPUT           CSV file (potentially gzipped) containing all the
+                              videos you want to process. Will consider `-` as
+                              stdin.
   -o, --output OUTPUT         Path to the output file. Will consider `-` as
                               stdout. If not given, results will also be printed
                               to stdout.
