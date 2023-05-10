@@ -24,6 +24,7 @@ from quenouille import ThreadPoolExecutor
 from ural import get_domain_name, ensure_protocol
 from tenacity import RetryCallState
 
+from minet.serialization import serialize_error_as_slug
 from minet.exceptions import CancelledRequestError, HTTPCallbackError
 from minet.web import (
     create_pool_manager,
@@ -98,6 +99,10 @@ class RequestResult(Generic[ItemType, AddendumType]):
         self.response = None
         self.addendum = None
 
+    @property
+    def error_code(self) -> Optional[str]:
+        return serialize_error_as_slug(self.error) if self.error is not None else None
+
     def __repr__(self):
         name = self.__class__.__name__
 
@@ -134,6 +139,10 @@ class ResolveResult(Generic[ItemType, AddendumType]):
         self.error = None
         self.stack = None
         self.addendum = None
+
+    @property
+    def error_code(self) -> Optional[str]:
+        return serialize_error_as_slug(self.error) if self.error is not None else None
 
     def __repr__(self):
         name = self.__class__.__name__

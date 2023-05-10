@@ -25,7 +25,6 @@ from minet.web import (
 from minet.exceptions import InvalidURLError, FilenameFormattingError, HTTPCallbackError
 from minet.heuristics import should_spoof_ua_when_resolving
 from minet.cli.exceptions import InvalidArgumentsError, FatalError
-from minet.serialization import serialize_error_as_slug
 from minet.cli.reporters import report_filename_formatting_error
 from minet.cli.utils import with_enricher_and_loading_bar, with_ctrl_c_warning
 
@@ -353,9 +352,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                         if isinstance(error, HTTPCallbackError):
                             error.unwrap(FilenameFormattingError)
 
-                        error_code = serialize_error_as_slug(error)
-
-                        loading_bar.inc_stat(error_code, style="error")
+                        loading_bar.inc_stat(result.error_code, style="error")
 
                         resolved_url = None
 
@@ -365,7 +362,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                         if isinstance(error, FilenameFormattingError):
                             loading_bar.print(report_filename_formatting_error(error))
 
-                        addendum.fetch_error = error_code
+                        addendum.fetch_error = result.error_code
                         addendum.resolved_url = resolved_url
 
                         enricher.writerow(index, row, addendum)
@@ -407,8 +404,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
                     # Handling potential errors
                     else:
-                        error_code = serialize_error_as_slug(result.error)
-                        loading_bar.inc_stat(error_code, style="error")
+                        loading_bar.inc_stat(result.error_code, style="error")
 
-                        addendum.resolution_error = error_code
+                        addendum.resolution_error = result.error_code
                         enricher.writerow(index, row, addendum)
