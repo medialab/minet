@@ -23,7 +23,7 @@ SCRAPE_COMMAND = command(
         you can find in a fetch command CSV report.
 
         This said, you can of course feed this command any kind of CSV data,
-        and use dedicated flags such as --filename-column, --body-column to
+        and use dedicated flags such as --status-column, --body-column to
         to inform the command about your specific table.
 
         The comand is also able to work on glob patterns, such as: "downloaded/**/*.html",
@@ -49,8 +49,8 @@ SCRAPE_COMMAND = command(
         . Scraping a single url:
             $ minet fetch "https://lemonde.fr" | minet scrape scraper.yml -i -
 
-        . Indicating a custom `filename` column:
-            $ minet scrape scraper.yml -i report.csv -I downloaded --filename-column path > scraped.csv
+        . Indicating a custom filename column (named "path"):
+            $ minet scrape scraper.yml path -i report.csv -I downloaded > scraped.csv
 
         . Scraping a CSV colum containing HTML directly:
             $ minet scrape scraper.yml -i report.csv --body-column html > scraped.csv

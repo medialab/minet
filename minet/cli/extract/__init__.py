@@ -31,7 +31,7 @@ EXTRACT_COMMAND = command(
         you can find in a fetch command CSV report.
 
         This said, you can of course feed this command any kind of CSV data,
-        and use dedicated flags such as --filename-column, --body-column to
+        and use dedicated flags such as --status-column, --body-column to
         to inform the command about your specific table.
 
         The comand is also able to work on glob patterns, such as: "downloaded/**/*.html",
@@ -74,8 +74,8 @@ EXTRACT_COMMAND = command(
         . Extracting content from a single url:
             $ minet fetch "https://lemonde.fr" | minet extract -i -
 
-        . Indicating a custom `filename` column:
-            $ minet extract -i report.csv -I downloaded --filename-column path > extracted.csv
+        . Indicating a custom filename column (named "path"):
+            $ minet extract path -i report.csv -I downloaded > extracted.csv
 
         . Extracting content from a CSV colum containing HTML directly:
             $ minet extract -i report.csv --body-column html > extracted.csv
