@@ -212,6 +212,7 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
         "error",
         "status",
         "degree",
+        "body_size",
     ]
 
     job: CrawlJob[CrawlJobDataType]
@@ -256,6 +257,7 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
             self.error_code,
             self.response.status if self.response else None,
             self.degree,
+            len(self.response) if self.response else None,
         ]
 
     def _repr_from_job(self) -> str:

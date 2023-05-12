@@ -962,6 +962,9 @@ class Response(object):
     def body(self) -> bytes:
         return self.__body
 
+    def __len__(self) -> int:
+        return len(self.__body)
+
     def text(self) -> str:
         self.__decode()
         return self.__text  # type: ignore # If we don't raise, this IS a string

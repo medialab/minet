@@ -51,6 +51,7 @@ class FetchAddendum(TabularRecord):
     filename: Optional[str] = None
     mimetype: Optional[str] = None
     encoding: Optional[str] = None
+    body_size: Optional[int] = None
 
     def infos_from_response(
         self, response: Response, addendum: Optional[WorkerAddendum]
@@ -61,6 +62,7 @@ class FetchAddendum(TabularRecord):
         self.filename = addendum.filename if addendum else None
         self.encoding = response.encoding
         self.mimetype = response.mimetype
+        self.body_size = len(response)
 
 
 @dataclass

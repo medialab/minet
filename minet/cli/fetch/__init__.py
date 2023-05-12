@@ -102,6 +102,7 @@ FETCH_COMMAND = command(
             through -O/--output-dir.
         . "mimetype": detected mimetype of the requested file.
         . "encoding": detected encoding of the requested file if relevant.
+        . "body_size": size of the downloaded document in bytes.
         . "body": if -c/--contents-in-report is set, will contain the
             downloaded text and the files won't be written to disk.
 
