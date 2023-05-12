@@ -207,7 +207,7 @@ class ThreadSafeFileWriter(object):
 
     def write(
         self, filename: str, contents: Union[str, bytes], compress: bool = False
-    ) -> None:
+    ) -> str:
         binary = isinstance(contents, bytes)
         filename = self.resolve(filename)
         directory = dirname(filename)
@@ -225,9 +225,14 @@ class ThreadSafeFileWriter(object):
 
             if not binary:
                 open_kwargs["mode"] = "wt"
+
+            if not filename.endswith(".gz"):
+                filename += ".gz"
         else:
             open_fn = open
 
         with self.file_locks[filename]:
             with open_fn(filename, **open_kwargs) as f:
-                f.write(contents)
+                f.write(contents)  # type: ignore
+
+        return filename
