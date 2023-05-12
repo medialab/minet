@@ -6,6 +6,7 @@
 # web in a multithreaded fashion.
 #
 from typing import (
+    cast,
     Optional,
     Iterator,
     Callable,
@@ -52,8 +53,7 @@ AddendumType = TypeVar("AddendumType")
 CANCELLED = object()
 
 
-# TODO: split types to avoid issues with the callbacks
-class HTTPWorkerPayload(Generic[ItemType]):
+class HTTPWorkerPayloadBase(Generic[ItemType]):
     __slots__ = ("item", "url", "__has_cached_domain", "__domain")
 
     item: ItemType
@@ -79,6 +79,11 @@ class HTTPWorkerPayload(Generic[ItemType]):
         self.__has_cached_domain = True
 
         return self.__domain
+
+
+class HTTPWorkerPayload(HTTPWorkerPayloadBase[ItemType]):
+    item: ItemType
+    url: str
 
 
 ArgsCallbackType = Callable[[HTTPWorkerPayload[ItemType]], Dict]
@@ -304,25 +309,25 @@ AnyActualResolveResult = Union[
 ]
 
 
-def key_by_domain_name(payload: HTTPWorkerPayload) -> Optional[str]:
+def key_by_domain_name(payload: HTTPWorkerPayloadBase) -> Optional[str]:
     return payload.domain
 
 
 def payloads_iter(
     iterable: Iterable[ItemType],
     key: Optional[Callable[[ItemType], Optional[str]]] = None,
-) -> Iterator[HTTPWorkerPayload[ItemType]]:
+) -> Iterator[HTTPWorkerPayloadBase[ItemType]]:
     for item in iterable:
         url = item if key is None else key(item)
 
         if not url:
-            yield HTTPWorkerPayload(item=item, url=None)
+            yield HTTPWorkerPayloadBase(item=item, url=None)
             continue
 
         # Url cleanup
         url = ensure_protocol(url.strip())  # type: ignore
 
-        yield HTTPWorkerPayload(item=item, url=url)
+        yield HTTPWorkerPayloadBase(item=item, url=url)
 
 
 class HTTPWorker(Generic[ItemType, AddendumType]):
@@ -373,7 +378,7 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
         }
 
     def __call__(
-        self, payload: HTTPWorkerPayload[ItemType]
+        self, payload: HTTPWorkerPayloadBase[ItemType]
     ) -> Union[object, RequestResult[ItemType, AddendumType]]:
         item, url = payload.item, payload.url
 
@@ -388,7 +393,7 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
 
         if self.get_args is not None:
             # NOTE: given callback must be threadsafe
-            kwargs = self.get_args(payload)
+            kwargs = self.get_args(cast(HTTPWorkerPayload, payload))
 
         if self.cancel_event.is_set():
             return CANCELLED
