@@ -323,6 +323,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                 enricher,
                 request_args=request_args,
                 callback=worker_callback,
+                passthrough=True,
                 **common_imap_kwargs
             ):
                 with loading_bar.step():
@@ -377,6 +378,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                 follow_js_relocation=cli_args.follow_js_relocation,
                 infer_redirection=cli_args.infer_redirection,
                 canonicalize=cli_args.canonicalize,
+                passthrough=True,
                 **common_imap_kwargs
             ):
                 with loading_bar.step():

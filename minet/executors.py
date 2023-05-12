@@ -7,6 +7,7 @@
 #
 from typing import (
     cast,
+    overload,
     Optional,
     Iterator,
     Callable,
@@ -17,6 +18,7 @@ from typing import (
     Union,
     Any,
 )
+from minet.types import Literal
 
 import urllib3
 import threading
@@ -316,11 +318,15 @@ def key_by_domain_name(payload: HTTPWorkerPayloadBase) -> Optional[str]:
 def payloads_iter(
     iterable: Iterable[ItemType],
     key: Optional[Callable[[ItemType], Optional[str]]] = None,
+    passthrough: bool = False,
 ) -> Iterator[HTTPWorkerPayloadBase[ItemType]]:
     for item in iterable:
         url = item if key is None else key(item)
 
         if not url:
+            if not passthrough:
+                raise TypeError("item has no url: {!r}".format(item))
+
             yield HTTPWorkerPayloadBase(item=item, url=None)
             continue
 
@@ -494,6 +500,40 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         self.pool_manager.clear()
         return super().shutdown(wait=wait)
 
+    @overload
+    def request(
+        self,
+        iterator: Iterable[ItemType],
+        *,
+        ordered: bool = ...,
+        key: Optional[Callable[[ItemType], Optional[str]]] = ...,
+        throttle: float = ...,
+        request_args: Optional[ArgsCallbackType[ItemType]] = ...,
+        buffer_size: int = ...,
+        domain_parallelism: int = ...,
+        max_redirects: int = ...,
+        callback: Optional[Callable[[ItemType, str, Response], AddendumType]] = ...,
+        passthrough: Literal[False] = False,
+    ) -> Iterator[AnyActualRequestResult[ItemType, AddendumType]]:
+        ...
+
+    @overload
+    def request(
+        self,
+        iterator: Iterable[ItemType],
+        *,
+        ordered: bool = ...,
+        key: Optional[Callable[[ItemType], Optional[str]]] = ...,
+        throttle: float = ...,
+        request_args: Optional[ArgsCallbackType[ItemType]] = ...,
+        buffer_size: int = ...,
+        domain_parallelism: int = ...,
+        max_redirects: int = ...,
+        callback: Optional[Callable[[ItemType, str, Response], AddendumType]] = ...,
+        passthrough: Literal[True] = ...,
+    ) -> Iterator[AnyRequestResult[ItemType, AddendumType]]:
+        ...
+
     def request(
         self,
         iterator: Iterable[ItemType],
@@ -506,7 +546,13 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         callback: Optional[Callable[[ItemType, str, Response], AddendumType]] = None,
-    ) -> Iterator[AnyRequestResult[ItemType, AddendumType]]:
+        passthrough: bool = False,
+    ) -> Iterator[
+        Union[
+            AnyRequestResult[ItemType, AddendumType],
+            AnyActualRequestResult[ItemType, AddendumType],
+        ]
+    ]:
         # TODO: validate
         worker = HTTPWorker(
             self.pool_manager,
@@ -520,7 +566,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         method = super().imap if ordered else super().imap_unordered
 
         imap_unordered = method(
-            payloads_iter(iterator, key=key),
+            payloads_iter(iterator, key=key, passthrough=passthrough),
             worker,
             key=key_by_domain_name,
             parallelism=domain_parallelism,
@@ -529,6 +575,54 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         )
 
         return (item for item in imap_unordered if item is not CANCELLED)  # type: ignore
+
+    @overload
+    def resolve(
+        self,
+        iterator: Iterable[ItemType],
+        *,
+        ordered: bool = ...,
+        key: Optional[Callable[[ItemType], Optional[str]]] = ...,
+        throttle: float = ...,
+        resolve_args: Optional[ArgsCallbackType[ItemType]] = ...,
+        buffer_size: int = ...,
+        domain_parallelism: int = ...,
+        max_redirects: int = ...,
+        follow_refresh_header: bool = ...,
+        follow_meta_refresh: bool = ...,
+        follow_js_relocation: bool = ...,
+        infer_redirection: bool = ...,
+        canonicalize: bool = ...,
+        callback: Optional[
+            Callable[[ItemType, str, RedirectionStack], AddendumType]
+        ] = ...,
+        passthrough: Literal[False] = False,
+    ) -> Iterator[AnyActualResolveResult[ItemType, AddendumType]]:
+        ...
+
+    @overload
+    def resolve(
+        self,
+        iterator: Iterable[ItemType],
+        *,
+        ordered: bool = ...,
+        key: Optional[Callable[[ItemType], Optional[str]]] = ...,
+        throttle: float = ...,
+        resolve_args: Optional[ArgsCallbackType[ItemType]] = ...,
+        buffer_size: int = ...,
+        domain_parallelism: int = ...,
+        max_redirects: int = ...,
+        follow_refresh_header: bool = ...,
+        follow_meta_refresh: bool = ...,
+        follow_js_relocation: bool = ...,
+        infer_redirection: bool = ...,
+        canonicalize: bool = ...,
+        callback: Optional[
+            Callable[[ItemType, str, RedirectionStack], AddendumType]
+        ] = ...,
+        passthrough: Literal[True] = ...,
+    ) -> Iterator[AnyResolveResult[ItemType, AddendumType]]:
+        ...
 
     def resolve(
         self,
@@ -549,7 +643,13 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         callback: Optional[
             Callable[[ItemType, str, RedirectionStack], AddendumType]
         ] = None,
-    ) -> Iterator[AnyResolveResult[ItemType, AddendumType]]:
+        passthrough: bool = False,
+    ) -> Iterator[
+        Union[
+            AnyResolveResult[ItemType, AddendumType],
+            AnyActualResolveResult[ItemType, AddendumType],
+        ]
+    ]:
         # TODO: validate
         worker = HTTPWorker(
             self.pool_manager,
@@ -569,7 +669,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         method = super().imap if ordered else super().imap_unordered
 
         imap_unordered = method(
-            payloads_iter(iterator, key=key),
+            payloads_iter(iterator, key=key, passthrough=passthrough),
             worker,
             key=key_by_domain_name,
             parallelism=domain_parallelism,

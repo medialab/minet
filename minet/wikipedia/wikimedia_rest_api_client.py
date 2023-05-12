@@ -2,7 +2,7 @@ from typing import Iterable, Iterator, TypeVar, Callable, Tuple, List, Optional
 
 from urllib.parse import quote, unquote
 
-from minet.executors import HTTPThreadPoolExecutor
+from minet.executors import HTTPThreadPoolExecutor, ErroredRequestResult
 
 from minet.wikipedia.exceptions import (
     WikimediaRESTAPIThrottledError,
@@ -105,12 +105,10 @@ class WikimediaRestAPIClient(object):
                 throttle=0,
                 ordered=True,
             ):
-                if result.error:
+                if isinstance(result, ErroredRequestResult):
                     raise result.error
 
                 response = result.response
-
-                assert response is not None
 
                 if response.status == 429:
                     raise WikimediaRESTAPIThrottledError
