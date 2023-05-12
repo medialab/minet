@@ -265,7 +265,11 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         # Params
         self.persistent_storage_path = persistent_storage_path
         self.persistent = persistent_storage_path is not None
-        self.queue_path = join(persistent_storage_path, 'queue') if persistent_storage_path is not None else None
+        self.queue_path = (
+            join(persistent_storage_path, "queue")
+            if persistent_storage_path is not None
+            else None
+        )
 
         # Threading
         self.enqueue_lock = Lock()
@@ -277,9 +281,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         self.finished = False
 
         # Queue
-        self.queue = CrawlerQueue(
-            self.queue_path, resume=resume, dfs=dfs
-        )
+        self.queue = CrawlerQueue(self.queue_path, resume=resume, dfs=dfs)
         self.persistent = self.queue.persistent
         self.resuming = self.queue.resuming
 

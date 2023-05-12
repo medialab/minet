@@ -16,7 +16,6 @@ from minet.cli.console import console
 from minet.scrape import Scraper
 from minet.scrape.exceptions import InvalidScraperError
 from minet.crawl import Crawler, CrawlResult, CrawlJob, DefinitionSpiderOutput
-from minet.serialization import serialize_error_as_slug
 from minet.cli.reporters import report_scraper_validation_errors
 from minet.cli.loading_bar import LoadingBar
 from minet.cli.utils import (
@@ -253,9 +252,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         for result in crawler:
             with loading_bar.step():
                 if result.error is not None:
-                    loading_bar.inc_stat(
-                        serialize_error_as_slug(result.error), style="error"
-                    )
+                    loading_bar.inc_stat(result.error_code, style="error")
                     jobs_writer.writerow(result.as_csv_row() + [0])
                     continue
 
