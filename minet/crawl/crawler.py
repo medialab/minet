@@ -19,6 +19,7 @@ from typing import (
     Union,
 )
 
+from os.path import join
 from threading import Lock
 from urllib.parse import urljoin
 from ural import ensure_protocol, is_url
@@ -119,6 +120,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
             spider = self.crawler.get_spider(job.spider)
 
             if spider is None:
+                assert job.spider is not None
                 return ErroredCrawlResult(job, UnknownSpiderError(job.spider))
 
             # NOTE: crawl job must have a url and a depth at that point
@@ -217,7 +219,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
     def __init__(
         self,
         spider_or_spiders: Spiders[CrawlJobDataTypes, CrawlResultDataTypes],
-        queue_path: Optional[str] = None,
+        persistent_storage_path: Optional[str] = None,
         resume: bool = False,
         dfs: bool = False,
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
@@ -261,8 +263,9 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         }
 
         # Params
-        self.queue_path = queue_path
-        self.persistent = queue_path is not None
+        self.persistent_storage_path = persistent_storage_path
+        self.persistent = persistent_storage_path is not None
+        self.queue_path = join(persistent_storage_path, 'queue') if persistent_storage_path is not None else None
 
         # Threading
         self.enqueue_lock = Lock()
@@ -275,7 +278,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
         # Queue
         self.queue = CrawlerQueue(
-            queue_path, resume=resume, cleanup_interval=2, dfs=dfs
+            self.queue_path, resume=resume, dfs=dfs
         )
         self.persistent = self.queue.persistent
         self.resuming = self.queue.resuming

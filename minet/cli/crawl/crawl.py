@@ -181,7 +181,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         raise FatalError("Cannot dump crawl not started yet!")
 
     # Loading crawler definition
-    queue_path = join(cli_args.output_dir, "queue")
+    persistent_storage_path = join(cli_args.output_dir, "store")
 
     # Scaffolding output directory
     os.makedirs(cli_args.output_dir, exist_ok=True)
@@ -199,8 +199,8 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         crawler = Crawler.from_definition(
             cli_args.crawler,
             throttle=cli_args.throttle,
-            queue_path=queue_path,
-            resume=cli_args.resume,
+            persistent_storage_path=persistent_storage_path,
+            resume=cli_args.resume or cli_args.dump_queue,
             wait=False,
             daemonic=False,
         )
