@@ -237,6 +237,10 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         request_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
     ):
+        # Validation
+        if resume and persistent_storage_path is None:
+            raise TypeError("cannot resume a non-persistent crawler")
+
         # Own executor and imap params
         self.executor = HTTPThreadPoolExecutor(
             max_workers=max_workers,
