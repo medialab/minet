@@ -337,7 +337,6 @@ class TestScrape(object):
         assert result == [["One", "1"], ["Two", "2"]]
 
     def test_selection_eval(self):
-
         result = scrape(
             {"iterator": "li", "item": {"sel_eval": 'element.select_one("span")'}},
             NESTED_HTML,

@@ -192,7 +192,6 @@ def forge_user_posts_url(
 
 def ensure_magic_token(method):
     def wrapped(self, *args, **kwargs):
-
         if self.magic_token is None:
             self.get_magic_token()
 
@@ -272,7 +271,6 @@ class InstagramAPIScraper(object):
             self.nb_calls != 0
             and (self.nb_calls % INSTAGRAM_NB_REQUEST_LITTLE_WAIT) == 0
         ):
-
             sleep_with_entropy(
                 INSTAGRAM_DEFAULT_THROTTLE_LITTLE_WAIT,
                 INSTAGRAM_MAX_RANDOM_ADDENDUM_LITTLE_WAIT,
@@ -336,14 +334,12 @@ class InstagramAPIScraper(object):
                 break
 
             for item in items:
-
                 if item.get("type") == 2:
                     continue
 
                 yield format_comment(item)
 
                 if item.get("child_comment_count") > 0:
-
                     max_id = ""
 
                     while True:
@@ -550,7 +546,6 @@ class InstagramAPIScraper(object):
             items = data.get("items")
 
             if not items:
-
                 if getpath(data, ["user", "username"]):
                     raise InstagramNoPublicationError
 

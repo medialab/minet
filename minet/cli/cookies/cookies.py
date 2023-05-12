@@ -96,7 +96,6 @@ def action(cli_args):
         cookie = resolver(cli_args.url)
 
         if cookie is not None:
-
             if cli_args.csv:
                 output_writer.writerow(MORSEL_CSV_HEADER)
 

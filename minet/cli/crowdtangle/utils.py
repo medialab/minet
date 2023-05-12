@@ -50,7 +50,6 @@ def make_paginated_action(
 ):
     @with_crowdtangle_fatal_errors
     def action(cli_args):
-
         resume = getattr(cli_args, "resume", False)
 
         # Validation

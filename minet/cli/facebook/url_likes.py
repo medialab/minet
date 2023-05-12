@@ -38,7 +38,6 @@ def make_request(url: str) -> Optional[bytes]:
 
 
 def scrape(data: bytes):
-
     match = NUMBER_RE.search(data)
 
     if match is None:
@@ -61,7 +60,6 @@ def scrape(data: bytes):
 )
 def action(cli_args, enricher, loading_bar):
     for row, url in enricher.cells(cli_args.column, with_rows=True):
-
         with loading_bar.step():
             url = url.strip()
 

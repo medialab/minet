@@ -174,7 +174,6 @@ class ScraperReporterPool(object):
 )
 @with_ctrl_c_warning
 def action(cli_args, defer, loading_bar: LoadingBar):
-
     if cli_args.dump_queue and not isdir(cli_args.output_dir):
         loading_bar.erase()
         raise FatalError("Cannot dump crawl not started yet!")
@@ -214,7 +213,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
     if cli_args.dump_queue:
         loading_bar.erase()
         dump = crawler.dump_queue()
-        for (status, job) in dump:
+        for status, job in dump:
             console.print(
                 "[{style}]{status}[/{style}] depth=[warning]{depth}[/warning] {url}".format(
                     style=STATUS_TO_STYLE.get(status, "log.time"),
@@ -239,7 +238,6 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         loading_bar.print("[log.time]Will now resume…")
 
     with crawler:
-
         # Reporter pool
         reporter_pool = ScraperReporterPool(
             crawler, cli_args.output_dir, resume=cli_args.resume

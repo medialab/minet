@@ -13,7 +13,6 @@ URL_TEMPLATE = "https://api.crowdtangle.com/post/%s?token=%s"
 
 
 def crowdtangle_post(request, post_id, token=None, raw=False):
-
     if token is None:
         raise CrowdTangleMissingTokenError
 

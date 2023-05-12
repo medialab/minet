@@ -68,7 +68,6 @@ def scrape_post_id(post_url):
     root_element = soup.select_one("#m_story_permalink_view [data-ft]")
 
     if root_element is None:
-
         # Is this a photo post?
         next_link = soup.select_one('[href^="/photo.php"]')
 

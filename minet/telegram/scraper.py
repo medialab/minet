@@ -124,7 +124,6 @@ def scrape_channel_messages(html):
         "div[class*='tgme_widget_message_wrap js-widget_message_wrap']"
     )
     for message in messages:
-
         if message.select_one(
             "div[class='tgme_widget_message text_not_supported_wrap service_message js-widget_message']"
         ):

@@ -130,11 +130,9 @@ def errors_sorting_key(error):
 
 
 def validate(scraper):
-
     errors = []
 
     def recurse(node, path=[]):
-
         # Checking conflicts
         c = []
 
@@ -233,7 +231,6 @@ def validate(scraper):
         in_fields = path and path[-1] == "fields"
 
         for k, v in node.items():
-
             # Unkown keys
             if not in_fields and k not in KNOWN_KEYS:
                 errors.append(ScraperValidationUnknownKeyError(path=path, key=k))

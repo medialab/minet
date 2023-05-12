@@ -193,7 +193,6 @@ def scrape_comments(html, direction=None, in_reply_to=None):
                 replies_text = replies_item.get_text()
 
                 if replies_text != "Reply":
-
                     if "See all" in replies_text:
                         replies = (
                             replies_text.split("See all")[-1]
@@ -326,11 +325,9 @@ def scrape_posts(html):
 
 
 def scrape_video(soup):
-
     video_url_html = soup.select_one("meta[property='og:video:url']")
 
     if not video_url_html:
-
         title = soup.head.select_one("title").get_text().lower()
 
         if title == "facebook watch":
@@ -425,11 +422,9 @@ def scrape_video(soup):
 
 
 def scrape_photo(soup):
-
     photo_url_html = soup.select_one("meta[property='og:url']")
 
     if not photo_url_html:
-
         raise FacebookInvalidTargetError
 
     photo_url = photo_url_html.get("content")
@@ -529,7 +524,6 @@ def scrape_post(html):
     post_url_htlm = soup.head.select_one("meta[property='og:url']")
 
     if not post_url_htlm:
-
         title = soup.head.select_one("title").get_text().lower()
 
         if title == "facebook watch":
@@ -625,7 +619,6 @@ def scrape_post(html):
 
 class FacebookMobileScraper(object):
     def __init__(self, cookie, throttle=FACEBOOK_MOBILE_DEFAULT_THROTTLE):
-
         # Grabbing cookie
         self.cookie = grab_facebook_cookie(cookie)
 
@@ -653,7 +646,6 @@ class FacebookMobileScraper(object):
         return response.text()
 
     def comments(self, url, detailed=False, per_call=False):
-
         if not has_facebook_comments(url):
             raise FacebookInvalidTargetError
 

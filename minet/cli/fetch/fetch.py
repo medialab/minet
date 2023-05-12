@@ -312,7 +312,6 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
     # Normal fetch
     if not resolve:
-
         Addendum = (
             FetchAddendum if not cli_args.contents_in_report else FetchAddendumWithBody
         )
@@ -368,7 +367,6 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
     # Resolve
     else:
-
         with HTTPThreadPoolExecutor(**common_executor_kwargs) as executor:
             for result in executor.resolve(
                 enricher,
@@ -391,7 +389,6 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
                     # No error
                     if isinstance(result, SuccessfulResolveResult):
-
                         # Reporting in output
                         last = result.stack[-1]
                         status = last.status

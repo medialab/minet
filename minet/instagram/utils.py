@@ -12,14 +12,12 @@ HANDLES_RE = re.compile(r"[^\w\.@]+")
 
 
 def extract_hashtags(text):
-
     return sorted(
         set(r.lstrip("#").lower() for r in HASHTAGS_RE.split(text) if r.startswith("#"))
     )
 
 
 def extract_handles(text):
-
     return sorted(
         set(r.lstrip("@").lower() for r in HANDLES_RE.split(text) if r.startswith("@"))
     )

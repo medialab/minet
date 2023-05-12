@@ -151,7 +151,6 @@ def format_comment(comment):
 
 
 def format_hashtag_post(item):
-
     text = getpath(item, ["edge_media_to_caption", "edges", 0, "node", "text"])
 
     hashtags = []
@@ -185,7 +184,6 @@ def format_hashtag_post(item):
 
 
 def format_post(item):
-
     media_type = INSTAGRAM_MEDIA_TYPE.get(item["media_type"])
     if media_type is None:
         media_type = item["media_type"]
@@ -256,7 +254,6 @@ def format_post(item):
 
 
 def format_user(item):
-
     row = InstagramUser(
         item.get("pk"),
         item.get("username"),
@@ -277,7 +274,6 @@ def format_user(item):
 
 
 def format_user_info(user):
-
     bio_links_title = []
     bio_links_url = []
     biography_with_username = []
@@ -292,7 +288,6 @@ def format_user_info(user):
     biography_with_entities = getpath(user, ["biography_with_entities", "entities"])
 
     if biography_with_entities:
-
         for entity in biography_with_entities:
             username = getpath(entity, ["user", "username"])
             if username:

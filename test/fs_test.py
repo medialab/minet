@@ -19,7 +19,6 @@ from minet.exceptions import FilenameFormattingError
 
 class TestFS(object):
     def test_folder_strategy(self):
-
         # Don't test on windows yet
         if os.sep != "/":
             return
@@ -58,7 +57,6 @@ class TestFS(object):
         )
 
     def test_filename_builder(self):
-
         # Don't test on windows yet
         if os.sep != "/":
             return
@@ -171,7 +169,6 @@ class TestFS(object):
         )
 
     def test_thread_safe_files_writer(self):
-
         # Don't test on windows yet
         if os.sep != "/":
             return

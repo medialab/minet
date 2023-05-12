@@ -35,7 +35,6 @@ TiktokVideo = namedrecord(
 
 
 def format_video(item):
-
     challenges_titles = []
     challenges_descs = []
     stickers_texts = []

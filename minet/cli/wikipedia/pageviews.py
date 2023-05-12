@@ -43,7 +43,6 @@ def action(cli_args, enricher, loading_bar):
         threads=cli_args.threads,
     ):
         with loading_bar.step():
-
             if cli_args.sum:
                 s = 0
 

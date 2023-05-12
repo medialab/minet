@@ -70,7 +70,6 @@ NUMBER_RE = re.compile(r"\d+[\.,]?\d*[KM]?")
 
 
 def clean_human_readable_numbers(text):
-
     match = NUMBER_RE.search(text)
 
     if match is None:

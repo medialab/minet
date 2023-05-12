@@ -118,7 +118,6 @@ def compile_scraper(definition, as_string=False):
     initial_context = root_context.descend()
 
     def recurse(node, context):
-
         # Default extraction
         if node is None or (isinstance(node, str) and node in EXTRACTOR_NAMES):
             context.yield_to_parent("element_{id}.get_text().strip()")

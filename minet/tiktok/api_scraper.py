@@ -32,7 +32,6 @@ from minet.tiktok.formatters import (
 
 
 def forge_video_search_url(query, offset):
-
     url = (
         "https://www.tiktok.com/api/search/general/full/?aid=1988&keyword=%s&offset=%s"
         % (quote(query), offset)

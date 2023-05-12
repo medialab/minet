@@ -32,7 +32,6 @@ RANGE_UPPER_BOUND = math.ceil(MAX_ITEM_COUNT / ITEMS_PER_PAGE) + 1
 )
 @with_twitter_client()
 def action(cli_args, client, enricher, loading_bar):
-
     for row, query in enricher.cells(cli_args.column, with_rows=True):
         with loading_bar.step(query):
             kwargs = {"q": query, "count": ITEMS_PER_PAGE, "include_entities": True}

@@ -160,7 +160,6 @@ def forge_replies_url(comment_id, token=None):
 
 
 def get_channel_id(channel_target):
-
     should_scrape, channel_id = ensure_channel_id(channel_target)
 
     # is a youtube url without the channel ID
@@ -169,7 +168,6 @@ def get_channel_id(channel_target):
 
     # is not a url
     elif channel_id == channel_target:
-
         username = channel_target
         if not channel_target.startswith("@"):
             username = "@" + channel_target
@@ -188,7 +186,6 @@ def get_channel_id(channel_target):
 
 class YouTubeAPIClient(object):
     def __init__(self, key):
-
         if not isinstance(key, list):
             key = [key]
 
@@ -208,9 +205,7 @@ class YouTubeAPIClient(object):
             data = response.json()
 
             if response.status == 403:
-
                 if data is not None:
-
                     reason = getpath(data, ["error", "errors", 0, "reason"])
 
                     if reason == "accessNotConfigured":
@@ -260,7 +255,6 @@ class YouTubeAPIClient(object):
             return data
 
     def rotate_key(self):
-
         self.keys[self.current_key] = False
 
         available_key = next(
@@ -275,16 +269,13 @@ class YouTubeAPIClient(object):
         return False
 
     def reset_keys(self):
-
         for key in self.keys:
-
             if self.current_key is None:
                 self.current_key = key
 
             self.keys[key] = True
 
     def channels(self, channels_target, key=None, raw=False):
-
         # TODO: we could chunk per not None
         for group in as_chunks(YOUTUBE_API_MAX_CHANNELS_PER_CALL, channels_target):
             group_data = []
@@ -317,7 +308,6 @@ class YouTubeAPIClient(object):
                 yield item, indexed_result.get(channel_id)
 
     def videos(self, videos, key=None, raw=False):
-
         # TODO: we could chunk per not None
         for group in as_chunks(YOUTUBE_API_MAX_VIDEOS_PER_CALL, videos):
             group_data = []
@@ -429,7 +419,6 @@ class YouTubeAPIClient(object):
         return generator()
 
     def channel_videos(self, channel_target):
-
         channel_id = get_channel_id(channel_target)
 
         playlist_id = get_channel_main_playlist_id(channel_id)

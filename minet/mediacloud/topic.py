@@ -13,7 +13,6 @@ from minet.mediacloud.formatters import format_topic_story
 def url_forge(
     token=None, topic_id=None, link_id=None, media_id=None, from_media_id=None
 ):
-
     url = "%s/topics/%s/stories/list?key=%s&limit=%i" % (
         MEDIACLOUD_API_BASE_URL,
         topic_id,
@@ -42,7 +41,6 @@ def mediacloud_topic_stories(
     from_media_id=None,
     raw=False,
 ):
-
     while True:
         url = url_forge(
             token,

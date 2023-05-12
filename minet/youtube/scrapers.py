@@ -26,7 +26,6 @@ YouTubeCaptionTrack = namedtuple("YouTubeCaptionTrack", ["lang", "url", "generat
 
 
 def get_caption_tracks(video_id):
-
     # First we try to retrieve it from video info
     url = "https://www.youtube.com/get_video_info?video_id=%s" % video_id
 

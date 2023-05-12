@@ -147,7 +147,6 @@ def format_leaderboard(item, with_breakdown=False):
         breakdown = item["breakdown"]
 
         for post_type in CROWDTANGLE_POST_TYPES:
-
             data = breakdown.get(post_type)
 
             for key, _ in CROWDTANGLE_FULL_STATISTICS:

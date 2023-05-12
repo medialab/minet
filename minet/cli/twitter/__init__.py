@@ -92,7 +92,6 @@ COMMON_V2_SEARCH_ARGUMENTS = [
 
 
 def check_credentials(cli_args):
-
     # Credentials are required to be able to access the API
     if (
         not cli_args.api_key

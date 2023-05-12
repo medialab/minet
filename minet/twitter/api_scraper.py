@@ -52,6 +52,7 @@ MAXIMUM_QUERY_LENGTH = 500
 DEFAULT_COUNT = 100  # NOTE: the actual upper limit seems to be 20, but I keep 100 just in case it changes in the future, who knows...
 MAX_GUEST_TOKEN_USE_COUNT = 100
 
+
 # =============================================================================
 # Helpers
 # =============================================================================
@@ -313,7 +314,6 @@ def tweets_payload_iter(payload):
             meta = None
 
             if tweet is not None:
-
                 if "forwardPivot" in tweet_meta:
                     pivot = tweet_meta["forwardPivot"]
 
@@ -499,7 +499,6 @@ class TwitterAPIScraper(object):
 
             if refs is not None:
                 for is_first, extracted_tweet in with_is_first(result):
-
                     # Casting to int64 to save up memory
                     id_int64 = int(extracted_tweet["id"])
 
@@ -557,7 +556,6 @@ class TwitterAPIScraper(object):
         include_referenced_tweets=False,
         with_meta=False,
     ):
-
         if is_query_too_long(query):
             raise TwitterPublicAPIQueryTooLongError
 

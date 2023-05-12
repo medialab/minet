@@ -44,6 +44,7 @@ async def boot():
 LOOP = asyncio.get_event_loop()
 MASTER, ENDPOINT = LOOP.run_until_complete(boot())
 
+
 # TODO: use incognito browser context?
 async def work(url):
     browser = await connect(browserWSEndpoint=ENDPOINT)

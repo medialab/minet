@@ -21,7 +21,6 @@ def url_forge(
     list_ids=None,
     **kwargs
 ):
-
     base_url = URL_TEMPLATE % {"sort_by": sort_by, "token": token}
 
     if language:

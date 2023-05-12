@@ -123,7 +123,6 @@ def worker(payload: ScrapeWorkerPayload) -> ScrapeResult:
 
 
 def action(cli_args):
-
     using_typical_scraper = False
 
     # Parsing scraper definition
@@ -214,7 +213,6 @@ def action(cli_args):
             current_id = count()
 
             for item in items:
-
                 # Items we cannot process
                 if item.error is not None:
                     loading_bar.advance()

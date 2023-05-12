@@ -31,7 +31,6 @@ def construct_url(
     q=None,
     page=None,
 ):
-
     url = URL_TEMPLATE % (endpoint, token)
 
     url += "&num_results=%i" % num_results
@@ -138,7 +137,6 @@ class BuzzSumoAPIClient(object):
         return nb_pages
 
     def domain_articles(self, domain, begin_timestamp, end_timestamp):
-
         # Here we optimize the periods used to request the API, because BuzzSumo
         # prevents us from getting more than 99 pages.
         maximum_page_nb = MAXIMUM_PAGE_NB
@@ -147,7 +145,6 @@ class BuzzSumoAPIClient(object):
 
         # This loop creates adapted time periods that all return less than 99 pages of results:
         while any(nb_page > maximum_page_nb for nb_page in nb_pages):
-
             # We ask how many pages are needed to get all the articles for the given periods:
             nb_pages = self.__get_nb_pages_per_period_dates(domain, period_timestamps)
 

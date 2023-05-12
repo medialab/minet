@@ -121,7 +121,6 @@ class DefinitionSpider(
     next_scrapers: Dict[str, Scraper]
 
     def __init__(self, definition: Union[AnyFileTarget, Dict[str, Any]]):
-
         if not isinstance(definition, dict):
             definition = load_definition(definition)
 
@@ -156,7 +155,6 @@ class DefinitionSpider(
                     self.next_scrapers[name] = Scraper(scraper)
 
     def start(self) -> Iterable[UrlOrCrawlTarget[CrawlJobDataType]]:
-
         # TODO: possibility to name this as jobs and get additional metadata
         start_urls = ensure_list(self.definition.get("start_url", [])) + ensure_list(
             self.definition.get("start_urls", [])
@@ -188,7 +186,6 @@ class DefinitionSpider(
             return CrawlTarget(target)
 
         else:
-
             # TODO: validate target
             return CrawlTarget(
                 url=target["url"],
@@ -199,7 +196,6 @@ class DefinitionSpider(
     def __next(
         self, response: Response, soup: BeautifulSoup
     ) -> Iterator[Union[str, DefinitionSpiderTarget[CrawlJobDataType]]]:
-
         # Scraping next results
         if self.next_scraper is not None:
             scraped = self.next_scraper(soup)

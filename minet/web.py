@@ -171,7 +171,6 @@ def parse_http_header(header: str) -> Tuple[str, str]:
 #   http://www.otsukare.info/2015/03/26/refresh-http-header
 def parse_http_refresh(value) -> Optional[Tuple[int, str]]:
     try:
-
         if isinstance(value, bytes):
             value = value.decode()
 
@@ -186,7 +185,6 @@ def parse_http_refresh(value) -> Optional[Tuple[int, str]]:
 
 
 def extract_href(value):
-
     m = HREF_RE.search(value)
 
     if not m:
@@ -255,7 +253,6 @@ def create_pool_manager(
         urllib3.disable_warnings()
 
     if threads is not None:
-
         # TODO: maxsize should increase with group_parallelism
         manager_kwargs["maxsize"] = 10
         manager_kwargs["num_pools"] = threads * 2
@@ -562,7 +559,6 @@ def atomic_resolve(
 
     try:
         for _ in range(max_redirects):
-
             # We close last buffered_response as it won't be used anymore
             # NOTE: this should always happen at the beginning of the loop
             if buffered_response is not None:
@@ -603,9 +599,7 @@ def atomic_resolve(
             location = None
 
             if buffered_response.status not in REDIRECT_STATUSES:
-
                 if buffered_response.status < 400:
-
                     # Refresh header
                     if follow_refresh_header:
                         refresh = buffered_response.getheader("refresh")
@@ -705,7 +699,6 @@ def atomic_resolve(
 
     # NOTE: using BaseException here to avoid leaks on e.g. KeyboardInterrupt
     except BaseException:
-
         # NOTE: here we must make sure to cleanup any still alive
         # buffered response to avoid leaks
         if buffered_response is not None:
@@ -722,7 +715,6 @@ def atomic_resolve(
 
 
 def build_request_headers(headers=None, cookie=None, spoof_ua=False, json_body=False):
-
     # Formatting headers
     final_headers = {}
 
@@ -1023,7 +1015,6 @@ def request(
     cancel_event: Optional[Event] = None,
     raise_on_statuses: Optional[Container[int]] = None,
 ) -> Response:
-
     # Formatting headers
     final_headers = build_request_headers(
         headers=headers,
@@ -1099,7 +1090,6 @@ def resolve(
     cancel_event: Optional[Event] = None,
     raise_on_statuses: Optional[Container[int]] = None,
 ) -> RedirectionStack:
-
     final_headers = build_request_headers(
         headers=headers, cookie=cookie, spoof_ua=spoof_ua
     )
@@ -1235,7 +1225,6 @@ def create_request_retryer(
     epilog: Optional[Callable[[RetryCallState], Optional[str]]] = None,
     cancel_event: Optional[Event] = None,
 ):
-
     # By default we only retry network issues, such as Internet being cut off etc.
     retryable_exception_types = [
         urllib3_exceptions.ProtocolError,

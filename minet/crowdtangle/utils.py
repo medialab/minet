@@ -105,7 +105,6 @@ def make_paginated_iterator(
         namespace=None,
         **kwargs
     ):
-
         if namespace is not None:
             kwargs = vars(namespace)
         else:
@@ -113,7 +112,6 @@ def make_paginated_iterator(
 
         # Checking we have the necessary dates
         if kwargs.get("sort_by") == "date":
-
             # Inferring end date to be now, this will be important later
             if kwargs.get("end_date") is None:
                 kwargs["end_date"] = infer_end_date()
@@ -165,7 +163,6 @@ def make_paginated_iterator(
 
             # We have exhausted the available data
             if items is None:
-
                 if need_to_chunk:
                     could_rotate = rotate_year()
 
@@ -181,7 +178,6 @@ def make_paginated_iterator(
             acc = []
 
             for item in items:
-
                 # Avoiding duplicating items due to race conditions
                 if item_id_getter(item) in last_items:
                     continue

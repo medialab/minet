@@ -65,7 +65,6 @@ def run(name: str, version: str, commands: List, args: Optional[str] = None):
     action = subparser_index.get(cli_args.action)
 
     if action is not None:
-
         # If subparser is called without any subaction, we print help and exit
         if "subparsers" in action["command"]:
             subdest = action["command"]["subparsers"]["dest"]
@@ -128,7 +127,6 @@ def run(name: str, version: str, commands: List, args: Optional[str] = None):
                 sys.exit(1)
 
     elif cli_args.action == "help":
-
         if len(cli_args.subcommand) == 0:
             parser.print_help()
             return

@@ -59,7 +59,6 @@ def action(cli_args, enricher, loading_bar):
         )
 
     for row, query in enricher.cells(cli_args.column, with_rows=True):
-
         # Templating?
         if cli_args.query_template is not None:
             query = CUSTOM_FORMATTER.format(cli_args.query_template, value=query)

@@ -41,7 +41,6 @@ class ScraperMixin(object):
             raise ScraperNotTabularError
 
         def generator():
-
             result = self.__call__(html, context=context)
 
             if result is None:
@@ -72,7 +71,6 @@ class ScraperMixin(object):
             raise ScraperNotTabularError
 
         def generator():
-
             result = self.__call__(html, context=context)
 
             if result is None:

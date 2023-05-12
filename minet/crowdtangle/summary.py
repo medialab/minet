@@ -26,7 +26,6 @@ URL_TEMPLATE = (
 
 
 def url_forge(link, token, start_date, sort_by, platforms=None, include_posts=False):
-
     base_url = URL_TEMPLATE % {
         "token": token,
         "count": 1 if not include_posts else 1000,
@@ -51,7 +50,6 @@ def crowdtangle_summary(
     raw=False,
     platforms=None,
 ):
-
     if token is None:
         raise CrowdTangleMissingTokenError
 

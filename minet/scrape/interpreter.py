@@ -92,7 +92,6 @@ def eval_expression(
     check=None,
     allow_none=False,
 ):
-
     if callable(expression):
         try:
             result = expression(
@@ -105,7 +104,6 @@ def eval_expression(
         except Exception as e:
             raise ScraperEvalError(reason=e, path=path, expression=expression)
     else:
-
         # Local variables
         EVAL_CONTEXT["element"] = element
         EVAL_CONTEXT["elements"] = elements
@@ -117,7 +115,6 @@ def eval_expression(
         EVAL_CONTEXT["scope"] = scope
 
         if "\n" in expression:
-
             # Multiline expression
             scope = {}
 
@@ -132,7 +129,6 @@ def eval_expression(
             except Exception as e:
                 raise ScraperEvalError(reason=e, path=path, expression=expression)
         else:
-
             # Simple expression
             try:
                 result = eval(expression, EVAL_CONTEXT, None)
@@ -205,7 +201,6 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[], scope=
     if sel is not None:
         element = soupsieve.select_one(sel, element)
     elif "sel_eval" in scraper:
-
         evaluated_sel = eval_expression(
             scraper["sel_eval"],
             element=element,
@@ -292,7 +287,6 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[], scope=
 
         # Do we have a scalar?
         elif "item" in scraper:
-
             # Default value is text
             value = interpret_scraper(
                 scraper["item"],
@@ -304,7 +298,6 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[], scope=
             )
 
         else:
-
             if "attr" in scraper:
                 value = element.get(scraper["attr"])
             elif "extract" in scraper:
@@ -312,7 +305,6 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[], scope=
             elif "get_context" in scraper:
                 value = nested_getter(context, scraper["get_context"])
             elif "default" not in scraper:
-
                 # Default value is text
                 value = extract(element, "text")
 
@@ -338,7 +330,6 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[], scope=
         if single_value:
             acc = value
         else:
-
             # Filtering?
             if "filter_eval" in scraper:
                 passed_filter = eval_expression(

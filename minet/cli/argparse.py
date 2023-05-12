@@ -141,7 +141,6 @@ ARGUMENT_KEYS_TO_OMIT = ["name", "flag", "flags"]
 
 def add_arguments(subparser, arguments):
     for argument in arguments:
-
         argument_kwargs = omit(argument, ARGUMENT_KEYS_TO_OMIT)
 
         if "help" in argument_kwargs and "default" in argument_kwargs:
@@ -210,7 +209,6 @@ def build_subparsers(
     dest="action",
     common_arguments=[],
 ):
-
     subparsers = parser.add_subparsers(help=help, title=title, dest=dest)
 
     for name, command in commands.items():
@@ -255,7 +253,6 @@ def build_subparsers(
 
 
 def build_parser(name, version, commands):
-
     # Building the argument parser
     parser = ArgumentParser(prog="minet", formatter_class=custom_formatter)
 
@@ -701,7 +698,6 @@ def resolve_typical_arguments(
             )
 
     if select or variadic_input is not None:
-
         # TODO: actually one can use xsv mini dsl here
         args.append(
             {
@@ -766,7 +762,6 @@ def command(
     variadic_input: Optional[VariadicInputDefinition] = None,
     **kwargs,
 ):
-
     if resumer is not None and not issubclass(resumer, Resumer):
         raise TypeError("given resumer is not a Resumer class")
 

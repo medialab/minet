@@ -16,7 +16,6 @@ WHITESPACE_RE = re.compile(r"\s+")
 
 
 def match_selector(selector, tag, attrs):
-
     # Checking tag name
     if selector.tag.name != "*" and tag != selector.tag.name:
         return False

@@ -42,7 +42,6 @@ def query_additions(
     publish_month=None,
     publish_year=None,
 ):
-
     if collections is not None:
         query += create_plural_query_component("tags_id_media", collections)
 
@@ -75,7 +74,6 @@ def url_forge(
     count=False,
     last_processed_stories_id=None,
 ):
-
     url = "%s/stories_public/%s?key=%s" % (
         MEDIACLOUD_API_BASE_URL,
         "count" if count else "list",

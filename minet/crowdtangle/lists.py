@@ -11,7 +11,6 @@ URL_TEMPLATE = "https://api.crowdtangle.com/lists?token=%s"
 
 
 def crowdtangle_lists(request, token=None, raw=False):
-
     if token is None:
         raise CrowdTangleMissingTokenError
 

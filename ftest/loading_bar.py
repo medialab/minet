@@ -29,7 +29,6 @@ try:
         nested=NESTED,
         sub_title_style="",
     ) as loading_bar:
-
         if not NESTED:
             for i in range(SUB_N):
                 time.sleep(0.005)

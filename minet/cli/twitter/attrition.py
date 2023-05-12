@@ -54,13 +54,11 @@ def action(cli_args, client, enricher, loading_bar):
 
     def cells():
         for row, cell in enricher.cells(cli_args.column, with_rows=True):
-
             if cell == "":
                 tweet = None
                 user = None
 
             else:
-
                 parsed = parse_twitter_url(cell)
 
                 if parsed is None:
@@ -74,7 +72,6 @@ def action(cli_args, client, enricher, loading_bar):
                     user = None
 
                 if cli_args.user:
-
                     if cli_args.has_dummy_csv:
                         user = cli_args.user
 
@@ -85,7 +82,6 @@ def action(cli_args, client, enricher, loading_bar):
                             user = row[user_pos]
 
                     if cli_args.ids:
-
                         if is_not_user_id(user):
                             raise FatalError(
                                 "The column given as argument doesn't contain user ids, you have probably given user screen names as argument instead. \nTry removing --ids from the command."
@@ -179,7 +175,6 @@ def action(cli_args, client, enricher, loading_bar):
                 current_tweet_status == "user_or_tweet_deleted"
                 or current_tweet_status == "unknown"
             ):
-
                 if user is not None:
                     if user in user_cache:
                         if user_cache[user] == "user_ok":
@@ -189,7 +184,6 @@ def action(cli_args, client, enricher, loading_bar):
                             current_tweet_status = user_cache[user]
 
                     else:
-
                         if cli_args.ids:
                             c_args = {"user_id": user}
                         else:
@@ -221,12 +215,10 @@ def action(cli_args, client, enricher, loading_bar):
                 # case we need to enquire about the original tweet to find
                 # a reason for the tweet's unavailability
                 if cli_args.retweeted_id:
-
                     if (
                         current_tweet_status == "unavailable_tweet"
                         or current_tweet_status == "unknown"
                     ):
-
                         if cli_args.has_dummy_csv:
                             original_tweet = cli_args.retweeted_id
                         else:

@@ -30,7 +30,6 @@ def format_page_filename(webentity, page):
 
 @with_hyphe_fatal_errors
 def action(cli_args):
-
     # Paths
     output_dir = "hyphe_corpus_%s" % cli_args.corpus
 

@@ -109,7 +109,6 @@ def make_twitter_action(method_name, csv_headers):
                     client_kwargs = {"screen_name": user}
 
                 while True:
-
                     skip_in_output = None
 
                     if resuming_state:
@@ -122,7 +121,6 @@ def make_twitter_action(method_name, csv_headers):
                         try:
                             result = client.call([method_name, "ids"], **client_kwargs)
                         except TwitterHTTPError as e:
-
                             # The user does not exist
                             loading_bar.inc_stat("not-found", style="error")
                             break
@@ -155,7 +153,6 @@ def make_twitter_action(method_name, csv_headers):
                                 route=["users", user, method_name_v2], **client_kwargs
                             )
                         except TwitterHTTPError as e:
-
                             # The user does not exist
                             loading_bar.inc_stat("not-found", style="error")
                             break

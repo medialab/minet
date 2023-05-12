@@ -112,7 +112,6 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
     def __call__(
         self, job: CrawlJob[CrawlJobDataType]
     ) -> Union[object, AnyCrawlResult[CrawlJobDataType, CrawlResultDataType]]:
-
         # Registering work
         with self.crawler.state.task():
             cancel_event = self.cancel_event
@@ -197,6 +196,7 @@ Spiders = Union[
     Dict[str, Spider[CrawlJobDataTypes, CrawlResultDataTypes]],
 ]
 
+
 # TODO: try creating a kwarg type for those
 class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
     executor: HTTPThreadPoolExecutor
@@ -237,7 +237,6 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         request_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
     ):
-
         # Own executor and imap params
         self.executor = HTTPThreadPoolExecutor(
             max_workers=max_workers,
@@ -351,12 +350,10 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
         # Enqueuing start jobs, only if we are not resuming
         if not self.resuming:
-
             # NOTE: start jobs are all buffered into memory
             # We could use a blocking queue with max size but this could prove
             # difficult to resume crawls based upon lazy iterators
             for name, spider in self.__spiders.items():
-
                 if self.singular:
                     name = None
 

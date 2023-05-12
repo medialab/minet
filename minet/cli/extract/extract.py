@@ -140,7 +140,6 @@ def action(cli_args, enricher: ThreadSafeEnricher, loading_bar):
         current_id = count()
 
         for item in items:
-
             # Items we cannot process
             if item.error is not None:
                 loading_bar.advance()

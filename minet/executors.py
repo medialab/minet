@@ -502,7 +502,6 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         callback: Optional[Callable[[ItemType, str, Response], AddendumType]] = None,
     ) -> Iterator[AnyRequestResult[ItemType, AddendumType]]:
-
         # TODO: validate
         worker = HTTPWorker(
             self.pool_manager,
@@ -546,7 +545,6 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
             Callable[[ItemType, str, RedirectionStack], AddendumType]
         ] = None,
     ) -> Iterator[AnyResolveResult[ItemType, AddendumType]]:
-
         # TODO: validate
         worker = HTTPWorker(
             self.pool_manager,

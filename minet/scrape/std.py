@@ -97,7 +97,6 @@ def get_display_text(element):
                     yield "\n"
 
                 else:
-
                     # NOTE: an empty inline tag should not generate whitespace
                     if not descendant.contents:
                         continue

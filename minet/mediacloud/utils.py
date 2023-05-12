@@ -10,7 +10,6 @@ from minet.mediacloud.exceptions import MediacloudServerError
 
 
 def get_next_link_id(data):
-
     if "link_ids" not in data:
         return None
 

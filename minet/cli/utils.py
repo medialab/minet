@@ -132,7 +132,6 @@ class CLIRetryerHandler(Handler):
 
 
 def acquire_cross_platform_stdout():
-
     # As per #254: stdout need to be wrapped so that windows get a correct csv
     # stream output
     if "windows" in platform.system().lower():
@@ -163,7 +162,6 @@ class FetchReportLikeItem:
 def create_fetch_like_report_iterator(
     cli_args: SimpleNamespace, reader: casanova.Reader
 ) -> Iterator[FetchReportLikeItem]:
-
     headers = reader.headers
     input_dir = cli_args.input_dir or ""
 
@@ -240,7 +238,6 @@ def create_fetch_like_report_iterator(
             encoding = get(row, encoding_pos, "").strip()
 
             if encoding:
-
                 if not is_supported_encoding(encoding):
                     item.error = "encoding-not-supported"
                     yield item
@@ -363,7 +360,6 @@ def with_enricher_and_loading_bar(
                 )
                 and cli_args.output.can_resume()
             ):
-
                 resume_loading_bar = LoadingBar(
                     title="Reading output to resume", unit="lines", transient=True
                 )
@@ -423,7 +419,6 @@ def with_enricher_and_loading_bar(
                 show_label=show_label,
                 completed=completed,
             ) as loading_bar:
-
                 additional_kwargs = {
                     "enricher": enricher,
                     "loading_bar": loading_bar,
