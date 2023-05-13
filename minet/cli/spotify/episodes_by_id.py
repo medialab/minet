@@ -9,7 +9,7 @@ from ebbe import as_chunks
 
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.spotify import SpotifyAPIClient, SpotifyShowEpisode
-from minet.spotify.utils import parse_chunk, parse_spotify_id
+from minet.spotify.utils import parse_spotify_id
 
 
 @with_enricher_and_loading_bar(
@@ -24,7 +24,7 @@ def action(cli_args, enricher, loading_bar):
 
     for chunk in as_chunks(50, enricher.cells(cli_args.column, with_rows=True)):
         with loading_bar.step(count=len(chunk)):
-            episode_ids = [parse_spotify_id(id) for _, id in parse_chunk(chunk)]
+            episode_ids = [parse_spotify_id(id) for _, id in chunk]
 
             indexed_result = {}
             for result in client.get_by_id(
@@ -35,7 +35,7 @@ def action(cli_args, enricher, loading_bar):
             ):
                 indexed_result[result.id] = result
 
-            for row, episode in parse_chunk(chunk):
+            for row, episode in chunk:
                 episode_id = parse_spotify_id(episode)
                 addendum = indexed_result.get(episode_id)
                 enricher.writerow(row, addendum)

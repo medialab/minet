@@ -4,13 +4,20 @@
 #
 # A handy API client used by the CLI actions.
 #
-import time
 import json
 
-from minet.spotify.constants import BASE_API_ENDPOINT_V1
-from minet.web import create_request_retryer, request, retrying_method
-from minet.spotify.exceptions import SpotifyAPIError
 from ural.format_url import URLFormatter
+
+from minet.spotify.constants import BASE_API_ENDPOINT_V1
+from minet.spotify.exceptions import (
+    SpotifyAPIAuthorizationError,
+    SpotifyAPIBadRequest,
+    SpotifyAPINoContentError,
+    SpotifyInternalServerError,
+    SpotifyServerError,
+    SpotifyTooManyRequestsError,
+)
+from minet.web import create_request_retryer, request, retrying_method
 
 LIMIT = 50
 
@@ -43,21 +50,46 @@ class SpotifyAPIClient(object):
         self.access_token = get_access_token(
             client_id=client_id, client_secret=client_secret
         )
-        self.retryer = create_request_retryer()
-        self.spotify_url = URLFormatter(base_url=BASE_API_ENDPOINT_V1)
+        self.retryer = create_request_retryer(
+            min=30,
+            additional_exceptions=[
+                SpotifyInternalServerError,
+                SpotifyTooManyRequestsError,
+            ],
+        )
+        self.spotify_url = URLFormatter(
+            base_url=BASE_API_ENDPOINT_V1, format_arg_value=self.format_id_list
+        )
+
+    def format_id_list(self, key, value):
+        if key == "ids" and isinstance(value, list):
+            value = ",".join(value)
+        return value
 
     @retrying_method()
     def request_json(self, url):
         response = request(
             url=url, headers={"Authorization": f"Bearer {self.access_token}"}
         )
-        if response.status == 429:
-            time.sleep(30)
-            response = request(
-                url=url, headers={"Authorization": f"Bearer {self.access_token}"}
-            )
+
+        if response.status == 204:
+            raise SpotifyAPINoContentError
+
+        elif response.status == 400:
+            raise SpotifyAPIBadRequest
+
+        elif response.status == 401:
+            raise SpotifyAPIAuthorizationError
+
+        elif response.status == 429:
+            raise SpotifyTooManyRequestsError
+
+        elif response.status == 500:
+            raise SpotifyInternalServerError
+
         elif response.status != 200:
-            raise SpotifyAPIError(response.text(), url, response.status)
+            raise SpotifyServerError
+
         return response.json()
 
     def search(self, query, type, market, method):
@@ -67,11 +99,8 @@ class SpotifyAPIClient(object):
 
     def get_by_id(self, ids, type, market, method):
         path = type
-        args = {"market": market, "limit": LIMIT}
+        args = {"market": market, "limit": LIMIT, "ids": ids}
         url = self.spotify_url.format(path=path, args=args)
-        # Temporary fix for formatted string of IDs
-        id_string = "%2C".join(ids)
-        url += "&ids=" + id_string
         return self.generator(base_url=url, formatter=method, do_offset=False)
 
     def get_episodes_by_show_id(self, id, market, method):
@@ -109,9 +138,8 @@ class SpotifyAPIClient(object):
             # Yield each item in the array of target data
             if isinstance(items, list) and len(items) > 0:
                 for item in items:
-                    if not item:
-                        raise SpotifyAPIError(response=result, url=url)
-                    else:
+                    # When an item is no longer available (e.g. it was deleted) the item in a list of results will be None
+                    if item:
                         formatted_item = formatter(item)
                         yield formatted_item
             # If there are no more items in the returned array, do not continue
