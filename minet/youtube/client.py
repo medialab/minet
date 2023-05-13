@@ -296,7 +296,10 @@ class YouTubeAPIClient(object):
 
             indexed_result = {}
 
-            for item in result["items"]:
+            # NOTE: as per #753, the "items" key is sometimes absent of the
+            # API payload, e.g. if all the enquired channels have been
+            # terminated for TOS violations.
+            for item in result.get("items", []):
                 channel_id = item["id"]
 
                 if not raw:
