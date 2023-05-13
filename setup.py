@@ -29,7 +29,7 @@ setup(
         "casanova>=1.10,<1.11",
         "charset-normalizer>=3,<4",
         "dateparser>=1.1.1",
-        "ebbe>=1.11.1,<2",
+        "ebbe>=1.12.1,<2",
         "json5>=0.8.5",
         "lxml>=4.3.0",
         "nanoid>=2,<3",

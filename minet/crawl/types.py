@@ -1,6 +1,7 @@
 from typing import TypeVar, Union, Generic, Optional
 
 from nanoid import generate
+from ebbe import format_repr
 from functools import partial
 from ural import get_domain_name
 
@@ -58,20 +59,7 @@ class CrawlTarget(Generic[CrawlJobDataType]):
         )
 
     def __repr__(self):
-        class_name = self.__class__.__name__
-
-        data_repr = " data={!r}".format(self.data) if self.data is not None else ""
-        spider_repr = (
-            " spider={!r} ".format(self.spider) if self.spider is not None else ""
-        )
-
-        return ("<{class_name} {spider}depth={depth!r} url={url!r}{data}>").format(
-            class_name=class_name,
-            url=self.url,
-            depth=self.depth,
-            spider=spider_repr,
-            data=data_repr,
-        )
+        return format_repr(self, conditionals=("spider", "data", "depth"))
 
 
 UrlOrCrawlTarget = Union[str, CrawlTarget[CrawlJobDataType]]
@@ -179,24 +167,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
         return self.__domain
 
     def __repr__(self):
-        class_name = self.__class__.__name__
-
-        data_repr = " data={!r}".format(self.data) if self.data is not None else ""
-        spider_repr = (
-            " spider={!r} ".format(self.spider) if self.spider is not None else ""
-        )
-
-        return (
-            "<{class_name} id={id!r} {spider}depth={depth!r} url={url!r} attempts={attempts!r}{data}>"
-        ).format(
-            class_name=class_name,
-            id=self.id,
-            url=self.url,
-            depth=self.depth,
-            spider=spider_repr,
-            attempts=self.attempts,
-            data=data_repr,
-        )
+        return format_repr(self, conditionals=("data", "spider", "parent"))
 
 
 class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
@@ -260,13 +231,25 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
             len(self.response) if self.response else None,
         ]
 
-    def _repr_from_job(self) -> str:
-        r = "url={url!r} depth={depth!r}".format(url=self.job.url, depth=self.job.depth)
-
-        if self.job.spider is not None:
-            r += " spider={!r}".format(self.job.spider)
-
-        return r
+    def __repr__(self) -> str:
+        return format_repr(
+            self,
+            attributes=(
+                (
+                    "url",
+                    "depth",
+                    "spider",
+                    ("error", self.error_code),
+                    ("status", self.response.status if self.response else None),
+                    "degree",
+                    (
+                        "dtype",
+                        type(self.data).__name__ if self.data is not None else None,
+                    ),
+                )
+            ),
+            conditionals=("spider", "error", "status", "degree", "dtype"),
+        )
 
 
 class ErroredCrawlResult(CrawlResult[CrawlJobDataType, None]):
@@ -292,13 +275,6 @@ class ErroredCrawlResult(CrawlResult[CrawlJobDataType, None]):
     def error_code(self) -> str:
         return serialize_error_as_slug(self.error)
 
-    def __repr__(self):
-        name = self.__class__.__name__
-
-        return "<{name} {job} error={error}>".format(
-            name=name, job=self._repr_from_job(), error=self.error_code
-        )
-
 
 class SuccessfulCrawlResult(CrawlResult[CrawlJobDataType, CrawlResultDataType]):
     job: CrawlJob[CrawlJobDataType]
@@ -323,20 +299,6 @@ class SuccessfulCrawlResult(CrawlResult[CrawlJobDataType, CrawlResultDataType]):
     @property
     def error_code(self) -> None:
         return None
-
-    def __repr__(self):
-        name = self.__class__.__name__
-        dtype = type(self.data).__name__
-
-        return (
-            "<{name} {job} status={status!r} degree={degree!r} dtype={dtype}>".format(
-                name=name,
-                job=self._repr_from_job(),
-                status=self.response.status,
-                degree=self.degree,
-                dtype=dtype,
-            )
-        )
 
 
 AnyCrawlResult = Union[

@@ -14,7 +14,7 @@ browser-cookie3==0.17.1
 casanova==1.10.0
 charset-normalizer==3.0.1
 dateparser==1.1.6
-ebbe==1.11.1
+ebbe==1.12.1
 json5==0.9.11
 lxml==4.9.2
 nanoid==2.0.0
