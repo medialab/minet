@@ -189,13 +189,16 @@ class ThreadSafeFileWriter(object):
         self.folder_locks = NamedLocks()
         self.file_locks = NamedLocks()
 
-    def resolve(self, filename: str, relative: bool = False):
+    def resolve(self, filename: str, relative: bool = False, compress: bool = False):
         full_path = join(self.root_directory, filename)
+
+        if compress and not full_path.endswith(".gz"):
+            full_path += ".gz"
 
         if relative:
             return normpath(full_path)
 
-        return abspath(full_path)
+        return normpath(abspath(full_path))
 
     def makedirs(self, directory: str) -> None:
         if not directory:
@@ -206,10 +209,14 @@ class ThreadSafeFileWriter(object):
             makedirs(directory, exist_ok=True)
 
     def write(
-        self, filename: str, contents: Union[str, bytes], compress: bool = False
+        self,
+        filename: str,
+        contents: Union[str, bytes],
+        compress: bool = False,
+        relative: bool = False,
     ) -> str:
         binary = isinstance(contents, bytes)
-        filename = self.resolve(filename)
+        filename = self.resolve(filename, relative=relative, compress=compress)
         directory = dirname(filename)
 
         # NOTE: Could have prefix-free locking as a bonus...
@@ -225,9 +232,6 @@ class ThreadSafeFileWriter(object):
 
             if not binary:
                 open_kwargs["mode"] = "wt"
-
-            if not filename.endswith(".gz"):
-                filename += ".gz"
         else:
             open_fn = open
 

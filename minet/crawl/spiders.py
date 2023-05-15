@@ -92,9 +92,15 @@ class Spider(Generic[CrawlJobDataType, CrawlResultDataType]):
         return "<%(class_name)s>" % {"class_name": class_name}
 
     def write(
-        self, filename: str, contents: Union[str, bytes], compress: bool = False
+        self,
+        filename: str,
+        contents: Union[str, bytes],
+        compress: bool = False,
+        relative: bool = False,
     ) -> str:
-        return self.crawler.write(filename, contents, compress=compress)
+        return self.crawler.write(
+            filename, contents, compress=compress, relative=relative
+        )
 
     def submit(self, fn, *args, **kwargs):
         return self.crawler.submit(fn, *args, **kwargs)

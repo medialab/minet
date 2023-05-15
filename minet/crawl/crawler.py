@@ -503,9 +503,15 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         return self.queue.dump()
 
     def write(
-        self, filename: str, contents: Union[str, bytes], compress: bool = False
+        self,
+        filename: str,
+        contents: Union[str, bytes],
+        compress: bool = False,
+        relative: bool = False,
     ) -> str:
-        return self.file_writer.write(filename, contents, compress=compress)
+        return self.file_writer.write(
+            filename, contents, compress=compress, relative=relative
+        )
 
     def submit(self, fn, *args, **kwargs):
 
