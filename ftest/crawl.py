@@ -1,4 +1,4 @@
-from minet.crawl import Crawler, CrawlJob
+from minet.crawl import Crawler, Spider, CrawlJob
 from minet.web import Response
 from urllib.parse import urljoin
 from minet.cli.console import console
@@ -18,7 +18,20 @@ from minet.cli.console import console
 #     return titles, [next_link]
 
 
-with Crawler.from_definition("./ftest/crawlers/echojs_crawl.yml") as crawler:
+# with Crawler.from_definition("./ftest/crawlers/echojs_crawl.yml") as crawler:
+#     for result in crawler:
+#         console.print(result.job, highlight=True)
+#         console.print(result, highlight=True)
+
+
+class CustomSpider(Spider):
+    START_URL = "https://www.lemonde.fr/"
+
+    def __call__(self, job, response):
+        self.write("dump.html", response.body, compress=True)
+        return
+
+
+with Crawler(CustomSpider()) as crawler:
     for result in crawler:
-        console.print(result.job, highlight=True)
         console.print(result, highlight=True)

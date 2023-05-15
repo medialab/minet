@@ -4,6 +4,7 @@
 #
 #
 from typing import (
+    TYPE_CHECKING,
     cast,
     Any,
     Optional,
@@ -18,6 +19,9 @@ from typing import (
     Generic,
 )
 from minet.types import TypedDict, NotRequired
+
+if TYPE_CHECKING:
+    from minet.crawl.crawler import Crawler
 
 from bs4 import BeautifulSoup
 
@@ -55,6 +59,25 @@ class Spider(Generic[CrawlJobDataType, CrawlResultDataType]):
     START_TARGET: Optional[CrawlTarget[CrawlJobDataType]] = None
     START_TARGETS: Optional[Iterable[CrawlTarget[CrawlJobDataType]]] = None
 
+    @property
+    def crawler(self) -> "Crawler":
+        c = getattr(self, "_crawler", None)
+
+        if c is None:
+            raise RuntimeError("spider has no attached crawler")
+
+        return c
+
+    def attach(self, crawler: "Crawler"):
+        if getattr(self, "_crawler", None) is not None:
+            raise TypeError("spider is already attached to a crawler")
+
+        self._crawler = crawler
+
+    def detach(self):
+        if getattr(self, "_crawler", None) is None:
+            raise TypeError("spider is not attached to a crawler")
+
     def start(self) -> Optional[Iterable[UrlOrCrawlTarget[CrawlJobDataType]]]:
         return None
 
@@ -67,6 +90,11 @@ class Spider(Generic[CrawlJobDataType, CrawlResultDataType]):
         class_name = self.__class__.__name__
 
         return "<%(class_name)s>" % {"class_name": class_name}
+
+    def write(
+        self, filename: str, contents: Union[str, bytes], compress: bool = False
+    ) -> str:
+        return self.crawler.write(filename, contents, compress=compress)
 
 
 FunctionSpiderCallable = Callable[

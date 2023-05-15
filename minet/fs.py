@@ -184,8 +184,8 @@ class FilenameBuilder(object):
 
 
 class ThreadSafeFileWriter(object):
-    def __init__(self, root_directory: str = ""):
-        self.root_directory = root_directory
+    def __init__(self, root_directory: Optional[str] = None):
+        self.root_directory = root_directory or ""
         self.folder_locks = NamedLocks()
         self.file_locks = NamedLocks()
 

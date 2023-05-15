@@ -45,6 +45,7 @@ from minet.crawl.spiders import (
 from minet.crawl.queue import CrawlerQueue, DumpType
 from minet.crawl.state import CrawlerState
 from minet.web import request, EXPECTED_WEB_ERRORS, AnyTimeout
+from minet.fs import ThreadSafeFileWriter
 from minet.executors import HTTPThreadPoolExecutor, CANCELLED
 from minet.exceptions import UnknownSpiderError, CancelledRequestError, InvalidURLError
 from minet.constants import (
@@ -222,6 +223,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         persistent_storage_path: Optional[str] = None,
         resume: bool = False,
         dfs: bool = False,
+        writer_root_directory: Optional[str] = None,
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         throttle: float = DEFAULT_THROTTLE,
@@ -282,6 +284,9 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         self.stopped = False
         self.resuming = False
         self.finished = False
+
+        # Utilities
+        self.file_writer = ThreadSafeFileWriter(writer_root_directory)
 
         # Queue
         self.queue = CrawlerQueue(self.queue_path, resume=resume, dfs=dfs)
@@ -352,6 +357,10 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         if self.started:
             raise RuntimeError("Crawler has already started")
 
+        # Attaching spiders
+        for spider in self.__spiders.values():
+            spider.attach(self)
+
         # Enqueuing start jobs, only if we are not resuming
         if not self.resuming:
             # NOTE: start jobs are all buffered into memory
@@ -366,6 +375,10 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         self.started = True
 
     def stop(self):
+        # Detaching spiders
+        for spider in self.__spiders.values():
+            spider.detach()
+
         self.stopped = True
         self.executor.shutdown(wait=self.executor.wait)
         del self.queue
@@ -477,6 +490,11 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             raise TypeError("cannot dump queue while crawler is running")
 
         return self.queue.dump()
+
+    def write(
+        self, filename: str, contents: Union[str, bytes], compress: bool = False
+    ) -> str:
+        return self.file_writer.write(filename, contents, compress=compress)
 
     @classmethod
     def from_callable(
