@@ -246,7 +246,7 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
                         "dtype",
                         type(self.data).__name__ if self.data is not None else None,
                     ),
-                    ("size", len(self.response) if self.response else None),
+                    ("size", self.response.human_size if self.response else None),
                 )
             ),
             conditionals=("spider", "error", "status", "degree", "dtype"),

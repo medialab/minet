@@ -38,7 +38,7 @@ from itertools import chain
 from urllib.parse import urljoin
 from urllib3 import HTTPResponse
 from urllib3.util.ssl_ import create_urllib3_context
-from ebbe import rcompose, noop
+from ebbe import rcompose, noop, format_filesize
 from collections import defaultdict
 from tenacity import (
     Retrying,
@@ -964,6 +964,10 @@ class Response(object):
 
     def __len__(self) -> int:
         return len(self.__body)
+
+    @property
+    def human_size(self) -> str:
+        return format_filesize(len(self.__body))
 
     def text(self) -> str:
         self.__decode()

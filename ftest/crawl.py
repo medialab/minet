@@ -28,7 +28,7 @@ class CustomSpider(Spider):
     START_URL = "https://www.lemonde.fr/"
 
     def __call__(self, job, response):
-        self.write("dump.html", response.body, compress=True)
+        # self.write("dump.html", response.body, compress=True)
         return
 
 
