@@ -147,7 +147,15 @@ def format_channel(item):
     status = item.get("status")
     branding_settings = item.get("brandingSettings")
 
-    topic_keywords = [url.rsplit("/", 1)[1] for url in topic_details["topicCategories"]]
+    topic_ids = topic_details["topicIds"] if topic_details is not None else None
+    topic_categories = (
+        topic_details["topicCategories"] if topic_details is not None else None
+    )
+    topic_keywords = (
+        [url.rsplit("/", 1)[1] for url in topic_categories]
+        if topic_categories is not None
+        else None
+    )
 
     keywords = getpath(branding_settings, ["channel", "keywords"])
     if keywords:
@@ -169,8 +177,8 @@ def format_channel(item):
         statistics.get("hiddenSubscriberCount"),
         statistics.get("subscriberCount"),
         statistics.get("videoCount"),
-        topic_details.get("topicIds"),
-        topic_details.get("topicCategories"),
+        topic_ids,
+        topic_categories,
         topic_keywords,
         status.get("privacyStatus"),
         status.get("madeForKids"),
