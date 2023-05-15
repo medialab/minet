@@ -4,14 +4,14 @@
 #
 # Logic of the extract action.
 #
-from typing import Optional, List, Dict, Iterator, Any
+from typing import Optional, Dict, Iterator
 
 from os.path import isdir
-from trafilatura.core import bare_extraction
 from dataclasses import dataclass
 from itertools import count
-from casanova import TabularRecord, ThreadSafeEnricher
+from casanova import ThreadSafeEnricher
 
+from minet.extraction import extract, TrafilaturaResult
 from minet.multiprocessing import LazyPool
 from minet.serialization import serialize_error_as_slug
 from minet.fs import read_potentially_gzipped_path
@@ -21,7 +21,6 @@ from minet.cli.utils import (
     FetchReportLikeItem,
 )
 from minet.cli.console import console
-from minet.exceptions import TrafilaturaError
 from minet.cli.exceptions import FatalError
 
 
@@ -37,52 +36,7 @@ class ExtractWorkerPayload:
 class ExtractResult:
     id: int
     error: Optional[Exception] = None
-    meta: Optional[Dict[str, Any]] = None
-
-
-@dataclass
-class ExtractAddendum(TabularRecord):
-    extract_error: Optional[str] = None
-    canonical_url: Optional[str] = None
-    title: Optional[str] = None
-    description: Optional[str] = None
-    content: Optional[str] = None
-    comments: Optional[str] = None
-    author: Optional[str] = None
-    categories: Optional[List[str]] = None
-    tags: Optional[List[str]] = None
-    date: Optional[str] = None
-    sitename: Optional[str] = None
-
-
-def plural(meta: Dict[str, Any], key: str) -> List[str]:
-    l = meta.get(key, []) or []
-
-    items = []
-
-    if not l:
-        return items
-
-    for item in l:
-        if isinstance(item, dict):
-            item = item.get("name")
-
-            if item is None:
-                continue
-
-        if isinstance(item, (int, float)):
-            item = str(item)
-
-        if not isinstance(item, str):
-            continue
-
-        for subitem in item.split(","):
-            subitem = subitem.strip()
-
-            if subitem:
-                items.append(subitem)
-
-    return items
+    data: Optional[TrafilaturaResult] = None
 
 
 def worker(payload: ExtractWorkerPayload) -> ExtractResult:
@@ -101,20 +55,17 @@ def worker(payload: ExtractWorkerPayload) -> ExtractResult:
             return result
 
     # Attempting extraction
-    try:
-        # https://trafilatura.readthedocs.io/en/latest/corefunctions.html
-        # TODO: discuss deduplication
-        # TODO: fallback options
-        result.meta = bare_extraction(text)
-    except Exception as e:
-        result.error = TrafilaturaError(reason=e)
-        return result
+    result.data = extract(text)
 
     return result
 
 
+HEADERS = ["extract_error"] + TrafilaturaResult.fieldnames()
+PADDING = [""] * len(TrafilaturaResult.fieldnames())
+
+
 @with_enricher_and_loading_bar(
-    headers=ExtractAddendum,
+    headers=HEADERS,
     enricher_type="threadsafe",
     index_column="extract_original_index",
     title="Extracting text",
@@ -189,29 +140,15 @@ def action(cli_args, enricher: ThreadSafeEnricher, loading_bar):
                                 )
                             )
 
-                    addendum = ExtractAddendum(extract_error=error_code)
-                    enricher.writerow(item.index, row, addendum)
+                    enricher.writerow(item.index, row, [error_code], PADDING)
 
                     continue
 
-                meta = result.meta
+                data = result.data
 
-                if meta is None:
+                if data is None:
                     loading_bar.inc_stat("no-trafilatura-result", style="error")
                     console.warning("did you forget to use [cyan]-i/--input[/cyan]?")
-                    addendum = ExtractAddendum(extract_error="no-trafilatura-result")
+                    enricher.writerow(item.index, row, "no-trafilatura-result", PADDING)
                 else:
-                    addendum = ExtractAddendum(
-                        canonical_url=meta.get("url"),
-                        title=meta.get("title"),
-                        description=meta.get("description"),
-                        content=meta.get("text"),
-                        comments=meta.get("comments"),
-                        author=meta.get("author"),
-                        categories=plural(meta, "categories"),
-                        tags=plural(meta, "tags"),
-                        date=meta.get("date"),
-                        sitename=meta.get("sitename"),
-                    )
-
-                enricher.writerow(item.index, row, addendum)
+                    enricher.writerow(item.index, row, [None], data)
