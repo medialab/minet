@@ -291,7 +291,8 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         self.file_writer = ThreadSafeFileWriter(writer_root_directory)
         self.process_pool = None
 
-        if process_pool_workers is not None:
+        # NOTE: if not None and not 0 basically
+        if process_pool_workers:
             self.process_pool = Pool(process_pool_workers)
 
         # Queue
@@ -507,10 +508,10 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         return self.file_writer.write(filename, contents, compress=compress)
 
     def submit(self, fn, *args, **kwargs):
+
+        # NOTE: this might be a footgun!
         if self.process_pool is None:
-            raise RuntimeError(
-                "cannot submit work to a process if pool has no workers. Did you forget to set process_pool_workers?"
-            )
+            return fn(*args, **kwargs)
 
         return self.process_pool.apply(fn, args, kwargs)
 
