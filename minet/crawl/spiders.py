@@ -96,6 +96,9 @@ class Spider(Generic[CrawlJobDataType, CrawlResultDataType]):
     ) -> str:
         return self.crawler.write(filename, contents, compress=compress)
 
+    def submit(self, fn, *args, **kwargs):
+        return self.crawler.submit(fn, *args, **kwargs)
+
 
 FunctionSpiderCallable = Callable[
     [CrawlJob[CrawlJobDataType], Response],

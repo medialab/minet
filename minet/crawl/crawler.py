@@ -23,6 +23,7 @@ from os.path import join
 from threading import Lock
 from urllib.parse import urljoin
 from ural import ensure_protocol, is_url
+from multiprocessing import Pool
 
 from minet.types import AnyFileTarget
 from minet.fs import load_definition
@@ -189,7 +190,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
             return SuccessfulCrawlResult(job, response, data, degree)
 
 
-CrawlJobDataTypes = TypeVar("CrawlJobDataTypes", bound=Mapping)
+CrawlJobDataTypes = TypeVar("CrawlJobDataTypes")
 CrawlResultDataTypes = TypeVar("CrawlResultDataTypes")
 Spiders = Union[
     FunctionSpiderCallable[CrawlJobDataTypes, CrawlResultDataTypes],
@@ -227,6 +228,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         throttle: float = DEFAULT_THROTTLE,
+        process_pool_workers: Optional[int] = None,
         max_workers: Optional[int] = None,
         wait: bool = True,
         daemonic: bool = False,
@@ -287,6 +289,10 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
         # Utilities
         self.file_writer = ThreadSafeFileWriter(writer_root_directory)
+        self.process_pool = None
+
+        if process_pool_workers is not None:
+            self.process_pool = Pool(process_pool_workers)
 
         # Queue
         self.queue = CrawlerQueue(self.queue_path, resume=resume, dfs=dfs)
@@ -380,6 +386,10 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             spider.detach()
 
         self.stopped = True
+
+        if self.process_pool is not None:
+            self.process_pool.terminate()
+
         self.executor.shutdown(wait=self.executor.wait)
         del self.queue
 
@@ -495,6 +505,14 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         self, filename: str, contents: Union[str, bytes], compress: bool = False
     ) -> str:
         return self.file_writer.write(filename, contents, compress=compress)
+
+    def submit(self, fn, *args, **kwargs):
+        if self.process_pool is None:
+            raise RuntimeError(
+                "cannot submit work to a process if pool has no workers. Did you forget to set process_pool_workers?"
+            )
+
+        return self.process_pool.apply(fn, args, kwargs)
 
     @classmethod
     def from_callable(
