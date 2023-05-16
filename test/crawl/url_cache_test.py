@@ -21,6 +21,10 @@ class TestUrlCache:
 
         assert set(s) == {"one", "two", "three"}
 
+        assert s.add_many_and_keep_new(["one", "three", "four"]) == ["four"]
+
+        assert len(s) == 4
+
     def test_sqlite_string_set(self, tmp_path):
         p = tmp_path / "set.db"
 
@@ -63,4 +67,9 @@ class TestUrlCache:
 
         assert len(s) == 5
 
-        # s.add_and_keep_new(["three", "one"])
+        assert s.add_many_and_keep_new(["one", "three", "six", "seven"]) == [
+            "six",
+            "seven",
+        ]
+
+        assert len(s) == 7

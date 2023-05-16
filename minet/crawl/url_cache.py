@@ -37,6 +37,19 @@ class AtomicSet(Generic[T]):
 
             return len(self.__items) - len_before
 
+    def add_many_and_keep_new(self, items: Iterable[T]) -> List[str]:
+        with self.__lock:
+            new = []
+
+            for item in items:
+                len_before = len(self.__items)
+                self.__items.add(item)
+
+                if len_before < len(self.__items):
+                    new.append(item)
+
+            return new
+
     def __len__(self) -> int:
         with self.__lock:
             return len(self.__items)
@@ -92,11 +105,26 @@ class SQLiteStringSet:
             cursor.executemany('INSERT OR IGNORE INTO "set" ("key") VALUES (?);', rows)
             return cursor.rowcount
 
-    # def add_and_keep_new(self, items: Iterable[str]) -> List[str]:
+    def add_many_and_keep_new(self, items: Iterable[str]) -> List[str]:
+        with self.__transaction() as cursor:
+            new = []
+
+            for item in items:
+                try:
+                    cursor.execute('INSERT INTO "set" ("key") VALUES (?);', (item,))
+                    new.append(item)
+                except sqlite3.IntegrityError:
+                    pass
+
+            return new
+
+    # NOTE: I keep this for the ugly trick.
+    # def contains_many(self, items: Iterable[str]) -> List[str]:
     #     with self.__transaction() as cursor:
-    #         rows = [(item,) for item in items]
-    #         cursor.executemany('SELECT "key" FROM "set" WHERE "key" = ?;', rows)
-    #         print(cursor.fetchall())
+    #         cursor.execute(
+    #             'SELECT "key" FROM "set" WHERE "key" in (SELECT "value" FROM JSON_EACH(?));',
+    #             (json.dumps(items),),
+    #         )
 
     def __contains__(self, item: str) -> bool:
         with self.__transaction() as cursor:
