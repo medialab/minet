@@ -1,10 +1,24 @@
-from typing import TypeVar, Generic, Set, Iterable, Iterator, List
+from typing import (
+    TypeVar,
+    Generic,
+    Set,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Callable,
+    overload,
+)
 
 import sqlite3
 from threading import Lock
 from contextlib import contextmanager
+from ebbe import distinct
+
+from minet.crawl.types import CrawlJob, CrawlJobDataType
 
 T = TypeVar("T")
+I = TypeVar("I")
 
 
 class AtomicSet(Generic[T]):
@@ -37,13 +51,25 @@ class AtomicSet(Generic[T]):
 
             return len(self.__items) - len_before
 
-    def add_many_and_keep_new(self, items: Iterable[T]) -> List[str]:
+    @overload
+    def add_many_and_keep_new(
+        self, items: Iterable[I], key: Callable[[I], T] = ...
+    ) -> List[I]:
+        ...
+
+    @overload
+    def add_many_and_keep_new(self, items: Iterable[T], key: None = ...) -> List[T]:
+        ...
+
+    def add_many_and_keep_new(self, items, key=None):
         with self.__lock:
             new = []
 
             for item in items:
+                k = item if key is None else key(item)
+
                 len_before = len(self.__items)
-                self.__items.add(item)
+                self.__items.add(k)
 
                 if len_before < len(self.__items):
                     new.append(item)
@@ -105,13 +131,24 @@ class SQLiteStringSet:
             cursor.executemany('INSERT OR IGNORE INTO "set" ("key") VALUES (?);', rows)
             return cursor.rowcount
 
-    def add_many_and_keep_new(self, items: Iterable[str]) -> List[str]:
+    @overload
+    def add_many_and_keep_new(
+        self, items: Iterable[I], key: Callable[[I], str] = ...
+    ) -> List[I]:
+        ...
+
+    @overload
+    def add_many_and_keep_new(self, items: Iterable[str], key: None = ...) -> List[str]:
+        ...
+
+    def add_many_and_keep_new(self, items, key=None):
         with self.__transaction() as cursor:
             new = []
 
             for item in items:
                 try:
-                    cursor.execute('INSERT INTO "set" ("key") VALUES (?);', (item,))
+                    k = item if key is None else key(item)
+                    cursor.execute('INSERT INTO "set" ("key") VALUES (?);', (k,))
                     new.append(item)
                 except sqlite3.IntegrityError:
                     pass
@@ -151,3 +188,26 @@ class SQLiteStringSet:
 
     def __del__(self) -> None:
         self.__connection.close()
+
+
+class URLCache:
+    def __init__(self, path: Optional[str] = None):
+        self.path = path
+        self.persistent = path is not None
+
+        self.__cache = SQLiteStringSet(path) if self.persistent else AtomicSet()
+
+    def register(
+        self, jobs: Iterable[CrawlJob[CrawlJobDataType]]
+    ) -> List[CrawlJob[CrawlJobDataType]]:
+        def url_key(job: CrawlJob[CrawlJobDataType]):
+            return job.url
+
+        # We deduplicate beforehand
+        jobs = distinct(jobs, key=url_key)
+        new = self.__cache.add_many_and_keep_new(jobs, key=url_key)
+
+        return new
+
+    def __len__(self) -> int:
+        return len(self.__cache)
