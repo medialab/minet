@@ -62,3 +62,5 @@ class TestUrlCache:
         s = SQLiteStringSet(p)
 
         assert len(s) == 5
+
+        # s.add_and_keep_new(["three", "one"])

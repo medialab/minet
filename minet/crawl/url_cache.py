@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, Set, Iterable, Iterator
+from typing import TypeVar, Generic, Set, Iterable, Iterator, List
 
 import sqlite3
 from threading import Lock
@@ -92,9 +92,15 @@ class SQLiteStringSet:
             cursor.executemany('INSERT OR IGNORE INTO "set" ("key") VALUES (?);', rows)
             return cursor.rowcount
 
+    # def add_and_keep_new(self, items: Iterable[str]) -> List[str]:
+    #     with self.__transaction() as cursor:
+    #         rows = [(item,) for item in items]
+    #         cursor.executemany('SELECT "key" FROM "set" WHERE "key" = ?;', rows)
+    #         print(cursor.fetchall())
+
     def __contains__(self, item: str) -> bool:
         with self.__transaction() as cursor:
-            cursor.execute('SELECT "key" FROM "set" WHERE "key" = ?', (item,))
+            cursor.execute('SELECT 1 FROM "set" WHERE "key" = ?;', (item,))
             return cursor.fetchone() is not None
 
     def __len__(self) -> int:
