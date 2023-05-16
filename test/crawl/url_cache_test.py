@@ -104,3 +104,16 @@ class TestUrlCache:
             c.register([CrawlJob(url="two"), CrawlJob(url="three")])
         ) == ["three"]
         assert len(c) == 3
+
+        assert "two" in c
+        assert "four" not in c
+
+    def test_normalized_url_cache(self):
+        c = URLCache(normalized=True)
+
+        c.register([CrawlJob(url="lemonde.fr"), CrawlJob(url="www.lemonde.fr")])
+
+        assert len(c) == 1
+
+        assert "https://www.lemonde.fr/index.html" in c
+        assert "https://www.lemonde.fr/articles/one.html" not in c

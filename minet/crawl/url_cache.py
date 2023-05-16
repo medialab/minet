@@ -14,6 +14,7 @@ import sqlite3
 from threading import Lock
 from contextlib import contextmanager
 from ebbe import distinct
+from ural import normalize_url
 
 from minet.crawl.types import CrawlJob, CrawlJobDataType
 
@@ -190,10 +191,12 @@ class SQLiteStringSet:
         self.__connection.close()
 
 
+# TODO: should canonicalize by default
 class URLCache:
-    def __init__(self, path: Optional[str] = None):
+    def __init__(self, path: Optional[str] = None, normalized: bool = False):
         self.path = path
         self.persistent = path is not None
+        self.normalized = normalized
 
         self.__cache = SQLiteStringSet(path) if self.persistent else AtomicSet()
 
@@ -201,6 +204,9 @@ class URLCache:
         self, jobs: Iterable[CrawlJob[CrawlJobDataType]]
     ) -> List[CrawlJob[CrawlJobDataType]]:
         def url_key(job: CrawlJob[CrawlJobDataType]):
+            if self.normalized:
+                return normalize_url(job.url)
+
             return job.url
 
         # We deduplicate beforehand
@@ -211,3 +217,9 @@ class URLCache:
 
     def __len__(self) -> int:
         return len(self.__cache)
+
+    def __contains__(self, url: str) -> bool:
+        if self.normalized:
+            url = normalize_url(url)
+
+        return url in self.__cache
