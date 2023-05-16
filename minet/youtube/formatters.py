@@ -143,19 +143,13 @@ def format_playlist_item_snippet(item):
 def format_channel(item):
     snippet = item.get("snippet")
     statistics = item.get("statistics")
-    topic_details = item.get("topicDetails")
+    topic_details = item.get("topicDetails", {})
     status = item.get("status")
     branding_settings = item.get("brandingSettings")
 
-    topic_ids = topic_details["topicIds"] if topic_details is not None else None
-    topic_categories = (
-        topic_details["topicCategories"] if topic_details is not None else None
-    )
-    topic_keywords = (
-        [url.rsplit("/", 1)[1] for url in topic_categories]
-        if topic_categories is not None
-        else None
-    )
+    topic_ids = topic_details.get("topicIds", [])
+    topic_categories = topic_details.get("topicCategories", [])
+    topic_keywords = [url.rsplit("/", 1)[1] for url in topic_categories]
 
     keywords = getpath(branding_settings, ["channel", "keywords"])
     if keywords:
