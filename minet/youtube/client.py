@@ -4,13 +4,11 @@
 #
 # A handy API client used by the CLI actions.
 #
-from typing import Optional
-
 import time
 from ebbe import as_chunks
 from collections import deque
 from urllib.parse import quote
-from ural import urls_from_text, URLFormatter, add_query_argument
+from ural import urls_from_text, add_query_argument
 from ebbe import getpath
 
 from minet.web import (
@@ -26,6 +24,7 @@ from minet.youtube.utils import (
     get_channel_main_playlist_id,
     seconds_to_midnight_pacific_time,
 )
+from minet.youtube.urls import YouTubeAPIURLFormatter
 from minet.youtube.constants import (
     YOUTUBE_API_BASE_URL,
     YOUTUBE_API_MAX_VIDEOS_PER_CALL,
@@ -54,45 +53,6 @@ from minet.youtube.formatters import (
     format_channel,
 )
 from minet.youtube.scrapers import scrape_channel_id
-
-
-class YouTubeAPIURLFormatter(URLFormatter):
-    BASE_URL = YOUTUBE_API_BASE_URL
-
-    def playlist_videos(self, playlist_id: str, token: Optional[str]) -> str:
-        return self.format(
-            path="playlistItems",
-            args={
-                "part": "snippet",
-                "playlistId": playlist_id,
-                "maxResults": YOUTUBE_API_MAX_VIDEOS_PER_CALL,
-                "pageToken": token,
-            },
-        )
-
-
-def forge_playlist_videos_url(playlist_id, token=None):
-    data = {
-        "base": YOUTUBE_API_BASE_URL,
-        "playlist_id": playlist_id,
-        "count": YOUTUBE_API_MAX_VIDEOS_PER_CALL,
-    }
-
-    url = (
-        "%(base)s/playlistItems?part=snippet&maxResults=%(count)i&playlistId=%(playlist_id)s"
-        % data
-    )
-
-    if token is not None:
-        url += "&pageToken=%s" % token
-
-    return url
-
-
-def forge_videos_url(ids):
-    data = {"base": YOUTUBE_API_BASE_URL, "ids": ",".join(ids)}
-
-    return "%(base)s/videos?id=%(ids)s&part=snippet,statistics,contentDetails" % data
 
 
 def forge_channels_url(ids):
@@ -324,7 +284,7 @@ class YouTubeAPIClient(object):
 
             ids = [video_id for video_id, _ in group_data if video_id is not None]
 
-            url = forge_videos_url(ids)
+            url = self.url_formatter.videos(ids)
 
             result = self.request_json(url)
 
@@ -432,7 +392,7 @@ class YouTubeAPIClient(object):
             token = None
 
             while True:
-                url = forge_playlist_videos_url(playlist_id, token=token)
+                url = self.url_formatter.playlist_videos(playlist_id, token=token)
 
                 result = self.request_json(url)
 
