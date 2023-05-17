@@ -45,6 +45,7 @@ from minet.crawl.spiders import (
 )
 from minet.crawl.queue import CrawlerQueue, DumpType
 from minet.crawl.state import CrawlerState
+from minet.crawl.url_cache import URLCache
 from minet.web import request, EXPECTED_WEB_ERRORS, AnyTimeout
 from minet.fs import ThreadSafeFileWriter
 from minet.executors import HTTPThreadPoolExecutor, CANCELLED
@@ -222,6 +223,8 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         self,
         spider_or_spiders: Spiders[CrawlJobDataTypes, CrawlResultDataTypes],
         persistent_storage_path: Optional[str] = None,
+        visit_urls_only_once: bool = False,
+        normalized_url_cache: bool = False,
         resume: bool = False,
         dfs: bool = False,
         writer_root_directory: Optional[str] = None,
@@ -277,6 +280,11 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             if persistent_storage_path is not None
             else None
         )
+        self.url_cache_path = (
+            join(persistent_storage_path, "urls/urls.db")
+            if persistent_storage_path is not None
+            else None
+        )
 
         # Threading
         self.enqueue_lock = Lock()
@@ -302,6 +310,14 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
         if self.resuming and self.queue.qsize() == 0:
             self.finished = True
+
+        # Url cache
+        self.unique = visit_urls_only_once
+        self.url_cache = (
+            URLCache(self.url_cache_path, normalized=normalized_url_cache)
+            if self.unique
+            else None
+        )
 
         # Initializing state
         self.state = CrawlerState(jobs_queued=self.queue.qsize())
@@ -488,6 +504,10 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
                 jobs.append(job)
 
+            # Filtering urls we already visited
+            if self.url_cache is not None:
+                jobs = self.url_cache.register(jobs)
+
             count = len(jobs)
 
             self.queue.put_many(jobs)
@@ -514,7 +534,6 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         )
 
     def submit(self, fn, *args, **kwargs):
-
         # NOTE: this might be a footgun!
         if self.process_pool is None:
             return fn(*args, **kwargs)
