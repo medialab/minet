@@ -192,7 +192,9 @@ class YouTubeAPIClient(object):
         self.keys = {k: True for k in key}
         self.current_key = key[0]
         self.pool_manager = create_pool_manager()
-        self.retryer = create_request_retryer()
+
+        # YouTube's API is known to crash sometimes...
+        self.retryer = create_request_retryer(retry_on_statuses=(503,))
         self.url_formatter = YouTubeAPIURLFormatter()
 
     @retrying_method()
