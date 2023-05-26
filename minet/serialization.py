@@ -40,7 +40,13 @@ def serialize_new_connection_error(error):
     if "temporary failure in name resolution" in msg or "errno -3" in msg:
         return "name-resolution-failure"
 
-    return msg
+    if "no address associated with hostname" in msg or "errno -5" in msg:
+        return "no-address-associated-with-hostname"
+
+    if "network is unreachable" in msg or "errno 101" in msg:
+        return "unreachable-network"
+
+    return "new-connection-error"
 
 
 def serialize_protocol_error(error):
