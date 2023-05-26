@@ -43,7 +43,11 @@ def action(cli_args, client, enricher, loading_bar):
 
             try:
                 post = client.post(post_id)
-                enricher.writerow(row, post.as_csv_row())
+
+                if post is not None:
+                    enricher.writerow(row, post.as_csv_row())
+                else:
+                    enricher.writerow(row)
             except CrowdTanglePostNotFound as error:
                 enricher.writerow(row)
                 loading_bar.print(
