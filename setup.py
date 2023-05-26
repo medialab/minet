@@ -43,7 +43,7 @@ setup(
         "trafilatura>=1.4.1,<1.5",
         "twitwi>=0.18.1,<0.19",
         "ural>=0.42,<0.43",
-        "urllib3>=1.26.9,<2",
+        "urllib3>=1.26.16,<2",
     ],
     extras_require={
         ":python_version<'3.11'": ["typing_extensions>=4.3"],
