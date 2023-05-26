@@ -11,6 +11,7 @@ from typing import (
 )
 
 import sqlite3
+import os, os.path
 from threading import Lock
 from contextlib import contextmanager
 from ebbe import distinct
@@ -93,6 +94,8 @@ class AtomicSet(Generic[T]):
 class SQLiteStringSet:
     def __init__(self, path):
         self.path = path
+
+        os.makedirs(os.path.dirname(path), exist_ok=True)
 
         self.__connection = sqlite3.connect(self.path, check_same_thread=False)
         self.__lock = Lock()
