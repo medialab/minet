@@ -97,31 +97,32 @@ def test(
         "pertinent": pertinent,
     })
 
-def run_test(filename, regex, html, bs):
+def run_test(filename, export, regex, html, bs):
     with open(filename) as file:
         csv = casanova.reader(file)
-        wrt = casanova.writer(sys.stdout, fieldnames=[
-            "url",
-            "interesting",
-            "on html",
-            "using bs",
-            "nexts",
-            "pertinent"
-        ])
-        urls = []
-        for f in csv:
-            """
-            (i, r) = test(f[3], regex, 0, html, bs)
-            if r:
-                wrt.writerow(r.values())
-            """
-            urls.append(f[3])
-        pool = minet.executors.HTTPThreadPoolExecutor()
-        for r in pool.request(urls):
-            if r.response:
-                (i, res) = test(r.response, regex, 0, html, bs)
-                if res:
-                    wrt.writerow(res.values())
+        with open(export, "a") as export:
+            wrt = casanova.writer(export, fieldnames=[
+                "url",
+                "interesting",
+                "on html",
+                "using bs",
+                "nexts",
+                "pertinent"
+            ])
+            urls = []
+            for f in csv:
+                """
+                (i, r) = test(f[3], regex, 0, html, bs)
+                if r:
+                    wrt.writerow(r.values())
+                """
+                urls.append(f[3])
+            pool = minet.executors.HTTPThreadPoolExecutor()
+            for r in pool.request(urls):
+                if r.response:
+                    (i, res) = test(r.response, regex, 0, html, bs)
+                    if res:
+                        wrt.writerow(res.values())
 
 
 REGEX = re.compile(r"(?:[Pp]esticide|[Ff]ongicide|[Gg]lypho|[Rr]oundup|[Hh]erbicide|SDHI|sdhi|[Cc]hlord[ée]cone|[Ii]secticide|[Nn][ée]onicotino[ïi]de|[Dd]esherbant|[Pp]hyto)")
@@ -129,9 +130,13 @@ REGEX = re.compile(r"(?:[Pp]esticide|[Ff]ongicide|[Gg]lypho|[Rr]oundup|[Hh]erbic
 
 run_test(
     "../results/tests/pesticides.csv",
+    "../results/test/pesticides_export_match.csv",
     REGEX,
     html=True,
     bs=False
 )
+
+# Test result
+#
 
 
