@@ -123,8 +123,8 @@ def run_test(filename, export, regex, html, bs):
                     (i, res) = test(r.response, regex, 0, html, bs)
                     if res:
                         wrt.writerow(res.values())
-			export.flush()
-   
+                        export.flush()
+
 
 
 REGEX = re.compile(r"(?:[Pp]esticide|[Ff]ongicide|[Gg]lypho|[Rr]oundup|[Hh]erbicide|SDHI|sdhi|[Cc]hlord[ée]cone|[Ii]secticide|[Nn][ée]onicotino[ïi]de|[Dd]esherbant|[Pp]hyto)")
