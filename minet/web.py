@@ -420,9 +420,22 @@ class BufferedResponse(object):
             raise TypeError("already closed")
 
         self.__closed = True
-        # NOTE: releasing and closing is a noop if already done
+
+        # urllib3's documentation is not very clear on the subject but it seems
+        # the library was not geared toward only reading a few bytes from the
+        # body of a request.
+        # This means that if we read everything, we should only release the
+        # connection so it can be reused by the pool. In the contrary,
+        # we need to close the connection to avoid issues. What's more, it
+        # is important to close the connection before releasing it.
+        # Ref: https://urllib3.readthedocs.io/en/stable/advanced-usage.html#streaming-and-i-o
+        if not self.__finished:
+            # NOTE: closing connections has a performance cost but I am
+            # not really able to understand whether it would be safe not
+            # to close them at all.
+            self.__inner.close()
+
         self.__inner.release_conn()
-        self.__inner.close()
 
     def __del__(self):
         if not self.__closed:
