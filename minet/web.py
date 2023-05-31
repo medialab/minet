@@ -232,7 +232,8 @@ def find_javascript_relocation(html_chunk: bytes):
 
 def create_pool_manager(
     proxy: Optional[str] = None,
-    threads: Optional[int] = None,
+    parallelism: int = 1,
+    num_pools: Optional[int] = None,
     insecure: bool = False,
     spoof_tls_ciphers: bool = False,
     **kwargs
@@ -252,10 +253,10 @@ def create_pool_manager(
 
         urllib3.disable_warnings()
 
-    if threads is not None:
-        # TODO: maxsize should increase with group_parallelism
-        manager_kwargs["maxsize"] = 10
-        manager_kwargs["num_pools"] = threads * 2
+    manager_kwargs["maxsize"] = parallelism
+
+    if num_pools is not None:
+        manager_kwargs["num_pools"] = num_pools
 
     manager_kwargs.update(kwargs)
 
@@ -270,7 +271,7 @@ def create_pool_manager(
     return urllib3.PoolManager(**manager_kwargs)
 
 
-DEFAULT_POOL_MANAGER = create_pool_manager(maxsize=10, num_pools=10)
+DEFAULT_POOL_MANAGER = create_pool_manager()
 
 
 def timeout_to_final_time(timeout: AnyTimeout) -> float:

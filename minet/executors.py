@@ -485,7 +485,8 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         # NOTE: 0 workers means a synchronous pool in quenouille,
         # so we reserve at least one connection for the pool.
         self.pool_manager = create_pool_manager(
-            threads=max(1, self.max_workers),
+            parallelism=max(1, self.max_workers),
+            num_pools=1024,
             insecure=insecure,
             timeout=timeout,
             spoof_tls_ciphers=spoof_tls_ciphers,
