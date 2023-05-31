@@ -339,6 +339,10 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         else:
             raise TypeError("expecting a single spider or a mapping of spiders")
 
+        # Attaching spiders
+        for spider in self.__spiders.values():
+            spider.attach(self)
+
     def __repr__(self):
         class_name = self.__class__.__name__
 
@@ -383,10 +387,6 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
         if self.started:
             raise RuntimeError("Crawler has already started")
-
-        # Attaching spiders
-        for spider in self.__spiders.values():
-            spider.attach(self)
 
         # Enqueuing start jobs, only if we are not resuming
         if not self.resuming:
