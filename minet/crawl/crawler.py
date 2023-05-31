@@ -248,7 +248,18 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         if resume and persistent_storage_path is None:
             raise TypeError("cannot resume a non-persistent crawler")
 
+        # Utilities
+        self.file_writer = ThreadSafeFileWriter(writer_root_directory)
+        self.process_pool = None
+
+        # NOTE: if not None and not 0 basically
+        if process_pool_workers:
+            self.process_pool = Pool(process_pool_workers)
+
         # Own executor and imap params
+        # NOTE: the process pool is initialized before the HTTPThreadPoolExecutor
+        # so that we don't have potential issues related to urllib3.PoolManager
+        # not being fork-safe.
         self.executor = HTTPThreadPoolExecutor(
             max_workers=max_workers,
             insecure=insecure,
@@ -294,14 +305,6 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         self.stopped = False
         self.resuming = False
         self.finished = False
-
-        # Utilities
-        self.file_writer = ThreadSafeFileWriter(writer_root_directory)
-        self.process_pool = None
-
-        # NOTE: if not None and not 0 basically
-        if process_pool_workers:
-            self.process_pool = Pool(process_pool_workers)
 
         # Queue
         self.queue = CrawlerQueue(self.queue_path, resume=resume, dfs=dfs)
