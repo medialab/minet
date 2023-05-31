@@ -19,6 +19,7 @@ from typing import (
     Union,
 )
 
+from os import makedirs
 from os.path import join
 from threading import Lock
 from urllib.parse import urljoin
@@ -286,16 +287,14 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         # Params
         self.persistent_storage_path = persistent_storage_path
         self.persistent = persistent_storage_path is not None
-        self.queue_path = (
-            join(persistent_storage_path, "queue")
-            if persistent_storage_path is not None
-            else None
-        )
-        self.url_cache_path = (
-            join(persistent_storage_path, "urls/urls.db")
-            if persistent_storage_path is not None
-            else None
-        )
+        self.queue_path = None
+        self.url_cache_path = None
+
+        if self.persistent_storage_path is not None:
+            makedirs(self.persistent_storage_path, exist_ok=True)
+
+            self.queue_path = join(self.persistent_storage_path, "queue")
+            self.url_cache_path = join(self.persistent_storage_path, "urls")
 
         # Threading
         self.enqueue_lock = Lock()
@@ -309,7 +308,9 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         # Queue
         self.queue = CrawlerQueue(self.queue_path, resume=resume, dfs=dfs)
         self.persistent = self.queue.persistent
-        self.resuming = self.queue.resuming
+        self.resuming = (
+            self.queue.resuming
+        )  # TODO: should probably also check url cache integrity
 
         if self.resuming and self.queue.qsize() == 0:
             self.finished = True

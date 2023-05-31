@@ -31,7 +31,7 @@ class TestUrlCache:
         ) == [(2, "five")]
 
     def test_sqlite_string_set(self, tmp_path):
-        p = tmp_path / "set.db"
+        p = tmp_path
 
         s = SQLiteStringSet(p)
 

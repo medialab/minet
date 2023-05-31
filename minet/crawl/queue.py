@@ -2,6 +2,7 @@ from typing import Generic, TypeVar, Optional, Any, Iterable, List, Tuple
 from minet.types import Literal
 
 from shutil import rmtree
+from os import makedirs
 from os.path import isfile, join
 from queue import Queue, LifoQueue as Stack, Empty
 from persistqueue import SQLiteAckQueue
@@ -9,8 +10,6 @@ from persistqueue.sqlackqueue import FILOSQLiteAckQueue as SQLiteAckStack
 from threading import Lock
 
 ItemType = TypeVar("ItemType")
-
-DB_FILE_NAME = "queue.db"
 
 ACK_STATUS_TO_NAME = {
     0: "inited",
@@ -38,6 +37,7 @@ class CrawlerQueue(Generic[ItemType]):
     def __init__(
         self,
         path: Optional[str] = None,
+        db_name: str = "queue.db",
         resume: bool = False,
         cleanup_interval: int = 5000,
         dfs: bool = False,
@@ -55,13 +55,15 @@ class CrawlerQueue(Generic[ItemType]):
             if not resume:
                 rmtree(path, ignore_errors=True)
             else:
-                if isfile(join(path, DB_FILE_NAME)):
+                if isfile(join(path, db_name)):
                     self.resuming = True
+
+            makedirs(path, exist_ok=True)
 
             QueueCls = SQLiteAckStack if dfs else SQLiteAckQueue
 
             self.__queue = QueueCls(
-                path, db_file_name=DB_FILE_NAME, multithreading=True, auto_resume=True
+                path, db_file_name=db_name, multithreading=True, auto_resume=True
             )
 
         else:
