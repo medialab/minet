@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from itertools import count
 from casanova import ThreadSafeEnricher
 
+from minet.exceptions import TrafilaturaError
 from minet.extraction import extract, TrafilaturaResult
 from minet.multiprocessing import LazyPool
 from minet.serialization import serialize_error_as_slug
@@ -55,7 +56,11 @@ def worker(payload: ExtractWorkerPayload) -> ExtractResult:
             return result
 
     # Attempting extraction
-    result.data = extract(text)
+    try:
+        result.data = extract(text)
+    except TrafilaturaError as e:
+        result.error = e
+        return result
 
     return result
 
