@@ -1,6 +1,6 @@
 import re
-import bs4
 import ural
+from bs4 import BeautifulSoup, SoupStrainer
 from typing import Iterable, Optional
 from ural import urls_from_text, urls_from_html
 from urllib.parse import urljoin
@@ -20,6 +20,10 @@ class FocusResponse:
         self.ignored_url = ignored_url
 
 class FocusSpider(Spider):
+
+    def clean_url(self, origin, url):
+        url = urljoin(origin, url)
+        return ural.normalize_url(ural)
 
     # None
     def __init__(
@@ -41,13 +45,18 @@ class FocusSpider(Spider):
         self.target_html = only_target_html_page
 
 
+
     # Tuple[Any, Iterable[str | CrawlTarget] | None] | None
     # Any : ce qu'on veut renvoyer dans l'itération du résultat du crawler
     def __call__(self, job: CrawlJob, response: Response):
+
         # Return variables
         interesting_content = False
         next_urls = set()
         ignored_urls = set()
+
+        # Useful "constants"
+        end_url = response.end_url
 
         if job.depth > self.depth:
             return None
@@ -55,20 +64,20 @@ class FocusSpider(Spider):
         html = response.body
         if self.target_html and not looks_like_html(html):
             return (FocusResponse(False, None), [])
-        if not response.is_text and not html:
+        if not response.is_text or not html:
             return (FocusResponse(False, None), [])
 
         html = response.text()
         content = html
 
         # NOTE
-        # Needs for now to be commented because something
+        # Warning : the use of trafiulatura
         # keeps printing the error :
         # "encoding error : input conversion failed due to input error ..."
         # and it has consequences on the terminal user interface of minet
         #
         # The problem seems to come from Trafilatura or BeautifulSoup
-        """
+
         if self.extraction:
             dico_content = extract(content)
             items = [
@@ -84,11 +93,11 @@ class FocusSpider(Spider):
             ]
             clist = [v for v in items if isinstance(v, str)]
             content = '\n'.join(clist)
-        """
 
 
-        links = set(urls_from_text(html))
-        links.update(i for i in urls_from_html(html) if i not in links)
+
+        bs = BeautifulSoup(content, "html.parser", parse_only=SoupStrainer("a")).find_all("a")
+        links = set(self.clean_url(end_url, a.get('href')) for a in bs if a.get('href'))
 
         if self.regex_content:
             match = self.regex_content.findall(content)
@@ -98,17 +107,12 @@ class FocusSpider(Spider):
             else:
                 match = True
 
-
         interesting_content = bool(match)
 
         if not self.regex_url:
             next_urls = links
         else:
             for a in links:
-                a = ural.normalize_url(
-                    urljoin(response.end_url, a), quoted=False
-                )
-
                 if self.regex_url.match(a):
                     if self.target_html:
                         if ural.could_be_html(a): next_urls.add(a)

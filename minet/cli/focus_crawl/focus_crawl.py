@@ -1,6 +1,7 @@
 from ebbe.decorators import with_defer
 import os
 import casanova
+import sys
 from os.path import join, isfile, isdir, dirname
 
 from minet.cli.crawl.crawl import open_report
@@ -52,8 +53,6 @@ def action(cli_args, defer, loading_bar: LoadingBar):
 
     # Creating focus spider
 
-    print(cli_args.regex_content)
-
     spider = FocusSpider(
         start_urls,
         max_depth=cli_args.max_depth,
@@ -89,6 +88,8 @@ def action(cli_args, defer, loading_bar: LoadingBar):
                 normalized_url_cache=True,
                 resume=cli_args.resume or cli_args.dump_queue)
 
+    print(crawler.process_pool)
+
     if cli_args.dump_queue:
         loading_bar.erase()
         dump = crawler.dump_queue()
@@ -123,24 +124,24 @@ def action(cli_args, defer, loading_bar: LoadingBar):
 
         # Running crawler
         for result in crawler:
-            with loading_bar.step():
-                focus_rep: FocusResponse = result.data
+            #with loading_bar.step():
+            focus_rep: FocusResponse = result.data
 
-                inc_label = "crawled"
-                inc_style = "success"
-                inc_count = 1
-                if result.error is not None:
-                    inc_label = result.error_code
-                    inc_style = "error"
-                elif not focus_rep.interesting:
-                    inc_label = "not interesting"
-                    inc_style = "warning"
+            inc_label = "crawled"
+            inc_style = "success"
+            inc_count = 1
+            if result.error is not None:
+                inc_label = result.error_code
+                inc_style = "error"
+            elif not focus_rep.interesting:
+                inc_label = "not interesting"
+                inc_style = "warning"
 
-                loading_bar.inc_stat(inc_label, count=inc_count, style=inc_style)
+            loading_bar.inc_stat(inc_label, count=inc_count, style=inc_style)
 
-                if not keep_uninteresting and (result.error or not result.data or not focus_rep.interesting): continue
+            if not keep_uninteresting and (result.error or not result.data or not focus_rep.interesting): continue
 
-                jobs_writer.writerow(result.as_csv_row() + [focus_rep.interesting])
+            jobs_writer.writerow(result.as_csv_row() + [focus_rep.interesting])
 
-                # Flushing to avoid sync issues as well as possible
-                jobs_output.flush()
+            # Flushing to avoid sync issues as well as possible
+            jobs_output.flush()

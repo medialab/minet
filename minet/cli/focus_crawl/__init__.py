@@ -3,19 +3,22 @@ from minet.cli.argparse import command
 from minet.constants import DEFAULT_THROTTLE
 
 FOCUS_CRAWL_COMMAND = command(
-    "focus",
+    "focus-crawl",
     "minet.cli.focus_crawl.focus_crawl",
     title="Minet Focus Crawl Command",
     description="""
         Minet crawl feature with the possibility
         to use regular expressions or keywords to
         filter content.
+
+        Regex are not case sensitive, but
+        accents sensitive.
     """,
     epilog="""
         Examples:
 
           Running a simple crawler:
-            $ minet focus-crawl ......
+            $ minet focus-crawl -i urls.csv url -r "(?:assembl[ée]e nationale|s[ée]nat)" -O ./result
     """,
     no_output=True,
     variadic_input={"dummy_column": "url"},
