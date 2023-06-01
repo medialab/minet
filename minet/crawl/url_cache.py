@@ -11,7 +11,8 @@ from typing import (
 )
 
 import sqlite3
-import os, os.path
+from os import makedirs
+from os.path import join
 from threading import Lock
 from contextlib import contextmanager
 from ebbe import distinct
@@ -92,12 +93,14 @@ class AtomicSet(Generic[T]):
 
 
 class SQLiteStringSet:
-    def __init__(self, path):
+    def __init__(self, path: str, db_name: str = "set.db"):
+        makedirs(path, exist_ok=True)
+
         self.path = path
 
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-
-        self.__connection = sqlite3.connect(self.path, check_same_thread=False)
+        self.__connection = sqlite3.connect(
+            join(self.path, db_name), check_same_thread=False
+        )
         self.__lock = Lock()
 
         # Setup
@@ -201,7 +204,9 @@ class URLCache:
         self.persistent = path is not None
         self.normalized = normalized
 
-        self.__cache = SQLiteStringSet(path) if self.persistent else AtomicSet()
+        self.__cache = (
+            SQLiteStringSet(path, "urls.db") if path is not None else AtomicSet()
+        )
 
     def register(
         self, jobs: Iterable[CrawlJob[CrawlJobDataType]]

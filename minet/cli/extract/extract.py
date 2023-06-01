@@ -148,7 +148,13 @@ def action(cli_args, enricher: ThreadSafeEnricher, loading_bar):
 
                 if data is None:
                     loading_bar.inc_stat("no-trafilatura-result", style="error")
-                    console.warning("did you forget to use [cyan]-i/--input[/cyan]?")
-                    enricher.writerow(item.index, row, "no-trafilatura-result", PADDING)
+                    if not cli_args.input:
+                        console.warning(
+                            "did you forget to use [cyan]-i/--input[/cyan]?"
+                        )
+
+                    enricher.writerow(
+                        item.index, row, ["no-trafilatura-result"], PADDING
+                    )
                 else:
                     enricher.writerow(item.index, row, [None], data)

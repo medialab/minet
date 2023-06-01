@@ -14,7 +14,7 @@ browser-cookie3==0.17.1
 casanova==1.11.1
 charset-normalizer==3.0.1
 dateparser==1.1.6
-ebbe==1.13.0
+ebbe==1.13.1
 json5==0.9.11
 lxml==4.9.2
 nanoid==2.0.0
@@ -28,5 +28,5 @@ tenacity==8.2.1
 trafilatura==1.4.1
 typing_extensions>=4.3; python_version < '3.11'
 twitwi==0.18.1
-ural==0.41.1
+ural==0.42.0
 urllib3==1.26.16

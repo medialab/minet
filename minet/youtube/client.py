@@ -7,7 +7,6 @@
 import time
 from ebbe import as_chunks
 from collections import deque
-from urllib.parse import quote
 from ural import urls_from_text, add_query_argument
 from ebbe import getpath
 
@@ -26,10 +25,8 @@ from minet.youtube.utils import (
 )
 from minet.youtube.urls import YouTubeAPIURLFormatter
 from minet.youtube.constants import (
-    YOUTUBE_API_BASE_URL,
     YOUTUBE_API_MAX_VIDEOS_PER_CALL,
     YOUTUBE_API_MAX_CHANNELS_PER_CALL,
-    YOUTUBE_API_MAX_COMMENTS_PER_CALL,
     YOUTUBE_API_DEFAULT_SEARCH_ORDER,
     YOUTUBE_API_SEARCH_ORDERS,
 )
@@ -53,70 +50,6 @@ from minet.youtube.formatters import (
     format_channel,
 )
 from minet.youtube.scrapers import scrape_channel_id
-
-
-def forge_channels_url(ids):
-    data = {"base": YOUTUBE_API_BASE_URL, "ids": ",".join(ids)}
-
-    return (
-        "%(base)s/channels?id=%(ids)s&part=snippet,statistics,contentDetails,topicDetails,brandingSettings,status"
-        % data
-    )
-
-
-def forge_search_url(query, order=YOUTUBE_API_DEFAULT_SEARCH_ORDER, token=None):
-    data = {
-        "base": YOUTUBE_API_BASE_URL,
-        "order": order,
-        "query": quote(query),
-        "count": YOUTUBE_API_MAX_VIDEOS_PER_CALL,
-    }
-
-    url = (
-        "%(base)s/search?part=snippet&maxResults=%(count)i&q=%(query)s&type=video&order=%(order)s"
-        % data
-    )
-
-    if token is not None:
-        url += "&pageToken=%s" % token
-
-    return url
-
-
-def forge_comments_url(video_id, token=None):
-    data = {
-        "base": YOUTUBE_API_BASE_URL,
-        "count": YOUTUBE_API_MAX_COMMENTS_PER_CALL,
-        "video_id": video_id,
-    }
-
-    url = (
-        "%(base)s/commentThreads?videoId=%(video_id)s&part=snippet,replies&maxResults=%(count)s"
-        % data
-    )
-
-    if token is not None:
-        url += "&pageToken=%s" % token
-
-    return url
-
-
-def forge_replies_url(comment_id, token=None):
-    data = {
-        "base": YOUTUBE_API_BASE_URL,
-        "comment_id": comment_id,
-        "count": YOUTUBE_API_MAX_COMMENTS_PER_CALL,
-    }
-
-    url = (
-        "%(base)s/comments?part=snippet&parentId=%(comment_id)s&maxResults=%(count)s"
-        % data
-    )
-
-    if token is not None:
-        url += "&pageToken=%s" % token
-
-    return url
 
 
 def get_channel_id(channel_target):
@@ -252,7 +185,7 @@ class YouTubeAPIClient(object):
 
             ids = [channel_id for channel_id, _ in group_data if channel_id is not None]
 
-            url = forge_channels_url(ids)
+            url = self.url_formatter.channels(ids)
 
             result = self.request_json(url)
 
@@ -309,7 +242,7 @@ class YouTubeAPIClient(object):
             token = None
 
             while True:
-                url = forge_search_url(query, order=order, token=token)
+                url = self.url_formatter.search(query, order=order, token=token)
 
                 result = self.request_json(url)
 
@@ -333,7 +266,7 @@ class YouTubeAPIClient(object):
             raise YouTubeInvalidVideoTargetError
 
         def generator():
-            starting_url = forge_comments_url(video_id)
+            starting_url = self.url_formatter.comments(video_id)
 
             queue = deque([(False, video_id, starting_url)])
 
@@ -367,7 +300,7 @@ class YouTubeAPIClient(object):
 
                             yield reply
                     elif total_reply_count > 0:
-                        replies_url = forge_replies_url(comment_id)
+                        replies_url = self.url_formatter.replies(comment_id)
 
                         queue.append((True, comment_id, replies_url))
 
@@ -375,7 +308,11 @@ class YouTubeAPIClient(object):
                 token = result.get("nextPageToken")
 
                 if token is not None and len(result["items"]) != 0:
-                    forge = forge_replies_url if is_reply else forge_comments_url
+                    forge = (
+                        self.url_formatter.replies
+                        if is_reply
+                        else self.url_formatter.comments
+                    )
 
                     next_url = forge(item_id, token=token)
 

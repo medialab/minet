@@ -19,6 +19,7 @@ from typing import (
     Union,
 )
 
+from os import makedirs
 from os.path import join
 from threading import Lock
 from urllib.parse import urljoin
@@ -248,7 +249,18 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         if resume and persistent_storage_path is None:
             raise TypeError("cannot resume a non-persistent crawler")
 
+        # Utilities
+        self.file_writer = ThreadSafeFileWriter(writer_root_directory)
+        self.process_pool = None
+
+        # NOTE: if not None and not 0 basically
+        if process_pool_workers:
+            self.process_pool = Pool(process_pool_workers)
+
         # Own executor and imap params
+        # NOTE: the process pool is initialized before the HTTPThreadPoolExecutor
+        # so that we don't have potential issues related to urllib3.PoolManager
+        # not being fork-safe.
         self.executor = HTTPThreadPoolExecutor(
             max_workers=max_workers,
             insecure=insecure,
@@ -275,16 +287,14 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         # Params
         self.persistent_storage_path = persistent_storage_path
         self.persistent = persistent_storage_path is not None
-        self.queue_path = (
-            join(persistent_storage_path, "queue")
-            if persistent_storage_path is not None
-            else None
-        )
-        self.url_cache_path = (
-            join(persistent_storage_path, "urls/urls.db")
-            if persistent_storage_path is not None
-            else None
-        )
+        self.queue_path = None
+        self.url_cache_path = None
+
+        if self.persistent_storage_path is not None:
+            makedirs(self.persistent_storage_path, exist_ok=True)
+
+            self.queue_path = join(self.persistent_storage_path, "queue")
+            self.url_cache_path = join(self.persistent_storage_path, "urls")
 
         # Threading
         self.enqueue_lock = Lock()
@@ -295,18 +305,12 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         self.resuming = False
         self.finished = False
 
-        # Utilities
-        self.file_writer = ThreadSafeFileWriter(writer_root_directory)
-        self.process_pool = None
-
-        # NOTE: if not None and not 0 basically
-        if process_pool_workers:
-            self.process_pool = Pool(process_pool_workers)
-
         # Queue
         self.queue = CrawlerQueue(self.queue_path, resume=resume, dfs=dfs)
         self.persistent = self.queue.persistent
-        self.resuming = self.queue.resuming
+        self.resuming = (
+            self.queue.resuming
+        )  # TODO: should probably also check url cache integrity
 
         if self.resuming and self.queue.qsize() == 0:
             self.finished = True
@@ -334,6 +338,10 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             self.singular = True
         else:
             raise TypeError("expecting a single spider or a mapping of spiders")
+
+        # Attaching spiders
+        for spider in self.__spiders.values():
+            spider.attach(self)
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -379,10 +387,6 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
         if self.started:
             raise RuntimeError("Crawler has already started")
-
-        # Attaching spiders
-        for spider in self.__spiders.values():
-            spider.attach(self)
 
         # Enqueuing start jobs, only if we are not resuming
         if not self.resuming:

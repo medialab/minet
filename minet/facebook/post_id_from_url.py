@@ -115,6 +115,10 @@ def post_id_from_url(post_url):
     if not isinstance(parsed, FacebookPost):
         return
 
+    # NOTE: as hinted in #768, we cannot figure pfbids
+    if parsed.id.startswith("pfbid"):
+        return scrape_post_id(post_url)
+
     if parsed.full_id is not None:
         return parsed.full_id
 

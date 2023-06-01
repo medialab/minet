@@ -232,7 +232,8 @@ def find_javascript_relocation(html_chunk: bytes):
 
 def create_pool_manager(
     proxy: Optional[str] = None,
-    threads: Optional[int] = None,
+    parallelism: int = 1,
+    num_pools: Optional[int] = None,
     insecure: bool = False,
     spoof_tls_ciphers: bool = False,
     **kwargs
@@ -252,10 +253,10 @@ def create_pool_manager(
 
         urllib3.disable_warnings()
 
-    if threads is not None:
-        # TODO: maxsize should increase with group_parallelism
-        manager_kwargs["maxsize"] = 10
-        manager_kwargs["num_pools"] = threads * 2
+    manager_kwargs["maxsize"] = parallelism
+
+    if num_pools is not None:
+        manager_kwargs["num_pools"] = num_pools
 
     manager_kwargs.update(kwargs)
 
@@ -270,7 +271,7 @@ def create_pool_manager(
     return urllib3.PoolManager(**manager_kwargs)
 
 
-DEFAULT_POOL_MANAGER = create_pool_manager(maxsize=10, num_pools=10)
+DEFAULT_POOL_MANAGER = create_pool_manager()
 
 
 def timeout_to_final_time(timeout: AnyTimeout) -> float:
@@ -420,9 +421,22 @@ class BufferedResponse(object):
             raise TypeError("already closed")
 
         self.__closed = True
-        # NOTE: releasing and closing is a noop if already done
+
+        # urllib3's documentation is not very clear on the subject but it seems
+        # the library was not geared toward only reading a few bytes from the
+        # body of a request.
+        # This means that if we read everything, we should only release the
+        # connection so it can be reused by the pool. In the contrary,
+        # we need to close the connection to avoid issues. What's more, it
+        # is important to close the connection before releasing it.
+        # Ref: https://urllib3.readthedocs.io/en/stable/advanced-usage.html#streaming-and-i-o
+        if not self.__finished:
+            # NOTE: closing connections has a performance cost but I am
+            # not really able to understand whether it would be safe not
+            # to close them at all.
+            self.__inner.close()
+
         self.__inner.release_conn()
-        self.__inner.close()
 
     def __del__(self):
         if not self.__closed:
