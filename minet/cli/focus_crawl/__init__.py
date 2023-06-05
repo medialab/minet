@@ -1,6 +1,10 @@
-from minet.cli.argparse import command
+import codecs
 
+from minet.cli.argparse import command
 from minet.constants import DEFAULT_THROTTLE
+
+def treat_escape(s):
+    return r'{0}'.format(s)
 
 FOCUS_CRAWL_COMMAND = command(
     "focus-crawl",
@@ -26,11 +30,13 @@ FOCUS_CRAWL_COMMAND = command(
         {
             "flags": ["-r", "--regex-content"],
             "help": "Regex used to filter fetched content.",
+            #"type": treat_escape,
             "default": None
         },
         {
             "flags": ["-u", "--regex-url"],
             "help": "Regex used to filter URLs added to crawler's queue.",
+            #"type": lambda s: r"{}".replace(r"\\", "\\\\").format(s),
             "default": None
         },
         {

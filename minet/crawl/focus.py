@@ -1,53 +1,51 @@
 import re
 import ural
+import warnings
 from bs4 import BeautifulSoup, SoupStrainer
-from typing import Iterable, Optional
-from ural import urls_from_text, urls_from_html
 from urllib.parse import urljoin
-from urllib.parse import unquote
 
 from minet.cli.exceptions import FatalError
-from minet.crawl.spiders import SpiderResult
 from minet.web import looks_like_html
-from minet.crawl.types import CrawlJob, UrlOrCrawlTarget
+from minet.crawl.types import CrawlJob
 from minet.extraction import extract
 from minet.web import Response
 from minet.crawl.spiders import Spider
 
 class FocusResponse:
-    def __init__(self, interesting, ignored_url) -> None:
+    def __init__(self, interesting, regex_match_size, ignored_url) -> None:
         self.interesting = interesting
+        self.regex_match_size = regex_match_size
         self.ignored_url = ignored_url
 
 class FocusSpider(Spider):
 
     def clean_url(self, origin, url):
         url = urljoin(origin, url)
-        return ural.normalize_url(ural)
+        return ural.normalize_url(url)
 
-    # None
     def __init__(
         self,
         start_urls,
-        max_depth,
+        max_depth = 3,
         regex_content = None,
         regex_url = None,
         uninteresting_continue = False,
-        perform_on_html=False,
-        only_target_html_page=True):
+        perform_on_html = True,
+        only_target_html_page = True):
+
+        try:
+            int(max_depth)
+            self.depth = int(max_depth)
+        except:
+            raise TypeError("max depth needs to be an integer")
 
         self.urls = start_urls
-        self.regex_content = re.compile(regex_content, re.I) if regex_content else None
-        self.regex_url = re.compile(regex_url, re.I) if regex_url else None
+        self.regex_content = re.compile("{0}".format(regex_content), re.I) if regex_content else None
+        self.regex_url = re.compile("{0}".format(regex_url), re.I) if regex_url else None
         self.extraction = not perform_on_html
-        self.depth = max_depth
         self.unteresting_continue = uninteresting_continue
         self.target_html = only_target_html_page
 
-
-
-    # Tuple[Any, Iterable[str | CrawlTarget] | None] | None
-    # Any : ce qu'on veut renvoyer dans l'itération du résultat du crawler
     def __call__(self, job: CrawlJob, response: Response):
 
         # Return variables
@@ -55,24 +53,20 @@ class FocusSpider(Spider):
         next_urls = set()
         ignored_urls = set()
 
-        # Useful "constants"
         end_url = response.end_url
-
-        if job.depth > self.depth:
-            return None
 
         html = response.body
         if self.target_html and not looks_like_html(html):
-            return (FocusResponse(False, None), [])
+            return (FocusResponse(False, 0, None), [])
         if not response.is_text or not html:
-            return (FocusResponse(False, None), [])
+            return (FocusResponse(False, 0, None), [])
 
         html = response.text()
         content = html
 
         # NOTE
-        # Warning : the use of trafiulatura
-        # keeps printing the error :
+        # Warning : the use of trafilatura
+        # may print the error :
         # "encoding error : input conversion failed due to input error ..."
         # and it has consequences on the terminal user interface of minet
         #
@@ -95,8 +89,7 @@ class FocusSpider(Spider):
             content = '\n'.join(clist)
 
 
-
-        bs = BeautifulSoup(content, "html.parser", parse_only=SoupStrainer("a")).find_all("a")
+        bs = BeautifulSoup(content, "html.parser", parse_only = SoupStrainer("a")).find_all("a")
         links = set(self.clean_url(end_url, a.get('href')) for a in bs if a.get('href'))
 
         if self.regex_content:
@@ -107,6 +100,7 @@ class FocusSpider(Spider):
             else:
                 match = True
 
+        interesting_size = len(match) if match else 0
         interesting_content = bool(match)
 
         if not self.regex_url:
@@ -128,12 +122,13 @@ class FocusSpider(Spider):
 
         rep_obj = FocusResponse(
             interesting_content,
+            interesting_size,
             ignored_urls
         )
 
-
         return (rep_obj, next_urls)
 
-    # Iterable[str | CrawlTarget] | None
     def start(self):
+        #print(list(self.urls))
+        self.urls = list(self.urls)
         return self.urls

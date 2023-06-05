@@ -1,7 +1,7 @@
 from ebbe.decorators import with_defer
 import os
 import casanova
-import sys
+import warnings
 from os.path import join, isfile, isdir, dirname
 
 from minet.cli.crawl.crawl import open_report
@@ -19,7 +19,7 @@ from minet.cli.utils import (
     track_crawler_state_with_loading_bar,
 )
 
-ADDITIONAL_JOBS_HEADERS = ["interesting"]
+ADDITIONAL_JOBS_HEADERS = ["interesting", "regex_match_size"]
 
 STATUS_TO_STYLE = {
     "acked": "success_background",
@@ -45,7 +45,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         loading_bar.erase()
         raise FatalError("Cannot dump crawl not started yet!")
 
-    # Get all URLS
+    # Getting all URLs
 
     keep_uninteresting = cli_args.keep_uninteresting
     reader = casanova.reader(cli_args.input)
@@ -80,15 +80,13 @@ def action(cli_args, defer, loading_bar: LoadingBar):
     # Creating crawler
     crawler = Crawler(
                 spider,
-                throttle=cli_args.throttle,
-                persistent_storage_path=persistent_storage_path,
-                wait=False,
-                daemonic=False,
-                visit_urls_only_once=True,
-                normalized_url_cache=True,
-                resume=cli_args.resume or cli_args.dump_queue)
-
-    print(crawler.process_pool)
+                throttle = cli_args.throttle,
+                persistent_storage_path = persistent_storage_path,
+                wait = False,
+                daemonic = False,
+                visit_urls_only_once = True,
+                normalized_url_cache = True,
+                resume = cli_args.resume or cli_args.dump_queue)
 
     if cli_args.dump_queue:
         loading_bar.erase()
@@ -122,26 +120,38 @@ def action(cli_args, defer, loading_bar: LoadingBar):
 
         track_crawler_state_with_loading_bar(loading_bar, crawler.state)
 
+        # BeautifulSoup prints wild warnings
+        # this instruction prevents it.
+        warnings.filterwarnings("ignore", module = 'bs4')
+
         # Running crawler
         for result in crawler:
-            #with loading_bar.step():
-            focus_rep: FocusResponse = result.data
+            with loading_bar.step():
+                focus_rep: FocusResponse = result.data
+                if not focus_rep:
+                    focus_rep = FocusResponse(
+                        None,
+                        0,
+                        None
+                    )
 
-            inc_label = "crawled"
-            inc_style = "success"
-            inc_count = 1
-            if result.error is not None:
-                inc_label = result.error_code
-                inc_style = "error"
-            elif not focus_rep.interesting:
-                inc_label = "not interesting"
-                inc_style = "warning"
+                inc_label = "crawled"
+                inc_style = "success"
+                inc_count = 1
+                if result.error is not None:
+                    inc_label = result.error_code
+                    inc_style = "error"
+                elif not focus_rep.interesting:
+                    inc_label = "not interesting"
+                    inc_style = "warning"
 
-            loading_bar.inc_stat(inc_label, count=inc_count, style=inc_style)
+                loading_bar.inc_stat(inc_label, count=inc_count, style=inc_style)
 
-            if not keep_uninteresting and (result.error or not result.data or not focus_rep.interesting): continue
+                if not keep_uninteresting and (result.error or not result.data or not focus_rep.interesting): continue
 
-            jobs_writer.writerow(result.as_csv_row() + [focus_rep.interesting])
+                jobs_writer.writerow(
+                    result.as_csv_row() + [focus_rep.interesting, focus_rep.regex_match_size]
+                )
 
-            # Flushing to avoid sync issues as well as possible
-            jobs_output.flush()
+                # Flushing to avoid sync issues as well as possible
+                jobs_output.flush()
