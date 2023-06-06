@@ -285,3 +285,10 @@ UTF16_LE_BOM = b"\xff\xfe"
 UTF16_BE_BOM = b"\xfe\xff"
 UTF32_LE_BOM = b"\xff\xfe\x00\x00"
 UTF32_BE_BOM = b"\x00\x00\xfe\xff"
+
+
+def fix_surrogates(string: str) -> str:
+    try:
+        return string.encode("utf-16", errors="surrogatepass").decode("utf-16")
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return string.encode("utf-8", errors="replace").decode("utf-8")

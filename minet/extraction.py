@@ -5,6 +5,7 @@ from casanova import TabularRecord
 from trafilatura.core import bare_extraction
 
 from minet.exceptions import TrafilaturaError
+from minet.encodings import fix_surrogates
 
 
 def normalize_plural_trafilatura_item(meta: Dict[str, Any], key: str) -> List[str]:
@@ -33,6 +34,11 @@ def normalize_plural_trafilatura_item(meta: Dict[str, Any], key: str) -> List[st
 
             if subitem:
                 items.append(subitem)
+
+    # NOTE: trafilatura metadata extraction seem to produce invalid utf-8
+    # sometimes, so we fix it here. We might need to fix this elsewhere
+    # at some point also.
+    items = [fix_surrogates(item) for item in items]
 
     return items
 
