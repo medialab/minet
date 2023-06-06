@@ -25,7 +25,10 @@ from minet.encodings import infer_encoding
 
 
 def read_potentially_gzipped_path(
-    path, encoding: Optional[str] = None, errors: str = "replace"
+    path,
+    encoding: Optional[str] = None,
+    errors: str = "replace",
+    fallback_encoding: Optional[str] = None,
 ) -> str:
     open_fn = open
     flag = "r" if encoding is not None else "rb"
@@ -40,7 +43,10 @@ def read_potentially_gzipped_path(
             encoding = infer_encoding(binary)
 
             if encoding is None:
-                raise CouldNotInferEncodingError
+                if fallback_encoding is not None:
+                    encoding = fallback_encoding
+                else:
+                    raise CouldNotInferEncodingError
 
             return binary.decode(encoding, errors=errors)
 
