@@ -40,8 +40,8 @@ class FocusSpider(Spider):
             raise TypeError("max depth needs to be an integer")
 
         self.urls = start_urls
-        self.regex_content = re.compile("{0}".format(regex_content), re.I) if regex_content else None
-        self.regex_url = re.compile("{0}".format(regex_url), re.I) if regex_url else None
+        self.regex_content = re.compile(regex_content, re.I) if regex_content else None
+        self.regex_url = re.compile(regex_url, re.I) if regex_url else None
         self.extraction = not perform_on_html
         self.unteresting_continue = uninteresting_continue
         self.target_html = only_target_html_page
@@ -64,14 +64,6 @@ class FocusSpider(Spider):
         html = response.text()
         content = html
 
-        # NOTE
-        # Warning : the use of trafilatura
-        # may print the error :
-        # "encoding error : input conversion failed due to input error ..."
-        # and it has consequences on the terminal user interface of minet
-        #
-        # The problem seems to come from Trafilatura or BeautifulSoup
-
         if self.extraction:
             dico_content = extract(content)
             items = [
@@ -89,7 +81,7 @@ class FocusSpider(Spider):
             content = '\n'.join(clist)
 
 
-        bs = BeautifulSoup(content, "html.parser", parse_only = SoupStrainer("a")).find_all("a")
+        bs = response.soup(ignore_xhtml_warning=True, strainer=SoupStrainer("a")).find_all("a")
         links = set(self.clean_url(end_url, a.get('href')) for a in bs if a.get('href'))
 
         if self.regex_content:
@@ -119,7 +111,6 @@ class FocusSpider(Spider):
         if (not interesting_content and not self.unteresting_continue) or job.depth + 1 > self.depth:
             next_urls = set()
 
-
         rep_obj = FocusResponse(
             interesting_content,
             interesting_size,
@@ -129,6 +120,5 @@ class FocusSpider(Spider):
         return (rep_obj, next_urls)
 
     def start(self):
-        #print(list(self.urls))
         self.urls = list(self.urls)
         return self.urls

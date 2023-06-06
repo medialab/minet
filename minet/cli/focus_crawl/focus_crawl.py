@@ -19,7 +19,10 @@ from minet.cli.utils import (
     track_crawler_state_with_loading_bar,
 )
 
-ADDITIONAL_JOBS_HEADERS = ["interesting", "regex_match_size"]
+ADDITIONAL_JOBS_HEADERS = [
+    "interesting",
+    "regex_search_size"
+]
 
 STATUS_TO_STYLE = {
     "acked": "success_background",
@@ -119,10 +122,6 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         # Reporter pool
 
         track_crawler_state_with_loading_bar(loading_bar, crawler.state)
-
-        # BeautifulSoup prints wild warnings
-        # this instruction prevents it.
-        warnings.filterwarnings("ignore", module = 'bs4')
 
         # Running crawler
         for result in crawler:

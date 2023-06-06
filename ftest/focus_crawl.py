@@ -6,9 +6,9 @@ def test1():
 
     warnings.filterwarnings("ignore", module = "bs4")
 
-    url = "https://blog.pigeoff.pw/ma-musique"
-    pattern = "\\n"
-    print(pattern)
+    url = ""
+    pattern = r"\\n"
+    #print(pattern)
 
     spider = FocusSpider(
         [url],
