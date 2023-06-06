@@ -99,7 +99,7 @@ class FocusSpider(Spider):
             next_urls = links
         else:
             for a in links:
-                if self.regex_url.match(a):
+                if self.regex_url.search(a):
                     if self.target_html:
                         if ural.could_be_html(a): next_urls.add(a)
                         else: ignored_urls.add(a)
