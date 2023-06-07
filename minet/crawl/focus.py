@@ -13,6 +13,7 @@ from minet.extraction import extract
 from minet.web import Response
 from minet.crawl.spiders import Spider
 
+
 @dataclass
 class FocusCrawlResult:
     relevant: bool
@@ -25,6 +26,7 @@ class FocusCrawlResult:
         self.matches = matches
         self.ignored_url = ignored_url
     """
+
 
 class FocusSpider(Spider):
     def clean_url(self, origin, url):

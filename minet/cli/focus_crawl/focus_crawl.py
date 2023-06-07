@@ -15,10 +15,7 @@ from minet.cli.utils import (
     track_crawler_state_with_loading_bar,
 )
 
-ADDITIONAL_JOBS_HEADERS = [
-    "relevant",
-    "matches"
-]
+ADDITIONAL_JOBS_HEADERS = ["relevant", "matches"]
 
 STATUS_TO_STYLE = {
     "acked": "success_background",
@@ -45,7 +42,6 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         raise FatalError("Cannot dump crawl not started yet!")
 
     # Getting all URLs
-
     keep_irrelevant = cli_args.keep_irrelevant
     reader = casanova.reader(cli_args.input)
     start_urls = reader.cells(cli_args.column)
@@ -109,7 +105,6 @@ def action(cli_args, defer, loading_bar: LoadingBar):
 
     if crawler.finished:
         loading_bar.erase()
-        # crawler.stop()
         raise FatalError("[error]Crawler has already finished!")
 
     if crawler.resuming:
@@ -117,7 +112,6 @@ def action(cli_args, defer, loading_bar: LoadingBar):
 
     with crawler:
         # Reporter pool
-
         track_crawler_state_with_loading_bar(loading_bar, crawler.state)
 
         # Running crawler
@@ -143,11 +137,11 @@ def action(cli_args, defer, loading_bar: LoadingBar):
 
                 if not keep_irrelevant and (
                     result.error or not result.data or not focus_rep.relevant
-                ):  continue
+                ):
+                    continue
 
                 jobs_writer.writerow(
-                    result.as_csv_row()
-                    + [focus_rep.relevant, focus_rep.matches]
+                    result.as_csv_row() + [focus_rep.relevant, focus_rep.matches]
                 )
 
                 # Flushing to avoid sync issues as well as possible

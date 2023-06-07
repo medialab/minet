@@ -43,7 +43,7 @@ FOCUS_CRAWL_COMMAND = command(
             "flags": ["-m", "--max-depth"],
             "help": "Max depth of the crawling exploration.",
             "default": 3,
-            "type": int
+            "type": int,
         },
         {
             "flag": "--irrelevant-continue",
