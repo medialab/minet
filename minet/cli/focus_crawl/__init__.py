@@ -1,10 +1,24 @@
 from minet.cli.argparse import command
 from minet.constants import DEFAULT_THROTTLE
+from minet.cli.exceptions import InvalidArgumentsError
 
+def check_regexs(cli_args):
+    rc = cli_args.regex_content
+    ru = cli_args.regex_url
+    if not rc and not ru:
+        raise InvalidArgumentsError(
+            [
+                "At least one regex is required, either for URLs or content.",
+                "To do so, use one of the following flags :",
+                "   -r, --regex-content",
+                "   -u, --regex-url"
+            ]
+        )
 
 FOCUS_CRAWL_COMMAND = command(
     "focus-crawl",
     "minet.cli.focus_crawl.focus_crawl",
+    resolve=check_regexs,
     title="Minet Focus Crawl Command",
     description="""
         Minet crawl feature with the possibility
