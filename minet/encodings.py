@@ -262,17 +262,20 @@ def encoding_sort_key(encoding):
     return (normalize_encoding(encoding), -len(encoding))
 
 
-def infer_charset(data: bytes) -> Optional[charset_normalizer.CharsetMatch]:
-    best = charset_normalizer.from_bytes(data).best()
+def infer_charset(
+    data: bytes, only_supported_encodings: bool = True
+) -> Optional[charset_normalizer.CharsetMatch]:
+    matches = charset_normalizer.from_bytes(data)
 
-    if best is None:
-        return None
+    for match in matches:
+        if not only_supported_encodings or is_supported_encoding(match.encoding):
+            return match
 
-    return best
+    return None
 
 
-def infer_encoding(data: bytes) -> Optional[str]:
-    charset = infer_charset(data)
+def infer_encoding(data: bytes, only_supported_encodings: bool = True) -> Optional[str]:
+    charset = infer_charset(data, only_supported_encodings=only_supported_encodings)
 
     if charset is None:
         return None

@@ -49,7 +49,7 @@ def worker(payload: ExtractWorkerPayload) -> ExtractResult:
     if text is None:
         try:
             text = read_potentially_gzipped_path(
-                payload.path, encoding=payload.encoding
+                payload.path, encoding=payload.encoding, fallback_encoding="utf-8"
             )
         except (FileNotFoundError, UnicodeDecodeError) as e:
             result.error = e
