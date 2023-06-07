@@ -2,11 +2,9 @@ import re
 import ural
 from typing import List
 from collections.abc import Iterable
-from bs4 import SoupStrainer
 from urllib.parse import urljoin
 from dataclasses import dataclass
 
-from minet.cli.exceptions import FatalError
 from minet.web import looks_like_html
 from minet.crawl.types import CrawlJob
 from minet.extraction import extract
@@ -74,20 +72,19 @@ class FocusSpider(Spider):
             return FocusCrawlResult(False, 0, None), []
 
         html = response.text()
-        content = html
+        soup = response.soup(ignore_xhtml_warning=True)
 
         if self.extraction:
-            extraction = extract(content)
+            extraction = extract(html)
             if extraction:
                 content = extraction.blurb()
+        else:
+            content = soup.get_text()
 
-        bs = response.soup(
-            ignore_xhtml_warning=True, strainer=SoupStrainer("a")
-        ).find_all("a")
-
+        a_tags = soup.find_all("a")
         links = set(
             self.clean_url(end_url, a.get("href"))
-            for a in bs
+            for a in a_tags
             if a.get("href") and ural.should_follow_href(a.get("href"))
         )
 
@@ -96,13 +93,8 @@ class FocusSpider(Spider):
             relevant_content = bool(match)
             relevant_size = len(match) if match else 0
         else:
-            # NOTE
-            # Doit on mettre un match à 1
-            # pour avoir quelque chose dans la colonne
-            # "matches"
-            match = True
+            relevant_content = True
             relevant_size = None
-
 
         if not self.regex_url:
             next_urls = links
