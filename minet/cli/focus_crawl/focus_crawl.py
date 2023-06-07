@@ -7,7 +7,7 @@ from minet.cli.crawl.crawl import open_report
 from minet.cli.exceptions import FatalError
 from minet.cli.console import console
 from minet.crawl import Crawler, CrawlResult
-from minet.crawl.focus import FocusSpider, FocusResponse
+from minet.crawl.focus import FocusSpider
 from minet.cli.loading_bar import LoadingBar
 from minet.cli.utils import (
     with_loading_bar,
@@ -17,7 +17,7 @@ from minet.cli.utils import (
 
 ADDITIONAL_JOBS_HEADERS = [
     "relevant",
-    "regex_search_size"
+    "matches"
 ]
 
 STATUS_TO_STYLE = {
@@ -58,8 +58,8 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         regex_content=cli_args.regex_content,
         regex_url=cli_args.regex_url,
         irrelevant_continue=cli_args.irrelevant_continue,
-        only_target_html_page=cli_args.target_html,
-        perform_on_html=not cli_args.on_text
+        only_target_html_page=cli_args.only_html,
+        extract=cli_args.extract,
     )
 
     # Loading crawler definition
@@ -78,14 +78,15 @@ def action(cli_args, defer, loading_bar: LoadingBar):
 
     # Creating crawler
     crawler = Crawler(
-                spider,
-                throttle = cli_args.throttle,
-                persistent_storage_path = persistent_storage_path,
-                wait = False,
-                daemonic = False,
-                visit_urls_only_once = True,
-                normalized_url_cache = True,
-                resume = cli_args.resume or cli_args.dump_queue)
+        spider,
+        throttle=cli_args.throttle,
+        persistent_storage_path=persistent_storage_path,
+        wait=False,
+        daemonic=False,
+        visit_urls_only_once=True,
+        normalized_url_cache=True,
+        resume=cli_args.resume or cli_args.dump_queue,
+    )
 
     if cli_args.dump_queue:
         loading_bar.erase()
@@ -108,7 +109,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
 
     if crawler.finished:
         loading_bar.erase()
-        #crawler.stop()
+        # crawler.stop()
         raise FatalError("[error]Crawler has already finished!")
 
     if crawler.resuming:
@@ -122,13 +123,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         # Running crawler
         for result in crawler:
             with loading_bar.step():
-                focus_rep: FocusResponse = result.data
-                if not focus_rep:
-                    focus_rep = FocusResponse(
-                        None,
-                        0,
-                        None
-                    )
+                focus_rep = result.data
 
                 inc_label = "crawled"
                 inc_style = "success"
@@ -142,10 +137,17 @@ def action(cli_args, defer, loading_bar: LoadingBar):
 
                 loading_bar.inc_stat(inc_label, count=inc_count, style=inc_style)
 
-                if not keep_irrelevant and (result.error or not result.data or not focus_rep.relevant): continue
+                if not focus_rep:
+                    jobs_writer.writerow(result.as_csv_row() + [False, 0])
+                    continue
+
+                if not keep_irrelevant and (
+                    result.error or not result.data or not focus_rep.relevant
+                ):  continue
 
                 jobs_writer.writerow(
-                    result.as_csv_row() + [focus_rep.relevant, focus_rep.regex_match_size]
+                    result.as_csv_row()
+                    + [focus_rep.relevant, focus_rep.matches]
                 )
 
                 # Flushing to avoid sync issues as well as possible

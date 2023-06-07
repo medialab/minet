@@ -1,10 +1,6 @@
-import codecs
-
 from minet.cli.argparse import command
 from minet.constants import DEFAULT_THROTTLE
 
-def treat_escape(s):
-    return r'{0}'.format(s)
 
 FOCUS_CRAWL_COMMAND = command(
     "focus-crawl",
@@ -31,30 +27,31 @@ FOCUS_CRAWL_COMMAND = command(
         {
             "flags": ["-r", "--regex-content"],
             "help": "Regex used to filter fetched content.",
-            "default": None
+            "default": None,
         },
         {
             "flags": ["-u", "--regex-url"],
             "help": "Regex used to filter URLs added to crawler's queue.",
-            "default": None
+            "default": None,
         },
         {
-            "flag": "--on-text",
-            "help": "Perform regex match on extracted text content instead of html content.",
+            "flag": "--extract",
+            "help": "Perform regex match on extracted text content instead of html content using the Trafilatura library.",
             "action": "store_true",
         },
         {
             "flags": ["-m", "--max-depth"],
             "help": "Max depth of the crawling exploration.",
-            "default": 3
+            "default": 3,
+            "type": int
         },
         {
             "flag": "--irrelevant-continue",
             "help": "Continue exploration whether met content is relevant or not.",
-            "action": "store_true"
+            "action": "store_true",
         },
         {
-            "flag": "--target-html",
+            "flag": "--only-html",
             "help": "Add URLs to the crawler queue only if they seem to lead to a HTML content.",
             "action": "store_true",
         },
@@ -66,7 +63,7 @@ FOCUS_CRAWL_COMMAND = command(
         {
             "flags": ["-O", "--output-dir"],
             "help": "Output directory.",
-            "default": "focus_crawl"
+            "default": "focus_crawl",
         },
         {
             "flag": "--resume",
@@ -84,5 +81,5 @@ FOCUS_CRAWL_COMMAND = command(
             "type": float,
             "default": DEFAULT_THROTTLE,
         },
-    ]
+    ],
 )

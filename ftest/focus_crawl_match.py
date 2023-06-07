@@ -24,13 +24,14 @@ import re
 def hash(url):
     return hashlib.md5(url.encode()).hexdigest()
 
+
 def test(
     resp,
     regex: re.Pattern,
-    depth = 0,
-    on_bare_html = True,
-    a_with_bs = False,
-    ):
+    depth=0,
+    on_bare_html=True,
+    a_with_bs=False,
+):
 
     url = resp.end_url
 
@@ -50,13 +51,13 @@ def test(
             dico_content.content,
             dico_content.comments,
             dico_content.author,
-            ' '.join(dico_content.categories),
-            ' '.join(dico_content.tags),
+            " ".join(dico_content.categories),
+            " ".join(dico_content.tags),
             dico_content.date,
-            dico_content.sitename
+            dico_content.sitename,
         ]
         clist = [v for v in items if isinstance(v, str)]
-        content = '\n'.join(clist)
+        content = "\n".join(clist)
 
     match = regex.findall(content)
     relevant = bool(match)
@@ -78,37 +79,40 @@ def test(
         urls = [urljoin(url, l) for l in links]
         for r in pool.request(urls):
             if r.response:
-                rr = test(
-                    r.response,
-                    regex,
-                    depth+1,
-                    on_bare_html,
-                    a_with_bs)
+                rr = test(r.response, regex, depth + 1, on_bare_html, a_with_bs)
                 if rr:
                     (i, r) = rr
-                    if i: pertinent += 1
+                    if i:
+                        pertinent += 1
 
-    return (relevant, {
-        "url": url,
-        "relevant": relevant,
-        "on html": on_bare_html,
-        "using bs": a_with_bs,
-        "nexts": len(links),
-        "pertinent": pertinent,
-    })
+    return (
+        relevant,
+        {
+            "url": url,
+            "relevant": relevant,
+            "on html": on_bare_html,
+            "using bs": a_with_bs,
+            "nexts": len(links),
+            "pertinent": pertinent,
+        },
+    )
+
 
 def run_test(filename, export, regex, html, bs):
     with open(filename) as file:
         csv = casanova.reader(file)
         with open(export, "a") as export:
-            wrt = casanova.writer(export, fieldnames=[
-                "url",
-                "relevant",
-                "on html",
-                "using bs",
-                "nexts",
-                "pertinent"
-            ])
+            wrt = casanova.writer(
+                export,
+                fieldnames=[
+                    "url",
+                    "relevant",
+                    "on html",
+                    "using bs",
+                    "nexts",
+                    "pertinent",
+                ],
+            )
             urls = []
             for f in csv:
                 """
@@ -126,19 +130,14 @@ def run_test(filename, export, regex, html, bs):
                         export.flush()
 
 
-
-REGEX = re.compile(r"(?:[Pp]esticide|[Ff]ongicide|[Gg]lypho|[Rr]oundup|[Hh]erbicide|SDHI|sdhi|[Cc]hlord[ée]cone|[Ii]secticide|[Nn][ée]onicotino[ïi]de|[Dd]esherbant|[Pp]hyto)")
+REGEX = re.compile(
+    r"(?:[Pp]esticide|[Ff]ongicide|[Gg]lypho|[Rr]oundup|[Hh]erbicide|SDHI|sdhi|[Cc]hlord[ée]cone|[Ii]secticide|[Nn][ée]onicotino[ïi]de|[Dd]esherbant|[Pp]hyto)"
+)
 
 
 run_test(
-    "../pesticides.csv",
-    "../pesticides_export_match.csv",
-    REGEX,
-    html=True,
-    bs=False
+    "../pesticides.csv", "../pesticides_export_match.csv", REGEX, html=True, bs=False
 )
 
 # Test result
 #
-
-
