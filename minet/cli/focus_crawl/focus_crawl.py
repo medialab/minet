@@ -1,17 +1,13 @@
 from ebbe.decorators import with_defer
 import os
 import casanova
-import warnings
-from os.path import join, isfile, isdir, dirname
+from os.path import join, isdir
 
 from minet.cli.crawl.crawl import open_report
 from minet.cli.exceptions import FatalError
 from minet.cli.console import console
-from minet.scrape import Scraper
-from minet.scrape.exceptions import InvalidScraperError
-from minet.crawl import Crawler, CrawlResult, CrawlJob, DefinitionSpiderOutput
+from minet.crawl import Crawler, CrawlResult
 from minet.crawl.focus import FocusSpider, FocusResponse
-from minet.cli.reporters import report_scraper_validation_errors
 from minet.cli.loading_bar import LoadingBar
 from minet.cli.utils import (
     with_loading_bar,

@@ -1,7 +1,6 @@
 import re
 import ural
-import warnings
-from bs4 import BeautifulSoup, SoupStrainer
+from bs4 import SoupStrainer
 from urllib.parse import urljoin
 
 from minet.cli.exceptions import FatalError
