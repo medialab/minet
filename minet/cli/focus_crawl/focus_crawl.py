@@ -33,6 +33,7 @@ STATUS_TO_STYLE = {
         {"name": "queued", "style": "info"},
         {"name": "doing", "style": "warning"},
         {"name": "done", "style": "success"},
+        {"name": "relevant", "style": "success"},
         {"name": "irrelevant", "style": "warning"},
     ],
 )
@@ -120,7 +121,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
             with loading_bar.step():
                 focus_rep = result.data
 
-                inc_label = "crawled"
+                inc_label = "relevant"
                 inc_style = "success"
                 inc_count = 1
                 if result.error is not None:
