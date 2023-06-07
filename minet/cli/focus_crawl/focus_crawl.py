@@ -33,6 +33,7 @@ STATUS_TO_STYLE = {
         {"name": "queued", "style": "info"},
         {"name": "doing", "style": "warning"},
         {"name": "done", "style": "success"},
+        {"name": "irrelevant", "style": "warning"},
     ],
 )
 @with_ctrl_c_warning
@@ -126,7 +127,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
                     inc_label = result.error_code
                     inc_style = "error"
                 elif not focus_rep.relevant:
-                    inc_label = "not relevant"
+                    inc_label = "irrelevant"
                     inc_style = "warning"
 
                 loading_bar.inc_stat(inc_label, count=inc_count, style=inc_style)
