@@ -40,7 +40,7 @@ setup(
         "rich-argparse>=1,<2",
         "soupsieve>=2.1,<3",
         "tenacity>=8,<9",
-        "trafilatura>=1.4.1,<1.5",
+        "trafilatura>=1.6,<1.7",
         "twitwi>=0.18.1,<0.19",
         "ural>=0.42,<0.43",
         "urllib3>=1.26.16,<2",

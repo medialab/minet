@@ -1248,8 +1248,14 @@ def create_request_retryer(
 ):
     # By default we only retry network issues, such as Internet being cut off etc.
     retryable_exception_types = [
+        # urllib3 errors
         urllib3_exceptions.ProtocolError,
+        # urllib errors
         urllib.error.URLError,
+        # Low-level socket connection errors
+        ConnectionAbortedError,
+        ConnectionRefusedError,
+        ConnectionResetError,
     ]
 
     # We also usually include most timeout errors
