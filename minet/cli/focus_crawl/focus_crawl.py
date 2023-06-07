@@ -142,7 +142,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
                     continue
 
                 jobs_writer.writerow(
-                    result.as_csv_row() + [focus_rep.relevant, focus_rep.matches]
+                    result.as_csv_row(), [focus_rep.relevant, focus_rep.matches]
                 )
 
                 # Flushing to avoid sync issues as well as possible
