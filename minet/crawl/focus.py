@@ -93,15 +93,16 @@ class FocusSpider(Spider):
 
         if self.regex_content:
             match = self.regex_content.findall(content)
+            relevant_content = bool(match)
+            relevant_size = len(match) if match else 0
         else:
             # NOTE
             # Doit on mettre un match à 1
             # pour avoir quelque chose dans la colonne
             # "matches"
-            match = 1
+            match = True
+            relevant_size = None
 
-        relevant_size = len(match) if match else 0
-        relevant_content = bool(match)
 
         if not self.regex_url:
             next_urls = links
