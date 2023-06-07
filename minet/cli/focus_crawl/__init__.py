@@ -49,8 +49,8 @@ FOCUS_CRAWL_COMMAND = command(
             "default": 3
         },
         {
-            "flag": "--uninteresting-continue",
-            "help": "Continue exploration whether met content is interesting or not.",
+            "flag": "--irrelevant-continue",
+            "help": "Continue exploration whether met content is relevant or not.",
             "action": "store_true"
         },
         {
@@ -59,8 +59,8 @@ FOCUS_CRAWL_COMMAND = command(
             "action": "store_true",
         },
         {
-            "flag": "--keep-uninteresting",
-            "help": "Add to exported data the results judged uninteresting by the algorithm.",
+            "flag": "--keep-irrelevant",
+            "help": "Add to exported data the results judged irrelevant by the algorithm.",
             "action": "store_true",
         },
         {

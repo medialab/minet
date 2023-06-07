@@ -38,7 +38,7 @@ def test(
         return (False, None)
     html = resp.text()
 
-    # Handling interesting
+    # Handling relevant
 
     if on_bare_html:
         content = html
@@ -59,7 +59,7 @@ def test(
         content = '\n'.join(clist)
 
     match = regex.findall(content)
-    interesting = bool(match)
+    relevant = bool(match)
 
     # Handling links
     links = set(ural.urls_from_text(html))
@@ -88,9 +88,9 @@ def test(
                     (i, r) = rr
                     if i: pertinent += 1
 
-    return (interesting, {
+    return (relevant, {
         "url": url,
-        "interesting": interesting,
+        "relevant": relevant,
         "on html": on_bare_html,
         "using bs": a_with_bs,
         "nexts": len(links),
@@ -103,7 +103,7 @@ def run_test(filename, export, regex, html, bs):
         with open(export, "a") as export:
             wrt = casanova.writer(export, fieldnames=[
                 "url",
-                "interesting",
+                "relevant",
                 "on html",
                 "using bs",
                 "nexts",

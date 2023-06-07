@@ -16,7 +16,7 @@ from minet.cli.utils import (
 )
 
 ADDITIONAL_JOBS_HEADERS = [
-    "interesting",
+    "relevant",
     "regex_search_size"
 ]
 
@@ -46,7 +46,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
 
     # Getting all URLs
 
-    keep_uninteresting = cli_args.keep_uninteresting
+    keep_irrelevant = cli_args.keep_irrelevant
     reader = casanova.reader(cli_args.input)
     start_urls = reader.cells(cli_args.column)
 
@@ -57,7 +57,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         max_depth=cli_args.max_depth,
         regex_content=cli_args.regex_content,
         regex_url=cli_args.regex_url,
-        uninteresting_continue=cli_args.uninteresting_continue,
+        irrelevant_continue=cli_args.irrelevant_continue,
         only_target_html_page=cli_args.target_html,
         perform_on_html=not cli_args.on_text
     )
@@ -136,16 +136,16 @@ def action(cli_args, defer, loading_bar: LoadingBar):
                 if result.error is not None:
                     inc_label = result.error_code
                     inc_style = "error"
-                elif not focus_rep.interesting:
-                    inc_label = "not interesting"
+                elif not focus_rep.relevant:
+                    inc_label = "not relevant"
                     inc_style = "warning"
 
                 loading_bar.inc_stat(inc_label, count=inc_count, style=inc_style)
 
-                if not keep_uninteresting and (result.error or not result.data or not focus_rep.interesting): continue
+                if not keep_irrelevant and (result.error or not result.data or not focus_rep.relevant): continue
 
                 jobs_writer.writerow(
-                    result.as_csv_row() + [focus_rep.interesting, focus_rep.regex_match_size]
+                    result.as_csv_row() + [focus_rep.relevant, focus_rep.regex_match_size]
                 )
 
                 # Flushing to avoid sync issues as well as possible

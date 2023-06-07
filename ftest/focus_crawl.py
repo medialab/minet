@@ -14,7 +14,7 @@ def test1():
         [url],
         1,
         pattern,
-        uninteresting_continue = True
+        irrelevant_continue = True
     )
 
     crawler = Crawler(
@@ -24,7 +24,7 @@ def test1():
     with crawler:
         for result in crawler:
             if not result.error:
-                print(result.as_csv_row() + [result.data.interesting])
+                print(result.as_csv_row() + [result.data.relevant])
 
 
 test1()

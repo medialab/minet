@@ -11,8 +11,8 @@ from minet.web import Response
 from minet.crawl.spiders import Spider
 
 class FocusResponse:
-    def __init__(self, interesting, regex_match_size, ignored_url) -> None:
-        self.interesting = interesting
+    def __init__(self, relevant, regex_match_size, ignored_url) -> None:
+        self.relevant = relevant
         self.regex_match_size = regex_match_size
         self.ignored_url = ignored_url
 
@@ -28,7 +28,7 @@ class FocusSpider(Spider):
         max_depth = 3,
         regex_content = None,
         regex_url = None,
-        uninteresting_continue = False,
+        irrelevant_continue = False,
         perform_on_html = True,
         only_target_html_page = True):
 
@@ -42,13 +42,13 @@ class FocusSpider(Spider):
         self.regex_content = re.compile(regex_content, re.I) if regex_content else None
         self.regex_url = re.compile(regex_url, re.I) if regex_url else None
         self.extraction = not perform_on_html
-        self.unteresting_continue = uninteresting_continue
+        self.irrelevant_continue = irrelevant_continue
         self.target_html = only_target_html_page
 
     def __call__(self, job: CrawlJob, response: Response):
 
         # Return variables
-        interesting_content = False
+        relevant_content = False
         next_urls = set()
         ignored_urls = set()
 
@@ -81,7 +81,11 @@ class FocusSpider(Spider):
 
 
         bs = response.soup(ignore_xhtml_warning=True, strainer=SoupStrainer("a")).find_all("a")
-        links = set(self.clean_url(end_url, a.get('href')) for a in bs if a.get('href'))
+        links = set(
+            self.clean_url(end_url, a.get('href'))
+            for a in bs
+            if a.get('href') and ural.should_follow_href(a.get('href'))
+        )
 
         if self.regex_content:
             match = self.regex_content.findall(content)
@@ -91,8 +95,8 @@ class FocusSpider(Spider):
             else:
                 match = True
 
-        interesting_size = len(match) if match else 0
-        interesting_content = bool(match)
+        relevant_size = len(match) if match else 0
+        relevant_content = bool(match)
 
         if not self.regex_url:
             next_urls = links
@@ -107,12 +111,12 @@ class FocusSpider(Spider):
                     ignored_urls.add(a)
 
 
-        if (not interesting_content and not self.unteresting_continue) or job.depth + 1 > self.depth:
+        if (not relevant_content and not self.irrelevant_continue) or job.depth + 1 > self.depth:
             next_urls = set()
 
         rep_obj = FocusResponse(
-            interesting_content,
-            interesting_size,
+            relevant_content,
+            relevant_size,
             ignored_urls
         )
 
