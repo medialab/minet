@@ -3,9 +3,7 @@ from minet.constants import DEFAULT_THROTTLE
 from minet.cli.exceptions import InvalidArgumentsError
 
 def check_regexs(cli_args):
-    rc = cli_args.regex_content
-    ru = cli_args.regex_url
-    if not rc and not ru:
+    if not cli_args.regex_content and not cli_args.regex_url:
         raise InvalidArgumentsError(
             [
                 "At least one regex is required, either for URLs or content.",
@@ -14,11 +12,12 @@ def check_regexs(cli_args):
                 "   -u, --regex-url"
             ]
         )
+    if cli_args.max_depth < 0:
+        raise InvalidArgumentsError("Max depth needs to be a positive integer.")
 
 FOCUS_CRAWL_COMMAND = command(
     "focus-crawl",
     "minet.cli.focus_crawl.focus_crawl",
-    resolve=check_regexs,
     title="Minet Focus Crawl Command",
     description="""
         Minet crawl feature with the possibility
@@ -37,6 +36,7 @@ FOCUS_CRAWL_COMMAND = command(
     """,
     no_output=True,
     variadic_input={"dummy_column": "url"},
+    resolve=check_regexs,
     arguments=[
         {
             "flags": ["-r", "--regex-content"],

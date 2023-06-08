@@ -42,8 +42,8 @@ class FocusSpider(Spider):
         only_target_html_page=True,
     ):
 
-        if not isinstance(max_depth, int):
-            raise TypeError("Max depth needs to be an integer.")
+        if not isinstance(max_depth, int) or max_depth < 0:
+            raise TypeError("Max depth needs to be a positive integer.")
 
         if not regex_content and not regex_url:
             raise TypeError("Neither url nor content filter provided.")
@@ -66,7 +66,7 @@ class FocusSpider(Spider):
         end_url = response.end_url
 
         html = response.body
-        if self.target_html and not looks_like_html(html):
+        if (self.target_html and not looks_like_html(html)):
             return FocusCrawlResult(False, 0, None), []
         if not response.is_text or not html:
             return FocusCrawlResult(False, 0, None), []
@@ -121,7 +121,4 @@ class FocusSpider(Spider):
         return rep_obj, next_urls
 
     def start(self):
-        if isinstance(self.urls, Iterable):
-            yield from self.urls
-        else:
-            yield from [self.urls]
+        yield from self.urls
