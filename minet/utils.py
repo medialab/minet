@@ -9,6 +9,7 @@ import hashlib
 import json
 import time
 import string
+import importlib
 from random import uniform
 
 
@@ -94,3 +95,21 @@ def message_flatmap(*messages, sep=" ", end="\n"):
         end.join(m for m in message) if not isinstance(message, str) else message
         for message in messages
     )
+
+
+def parse_module_and_target(path, default: str = "main"):
+    if ":" in path:
+        s = path.rsplit(":", 1)
+        return s[0], s[1]
+
+    return path, default
+
+
+def import_target(path, default: str = "main"):
+    module_name, function_name = parse_module_and_target(path, default=default)
+    m = importlib.import_module(module_name)
+
+    try:
+        return getattr(m, function_name)
+    except AttributeError:
+        raise ImportError
