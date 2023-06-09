@@ -18,13 +18,6 @@ class FocusCrawlResult:
     matches: int
     ignored_url: List[str]
 
-    """
-    def __init__(self, relevant, matches, ignored_url) -> None:
-        self.relevant = relevant
-        self.matches = matches
-        self.ignored_url = ignored_url
-    """
-
 
 class FocusSpider(Spider):
     def clean_url(self, origin, url):
@@ -67,9 +60,9 @@ class FocusSpider(Spider):
 
         html = response.body
         if (self.target_html and not looks_like_html(html)):
-            return FocusCrawlResult(False, 0, None), []
+            return FocusCrawlResult(False, 0, None), None
         if not response.is_text or not html:
-            return FocusCrawlResult(False, 0, None), []
+            return FocusCrawlResult(False, 0, None), None
 
         html = response.text()
         soup = response.soup(ignore_xhtml_warning=True)
