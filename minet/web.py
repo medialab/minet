@@ -35,7 +35,7 @@ from timeit import default_timer as timer
 from io import BytesIO
 from threading import Event
 from itertools import chain
-from urllib.parse import urljoin
+from urllib.parse import urljoin, quote
 from urllib3 import HTTPResponse
 from urllib3.util.ssl_ import create_urllib3_context
 from ebbe import rcompose, noop, format_filesize
@@ -729,7 +729,11 @@ def atomic_resolve(
 
 
 def build_request_headers(
-    headers=None, cookie=None, spoof_ua=False, json_body=False, urlencoded_body=False
+    headers: Optional[Dict[str, str]] = None,
+    cookie: Optional[Union[str, Dict[str, str]]] = None,
+    spoof_ua: bool = False,
+    json_body: bool = False,
+    urlencoded_body: bool = False,
 ):
     # Formatting headers
     final_headers = {}
@@ -1024,7 +1028,7 @@ def request(
     pool_manager: urllib3.PoolManager = DEFAULT_POOL_MANAGER,
     method: str = "GET",
     headers: Optional[Dict[str, str]] = None,
-    cookie: Optional[str] = None,
+    cookie: Optional[Union[str, Dict[str, str]]] = None,
     spoof_ua: bool = True,
     follow_redirects: bool = True,
     max_redirects: int = 5,
@@ -1036,7 +1040,8 @@ def request(
     known_encoding: Optional[str] = None,
     timeout: Optional[AnyTimeout] = None,
     body: Optional[Union[str, bytes]] = None,
-    json_body=None,
+    json_body: Optional[Any] = None,
+    urlencoded_body: Optional[Dict[str, str]] = None,
     cancel_event: Optional[Event] = None,
     raise_on_statuses: Optional[Container[int]] = None,
 ) -> Response:
@@ -1049,15 +1054,15 @@ def request(
     )
 
     # Dealing with body
-    final_body = None
-
-    if isinstance(body, bytes):
-        final_body = body
-    elif isinstance(body, str):
-        final_body = body.encode("utf-8")
-
     if json_body is not None:
-        final_body = json.dumps(json_body, ensure_ascii=False).encode("utf-8")
+        body = json.dumps(json_body, ensure_ascii=False).encode("utf-8")
+    elif urlencoded_body is not None:
+        body = "&".join(
+            "%s=%s" % (quote(k), quote(v)) for k, v in urlencoded_body.items()
+        )
+
+    if isinstance(body, str):
+        body = body.encode("utf-8")
 
     stack: Optional[RedirectionStack] = None
 
@@ -1067,7 +1072,7 @@ def request(
             url,
             method,
             headers=final_headers,
-            body=final_body,
+            body=body,
             timeout=timeout,
             cancel_event=cancel_event,
         )
@@ -1077,7 +1082,7 @@ def request(
             url,
             method,
             headers=final_headers,
-            body=final_body,
+            body=body,
             max_redirects=max_redirects,
             follow_refresh_header=follow_refresh_header,
             follow_meta_refresh=follow_meta_refresh,
@@ -1102,8 +1107,8 @@ def resolve(
     url: str,
     pool_manager: urllib3.PoolManager = DEFAULT_POOL_MANAGER,
     method: str = "GET",
-    headers=None,
-    cookie=None,
+    headers: Optional[Dict[str, str]] = None,
+    cookie: Optional[Union[str, Dict[str, str]]] = None,
     spoof_ua: bool = True,
     max_redirects: int = 5,
     follow_refresh_header: bool = True,
