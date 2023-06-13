@@ -728,7 +728,9 @@ def atomic_resolve(
     return compiled_stack, buffered_response
 
 
-def build_request_headers(headers=None, cookie=None, spoof_ua=False, json_body=False):
+def build_request_headers(
+    headers=None, cookie=None, spoof_ua=False, json_body=False, urlencoded_body=False
+):
     # Formatting headers
     final_headers = {}
 
@@ -743,6 +745,8 @@ def build_request_headers(headers=None, cookie=None, spoof_ua=False, json_body=F
 
     if json_body:
         final_headers["Content-Type"] = "application/json"
+    elif urlencoded_body:
+        final_headers["Content-Type"] = "application/x-www-form-urlencoded"
 
     # Note: headers passed explicitly by users always win
     if headers is not None:
@@ -1019,8 +1023,8 @@ def request(
     url: str,
     pool_manager: urllib3.PoolManager = DEFAULT_POOL_MANAGER,
     method: str = "GET",
-    headers=None,
-    cookie=None,
+    headers: Optional[Dict[str, str]] = None,
+    cookie: Optional[str] = None,
     spoof_ua: bool = True,
     follow_redirects: bool = True,
     max_redirects: int = 5,
@@ -1031,7 +1035,7 @@ def request(
     canonicalize: bool = False,
     known_encoding: Optional[str] = None,
     timeout: Optional[AnyTimeout] = None,
-    body=None,
+    body: Optional[Union[str, bytes]] = None,
     json_body=None,
     cancel_event: Optional[Event] = None,
     raise_on_statuses: Optional[Container[int]] = None,
