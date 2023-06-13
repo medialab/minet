@@ -11,6 +11,7 @@ from typing import (
     Union,
     OrderedDict,
     List,
+    Mapping,
     Any,
     Dict,
     Container,
@@ -1041,7 +1042,7 @@ def request(
     timeout: Optional[AnyTimeout] = None,
     body: Optional[Union[str, bytes]] = None,
     json_body: Optional[Any] = None,
-    urlencoded_body: Optional[Dict[str, str]] = None,
+    urlencoded_body: Optional[Mapping[str, Union[str, int, float]]] = None,
     cancel_event: Optional[Event] = None,
     raise_on_statuses: Optional[Container[int]] = None,
 ) -> Response:
