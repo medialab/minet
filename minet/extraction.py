@@ -71,6 +71,21 @@ class TrafilaturaResult(TabularRecord):
             sitename=data.get("sitename"),
         )
 
+    def blurb(self) -> str:
+        items = [
+            self.title,
+            self.description,
+            self.content,
+            self.comments,
+            self.author,
+            " ".join(self.categories),
+            " ".join(self.tags),
+            self.date,
+            self.sitename,
+        ]
+        clist = [v for v in items if isinstance(v, str)]
+        return "\n".join(clist)
+
 
 def extract(text: str) -> Optional[TrafilaturaResult]:
     # Attempting extraction
