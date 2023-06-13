@@ -1,7 +1,7 @@
+from typing import List, Optional
+
 import re
 import ural
-from typing import List
-from collections.abc import Iterable
 from urllib.parse import urljoin
 from dataclasses import dataclass
 
@@ -15,8 +15,8 @@ from minet.crawl.spiders import Spider
 @dataclass
 class FocusCrawlResult:
     relevant: bool
-    matches: int
-    ignored_url: List[str]
+    matches: Optional[int]
+    ignored_url: Optional[List[str]]
 
 
 class FocusSpider(Spider):
@@ -34,7 +34,6 @@ class FocusSpider(Spider):
         extract=False,
         only_target_html_page=True,
     ):
-
         if not isinstance(max_depth, int) or max_depth < 0:
             raise TypeError("Max depth needs to be a positive integer.")
 
@@ -50,7 +49,6 @@ class FocusSpider(Spider):
         self.target_html = only_target_html_page
 
     def __call__(self, job: CrawlJob, response: Response):
-
         # Return variables
         relevant_content = False
         next_urls = set()
@@ -59,13 +57,15 @@ class FocusSpider(Spider):
         end_url = response.end_url
 
         html = response.body
-        if (self.target_html and not looks_like_html(html)):
+        if self.target_html and not looks_like_html(html):
             return FocusCrawlResult(False, 0, None), None
         if not response.is_text or not html:
             return FocusCrawlResult(False, 0, None), None
 
         html = response.text()
         soup = response.soup(ignore_xhtml_warning=True)
+
+        content = ""
 
         if self.extraction:
             extraction = extract(html)
@@ -109,7 +109,7 @@ class FocusSpider(Spider):
         ) or job.depth + 1 > self.depth:
             next_urls = set()
 
-        rep_obj = FocusCrawlResult(relevant_content, relevant_size, ignored_urls)
+        rep_obj = FocusCrawlResult(relevant_content, relevant_size, list(ignored_urls))
 
         return rep_obj, next_urls
 

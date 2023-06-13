@@ -13,6 +13,7 @@ _Generic commands_
 
 - [cookies](#cookies)
 - [crawl](#crawl)
+- [focus-crawl](#focus-crawl)
 - [fetch](#fetch)
 - [extract](#extract)
 - [resolve](#resolve)
@@ -235,6 +236,105 @@ Examples:
 
 . Running a crawler definition:
     $ minet crawl crawler.yml -O crawl-data
+```
+
+## focus-crawl
+
+```
+Usage: minet focus-crawl [-h] [-r REGEX_CONTENT] [--silent] [-u REGEX_URL]
+                         [--extract] [-m MAX_DEPTH] [--irrelevant-continue]
+                         [--only-html] [--keep-irrelevant] [-O OUTPUT_DIR]
+                         [--resume] [--dump-queue] [--throttle THROTTLE]
+                         [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                         [--total TOTAL]
+                         url_or_url_column
+
+# Minet Focus Crawl Command
+
+Minet crawl feature with the possibility
+to use regular expressions to filter content.
+
+Regex are not case sensitive, but
+accents sensitive.
+
+Regex must be written between simple quotes.
+
+Positional Arguments:
+  url_or_url_column             Single url to process or name of the CSV column
+                                containing urls when using -i/--input.
+
+Optional Arguments:
+  --dump-queue                  Print the contents of the persistent queue.
+                                (This is for debug only, don't use this flag
+                                unless you know what you are doing).
+  --extract                     Perform regex match on extracted text content
+                                instead of html content using the Trafilatura
+                                library.
+  --irrelevant-continue         Continue exploration whether met content is
+                                relevant or not.
+  --keep-irrelevant             Add to exported data the results judged
+                                irrelevant by the algorithm.
+  -m, --max-depth MAX_DEPTH     Max depth of the crawling exploration. Defaults
+                                to `3`.
+  --only-html                   Add URLs to the crawler queue only if they seem
+                                to lead to a HTML content.
+  -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `focus_crawl`.
+  -r, --regex-content REGEX_CONTENT
+                                Regex used to filter fetched content.
+  -u, --regex-url REGEX_URL     Regex used to filter URLs added to crawler's
+                                queue.
+  --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
+                                the same domain. Defaults to `0.2`.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the urls you want to process. Will consider `-`
+                                as stdin.
+  --resume                      Whether to resume an interrupted crawl.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Examples:
+
+  Running a simple crawler:
+    $ minet focus-crawl -i urls.csv url -r '(?:assembl[ée]e nationale|s[ée]nat)' -O ./result
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet focus-crawl focus-crawl "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet focus-crawl focus-crawl column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet focus-crawl focus-crawl column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet focus-crawl focus-crawl column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet focus-crawl focus-crawl "value1,value2" --explode ","
 ```
 
 ## fetch

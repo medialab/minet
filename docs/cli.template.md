@@ -13,6 +13,7 @@ _Generic commands_
 
 - [cookies](#cookies)
 - [crawl](#crawl)
+- [focus-crawl](#focus-crawl)
 - [fetch](#fetch)
 - [extract](#extract)
 - [resolve](#resolve)
@@ -169,6 +170,10 @@ Finally note that command line arguments and flags will take precedence over env
 ## crawl
 
 <% crawl %>
+
+## focus-crawl
+
+<% focus-crawl %>
 
 ## fetch
 
