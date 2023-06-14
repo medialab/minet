@@ -1059,7 +1059,7 @@ def request(
         body = json.dumps(json_body, ensure_ascii=False).encode("utf-8")
     elif urlencoded_body is not None:
         body = "&".join(
-            "%s=%s" % (quote(k), quote(v)) for k, v in urlencoded_body.items()
+            "%s=%s" % (quote(str(k)), quote(str(v))) for k, v in urlencoded_body.items()
         )
 
     if isinstance(body, str):
