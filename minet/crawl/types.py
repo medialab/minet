@@ -232,7 +232,7 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
     def error_code(self) -> Optional[str]:
         return serialize_error_as_slug(self.error) if self.error else None
 
-    def as_csv_row(self):
+    def __csv_row__(self):
         job = self.job
 
         return [

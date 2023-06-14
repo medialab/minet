@@ -25,24 +25,6 @@ from minet.cli.utils import (
 
 
 # TODO: rely on casanova resumers?
-def open_report(
-    path: str, headers: List[str], resume: bool = False
-) -> Tuple[TextIO, casanova.Writer]:
-    flag = "w"
-
-    if resume and isfile(path):
-        flag = "a"
-
-    os.makedirs(dirname(path), exist_ok=True)
-
-    f = open(path, flag, encoding="utf-8")
-    writer = casanova.writer(f)
-
-    if flag == "w":
-        writer.writerow(headers)
-
-    return f, writer
-
 
 # class ScraperReporter(object):
 #     def __init__(self, path: str, scraper: Scraper, resume=False):
@@ -176,11 +158,12 @@ def action(cli_args, defer, loading_bar: LoadingBar):
     os.makedirs(cli_args.output_dir, exist_ok=True)
 
     jobs_output_path = join(cli_args.output_dir, "jobs.csv")
-    jobs_output, jobs_writer = open_report(
-        jobs_output_path,
-        CrawlResult.fieldnames(),
-        resume=cli_args.resume,
+    jobs_output = (
+        casanova.BasicResumer(jobs_output_path, encoding="utf-8")
+        if cli_args.resume
+        else open(jobs_output_path, encoding="utf-8")
     )
+    jobs_writer = casanova.Writer(jobs_output, fieldnames=CrawlResult.fieldnames())
     defer(jobs_output.close)
 
     target = import_target(cli_args.target, "spider")
@@ -228,16 +211,16 @@ def action(cli_args, defer, loading_bar: LoadingBar):
             with loading_bar.step():
                 if cli_args.verbose:
                     console.print(result, highlight=True)
-                pass
-                # if result.error is not None:
-                #     loading_bar.inc_stat(result.error_code, style="error")
-                #     jobs_writer.writerow(result.as_csv_row() + [0])
-                #     continue
 
-                # # count = reporter_pool.write(result.job, result.data)
-                # jobs_writer.writerow(result.as_csv_row() + [count])
+                jobs_writer.writerow(result)
+                jobs_output.flush()
+
+                if result.error is not None:
+                    loading_bar.inc_stat(result.error_code, style="error")
+                    continue
+
+                # count = reporter_pool.write(result.job, result.data)
                 # loading_bar.inc_stat("scraped", count=count, style="success")
 
                 # # Flushing to avoid sync issues as well as possible
-                # jobs_output.flush()
                 # reporter_pool.flush()
