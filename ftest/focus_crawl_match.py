@@ -32,7 +32,6 @@ def test(
     on_bare_html=True,
     a_with_bs=False,
 ):
-
     url = resp.end_url
 
     if not resp.is_html:

@@ -2,6 +2,7 @@ from minet.cli.argparse import command
 from minet.constants import DEFAULT_THROTTLE
 from minet.cli.exceptions import InvalidArgumentsError
 
+
 def check_regexs(cli_args):
     if not cli_args.regex_content and not cli_args.regex_url:
         raise InvalidArgumentsError(
@@ -9,11 +10,12 @@ def check_regexs(cli_args):
                 "At least one regex is required, either for URLs or content.",
                 "To do so, use one of the following flags :",
                 "   -r, --regex-content",
-                "   -u, --regex-url"
+                "   -u, --regex-url",
             ]
         )
     if cli_args.max_depth < 0:
         raise InvalidArgumentsError("Max depth needs to be a positive integer.")
+
 
 FOCUS_CRAWL_COMMAND = command(
     "focus-crawl",

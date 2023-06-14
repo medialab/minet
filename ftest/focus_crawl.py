@@ -4,7 +4,6 @@ import warnings
 
 
 def test1():
-
     warnings.filterwarnings("ignore", module="bs4")
 
     url = ""
