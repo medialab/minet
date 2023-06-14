@@ -519,13 +519,6 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
             return count
 
-    # NOTE: this is clearly not threadsafe lol. This is for debug only.
-    def dump_queue(self) -> DumpType[CrawlJob[CrawlJobDataTypes]]:
-        if self.started:
-            raise TypeError("cannot dump queue while crawler is running")
-
-        return self.queue.dump()
-
     def write(
         self,
         filename: str,
