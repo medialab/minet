@@ -1,11 +1,10 @@
 from ebbe.decorators import with_defer
 import os
 import casanova
-from os.path import join, isdir
+from os.path import join
 
 from minet.cli.crawl.crawl import open_report
 from minet.cli.exceptions import FatalError
-from minet.cli.console import console
 from minet.crawl import Crawler, CrawlResult
 from minet.crawl.focus import FocusSpider
 from minet.cli.loading_bar import LoadingBar
@@ -16,13 +15,6 @@ from minet.cli.utils import (
 )
 
 ADDITIONAL_JOBS_HEADERS = ["relevant", "matches"]
-
-STATUS_TO_STYLE = {
-    "acked": "success_background",
-    "ready": "info_background",
-    "unack": "warning_background",
-    "ack_failed": "error_background",
-}
 
 
 @with_defer()
@@ -39,10 +31,6 @@ STATUS_TO_STYLE = {
 )
 @with_ctrl_c_warning
 def action(cli_args, defer, loading_bar: LoadingBar):
-    if cli_args.dump_queue and not isdir(cli_args.output_dir):
-        loading_bar.erase()
-        raise FatalError("Cannot dump crawl not started yet!")
-
     # Getting all URLs
     keep_irrelevant = cli_args.keep_irrelevant
     reader = casanova.reader(cli_args.input)
@@ -85,25 +73,6 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         normalized_url_cache=True,
         resume=cli_args.resume or cli_args.dump_queue,
     )
-
-    if cli_args.dump_queue:
-        loading_bar.erase()
-        dump = crawler.dump_queue()
-        for status, job in dump:
-            console.print(
-                "[{style}]{status}[/{style}] depth=[warning]{depth}[/warning] {url}".format(
-                    style=STATUS_TO_STYLE.get(status, "log.time"),
-                    status=status,
-                    depth=job.depth,
-                    url=job.url,
-                ),
-                no_wrap=True,
-                overflow="ellipsis",
-            )
-
-        console.print("Total:", "[success]{}".format(len(dump)))
-        crawler.stop()
-        return
 
     if crawler.finished:
         loading_bar.erase()

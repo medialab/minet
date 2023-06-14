@@ -1,5 +1,6 @@
 from typing import TypeVar, Union, Generic, Optional
 
+import json
 from nanoid import generate
 from ebbe import format_repr
 from functools import partial
@@ -107,6 +108,10 @@ class CrawlJob(Generic[CrawlJobDataType]):
     __has_cached_domain: bool
     __domain: Optional[str]
 
+    @classmethod
+    def fieldnames(cls):
+        return [slot for slot in cls.__slots__ if not slot.startswith("_")]
+
     def __init__(
         self,
         url: str,
@@ -129,16 +134,24 @@ class CrawlJob(Generic[CrawlJobDataType]):
     def __hash__(self) -> int:
         return hash(self.id)
 
-    def __getstate__(self):
+    def __tabulate(self, serialize_data: bool = False):
         return (
             self.id,
             self.url,
             self.depth,
             self.spider,
-            self.data,
+            self.data
+            if not serialize_data
+            else json.dumps(self.data, ensure_ascii=False),
             self.attempts,
             self.parent,
         )
+
+    def __getstate__(self):
+        return self.__tabulate()
+
+    def __csv_row__(self):
+        return self.__tabulate(serialize_data=True)
 
     def __setstate__(self, state):
         (

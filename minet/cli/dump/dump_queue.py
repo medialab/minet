@@ -2,6 +2,7 @@ import casanova
 from os.path import isdir
 
 from minet.crawl.queue import CrawlerQueue
+from minet.crawl.types import CrawlJob
 
 from minet.cli.exceptions import FatalError
 
@@ -12,7 +13,9 @@ def action(cli_args):
 
     queue = CrawlerQueue(cli_args.queue_dir, resume=True)
 
-    writer = casanova.writer(cli_args.output, fieldnames=["status", "depth", "url"])
+    writer = casanova.writer(
+        cli_args.output, fieldnames=["status"] + CrawlJob.fieldnames()
+    )
 
     for status, job in queue.dump():
-        writer.writerow([status, job.depth, job.url])
+        writer.writerow([status], job)

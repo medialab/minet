@@ -31,11 +31,6 @@ CRAWL_COMMAND = command(
             "action": "store_true",
         },
         {
-            "flag": "--dump-queue",
-            "help": "Print the contents of the persistent queue. (This is for debug only, don't use this flag unless you know what you are doing).",
-            "action": "store_true",
-        },
-        {
             "flag": "--throttle",
             "help": "Time to wait - in seconds - between 2 calls to the same domain.",
             "type": float,

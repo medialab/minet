@@ -8,11 +8,10 @@ from typing import List, TextIO, Tuple
 
 import os
 import casanova
-from os.path import join, isfile, isdir, dirname
+from os.path import join, isfile, dirname
 from ebbe.decorators import with_defer
 
 from minet.cli.exceptions import FatalError
-from minet.cli.console import console
 from minet.scrape import Scraper
 from minet.scrape.exceptions import InvalidScraperError
 from minet.crawl import Crawler, CrawlResult, CrawlJob, DefinitionSpiderOutput
@@ -25,13 +24,6 @@ from minet.cli.utils import (
 )
 
 ADDITIONAL_JOBS_HEADERS = ["scraped"]
-
-STATUS_TO_STYLE = {
-    "acked": "success_background",
-    "ready": "info_background",
-    "unack": "warning_background",
-    "ack_failed": "error_background",
-}
 
 
 def open_report(
@@ -174,10 +166,6 @@ class ScraperReporterPool(object):
 )
 @with_ctrl_c_warning
 def action(cli_args, defer, loading_bar: LoadingBar):
-    if cli_args.dump_queue and not isdir(cli_args.output_dir):
-        loading_bar.erase()
-        raise FatalError("Cannot dump crawl not started yet!")
-
     # Loading crawler definition
     persistent_storage_path = join(cli_args.output_dir, "store")
 
@@ -209,25 +197,6 @@ def action(cli_args, defer, loading_bar: LoadingBar):
                 report_scraper_validation_errors(error.validation_errors),
             ]
         )
-
-    if cli_args.dump_queue:
-        loading_bar.erase()
-        dump = crawler.dump_queue()
-        for status, job in dump:
-            console.print(
-                "[{style}]{status}[/{style}] depth=[warning]{depth}[/warning] {url}".format(
-                    style=STATUS_TO_STYLE.get(status, "log.time"),
-                    status=status,
-                    depth=job.depth,
-                    url=job.url,
-                ),
-                no_wrap=True,
-                overflow="ellipsis",
-            )
-
-        console.print("Total:", "[success]{}".format(len(dump)))
-        crawler.stop()
-        return
 
     if crawler.finished:
         loading_bar.erase()
