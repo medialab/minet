@@ -44,7 +44,7 @@ from minet.crawl.spiders import (
     FunctionSpiderCallable,
     DefinitionSpider,
 )
-from minet.crawl.queue import CrawlerQueue, DumpType
+from minet.crawl.queue import CrawlerQueue
 from minet.crawl.state import CrawlerState
 from minet.crawl.url_cache import URLCache
 from minet.web import request, EXPECTED_WEB_ERRORS, AnyTimeout

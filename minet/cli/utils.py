@@ -351,8 +351,6 @@ def with_enricher_and_loading_bar(
         def wrapper(cli_args, *args, **kwargs):
             enricher_context = nullcontext()
 
-            completed = 0
-
             # Do we need to display a transient resume progress?
             if (
                 hasattr(cli_args, "resume")
@@ -372,11 +370,8 @@ def with_enricher_and_loading_bar(
                 enricher_context = resume_loading_bar
 
                 def listener(event, _):
-                    nonlocal completed
-
                     if event == "output.row.read":
                         resume_loading_bar.advance()
-                        completed += 1
 
                 cli_args.output.set_listener(listener)
 
@@ -413,6 +408,14 @@ def with_enricher_and_loading_bar(
                     multiplex=multiplex,
                     **enricher_kwargs
                 )
+
+            completed = 0
+
+            if isinstance(cli_args.output, casanova.Resumer):
+                try:
+                    completed = cli_args.output.already_done_count()
+                except NotImplementedError:
+                    pass
 
             with LoadingBar(
                 title=title(cli_args) if callable(title) else title,
