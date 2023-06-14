@@ -52,7 +52,7 @@ from tenacity import (
 )
 from tenacity.wait import wait_base
 
-from minet.shim import suppress_xml_parsed_as_html_warnings
+from minet.soup import suppress_xml_parsed_as_html_warnings
 from minet.encodings import normalize_encoding, infer_encoding
 from minet.loggers import sleepers_logger
 from minet.utils import is_binary_mimetype
