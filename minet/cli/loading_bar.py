@@ -201,7 +201,7 @@ class LoadingBar(object):
         sub_title_style: str = "info",
         sub_unit: Optional[str] = None,
         transient: bool = False,
-        refresh_per_second: int = 10,
+        refresh_per_second: float = 10,
     ):
         self.sub_total_sum = 0
         self.nested = nested
@@ -321,6 +321,7 @@ class LoadingBar(object):
 
     def start(self) -> None:
         self.live.start()
+        self.live.refresh()
 
     def stop(self, erase=False) -> None:
         if self.already_stopped:

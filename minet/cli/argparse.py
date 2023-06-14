@@ -48,6 +48,7 @@ FLAG_SORTING_PRIORITIES = {
             "output",
             "resume",
             "rcfile",
+            "refresh-per-second",
             "silent",
             "help",
         ],
@@ -186,6 +187,18 @@ def add_arguments(subparser, arguments):
                 "--silent",
                 help="Whether to suppress all the log and progress bars. Can be useful when piping.",
                 action="store_true",
+            )
+        except ArgumentError:
+            pass
+
+        try:
+            # NOTE: we might want to add those common flags to the list of arguments themselves, after deduplication
+            # rather than relying on those ugly try/catch and forfeiting the help text wrangling wrt default values.
+            subparser.add_argument(
+                "--refresh-per-second",
+                help="Number of times to refresh the progress bar per second. Can be a float e.g. `0.5` meaning once every two seconds. Use this to limit CPU usage when launching multiple commands at once. Defaults to `10`.",
+                default=10,
+                type=float,
             )
         except ArgumentError:
             pass
