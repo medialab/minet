@@ -37,6 +37,16 @@ CRAWL_COMMAND = command(
             "type": int,
         },
         {
+            "flags": ["-u", "--visit-urls-only-once"],
+            "help": "Whether to ensure that any url will only be visited once.",
+            "action": "store_true",
+        },
+        {
+            "flags": ["-n", "--normalized-url-cache"],
+            "help": "Whether to normalize url cache when using -u/--visit-urls-only-once.",
+            "action": "store_true",
+        },
+        {
             "flag": "--throttle",
             "help": "Time to wait - in seconds - between 2 calls to the same domain.",
             "type": float,

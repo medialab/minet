@@ -177,6 +177,8 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         throttle=cli_args.throttle,
         max_depth=cli_args.max_depth,
         persistent_storage_path=persistent_storage_path,
+        visit_urls_only_once=cli_args.visit_urls_only_once,
+        normalized_url_cache=cli_args.normalized_url_cache,
         resume=cli_args.resume,
         wait=False,
         daemonic=False,
