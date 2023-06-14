@@ -121,6 +121,12 @@ def make_twitter_action(method_name, csv_headers):
                         try:
                             result = client.call([method_name, "ids"], **client_kwargs)
                         except TwitterHTTPError as e:
+                            if e.e.code != 404:
+                                raise FatalError(
+                                    "Received an unusual %i error. Your key is probably dead, sorry :'("
+                                    % e.e.code
+                                )
+
                             # The user does not exist
                             loading_bar.inc_stat("not-found", style="error")
                             break
@@ -153,6 +159,12 @@ def make_twitter_action(method_name, csv_headers):
                                 route=["users", user, method_name_v2], **client_kwargs
                             )
                         except TwitterHTTPError as e:
+                            if e.e.code != 404:
+                                raise FatalError(
+                                    "Received an unusual %i error. Your key is probably dead, or not activated for v2 sorry :'("
+                                    % e.e.code
+                                )
+
                             # The user does not exist
                             loading_bar.inc_stat("not-found", style="error")
                             break
