@@ -195,7 +195,7 @@ class TestScrape(object):
             BASIC_HTML,
         )
 
-        result == ["li1-test", "li2-test"]
+        assert result == ["li1-test", "li2-test"]
 
         result = scrape(
             {"iterator": "li", "fields": {"id": "id", "text": "text"}}, BASIC_HTML
