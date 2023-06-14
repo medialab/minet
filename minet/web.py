@@ -39,7 +39,7 @@ from itertools import chain
 from urllib.parse import urljoin, quote
 from urllib3 import HTTPResponse
 from urllib3.util.ssl_ import create_urllib3_context
-from ebbe import rcompose, noop, format_filesize
+from ebbe import rcompose, noop, format_filesize, format_repr
 from collections import defaultdict
 from tenacity import (
     Retrying,
@@ -772,8 +772,6 @@ class Response(object):
 
     Note that it will lazily compute required items when asked for certain
     properties.
-
-    It also works as a kind of dict that can bring around meta information.
     """
 
     __slots__ = (
@@ -782,7 +780,6 @@ class Response(object):
         "__body",
         "__text",
         "__url",
-        "__meta",
         "__datetime_utc",
         "__is_text",
         "__encoding",
@@ -798,7 +795,6 @@ class Response(object):
     __body: bytes
     __text: Optional[str]
     __url: str
-    __meta: Dict[str, Any]
     __datetime_utc: datetime
     __is_text: Optional[bool]
     __encoding: Optional[str]
@@ -822,7 +818,6 @@ class Response(object):
         self.__response = response
         self.__body = body
         self.__text = None
-        self.__meta = {}
         self.__datetime_utc = datetime.utcnow()
         self.__is_text = None
         self.__encoding = known_encoding
@@ -953,6 +948,10 @@ class Response(object):
         return self.__is_text  # type: ignore # At that point we know it's a bool
 
     @property
+    def is_binary(self) -> bool:
+        return not self.is_text
+
+    @property
     def could_be_html(self) -> bool:
         mime = self.mimetype
         return mime is not None and "/htm" in mime
@@ -1008,20 +1007,18 @@ class Response(object):
         with suppress_xml_parsed_as_html_warnings(bypass=not ignore_xhtml_warning):
             return BeautifulSoup(self.text(), engine, parse_only=strainer)
 
-    def __getitem__(self, name: str) -> Any:
-        return self.__meta[name]
+    def __repr__(self) -> str:
+        attr: List[Union[str, Tuple[str, Union[str, bool]]]] = ["status", "url"]
 
-    def __setitem__(self, name: str, value: Any) -> None:
-        self.__meta[name] = value
+        if self.url != self.end_url:
+            attr.append(("resolved", self.end_url))
 
-    def __contains__(self, name: str) -> bool:
-        return name in self.__meta
+        attr.extend([("size", self.human_size), "mimetype"])
 
-    def get(self, name: str, default=None) -> Optional[Any]:
-        return self.__meta.get(name, default)
+        if self.is_text:
+            attr.append("encoding")
 
-    def set(self, name: str, value: Any) -> None:
-        self.__meta[name] = value
+        return format_repr(self, attr)
 
 
 def request(

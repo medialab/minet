@@ -5,7 +5,6 @@
 # Crawler class invoking multiple spiders to scrape data from the web.
 #
 from typing import (
-    cast,
     Optional,
     TypeVar,
     Callable,
@@ -26,8 +25,6 @@ from urllib.parse import urljoin
 from ural import ensure_protocol, is_url
 from multiprocessing import Pool
 
-from minet.types import AnyFileTarget
-from minet.fs import load_definition
 from minet.crawl.types import (
     CrawlJob,
     CrawlTarget,
@@ -42,7 +39,6 @@ from minet.crawl.spiders import (
     Spider,
     FunctionSpider,
     FunctionSpiderCallable,
-    DefinitionSpider,
 )
 from minet.crawl.queue import CrawlerQueue
 from minet.crawl.state import CrawlerState
@@ -106,6 +102,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
         self.cancel_event = self.crawler.executor.cancel_event
         self.local_context = self.crawler.executor.local_context
         self.request_args = request_args
+        self.max_depth = crawler.max_depth
 
         self.default_kwargs = {
             "pool_manager": crawler.executor.pool_manager,
@@ -163,31 +160,29 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
             if cancel_event.is_set():
                 return CANCELLED
 
-            try:
-                spider_result = spider(job, response)
+            spider_result = spider(job, response)
 
-                if spider_result is not None:
-                    data, next_jobs = spider_result
-                else:
-                    data = None
-                    next_jobs = None
+            if spider_result is not None:
+                data, next_jobs = spider_result
+            else:
+                data = None
+                next_jobs = None
 
-                if cancel_event.is_set():
-                    return CANCELLED
+            if cancel_event.is_set():
+                return CANCELLED
 
-                degree = 0
+            degree = 0
 
-                if next_jobs is not None:
-                    degree = self.crawler.enqueue(
-                        next_jobs,
-                        spider=job.spider,
-                        depth=job.depth + 1,
-                        base_url=response.end_url,
-                        parent=job,
-                    )
-
-            except Exception as error:
-                return ErroredCrawlResult(job, error, response=response)
+            if next_jobs is not None and (
+                self.max_depth is not None and job.depth < self.max_depth
+            ):
+                degree = self.crawler.enqueue(
+                    next_jobs,
+                    spider=job.spider,
+                    depth=job.depth + 1,
+                    base_url=response.end_url,
+                    parent=job,
+                )
 
             return SuccessfulCrawlResult(job, response, data, degree)
 
@@ -226,6 +221,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         persistent_storage_path: Optional[str] = None,
         visit_urls_only_once: bool = False,
         normalized_url_cache: bool = False,
+        max_depth: Optional[int] = None,
         resume: bool = False,
         dfs: bool = False,
         writer_root_directory: Optional[str] = None,
@@ -289,6 +285,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         self.persistent = persistent_storage_path is not None
         self.queue_path = None
         self.url_cache_path = None
+        self.max_depth = max_depth
 
         if self.persistent_storage_path is not None:
             makedirs(self.persistent_storage_path, exist_ok=True)
@@ -473,12 +470,17 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             for target in targets:
                 if isinstance(target, str):
                     job = CrawlJob(url=target)
-                else:
+                elif isinstance(target, CrawlTarget):
                     job = CrawlJob(
                         url=target.url,
                         depth=target.depth,
                         spider=target.spider,
                         data=target.data,
+                    )
+                else:
+                    raise TypeError(
+                        "attempted to enqueue a target with an invalid type %s, while expecting str or CrawlTarget"
+                        % target.__class__.__name__
                     )
 
                 job.url = ensure_protocol(job.url.strip(), "https")
@@ -536,31 +538,3 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             return fn(*args, **kwargs)
 
         return self.process_pool.apply(fn, args, kwargs)
-
-    @classmethod
-    def from_callable(
-        cls,
-        fn: FunctionSpiderCallable,
-        start: Optional[Iterable[UrlOrCrawlTarget]] = None,
-        **kwargs,
-    ):
-        return cls(FunctionSpider(fn, start=start), **kwargs)
-
-    @classmethod
-    def from_definition(
-        cls, definition: Union[Dict[str, Any], AnyFileTarget], **kwargs
-    ):
-        if not isinstance(definition, dict):
-            definition = load_definition(definition)
-
-        definition = cast(Dict[str, Any], definition)
-
-        # Do we have a single spider or multiple spiders?
-        if "spiders" in definition:
-            spiders = {
-                name: DefinitionSpider(s) for name, s in definition["spiders"].items()
-            }
-        else:
-            spiders = DefinitionSpider(definition)
-
-        return cls(spiders, **kwargs)

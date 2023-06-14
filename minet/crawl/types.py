@@ -1,4 +1,4 @@
-from typing import TypeVar, Union, Generic, Optional
+from typing import TypeVar, Union, Generic, Optional, List
 
 import json
 from nanoid import generate
@@ -204,6 +204,10 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
     error: Optional[Exception]
     response: Optional[Response]
     degree: int
+
+    @classmethod
+    def fieldnames(cls) -> List[str]:
+        return cls.FIELDNAMES
 
     def __init__(self, job: CrawlJob[CrawlJobDataType]):
         self.job = job

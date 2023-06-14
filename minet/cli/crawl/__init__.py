@@ -8,33 +8,44 @@ CRAWL_COMMAND = command(
     "minet.cli.crawl.crawl",
     title="Minet Crawl Command",
     description="""
-        Use multiple threads to crawl the web using minet crawling and
-        scraping DSL.
+        Run a crawl using a minet crawler or spiders defined
+        in a python module.
     """,
     epilog="""
         Examples:
 
-        . Running a crawler definition:
-            $ minet crawl crawler.yml -O crawl-data
+        . Crawling using the `process` function in the `crawl` module:
+            $ minet crawl crawl:process -O crawl-data
     """,
     no_output=True,
     arguments=[
-        {"name": "crawler", "help": "Path to the crawler definition file."},
+        {"name": "target", "help": "Crawling target."},
         {
             "flags": ["-O", "--output-dir"],
             "help": "Output directory.",
             "default": "crawl",
         },
+        {"flags": ["-s", "--start-url"], "help": "Starting url."},
         {
             "flag": "--resume",
             "help": "Whether to resume an interrupted crawl.",
             "action": "store_true",
         },
         {
+            "flags": ["-m", "--max-depth"],
+            "help": "Maximum depth for the crawl.",
+            "type": int,
+        },
+        {
             "flag": "--throttle",
             "help": "Time to wait - in seconds - between 2 calls to the same domain.",
             "type": float,
             "default": DEFAULT_THROTTLE,
+        },
+        {
+            "flags": ["-v", "--verbose"],
+            "help": "Whether to print information about crawl results.",
+            "action": "store_true",
         },
     ],
 )
