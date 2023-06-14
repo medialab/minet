@@ -166,7 +166,8 @@ Finally note that command line arguments and flags will take precedence over env
 ## cookies
 
 ```
-Usage: minet cookies [-h] [--silent] [--csv] [--url URL] [-o OUTPUT]
+Usage: minet cookies [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
+                     [--csv] [--url URL] [-o OUTPUT]
                      {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}
 
 # Minet Cookies Command
@@ -186,6 +187,12 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -208,8 +215,8 @@ Examples:
 ## crawl
 
 ```
-Usage: minet crawl [-h] [--silent] [-O OUTPUT_DIR] [--resume] [--dump-queue]
-                   [--throttle THROTTLE]
+Usage: minet crawl [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
+                   [-O OUTPUT_DIR] [--resume] [--throttle THROTTLE]
                    crawler
 
 # Minet Crawl Command
@@ -221,13 +228,16 @@ Positional Arguments:
   crawler                       Path to the crawler definition file.
 
 Optional Arguments:
-  --dump-queue                  Print the contents of the persistent queue.
-                                (This is for debug only, don't use this flag
-                                unless you know what you are doing).
   -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to `0.2`.
   --resume                      Whether to resume an interrupted crawl.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -241,12 +251,13 @@ Examples:
 ## focus-crawl
 
 ```
-Usage: minet focus-crawl [-h] [-r REGEX_CONTENT] [--silent] [-u REGEX_URL]
-                         [--extract] [-m MAX_DEPTH] [--irrelevant-continue]
-                         [--only-html] [--keep-irrelevant] [-O OUTPUT_DIR]
-                         [--resume] [--dump-queue] [--throttle THROTTLE]
-                         [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                         [--total TOTAL]
+Usage: minet focus-crawl [-h] [-r REGEX_CONTENT] [--silent]
+                         [--refresh-per-second REFRESH_PER_SECOND]
+                         [-u REGEX_URL] [--extract] [-m MAX_DEPTH]
+                         [--irrelevant-continue] [--only-html]
+                         [--keep-irrelevant] [-O OUTPUT_DIR] [--resume]
+                         [--throttle THROTTLE] [-i INPUT] [--explode EXPLODE]
+                         [-s SELECT] [--total TOTAL]
                          url_or_url_column
 
 # Minet Focus Crawl Command
@@ -264,9 +275,6 @@ Positional Arguments:
                                 containing urls when using -i/--input.
 
 Optional Arguments:
-  --dump-queue                  Print the contents of the persistent queue.
-                                (This is for debug only, don't use this flag
-                                unless you know what you are doing).
   --extract                     Perform regex match on extracted text content
                                 instead of html content using the Trafilatura
                                 library.
@@ -300,6 +308,12 @@ Optional Arguments:
                                 the urls you want to process. Will consider `-`
                                 as stdin.
   --resume                      Whether to resume an interrupted crawl.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -341,6 +355,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
+                   [--refresh-per-second REFRESH_PER_SECOND]
                    [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
                    [-H HEADERS] [--insecure] [-t THREADS] [--throttle THROTTLE]
                    [--timeout TIMEOUT] [--url-template URL_TEMPLATE] [-X METHOD]
@@ -442,6 +457,12 @@ Optional Arguments:
                                 printed to stdout.
   --resume                      "Whether to resume from an aborted collection.
                                 Need -o to be set.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -525,9 +546,10 @@ how to use the command with a CSV file?
 ## extract
 
 ```
-Usage: minet extract [-h] [-g] [--silent] [-I INPUT_DIR] [-p PROCESSES]
-                     [--chunk-size CHUNK_SIZE] [--body-column BODY_COLUMN]
-                     [--error-column ERROR_COLUMN]
+Usage: minet extract [-h] [-g] [--silent]
+                     [--refresh-per-second REFRESH_PER_SECOND] [-I INPUT_DIR]
+                     [-p PROCESSES] [--chunk-size CHUNK_SIZE]
+                     [--body-column BODY_COLUMN] [--error-column ERROR_COLUMN]
                      [--status-column STATUS_COLUMN]
                      [--encoding-column ENCODING_COLUMN]
                      [--mimetype-column MIMETYPE_COLUMN] [--encoding ENCODING]
@@ -608,6 +630,12 @@ Optional Arguments:
                                 printed to stdout.
   --resume                      "Whether to resume from an aborted collection.
                                 Need -o to be set.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -666,6 +694,7 @@ Examples:
 
 ```
 Usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
+                     [--refresh-per-second REFRESH_PER_SECOND]
                      [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
                      [-H HEADERS] [--insecure] [-t THREADS]
                      [--throttle THROTTLE] [--timeout TIMEOUT]
@@ -745,6 +774,12 @@ Optional Arguments:
                                 printed to stdout.
   --resume                      "Whether to resume from an aborted collection.
                                 Need -o to be set.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -803,9 +838,10 @@ how to use the command with a CSV file?
 For more documentation about minet's scraping DSL check this [page](../cookbook/scraping_dsl.md) from the Cookbook.
 
 ```
-Usage: minet scrape [-h] [--silent] [-g] [-I INPUT_DIR] [-p PROCESSES]
-                    [--chunk-size CHUNK_SIZE] [--body-column BODY_COLUMN]
-                    [--url-column URL_COLUMN] [--error-column ERROR_COLUMN]
+Usage: minet scrape [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
+                    [-g] [-I INPUT_DIR] [-p PROCESSES] [--chunk-size CHUNK_SIZE]
+                    [--body-column BODY_COLUMN] [--url-column URL_COLUMN]
+                    [--error-column ERROR_COLUMN]
                     [--status-column STATUS_COLUMN]
                     [--encoding-column ENCODING_COLUMN]
                     [--mimetype-column MIMETYPE_COLUMN] [--encoding ENCODING]
@@ -893,6 +929,12 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -946,9 +988,10 @@ Examples:
 ## url-extract
 
 ```
-Usage: minet url-extract [-h] [--silent] [--base-url BASE_URL]
-                         [--from {html,text}] [-s SELECT] [--total TOTAL]
-                         [-o OUTPUT]
+Usage: minet url-extract [-h] [--silent]
+                         [--refresh-per-second REFRESH_PER_SECOND]
+                         [--base-url BASE_URL] [--from {html,text}] [-s SELECT]
+                         [--total TOTAL] [-o OUTPUT]
                          column input
 
 # Minet Url Extract Command
@@ -957,26 +1000,32 @@ Extract urls from a CSV column containing either raw text or raw
 HTML.
 
 Positional Arguments:
-  column                      Name of the column containing text or html.
-  input                       Target CSV file.
+  column                        Name of the column containing text or html.
+  input                         Target CSV file.
 
 Optional Arguments:
-  --base-url BASE_URL         Base url used to resolve relative urls.
-  --from {html,text}          Extract urls from which kind of source? Defaults
-                              to `text`.
-  -s, --select SELECT         Columns of -i/--input CSV file to include in the
-                              output (separated by `,`). Use an empty string if
-                              you don't want to keep anything: --select ''.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  --base-url BASE_URL           Base url used to resolve relative urls.
+  --from {html,text}            Extract urls from which kind of source? Defaults
+                                to `text`.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 Examples:
 
@@ -990,8 +1039,9 @@ Examples:
 ## url-join
 
 ```
-Usage: minet url-join [-h] [--silent] [-p MATCH_COLUMN_PREFIX]
-                      [--separator SEPARATOR] [-s SELECT] [-o OUTPUT]
+Usage: minet url-join [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
+                      [-p MATCH_COLUMN_PREFIX] [--separator SEPARATOR]
+                      [-s SELECT] [-o OUTPUT]
                       column1 input1 column2 input2
 
 # Minet Url Join Command
@@ -1021,6 +1071,12 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1043,8 +1099,9 @@ Examples:
 ## url-parse
 
 ```
-Usage: minet url-parse [-h] [--facebook] [--silent] [--twitter] [--youtube]
-                       [--infer-redirection] [--fix-common-mistakes]
+Usage: minet url-parse [-h] [--facebook] [--silent]
+                       [--refresh-per-second REFRESH_PER_SECOND] [--twitter]
+                       [--youtube] [--infer-redirection] [--fix-common-mistakes]
                        [--normalize-amp] [--quoted] [--sort-query]
                        [--strip-authentication] [--strip-fragment]
                        [--strip-index] [--strip-irrelevant-subdomains]
@@ -1140,6 +1197,12 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1234,6 +1297,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet buzzsumo [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
+                      [--refresh-per-second REFRESH_PER_SECOND]
                       {limit,domain,domain-summary} ...
 
 # Minet Buzzsumo Command
@@ -1248,6 +1312,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1261,6 +1331,7 @@ Subcommands:
 
 ```
 Usage: minet buzzsumo limit [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
+                            [--refresh-per-second REFRESH_PER_SECOND]
                             [-o OUTPUT]
 
 # Minet Buzzsumo Limit Command
@@ -1269,19 +1340,25 @@ Call BuzzSumo for a given request and return the remaining number
 of calls for this month contained in the request's headers.
 
 Optional Arguments:
-  -t, --token TOKEN           BuzzSumo API token. Can also be configured in a
-                              .minetrc file as "buzzsumo.token" or read from the
-                              MINET_BUZZSUMO_TOKEN env variable.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here:
-                              https://github.com/medialab/minet/blob/master/docs
-                              /cli.md#minetrc
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  -t, --token TOKEN             BuzzSumo API token. Can also be configured in a
+                                .minetrc file as "buzzsumo.token" or read from
+                                the MINET_BUZZSUMO_TOKEN env variable.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 Examples:
 
@@ -1293,9 +1370,10 @@ Examples:
 
 ```
 Usage: minet buzzsumo domain-summary [-h] [-t TOKEN] [--rcfile RCFILE]
-                                     [--silent] --begin-date BEGIN_DATE
-                                     --end-date END_DATE [-i INPUT]
-                                     [--explode EXPLODE] [-s SELECT]
+                                     [--silent]
+                                     [--refresh-per-second REFRESH_PER_SECOND]
+                                     --begin-date BEGIN_DATE --end-date END_DATE
+                                     [-i INPUT] [--explode EXPLODE] [-s SELECT]
                                      [--total TOTAL] [-o OUTPUT]
                                      domain_name_or_domain_name_column
 
@@ -1341,6 +1419,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1385,6 +1469,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet buzzsumo domain [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
+                             [--refresh-per-second REFRESH_PER_SECOND]
                              --begin-date BEGIN_DATE --end-date END_DATE
                              [-i INPUT] [--explode EXPLODE] [-s SELECT]
                              [--total TOTAL] [-o OUTPUT]
@@ -1432,6 +1517,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1476,7 +1567,8 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet crowdtangle [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
-                         [--silent] [-t TOKEN]
+                         [--silent] [--refresh-per-second REFRESH_PER_SECOND]
+                         [-t TOKEN]
                          {leaderboard,lists,posts-by-id,posts,search,summary}
                          ...
 
@@ -1497,6 +1589,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1510,9 +1608,10 @@ Subcommands:
 
 ```
 Usage: minet crowdtangle leaderboard [-h] [--rate-limit RATE_LIMIT]
-                                     [--rcfile RCFILE] [--silent] [-t TOKEN]
-                                     [--breakdown] [-f {csv,jsonl}] [-l LIMIT]
-                                     [--list-id LIST_ID]
+                                     [--rcfile RCFILE] [--silent]
+                                     [--refresh-per-second REFRESH_PER_SECOND]
+                                     [-t TOKEN] [--breakdown] [-f {csv,jsonl}]
+                                     [-l LIMIT] [--list-id LIST_ID]
                                      [--start-date START_DATE] [-o OUTPUT]
 
 # Minet CrowdTangle Leaderboard Command
@@ -1547,6 +1646,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1561,7 +1666,9 @@ Examples:
 
 ```
 Usage: minet crowdtangle lists [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
-                               [--silent] [-t TOKEN] [-o OUTPUT]
+                               [--silent]
+                               [--refresh-per-second REFRESH_PER_SECOND]
+                               [-t TOKEN] [-o OUTPUT]
 
 # Minet CrowdTangle Lists Command
 
@@ -1570,24 +1677,30 @@ Retrieve the lists from a CrowdTangle dashboard (indicated by a given token).
 For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Lists.
 
 Optional Arguments:
-  --rate-limit RATE_LIMIT     Authorized number of hits by minutes. Defaults to
-                              `6`. Can also be configured in a .minetrc file as
-                              "crowdtangle.rate_limit" or read from the
-                              MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  -t, --token TOKEN           CrowdTangle dashboard API token. Rcfile key:
-                              crowdtangle.token. Can also be configured in a
-                              .minetrc file as "crowdtangle.token" or read from
-                              the MINET_CROWDTANGLE_TOKEN env variable.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here:
-                              https://github.com/medialab/minet/blob/master/docs
-                              /cli.md#minetrc
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  --rate-limit RATE_LIMIT       Authorized number of hits by minutes. Defaults
+                                to `6`. Can also be configured in a .minetrc
+                                file as "crowdtangle.rate_limit" or read from
+                                the MINET_CROWDTANGLE_RATE_LIMIT env variable.
+  -t, --token TOKEN             CrowdTangle dashboard API token. Rcfile key:
+                                crowdtangle.token. Can also be configured in a
+                                .minetrc file as "crowdtangle.token" or read
+                                from the MINET_CROWDTANGLE_TOKEN env variable.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 Examples:
 
@@ -1599,9 +1712,11 @@ Examples:
 
 ```
 Usage: minet crowdtangle posts-by-id [-h] [--rate-limit RATE_LIMIT]
-                                     [--rcfile RCFILE] [--silent] [-t TOKEN]
-                                     [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                                     [--total TOTAL] [--resume] [-o OUTPUT]
+                                     [--rcfile RCFILE] [--silent]
+                                     [--refresh-per-second REFRESH_PER_SECOND]
+                                     [-t TOKEN] [-i INPUT] [--explode EXPLODE]
+                                     [-s SELECT] [--total TOTAL] [--resume]
+                                     [-o OUTPUT]
                                      post_url_or_id_or_post_url_or_id_column
 
 # Minet CrowdTangle Post By Id Command
@@ -1648,6 +1763,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1692,7 +1813,9 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
-                               [--silent] [-t TOKEN] [--chunk-size CHUNK_SIZE]
+                               [--silent]
+                               [--refresh-per-second REFRESH_PER_SECOND]
+                               [-t TOKEN] [--chunk-size CHUNK_SIZE]
                                [--end-date END_DATE] [-f {csv,jsonl}]
                                [--language LANGUAGE] [-l LIMIT]
                                [--list-ids LIST_IDS]
@@ -1742,6 +1865,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1765,9 +1894,11 @@ To know the different list ids associated with your dashboard:
 
 ```
 Usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
-                                [--silent] [-t TOKEN] [--and AND]
-                                [--chunk-size CHUNK_SIZE] [--end-date END_DATE]
-                                [-f {csv,jsonl}] [--in-list-ids IN_LIST_IDS]
+                                [--silent]
+                                [--refresh-per-second REFRESH_PER_SECOND]
+                                [-t TOKEN] [--and AND] [--chunk-size CHUNK_SIZE]
+                                [--end-date END_DATE] [-f {csv,jsonl}]
+                                [--in-list-ids IN_LIST_IDS]
                                 [--language LANGUAGE] [-l LIMIT]
                                 [--not-in-title] [--offset OFFSET]
                                 [-p PLATFORMS]
@@ -1831,6 +1962,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1845,8 +1982,9 @@ Examples:
 
 ```
 Usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT]
-                                 [--rcfile RCFILE] [--silent] [-t TOKEN]
-                                 [-p PLATFORMS] [--posts POSTS]
+                                 [--rcfile RCFILE] [--silent]
+                                 [--refresh-per-second REFRESH_PER_SECOND]
+                                 [-t TOKEN] [-p PLATFORMS] [--posts POSTS]
                                  [--sort-by {date,subscriber_count,total_interactions}]
                                  --start-date START_DATE [-i INPUT]
                                  [--explode EXPLODE] [-s SELECT] [--total TOTAL]
@@ -1902,6 +2040,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1962,6 +2106,7 @@ Subcommands:
 
 ```
 Usage: minet facebook comments [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                               [--refresh-per-second REFRESH_PER_SECOND]
                                [--throttle THROTTLE] [-i INPUT]
                                [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                                [-o OUTPUT]
@@ -1980,43 +2125,49 @@ to directly pass the cookie as a string, check out the
 -c/--cookie flag.
 
 Positional Arguments:
-  post_url_or_post_url_column  Single post url to process or name of the CSV
-                               column containing post urls when using
-                               -i/--input.
+  post_url_or_post_url_column   Single post url to process or name of the CSV
+                                column containing post urls when using
+                                -i/--input.
 
 Optional Arguments:
-  -c, --cookie COOKIE          Authenticated cookie to use or browser from which
-                               to extract it (supports "firefox", "chrome",
-                               "chromium", "opera" and "edge"). Defaults to
-                               `firefox`. Can also be configured in a .minetrc
-                               file as "facebook.cookie" or read from the
-                               MINET_FACEBOOK_COOKIE env variable.
-  --throttle THROTTLE          Throttling time, in seconds, to wait between each
-                               request. Defaults to `2.0`.
-  -s, --select SELECT          Columns of -i/--input CSV file to include in the
-                               output (separated by `,`). Use an empty string if
-                               you don't want to keep anything: --select ''.
-  --explode EXPLODE            Use to indicate the character used to separate
-                               multiple values in a single CSV cell. Defaults to
-                               none, i.e. CSV cells having a single values,
-                               which is usually the case.
-  --total TOTAL                Total number of items to process. Might be
-                               necessary when you want to display a finite
-                               progress indicator for large files given as input
-                               to the command.
-  -i, --input INPUT            CSV file (potentially gzipped) containing all the
-                               post urls you want to process. Will consider `-`
-                               as stdin.
-  -o, --output OUTPUT          Path to the output file. Will consider `-` as
-                               stdout. If not given, results will also be
-                               printed to stdout.
-  --rcfile RCFILE              Custom path to a minet configuration file. More
-                               info about this here:
-                               https://github.com/medialab/minet/blob/master/doc
-                               s/cli.md#minetrc
-  --silent                     Whether to suppress all the log and progress
-                               bars. Can be useful when piping.
-  -h, --help                   show this help message and exit
+  -c, --cookie COOKIE           Authenticated cookie to use or browser from
+                                which to extract it (supports "firefox",
+                                "chrome", "chromium", "opera" and "edge").
+                                Defaults to `firefox`. Can also be configured in
+                                a .minetrc file as "facebook.cookie" or read
+                                from the MINET_FACEBOOK_COOKIE env variable.
+  --throttle THROTTLE           Throttling time, in seconds, to wait between
+                                each request. Defaults to `2.0`.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the post urls you want to process. Will consider
+                                `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 Examples:
 
@@ -2061,6 +2212,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet facebook post [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                           [--refresh-per-second REFRESH_PER_SECOND]
                            [--throttle THROTTLE] [-i INPUT] [--explode EXPLODE]
                            [-s SELECT] [--total TOTAL] [-o OUTPUT]
                            post_url_or_post_url_column
@@ -2099,43 +2251,49 @@ when displayed in lists. This text is not yet entirely
 scraped by minet at this time.
 
 Positional Arguments:
-  post_url_or_post_url_column  Single post url to process or name of the CSV
-                               column containing post urls when using
-                               -i/--input.
+  post_url_or_post_url_column   Single post url to process or name of the CSV
+                                column containing post urls when using
+                                -i/--input.
 
 Optional Arguments:
-  -c, --cookie COOKIE          Authenticated cookie to use or browser from which
-                               to extract it (supports "firefox", "chrome",
-                               "chromium", "opera" and "edge"). Defaults to
-                               `firefox`. Can also be configured in a .minetrc
-                               file as "facebook.cookie" or read from the
-                               MINET_FACEBOOK_COOKIE env variable.
-  --throttle THROTTLE          Throttling time, in seconds, to wait between each
-                               request. Defaults to `2.0`.
-  -s, --select SELECT          Columns of -i/--input CSV file to include in the
-                               output (separated by `,`). Use an empty string if
-                               you don't want to keep anything: --select ''.
-  --explode EXPLODE            Use to indicate the character used to separate
-                               multiple values in a single CSV cell. Defaults to
-                               none, i.e. CSV cells having a single values,
-                               which is usually the case.
-  --total TOTAL                Total number of items to process. Might be
-                               necessary when you want to display a finite
-                               progress indicator for large files given as input
-                               to the command.
-  -i, --input INPUT            CSV file (potentially gzipped) containing all the
-                               post urls you want to process. Will consider `-`
-                               as stdin.
-  -o, --output OUTPUT          Path to the output file. Will consider `-` as
-                               stdout. If not given, results will also be
-                               printed to stdout.
-  --rcfile RCFILE              Custom path to a minet configuration file. More
-                               info about this here:
-                               https://github.com/medialab/minet/blob/master/doc
-                               s/cli.md#minetrc
-  --silent                     Whether to suppress all the log and progress
-                               bars. Can be useful when piping.
-  -h, --help                   show this help message and exit
+  -c, --cookie COOKIE           Authenticated cookie to use or browser from
+                                which to extract it (supports "firefox",
+                                "chrome", "chromium", "opera" and "edge").
+                                Defaults to `firefox`. Can also be configured in
+                                a .minetrc file as "facebook.cookie" or read
+                                from the MINET_FACEBOOK_COOKIE env variable.
+  --throttle THROTTLE           Throttling time, in seconds, to wait between
+                                each request. Defaults to `2.0`.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the post urls you want to process. Will consider
+                                `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 Examples:
 
@@ -2180,6 +2338,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet facebook posts [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                            [--refresh-per-second REFRESH_PER_SECOND]
                             [--throttle THROTTLE] [-i INPUT] [--explode EXPLODE]
                             [-s SELECT] [--total TOTAL] [-o OUTPUT]
                             group_url_or_group_url_column
@@ -2252,6 +2411,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -2299,6 +2464,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet facebook post-authors [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                                   [--refresh-per-second REFRESH_PER_SECOND]
                                    [--throttle THROTTLE] [-i INPUT]
                                    [--explode EXPLODE] [-s SELECT]
                                    [--total TOTAL] [-o OUTPUT]
@@ -2312,42 +2478,48 @@ Note that it is only relevant for group posts since
 only administrators can post something on pages.
 
 Positional Arguments:
-  post_url_or_post_url_column  Single post to process or name of the CSV column
-                               containing posts when using -i/--input.
+  post_url_or_post_url_column   Single post to process or name of the CSV column
+                                containing posts when using -i/--input.
 
 Optional Arguments:
-  -c, --cookie COOKIE          Authenticated cookie to use or browser from which
-                               to extract it (supports "firefox", "chrome",
-                               "chromium", "opera" and "edge"). Defaults to
-                               `firefox`. Can also be configured in a .minetrc
-                               file as "facebook.cookie" or read from the
-                               MINET_FACEBOOK_COOKIE env variable.
-  --throttle THROTTLE          Throttling time, in seconds, to wait between each
-                               request. Defaults to `2.0`.
-  -s, --select SELECT          Columns of -i/--input CSV file to include in the
-                               output (separated by `,`). Use an empty string if
-                               you don't want to keep anything: --select ''.
-  --explode EXPLODE            Use to indicate the character used to separate
-                               multiple values in a single CSV cell. Defaults to
-                               none, i.e. CSV cells having a single values,
-                               which is usually the case.
-  --total TOTAL                Total number of items to process. Might be
-                               necessary when you want to display a finite
-                               progress indicator for large files given as input
-                               to the command.
-  -i, --input INPUT            CSV file (potentially gzipped) containing all the
-                               posts you want to process. Will consider `-` as
-                               stdin.
-  -o, --output OUTPUT          Path to the output file. Will consider `-` as
-                               stdout. If not given, results will also be
-                               printed to stdout.
-  --rcfile RCFILE              Custom path to a minet configuration file. More
-                               info about this here:
-                               https://github.com/medialab/minet/blob/master/doc
-                               s/cli.md#minetrc
-  --silent                     Whether to suppress all the log and progress
-                               bars. Can be useful when piping.
-  -h, --help                   show this help message and exit
+  -c, --cookie COOKIE           Authenticated cookie to use or browser from
+                                which to extract it (supports "firefox",
+                                "chrome", "chromium", "opera" and "edge").
+                                Defaults to `firefox`. Can also be configured in
+                                a .minetrc file as "facebook.cookie" or read
+                                from the MINET_FACEBOOK_COOKIE env variable.
+  --throttle THROTTLE           Throttling time, in seconds, to wait between
+                                each request. Defaults to `2.0`.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the posts you want to process. Will consider `-`
+                                as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 Examples:
 
@@ -2385,8 +2557,10 @@ how to use the command with a CSV file?
 <h3 id="facebook-url-likes">url-likes</h3>
 
 ```
-Usage: minet facebook url-likes [-h] [--silent] [-i INPUT] [--explode EXPLODE]
-                                [-s SELECT] [--total TOTAL] [-o OUTPUT]
+Usage: minet facebook url-likes [-h] [--silent]
+                                [--refresh-per-second REFRESH_PER_SECOND]
+                                [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                [--total TOTAL] [-o OUTPUT]
                                 url_or_url_column
 
 # Minet Facebook Url Likes Command
@@ -2403,30 +2577,36 @@ reactions plus the number of comments and shares that the URL got on Facebook
 explaining "What makes up the number shown next to my Share button?").
 
 Positional Arguments:
-  url_or_url_column           Single url to process or name of the CSV column
-                              containing urls when using -i/--input.
+  url_or_url_column             Single url to process or name of the CSV column
+                                containing urls when using -i/--input.
 
 Optional Arguments:
-  -s, --select SELECT         Columns of -i/--input CSV file to include in the
-                              output (separated by `,`). Use an empty string if
-                              you don't want to keep anything: --select ''.
-  --explode EXPLODE           Use to indicate the character used to separate
-                              multiple values in a single CSV cell. Defaults to
-                              none, i.e. CSV cells having a single values, which
-                              is usually the case.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -i, --input INPUT           CSV file (potentially gzipped) containing all the
-                              urls you want to process. Will consider `-` as
-                              stdin.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the urls you want to process. Will consider `-`
+                                as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 example:
 . Retrieving the "like" number for one url:
@@ -2482,7 +2662,9 @@ Subcommands:
 <h3 id="google-sheets">sheets</h3>
 
 ```
-Usage: minet google sheets [-h] [--silent] [-a AUTHUSER] [-c COOKIE] [-o OUTPUT]
+Usage: minet google sheets [-h] [--silent]
+                           [--refresh-per-second REFRESH_PER_SECOND]
+                           [-a AUTHUSER] [-c COOKIE] [-o OUTPUT]
                            url
 
 # Minet Google Sheets Command
@@ -2515,6 +2697,12 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -2533,8 +2721,9 @@ Examples:
 <h3 id="hyphe-declare">declare</h3>
 
 ```
-Usage: minet hyphe declare [-h] [--silent] [--password PASSWORD] [--total TOTAL]
-                           [-o OUTPUT]
+Usage: minet hyphe declare [-h] [--silent]
+                           [--refresh-per-second REFRESH_PER_SECOND]
+                           [--password PASSWORD] [--total TOTAL] [-o OUTPUT]
                            url corpus webentities
 
 # Minet Hyphe Declare Command
@@ -2546,22 +2735,28 @@ It is ideal to start or restart a corpus using the same exact
 webentity declarations as another one.
 
 Positional Arguments:
-  url                         Url of the Hyphe API.
-  corpus                      Id of the corpus.
-  webentities                 CSV file of webentities (exported from Hyphe).
+  url                           Url of the Hyphe API.
+  corpus                        Id of the corpus.
+  webentities                   CSV file of webentities (exported from Hyphe).
 
 Optional Arguments:
-  --password PASSWORD         The corpus's password if required.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  --password PASSWORD           The corpus's password if required.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 Examples:
 
@@ -2572,7 +2767,9 @@ Examples:
 <h3 id="hyphe-destroy">destroy</h3>
 
 ```
-Usage: minet hyphe destroy [-h] [--silent] [--password PASSWORD] [-o OUTPUT]
+Usage: minet hyphe destroy [-h] [--silent]
+                           [--refresh-per-second REFRESH_PER_SECOND]
+                           [--password PASSWORD] [-o OUTPUT]
                            url corpus
 
 # Minet Hyphe Destroy Command
@@ -2580,17 +2777,23 @@ Usage: minet hyphe destroy [-h] [--silent] [--password PASSWORD] [-o OUTPUT]
 Command that can be used to destroy a corpus entirely.
 
 Positional Arguments:
-  url                         Url of the Hyphe API.
-  corpus                      Id of the corpus.
+  url                           Url of the Hyphe API.
+  corpus                        Id of the corpus.
 
 Optional Arguments:
-  --password PASSWORD         The corpus's password if required.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  --password PASSWORD           The corpus's password if required.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 Examples:
 
@@ -2601,9 +2804,11 @@ Examples:
 <h3 id="hyphe-dump">dump</h3>
 
 ```
-Usage: minet hyphe dump [-h] [--silent] [-O OUTPUT_DIR] [--body]
-                        [--statuses STATUSES] [--page-count PAGE_COUNT]
-                        [--password PASSWORD] [-o OUTPUT]
+Usage: minet hyphe dump [-h] [--silent]
+                        [--refresh-per-second REFRESH_PER_SECOND]
+                        [-O OUTPUT_DIR] [--body] [--statuses STATUSES]
+                        [--page-count PAGE_COUNT] [--password PASSWORD]
+                        [-o OUTPUT]
                         url corpus
 
 # Minet Hyphe Dump Command
@@ -2629,6 +2834,12 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -2642,7 +2853,9 @@ Examples:
 <h3 id="hyphe-reset">reset</h3>
 
 ```
-Usage: minet hyphe reset [-h] [--silent] [--password PASSWORD] [-o OUTPUT]
+Usage: minet hyphe reset [-h] [--silent]
+                         [--refresh-per-second REFRESH_PER_SECOND]
+                         [--password PASSWORD] [-o OUTPUT]
                          url corpus
 
 # Minet Hyphe Reset Command
@@ -2650,17 +2863,23 @@ Usage: minet hyphe reset [-h] [--silent] [--password PASSWORD] [-o OUTPUT]
 Command that can be used to reset a corpus entirely.
 
 Positional Arguments:
-  url                         Url of the Hyphe API.
-  corpus                      Id of the corpus.
+  url                           Url of the Hyphe API.
+  corpus                        Id of the corpus.
 
 Optional Arguments:
-  --password PASSWORD         The corpus's password if required.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  --password PASSWORD           The corpus's password if required.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 Examples:
 
@@ -2671,8 +2890,9 @@ Examples:
 <h3 id="hyphe-tag">tag</h3>
 
 ```
-Usage: minet hyphe tag [-h] [--silent] [--separator SEPARATOR]
-                       [--password PASSWORD] [--total TOTAL] [-o OUTPUT]
+Usage: minet hyphe tag [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
+                       [--separator SEPARATOR] [--password PASSWORD]
+                       [--total TOTAL] [-o OUTPUT]
                        url corpus webentity_id_column tag_columns data
 
 # Minet Hyphe Tag Command
@@ -2681,27 +2901,33 @@ Command that can be used to tag webentities in batch using
 metadata recorded in a CSV file.
 
 Positional Arguments:
-  url                         Url of the Hyphe API.
-  corpus                      Id of the corpus.
-  webentity_id_column         Column of the CSV file containing the webentity
-                              ids.
-  tag_columns                 Columns, separated by comma, to use as tags.
-  data                        CSV file of webentities (exported from Hyphe).
+  url                           Url of the Hyphe API.
+  corpus                        Id of the corpus.
+  webentity_id_column           Column of the CSV file containing the webentity
+                                ids.
+  tag_columns                   Columns, separated by comma, to use as tags.
+  data                          CSV file of webentities (exported from Hyphe).
 
 Optional Arguments:
-  --password PASSWORD         The corpus's password if required.
-  --separator SEPARATOR       Separator use to split multiple tag values in the
-                              same column. Defaults to `|`.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  --password PASSWORD           The corpus's password if required.
+  --separator SEPARATOR         Separator use to split multiple tag values in
+                                the same column. Defaults to `|`.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 Examples:
 
@@ -2713,6 +2939,7 @@ Examples:
 
 ```
 Usage: minet instagram [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                       [--refresh-per-second REFRESH_PER_SECOND]
                        {comments,hashtag,post-infos,user-followers,user-following,user-infos,user-posts}
                        ...
 
@@ -2731,6 +2958,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -2744,6 +2977,7 @@ Subcommands:
 
 ```
 Usage: minet instagram comments [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                                [--refresh-per-second REFRESH_PER_SECOND]
                                 [-l LIMIT] [-i INPUT] [--explode EXPLODE]
                                 [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                 post_or_post_column
@@ -2761,43 +2995,49 @@ to directly pass the cookie as a string, check out the
 -c/--cookie flag.
 
 Positional Arguments:
-  post_or_post_column         Single post url, post shortcode or post id to
-                              process or name of the CSV column containing post
-                              urls, post shortcodes or post ids when using
-                              -i/--input.
+  post_or_post_column           Single post url, post shortcode or post id to
+                                process or name of the CSV column containing
+                                post urls, post shortcodes or post ids when
+                                using -i/--input.
 
 Optional Arguments:
-  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
-                              to extract it (supports "firefox", "chrome",
-                              "chromium", "opera" and "edge"). Defaults to
-                              `firefox`. Can also be configured in a .minetrc
-                              file as "instagram.cookie" or read from the
-                              MINET_INSTAGRAM_COOKIE env variable.
-  -l, --limit LIMIT           Maximum number of comments to retrieve per post.
-  -s, --select SELECT         Columns of -i/--input CSV file to include in the
-                              output (separated by `,`). Use an empty string if
-                              you don't want to keep anything: --select ''.
-  --explode EXPLODE           Use to indicate the character used to separate
-                              multiple values in a single CSV cell. Defaults to
-                              none, i.e. CSV cells having a single values, which
-                              is usually the case.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -i, --input INPUT           CSV file (potentially gzipped) containing all the
-                              post urls, post shortcodes or post ids you want to
-                              process. Will consider `-` as stdin.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here:
-                              https://github.com/medialab/minet/blob/master/docs
-                              /cli.md#minetrc
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  -c, --cookie COOKIE           Authenticated cookie to use or browser from
+                                which to extract it (supports "firefox",
+                                "chrome", "chromium", "opera" and "edge").
+                                Defaults to `firefox`. Can also be configured in
+                                a .minetrc file as "instagram.cookie" or read
+                                from the MINET_INSTAGRAM_COOKIE env variable.
+  -l, --limit LIMIT             Maximum number of comments to retrieve per post.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the post urls, post shortcodes or post ids you
+                                want to process. Will consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 example:
 
@@ -2836,6 +3076,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet instagram hashtag [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                               [--refresh-per-second REFRESH_PER_SECOND]
                                [-l LIMIT] [-i INPUT] [--explode EXPLODE]
                                [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                hashtag_or_hashtag_column
@@ -2856,41 +3097,48 @@ display_url is not the media url, but a thumbnail of the post.
 There is no way with this command to get the media urls.
 
 Positional Arguments:
-  hashtag_or_hashtag_column   Single hashtag to process or name of the CSV
-                              column containing hashtags when using -i/--input.
+  hashtag_or_hashtag_column     Single hashtag to process or name of the CSV
+                                column containing hashtags when using
+                                -i/--input.
 
 Optional Arguments:
-  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
-                              to extract it (supports "firefox", "chrome",
-                              "chromium", "opera" and "edge"). Defaults to
-                              `firefox`. Can also be configured in a .minetrc
-                              file as "instagram.cookie" or read from the
-                              MINET_INSTAGRAM_COOKIE env variable.
-  -l, --limit LIMIT           Maximum number of posts to retrieve per hashtag.
-  -s, --select SELECT         Columns of -i/--input CSV file to include in the
-                              output (separated by `,`). Use an empty string if
-                              you don't want to keep anything: --select ''.
-  --explode EXPLODE           Use to indicate the character used to separate
-                              multiple values in a single CSV cell. Defaults to
-                              none, i.e. CSV cells having a single values, which
-                              is usually the case.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -i, --input INPUT           CSV file (potentially gzipped) containing all the
-                              hashtags you want to process. Will consider `-` as
-                              stdin.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here:
-                              https://github.com/medialab/minet/blob/master/docs
-                              /cli.md#minetrc
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  -c, --cookie COOKIE           Authenticated cookie to use or browser from
+                                which to extract it (supports "firefox",
+                                "chrome", "chromium", "opera" and "edge").
+                                Defaults to `firefox`. Can also be configured in
+                                a .minetrc file as "instagram.cookie" or read
+                                from the MINET_INSTAGRAM_COOKIE env variable.
+  -l, --limit LIMIT             Maximum number of posts to retrieve per hashtag.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the hashtags you want to process. Will consider
+                                `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 example:
 
@@ -2929,6 +3177,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet instagram post-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                                  [--refresh-per-second REFRESH_PER_SECOND]
                                   [-i INPUT] [--explode EXPLODE] [-s SELECT]
                                   [--total TOTAL] [-o OUTPUT]
                                   post_or_post_column
@@ -2951,42 +3200,48 @@ the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
 Positional Arguments:
-  post_or_post_column         Single post url, post shortcode or post id to
-                              process or name of the CSV column containing post
-                              urls, post shortcodes or post ids when using
-                              -i/--input.
+  post_or_post_column           Single post url, post shortcode or post id to
+                                process or name of the CSV column containing
+                                post urls, post shortcodes or post ids when
+                                using -i/--input.
 
 Optional Arguments:
-  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
-                              to extract it (supports "firefox", "chrome",
-                              "chromium", "opera" and "edge"). Defaults to
-                              `firefox`. Can also be configured in a .minetrc
-                              file as "instagram.cookie" or read from the
-                              MINET_INSTAGRAM_COOKIE env variable.
-  -s, --select SELECT         Columns of -i/--input CSV file to include in the
-                              output (separated by `,`). Use an empty string if
-                              you don't want to keep anything: --select ''.
-  --explode EXPLODE           Use to indicate the character used to separate
-                              multiple values in a single CSV cell. Defaults to
-                              none, i.e. CSV cells having a single values, which
-                              is usually the case.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -i, --input INPUT           CSV file (potentially gzipped) containing all the
-                              post urls, post shortcodes or post ids you want to
-                              process. Will consider `-` as stdin.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here:
-                              https://github.com/medialab/minet/blob/master/docs
-                              /cli.md#minetrc
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  -c, --cookie COOKIE           Authenticated cookie to use or browser from
+                                which to extract it (supports "firefox",
+                                "chrome", "chromium", "opera" and "edge").
+                                Defaults to `firefox`. Can also be configured in
+                                a .minetrc file as "instagram.cookie" or read
+                                from the MINET_INSTAGRAM_COOKIE env variable.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the post urls, post shortcodes or post ids you
+                                want to process. Will consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 example:
 
@@ -3025,9 +3280,10 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet instagram user-followers [-h] [-c COOKIE] [--rcfile RCFILE]
-                                      [--silent] [-l LIMIT] [-i INPUT]
-                                      [--explode EXPLODE] [-s SELECT]
-                                      [--total TOTAL] [-o OUTPUT]
+                                      [--silent]
+                                      [--refresh-per-second REFRESH_PER_SECOND]
+                                      [-l LIMIT] [-i INPUT] [--explode EXPLODE]
+                                      [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                       user_or_user_column
 
 # Instagram User Followers Command
@@ -3052,42 +3308,49 @@ If a username is a number without '@' at the begining, it will be
 considered as an id.
 
 Positional Arguments:
-  user_or_user_column         Single username, user url or user id to process or
-                              name of the CSV column containing usernames, user
-                              urls or user ids when using -i/--input.
+  user_or_user_column           Single username, user url or user id to process
+                                or name of the CSV column containing usernames,
+                                user urls or user ids when using -i/--input.
 
 Optional Arguments:
-  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
-                              to extract it (supports "firefox", "chrome",
-                              "chromium", "opera" and "edge"). Defaults to
-                              `firefox`. Can also be configured in a .minetrc
-                              file as "instagram.cookie" or read from the
-                              MINET_INSTAGRAM_COOKIE env variable.
-  -l, --limit LIMIT           Maximum number of followers to retrieve per user.
-  -s, --select SELECT         Columns of -i/--input CSV file to include in the
-                              output (separated by `,`). Use an empty string if
-                              you don't want to keep anything: --select ''.
-  --explode EXPLODE           Use to indicate the character used to separate
-                              multiple values in a single CSV cell. Defaults to
-                              none, i.e. CSV cells having a single values, which
-                              is usually the case.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -i, --input INPUT           CSV file (potentially gzipped) containing all the
-                              usernames, user urls or user ids you want to
-                              process. Will consider `-` as stdin.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here:
-                              https://github.com/medialab/minet/blob/master/docs
-                              /cli.md#minetrc
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  -c, --cookie COOKIE           Authenticated cookie to use or browser from
+                                which to extract it (supports "firefox",
+                                "chrome", "chromium", "opera" and "edge").
+                                Defaults to `firefox`. Can also be configured in
+                                a .minetrc file as "instagram.cookie" or read
+                                from the MINET_INSTAGRAM_COOKIE env variable.
+  -l, --limit LIMIT             Maximum number of followers to retrieve per
+                                user.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the usernames, user urls or user ids you want to
+                                process. Will consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 example:
 
@@ -3126,9 +3389,10 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet instagram user-following [-h] [-c COOKIE] [--rcfile RCFILE]
-                                      [--silent] [-l LIMIT] [-i INPUT]
-                                      [--explode EXPLODE] [-s SELECT]
-                                      [--total TOTAL] [-o OUTPUT]
+                                      [--silent]
+                                      [--refresh-per-second REFRESH_PER_SECOND]
+                                      [-l LIMIT] [-i INPUT] [--explode EXPLODE]
+                                      [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                       user_or_user_column
 
 # Instagram User Following Command
@@ -3152,42 +3416,48 @@ If a username is a number without '@' at the begining, it will be
 considered as an id.
 
 Positional Arguments:
-  user_or_user_column         Single username, user url or user id to process or
-                              name of the CSV column containing usernames, user
-                              urls or user ids when using -i/--input.
+  user_or_user_column           Single username, user url or user id to process
+                                or name of the CSV column containing usernames,
+                                user urls or user ids when using -i/--input.
 
 Optional Arguments:
-  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
-                              to extract it (supports "firefox", "chrome",
-                              "chromium", "opera" and "edge"). Defaults to
-                              `firefox`. Can also be configured in a .minetrc
-                              file as "instagram.cookie" or read from the
-                              MINET_INSTAGRAM_COOKIE env variable.
-  -l, --limit LIMIT           Maximum number of accounts to retrieve per user.
-  -s, --select SELECT         Columns of -i/--input CSV file to include in the
-                              output (separated by `,`). Use an empty string if
-                              you don't want to keep anything: --select ''.
-  --explode EXPLODE           Use to indicate the character used to separate
-                              multiple values in a single CSV cell. Defaults to
-                              none, i.e. CSV cells having a single values, which
-                              is usually the case.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -i, --input INPUT           CSV file (potentially gzipped) containing all the
-                              usernames, user urls or user ids you want to
-                              process. Will consider `-` as stdin.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here:
-                              https://github.com/medialab/minet/blob/master/docs
-                              /cli.md#minetrc
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  -c, --cookie COOKIE           Authenticated cookie to use or browser from
+                                which to extract it (supports "firefox",
+                                "chrome", "chromium", "opera" and "edge").
+                                Defaults to `firefox`. Can also be configured in
+                                a .minetrc file as "instagram.cookie" or read
+                                from the MINET_INSTAGRAM_COOKIE env variable.
+  -l, --limit LIMIT             Maximum number of accounts to retrieve per user.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the usernames, user urls or user ids you want to
+                                process. Will consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 example:
 
@@ -3226,6 +3496,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet instagram user-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                                  [--refresh-per-second REFRESH_PER_SECOND]
                                   [-i INPUT] [--explode EXPLODE] [-s SELECT]
                                   [--total TOTAL] [-o OUTPUT]
                                   user_or_user_column
@@ -3251,41 +3522,47 @@ If a username is a number without '@' at the begining, it will be
 considered as an id.
 
 Positional Arguments:
-  user_or_user_column         Single username, user url or user id to process or
-                              name of the CSV column containing usernames, user
-                              urls or user ids when using -i/--input.
+  user_or_user_column           Single username, user url or user id to process
+                                or name of the CSV column containing usernames,
+                                user urls or user ids when using -i/--input.
 
 Optional Arguments:
-  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
-                              to extract it (supports "firefox", "chrome",
-                              "chromium", "opera" and "edge"). Defaults to
-                              `firefox`. Can also be configured in a .minetrc
-                              file as "instagram.cookie" or read from the
-                              MINET_INSTAGRAM_COOKIE env variable.
-  -s, --select SELECT         Columns of -i/--input CSV file to include in the
-                              output (separated by `,`). Use an empty string if
-                              you don't want to keep anything: --select ''.
-  --explode EXPLODE           Use to indicate the character used to separate
-                              multiple values in a single CSV cell. Defaults to
-                              none, i.e. CSV cells having a single values, which
-                              is usually the case.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -i, --input INPUT           CSV file (potentially gzipped) containing all the
-                              usernames, user urls or user ids you want to
-                              process. Will consider `-` as stdin.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here:
-                              https://github.com/medialab/minet/blob/master/docs
-                              /cli.md#minetrc
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  -c, --cookie COOKIE           Authenticated cookie to use or browser from
+                                which to extract it (supports "firefox",
+                                "chrome", "chromium", "opera" and "edge").
+                                Defaults to `firefox`. Can also be configured in
+                                a .minetrc file as "instagram.cookie" or read
+                                from the MINET_INSTAGRAM_COOKIE env variable.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the usernames, user urls or user ids you want to
+                                process. Will consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 example:
 
@@ -3324,6 +3601,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet instagram user-posts [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                                  [--refresh-per-second REFRESH_PER_SECOND]
                                   [-l LIMIT] [-i INPUT] [--explode EXPLODE]
                                   [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                   user_or_user_column
@@ -3351,42 +3629,48 @@ If a username is a number without '@' at the begining, it will be
 considered as an id.
 
 Positional Arguments:
-  user_or_user_column         Single username, user url or user id to process or
-                              name of the CSV column containing usernames, user
-                              urls or user ids when using -i/--input.
+  user_or_user_column           Single username, user url or user id to process
+                                or name of the CSV column containing usernames,
+                                user urls or user ids when using -i/--input.
 
 Optional Arguments:
-  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
-                              to extract it (supports "firefox", "chrome",
-                              "chromium", "opera" and "edge"). Defaults to
-                              `firefox`. Can also be configured in a .minetrc
-                              file as "instagram.cookie" or read from the
-                              MINET_INSTAGRAM_COOKIE env variable.
-  -l, --limit LIMIT           Maximum number of posts to retrieve per user.
-  -s, --select SELECT         Columns of -i/--input CSV file to include in the
-                              output (separated by `,`). Use an empty string if
-                              you don't want to keep anything: --select ''.
-  --explode EXPLODE           Use to indicate the character used to separate
-                              multiple values in a single CSV cell. Defaults to
-                              none, i.e. CSV cells having a single values, which
-                              is usually the case.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -i, --input INPUT           CSV file (potentially gzipped) containing all the
-                              usernames, user urls or user ids you want to
-                              process. Will consider `-` as stdin.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here:
-                              https://github.com/medialab/minet/blob/master/docs
-                              /cli.md#minetrc
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  -c, --cookie COOKIE           Authenticated cookie to use or browser from
+                                which to extract it (supports "firefox",
+                                "chrome", "chromium", "opera" and "edge").
+                                Defaults to `firefox`. Can also be configured in
+                                a .minetrc file as "instagram.cookie" or read
+                                from the MINET_INSTAGRAM_COOKIE env variable.
+  -l, --limit LIMIT             Maximum number of posts to retrieve per user.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the usernames, user urls or user ids you want to
+                                process. Will consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 example:
 
@@ -3427,6 +3711,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet mediacloud medias [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
+                               [--refresh-per-second REFRESH_PER_SECOND]
                                [--feeds FEEDS] [-i INPUT] [--explode EXPLODE]
                                [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                media_or_media_column
@@ -3436,41 +3721,47 @@ Usage: minet mediacloud medias [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
 Retrieve metadata about a list of Mediacloud medias.
 
 Positional Arguments:
-  media_or_media_column       Single Mediacloud media id to process or name of
-                              the CSV column containing Mediacloud media ids
-                              when using -i/--input.
+  media_or_media_column         Single Mediacloud media id to process or name of
+                                the CSV column containing Mediacloud media ids
+                                when using -i/--input.
 
 Optional Arguments:
-  --feeds FEEDS               If given, path of the CSV file listing media RSS
-                              feeds.
-  -t, --token TOKEN           Mediacloud API token (also called "key"
-                              sometimes). Can also be configured in a .minetrc
-                              file as "mediacloud.token" or read from the
-                              MINET_MEDIACLOUD_TOKEN env variable.
-  -s, --select SELECT         Columns of -i/--input CSV file to include in the
-                              output (separated by `,`). Use an empty string if
-                              you don't want to keep anything: --select ''.
-  --explode EXPLODE           Use to indicate the character used to separate
-                              multiple values in a single CSV cell. Defaults to
-                              none, i.e. CSV cells having a single values, which
-                              is usually the case.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -i, --input INPUT           CSV file (potentially gzipped) containing all the
-                              Mediacloud media ids you want to process. Will
-                              consider `-` as stdin.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here:
-                              https://github.com/medialab/minet/blob/master/docs
-                              /cli.md#minetrc
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  --feeds FEEDS                 If given, path of the CSV file listing media RSS
+                                feeds.
+  -t, --token TOKEN             Mediacloud API token (also called "key"
+                                sometimes). Can also be configured in a .minetrc
+                                file as "mediacloud.token" or read from the
+                                MINET_MEDIACLOUD_TOKEN env variable.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the Mediacloud media ids you want to process.
+                                Will consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 how to use the command with a CSV file?
 
@@ -3504,6 +3795,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet mediacloud search [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
+                               [--refresh-per-second REFRESH_PER_SECOND]
                                [-c COLLECTIONS] [--filter-query FILTER_QUERY]
                                [-m MEDIAS] [--publish-day PUBLISH_DAY]
                                [--publish-month PUBLISH_MONTH]
@@ -3549,6 +3841,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -3560,7 +3858,9 @@ Optional Arguments:
 
 ```
 Usage: minet mediacloud topic stories [-h] [-t TOKEN] [--rcfile RCFILE]
-                                      [--silent] [--media-id MEDIA_ID]
+                                      [--silent]
+                                      [--refresh-per-second REFRESH_PER_SECOND]
+                                      [--media-id MEDIA_ID]
                                       [--from-media-id FROM_MEDIA_ID]
                                       topic_id
 
@@ -3585,6 +3885,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -3596,6 +3902,7 @@ Optional Arguments:
 
 ```
 Usage: minet telegram channel-infos [-h] [--throttle THROTTLE] [--silent]
+                                    [--refresh-per-second REFRESH_PER_SECOND]
                                     [-i INPUT] [--explode EXPLODE] [-s SELECT]
                                     [--total TOTAL] [-o OUTPUT]
                                     channel_name_or_channel_name_column
@@ -3630,6 +3937,12 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -3670,6 +3983,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet telegram channel-messages [-h] [--throttle THROTTLE] [--silent]
+                                       [--refresh-per-second REFRESH_PER_SECOND]
                                        [-i INPUT] [--explode EXPLODE]
                                        [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                        channel_name_or_channel_name_column
@@ -3704,6 +4018,12 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -3760,6 +4080,7 @@ Subcommands:
 
 ```
 Usage: minet tiktok search-videos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                                  [--refresh-per-second REFRESH_PER_SECOND]
                                   [-l LIMIT] [-i INPUT] [--explode EXPLODE]
                                   [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                   query_or_query_column
@@ -3787,42 +4108,48 @@ relevance (a mix of most popular, and most relevant according to your
 profile).
 
 Positional Arguments:
-  query_or_query_column       Single tiktok keyword to process or name of the
-                              CSV column containing tiktok keywords when using
-                              -i/--input.
+  query_or_query_column         Single tiktok keyword to process or name of the
+                                CSV column containing tiktok keywords when using
+                                -i/--input.
 
 Optional Arguments:
-  -c, --cookie COOKIE         Authenticated cookie to use or browser from which
-                              to extract it (supports "firefox", "chrome",
-                              "chromium", "opera" and "edge"). Defaults to
-                              `firefox`. Can also be configured in a .minetrc
-                              file as "tiktok.cookie" or read from the
-                              MINET_TIKTOK_COOKIE env variable.
-  -l, --limit LIMIT           Maximum number of videos to retrieve per query.
-  -s, --select SELECT         Columns of -i/--input CSV file to include in the
-                              output (separated by `,`). Use an empty string if
-                              you don't want to keep anything: --select ''.
-  --explode EXPLODE           Use to indicate the character used to separate
-                              multiple values in a single CSV cell. Defaults to
-                              none, i.e. CSV cells having a single values, which
-                              is usually the case.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -i, --input INPUT           CSV file (potentially gzipped) containing all the
-                              tiktok keywords you want to process. Will consider
-                              `-` as stdin.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here:
-                              https://github.com/medialab/minet/blob/master/docs
-                              /cli.md#minetrc
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  -c, --cookie COOKIE           Authenticated cookie to use or browser from
+                                which to extract it (supports "firefox",
+                                "chrome", "chromium", "opera" and "edge").
+                                Defaults to `firefox`. Can also be configured in
+                                a .minetrc file as "tiktok.cookie" or read from
+                                the MINET_TIKTOK_COOKIE env variable.
+  -l, --limit LIMIT             Maximum number of videos to retrieve per query.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the tiktok keywords you want to process. Will
+                                consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 example:
 
@@ -3863,6 +4190,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter attrition [-h] [--user USER] [--silent]
+                               [--refresh-per-second REFRESH_PER_SECOND]
                                [--retweeted-id RETWEETED_ID] [--ids]
                                [--api-key API_KEY] [--rcfile RCFILE]
                                [--api-secret-key API_SECRET_KEY]
@@ -3965,6 +4293,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4008,7 +4342,8 @@ how to use the command with a CSV file?
 ### followers
 
 ```
-Usage: minet twitter followers [-h] [--ids] [--silent] [--v2]
+Usage: minet twitter followers [-h] [--ids] [--silent]
+                               [--refresh-per-second REFRESH_PER_SECOND] [--v2]
                                [--api-key API_KEY] [--rcfile RCFILE]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
@@ -4072,6 +4407,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4112,8 +4453,10 @@ how to use the command with a CSV file?
 ### friends
 
 ```
-Usage: minet twitter friends [-h] [--ids] [--silent] [--v2] [--api-key API_KEY]
-                             [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
+Usage: minet twitter friends [-h] [--ids] [--silent]
+                             [--refresh-per-second REFRESH_PER_SECOND] [--v2]
+                             [--api-key API_KEY] [--rcfile RCFILE]
+                             [--api-secret-key API_SECRET_KEY]
                              [--access-token ACCESS_TOKEN]
                              [--access-token-secret ACCESS_TOKEN_SECRET]
                              [-i INPUT] [--explode EXPLODE] [-s SELECT]
@@ -4175,6 +4518,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4216,7 +4565,9 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter list-followers [-h] [--api-key API_KEY] [--rcfile RCFILE]
-                                    [--silent] [--api-secret-key API_SECRET_KEY]
+                                    [--silent]
+                                    [--refresh-per-second REFRESH_PER_SECOND]
+                                    [--api-secret-key API_SECRET_KEY]
                                     [--access-token ACCESS_TOKEN]
                                     [--access-token-secret ACCESS_TOKEN_SECRET]
                                     [-i INPUT] [--explode EXPLODE] [-s SELECT]
@@ -4271,6 +4622,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4312,7 +4669,9 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter list-members [-h] [--api-key API_KEY] [--rcfile RCFILE]
-                                  [--silent] [--api-secret-key API_SECRET_KEY]
+                                  [--silent]
+                                  [--refresh-per-second REFRESH_PER_SECOND]
+                                  [--api-secret-key API_SECRET_KEY]
                                   [--access-token ACCESS_TOKEN]
                                   [--access-token-secret ACCESS_TOKEN_SECRET]
                                   [-i INPUT] [--explode EXPLODE] [-s SELECT]
@@ -4367,6 +4726,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4408,6 +4773,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter retweeters [-h] [--timezone TIMEZONE] [--silent]
+                                [--refresh-per-second REFRESH_PER_SECOND]
                                 [--api-key API_KEY] [--rcfile RCFILE]
                                 [--api-secret-key API_SECRET_KEY]
                                 [--access-token ACCESS_TOKEN]
@@ -4466,6 +4832,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4506,7 +4878,9 @@ how to use the command with a CSV file?
 <h3 id="twitter-scrape">scrape</h3>
 
 ```
-Usage: minet twitter scrape [-h] [--silent] [--include-refs] [-l LIMIT]
+Usage: minet twitter scrape [-h] [--silent]
+                            [--refresh-per-second REFRESH_PER_SECOND]
+                            [--include-refs] [-l LIMIT]
                             [--query-template QUERY_TEMPLATE] [-c COOKIE]
                             [--rcfile RCFILE] [--timezone TIMEZONE] [-i INPUT]
                             [--explode EXPLODE] [-s SELECT] [--total TOTAL]
@@ -4589,6 +4963,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4650,9 +5030,10 @@ how to use the command with a CSV file?
 ### tweet-date
 
 ```
-Usage: minet twitter tweet-date [-h] [--timezone TIMEZONE] [--silent] [-i INPUT]
-                                [--explode EXPLODE] [-s SELECT] [--total TOTAL]
-                                [-o OUTPUT]
+Usage: minet twitter tweet-date [-h] [--timezone TIMEZONE] [--silent]
+                                [--refresh-per-second REFRESH_PER_SECOND]
+                                [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                [--total TOTAL] [-o OUTPUT]
                                 tweet_or_tweet_column
 
 # Minet Twitter Tweet Date Command
@@ -4660,33 +5041,39 @@ Usage: minet twitter tweet-date [-h] [--timezone TIMEZONE] [--silent] [-i INPUT]
 Getting timestamp and date from tweet url or id.
 
 Positional Arguments:
-  tweet_or_tweet_column       Single tweet url or id to process or name of the
-                              CSV column containing tweet urls or ids when using
-                              -i/--input.
+  tweet_or_tweet_column         Single tweet url or id to process or name of the
+                                CSV column containing tweet urls or ids when
+                                using -i/--input.
 
 Optional Arguments:
-  --timezone TIMEZONE         Timezone for dates, for example 'Europe/Paris'.
-                              Defaults to UTC.
-  -s, --select SELECT         Columns of -i/--input CSV file to include in the
-                              output (separated by `,`). Use an empty string if
-                              you don't want to keep anything: --select ''.
-  --explode EXPLODE           Use to indicate the character used to separate
-                              multiple values in a single CSV cell. Defaults to
-                              none, i.e. CSV cells having a single values, which
-                              is usually the case.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -i, --input INPUT           CSV file (potentially gzipped) containing all the
-                              tweet urls or ids you want to process. Will
-                              consider `-` as stdin.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
+                                Defaults to UTC.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the tweet urls or ids you want to process. Will
+                                consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 Examples:
 
@@ -4724,6 +5111,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter tweet-search [-h] [--since-id SINCE_ID] [--silent]
+                                  [--refresh-per-second REFRESH_PER_SECOND]
                                   [--until-id UNTIL_ID]
                                   [--start-time START_TIME]
                                   [--end-time END_TIME] [--academic]
@@ -4809,6 +5197,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4853,10 +5247,12 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter tweet-count [-h] [--granularity {day,hour,minute}]
-                                 [--silent] [--since-id SINCE_ID]
-                                 [--until-id UNTIL_ID] [--start-time START_TIME]
-                                 [--end-time END_TIME] [--academic]
-                                 [--api-key API_KEY] [--rcfile RCFILE]
+                                 [--silent]
+                                 [--refresh-per-second REFRESH_PER_SECOND]
+                                 [--since-id SINCE_ID] [--until-id UNTIL_ID]
+                                 [--start-time START_TIME] [--end-time END_TIME]
+                                 [--academic] [--api-key API_KEY]
+                                 [--rcfile RCFILE]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -4959,6 +5355,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -5005,9 +5407,10 @@ how to use the command with a CSV file?
 ### tweets
 
 ```
-Usage: minet twitter tweets [-h] [--v2] [--silent] [--timezone TIMEZONE]
-                            [--api-key API_KEY] [--rcfile RCFILE]
-                            [--api-secret-key API_SECRET_KEY]
+Usage: minet twitter tweets [-h] [--v2] [--silent]
+                            [--refresh-per-second REFRESH_PER_SECOND]
+                            [--timezone TIMEZONE] [--api-key API_KEY]
+                            [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
                             [--access-token ACCESS_TOKEN]
                             [--access-token-secret ACCESS_TOKEN_SECRET]
                             [-i INPUT] [--explode EXPLODE] [-s SELECT]
@@ -5068,6 +5471,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -5108,9 +5517,10 @@ how to use the command with a CSV file?
 ### users
 
 ```
-Usage: minet twitter users [-h] [--ids] [--silent] [--v2] [--timezone TIMEZONE]
-                           [--api-key API_KEY] [--rcfile RCFILE]
-                           [--api-secret-key API_SECRET_KEY]
+Usage: minet twitter users [-h] [--ids] [--silent]
+                           [--refresh-per-second REFRESH_PER_SECOND] [--v2]
+                           [--timezone TIMEZONE] [--api-key API_KEY]
+                           [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
                            [--access-token ACCESS_TOKEN]
                            [--access-token-secret ACCESS_TOKEN_SECRET]
                            [-i INPUT] [--explode EXPLODE] [-s SELECT]
@@ -5173,6 +5583,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -5214,6 +5630,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter user-search [-h] [--timezone TIMEZONE] [--silent]
+                                 [--refresh-per-second REFRESH_PER_SECOND]
                                  [--api-key API_KEY] [--rcfile RCFILE]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
@@ -5275,6 +5692,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -5318,10 +5741,11 @@ how to use the command with a CSV file?
 ### user-tweets
 
 ```
-Usage: minet twitter user-tweets [-h] [--ids] [--silent] [--min-date MIN_DATE]
-                                 [--exclude-retweets] [--v2]
-                                 [--timezone TIMEZONE] [--api-key API_KEY]
-                                 [--rcfile RCFILE]
+Usage: minet twitter user-tweets [-h] [--ids] [--silent]
+                                 [--refresh-per-second REFRESH_PER_SECOND]
+                                 [--min-date MIN_DATE] [--exclude-retweets]
+                                 [--v2] [--timezone TIMEZONE]
+                                 [--api-key API_KEY] [--rcfile RCFILE]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -5389,6 +5813,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -5432,6 +5862,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet wikipedia pageviews [-h] --start-date START_DATE [--silent]
+                                 [--refresh-per-second REFRESH_PER_SECOND]
                                  --end-date END_DATE [--agent AGENT]
                                  [--access ACCESS] [-t THREADS]
                                  [--granularity GRANULARITY] [--sum]
@@ -5486,6 +5917,12 @@ Optional Arguments:
                                 printed to stdout.
   --resume                      "Whether to resume from an aborted collection.
                                 Need -o to be set. Will only work with --sum.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -5523,9 +5960,10 @@ how to use the command with a CSV file?
 ### captions
 
 ```
-Usage: minet youtube captions [-h] [--lang LANG] [--silent] [-i INPUT]
-                              [--explode EXPLODE] [-s SELECT] [--total TOTAL]
-                              [-o OUTPUT]
+Usage: minet youtube captions [-h] [--lang LANG] [--silent]
+                              [--refresh-per-second REFRESH_PER_SECOND]
+                              [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                              [--total TOTAL] [-o OUTPUT]
                               video_or_video_column
 
 # Youtube captions
@@ -5533,35 +5971,41 @@ Usage: minet youtube captions [-h] [--lang LANG] [--silent] [-i INPUT]
 Retrieve captions for the given YouTube videos.
 
 Positional Arguments:
-  video_or_video_column       Single video url or id to process or name of the
-                              CSV column containing video urls or ids when using
-                              -i/--input.
+  video_or_video_column         Single video url or id to process or name of the
+                                CSV column containing video urls or ids when
+                                using -i/--input.
 
 Optional Arguments:
-  --lang LANG                 Language (ISO code like "en") of captions to
-                              retrieve. You can specify several languages by
-                              preferred order separated by commas. Defaults to
-                              `en`.
-  -s, --select SELECT         Columns of -i/--input CSV file to include in the
-                              output (separated by `,`). Use an empty string if
-                              you don't want to keep anything: --select ''.
-  --explode EXPLODE           Use to indicate the character used to separate
-                              multiple values in a single CSV cell. Defaults to
-                              none, i.e. CSV cells having a single values, which
-                              is usually the case.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -i, --input INPUT           CSV file (potentially gzipped) containing all the
-                              video urls or ids you want to process. Will
-                              consider `-` as stdin.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  --lang LANG                   Language (ISO code like "en") of captions to
+                                retrieve. You can specify several languages by
+                                preferred order separated by commas. Defaults to
+                                `en`.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the video urls or ids you want to process. Will
+                                consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 Examples:
 
@@ -5603,6 +6047,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet youtube channel-videos [-h] [-k KEY] [--rcfile RCFILE] [--silent]
+                                    [--refresh-per-second REFRESH_PER_SECOND]
                                     [-i INPUT] [--explode EXPLODE] [-s SELECT]
                                     [--total TOTAL] [-o OUTPUT]
                                     channel_or_channel_column
@@ -5617,38 +6062,45 @@ information about videos stored in the main playlist of the channel
 supposed to contain all the channel's videos.
 
 Positional Arguments:
-  channel_or_channel_column   Single channel to process or name of the CSV
-                              column containing channels when using -i/--input.
+  channel_or_channel_column     Single channel to process or name of the CSV
+                                column containing channels when using
+                                -i/--input.
 
 Optional Arguments:
-  -k, --key KEY               YouTube API Data dashboard API key. Can be used
-                              more than once. Can also be configured in a
-                              .minetrc file as "youtube.key" or read from the
-                              MINET_YOUTUBE_KEY env variable.
-  -s, --select SELECT         Columns of -i/--input CSV file to include in the
-                              output (separated by `,`). Use an empty string if
-                              you don't want to keep anything: --select ''.
-  --explode EXPLODE           Use to indicate the character used to separate
-                              multiple values in a single CSV cell. Defaults to
-                              none, i.e. CSV cells having a single values, which
-                              is usually the case.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -i, --input INPUT           CSV file (potentially gzipped) containing all the
-                              channels you want to process. Will consider `-` as
-                              stdin.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here:
-                              https://github.com/medialab/minet/blob/master/docs
-                              /cli.md#minetrc
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  -k, --key KEY                 YouTube API Data dashboard API key. Can be used
+                                more than once. Can also be configured in a
+                                .minetrc file as "youtube.key" or read from the
+                                MINET_YOUTUBE_KEY env variable.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the channels you want to process. Will consider
+                                `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 example:
 
@@ -5695,6 +6147,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet youtube channels [-h] [-k KEY] [--rcfile RCFILE] [--silent]
+                              [--refresh-per-second REFRESH_PER_SECOND]
                               [-i INPUT] [--explode EXPLODE] [-s SELECT]
                               [--total TOTAL] [-o OUTPUT]
                               channel_or_channel_column
@@ -5708,38 +6161,45 @@ website to find it if necessary. Then the command uses the API to retrieve
 information about the channel.
 
 Positional Arguments:
-  channel_or_channel_column   Single channel to process or name of the CSV
-                              column containing channels when using -i/--input.
+  channel_or_channel_column     Single channel to process or name of the CSV
+                                column containing channels when using
+                                -i/--input.
 
 Optional Arguments:
-  -k, --key KEY               YouTube API Data dashboard API key. Can be used
-                              more than once. Can also be configured in a
-                              .minetrc file as "youtube.key" or read from the
-                              MINET_YOUTUBE_KEY env variable.
-  -s, --select SELECT         Columns of -i/--input CSV file to include in the
-                              output (separated by `,`). Use an empty string if
-                              you don't want to keep anything: --select ''.
-  --explode EXPLODE           Use to indicate the character used to separate
-                              multiple values in a single CSV cell. Defaults to
-                              none, i.e. CSV cells having a single values, which
-                              is usually the case.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -i, --input INPUT           CSV file (potentially gzipped) containing all the
-                              channels you want to process. Will consider `-` as
-                              stdin.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here:
-                              https://github.com/medialab/minet/blob/master/docs
-                              /cli.md#minetrc
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  -k, --key KEY                 YouTube API Data dashboard API key. Can be used
+                                more than once. Can also be configured in a
+                                .minetrc file as "youtube.key" or read from the
+                                MINET_YOUTUBE_KEY env variable.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the channels you want to process. Will consider
+                                `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 example:
 
@@ -5782,6 +6242,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet youtube comments [-h] [-k KEY] [--rcfile RCFILE] [--silent]
+                              [--refresh-per-second REFRESH_PER_SECOND]
                               [-i INPUT] [--explode EXPLODE] [-s SELECT]
                               [--total TOTAL] [-o OUTPUT]
                               video_or_video_column
@@ -5791,38 +6252,44 @@ Usage: minet youtube comments [-h] [-k KEY] [--rcfile RCFILE] [--silent]
 Retrieve metadata about Youtube comments using the API.
 
 Positional Arguments:
-  video_or_video_column       Single video to process or name of the CSV column
-                              containing videos when using -i/--input.
+  video_or_video_column         Single video to process or name of the CSV
+                                column containing videos when using -i/--input.
 
 Optional Arguments:
-  -k, --key KEY               YouTube API Data dashboard API key. Can be used
-                              more than once. Can also be configured in a
-                              .minetrc file as "youtube.key" or read from the
-                              MINET_YOUTUBE_KEY env variable.
-  -s, --select SELECT         Columns of -i/--input CSV file to include in the
-                              output (separated by `,`). Use an empty string if
-                              you don't want to keep anything: --select ''.
-  --explode EXPLODE           Use to indicate the character used to separate
-                              multiple values in a single CSV cell. Defaults to
-                              none, i.e. CSV cells having a single values, which
-                              is usually the case.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -i, --input INPUT           CSV file (potentially gzipped) containing all the
-                              videos you want to process. Will consider `-` as
-                              stdin.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here:
-                              https://github.com/medialab/minet/blob/master/docs
-                              /cli.md#minetrc
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  -k, --key KEY                 YouTube API Data dashboard API key. Can be used
+                                more than once. Can also be configured in a
+                                .minetrc file as "youtube.key" or read from the
+                                MINET_YOUTUBE_KEY env variable.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the videos you want to process. Will consider
+                                `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 example:
 
@@ -5861,6 +6328,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet youtube search [-h] [-l LIMIT] [--silent]
+                            [--refresh-per-second REFRESH_PER_SECOND]
                             [--order {date,rating,relevance,title,videoCount,viewCount}]
                             [-k KEY] [--rcfile RCFILE] [-i INPUT]
                             [--explode EXPLODE] [-s SELECT] [--total TOTAL]
@@ -5908,6 +6376,12 @@ Optional Arguments:
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
                                 cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -5949,8 +6423,9 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet youtube videos [-h] [-k KEY] [--rcfile RCFILE] [--silent]
-                            [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                            [--total TOTAL] [-o OUTPUT]
+                            [--refresh-per-second REFRESH_PER_SECOND] [-i INPUT]
+                            [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                            [-o OUTPUT]
                             video_or_video_column
 
 # Youtube videos
@@ -5958,38 +6433,44 @@ Usage: minet youtube videos [-h] [-k KEY] [--rcfile RCFILE] [--silent]
 Retrieve metadata about Youtube videos using the API.
 
 Positional Arguments:
-  video_or_video_column       Single video to process or name of the CSV column
-                              containing videos when using -i/--input.
+  video_or_video_column         Single video to process or name of the CSV
+                                column containing videos when using -i/--input.
 
 Optional Arguments:
-  -k, --key KEY               YouTube API Data dashboard API key. Can be used
-                              more than once. Can also be configured in a
-                              .minetrc file as "youtube.key" or read from the
-                              MINET_YOUTUBE_KEY env variable.
-  -s, --select SELECT         Columns of -i/--input CSV file to include in the
-                              output (separated by `,`). Use an empty string if
-                              you don't want to keep anything: --select ''.
-  --explode EXPLODE           Use to indicate the character used to separate
-                              multiple values in a single CSV cell. Defaults to
-                              none, i.e. CSV cells having a single values, which
-                              is usually the case.
-  --total TOTAL               Total number of items to process. Might be
-                              necessary when you want to display a finite
-                              progress indicator for large files given as input
-                              to the command.
-  -i, --input INPUT           CSV file (potentially gzipped) containing all the
-                              videos you want to process. Will consider `-` as
-                              stdin.
-  -o, --output OUTPUT         Path to the output file. Will consider `-` as
-                              stdout. If not given, results will also be printed
-                              to stdout.
-  --rcfile RCFILE             Custom path to a minet configuration file. More
-                              info about this here:
-                              https://github.com/medialab/minet/blob/master/docs
-                              /cli.md#minetrc
-  --silent                    Whether to suppress all the log and progress bars.
-                              Can be useful when piping.
-  -h, --help                  show this help message and exit
+  -k, --key KEY                 YouTube API Data dashboard API key. Can be used
+                                more than once. Can also be configured in a
+                                .minetrc file as "youtube.key" or read from the
+                                MINET_YOUTUBE_KEY env variable.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the videos you want to process. Will consider
+                                `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
 
 how to use the command with a CSV file?
 

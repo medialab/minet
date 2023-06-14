@@ -226,6 +226,9 @@ class URLCache:
     def __len__(self) -> int:
         return len(self.__cache)
 
+    def __iter__(self) -> Iterator[str]:
+        return self.__cache.__iter__()
+
     def __contains__(self, url: str) -> bool:
         if self.normalized:
             url = normalize_url(url)
