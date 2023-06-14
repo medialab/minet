@@ -86,7 +86,7 @@ def make_twitter_action(method_name, csv_headers):
                 if cli_args.v2:
                     if is_not_user_id(user):
                         raise FatalError(
-                            "The column given as argument doesn't contain user ids, you have probably given user screen names as argument instead. With --api-v2, you can only use user ids to retrieve followers."
+                            "The column given as argument doesn't contain user ids, you have probably given user screen names as argument instead. With --v2, you can only use user ids to retrieve followers."
                         )
 
                     client_kwargs = {"max_results": ITEMS_PER_PAGE}
