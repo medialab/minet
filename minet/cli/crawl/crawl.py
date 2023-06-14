@@ -84,7 +84,7 @@ def open_report(
 
 
 # class ScraperReporterPool(object):
-#     SINGULAR = "$SINGULAR$"
+#     SINGULAR = object()
 
 #     def __init__(self, crawler: Crawler, output_dir: str, resume=False):
 #         self.reporters = {}
@@ -210,6 +210,8 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         # -s/--start-url
         if cli_args.start_url is not None:
             crawler.enqueue(cli_args.start_url)
+
+        # TODO: -i, -s and variant for specific spiders
 
     with crawler:
         # Reporter pool

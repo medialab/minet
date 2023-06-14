@@ -55,7 +55,7 @@ from minet.constants import (
     DEFAULT_URLLIB3_TIMEOUT,
 )
 
-DEFAULT_SPIDER_KEY = "$$DEFAULT_MINET_SPIDER$$"
+DEFAULT_SPIDER_KEY = object()
 
 
 def coerce_spider(target):
