@@ -2,7 +2,6 @@ import casanova
 import json
 
 def action(cli_args):
-    print(cli_args)
     jobs = casanova.reader(cli_args.input)
     graph = {
         "attributes": {
