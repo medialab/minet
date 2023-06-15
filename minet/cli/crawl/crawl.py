@@ -4,10 +4,11 @@
 #
 # Logic of the crawl action.
 #
-from typing import List, TextIO, Tuple
+from typing import List, TextIO, Tuple, Optional
 
 import os
 import casanova
+import casanova.ndjson as ndjson
 from os.path import join, isfile, dirname
 from ebbe.decorators import with_defer
 
@@ -38,116 +39,59 @@ from minet.cli.utils import (
 #    - data/
 #      - spider1/
 #        - group1.csv
+class DataWriter:
+    def __init__(
+        self, base_dir: str, crawler: Crawler, resume: bool = False, format: str = "csv"
+    ):
+        self.handles = {}
+        self.resume = resume
+        self.singular = crawler.singular
+        self.format = format
 
-# TODO: rely on casanova resumers?
+        if self.singular:
+            self.dir = base_dir
+            self.__add_file(None, "data")
+        else:
+            self.dir = join(base_dir, "data")
+            for name, _ in crawler.spiders():
+                self.__add_file(name, join("data", name))
 
-# class ScraperReporter(object):
-#     def __init__(self, path: str, scraper: Scraper, resume=False):
-#         if scraper.fieldnames is None:
-#             raise NotImplementedError("Scraper fieldnames could not be inferred.")
+    def __add_file(self, name: Optional[str], path: str):
+        path += "." + self.format
 
-#         f, writer = open_report(path, ["job_id"] + scraper.fieldnames, resume)
+        path = join(self.dir, path)
+        directory = dirname(path)
+        os.makedirs(directory, exist_ok=True)
 
-#         self.fieldnames = scraper.fieldnames
-#         self.file = f
-#         self.writer = writer
+        f = (
+            casanova.BasicResumer(path, encoding="utf-8")
+            if self.resume
+            else open(path, "w", encoding="utf-8")
+        )
 
-#     def write(self, job_id: str, items) -> int:
-#         count = 0
+        if self.format == "csv":
+            # TODO: ability to pass fieldnames? from spider?
+            w = casanova.InferringWriter(f)
+        elif self.format == "jsonl" or self.format == "ndjson":
+            w = ndjson.writer(f)
+        else:
+            raise NotImplementedError('unknown format "%s"' % self.format)
 
-#         # TODO: maybe abstract this once step above
-#         if not isinstance(items, list):
-#             items = [items]
+        self.handles[name] = {"file": f, "writer": w}
 
-#         for item in items:
-#             count += 1
+    def write(self, result: CrawlResult) -> None:
+        if self.singular:
+            self.handles[None]["writer"].writerow(result.data)
+        else:
+            raise NotImplementedError
 
-#             if not isinstance(item, dict):
-#                 row = [item]
-#             else:
-#                 row = [item.get(k, "") for k in self.fieldnames]
+    def flush(self) -> None:
+        for h in self.handles.values():
+            h["file"].flush()
 
-#             row = [job_id] + row
-
-#             self.writer.writerow(row)
-
-#         return count
-
-#     def flush(self):
-#         self.file.flush()
-
-#     def close(self):
-#         self.file.close()
-
-
-# class ScraperReporterPool(object):
-#     SINGULAR = object()
-
-#     def __init__(self, crawler: Crawler, output_dir: str, resume=False):
-#         self.reporters = {}
-
-#         if crawler.singular:
-#             spider = crawler.get_spider()
-
-#             self.reporters["default"] = {}
-
-#             if spider.scraper is not None:
-#                 path = join(output_dir, "scraped.csv")
-#                 reporter = ScraperReporter(path, spider.scraper, resume)
-#                 self.reporters["default"][ScraperReporterPool.SINGULAR] = reporter
-
-#             for name, scraper in spider.scrapers.items():
-#                 path = join(output_dir, "scraped", "%s.csv" % name)
-
-#                 reporter = ScraperReporter(path, scraper, resume)
-#                 self.reporters["default"][name] = reporter
-#         else:
-#             for spider_name, spider in crawler.spiders.items():
-#                 self.reporters[spider_name] = {}
-
-#                 if spider.scraper is not None:
-#                     path = join(output_dir, "scraped", spider_name, "scraped.csv")
-#                     reporter = ScraperReporter(path, spider.scraper, resume)
-#                     self.reporters[spider_name][ScraperReporterPool.SINGULAR] = reporter
-
-#                 for name, scraper in spider.scrapers.items():
-#                     path = join(output_dir, "scraped", spider_name, "%s.csv" % name)
-
-#                     reporter = ScraperReporter(path, scraper, resume)
-#                     self.reporters[spider_name][name] = reporter
-
-#     def write(self, job: CrawlJob, scraped: DefinitionSpiderOutput) -> int:
-#         count = 0
-
-#         spider_name = job.spider
-
-#         if spider_name is None:
-#             spider_name = "default"
-
-#         reporter = self.reporters[spider_name]
-
-#         if scraped.default is not None:
-#             count += reporter[ScraperReporterPool.SINGULAR].write(
-#                 job.id, scraped.default
-#             )
-
-#         for name, items in scraped.named.items():
-#             count += reporter[name].write(job.id, items)
-
-#         return count
-
-#     def __iter__(self):
-#         for spider_reporters in self.reporters.values():
-#             for reporter in spider_reporters.values():
-#                 yield reporter
-
-#     def flush(self) -> None:
-#         for reporter in self:
-#             reporter.flush()
-
-#     def close(self) -> None:
-#         for reporter in self:
-#             reporter.close()
+    def close(self) -> None:
+        for h in self.handles.values():
+            h["file"].close()
 
 
 # NOTE: overhauling the way the crawler works.
@@ -176,7 +120,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
     jobs_output = (
         casanova.BasicResumer(jobs_output_path, encoding="utf-8")
         if cli_args.resume
-        else open(jobs_output_path, encoding="utf-8")
+        else open(jobs_output_path, "w", encoding="utf-8")
     )
     jobs_writer = casanova.Writer(jobs_output, fieldnames=CrawlResult.fieldnames())
     defer(jobs_output.close)
@@ -213,31 +157,30 @@ def action(cli_args, defer, loading_bar: LoadingBar):
 
         # TODO: -i, -s and variant for specific spiders
 
-    with crawler:
-        # Reporter pool
-        # reporter_pool = ScraperReporterPool(
-        #     crawler, cli_args.output_dir, resume=cli_args.resume
-        # )
-        # defer(reporter_pool.close)
+    data_writer = DataWriter(
+        cli_args.output_dir, crawler, resume=cli_args.resume, format=cli_args.format
+    )
+    defer(data_writer.close)
 
+    with crawler:
         track_crawler_state_with_loading_bar(loading_bar, crawler.state)
 
         # Running crawler
         for result in crawler:
-            # TODO: verbose
             with loading_bar.step():
                 if cli_args.verbose:
                     console.print(result, highlight=True)
 
                 jobs_writer.writerow(result)
+
+                # Flushing to avoid sync issues as well as possible
                 jobs_output.flush()
 
                 if result.error is not None:
                     loading_bar.inc_stat(result.error_code, style="error")
                     continue
 
-                # count = reporter_pool.write(result.job, result.data)
-                # loading_bar.inc_stat("scraped", count=count, style="success")
+                data_writer.write(result)
 
-                # # Flushing to avoid sync issues as well as possible
-                # reporter_pool.flush()
+                # Flushing to avoid sync issues as well as possible
+                data_writer.flush()

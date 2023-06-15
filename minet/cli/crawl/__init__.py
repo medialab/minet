@@ -53,6 +53,12 @@ CRAWL_COMMAND = command(
             "default": DEFAULT_THROTTLE,
         },
         {
+            "flags": ["-f", "--format"],
+            "help": "Serialization format for scraped/extracted data.",
+            "choices": ("csv", "jsonl", "ndjson"),
+            "default": "csv",
+        },
+        {
             "flags": ["-v", "--verbose"],
             "help": "Whether to print information about crawl results.",
             "action": "store_true",
