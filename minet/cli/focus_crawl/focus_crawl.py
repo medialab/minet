@@ -71,7 +71,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         daemonic=False,
         visit_urls_only_once=True,
         normalized_url_cache=True,
-        resume=cli_args.resume or cli_args.dump_queue,
+        resume=cli_args.resume,
     )
 
     if crawler.finished:
