@@ -13,8 +13,7 @@ from ebbe.decorators import with_defer
 
 from minet.utils import import_target
 from minet.cli.exceptions import FatalError
-from minet.scrape import Scraper
-from minet.crawl import Crawler, CrawlResult, CrawlJob
+from minet.crawl import Crawler, CrawlResult, CrawlJob, Spider
 from minet.cli.console import console
 from minet.cli.loading_bar import LoadingBar
 from minet.cli.utils import (
@@ -23,6 +22,22 @@ from minet.cli.utils import (
     track_crawler_state_with_loading_bar,
 )
 
+# NOTE: here are the possible file structure for scraped data:
+#
+# 1. singular spider, one group:
+#    - data.csv
+# 2. singular spider, multiple groups:
+#    - data/
+#      - group1.csv
+#      - group2.csv
+# 3. plural spider, one group:
+#    - data/
+#      - spider1.csv
+#      - spider2.csv
+# 4. plural spider, multiple groups
+#    - data/
+#      - spider1/
+#        - group1.csv
 
 # TODO: rely on casanova resumers?
 
