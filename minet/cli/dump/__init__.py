@@ -1,4 +1,5 @@
-from minet.cli.argparse import command
+from minet.cli.argparse import command, InputAction
+from sys import stdin
 
 DUMP_QUEUE_COMMAND = command(
     "dump-queue",
@@ -35,5 +36,30 @@ DUMP_URLS_COMMAND = command(
     """,
     arguments=[
         {"name": "urls_dir", "help": "Path to the url store's directory."},
+    ],
+)
+
+DUMP_GRAPH_COMMAND = command(
+    "dump-graph",
+    "minet.cli.dump.dump_graph",
+    title="Minet Dump Graph Command",
+    description="""
+        Debug command that can be used to dump a crawler's graph from
+        a jobs csv and visual it as a network.
+
+        The export file is in json with a Graphology format.
+    """,
+    epilog="""
+        Examples:
+
+        . Dumping a graph file from crawler jobs:
+            $ minet dump-graph ./jobs.csv > graph.json
+    """,
+    arguments=[
+        {
+            "name": "file",
+            "help": "Path to the url store's directory.",
+            "action": InputAction,
+        },
     ],
 )
