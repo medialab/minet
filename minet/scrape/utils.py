@@ -10,7 +10,7 @@ from minet.types import AnyScrapableTarget
 from bs4 import BeautifulSoup, SoupStrainer
 from functools import partial
 
-from minet.soup import suppress_xml_parsed_as_html_warnings
+from minet.scrape.soup import suppress_xml_parsed_as_html_warnings
 from minet.scrape.constants import SELECT_ALIASES, ITERATOR_ALIASES
 
 

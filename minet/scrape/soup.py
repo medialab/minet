@@ -1,8 +1,11 @@
-from typing import List, Optional
+from typing import List, Optional, overload, cast
+from minet.types import Literal
 
 import warnings
 from contextlib import contextmanager
 from bs4 import Tag, BeautifulSoup
+
+from minet.scrape.std import get_display_text
 
 try:
     from bs4 import XMLParsedAsHTMLWarning
@@ -10,12 +13,38 @@ except ImportError:
     XMLParsedAsHTMLWarning = None
 
 
-class MinetTag(Tag):
-    def hello(self) -> None:
-        print("hello")
+class SelectionError(Exception):
+    pass
 
-    def select_one(self, css: str) -> Optional["MinetTag"]:
-        return super().select_one(css)  # type: ignore
+
+class MinetTag(Tag):
+    @overload
+    def select_one(
+        self, css: str, *args, strict: Literal[False] = ..., **kwargs
+    ) -> Optional["MinetTag"]:
+        ...
+
+    @overload
+    def select_one(
+        self, css: str, *args, strict: Literal[True] = ..., **kwargs
+    ) -> "MinetTag":
+        ...
+
+    def select_one(
+        self, css: str, *args, strict: bool = False, **kwargs
+    ) -> Optional["MinetTag"]:
+        elem = super().select_one(css, *args, **kwargs)
+
+        if strict and elem is None:
+            raise SelectionError(css)
+
+        return cast(MinetTag, elem)
+
+    def select(self, css: str, *args, **kwargs) -> List["MinetTag"]:
+        return cast(List["MinetTag"], super().select(css, *args, **kwargs))
+
+    def get_display_text(self) -> str:
+        return get_display_text(self)
 
 
 WONDERFUL_ELEMENT_CLASSES = {Tag: MinetTag}
@@ -42,15 +71,3 @@ def suppress_xml_parsed_as_html_warnings(bypass=False):
                 yield
     finally:
         pass
-
-
-if __name__ == "__main__":
-    html = "<div><p>wonderful</p></div>"
-    soup = WonderfulSoup(html)
-
-    soup.hello()
-    p = soup.select_one("p")
-
-    assert p is not None
-
-    p.hello()
