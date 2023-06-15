@@ -1,5 +1,4 @@
 from minet.cli.argparse import command, InputAction
-from sys import stdin
 
 DUMP_QUEUE_COMMAND = command(
     "dump-queue",
@@ -45,7 +44,7 @@ DUMP_GRAPH_COMMAND = command(
     title="Minet Dump Graph Command",
     description="""
         Debug command that can be used to dump a crawler's graph from
-        a jobs csv and visual it as a network.
+        a jobs csv and manipulate it as a network.
 
         The export file is in json with a Graphology format.
     """,
@@ -55,10 +54,11 @@ DUMP_GRAPH_COMMAND = command(
         . Dumping a graph file from crawler jobs:
             $ minet dump-graph ./jobs.csv > graph.json
     """,
+    select=True,
     arguments=[
         {
-            "name": "file",
-            "help": "Path to the url store's directory.",
+            "flags": ["-i", "--input"],
+            "help": "Path to crawler's jobs csv file.",
             "action": InputAction,
         },
     ],
