@@ -61,5 +61,9 @@ DUMP_GRAPH_COMMAND = command(
             "help": "Path to crawler's jobs csv file.",
             "action": InputAction,
         },
+        {
+            "flags": ["-l", "--label"],
+            "help": "Specify the CSV column to use for graph's nodes label"
+        }
     ],
 )
