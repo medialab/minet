@@ -65,3 +65,9 @@ pyinstaller: clean
 		--exclude-module jupyterlab_server \
 		--exclude-module jupyterlab-widgets \
 		minet/cli/__main__.py
+
+useragents:
+	python -m scripts.useragents.update
+	rm -f ./scripts/useragents/list.csv
+	mv ./scripts/useragents/list_new.csv ./scripts/useragents/list.csv
+	make format
