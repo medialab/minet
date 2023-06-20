@@ -48,7 +48,7 @@ class FocusSpider(Spider):
         self.irrelevant_continue = irrelevant_continue
         self.target_html = only_target_html_page
 
-    def __call__(self, job: CrawlJob, response: Response):
+    def process(self, job: CrawlJob, response: Response):
         # Return variables
         relevant_content = False
         next_urls = set()

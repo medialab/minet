@@ -5,6 +5,7 @@
 # Crawler class invoking multiple spiders to scrape data from the web.
 #
 from typing import (
+    cast,
     Optional,
     TypeVar,
     Callable,
@@ -160,7 +161,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
             if cancel_event.is_set():
                 return CANCELLED
 
-            spider_result = spider(job, response)
+            spider_result = spider.process(job, response)
 
             if spider_result is not None:
                 data, next_jobs = spider_result
@@ -213,7 +214,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
     finished: bool
     singular: bool
 
-    __spiders: Dict[str, Spider[CrawlJobDataTypes, CrawlResultDataTypes]]
+    __spiders: Dict[Union[object, str], Spider[CrawlJobDataTypes, CrawlResultDataTypes]]
 
     def __init__(
         self,
@@ -359,7 +360,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             raise TypeError("singular crawler cannot return a spider by name")
 
         if name is None:
-            name = DEFAULT_SPIDER_KEY
+            name = cast(str, DEFAULT_SPIDER_KEY)
 
         return self.__spiders[name]
 
@@ -370,6 +371,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             )
 
         for name, spiders in self.__spiders.items():
+            assert isinstance(name, str)
             yield name, spiders
 
     def start(self) -> None:
@@ -393,6 +395,8 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             for name, spider in self.__spiders.items():
                 if self.singular:
                     name = None
+
+                assert name is None or isinstance(name, str)
 
                 self.enqueue(spider_start_iter(spider), spider=name)
 

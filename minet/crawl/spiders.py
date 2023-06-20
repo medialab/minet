@@ -60,7 +60,7 @@ class Spider(Generic[CrawlJobDataType, CrawlResultDataType]):
     def start(self) -> Optional[Iterable[UrlOrCrawlTarget[CrawlJobDataType]]]:
         return None
 
-    def __call__(
+    def process(
         self, job: CrawlJob[CrawlJobDataType], response: Response
     ) -> SpiderResult[CrawlResultDataType, CrawlJobDataType]:
         raise NotImplementedError
@@ -105,7 +105,7 @@ class FunctionSpider(Spider[CrawlJobDataType, CrawlResultDataType]):
     def start(self) -> Optional[Iterable[UrlOrCrawlTarget[CrawlJobDataType]]]:
         return self.__start_targets
 
-    def __call__(
+    def process(
         self, job: CrawlJob[CrawlJobDataType], response: Response
     ) -> SpiderResult[CrawlResultDataType, CrawlJobDataType]:
         return self.fn(job, response)
