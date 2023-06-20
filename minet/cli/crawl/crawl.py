@@ -9,7 +9,7 @@ from typing import List, TextIO, Tuple, Optional
 import os
 import casanova
 import casanova.ndjson as ndjson
-from os.path import join, isfile, dirname
+from os.path import join, isfile, dirname, relpath
 from ebbe.decorators import with_defer
 
 from minet.utils import import_target
@@ -131,9 +131,9 @@ def action(cli_args, defer, loading_bar: LoadingBar):
             ext=response.ext,
         )
 
-        # TODO: find a way to percolate the path down the line
-        # TODO: write the path of the job in the result
         self.write(path, response.body, compress=cli_args.compress)
+
+        setattr(result, "_path", path)
 
     # Scaffolding output directory
     os.makedirs(cli_args.output_dir, exist_ok=True)
@@ -144,7 +144,12 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         if cli_args.resume
         else open(jobs_output_path, "w", encoding="utf-8")
     )
-    jobs_writer = casanova.Writer(jobs_output, fieldnames=CrawlResult.fieldnames())
+    jobs_fieldnames = CrawlResult.fieldnames()
+
+    if cli_args.write:
+        jobs_fieldnames += ["path"]
+
+    jobs_writer = casanova.Writer(jobs_output, fieldnames=jobs_fieldnames)
     defer(jobs_output.close)
 
     target = import_target(cli_args.target, "spider")
@@ -195,7 +200,10 @@ def action(cli_args, defer, loading_bar: LoadingBar):
                 if cli_args.verbose:
                     console.print(result, highlight=True)
 
-                jobs_writer.writerow(result)
+                if cli_args.write:
+                    jobs_writer.writerow(result, [getattr(result, "_path", "")])
+                else:
+                    jobs_writer.writerow(result)
 
                 # Flushing to avoid sync issues as well as possible
                 jobs_output.flush()
