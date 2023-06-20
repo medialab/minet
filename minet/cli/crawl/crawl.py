@@ -13,8 +13,9 @@ from os.path import join, isfile, dirname
 from ebbe.decorators import with_defer
 
 from minet.utils import import_target
+from minet.fs import FilenameBuilder
 from minet.cli.exceptions import FatalError
-from minet.crawl import Crawler, CrawlResult, CrawlJob, Spider
+from minet.crawl import Crawler, CrawlResult, SuccessfulCrawlResult, CrawlJob, Spider
 from minet.cli.console import console
 from minet.cli.loading_bar import LoadingBar
 from minet.cli.utils import (
@@ -111,8 +112,28 @@ class DataWriter:
 )
 @with_ctrl_c_warning
 def action(cli_args, defer, loading_bar: LoadingBar):
-    # Loading crawler definition
     persistent_storage_path = join(cli_args.output_dir, "store")
+    writer_root_directory = join(cli_args.output_dir, "pages")
+
+    filename_builder = FilenameBuilder(cli_args.folder_strategy)
+
+    def callback(self: Crawler, result: SuccessfulCrawlResult) -> None:
+        if not cli_args.write:
+            return
+
+        response = result.response
+        filename = result.job.id
+
+        path = filename_builder(
+            url=response.end_url,
+            filename=filename,
+            compressed=cli_args.compress,
+            ext=response.ext,
+        )
+
+        # TODO: find a way to percolate the path down the line
+        # TODO: write the path of the job in the result
+        self.write(path, response.body, compress=cli_args.compress)
 
     # Scaffolding output directory
     os.makedirs(cli_args.output_dir, exist_ok=True)
@@ -137,9 +158,11 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         throttle=cli_args.throttle,
         max_depth=cli_args.max_depth,
         persistent_storage_path=persistent_storage_path,
+        writer_root_directory=writer_root_directory,
         visit_urls_only_once=cli_args.visit_urls_only_once,
         normalized_url_cache=cli_args.normalized_url_cache,
         resume=cli_args.resume,
+        callback=callback,
         wait=False,
         daemonic=False,
     )

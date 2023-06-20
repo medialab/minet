@@ -1,4 +1,4 @@
-from minet.cli.argparse import command
+from minet.cli.argparse import command, FolderStrategyType
 
 # TODO: lazyloading issue
 from minet.constants import DEFAULT_THROTTLE
@@ -12,6 +12,27 @@ CRAWL_COMMAND = command(
         in a python module.
     """,
     epilog="""
+        --folder-strategy options:
+
+        . "flat": default choice, all files will be written in the indicated
+            content folder.
+
+        . "fullpath": all files will be written in a folder consisting of the
+            url hostname and then its path.
+
+        . "prefix-x": e.g. "prefix-4", files will be written in folders
+            having a name that is the first x characters of the file's name.
+            This is an efficient way to partition content into folders containing
+            roughly the same number of files if the file names are random (which
+            is the case by default since md5 hashes will be used).
+
+        . "hostname": files will be written in folders based on their url's
+            full host name.
+
+        . "normalized-hostname": files will be written in folders based on
+            their url's hostname stripped of some undesirable parts (such as
+            "www.", or "m." or "fr.", for instance).
+
         Examples:
 
         . Crawling using the `process` function in the `crawl` module:
@@ -51,6 +72,22 @@ CRAWL_COMMAND = command(
             "help": "Time to wait - in seconds - between 2 calls to the same domain.",
             "type": float,
             "default": DEFAULT_THROTTLE,
+        },
+        {
+            "flag": "--compress",
+            "help": "Whether to compress the downloaded files when saving on disk using -w/--write.",
+            "action": "store_true",
+        },
+        {
+            "flags": ["-w", "--write"],
+            "help": "Whether to write downloaded responses on disk in order to save them for later.",
+            "action": "store_true",
+        },
+        {
+            "flag": "--folder-strategy",
+            "help": "Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. All of the strategies are described at the end of this help.",
+            "default": "flat",
+            "type": FolderStrategyType(),
         },
         {
             "flags": ["-f", "--format"],

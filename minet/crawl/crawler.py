@@ -100,7 +100,11 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         callback: Optional[
             Callable[
-                [SuccessfulCrawlResult[CrawlJobDataType, CrawlResultDataType]], None
+                [
+                    "Crawler",
+                    SuccessfulCrawlResult[CrawlJobDataType, CrawlResultDataType],
+                ],
+                None,
             ]
         ] = None
     ):
@@ -196,7 +200,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
             # NOTE: at one point we might want to retry the callback like
             # in the HTTPWorker
             if self.callback is not None:
-                self.callback(result)  # type: ignore
+                self.callback(self.crawler, result)  # type: ignore
 
             return result
 
@@ -256,7 +260,11 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         callback: Optional[
             Callable[
-                [SuccessfulCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes]], None
+                [
+                    "Crawler",
+                    SuccessfulCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes],
+                ],
+                None,
             ]
         ] = None,
     ):

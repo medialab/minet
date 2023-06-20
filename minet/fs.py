@@ -179,6 +179,8 @@ class FilenameBuilder(object):
 
         if folder_strategy is not None and isinstance(folder_strategy, str):
             self.folder_strategy = FolderStrategy.from_name(folder_strategy)
+        elif isinstance(folder_strategy, FolderStrategy):
+            self.folder_strategy = folder_strategy
 
         self.formatter = PseudoFStringFormatter()
         self.template = template
