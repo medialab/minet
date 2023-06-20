@@ -63,6 +63,9 @@ class Spider(Generic[CrawlJobDataType, CrawlResultDataType]):
     def process(
         self, job: CrawlJob[CrawlJobDataType], response: Response
     ) -> SpiderResult[CrawlResultDataType, CrawlJobDataType]:
+        if callable(self):
+            return self(job, response)
+
         raise NotImplementedError
 
     def __repr__(self):
