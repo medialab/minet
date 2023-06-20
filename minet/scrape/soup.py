@@ -3,7 +3,7 @@ from minet.types import Literal
 
 import warnings
 from contextlib import contextmanager
-from bs4 import Tag, BeautifulSoup
+from bs4 import Tag, BeautifulSoup, SoupStrainer
 
 from minet.scrape.std import get_display_text
 
@@ -41,10 +41,24 @@ class MinetTag(Tag):
         return cast(MinetTag, elem)
 
     def select(self, css: str, *args, **kwargs) -> List["MinetTag"]:
+        css = css.replace(":contains(", ":-soup-contains(")
+
         return cast(List["MinetTag"], super().select(css, *args, **kwargs))
+
+    def get_text(self) -> str:
+        return super().get_text().strip()
 
     def get_display_text(self) -> str:
         return get_display_text(self)
+
+    def get_html(self) -> str:
+        return self.decode_contents().strip()
+
+    def get_inner_html(self) -> str:
+        return self.get_html()
+
+    def get_outer_html(self) -> str:
+        return str(self).strip()
 
 
 WONDERFUL_ELEMENT_CLASSES = {Tag: MinetTag}
@@ -56,8 +70,13 @@ class WonderfulSoup(BeautifulSoup, MinetTag):
     wrangling, scraping utilities and better typings.
     """
 
-    def __init__(self, markup: str, features: str = "lxml") -> None:
-        super().__init__(markup, features, element_classes=WONDERFUL_ELEMENT_CLASSES)  # type: ignore
+    def __init__(
+        self,
+        markup: str,
+        features: str = "lxml",
+        parse_only: Optional[SoupStrainer] = None,
+    ) -> None:
+        super().__init__(markup, features, element_classes=WONDERFUL_ELEMENT_CLASSES, parse_only=parse_only)  # type: ignore
 
 
 @contextmanager

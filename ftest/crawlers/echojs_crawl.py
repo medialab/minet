@@ -23,6 +23,6 @@ def spider(job: CrawlJob, response: Response) -> SpiderResult:
     next_links = set(
         a.get("href") for a in soup.select("#newslist article > h2 > a[href]")
     )
-    title = soup.select_one("title").get_text().strip()
+    title = soup.select_one("title", strict=True).get_text().strip()
 
     return title, next_links

@@ -52,7 +52,7 @@ from tenacity import (
 )
 from tenacity.wait import wait_base
 
-from minet.scrape.soup import suppress_xml_parsed_as_html_warnings
+from minet.scrape.soup import suppress_xml_parsed_as_html_warnings, WonderfulSoup
 from minet.encodings import normalize_encoding, infer_encoding
 from minet.loggers import sleepers_logger
 from minet.utils import is_binary_mimetype
@@ -1003,9 +1003,9 @@ class Response(object):
         engine: str = "lxml",
         ignore_xhtml_warning=False,
         strainer: Optional[SoupStrainer] = None,
-    ) -> BeautifulSoup:
+    ) -> WonderfulSoup:
         with suppress_xml_parsed_as_html_warnings(bypass=not ignore_xhtml_warning):
-            return BeautifulSoup(self.text(), engine, parse_only=strainer)
+            return WonderfulSoup(self.text(), engine, parse_only=strainer)
 
     def __repr__(self) -> str:
         attr: List[Union[str, Tuple[str, Union[str, bool]]]] = ["status", "url"]
