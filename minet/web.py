@@ -30,7 +30,7 @@ import json
 import mimetypes
 import functools
 import threading
-from bs4 import BeautifulSoup, SoupStrainer
+from bs4 import SoupStrainer
 from datetime import datetime
 from timeit import default_timer as timer
 from io import BytesIO

@@ -17,12 +17,9 @@ from minet.crawl import CrawlJob, SpiderResult
 
 
 def spider(job: CrawlJob, response: Response) -> SpiderResult:
-    # TODO: response.scrape?
     soup = response.soup()
 
-    next_links = set(
-        a.get("href") for a in soup.select("#newslist article > h2 > a[href]")
-    )
-    title = soup.select_one("title", strict=True).get_text().strip()
+    next_links = soup.scrape("#newslist article > h2 > a[href]", "href")
+    title = soup.select_one("title", strict=True).get_text()
 
     return title, next_links

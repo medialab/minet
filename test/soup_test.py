@@ -1,4 +1,6 @@
-from minet.scrape.soup import WonderfulSoup
+import pytest
+
+from minet.scrape.soup import WonderfulSoup, SelectionError
 
 HTML = """
 <div>
@@ -6,8 +8,20 @@ HTML = """
 </div>
 """
 
+LINKS = """
+    <h1 id="title">Title</h1>
+    <ul>
+        <li><a href="one">1</a></li>
+        <li><a href="two">2</a></li>
+    </ul>
+"""
+
 
 class TestWonderfulSoup:
+    def test_select_one_strict(self):
+        with pytest.raises(SelectionError):
+            WonderfulSoup(HTML).select_one("li", strict=True)
+
     def test_get_display_text(self):
         soup = WonderfulSoup(HTML)
 
@@ -28,3 +42,12 @@ class TestWonderfulSoup:
 
         assert soup.select_one(':contains("wut")') is not None
         assert soup.select(':contains("wut")') is not None
+
+    def test_scrape_one(self):
+        soup = WonderfulSoup(LINKS)
+
+        assert soup.scrape_one("h1") == "Title"
+        assert soup.scrape_one("link") is None
+
+        with pytest.raises(SelectionError):
+            assert soup.scrape_one("link", strict=True)

@@ -17,6 +17,22 @@ class SelectionError(Exception):
     pass
 
 
+def extract(elem: "MinetTag", target: Optional[str]) -> Optional[str]:
+    if target is None or target == "text":
+        return elem.get_text()
+
+    if target == "html" or target == "inner_html":
+        return elem.get_html()
+
+    if target == "outer_html":
+        return elem.get_outer_html()
+
+    if target == "display_text":
+        return elem.get_display_text()
+
+    return cast(Optional[str], elem.get(target))
+
+
 class MinetTag(Tag):
     @overload
     def select_one(
@@ -44,6 +60,42 @@ class MinetTag(Tag):
         css = css.replace(":contains(", ":-soup-contains(")
 
         return cast(List["MinetTag"], super().select(css, *args, **kwargs))
+
+    @overload
+    def scrape_one(
+        self, css: str, target: Optional[str] = ..., strict: Literal[False] = ...
+    ) -> Optional[str]:
+        ...
+
+    @overload
+    def scrape_one(
+        self, css: str, target: Optional[str] = ..., strict: Literal[True] = ...
+    ) -> str:
+        ...
+
+    def scrape_one(
+        self, css: str, target: Optional[str] = None, strict: bool = False
+    ) -> Optional[str]:
+        elem = self.select_one(css)
+
+        if elem is None:
+            if strict:
+                raise SelectionError(css)
+
+            return None
+
+        return extract(elem, target)
+
+    def scrape(self, css: str, target: Optional[str] = None) -> List[str]:
+        output = []
+
+        for elem in self.select(css):
+            value = extract(elem, target)
+
+            if value is not None:
+                output.append(value)
+
+        return output
 
     def get_text(self) -> str:
         return super().get_text().strip()
