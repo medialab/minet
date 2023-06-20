@@ -63,7 +63,8 @@ DUMP_GRAPH_COMMAND = command(
         },
         {
             "flags": ["-l", "--label"],
-            "help": "Specify the CSV column to use for graph's nodes label"
-        }
+            "help": "Specify the CSV column to use for graph's nodes label",
+            "default": "url",
+        },
     ],
 )
