@@ -111,6 +111,9 @@ FETCH_COMMAND = command(
         . "flat": default choice, all files will be written in the indicated
             content folder.
 
+        . "fullpath": all files will be written in a folder consisting of the
+            url hostname and then its path.
+
         . "prefix-x": e.g. "prefix-4", files will be written in folders
             having a name that is the first x characters of the file's name.
             This is an efficient way to partition content into folders containing

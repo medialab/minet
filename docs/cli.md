@@ -216,21 +216,33 @@ Examples:
 
 ```
 Usage: minet crawl [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                   [-O OUTPUT_DIR] [--resume] [--throttle THROTTLE]
-                   crawler
+                   [-O OUTPUT_DIR] [-s START_URL] [--resume] [-m MAX_DEPTH] [-u]
+                   [-n] [--throttle THROTTLE] [-f {csv,jsonl,ndjson}] [-v]
+                   target
 
 # Minet Crawl Command
 
-Use multiple threads to crawl the web using minet crawling and
-scraping DSL.
+Run a crawl using a minet crawler or spiders defined
+in a python module.
 
 Positional Arguments:
-  crawler                       Path to the crawler definition file.
+  target                        Crawling target.
 
 Optional Arguments:
+  -f, --format {csv,jsonl,ndjson}
+                                Serialization format for scraped/extracted data.
+                                Defaults to `csv`.
+  -m, --max-depth MAX_DEPTH     Maximum depth for the crawl.
+  -n, --normalized-url-cache    Whether to normalize url cache when using
+                                -u/--visit-urls-only-once.
   -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.
+  -s, --start-url START_URL     Starting url.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to `0.2`.
+  -v, --verbose                 Whether to print information about crawl
+                                results.
+  -u, --visit-urls-only-once    Whether to ensure that any url will only be
+                                visited once.
   --resume                      Whether to resume an interrupted crawl.
   --refresh-per-second REFRESH_PER_SECOND
                                 Number of times to refresh the progress bar per
@@ -244,8 +256,8 @@ Optional Arguments:
 
 Examples:
 
-. Running a crawler definition:
-    $ minet crawl crawler.yml -O crawl-data
+. Crawling using the `process` function in the `crawl` module:
+    $ minet crawl crawl:process -O crawl-data
 ```
 
 ## focus-crawl
@@ -487,6 +499,9 @@ Columns being added to the output:
 
 . "flat": default choice, all files will be written in the indicated
     content folder.
+
+. "fullpath": all files will be written in a folder consisting of the
+    url hostname and then its path.
 
 . "prefix-x": e.g. "prefix-4", files will be written in folders
     having a name that is the first x characters of the file's name.

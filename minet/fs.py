@@ -6,13 +6,14 @@
 #
 from typing import Union, Optional
 
+import os
 import gzip
 import json
 import yaml
 from ebbe.decorators import with_defer
 from os import makedirs, PathLike
 from os.path import basename, join, splitext, abspath, normpath, dirname
-from ural import get_hostname, get_normalized_hostname
+from ural import get_hostname, get_normalized_hostname, safe_urlsplit, pathsplit
 from quenouille import NamedLocks
 
 from minet.exceptions import (
@@ -84,6 +85,9 @@ class FolderStrategy(object):
         if name == "flat":
             return FlatFolderStrategy()
 
+        if name == "fullpath":
+            return FullPathFolderStrategy()
+
         if name == "hostname":
             return HostnameFolderStrategy()
 
@@ -109,6 +113,21 @@ class FolderStrategy(object):
 class FlatFolderStrategy(FolderStrategy):
     def __call__(self, filename, **kwargs):
         return filename
+
+
+class FullPathFolderStrategy(FolderStrategy):
+    def __call__(self, filename, url, **kwargs):
+        parsed = safe_urlsplit(url)
+        final_path = [parsed.hostname]
+
+        path = pathsplit(parsed.path)
+
+        if path and "." in path[-1]:
+            path.pop()
+
+        final_path += path
+
+        return join(os.sep.join(final_path), filename)
 
 
 class PrefixFolderStrategy(FolderStrategy):

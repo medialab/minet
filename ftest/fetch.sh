@@ -6,7 +6,7 @@ rm -f ftest/report.csv
 python -m minet.cli fetch url -i ftest/resources/urls.csv \
   -O ftest/content \
   --filename id \
-  --folder-strategy normalized-hostname \
+  --folder-strategy fullpath \
   --grab-cookies firefox \
   --compress \
   --only-html \
