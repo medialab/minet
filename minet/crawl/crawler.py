@@ -44,7 +44,7 @@ from minet.crawl.spiders import (
 from minet.crawl.queue import CrawlerQueue
 from minet.crawl.state import CrawlerState
 from minet.crawl.url_cache import URLCache
-from minet.web import request, EXPECTED_WEB_ERRORS, AnyTimeout
+from minet.web import request, EXPECTED_WEB_ERRORS, AnyTimeout, Response
 from minet.fs import ThreadSafeFileWriter
 from minet.executors import HTTPThreadPoolExecutor, CANCELLED
 from minet.exceptions import UnknownSpiderError, CancelledRequestError, InvalidURLError
@@ -98,12 +98,18 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
         *,
         request_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
+        callback: Optional[
+            Callable[
+                [SuccessfulCrawlResult[CrawlJobDataType, CrawlResultDataType]], None
+            ]
+        ] = None
     ):
         self.crawler = crawler
         self.cancel_event = self.crawler.executor.cancel_event
         self.local_context = self.crawler.executor.local_context
         self.request_args = request_args
         self.max_depth = crawler.max_depth
+        self.callback = callback
 
         self.default_kwargs = {
             "pool_manager": crawler.executor.pool_manager,
@@ -185,7 +191,14 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
                     parent=job,
                 )
 
-            return SuccessfulCrawlResult(job, response, data, degree)
+            result = SuccessfulCrawlResult(job, response, data, degree)
+
+            # NOTE: at one point we might want to retry the callback like
+            # in the HTTPWorker
+            if self.callback is not None:
+                self.callback(result)  # type: ignore
+
+            return result
 
 
 CrawlJobDataTypes = TypeVar("CrawlJobDataTypes")
@@ -241,6 +254,11 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         retryer_kwargs: Optional[Dict[str, Any]] = None,
         request_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
+        callback: Optional[
+            Callable[
+                [SuccessfulCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes]], None
+            ]
+        ] = None,
     ):
         # Validation
         if resume and persistent_storage_path is None:
@@ -277,6 +295,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         }
 
         self.worker_kwargs = {
+            "callback": callback,
             "request_args": request_args,
             "max_redirects": max_redirects,
         }

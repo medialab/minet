@@ -23,6 +23,7 @@ from minet.cli.utils import (
     track_crawler_state_with_loading_bar,
 )
 
+
 # NOTE: here are the possible file structure for scraped data:
 #
 # 1. singular spider, one group:
