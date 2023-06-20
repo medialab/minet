@@ -48,7 +48,7 @@ def prepare_columns(cli_args, headers):
 
 def prepare_attributes(fields, row, fieldnames, caster):
     casted_row = caster.cast_row(fieldnames, row)
-    for (k, v) in fields.items():
+    for k, v in fields.items():
         if k != "id" and k != "parent" and k != "degree":
             yield (fieldnames[v], casted_row[v])
 
