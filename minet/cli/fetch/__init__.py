@@ -1,6 +1,6 @@
 from casanova import ThreadSafeResumer
 
-from minet.cli.argparse import command, BooleanAction
+from minet.cli.argparse import command, BooleanAction, FolderStrategyType
 from minet.cli.constants import DEFAULT_CONTENT_FOLDER
 from minet.cli.exceptions import InvalidArgumentsError
 
@@ -185,6 +185,7 @@ FETCH_COMMAND = command(
             "flag": "--folder-strategy",
             "help": "Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. All of the strategies are described at the end of this help.",
             "default": "flat",
+            "type": FolderStrategyType(),
         },
         {
             "flag": "--keep-failed-contents",

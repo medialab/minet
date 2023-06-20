@@ -77,6 +77,8 @@ def load_definition(f, *, defer=None, encoding="utf-8"):
 
 
 class FolderStrategy(object):
+    CHOICES = ["flat", "fullpath", "hostname", "normalize-hostname", "prefix-x"]
+
     def __call__(self):
         raise NotImplementedError
 
@@ -166,10 +168,16 @@ class NormalizedHostnameFolderStrategy(FolderStrategy):
 
 
 class FilenameBuilder(object):
-    def __init__(self, folder_strategy=None, template=None):
+    folder_strategy: Optional[FolderStrategy]
+
+    def __init__(
+        self,
+        folder_strategy: Optional[Union[str, FolderStrategy]] = None,
+        template=None,
+    ):
         self.folder_strategy = None
 
-        if folder_strategy is not None:
+        if folder_strategy is not None and isinstance(folder_strategy, str):
             self.folder_strategy = FolderStrategy.from_name(folder_strategy)
 
         self.formatter = PseudoFStringFormatter()

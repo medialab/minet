@@ -226,19 +226,10 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
     file_writer = None
 
     if not resolve:
-        try:
-            filename_builder = FilenameBuilder(
-                folder_strategy=cli_args.folder_strategy,
-                template=cli_args.filename_template,
-            )
-        except TypeError:
-            raise FatalError(
-                [
-                    'Invalid "%s" --folder-strategy!' % cli_args.folder_strategy,
-                    "Check the list at the end of the command help:",
-                    "  $ minet fetch -h",
-                ]
-            )
+        filename_builder = FilenameBuilder(
+            folder_strategy=cli_args.folder_strategy,
+            template=cli_args.filename_template,
+        )
 
         file_writer = ThreadSafeFileWriter(cli_args.output_dir)
 

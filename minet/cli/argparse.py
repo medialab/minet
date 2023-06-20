@@ -23,12 +23,13 @@ from rich_argparse import RawDescriptionRichHelpFormatter
 from gettext import gettext
 from textwrap import dedent
 from casanova import Resumer, CsvCellIO
-from ebbe import getpath, omit
+from ebbe import getpath, omit, and_join
 from datetime import datetime
 from pytz import timezone
 from pytz.exceptions import UnknownTimeZoneError
 
 from minet.dates import datetime_from_partial_iso_format
+from minet.fs import FolderStrategy
 
 from minet.cli.console import MINET_COLORS
 from minet.cli.exceptions import NotResumableError, InvalidArgumentsError
@@ -286,15 +287,25 @@ def build_parser(name, version, commands):
     return parser, subparser_index
 
 
+class FolderStrategyType:
+    def __call__(self, name):
+        try:
+            return FolderStrategy.from_name(name)
+        except TypeError:
+            raise ArgumentTypeError(
+                "should be one of %s"
+                % and_join(('"%s"' % c for c in FolderStrategy.CHOICES), copula="or")
+            )
+
+
 class TimestampAsUTCDateType:
     def __call__(self, date):
         try:
-            timestamp = int(datetime.strptime(date, "%Y-%m-%d").timestamp())
+            return int(datetime.strptime(date, "%Y-%m-%d").timestamp())
         except ValueError:
             raise ArgumentTypeError(
-                "UTC date should have the following format : %Y-%m-%d"
+                "UTC date should have the following format: %Y-%m-%d"
             )
-        return timestamp
 
 
 class TimezoneType:
