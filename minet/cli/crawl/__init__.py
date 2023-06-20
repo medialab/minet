@@ -74,6 +74,12 @@ CRAWL_COMMAND = command(
             "default": DEFAULT_THROTTLE,
         },
         {
+            "flags": ["-t", "--threads"],
+            "help": "Number of threads to use. You can use `0` if you want the crawler to remain completely synchronous.",
+            "type": int,
+            "default": 25,
+        },
+        {
             "flag": "--compress",
             "help": "Whether to compress the downloaded files when saving on disk using -w/--write.",
             "action": "store_true",

@@ -167,6 +167,7 @@ def action(cli_args, defer, loading_bar: LoadingBar):
         visit_urls_only_once=cli_args.visit_urls_only_once,
         normalized_url_cache=cli_args.normalized_url_cache,
         resume=cli_args.resume,
+        max_workers=cli_args.threads,
         callback=callback,
         wait=False,
         daemonic=False,
