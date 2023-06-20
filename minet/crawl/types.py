@@ -195,6 +195,7 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
         "resolved_url",
         "error",
         "status",
+        "mimetype",
         "degree",
         "body_size",
     ]
@@ -244,6 +245,7 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
             self.response.end_url if self.response else None,
             self.error_code,
             self.response.status if self.response else None,
+            self.response.mimetype if self.response else None,
             self.degree,
             len(self.response) if self.response else None,
         ]
@@ -264,6 +266,7 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
                         type(self.data).__name__ if self.data is not None else None,
                     ),
                     ("size", self.response.human_size if self.response else None),
+                    ("mimetype", self.response.mimetype if self.response else None),
                 )
             ),
             conditionals=("spider", "error", "status", "degree", "dtype"),
