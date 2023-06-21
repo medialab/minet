@@ -1,10 +1,5 @@
 from minet.cli.argparse import command, subcommand
 from minet.cli.exceptions import InvalidArgumentsError
-from minet.cli.argparse import InputAction
-
-def check_arguments(cli_args):
-    if not cli_args.input and not cli_args.user_agent_column:
-        raise InvalidArgumentsError("You need to mention the CSV file path and user agents' column name to use your own list of user agents.")
 
 USER_AGENTS_UPDATE_SUBCOMMAND = subcommand(
     "update",
@@ -14,10 +9,19 @@ USER_AGENTS_UPDATE_SUBCOMMAND = subcommand(
         Command tu update the list of user agents
         used by minet http requests.
 
-        By default, it fetches a list from the
-        internet (from www.useragentsme.com) but you
-        can use your own list of user agents from
-        a csv file (using -i, --input flag).
+        The list of user agents come from the website
+        www.useragents.me
+    """
+)
+
+USER_AGENTS_EXPORT_SUBCOMMAND = subcommand(
+    "export",
+    "minet.cli.user_agents.export",
+    title="Minet User Agents Export Command",
+    description="""
+        Command to export the user agents stored
+        in the minet's module. The export format
+        is CSV.
     """
 )
 
@@ -27,6 +31,7 @@ USER_AGENTS_COMMAND = command(
     title="Minet User Agents Command",
     aliases=["ua"],
     subcommands=[
-        USER_AGENTS_UPDATE_SUBCOMMAND
+        USER_AGENTS_UPDATE_SUBCOMMAND,
+        USER_AGENTS_EXPORT_SUBCOMMAND
     ]
 )

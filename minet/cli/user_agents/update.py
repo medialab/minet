@@ -1,2 +1,4 @@
+from minet.user_agents import update
+
 def action(cli_args):
-    print("hello world")
+    update()
