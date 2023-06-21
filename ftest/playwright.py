@@ -5,6 +5,7 @@ from webdriver_manager.core.utils import ChromeType
 from playwright.async_api import async_playwright
 
 # ref: https://github.com/microsoft/playwright-python/issues/342
+# ref: https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/registry/index.ts
 
 
 async def main():
