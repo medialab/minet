@@ -18,6 +18,8 @@ As such, it has been designed to be:
 
 **Shortcuts**: [Command line documentation](./docs/cli.md), [Python library documentation](./docs/lib.md).
 
+![fetch](./docs/img/fetch.gif)
+
 ## Whirlwind tour
 
 ```bash
