@@ -11,7 +11,7 @@ USER_AGENTS_UPDATE_SUBCOMMAND = subcommand(
 
         The list of user agents come from the website
         www.useragents.me
-    """
+    """,
 )
 
 USER_AGENTS_EXPORT_SUBCOMMAND = subcommand(
@@ -22,7 +22,7 @@ USER_AGENTS_EXPORT_SUBCOMMAND = subcommand(
         Command to export the user agents stored
         in the minet's module. The export format
         is CSV.
-    """
+    """,
 )
 
 USER_AGENTS_COMMAND = command(
@@ -30,8 +30,5 @@ USER_AGENTS_COMMAND = command(
     "minet.cli.user_agents",
     title="Minet User Agents Command",
     aliases=["ua"],
-    subcommands=[
-        USER_AGENTS_UPDATE_SUBCOMMAND,
-        USER_AGENTS_EXPORT_SUBCOMMAND
-    ]
+    subcommands=[USER_AGENTS_UPDATE_SUBCOMMAND, USER_AGENTS_EXPORT_SUBCOMMAND],
 )

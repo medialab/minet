@@ -7,9 +7,10 @@ from os.path import dirname, join
 
 import minet.user_agents.data as data
 
+
 def download(url):
     http = urllib3.PoolManager()
-    response = http.request('GET', url)
+    response = http.request("GET", url)
 
     try:
         data = response.data
@@ -17,6 +18,7 @@ def download(url):
         response.close()
 
     return data.decode("utf-8")
+
 
 def useragentsme():
     endpoint = "https://www.useragents.me/api"
@@ -28,11 +30,13 @@ def useragentsme():
         if not "Trident" in row["ua"]
     ]
 
+
 def calculate_prob(probs):
     d = 0
     for p in probs:
         d = d + p
         yield d
+
 
 def update(transient=False):
     try:
@@ -52,8 +56,8 @@ def update(transient=False):
 
             f.write("USER_AGENTS = [\n")
             for ua in data.USER_AGENTS:
-                eua = ua.replace('"', r'\"')
-                f.write("\t\"%s\",\n" % eua)
+                eua = ua.replace('"', r"\"")
+                f.write('\t"%s",\n' % eua)
             f.write("]\n\n")
 
             f.write("USER_AGENTS_PROB = [\n")
@@ -63,6 +67,7 @@ def update(transient=False):
 
     except:
         raise TypeError("Unable to get new useragents")
+
 
 def get_useragent(random=False):
     if random:
