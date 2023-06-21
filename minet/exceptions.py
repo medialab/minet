@@ -156,3 +156,10 @@ class FilenameFormattingError(MinetError):
         super().__init__(msg)
         self.reason = reason
         self.template = template
+
+
+# User Agents error
+class UserAgentsError(MinetError):
+    def __init__(self, reason, message=None):
+        super().__init__(message)
+        self.reason = reason

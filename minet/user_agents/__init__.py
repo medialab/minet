@@ -5,6 +5,7 @@ import random as rd
 from os.path import dirname, join
 
 import minet.user_agents.data as data
+from minet.exceptions import UserAgentsError
 
 
 def download(url):
@@ -64,8 +65,8 @@ def update(transient=False):
                 f.write("\t%f,\n" % pct)
             f.write("]\n\n")
 
-    except:
-        raise TypeError("Unable to get new useragents")
+    except Exception as reason:
+        raise UserAgentsError("Unable to update the list of user agents", reason=reason)
 
 
 def get_useragent(random=False):
