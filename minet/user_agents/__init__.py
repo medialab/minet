@@ -2,7 +2,6 @@ import json
 import urllib3
 import codecs
 import random as rd
-from functools import reduce
 from os.path import dirname, join
 
 import minet.user_agents.data as data
