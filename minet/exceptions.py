@@ -159,7 +159,7 @@ class FilenameFormattingError(MinetError):
 
 
 # User Agents error
-class UserAgentsError(MinetError):
+class UserAgentsUpdateError(MinetError):
     def __init__(self, reason, message=None):
         super().__init__(message)
         self.reason = reason

@@ -72,8 +72,8 @@ from minet.exceptions import (
 from minet.constants import (
     DEFAULT_SPOOFED_TLS_CIPHERS,
     DEFAULT_URLLIB3_TIMEOUT,
+    DEFAULT_SPOOFED_UA,
 )
-from minet.user_agents import get_useragent
 
 mimetypes.init()
 
@@ -740,7 +740,7 @@ def build_request_headers(
     final_headers = {}
 
     if spoof_ua:
-        final_headers["User-Agent"] = get_useragent(True)
+        final_headers["User-Agent"] = DEFAULT_SPOOFED_UA
 
     if cookie:
         if not isinstance(cookie, str):
