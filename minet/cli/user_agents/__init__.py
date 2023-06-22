@@ -25,10 +25,27 @@ USER_AGENTS_EXPORT_SUBCOMMAND = subcommand(
     """,
 )
 
+USER_AGENTS_RANDOM_SUBCOMMAND = subcommand(
+    "random",
+    "minet.cli.user_agents.random",
+    title="Minet User Agents Random Command",
+    description="""
+        Command to export a random user agent stored
+        in the minet's module.
+
+        The percent provided is « the relative share
+        of each useragent » detected by useragents.me
+    """,
+)
+
 USER_AGENTS_COMMAND = command(
     "useragents",
     "minet.cli.user_agents",
     title="Minet User Agents Command",
     aliases=["ua"],
-    subcommands=[USER_AGENTS_UPDATE_SUBCOMMAND, USER_AGENTS_EXPORT_SUBCOMMAND],
+    subcommands=[
+        USER_AGENTS_UPDATE_SUBCOMMAND,
+        USER_AGENTS_EXPORT_SUBCOMMAND,
+        USER_AGENTS_RANDOM_SUBCOMMAND
+    ],
 )
