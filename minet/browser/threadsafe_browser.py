@@ -1,14 +1,21 @@
 from typing import Callable, Optional
+from minet.types import Literal
 
 import asyncio
 import platform
 from threading import Thread, Event
 from playwright.async_api import async_playwright, Page
+from playwright_stealth import stealth_async
 
 from minet.__future__.threaded_child_watcher import ThreadedChildWatcher
+from minet.browser.plawright_shim import run_playwright
 
 UNIX = "windows" not in platform.system().lower()
 LTE_PY37 = platform.python_version_tuple()[:2] <= ("3", "7")
+SUPPORTED_BROWSERS = ("chromium", "firefox")
+
+
+BrowserName = Literal["chromium", "firefox"]
 
 
 class PageContext:
@@ -23,11 +30,23 @@ class PageContext:
 
 
 class ThreadsafeBrowser:
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        browser: BrowserName = "chromium",
+        stealthy: bool = False,
+    ) -> None:
+        if browser not in SUPPORTED_BROWSERS:
+            raise TypeError("unsupported browser")
+
         # NOTE: on unix python 3.7, child watching does not
         # work properly when asyncio is not running from the main thread
         if UNIX and LTE_PY37:
             asyncio.set_child_watcher(ThreadedChildWatcher())
+
+        self.stealthy = stealthy
+        self.browser_name = browser
+
+        run_playwright("install", self.browser_name)
 
         self.loop = asyncio.new_event_loop()
         self.start_event = Event()
@@ -39,7 +58,18 @@ class ThreadsafeBrowser:
 
     async def __start_playwright(self) -> None:
         self.playwright = await async_playwright().start()
-        self.browser = await self.playwright.chromium.launch(headless=True)
+
+        if self.browser_name == "chromium":
+            browser_type = self.playwright.chromium
+        elif self.browser_name == "firefox":
+            browser_type = self.playwright.firefox
+        else:
+            raise TypeError("unsupported browser")
+
+        # NOTE: forcing the executable path so this works with pyinstaller
+        self.browser = await browser_type.launch(
+            headless=True, executable_path=browser_type.executable_path
+        )
 
     async def __stop_playwright(self) -> None:
         # NOTE: we need to make sure those were actually launched, in
@@ -76,6 +106,9 @@ class ThreadsafeBrowser:
         self, url: Optional[str], fn: Callable, *args, **kwargs
     ):
         page = await self.browser.new_page()
+
+        if self.stealthy:
+            await stealth_async(page)
 
         async with PageContext(page):
             if url is not None:
