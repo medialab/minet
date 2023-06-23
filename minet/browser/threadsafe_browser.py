@@ -17,6 +17,8 @@ SUPPORTED_BROWSERS = ("chromium", "firefox")
 
 BrowserName = Literal["chromium", "firefox"]
 
+# TODO: contexts, persistent contexts etc.
+
 
 class PageContext:
     def __init__(self, page: Page):
