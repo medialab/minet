@@ -34,6 +34,8 @@ setup(
         "lxml>=4.3.0",
         "nanoid>=2,<3",
         "persist-queue>=0.7,<0.9",
+        "playwright>=1.35,<1.36",
+        "playwright_stealth>=1,<2",
         "pyyaml",
         "quenouille>=1.8.0,<2",
         "rich>=13,<14",

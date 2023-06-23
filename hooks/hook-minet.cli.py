@@ -1,4 +1,5 @@
 import re
+import playwright_stealth
 import trafilatura
 import justext
 from glob import iglob
@@ -26,6 +27,9 @@ hiddenimports.append("charset_normalizer.md__mypyc")
 datas = [
     (join(dirname(trafilatura.__file__), "settings.cfg"), "trafilatura"),
 ]
+
+for p in iglob(join(dirname(playwright_stealth.__file__), "js", "*.js")):
+    datas.append((p, "playwright_stealth/js"))
 
 for p in iglob(join(dirname(justext.__file__), "stoplists", "*.txt")):
     datas.append((p, "justext/stoplists"))
