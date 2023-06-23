@@ -54,6 +54,12 @@ class ThreadsafePlaywrightBrowser:
         print("joining", current_thread())
         self.thread.join()
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.stop()
+
     def worker(self):
         asyncio.set_event_loop(self.loop)
         self.loop.run_until_complete(self.start_playwright())
@@ -81,15 +87,11 @@ class ThreadsafePlaywrightBrowser:
         ).result()
 
 
-browser = ThreadsafePlaywrightBrowser()
-# print(browser.get_page_title_sync(URLS[0]))
-
-for title in imap_unordered(
-    [URLS[0]] * 5, lambda url: browser.get_page_title_sync(url), 5
-):
-    print(title)
-
-browser.stop()
+with ThreadsafePlaywrightBrowser() as browser:
+    for title in imap_unordered(
+        [URLS[0]] * 5, lambda url: browser.get_page_title_sync(url), 5
+    ):
+        print(title)
 
 
 # async def main():
