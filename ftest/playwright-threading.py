@@ -29,7 +29,11 @@ class ThreadsafePlaywrightBrowser:
 
     async def start_playwright(self) -> None:
         self.playwright = await async_playwright().start()
-        self.browser = await self.playwright.chromium.launch(headless=True)
+
+        self.browser = await self.playwright.chromium.launch(
+            headless=True,
+            executable_path="/home/yomguithereal/.cache/ms-playwright/chromium-1067/chrome-linux/chrome",
+        )
 
     async def stop_playwright(self) -> None:
         # NOTE: we need to make sure those were actually launched...
