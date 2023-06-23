@@ -1,6 +1,7 @@
 from quenouille import imap_unordered
 from minet.browser import ThreadsafeBrowser
 from playwright.async_api import Page
+from ural import get_normalized_hostname
 
 # ref: https://github.com/microsoft/playwright-python/issues/342
 # ref: https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/registry/index.ts
@@ -14,6 +15,8 @@ URLS = [
 
 
 async def get_title(page: Page) -> str:
+    # path = get_normalized_hostname(page.url) + ".png"  # type: ignore
+    # await page.screenshot(path=path, full_page=True)
     return await page.title()
 
 
