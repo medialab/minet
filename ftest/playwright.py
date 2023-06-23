@@ -33,7 +33,8 @@ class ThreadsafePlaywrightBrowser:
         print(self.browser, self.playwright)
         await self.browser.close()
         print("browser closed")
-        await self.playwright.stop()
+        # NOTE: we need py3.8 for this to make sense unfortunately
+        # await self.playwright.stop()
         print("playwright closed")
 
     def stop(self) -> None:
