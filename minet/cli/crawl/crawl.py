@@ -73,7 +73,7 @@ class DataWriter:
 
         if self.format == "csv":
             # TODO: ability to pass fieldnames? from spider?
-            w = casanova.InferringWriter(f)
+            w = casanova.InferringWriter(f, add=["job_id"])
         elif self.format == "jsonl" or self.format == "ndjson":
             w = ndjson.writer(f)
         else:
@@ -81,9 +81,17 @@ class DataWriter:
 
         self.handles[name] = {"file": f, "writer": w}
 
+    def unpack_result(self, result: CrawlResult):
+        job_id = result.job.id
+
+        if self.format == "csv":
+            return (result.data, [job_id])
+
+        return ({"job_id": job_id, "data": result.data},)
+
     def write(self, result: CrawlResult) -> None:
         if self.singular:
-            self.handles[None]["writer"].writerow(result.data)
+            self.handles[None]["writer"].writerow(*self.unpack_result(result))
         else:
             raise NotImplementedError
 
