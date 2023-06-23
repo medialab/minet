@@ -1,0 +1,1 @@
+from minet.browser.threadsafe_browser import ThreadsafeBrowser
