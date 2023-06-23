@@ -77,6 +77,11 @@ class ThreadsafePlaywrightBrowser:
 browser = ThreadsafePlaywrightBrowser()
 # print(browser.get_page_title_sync(URLS[0]))
 
+for title in imap_unordered(
+    [URLS[0]] * 5, lambda url: browser.get_page_title_sync(url), 5
+):
+    print(title)
+
 browser.stop()
 
 
