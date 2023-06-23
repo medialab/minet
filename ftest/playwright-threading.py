@@ -2,6 +2,9 @@ import asyncio
 from playwright.async_api import async_playwright
 from quenouille import imap_unordered
 from threading import Thread, Event, current_thread
+from ftest.thread_child_watcher import ThreadedChildWatcher
+
+asyncio.set_child_watcher(ThreadedChildWatcher())
 
 # ref: https://github.com/microsoft/playwright-python/issues/342
 # ref: https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/registry/index.ts
@@ -34,7 +37,7 @@ class ThreadsafePlaywrightBrowser:
         await self.browser.close()
         print("browser closed")
         # NOTE: we need py3.8 for this to make sense unfortunately
-        # await self.playwright.stop()
+        await self.playwright.stop()
         print("playwright closed")
 
     def stop(self) -> None:
