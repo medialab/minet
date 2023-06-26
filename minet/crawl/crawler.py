@@ -184,16 +184,15 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
 
             degree = 0
 
-            if next_jobs is not None and (
-                self.max_depth is not None and job.depth < self.max_depth
-            ):
-                degree = self.crawler.enqueue(
-                    next_jobs,
-                    spider=job.spider,
-                    depth=job.depth + 1,
-                    base_url=response.end_url,
-                    parent=job,
-                )
+            if next_jobs is not None:
+                if self.max_depth is None or job.depth < self.max_depth:
+                    degree = self.crawler.enqueue(
+                        next_jobs,
+                        spider=job.spider,
+                        depth=job.depth + 1,
+                        base_url=response.end_url,
+                        parent=job,
+                    )
 
             result = SuccessfulCrawlResult(job, response, data, degree)
 
