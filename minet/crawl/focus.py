@@ -13,7 +13,7 @@ from minet.crawl.spiders import Spider
 
 
 @dataclass
-class FocusCrawlResult:
+class FocusCrawlInfo:
     relevant: bool
     matches: Optional[int]
     ignored_url: Optional[List[str]]
@@ -26,21 +26,16 @@ class FocusSpider(Spider):
 
     def __init__(
         self,
-        start_urls,
-        max_depth=3,
+        start_urls=None,
         regex_content=None,
         regex_url=None,
         irrelevant_continue=False,
         extract=False,
         only_target_html_page=True,
     ):
-        if not isinstance(max_depth, int) or max_depth < 0:
-            raise TypeError("Max depth needs to be a positive integer.")
-
         if not regex_content and not regex_url:
             raise TypeError("Neither url nor content filter provided.")
 
-        self.depth = max_depth
         self.urls = start_urls
         self.regex_content = re.compile(regex_content, re.I) if regex_content else None
         self.regex_url = re.compile(regex_url, re.I) if regex_url else None
@@ -58,9 +53,9 @@ class FocusSpider(Spider):
 
         html = response.body
         if self.target_html and not looks_like_html(html):
-            return FocusCrawlResult(False, 0, None), None
+            return FocusCrawlInfo(False, 0, None), None
         if not response.is_text or not html:
-            return FocusCrawlResult(False, 0, None), None
+            return FocusCrawlInfo(False, 0, None), None
 
         html = response.text()
         soup = response.soup(ignore_xhtml_warning=True)
@@ -104,14 +99,15 @@ class FocusSpider(Spider):
                 else:
                     ignored_urls.add(a)
 
-        if (
-            not relevant_content and not self.irrelevant_continue
-        ) or job.depth + 1 > self.depth:
+        if not relevant_content and not self.irrelevant_continue:
             next_urls = set()
 
-        rep_obj = FocusCrawlResult(relevant_content, relevant_size, list(ignored_urls))
+        rep_obj = FocusCrawlInfo(relevant_content, relevant_size, list(ignored_urls))
 
         return rep_obj, next_urls
 
     def start(self):
+        if not self.urls:
+            return
+
         yield from self.urls

@@ -4,7 +4,7 @@
 #
 # Logic of the crawl action.
 #
-from typing import Optional
+from typing import Optional, List, Callable
 
 import os
 import casanova
@@ -15,7 +15,7 @@ from ebbe.decorators import with_defer
 from minet.utils import import_target
 from minet.fs import FilenameBuilder
 from minet.cli.exceptions import FatalError
-from minet.crawl import Crawler, CrawlResult, SuccessfulCrawlResult
+from minet.crawl import Crawler, CrawlResult, SuccessfulCrawlResult, SpiderDeclaration
 from minet.cli.console import console
 from minet.cli.loading_bar import LoadingBar
 from minet.cli.utils import (
@@ -89,9 +89,12 @@ class DataWriter:
 
         return ({"job_id": job_id, "data": result.data},)
 
+    # NOTE: write is flushing to ensure atomicity as well as possible
     def write(self, result: CrawlResult) -> None:
         if self.singular:
-            self.handles[None]["writer"].writerow(*self.unpack_result(result))
+            handle = self.handles[None]
+            handle["writer"].writerow(*self.unpack_result(result))
+            handle["file"].flush()
         else:
             raise NotImplementedError
 
@@ -119,7 +122,26 @@ class DataWriter:
     ],
 )
 @with_ctrl_c_warning
-def action(cli_args, defer, loading_bar: LoadingBar, spiders=None):
+def action(
+    cli_args,
+    defer=None,
+    loading_bar: Optional[LoadingBar] = None,
+    spiders: Optional[SpiderDeclaration] = None,
+    additional_job_fieldnames: Optional[List[str]] = None,
+    format_job_row_addendum: Optional[Callable[[CrawlResult], List]] = None,
+    result_callback: Optional[Callable[[LoadingBar, CrawlResult], None]] = None,
+    write_data: bool = True,
+):
+
+    if (additional_job_fieldnames is not None and format_job_row_addendum is None) or (
+        additional_job_fieldnames is None and format_job_row_addendum is not None
+    ):
+        raise TypeError("additional_job_fieldnames requires format_job_row_addendum")
+
+    # NOTE: typing and decorators don't play well toegether
+    assert defer is not None
+    assert isinstance(loading_bar, LoadingBar)
+
     persistent_storage_path = join(cli_args.output_dir, "store")
     writer_root_directory = join(cli_args.output_dir, "pages")
 
@@ -157,6 +179,9 @@ def action(cli_args, defer, loading_bar: LoadingBar, spiders=None):
     if cli_args.write:
         jobs_fieldnames += ["path"]
 
+    if additional_job_fieldnames is not None:
+        jobs_fieldnames += additional_job_fieldnames
+
     jobs_writer = casanova.Writer(jobs_output, fieldnames=jobs_fieldnames)
     defer(jobs_output.close)
 
@@ -192,28 +217,48 @@ def action(cli_args, defer, loading_bar: LoadingBar, spiders=None):
     if crawler.resuming:
         loading_bar.print("[log.time]Crawler will now resume…")
     elif cli_args.input:
-        # TODO: have a warning if the crawler did nothing
         for url in casanova.reader(cli_args.input).cells(cli_args.column):
             crawler.enqueue(url)  # type: ignore
 
-    data_writer = DataWriter(
-        cli_args.output_dir, crawler, resume=cli_args.resume, format=cli_args.format
-    )
-    defer(data_writer.close)
+    data_writer = None
+
+    if write_data:
+        data_writer = DataWriter(
+            cli_args.output_dir, crawler, resume=cli_args.resume, format=cli_args.format
+        )
+        defer(data_writer.close)
 
     with crawler:
+        if not crawler.resuming and len(crawler) == 0:
+            raise FatalError(
+                [
+                    "Started a crawler without any jobs.",
+                    "This can happen if the command was given no start url nor -i/--input flag.",
+                    "You can also implement start urls/targets on your spiders themselves if required.",
+                ],
+                warning=True,
+            )
+
         track_crawler_state_with_loading_bar(loading_bar, crawler.state)
 
         # Running crawler
         for result in crawler:
             with loading_bar.step():
+                if result_callback is not None:
+                    result_callback(loading_bar, result)
+
                 if cli_args.verbose:
                     console.print(result, highlight=True)
 
+                job_row = result.as_csv_row()
+
                 if cli_args.write:
-                    jobs_writer.writerow(result, [getattr(result, "_path", "")])
-                else:
-                    jobs_writer.writerow(result)
+                    job_row += [getattr(result, "_path", "")]
+
+                if format_job_row_addendum is not None:
+                    job_row += format_job_row_addendum(result)
+
+                jobs_writer.writerow(job_row)
 
                 # Flushing to avoid sync issues as well as possible
                 jobs_output.flush()
@@ -222,7 +267,5 @@ def action(cli_args, defer, loading_bar: LoadingBar, spiders=None):
                     loading_bar.inc_stat(result.error_code, style="error")
                     continue
 
-                data_writer.write(result)
-
-                # Flushing to avoid sync issues as well as possible
-                data_writer.flush()
+                if data_writer is not None:
+                    data_writer.write(result)

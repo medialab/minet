@@ -1,11 +1,13 @@
 from typing import List, Optional
 
 from minet.cli.argparse import command, FolderStrategyType
+from minet.cli.exceptions import InvalidArgumentsError
 
 # TODO: lazyloading issue
 from minet.constants import DEFAULT_THROTTLE
 from minet.fs import FolderStrategy
 
+# TODO: negative int forbiding type
 COMMON_CRAWL_ARGUMENTS = [
     {
         "flags": ["-O", "--output-dir"],
@@ -73,7 +75,7 @@ COMMON_CRAWL_ARGUMENTS = [
     },
 ]
 
-
+# TODO: add option to declare we will be taking a crawler or restrict some possible flags
 def crawl_command(
     name: str,
     package: str,
@@ -82,6 +84,7 @@ def crawl_command(
     epilog: str = "",
     arguments: Optional[List] = None,
     accept_input: bool = True,
+    resolve=None,
 ):
     arguments = (arguments or []) + COMMON_CRAWL_ARGUMENTS
 
@@ -113,6 +116,7 @@ def crawl_command(
         epilog=epilog,
         arguments=arguments,
         no_output=True,
+        resolve=resolve,
         **additional_kwargs,
     )
 
@@ -132,4 +136,71 @@ CRAWL_COMMAND = crawl_command(
             $ minet crawl crawl:process -O crawl-data
     """,
     arguments=[{"name": "target", "help": "Crawling target."}],
+)
+
+
+def ensure_filters(cli_args):
+    if not cli_args.content_filter and not cli_args.url_filter:
+        raise InvalidArgumentsError(
+            [
+                "At least one filter is required, either for URLs or content.",
+                "To do so, use one of the following flags:",
+                "   -C/--content-filter",
+                "   -U/--url-filter",
+            ]
+        )
+
+
+FOCUS_CRAWL_COMMAND = crawl_command(
+    "focus-crawl",
+    "minet.cli.crawl.focus_crawl",
+    title="Minet Focus Crawl Command",
+    description="""
+        Minet crawl feature with the possibility
+        to use regular expressions to filter content.
+
+        Regex are not case sensitive, but
+        accents sensitive.
+
+        Regex must be written between simple quotes.
+    """,
+    epilog=f"""
+        Examples:
+
+        . Running a simple crawler:
+            $ minet focus-crawl url -i urls.csv --content-filter '(?:assembl[ée]e nationale|s[ée]nat)' -O ./result
+    """,
+    resolve=ensure_filters,
+    arguments=[
+        {
+            "flags": ["-C", "--content-filter"],
+            "help": "Regex used to filter fetched content.",
+            "default": None,
+        },
+        {
+            "flags": ["-U", "--url-filter"],
+            "help": "Regex used to filter URLs added to crawler's queue.",
+            "default": None,
+        },
+        {
+            "flag": "--extract",
+            "help": "Perform regex match on extracted text content instead of html content using the Trafilatura library.",
+            "action": "store_true",
+        },
+        {
+            "flag": "--irrelevant-continue",
+            "help": "Continue exploration whether met content is relevant or not.",
+            "action": "store_true",
+        },
+        {
+            "flag": "--only-html",
+            "help": "Add URLs to the crawler queue only if they seem to lead to a HTML content.",
+            "action": "store_true",
+        },
+        {
+            "flag": "--keep-irrelevant",
+            "help": "Add to exported data the results judged irrelevant by the algorithm.",
+            "action": "store_true",
+        },
+    ],
 )

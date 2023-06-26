@@ -250,6 +250,9 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
             len(self.response) if self.response else None,
         ]
 
+    def as_csv_row(self):
+        return self.__csv_row__()
+
     def __repr__(self) -> str:
         return format_repr(
             self,

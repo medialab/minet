@@ -1,6 +1,5 @@
 from minet.cli.cookies import COOKIES_COMMAND
-from minet.cli.crawl import CRAWL_COMMAND
-from minet.cli.focus_crawl import FOCUS_CRAWL_COMMAND
+from minet.cli.crawl import CRAWL_COMMAND, FOCUS_CRAWL_COMMAND
 from minet.cli.dump import DUMP_QUEUE_COMMAND, DUMP_URLS_COMMAND, DUMP_GRAPH_COMMAND
 from minet.cli.extract import EXTRACT_COMMAND
 from minet.cli.fetch import FETCH_COMMAND, RESOLVE_COMMAND

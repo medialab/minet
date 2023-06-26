@@ -206,10 +206,13 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
 
 CrawlJobDataTypes = TypeVar("CrawlJobDataTypes")
 CrawlResultDataTypes = TypeVar("CrawlResultDataTypes")
-Spiders = Union[
+AnySpider = Union[
     FunctionSpiderCallable[CrawlJobDataTypes, CrawlResultDataTypes],
     Spider[CrawlJobDataTypes, CrawlResultDataTypes],
-    Dict[str, Spider[CrawlJobDataTypes, CrawlResultDataTypes]],
+]
+SpiderDeclaration = Union[
+    AnySpider[CrawlJobDataTypes, CrawlResultDataTypes],
+    Dict[str, AnySpider[CrawlJobDataTypes, CrawlResultDataTypes]],
 ]
 
 
@@ -234,7 +237,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
     def __init__(
         self,
-        spider_or_spiders: Spiders[CrawlJobDataTypes, CrawlResultDataTypes],
+        spider_or_spiders: SpiderDeclaration[CrawlJobDataTypes, CrawlResultDataTypes],
         persistent_storage_path: Optional[str] = None,
         visit_urls_only_once: bool = False,
         normalized_url_cache: bool = False,
@@ -373,6 +376,9 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         return "<{class_name} {number}>".format(
             class_name=class_name, number="singular" if self.singular else "plural"
         )
+
+    def __len__(self) -> int:
+        return self.queue.qsize()
 
     @property
     def plural(self) -> bool:
