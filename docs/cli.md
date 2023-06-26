@@ -216,9 +216,12 @@ Examples:
 
 ```
 Usage: minet crawl [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                   [-O OUTPUT_DIR] [-s START_URL] [--resume] [-m MAX_DEPTH] [-u]
-                   [-n] [--throttle THROTTLE] [-f {csv,jsonl,ndjson}] [-v]
-                   target
+                   [-O OUTPUT_DIR] [--resume] [-m MAX_DEPTH] [-u] [-n]
+                   [--throttle THROTTLE] [-t THREADS] [--compress] [-w]
+                   [--folder-strategy FOLDER_STRATEGY] [-f {csv,jsonl,ndjson}]
+                   [-v] [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                   [--total TOTAL]
+                   target [start_url_or_start_url_column]
 
 # Minet Crawl Command
 
@@ -227,8 +230,22 @@ in a python module.
 
 Positional Arguments:
   target                        Crawling target.
+  start_url_or_start_url_column
+                                Single start_url to process or name of the CSV
+                                column containing start_urls when using
+                                -i/--input. Defaults to "start_url".
 
 Optional Arguments:
+  --compress                    Whether to compress the downloaded files when
+                                saving on disk using -w/--write.
+  --folder-strategy FOLDER_STRATEGY
+                                Name of the strategy to be used to dispatch the
+                                retrieved files into folders to alleviate issues
+                                on some filesystems when a folder contains too
+                                much files. Note that this will be applied on
+                                top of --filename-template. All of the
+                                strategies are described at the end of this
+                                help. Defaults to `flat`.
   -f, --format {csv,jsonl,ndjson}
                                 Serialization format for scraped/extracted data.
                                 Defaults to `csv`.
@@ -236,13 +253,31 @@ Optional Arguments:
   -n, --normalized-url-cache    Whether to normalize url cache when using
                                 -u/--visit-urls-only-once.
   -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.
-  -s, --start-url START_URL     Starting url.
+  -t, --threads THREADS         Number of threads to use. You can use `0` if you
+                                want the crawler to remain completely
+                                synchronous. Defaults to `25`.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to `0.2`.
   -v, --verbose                 Whether to print information about crawl
                                 results.
   -u, --visit-urls-only-once    Whether to ensure that any url will only be
                                 visited once.
+  -w, --write                   Whether to write downloaded responses on disk in
+                                order to save them for later.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the start_urls you want to process. Will
+                                consider `-` as stdin.
   --resume                      Whether to resume an interrupted crawl.
   --refresh-per-second REFRESH_PER_SECOND
                                 Number of times to refresh the progress bar per
@@ -253,6 +288,27 @@ Optional Arguments:
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
+
+--folder-strategy options:
+
+. "flat": default choice, all files will be written in the indicated
+    content folder.
+
+. "fullpath": all files will be written in a folder consisting of the
+    url hostname and then its path.
+
+. "prefix-x": e.g. "prefix-4", files will be written in folders
+    having a name that is the first x characters of the file's name.
+    This is an efficient way to partition content into folders containing
+    roughly the same number of files if the file names are random (which
+    is the case by default since md5 hashes will be used).
+
+. "hostname": files will be written in folders based on their url's
+    full host name.
+
+. "normalized-hostname": files will be written in folders based on
+    their url's hostname stripped of some undesirable parts (such as
+    "www.", or "m." or "fr.", for instance).
 
 Examples:
 

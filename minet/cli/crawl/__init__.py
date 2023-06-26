@@ -2,6 +2,7 @@ from minet.cli.argparse import command, FolderStrategyType
 
 # TODO: lazyloading issue
 from minet.constants import DEFAULT_THROTTLE
+from minet.fs import FolderStrategy
 
 CRAWL_COMMAND = command(
     "crawl",
@@ -11,27 +12,10 @@ CRAWL_COMMAND = command(
         Run a crawl using a minet crawler or spiders defined
         in a python module.
     """,
-    epilog="""
+    epilog=f"""
         --folder-strategy options:
 
-        . "flat": default choice, all files will be written in the indicated
-            content folder.
-
-        . "fullpath": all files will be written in a folder consisting of the
-            url hostname and then its path.
-
-        . "prefix-x": e.g. "prefix-4", files will be written in folders
-            having a name that is the first x characters of the file's name.
-            This is an efficient way to partition content into folders containing
-            roughly the same number of files if the file names are random (which
-            is the case by default since md5 hashes will be used).
-
-        . "hostname": files will be written in folders based on their url's
-            full host name.
-
-        . "normalized-hostname": files will be written in folders based on
-            their url's hostname stripped of some undesirable parts (such as
-            "www.", or "m." or "fr.", for instance).
+        {FolderStrategy.DOCUMENTATION}
 
         Examples:
 
