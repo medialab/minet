@@ -191,7 +191,8 @@ def action(cli_args, defer, loading_bar: LoadingBar, spiders=None):
 
     if crawler.resuming:
         loading_bar.print("[log.time]Crawler will now resume…")
-    else:
+    elif cli_args.input:
+        # TODO: have a warning if the crawler did nothing
         for url in casanova.reader(cli_args.input).cells(cli_args.column):
             crawler.enqueue(url)  # type: ignore
 

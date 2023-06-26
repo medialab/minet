@@ -383,7 +383,8 @@ class SingleColumnDummyCSVInput(DummyCSVInput):
         value = getattr(cli_args, self.dest)
 
         if not value:
-            raise InvalidArgumentsError("the command was given nothing!")
+            return None
+            # raise InvalidArgumentsError("the command was given nothing!")
 
         f = CsvCellIO(value, column=self.column)
         setattr(cli_args, self.dest, self.column)
