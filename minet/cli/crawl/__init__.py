@@ -63,6 +63,11 @@ COMMON_CRAWL_ARGUMENTS = [
         "help": "Whether to print information about crawl results.",
         "action": "store_true",
     },
+    {
+        "flags": ["-n", "--normalized-url-cache"],
+        "help": "Whether to normalize url cache when using -u/--visit-urls-only-once.",
+        "action": "store_true",
+    },
 ]
 
 UNIQUE_CRAWL_ARGUMENTS = [
@@ -70,12 +75,7 @@ UNIQUE_CRAWL_ARGUMENTS = [
         "flags": ["-u", "--visit-urls-only-once"],
         "help": "Whether to ensure that any url will only be visited once.",
         "action": "store_true",
-    },
-    {
-        "flags": ["-n", "--normalized-url-cache"],
-        "help": "Whether to normalize url cache when using -u/--visit-urls-only-once.",
-        "action": "store_true",
-    },
+    }
 ]
 
 # TODO: add option to declare we will be taking a crawler or restrict some possible flags

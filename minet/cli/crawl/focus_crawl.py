@@ -7,6 +7,9 @@ from minet.cli.loading_bar import LoadingBar
 
 
 def action(cli_args):
+    additional_fieldnames = FocusCrawlInfo.CRAWL_RESULT_ADDENDUM_FIELDNAMES
+    padding = [None] * len(additional_fieldnames)
+
     spider = FocusSpider(
         regex_content=cli_args.content_filter,
         regex_url=cli_args.url_filter,
@@ -19,12 +22,12 @@ def action(cli_args):
         info = result.data
 
         if not info:
-            return [False, 0]
+            return padding
 
-        return [info.relevant, info.matches]
+        return info.as_crawl_result_csv_addendum()
 
     def result_callback(
-        loading_bar: LoadingBar, result: CrawlResult[Any, FocusCrawlInfo]
+        cli_args, loading_bar: LoadingBar, result: CrawlResult[Any, FocusCrawlInfo]
     ):
         if result.data is not None:
             loading_bar.inc_stat("relevant", style="success")
@@ -34,8 +37,7 @@ def action(cli_args):
     return crawl_action(
         cli_args,
         spiders=spider,
-        additional_job_fieldnames=["relevant", "matches"],
+        additional_job_fieldnames=additional_fieldnames,
         format_job_row_addendum=format_job_row_addendum,
         result_callback=result_callback,
-        write_data=False,
     )

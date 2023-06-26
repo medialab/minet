@@ -4,7 +4,7 @@
 #
 # Logic of the crawl action.
 #
-from typing import Optional, List, Callable
+from typing import Optional, List, Callable, Any
 
 import os
 import casanova
@@ -52,13 +52,13 @@ class DataWriter:
 
         if self.singular:
             self.dir = base_dir
-            self.__add_file(None, "data")
+            self.__add_file(None, "data", crawler.get_spider())
         else:
             self.dir = join(base_dir, "data")
-            for name, _ in crawler.spiders():
-                self.__add_file(name, join("data", name))
+            for name, spider in crawler.spiders():
+                self.__add_file(name, join("data", name), spider)
 
-    def __add_file(self, name: Optional[str], path: str):
+    def __add_file(self, name: Optional[str], path: str, spider):
         path += "." + self.format
 
         path = join(self.dir, path)
@@ -79,21 +79,23 @@ class DataWriter:
         else:
             raise NotImplementedError('unknown format "%s"' % self.format)
 
-        self.handles[name] = {"file": f, "writer": w}
+        self.handles[name] = {"file": f, "writer": w, "spider": spider}
 
-    def unpack_result(self, result: CrawlResult):
+    def unpack_result(self, result: CrawlResult, data):
         job_id = result.job.id
 
         if self.format == "csv":
-            return (result.data, [job_id])
+            return (data, [job_id])
 
-        return ({"job_id": job_id, "data": result.data},)
+        return ({"job_id": job_id, "data": data},)
 
     # NOTE: write is flushing to ensure atomicity as well as possible
     def write(self, result: CrawlResult) -> None:
         if self.singular:
             handle = self.handles[None]
-            handle["writer"].writerow(*self.unpack_result(result))
+            # TODO: factorize
+            for item in handle["spider"].tabulate(result):
+                handle["writer"].writerow(*self.unpack_result(result, item))
             handle["file"].flush()
         else:
             raise NotImplementedError
@@ -129,7 +131,7 @@ def action(
     spiders: Optional[SpiderDeclaration] = None,
     additional_job_fieldnames: Optional[List[str]] = None,
     format_job_row_addendum: Optional[Callable[[CrawlResult], List]] = None,
-    result_callback: Optional[Callable[[LoadingBar, CrawlResult], None]] = None,
+    result_callback: Optional[Callable[[Any, LoadingBar, CrawlResult], None]] = None,
     write_data: bool = True,
 ):
 
@@ -235,6 +237,7 @@ def action(
                     "Started a crawler without any jobs.",
                     "This can happen if the command was given no start url nor -i/--input flag.",
                     "You can also implement start urls/targets on your spiders themselves if required.",
+                    "Or maybe you forgot to --resume?",
                 ],
                 warning=True,
             )
@@ -245,7 +248,7 @@ def action(
         for result in crawler:
             with loading_bar.step():
                 if result_callback is not None:
-                    result_callback(loading_bar, result)
+                    result_callback(cli_args, loading_bar, result)
 
                 if cli_args.verbose:
                     console.print(result, highlight=True)

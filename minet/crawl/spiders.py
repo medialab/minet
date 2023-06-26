@@ -10,11 +10,14 @@ from typing import (
     Union,
     Callable,
     Iterable,
+    Iterator,
     Generic,
 )
 
 if TYPE_CHECKING:
     from minet.crawl.crawler import Crawler
+
+from casanova.types import AnyWritableCSVRowPart
 
 from minet.crawl.types import (
     UrlOrCrawlTarget,
@@ -22,6 +25,7 @@ from minet.crawl.types import (
     CrawlJob,
     CrawlJobDataType,
     CrawlResultDataType,
+    SuccessfulCrawlResult,
 )
 from minet.web import Response
 from minet.utils import PseudoFStringFormatter
@@ -86,6 +90,11 @@ class Spider(Generic[CrawlJobDataType, CrawlResultDataType]):
 
     def submit(self, fn, *args, **kwargs):
         return self.crawler.submit(fn, *args, **kwargs)
+
+    def tabulate(
+        self, result: SuccessfulCrawlResult[CrawlJobDataType, CrawlResultDataType]
+    ) -> Iterator[AnyWritableCSVRowPart]:
+        yield result.data  # type: ignore
 
 
 FunctionSpiderCallable = Callable[

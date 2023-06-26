@@ -912,6 +912,9 @@ class Response(object):
             return self.__url
         return self.__stack[-1].url
 
+    def resolve(self, url: str) -> str:
+        return urljoin(self.end_url, url)
+
     @property
     def headers(self):
         return self.__response.headers
