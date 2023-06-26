@@ -1,10 +1,123 @@
+from typing import List, Optional
+
 from minet.cli.argparse import command, FolderStrategyType
 
 # TODO: lazyloading issue
 from minet.constants import DEFAULT_THROTTLE
 from minet.fs import FolderStrategy
 
-CRAWL_COMMAND = command(
+COMMON_CRAWL_ARGUMENTS = [
+    {
+        "flags": ["-O", "--output-dir"],
+        "help": "Output directory.",
+        "default": "crawl",
+    },
+    {
+        "flag": "--resume",
+        "help": "Whether to resume an interrupted crawl.",
+        "action": "store_true",
+    },
+    {
+        "flags": ["-m", "--max-depth"],
+        "help": "Maximum depth for the crawl.",
+        "type": int,
+    },
+    {
+        "flags": ["-u", "--visit-urls-only-once"],
+        "help": "Whether to ensure that any url will only be visited once.",
+        "action": "store_true",
+    },
+    {
+        "flags": ["-n", "--normalized-url-cache"],
+        "help": "Whether to normalize url cache when using -u/--visit-urls-only-once.",
+        "action": "store_true",
+    },
+    {
+        "flag": "--throttle",
+        "help": "Time to wait - in seconds - between 2 calls to the same domain.",
+        "type": float,
+        "default": DEFAULT_THROTTLE,
+    },
+    {
+        "flags": ["-t", "--threads"],
+        "help": "Number of threads to use. You can use `0` if you want the crawler to remain completely synchronous.",
+        "type": int,
+        "default": 25,
+    },
+    {
+        "flag": "--compress",
+        "help": "Whether to compress the downloaded files when saving on disk using -w/--write.",
+        "action": "store_true",
+    },
+    {
+        "flags": ["-w", "--write"],
+        "help": "Whether to write downloaded responses on disk in order to save them for later.",
+        "action": "store_true",
+    },
+    {
+        "flag": "--folder-strategy",
+        "help": "Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. All of the strategies are described at the end of this help.",
+        "default": "flat",
+        "type": FolderStrategyType(),
+    },
+    {
+        "flags": ["-f", "--format"],
+        "help": "Serialization format for scraped/extracted data.",
+        "choices": ("csv", "jsonl", "ndjson"),
+        "default": "csv",
+    },
+    {
+        "flags": ["-v", "--verbose"],
+        "help": "Whether to print information about crawl results.",
+        "action": "store_true",
+    },
+]
+
+
+def crawl_command(
+    name: str,
+    package: str,
+    title: str,
+    description: str,
+    epilog: str = "",
+    arguments: Optional[List] = None,
+    accept_input: bool = True,
+):
+    arguments = (arguments or []) + COMMON_CRAWL_ARGUMENTS
+
+    additional_kwargs = {}
+
+    if accept_input:
+        additional_kwargs["variadic_input"] = {
+            "dummy_column": "url",
+            "item_label": "start url",
+            "optional": True,
+            "no_help": True,
+        }
+
+    epilog = (
+        f"""
+        --folder-strategy options:
+
+        {FolderStrategy.DOCUMENTATION}
+
+    """
+        + epilog
+    )
+
+    return command(
+        name,
+        package,
+        title=title,
+        description=description,
+        epilog=epilog,
+        arguments=arguments,
+        no_output=True,
+        **additional_kwargs,
+    )
+
+
+CRAWL_COMMAND = crawl_command(
     "crawl",
     "minet.cli.crawl.crawl",
     title="Minet Crawl Command",
@@ -13,82 +126,10 @@ CRAWL_COMMAND = command(
         in a python module.
     """,
     epilog=f"""
-        --folder-strategy options:
-
-        {FolderStrategy.DOCUMENTATION}
-
         Examples:
 
         . Crawling using the `process` function in the `crawl` module:
             $ minet crawl crawl:process -O crawl-data
     """,
-    no_output=True,
-    variadic_input={"dummy_column": "start_url", "optional": True, "no_help": True},
-    arguments=[
-        {"name": "target", "help": "Crawling target."},
-        {
-            "flags": ["-O", "--output-dir"],
-            "help": "Output directory.",
-            "default": "crawl",
-        },
-        {
-            "flag": "--resume",
-            "help": "Whether to resume an interrupted crawl.",
-            "action": "store_true",
-        },
-        {
-            "flags": ["-m", "--max-depth"],
-            "help": "Maximum depth for the crawl.",
-            "type": int,
-        },
-        {
-            "flags": ["-u", "--visit-urls-only-once"],
-            "help": "Whether to ensure that any url will only be visited once.",
-            "action": "store_true",
-        },
-        {
-            "flags": ["-n", "--normalized-url-cache"],
-            "help": "Whether to normalize url cache when using -u/--visit-urls-only-once.",
-            "action": "store_true",
-        },
-        {
-            "flag": "--throttle",
-            "help": "Time to wait - in seconds - between 2 calls to the same domain.",
-            "type": float,
-            "default": DEFAULT_THROTTLE,
-        },
-        {
-            "flags": ["-t", "--threads"],
-            "help": "Number of threads to use. You can use `0` if you want the crawler to remain completely synchronous.",
-            "type": int,
-            "default": 25,
-        },
-        {
-            "flag": "--compress",
-            "help": "Whether to compress the downloaded files when saving on disk using -w/--write.",
-            "action": "store_true",
-        },
-        {
-            "flags": ["-w", "--write"],
-            "help": "Whether to write downloaded responses on disk in order to save them for later.",
-            "action": "store_true",
-        },
-        {
-            "flag": "--folder-strategy",
-            "help": "Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. All of the strategies are described at the end of this help.",
-            "default": "flat",
-            "type": FolderStrategyType(),
-        },
-        {
-            "flags": ["-f", "--format"],
-            "help": "Serialization format for scraped/extracted data.",
-            "choices": ("csv", "jsonl", "ndjson"),
-            "default": "csv",
-        },
-        {
-            "flags": ["-v", "--verbose"],
-            "help": "Whether to print information about crawl results.",
-            "action": "store_true",
-        },
-    ],
+    arguments=[{"name": "target", "help": "Crawling target."}],
 )
