@@ -25,16 +25,6 @@ COMMON_CRAWL_ARGUMENTS = [
         "type": int,
     },
     {
-        "flags": ["-u", "--visit-urls-only-once"],
-        "help": "Whether to ensure that any url will only be visited once.",
-        "action": "store_true",
-    },
-    {
-        "flags": ["-n", "--normalized-url-cache"],
-        "help": "Whether to normalize url cache when using -u/--visit-urls-only-once.",
-        "action": "store_true",
-    },
-    {
         "flag": "--throttle",
         "help": "Time to wait - in seconds - between 2 calls to the same domain.",
         "type": float,
@@ -75,6 +65,19 @@ COMMON_CRAWL_ARGUMENTS = [
     },
 ]
 
+UNIQUE_CRAWL_ARGUMENTS = [
+    {
+        "flags": ["-u", "--visit-urls-only-once"],
+        "help": "Whether to ensure that any url will only be visited once.",
+        "action": "store_true",
+    },
+    {
+        "flags": ["-n", "--normalized-url-cache"],
+        "help": "Whether to normalize url cache when using -u/--visit-urls-only-once.",
+        "action": "store_true",
+    },
+]
+
 # TODO: add option to declare we will be taking a crawler or restrict some possible flags
 def crawl_command(
     name: str,
@@ -85,8 +88,12 @@ def crawl_command(
     arguments: Optional[List] = None,
     accept_input: bool = True,
     resolve=None,
+    unique=False,
 ):
     arguments = (arguments or []) + COMMON_CRAWL_ARGUMENTS
+
+    if not unique:
+        arguments.extend(UNIQUE_CRAWL_ARGUMENTS)
 
     additional_kwargs = {}
 
@@ -108,6 +115,13 @@ def crawl_command(
         + epilog
     )
 
+    def wrapped_resolve(cli_args):
+        if unique:
+            cli_args.visit_urls_only_once = True
+
+        if resolve is not None:
+            resolve(cli_args)
+
     return command(
         name,
         package,
@@ -116,7 +130,7 @@ def crawl_command(
         epilog=epilog,
         arguments=arguments,
         no_output=True,
-        resolve=resolve,
+        resolve=wrapped_resolve,
         **additional_kwargs,
     )
 
@@ -171,6 +185,7 @@ FOCUS_CRAWL_COMMAND = crawl_command(
             $ minet focus-crawl url -i urls.csv --content-filter '(?:assembl[ée]e nationale|s[ée]nat)' -O ./result
     """,
     resolve=ensure_filters,
+    unique=True,
     arguments=[
         {
             "flags": ["-C", "--content-filter"],
