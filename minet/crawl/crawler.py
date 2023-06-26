@@ -44,7 +44,7 @@ from minet.crawl.spiders import (
 from minet.crawl.queue import CrawlerQueue
 from minet.crawl.state import CrawlerState
 from minet.crawl.url_cache import URLCache
-from minet.web import request, EXPECTED_WEB_ERRORS, AnyTimeout, Response
+from minet.web import request, EXPECTED_WEB_ERRORS, AnyTimeout
 from minet.fs import ThreadSafeFileWriter
 from minet.executors import HTTPThreadPoolExecutor, CANCELLED
 from minet.exceptions import UnknownSpiderError, CancelledRequestError, InvalidURLError

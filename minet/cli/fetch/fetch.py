@@ -31,7 +31,7 @@ from minet.web import (
 )
 from minet.exceptions import InvalidURLError, FilenameFormattingError, HTTPCallbackError
 from minet.heuristics import should_spoof_ua_when_resolving
-from minet.cli.exceptions import InvalidArgumentsError, FatalError
+from minet.cli.exceptions import InvalidArgumentsError
 from minet.cli.reporters import report_filename_formatting_error
 from minet.cli.utils import with_enricher_and_loading_bar, with_ctrl_c_warning
 

@@ -4,18 +4,18 @@
 #
 # Logic of the crawl action.
 #
-from typing import List, TextIO, Tuple, Optional
+from typing import Optional
 
 import os
 import casanova
 import casanova.ndjson as ndjson
-from os.path import join, isfile, dirname, relpath
+from os.path import join, dirname
 from ebbe.decorators import with_defer
 
 from minet.utils import import_target
 from minet.fs import FilenameBuilder
 from minet.cli.exceptions import FatalError
-from minet.crawl import Crawler, CrawlResult, SuccessfulCrawlResult, CrawlJob, Spider
+from minet.crawl import Crawler, CrawlResult, SuccessfulCrawlResult
 from minet.cli.console import console
 from minet.cli.loading_bar import LoadingBar
 from minet.cli.utils import (
@@ -119,7 +119,7 @@ class DataWriter:
     ],
 )
 @with_ctrl_c_warning
-def action(cli_args, defer, loading_bar: LoadingBar):
+def action(cli_args, defer, loading_bar: LoadingBar, spiders=None):
     persistent_storage_path = join(cli_args.output_dir, "store")
     writer_root_directory = join(cli_args.output_dir, "pages")
 
@@ -160,11 +160,14 @@ def action(cli_args, defer, loading_bar: LoadingBar):
     jobs_writer = casanova.Writer(jobs_output, fieldnames=jobs_fieldnames)
     defer(jobs_output.close)
 
-    target = import_target(cli_args.target, "spider")
+    if spiders is not None:
+        target = spiders
+    else:
+        target = import_target(cli_args.target, "spider")
 
-    if not callable(target):
-        # TODO: explain further
-        raise FatalError("invalid crawling target")
+        if not callable(target):
+            # TODO: explain further
+            raise FatalError("invalid crawling target")
 
     crawler = Crawler(
         target,
@@ -189,11 +192,8 @@ def action(cli_args, defer, loading_bar: LoadingBar):
     if crawler.resuming:
         loading_bar.print("[log.time]Crawler will now resume…")
     else:
-        # -s/--start-url
-        if cli_args.start_url is not None:
-            crawler.enqueue(cli_args.start_url)
-
-        # TODO: -i, -s and variant for specific spiders
+        for url in casanova.reader(cli_args.input).cells(cli_args.column):
+            crawler.enqueue(url)  # type: ignore
 
     data_writer = DataWriter(
         cli_args.output_dir, crawler, resume=cli_args.resume, format=cli_args.format

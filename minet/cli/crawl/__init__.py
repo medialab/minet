@@ -39,6 +39,7 @@ CRAWL_COMMAND = command(
             $ minet crawl crawl:process -O crawl-data
     """,
     no_output=True,
+    variadic_input={"dummy_column": "start_url", "optional": True, "no_help": True},
     arguments=[
         {"name": "target", "help": "Crawling target."},
         {
@@ -46,7 +47,6 @@ CRAWL_COMMAND = command(
             "help": "Output directory.",
             "default": "crawl",
         },
-        {"flags": ["-s", "--start-url"], "help": "Starting url."},
         {
             "flag": "--resume",
             "help": "Whether to resume an interrupted crawl.",
