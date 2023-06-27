@@ -29,7 +29,7 @@ def action(cli_args):
     def result_callback(
         cli_args, loading_bar: LoadingBar, result: CrawlResult[Any, FocusCrawlInfo]
     ):
-        if result.data is not None:
+        if result.data is not None and result.data.relevant:
             loading_bar.inc_stat("relevant", style="success")
         else:
             loading_bar.inc_stat("irrelevant", style="warning")
