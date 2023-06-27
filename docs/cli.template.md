@@ -443,11 +443,11 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% yt/channel-videos %>
 
-<h3 id="youtube-comments">comments</h3>
-
 ### channels
 
 <% yt/channels %>
+
+<h3 id="youtube-comments">comments</h3>
 
 <% yt/comments %>
 

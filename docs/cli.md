@@ -216,10 +216,10 @@ Examples:
 
 ```
 Usage: minet crawl [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                   [-O OUTPUT_DIR] [--resume] [-m MAX_DEPTH] [-u] [-n]
-                   [--throttle THROTTLE] [-t THREADS] [--compress] [-w]
+                   [-O OUTPUT_DIR] [--resume] [-m MAX_DEPTH]
+                   [--throttle THROTTLE] [-t THREADS] [--compress] [-w] [-d]
                    [--folder-strategy FOLDER_STRATEGY] [-f {csv,jsonl,ndjson}]
-                   [-v] [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                   [-v] [-n] [-u] [-i INPUT] [--explode EXPLODE] [-s SELECT]
                    [--total TOTAL]
                    target [url_or_url_column]
 
@@ -261,7 +261,10 @@ Optional Arguments:
                                 results.
   -u, --visit-urls-only-once    Whether to ensure that any url will only be
                                 visited once.
-  -w, --write                   Whether to write downloaded responses on disk in
+  -d, --write-data, -D, --dont-write-data
+                                Whether to write scraped/extracted data on disk.
+                                Defaults to `True`.
+  -w, --write-files             Whether to write downloaded files on disk in
                                 order to save them for later.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
@@ -322,10 +325,10 @@ Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
                          [--refresh-per-second REFRESH_PER_SECOND]
                          [-U URL_FILTER] [--extract] [--irrelevant-continue]
                          [--only-html] [--keep-irrelevant] [-O OUTPUT_DIR]
-                         [--resume] [-m MAX_DEPTH] [-u] [-n]
-                         [--throttle THROTTLE] [-t THREADS] [--compress] [-w]
+                         [--resume] [-m MAX_DEPTH] [--throttle THROTTLE]
+                         [-t THREADS] [--compress] [-w] [-d]
                          [--folder-strategy FOLDER_STRATEGY]
-                         [-f {csv,jsonl,ndjson}] [-v] [-i INPUT]
+                         [-f {csv,jsonl,ndjson}] [-v] [-n] [-i INPUT]
                          [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                          [url_or_url_column]
 
@@ -382,9 +385,10 @@ Optional Arguments:
                                 queue.
   -v, --verbose                 Whether to print information about crawl
                                 results.
-  -u, --visit-urls-only-once    Whether to ensure that any url will only be
-                                visited once.
-  -w, --write                   Whether to write downloaded responses on disk in
+  -d, --write-data, -D, --dont-write-data
+                                Whether to write scraped/extracted data on disk.
+                                Defaults to `True`.
+  -w, --write-files             Whether to write downloaded files on disk in
                                 order to save them for later.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
@@ -6231,8 +6235,6 @@ how to use the command with a CSV file?
     $ minet youtube channel-videos "value1,value2" --explode ","
 ```
 
-<h3 id="youtube-comments">comments</h3>
-
 ### channels
 
 ```
@@ -6329,6 +6331,8 @@ how to use the command with a CSV file?
 . This also works with single values:
     $ minet youtube channels "value1,value2" --explode ","
 ```
+
+<h3 id="youtube-comments">comments</h3>
 
 ```
 Usage: minet youtube comments [-h] [-k KEY] [--rcfile RCFILE] [--silent]
