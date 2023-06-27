@@ -23,7 +23,7 @@ async def get_title(page: Page) -> str:
 with ThreadsafeBrowser() as browser:
 
     def worker(url):
-        return browser.with_new_page(url, get_title)
+        return browser.run_with_page(get_title, url=url)
 
     for title in imap_unordered(URLS, worker, 3):
         print(title)

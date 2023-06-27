@@ -4,11 +4,12 @@ from minet.types import Literal
 import asyncio
 import platform
 from threading import Thread, Event
-from playwright.async_api import async_playwright, Page
+from playwright.async_api import async_playwright
 from playwright_stealth import stealth_async
 
 from minet.__future__.threaded_child_watcher import ThreadedChildWatcher
 from minet.browser.plawright_shim import run_playwright
+from minet.browser.utils import PageContextManager
 
 UNIX = "windows" not in platform.system().lower()
 LTE_PY37 = platform.python_version_tuple()[:2] <= ("3", "7")
@@ -18,17 +19,6 @@ SUPPORTED_BROWSERS = ("chromium", "firefox")
 BrowserName = Literal["chromium", "firefox"]
 
 # TODO: contexts, persistent contexts etc.
-
-
-class PageContext:
-    def __init__(self, page: Page):
-        self.page = page
-
-    async def __aenter__(self) -> Page:
-        return self.page
-
-    async def __aexit__(self, *args):
-        await self.page.close()
 
 
 class ThreadsafeBrowser:
@@ -104,7 +94,7 @@ class ThreadsafeBrowser:
 
         self.loop.run_until_complete(self.__stop_playwright())
 
-    async def __call_within_new_page_context(
+    async def __call_with_new_page(
         self, url: Optional[str], fn: Callable, *args, **kwargs
     ):
         page = await self.browser.new_page()
@@ -112,14 +102,14 @@ class ThreadsafeBrowser:
         if self.stealthy:
             await stealth_async(page)
 
-        async with PageContext(page):
+        async with PageContextManager(page):
             if url is not None:
                 await page.goto(url)
             return await fn(page, *args, **kwargs)
 
-    def with_new_page(self, url: Optional[str], fn: Callable, *args, **kwargs):
+    def run_with_page(self, fn: Callable, *args, url: Optional[str] = None, **kwargs):
         future = asyncio.run_coroutine_threadsafe(
-            self.__call_within_new_page_context(url, fn, *args, **kwargs), self.loop
+            self.__call_with_new_page(url, fn, *args, **kwargs), self.loop
         )
 
         return future.result()
