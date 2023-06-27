@@ -11,9 +11,9 @@ else:
     from typing_extensions import Literal
 
 if sys.version_info >= (3, 10):
-    from typing import TypeGuard
+    from typing import TypeGuard, Concatenate, ParamSpec
 else:
-    from typing_extensions import TypeGuard
+    from typing_extensions import TypeGuard, Concatenate, ParamSpec
 
 if sys.version_info >= (3, 11):
     from typing import TypedDict, Required, NotRequired

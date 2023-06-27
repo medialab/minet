@@ -1,10 +1,10 @@
-from typing import Callable, Optional
-from minet.types import Literal
+from typing import Callable, Optional, TypeVar, Awaitable
+from minet.types import Literal, Concatenate, ParamSpec
 
 import asyncio
 import platform
 from threading import Thread, Event
-from playwright.async_api import async_playwright
+from playwright.async_api import async_playwright, Page, Browser
 from playwright_stealth import stealth_async
 
 from minet.__future__.threaded_child_watcher import ThreadedChildWatcher
@@ -17,6 +17,10 @@ SUPPORTED_BROWSERS = ("chromium", "firefox")
 
 
 BrowserName = Literal["chromium", "firefox"]
+T = TypeVar("T")
+P = ParamSpec("P")
+PageCallable = Callable[Concatenate[Page, P], Awaitable[T]]
+BrowserCallable = Callable[Concatenate[Browser, P], Awaitable[T]]
 
 # TODO: contexts, persistent contexts etc.
 
@@ -94,8 +98,11 @@ class ThreadsafeBrowser:
 
         self.loop.run_until_complete(self.__stop_playwright())
 
+    async def __call(self, fn: Callable, *args, **kwargs):
+        return await fn(self.browser, *args, **kwargs)
+
     async def __call_with_new_page(
-        self, url: Optional[str], fn: Callable, *args, **kwargs
+        self, fn: Callable, *args, url: Optional[str] = None, **kwargs
     ):
         context = await self.browser.new_context()
 
@@ -110,9 +117,22 @@ class ThreadsafeBrowser:
                     await page.goto(url)
                 return await fn(page, *args, **kwargs)
 
-    def run_with_page(self, fn: Callable, *args, url: Optional[str] = None, **kwargs):
+    def run(self, fn: BrowserCallable[P, T], *args: P.args, **kwargs: P.kwargs) -> T:
         future = asyncio.run_coroutine_threadsafe(
-            self.__call_with_new_page(url, fn, *args, **kwargs), self.loop
+            self.__call(fn, *args, **kwargs), self.loop
+        )
+
+        return future.result()
+
+    def run_with_new_page(
+        self,
+        fn: PageCallable[P, T],
+        url: Optional[str] = None,
+        *args: P.args,
+        **kwargs: P.kwargs
+    ) -> T:
+        future = asyncio.run_coroutine_threadsafe(
+            self.__call_with_new_page(fn, *args, url=url, **kwargs), self.loop
         )
 
         return future.result()
