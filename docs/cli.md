@@ -324,10 +324,9 @@ Examples:
 Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
                          [--refresh-per-second REFRESH_PER_SECOND]
                          [-U URL_FILTER] [--extract] [--irrelevant-continue]
-                         [--only-html] [--keep-irrelevant] [-O OUTPUT_DIR]
-                         [--resume] [-m MAX_DEPTH] [--throttle THROTTLE]
-                         [-t THREADS] [--compress] [-w] [-d]
-                         [--folder-strategy FOLDER_STRATEGY]
+                         [--only-html] [-O OUTPUT_DIR] [--resume] [-m MAX_DEPTH]
+                         [--throttle THROTTLE] [-t THREADS] [--compress] [-w]
+                         [-d] [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-i INPUT]
                          [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                          [url_or_url_column]
@@ -368,8 +367,6 @@ Optional Arguments:
                                 Defaults to `csv`.
   --irrelevant-continue         Continue exploration whether met content is
                                 relevant or not.
-  --keep-irrelevant             Add to exported data the results judged
-                                irrelevant by the algorithm.
   -m, --max-depth MAX_DEPTH     Maximum depth for the crawl.
   -n, --normalized-url-cache    Whether to normalize url cache when using
                                 -u/--visit-urls-only-once.
