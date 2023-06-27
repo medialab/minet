@@ -61,10 +61,10 @@ class ThreadsafeBrowser:
         else:
             raise TypeError("unsupported browser")
 
-        # NOTE: forcing the executable path so this works with pyinstaller
-        self.browser = await browser_type.launch(
-            headless=True, executable_path=browser_type.executable_path
-        )
+        # TODO: we need to find a way to force frozen executable to use the same
+        # directory as non-frozen one, e.g. by mangling PLAYWRIGHT_BROWSERS_PATH
+        # or sys.frozen
+        self.browser = await browser_type.launch(headless=True)
 
     async def __stop_playwright(self) -> None:
         # NOTE: we need to make sure those were actually launched, in
