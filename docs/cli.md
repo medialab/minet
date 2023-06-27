@@ -601,13 +601,13 @@ Examples:
     $ minet fetch "https://www.lemonde.fr"
 
 . Fetching a batch of url from existing CSV file:
-    $ minet fetch url file.csv > report.csv
+    $ minet fetch url -i file.csv > report.csv
 
 . CSV input from stdin (mind the `-`):
     $ xsv select url file.csv | minet fetch url -i - > report.csv
 
 . Dowloading files in specific output directory:
-    $ minet fetch url file.csv -O html > report.csv
+    $ minet fetch url -i file.csv -O html > report.csv
 
 how to use the command with a CSV file?
 
@@ -621,20 +621,20 @@ how to use the command with a CSV file?
 > columns to keep by using the -s/--select flag.
 
 . Here is how to use a command with a single value:
-    $ minet fetch fetch "value"
+    $ minet fetch "value"
 
 . Here is how to use a command with a CSV file:
-    $ minet fetch fetch column_name -i file.csv
+    $ minet fetch column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet fetch fetch column_name -i -
+    $ xsv search -s col . | minet fetch column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet fetch fetch column_name -i file.csv --explode "|"
+    $ minet fetch column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet fetch fetch "value1,value2" --explode ","
+    $ minet fetch "value1,value2" --explode ","
 ```
 
 ## extract
@@ -911,20 +911,20 @@ how to use the command with a CSV file?
 > columns to keep by using the -s/--select flag.
 
 . Here is how to use a command with a single value:
-    $ minet fetch fetch "value"
+    $ minet fetch "value"
 
 . Here is how to use a command with a CSV file:
-    $ minet fetch fetch column_name -i file.csv
+    $ minet fetch column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet fetch fetch column_name -i -
+    $ xsv search -s col . | minet fetch column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet fetch fetch column_name -i file.csv --explode "|"
+    $ minet fetch column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet fetch fetch "value1,value2" --explode ","
+    $ minet fetch "value1,value2" --explode ","
 ```
 
 ## scrape
@@ -1371,20 +1371,20 @@ how to use the command with a CSV file?
 > columns to keep by using the -s/--select flag.
 
 . Here is how to use a command with a single value:
-    $ minet url-parse url-parse "value"
+    $ minet url-parse "value"
 
 . Here is how to use a command with a CSV file:
-    $ minet url-parse url-parse column_name -i file.csv
+    $ minet url-parse column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet url-parse url-parse column_name -i -
+    $ xsv search -s col . | minet url-parse column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet url-parse url-parse column_name -i file.csv --explode "|"
+    $ minet url-parse column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet url-parse url-parse "value1,value2" --explode ","
+    $ minet url-parse "value1,value2" --explode ","
 ```
 
 ## BuzzSumo

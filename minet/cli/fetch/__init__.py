@@ -117,13 +117,13 @@ FETCH_COMMAND = command(
             $ minet fetch "https://www.lemonde.fr"
 
         . Fetching a batch of url from existing CSV file:
-            $ minet fetch url file.csv > report.csv
+            $ minet fetch url -i file.csv > report.csv
 
         . CSV input from stdin (mind the `-`):
             $ xsv select url file.csv | minet fetch url -i - > report.csv
 
         . Dowloading files in specific output directory:
-            $ minet fetch url file.csv -O html > report.csv
+            $ minet fetch url -i file.csv -O html > report.csv
     """,
     resolve=resolve_fetch_arguments,
     resumer=ThreadSafeResumer,
