@@ -12,6 +12,9 @@ from minet.constants import COOKIE_BROWSERS
 # NOTE: this code comes from Django
 # ref: https://bugs.python.org/issue27674
 # ref: https://github.com/django/django/commit/93a135d111c2569d88d65a3f4ad9e6d9ad291452
+# NOTE: we cannot rely on python's SimpleCookie.load because it does not
+# handle double quote and JSON values properly, which against the spec but happens
+# in real life quite frequently.
 def cookie_string_to_dict(cookie: str) -> Dict[str, str]:
     cookie_dict = {}
 
