@@ -134,7 +134,6 @@ def action(
     result_callback: Optional[Callable[[Any, LoadingBar, CrawlResult], None]] = None,
     write_data: bool = True,
 ):
-
     if (additional_job_fieldnames is not None and format_job_row_addendum is None) or (
         additional_job_fieldnames is None and format_job_row_addendum is not None
     ):
@@ -150,7 +149,7 @@ def action(
     filename_builder = FilenameBuilder(cli_args.folder_strategy)
 
     def callback(self: Crawler, result: SuccessfulCrawlResult) -> None:
-        if not cli_args.write:
+        if not cli_args.write_files:
             return
 
         response = result.response
@@ -178,7 +177,7 @@ def action(
     )
     jobs_fieldnames = CrawlResult.fieldnames()
 
-    if cli_args.write:
+    if cli_args.write_files:
         jobs_fieldnames += ["path"]
 
     if additional_job_fieldnames is not None:
@@ -211,26 +210,28 @@ def action(
         daemonic=False,
     )
 
-    if crawler.finished:
-        loading_bar.erase()
-        crawler.stop()
-        raise FatalError("[error]Crawler has already finished!")
-
-    if crawler.resuming:
-        loading_bar.print("[log.time]Crawler will now resume…")
-    elif cli_args.input:
-        for url in casanova.reader(cli_args.input).cells(cli_args.column):
-            crawler.enqueue(url)  # type: ignore
-
-    data_writer = None
-
-    if write_data:
-        data_writer = DataWriter(
-            cli_args.output_dir, crawler, resume=cli_args.resume, format=cli_args.format
-        )
-        defer(data_writer.close)
-
     with crawler:
+        if crawler.finished:
+            loading_bar.erase()
+            raise FatalError("[error]Crawler has already finished!")
+
+        if crawler.resuming:
+            loading_bar.print("[log.time]Crawler will now resume…")
+        elif cli_args.input:
+            for url in casanova.reader(cli_args.input).cells(cli_args.column):
+                crawler.enqueue(url)  # type: ignore
+
+        data_writer = None
+
+        if write_data and cli_args.write_data:
+            data_writer = DataWriter(
+                cli_args.output_dir,
+                crawler,
+                resume=cli_args.resume,
+                format=cli_args.format,
+            )
+            defer(data_writer.close)
+
         if not crawler.resuming and len(crawler) == 0:
             raise FatalError(
                 [
@@ -255,7 +256,7 @@ def action(
 
                 job_row = result.as_csv_row()
 
-                if cli_args.write:
+                if cli_args.write_files:
                     job_row += [getattr(result, "_path", "")]
 
                 if format_job_row_addendum is not None:

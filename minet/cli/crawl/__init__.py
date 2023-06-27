@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from minet.cli.argparse import command, FolderStrategyType
+from minet.cli.argparse import command, FolderStrategyType, BooleanAction
 from minet.cli.exceptions import InvalidArgumentsError
 
 # TODO: lazyloading issue
@@ -42,9 +42,15 @@ COMMON_CRAWL_ARGUMENTS = [
         "action": "store_true",
     },
     {
-        "flags": ["-w", "--write"],
-        "help": "Whether to write downloaded responses on disk in order to save them for later.",
+        "flags": ["-w", "--write-files"],
+        "help": "Whether to write downloaded files on disk in order to save them for later.",
         "action": "store_true",
+    },
+    {
+        "flags": ["-d", "--write-data", "-D", "--dont-write-data"],
+        "help": "Whether to write scraped/extracted data on disk.",
+        "action": BooleanAction,
+        "default": True,
     },
     {
         "flag": "--folder-strategy",
@@ -77,6 +83,7 @@ UNIQUE_CRAWL_ARGUMENTS = [
         "action": "store_true",
     }
 ]
+
 
 # TODO: add option to declare we will be taking a crawler or restrict some possible flags
 def crawl_command(
