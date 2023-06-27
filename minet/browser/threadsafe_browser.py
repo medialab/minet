@@ -9,7 +9,7 @@ from playwright_stealth import stealth_async
 
 from minet.__future__.threaded_child_watcher import ThreadedChildWatcher
 from minet.browser.plawright_shim import run_playwright
-from minet.browser.utils import PageContextManager
+from minet.browser.utils import PageContextManager, BrowserContextContextManager
 
 UNIX = "windows" not in platform.system().lower()
 LTE_PY37 = platform.python_version_tuple()[:2] <= ("3", "7")
@@ -97,15 +97,18 @@ class ThreadsafeBrowser:
     async def __call_with_new_page(
         self, url: Optional[str], fn: Callable, *args, **kwargs
     ):
-        page = await self.browser.new_page()
+        context = await self.browser.new_context()
 
-        if self.stealthy:
-            await stealth_async(page)
+        async with BrowserContextContextManager(context):
+            page = await self.browser.new_page()
 
-        async with PageContextManager(page):
-            if url is not None:
-                await page.goto(url)
-            return await fn(page, *args, **kwargs)
+            if self.stealthy:
+                await stealth_async(page)
+
+            async with PageContextManager(page):
+                if url is not None:
+                    await page.goto(url)
+                return await fn(page, *args, **kwargs)
 
     def run_with_page(self, fn: Callable, *args, url: Optional[str] = None, **kwargs):
         future = asyncio.run_coroutine_threadsafe(
