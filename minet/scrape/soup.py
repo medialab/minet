@@ -1,3 +1,4 @@
+import re
 from typing import List, Optional, overload, cast
 from minet.types import Literal
 
@@ -11,6 +12,8 @@ try:
     from bs4 import XMLParsedAsHTMLWarning
 except ImportError:
     XMLParsedAsHTMLWarning = None
+
+WHITESPACE_RE = re.compile(r"\s+")
 
 
 class SelectionError(Exception):
@@ -112,6 +115,20 @@ class MinetTag(Tag):
     def get_outer_html(self) -> str:
         return str(self).strip()
 
+    def __getitem__(self, name: str) -> str:
+        return cast(str, super().__getitem__(name))
+
+    def get(self, name: str) -> Optional[str]:
+        return cast(Optional[str], super().get(name))
+
+    def get_list(self, name: str) -> List[str]:
+        value = super().get(name)
+
+        if not value:
+            return []
+
+        return WHITESPACE_RE.split(cast(str, value).strip())
+
 
 WONDERFUL_ELEMENT_CLASSES = {Tag: MinetTag}
 
@@ -128,7 +145,7 @@ class WonderfulSoup(BeautifulSoup, MinetTag):
         features: str = "lxml",
         parse_only: Optional[SoupStrainer] = None,
     ) -> None:
-        super().__init__(markup, features, element_classes=WONDERFUL_ELEMENT_CLASSES, parse_only=parse_only)  # type: ignore
+        super().__init__(markup, features, element_classes=WONDERFUL_ELEMENT_CLASSES, parse_only=parse_only, multi_valued_attributes=None)  # type: ignore
 
 
 @contextmanager

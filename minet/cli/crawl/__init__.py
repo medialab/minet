@@ -218,6 +218,6 @@ FOCUS_CRAWL_COMMAND = crawl_command(
             "flag": "--only-html",
             "help": "Add URLs to the crawler queue only if they seem to lead to a HTML content.",
             "action": "store_true",
-        }
+        },
     ],
 )

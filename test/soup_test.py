@@ -51,3 +51,16 @@ class TestWonderfulSoup:
 
         with pytest.raises(SelectionError):
             assert soup.scrape_one("link", strict=True)
+
+    def test_get(self):
+        soup = WonderfulSoup('<div class=" a  b  ">Ok</div>')
+        div = soup.select_one("div", strict=True)
+
+        assert div.get("class") == " a  b  "
+        assert div.get("id") is None
+        assert div.get_list("class") == ["a", "b"]
+        assert div.get_list("id") == []
+        assert div["class"] == " a  b  "
+
+        with pytest.raises(KeyError):
+            div["id"]
