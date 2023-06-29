@@ -128,7 +128,7 @@ def action(
     cli_args,
     defer=None,
     loading_bar: Optional[LoadingBar] = None,
-    spiders: Optional[SpiderDeclaration] = None,
+    target: Optional[SpiderDeclaration] = None,
     additional_job_fieldnames: Optional[List[str]] = None,
     format_job_row_addendum: Optional[Callable[[CrawlResult], List]] = None,
     result_callback: Optional[Callable[[Any, LoadingBar, CrawlResult], None]] = None,
@@ -186,9 +186,7 @@ def action(
     jobs_writer = casanova.Writer(jobs_output, fieldnames=jobs_fieldnames)
     defer(jobs_output.close)
 
-    if spiders is not None:
-        target = spiders
-    else:
+    if target is None:
         target = import_target(cli_args.target, "spider")
 
         if not callable(target):

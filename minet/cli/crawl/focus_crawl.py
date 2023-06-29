@@ -36,7 +36,7 @@ def action(cli_args):
 
     return crawl_action(
         cli_args,
-        spiders=spider,
+        target=spider,
         additional_job_fieldnames=additional_fieldnames,
         format_job_row_addendum=format_job_row_addendum,
         result_callback=result_callback,
