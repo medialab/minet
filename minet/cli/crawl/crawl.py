@@ -4,7 +4,7 @@
 #
 # Logic of the crawl action.
 #
-from typing import Optional, List, Callable, Any
+from typing import Optional, List, Callable, Any, Mapping
 
 import os
 import casanova
@@ -56,12 +56,11 @@ class DataWriter:
         self.resume = resume
         self.singular = crawler.singular
         self.format = format
+        self.dir = base_dir
 
         if self.singular:
-            self.dir = base_dir
             self.__add_file(None, "data", crawler.get_spider())
         else:
-            self.dir = join(base_dir, "data")
             for name, spider in crawler.spiders():
                 self.__add_file(name, join("data", name), spider)
 
@@ -88,7 +87,7 @@ class DataWriter:
 
         self.handles[name] = {"file": f, "writer": w, "spider": spider}
 
-    def unpack_result(self, result: CrawlResult, data):
+    def __unpack_result(self, result: CrawlResult, data):
         job_id = result.job.id
 
         if self.format == "csv":
@@ -96,16 +95,17 @@ class DataWriter:
 
         return ({"job_id": job_id, "data": data},)
 
-    # NOTE: write is flushing to ensure atomicity as well as possible
     def write(self, result: CrawlResult) -> None:
-        if self.singular:
-            handle = self.handles[None]
-            # TODO: factorize
-            for item in handle["spider"].tabulate(result):
-                handle["writer"].writerow(*self.unpack_result(result, item))
-            handle["file"].flush()
-        else:
-            raise NotImplementedError
+        handle = self.handles[result.spider]
+        spider = handle["spider"]
+        writer = handle["writer"]
+        f = handle["file"]
+
+        for item in spider.tabulate(result):
+            writer.writerow(*self.__unpack_result(result, item))
+
+        # NOTE: write is flushing to ensure atomicity as well as possible
+        f.flush()
 
     def flush(self) -> None:
         for h in self.handles.values():
@@ -118,6 +118,7 @@ class DataWriter:
 
 # NOTE: overhauling the way the crawler works.
 # It should be able to import a spider instance, a crawler instance, a dict of spider instances, a callable, a spider class, a crawler class
+# It could also accept a factory using a custom flag I guess
 
 
 @with_defer()
@@ -208,9 +209,20 @@ def action(
         if isclass(target) and issubclass(target, Spider):
             target = target()
         else:
-            # NOTE: at that point, target can be a Spider instance or a callable
+            # NOTE: at that point, target can be:
+            #   - a Spider instance
+            #   - a dict of Spider instances
+            #   - a callable
+            valid_spiders_dict = isinstance(target, Mapping) and all(
+                isinstance(v, Spider) for v in target.values()
+            )
+
             # TODO: inspect arity to weed out potential footguns
-            if not isinstance(target, Spider) and not callable(target):
+            if (
+                not valid_spiders_dict
+                and not isinstance(target, Spider)
+                and not callable(target)
+            ):
                 # TODO: explain further
                 raise FatalError("Invalid crawling target %s!" % cli_args.target)
 
