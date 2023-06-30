@@ -103,6 +103,7 @@ def crawl_command(
     write_files=False,
     write_data=True,
     factory=False,
+    default_folder_strategy=None,
 ):
     arguments_dict = CRAWL_ARGUMENTS.copy()
 
@@ -126,6 +127,12 @@ def crawl_command(
 
     if factory:
         del arguments_dict["factory"]
+
+    if default_folder_strategy is not None:
+        arguments_dict["folder_strategy"] = {
+            **arguments_dict["folder_strategy"],
+            "default": default_folder_strategy,
+        }
 
     arguments = (arguments or []) + list(arguments_dict.values())
 
