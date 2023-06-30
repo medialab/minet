@@ -14,6 +14,11 @@ CRAWL_ARGUMENTS = {
         "help": "Output directory.",
         "default": "crawl",
     },
+    "factory": {
+        "flag": "--factory",
+        "help": "Whether crawl target is a crawler factory function.",
+        "action": "store_true",
+    },
     "resume": {
         "flag": "--resume",
         "help": "Whether to resume an interrupted crawl.",
@@ -97,6 +102,7 @@ def crawl_command(
     threads=True,
     write_files=False,
     write_data=True,
+    factory=False,
 ):
     arguments_dict = CRAWL_ARGUMENTS.copy()
 
@@ -117,6 +123,9 @@ def crawl_command(
 
     if not write_data:
         del arguments_dict["write_data"]
+
+    if factory:
+        del arguments_dict["factory"]
 
     arguments = (arguments or []) + list(arguments_dict.values())
 
@@ -146,6 +155,9 @@ def crawl_command(
 
         if write_files:
             cli_args.write_files = True
+
+        if factory:
+            cli_args.factory = True
 
         if resolve is not None:
             resolve(cli_args)

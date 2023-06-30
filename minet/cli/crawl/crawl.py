@@ -116,11 +116,6 @@ class DataWriter:
             h["file"].close()
 
 
-# NOTE: overhauling the way the crawler works.
-# It should be able to import a spider instance, a crawler instance, a dict of spider instances, a callable, a spider class, a crawler class
-# It could also accept a factory using a custom flag I guess
-
-
 @with_defer()
 @with_loading_bar(
     title="Crawling",
@@ -193,6 +188,20 @@ def action(
     jobs_writer = casanova.Writer(jobs_output, fieldnames=jobs_fieldnames)
     defer(jobs_output.close)
 
+    crawler_kwargs = {
+        "throttle": cli_args.throttle,
+        "max_depth": cli_args.max_depth,
+        "persistent_storage_path": persistent_storage_path,
+        "writer_root_directory": writer_root_directory,
+        "visit_urls_only_once": cli_args.visit_urls_only_once,
+        "normalized_url_cache": cli_args.normalized_url_cache,
+        "resume": cli_args.resume,
+        "max_workers": cli_args.threads,
+        "callback": callback,
+        "wait": False,
+        "daemonic": False,
+    }
+
     if target is None:
         try:
             target = import_target(cli_args.target, "spider")
@@ -203,6 +212,14 @@ def action(
                     "Are you sure the module exists?",
                 ]
             )
+
+    # NOTE: target can be:
+    #   - a crawler factory function
+    #   - a spider class
+    #   - a spider instance
+    #   - a dict of spider instances
+    #   - a simple callable
+    if not cli_args.factory:
 
         # Is target a Spider class?
         if isclass(target) and issubclass(target, Spider):
@@ -223,22 +240,18 @@ def action(
                 and not callable(target)
             ):
                 # TODO: explain further
-                raise FatalError("Invalid crawling target %s!" % cli_args.target)
+                raise FatalError("Invalid crawling target!")
 
-    crawler = Crawler(
-        target,
-        throttle=cli_args.throttle,
-        max_depth=cli_args.max_depth,
-        persistent_storage_path=persistent_storage_path,
-        writer_root_directory=writer_root_directory,
-        visit_urls_only_once=cli_args.visit_urls_only_once,
-        normalized_url_cache=cli_args.normalized_url_cache,
-        resume=cli_args.resume,
-        max_workers=cli_args.threads,
-        callback=callback,
-        wait=False,
-        daemonic=False,
-    )
+        crawler = Crawler(target, **crawler_kwargs)
+
+    else:
+        if not callable(target):
+            raise FatalError("Factory should be callable!")
+
+        crawler = target(**crawler_kwargs)
+
+        if not isinstance(crawler, Crawler):
+            raise FatalError("Factory did not return a crawler!")
 
     with crawler:
         if crawler.finished:
