@@ -215,13 +215,13 @@ Examples:
 ## crawl
 
 ```
-Usage: minet crawl [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                   [-O OUTPUT_DIR] [--resume] [-m MAX_DEPTH]
-                   [--throttle THROTTLE] [-t THREADS] [--compress] [-w] [-d]
-                   [--folder-strategy FOLDER_STRATEGY] [-f {csv,jsonl,ndjson}]
-                   [-v] [-n] [-u] [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                   [--total TOTAL]
-                   target [url_or_url_column]
+Usage: minet crawl [-h] [-O OUTPUT_DIR] [--silent]
+                   [--refresh-per-second REFRESH_PER_SECOND] [--resume]
+                   [-m MAX_DEPTH] [--throttle THROTTLE] [-t THREADS]
+                   [--compress] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
+                   [-f {csv,jsonl,ndjson}] [-v] [-u] [-n] [-i INPUT]
+                   [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                   [url_or_url_column]
 
 # Minet Crawl Command
 
@@ -229,7 +229,6 @@ Run a crawl using a minet crawler or spiders defined
 in a python module.
 
 Positional Arguments:
-  target                        Crawling target.
   url_or_url_column             Single start url to process or name of the CSV
                                 column containing start urls when using
                                 -i/--input. Defaults to "url".
@@ -249,8 +248,8 @@ Optional Arguments:
                                 Serialization format for scraped/extracted data.
                                 Defaults to `csv`.
   -m, --max-depth MAX_DEPTH     Maximum depth for the crawl.
-  -n, --normalized-url-cache    Whether to normalize url cache when using
-                                -u/--visit-urls-only-once.
+  -n, --normalized-url-cache    Whether to normalize url cache used to assess if
+                                some url was already visited.
   -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.
   -t, --threads THREADS         Number of threads to use. You can use `0` if you
                                 want the crawler to remain completely
@@ -321,12 +320,11 @@ Examples:
 ## focus-crawl
 
 ```
-Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
-                         [--refresh-per-second REFRESH_PER_SECOND]
-                         [-U URL_FILTER] [--extract] [--irrelevant-continue]
-                         [--only-html] [-O OUTPUT_DIR] [--resume] [-m MAX_DEPTH]
-                         [--throttle THROTTLE] [-t THREADS] [--compress] [-w]
-                         [-d] [--folder-strategy FOLDER_STRATEGY]
+Usage: minet focus-crawl [-h] [-O OUTPUT_DIR] [--silent]
+                         [--refresh-per-second REFRESH_PER_SECOND] [--resume]
+                         [-m MAX_DEPTH] [--throttle THROTTLE] [-t THREADS]
+                         [--compress] [-w] [-d]
+                         [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-i INPUT]
                          [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                          [url_or_url_column]
@@ -349,11 +347,6 @@ Positional Arguments:
 Optional Arguments:
   --compress                    Whether to compress the downloaded files when
                                 saving on disk using -w/--write.
-  -C, --content-filter CONTENT_FILTER
-                                Regex used to filter fetched content.
-  --extract                     Perform regex match on extracted text content
-                                instead of html content using the Trafilatura
-                                library.
   --folder-strategy FOLDER_STRATEGY
                                 Name of the strategy to be used to dispatch the
                                 retrieved files into folders to alleviate issues
@@ -365,21 +358,15 @@ Optional Arguments:
   -f, --format {csv,jsonl,ndjson}
                                 Serialization format for scraped/extracted data.
                                 Defaults to `csv`.
-  --irrelevant-continue         Continue exploration whether met content is
-                                relevant or not.
   -m, --max-depth MAX_DEPTH     Maximum depth for the crawl.
-  -n, --normalized-url-cache    Whether to normalize url cache when using
-                                -u/--visit-urls-only-once.
-  --only-html                   Add URLs to the crawler queue only if they seem
-                                to lead to a HTML content.
+  -n, --normalized-url-cache    Whether to normalize url cache used to assess if
+                                some url was already visited.
   -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.
   -t, --threads THREADS         Number of threads to use. You can use `0` if you
                                 want the crawler to remain completely
                                 synchronous. Defaults to `25`.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to `0.2`.
-  -U, --url-filter URL_FILTER   Regex used to filter URLs added to crawler's
-                                queue.
   -v, --verbose                 Whether to print information about crawl
                                 results.
   -d, --write-data, -D, --dont-write-data

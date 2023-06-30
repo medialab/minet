@@ -140,7 +140,6 @@ def action(
     additional_job_fieldnames: Optional[List[str]] = None,
     format_job_row_addendum: Optional[Callable[[CrawlResult], List]] = None,
     result_callback: Optional[Callable[[Any, LoadingBar, CrawlResult], None]] = None,
-    write_data: bool = True,
 ):
     if (additional_job_fieldnames is not None and format_job_row_addendum is None) or (
         additional_job_fieldnames is None and format_job_row_addendum is not None
@@ -254,7 +253,7 @@ def action(
 
         data_writer = None
 
-        if write_data and cli_args.write_data:
+        if cli_args.write_data:
             data_writer = DataWriter(
                 cli_args.output_dir,
                 crawler,

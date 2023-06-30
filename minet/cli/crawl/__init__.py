@@ -8,82 +8,78 @@ from minet.constants import DEFAULT_THROTTLE
 from minet.fs import FolderStrategy
 
 # TODO: negative int forbiding type
-COMMON_CRAWL_ARGUMENTS = [
-    {
+CRAWL_ARGUMENTS = {
+    "output_dir": {
         "flags": ["-O", "--output-dir"],
         "help": "Output directory.",
         "default": "crawl",
     },
-    {
+    "resume": {
         "flag": "--resume",
         "help": "Whether to resume an interrupted crawl.",
         "action": "store_true",
     },
-    {
+    "max_depth": {
         "flags": ["-m", "--max-depth"],
         "help": "Maximum depth for the crawl.",
         "type": int,
     },
-    {
+    "throttle": {
         "flag": "--throttle",
         "help": "Time to wait - in seconds - between 2 calls to the same domain.",
         "type": float,
         "default": DEFAULT_THROTTLE,
     },
-    {
+    "threads": {
         "flags": ["-t", "--threads"],
         "help": "Number of threads to use. You can use `0` if you want the crawler to remain completely synchronous.",
         "type": int,
         "default": 25,
     },
-    {
+    "compress": {
         "flag": "--compress",
         "help": "Whether to compress the downloaded files when saving on disk using -w/--write.",
         "action": "store_true",
     },
-    {
+    "write_files": {
         "flags": ["-w", "--write-files"],
         "help": "Whether to write downloaded files on disk in order to save them for later.",
         "action": "store_true",
     },
-    {
+    "write_data": {
         "flags": ["-d", "--write-data", "-D", "--dont-write-data"],
         "help": "Whether to write scraped/extracted data on disk.",
         "action": BooleanAction,
         "default": True,
     },
-    {
+    "folder_strategy": {
         "flag": "--folder-strategy",
         "help": "Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. All of the strategies are described at the end of this help.",
         "default": "flat",
         "type": FolderStrategyType(),
     },
-    {
+    "format": {
         "flags": ["-f", "--format"],
         "help": "Serialization format for scraped/extracted data.",
         "choices": ("csv", "jsonl", "ndjson"),
         "default": "csv",
     },
-    {
+    "verbose": {
         "flags": ["-v", "--verbose"],
         "help": "Whether to print information about crawl results.",
         "action": "store_true",
     },
-    {
-        "flags": ["-n", "--normalized-url-cache"],
-        "help": "Whether to normalize url cache when using -u/--visit-urls-only-once.",
-        "action": "store_true",
-    },
-]
-
-UNIQUE_CRAWL_ARGUMENTS = [
-    {
+    "visit_urls_only_once": {
         "flags": ["-u", "--visit-urls-only-once"],
         "help": "Whether to ensure that any url will only be visited once.",
         "action": "store_true",
-    }
-]
-
+    },
+    "normalized_url_cache": {
+        "flags": ["-n", "--normalized-url-cache"],
+        "help": "Whether to normalize url cache used to assess if some url was already visited.",
+        "action": "store_true",
+    },
+}
 
 # TODO: add option to declare we will be taking a crawler or restrict some possible flags
 def crawl_command(
@@ -97,10 +93,12 @@ def crawl_command(
     resolve=None,
     unique=False,
 ):
-    arguments = (arguments or []) + COMMON_CRAWL_ARGUMENTS
+    arguments_dict = CRAWL_ARGUMENTS.copy()
 
-    if not unique:
-        arguments.extend(UNIQUE_CRAWL_ARGUMENTS)
+    if unique:
+        del arguments_dict["visit_urls_only_once"]
+
+    arguments = list(arguments_dict.values())
 
     additional_kwargs = {}
 
