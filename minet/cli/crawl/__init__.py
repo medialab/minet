@@ -246,12 +246,12 @@ FOCUS_CRAWL_COMMAND = crawl_command(
         },
         {
             "flags": ["-nC", "--negative-content-filter"],
-            "help": "Flag to turn the content filter into an exclusion rule",
+            "help": "Flag to turn the content filter into an exclusion rule.",
             "action": "store_true",
         },
         {
             "flags": ["-nU", "--negative-url-filter"],
-            "help": "Flag to turn the url filter into an exclusion rule",
+            "help": "Flag to turn the url filter into an exclusion rule.",
             "action": "store_true",
         },
         {
