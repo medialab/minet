@@ -63,7 +63,9 @@ class FocusSpider(Spider):
         self,
         start_urls=None,
         regex_content=None,
+        negative_regex_content=None,
         regex_url=None,
+        negative_regex_url=None,
         irrelevant_continue=False,
         extract=False,
         only_target_html_page=True,
@@ -73,7 +75,9 @@ class FocusSpider(Spider):
 
         self.urls = start_urls
         self.regex_content = re.compile(regex_content, re.I) if regex_content else None
+        self.negative_regex_content = negative_regex_content
         self.regex_url = re.compile(regex_url, re.I) if regex_url else None
+        self.negative_regex_url = negative_regex_url
         self.extraction = extract
         self.irrelevant_continue = irrelevant_continue
         self.target_html = only_target_html_page
@@ -116,8 +120,12 @@ class FocusSpider(Spider):
 
         if self.regex_content:
             match = self.regex_content.findall(content)
-            has_relevant_content = bool(match)
-            relevant_size = len(match) if match else 0
+            if self.negative_regex_content:
+                has_relevant_content = not bool(match)
+                relevant_size = None
+            else:
+                has_relevant_content = bool(match)
+                relevant_size = len(match) if match else 0
         else:
             has_relevant_content = True
             relevant_size = None
@@ -132,9 +140,13 @@ class FocusSpider(Spider):
                 link.invalidity = "not-html"
                 continue
 
-            if self.regex_url and not self.regex_url.search(url):
-                link.invalidity = "irrelevant"
-                continue
+            if self.regex_url:
+                if self.negative_regex_url and self.regex_url.search(url):
+                    link.invalidity = "irrelevant"
+                    continue
+                elif not self.negative_regex_url and not self.regex_url.search(url):
+                    link.invalidity = "irrelevant"
+                    continue
 
             next_urls.append(url)
 

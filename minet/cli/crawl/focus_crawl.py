@@ -12,7 +12,9 @@ def action(cli_args):
 
     spider = FocusSpider(
         regex_content=cli_args.content_filter,
+        negative_regex_content=cli_args.negative_content_filter,
         regex_url=cli_args.url_filter,
+        negative_regex_url=cli_args.negative_url_filter,
         irrelevant_continue=cli_args.irrelevant_continue,
         only_target_html_page=cli_args.only_html,
         extract=cli_args.extract,
