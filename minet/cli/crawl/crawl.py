@@ -9,13 +9,20 @@ from typing import Optional, List, Callable, Any
 import os
 import casanova
 import casanova.ndjson as ndjson
+from inspect import isclass
 from os.path import join, dirname
 from ebbe.decorators import with_defer
 
 from minet.utils import import_target
 from minet.fs import FilenameBuilder
 from minet.cli.exceptions import FatalError
-from minet.crawl import Crawler, CrawlResult, SuccessfulCrawlResult, SpiderDeclaration
+from minet.crawl import (
+    Crawler,
+    CrawlResult,
+    SuccessfulCrawlResult,
+    SpiderDeclaration,
+    Spider,
+)
 from minet.cli.console import console
 from minet.cli.loading_bar import LoadingBar
 from minet.cli.utils import (
@@ -187,11 +194,22 @@ def action(
     defer(jobs_output.close)
 
     if target is None:
-        target = import_target(cli_args.target, "spider")
+        try:
+            target = import_target(cli_args.target, "spider")
+        except ImportError:
+            raise FatalError(
+                [
+                    "Could not import %s!" % cli_args.target,
+                    "Are you sure the module exists?",
+                ]
+            )
 
-        if not callable(target):
+        # Is target a Spider class?
+        if isclass(target) and issubclass(target, Spider):
+            target = target()
+        elif not callable(target):
             # TODO: explain further
-            raise FatalError("invalid crawling target")
+            raise FatalError("Invalid crawling target %s!" % cli_args.target)
 
     crawler = Crawler(
         target,

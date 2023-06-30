@@ -2,7 +2,7 @@ from minet.web import Response
 from minet.crawl import CrawlJob, SpiderResult, Spider
 from minet.scrape import WonderfulSoup
 
-# https://echojs.com/latest
+START_URL = "https://echojs.com/latest"
 
 
 def scrape(soup: WonderfulSoup) -> SpiderResult:
@@ -17,5 +17,7 @@ def spider(job: CrawlJob, response: Response) -> SpiderResult:
 
 
 class EchoJSSpider(Spider):
+    START_URL = "https://echojs.com/latest"
+
     def process(self, job: CrawlJob, response: Response) -> SpiderResult:
         return scrape(response.soup())
