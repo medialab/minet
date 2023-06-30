@@ -274,19 +274,19 @@ def check_focus_crawl_arguments(cli_args):
         "date",
         "sitename",
     ]
+    if cli_args.extraction_fields:
+        fields = set(cli_args.extraction_fields.split(","))
 
-    fields = set(cli_args.extraction_fields.split(","))
+        for field in fields:
+            if not field in TRAFILATURA_FIELDS:
+                raise InvalidArgumentsError(
+                    [
+                        f"The trafilatura field `{field}` doesn't exist. Available fields are :"
+                    ]
+                    + [f"- {a}" for a in TRAFILATURA_FIELDS]
+                )
 
-    for field in fields:
-        if not field in TRAFILATURA_FIELDS:
-            raise InvalidArgumentsError(
-                [
-                    f"The trafilatura field `{field}` doesn't exist. Available fields are :"
-                ]
-                + [f"- {a}" for a in TRAFILATURA_FIELDS]
-            )
-
-    cli_args.extraction_fields = fields
+        cli_args.extraction_fields = fields
 
 
 FOCUS_CRAWL_COMMAND = crawl_command(
