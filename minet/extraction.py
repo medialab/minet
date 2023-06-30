@@ -71,18 +71,59 @@ class TrafilaturaResult(TabularRecord):
             sitename=data.get("sitename"),
         )
 
-    def blurb(self) -> str:
-        items = [
-            self.title,
-            self.description,
-            self.content,
-            self.comments,
-            self.author,
-            " ".join(self.categories),
-            " ".join(self.tags),
-            self.date,
-            self.sitename,
-        ]
+    def blurb(self, fields=None) -> str:
+        if not fields:
+            items = [
+                self.title,
+                self.description,
+                self.content,
+                self.comments,
+                self.author,
+                " ".join(self.categories),
+                " ".join(self.tags),
+                self.date,
+                self.sitename,
+            ]
+        else:
+            items = []
+            for f in fields:
+                if f == "title":
+                    val = self.title
+                    if val:
+                        items.append(val)
+                if f == "description":
+                    val = self.description
+                    if val:
+                        items.append(val)
+                if f == "content":
+                    val = self.content
+                    if val:
+                        items.append(val)
+                if f == "comments":
+                    val = self.comments
+                    if val:
+                        items.append(val)
+                if f == "author":
+                    val = self.author
+                    if val:
+                        items.append(val)
+                if f == "categories":
+                    val = " ".join(self.categories)
+                    if val:
+                        items.append(val)
+                if f == "tags":
+                    val = " ".join(self.tags)
+                    if val:
+                        items.append(val)
+                if f == "date":
+                    val = self.date
+                    if val:
+                        items.append(val)
+                if f == "sitename":
+                    val = self.sitename
+                    if val:
+                        items.append(val)
+
         clist = [v for v in items if isinstance(v, str)]
         return "\n".join(clist)
 

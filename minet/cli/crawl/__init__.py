@@ -252,7 +252,7 @@ CRAWL_COMMAND = crawl_command(
 )
 
 
-def ensure_filters(cli_args):
+def check_focus_crawl_arguments(cli_args):
     if not cli_args.content_filter and not cli_args.url_filter:
         raise InvalidArgumentsError(
             [
@@ -262,6 +262,31 @@ def ensure_filters(cli_args):
                 "   -U/--url-filter",
             ]
         )
+
+    TRAFILATURA_FIELDS = [
+        "title",
+        "description",
+        "content",
+        "comments",
+        "author",
+        "categories",
+        "tags",
+        "date",
+        "sitename",
+    ]
+
+    fields = set(cli_args.extraction_fields.split(","))
+
+    for field in fields:
+        if not field in TRAFILATURA_FIELDS:
+            raise InvalidArgumentsError(
+                [
+                    f"The trafilatura field `{field}` doesn't exist. Available fields are :"
+                ]
+                + [f"- {a}" for a in TRAFILATURA_FIELDS]
+            )
+
+    cli_args.extraction_fields = fields
 
 
 FOCUS_CRAWL_COMMAND = crawl_command(
@@ -283,7 +308,7 @@ FOCUS_CRAWL_COMMAND = crawl_command(
         . Running a simple crawler:
             $ minet focus-crawl url -i urls.csv --content-filter '(?:assembl[ée]e nationale|s[ée]nat)' -O ./result
     """,
-    resolve=ensure_filters,
+    resolve=check_focus_crawl_arguments,
     unique=True,
     arguments=[
         {
@@ -320,6 +345,11 @@ FOCUS_CRAWL_COMMAND = crawl_command(
             "flag": "--only-html",
             "help": "Add URLs to the crawler queue only if they seem to lead to a HTML content.",
             "action": "store_true",
+        },
+        {
+            "flag": "--extraction-fields",
+            "help": "Fields of the trafilatura extraction you want to apply the content filter on, separated using commas. It enables the flag `--extract`. Available flags are : `title`, `description`, `content`, `comments`, `author`, `categories`, `tags`, `date` and `sitename`.",
+            "default": None,
         },
     ],
 )

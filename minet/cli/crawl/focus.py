@@ -19,6 +19,7 @@ def action(cli_args):
         irrelevant_continue=cli_args.irrelevant_continue,
         only_html=cli_args.only_html,
         extract=cli_args.extract,
+        extraction_fields=cli_args.extraction_fields,
     )
 
     def format_job_row_addendum(result: CrawlResult[Any, FocusCrawlInfo]) -> List:
