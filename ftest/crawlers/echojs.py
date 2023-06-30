@@ -21,3 +21,6 @@ class EchoJSSpider(Spider):
 
     def process(self, job: CrawlJob, response: Response) -> SpiderResult:
         return scrape(response.soup())
+
+
+spider_instance = EchoJSSpider()

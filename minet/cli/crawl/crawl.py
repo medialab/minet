@@ -207,9 +207,12 @@ def action(
         # Is target a Spider class?
         if isclass(target) and issubclass(target, Spider):
             target = target()
-        elif not callable(target):
-            # TODO: explain further
-            raise FatalError("Invalid crawling target %s!" % cli_args.target)
+        else:
+            # NOTE: at that point, target can be a Spider instance or a callable
+            # TODO: inspect arity to weed out potential footguns
+            if not isinstance(target, Spider) and not callable(target):
+                # TODO: explain further
+                raise FatalError("Invalid crawling target %s!" % cli_args.target)
 
     crawler = Crawler(
         target,
