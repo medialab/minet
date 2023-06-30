@@ -1,5 +1,5 @@
 from minet.web import Response
-from minet.crawl import CrawlJob, SpiderResult, Spider, CrawlTarget
+from minet.crawl import CrawlJob, SpiderResult, Spider, CrawlTarget, Crawler
 from minet.scrape import WonderfulSoup
 
 START_URL = "https://echojs.com/latest"
@@ -44,3 +44,8 @@ class ArticleSpider(Spider):
 
 
 spiders = {"start": EchoJSStartSpider(), "article": ArticleSpider()}
+
+
+class EchoJSCrawler(Crawler):
+    def __init__(self):
+        super().__init__(EchoJSSpider())

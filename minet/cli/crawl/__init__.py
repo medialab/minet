@@ -81,7 +81,7 @@ CRAWL_ARGUMENTS = {
     },
 }
 
-# TODO: add option to declare we will be taking a crawler or restrict some possible flags
+
 def crawl_command(
     name: str,
     package: str,
@@ -92,13 +92,33 @@ def crawl_command(
     accept_input: bool = True,
     resolve=None,
     unique=False,
+    max_depth=True,
+    throttle=True,
+    threads=True,
+    write_files=False,
+    write_data=True,
 ):
     arguments_dict = CRAWL_ARGUMENTS.copy()
 
     if unique:
         del arguments_dict["visit_urls_only_once"]
 
-    arguments = list(arguments_dict.values())
+    if not max_depth:
+        del arguments_dict["max_depth"]
+
+    if not throttle:
+        del arguments_dict["throttle"]
+
+    if not threads:
+        del arguments_dict["threads"]
+
+    if write_files:
+        del arguments_dict["write_files"]
+
+    if not write_data:
+        del arguments_dict["write_data"]
+
+    arguments = (arguments or []) + list(arguments_dict.values())
 
     additional_kwargs = {}
 
@@ -123,6 +143,9 @@ def crawl_command(
     def wrapped_resolve(cli_args):
         if unique:
             cli_args.visit_urls_only_once = True
+
+        if write_files:
+            cli_args.write_files = True
 
         if resolve is not None:
             resolve(cli_args)
