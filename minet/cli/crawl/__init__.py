@@ -107,6 +107,7 @@ def crawl_command(
 ):
     arguments_dict = CRAWL_ARGUMENTS.copy()
 
+    # NOTE: missing a lot in the resolve here
     if unique:
         del arguments_dict["visit_urls_only_once"]
 

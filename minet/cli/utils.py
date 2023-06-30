@@ -318,6 +318,7 @@ def with_loading_bar(stats: Optional[Iterable[StatsItem]] = None, **loading_bar_
                 total=total,
                 stats=stats,
                 refresh_per_second=getattr(cli_args, "refresh_per_second", 10),
+                single_line=getattr(cli_args, "single_line", False),
                 **loading_bar_kwargs
             ) as loading_bar:
                 additional_kwargs = {
@@ -366,6 +367,7 @@ def with_enricher_and_loading_bar(
                     unit="lines",
                     transient=True,
                     refresh_per_second=getattr(cli_args, "refresh_per_second", 10),
+                    single_line=getattr(cli_args, "single_line", False),
                 )
                 enricher_context = resume_loading_bar
 
@@ -428,6 +430,7 @@ def with_enricher_and_loading_bar(
                 show_label=show_label,
                 completed=completed,
                 refresh_per_second=getattr(cli_args, "refresh_per_second", 10),
+                single_line=getattr(cli_args, "single_line", False),
             ) as loading_bar:
                 additional_kwargs = {
                     "enricher": enricher,

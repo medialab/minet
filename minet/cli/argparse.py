@@ -50,6 +50,7 @@ FLAG_SORTING_PRIORITIES = {
             "resume",
             "rcfile",
             "refresh-per-second",
+            "simple-progress",
             "silent",
             "help",
         ],
@@ -141,6 +142,13 @@ def get_subparser(o, keys):
 ARGUMENT_KEYS_TO_OMIT = ["name", "flag", "flags"]
 
 
+def add_argument_once(parser, *args, **kwargs) -> None:
+    try:
+        parser.add_argument(*args, **kwargs)
+    except ArgumentError:
+        pass
+
+
 def add_arguments(subparser, arguments):
     for argument in arguments:
         argument_kwargs = omit(argument, ARGUMENT_KEYS_TO_OMIT)
@@ -174,35 +182,35 @@ def add_arguments(subparser, arguments):
         else:
             subparser.add_argument(*argument["flags"], **argument_kwargs)
 
+        # Global arguments
         if "action" in argument and argument["action"] is ConfigAction:
-            try:
-                subparser.add_argument(
-                    "--rcfile",
-                    help="Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc",
-                )
-            except ArgumentError:
-                pass
-
-        try:
-            subparser.add_argument(
-                "--silent",
-                help="Whether to suppress all the log and progress bars. Can be useful when piping.",
-                action="store_true",
+            add_argument_once(
+                subparser,
+                "--rcfile",
+                help="Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc",
             )
-        except ArgumentError:
-            pass
 
-        try:
-            # NOTE: we might want to add those common flags to the list of arguments themselves, after deduplication
-            # rather than relying on those ugly try/catch and forfeiting the help text wrangling wrt default values.
-            subparser.add_argument(
-                "--refresh-per-second",
-                help="Number of times to refresh the progress bar per second. Can be a float e.g. `0.5` meaning once every two seconds. Use this to limit CPU usage when launching multiple commands at once. Defaults to `10`.",
-                default=10,
-                type=float,
-            )
-        except ArgumentError:
-            pass
+        add_argument_once(
+            subparser,
+            "--silent",
+            help="Whether to suppress all the log and progress bars. Can be useful when piping.",
+            action="store_true",
+        )
+
+        add_argument_once(
+            subparser,
+            "--refresh-per-second",
+            help="Number of times to refresh the progress bar per second. Can be a float e.g. `0.5` meaning once every two seconds. Use this to limit CPU usage when launching multiple commands at once. Defaults to `10`.",
+            default=10,
+            type=float,
+        )
+
+        add_argument_once(
+            subparser,
+            "--single-line",
+            help="Whether to simplify the progress bar to make it fit on a single line. Can be useful in terminals with partial ANSI support, e.g. a Jupyter notebook cell.",
+            action="store_true",
+        )
 
 
 def build_description(command):
