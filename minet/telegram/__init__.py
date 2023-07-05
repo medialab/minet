@@ -1,5 +1,5 @@
 # =============================================================================
-# Minet Telegram Enpoint
+# Minet Telegram Endpoint
 # =============================================================================
 #
 from minet.telegram.scraper import TelegramScraper

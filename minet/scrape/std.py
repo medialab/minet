@@ -2,7 +2,7 @@
 # Minet Scrapers Standard Library
 # =============================================================================
 #
-# Collection of helpers, and depencies exposed to scraper evaluation.
+# Collection of helpers, and dependencies exposed to scraper evaluation.
 #
 import re
 import json

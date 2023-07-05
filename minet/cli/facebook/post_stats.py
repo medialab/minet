@@ -78,7 +78,7 @@ def collect_top_reactions(data):
         emotion = FACEBOOK_REACTION_KEYS.get(edge["node"]["key"])
 
         if emotion is None:
-            print_err("Found unkown emotion %s" % edge)
+            print_err("Found unknown emotion %s" % edge)
             continue
 
         index[emotion] = edge["reaction_count"] or 0

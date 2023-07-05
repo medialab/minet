@@ -1,5 +1,5 @@
 # =============================================================================
-# Minet Facebook Enpoint
+# Minet Facebook Endpoint
 # =============================================================================
 #
 from minet.facebook.mobile_scraper import FacebookMobileScraper

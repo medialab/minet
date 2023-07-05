@@ -187,7 +187,7 @@ Once we cut access to Google to our whole university!
 
 ---
 
-## Complex spidering, scalability, storage, indexing, recombobulation, steam engines, fancy boats, unionization, agility, upper management, Peters syndrom, eXtreme programming
+## Complex spidering, scalability, storage, indexing, recombobulation, steam engines, fancy boats, unionization, agility, upper management, Peters syndrome, eXtreme programming
 
 _Most of it is irrelevant and made up but you get the point..._
 

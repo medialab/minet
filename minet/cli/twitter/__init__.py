@@ -127,7 +127,7 @@ TWITTER_ATTRITION_SUBCOMMAND = twitter_api_subcommand(
         Using Twitter API to find whether batches of tweets are still
         available today and if they aren't, attempt to find a reason why.
 
-        This command relies on tweet ids or tweet urls. We recommand to add `--user` and
+        This command relies on tweet ids or tweet urls. We recommend to add `--user` and
         the tweet's user id to the command if you can, as more information can
         be obtained when the user id (or the full url) is known.
 

@@ -138,7 +138,7 @@ CROWDTANGLE_POSTS_SUBCOMMAND = command(
     arguments=[
         {
             "flag": "--chunk-size",
-            "help": "When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations.",
+            "help": "When sorting by date (default), the number of items to retrieve before shifting the initial query to circumvent the APIs limitations.",
             "type": int,
             "default": 500,
         },
@@ -198,7 +198,7 @@ CROWDTANGLE_SEARCH_SUBCOMMAND = command(
         },
         {
             "flag": "--chunk-size",
-            "help": "When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations.",
+            "help": "When sorting by date (default), the number of items to retrieve before shifting the initial query to circumvent the APIs limitations.",
             "type": int,
             "default": 500,
         },

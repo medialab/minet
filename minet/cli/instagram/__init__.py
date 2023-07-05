@@ -97,7 +97,7 @@ INSTAGRAM_USER_FOLLOWERS_SUBCOMMAND = command(
         the result. Be sure to download them fast if you need them (you can
         use the `minet fetch` command for that, and won't need to use cookies).
 
-        If a username is a number without '@' at the begining, it will be
+        If a username is a number without '@' at the beginning, it will be
         considered as an id.
     """,
     epilog="""
@@ -174,7 +174,7 @@ INSTAGRAM_USER_FOLLOWING_SUBCOMMAND = command(
         the result. Be sure to download them fast if you need them (you can
         use the `minet fetch` command for that, and won't need to use cookies).
 
-        If a username is a number without '@' at the begining, it will be
+        If a username is a number without '@' at the beginning, it will be
         considered as an id.
     """,
     epilog="""
@@ -217,7 +217,7 @@ INSTAGRAM_USER_INFOS_SUBCOMMAND = command(
         the result. Be sure to download them fast if you need them (you can
         use the `minet fetch` command for that, and won't need to use cookies).
 
-        If a username is a number without '@' at the begining, it will be
+        If a username is a number without '@' at the beginning, it will be
         considered as an id.
     """,
     epilog="""
@@ -255,7 +255,7 @@ INSTAGRAM_USER_POSTS_SUBCOMMAND = command(
         them (you can use the `minet fetch` command for that, and
         won't need to use cookies).
 
-        If a username is a number without '@' at the begining, it will be
+        If a username is a number without '@' at the beginning, it will be
         considered as an id.
     """,
     epilog="""

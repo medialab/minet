@@ -624,7 +624,7 @@ Examples:
 . CSV input from stdin (mind the `-`):
     $ xsv select url file.csv | minet fetch url -i - > report.csv
 
-. Dowloading files in specific output directory:
+. Downloading files in specific output directory:
     $ minet fetch url -i file.csv -O html > report.csv
 
 how to use the command with a CSV file?
@@ -692,7 +692,7 @@ This said, you can of course feed this command any kind of CSV data,
 and use dedicated flags such as --status-column, --body-column to
 to inform the command about your specific table.
 
-The comand is also able to work on glob patterns, such as: "downloaded/**/*.html",
+The command is also able to work on glob patterns, such as: "downloaded/**/*.html",
 and can also be fed CSV columns containing HTML content directly if
 required.
 
@@ -793,7 +793,7 @@ Examples:
 . Indicating a custom filename column (named "path"):
     $ minet extract path -i report.csv -I downloaded > extracted.csv
 
-. Extracting content from a CSV colum containing HTML directly:
+. Extracting content from a CSV column containing HTML directly:
     $ minet extract -i report.csv --body-column html > extracted.csv
 
 . Extracting content from a bunch of files using a glob pattern:
@@ -988,7 +988,7 @@ This said, you can of course feed this command any kind of CSV data,
 and use dedicated flags such as --status-column, --body-column to
 to inform the command about your specific table.
 
-The comand is also able to work on glob patterns, such as: "downloaded/**/*.html",
+The command is also able to work on glob patterns, such as: "downloaded/**/*.html",
 and can also be fed CSV columns containing HTML content directly if
 required.
 
@@ -1084,7 +1084,7 @@ Examples:
 . Indicating a custom filename column (named "path"):
     $ minet scrape scraper.yml path -i report.csv -I downloaded > scraped.csv
 
-. Scraping a CSV colum containing HTML directly:
+. Scraping a CSV column containing HTML directly:
     $ minet scrape scraper.yml -i report.csv --body-column html > scraped.csv
 
 . Scraping a bunch of files using a glob pattern:
@@ -1941,7 +1941,7 @@ For more information, see the API endpoint documentation: https://github.com/Cro
 
 Optional Arguments:
   --chunk-size CHUNK_SIZE       When sorting by date (default), the number of
-                                items to retrieve before shifting the inital
+                                items to retrieve before shifting the initial
                                 query to circumvent the APIs limitations.
                                 Defaults to `500`.
   --end-date END_DATE           The latest date at which a post could be posted
@@ -2035,7 +2035,7 @@ Positional Arguments:
 Optional Arguments:
   --and AND                     AND clause to add to the query terms.
   --chunk-size CHUNK_SIZE       When sorting by date (default), the number of
-                                items to retrieve before shifting the inital
+                                items to retrieve before shifting the initial
                                 query to circumvent the APIs limitations.
                                 Defaults to `500`.
   --end-date END_DATE           The latest date at which a post could be posted
@@ -3378,7 +3378,7 @@ for profile picture urls retrieved as the "profile_pic_url" in
 the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
-If a username is a number without '@' at the begining, it will be
+If a username is a number without '@' at the beginning, it will be
 considered as an id.
 
 Positional Arguments:
@@ -3491,7 +3491,7 @@ for profile picture urls retrieved as the "profile_pic_url" in
 the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
-If a username is a number without '@' at the begining, it will be
+If a username is a number without '@' at the beginning, it will be
 considered as an id.
 
 Positional Arguments:
@@ -3599,7 +3599,7 @@ for profile picture urls retrieved as the "profile_pic_url_hd" in
 the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
-If a username is a number without '@' at the begining, it will be
+If a username is a number without '@' at the beginning, it will be
 considered as an id.
 
 Optional Arguments:
@@ -3662,7 +3662,7 @@ media is a video). Be sure to download them fast if you need
 them (you can use the `minet fetch` command for that, and
 won't need to use cookies).
 
-If a username is a number without '@' at the begining, it will be
+If a username is a number without '@' at the beginning, it will be
 considered as an id.
 
 Positional Arguments:
@@ -4279,7 +4279,7 @@ Usage: minet twitter attrition [-h] [--user USER] [--silent]
 Using Twitter API to find whether batches of tweets are still
 available today and if they aren't, attempt to find a reason why.
 
-This command relies on tweet ids or tweet urls. We recommand to add `--user` and
+This command relies on tweet ids or tweet urls. We recommend to add `--user` and
 the tweet's user id to the command if you can, as more information can
 be obtained when the user id (or the full url) is known.
 
