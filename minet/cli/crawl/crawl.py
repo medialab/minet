@@ -4,7 +4,7 @@
 #
 # Logic of the crawl action.
 #
-from typing import Optional, List, Callable, Any, Mapping
+from typing import Optional, List, Callable, Any, Mapping, Union
 
 import os
 import casanova
@@ -131,7 +131,7 @@ def action(
     cli_args,
     defer=None,
     loading_bar: Optional[LoadingBar] = None,
-    target: Optional[SpiderDeclaration] = None,
+    target: Optional[Union[SpiderDeclaration, Callable[..., Crawler]]] = None,
     additional_job_fieldnames: Optional[List[str]] = None,
     format_job_row_addendum: Optional[Callable[[CrawlResult], List]] = None,
     result_callback: Optional[Callable[[Any, LoadingBar, CrawlResult], None]] = None,
