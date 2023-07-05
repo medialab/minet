@@ -189,18 +189,33 @@ def action(
     defer(jobs_output.close)
 
     crawler_kwargs = {
-        "throttle": cli_args.throttle,
-        "max_depth": cli_args.max_depth,
         "persistent_storage_path": persistent_storage_path,
         "writer_root_directory": writer_root_directory,
-        "visit_urls_only_once": cli_args.visit_urls_only_once,
-        "normalized_url_cache": cli_args.normalized_url_cache,
         "resume": cli_args.resume,
-        "max_workers": cli_args.threads,
         "callback": callback,
         "wait": False,
         "daemonic": False,
     }
+
+    # NOTE: the cli_args given to this action might lack some items
+    # so that crawler factory are more convenient to use.
+    cli_args_to_forward_to_crawler = [
+        "throttle",
+        "max_depth",
+        "visit_urls_only_once",
+        "normalized_url_cache",
+        ("threads", "max_workers"),
+    ]
+
+    for arg in cli_args_to_forward_to_crawler:
+        if isinstance(arg, tuple):
+            cli_arg_name, crawler_arg_name = arg
+        else:
+            cli_arg_name = arg
+            crawler_arg_name = arg
+
+        if hasattr(cli_args, cli_arg_name):
+            crawler_kwargs[crawler_arg_name] = getattr(cli_args, cli_arg_name)
 
     if target is None:
         try:
@@ -270,7 +285,7 @@ def action(
                 cli_args.output_dir,
                 crawler,
                 resume=cli_args.resume,
-                format=cli_args.format,
+                format=getattr(cli_args, "format", "csv"),
             )
             defer(data_writer.close)
 

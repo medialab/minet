@@ -43,7 +43,7 @@ CRAWL_ARGUMENTS = {
     },
     "compress": {
         "flag": "--compress",
-        "help": "Whether to compress the downloaded files when saving on disk using -w/--write.",
+        "help": "Whether to compress the downloaded files when saving files on disk.",
         "action": "store_true",
     },
     "write_files": {
@@ -171,34 +171,20 @@ def crawl_command(
         if unique:
             cli_args.visit_urls_only_once = True
 
-        if not url_cache:
-            cli_args.visit_urls_only_once = unique
-            cli_args.normalized_url_cache = False
-
-        if not max_depth:
-            cli_args.max_depth = None
-
-        if not throttle:
-            cli_args.throttle = DEFAULT_THROTTLE
-
-        if not threads:
-            cli_args.threads = 25
-
         if write_files:
             cli_args.write_files = True
 
         if not write_data:
             cli_args.write_data = False
-            cli_args.format = "csv"
 
         if factory:
             cli_args.factory = True
 
-        if resolve is not None:
-            resolve(cli_args)
-
         if force_folder_strategy is not None:
             cli_args.folder_strategy = force_folder_strategy
+
+        if resolve is not None:
+            resolve(cli_args)
 
     return command(
         name,
