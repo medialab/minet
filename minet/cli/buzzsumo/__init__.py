@@ -7,7 +7,7 @@
 from argparse import ArgumentTypeError
 from datetime import datetime
 
-from minet.cli.argparse import command, subcommand, ConfigAction
+from minet.cli.argparse import command, ConfigAction
 
 FIVE_YEARS_IN_SEC = 5 * 365.25 * 24 * 60 * 60
 
@@ -29,7 +29,7 @@ class BuzzSumoDateType(object):
         return timestamp
 
 
-BUZZSUMO_LIMIT_SUBCOMMAND = subcommand(
+BUZZSUMO_LIMIT_SUBCOMMAND = command(
     "limit",
     "minet.cli.buzzsumo.limit",
     title="Minet Buzzsumo Limit Command",
@@ -60,7 +60,7 @@ DATE_ARGUMENTS = [
     },
 ]
 
-BUZZSUMO_DOMAIN_COMMAND = subcommand(
+BUZZSUMO_DOMAIN_COMMAND = command(
     "domain",
     "minet.cli.buzzsumo.domain",
     title="Minet Buzzsumo Domain Command",
@@ -85,7 +85,7 @@ BUZZSUMO_DOMAIN_COMMAND = subcommand(
 )
 
 
-BUZZSUMO_DOMAIN_SUMMARY_COMMAND = subcommand(
+BUZZSUMO_DOMAIN_SUMMARY_COMMAND = command(
     "domain-summary",
     "minet.cli.buzzsumo.domain_summary",
     title="Minet Buzzsumo Domain Summary Command",

@@ -1474,7 +1474,7 @@ Subcommands:
 ```
 Usage: minet buzzsumo limit [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
                             [--refresh-per-second REFRESH_PER_SECOND]
-                            [--single-line] [-o OUTPUT]
+                            [--single-line]
 
 # Minet Buzzsumo Limit Command
 
@@ -1489,9 +1489,6 @@ Optional Arguments:
   -t, --token TOKEN             BuzzSumo API token. Can also be configured in a
                                 .minetrc file as "buzzsumo.token" or read from
                                 the MINET_BUZZSUMO_TOKEN env variable.
-  -o, --output OUTPUT           Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
@@ -1832,7 +1829,7 @@ Examples:
 Usage: minet crowdtangle lists [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
                                [--silent]
                                [--refresh-per-second REFRESH_PER_SECOND]
-                               [--single-line] [-t TOKEN] [-o OUTPUT]
+                               [--single-line] [-t TOKEN]
 
 # Minet CrowdTangle Lists Command
 
@@ -1853,9 +1850,6 @@ Optional Arguments:
                                 crowdtangle.token. Can also be configured in a
                                 .minetrc file as "crowdtangle.token" or read
                                 from the MINET_CROWDTANGLE_TOKEN env variable.
-  -o, --output OUTPUT           Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
@@ -1882,22 +1876,13 @@ Examples:
 Usage: minet crowdtangle posts-by-id [-h] [--rate-limit RATE_LIMIT]
                                      [--rcfile RCFILE] [--silent]
                                      [--refresh-per-second REFRESH_PER_SECOND]
-                                     [--single-line] [-t TOKEN] [-i INPUT]
-                                     [--explode EXPLODE] [-s SELECT]
-                                     [--total TOTAL] [--resume] [-o OUTPUT]
-                                     post_url_or_id_or_post_url_or_id_column
+                                     [--single-line] [-t TOKEN]
 
 # Minet CrowdTangle Post By Id Command
 
 Retrieve metadata about batches of posts using Crowdtangle's API.
 
 For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Posts#get-postid.
-
-Positional Arguments:
-  post_url_or_id_or_post_url_or_id_column
-                                Single URL or id to process or name of the CSV
-                                column containing URLs or ids when using
-                                -i/--input.
 
 Optional Arguments:
   --rate-limit RATE_LIMIT       Authorized number of hits by minutes. Defaults
@@ -1912,25 +1897,6 @@ Optional Arguments:
                                 crowdtangle.token. Can also be configured in a
                                 .minetrc file as "crowdtangle.token" or read
                                 from the MINET_CROWDTANGLE_TOKEN env variable.
-  -s, --select SELECT           Columns of -i/--input CSV file to include in the
-                                output (separated by `,`). Use an empty string
-                                if you don't want to keep anything: --select ''.
-  --explode EXPLODE             Use to indicate the character used to separate
-                                multiple values in a single CSV cell. Defaults
-                                to none, i.e. CSV cells having a single values,
-                                which is usually the case.
-  --total TOTAL                 Total number of items to process. Might be
-                                necessary when you want to display a finite
-                                progress indicator for large files given as
-                                input to the command.
-  -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the URLs or ids you want to process. Will
-                                consider `-` as stdin.
-  -o, --output OUTPUT           Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
-  --resume                      "Whether to resume from an aborted collection.
-                                Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
@@ -1952,33 +1918,6 @@ Examples:
 
 . Retrieving information about a single post:
     $ minet ct posts-by-id 1784333048289665 --token YOUR_TOKEN
-
-how to use the command with a CSV file?
-
-> A lot of minet commands, including this one, can both be
-> given a single value to process or a bunch of them if
-> given the column of a CSV file passed to -i/--input instead.
-
-> Note that when given a CSV file as input, minet will
-> concatenate the input file columns with the ones added
-> by the command. You can always restrict the input file
-> columns to keep by using the -s/--select flag.
-
-. Here is how to use a command with a single value:
-    $ minet crowdtangle posts-by-id "value"
-
-. Here is how to use a command with a CSV file:
-    $ minet crowdtangle posts-by-id column_name -i file.csv
-
-. Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet crowdtangle posts-by-id column_name -i -
-
-. Here is how to indicate that the CSV column may contain multiple
-  values separated by a special character:
-    $ minet crowdtangle posts-by-id column_name -i file.csv --explode "|"
-
-. This also works with single values:
-    $ minet crowdtangle posts-by-id "value1,value2" --explode ","
 ```
 
 ### posts
@@ -2760,11 +2699,7 @@ how to use the command with a CSV file?
 <h3 id="facebook-url-likes">url-likes</h3>
 
 ```
-Usage: minet facebook url-likes [-h] [--silent]
-                                [--refresh-per-second REFRESH_PER_SECOND]
-                                [--single-line] [-i INPUT] [--explode EXPLODE]
-                                [-s SELECT] [--total TOTAL] [-o OUTPUT]
-                                url_or_url_column
+Usage: minet facebook url-likes [-h]
 
 # Minet Facebook Url Likes Command
 
@@ -2779,41 +2714,8 @@ reactions plus the number of comments and shares that the URL got on Facebook
 (here is the official documentation: https://developers.facebook.com/docs/plugins/faqs
 explaining "What makes up the number shown next to my Share button?").
 
-Positional Arguments:
-  url_or_url_column             Single url to process or name of the CSV column
-                                containing urls when using -i/--input.
-
 Optional Arguments:
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
-  -s, --select SELECT           Columns of -i/--input CSV file to include in the
-                                output (separated by `,`). Use an empty string
-                                if you don't want to keep anything: --select ''.
-  --explode EXPLODE             Use to indicate the character used to separate
-                                multiple values in a single CSV cell. Defaults
-                                to none, i.e. CSV cells having a single values,
-                                which is usually the case.
-  --total TOTAL                 Total number of items to process. Might be
-                                necessary when you want to display a finite
-                                progress indicator for large files given as
-                                input to the command.
-  -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the urls you want to process. Will consider `-`
-                                as stdin.
-  -o, --output OUTPUT           Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
-  --refresh-per-second REFRESH_PER_SECOND
-                                Number of times to refresh the progress bar per
-                                second. Can be a float e.g. `0.5` meaning once
-                                every two seconds. Use this to limit CPU usage
-                                when launching multiple commands at once.
-                                Defaults to `10`.
-  --silent                      Whether to suppress all the log and progress
-                                bars. Can be useful when piping.
-  -h, --help                    show this help message and exit
+  -h, --help  show this help message and exit
 
 example:
 . Retrieving the "like" number for one url:
@@ -2821,33 +2723,6 @@ example:
 
 . Retrieving the "like" number for the urls listed in a CSV file:
     $ minet fb url-likes url -i url.csv > url_likes.csv
-
-how to use the command with a CSV file?
-
-> A lot of minet commands, including this one, can both be
-> given a single value to process or a bunch of them if
-> given the column of a CSV file passed to -i/--input instead.
-
-> Note that when given a CSV file as input, minet will
-> concatenate the input file columns with the ones added
-> by the command. You can always restrict the input file
-> columns to keep by using the -s/--select flag.
-
-. Here is how to use a command with a single value:
-    $ minet facebook url-likes "value"
-
-. Here is how to use a command with a CSV file:
-    $ minet facebook url-likes column_name -i file.csv
-
-. Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet facebook url-likes column_name -i -
-
-. Here is how to indicate that the CSV column may contain multiple
-  values separated by a special character:
-    $ minet facebook url-likes column_name -i file.csv --explode "|"
-
-. This also works with single values:
-    $ minet facebook url-likes "value1,value2" --explode ","
 ```
 
 ## Google
@@ -3424,9 +3299,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet instagram post-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                   [--refresh-per-second REFRESH_PER_SECOND]
-                                  [--single-line] [-i INPUT] [--explode EXPLODE]
-                                  [-s SELECT] [--total TOTAL] [-o OUTPUT]
-                                  post_or_post_column
+                                  [--single-line]
 
 # Instagram post-infos
 
@@ -3445,12 +3318,6 @@ for profile picture urls retrieved as the "profile_pic_url_hd" in
 the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
-Positional Arguments:
-  post_or_post_column           Single post url, post shortcode or post id to
-                                process or name of the CSV column containing
-                                post urls, post shortcodes or post ids when
-                                using -i/--input.
-
 Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
@@ -3462,23 +3329,6 @@ Optional Arguments:
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
-  -s, --select SELECT           Columns of -i/--input CSV file to include in the
-                                output (separated by `,`). Use an empty string
-                                if you don't want to keep anything: --select ''.
-  --explode EXPLODE             Use to indicate the character used to separate
-                                multiple values in a single CSV cell. Defaults
-                                to none, i.e. CSV cells having a single values,
-                                which is usually the case.
-  --total TOTAL                 Total number of items to process. Might be
-                                necessary when you want to display a finite
-                                progress indicator for large files given as
-                                input to the command.
-  -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the post urls, post shortcodes or post ids you
-                                want to process. Will consider `-` as stdin.
-  -o, --output OUTPUT           Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
@@ -3497,33 +3347,6 @@ example:
 
 . Searching infos for the post https://www.instagram.com/p/CpA46rmU26Y/:
     $ minet instagram post-infos https://www.instagram.com/p/CpA46rmU26Y/ > post_infos.csv
-
-how to use the command with a CSV file?
-
-> A lot of minet commands, including this one, can both be
-> given a single value to process or a bunch of them if
-> given the column of a CSV file passed to -i/--input instead.
-
-> Note that when given a CSV file as input, minet will
-> concatenate the input file columns with the ones added
-> by the command. You can always restrict the input file
-> columns to keep by using the -s/--select flag.
-
-. Here is how to use a command with a single value:
-    $ minet instagram post-infos "value"
-
-. Here is how to use a command with a CSV file:
-    $ minet instagram post-infos column_name -i file.csv
-
-. Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet instagram post-infos column_name -i -
-
-. Here is how to indicate that the CSV column may contain multiple
-  values separated by a special character:
-    $ minet instagram post-infos column_name -i file.csv --explode "|"
-
-. This also works with single values:
-    $ minet instagram post-infos "value1,value2" --explode ","
 ```
 
 ### user-followers
@@ -3757,9 +3580,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet instagram user-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                   [--refresh-per-second REFRESH_PER_SECOND]
-                                  [--single-line] [-i INPUT] [--explode EXPLODE]
-                                  [-s SELECT] [--total TOTAL] [-o OUTPUT]
-                                  user_or_user_column
+                                  [--single-line]
 
 # Instagram user-infos
 
@@ -3781,11 +3602,6 @@ use the `minet fetch` command for that, and won't need to use cookies).
 If a username is a number without '@' at the begining, it will be
 considered as an id.
 
-Positional Arguments:
-  user_or_user_column           Single username, user url or user id to process
-                                or name of the CSV column containing usernames,
-                                user urls or user ids when using -i/--input.
-
 Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
@@ -3797,23 +3613,6 @@ Optional Arguments:
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
-  -s, --select SELECT           Columns of -i/--input CSV file to include in the
-                                output (separated by `,`). Use an empty string
-                                if you don't want to keep anything: --select ''.
-  --explode EXPLODE             Use to indicate the character used to separate
-                                multiple values in a single CSV cell. Defaults
-                                to none, i.e. CSV cells having a single values,
-                                which is usually the case.
-  --total TOTAL                 Total number of items to process. Might be
-                                necessary when you want to display a finite
-                                progress indicator for large files given as
-                                input to the command.
-  -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the usernames, user urls or user ids you want to
-                                process. Will consider `-` as stdin.
-  -o, --output OUTPUT           Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
@@ -3832,33 +3631,6 @@ example:
 
 . Searching infos with the username banksrepeta:
     $ minet instagram user-infos banksrepeta > banksrepeta_infos.csv
-
-how to use the command with a CSV file?
-
-> A lot of minet commands, including this one, can both be
-> given a single value to process or a bunch of them if
-> given the column of a CSV file passed to -i/--input instead.
-
-> Note that when given a CSV file as input, minet will
-> concatenate the input file columns with the ones added
-> by the command. You can always restrict the input file
-> columns to keep by using the -s/--select flag.
-
-. Here is how to use a command with a single value:
-    $ minet instagram user-infos "value"
-
-. Here is how to use a command with a CSV file:
-    $ minet instagram user-infos column_name -i file.csv
-
-. Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet instagram user-infos column_name -i -
-
-. Here is how to indicate that the CSV column may contain multiple
-  values separated by a special character:
-    $ minet instagram user-infos column_name -i file.csv --explode "|"
-
-. This also works with single values:
-    $ minet instagram user-infos "value1,value2" --explode ","
 ```
 
 ### user-posts
@@ -4141,6 +3913,7 @@ Usage: minet mediacloud topic stories [-h] [-t TOKEN] [--rcfile RCFILE]
                                       [--refresh-per-second REFRESH_PER_SECOND]
                                       [--single-line] [--media-id MEDIA_ID]
                                       [--from-media-id FROM_MEDIA_ID]
+                                      [-o OUTPUT]
                                       topic_id
 
 # Minet Mediacloud Topic Stories Command
@@ -4164,6 +3937,9 @@ Optional Arguments:
                                 sometimes). Can also be configured in a .minetrc
                                 file as "mediacloud.token" or read from the
                                 MINET_MEDIACLOUD_TOKEN env variable.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do

@@ -8,7 +8,6 @@ from casanova import RowCountResumer, BatchResumer
 
 from minet.cli.argparse import (
     command,
-    subcommand,
     ConfigAction,
     TimezoneType,
     TimestampAsUTCDateType,
@@ -112,7 +111,7 @@ def check_credentials(cli_args):
 
 
 def twitter_api_subcommand(*args, arguments=[], **kwargs):
-    return subcommand(
+    return command(
         *args,
         arguments=arguments + TWITTER_API_COMMON_ARGUMENTS,
         resolve=check_credentials,
@@ -297,7 +296,7 @@ TWITTER_RETWEETERS_SUBCOMMAND = twitter_api_subcommand(
     arguments=[TIMEZONE_ARGUMENT],
 )
 
-TWITTER_SCRAPE_SUBCOMMAND = subcommand(
+TWITTER_SCRAPE_SUBCOMMAND = command(
     "scrape",
     "minet.cli.twitter.scrape",
     title="Minet Twitter Scrape Command",
@@ -450,7 +449,7 @@ TWITTER_TWEET_COUNT_SUBCOMMAND = twitter_api_subcommand(
     ],
 )
 
-TWITTER_TWEET_DATE_SUBCOMMAND = subcommand(
+TWITTER_TWEET_DATE_SUBCOMMAND = command(
     "tweet-date",
     "minet.cli.twitter.tweet_date",
     title="Minet Twitter Tweet Date Command",

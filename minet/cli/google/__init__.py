@@ -4,9 +4,9 @@
 #
 # Logic of the `google` action.
 #
-from minet.cli.argparse import command, subcommand
+from minet.cli.argparse import command
 
-GOOGLE_SHEETS_SUBCOMMAND = subcommand(
+GOOGLE_SHEETS_SUBCOMMAND = command(
     "sheets",
     "minet.cli.google.sheets",
     title="Minet Google Sheets Command",

@@ -6,7 +6,7 @@
 #
 from argparse import FileType
 
-from minet.cli.argparse import command, subcommand, SplitterType
+from minet.cli.argparse import command, SplitterType
 
 HYPHE_API_URL_ARGUMENT = {"name": "url", "help": "Url of the Hyphe API."}
 HYPHE_CORPUS_ARGUMENT = {"name": "corpus", "help": "Id of the corpus."}
@@ -17,7 +17,7 @@ HYPHE_PASSWORD_ARGUMENT = {
 
 
 def hyphe_corpus_subcommand(*args, arguments=[], **kwargs):
-    return subcommand(
+    return command(
         *args,
         arguments=[HYPHE_API_URL_ARGUMENT, HYPHE_CORPUS_ARGUMENT]
         + arguments

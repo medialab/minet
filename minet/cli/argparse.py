@@ -4,7 +4,7 @@
 #
 # Miscellaneous helpers related to CLI argument parsing.
 #
-from typing import Optional
+from typing import Optional, Iterable, Callable, Any, Dict, Type, List
 from minet.types import TypedDict, NotRequired
 
 import os
@@ -781,21 +781,23 @@ def command(
     name: str,
     package: str,
     title: Optional[str] = None,
-    aliases=None,
-    description=None,
-    epilog=None,
-    common_arguments=None,
-    arguments=None,
-    subcommands=None,
-    resolve=None,
-    resumer=None,
+    aliases: Optional[Iterable[str]] = None,
+    description: Optional[str] = None,
+    epilog: Optional[str] = None,
+    common_arguments: Optional[List[Dict[str, Any]]] = None,
+    arguments: Optional[List[Dict[str, Any]]] = None,
+    subcommands: Optional[List[Dict[str, Any]]] = None,
+    subcommands_help: str = "Subcommand to use.",
+    subcommands_dest: str = "subcommand",
+    subcommands_title: str = "subcommands",
+    resolve: Optional[Callable[[Any], None]] = None,
+    resumer: Optional[Type[Resumer]] = None,
     resumer_epilog: Optional[str] = None,
-    resumer_kwargs=None,
-    no_output=False,
-    select=False,
-    total=False,
+    resumer_kwargs: Optional[Dict[str, Any]] = None,
+    no_output: bool = False,
+    select: bool = False,
+    total: bool = False,
     variadic_input: Optional[VariadicInputDefinition] = None,
-    **kwargs,
 ):
     if resumer is not None and not issubclass(resumer, Resumer):
         raise TypeError("given resumer is not a Resumer class")
@@ -821,9 +823,9 @@ def command(
 
     if subcommands is not None:
         data["subparsers"] = {
-            "help": "Subcommand to use.",
-            "title": "subcommands",
-            "dest": "subcommand",
+            "help": subcommands_help,
+            "title": subcommands_title,
+            "dest": subcommands_dest,
             "commands": {s["name"]: s for s in subcommands},
         }
 
@@ -851,59 +853,6 @@ def command(
 
     if resolve is not None:
         data["resolve"] = resolve
-
-    data.update(kwargs)
-
-    return data
-
-
-def subcommand(
-    name: str,
-    package: str,
-    title: str,
-    description=None,
-    epilog=None,
-    arguments=[],
-    resolve=None,
-    resumer=None,
-    resumer_epilog: Optional[str] = None,
-    resumer_kwargs=None,
-    no_output=False,
-    select=False,
-    total=False,
-    variadic_input: Optional[VariadicInputDefinition] = None,
-    **kwargs,
-):
-    data = {"name": name, "title": title, "package": package, "arguments": arguments}
-
-    if description is not None:
-        data["description"] = description
-
-    if epilog is not None:
-        data["epilog"] = epilog
-
-    data["arguments"], epilog_addendum = resolve_typical_arguments(
-        package,
-        arguments,
-        no_output=no_output,
-        resumer=resumer,
-        resumer_epilog=resumer_epilog,
-        resumer_kwargs=resumer_kwargs,
-        select=select,
-        total=total,
-        variadic_input=variadic_input,
-    )
-
-    if epilog_addendum is not None:
-        if not "epilog" in data:
-            data["epilog"] = epilog_addendum
-        else:
-            data["epilog"] += "\n\n" + epilog_addendum
-
-    if resolve is not None:
-        data["resolve"] = resolve
-
-    data.update(kwargs)
 
     return data
 
