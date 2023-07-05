@@ -97,19 +97,25 @@ def crawl_command(
     accept_input: bool = True,
     resolve=None,
     unique=False,
+    url_cache=True,
     max_depth=True,
     throttle=True,
     threads=True,
     write_files=False,
     write_data=True,
     factory=False,
-    default_folder_strategy=None,
+    default_folder_strategy: Optional[str] = None,
+    force_folder_strategy: Optional[str] = None,
 ):
     arguments_dict = CRAWL_ARGUMENTS.copy()
 
     # NOTE: missing a lot in the resolve here
     if unique:
         del arguments_dict["visit_urls_only_once"]
+
+    if not url_cache:
+        del arguments_dict["visit_urls_only_once"]
+        del arguments_dict["normalized_url_cache"]
 
     if not max_depth:
         del arguments_dict["max_depth"]
@@ -125,6 +131,7 @@ def crawl_command(
 
     if not write_data:
         del arguments_dict["write_data"]
+        del arguments_dict["format"]
 
     if factory:
         del arguments_dict["factory"]
@@ -134,6 +141,9 @@ def crawl_command(
             **arguments_dict["folder_strategy"],
             "default": default_folder_strategy,
         }
+
+    if force_folder_strategy is not None:
+        del arguments_dict["folder_strategy"]
 
     arguments = (arguments or []) + list(arguments_dict.values())
 
@@ -147,18 +157,23 @@ def crawl_command(
             "no_help": True,
         }
 
-    epilog = f"""
-        --folder-strategy options:
+    if "folder_strategy" in arguments_dict:
+        epilog = f"""
+            --folder-strategy options:
 
-        {FolderStrategy.DOCUMENTATION}
+            {FolderStrategy.DOCUMENTATION}
 
-    """ + (
-        epilog or ""
-    )
+        """ + (
+            epilog or ""
+        )
 
     def wrapped_resolve(cli_args):
         if unique:
             cli_args.visit_urls_only_once = True
+
+        if not url_cache:
+            cli_args.visit_urls_only_once = unique
+            cli_args.normalized_url_cache = False
 
         if not max_depth:
             cli_args.max_depth = None
@@ -174,12 +189,16 @@ def crawl_command(
 
         if not write_data:
             cli_args.write_data = False
+            cli_args.format = "csv"
 
         if factory:
             cli_args.factory = True
 
         if resolve is not None:
             resolve(cli_args)
+
+        if force_folder_strategy is not None:
+            cli_args.folder_strategy = force_folder_strategy
 
     return command(
         name,
