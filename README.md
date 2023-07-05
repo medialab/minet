@@ -72,7 +72,7 @@ Minet can single-handedly:
   - ...and scrape structured data (using a declarative language to define your heuristics)
 - Crawl (using a declarative language to define a browsing behavior, and what to harvest)
 - Mine or search:
-  - _[Buzzsumo](https://buzzsumo.com/)_ (requires API acess)
+  - _[Buzzsumo](https://buzzsumo.com/)_ (requires API access)
   - _[Crowdtangle](https://www.crowdtangle.com/)_ (requires API access)
   - _[Mediacloud](https://mediacloud.org/)_ (requires free API access)
   - _[Twitter](https://twitter.com)_ (requires free API access)

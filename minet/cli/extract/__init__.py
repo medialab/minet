@@ -34,7 +34,7 @@ EXTRACT_COMMAND = command(
         and use dedicated flags such as --status-column, --body-column to
         to inform the command about your specific table.
 
-        The comand is also able to work on glob patterns, such as: "downloaded/**/*.html",
+        The command is also able to work on glob patterns, such as: "downloaded/**/*.html",
         and can also be fed CSV columns containing HTML content directly if
         required.
     """,
@@ -77,7 +77,7 @@ EXTRACT_COMMAND = command(
         . Indicating a custom filename column (named "path"):
             $ minet extract path -i report.csv -I downloaded > extracted.csv
 
-        . Extracting content from a CSV colum containing HTML directly:
+        . Extracting content from a CSV column containing HTML directly:
             $ minet extract -i report.csv --body-column html > extracted.csv
 
         . Extracting content from a bunch of files using a glob pattern:

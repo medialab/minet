@@ -58,7 +58,7 @@ class CouldNotInferEncodingError(MinetError):
 # Cookie errors
 class UnknownBrowserError(MinetError):
     def __init__(self, browser: str):
-        super().__init__("Unkown browser: %s" % browser)
+        super().__init__("Unknown browser: %s" % browser)
         self.browser = browser
 
 

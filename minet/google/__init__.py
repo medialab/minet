@@ -1,5 +1,5 @@
 # =============================================================================
-# Minet Google Enpoint
+# Minet Google Endpoint
 # =============================================================================
 #
 from minet.google.sheets import export_google_sheets_as_csv

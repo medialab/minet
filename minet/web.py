@@ -355,7 +355,7 @@ class BufferedResponse(object):
     a "final" timeout correctly enforced to bypass python socket race condition
     issues on read loops and is also able to be cancelled if required.
 
-    NOTE: this is the user's responsability to close or unwrap the response
+    NOTE: this is the user's responsibility to close or unwrap the response
     after use. This will be done by __del__ in any case, but don't rely
     on it too much.
     """

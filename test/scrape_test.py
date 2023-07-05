@@ -65,7 +65,7 @@ NESTED_HTML = """
 """
 
 META_HTML = """
-    Exemple
+    Example
     <div id="ok">
         <ul>
             <li id="li1">One</li>

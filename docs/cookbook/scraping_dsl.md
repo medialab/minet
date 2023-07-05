@@ -770,7 +770,7 @@ this will return:
 ]
 ```
 
-Finally, note that both `sel_eval` or `iterator_eval` may also return a single string that will subsquently be used as a CSS selector. As such, this example has the same behavior as the previous one:
+Finally, note that both `sel_eval` or `iterator_eval` may also return a single string that will subsequently be used as a CSS selector. As such, this example has the same behavior as the previous one:
 
 ```yml
 iterator: div

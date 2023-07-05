@@ -122,7 +122,7 @@ FETCH_COMMAND = command(
         . CSV input from stdin (mind the `-`):
             $ xsv select url file.csv | minet fetch url -i - > report.csv
 
-        . Dowloading files in specific output directory:
+        . Downloading files in specific output directory:
             $ minet fetch url -i file.csv -O html > report.csv
     """,
     resolve=resolve_fetch_arguments,

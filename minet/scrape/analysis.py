@@ -231,7 +231,7 @@ def validate(scraper):
         in_fields = path and path[-1] == "fields"
 
         for k, v in node.items():
-            # Unkown keys
+            # Unknown keys
             if not in_fields and k not in KNOWN_KEYS:
                 errors.append(ScraperValidationUnknownKeyError(path=path, key=k))
                 continue

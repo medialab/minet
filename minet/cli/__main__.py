@@ -3,7 +3,7 @@
 # Minet CLI Endpoint
 # =============================================================================
 #
-# CLI enpoint of the Minet library.
+# CLI endpoint of the Minet library.
 #
 from minet.__version__ import __identifier__
 from minet.cli.run import run

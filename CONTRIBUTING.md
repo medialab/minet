@@ -33,7 +33,7 @@ alias lminet="python -m minet.cli"
 
 You can now run the commands using `lminet` instead of `minet` to test your changes locally without clashing with the global command if installed.
 
-You can also install `minet` as a package in your curent environment like so:
+You can also install `minet` as a package in your current environment like so:
 
 ```bash
 pip install -e .
