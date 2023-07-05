@@ -106,6 +106,7 @@ def crawl_command(
     factory=False,
     default_folder_strategy: Optional[str] = None,
     force_folder_strategy: Optional[str] = None,
+    default_output_dir: Optional[str] = None,
 ):
     arguments_dict = CRAWL_ARGUMENTS.copy()
 
@@ -140,6 +141,12 @@ def crawl_command(
         arguments_dict["folder_strategy"] = {
             **arguments_dict["folder_strategy"],
             "default": default_folder_strategy,
+        }
+
+    if default_output_dir is not None:
+        arguments_dict["output_dir"] = {
+            **arguments_dict["output_dir"],
+            "default": default_output_dir,
         }
 
     if force_folder_strategy is not None:
