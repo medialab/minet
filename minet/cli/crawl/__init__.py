@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from minet.cli.argparse import command, FolderStrategyType, BooleanAction, InputAction
+from minet.cli.argparse import command, FolderStrategyType, BooleanAction, InputAction, TrafilaturaSelect
 from minet.cli.exceptions import InvalidArgumentsError
 
 # TODO: lazyloading issue
@@ -263,31 +263,6 @@ def check_focus_crawl_arguments(cli_args):
             ]
         )
 
-    TRAFILATURA_FIELDS = [
-        "title",
-        "description",
-        "content",
-        "comments",
-        "author",
-        "categories",
-        "tags",
-        "date",
-        "sitename",
-    ]
-    if cli_args.extraction_fields:
-        fields = set(cli_args.extraction_fields.split(","))
-
-        for field in fields:
-            if not field in TRAFILATURA_FIELDS:
-                raise InvalidArgumentsError(
-                    [
-                        f"The trafilatura field `{field}` doesn't exist. Available fields are :"
-                    ]
-                    + [f"- {a}" for a in TRAFILATURA_FIELDS]
-                )
-
-        cli_args.extraction_fields = fields
-
 
 FOCUS_CRAWL_COMMAND = crawl_command(
     "focus-crawl",
@@ -348,7 +323,8 @@ FOCUS_CRAWL_COMMAND = crawl_command(
         },
         {
             "flag": "--extraction-fields",
-            "help": "Fields of the trafilatura extraction you want to apply the content filter on, separated using commas. It enables the flag `--extract`. Available flags are : `title`, `description`, `content`, `comments`, `author`, `categories`, `tags`, `date` and `sitename`.",
+            "help": "Fields of the trafilatura extraction you want to apply the content filter on, separated using commas. It enables the flag `--extract`.",
+            "action": TrafilaturaSelect,
             "default": None,
         },
     ],
