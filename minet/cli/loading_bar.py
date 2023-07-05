@@ -137,7 +137,7 @@ class StatsColumn(ProgressColumn):
 
 
 class NestedTotalColumn(ProgressColumn):
-    def render(self, task: Task) -> Text:
+    def render(self, task: Task) -> Optional[Text]:
         sub_total_sum = task.fields.get("sub_total_sum")
 
         if sub_total_sum is None:
@@ -157,7 +157,7 @@ class SingleLineNestedTotalColumn(ProgressColumn):
         self.__unit = unit
         super().__init__(table_column=table_column)
 
-    def render(self, _) -> Text:
+    def render(self, _) -> Optional[Text]:
         sub_total_sum = self.__parent.sub_total_sum
 
         if sub_total_sum is None:
@@ -526,8 +526,8 @@ class LoadingBar(object):
 
             self.__refresh_stats()
 
-    def print(self, *msg, end="\n"):
-        console.print(message_flatmap(*msg), end=end)
+    def print(self, *msg, **kwargs):
+        console.print(message_flatmap(*msg), **kwargs)
 
     def error(self, *args, **kwargs):
         console.error(*args, **kwargs)
