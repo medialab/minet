@@ -127,7 +127,7 @@ class DataWriter:
     ],
 )
 @with_ctrl_c_warning
-def action(
+def crawl_action(
     cli_args,
     defer=None,
     loading_bar: Optional[LoadingBar] = None,
@@ -330,3 +330,6 @@ def action(
 
                 if data_writer is not None:
                     data_writer.write(result)
+
+
+action = crawl_action
