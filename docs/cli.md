@@ -221,8 +221,8 @@ Examples:
 ```
 Usage: minet crawl [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
                    [--single-line] [-O OUTPUT_DIR] [--factory] [--resume]
-                   [-m MAX_DEPTH] [--throttle THROTTLE] [-t THREADS]
-                   [--compress] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
+                   [-m MAX_DEPTH] [--throttle THROTTLE] [-t THREADS] [-z] [-w]
+                   [-d] [--folder-strategy FOLDER_STRATEGY]
                    [-f {csv,jsonl,ndjson}] [-v] [-u] [-n] [-i INPUT]
                    [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                    target [url_or_url_column]
@@ -239,8 +239,8 @@ Positional Arguments:
                                 -i/--input. Defaults to "url".
 
 Optional Arguments:
-  --compress                    Whether to compress the downloaded files when
-                                saving on disk using -w/--write.
+  -z, --compress                Whether to compress the downloaded files when
+                                saving files on disk.
   --factory                     Whether crawl target is a crawler factory
                                 function.
   --folder-strategy FOLDER_STRATEGY
@@ -301,7 +301,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
---folder-strategy options:
+    --folder-strategy options:
 
 . "flat": default choice, all files will be written in the indicated
     content folder.
@@ -336,8 +336,8 @@ Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
                          [--single-line] [-U URL_FILTER] [--extract]
                          [--irrelevant-continue] [--only-html] [-O OUTPUT_DIR]
                          [--factory] [--resume] [-m MAX_DEPTH]
-                         [--throttle THROTTLE] [-t THREADS] [--compress] [-w]
-                         [-d] [--folder-strategy FOLDER_STRATEGY]
+                         [--throttle THROTTLE] [-t THREADS] [-z] [-w] [-d]
+                         [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-i INPUT]
                          [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                          [url_or_url_column]
@@ -358,8 +358,8 @@ Positional Arguments:
                                 -i/--input. Defaults to "url".
 
 Optional Arguments:
-  --compress                    Whether to compress the downloaded files when
-                                saving on disk using -w/--write.
+  -z, --compress                Whether to compress the downloaded files when
+                                saving files on disk.
   -C, --content-filter CONTENT_FILTER
                                 Regex used to filter fetched content.
   --extract                     Perform regex match on extracted text content
@@ -429,7 +429,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
---folder-strategy options:
+    --folder-strategy options:
 
 . "flat": default choice, all files will be written in the indicated
     content folder.
@@ -464,7 +464,7 @@ Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                    [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
                    [-H HEADERS] [--insecure] [-t THREADS] [--throttle THROTTLE]
                    [--timeout TIMEOUT] [--url-template URL_TEMPLATE] [-X METHOD]
-                   [--max-redirects MAX_REDIRECTS] [--compress] [-c] [-D]
+                   [--max-redirects MAX_REDIRECTS] [-z] [-c] [-D]
                    [-O OUTPUT_DIR] [-f FILENAME]
                    [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [--keep-failed-contents]
@@ -485,7 +485,7 @@ Positional Arguments:
                                 containing urls when using -i/--input.
 
 Optional Arguments:
-  --compress                    Whether to compress the contents.
+  -z, --compress                Whether to compress the contents.
   -c, --contents-in-report, -w, --no-contents-in-report
                                 Whether to include retrieved contents, e.g.
                                 html, directly in the report and avoid writing

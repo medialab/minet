@@ -42,7 +42,7 @@ CRAWL_ARGUMENTS = {
         "default": 25,
     },
     "compress": {
-        "flag": "--compress",
+        "flags": ["-z", "--compress"],
         "help": "Whether to compress the downloaded files when saving files on disk.",
         "action": "store_true",
     },

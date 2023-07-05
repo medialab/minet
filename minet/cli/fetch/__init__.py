@@ -137,7 +137,7 @@ FETCH_COMMAND = command(
             "default": DEFAULT_FETCH_MAX_REDIRECTS,
         },
         {
-            "flag": "--compress",
+            "flags": ["-z", "--compress"],
             "help": "Whether to compress the contents.",
             "action": "store_true",
         },
