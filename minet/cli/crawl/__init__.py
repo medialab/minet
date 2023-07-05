@@ -90,9 +90,9 @@ CRAWL_ARGUMENTS = {
 def crawl_command(
     name: str,
     package: str,
-    title: str,
-    description: str,
-    epilog: str = "",
+    title: Optional[str] = None,
+    description: Optional[str] = None,
+    epilog: Optional[str] = None,
     arguments: Optional[List] = None,
     accept_input: bool = True,
     resolve=None,
@@ -147,14 +147,13 @@ def crawl_command(
             "no_help": True,
         }
 
-    epilog = (
-        f"""
+    epilog = f"""
         --folder-strategy options:
 
         {FolderStrategy.DOCUMENTATION}
 
-    """
-        + epilog
+    """ + (
+        epilog or ""
     )
 
     def wrapped_resolve(cli_args):
