@@ -4,7 +4,7 @@
 #
 # Logic of the crawl action.
 #
-from typing import Optional, List, Callable, Any, Mapping, Union
+from typing import Optional, List, Callable, Any, Mapping, Union, cast
 
 import os
 import casanova
@@ -256,11 +256,17 @@ def crawl_action(
                 # TODO: explain further
                 raise FatalError("Invalid crawling target!")
 
+        # NOTE: target IS a spider declaration
+        target = cast(SpiderDeclaration, target)
+
         crawler = Crawler(target, **crawler_kwargs)
 
     else:
         if not callable(target):
             raise FatalError("Factory should be callable!")
+
+        # NOTE: target is a crawler factory
+        target = cast(Callable[..., Crawler], target)
 
         crawler = target(**crawler_kwargs)
 
@@ -274,7 +280,7 @@ def crawl_action(
 
         if crawler.resuming:
             loading_bar.print("[log.time]Crawler will now resume…")
-        elif cli_args.input:
+        elif getattr(cli_args, "input", None):
             for url in casanova.reader(cli_args.input).cells(cli_args.column):
                 crawler.enqueue(url)  # type: ignore
 
