@@ -161,8 +161,20 @@ def crawl_command(
         if unique:
             cli_args.visit_urls_only_once = True
 
+        if not max_depth:
+            cli_args.max_depth = None
+
+        if not throttle:
+            cli_args.throttle = DEFAULT_THROTTLE
+
+        if not threads:
+            cli_args.threads = 25
+
         if write_files:
             cli_args.write_files = True
+
+        if not write_data:
+            cli_args.write_data = False
 
         if factory:
             cli_args.factory = True

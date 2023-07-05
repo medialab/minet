@@ -220,7 +220,6 @@ def action(
     #   - a dict of spider instances
     #   - a simple callable
     if not cli_args.factory:
-
         # Is target a Spider class?
         if isclass(target) and issubclass(target, Spider):
             target = target()
