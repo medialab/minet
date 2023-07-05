@@ -158,10 +158,11 @@ def crawl_command(
         }
 
     if "folder_strategy" in arguments_dict:
+        # NOTE: text indentation IS important
         epilog = f"""
-            --folder-strategy options:
+        --folder-strategy options:
 
-            {FolderStrategy.DOCUMENTATION}
+        {FolderStrategy.DOCUMENTATION}
 
         """ + (
             epilog or ""
