@@ -4,18 +4,26 @@
 #
 # Logic of the crawl action.
 #
-from typing import List, TextIO, Tuple
+from typing import Optional, List, Callable, Any, Mapping, Union, cast
 
 import os
 import casanova
-from os.path import join, isfile, dirname
+import casanova.ndjson as ndjson
+from inspect import isclass
+from os.path import join, dirname
 from ebbe.decorators import with_defer
 
+from minet.utils import import_target
+from minet.fs import FilenameBuilder
 from minet.cli.exceptions import FatalError
-from minet.scrape import Scraper
-from minet.scrape.exceptions import InvalidScraperError
-from minet.crawl import Crawler, CrawlResult, CrawlJob, DefinitionSpiderOutput
-from minet.cli.reporters import report_scraper_validation_errors
+from minet.crawl import (
+    Crawler,
+    CrawlResult,
+    SuccessfulCrawlResult,
+    SpiderDeclaration,
+    Spider,
+)
+from minet.cli.console import console
 from minet.cli.loading_bar import LoadingBar
 from minet.cli.utils import (
     with_loading_bar,
@@ -23,135 +31,89 @@ from minet.cli.utils import (
     track_crawler_state_with_loading_bar,
 )
 
-ADDITIONAL_JOBS_HEADERS = ["scraped"]
 
+# NOTE: here are the possible file structure for scraped data:
+#
+# 1. singular spider, one group:
+#    - data.csv
+# 2. singular spider, multiple groups:
+#    - data/
+#      - group1.csv
+#      - group2.csv
+# 3. plural spider, one group:
+#    - data/
+#      - spider1.csv
+#      - spider2.csv
+# 4. plural spider, multiple groups
+#    - data/
+#      - spider1/
+#        - group1.csv
+class DataWriter:
+    def __init__(
+        self, base_dir: str, crawler: Crawler, resume: bool = False, format: str = "csv"
+    ):
+        self.handles = {}
+        self.resume = resume
+        self.singular = crawler.singular
+        self.format = format
+        self.dir = base_dir
 
-def open_report(
-    path: str, headers: List[str], resume: bool = False
-) -> Tuple[TextIO, casanova.Writer]:
-    flag = "w"
-
-    if resume and isfile(path):
-        flag = "a"
-
-    os.makedirs(dirname(path), exist_ok=True)
-
-    f = open(path, flag, encoding="utf-8")
-    writer = casanova.writer(f)
-
-    if flag == "w":
-        writer.writerow(headers)
-
-    return f, writer
-
-
-class ScraperReporter(object):
-    def __init__(self, path: str, scraper: Scraper, resume=False):
-        if scraper.fieldnames is None:
-            raise NotImplementedError("Scraper fieldnames could not be inferred.")
-
-        f, writer = open_report(path, ["job_id"] + scraper.fieldnames, resume)
-
-        self.fieldnames = scraper.fieldnames
-        self.file = f
-        self.writer = writer
-
-    def write(self, job_id: str, items) -> int:
-        count = 0
-
-        # TODO: maybe abstract this once step above
-        if not isinstance(items, list):
-            items = [items]
-
-        for item in items:
-            count += 1
-
-            if not isinstance(item, dict):
-                row = [item]
-            else:
-                row = [item.get(k, "") for k in self.fieldnames]
-
-            row = [job_id] + row
-
-            self.writer.writerow(row)
-
-        return count
-
-    def flush(self):
-        self.file.flush()
-
-    def close(self):
-        self.file.close()
-
-
-class ScraperReporterPool(object):
-    SINGULAR = "$SINGULAR$"
-
-    def __init__(self, crawler: Crawler, output_dir: str, resume=False):
-        self.reporters = {}
-
-        if crawler.singular:
-            spider = crawler.get_spider()
-
-            self.reporters["default"] = {}
-
-            if spider.scraper is not None:
-                path = join(output_dir, "scraped.csv")
-                reporter = ScraperReporter(path, spider.scraper, resume)
-                self.reporters["default"][ScraperReporterPool.SINGULAR] = reporter
-
-            for name, scraper in spider.scrapers.items():
-                path = join(output_dir, "scraped", "%s.csv" % name)
-
-                reporter = ScraperReporter(path, scraper, resume)
-                self.reporters["default"][name] = reporter
+        if self.singular:
+            self.__add_file(None, "data", crawler.get_spider())
         else:
-            for spider_name, spider in crawler.spiders.items():
-                self.reporters[spider_name] = {}
+            for name, spider in crawler.spiders():
+                self.__add_file(name, join("data", name), spider)
 
-                if spider.scraper is not None:
-                    path = join(output_dir, "scraped", spider_name, "scraped.csv")
-                    reporter = ScraperReporter(path, spider.scraper, resume)
-                    self.reporters[spider_name][ScraperReporterPool.SINGULAR] = reporter
+    def __add_file(self, name: Optional[str], path: str, spider):
+        path += "." + self.format
 
-                for name, scraper in spider.scrapers.items():
-                    path = join(output_dir, "scraped", spider_name, "%s.csv" % name)
+        path = join(self.dir, path)
+        directory = dirname(path)
+        os.makedirs(directory, exist_ok=True)
 
-                    reporter = ScraperReporter(path, scraper, resume)
-                    self.reporters[spider_name][name] = reporter
+        f = (
+            casanova.BasicResumer(path, encoding="utf-8")
+            if self.resume
+            else open(path, "w", encoding="utf-8")
+        )
 
-    def write(self, job: CrawlJob, scraped: DefinitionSpiderOutput) -> int:
-        count = 0
+        if self.format == "csv":
+            # TODO: ability to pass fieldnames? from spider?
+            w = casanova.InferringWriter(f, add=["job_id"])
+        elif self.format == "jsonl" or self.format == "ndjson":
+            w = ndjson.writer(f)
+        else:
+            raise NotImplementedError('unknown format "%s"' % self.format)
 
-        spider_name = job.spider
+        self.handles[name] = {"file": f, "writer": w, "spider": spider}
 
-        if spider_name is None:
-            spider_name = "default"
+    def __unpack_result(self, result: CrawlResult, data):
+        job_id = result.job.id
 
-        reporter = self.reporters[spider_name]
+        if self.format == "csv":
+            return (data, [job_id])
 
-        if scraped.default is not None:
-            count += reporter[ScraperReporterPool.SINGULAR].write(
-                job.id, scraped.default
-            )
+        return ({"job_id": job_id, "data": data},)
 
-        for name, items in scraped.named.items():
-            count += reporter[name].write(job.id, items)
+    def write(self, result: CrawlResult) -> None:
+        handle = self.handles[result.spider]
+        spider = handle["spider"]
+        writer = handle["writer"]
+        f = handle["file"]
 
-        return count
+        for item in spider.tabulate(result):
+            writer.writerow(*self.__unpack_result(result, item))
 
-    def __iter__(self):
-        for spider_reporters in self.reporters.values():
-            for reporter in spider_reporters.values():
-                yield reporter
+        # NOTE: write is flushing to ensure atomicity as well as possible
+        f.flush()
 
     def flush(self) -> None:
-        for reporter in self:
-            reporter.flush()
+        for h in self.handles.values():
+            h["file"].flush()
 
     def close(self) -> None:
-        for reporter in self:
-            reporter.close()
+        for h in self.handles.values():
+            h["file"].close()
 
 
 @with_defer()
@@ -165,68 +127,215 @@ class ScraperReporterPool(object):
     ],
 )
 @with_ctrl_c_warning
-def action(cli_args, defer, loading_bar: LoadingBar):
-    # Loading crawler definition
+def crawl_action(
+    cli_args,
+    defer=None,
+    loading_bar: Optional[LoadingBar] = None,
+    target: Optional[Union[SpiderDeclaration, Callable[..., Crawler]]] = None,
+    additional_job_fieldnames: Optional[List[str]] = None,
+    format_job_row_addendum: Optional[Callable[[CrawlResult], List]] = None,
+    result_callback: Optional[Callable[[Any, LoadingBar, CrawlResult], None]] = None,
+):
+    if (additional_job_fieldnames is not None and format_job_row_addendum is None) or (
+        additional_job_fieldnames is None and format_job_row_addendum is not None
+    ):
+        raise TypeError("additional_job_fieldnames requires format_job_row_addendum")
+
+    # NOTE: typing and decorators don't play well toegether
+    assert defer is not None
+    assert isinstance(loading_bar, LoadingBar)
+
     persistent_storage_path = join(cli_args.output_dir, "store")
+    writer_root_directory = join(cli_args.output_dir, "pages")
+
+    filename_builder = FilenameBuilder(cli_args.folder_strategy)
+
+    def callback(self: Crawler, result: SuccessfulCrawlResult) -> None:
+        if not cli_args.write_files:
+            return
+
+        response = result.response
+        filename = result.job.id
+
+        path = filename_builder(
+            url=response.end_url,
+            filename=filename,
+            compressed=cli_args.compress,
+            ext=response.ext,
+        )
+
+        self.write(path, response.body, compress=cli_args.compress)
+
+        setattr(result, "_path", path)
 
     # Scaffolding output directory
     os.makedirs(cli_args.output_dir, exist_ok=True)
 
     jobs_output_path = join(cli_args.output_dir, "jobs.csv")
-    jobs_output, jobs_writer = open_report(
-        jobs_output_path,
-        CrawlResult.FIELDNAMES + ADDITIONAL_JOBS_HEADERS,
-        resume=cli_args.resume,
+    jobs_output = (
+        casanova.BasicResumer(jobs_output_path, encoding="utf-8")
+        if cli_args.resume
+        else open(jobs_output_path, "w", encoding="utf-8")
     )
+    jobs_fieldnames = CrawlResult.fieldnames()
+
+    if cli_args.write_files:
+        jobs_fieldnames += ["path"]
+
+    if additional_job_fieldnames is not None:
+        jobs_fieldnames += additional_job_fieldnames
+
+    jobs_writer = casanova.Writer(jobs_output, fieldnames=jobs_fieldnames)
     defer(jobs_output.close)
 
-    # Creating crawler
-    try:
-        crawler = Crawler.from_definition(
-            cli_args.crawler,
-            throttle=cli_args.throttle,
-            persistent_storage_path=persistent_storage_path,
-            resume=cli_args.resume or cli_args.dump_queue,
-            wait=False,
-            daemonic=False,
-        )
-    except InvalidScraperError as error:
-        raise FatalError(
-            [
-                "Your scraper is invalid! You need to fix the following errors:\n",
-                report_scraper_validation_errors(error.validation_errors),
-            ]
-        )
+    crawler_kwargs = {
+        "persistent_storage_path": persistent_storage_path,
+        "writer_root_directory": writer_root_directory,
+        "resume": cli_args.resume,
+        "callback": callback,
+        "wait": False,
+        "daemonic": False,
+    }
 
-    if crawler.finished:
-        loading_bar.erase()
-        crawler.stop()
-        raise FatalError("[error]Crawler has already finished!")
+    # NOTE: the cli_args given to this action might lack some items
+    # so that crawler factory are more convenient to use.
+    cli_args_to_forward_to_crawler = [
+        "throttle",
+        "max_depth",
+        "visit_urls_only_once",
+        "normalized_url_cache",
+        ("threads", "max_workers"),
+    ]
 
-    if crawler.resuming:
-        loading_bar.print("[log.time]Will now resume…")
+    for arg in cli_args_to_forward_to_crawler:
+        if isinstance(arg, tuple):
+            cli_arg_name, crawler_arg_name = arg
+        else:
+            cli_arg_name = arg
+            crawler_arg_name = arg
+
+        if hasattr(cli_args, cli_arg_name):
+            crawler_kwargs[crawler_arg_name] = getattr(cli_args, cli_arg_name)
+
+    if target is None:
+        try:
+            target = import_target(cli_args.target, "spider")
+        except ImportError:
+            raise FatalError(
+                [
+                    "Could not import %s!" % cli_args.target,
+                    "Are you sure the module exists?",
+                ]
+            )
+
+    # NOTE: target can be:
+    #   - a crawler factory function
+    #   - a spider class
+    #   - a spider instance
+    #   - a dict of spider instances
+    #   - a simple callable
+    if not cli_args.factory:
+        # Is target a Spider class?
+        if isclass(target) and issubclass(target, Spider):
+            target = target()
+        else:
+            # NOTE: at that point, target can be:
+            #   - a Spider instance
+            #   - a dict of Spider instances
+            #   - a callable
+            valid_spiders_dict = isinstance(target, Mapping) and all(
+                isinstance(v, Spider) for v in target.values()
+            )
+
+            # TODO: inspect arity to weed out potential footguns
+            if (
+                not valid_spiders_dict
+                and not isinstance(target, Spider)
+                and not callable(target)
+            ):
+                # TODO: explain further
+                raise FatalError("Invalid crawling target!")
+
+        # NOTE: target IS a spider declaration
+        target = cast(SpiderDeclaration, target)
+
+        crawler = Crawler(target, **crawler_kwargs)
+
+    else:
+        if not callable(target):
+            raise FatalError("Factory should be callable!")
+
+        # NOTE: target is a crawler factory
+        target = cast(Callable[..., Crawler], target)
+
+        crawler = target(**crawler_kwargs)
+
+        if not isinstance(crawler, Crawler):
+            raise FatalError("Factory did not return a crawler!")
 
     with crawler:
-        # Reporter pool
-        reporter_pool = ScraperReporterPool(
-            crawler, cli_args.output_dir, resume=cli_args.resume
-        )
-        defer(reporter_pool.close)
+        if crawler.finished:
+            loading_bar.erase()
+            raise FatalError("[error]Crawler has already finished!")
+
+        if crawler.resuming:
+            loading_bar.print("[log.time]Crawler will now resume…")
+        elif getattr(cli_args, "input", None):
+            for url in casanova.reader(cli_args.input).cells(cli_args.column):
+                crawler.enqueue(url)  # type: ignore
+
+        data_writer = None
+
+        if cli_args.write_data:
+            data_writer = DataWriter(
+                cli_args.output_dir,
+                crawler,
+                resume=cli_args.resume,
+                format=getattr(cli_args, "format", "csv"),
+            )
+            defer(data_writer.close)
+
+        if not crawler.resuming and len(crawler) == 0:
+            raise FatalError(
+                [
+                    "Started a crawler without any jobs.",
+                    "This can happen if the command was given no start url nor -i/--input flag.",
+                    "You can also implement start urls/targets on your spiders themselves if required.",
+                    "Or maybe you forgot to --resume?",
+                ],
+                warning=True,
+            )
 
         track_crawler_state_with_loading_bar(loading_bar, crawler.state)
 
         # Running crawler
         for result in crawler:
             with loading_bar.step():
-                if result.error is not None:
-                    loading_bar.inc_stat(result.error_code, style="error")
-                    jobs_writer.writerow(result.as_csv_row() + [0])
-                    continue
+                if result_callback is not None:
+                    result_callback(cli_args, loading_bar, result)
 
-                count = reporter_pool.write(result.job, result.data)
-                jobs_writer.writerow(result.as_csv_row() + [count])
-                loading_bar.inc_stat("scraped", count=count, style="success")
+                if cli_args.verbose:
+                    console.print(result, highlight=True)
+
+                job_row = result.as_csv_row()
+
+                if cli_args.write_files:
+                    job_row += [getattr(result, "_path", "")]
+
+                if format_job_row_addendum is not None:
+                    job_row += format_job_row_addendum(result)
+
+                jobs_writer.writerow(job_row)
 
                 # Flushing to avoid sync issues as well as possible
                 jobs_output.flush()
-                reporter_pool.flush()
+
+                if result.error is not None:
+                    loading_bar.inc_stat(result.error_code, style="error")
+                    continue
+
+                if data_writer is not None:
+                    data_writer.write(result)
+
+
+action = crawl_action

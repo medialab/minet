@@ -4,7 +4,7 @@
 #
 # Logic of the `fb` action.
 #
-from minet.cli.argparse import command, subcommand, ConfigAction
+from minet.cli.argparse import command, ConfigAction
 
 # TODO: lazyloading issue
 from minet.facebook.constants import FACEBOOK_MOBILE_DEFAULT_THROTTLE
@@ -25,7 +25,7 @@ MOBILE_ARGUMENTS = [
     },
 ]
 
-FACEBOOK_COMMENTS_SUBCOMMAND = subcommand(
+FACEBOOK_COMMENTS_SUBCOMMAND = command(
     "comments",
     "minet.cli.facebook.comments",
     title="Minet Facebook Comments Command",
@@ -56,7 +56,7 @@ FACEBOOK_COMMENTS_SUBCOMMAND = subcommand(
     arguments=[*MOBILE_ARGUMENTS],
 )
 
-FACEBOOK_POST_AUTHORS_SUBCOMMAND = subcommand(
+FACEBOOK_POST_AUTHORS_SUBCOMMAND = command(
     "post-authors",
     "minet.cli.facebook.post_authors",
     title="Minet Facebook Post Authors Command",
@@ -76,7 +76,7 @@ FACEBOOK_POST_AUTHORS_SUBCOMMAND = subcommand(
     arguments=[*MOBILE_ARGUMENTS],
 )
 
-FACEBOOK_POST_STATS_SUBCOMMAND = subcommand(
+FACEBOOK_POST_STATS_SUBCOMMAND = command(
     "post-stats",
     "minet.cli.facebook.post_stats",
     title="Minet Facebook Post Stats Command",
@@ -92,7 +92,7 @@ FACEBOOK_POST_STATS_SUBCOMMAND = subcommand(
     variadic_input={"dummy_column": "post_url", "item_label": "post url"},
 )
 
-FACEBOOK_POST_SUBCOMMAND = subcommand(
+FACEBOOK_POST_SUBCOMMAND = command(
     "post",
     "minet.cli.facebook.post",
     title="Minet Facebook Post Command",
@@ -144,7 +144,7 @@ FACEBOOK_POST_SUBCOMMAND = subcommand(
     arguments=[*MOBILE_ARGUMENTS],
 )
 
-FACEBOOK_POSTS_SUBCOMMAND = subcommand(
+FACEBOOK_POSTS_SUBCOMMAND = command(
     "posts",
     "minet.cli.facebook.posts",
     title="Minet Facebook Posts Command",
@@ -195,7 +195,7 @@ FACEBOOK_POSTS_SUBCOMMAND = subcommand(
     arguments=[*MOBILE_ARGUMENTS],
 )
 
-FACEBOOK_URL_LIKES_SUBCOMMAND = subcommand(
+FACEBOOK_URL_LIKES_SUBCOMMAND = command(
     "url-likes",
     "minet.cli.facebook.url_likes",
     title="Minet Facebook Url Likes Command",

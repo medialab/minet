@@ -26,4 +26,6 @@ class NotResumableError(MinetCLIError):
 
 
 class FatalError(MinetCLIError):
-    pass
+    def __init__(self, message=None, warning=False):
+        self.warning = warning
+        super().__init__(message)

@@ -4,7 +4,7 @@
 #
 # Miscellaneous helpers related to CLI argument parsing.
 #
-from typing import Optional
+from typing import Optional, Iterable, Callable, Any, Dict, Type, List
 from minet.types import TypedDict, NotRequired
 
 import os
@@ -23,12 +23,13 @@ from rich_argparse import RawDescriptionRichHelpFormatter
 from gettext import gettext
 from textwrap import dedent
 from casanova import Resumer, CsvCellIO
-from ebbe import getpath, omit
+from ebbe import getpath, omit, and_join, distinct
 from datetime import datetime
 from pytz import timezone
 from pytz.exceptions import UnknownTimeZoneError
 
 from minet.dates import datetime_from_partial_iso_format
+from minet.fs import FolderStrategy
 
 from minet.cli.console import MINET_COLORS
 from minet.cli.exceptions import NotResumableError, InvalidArgumentsError
@@ -49,6 +50,7 @@ FLAG_SORTING_PRIORITIES = {
             "resume",
             "rcfile",
             "refresh-per-second",
+            "simple-progress",
             "silent",
             "help",
         ],
@@ -140,6 +142,13 @@ def get_subparser(o, keys):
 ARGUMENT_KEYS_TO_OMIT = ["name", "flag", "flags"]
 
 
+def add_argument_once(parser, *args, **kwargs) -> None:
+    try:
+        parser.add_argument(*args, **kwargs)
+    except ArgumentError:
+        pass
+
+
 def add_arguments(subparser, arguments):
     for argument in arguments:
         argument_kwargs = omit(argument, ARGUMENT_KEYS_TO_OMIT)
@@ -173,35 +182,35 @@ def add_arguments(subparser, arguments):
         else:
             subparser.add_argument(*argument["flags"], **argument_kwargs)
 
+        # Global arguments
         if "action" in argument and argument["action"] is ConfigAction:
-            try:
-                subparser.add_argument(
-                    "--rcfile",
-                    help="Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc",
-                )
-            except ArgumentError:
-                pass
-
-        try:
-            subparser.add_argument(
-                "--silent",
-                help="Whether to suppress all the log and progress bars. Can be useful when piping.",
-                action="store_true",
+            add_argument_once(
+                subparser,
+                "--rcfile",
+                help="Custom path to a minet configuration file. More info about this here: https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc",
             )
-        except ArgumentError:
-            pass
 
-        try:
-            # NOTE: we might want to add those common flags to the list of arguments themselves, after deduplication
-            # rather than relying on those ugly try/catch and forfeiting the help text wrangling wrt default values.
-            subparser.add_argument(
-                "--refresh-per-second",
-                help="Number of times to refresh the progress bar per second. Can be a float e.g. `0.5` meaning once every two seconds. Use this to limit CPU usage when launching multiple commands at once. Defaults to `10`.",
-                default=10,
-                type=float,
-            )
-        except ArgumentError:
-            pass
+        add_argument_once(
+            subparser,
+            "--silent",
+            help="Whether to suppress all the log and progress bars. Can be useful when piping.",
+            action="store_true",
+        )
+
+        add_argument_once(
+            subparser,
+            "--refresh-per-second",
+            help="Number of times to refresh the progress bar per second. Can be a float e.g. `0.5` meaning once every two seconds. Use this to limit CPU usage when launching multiple commands at once. Defaults to `10`.",
+            default=10,
+            type=float,
+        )
+
+        add_argument_once(
+            subparser,
+            "--single-line",
+            help="Whether to simplify the progress bar to make it fit on a single line. Can be useful in terminals with partial ANSI support, e.g. a Jupyter notebook cell.",
+            action="store_true",
+        )
 
 
 def build_description(command):
@@ -286,15 +295,25 @@ def build_parser(name, version, commands):
     return parser, subparser_index
 
 
+class FolderStrategyType:
+    def __call__(self, name):
+        try:
+            return FolderStrategy.from_name(name)
+        except TypeError:
+            raise ArgumentTypeError(
+                "should be one of %s"
+                % and_join(('"%s"' % c for c in FolderStrategy.CHOICES), copula="or")
+            )
+
+
 class TimestampAsUTCDateType:
     def __call__(self, date):
         try:
-            timestamp = int(datetime.strptime(date, "%Y-%m-%d").timestamp())
+            return int(datetime.strptime(date, "%Y-%m-%d").timestamp())
         except ValueError:
             raise ArgumentTypeError(
-                "UTC date should have the following format : %Y-%m-%d"
+                "UTC date should have the following format: %Y-%m-%d"
             )
-        return timestamp
 
 
 class TimezoneType:
@@ -372,7 +391,8 @@ class SingleColumnDummyCSVInput(DummyCSVInput):
         value = getattr(cli_args, self.dest)
 
         if not value:
-            raise InvalidArgumentsError("the command was given nothing!")
+            return None
+            # raise InvalidArgumentsError("the command was given nothing!")
 
         f = CsvCellIO(value, column=self.column)
         setattr(cli_args, self.dest, self.column)
@@ -677,7 +697,9 @@ def resolve_typical_arguments(
         if not variadic_input.get("no_help", False):
             split = package.split(".")
             name = split[0]
-            cmd = " ".join([s for s in split[1:] if s != "cli"]).replace("_", "-")
+            cmd = " ".join(distinct([s for s in split[1:] if s != "cli"])).replace(
+                "_", "-"
+            )
 
             epilog_addendum = """
         how to use the command with a CSV file?
@@ -759,21 +781,23 @@ def command(
     name: str,
     package: str,
     title: Optional[str] = None,
-    aliases=None,
-    description=None,
-    epilog=None,
-    common_arguments=None,
-    arguments=None,
-    subcommands=None,
-    resolve=None,
-    resumer=None,
+    aliases: Optional[Iterable[str]] = None,
+    description: Optional[str] = None,
+    epilog: Optional[str] = None,
+    common_arguments: Optional[List[Dict[str, Any]]] = None,
+    arguments: Optional[List[Dict[str, Any]]] = None,
+    subcommands: Optional[List[Dict[str, Any]]] = None,
+    subcommands_help: str = "Subcommand to use.",
+    subcommands_dest: str = "subcommand",
+    subcommands_title: str = "subcommands",
+    resolve: Optional[Callable[[Any], None]] = None,
+    resumer: Optional[Type[Resumer]] = None,
     resumer_epilog: Optional[str] = None,
-    resumer_kwargs=None,
-    no_output=False,
-    select=False,
-    total=False,
+    resumer_kwargs: Optional[Dict[str, Any]] = None,
+    no_output: bool = False,
+    select: bool = False,
+    total: bool = False,
     variadic_input: Optional[VariadicInputDefinition] = None,
-    **kwargs,
 ):
     if resumer is not None and not issubclass(resumer, Resumer):
         raise TypeError("given resumer is not a Resumer class")
@@ -799,9 +823,9 @@ def command(
 
     if subcommands is not None:
         data["subparsers"] = {
-            "help": "Subcommand to use.",
-            "title": "subcommands",
-            "dest": "subcommand",
+            "help": subcommands_help,
+            "title": subcommands_title,
+            "dest": subcommands_dest,
             "commands": {s["name"]: s for s in subcommands},
         }
 
@@ -829,59 +853,6 @@ def command(
 
     if resolve is not None:
         data["resolve"] = resolve
-
-    data.update(kwargs)
-
-    return data
-
-
-def subcommand(
-    name: str,
-    package: str,
-    title: str,
-    description=None,
-    epilog=None,
-    arguments=[],
-    resolve=None,
-    resumer=None,
-    resumer_epilog: Optional[str] = None,
-    resumer_kwargs=None,
-    no_output=False,
-    select=False,
-    total=False,
-    variadic_input: Optional[VariadicInputDefinition] = None,
-    **kwargs,
-):
-    data = {"name": name, "title": title, "package": package, "arguments": arguments}
-
-    if description is not None:
-        data["description"] = description
-
-    if epilog is not None:
-        data["epilog"] = epilog
-
-    data["arguments"], epilog_addendum = resolve_typical_arguments(
-        package,
-        arguments,
-        no_output=no_output,
-        resumer=resumer,
-        resumer_epilog=resumer_epilog,
-        resumer_kwargs=resumer_kwargs,
-        select=select,
-        total=total,
-        variadic_input=variadic_input,
-    )
-
-    if epilog_addendum is not None:
-        if not "epilog" in data:
-            data["epilog"] = epilog_addendum
-        else:
-            data["epilog"] += "\n\n" + epilog_addendum
-
-    if resolve is not None:
-        data["resolve"] = resolve
-
-    data.update(kwargs)
 
     return data
 

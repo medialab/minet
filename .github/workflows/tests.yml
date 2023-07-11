@@ -20,7 +20,7 @@ jobs:
 
           # Mac
           - os: macos-12
-            python-version: "3.7"
+            python-version: "3.7.16"
           - os: macos-12
             python-version: "3.8"
             pyinstaller: yes

@@ -4,8 +4,8 @@ from pyppeteer import launch, connect
 from quenouille import imap_unordered
 from functools import partial
 
-# TODO: add async delete to drop connexion
-# TODO: try to give loop to connexion? asyncio.ensure_future
+# TODO: add async delete to drop connection
+# TODO: try to give loop to connection? asyncio.ensure_future
 CONTEXT_POOL = []
 
 

@@ -18,6 +18,8 @@ As such, it has been designed to be:
 
 **Shortcuts**: [Command line documentation](./docs/cli.md), [Python library documentation](./docs/lib.md).
 
+![fetch](./docs/img/fetch.gif)
+
 ## Whirlwind tour
 
 ```bash
@@ -70,7 +72,7 @@ Minet can single-handedly:
   - ...and scrape structured data (using a declarative language to define your heuristics)
 - Crawl (using a declarative language to define a browsing behavior, and what to harvest)
 - Mine or search:
-  - _[Buzzsumo](https://buzzsumo.com/)_ (requires API acess)
+  - _[Buzzsumo](https://buzzsumo.com/)_ (requires API access)
   - _[Crowdtangle](https://www.crowdtangle.com/)_ (requires API access)
   - _[Mediacloud](https://mediacloud.org/)_ (requires free API access)
   - _[Twitter](https://twitter.com)_ (requires free API access)
@@ -125,10 +127,10 @@ Else, **minet** can be installed directly as a python CLI tool and library using
 # Minet is currently rolling out its v1 alpha
 # If you need stability, until Twitter sort its things out,
 # run the second command.
-pip install minet==1.0.0-a35
+pip install minet==1.0.0-a40
 
 # For more stability (v0.67.1)
-# Note that the present documentation targets 1.0.0-a35,
+# Note that the present documentation targets 1.0.0-a40,
 # not 0.67.1 (use -h to get the relevant help).
 pip install minet
 ```
@@ -180,4 +182,4 @@ To contribute to **minet** you can check out [this](./CONTRIBUTING.md) documenta
 
 You can cite it thusly:
 
-> Guillaume Plique, Pauline Breteau, Jules Farjas, Héloïse Théro, Jean Descamps, Amélie Pellé, & Laura Miguel. (2019, October 14). Minet, a webmining CLI tool & library for python. Zenodo. http://doi.org/10.5281/zenodo.4564399
+> Guillaume Plique, Pauline Breteau, Jules Farjas, Héloïse Théro, Jean Descamps, Amélie Pellé, Laura Miguel, & César Pichon. (2019, October 14). Minet, a webmining CLI tool & library for python. Zenodo. http://doi.org/10.5281/zenodo.4564399

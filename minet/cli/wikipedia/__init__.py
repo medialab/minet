@@ -1,7 +1,7 @@
 from casanova import RowCountResumer
 
 from minet.cli.exceptions import InvalidArgumentsError
-from minet.cli.argparse import command, subcommand
+from minet.cli.argparse import command
 
 
 def resolve_pageviews_args(cli_args):
@@ -14,7 +14,7 @@ def resolve_pageviews_args(cli_args):
         raise InvalidArgumentsError("Can only --resume with --sum.")
 
 
-WIKIPEDIA_PAGEVIEWS_SUBCOMMAND = subcommand(
+WIKIPEDIA_PAGEVIEWS_SUBCOMMAND = command(
     "pageviews",
     "minet.cli.wikipedia.pageviews",
     title="Minet Wikipedia Pageviews Command",

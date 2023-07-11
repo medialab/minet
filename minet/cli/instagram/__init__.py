@@ -4,9 +4,9 @@
 #
 # Logic of the `insta` action.
 #
-from minet.cli.argparse import command, subcommand, ConfigAction
+from minet.cli.argparse import command, ConfigAction
 
-INSTAGRAM_COMMENTS_SUBCOMMAND = subcommand(
+INSTAGRAM_COMMENTS_SUBCOMMAND = command(
     "comments",
     "minet.cli.instagram.comments",
     title="Instagram Comments Command",
@@ -42,7 +42,7 @@ INSTAGRAM_COMMENTS_SUBCOMMAND = subcommand(
     ],
 )
 
-INSTAGRAM_HASHTAG_SUBCOMMAND = subcommand(
+INSTAGRAM_HASHTAG_SUBCOMMAND = command(
     "hashtag",
     "minet.cli.instagram.hashtag",
     title="Instagram hashtag",
@@ -76,7 +76,7 @@ INSTAGRAM_HASHTAG_SUBCOMMAND = subcommand(
     ],
 )
 
-INSTAGRAM_USER_FOLLOWERS_SUBCOMMAND = subcommand(
+INSTAGRAM_USER_FOLLOWERS_SUBCOMMAND = command(
     "user-followers",
     "minet.cli.instagram.user_followers",
     title="Instagram User Followers Command",
@@ -97,7 +97,7 @@ INSTAGRAM_USER_FOLLOWERS_SUBCOMMAND = subcommand(
         the result. Be sure to download them fast if you need them (you can
         use the `minet fetch` command for that, and won't need to use cookies).
 
-        If a username is a number without '@' at the begining, it will be
+        If a username is a number without '@' at the beginning, it will be
         considered as an id.
     """,
     epilog="""
@@ -120,7 +120,7 @@ INSTAGRAM_USER_FOLLOWERS_SUBCOMMAND = subcommand(
     ],
 )
 
-INSTAGRAM_POST_INFOS_SUBCOMMAND = subcommand(
+INSTAGRAM_POST_INFOS_SUBCOMMAND = command(
     "post-infos",
     "minet.cli.instagram.post_infos",
     title="Instagram post-infos",
@@ -154,7 +154,7 @@ INSTAGRAM_POST_INFOS_SUBCOMMAND = subcommand(
     select=True,
 )
 
-INSTAGRAM_USER_FOLLOWING_SUBCOMMAND = subcommand(
+INSTAGRAM_USER_FOLLOWING_SUBCOMMAND = command(
     "user-following",
     "minet.cli.instagram.user_following",
     title="Instagram User Following Command",
@@ -174,7 +174,7 @@ INSTAGRAM_USER_FOLLOWING_SUBCOMMAND = subcommand(
         the result. Be sure to download them fast if you need them (you can
         use the `minet fetch` command for that, and won't need to use cookies).
 
-        If a username is a number without '@' at the begining, it will be
+        If a username is a number without '@' at the beginning, it will be
         considered as an id.
     """,
     epilog="""
@@ -197,7 +197,7 @@ INSTAGRAM_USER_FOLLOWING_SUBCOMMAND = subcommand(
     ],
 )
 
-INSTAGRAM_USER_INFOS_SUBCOMMAND = subcommand(
+INSTAGRAM_USER_INFOS_SUBCOMMAND = command(
     "user-infos",
     "minet.cli.instagram.user_infos",
     title="Instagram user-infos",
@@ -217,7 +217,7 @@ INSTAGRAM_USER_INFOS_SUBCOMMAND = subcommand(
         the result. Be sure to download them fast if you need them (you can
         use the `minet fetch` command for that, and won't need to use cookies).
 
-        If a username is a number without '@' at the begining, it will be
+        If a username is a number without '@' at the beginning, it will be
         considered as an id.
     """,
     epilog="""
@@ -233,7 +233,7 @@ INSTAGRAM_USER_INFOS_SUBCOMMAND = subcommand(
     },
 )
 
-INSTAGRAM_USER_POSTS_SUBCOMMAND = subcommand(
+INSTAGRAM_USER_POSTS_SUBCOMMAND = command(
     "user-posts",
     "minet.cli.instagram.user_posts",
     title="Instagram User Posts Command",
@@ -255,7 +255,7 @@ INSTAGRAM_USER_POSTS_SUBCOMMAND = subcommand(
         them (you can use the `minet fetch` command for that, and
         won't need to use cookies).
 
-        If a username is a number without '@' at the begining, it will be
+        If a username is a number without '@' at the beginning, it will be
         considered as an id.
     """,
     epilog="""

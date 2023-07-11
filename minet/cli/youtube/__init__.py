@@ -4,7 +4,7 @@
 #
 # Logic of the `yt` action.
 #
-from minet.cli.argparse import command, subcommand, ConfigAction, SplitterType
+from minet.cli.argparse import command, ConfigAction, SplitterType
 
 # TODO: this is a lazyloading issue
 from minet.youtube.constants import (
@@ -23,10 +23,10 @@ KEY_ARGUMENT = {
 
 
 def youtube_api_subcommand(*args, arguments=[], **kwargs):
-    return subcommand(*args, arguments=arguments + [KEY_ARGUMENT], **kwargs)
+    return command(*args, arguments=arguments + [KEY_ARGUMENT], **kwargs)
 
 
-YOUTUBE_CAPTIONS_SUBCOMMAND = subcommand(
+YOUTUBE_CAPTIONS_SUBCOMMAND = command(
     "captions",
     "minet.cli.youtube.captions",
     title="Youtube captions",

@@ -17,6 +17,7 @@ from minet.scrape.straining import strainer_from_css
 from minet.scrape.exceptions import InvalidScraperError
 from minet.scrape.mixin import ScraperMixin
 from minet.scrape.utils import ensure_soup
+from minet.scrape.soup import WonderfulSoup
 
 
 def scrape(
@@ -73,4 +74,4 @@ class Scraper(ScraperMixin):
         return scrape(self.definition, html, context=context, strainer=self.strainer)
 
 
-__all__ = ["Scraper", "validate"]
+__all__ = ["Scraper", "validate", "WonderfulSoup"]

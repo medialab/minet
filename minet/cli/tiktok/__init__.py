@@ -4,9 +4,9 @@
 #
 # Logic of the `tk` action.
 #
-from minet.cli.argparse import command, subcommand, ConfigAction
+from minet.cli.argparse import command, ConfigAction
 
-TIKTOK_SEARCH_VIDEOS_SUBCOMMAND = subcommand(
+TIKTOK_SEARCH_VIDEOS_SUBCOMMAND = command(
     "search-videos",
     "minet.cli.tiktok.search_videos",
     title="Tiktok Search Videos Command",

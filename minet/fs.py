@@ -6,13 +6,14 @@
 #
 from typing import Union, Optional
 
+import os
 import gzip
 import json
 import yaml
 from ebbe.decorators import with_defer
 from os import makedirs, PathLike
 from os.path import basename, join, splitext, abspath, normpath, dirname
-from ural import get_hostname, get_normalized_hostname
+from ural import get_hostname, get_normalized_hostname, safe_urlsplit, pathsplit
 from quenouille import NamedLocks
 
 from minet.exceptions import (
@@ -76,6 +77,29 @@ def load_definition(f, *, defer=None, encoding="utf-8"):
 
 
 class FolderStrategy(object):
+    CHOICES = ["flat", "fullpath", "hostname", "normalize-hostname", "prefix-x"]
+
+    DOCUMENTATION = """
+        . "flat": default choice, all files will be written in the indicated
+            content folder.
+
+        . "fullpath": all files will be written in a folder consisting of the
+            url hostname and then its path.
+
+        . "prefix-x": e.g. "prefix-4", files will be written in folders
+            having a name that is the first x characters of the file's name.
+            This is an efficient way to partition content into folders containing
+            roughly the same number of files if the file names are random (which
+            is the case by default since md5 hashes will be used).
+
+        . "hostname": files will be written in folders based on their url's
+            full host name.
+
+        . "normalized-hostname": files will be written in folders based on
+            their url's hostname stripped of some undesirable parts (such as
+            "www.", or "m." or "fr.", for instance).
+    """
+
     def __call__(self):
         raise NotImplementedError
 
@@ -83,6 +107,9 @@ class FolderStrategy(object):
     def from_name(name):
         if name == "flat":
             return FlatFolderStrategy()
+
+        if name == "fullpath":
+            return FullPathFolderStrategy()
 
         if name == "hostname":
             return HostnameFolderStrategy()
@@ -109,6 +136,21 @@ class FolderStrategy(object):
 class FlatFolderStrategy(FolderStrategy):
     def __call__(self, filename, **kwargs):
         return filename
+
+
+class FullPathFolderStrategy(FolderStrategy):
+    def __call__(self, filename, url, **kwargs):
+        parsed = safe_urlsplit(url)
+        final_path = [parsed.hostname]
+
+        path = pathsplit(parsed.path)
+
+        if path and "." in path[-1]:
+            path.pop()
+
+        final_path += path
+
+        return join(os.sep.join(final_path), filename)
 
 
 class PrefixFolderStrategy(FolderStrategy):
@@ -147,11 +189,19 @@ class NormalizedHostnameFolderStrategy(FolderStrategy):
 
 
 class FilenameBuilder(object):
-    def __init__(self, folder_strategy=None, template=None):
+    folder_strategy: Optional[FolderStrategy]
+
+    def __init__(
+        self,
+        folder_strategy: Optional[Union[str, FolderStrategy]] = None,
+        template=None,
+    ):
         self.folder_strategy = None
 
-        if folder_strategy is not None:
+        if folder_strategy is not None and isinstance(folder_strategy, str):
             self.folder_strategy = FolderStrategy.from_name(folder_strategy)
+        elif isinstance(folder_strategy, FolderStrategy):
+            self.folder_strategy = folder_strategy
 
         self.formatter = PseudoFStringFormatter()
         self.template = template

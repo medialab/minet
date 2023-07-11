@@ -167,7 +167,7 @@ Finally note that command line arguments and flags will take precedence over env
 
 ```
 Usage: minet cookies [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                     [--csv] [--url URL] [-o OUTPUT]
+                     [--single-line] [--csv] [--url URL] [-o OUTPUT]
                      {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}
 
 # Minet Cookies Command
@@ -182,6 +182,10 @@ Positional Arguments:
 Optional Arguments:
   --csv                         Whether to format the output as CSV. If --url is
                                 set, will output the cookie's morsels as CSV.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --url URL                     If given, only returns full cookie header value
                                 for this url.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
@@ -216,83 +220,62 @@ Examples:
 
 ```
 Usage: minet crawl [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                   [-O OUTPUT_DIR] [--resume] [--throttle THROTTLE]
-                   crawler
+                   [--single-line] [-O OUTPUT_DIR] [--factory] [--resume]
+                   [-m MAX_DEPTH] [--throttle THROTTLE] [-t THREADS] [-z] [-w]
+                   [-d] [--folder-strategy FOLDER_STRATEGY]
+                   [-f {csv,jsonl,ndjson}] [-v] [-u] [-n] [-i INPUT]
+                   [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                   target [url_or_url_column]
 
 # Minet Crawl Command
 
-Use multiple threads to crawl the web using minet crawling and
-scraping DSL.
+Run a crawl using a minet crawler or spiders defined
+in a python module.
 
 Positional Arguments:
-  crawler                       Path to the crawler definition file.
+  target                        Crawling target.
+  url_or_url_column             Single start url to process or name of the CSV
+                                column containing start urls when using
+                                -i/--input. Defaults to "url".
 
 Optional Arguments:
+  -z, --compress                Whether to compress the downloaded files when
+                                saving files on disk.
+  --factory                     Whether crawl target is a crawler factory
+                                function.
+  --folder-strategy FOLDER_STRATEGY
+                                Name of the strategy to be used to dispatch the
+                                retrieved files into folders to alleviate issues
+                                on some filesystems when a folder contains too
+                                much files. Note that this will be applied on
+                                top of --filename-template. All of the
+                                strategies are described at the end of this
+                                help. Defaults to `flat`.
+  -f, --format {csv,jsonl,ndjson}
+                                Serialization format for scraped/extracted data.
+                                Defaults to `csv`.
+  -m, --max-depth MAX_DEPTH     Maximum depth for the crawl.
+  -n, --normalized-url-cache    Whether to normalize url cache used to assess if
+                                some url was already visited.
   -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  -t, --threads THREADS         Number of threads to use. You can use `0` if you
+                                want the crawler to remain completely
+                                synchronous. Defaults to `25`.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to `0.2`.
-  --resume                      Whether to resume an interrupted crawl.
-  --refresh-per-second REFRESH_PER_SECOND
-                                Number of times to refresh the progress bar per
-                                second. Can be a float e.g. `0.5` meaning once
-                                every two seconds. Use this to limit CPU usage
-                                when launching multiple commands at once.
-                                Defaults to `10`.
-  --silent                      Whether to suppress all the log and progress
-                                bars. Can be useful when piping.
-  -h, --help                    show this help message and exit
-
-Examples:
-
-. Running a crawler definition:
-    $ minet crawl crawler.yml -O crawl-data
-```
-
-## focus-crawl
-
-```
-Usage: minet focus-crawl [-h] [-r REGEX_CONTENT] [--silent]
-                         [--refresh-per-second REFRESH_PER_SECOND]
-                         [-u REGEX_URL] [--extract] [-m MAX_DEPTH]
-                         [--irrelevant-continue] [--only-html]
-                         [--keep-irrelevant] [-O OUTPUT_DIR] [--resume]
-                         [--throttle THROTTLE] [-i INPUT] [--explode EXPLODE]
-                         [-s SELECT] [--total TOTAL]
-                         url_or_url_column
-
-# Minet Focus Crawl Command
-
-Minet crawl feature with the possibility
-to use regular expressions to filter content.
-
-Regex are not case sensitive, but
-accents sensitive.
-
-Regex must be written between simple quotes.
-
-Positional Arguments:
-  url_or_url_column             Single url to process or name of the CSV column
-                                containing urls when using -i/--input.
-
-Optional Arguments:
-  --extract                     Perform regex match on extracted text content
-                                instead of html content using the Trafilatura
-                                library.
-  --irrelevant-continue         Continue exploration whether met content is
-                                relevant or not.
-  --keep-irrelevant             Add to exported data the results judged
-                                irrelevant by the algorithm.
-  -m, --max-depth MAX_DEPTH     Max depth of the crawling exploration. Defaults
-                                to `3`.
-  --only-html                   Add URLs to the crawler queue only if they seem
-                                to lead to a HTML content.
-  -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `focus_crawl`.
-  -r, --regex-content REGEX_CONTENT
-                                Regex used to filter fetched content.
-  -u, --regex-url REGEX_URL     Regex used to filter URLs added to crawler's
-                                queue.
-  --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
-                                the same domain. Defaults to `0.2`.
+  -v, --verbose                 Whether to print information about crawl
+                                results.
+  -u, --visit-urls-only-once    Whether to ensure that any url will only be
+                                visited once.
+  -d, --write-data, -D, --dont-write-data
+                                Whether to write scraped/extracted data on disk.
+                                Defaults to `True`.
+  -w, --write-files             Whether to write downloaded files on disk in
+                                order to save them for later.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -305,8 +288,8 @@ Optional Arguments:
                                 progress indicator for large files given as
                                 input to the command.
   -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the urls you want to process. Will consider `-`
-                                as stdin.
+                                the start urls you want to process. Will
+                                consider `-` as stdin.
   --resume                      Whether to resume an interrupted crawl.
   --refresh-per-second REFRESH_PER_SECOND
                                 Number of times to refresh the progress bar per
@@ -318,48 +301,170 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
+    --folder-strategy options:
+
+. "flat": default choice, all files will be written in the indicated
+    content folder.
+
+. "fullpath": all files will be written in a folder consisting of the
+    url hostname and then its path.
+
+. "prefix-x": e.g. "prefix-4", files will be written in folders
+    having a name that is the first x characters of the file's name.
+    This is an efficient way to partition content into folders containing
+    roughly the same number of files if the file names are random (which
+    is the case by default since md5 hashes will be used).
+
+. "hostname": files will be written in folders based on their url's
+    full host name.
+
+. "normalized-hostname": files will be written in folders based on
+    their url's hostname stripped of some undesirable parts (such as
+    "www.", or "m." or "fr.", for instance).
+
 Examples:
 
-  Running a simple crawler:
-    $ minet focus-crawl -i urls.csv url -r '(?:assembl[ée]e nationale|s[ée]nat)' -O ./result
+. Crawling using the `process` function in the `crawl` module:
+    $ minet crawl crawl:process -O crawl-data
+```
 
-how to use the command with a CSV file?
+## focus-crawl
 
-> A lot of minet commands, including this one, can both be
-> given a single value to process or a bunch of them if
-> given the column of a CSV file passed to -i/--input instead.
+```
+Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
+                         [--refresh-per-second REFRESH_PER_SECOND]
+                         [--single-line] [-U URL_FILTER] [--extract]
+                         [--irrelevant-continue] [--only-html] [-O OUTPUT_DIR]
+                         [--factory] [--resume] [-m MAX_DEPTH]
+                         [--throttle THROTTLE] [-t THREADS] [-z] [-w] [-d]
+                         [--folder-strategy FOLDER_STRATEGY]
+                         [-f {csv,jsonl,ndjson}] [-v] [-n] [-i INPUT]
+                         [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                         [url_or_url_column]
 
-> Note that when given a CSV file as input, minet will
-> concatenate the input file columns with the ones added
-> by the command. You can always restrict the input file
-> columns to keep by using the -s/--select flag.
+# Minet Focus Crawl Command
 
-. Here is how to use a command with a single value:
-    $ minet focus-crawl focus-crawl "value"
+Minet crawl feature with the possibility
+to use regular expressions to filter content.
 
-. Here is how to use a command with a CSV file:
-    $ minet focus-crawl focus-crawl column_name -i file.csv
+Regex are not case sensitive, but
+accents sensitive.
 
-. Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet focus-crawl focus-crawl column_name -i -
+Regex must be written between simple quotes.
 
-. Here is how to indicate that the CSV column may contain multiple
-  values separated by a special character:
-    $ minet focus-crawl focus-crawl column_name -i file.csv --explode "|"
+Positional Arguments:
+  url_or_url_column             Single start url to process or name of the CSV
+                                column containing start urls when using
+                                -i/--input. Defaults to "url".
 
-. This also works with single values:
-    $ minet focus-crawl focus-crawl "value1,value2" --explode ","
+Optional Arguments:
+  -z, --compress                Whether to compress the downloaded files when
+                                saving files on disk.
+  -C, --content-filter CONTENT_FILTER
+                                Regex used to filter fetched content.
+  --extract                     Perform regex match on extracted text content
+                                instead of html content using the Trafilatura
+                                library.
+  --factory                     Whether crawl target is a crawler factory
+                                function.
+  --folder-strategy FOLDER_STRATEGY
+                                Name of the strategy to be used to dispatch the
+                                retrieved files into folders to alleviate issues
+                                on some filesystems when a folder contains too
+                                much files. Note that this will be applied on
+                                top of --filename-template. All of the
+                                strategies are described at the end of this
+                                help. Defaults to `flat`.
+  -f, --format {csv,jsonl,ndjson}
+                                Serialization format for scraped/extracted data.
+                                Defaults to `csv`.
+  --irrelevant-continue         Continue exploration whether met content is
+                                relevant or not.
+  -m, --max-depth MAX_DEPTH     Maximum depth for the crawl.
+  -n, --normalized-url-cache    Whether to normalize url cache used to assess if
+                                some url was already visited.
+  --only-html                   Add URLs to the crawler queue only if they seem
+                                to lead to a HTML content.
+  -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  -t, --threads THREADS         Number of threads to use. You can use `0` if you
+                                want the crawler to remain completely
+                                synchronous. Defaults to `25`.
+  --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
+                                the same domain. Defaults to `0.2`.
+  -U, --url-filter URL_FILTER   Regex used to filter URLs added to crawler's
+                                queue.
+  -v, --verbose                 Whether to print information about crawl
+                                results.
+  -d, --write-data, -D, --dont-write-data
+                                Whether to write scraped/extracted data on disk.
+                                Defaults to `True`.
+  -w, --write-files             Whether to write downloaded files on disk in
+                                order to save them for later.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the start urls you want to process. Will
+                                consider `-` as stdin.
+  --resume                      Whether to resume an interrupted crawl.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+    --folder-strategy options:
+
+. "flat": default choice, all files will be written in the indicated
+    content folder.
+
+. "fullpath": all files will be written in a folder consisting of the
+    url hostname and then its path.
+
+. "prefix-x": e.g. "prefix-4", files will be written in folders
+    having a name that is the first x characters of the file's name.
+    This is an efficient way to partition content into folders containing
+    roughly the same number of files if the file names are random (which
+    is the case by default since md5 hashes will be used).
+
+. "hostname": files will be written in folders based on their url's
+    full host name.
+
+. "normalized-hostname": files will be written in folders based on
+    their url's hostname stripped of some undesirable parts (such as
+    "www.", or "m." or "fr.", for instance).
+
+Examples:
+
+. Running a simple crawler:
+    $ minet focus-crawl url -i urls.csv --content-filter '(?:assembl[ée]e nationale|s[ée]nat)' -O ./result
 ```
 
 ## fetch
 
 ```
 Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
-                   [--refresh-per-second REFRESH_PER_SECOND]
+                   [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
                    [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
                    [-H HEADERS] [--insecure] [-t THREADS] [--throttle THROTTLE]
                    [--timeout TIMEOUT] [--url-template URL_TEMPLATE] [-X METHOD]
-                   [--max-redirects MAX_REDIRECTS] [--compress] [-c] [-D]
+                   [--max-redirects MAX_REDIRECTS] [-z] [-c] [-D]
                    [-O OUTPUT_DIR] [-f FILENAME]
                    [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [--keep-failed-contents]
@@ -380,7 +485,7 @@ Positional Arguments:
                                 containing urls when using -i/--input.
 
 Optional Arguments:
-  --compress                    Whether to compress the contents.
+  -z, --compress                Whether to compress the contents.
   -c, --contents-in-report, -w, --no-contents-in-report
                                 Whether to include retrieved contents, e.g.
                                 html, directly in the report and avoid writing
@@ -428,6 +533,10 @@ Optional Arguments:
   -X, --request METHOD          The http method to use. Will default to GET.
                                 Defaults to `GET`.
   -D, --dont-save               Use not to write any downloaded file on disk.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --standardize-encoding        Whether to systematically convert retrieved text
                                 to UTF-8.
   -t, --threads THREADS         Number of threads to use. Defaults to `25`.
@@ -488,6 +597,9 @@ Columns being added to the output:
 . "flat": default choice, all files will be written in the indicated
     content folder.
 
+. "fullpath": all files will be written in a folder consisting of the
+    url hostname and then its path.
+
 . "prefix-x": e.g. "prefix-4", files will be written in folders
     having a name that is the first x characters of the file's name.
     This is an efficient way to partition content into folders containing
@@ -507,13 +619,13 @@ Examples:
     $ minet fetch "https://www.lemonde.fr"
 
 . Fetching a batch of url from existing CSV file:
-    $ minet fetch url file.csv > report.csv
+    $ minet fetch url -i file.csv > report.csv
 
 . CSV input from stdin (mind the `-`):
     $ xsv select url file.csv | minet fetch url -i - > report.csv
 
-. Dowloading files in specific output directory:
-    $ minet fetch url file.csv -O html > report.csv
+. Downloading files in specific output directory:
+    $ minet fetch url -i file.csv -O html > report.csv
 
 how to use the command with a CSV file?
 
@@ -527,28 +639,28 @@ how to use the command with a CSV file?
 > columns to keep by using the -s/--select flag.
 
 . Here is how to use a command with a single value:
-    $ minet fetch fetch "value"
+    $ minet fetch "value"
 
 . Here is how to use a command with a CSV file:
-    $ minet fetch fetch column_name -i file.csv
+    $ minet fetch column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet fetch fetch column_name -i -
+    $ xsv search -s col . | minet fetch column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet fetch fetch column_name -i file.csv --explode "|"
+    $ minet fetch column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet fetch fetch "value1,value2" --explode ","
+    $ minet fetch "value1,value2" --explode ","
 ```
 
 ## extract
 
 ```
 Usage: minet extract [-h] [-g] [--silent]
-                     [--refresh-per-second REFRESH_PER_SECOND] [-I INPUT_DIR]
-                     [-p PROCESSES] [--chunk-size CHUNK_SIZE]
+                     [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
+                     [-I INPUT_DIR] [-p PROCESSES] [--chunk-size CHUNK_SIZE]
                      [--body-column BODY_COLUMN] [--error-column ERROR_COLUMN]
                      [--status-column STATUS_COLUMN]
                      [--encoding-column ENCODING_COLUMN]
@@ -580,7 +692,7 @@ This said, you can of course feed this command any kind of CSV data,
 and use dedicated flags such as --status-column, --body-column to
 to inform the command about your specific table.
 
-The comand is also able to work on glob patterns, such as: "downloaded/**/*.html",
+The command is also able to work on glob patterns, such as: "downloaded/**/*.html",
 and can also be fed CSV columns containing HTML content directly if
 required.
 
@@ -608,6 +720,10 @@ Optional Arguments:
                                 Defaults to `mimetype`.
   -p, --processes PROCESSES     Number of processes to use. Defaults to roughly
                                 half of the available CPUs.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --status-column STATUS_COLUMN
                                 Name of the CSV column containing HTTP status.
                                 Defaults to `http_status`.
@@ -677,7 +793,7 @@ Examples:
 . Indicating a custom filename column (named "path"):
     $ minet extract path -i report.csv -I downloaded > extracted.csv
 
-. Extracting content from a CSV colum containing HTML directly:
+. Extracting content from a CSV column containing HTML directly:
     $ minet extract -i report.csv --body-column html > extracted.csv
 
 . Extracting content from a bunch of files using a glob pattern:
@@ -694,7 +810,7 @@ Examples:
 
 ```
 Usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
-                     [--refresh-per-second REFRESH_PER_SECOND]
+                     [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
                      [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
                      [-H HEADERS] [--insecure] [-t THREADS]
                      [--throttle THROTTLE] [--timeout TIMEOUT]
@@ -747,6 +863,10 @@ Optional Arguments:
                                 probably shortened.
   -X, --request METHOD          The http method to use. Will default to GET.
                                 Defaults to `GET`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -t, --threads THREADS         Number of threads to use. Defaults to `25`.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to `0.2`.
@@ -817,20 +937,20 @@ how to use the command with a CSV file?
 > columns to keep by using the -s/--select flag.
 
 . Here is how to use a command with a single value:
-    $ minet fetch fetch "value"
+    $ minet fetch "value"
 
 . Here is how to use a command with a CSV file:
-    $ minet fetch fetch column_name -i file.csv
+    $ minet fetch column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet fetch fetch column_name -i -
+    $ xsv search -s col . | minet fetch column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet fetch fetch column_name -i file.csv --explode "|"
+    $ minet fetch column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet fetch fetch "value1,value2" --explode ","
+    $ minet fetch "value1,value2" --explode ","
 ```
 
 ## scrape
@@ -839,9 +959,9 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 ```
 Usage: minet scrape [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                    [-g] [-I INPUT_DIR] [-p PROCESSES] [--chunk-size CHUNK_SIZE]
-                    [--body-column BODY_COLUMN] [--url-column URL_COLUMN]
-                    [--error-column ERROR_COLUMN]
+                    [--single-line] [-g] [-I INPUT_DIR] [-p PROCESSES]
+                    [--chunk-size CHUNK_SIZE] [--body-column BODY_COLUMN]
+                    [--url-column URL_COLUMN] [--error-column ERROR_COLUMN]
                     [--status-column STATUS_COLUMN]
                     [--encoding-column ENCODING_COLUMN]
                     [--mimetype-column MIMETYPE_COLUMN] [--encoding ENCODING]
@@ -868,7 +988,7 @@ This said, you can of course feed this command any kind of CSV data,
 and use dedicated flags such as --status-column, --body-column to
 to inform the command about your specific table.
 
-The comand is also able to work on glob patterns, such as: "downloaded/**/*.html",
+The command is also able to work on glob patterns, such as: "downloaded/**/*.html",
 and can also be fed CSV columns containing HTML content directly if
 required.
 
@@ -904,6 +1024,10 @@ Optional Arguments:
                                 serializing to CSV. Defaults to `|`.
   -p, --processes PROCESSES     Number of processes to use. Defaults to roughly
                                 half of the available CPUs.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --status-column STATUS_COLUMN
                                 Name of the CSV column containing HTTP status.
                                 Defaults to `http_status`.
@@ -960,7 +1084,7 @@ Examples:
 . Indicating a custom filename column (named "path"):
     $ minet scrape scraper.yml path -i report.csv -I downloaded > scraped.csv
 
-. Scraping a CSV colum containing HTML directly:
+. Scraping a CSV column containing HTML directly:
     $ minet scrape scraper.yml -i report.csv --body-column html > scraped.csv
 
 . Scraping a bunch of files using a glob pattern:
@@ -990,8 +1114,9 @@ Examples:
 ```
 Usage: minet url-extract [-h] [--silent]
                          [--refresh-per-second REFRESH_PER_SECOND]
-                         [--base-url BASE_URL] [--from {html,text}] [-s SELECT]
-                         [--total TOTAL] [-o OUTPUT]
+                         [--single-line] [--base-url BASE_URL]
+                         [--from {html,text}] [-s SELECT] [--total TOTAL]
+                         [-o OUTPUT]
                          column input
 
 # Minet Url Extract Command
@@ -1007,6 +1132,10 @@ Optional Arguments:
   --base-url BASE_URL           Base url used to resolve relative urls.
   --from {html,text}            Extract urls from which kind of source? Defaults
                                 to `text`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -1040,8 +1169,8 @@ Examples:
 
 ```
 Usage: minet url-join [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                      [-p MATCH_COLUMN_PREFIX] [--separator SEPARATOR]
-                      [-s SELECT] [-o OUTPUT]
+                      [--single-line] [-p MATCH_COLUMN_PREFIX]
+                      [--separator SEPARATOR] [-s SELECT] [-o OUTPUT]
                       column1 input1 column2 input2
 
 # Minet Url Join Command
@@ -1065,6 +1194,10 @@ Optional Arguments:
                                 Optional prefix to add to the first file's
                                 column names to avoid conflicts. Defaults to ``.
   --separator SEPARATOR         Split indexed url column by a separator?
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -1100,11 +1233,12 @@ Examples:
 
 ```
 Usage: minet url-parse [-h] [--facebook] [--silent]
-                       [--refresh-per-second REFRESH_PER_SECOND] [--twitter]
-                       [--youtube] [--infer-redirection] [--fix-common-mistakes]
-                       [--normalize-amp] [--quoted] [--sort-query]
-                       [--strip-authentication] [--strip-fragment]
-                       [--strip-index] [--strip-irrelevant-subdomains]
+                       [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
+                       [--twitter] [--youtube] [--infer-redirection]
+                       [--fix-common-mistakes] [--normalize-amp] [--quoted]
+                       [--sort-query] [--strip-authentication]
+                       [--strip-fragment] [--strip-index]
+                       [--strip-irrelevant-subdomains]
                        [--strip-lang-query-items] [--strip-lang-subdomains]
                        [--strip-protocol] [--strip-trailing-slash] [-i INPUT]
                        [--explode EXPLODE] [-s SELECT] [--total TOTAL]
@@ -1140,6 +1274,10 @@ Optional Arguments:
   --quoted, --no-quoted         Whether or not to normalize to a quoted or
                                 unquoted version of the url when normalizing
                                 url. Defaults to `True`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --sort-query, --dont-sort-query
                                 Whether or not to sort query items when
                                 normalizing url. Defaults to `True`.
@@ -1277,27 +1415,27 @@ how to use the command with a CSV file?
 > columns to keep by using the -s/--select flag.
 
 . Here is how to use a command with a single value:
-    $ minet url-parse url-parse "value"
+    $ minet url-parse "value"
 
 . Here is how to use a command with a CSV file:
-    $ minet url-parse url-parse column_name -i file.csv
+    $ minet url-parse column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet url-parse url-parse column_name -i -
+    $ xsv search -s col . | minet url-parse column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
-    $ minet url-parse url-parse column_name -i file.csv --explode "|"
+    $ minet url-parse column_name -i file.csv --explode "|"
 
 . This also works with single values:
-    $ minet url-parse url-parse "value1,value2" --explode ","
+    $ minet url-parse "value1,value2" --explode ","
 ```
 
 ## BuzzSumo
 
 ```
 Usage: minet buzzsumo [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
-                      [--refresh-per-second REFRESH_PER_SECOND]
+                      [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
                       {limit,domain,domain-summary} ...
 
 # Minet Buzzsumo Command
@@ -1305,6 +1443,10 @@ Usage: minet buzzsumo [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
 Gather data from the BuzzSumo APIs easily and efficiently.
 
 Optional Arguments:
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -t, --token TOKEN             BuzzSumo API token. Can also be configured in a
                                 .minetrc file as "buzzsumo.token" or read from
                                 the MINET_BUZZSUMO_TOKEN env variable.
@@ -1332,7 +1474,7 @@ Subcommands:
 ```
 Usage: minet buzzsumo limit [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
                             [--refresh-per-second REFRESH_PER_SECOND]
-                            [-o OUTPUT]
+                            [--single-line]
 
 # Minet Buzzsumo Limit Command
 
@@ -1340,12 +1482,13 @@ Call BuzzSumo for a given request and return the remaining number
 of calls for this month contained in the request's headers.
 
 Optional Arguments:
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -t, --token TOKEN             BuzzSumo API token. Can also be configured in a
                                 .minetrc file as "buzzsumo.token" or read from
                                 the MINET_BUZZSUMO_TOKEN env variable.
-  -o, --output OUTPUT           Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
@@ -1372,8 +1515,9 @@ Examples:
 Usage: minet buzzsumo domain-summary [-h] [-t TOKEN] [--rcfile RCFILE]
                                      [--silent]
                                      [--refresh-per-second REFRESH_PER_SECOND]
-                                     --begin-date BEGIN_DATE --end-date END_DATE
-                                     [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                     [--single-line] --begin-date BEGIN_DATE
+                                     --end-date END_DATE [-i INPUT]
+                                     [--explode EXPLODE] [-s SELECT]
                                      [--total TOTAL] [-o OUTPUT]
                                      domain_name_or_domain_name_column
 
@@ -1395,6 +1539,10 @@ Optional Arguments:
                                 YYYY-MM-DD
   --end-date END_DATE           The date you wish to fetch articles to. UTC date
                                 should have the following format : YYYY-MM-DD
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -t, --token TOKEN             BuzzSumo API token. Can also be configured in a
                                 .minetrc file as "buzzsumo.token" or read from
                                 the MINET_BUZZSUMO_TOKEN env variable.
@@ -1470,8 +1618,8 @@ how to use the command with a CSV file?
 ```
 Usage: minet buzzsumo domain [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
                              [--refresh-per-second REFRESH_PER_SECOND]
-                             --begin-date BEGIN_DATE --end-date END_DATE
-                             [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                             [--single-line] --begin-date BEGIN_DATE --end-date
+                             END_DATE [-i INPUT] [--explode EXPLODE] [-s SELECT]
                              [--total TOTAL] [-o OUTPUT]
                              domain_name_or_domain_name_column
 
@@ -1493,6 +1641,10 @@ Optional Arguments:
                                 YYYY-MM-DD
   --end-date END_DATE           The date you wish to fetch articles to. UTC date
                                 should have the following format : YYYY-MM-DD
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -t, --token TOKEN             BuzzSumo API token. Can also be configured in a
                                 .minetrc file as "buzzsumo.token" or read from
                                 the MINET_BUZZSUMO_TOKEN env variable.
@@ -1568,7 +1720,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet crowdtangle [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
                          [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                         [-t TOKEN]
+                         [--single-line] [-t TOKEN]
                          {leaderboard,lists,posts-by-id,posts,search,summary}
                          ...
 
@@ -1581,6 +1733,10 @@ Optional Arguments:
                                 to `6`. Can also be configured in a .minetrc
                                 file as "crowdtangle.rate_limit" or read from
                                 the MINET_CROWDTANGLE_RATE_LIMIT env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -t, --token TOKEN             CrowdTangle dashboard API token. Rcfile key:
                                 crowdtangle.token. Can also be configured in a
                                 .minetrc file as "crowdtangle.token" or read
@@ -1610,8 +1766,9 @@ Subcommands:
 Usage: minet crowdtangle leaderboard [-h] [--rate-limit RATE_LIMIT]
                                      [--rcfile RCFILE] [--silent]
                                      [--refresh-per-second REFRESH_PER_SECOND]
-                                     [-t TOKEN] [--breakdown] [-f {csv,jsonl}]
-                                     [-l LIMIT] [--list-id LIST_ID]
+                                     [--single-line] [-t TOKEN] [--breakdown]
+                                     [-f {csv,jsonl}] [-l LIMIT]
+                                     [--list-id LIST_ID]
                                      [--start-date START_DATE] [-o OUTPUT]
 
 # Minet CrowdTangle Leaderboard Command
@@ -1632,6 +1789,10 @@ Optional Arguments:
                                 to `6`. Can also be configured in a .minetrc
                                 file as "crowdtangle.rate_limit" or read from
                                 the MINET_CROWDTANGLE_RATE_LIMIT env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --start-date START_DATE       The earliest date at which to start aggregating
                                 statistics (UTC!). You can pass just a year or a
                                 year-month for convenience.
@@ -1668,7 +1829,7 @@ Examples:
 Usage: minet crowdtangle lists [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
                                [--silent]
                                [--refresh-per-second REFRESH_PER_SECOND]
-                               [-t TOKEN] [-o OUTPUT]
+                               [--single-line] [-t TOKEN]
 
 # Minet CrowdTangle Lists Command
 
@@ -1681,13 +1842,14 @@ Optional Arguments:
                                 to `6`. Can also be configured in a .minetrc
                                 file as "crowdtangle.rate_limit" or read from
                                 the MINET_CROWDTANGLE_RATE_LIMIT env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -t, --token TOKEN             CrowdTangle dashboard API token. Rcfile key:
                                 crowdtangle.token. Can also be configured in a
                                 .minetrc file as "crowdtangle.token" or read
                                 from the MINET_CROWDTANGLE_TOKEN env variable.
-  -o, --output OUTPUT           Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
@@ -1714,10 +1876,7 @@ Examples:
 Usage: minet crowdtangle posts-by-id [-h] [--rate-limit RATE_LIMIT]
                                      [--rcfile RCFILE] [--silent]
                                      [--refresh-per-second REFRESH_PER_SECOND]
-                                     [-t TOKEN] [-i INPUT] [--explode EXPLODE]
-                                     [-s SELECT] [--total TOTAL] [--resume]
-                                     [-o OUTPUT]
-                                     post_url_or_id_or_post_url_or_id_column
+                                     [--single-line] [-t TOKEN]
 
 # Minet CrowdTangle Post By Id Command
 
@@ -1725,40 +1884,19 @@ Retrieve metadata about batches of posts using Crowdtangle's API.
 
 For more information, see the API endpoint documentation: https://github.com/CrowdTangle/API/wiki/Posts#get-postid.
 
-Positional Arguments:
-  post_url_or_id_or_post_url_or_id_column
-                                Single URL or id to process or name of the CSV
-                                column containing URLs or ids when using
-                                -i/--input.
-
 Optional Arguments:
   --rate-limit RATE_LIMIT       Authorized number of hits by minutes. Defaults
                                 to `6`. Can also be configured in a .minetrc
                                 file as "crowdtangle.rate_limit" or read from
                                 the MINET_CROWDTANGLE_RATE_LIMIT env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -t, --token TOKEN             CrowdTangle dashboard API token. Rcfile key:
                                 crowdtangle.token. Can also be configured in a
                                 .minetrc file as "crowdtangle.token" or read
                                 from the MINET_CROWDTANGLE_TOKEN env variable.
-  -s, --select SELECT           Columns of -i/--input CSV file to include in the
-                                output (separated by `,`). Use an empty string
-                                if you don't want to keep anything: --select ''.
-  --explode EXPLODE             Use to indicate the character used to separate
-                                multiple values in a single CSV cell. Defaults
-                                to none, i.e. CSV cells having a single values,
-                                which is usually the case.
-  --total TOTAL                 Total number of items to process. Might be
-                                necessary when you want to display a finite
-                                progress indicator for large files given as
-                                input to the command.
-  -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the URLs or ids you want to process. Will
-                                consider `-` as stdin.
-  -o, --output OUTPUT           Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
-  --resume                      "Whether to resume from an aborted collection.
-                                Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
@@ -1780,33 +1918,6 @@ Examples:
 
 . Retrieving information about a single post:
     $ minet ct posts-by-id 1784333048289665 --token YOUR_TOKEN
-
-how to use the command with a CSV file?
-
-> A lot of minet commands, including this one, can both be
-> given a single value to process or a bunch of them if
-> given the column of a CSV file passed to -i/--input instead.
-
-> Note that when given a CSV file as input, minet will
-> concatenate the input file columns with the ones added
-> by the command. You can always restrict the input file
-> columns to keep by using the -s/--select flag.
-
-. Here is how to use a command with a single value:
-    $ minet crowdtangle posts-by-id "value"
-
-. Here is how to use a command with a CSV file:
-    $ minet crowdtangle posts-by-id column_name -i file.csv
-
-. Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet crowdtangle posts-by-id column_name -i -
-
-. Here is how to indicate that the CSV column may contain multiple
-  values separated by a special character:
-    $ minet crowdtangle posts-by-id column_name -i file.csv --explode "|"
-
-. This also works with single values:
-    $ minet crowdtangle posts-by-id "value1,value2" --explode ","
 ```
 
 ### posts
@@ -1815,9 +1926,9 @@ how to use the command with a CSV file?
 Usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
                                [--silent]
                                [--refresh-per-second REFRESH_PER_SECOND]
-                               [-t TOKEN] [--chunk-size CHUNK_SIZE]
-                               [--end-date END_DATE] [-f {csv,jsonl}]
-                               [--language LANGUAGE] [-l LIMIT]
+                               [--single-line] [-t TOKEN]
+                               [--chunk-size CHUNK_SIZE] [--end-date END_DATE]
+                               [-f {csv,jsonl}] [--language LANGUAGE] [-l LIMIT]
                                [--list-ids LIST_IDS]
                                [--sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}]
                                [--start-date START_DATE] [--resume] [-o OUTPUT]
@@ -1830,7 +1941,7 @@ For more information, see the API endpoint documentation: https://github.com/Cro
 
 Optional Arguments:
   --chunk-size CHUNK_SIZE       When sorting by date (default), the number of
-                                items to retrieve before shifting the inital
+                                items to retrieve before shifting the initial
                                 query to circumvent the APIs limitations.
                                 Defaults to `500`.
   --end-date END_DATE           The latest date at which a post could be posted
@@ -1846,6 +1957,10 @@ Optional Arguments:
                                 to `6`. Can also be configured in a .minetrc
                                 file as "crowdtangle.rate_limit" or read from
                                 the MINET_CROWDTANGLE_RATE_LIMIT env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                 The order in which to retrieve posts. Defaults
                                 to `date`.
@@ -1896,9 +2011,9 @@ To know the different list ids associated with your dashboard:
 Usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
                                 [--silent]
                                 [--refresh-per-second REFRESH_PER_SECOND]
-                                [-t TOKEN] [--and AND] [--chunk-size CHUNK_SIZE]
-                                [--end-date END_DATE] [-f {csv,jsonl}]
-                                [--in-list-ids IN_LIST_IDS]
+                                [--single-line] [-t TOKEN] [--and AND]
+                                [--chunk-size CHUNK_SIZE] [--end-date END_DATE]
+                                [-f {csv,jsonl}] [--in-list-ids IN_LIST_IDS]
                                 [--language LANGUAGE] [-l LIMIT]
                                 [--not-in-title] [--offset OFFSET]
                                 [-p PLATFORMS]
@@ -1920,7 +2035,7 @@ Positional Arguments:
 Optional Arguments:
   --and AND                     AND clause to add to the query terms.
   --chunk-size CHUNK_SIZE       When sorting by date (default), the number of
-                                items to retrieve before shifting the inital
+                                items to retrieve before shifting the initial
                                 query to circumvent the APIs limitations.
                                 Defaults to `500`.
   --end-date END_DATE           The latest date at which a post could be posted
@@ -1944,6 +2059,10 @@ Optional Arguments:
   --search-field {account_name_only,image_text_only,include_query_strings,text_fields_and_image_text,text_fields_only}
                                 In what to search the query. Defaults to
                                 `text_fields_and_image_text`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                 The order in which to retrieve posts. Defaults
                                 to `date`.
@@ -1984,7 +2103,8 @@ Examples:
 Usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT]
                                  [--rcfile RCFILE] [--silent]
                                  [--refresh-per-second REFRESH_PER_SECOND]
-                                 [-t TOKEN] [-p PLATFORMS] [--posts POSTS]
+                                 [--single-line] [-t TOKEN] [-p PLATFORMS]
+                                 [--posts POSTS]
                                  [--sort-by {date,subscriber_count,total_interactions}]
                                  --start-date START_DATE [-i INPUT]
                                  [--explode EXPLODE] [-s SELECT] [--total TOTAL]
@@ -2010,6 +2130,10 @@ Optional Arguments:
                                 to `6`. Can also be configured in a .minetrc
                                 file as "crowdtangle.rate_limit" or read from
                                 the MINET_CROWDTANGLE_RATE_LIMIT env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --sort-by {date,subscriber_count,total_interactions}
                                 How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE       The earliest date at which a post could be
@@ -2107,7 +2231,7 @@ Subcommands:
 ```
 Usage: minet facebook comments [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                [--refresh-per-second REFRESH_PER_SECOND]
-                               [--throttle THROTTLE] [-i INPUT]
+                               [--single-line] [--throttle THROTTLE] [-i INPUT]
                                [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                                [-o OUTPUT]
                                post_url_or_post_url_column
@@ -2136,6 +2260,10 @@ Optional Arguments:
                                 Defaults to `firefox`. Can also be configured in
                                 a .minetrc file as "facebook.cookie" or read
                                 from the MINET_FACEBOOK_COOKIE env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `2.0`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -2213,8 +2341,9 @@ how to use the command with a CSV file?
 ```
 Usage: minet facebook post [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                            [--refresh-per-second REFRESH_PER_SECOND]
-                           [--throttle THROTTLE] [-i INPUT] [--explode EXPLODE]
-                           [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                           [--single-line] [--throttle THROTTLE] [-i INPUT]
+                           [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                           [-o OUTPUT]
                            post_url_or_post_url_column
 
 # Minet Facebook Post Command
@@ -2262,6 +2391,10 @@ Optional Arguments:
                                 Defaults to `firefox`. Can also be configured in
                                 a .minetrc file as "facebook.cookie" or read
                                 from the MINET_FACEBOOK_COOKIE env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `2.0`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -2339,8 +2472,9 @@ how to use the command with a CSV file?
 ```
 Usage: minet facebook posts [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                             [--refresh-per-second REFRESH_PER_SECOND]
-                            [--throttle THROTTLE] [-i INPUT] [--explode EXPLODE]
-                            [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                            [--single-line] [--throttle THROTTLE] [-i INPUT]
+                            [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                            [-o OUTPUT]
                             group_url_or_group_url_column
 
 # Minet Facebook Posts Command
@@ -2388,6 +2522,10 @@ Optional Arguments:
                                 Defaults to `firefox`. Can also be configured in
                                 a .minetrc file as "facebook.cookie" or read
                                 from the MINET_FACEBOOK_COOKIE env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `2.0`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -2465,8 +2603,8 @@ how to use the command with a CSV file?
 ```
 Usage: minet facebook post-authors [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                    [--refresh-per-second REFRESH_PER_SECOND]
-                                   [--throttle THROTTLE] [-i INPUT]
-                                   [--explode EXPLODE] [-s SELECT]
+                                   [--single-line] [--throttle THROTTLE]
+                                   [-i INPUT] [--explode EXPLODE] [-s SELECT]
                                    [--total TOTAL] [-o OUTPUT]
                                    post_url_or_post_url_column
 
@@ -2488,6 +2626,10 @@ Optional Arguments:
                                 Defaults to `firefox`. Can also be configured in
                                 a .minetrc file as "facebook.cookie" or read
                                 from the MINET_FACEBOOK_COOKIE env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `2.0`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -2557,11 +2699,7 @@ how to use the command with a CSV file?
 <h3 id="facebook-url-likes">url-likes</h3>
 
 ```
-Usage: minet facebook url-likes [-h] [--silent]
-                                [--refresh-per-second REFRESH_PER_SECOND]
-                                [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                                [--total TOTAL] [-o OUTPUT]
-                                url_or_url_column
+Usage: minet facebook url-likes [-h]
 
 # Minet Facebook Url Likes Command
 
@@ -2576,37 +2714,8 @@ reactions plus the number of comments and shares that the URL got on Facebook
 (here is the official documentation: https://developers.facebook.com/docs/plugins/faqs
 explaining "What makes up the number shown next to my Share button?").
 
-Positional Arguments:
-  url_or_url_column             Single url to process or name of the CSV column
-                                containing urls when using -i/--input.
-
 Optional Arguments:
-  -s, --select SELECT           Columns of -i/--input CSV file to include in the
-                                output (separated by `,`). Use an empty string
-                                if you don't want to keep anything: --select ''.
-  --explode EXPLODE             Use to indicate the character used to separate
-                                multiple values in a single CSV cell. Defaults
-                                to none, i.e. CSV cells having a single values,
-                                which is usually the case.
-  --total TOTAL                 Total number of items to process. Might be
-                                necessary when you want to display a finite
-                                progress indicator for large files given as
-                                input to the command.
-  -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the urls you want to process. Will consider `-`
-                                as stdin.
-  -o, --output OUTPUT           Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
-  --refresh-per-second REFRESH_PER_SECOND
-                                Number of times to refresh the progress bar per
-                                second. Can be a float e.g. `0.5` meaning once
-                                every two seconds. Use this to limit CPU usage
-                                when launching multiple commands at once.
-                                Defaults to `10`.
-  --silent                      Whether to suppress all the log and progress
-                                bars. Can be useful when piping.
-  -h, --help                    show this help message and exit
+  -h, --help  show this help message and exit
 
 example:
 . Retrieving the "like" number for one url:
@@ -2614,33 +2723,6 @@ example:
 
 . Retrieving the "like" number for the urls listed in a CSV file:
     $ minet fb url-likes url -i url.csv > url_likes.csv
-
-how to use the command with a CSV file?
-
-> A lot of minet commands, including this one, can both be
-> given a single value to process or a bunch of them if
-> given the column of a CSV file passed to -i/--input instead.
-
-> Note that when given a CSV file as input, minet will
-> concatenate the input file columns with the ones added
-> by the command. You can always restrict the input file
-> columns to keep by using the -s/--select flag.
-
-. Here is how to use a command with a single value:
-    $ minet facebook url-likes "value"
-
-. Here is how to use a command with a CSV file:
-    $ minet facebook url-likes column_name -i file.csv
-
-. Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet facebook url-likes column_name -i -
-
-. Here is how to indicate that the CSV column may contain multiple
-  values separated by a special character:
-    $ minet facebook url-likes column_name -i file.csv --explode "|"
-
-. This also works with single values:
-    $ minet facebook url-likes "value1,value2" --explode ","
 ```
 
 ## Google
@@ -2664,7 +2746,7 @@ Subcommands:
 ```
 Usage: minet google sheets [-h] [--silent]
                            [--refresh-per-second REFRESH_PER_SECOND]
-                           [-a AUTHUSER] [-c COOKIE] [-o OUTPUT]
+                           [--single-line] [-a AUTHUSER] [-c COOKIE] [-o OUTPUT]
                            url
 
 # Minet Google Sheets Command
@@ -2694,6 +2776,10 @@ Optional Arguments:
   -c, --cookie COOKIE           Google Drive cookie or browser from which to
                                 extract it (supports "firefox", "chrome",
                                 "chromium", "opera" and "edge").
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -2723,7 +2809,8 @@ Examples:
 ```
 Usage: minet hyphe declare [-h] [--silent]
                            [--refresh-per-second REFRESH_PER_SECOND]
-                           [--password PASSWORD] [--total TOTAL] [-o OUTPUT]
+                           [--single-line] [--password PASSWORD] [--total TOTAL]
+                           [-o OUTPUT]
                            url corpus webentities
 
 # Minet Hyphe Declare Command
@@ -2741,6 +2828,10 @@ Positional Arguments:
 
 Optional Arguments:
   --password PASSWORD           The corpus's password if required.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -2769,7 +2860,7 @@ Examples:
 ```
 Usage: minet hyphe destroy [-h] [--silent]
                            [--refresh-per-second REFRESH_PER_SECOND]
-                           [--password PASSWORD] [-o OUTPUT]
+                           [--single-line] [--password PASSWORD] [-o OUTPUT]
                            url corpus
 
 # Minet Hyphe Destroy Command
@@ -2782,6 +2873,10 @@ Positional Arguments:
 
 Optional Arguments:
   --password PASSWORD           The corpus's password if required.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -2806,9 +2901,9 @@ Examples:
 ```
 Usage: minet hyphe dump [-h] [--silent]
                         [--refresh-per-second REFRESH_PER_SECOND]
-                        [-O OUTPUT_DIR] [--body] [--statuses STATUSES]
-                        [--page-count PAGE_COUNT] [--password PASSWORD]
-                        [-o OUTPUT]
+                        [--single-line] [-O OUTPUT_DIR] [--body]
+                        [--statuses STATUSES] [--page-count PAGE_COUNT]
+                        [--password PASSWORD] [-o OUTPUT]
                         url corpus
 
 # Minet Hyphe Dump Command
@@ -2828,6 +2923,10 @@ Optional Arguments:
                                 Tweak if corpus has large pages or if the
                                 network is unreliable. Defaults to `500`.
   --password PASSWORD           The corpus's password if required.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --statuses STATUSES           Webentity statuses to dump, separated by comma.
                                 Possible statuses being "IN", "OUT", "UNDECIDED"
                                 and "DISCOVERED".
@@ -2855,7 +2954,7 @@ Examples:
 ```
 Usage: minet hyphe reset [-h] [--silent]
                          [--refresh-per-second REFRESH_PER_SECOND]
-                         [--password PASSWORD] [-o OUTPUT]
+                         [--single-line] [--password PASSWORD] [-o OUTPUT]
                          url corpus
 
 # Minet Hyphe Reset Command
@@ -2868,6 +2967,10 @@ Positional Arguments:
 
 Optional Arguments:
   --password PASSWORD           The corpus's password if required.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -2891,8 +2994,8 @@ Examples:
 
 ```
 Usage: minet hyphe tag [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                       [--separator SEPARATOR] [--password PASSWORD]
-                       [--total TOTAL] [-o OUTPUT]
+                       [--single-line] [--separator SEPARATOR]
+                       [--password PASSWORD] [--total TOTAL] [-o OUTPUT]
                        url corpus webentity_id_column tag_columns data
 
 # Minet Hyphe Tag Command
@@ -2912,6 +3015,10 @@ Optional Arguments:
   --password PASSWORD           The corpus's password if required.
   --separator SEPARATOR         Separator use to split multiple tag values in
                                 the same column. Defaults to `|`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -2939,7 +3046,7 @@ Examples:
 
 ```
 Usage: minet instagram [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                       [--refresh-per-second REFRESH_PER_SECOND]
+                       [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
                        {comments,hashtag,post-infos,user-followers,user-following,user-infos,user-posts}
                        ...
 
@@ -2954,6 +3061,10 @@ Optional Arguments:
                                 Defaults to `firefox`. Can also be configured in
                                 a .minetrc file as "instagram.cookie" or read
                                 from the MINET_INSTAGRAM_COOKIE env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
@@ -2978,8 +3089,9 @@ Subcommands:
 ```
 Usage: minet instagram comments [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                 [--refresh-per-second REFRESH_PER_SECOND]
-                                [-l LIMIT] [-i INPUT] [--explode EXPLODE]
-                                [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                                [--single-line] [-l LIMIT] [-i INPUT]
+                                [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                                [-o OUTPUT]
                                 post_or_post_column
 
 # Instagram Comments Command
@@ -3008,6 +3120,10 @@ Optional Arguments:
                                 a .minetrc file as "instagram.cookie" or read
                                 from the MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT             Maximum number of comments to retrieve per post.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -3077,8 +3193,9 @@ how to use the command with a CSV file?
 ```
 Usage: minet instagram hashtag [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                [--refresh-per-second REFRESH_PER_SECOND]
-                               [-l LIMIT] [-i INPUT] [--explode EXPLODE]
-                               [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                               [--single-line] [-l LIMIT] [-i INPUT]
+                               [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                               [-o OUTPUT]
                                hashtag_or_hashtag_column
 
 # Instagram hashtag
@@ -3109,6 +3226,10 @@ Optional Arguments:
                                 a .minetrc file as "instagram.cookie" or read
                                 from the MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT             Maximum number of posts to retrieve per hashtag.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -3178,9 +3299,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet instagram post-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                   [--refresh-per-second REFRESH_PER_SECOND]
-                                  [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                                  [--total TOTAL] [-o OUTPUT]
-                                  post_or_post_column
+                                  [--single-line]
 
 # Instagram post-infos
 
@@ -3199,12 +3318,6 @@ for profile picture urls retrieved as the "profile_pic_url_hd" in
 the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
-Positional Arguments:
-  post_or_post_column           Single post url, post shortcode or post id to
-                                process or name of the CSV column containing
-                                post urls, post shortcodes or post ids when
-                                using -i/--input.
-
 Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
@@ -3212,23 +3325,10 @@ Optional Arguments:
                                 Defaults to `firefox`. Can also be configured in
                                 a .minetrc file as "instagram.cookie" or read
                                 from the MINET_INSTAGRAM_COOKIE env variable.
-  -s, --select SELECT           Columns of -i/--input CSV file to include in the
-                                output (separated by `,`). Use an empty string
-                                if you don't want to keep anything: --select ''.
-  --explode EXPLODE             Use to indicate the character used to separate
-                                multiple values in a single CSV cell. Defaults
-                                to none, i.e. CSV cells having a single values,
-                                which is usually the case.
-  --total TOTAL                 Total number of items to process. Might be
-                                necessary when you want to display a finite
-                                progress indicator for large files given as
-                                input to the command.
-  -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the post urls, post shortcodes or post ids you
-                                want to process. Will consider `-` as stdin.
-  -o, --output OUTPUT           Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
@@ -3247,33 +3347,6 @@ example:
 
 . Searching infos for the post https://www.instagram.com/p/CpA46rmU26Y/:
     $ minet instagram post-infos https://www.instagram.com/p/CpA46rmU26Y/ > post_infos.csv
-
-how to use the command with a CSV file?
-
-> A lot of minet commands, including this one, can both be
-> given a single value to process or a bunch of them if
-> given the column of a CSV file passed to -i/--input instead.
-
-> Note that when given a CSV file as input, minet will
-> concatenate the input file columns with the ones added
-> by the command. You can always restrict the input file
-> columns to keep by using the -s/--select flag.
-
-. Here is how to use a command with a single value:
-    $ minet instagram post-infos "value"
-
-. Here is how to use a command with a CSV file:
-    $ minet instagram post-infos column_name -i file.csv
-
-. Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet instagram post-infos column_name -i -
-
-. Here is how to indicate that the CSV column may contain multiple
-  values separated by a special character:
-    $ minet instagram post-infos column_name -i file.csv --explode "|"
-
-. This also works with single values:
-    $ minet instagram post-infos "value1,value2" --explode ","
 ```
 
 ### user-followers
@@ -3282,8 +3355,9 @@ how to use the command with a CSV file?
 Usage: minet instagram user-followers [-h] [-c COOKIE] [--rcfile RCFILE]
                                       [--silent]
                                       [--refresh-per-second REFRESH_PER_SECOND]
-                                      [-l LIMIT] [-i INPUT] [--explode EXPLODE]
-                                      [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                                      [--single-line] [-l LIMIT] [-i INPUT]
+                                      [--explode EXPLODE] [-s SELECT]
+                                      [--total TOTAL] [-o OUTPUT]
                                       user_or_user_column
 
 # Instagram User Followers Command
@@ -3304,7 +3378,7 @@ for profile picture urls retrieved as the "profile_pic_url" in
 the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
-If a username is a number without '@' at the begining, it will be
+If a username is a number without '@' at the beginning, it will be
 considered as an id.
 
 Positional Arguments:
@@ -3321,6 +3395,10 @@ Optional Arguments:
                                 from the MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT             Maximum number of followers to retrieve per
                                 user.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -3391,8 +3469,9 @@ how to use the command with a CSV file?
 Usage: minet instagram user-following [-h] [-c COOKIE] [--rcfile RCFILE]
                                       [--silent]
                                       [--refresh-per-second REFRESH_PER_SECOND]
-                                      [-l LIMIT] [-i INPUT] [--explode EXPLODE]
-                                      [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                                      [--single-line] [-l LIMIT] [-i INPUT]
+                                      [--explode EXPLODE] [-s SELECT]
+                                      [--total TOTAL] [-o OUTPUT]
                                       user_or_user_column
 
 # Instagram User Following Command
@@ -3412,7 +3491,7 @@ for profile picture urls retrieved as the "profile_pic_url" in
 the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
-If a username is a number without '@' at the begining, it will be
+If a username is a number without '@' at the beginning, it will be
 considered as an id.
 
 Positional Arguments:
@@ -3428,6 +3507,10 @@ Optional Arguments:
                                 a .minetrc file as "instagram.cookie" or read
                                 from the MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT             Maximum number of accounts to retrieve per user.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -3497,9 +3580,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet instagram user-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                   [--refresh-per-second REFRESH_PER_SECOND]
-                                  [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                                  [--total TOTAL] [-o OUTPUT]
-                                  user_or_user_column
+                                  [--single-line]
 
 # Instagram user-infos
 
@@ -3518,13 +3599,8 @@ for profile picture urls retrieved as the "profile_pic_url_hd" in
 the result. Be sure to download them fast if you need them (you can
 use the `minet fetch` command for that, and won't need to use cookies).
 
-If a username is a number without '@' at the begining, it will be
+If a username is a number without '@' at the beginning, it will be
 considered as an id.
-
-Positional Arguments:
-  user_or_user_column           Single username, user url or user id to process
-                                or name of the CSV column containing usernames,
-                                user urls or user ids when using -i/--input.
 
 Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
@@ -3533,23 +3609,10 @@ Optional Arguments:
                                 Defaults to `firefox`. Can also be configured in
                                 a .minetrc file as "instagram.cookie" or read
                                 from the MINET_INSTAGRAM_COOKIE env variable.
-  -s, --select SELECT           Columns of -i/--input CSV file to include in the
-                                output (separated by `,`). Use an empty string
-                                if you don't want to keep anything: --select ''.
-  --explode EXPLODE             Use to indicate the character used to separate
-                                multiple values in a single CSV cell. Defaults
-                                to none, i.e. CSV cells having a single values,
-                                which is usually the case.
-  --total TOTAL                 Total number of items to process. Might be
-                                necessary when you want to display a finite
-                                progress indicator for large files given as
-                                input to the command.
-  -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the usernames, user urls or user ids you want to
-                                process. Will consider `-` as stdin.
-  -o, --output OUTPUT           Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
@@ -3568,33 +3631,6 @@ example:
 
 . Searching infos with the username banksrepeta:
     $ minet instagram user-infos banksrepeta > banksrepeta_infos.csv
-
-how to use the command with a CSV file?
-
-> A lot of minet commands, including this one, can both be
-> given a single value to process or a bunch of them if
-> given the column of a CSV file passed to -i/--input instead.
-
-> Note that when given a CSV file as input, minet will
-> concatenate the input file columns with the ones added
-> by the command. You can always restrict the input file
-> columns to keep by using the -s/--select flag.
-
-. Here is how to use a command with a single value:
-    $ minet instagram user-infos "value"
-
-. Here is how to use a command with a CSV file:
-    $ minet instagram user-infos column_name -i file.csv
-
-. Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet instagram user-infos column_name -i -
-
-. Here is how to indicate that the CSV column may contain multiple
-  values separated by a special character:
-    $ minet instagram user-infos column_name -i file.csv --explode "|"
-
-. This also works with single values:
-    $ minet instagram user-infos "value1,value2" --explode ","
 ```
 
 ### user-posts
@@ -3602,8 +3638,9 @@ how to use the command with a CSV file?
 ```
 Usage: minet instagram user-posts [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                   [--refresh-per-second REFRESH_PER_SECOND]
-                                  [-l LIMIT] [-i INPUT] [--explode EXPLODE]
-                                  [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                                  [--single-line] [-l LIMIT] [-i INPUT]
+                                  [--explode EXPLODE] [-s SELECT]
+                                  [--total TOTAL] [-o OUTPUT]
                                   user_or_user_column
 
 # Instagram User Posts Command
@@ -3625,7 +3662,7 @@ media is a video). Be sure to download them fast if you need
 them (you can use the `minet fetch` command for that, and
 won't need to use cookies).
 
-If a username is a number without '@' at the begining, it will be
+If a username is a number without '@' at the beginning, it will be
 considered as an id.
 
 Positional Arguments:
@@ -3641,6 +3678,10 @@ Optional Arguments:
                                 a .minetrc file as "instagram.cookie" or read
                                 from the MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT             Maximum number of posts to retrieve per user.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -3712,8 +3753,9 @@ how to use the command with a CSV file?
 ```
 Usage: minet mediacloud medias [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
                                [--refresh-per-second REFRESH_PER_SECOND]
-                               [--feeds FEEDS] [-i INPUT] [--explode EXPLODE]
-                               [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                               [--single-line] [--feeds FEEDS] [-i INPUT]
+                               [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                               [-o OUTPUT]
                                media_or_media_column
 
 # Minet Mediacloud Medias Command
@@ -3728,6 +3770,10 @@ Positional Arguments:
 Optional Arguments:
   --feeds FEEDS                 If given, path of the CSV file listing media RSS
                                 feeds.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -t, --token TOKEN             Mediacloud API token (also called "key"
                                 sometimes). Can also be configured in a .minetrc
                                 file as "mediacloud.token" or read from the
@@ -3796,8 +3842,9 @@ how to use the command with a CSV file?
 ```
 Usage: minet mediacloud search [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
                                [--refresh-per-second REFRESH_PER_SECOND]
-                               [-c COLLECTIONS] [--filter-query FILTER_QUERY]
-                               [-m MEDIAS] [--publish-day PUBLISH_DAY]
+                               [--single-line] [-c COLLECTIONS]
+                               [--filter-query FILTER_QUERY] [-m MEDIAS]
+                               [--publish-day PUBLISH_DAY]
                                [--publish-month PUBLISH_MONTH]
                                [--publish-year PUBLISH_YEAR] [--skip-count]
                                [-o OUTPUT]
@@ -3828,6 +3875,10 @@ Optional Arguments:
                                 (iso format, e.g. "2018-03").
   --publish-year PUBLISH_YEAR   Only search stories published on provided year
                                 (iso format, e.g. "2018").
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --skip-count                  Whether to skip the first API call counting the
                                 number of posts for the progress bar.
   -t, --token TOKEN             Mediacloud API token (also called "key"
@@ -3860,8 +3911,9 @@ Optional Arguments:
 Usage: minet mediacloud topic stories [-h] [-t TOKEN] [--rcfile RCFILE]
                                       [--silent]
                                       [--refresh-per-second REFRESH_PER_SECOND]
-                                      [--media-id MEDIA_ID]
+                                      [--single-line] [--media-id MEDIA_ID]
                                       [--from-media-id FROM_MEDIA_ID]
+                                      [-o OUTPUT]
                                       topic_id
 
 # Minet Mediacloud Topic Stories Command
@@ -3877,10 +3929,17 @@ Optional Arguments:
                                 in the given media_id.
   --media-id MEDIA_ID           Return only stories belonging to the given
                                 media_ids.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -t, --token TOKEN             Mediacloud API token (also called "key"
                                 sometimes). Can also be configured in a .minetrc
                                 file as "mediacloud.token" or read from the
                                 MINET_MEDIACLOUD_TOKEN env variable.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
@@ -3903,7 +3962,8 @@ Optional Arguments:
 ```
 Usage: minet telegram channel-infos [-h] [--throttle THROTTLE] [--silent]
                                     [--refresh-per-second REFRESH_PER_SECOND]
-                                    [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                    [--single-line] [-i INPUT]
+                                    [--explode EXPLODE] [-s SELECT]
                                     [--total TOTAL] [-o OUTPUT]
                                     channel_name_or_channel_name_column
 
@@ -3918,6 +3978,10 @@ Positional Arguments:
                                 when using -i/--input.
 
 Optional Arguments:
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `0.5`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -3984,8 +4048,9 @@ how to use the command with a CSV file?
 ```
 Usage: minet telegram channel-messages [-h] [--throttle THROTTLE] [--silent]
                                        [--refresh-per-second REFRESH_PER_SECOND]
-                                       [-i INPUT] [--explode EXPLODE]
-                                       [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                                       [--single-line] [-i INPUT]
+                                       [--explode EXPLODE] [-s SELECT]
+                                       [--total TOTAL] [-o OUTPUT]
                                        channel_name_or_channel_name_column
 
 # Minet Telegram Channel-Messages Command
@@ -3999,6 +4064,10 @@ Positional Arguments:
                                 when using -i/--input.
 
 Optional Arguments:
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `0.5`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -4081,8 +4150,9 @@ Subcommands:
 ```
 Usage: minet tiktok search-videos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                   [--refresh-per-second REFRESH_PER_SECOND]
-                                  [-l LIMIT] [-i INPUT] [--explode EXPLODE]
-                                  [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                                  [--single-line] [-l LIMIT] [-i INPUT]
+                                  [--explode EXPLODE] [-s SELECT]
+                                  [--total TOTAL] [-o OUTPUT]
                                   query_or_query_column
 
 # Tiktok Search Videos Command
@@ -4120,6 +4190,10 @@ Optional Arguments:
                                 a .minetrc file as "tiktok.cookie" or read from
                                 the MINET_TIKTOK_COOKIE env variable.
   -l, --limit LIMIT             Maximum number of videos to retrieve per query.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -4191,8 +4265,8 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter attrition [-h] [--user USER] [--silent]
                                [--refresh-per-second REFRESH_PER_SECOND]
-                               [--retweeted-id RETWEETED_ID] [--ids]
-                               [--api-key API_KEY] [--rcfile RCFILE]
+                               [--single-line] [--retweeted-id RETWEETED_ID]
+                               [--ids] [--api-key API_KEY] [--rcfile RCFILE]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -4205,7 +4279,7 @@ Usage: minet twitter attrition [-h] [--user USER] [--silent]
 Using Twitter API to find whether batches of tweets are still
 available today and if they aren't, attempt to find a reason why.
 
-This command relies on tweet ids or tweet urls. We recommand to add `--user` and
+This command relies on tweet ids or tweet urls. We recommend to add `--user` and
 the tweet's user id to the command if you can, as more information can
 be obtained when the user id (or the full url) is known.
 
@@ -4266,6 +4340,10 @@ Optional Arguments:
   --retweeted-id RETWEETED_ID   Name of the column containing the ids of the
                                 original tweets in case the tweets no longer
                                 available were retweets.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --user USER                   Name of the column containing the tweet's author
                                 (given as ids or screen names). This is useful
                                 to have more information on a tweet's
@@ -4343,8 +4421,9 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter followers [-h] [--ids] [--silent]
-                               [--refresh-per-second REFRESH_PER_SECOND] [--v2]
-                               [--api-key API_KEY] [--rcfile RCFILE]
+                               [--refresh-per-second REFRESH_PER_SECOND]
+                               [--single-line] [--v2] [--api-key API_KEY]
+                               [--rcfile RCFILE]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
                                [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -4382,6 +4461,10 @@ Optional Arguments:
                                 env variable.
   --ids                         Whether your users are given as ids rather than
                                 screen names.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --v2                          Whether to use latest Twitter API v2 rather than
                                 v1.1.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -4454,9 +4537,9 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter friends [-h] [--ids] [--silent]
-                             [--refresh-per-second REFRESH_PER_SECOND] [--v2]
-                             [--api-key API_KEY] [--rcfile RCFILE]
-                             [--api-secret-key API_SECRET_KEY]
+                             [--refresh-per-second REFRESH_PER_SECOND]
+                             [--single-line] [--v2] [--api-key API_KEY]
+                             [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
                              [--access-token ACCESS_TOKEN]
                              [--access-token-secret ACCESS_TOKEN_SECRET]
                              [-i INPUT] [--explode EXPLODE] [-s SELECT]
@@ -4493,6 +4576,10 @@ Optional Arguments:
                                 env variable.
   --ids                         Whether your users are given as ids rather than
                                 screen names.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --v2                          Whether to use latest Twitter API v2 rather than
                                 v1.1.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -4567,6 +4654,7 @@ how to use the command with a CSV file?
 Usage: minet twitter list-followers [-h] [--api-key API_KEY] [--rcfile RCFILE]
                                     [--silent]
                                     [--refresh-per-second REFRESH_PER_SECOND]
+                                    [--single-line]
                                     [--api-secret-key API_SECRET_KEY]
                                     [--access-token ACCESS_TOKEN]
                                     [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -4601,6 +4689,10 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -4671,6 +4763,7 @@ how to use the command with a CSV file?
 Usage: minet twitter list-members [-h] [--api-key API_KEY] [--rcfile RCFILE]
                                   [--silent]
                                   [--refresh-per-second REFRESH_PER_SECOND]
+                                  [--single-line]
                                   [--api-secret-key API_SECRET_KEY]
                                   [--access-token ACCESS_TOKEN]
                                   [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -4705,6 +4798,10 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -4774,7 +4871,8 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter retweeters [-h] [--timezone TIMEZONE] [--silent]
                                 [--refresh-per-second REFRESH_PER_SECOND]
-                                [--api-key API_KEY] [--rcfile RCFILE]
+                                [--single-line] [--api-key API_KEY]
+                                [--rcfile RCFILE]
                                 [--api-secret-key API_SECRET_KEY]
                                 [--access-token ACCESS_TOKEN]
                                 [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -4809,6 +4907,10 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -4880,7 +4982,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter scrape [-h] [--silent]
                             [--refresh-per-second REFRESH_PER_SECOND]
-                            [--include-refs] [-l LIMIT]
+                            [--single-line] [--include-refs] [-l LIMIT]
                             [--query-template QUERY_TEMPLATE] [-c COOKIE]
                             [--rcfile RCFILE] [--timezone TIMEZONE] [-i INPUT]
                             [--explode EXPLODE] [-s SELECT] [--total TOTAL]
@@ -4940,6 +5042,10 @@ Optional Arguments:
                                 Query template. Can be useful for instance to
                                 change a column of twitter user screen names
                                 into from:@user queries.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -5032,8 +5138,8 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter tweet-date [-h] [--timezone TIMEZONE] [--silent]
                                 [--refresh-per-second REFRESH_PER_SECOND]
-                                [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                                [--total TOTAL] [-o OUTPUT]
+                                [--single-line] [-i INPUT] [--explode EXPLODE]
+                                [-s SELECT] [--total TOTAL] [-o OUTPUT]
                                 tweet_or_tweet_column
 
 # Minet Twitter Tweet Date Command
@@ -5046,6 +5152,10 @@ Positional Arguments:
                                 using -i/--input.
 
 Optional Arguments:
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -5112,7 +5222,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter tweet-search [-h] [--since-id SINCE_ID] [--silent]
                                   [--refresh-per-second REFRESH_PER_SECOND]
-                                  [--until-id UNTIL_ID]
+                                  [--single-line] [--until-id UNTIL_ID]
                                   [--start-time START_TIME]
                                   [--end-time END_TIME] [--academic]
                                   [--timezone TIMEZONE]
@@ -5165,6 +5275,10 @@ Optional Arguments:
   --since-id SINCE_ID           Will return tweets with ids that are greater
                                 than the specified id. Takes precedence over
                                 --start-time.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --sort-order {recency,relevancy}
                                 How to sort retrieved tweets. Defaults to
                                 `recency`.
@@ -5249,10 +5363,10 @@ how to use the command with a CSV file?
 Usage: minet twitter tweet-count [-h] [--granularity {day,hour,minute}]
                                  [--silent]
                                  [--refresh-per-second REFRESH_PER_SECOND]
-                                 [--since-id SINCE_ID] [--until-id UNTIL_ID]
-                                 [--start-time START_TIME] [--end-time END_TIME]
-                                 [--academic] [--api-key API_KEY]
-                                 [--rcfile RCFILE]
+                                 [--single-line] [--since-id SINCE_ID]
+                                 [--until-id UNTIL_ID] [--start-time START_TIME]
+                                 [--end-time END_TIME] [--academic]
+                                 [--api-key API_KEY] [--rcfile RCFILE]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -5328,6 +5442,10 @@ Optional Arguments:
   --since-id SINCE_ID           Will return tweets with ids that are greater
                                 than the specified id. Takes precedence over
                                 --start-time.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --start-time START_TIME       The oldest UTC datetime from which the tweets
                                 will be counted. The date should have the format
                                 : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates
@@ -5409,8 +5527,9 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter tweets [-h] [--v2] [--silent]
                             [--refresh-per-second REFRESH_PER_SECOND]
-                            [--timezone TIMEZONE] [--api-key API_KEY]
-                            [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
+                            [--single-line] [--timezone TIMEZONE]
+                            [--api-key API_KEY] [--rcfile RCFILE]
+                            [--api-secret-key API_SECRET_KEY]
                             [--access-token ACCESS_TOKEN]
                             [--access-token-secret ACCESS_TOKEN_SECRET]
                             [-i INPUT] [--explode EXPLODE] [-s SELECT]
@@ -5444,6 +5563,10 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   --v2                          Whether to use latest Twitter API v2 rather than
@@ -5518,9 +5641,10 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet twitter users [-h] [--ids] [--silent]
-                           [--refresh-per-second REFRESH_PER_SECOND] [--v2]
-                           [--timezone TIMEZONE] [--api-key API_KEY]
-                           [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
+                           [--refresh-per-second REFRESH_PER_SECOND]
+                           [--single-line] [--v2] [--timezone TIMEZONE]
+                           [--api-key API_KEY] [--rcfile RCFILE]
+                           [--api-secret-key API_SECRET_KEY]
                            [--access-token ACCESS_TOKEN]
                            [--access-token-secret ACCESS_TOKEN_SECRET]
                            [-i INPUT] [--explode EXPLODE] [-s SELECT]
@@ -5556,6 +5680,10 @@ Optional Arguments:
                                 env variable.
   --ids                         Whether your users are given as ids rather than
                                 screen names.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   --v2                          Whether to use latest Twitter API v2 rather than
@@ -5631,7 +5759,8 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter user-search [-h] [--timezone TIMEZONE] [--silent]
                                  [--refresh-per-second REFRESH_PER_SECOND]
-                                 [--api-key API_KEY] [--rcfile RCFILE]
+                                 [--single-line] [--api-key API_KEY]
+                                 [--rcfile RCFILE]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -5669,6 +5798,10 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -5743,9 +5876,10 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter user-tweets [-h] [--ids] [--silent]
                                  [--refresh-per-second REFRESH_PER_SECOND]
-                                 [--min-date MIN_DATE] [--exclude-retweets]
-                                 [--v2] [--timezone TIMEZONE]
-                                 [--api-key API_KEY] [--rcfile RCFILE]
+                                 [--single-line] [--min-date MIN_DATE]
+                                 [--exclude-retweets] [--v2]
+                                 [--timezone TIMEZONE] [--api-key API_KEY]
+                                 [--rcfile RCFILE]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
                                  [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -5788,6 +5922,10 @@ Optional Arguments:
   --min-date MIN_DATE           Whether to add a date to stop at for user's
                                 tweets retrieval. UTC date should have the
                                 following format : YYYY-MM-DD
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   --v2                          Whether to use latest Twitter API v2 rather than
@@ -5863,8 +6001,8 @@ how to use the command with a CSV file?
 ```
 Usage: minet wikipedia pageviews [-h] --start-date START_DATE [--silent]
                                  [--refresh-per-second REFRESH_PER_SECOND]
-                                 --end-date END_DATE [--agent AGENT]
-                                 [--access ACCESS] [-t THREADS]
+                                 [--single-line] --end-date END_DATE
+                                 [--agent AGENT] [--access ACCESS] [-t THREADS]
                                  [--granularity GRANULARITY] [--sum]
                                  [--lang LANG] [--lang-column LANG_COLUMN]
                                  [-i INPUT] [--explode EXPLODE] [-s SELECT]
@@ -5893,6 +6031,10 @@ Optional Arguments:
   --granularity GRANULARITY     Pageviews granularity. Defaults to `monthly`.
   --lang LANG                   Lang for the given pages.
   --lang-column LANG_COLUMN     Name of a CSV column containing page lang.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --start-date START_DATE       Starting date. Must be of format YYYYMMDD (e.g.
                                 20151031) or YYYYMMDDHH (e.g. 2015103100)
   --sum                         Whether to sum the collected pageviews rather
@@ -5962,8 +6104,8 @@ how to use the command with a CSV file?
 ```
 Usage: minet youtube captions [-h] [--lang LANG] [--silent]
                               [--refresh-per-second REFRESH_PER_SECOND]
-                              [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                              [--total TOTAL] [-o OUTPUT]
+                              [--single-line] [-i INPUT] [--explode EXPLODE]
+                              [-s SELECT] [--total TOTAL] [-o OUTPUT]
                               video_or_video_column
 
 # Youtube captions
@@ -5980,6 +6122,10 @@ Optional Arguments:
                                 retrieve. You can specify several languages by
                                 preferred order separated by commas. Defaults to
                                 `en`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -6048,7 +6194,8 @@ how to use the command with a CSV file?
 ```
 Usage: minet youtube channel-videos [-h] [-k KEY] [--rcfile RCFILE] [--silent]
                                     [--refresh-per-second REFRESH_PER_SECOND]
-                                    [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                                    [--single-line] [-i INPUT]
+                                    [--explode EXPLODE] [-s SELECT]
                                     [--total TOTAL] [-o OUTPUT]
                                     channel_or_channel_column
 
@@ -6071,6 +6218,10 @@ Optional Arguments:
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
                                 MINET_YOUTUBE_KEY env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -6141,15 +6292,13 @@ how to use the command with a CSV file?
     $ minet youtube channel-videos "value1,value2" --explode ","
 ```
 
-<h3 id="youtube-comments">comments</h3>
-
 ### channels
 
 ```
 Usage: minet youtube channels [-h] [-k KEY] [--rcfile RCFILE] [--silent]
                               [--refresh-per-second REFRESH_PER_SECOND]
-                              [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                              [--total TOTAL] [-o OUTPUT]
+                              [--single-line] [-i INPUT] [--explode EXPLODE]
+                              [-s SELECT] [--total TOTAL] [-o OUTPUT]
                               channel_or_channel_column
 
 # Youtube Channels Command
@@ -6170,6 +6319,10 @@ Optional Arguments:
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
                                 MINET_YOUTUBE_KEY env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -6240,11 +6393,13 @@ how to use the command with a CSV file?
     $ minet youtube channels "value1,value2" --explode ","
 ```
 
+<h3 id="youtube-comments">comments</h3>
+
 ```
 Usage: minet youtube comments [-h] [-k KEY] [--rcfile RCFILE] [--silent]
                               [--refresh-per-second REFRESH_PER_SECOND]
-                              [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                              [--total TOTAL] [-o OUTPUT]
+                              [--single-line] [-i INPUT] [--explode EXPLODE]
+                              [-s SELECT] [--total TOTAL] [-o OUTPUT]
                               video_or_video_column
 
 # Youtube comments
@@ -6260,6 +6415,10 @@ Optional Arguments:
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
                                 MINET_YOUTUBE_KEY env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -6329,6 +6488,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet youtube search [-h] [-l LIMIT] [--silent]
                             [--refresh-per-second REFRESH_PER_SECOND]
+                            [--single-line]
                             [--order {date,rating,relevance,title,videoCount,viewCount}]
                             [-k KEY] [--rcfile RCFILE] [-i INPUT]
                             [--explode EXPLODE] [-s SELECT] [--total TOTAL]
@@ -6355,6 +6515,10 @@ Optional Arguments:
   --order {date,rating,relevance,title,videoCount,viewCount}
                                 Order in which videos are retrieved. The default
                                 one is relevance. Defaults to `relevance`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -6423,9 +6587,9 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet youtube videos [-h] [-k KEY] [--rcfile RCFILE] [--silent]
-                            [--refresh-per-second REFRESH_PER_SECOND] [-i INPUT]
-                            [--explode EXPLODE] [-s SELECT] [--total TOTAL]
-                            [-o OUTPUT]
+                            [--refresh-per-second REFRESH_PER_SECOND]
+                            [--single-line] [-i INPUT] [--explode EXPLODE]
+                            [-s SELECT] [--total TOTAL] [-o OUTPUT]
                             video_or_video_column
 
 # Youtube videos
@@ -6441,6 +6605,10 @@ Optional Arguments:
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
                                 MINET_YOUTUBE_KEY env variable.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.

@@ -26,7 +26,7 @@ SCRAPE_COMMAND = command(
         and use dedicated flags such as --status-column, --body-column to
         to inform the command about your specific table.
 
-        The comand is also able to work on glob patterns, such as: "downloaded/**/*.html",
+        The command is also able to work on glob patterns, such as: "downloaded/**/*.html",
         and can also be fed CSV columns containing HTML content directly if
         required.
     """,
@@ -52,7 +52,7 @@ SCRAPE_COMMAND = command(
         . Indicating a custom filename column (named "path"):
             $ minet scrape scraper.yml path -i report.csv -I downloaded > scraped.csv
 
-        . Scraping a CSV colum containing HTML directly:
+        . Scraping a CSV column containing HTML directly:
             $ minet scrape scraper.yml -i report.csv --body-column html > scraped.csv
 
         . Scraping a bunch of files using a glob pattern:

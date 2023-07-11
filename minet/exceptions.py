@@ -10,12 +10,12 @@ from minet.utils import message_flatmap
 # Base minet error
 class MinetError(Exception):
     def __init__(self, message=None):
-        if message is not None:
+        if message:
             message = message_flatmap(message)
 
-        self.message = message
+        self.message = message or ""
 
-        if message is None:
+        if not message:
             super().__init__()
         else:
             super().__init__(message)
@@ -58,7 +58,7 @@ class CouldNotInferEncodingError(MinetError):
 # Cookie errors
 class UnknownBrowserError(MinetError):
     def __init__(self, browser: str):
-        super().__init__("Unkown browser: %s" % browser)
+        super().__init__("Unknown browser: %s" % browser)
         self.browser = browser
 
 
@@ -145,15 +145,15 @@ class UnknownSpiderError(CrawlError):
 
 # Extraction errors
 class TrafilaturaError(MinetError):
-    def __init__(self, msg=None, reason=None):
-        super().__init__(msg)
+    def __init__(self, message=None, reason=None):
+        super().__init__(message)
         self.reason = reason
 
 
 # Filesystem errors
 class FilenameFormattingError(MinetError):
-    def __init__(self, msg=None, reason=None, template=None):
-        super().__init__(msg)
+    def __init__(self, message=None, reason=None, template=None):
+        super().__init__(message)
         self.reason = reason
         self.template = template
 

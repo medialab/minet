@@ -1,4 +1,4 @@
-from typing import TypeVar, Union, Generic, Optional
+from typing import TypeVar, Union, Generic, Optional, List
 
 import json
 from nanoid import generate
@@ -195,6 +195,7 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
         "resolved_url",
         "error",
         "status",
+        "mimetype",
         "degree",
         "body_size",
     ]
@@ -204,6 +205,10 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
     error: Optional[Exception]
     response: Optional[Response]
     degree: int
+
+    @classmethod
+    def fieldnames(cls) -> List[str]:
+        return cls.FIELDNAMES
 
     def __init__(self, job: CrawlJob[CrawlJobDataType]):
         self.job = job
@@ -228,7 +233,7 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
     def error_code(self) -> Optional[str]:
         return serialize_error_as_slug(self.error) if self.error else None
 
-    def as_csv_row(self):
+    def __csv_row__(self):
         job = self.job
 
         return [
@@ -240,9 +245,13 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
             self.response.end_url if self.response else None,
             self.error_code,
             self.response.status if self.response else None,
+            self.response.mimetype if self.response else None,
             self.degree,
             len(self.response) if self.response else None,
         ]
+
+    def as_csv_row(self):
+        return self.__csv_row__()
 
     def __repr__(self) -> str:
         return format_repr(
@@ -260,6 +269,7 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
                         type(self.data).__name__ if self.data is not None else None,
                     ),
                     ("size", self.response.human_size if self.response else None),
+                    ("mimetype", self.response.mimetype if self.response else None),
                 )
             ),
             conditionals=("spider", "error", "status", "degree", "dtype"),

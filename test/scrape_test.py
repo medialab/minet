@@ -65,7 +65,7 @@ NESTED_HTML = """
 """
 
 META_HTML = """
-    Exemple
+    Example
     <div id="ok">
         <ul>
             <li id="li1">One</li>
@@ -195,7 +195,7 @@ class TestScrape(object):
             BASIC_HTML,
         )
 
-        result == ["li1-test", "li2-test"]
+        assert result == ["li1-test", "li2-test"]
 
         result = scrape(
             {"iterator": "li", "fields": {"id": "id", "text": "text"}}, BASIC_HTML

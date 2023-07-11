@@ -1,10 +1,11 @@
 from casanova import ThreadSafeResumer
 
-from minet.cli.argparse import command, BooleanAction
+from minet.cli.argparse import command, BooleanAction, FolderStrategyType
 from minet.cli.constants import DEFAULT_CONTENT_FOLDER
 from minet.cli.exceptions import InvalidArgumentsError
 
 # TODO: lazyloading issue
+from minet.fs import FolderStrategy
 from minet.constants import (
     COOKIE_BROWSERS,
     DEFAULT_THROTTLE,
@@ -89,7 +90,7 @@ FETCH_COMMAND = command(
         HTTP calls and will generally write the retrieved files in a folder
         given by the user.
     """,
-    epilog="""
+    epilog=f"""
         Columns being added to the output:
 
         . "fetch_original_index": index of the line in the original file (the output will be
@@ -108,21 +109,7 @@ FETCH_COMMAND = command(
 
         --folder-strategy options:
 
-        . "flat": default choice, all files will be written in the indicated
-            content folder.
-
-        . "prefix-x": e.g. "prefix-4", files will be written in folders
-            having a name that is the first x characters of the file's name.
-            This is an efficient way to partition content into folders containing
-            roughly the same number of files if the file names are random (which
-            is the case by default since md5 hashes will be used).
-
-        . "hostname": files will be written in folders based on their url's
-            full host name.
-
-        . "normalized-hostname": files will be written in folders based on
-            their url's hostname stripped of some undesirable parts (such as
-            "www.", or "m." or "fr.", for instance).
+        {FolderStrategy.DOCUMENTATION}
 
         Examples:
 
@@ -130,13 +117,13 @@ FETCH_COMMAND = command(
             $ minet fetch "https://www.lemonde.fr"
 
         . Fetching a batch of url from existing CSV file:
-            $ minet fetch url file.csv > report.csv
+            $ minet fetch url -i file.csv > report.csv
 
         . CSV input from stdin (mind the `-`):
             $ xsv select url file.csv | minet fetch url -i - > report.csv
 
-        . Dowloading files in specific output directory:
-            $ minet fetch url file.csv -O html > report.csv
+        . Downloading files in specific output directory:
+            $ minet fetch url -i file.csv -O html > report.csv
     """,
     resolve=resolve_fetch_arguments,
     resumer=ThreadSafeResumer,
@@ -150,7 +137,7 @@ FETCH_COMMAND = command(
             "default": DEFAULT_FETCH_MAX_REDIRECTS,
         },
         {
-            "flag": "--compress",
+            "flags": ["-z", "--compress"],
             "help": "Whether to compress the contents.",
             "action": "store_true",
         },
@@ -182,6 +169,7 @@ FETCH_COMMAND = command(
             "flag": "--folder-strategy",
             "help": "Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. All of the strategies are described at the end of this help.",
             "default": "flat",
+            "type": FolderStrategyType(),
         },
         {
             "flag": "--keep-failed-contents",

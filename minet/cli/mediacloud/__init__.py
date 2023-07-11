@@ -6,13 +6,12 @@
 #
 from minet.cli.argparse import (
     command,
-    subcommand,
     ConfigAction,
     OutputAction,
     SplitterType,
 )
 
-MEDIACLOUD_MEDIAS_SUBCOMMAND = subcommand(
+MEDIACLOUD_MEDIAS_SUBCOMMAND = command(
     "medias",
     "minet.cli.mediacloud.medias",
     title="Minet Mediacloud Medias Command",
@@ -29,7 +28,7 @@ MEDIACLOUD_MEDIAS_SUBCOMMAND = subcommand(
     ],
 )
 
-MEDIACLOUD_SEARCH_SUBCOMMAND = subcommand(
+MEDIACLOUD_SEARCH_SUBCOMMAND = command(
     "search",
     "minet.cli.mediacloud.search",
     title="Minet Mediacloud Search Command",
@@ -75,37 +74,29 @@ MEDIACLOUD_SEARCH_SUBCOMMAND = subcommand(
     ],
 )
 
-# TODO: unnest into topic-stories one day
-MEDIACLOUD_TOPIC_SUBCOMMAND = subcommand(
+MEDIACLOUD_TOPIC_STORIES_SUBCOMMAND = command(
+    "stories",
+    "minet.cli.mediacloud.topic.stories",
+    title="Minet Mediacloud Topic Stories Command",
+    description="Retrieves the list of stories from a mediacloud topic.",
+    arguments=[
+        {"name": "topic_id", "help": "Id of the topic."},
+        {
+            "flag": "--media-id",
+            "help": "Return only stories belonging to the given media_ids.",
+        },
+        {
+            "flag": "--from-media-id",
+            "help": "Return only stories that are linked from stories in the given media_id.",
+        },
+    ],
+)
+
+MEDIACLOUD_TOPIC_SUBCOMMAND = command(
     "topic",
     "minet.cli.mediacloud.topic",
-    title="Minet Mediacloud Topic Command",
-    description="""
-        Gather information and aggregated stats about pages and groups of
-        the designated dashboard (indicated by a given token).
-    """,
-    subparsers={
-        "help": "Topic action to perform.",
-        "title": "topic_actions",
-        "dest": "mc_topic_action",
-        "commands": {
-            "stories": {
-                "title": "Minet Mediacloud Topic Stories Command",
-                "description": "Retrieves the list of stories from a mediacloud topic.",
-                "arguments": [
-                    {"name": "topic_id", "help": "Id of the topic."},
-                    {
-                        "flag": "--media-id",
-                        "help": "Return only stories belonging to the given media_ids.",
-                    },
-                    {
-                        "flag": "--from-media-id",
-                        "help": "Return only stories that are linked from stories in the given media_id.",
-                    },
-                ],
-            }
-        },
-    },
+    title="Minet Mediacloud Topic Commands",
+    subcommands=[MEDIACLOUD_TOPIC_STORIES_SUBCOMMAND],
 )
 
 MEDIACLOUD_COMMAND = command(

@@ -4,7 +4,7 @@
 #
 # Logic of the `tl` action.
 #
-from minet.cli.argparse import command, subcommand
+from minet.cli.argparse import command
 
 # TODO: this is a lazyloading problem
 from minet.telegram.constants import TELEGRAM_DEFAULT_THROTTLE
@@ -16,7 +16,7 @@ THROTTLE_ARGUMENT = {
     "default": TELEGRAM_DEFAULT_THROTTLE,
 }
 
-TELEGRAM_CHANNEL_INFOS_SUBCOMMAND = subcommand(
+TELEGRAM_CHANNEL_INFOS_SUBCOMMAND = command(
     "channel-infos",
     "minet.cli.telegram.channel_infos",
     title="Minet Telegram Channel-Infos Command",
@@ -36,7 +36,7 @@ TELEGRAM_CHANNEL_INFOS_SUBCOMMAND = subcommand(
     arguments=[THROTTLE_ARGUMENT],
 )
 
-TELEGRAM_CHANNEL_MESSAGES_SUBCOMMAND = subcommand(
+TELEGRAM_CHANNEL_MESSAGES_SUBCOMMAND = command(
     "channel-messages",
     "minet.cli.telegram.channel_messages",
     title="Minet Telegram Channel-Messages Command",

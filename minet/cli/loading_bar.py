@@ -137,13 +137,33 @@ class StatsColumn(ProgressColumn):
 
 
 class NestedTotalColumn(ProgressColumn):
-    def render(self, task: Task) -> Text:
+    def render(self, task: Task) -> Optional[Text]:
         sub_total_sum = task.fields.get("sub_total_sum")
 
         if sub_total_sum is None:
             return None
 
         unit = task.fields.get("unit")
+        unit_text = f" {unit}" if unit is not None else ""
+
+        return Text(f"total: {format_int(sub_total_sum)}{unit_text}")
+
+
+class SingleLineNestedTotalColumn(ProgressColumn):
+    def __init__(
+        self, parent, unit: Optional[str], table_column: Optional[Column] = None
+    ) -> None:
+        self.__parent = parent
+        self.__unit = unit
+        super().__init__(table_column=table_column)
+
+    def render(self, _) -> Optional[Text]:
+        sub_total_sum = self.__parent.sub_total_sum
+
+        if sub_total_sum is None:
+            return None
+
+        unit = self.__unit
         unit_text = f" {unit}" if unit is not None else ""
 
         return Text(f"total: {format_int(sub_total_sum)}{unit_text}")
@@ -202,6 +222,7 @@ class LoadingBar(object):
         sub_unit: Optional[str] = None,
         transient: bool = False,
         refresh_per_second: float = 10,
+        single_line: bool = False,
     ):
         self.sub_total_sum = 0
         self.nested = nested
@@ -209,6 +230,7 @@ class LoadingBar(object):
         self.transient = transient
         self.known_total = total is not None
         self.already_stopped = False
+        self.single_line = single_line
 
         self.bar_column = None
         self.label_progress = None
@@ -223,6 +245,7 @@ class LoadingBar(object):
         self.table = Table.grid(expand=True)
 
         # Label line
+        # NOTE: this was never really used
         if show_label:
             label_progress_columns = []
 
@@ -233,7 +256,9 @@ class LoadingBar(object):
             self.label_progress_task_id = self.label_progress.add_task(
                 description="", total=None
             )
-            self.table.add_row(self.label_progress)
+
+            if not single_line:
+                self.table.add_row(self.label_progress)
 
         # Main progress line
         self.bar_column = CautiousBarColumn(pulse_style="white")
@@ -245,12 +270,15 @@ class LoadingBar(object):
 
         columns.append(CompletionColumn(Column(overflow="ellipsis", no_wrap=True)))
 
-        if not nested:
+        if not nested or single_line:
             columns.append(SpinnerColumn("dots", style=None, finished_text="·"))
 
         columns.append(PercentageColumn())
         columns.append(TimeElapsedColumn())
         columns.append(ThroughputColumn(Column(overflow="ellipsis", no_wrap=True)))
+
+        if nested and single_line:
+            columns.append(SingleLineNestedTotalColumn(self, sub_unit))
 
         self.progress = Progress(*columns)
         self.table.add_row(self.progress)
@@ -285,7 +313,8 @@ class LoadingBar(object):
                 unit=sub_unit,
             )
 
-            self.table.add_row(self.sub_progress)
+            if not single_line:
+                self.table.add_row(self.sub_progress)
 
         # Stats line
         if stats is not None:
@@ -304,7 +333,7 @@ class LoadingBar(object):
         self.stats_progress = Progress(StatsColumn(sort_key=stats_sort_key))
         self.stats_task_id = self.stats_progress.add_task("", stats=self.stats)
 
-        if self.stats_are_shown:
+        if self.stats_are_shown and not single_line:
             self.table.add_row(self.stats_progress)
 
         # Internal live instance
@@ -426,7 +455,7 @@ class LoadingBar(object):
     def __refresh_stats(self):
         self.stats_progress.update(self.stats_task_id, stats=self.stats)
 
-        if not self.stats_are_shown:
+        if not self.single_line and not self.stats_are_shown:
             self.stats_are_shown = True
             self.table.add_row(self.stats_progress)
 
@@ -497,8 +526,8 @@ class LoadingBar(object):
 
             self.__refresh_stats()
 
-    def print(self, *msg, end="\n"):
-        console.print(message_flatmap(*msg), end=end)
+    def print(self, *msg, **kwargs):
+        console.print(message_flatmap(*msg), **kwargs)
 
     def error(self, *args, **kwargs):
         console.error(*args, **kwargs)

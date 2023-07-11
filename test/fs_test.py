@@ -8,6 +8,7 @@ from casanova import Headers, RowWrapper
 from minet.fs import (
     FolderStrategy,
     FlatFolderStrategy,
+    FullPathFolderStrategy,
     PrefixFolderStrategy,
     HostnameFolderStrategy,
     NormalizedHostnameFolderStrategy,
@@ -28,6 +29,29 @@ class TestFS(object):
         assert isinstance(flat, FlatFolderStrategy)
 
         assert flat(filename="test/ok/whatever.html") == "test/ok/whatever.html"
+
+        fullpath = FolderStrategy.from_name("fullpath")
+
+        assert isinstance(fullpath, FullPathFolderStrategy)
+
+        assert (
+            fullpath(filename="a.html", url="https://www.lemonde.fr/business/test.html")
+            == "www.lemonde.fr/business/a.html"
+        )
+
+        assert (
+            fullpath(filename="a.html", url="https://www.lemonde.fr/business/")
+            == "www.lemonde.fr/business/a.html"
+        )
+
+        assert (
+            fullpath(filename="a.html", url="https://www.lemonde.fr/business")
+            == "www.lemonde.fr/business/a.html"
+        )
+
+        assert (
+            fullpath(filename="a.html", url="https://127.0.0.1/") == "127.0.0.1/a.html"
+        )
 
         prefix = FolderStrategy.from_name("prefix-5")
 

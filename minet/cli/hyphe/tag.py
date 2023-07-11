@@ -38,7 +38,7 @@ def action(cli_args):
     corpus.ensure_is_started()
 
     with LoadingBar(
-        title="Tagging web entitites", unit="webentity", total=reader.total
+        title="Tagging web entities", unit="webentity", total=reader.total
     ) as loading_bar:
         for row, webentity_id in reader.cells(
             cli_args.webentity_id_column, with_rows=True

@@ -3,7 +3,7 @@
 # Minet CLI Endpoint
 # =============================================================================
 #
-# CLI enpoint of the Minet library.
+# CLI endpoint of the Minet library.
 #
 from typing import Optional, List
 
@@ -123,7 +123,7 @@ def run(name: str, version: str, commands: List, args: Optional[str] = None):
                 console.print("Missing column", "[error]{}[/error]!".format(str(e)))
                 sys.exit(1)
             except FatalError as e:
-                console.vprint(e.message, style="error")
+                console.vprint(e.message, style="error" if not e.warning else "warning")
                 sys.exit(1)
 
     elif cli_args.action == "help":

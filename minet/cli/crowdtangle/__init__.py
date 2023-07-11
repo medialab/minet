@@ -17,7 +17,7 @@ from minet.crowdtangle.constants import (
     CROWDTANGLE_SUMMARY_SORT_TYPES,
 )
 
-from minet.cli.argparse import command, subcommand, ConfigAction
+from minet.cli.argparse import command, ConfigAction
 
 FORMAT_ARGUMENT = {
     "flags": ["-f", "--format"],
@@ -26,7 +26,7 @@ FORMAT_ARGUMENT = {
     "default": "csv",
 }
 
-CROWDTANGLE_LEADERBOARD_SUBCOMMAND = subcommand(
+CROWDTANGLE_LEADERBOARD_SUBCOMMAND = command(
     "leaderboard",
     "minet.cli.crowdtangle.leaderboard",
     title="Minet CrowdTangle Leaderboard Command",
@@ -66,7 +66,7 @@ CROWDTANGLE_LEADERBOARD_SUBCOMMAND = subcommand(
     ],
 )
 
-CROWDTANGLE_LISTS_SUBCOMMAND = subcommand(
+CROWDTANGLE_LISTS_SUBCOMMAND = command(
     "lists",
     "minet.cli.crowdtangle.lists",
     title="Minet CrowdTangle Lists Command",
@@ -83,7 +83,7 @@ CROWDTANGLE_LISTS_SUBCOMMAND = subcommand(
     """,
 )
 
-CROWDTANGLE_POSTS_BY_ID_SUBCOMMAND = subcommand(
+CROWDTANGLE_POSTS_BY_ID_SUBCOMMAND = command(
     "posts-by-id",
     "minet.cli.crowdtangle.posts_by_id",
     title="Minet CrowdTangle Post By Id Command",
@@ -109,7 +109,7 @@ CROWDTANGLE_POSTS_BY_ID_SUBCOMMAND = subcommand(
     resumer=RowCountResumer,
 )
 
-CROWDTANGLE_POSTS_SUBCOMMAND = subcommand(
+CROWDTANGLE_POSTS_SUBCOMMAND = command(
     "posts",
     "minet.cli.crowdtangle.posts",
     title="Minet CrowdTangle Posts Command",
@@ -138,7 +138,7 @@ CROWDTANGLE_POSTS_SUBCOMMAND = subcommand(
     arguments=[
         {
             "flag": "--chunk-size",
-            "help": "When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations.",
+            "help": "When sorting by date (default), the number of items to retrieve before shifting the initial query to circumvent the APIs limitations.",
             "type": int,
             "default": 500,
         },
@@ -175,7 +175,7 @@ CROWDTANGLE_POSTS_SUBCOMMAND = subcommand(
     ],
 )
 
-CROWDTANGLE_SEARCH_SUBCOMMAND = subcommand(
+CROWDTANGLE_SEARCH_SUBCOMMAND = command(
     "search",
     "minet.cli.crowdtangle.search",
     title="Minet CrowdTangle Search Command",
@@ -198,7 +198,7 @@ CROWDTANGLE_SEARCH_SUBCOMMAND = subcommand(
         },
         {
             "flag": "--chunk-size",
-            "help": "When sorting by date (default), the number of items to retrieve before shifting the inital query to circumvent the APIs limitations.",
+            "help": "When sorting by date (default), the number of items to retrieve before shifting the initial query to circumvent the APIs limitations.",
             "type": int,
             "default": 500,
         },
@@ -257,7 +257,7 @@ CROWDTANGLE_SEARCH_SUBCOMMAND = subcommand(
     ],
 )
 
-CROWDTANGLE_SUMMARY_SUBCOMMAND = subcommand(
+CROWDTANGLE_SUMMARY_SUBCOMMAND = command(
     "summary",
     "minet.cli.crowdtangle.summary",
     title="Minet CrowdTangle Link Summary Command",

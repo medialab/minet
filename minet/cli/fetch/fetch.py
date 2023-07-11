@@ -31,7 +31,7 @@ from minet.web import (
 )
 from minet.exceptions import InvalidURLError, FilenameFormattingError, HTTPCallbackError
 from minet.heuristics import should_spoof_ua_when_resolving
-from minet.cli.exceptions import InvalidArgumentsError, FatalError
+from minet.cli.exceptions import InvalidArgumentsError
 from minet.cli.reporters import report_filename_formatting_error
 from minet.cli.utils import with_enricher_and_loading_bar, with_ctrl_c_warning
 
@@ -226,19 +226,10 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
     file_writer = None
 
     if not resolve:
-        try:
-            filename_builder = FilenameBuilder(
-                folder_strategy=cli_args.folder_strategy,
-                template=cli_args.filename_template,
-            )
-        except TypeError:
-            raise FatalError(
-                [
-                    'Invalid "%s" --folder-strategy!' % cli_args.folder_strategy,
-                    "Check the list at the end of the command help:",
-                    "  $ minet fetch -h",
-                ]
-            )
+        filename_builder = FilenameBuilder(
+            folder_strategy=cli_args.folder_strategy,
+            template=cli_args.filename_template,
+        )
 
         file_writer = ThreadSafeFileWriter(cli_args.output_dir)
 

@@ -78,7 +78,7 @@ elif cat /etc/os-release | grep -q "Debian GNU/Linux"; then
 else
   ubuntu_version=$(get_ubuntu_version)
 
-  if [[ $ubuntu_version != "unkown" ]]; then
+  if [[ $ubuntu_version != "unknown" ]]; then
     echo "Installing minet for ubuntu $ubuntu_version (or similar)..."
 
     if [[ $ubuntu_version -le "20" ]]; then

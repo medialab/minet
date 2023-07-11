@@ -133,7 +133,7 @@ stats, posts = client.summary(
 *Arguments*
 
 * **link** *str*: url to query.
-* **start_date** *str*: start date for the agregation.
+* **start_date** *str*: start date for the aggregation.
 * **sort_by** *?str* [`date`]: how to sort posts. Can be `date`, `subscriber_count` or `total_interactions`.
 * **with_top_posts** *?bool*: whether to also return top 100 posts.
 
