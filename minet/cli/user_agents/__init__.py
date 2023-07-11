@@ -5,10 +5,11 @@ USER_AGENTS_UPDATE_SUBCOMMAND = command(
     "minet.cli.user_agents.update",
     title="Minet User Agents Update Command",
     description="""
-        Command to update the list of user agents
-        used by minet http requests.
+        Command used to update the internal list of
+        plausible User Agent strings used by minet
+        to spoof some requests.
 
-        The list of user agents come from the website
+        The list of user agents come from the website:
         www.useragents.me
     """,
     no_output=True,
@@ -19,9 +20,12 @@ USER_AGENTS_EXPORT_SUBCOMMAND = command(
     "minet.cli.user_agents.export",
     title="Minet User Agents Export Command",
     description="""
-        Command to export the user agents stored
-        in the minet's module. The export format
-        is CSV.
+        Command used to export the internal list of
+        plausible User Agent strings used by minet
+        to spoof some requests.
+
+        The list of user agents come from the website:
+        www.useragents.me
     """,
 )
 
@@ -30,11 +34,11 @@ USER_AGENTS_RANDOM_SUBCOMMAND = command(
     "minet.cli.user_agents.random",
     title="Minet User Agents Random Command",
     description="""
-        Command to export a random user agent stored
-        in the minet's module.
+        Command used to return a random plausible
+        User Agent.
 
-        The percent provided is « the relative share
-        of each useragent » detected by useragents.me
+        The list of user agents come from the website:
+        www.useragents.me
     """,
 )
 

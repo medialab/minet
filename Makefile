@@ -36,6 +36,12 @@ format:
 	black $(SOURCE) ftest hooks scripts test
 	@echo
 
+ua:
+	@echo Upgrading internals...
+	python -m minet.cli ua update
+	black minet/user_agents/data.py
+	@echo
+
 readme:
 	python -m scripts.generate_readme > docs/cli.md
 
