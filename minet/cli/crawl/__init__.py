@@ -270,6 +270,16 @@ FOCUS_CRAWL_COMMAND = crawl_command(
             "default": None,
         },
         {
+            "flag": "--invert-content-match",
+            "help": "Flag to turn the content filter into an exclusion rule.",
+            "action": "store_true",
+        },
+        {
+            "flag": "--invert-url-match",
+            "help": "Flag to turn the url filter into an exclusion rule.",
+            "action": "store_true",
+        },
+        {
             "flag": "--extract",
             "help": "Perform regex match on extracted text content instead of html content using the Trafilatura library.",
             "action": "store_true",

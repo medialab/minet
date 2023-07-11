@@ -59,11 +59,32 @@ class FocusSpider(Spider):
         url = urljoin(origin, url)
         return normalize_url(url)
 
+    def url_relevance(self, url):
+        if self.regex_url:
+            if self.invert_url_match and self.regex_url.search(url):
+                return False
+            elif not self.invert_url_match and not self.regex_url.search(url):
+                return False
+            return True
+        return True
+
+    def content_relevance(self, content):
+        if self.regex_content:
+            match = self.regex_content.findall(content)
+            if self.invert_content_match:
+                return not bool(match), None
+            else:
+                return bool(match), len(match) if match else 0
+        else:
+            return True, None
+
     def __init__(
         self,
         start_urls=None,
         regex_content=None,
+        invert_content_match=None,
         regex_url=None,
+        invert_url_match=None,
         irrelevant_continue=False,
         extract=False,
         only_target_html_page=True,
@@ -73,7 +94,9 @@ class FocusSpider(Spider):
 
         self.urls = start_urls
         self.regex_content = re.compile(regex_content, re.I) if regex_content else None
+        self.invert_content_match = invert_content_match
         self.regex_url = re.compile(regex_url, re.I) if regex_url else None
+        self.invert_url_match = invert_url_match
         self.extraction = extract
         self.irrelevant_continue = irrelevant_continue
         self.target_html = only_target_html_page
@@ -114,13 +137,7 @@ class FocusSpider(Spider):
 
             unique_urls.add(response.resolve(url))
 
-        if self.regex_content:
-            match = self.regex_content.findall(content)
-            has_relevant_content = bool(match)
-            relevant_size = len(match) if match else 0
-        else:
-            has_relevant_content = True
-            relevant_size = None
+        has_relevant_content, relevant_size = self.content_relevance(content)
 
         links = [FocusCrawLink(url=url) for url in unique_urls]
         next_urls = []
@@ -132,7 +149,7 @@ class FocusSpider(Spider):
                 link.invalidity = "not-html"
                 continue
 
-            if self.regex_url and not self.regex_url.search(url):
+            if not self.url_relevance(url):
                 link.invalidity = "irrelevant"
                 continue
 
