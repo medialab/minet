@@ -61,20 +61,22 @@ class FocusSpider(Spider):
 
     def url_relevance(self, url):
         if self.regex_url:
-            if self.invert_url_match and self.regex_url.search(url):
-                return False
-            elif not self.invert_url_match and not self.regex_url.search(url):
-                return False
-            return True
+            m = bool(self.regex_url.search(url))
+
+            if self.invert_url_match:
+                m = not m
+
+            return m
+
         return True
 
     def content_relevance(self, content):
         if self.regex_content:
-            match = self.regex_content.findall(content)
+            matches = self.regex_content.findall(content)
             if self.invert_content_match:
-                return not bool(match), None
+                return not bool(matches), None
             else:
-                return bool(match), len(match) if match else 0
+                return bool(matches), len(matches) if matches else None
         else:
             return True, None
 
@@ -82,12 +84,12 @@ class FocusSpider(Spider):
         self,
         start_urls=None,
         regex_content=None,
-        invert_content_match=None,
+        invert_content_match: bool = False,
         regex_url=None,
-        invert_url_match=None,
-        irrelevant_continue=False,
-        extract=False,
-        only_target_html_page=True,
+        invert_url_match: bool = False,
+        irrelevant_continue: bool = False,
+        extract: bool = False,
+        only_html: bool = True,
     ):
         if not regex_content and not regex_url:
             raise TypeError("Neither url nor content filter provided.")
@@ -99,7 +101,7 @@ class FocusSpider(Spider):
         self.invert_url_match = invert_url_match
         self.extraction = extract
         self.irrelevant_continue = irrelevant_continue
-        self.target_html = only_target_html_page
+        self.target_html = only_html
 
     def process(self, job: CrawlJob, response: Response):
         has_relevant_content = False

@@ -16,7 +16,7 @@ def action(cli_args):
         regex_url=cli_args.url_filter,
         invert_url_match=cli_args.invert_url_match,
         irrelevant_continue=cli_args.irrelevant_continue,
-        only_target_html_page=cli_args.only_html,
+        only_html=cli_args.only_html,
         extract=cli_args.extract,
     )
 
