@@ -7,6 +7,7 @@ from minet.cli.scrape import SCRAPE_COMMAND
 from minet.cli.url_extract import URL_EXTRACT_COMMAND
 from minet.cli.url_join import URL_JOIN_COMMAND
 from minet.cli.url_parse import URL_PARSE_COMMAND
+from minet.cli.user_agents import USER_AGENTS_COMMAND
 
 from minet.cli.buzzsumo import BUZZSUMO_COMMAND
 from minet.cli.crowdtangle import CROWDTANGLE_COMMAND
@@ -35,6 +36,7 @@ MINET_COMMANDS = [
     URL_EXTRACT_COMMAND,
     URL_JOIN_COMMAND,
     URL_PARSE_COMMAND,
+    USER_AGENTS_COMMAND,
     #
     BUZZSUMO_COMMAND,
     CROWDTANGLE_COMMAND,

@@ -832,7 +832,7 @@ def command(
         if common_arguments is not None:
             data["subparsers"]["common_arguments"] = common_arguments
 
-    elif arguments is not None:
+    else:
         data["arguments"], epilog_addendum = resolve_typical_arguments(
             package,
             arguments,

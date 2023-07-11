@@ -70,9 +70,9 @@ from minet.exceptions import (
     FinalTimeoutError,
 )
 from minet.constants import (
-    DEFAULT_SPOOFED_UA,
     DEFAULT_SPOOFED_TLS_CIPHERS,
     DEFAULT_URLLIB3_TIMEOUT,
+    DEFAULT_SPOOFED_UA,
 )
 
 mimetypes.init()
@@ -1030,7 +1030,7 @@ def request(
     method: str = "GET",
     headers: Optional[Dict[str, str]] = None,
     cookie: Optional[Union[str, Dict[str, str]]] = None,
-    spoof_ua: bool = True,
+    spoof_ua: bool = False,
     follow_redirects: bool = True,
     max_redirects: int = 5,
     follow_refresh_header: bool = True,
@@ -1110,7 +1110,7 @@ def resolve(
     method: str = "GET",
     headers: Optional[Dict[str, str]] = None,
     cookie: Optional[Union[str, Dict[str, str]]] = None,
-    spoof_ua: bool = True,
+    spoof_ua: bool = False,
     max_redirects: int = 5,
     follow_refresh_header: bool = True,
     follow_meta_refresh: bool = False,
