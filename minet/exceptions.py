@@ -4,6 +4,8 @@
 #
 # Collection of handy custom exceptions.
 #
+from typing import Optional
+
 from minet.utils import message_flatmap
 
 
@@ -160,6 +162,6 @@ class FilenameFormattingError(MinetError):
 
 # User Agents error
 class UserAgentsUpdateError(MinetError):
-    def __init__(self, reason, message=None):
+    def __init__(self, message=None, reason: Optional[BaseException] = None):
         super().__init__(message)
         self.reason = reason

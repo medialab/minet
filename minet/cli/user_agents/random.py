@@ -1,6 +1,6 @@
-from minet.user_agents import get_random_useragent
+from minet.user_agents import get_random_user_agent
+
 
 def action(cli_args):
-    pct, ua = get_random_useragent()
-    print("Random user agent ({:.2f}%) :".format(pct))
-    print(ua)
+    print(cli_args)
+    cli_args.output.write(get_random_user_agent() + "\n")

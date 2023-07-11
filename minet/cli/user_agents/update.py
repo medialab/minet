@@ -1,4 +1,5 @@
-from minet.user_agents.update import update
+from minet.user_agents import update_user_agents
 
-def action(cli_args):
-    update()
+
+def action(_):
+    update_user_agents()
