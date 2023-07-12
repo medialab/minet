@@ -8,11 +8,11 @@ from typing import Optional
 
 import re
 import json
-from bs4 import BeautifulSoup
 from html import unescape
 from urllib.parse import unquote
 from collections import namedtuple
 
+from minet.scrape import WonderfulSoup
 from minet.web import request, create_pool_manager
 from minet.youtube.utils import ensure_video_id
 from minet.youtube.exceptions import YouTubeInvalidVideoTargetError
@@ -97,7 +97,7 @@ def get_video_captions(video_target, langs):
         known_encoding="utf-8",
     )
 
-    soup = BeautifulSoup(response.text(), "lxml")
+    soup = WonderfulSoup(response.text(), "lxml")
 
     captions = []
 
@@ -111,11 +111,14 @@ def get_video_captions(video_target, langs):
 
 def scrape_channel_id(channel_url: str) -> Optional[str]:
     response = request(
-        channel_url, pool_manager=YOUTUBE_SCRAPER_POOL_MANAGER, known_encoding="utf-8"
+        channel_url,
+        pool_manager=YOUTUBE_SCRAPER_POOL_MANAGER,
+        known_encoding="utf-8",
+        spoof_ua=True,
     )
 
-    soup = BeautifulSoup(response.text(), "lxml")
-    tag = soup.find("meta", {"itemprop": "channelId"})
+    soup = WonderfulSoup(response.text(), "lxml")
+    tag = soup.find("meta", {"itemprop": "identifier"})
 
     if tag:
         return tag.get("content")
