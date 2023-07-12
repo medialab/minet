@@ -333,9 +333,10 @@ Examples:
 ```
 Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
                          [--refresh-per-second REFRESH_PER_SECOND]
-                         [--single-line] [-U URL_FILTER] [--extract]
-                         [--irrelevant-continue] [--only-html] [-O OUTPUT_DIR]
-                         [--factory] [--resume] [-m MAX_DEPTH]
+                         [--single-line] [-U URL_FILTER]
+                         [--invert-content-match] [--invert-url-match]
+                         [--extract] [--irrelevant-continue] [--only-html]
+                         [-O OUTPUT_DIR] [--factory] [--resume] [-m MAX_DEPTH]
                          [--throttle THROTTLE] [-t THREADS] [-z] [-w] [-d]
                          [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-i INPUT]
@@ -378,6 +379,10 @@ Optional Arguments:
   -f, --format {csv,jsonl,ndjson}
                                 Serialization format for scraped/extracted data.
                                 Defaults to `csv`.
+  --invert-content-match        Flag to turn the content filter into an
+                                exclusion rule.
+  --invert-url-match            Flag to turn the url filter into an exclusion
+                                rule.
   --irrelevant-continue         Continue exploration whether met content is
                                 relevant or not.
   -m, --max-depth MAX_DEPTH     Maximum depth for the crawl.
@@ -1066,6 +1071,7 @@ Optional Arguments:
 Builtin scrapers:
 
 . "canonical": scrape the <link rel="canonical"> tag href if any.
+. "metas": scrape the <meta> tags if any.
 . "title": scrape the <title> tag if any.
 . "urls": scrape all the relevant <a> tag href urls. Will join them
     with the correct base url if --url-column was given.
@@ -5246,6 +5252,11 @@ account and it might very well happen in the future (who knows?).
 BEWARE: the web search results seem to become inconsistent when
 queries return vast amounts of tweets. In which case you are
 strongly advised to segment your queries using temporal filters.
+
+NOTE 2023-07-12: scraping users does not work anymore for now.
+Tweet scraping was fixed but He-Who-Must-Not-Be-Named breaks things
+on a daily basis so be warned this might not be very stable nor
+consistent.
 
 Positional Arguments:
   {tweets,users}                What to scrape. Currently only allows for

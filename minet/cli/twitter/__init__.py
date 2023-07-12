@@ -328,6 +328,11 @@ TWITTER_SCRAPE_SUBCOMMAND = command(
         BEWARE: the web search results seem to become inconsistent when
         queries return vast amounts of tweets. In which case you are
         strongly advised to segment your queries using temporal filters.
+
+        NOTE 2023-07-12: scraping users does not work anymore for now.
+        Tweet scraping was fixed but He-Who-Must-Not-Be-Named breaks things
+        on a daily basis so be warned this might not be very stable nor
+        consistent.
     """,
     epilog="""
         Examples:

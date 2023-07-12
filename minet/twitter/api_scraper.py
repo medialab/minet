@@ -7,7 +7,7 @@
 import time
 import datetime
 from urllib.parse import urlencode, quote
-from twitwi import normalize_tweet, normalize_user
+from twitwi import normalize_tweet
 from ebbe import with_is_first, getpath, pathgetter
 from json import JSONDecodeError
 from tenacity import RetryCallState
@@ -294,14 +294,23 @@ def process_single_tweet(tweet_id, tweet_index, user_index):
 
 
 def tweets_payload_iter(payload):
-    tweet_index = payload["globalObjects"]["tweets"]
-    user_index = payload["globalObjects"]["users"]
+    instructions = payload["data"]["search_by_raw_query"]["search_timeline"][
+        "timeline"
+    ]["instructions"]
 
-    for instruction in payload["timeline"]["instructions"]:
-        if "addEntries" in instruction:
-            entries = instruction["addEntries"]["entries"]
-        elif "replaceEntry" in instruction:
-            entries = [instruction["replaceEntry"]["entry"]]
+    tweet_index = None
+    user_index = None
+
+    # with open("dump.json", "w") as f:
+    #     import json
+
+    #     json.dump(payload, f, ensure_ascii=False, indent=2)
+
+    for instruction in instructions:
+        if instruction["type"] == "TimelineAddEntries":
+            entries = instruction["entries"]
+        elif instruction["type"] == "TimelineReplaceEntry":
+            entries = [instruction["entry"]]
         else:
             continue
 
@@ -312,35 +321,77 @@ def tweets_payload_iter(payload):
             if not entry_id.startswith("sq-I-t-") and not entry_id.startswith("tweet-"):
                 continue
 
-            tweet_meta = getpath(entry, ["content", "item", "content", "tweet"])
-
-            if tweet_meta is None:
-                tweet_meta = getpath(
-                    entry, ["content", "item", "content", "tombstone", "tweet"]
-                )
+            tweet_root = getpath(
+                entry, ["content", "itemContent", "tweet_results", "result"]
+            )
 
             # Parsing error?
-            if tweet_meta is None:
-                raise TwitterPublicAPIParsingError
+            # NOTE: new API is inconsistent and returns empty objects...
+            if tweet_root is None:
+                continue
+                # raise TwitterPublicAPIParsingError
+
+            if tweet_root["__typename"] == "TweetWithVisibilityResults":
+                tweet_root = tweet_root["tweet"]
+
+            try:
+                tweet_meta = tweet_root["legacy"]
+            except KeyError:
+                raise TwitterPublicAPIParsingError(entry_id)
+
+            tweet_meta["source"] = tweet_root["source"]
+
+            # NOTE: tombstone not working anymore
+            # if tweet_meta is None:
+            #     tweet_meta = getpath(
+            #         entry, ["content", "item", "content", "tombstone", "tweet"]
+            #     )
 
             # Skipping ads
             if "promotedMetadata" in tweet_meta:
                 continue
 
-            tweet = process_single_tweet(tweet_meta["id"], tweet_index, user_index)
+            # NOTE: with new API results we need to build this index each time
+            tweet_index = {tweet_meta["id_str"]: tweet_meta}
+            user_index = {}
+
+            # Tweet user
+            user_index[tweet_meta["user_id_str"]] = tweet_root["core"]["user_results"][
+                "result"
+            ]["legacy"]
+
+            # Quote
+            if "quoted_status_result" in tweet_root:
+                quoted_root = tweet_root["quoted_status_result"]["result"]
+
+                if quoted_root["__typename"] == "TweetWithVisibilityResults":
+                    quoted_root = quoted_root["tweet"]
+
+                quoted_meta = quoted_root["legacy"]
+                quoted_meta["source"] = quoted_root["source"]
+                tweet_index[quoted_meta["id_str"]] = quoted_meta
+                user_index[quoted_meta["user_id_str"]] = quoted_root["core"][
+                    "user_results"
+                ]["result"]["legacy"]
+
+            for user_str_id, user_meta in user_index.items():
+                user_meta["id_str"] = user_str_id
+
+            tweet = process_single_tweet(tweet_meta["id_str"], tweet_index, user_index)
 
             # Additional metadata
+            # NOTE: not working anymore
             meta = None
 
             if tweet is not None:
-                if "forwardPivot" in tweet_meta:
-                    pivot = tweet_meta["forwardPivot"]
+                # if "forwardPivot" in tweet_meta:
+                #     pivot = tweet_meta["forwardPivot"]
 
-                    meta = {
-                        "intervention_text": getpath(pivot, ["text", "text"]),
-                        "intervention_type": pivot.get("displayType"),
-                        "intervention_url": getpath(pivot, ["landingUrl", "url"]),
-                    }
+                #     meta = {
+                #         "intervention_text": getpath(pivot, ["text", "text"]),
+                #         "intervention_type": pivot.get("displayType"),
+                #         "intervention_url": getpath(pivot, ["landingUrl", "url"]),
+                #     }
 
                 yield tweet, meta
 
@@ -510,20 +561,21 @@ class TwitterAPIScraper(object):
 
         next_cursor = extract_cursor_from_tweets_payload(data)
 
-        raise TwitterPublicAPIQueryTooLongError
-
         tweets = []
 
         if dump:
             return data
 
         for tweet, meta in tweets_payload_iter(data):
-            result = normalize_tweet(
-                tweet,
-                locale=locale,
-                extract_referenced_tweets=refs is not None,
-                collection_source="scraping",
-            )
+            try:
+                result = normalize_tweet(
+                    tweet,
+                    locale=locale,
+                    extract_referenced_tweets=refs is not None,
+                    collection_source="scraping",
+                )
+            except Exception:
+                raise TwitterPublicAPIParsingError(tweet["id_str"])
 
             if refs is not None:
                 for is_first, extracted_tweet in with_is_first(result):
