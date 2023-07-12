@@ -14,6 +14,7 @@ import importlib
 import multiprocessing
 import casanova
 import shlex
+import platform
 from casanova.exceptions import MissingColumnError
 from contextlib import ExitStack
 from encodings import idna  # NOTE: this is necessary for pyinstaller build still...
@@ -30,9 +31,16 @@ from minet.cli.utils import (
 from minet.cli.argparse import resolve_arg_dependencies, build_parser, get_subparser
 from minet.cli.exceptions import NotResumableError, InvalidArgumentsError, FatalError
 
+WINDOWS = "windows" in platform.system().lower()
+
 
 @with_cli_exceptions
 def run(name: str, version: str, commands: List, args: Optional[str] = None):
+    # Issue #497, utf-8 encoding for windows stdout
+    if WINDOWS:
+        sys.__stdout__.reconfigure(encoding="utf-8")
+        sys.__stderr__.reconfigure(encoding="utf-8")
+
     # Freezing multiprocessing support for pyinstaller etc.
     multiprocessing.freeze_support()
 
