@@ -50,7 +50,7 @@ FLAG_SORTING_PRIORITIES = {
             "resume",
             "rcfile",
             "refresh-per-second",
-            "simple-progress",
+            "single-line",
             "silent",
             "help",
         ],

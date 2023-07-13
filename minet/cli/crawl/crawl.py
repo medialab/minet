@@ -87,7 +87,7 @@ class DataWriter:
 
         self.handles[name] = {"file": f, "writer": w, "spider": spider}
 
-    def __unpack_result(self, result: CrawlResult, data):
+    def __unpack_result(self, result: SuccessfulCrawlResult, data):
         job_id = result.job.id
 
         if self.format == "csv":
@@ -95,7 +95,7 @@ class DataWriter:
 
         return ({"job_id": job_id, "data": data},)
 
-    def write(self, result: CrawlResult) -> None:
+    def write(self, result: SuccessfulCrawlResult) -> None:
         handle = self.handles[result.spider]
         spider = handle["spider"]
         writer = handle["writer"]

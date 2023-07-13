@@ -183,10 +183,6 @@ Positional Arguments:
 Optional Arguments:
   --csv                         Whether to format the output as CSV. If --url is
                                 set, will output the cookie's morsels as CSV.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --url URL                     If given, only returns full cookie header value
                                 for this url.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
@@ -198,6 +194,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -266,10 +266,6 @@ Optional Arguments:
   -n, --normalized-url-cache    Whether to normalize url cache used to assess if
                                 some url was already visited.
   -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
   -t, --threads THREADS         Number of threads to use. You can use `0` if you
@@ -307,6 +303,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -408,10 +408,6 @@ Optional Arguments:
   --only-html                   Add URLs to the crawler queue only if they seem
                                 to lead to a HTML content.
   -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
   -t, --threads THREADS         Number of threads to use. You can use `0` if you
@@ -449,6 +445,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -541,10 +541,6 @@ Optional Arguments:
                                 Name of the CSV column containing the webentity
                                 prefixes, separated by --prefix-separator.
                                 Defaults to `PREFIXES AS URL`.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
   --start-page-separator START_PAGE_SEPARATOR
@@ -577,6 +573,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -685,10 +685,6 @@ Optional Arguments:
   -X, --request METHOD          The http method to use. Will default to GET.
                                 Defaults to `GET`.
   -D, --dont-save               Use not to write any downloaded file on disk.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
   --standardize-encoding        Whether to systematically convert retrieved text
@@ -726,6 +722,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -874,10 +874,6 @@ Optional Arguments:
                                 Defaults to `mimetype`.
   -p, --processes PROCESSES     Number of processes to use. Defaults to roughly
                                 half of the available CPUs.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --status-column STATUS_COLUMN
                                 Name of the CSV column containing HTTP status.
                                 Defaults to `http_status`.
@@ -906,6 +902,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1017,10 +1017,6 @@ Optional Arguments:
                                 probably shortened.
   -X, --request METHOD          The http method to use. Will default to GET.
                                 Defaults to `GET`.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
   -t, --threads THREADS         Number of threads to use. Defaults to `25`.
@@ -1056,6 +1052,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1180,10 +1180,6 @@ Optional Arguments:
                                 serializing to CSV. Defaults to `|`.
   -p, --processes PROCESSES     Number of processes to use. Defaults to roughly
                                 half of the available CPUs.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --status-column STATUS_COLUMN
                                 Name of the CSV column containing HTTP status.
                                 Defaults to `http_status`.
@@ -1215,6 +1211,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1289,10 +1289,6 @@ Optional Arguments:
   --base-url BASE_URL           Base url used to resolve relative urls.
   --from {html,text}            Extract urls from which kind of source? Defaults
                                 to `text`.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -1309,6 +1305,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1351,10 +1351,6 @@ Optional Arguments:
                                 Optional prefix to add to the first file's
                                 column names to avoid conflicts. Defaults to ``.
   --separator SEPARATOR         Split indexed url column by a separator?
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -1367,6 +1363,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1431,10 +1431,6 @@ Optional Arguments:
   --quoted, --no-quoted         Whether or not to normalize to a quoted or
                                 unquoted version of the url when normalizing
                                 url. Defaults to `True`.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --sort-query, --dont-sort-query
                                 Whether or not to sort query items when
                                 normalizing url. Defaults to `True`.
@@ -1498,6 +1494,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1600,10 +1600,6 @@ Usage: minet buzzsumo [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
 Gather data from the BuzzSumo APIs easily and efficiently.
 
 Optional Arguments:
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -t, --token TOKEN             BuzzSumo API token. Can also be configured in a
                                 .minetrc file as "buzzsumo.token" or read from
                                 the MINET_BUZZSUMO_TOKEN env variable.
@@ -1617,6 +1613,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1639,10 +1639,6 @@ Call BuzzSumo for a given request and return the remaining number
 of calls for this month contained in the request's headers.
 
 Optional Arguments:
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -t, --token TOKEN             BuzzSumo API token. Can also be configured in a
                                 .minetrc file as "buzzsumo.token" or read from
                                 the MINET_BUZZSUMO_TOKEN env variable.
@@ -1659,6 +1655,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1699,10 +1699,6 @@ Optional Arguments:
                                 YYYY-MM-DD
   --end-date END_DATE           The date you wish to fetch articles to. UTC date
                                 should have the following format : YYYY-MM-DD
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -t, --token TOKEN             BuzzSumo API token. Can also be configured in a
                                 .minetrc file as "buzzsumo.token" or read from
                                 the MINET_BUZZSUMO_TOKEN env variable.
@@ -1733,6 +1729,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1801,10 +1801,6 @@ Optional Arguments:
                                 YYYY-MM-DD
   --end-date END_DATE           The date you wish to fetch articles to. UTC date
                                 should have the following format : YYYY-MM-DD
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -t, --token TOKEN             BuzzSumo API token. Can also be configured in a
                                 .minetrc file as "buzzsumo.token" or read from
                                 the MINET_BUZZSUMO_TOKEN env variable.
@@ -1835,6 +1831,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1893,10 +1893,6 @@ Optional Arguments:
                                 to `6`. Can also be configured in a .minetrc
                                 file as "crowdtangle.rate_limit" or read from
                                 the MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -t, --token TOKEN             CrowdTangle dashboard API token. Rcfile key:
                                 crowdtangle.token. Can also be configured in a
                                 .minetrc file as "crowdtangle.token" or read
@@ -1911,6 +1907,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -1949,10 +1949,6 @@ Optional Arguments:
                                 to `6`. Can also be configured in a .minetrc
                                 file as "crowdtangle.rate_limit" or read from
                                 the MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --start-date START_DATE       The earliest date at which to start aggregating
                                 statistics (UTC!). You can pass just a year or a
                                 year-month for convenience.
@@ -1973,6 +1969,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -2002,10 +2002,6 @@ Optional Arguments:
                                 to `6`. Can also be configured in a .minetrc
                                 file as "crowdtangle.rate_limit" or read from
                                 the MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -t, --token TOKEN             CrowdTangle dashboard API token. Rcfile key:
                                 crowdtangle.token. Can also be configured in a
                                 .minetrc file as "crowdtangle.token" or read
@@ -2023,6 +2019,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -2061,10 +2061,6 @@ Optional Arguments:
                                 to `6`. Can also be configured in a .minetrc
                                 file as "crowdtangle.rate_limit" or read from
                                 the MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -t, --token TOKEN             CrowdTangle dashboard API token. Rcfile key:
                                 crowdtangle.token. Can also be configured in a
                                 .minetrc file as "crowdtangle.token" or read
@@ -2098,6 +2094,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -2175,10 +2175,6 @@ Optional Arguments:
                                 to `6`. Can also be configured in a .minetrc
                                 file as "crowdtangle.rate_limit" or read from
                                 the MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                 The order in which to retrieve posts. Defaults
                                 to `date`.
@@ -2204,6 +2200,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -2277,10 +2277,6 @@ Optional Arguments:
   --search-field {account_name_only,image_text_only,include_query_strings,text_fields_and_image_text,text_fields_only}
                                 In what to search the query. Defaults to
                                 `text_fields_and_image_text`.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --sort-by {date,interaction_rate,overperforming,total_interactions,underperforming}
                                 The order in which to retrieve posts. Defaults
                                 to `date`.
@@ -2305,6 +2301,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -2348,10 +2348,6 @@ Optional Arguments:
                                 to `6`. Can also be configured in a .minetrc
                                 file as "crowdtangle.rate_limit" or read from
                                 the MINET_CROWDTANGLE_RATE_LIMIT env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --sort-by {date,subscriber_count,total_interactions}
                                 How to sort retrieved posts. Defaults to `date`.
   --start-date START_DATE       The earliest date at which a post could be
@@ -2388,6 +2384,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -2478,10 +2478,6 @@ Optional Arguments:
                                 Defaults to `firefox`. Can also be configured in
                                 a .minetrc file as "facebook.cookie" or read
                                 from the MINET_FACEBOOK_COOKIE env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `2.0`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -2511,6 +2507,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -2609,10 +2609,6 @@ Optional Arguments:
                                 Defaults to `firefox`. Can also be configured in
                                 a .minetrc file as "facebook.cookie" or read
                                 from the MINET_FACEBOOK_COOKIE env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `2.0`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -2642,6 +2638,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -2740,10 +2740,6 @@ Optional Arguments:
                                 Defaults to `firefox`. Can also be configured in
                                 a .minetrc file as "facebook.cookie" or read
                                 from the MINET_FACEBOOK_COOKIE env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `2.0`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -2773,6 +2769,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -2844,10 +2844,6 @@ Optional Arguments:
                                 Defaults to `firefox`. Can also be configured in
                                 a .minetrc file as "facebook.cookie" or read
                                 from the MINET_FACEBOOK_COOKIE env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `2.0`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -2877,6 +2873,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -2941,10 +2941,6 @@ Positional Arguments:
                                 containing urls when using -i/--input.
 
 Optional Arguments:
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -2968,6 +2964,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -3058,10 +3058,6 @@ Optional Arguments:
   -c, --cookie COOKIE           Google Drive cookie or browser from which to
                                 extract it (supports "firefox", "chrome",
                                 "chromium", "opera" and "edge").
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -3071,6 +3067,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -3110,10 +3110,6 @@ Positional Arguments:
 
 Optional Arguments:
   --password PASSWORD           The corpus's password if required.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -3127,6 +3123,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -3155,10 +3155,6 @@ Positional Arguments:
 
 Optional Arguments:
   --password PASSWORD           The corpus's password if required.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -3168,6 +3164,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -3205,10 +3205,6 @@ Optional Arguments:
                                 Tweak if corpus has large pages or if the
                                 network is unreliable. Defaults to `500`.
   --password PASSWORD           The corpus's password if required.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --statuses STATUSES           Webentity statuses to dump, separated by comma.
                                 Possible statuses being "IN", "OUT", "UNDECIDED"
                                 and "DISCOVERED".
@@ -3221,6 +3217,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -3249,10 +3249,6 @@ Positional Arguments:
 
 Optional Arguments:
   --password PASSWORD           The corpus's password if required.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -3262,6 +3258,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -3297,10 +3297,6 @@ Optional Arguments:
   --password PASSWORD           The corpus's password if required.
   --separator SEPARATOR         Separator use to split multiple tag values in
                                 the same column. Defaults to `|`.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
                                 progress indicator for large files given as
@@ -3314,6 +3310,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -3343,10 +3343,6 @@ Optional Arguments:
                                 Defaults to `firefox`. Can also be configured in
                                 a .minetrc file as "instagram.cookie" or read
                                 from the MINET_INSTAGRAM_COOKIE env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
@@ -3357,6 +3353,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -3402,10 +3402,6 @@ Optional Arguments:
                                 a .minetrc file as "instagram.cookie" or read
                                 from the MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT             Maximum number of comments to retrieve per post.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -3433,6 +3429,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -3508,10 +3508,6 @@ Optional Arguments:
                                 a .minetrc file as "instagram.cookie" or read
                                 from the MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT             Maximum number of posts to retrieve per hashtag.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -3539,6 +3535,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -3615,10 +3615,6 @@ Optional Arguments:
                                 Defaults to `firefox`. Can also be configured in
                                 a .minetrc file as "instagram.cookie" or read
                                 from the MINET_INSTAGRAM_COOKIE env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -3646,6 +3642,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -3729,10 +3729,6 @@ Optional Arguments:
                                 from the MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT             Maximum number of followers to retrieve per
                                 user.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -3760,6 +3756,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -3841,10 +3841,6 @@ Optional Arguments:
                                 a .minetrc file as "instagram.cookie" or read
                                 from the MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT             Maximum number of accounts to retrieve per user.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -3872,6 +3868,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -3950,10 +3950,6 @@ Optional Arguments:
                                 Defaults to `firefox`. Can also be configured in
                                 a .minetrc file as "instagram.cookie" or read
                                 from the MINET_INSTAGRAM_COOKIE env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -3981,6 +3977,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4063,10 +4063,6 @@ Optional Arguments:
                                 a .minetrc file as "instagram.cookie" or read
                                 from the MINET_INSTAGRAM_COOKIE env variable.
   -l, --limit LIMIT             Maximum number of posts to retrieve per user.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -4094,6 +4090,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4155,10 +4155,6 @@ Positional Arguments:
 Optional Arguments:
   --feeds FEEDS                 If given, path of the CSV file listing media RSS
                                 feeds.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -t, --token TOKEN             Mediacloud API token (also called "key"
                                 sometimes). Can also be configured in a .minetrc
                                 file as "mediacloud.token" or read from the
@@ -4190,6 +4186,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4260,10 +4260,6 @@ Optional Arguments:
                                 (iso format, e.g. "2018-03").
   --publish-year PUBLISH_YEAR   Only search stories published on provided year
                                 (iso format, e.g. "2018").
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --skip-count                  Whether to skip the first API call counting the
                                 number of posts for the progress bar.
   -t, --token TOKEN             Mediacloud API token (also called "key"
@@ -4283,6 +4279,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4314,10 +4314,6 @@ Optional Arguments:
                                 in the given media_id.
   --media-id MEDIA_ID           Return only stories belonging to the given
                                 media_ids.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -t, --token TOKEN             Mediacloud API token (also called "key"
                                 sometimes). Can also be configured in a .minetrc
                                 file as "mediacloud.token" or read from the
@@ -4335,6 +4331,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4363,10 +4363,6 @@ Positional Arguments:
                                 when using -i/--input.
 
 Optional Arguments:
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `0.5`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -4392,6 +4388,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4449,10 +4449,6 @@ Positional Arguments:
                                 when using -i/--input.
 
 Optional Arguments:
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `0.5`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -4478,6 +4474,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4575,10 +4575,6 @@ Optional Arguments:
                                 a .minetrc file as "tiktok.cookie" or read from
                                 the MINET_TIKTOK_COOKIE env variable.
   -l, --limit LIMIT             Maximum number of videos to retrieve per query.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -4606,6 +4602,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4725,10 +4725,6 @@ Optional Arguments:
   --retweeted-id RETWEETED_ID   Name of the column containing the ids of the
                                 original tweets in case the tweets no longer
                                 available were retweets.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --user USER                   Name of the column containing the tweet's author
                                 (given as ids or screen names). This is useful
                                 to have more information on a tweet's
@@ -4762,6 +4758,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4846,10 +4846,6 @@ Optional Arguments:
                                 env variable.
   --ids                         Whether your users are given as ids rather than
                                 screen names.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --v2                          Whether to use latest Twitter API v2 rather than
                                 v1.1.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -4881,6 +4877,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -4961,10 +4961,6 @@ Optional Arguments:
                                 env variable.
   --ids                         Whether your users are given as ids rather than
                                 screen names.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --v2                          Whether to use latest Twitter API v2 rather than
                                 v1.1.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -4996,6 +4992,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -5074,10 +5074,6 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -5105,6 +5101,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -5183,10 +5183,6 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -5214,6 +5210,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -5292,10 +5292,6 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -5325,6 +5321,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -5432,10 +5432,6 @@ Optional Arguments:
                                 Query template. Can be useful for instance to
                                 change a column of twitter user screen names
                                 into from:@user queries.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -5465,6 +5461,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -5542,10 +5542,6 @@ Positional Arguments:
                                 using -i/--input.
 
 Optional Arguments:
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -5571,6 +5567,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -5665,10 +5665,6 @@ Optional Arguments:
   --since-id SINCE_ID           Will return tweets with ids that are greater
                                 than the specified id. Takes precedence over
                                 --start-time.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --sort-order {recency,relevancy}
                                 How to sort retrieved tweets. Defaults to
                                 `recency`.
@@ -5707,6 +5703,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -5832,10 +5832,6 @@ Optional Arguments:
   --since-id SINCE_ID           Will return tweets with ids that are greater
                                 than the specified id. Takes precedence over
                                 --start-time.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --start-time START_TIME       The oldest UTC datetime from which the tweets
                                 will be counted. The date should have the format
                                 : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates
@@ -5869,6 +5865,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -5953,10 +5953,6 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   --v2                          Whether to use latest Twitter API v2 rather than
@@ -5990,6 +5986,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -6070,10 +6070,6 @@ Optional Arguments:
                                 env variable.
   --ids                         Whether your users are given as ids rather than
                                 screen names.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   --v2                          Whether to use latest Twitter API v2 rather than
@@ -6107,6 +6103,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -6188,10 +6188,6 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -6221,6 +6217,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -6312,10 +6312,6 @@ Optional Arguments:
   --min-date MIN_DATE           Whether to add a date to stop at for user's
                                 tweets retrieval. UTC date should have the
                                 following format : YYYY-MM-DD
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   --v2                          Whether to use latest Twitter API v2 rather than
@@ -6347,6 +6343,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -6421,10 +6421,6 @@ Optional Arguments:
   --granularity GRANULARITY     Pageviews granularity. Defaults to `monthly`.
   --lang LANG                   Lang for the given pages.
   --lang-column LANG_COLUMN     Name of a CSV column containing page lang.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   --start-date START_DATE       Starting date. Must be of format YYYYMMDD (e.g.
                                 20151031) or YYYYMMDDHH (e.g. 2015103100)
   --sum                         Whether to sum the collected pageviews rather
@@ -6455,6 +6451,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -6512,10 +6512,6 @@ Optional Arguments:
                                 retrieve. You can specify several languages by
                                 preferred order separated by commas. Defaults to
                                 `en`.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -6539,6 +6535,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -6608,10 +6608,6 @@ Optional Arguments:
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
                                 MINET_YOUTUBE_KEY env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -6639,6 +6635,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -6709,10 +6709,6 @@ Optional Arguments:
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
                                 MINET_YOUTUBE_KEY env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -6740,6 +6736,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -6805,10 +6805,6 @@ Optional Arguments:
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
                                 MINET_YOUTUBE_KEY env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -6836,6 +6832,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -6905,10 +6905,6 @@ Optional Arguments:
   --order {date,rating,relevance,title,videoCount,viewCount}
                                 Order in which videos are retrieved. The default
                                 one is relevance. Defaults to `relevance`.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -6936,6 +6932,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
@@ -6995,10 +6995,6 @@ Optional Arguments:
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
                                 MINET_YOUTUBE_KEY env variable.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -7026,6 +7022,10 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
