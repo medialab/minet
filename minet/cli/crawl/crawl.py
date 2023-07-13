@@ -220,6 +220,10 @@ def crawl_action(
         if hasattr(cli_args, cli_arg_name):
             crawler_kwargs[crawler_arg_name] = getattr(cli_args, cli_arg_name)
 
+    # if getattr(cli_args, "retry", False):
+    #     crawler_kwargs["retry"] = True
+    #     crawler_kwargs["retryer_kwargs"] = {"retry_on_timeout": True}
+
     if target is None:
         try:
             target = import_target(cli_args.target, "spider")
