@@ -71,7 +71,12 @@ def action(cli_args):
         info = result.data
 
         if not info:
-            return [None]
+            url = result.job.url
+            webentity = spider.trie.match(url)
+
+            assert webentity is not None
+
+            return [webentity.id]
 
         return [info.webentity_id]
 

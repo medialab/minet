@@ -23,7 +23,7 @@ from os import makedirs
 from os.path import join
 from threading import Lock
 from urllib.parse import urljoin
-from ural import ensure_protocol, is_url
+from ural import ensure_protocol
 from multiprocessing import Pool
 
 from minet.crawl.types import (
@@ -47,7 +47,7 @@ from minet.crawl.url_cache import URLCache
 from minet.web import request, EXPECTED_WEB_ERRORS, AnyTimeout
 from minet.fs import ThreadSafeFileWriter
 from minet.executors import HTTPThreadPoolExecutor, CANCELLED
-from minet.exceptions import UnknownSpiderError, CancelledRequestError, InvalidURLError
+from minet.exceptions import UnknownSpiderError, CancelledRequestError
 from minet.constants import (
     DEFAULT_DOMAIN_PARALLELISM,
     DEFAULT_IMAP_BUFFER_SIZE,
@@ -523,14 +523,6 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
                 if base_url is not None:
                     job.url = urljoin(base_url, job.url)
-
-                if not is_url(
-                    job.url,
-                    require_protocol=True,
-                    tld_aware=True,
-                    allow_spaces_in_path=True,
-                ):
-                    raise InvalidURLError(job.url)
 
                 if spider is not None and job.spider is None:
                     job.spider = spider
