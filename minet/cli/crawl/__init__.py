@@ -95,6 +95,11 @@ CRAWL_ARGUMENTS = {
         "help": "Whether to allow ssl errors when performing requests or not.",
         "action": "store_true",
     },
+    "spoof_user_agent": {
+        "flag": "--spoof-user-agent",
+        "help": 'Whether to use a plausible random "User-Agent" header when making requests.',
+        "action": "store_true",
+    },
 }
 
 

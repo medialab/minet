@@ -225,8 +225,9 @@ Usage: minet crawl [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
                    [-m MAX_DEPTH] [--throttle THROTTLE]
                    [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS] [-z]
                    [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
-                   [-f {csv,jsonl,ndjson}] [-v] [-u] [-n] [-k] [-i INPUT]
-                   [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                   [-f {csv,jsonl,ndjson}] [-v] [-u] [-n] [-k]
+                   [--spoof-user-agent] [-i INPUT] [--explode EXPLODE]
+                   [-s SELECT] [--total TOTAL]
                    target [url_or_url_column]
 
 # Minet Crawl Command
@@ -269,6 +270,8 @@ Optional Arguments:
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
+  --spoof-user-agent            Whether to use a plausible random "User-Agent"
+                                header when making requests.
   -t, --threads THREADS         Number of threads to use. You can use `0` if you
                                 want the crawler to remain completely
                                 synchronous. Defaults to `25`.
@@ -347,8 +350,9 @@ Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
                          [--throttle THROTTLE]
                          [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS]
                          [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
-                         [-f {csv,jsonl,ndjson}] [-v] [-n] [-k] [-i INPUT]
-                         [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                         [-f {csv,jsonl,ndjson}] [-v] [-n] [-k]
+                         [--spoof-user-agent] [-i INPUT] [--explode EXPLODE]
+                         [-s SELECT] [--total TOTAL]
                          [url_or_url_column]
 
 # Minet Focus Crawl Command
@@ -408,6 +412,8 @@ Optional Arguments:
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
+  --spoof-user-agent            Whether to use a plausible random "User-Agent"
+                                header when making requests.
   -t, --threads THREADS         Number of threads to use. You can use `0` if you
                                 want the crawler to remain completely
                                 synchronous. Defaults to `25`.
@@ -490,6 +496,7 @@ Usage: minet hyphe-crawl [-h] [--silent]
                          [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS]
                          [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-k]
+                         [--spoof-user-agent]
                          corpus
 
 # Minet Hyphe Crawl Command
@@ -538,6 +545,8 @@ Optional Arguments:
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
+  --spoof-user-agent            Whether to use a plausible random "User-Agent"
+                                header when making requests.
   --start-page-separator START_PAGE_SEPARATOR
                                 Separator character for the webentity start
                                 pages. Defaults to ` `.
@@ -680,7 +689,7 @@ Optional Arguments:
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
-  --spoof-user-agent            Whether to use a plausible random User-Agent
+  --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
   --standardize-encoding        Whether to systematically convert retrieved text
                                 to UTF-8.
@@ -1012,7 +1021,7 @@ Optional Arguments:
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
-  --spoof-user-agent            Whether to use a plausible random User-Agent
+  --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
   -t, --threads THREADS         Number of threads to use. Defaults to `25`.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to

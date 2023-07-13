@@ -205,6 +205,7 @@ def crawl_action(
         "visit_urls_only_once",
         "normalized_url_cache",
         ("threads", "max_workers"),
+        ("spoof_user_agent", "spoof_ua"),
         "insecure",
         "domain_parallelism",
     ]
