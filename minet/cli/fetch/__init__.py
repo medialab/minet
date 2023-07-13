@@ -63,6 +63,7 @@ COMMON_ARGUMENTS = [
         "dest": "method",
         "default": "GET",
     },
+    {"flags": ["-x", "--proxy"], "help": "Proxy server to use."},
     {
         "flag": "--spoof-user-agent",
         "help": 'Whether to use a plausible random "User-Agent" header when making requests.',

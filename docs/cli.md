@@ -616,8 +616,9 @@ Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                    [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
                    [-H HEADERS] [-k] [-t THREADS] [--throttle THROTTLE]
                    [--timeout TIMEOUT] [--url-template URL_TEMPLATE] [-X METHOD]
-                   [--spoof-user-agent] [--max-redirects MAX_REDIRECTS] [-z]
-                   [-c] [-D] [-O OUTPUT_DIR] [-f FILENAME]
+                   [-x PROXY] [--spoof-user-agent]
+                   [--max-redirects MAX_REDIRECTS] [-z] [-c] [-D]
+                   [-O OUTPUT_DIR] [-f FILENAME]
                    [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [--keep-failed-contents]
                    [--standardize-encoding] [--only-html] [-i INPUT]
@@ -682,6 +683,7 @@ Optional Arguments:
                                 the http body actually looks like html.
   -O, --output-dir OUTPUT_DIR   Directory where the fetched files will be
                                 written. Defaults to `downloaded`.
+  -x, --proxy PROXY             Proxy server to use.
   -X, --request METHOD          The http method to use. Will default to GET.
                                 Defaults to `GET`.
   -D, --dont-save               Use not to write any downloaded file on disk.
@@ -968,7 +970,7 @@ Usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                      [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
                      [-H HEADERS] [-k] [-t THREADS] [--throttle THROTTLE]
                      [--timeout TIMEOUT] [--url-template URL_TEMPLATE]
-                     [-X METHOD] [--spoof-user-agent]
+                     [-X METHOD] [-x PROXY] [--spoof-user-agent]
                      [--max-redirects MAX_REDIRECTS] [--follow-meta-refresh]
                      [--follow-js-relocation] [--infer-redirection]
                      [--canonicalize] [--only-shortened] [-i INPUT]
@@ -1015,6 +1017,7 @@ Optional Arguments:
                                 breaking. Defaults to `20`.
   --only-shortened              Whether to only attempt to resolve urls that are
                                 probably shortened.
+  -x, --proxy PROXY             Proxy server to use.
   -X, --request METHOD          The http method to use. Will default to GET.
                                 Defaults to `GET`.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"

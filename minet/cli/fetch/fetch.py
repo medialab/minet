@@ -297,6 +297,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
         "max_workers": cli_args.threads,
         "wait": False,
         "daemonic": False,
+        "proxy": cli_args.proxy,
     }
     common_imap_kwargs = {
         "key": url_key,

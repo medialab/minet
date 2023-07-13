@@ -7,6 +7,7 @@ from urllib3.exceptions import (
     DecodeError,
     LocationValueError,
     LocationParseError,
+    ProxyError,
 )
 
 from minet.exceptions import (
@@ -97,6 +98,7 @@ ERROR_REPORTERS = {
     FilenameFormattingError: "filename-formatting-error",
     CouldNotInferEncodingError: "could-not-infer-encoding",
     InvalidStatusError: serialize_invalid_status_error,
+    ProxyError: "proxy-error",
 }
 
 

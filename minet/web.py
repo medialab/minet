@@ -269,6 +269,7 @@ def create_pool_manager(
         )
 
     if proxy is not None:
+        proxy = ural.ensure_protocol(proxy)
         return urllib3.ProxyManager(proxy, **manager_kwargs)
 
     return urllib3.PoolManager(**manager_kwargs)
