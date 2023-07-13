@@ -30,6 +30,7 @@ import json
 import mimetypes
 import functools
 import threading
+from http.cookiejar import CookieJar
 from bs4 import SoupStrainer
 from datetime import datetime
 from timeit import default_timer as timer
@@ -37,6 +38,7 @@ from io import BytesIO
 from threading import Event
 from itertools import chain
 from urllib.parse import urljoin, quote
+from urllib.request import Request
 from urllib3 import HTTPResponse
 from urllib3.util.ssl_ import create_urllib3_context
 from ebbe import rcompose, noop, format_filesize, format_repr
@@ -460,6 +462,9 @@ class BufferedResponse(object):
     ) -> None:
         self.__stream(chunk_size=chunk_size, up_to=amount)
 
+    def extract_cookies_in_jar(self, jar: CookieJar) -> None:
+        jar.extract_cookies(self.__inner, Request(self.geturl()))  # type: ignore
+
 
 def atomic_request(
     pool_manager: urllib3.PoolManager,
@@ -561,6 +566,7 @@ def atomic_resolve(
     final_time: Optional[float] = None,
     body=None,
     canonicalize: bool = False,
+    stateful: bool = False,
 ) -> Tuple[RedirectionStack, BufferedResponse]:
     """
     Helper function attempting to resolve the given url.
@@ -572,17 +578,26 @@ def atomic_resolve(
     if final_time is None:
         final_time = pool_manager_aware_timeout_to_final_time(pool_manager, timeout)
 
+    jar = None
+
+    if stateful:
+        jar = CookieJar()
+
     try:
         for _ in range(max_redirects):
             # We close last buffered_response as it won't be used anymore
             # NOTE: this should always happen at the beginning of the loop
             if buffered_response is not None:
+                if stateful:
+                    assert jar is not None
+                    buffered_response.extract_cookies_in_jar(jar)
+
                 buffered_response.close()
                 # NOTE: resetting variable to avoid double free on errors
                 buffered_response = None
 
             # Detecting cycles
-            if url in url_stack:
+            if not stateful and url in url_stack:
                 raise InfiniteRedirectsError("Infinite redirects")
 
             if infer_redirection:
@@ -594,6 +609,16 @@ def atomic_resolve(
                     continue
 
             redirection = Redirection(url)
+
+            if stateful:
+                assert jar is not None
+
+                dummy_req = Request(url)
+                jar.add_cookie_header(dummy_req)
+                cookie = dummy_req.get_header("Cookie")
+
+                if cookie is not None:
+                    headers = {**(headers or {}), "Cookie": cookie}
 
             # NOTE: atomic_request will check for cancellation
             buffered_response = atomic_request(
