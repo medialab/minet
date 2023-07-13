@@ -214,11 +214,16 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
         if global_headers:
             headers = global_headers
 
+        spoof_ua = cli_args.spoof_user_agent
+
+        if not spoof_ua and resolve:
+            spoof_ua = should_spoof_ua_when_resolving(payload.domain)
+
         return {
             "method": http_method,
             "cookie": cookie,
             "headers": headers,
-            "spoof_ua": resolve and should_spoof_ua_when_resolving(payload.domain),
+            "spoof_ua": spoof_ua,
         }
 
     # Worker callback internals

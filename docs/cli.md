@@ -595,8 +595,8 @@ Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                    [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
                    [-H HEADERS] [-k] [-t THREADS] [--throttle THROTTLE]
                    [--timeout TIMEOUT] [--url-template URL_TEMPLATE] [-X METHOD]
-                   [--max-redirects MAX_REDIRECTS] [-z] [-c] [-D]
-                   [-O OUTPUT_DIR] [-f FILENAME]
+                   [--spoof-user-agent] [--max-redirects MAX_REDIRECTS] [-z]
+                   [-c] [-D] [-O OUTPUT_DIR] [-f FILENAME]
                    [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [--keep-failed-contents]
                    [--standardize-encoding] [--only-html] [-i INPUT]
@@ -668,6 +668,8 @@ Optional Arguments:
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
+  --spoof-user-agent            Whether to use a plausible random User-Agent
+                                header when making requests.
   --standardize-encoding        Whether to systematically convert retrieved text
                                 to UTF-8.
   -t, --threads THREADS         Number of threads to use. Defaults to `25`.
@@ -945,11 +947,12 @@ Usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                      [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
                      [-H HEADERS] [-k] [-t THREADS] [--throttle THROTTLE]
                      [--timeout TIMEOUT] [--url-template URL_TEMPLATE]
-                     [-X METHOD] [--max-redirects MAX_REDIRECTS]
-                     [--follow-meta-refresh] [--follow-js-relocation]
-                     [--infer-redirection] [--canonicalize] [--only-shortened]
-                     [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
-                     [--resume] [-o OUTPUT]
+                     [-X METHOD] [--spoof-user-agent]
+                     [--max-redirects MAX_REDIRECTS] [--follow-meta-refresh]
+                     [--follow-js-relocation] [--infer-redirection]
+                     [--canonicalize] [--only-shortened] [-i INPUT]
+                     [--explode EXPLODE] [-s SELECT] [--total TOTAL] [--resume]
+                     [-o OUTPUT]
                      url_or_url_column
 
 # Minet Resolve Command
@@ -997,6 +1000,8 @@ Optional Arguments:
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
+  --spoof-user-agent            Whether to use a plausible random User-Agent
+                                header when making requests.
   -t, --threads THREADS         Number of threads to use. Defaults to `25`.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to `0.2`.

@@ -63,6 +63,11 @@ COMMON_ARGUMENTS = [
         "dest": "method",
         "default": "GET",
     },
+    {
+        "flag": "--spoof-user-agent",
+        "help": "Whether to use a plausible random User-Agent header when making requests.",
+        "action": "store_true",
+    },
 ]
 
 
