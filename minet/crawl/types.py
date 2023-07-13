@@ -272,7 +272,15 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
                     ("mimetype", self.response.mimetype if self.response else None),
                 )
             ),
-            conditionals=("spider", "error", "status", "degree", "dtype"),
+            conditionals=(
+                "spider",
+                "error",
+                "status",
+                "degree",
+                "dtype",
+                "size",
+                "mimetype",
+            ),
         )
 
 
