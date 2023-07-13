@@ -224,7 +224,7 @@ Usage: minet crawl [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
                    [--single-line] [-O OUTPUT_DIR] [--factory] [--resume]
                    [-m MAX_DEPTH] [--throttle THROTTLE] [-t THREADS] [-z] [-w]
                    [-d] [--folder-strategy FOLDER_STRATEGY]
-                   [-f {csv,jsonl,ndjson}] [-v] [-u] [-n] [-i INPUT]
+                   [-f {csv,jsonl,ndjson}] [-v] [-u] [-n] [-k] [-i INPUT]
                    [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                    target [url_or_url_column]
 
@@ -255,6 +255,8 @@ Optional Arguments:
   -f, --format {csv,jsonl,ndjson}
                                 Serialization format for scraped/extracted data.
                                 Defaults to `csv`.
+  -k, --insecure                Whether to allow ssl errors when performing
+                                requests or not.
   -m, --max-depth MAX_DEPTH     Maximum depth for the crawl.
   -n, --normalized-url-cache    Whether to normalize url cache used to assess if
                                 some url was already visited.
@@ -340,7 +342,7 @@ Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
                          [-O OUTPUT_DIR] [--factory] [--resume] [-m MAX_DEPTH]
                          [--throttle THROTTLE] [-t THREADS] [-z] [-w] [-d]
                          [--folder-strategy FOLDER_STRATEGY]
-                         [-f {csv,jsonl,ndjson}] [-v] [-n] [-i INPUT]
+                         [-f {csv,jsonl,ndjson}] [-v] [-n] [-k] [-i INPUT]
                          [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                          [url_or_url_column]
 
@@ -380,6 +382,8 @@ Optional Arguments:
   -f, --format {csv,jsonl,ndjson}
                                 Serialization format for scraped/extracted data.
                                 Defaults to `csv`.
+  -k, --insecure                Whether to allow ssl errors when performing
+                                requests or not.
   --invert-content-match        Flag to turn the content filter into an
                                 exclusion rule.
   --invert-url-match            Flag to turn the url filter into an exclusion
@@ -476,7 +480,7 @@ Usage: minet hyphe-crawl [-h] [--silent]
                          [-O OUTPUT_DIR] [--factory] [--resume] [-m MAX_DEPTH]
                          [--throttle THROTTLE] [-t THREADS] [-z] [-w] [-d]
                          [--folder-strategy FOLDER_STRATEGY]
-                         [-f {csv,jsonl,ndjson}] [-v] [-n]
+                         [-f {csv,jsonl,ndjson}] [-v] [-n] [-k]
                          corpus
 
 # Minet Hyphe Crawl Command
@@ -505,6 +509,8 @@ Optional Arguments:
                                 Defaults to `csv`.
   --id-column ID_COLUMN         Name of the CSV column containing the webentity
                                 ids. Defaults to `ID`.
+  -k, --insecure                Whether to allow ssl errors when performing
+                                requests or not.
   -m, --max-depth MAX_DEPTH     Maximum depth for the crawl.
   -n, --normalized-url-cache    Whether to normalize url cache used to assess if
                                 some url was already visited.
@@ -587,7 +593,7 @@ Examples:
 Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                    [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
                    [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
-                   [-H HEADERS] [--insecure] [-t THREADS] [--throttle THROTTLE]
+                   [-H HEADERS] [-k] [-t THREADS] [--throttle THROTTLE]
                    [--timeout TIMEOUT] [--url-template URL_TEMPLATE] [-X METHOD]
                    [--max-redirects MAX_REDIRECTS] [-z] [-c] [-D]
                    [-O OUTPUT_DIR] [-f FILENAME]
@@ -641,7 +647,7 @@ Optional Arguments:
                                 computer's browser (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
   -H, --header HEADERS          Custom headers used with every requests.
-  --insecure                    Whether to allow ssl errors when performing
+  -k, --insecure                Whether to allow ssl errors when performing
                                 requests or not.
   --keep-failed-contents        Whether to keep & write contents for failed
                                 (i.e. non-200) http requests.
@@ -937,14 +943,13 @@ Examples:
 Usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                      [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
                      [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
-                     [-H HEADERS] [--insecure] [-t THREADS]
-                     [--throttle THROTTLE] [--timeout TIMEOUT]
-                     [--url-template URL_TEMPLATE] [-X METHOD]
-                     [--max-redirects MAX_REDIRECTS] [--follow-meta-refresh]
-                     [--follow-js-relocation] [--infer-redirection]
-                     [--canonicalize] [--only-shortened] [-i INPUT]
-                     [--explode EXPLODE] [-s SELECT] [--total TOTAL] [--resume]
-                     [-o OUTPUT]
+                     [-H HEADERS] [-k] [-t THREADS] [--throttle THROTTLE]
+                     [--timeout TIMEOUT] [--url-template URL_TEMPLATE]
+                     [-X METHOD] [--max-redirects MAX_REDIRECTS]
+                     [--follow-meta-refresh] [--follow-js-relocation]
+                     [--infer-redirection] [--canonicalize] [--only-shortened]
+                     [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                     [--resume] [-o OUTPUT]
                      url_or_url_column
 
 # Minet Resolve Command
@@ -979,7 +984,7 @@ Optional Arguments:
   --infer-redirection           Whether to try to heuristically infer
                                 redirections from the urls themselves, without
                                 requiring a HTTP call.
-  --insecure                    Whether to allow ssl errors when performing
+  -k, --insecure                Whether to allow ssl errors when performing
                                 requests or not.
   --max-redirects MAX_REDIRECTS
                                 Maximum number of redirections to follow before

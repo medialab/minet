@@ -32,7 +32,7 @@ COMMON_ARGUMENTS = [
         "dest": "headers",
     },
     {
-        "flag": "--insecure",
+        "flags": ["-k", "--insecure"],
         "help": "Whether to allow ssl errors when performing requests or not.",
         "action": "store_true",
     },

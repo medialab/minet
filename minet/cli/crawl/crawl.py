@@ -205,6 +205,7 @@ def crawl_action(
         "visit_urls_only_once",
         "normalized_url_cache",
         ("threads", "max_workers"),
+        "insecure",
     ]
 
     for arg in cli_args_to_forward_to_crawler:

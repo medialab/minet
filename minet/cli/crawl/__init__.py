@@ -84,6 +84,11 @@ CRAWL_ARGUMENTS = {
         "help": "Whether to normalize url cache used to assess if some url was already visited.",
         "action": "store_true",
     },
+    "insecure": {
+        "flags": ["-k", "--insecure"],
+        "help": "Whether to allow ssl errors when performing requests or not.",
+        "action": "store_true",
+    },
 }
 
 
