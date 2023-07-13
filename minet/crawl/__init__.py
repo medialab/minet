@@ -1,4 +1,3 @@
-from minet.crawl.focus import FocusCrawlInfo, FocusSpider
 from minet.crawl.types import (
     CrawlResult,
     AnyCrawlResult,

@@ -1,4 +1,4 @@
-from typing import List, Iterator
+from typing import Iterable, List, Set, Iterator, Any, Optional
 from minet.types import Literal
 
 from dataclasses import dataclass
@@ -7,9 +7,11 @@ from ural import should_follow_href
 from casanova import TabularRecord
 
 from minet.crawl.spiders import Spider, SpiderResult
-from minet.crawl.types import CrawlJob
+from minet.crawl.types import CrawlJob, SuccessfulCrawlResult
 from minet.web import Response
 from minet.scrape.typical import UrlsScraper
+
+VALID_WEBENTITY_STATUSES = ["IN", "OUT", "UNDECIDED", "DISCOVERED"]
 
 WebentityStatus = Literal["IN", "OUT", "UNDECIDED", "DISCOVERED"]
 
@@ -28,12 +30,31 @@ class WebentityLink(TabularRecord):
     target_url: str
 
 
+@dataclass
+class HypheSpiderAddendum:
+    webentity_id: str
+    links: List[WebentityLink]
+
+
 class HypheSpider(Spider):
     def __init__(self):
         self.trie: LRUTrie[WebentityRecord] = LRUTrie()
         self.urls_scraper = UrlsScraper()
+        self.start_pages: Set[str] = set()
+
+    def start(self) -> Iterable[str]:
+        yield from self.start_pages
+
+    def add_start_page(self, url: str) -> None:
+        if self.is_attached:
+            raise RuntimeError("cannot add start page if spider is already attached")
+
+        self.start_pages.add(url)
 
     def set(self, prefix, webentity, status: WebentityStatus = "IN") -> None:
+        if status not in VALID_WEBENTITY_STATUSES:
+            raise TypeError("invalid webentity status: {!r}".format(status))
+
         self.trie.set(prefix, WebentityRecord(id=webentity, status=status))
 
     def process(self, job: CrawlJob, response: Response) -> SpiderResult:
@@ -81,7 +102,15 @@ class HypheSpider(Spider):
 
             urls_to_follow.append(url)
 
-        return links, urls_to_follow
+        return (
+            HypheSpiderAddendum(webentity_id=webentity.id, links=links),
+            urls_to_follow,
+        )
 
-    def tabulate(self, data: List[WebentityLink]) -> Iterator[WebentityLink]:
-        yield from data
+    def tabulate(
+        self, result: SuccessfulCrawlResult[Any, Optional[HypheSpiderAddendum]]
+    ) -> Iterator[WebentityLink]:
+        if not result.data:
+            return
+
+        yield from result.data.links

@@ -51,6 +51,11 @@ class Spider(Generic[CrawlJobDataType, CrawlResultDataType]):
 
         return c
 
+    # TODO: add some kind of method decorator?
+    @property
+    def is_attached(self) -> bool:
+        return bool(getattr(self, "_crawler", None))
+
     def attach(self, crawler: "Crawler"):
         if getattr(self, "_crawler", None) is not None:
             raise TypeError("spider is already attached to a crawler")

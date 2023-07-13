@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from minet.cli.argparse import command, FolderStrategyType, BooleanAction
+from minet.cli.argparse import command, FolderStrategyType, BooleanAction, InputAction
 from minet.cli.exceptions import InvalidArgumentsError
 
 # TODO: lazyloading issue
@@ -239,7 +239,7 @@ def ensure_filters(cli_args):
 
 FOCUS_CRAWL_COMMAND = crawl_command(
     "focus-crawl",
-    "minet.cli.crawl.focus_crawl",
+    "minet.cli.crawl.focus",
     title="Minet Focus Crawl Command",
     description="""
         Minet crawl feature with the possibility
@@ -250,7 +250,7 @@ FOCUS_CRAWL_COMMAND = crawl_command(
 
         Regex must be written between simple quotes.
     """,
-    epilog=f"""
+    epilog="""
         Examples:
 
         . Running a simple crawler:
@@ -293,6 +293,62 @@ FOCUS_CRAWL_COMMAND = crawl_command(
             "flag": "--only-html",
             "help": "Add URLs to the crawler queue only if they seem to lead to a HTML content.",
             "action": "store_true",
+        },
+    ],
+)
+
+HYPHE_CRAWL_COMMAND = crawl_command(
+    "hyphe-crawl",
+    "minet.cli.crawl.hyphe",
+    title="Minet Hyphe Crawl Command",
+    description="""
+        Specialized crawl command that can be used to reproduce
+        a Hyphe crawl from a corpus exported in CSV.
+    """,
+    epilog="""
+        Examples:
+
+        . Reproducing a crawl:
+            $ minet hyphe-crawl corpus.csv
+    """,
+    unique=True,
+    accept_input=False,
+    default_folder_strategy="fullpath",
+    arguments=[
+        {
+            "name": "corpus",
+            "action": InputAction,
+            "help": "Path to the Hyphe corpus exported to CSV.",
+        },
+        {
+            "flag": "--id-column",
+            "default": "ID",
+            "help": "Name of the CSV column containing the webentity ids.",
+        },
+        {
+            "flag": "--status-column",
+            "default": "STATUS",
+            "help": "Name of the CSV column containing the webentity statuses.",
+        },
+        {
+            "flag": "--prefixes-column",
+            "default": "PREFIXES AS URL",
+            "help": "Name of the CSV column containing the webentity prefixes, separated by --prefix-separator.",
+        },
+        {
+            "flag": "--prefix-separator",
+            "default": " ",
+            "help": "Separator character for the webentity prefixes.",
+        },
+        {
+            "flag": "--start-pages-column",
+            "default": "START PAGES",
+            "help": "Name of the CSV column containing the webentity start pages, separated by --start-page-separator.",
+        },
+        {
+            "flag": "--start-page-separator",
+            "default": " ",
+            "help": "Separator character for the webentity start pages.",
         },
     ],
 )

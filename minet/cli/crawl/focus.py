@@ -1,6 +1,7 @@
 from typing import List, Any
 
-from minet.crawl import CrawlResult, FocusCrawlInfo, FocusSpider
+from minet.crawl import CrawlResult
+from minet.crawl.focus import FocusCrawlInfo, FocusSpider
 
 from minet.cli.crawl.crawl import crawl_action
 from minet.cli.loading_bar import LoadingBar
