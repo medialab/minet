@@ -35,6 +35,12 @@ CRAWL_ARGUMENTS = {
         "type": float,
         "default": DEFAULT_THROTTLE,
     },
+    "domain_parallelism": {
+        "flag": "--domain-parallelism",
+        "help": "Max number of urls per domain to hit at the same time.",
+        "type": int,
+        "default": 1,
+    },
     "threads": {
         "flags": ["-t", "--threads"],
         "help": "Number of threads to use. You can use `0` if you want the crawler to remain completely synchronous.",
@@ -101,14 +107,16 @@ def crawl_command(
     arguments: Optional[List] = None,
     accept_input: bool = True,
     resolve=None,
-    unique=False,
-    url_cache=True,
-    max_depth=True,
-    throttle=True,
-    threads=True,
-    write_files=False,
-    write_data=True,
-    factory=False,
+    unique: bool = False,
+    url_cache: bool = True,
+    max_depth: bool = True,
+    throttle: bool = True,
+    default_throttle: Optional[float] = None,
+    domain_parallelism: bool = True,
+    threads: bool = True,
+    write_files: bool = False,
+    write_data: bool = True,
+    factory: bool = False,
     default_folder_strategy: Optional[str] = None,
     force_folder_strategy: Optional[str] = None,
     default_output_dir: Optional[str] = None,
@@ -129,8 +137,17 @@ def crawl_command(
     if not throttle:
         del arguments_dict["throttle"]
 
+    if default_throttle is not None:
+        arguments_dict["throttle"] = {
+            **arguments_dict["throttle"],
+            "default": default_throttle,
+        }
+
     if not threads:
         del arguments_dict["threads"]
+
+    if not domain_parallelism:
+        del arguments_dict["domain_parallelism"]
 
     if write_files:
         del arguments_dict["write_files"]
@@ -319,6 +336,7 @@ HYPHE_CRAWL_COMMAND = crawl_command(
     unique=True,
     accept_input=False,
     default_folder_strategy="fullpath",
+    default_throttle=0,
     arguments=[
         {
             "name": "corpus",

@@ -206,6 +206,7 @@ def crawl_action(
         "normalized_url_cache",
         ("threads", "max_workers"),
         "insecure",
+        "domain_parallelism",
     ]
 
     for arg in cli_args_to_forward_to_crawler:

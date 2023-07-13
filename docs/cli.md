@@ -222,8 +222,9 @@ Examples:
 ```
 Usage: minet crawl [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
                    [--single-line] [-O OUTPUT_DIR] [--factory] [--resume]
-                   [-m MAX_DEPTH] [--throttle THROTTLE] [-t THREADS] [-z] [-w]
-                   [-d] [--folder-strategy FOLDER_STRATEGY]
+                   [-m MAX_DEPTH] [--throttle THROTTLE]
+                   [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS] [-z]
+                   [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                    [-f {csv,jsonl,ndjson}] [-v] [-u] [-n] [-k] [-i INPUT]
                    [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                    target [url_or_url_column]
@@ -242,6 +243,9 @@ Positional Arguments:
 Optional Arguments:
   -z, --compress                Whether to compress the downloaded files when
                                 saving files on disk.
+  --domain-parallelism DOMAIN_PARALLELISM
+                                Max number of urls per domain to hit at the same
+                                time. Defaults to `1`.
   --factory                     Whether crawl target is a crawler factory
                                 function.
   --folder-strategy FOLDER_STRATEGY
@@ -340,8 +344,9 @@ Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
                          [--invert-content-match] [--invert-url-match]
                          [--extract] [--irrelevant-continue] [--only-html]
                          [-O OUTPUT_DIR] [--factory] [--resume] [-m MAX_DEPTH]
-                         [--throttle THROTTLE] [-t THREADS] [-z] [-w] [-d]
-                         [--folder-strategy FOLDER_STRATEGY]
+                         [--throttle THROTTLE]
+                         [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS]
+                         [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-k] [-i INPUT]
                          [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                          [url_or_url_column]
@@ -366,6 +371,9 @@ Optional Arguments:
                                 saving files on disk.
   -C, --content-filter CONTENT_FILTER
                                 Regex used to filter fetched content.
+  --domain-parallelism DOMAIN_PARALLELISM
+                                Max number of urls per domain to hit at the same
+                                time. Defaults to `1`.
   --extract                     Perform regex match on extracted text content
                                 instead of html content using the Trafilatura
                                 library.
@@ -478,8 +486,9 @@ Usage: minet hyphe-crawl [-h] [--silent]
                          [--start-pages-column START_PAGES_COLUMN]
                          [--start-page-separator START_PAGE_SEPARATOR]
                          [-O OUTPUT_DIR] [--factory] [--resume] [-m MAX_DEPTH]
-                         [--throttle THROTTLE] [-t THREADS] [-z] [-w] [-d]
-                         [--folder-strategy FOLDER_STRATEGY]
+                         [--throttle THROTTLE]
+                         [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS]
+                         [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-k]
                          corpus
 
@@ -494,6 +503,9 @@ Positional Arguments:
 Optional Arguments:
   -z, --compress                Whether to compress the downloaded files when
                                 saving files on disk.
+  --domain-parallelism DOMAIN_PARALLELISM
+                                Max number of urls per domain to hit at the same
+                                time. Defaults to `1`.
   --factory                     Whether crawl target is a crawler factory
                                 function.
   --folder-strategy FOLDER_STRATEGY
@@ -541,7 +553,7 @@ Optional Arguments:
                                 want the crawler to remain completely
                                 synchronous. Defaults to `25`.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
-                                the same domain. Defaults to `0.2`.
+                                the same domain. Defaults to `0`.
   -v, --verbose                 Whether to print information about crawl
                                 results.
   -d, --write-data, -D, --dont-write-data
