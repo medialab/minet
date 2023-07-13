@@ -1,7 +1,10 @@
+from typing import List, Iterator
 from minet.types import Literal
 
 from dataclasses import dataclass
 from ural.lru import LRUTrie
+from ural import should_follow_href
+from casanova import TabularRecord
 
 from minet.crawl.spiders import Spider, SpiderResult
 from minet.crawl.types import CrawlJob
@@ -12,40 +15,73 @@ WebentityStatus = Literal["IN", "OUT", "UNDECIDED", "DISCOVERED"]
 
 
 @dataclass
-class HypheJobData:
-    webentity: str
+class WebentityRecord:
+    id: str
+    status: WebentityStatus
 
 
-class HypheSpider(Spider[HypheJobData, None]):
+@dataclass
+class WebentityLink(TabularRecord):
+    source_webentity: str
+    target_webentity: str
+    source_url: str
+    target_url: str
+
+
+class HypheSpider(Spider):
     def __init__(self):
-        self.trie = LRUTrie()
+        self.trie: LRUTrie[WebentityRecord] = LRUTrie()
         self.urls_scraper = UrlsScraper()
 
     def set(self, prefix, webentity, status: WebentityStatus = "IN") -> None:
-        self.trie.set(prefix, webentity)
+        self.trie.set(prefix, WebentityRecord(id=webentity, status=status))
 
-    def process(self, job: CrawlJob[HypheJobData], response: Response) -> SpiderResult:
-        assert job.data is not None
-
+    def process(self, job: CrawlJob, response: Response) -> SpiderResult:
         if response.status != 200:
-            return None
+            return
 
         if not response.could_be_html:
-            return None
+            return
+
+        webentity = self.trie.match(response.end_url)
+
+        if webentity is None or webentity.status != "IN":
+            return
 
         urls = self.urls_scraper(response.text())
 
-        valid_urls = []
+        urls_to_follow = []
+        links: List[WebentityLink] = []
 
         for url in urls:
+            url = response.resolve(url)
+
+            if not should_follow_href(url):
+                continue
+
             match = self.trie.match(url)
 
             if match is None:
                 continue
 
-            if match != job.data.webentity:
+            if match.status != "IN":
                 continue
 
-            valid_urls.append(url)
+            links.append(
+                WebentityLink(
+                    source_webentity=webentity.id,
+                    target_webentity=match.id,
+                    source_url=response.end_url,
+                    target_url=url,
+                )
+            )
 
-        return None, valid_urls
+            if match.id != webentity.id:
+                continue
+
+            urls_to_follow.append(url)
+
+        return links, urls_to_follow
+
+    def tabulate(self, data: List[WebentityLink]) -> Iterator[WebentityLink]:
+        yield from data
