@@ -38,7 +38,7 @@ class HypheSpiderAddendum:
 
 class HypheSpider(Spider):
     def __init__(self):
-        self.trie: LRUTrie[WebentityRecord] = LRUTrie()
+        self.trie: LRUTrie[WebentityRecord] = LRUTrie(suffix_aware=True)
         self.urls_scraper = UrlsScraper()
         self.start_pages: Set[str] = set()
 
