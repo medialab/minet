@@ -26,6 +26,13 @@ class EchoJSSpider(Spider):
 spider_instance = EchoJSSpider()
 
 
+class DummyEchoJSSpider(Spider):
+    START_URL = "https://echojs.com/latest"
+
+    def process(self, job, response):
+        return
+
+
 class EchoJSStartSpider(Spider):
     START_URL = "https://echojs.com/latest"
 

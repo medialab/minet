@@ -280,11 +280,14 @@ def crawl_action(
         if not isinstance(crawler, Crawler):
             raise FatalError("Factory did not return a crawler!")
 
-    with crawler:
-        if crawler.finished:
-            loading_bar.erase()
-            raise FatalError("[error]Crawler has already finished!")
+    # TODO: refactor this as exception
+    if crawler.finished:
+        crawler.stop()
+        loading_bar.erase()
+        raise FatalError("[error]Crawler has already finished!")
 
+    with crawler:
+        # Enqueuing extraneous start jobs?
         if crawler.resuming:
             loading_bar.print("[log.time]Crawler will now resume…")
         elif getattr(cli_args, "input", None):

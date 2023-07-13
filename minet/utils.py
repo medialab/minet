@@ -4,6 +4,7 @@
 #
 # Miscellaneous helper function used throughout the library.
 #
+import os
 import re
 import hashlib
 import json
@@ -105,7 +106,13 @@ def parse_module_and_target(path, default: str = "main"):
     return path, default
 
 
-def import_target(path, default: str = "main"):
+PY_EXT_RE = re.compile(r"\.py(?=:|$)", re.I)
+
+
+def import_target(path: str, default: str = "main"):
+    path = path.replace(os.sep, ".")
+    path = PY_EXT_RE.sub("", path)
+
     module_name, function_name = parse_module_and_target(path, default=default)
     m = importlib.import_module(module_name)
 
