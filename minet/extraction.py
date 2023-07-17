@@ -78,7 +78,7 @@ class TrafilaturaResult(TabularRecord):
             attr = getattr(self, s, "")
             if isinstance(attr, list):
                 items.append(" ".join(attr))
-            else:
+            elif attr:
                 items.append(attr)
 
         return "\n".join(items)

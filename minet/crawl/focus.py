@@ -95,6 +95,9 @@ class FocusSpider(Spider):
         if not regex_content and not regex_url:
             raise TypeError("Neither url nor content filter provided.")
 
+        if extraction_fields and not extract:
+            raise TypeError("Custom extraction fields can't be used without the extract option.")
+
         self.urls = start_urls
         self.regex_content = re.compile(regex_content, re.I) if regex_content else None
         self.invert_content_match = invert_content_match
@@ -121,7 +124,7 @@ class FocusSpider(Spider):
 
         content = ""
 
-        if self.extraction or self.extraction_fields:
+        if self.extraction:
             extraction = extract(html)
             if extraction:
                 content = extraction.blurb(self.extraction_fields)

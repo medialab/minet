@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from minet.cli.argparse import command, FolderStrategyType, BooleanAction, InputAction, TrafilaturaSelect
+from minet.cli.argparse import command, FolderStrategyType, BooleanAction, InputAction, ExtractionSelectionAction
 from minet.cli.exceptions import InvalidArgumentsError
 
 # TODO: lazyloading issue
@@ -263,6 +263,9 @@ def check_focus_crawl_arguments(cli_args):
             ]
         )
 
+    if cli_args.extraction_fields and not cli_args.extract:
+        raise InvalidArgumentsError("Custom extraction fields can't be used if the flag extract is not present.")
+
 
 FOCUS_CRAWL_COMMAND = crawl_command(
     "focus-crawl",
@@ -323,8 +326,8 @@ FOCUS_CRAWL_COMMAND = crawl_command(
         },
         {
             "flag": "--extraction-fields",
-            "help": "Fields of the trafilatura extraction you want to apply the content filter on, separated using commas. It enables the flag `--extract`.",
-            "action": TrafilaturaSelect,
+            "help": "Fields of the trafilatura extraction you want to apply the content filter on, separated using commas. It must be used with the flag `--extract`.",
+            "action": ExtractionSelectionAction,
             "default": None,
         },
     ],

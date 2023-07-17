@@ -530,7 +530,7 @@ class WrappedConfigValue(object):
         return value
 
 
-class TrafilaturaSelect(Action):
+class ExtractionSelectionAction(Action):
     def __init__(
         self,
         option_strings,
@@ -541,7 +541,7 @@ class TrafilaturaSelect(Action):
     ):
         self.fields = set(TrafilaturaResult.fieldnames())
         fields_help = (
-            "Available flags are : " + and_join([f"`{f}`" for f in self.fields]) + "."
+            "Available flags are: " + and_join([f"`{f}`" for f in self.fields]) + "."
         )
         help = fields_help if not help else help + " " + fields_help
         super().__init__(option_strings, dest, help=help, default=default, **kwargs)
@@ -549,9 +549,9 @@ class TrafilaturaSelect(Action):
     def __call__(self, _, cli_args, value):
         selection = value.split(",")
         for s in selection:
-            if not s in self.fields:
+            if s not in self.fields:
                 messages = [
-                    f"The trafilatura field `{s}` doesn't exist. Available fields are :"
+                    f"The trafilatura field `{s}` doesn't exist. Available fields are:"
                 ] + [f"- {a}" for a in self.fields]
                 raise ArgumentError(self, "\n".join(messages))
         selection = set(selection) if selection else None
