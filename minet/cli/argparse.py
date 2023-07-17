@@ -546,7 +546,7 @@ class ExtractionSelectionAction(Action):
         help = fields_help if not help else help + " " + fields_help
         super().__init__(option_strings, dest, help=help, default=default, **kwargs)
 
-    def __call__(self, _, cli_args, value):
+    def __call__(self, _, cli_args, value, *args):
         selection = value.split(",")
         for s in selection:
             if s not in self.fields:
