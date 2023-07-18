@@ -539,7 +539,7 @@ class ExtractionSelectionAction(Action):
         default=None,
         **kwargs,
     ):
-        self.fields = set(TrafilaturaResult.fieldnames())
+        self.fields = TrafilaturaResult.fieldnames()
         fields_help = (
             "Available flags are: " + and_join([f"`{f}`" for f in self.fields]) + "."
         )
@@ -552,7 +552,7 @@ class ExtractionSelectionAction(Action):
             if s not in self.fields:
                 messages = [
                     f"The trafilatura field `{s}` doesn't exist. Available fields are:"
-                ] + [f"- {a}" for a in self.fields]
+                ] + [f"  - {a}" for a in self.fields]
                 raise ArgumentError(self, "\n".join(messages))
         selection = set(selection) if selection else None
         setattr(cli_args, self.dest, selection)

@@ -346,7 +346,8 @@ Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
                          [--single-line] [-U URL_FILTER]
                          [--invert-content-match] [--invert-url-match]
                          [--extract] [--irrelevant-continue] [--only-html]
-                         [-O OUTPUT_DIR] [--factory] [--resume] [-m MAX_DEPTH]
+                         [--extraction-fields EXTRACTION_FIELDS] [-O OUTPUT_DIR]
+                         [--factory] [--resume] [-m MAX_DEPTH]
                          [--throttle THROTTLE]
                          [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS]
                          [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
@@ -381,6 +382,14 @@ Optional Arguments:
   --extract                     Perform regex match on extracted text content
                                 instead of html content using the Trafilatura
                                 library.
+  --extraction-fields EXTRACTION_FIELDS
+                                Fields of the trafilatura extraction you want to
+                                apply the content filter on, separated using
+                                commas. It must be used with the flag
+                                `--extract`. Available flags are:
+                                `canonical_url`, `title`, `description`,
+                                `content`, `comments`, `author`, `categories`,
+                                `tags`, `date` and `sitename`.
   --factory                     Whether crawl target is a crawler factory
                                 function.
   --folder-strategy FOLDER_STRATEGY
