@@ -19,6 +19,7 @@ setup(
     url="http://github.com/medialab/minet",
     author="Guillaume Plique, Pauline Breteau, Jules Farjas, Héloïse Théro, Jean Descamps, Amélie Pellé, Laura Miguel, César Pichon",
     keywords="webmining",
+    license="GPL-3.0",
     python_requires=">=3.7",
     packages=find_packages(exclude=["ftest", "scripts", "test"]),
     install_requires=[
