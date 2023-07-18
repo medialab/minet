@@ -17,7 +17,6 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="http://github.com/medialab/minet",
-    license="MIT",
     author="Guillaume Plique, Pauline Breteau, Jules Farjas, Héloïse Théro, Jean Descamps, Amélie Pellé, Laura Miguel, César Pichon",
     keywords="webmining",
     python_requires=">=3.7",
