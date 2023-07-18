@@ -71,20 +71,17 @@ class TrafilaturaResult(TabularRecord):
             sitename=data.get("sitename"),
         )
 
-    def blurb(self) -> str:
-        items = [
-            self.title,
-            self.description,
-            self.content,
-            self.comments,
-            self.author,
-            " ".join(self.categories),
-            " ".join(self.tags),
-            self.date,
-            self.sitename,
-        ]
-        clist = [v for v in items if isinstance(v, str)]
-        return "\n".join(clist)
+    def blurb(self, fields=None) -> str:
+        selection = fields if fields else self.fieldnames()
+        items = []
+        for s in selection:
+            attr = getattr(self, s, "")
+            if isinstance(attr, list):
+                items.append(" ".join(attr))
+            elif attr:
+                items.append(attr)
+
+        return "\n".join(items)
 
 
 def extract(text: str) -> Optional[TrafilaturaResult]:

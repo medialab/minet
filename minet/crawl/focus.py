@@ -90,9 +90,13 @@ class FocusSpider(Spider):
         irrelevant_continue: bool = False,
         extract: bool = False,
         only_html: bool = True,
+        extraction_fields=None,
     ):
         if not regex_content and not regex_url:
             raise TypeError("Neither url nor content filter provided.")
+
+        if extraction_fields and not extract:
+            raise TypeError("Custom extraction fields can't be used without the extract option.")
 
         self.urls = start_urls
         self.regex_content = re.compile(regex_content, re.I) if regex_content else None
@@ -100,6 +104,7 @@ class FocusSpider(Spider):
         self.regex_url = re.compile(regex_url, re.I) if regex_url else None
         self.invert_url_match = invert_url_match
         self.extraction = extract
+        self.extraction_fields = extraction_fields
         self.irrelevant_continue = irrelevant_continue
         self.target_html = only_html
 
@@ -122,7 +127,7 @@ class FocusSpider(Spider):
         if self.extraction:
             extraction = extract(html)
             if extraction:
-                content = extraction.blurb()
+                content = extraction.blurb(self.extraction_fields)
         else:
             content = soup.get_text()
 

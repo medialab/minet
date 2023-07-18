@@ -6,6 +6,7 @@
 #
 from typing import Optional, Iterable, Callable, Any, Dict, Type, List
 from minet.types import TypedDict, NotRequired
+from ebbe import and_join
 
 import os
 import re
@@ -30,6 +31,7 @@ from pytz.exceptions import UnknownTimeZoneError
 
 from minet.dates import datetime_from_partial_iso_format
 from minet.fs import FolderStrategy
+from minet.extraction import TrafilaturaResult
 
 from minet.cli.console import MINET_COLORS
 from minet.cli.exceptions import NotResumableError, InvalidArgumentsError
@@ -526,6 +528,34 @@ class WrappedConfigValue(object):
             )
 
         return value
+
+
+class ExtractionSelectionAction(Action):
+    def __init__(
+        self,
+        option_strings,
+        dest,
+        help=None,
+        default=None,
+        **kwargs,
+    ):
+        self.fields = set(TrafilaturaResult.fieldnames())
+        fields_help = (
+            "Available flags are: " + and_join([f"`{f}`" for f in self.fields]) + "."
+        )
+        help = fields_help if not help else help + " " + fields_help
+        super().__init__(option_strings, dest, help=help, default=default, **kwargs)
+
+    def __call__(self, _, cli_args, value, *args):
+        selection = value.split(",")
+        for s in selection:
+            if s not in self.fields:
+                messages = [
+                    f"The trafilatura field `{s}` doesn't exist. Available fields are:"
+                ] + [f"- {a}" for a in self.fields]
+                raise ArgumentError(self, "\n".join(messages))
+        selection = set(selection) if selection else None
+        setattr(cli_args, self.dest, selection)
 
 
 class ConfigAction(Action):

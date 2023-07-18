@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from minet.cli.argparse import command, FolderStrategyType, BooleanAction, InputAction
+from minet.cli.argparse import command, FolderStrategyType, BooleanAction, InputAction, ExtractionSelectionAction
 from minet.cli.exceptions import InvalidArgumentsError
 
 # TODO: lazyloading issue
@@ -252,7 +252,7 @@ CRAWL_COMMAND = crawl_command(
 )
 
 
-def ensure_filters(cli_args):
+def check_focus_crawl_arguments(cli_args):
     if not cli_args.content_filter and not cli_args.url_filter:
         raise InvalidArgumentsError(
             [
@@ -262,6 +262,9 @@ def ensure_filters(cli_args):
                 "   -U/--url-filter",
             ]
         )
+
+    if cli_args.extraction_fields and not cli_args.extract:
+        raise InvalidArgumentsError("Custom extraction fields can't be used if the flag extract is not present.")
 
 
 FOCUS_CRAWL_COMMAND = crawl_command(
@@ -283,7 +286,7 @@ FOCUS_CRAWL_COMMAND = crawl_command(
         . Running a simple crawler:
             $ minet focus-crawl url -i urls.csv --content-filter '(?:assembl[ée]e nationale|s[ée]nat)' -O ./result
     """,
-    resolve=ensure_filters,
+    resolve=check_focus_crawl_arguments,
     unique=True,
     arguments=[
         {
@@ -320,6 +323,12 @@ FOCUS_CRAWL_COMMAND = crawl_command(
             "flag": "--only-html",
             "help": "Add URLs to the crawler queue only if they seem to lead to a HTML content.",
             "action": "store_true",
+        },
+        {
+            "flag": "--extraction-fields",
+            "help": "Fields of the trafilatura extraction you want to apply the content filter on, separated using commas. It must be used with the flag `--extract`.",
+            "action": ExtractionSelectionAction,
+            "default": None,
         },
     ],
 )
