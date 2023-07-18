@@ -30,5 +30,5 @@ tenacity==8.2.1
 trafilatura==1.6.0
 typing_extensions>=4.3; python_version < '3.11'
 twitwi==0.18.1
-ural==1.0.0-a2
+ural==1.0.0-a3
 urllib3==1.26.16

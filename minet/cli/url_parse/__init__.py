@@ -147,14 +147,9 @@ URL_PARSE_COMMAND = command(
             "default": True,
         },
         {
-            "flags": [
-                "--quoted",
-                "--no-quoted",
-            ],
-            "help": "Whether or not to normalize to a quoted or unquoted version of the url when normalizing url.",
-            "dest": "quoted",
-            "action": BooleanAction,
-            "default": True,
+            "flag": "--quoted",
+            "help": "Whether to produce quoted canonical and normalized version.",
+            "action": "store_true",
         },
         {
             "flags": [
@@ -223,6 +218,11 @@ URL_PARSE_COMMAND = command(
             "dest": "strip_trailing_slash",
             "action": BooleanAction,
             "default": True,
+        },
+        {
+            "flag": "--strip-suffix",
+            "help": "Whether to strip the hostname suffix when fingerprinting the url.",
+            "action": "store_true",
         },
     ],
 )

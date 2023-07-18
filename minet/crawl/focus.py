@@ -96,7 +96,9 @@ class FocusSpider(Spider):
             raise TypeError("Neither url nor content filter provided.")
 
         if extraction_fields and not extract:
-            raise TypeError("Custom extraction fields can't be used without the extract option.")
+            raise TypeError(
+                "Custom extraction fields can't be used without the extract option."
+            )
 
         self.urls = start_urls
         self.regex_content = re.compile(regex_content, re.I) if regex_content else None

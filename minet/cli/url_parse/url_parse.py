@@ -76,14 +76,9 @@ YOUTUBE_REPORT_HEADERS = [
 TWITTER_REPORT_HEADERS = ["twitter_type", "twitter_user_screen_name", "tweet_id"]
 
 
-# TODO: item selection, quoted or not, strip suffix
-# TODO: check usage of ural everywhere
-
-
 def extract_standard_addendum(cli_args, url):
-    print(url)
     return [
-        canonicalize_url(url),
+        canonicalize_url(url, quoted=cli_args.quoted),
         normalize_url(
             url,
             infer_redirection=cli_args.infer_redirection,
@@ -98,7 +93,7 @@ def extract_standard_addendum(cli_args, url):
             strip_protocol=cli_args.strip_protocol,
             strip_trailing_slash=cli_args.strip_trailing_slash,
         ),
-        fingerprint_url(url),
+        fingerprint_url(url, strip_suffix=cli_args.strip_suffix),
         infer_redirection(url),
         get_domain_name(url),
         get_hostname(url),
@@ -107,13 +102,13 @@ def extract_standard_addendum(cli_args, url):
             infer_redirection=cli_args.infer_redirection,
             normalize_amp=cli_args.normalize_amp,
         ),
-        get_fingerprinted_hostname(url),
-        "yes" if is_shortened_url(url) else "",
-        "yes" if is_typo_url(url) else "",
-        "yes" if is_homepage(url) else "",
-        "yes" if should_resolve(url) else "",
-        "yes" if could_be_html(url) else "",
-        "yes" if could_be_rss(url) else "",
+        get_fingerprinted_hostname(url, strip_suffix=cli_args.strip_suffix),
+        "yes" if is_shortened_url(url) else "no",
+        "yes" if is_typo_url(url) else "no",
+        "yes" if is_homepage(url) else "no",
+        "yes" if should_resolve(url) else "no",
+        "yes" if could_be_html(url) else "no",
+        "yes" if could_be_rss(url) else "no",
     ]
 
 

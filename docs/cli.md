@@ -1407,9 +1407,8 @@ Usage: minet url-parse [-h] [--facebook] [--silent]
                        [--fix-common-mistakes] [--normalize-amp] [--quoted]
                        [--sort-query] [--strip-authentication]
                        [--strip-fragment] [--strip-index]
-                       [--strip-irrelevant-subdomains]
-                       [--strip-lang-query-items] [--strip-lang-subdomains]
-                       [--strip-protocol] [--strip-trailing-slash] [-i INPUT]
+                       [--strip-irrelevant-subdomains] [--strip-protocol]
+                       [--strip-trailing-slash] [--strip-suffix] [-i INPUT]
                        [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                        [-o OUTPUT]
                        url_or_url_column
@@ -1440,9 +1439,8 @@ Optional Arguments:
                                 Whether or not to attempt to normalize Google
                                 AMP urls when normalizing url. Defaults to
                                 `True`.
-  --quoted, --no-quoted         Whether or not to normalize to a quoted or
-                                unquoted version of the url when normalizing
-                                url. Defaults to `True`.
+  --quoted                      Whether to produce quoted canonical and
+                                normalized version.
   --sort-query, --dont-sort-query
                                 Whether or not to sort query items when
                                 normalizing url. Defaults to `True`.
@@ -1463,19 +1461,11 @@ Optional Arguments:
                                 Whether or not to strip trailing
                                 irrelevant-subdomains such as `www` etc. when
                                 normalizing url. Defaults to `True`.
-  --strip-lang-query-items, --dont-strip-lang-query-items
-                                Whether or not to strip language query items
-                                (ex: `gl=pt_BR`) when normalizing url. Defaults
-                                to `False`.
-  --strip-lang-subdomains, --dont-strip-lang-subdomains
-                                Whether or not to strip language subdomains (ex:
-                                `fr-FR.lemonde.fr` to only `lemonde.fr` because
-                                `fr-FR` isn't a relevant subdomain, it indicates
-                                the language and the country) when normalizing
-                                url. Defaults to `False`.
   --strip-protocol, --dont-strip-protocol
                                 Whether or not to strip the protocol when
                                 normalizing the url. Defaults to `True`.
+  --strip-suffix                Whether to strip the hostname suffix when
+                                fingerprinting the url.
   --strip-trailing-slash, --dont-strip-trailing-slash
                                 Whether or not to trailing slash when
                                 normalizing url. Defaults to `True`.
@@ -1516,23 +1506,30 @@ Optional Arguments:
 
 Columns being added to the output:
 
-. "normalized_url": urls aggressively normalized by removing any part
+. "canonicalized_url": url cleaned up but technically the same.
+. "normalized_url": url aggressively normalized by removing any part
   that is not useful to determine which resource it is actually
   pointing at.
+. "fingerprinted_url": url even more aggressively normalized. Might
+  not be valid anymore, but useful for statistical aggregation.
 . "inferred_redirection": redirection directly inferred from the
   url without needing to make any HTTP request.
-. "domain_name": TLD-aware domain name of the url.
+. "domain_name": public suffix-aware domain name of the url.
 . "hostname": full hostname of the url.
 . "normalized_hostname": normalized hostname, i.e. stripped of "www",
   "m" or some language subdomains etc., of the url.
-. "shortened": whether the url is probably shortened or
+. "fingerprinted_hostname": hostname even more aggressively normalized.
+  Might not be valid anymore.
+. "probably_shortened": whether the url is probably shortened or
   not (bit.ly, t.co etc.).
-. "typo": whether the url probably contains typo or not
+. "probably_typo": whether the url probably contains typo or not
   (such as inclusive language in french : curieux.se etc.).
-. "homepage": whether the given url looks like a website's
+. "probably_homepage": whether the given url looks like a website's
   homepage.
 . "should_resolve": whether the given url looks like something
-  we should resolve, i.e. shortened url.
+  we should resolve, i.e. shortened url or DOI etc.
+. "could_be_html": whether the given url could lead to a HTML file.
+. "could_be_rss": whether the given url could lead to a RSS file.
 
 columns being added with --facebook:
 

@@ -1,6 +1,12 @@
 from typing import List, Optional
 
-from minet.cli.argparse import command, FolderStrategyType, BooleanAction, InputAction, ExtractionSelectionAction
+from minet.cli.argparse import (
+    command,
+    FolderStrategyType,
+    BooleanAction,
+    InputAction,
+    ExtractionSelectionAction,
+)
 from minet.cli.exceptions import InvalidArgumentsError
 
 # TODO: lazyloading issue
@@ -264,7 +270,9 @@ def check_focus_crawl_arguments(cli_args):
         )
 
     if cli_args.extraction_fields and not cli_args.extract:
-        raise InvalidArgumentsError("Custom extraction fields can't be used if the flag extract is not present.")
+        raise InvalidArgumentsError(
+            "Custom extraction fields can't be used if the flag extract is not present."
+        )
 
 
 FOCUS_CRAWL_COMMAND = crawl_command(
