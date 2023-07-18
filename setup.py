@@ -17,9 +17,9 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="http://github.com/medialab/minet",
-    license="MIT",
     author="Guillaume Plique, Pauline Breteau, Jules Farjas, Héloïse Théro, Jean Descamps, Amélie Pellé, Laura Miguel, César Pichon",
     keywords="webmining",
+    license="GPL-3.0",
     python_requires=">=3.7",
     packages=find_packages(exclude=["ftest", "scripts", "test"]),
     install_requires=[
@@ -29,7 +29,7 @@ setup(
         "casanova>=1.15,<1.16",
         "charset-normalizer>=3,<4",
         "dateparser>=1.1.1",
-        "ebbe>=1.13.0,<2",
+        "ebbe>=1.13,<2",
         "json5>=0.8.5",
         "lxml>=4.3.0",
         "nanoid>=2,<3",
@@ -44,7 +44,7 @@ setup(
         "tenacity>=8,<9",
         "trafilatura>=1.6,<1.7",
         "twitwi>=0.18.1,<0.19",
-        "ural==1.0.0-a1",
+        "ural==1.0.0-a2",
         "urllib3>=1.26.16,<2",
     ],
     extras_require={
