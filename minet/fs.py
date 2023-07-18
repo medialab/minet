@@ -178,7 +178,6 @@ class NormalizedHostnameFolderStrategy(FolderStrategy):
         hostname = get_normalized_hostname(
             url,
             normalize_amp=False,
-            strip_lang_subdomains=True,
             infer_redirection=False,
         )
 

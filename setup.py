@@ -29,7 +29,7 @@ setup(
         "casanova>=1.15,<1.16",
         "charset-normalizer>=3,<4",
         "dateparser>=1.1.1",
-        "ebbe>=1.13.0,<2",
+        "ebbe>=1.13,<2",
         "json5>=0.8.5",
         "lxml>=4.3.0",
         "nanoid>=2,<3",
@@ -44,7 +44,7 @@ setup(
         "tenacity>=8,<9",
         "trafilatura>=1.6,<1.7",
         "twitwi>=0.18.1,<0.19",
-        "ural==1.0.0-a1",
+        "ural==1.0.0-a2",
         "urllib3>=1.26.16,<2",
     ],
     extras_require={
