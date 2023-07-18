@@ -141,7 +141,7 @@ def crawl_action(
     ):
         raise TypeError("additional_job_fieldnames requires format_job_row_addendum")
 
-    # NOTE: typing and decorators don't play well toegether
+    # NOTE: typing and decorators don't play well together
     assert defer is not None
     assert isinstance(loading_bar, LoadingBar)
 
@@ -321,11 +321,11 @@ def crawl_action(
         # Running crawler
         for result in crawler:
             with loading_bar.step():
-                if result_callback is not None:
-                    result_callback(cli_args, loading_bar, result)
-
                 if cli_args.verbose:
                     console.print(result, highlight=True)
+
+                if result_callback is not None:
+                    result_callback(cli_args, loading_bar, result)
 
                 job_row = result.as_csv_row()
 
