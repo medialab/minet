@@ -728,7 +728,7 @@ def atomic_resolve(
             next_url = urljoin(url, location.strip())
 
             # Self loop?
-            if next_url == url:
+            if not stateful and next_url == url:
                 raise SelfRedirectError("Self redirection")
 
             # Go to next
