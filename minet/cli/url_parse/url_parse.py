@@ -8,13 +8,18 @@ from ural import (
     is_url,
     is_shortened_url,
     normalize_url,
+    canonicalize_url,
+    fingerprint_url,
     get_hostname,
     get_domain_name,
     get_normalized_hostname,
+    get_fingerprinted_hostname,
     infer_redirection,
     is_typo_url,
     is_homepage,
     should_resolve,
+    could_be_html,
+    could_be_rss,
 )
 from ural.facebook import (
     parse_facebook_url,
@@ -37,15 +42,20 @@ from ural.twitter import parse_twitter_url, TwitterTweet, TwitterUser
 from minet.cli.utils import with_enricher_and_loading_bar
 
 REPORT_HEADERS = [
+    "canonicalized_url",
     "normalized_url",
+    "fingerprinted_url",
     "inferred_redirection",
     "domain_name",
     "hostname",
     "normalized_hostname",
-    "shortened",
-    "typo",
-    "homepage",
+    "fingerprinted_hostname",
+    "probably_shortened",
+    "probably_typo",
+    "probably_homepage",
     "should_resolve",
+    "could_be_html",
+    "could_be_rss",
 ]
 
 FACEBOOK_REPORT_HEADERS = [
@@ -66,10 +76,14 @@ YOUTUBE_REPORT_HEADERS = [
 TWITTER_REPORT_HEADERS = ["twitter_type", "twitter_user_screen_name", "tweet_id"]
 
 
-def extract_standard_addendum(cli_args, url):
-    inferred_redirection = infer_redirection(url)
+# TODO: item selection, quoted or not, strip suffix
+# TODO: check usage of ural everywhere
 
+
+def extract_standard_addendum(cli_args, url):
+    print(url)
     return [
+        canonicalize_url(url),
         normalize_url(
             url,
             infer_redirection=cli_args.infer_redirection,
@@ -81,24 +95,25 @@ def extract_standard_addendum(cli_args, url):
             strip_fragment=cli_args.strip_fragment,
             strip_index=cli_args.strip_index,
             strip_irrelevant_subdomains=cli_args.strip_irrelevant_subdomains,
-            strip_lang_query_items=cli_args.strip_lang_query_items,
-            strip_lang_subdomains=cli_args.strip_lang_subdomains,
             strip_protocol=cli_args.strip_protocol,
             strip_trailing_slash=cli_args.strip_trailing_slash,
         ),
-        inferred_redirection if inferred_redirection != url else "",
+        fingerprint_url(url),
+        infer_redirection(url),
         get_domain_name(url),
         get_hostname(url),
         get_normalized_hostname(
             url,
             infer_redirection=cli_args.infer_redirection,
             normalize_amp=cli_args.normalize_amp,
-            strip_lang_subdomains=cli_args.strip_lang_subdomains,
         ),
+        get_fingerprinted_hostname(url),
         "yes" if is_shortened_url(url) else "",
         "yes" if is_typo_url(url) else "",
         "yes" if is_homepage(url) else "",
         "yes" if should_resolve(url) else "",
+        "yes" if could_be_html(url) else "",
+        "yes" if could_be_rss(url) else "",
     ]
 
 

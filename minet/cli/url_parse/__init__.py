@@ -36,23 +36,30 @@ URL_PARSE_COMMAND = command(
     epilog="""
         Columns being added to the output:
 
-        . "normalized_url": urls aggressively normalized by removing any part
+        . "canonicalized_url": url cleaned up but technically the same.
+        . "normalized_url": url aggressively normalized by removing any part
           that is not useful to determine which resource it is actually
           pointing at.
+        . "fingerprinted_url": url even more aggressively normalized. Might
+          not be valid anymore, but useful for statistical aggregation.
         . "inferred_redirection": redirection directly inferred from the
           url without needing to make any HTTP request.
-        . "domain_name": TLD-aware domain name of the url.
+        . "domain_name": public suffix-aware domain name of the url.
         . "hostname": full hostname of the url.
         . "normalized_hostname": normalized hostname, i.e. stripped of "www",
           "m" or some language subdomains etc., of the url.
-        . "shortened": whether the url is probably shortened or
+        . "fingerprinted_hostname": hostname even more aggressively normalized.
+          Might not be valid anymore.
+        . "probably_shortened": whether the url is probably shortened or
           not (bit.ly, t.co etc.).
-        . "typo": whether the url probably contains typo or not
+        . "probably_typo": whether the url probably contains typo or not
           (such as inclusive language in french : curieux.se etc.).
-        . "homepage": whether the given url looks like a website's
+        . "probably_homepage": whether the given url looks like a website's
           homepage.
         . "should_resolve": whether the given url looks like something
-          we should resolve, i.e. shortened url.
+          we should resolve, i.e. shortened url or DOI etc.
+        . "could_be_html": whether the given url could lead to a HTML file.
+        . "could_be_rss": whether the given url could lead to a RSS file.
 
         columns being added with --facebook:
 
@@ -199,26 +206,6 @@ URL_PARSE_COMMAND = command(
             "dest": "strip_irrelevant_subdomains",
             "action": BooleanAction,
             "default": True,
-        },
-        {
-            "flags": [
-                "--strip-lang-query-items",
-                "--dont-strip-lang-query-items",
-            ],
-            "help": "Whether or not to strip language query items (ex: `gl=pt_BR`) when normalizing url.",
-            "dest": "strip_lang_query_items",
-            "action": BooleanAction,
-            "default": False,
-        },
-        {
-            "flags": [
-                "--strip-lang-subdomains",
-                "--dont-strip-lang-subdomains",
-            ],
-            "help": "Whether or not to strip language subdomains (ex: `fr-FR.lemonde.fr` to only `lemonde.fr` because `fr-FR` isn't a relevant subdomain, it indicates the language and the country) when normalizing url.",
-            "dest": "strip_lang_subdomains",
-            "action": BooleanAction,
-            "default": False,
         },
         {
             "flags": ["--strip-protocol", "--dont-strip-protocol"],
