@@ -6,6 +6,7 @@ from minet.scrape import (
     extract_canonical_link,
     extract_javascript_relocation,
     extract_meta_refresh,
+    extract_links,
 )
 from minet.scrape.regex import extract_href, JAVASCRIPT_LOCATION_RE
 
@@ -113,7 +114,7 @@ META_REFRESH = rb"""
     <head>
         <noscript>
             <META http-equiv="refresh" content="0;URL=https://twitter.com/i/web/status/1155764949777620992">
-        </noscrMETA_REFRESHipt>
+        </noscript>
         <title>https://twitter.com/i/web/status/1155764949777620992</title>
     </head>
     <script>
@@ -122,8 +123,20 @@ META_REFRESH = rb"""
     </script>
 """
 
+LINKS_TESTS = b"""
+<div>
+    <a href="javascript:alert('hello');">click</a>
+    <a href="http://lemonde.fr">lemonde</a>
+    <a href="http://lemonde.fr">lemonde</a>
+    <a href="http://lemonde.fr#test">lemonde</a>
+    <a href="HTTP://LEMONDE.FR">lemonde</a>
+    <a href="HTTP://LEMONDE.idontexistlol">lemonde</a>
+    <a href="article.html">lemonde</a>
+</div>
+"""
 
-class RegexTestScraper(object):
+
+class TestRegexScraper(object):
     def test_extract_encodings_from_xml(self):
         html = b"""
             <?xml version="1.0" encoding="UTF-16"?>
@@ -169,3 +182,49 @@ class RegexTestScraper(object):
             0,
             "https://twitter.com/i/web/status/1155764949777620992",
         )
+
+    def test_extract_links(self):
+        assert extract_links(LINKS_TESTS, "http://lefigaro.fr") == [
+            "http://lemonde.fr",
+            "http://lemonde.fr",
+            "http://lemonde.fr#test",
+            "http://LEMONDE.FR",  # urllib.parse.urljoin lowercases protocol...
+            "http://lefigaro.fr/article.html",
+        ]
+
+        assert extract_links(LINKS_TESTS, "http://lemonde.fr") == [
+            "http://lemonde.fr#test",
+            "http://LEMONDE.FR",
+            "http://lemonde.fr/article.html",
+        ]
+
+        assert extract_links(
+            LINKS_TESTS, "http://lemonde.fr", canonicalize=True, strip_fragment=True
+        ) == ["http://lemonde.fr/article.html"]
+
+        assert extract_links(LINKS_TESTS, "http://lefigaro.fr", canonicalize=True) == [
+            "http://lemonde.fr",
+            "http://lemonde.fr",
+            "http://lemonde.fr/#test",
+            "http://lemonde.fr",
+            "http://lefigaro.fr/article.html",
+        ]
+
+        assert extract_links(
+            LINKS_TESTS, "http://lefigaro.fr", canonicalize=True, unique=True
+        ) == [
+            "http://lemonde.fr",
+            "http://lemonde.fr/#test",
+            "http://lefigaro.fr/article.html",
+        ]
+
+        assert extract_links(
+            LINKS_TESTS,
+            "http://lefigaro.fr",
+            canonicalize=True,
+            unique=True,
+            strip_fragment=True,
+        ) == [
+            "http://lemonde.fr",
+            "http://lefigaro.fr/article.html",
+        ]

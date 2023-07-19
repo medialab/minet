@@ -11,6 +11,7 @@ from minet.scrape.regex import (
     extract_canonical_link,
     extract_javascript_relocation,
     extract_meta_refresh,
+    extract_links,
 )
 
 __all__ = [
@@ -22,4 +23,5 @@ __all__ = [
     "extract_canonical_link",
     "extract_javascript_relocation",
     "extract_meta_refresh",
+    "extract_links",
 ]

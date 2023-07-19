@@ -8,11 +8,13 @@
 # Those are also typically able to work on raw bytes so one does not need to
 # even decode the HTML.
 #
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 
 import re
 from itertools import chain
 from collections import defaultdict
+from ural import urls_from_html, canonicalize_url, should_follow_href, is_url
+from urllib.parse import urljoin
 
 from minet.encodings import normalize_encoding
 from minet.headers import parse_http_refresh
@@ -109,3 +111,49 @@ def extract_meta_refresh(html_chunk: bytes):
         return None
 
     return parse_http_refresh(m.group(1))
+
+
+def extract_links(
+    html_body: bytes,
+    base_url: str,
+    encoding: str = "utf-8",
+    canonicalize: bool = False,
+    unique: bool = False,
+    strip_fragment: bool = False,
+) -> List[str]:
+    links = []
+    already_seen = set()
+
+    if canonicalize:
+        base_url = canonicalize_url(base_url, strip_fragment=strip_fragment)
+
+    for url in urls_from_html(html_body, encoding=encoding, errors="replace"):
+        if not should_follow_href(url):
+            continue
+
+        url = urljoin(base_url, url)
+
+        if not is_url(
+            url,
+            require_protocol=True,
+            tld_aware=True,
+            allow_spaces_in_path=True,
+            only_http_https=True,
+        ):
+            continue
+
+        if canonicalize:
+            url = canonicalize_url(url, strip_fragment=strip_fragment)
+
+        if url == base_url:
+            continue
+
+        if unique:
+            if url in already_seen:
+                continue
+
+            already_seen.add(url)
+
+        links.append(url)
+
+    return links
