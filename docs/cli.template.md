@@ -14,7 +14,6 @@ _Generic commands_
 - [cookies](#cookies)
 - [crawl](#crawl)
 - [focus-crawl](#focus-crawl)
-- [hyphe-crawl](#hyphe-crawl)
 - [fetch](#fetch)
 - [extract](#extract)
 - [resolve](#resolve)
@@ -45,6 +44,7 @@ _Platform-related commands_
 - [google](#google)
   - [sheets](#google-sheets)
 - [hyphe](#hyphe)
+  - [crawl](#hyphe-crawl)
   - [declare](#hyphe-declare)
   - [destroy](#hyphe-destroy)
   - [dump](#hyphe-dump)
@@ -176,10 +176,6 @@ Finally note that command line arguments and flags will take precedence over env
 
 <% focus-crawl %>
 
-## hyphe-crawl
-
-<% hyphe-crawl %>
-
 ## fetch
 
 <% fetch %>
@@ -287,6 +283,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 <% google/sheets %>
 
 ## Hyphe
+
+<h3 id="hyphe-crawl">crawl</h3>
+
+<% hyphe/crawl %>
 
 <h3 id="hyphe-declare">declare</h3>
 

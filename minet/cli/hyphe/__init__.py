@@ -6,7 +6,8 @@
 #
 from argparse import FileType
 
-from minet.cli.argparse import command, SplitterType
+from minet.cli.argparse import command, SplitterType, InputAction
+from minet.cli.crawl import crawl_command
 
 HYPHE_API_URL_ARGUMENT = {"name": "url", "help": "Url of the Hyphe API."}
 HYPHE_CORPUS_ARGUMENT = {"name": "corpus", "help": "Id of the corpus."}
@@ -24,6 +25,64 @@ def hyphe_corpus_subcommand(*args, arguments=[], **kwargs):
         + [HYPHE_PASSWORD_ARGUMENT],
         **kwargs
     )
+
+
+HYPHE_CRAWL_SUBCOMMAND = crawl_command(
+    "crawl",
+    "minet.cli.hyphe.crawl",
+    title="Minet Hyphe Crawl Command",
+    description="""
+        Specialized crawl command that can be used to reproduce
+        a Hyphe crawl from a corpus exported in CSV.
+    """,
+    epilog="""
+        Examples:
+
+        . Reproducing a crawl:
+            $ minet hyphe crawl corpus.csv
+    """,
+    unique=True,
+    accept_input=False,
+    default_folder_strategy="fullpath",
+    default_throttle=0,
+    arguments=[
+        {
+            "name": "corpus",
+            "action": InputAction,
+            "help": "Path to the Hyphe corpus exported to CSV.",
+        },
+        {
+            "flag": "--id-column",
+            "default": "ID",
+            "help": "Name of the CSV column containing the webentity ids.",
+        },
+        {
+            "flag": "--status-column",
+            "default": "STATUS",
+            "help": "Name of the CSV column containing the webentity statuses.",
+        },
+        {
+            "flag": "--prefixes-column",
+            "default": "PREFIXES AS URL",
+            "help": "Name of the CSV column containing the webentity prefixes, separated by --prefix-separator.",
+        },
+        {
+            "flag": "--prefix-separator",
+            "default": " ",
+            "help": "Separator character for the webentity prefixes.",
+        },
+        {
+            "flag": "--start-pages-column",
+            "default": "START PAGES",
+            "help": "Name of the CSV column containing the webentity start pages, separated by --start-page-separator.",
+        },
+        {
+            "flag": "--start-page-separator",
+            "default": " ",
+            "help": "Separator character for the webentity start pages.",
+        },
+    ],
+)
 
 
 HYPHE_DECLARE_SUBCOMMAND = hyphe_corpus_subcommand(
@@ -167,6 +226,7 @@ HYPHE_COMMAND = command(
         Commands related to the Hyphe web crawler.
     """,
     subcommands=[
+        HYPHE_CRAWL_SUBCOMMAND,
         HYPHE_DECLARE_SUBCOMMAND,
         HYPHE_DESTROY_SUBCOMMAND,
         HYPHE_DUMP_SUBCOMMAND,

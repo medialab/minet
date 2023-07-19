@@ -4,7 +4,7 @@ import casanova
 from collections import Counter
 
 from minet.crawl import CrawlResult
-from minet.crawl.hyphe import HypheSpider, HypheSpiderAddendum
+from minet.hyphe import HypheSpider, HypheSpiderAddendum
 
 from minet.cli.console import console
 from minet.cli.crawl.crawl import crawl_action

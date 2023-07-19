@@ -14,7 +14,6 @@ _Generic commands_
 - [cookies](#cookies)
 - [crawl](#crawl)
 - [focus-crawl](#focus-crawl)
-- [hyphe-crawl](#hyphe-crawl)
 - [fetch](#fetch)
 - [extract](#extract)
 - [resolve](#resolve)
@@ -45,6 +44,7 @@ _Platform-related commands_
 - [google](#google)
   - [sheets](#google-sheets)
 - [hyphe](#hyphe)
+  - [crawl](#hyphe-crawl)
   - [declare](#hyphe-declare)
   - [destroy](#hyphe-destroy)
   - [dump](#hyphe-dump)
@@ -487,134 +487,6 @@ Examples:
 
 . Running a simple crawler:
     $ minet focus-crawl url -i urls.csv --content-filter '(?:assembl[ée]e nationale|s[ée]nat)' -O ./result
-```
-
-## hyphe-crawl
-
-```
-Usage: minet hyphe-crawl [-h] [--silent]
-                         [--refresh-per-second REFRESH_PER_SECOND]
-                         [--single-line] [--id-column ID_COLUMN]
-                         [--status-column STATUS_COLUMN]
-                         [--prefixes-column PREFIXES_COLUMN]
-                         [--prefix-separator PREFIX_SEPARATOR]
-                         [--start-pages-column START_PAGES_COLUMN]
-                         [--start-page-separator START_PAGE_SEPARATOR]
-                         [-O OUTPUT_DIR] [--factory] [--resume] [-m MAX_DEPTH]
-                         [--throttle THROTTLE]
-                         [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS]
-                         [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
-                         [-f {csv,jsonl,ndjson}] [-v] [-n] [-k]
-                         [--spoof-user-agent]
-                         corpus
-
-# Minet Hyphe Crawl Command
-
-Specialized crawl command that can be used to reproduce
-a Hyphe crawl from a corpus exported in CSV.
-
-Positional Arguments:
-  corpus                        Path to the Hyphe corpus exported to CSV.
-
-Optional Arguments:
-  -z, --compress                Whether to compress the downloaded files when
-                                saving files on disk.
-  --domain-parallelism DOMAIN_PARALLELISM
-                                Max number of urls per domain to hit at the same
-                                time. Defaults to `1`.
-  --factory                     Whether crawl target is a crawler factory
-                                function.
-  --folder-strategy FOLDER_STRATEGY
-                                Name of the strategy to be used to dispatch the
-                                retrieved files into folders to alleviate issues
-                                on some filesystems when a folder contains too
-                                much files. Note that this will be applied on
-                                top of --filename-template. All of the
-                                strategies are described at the end of this
-                                help. Defaults to `fullpath`.
-  -f, --format {csv,jsonl,ndjson}
-                                Serialization format for scraped/extracted data.
-                                Defaults to `csv`.
-  --id-column ID_COLUMN         Name of the CSV column containing the webentity
-                                ids. Defaults to `ID`.
-  -k, --insecure                Whether to allow ssl errors when performing
-                                requests or not.
-  -m, --max-depth MAX_DEPTH     Maximum depth for the crawl.
-  -n, --normalized-url-cache    Whether to normalize url cache used to assess if
-                                some url was already visited.
-  -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.
-  --prefix-separator PREFIX_SEPARATOR
-                                Separator character for the webentity prefixes.
-                                Defaults to ` `.
-  --prefixes-column PREFIXES_COLUMN
-                                Name of the CSV column containing the webentity
-                                prefixes, separated by --prefix-separator.
-                                Defaults to `PREFIXES AS URL`.
-  --spoof-user-agent            Whether to use a plausible random "User-Agent"
-                                header when making requests.
-  --start-page-separator START_PAGE_SEPARATOR
-                                Separator character for the webentity start
-                                pages. Defaults to ` `.
-  --start-pages-column START_PAGES_COLUMN
-                                Name of the CSV column containing the webentity
-                                start pages, separated by
-                                --start-page-separator. Defaults to `START
-                                PAGES`.
-  --status-column STATUS_COLUMN
-                                Name of the CSV column containing the webentity
-                                statuses. Defaults to `STATUS`.
-  -t, --threads THREADS         Number of threads to use. You can use `0` if you
-                                want the crawler to remain completely
-                                synchronous. Defaults to `25`.
-  --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
-                                the same domain. Defaults to `0`.
-  -v, --verbose                 Whether to print information about crawl
-                                results.
-  -d, --write-data, -D, --dont-write-data
-                                Whether to write scraped/extracted data on disk.
-                                Defaults to `True`.
-  -w, --write-files             Whether to write downloaded files on disk in
-                                order to save them for later.
-  --resume                      Whether to resume an interrupted crawl.
-  --refresh-per-second REFRESH_PER_SECOND
-                                Number of times to refresh the progress bar per
-                                second. Can be a float e.g. `0.5` meaning once
-                                every two seconds. Use this to limit CPU usage
-                                when launching multiple commands at once.
-                                Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
-  --silent                      Whether to suppress all the log and progress
-                                bars. Can be useful when piping.
-  -h, --help                    show this help message and exit
-
---folder-strategy options:
-
-. "flat": default choice, all files will be written in the indicated
-    content folder.
-
-. "fullpath": all files will be written in a folder consisting of the
-    url hostname and then its path.
-
-. "prefix-x": e.g. "prefix-4", files will be written in folders
-    having a name that is the first x characters of the file's name.
-    This is an efficient way to partition content into folders containing
-    roughly the same number of files if the file names are random (which
-    is the case by default since md5 hashes will be used).
-
-. "hostname": files will be written in folders based on their url's
-    full host name.
-
-. "normalized-hostname": files will be written in folders based on
-    their url's hostname stripped of some undesirable parts (such as
-    "www.", or "m." or "fr.", for instance).
-
-Examples:
-
-. Reproducing a crawl:
-    $ minet hyphe-crawl corpus.csv
 ```
 
 ## fetch
@@ -3095,6 +2967,134 @@ Examples:
 ```
 
 ## Hyphe
+
+<h3 id="hyphe-crawl">crawl</h3>
+
+```
+Usage: minet hyphe crawl [-h] [--silent]
+                         [--refresh-per-second REFRESH_PER_SECOND]
+                         [--single-line] [--id-column ID_COLUMN]
+                         [--status-column STATUS_COLUMN]
+                         [--prefixes-column PREFIXES_COLUMN]
+                         [--prefix-separator PREFIX_SEPARATOR]
+                         [--start-pages-column START_PAGES_COLUMN]
+                         [--start-page-separator START_PAGE_SEPARATOR]
+                         [-O OUTPUT_DIR] [--factory] [--resume] [-m MAX_DEPTH]
+                         [--throttle THROTTLE]
+                         [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS]
+                         [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
+                         [-f {csv,jsonl,ndjson}] [-v] [-n] [-k]
+                         [--spoof-user-agent]
+                         corpus
+
+# Minet Hyphe Crawl Command
+
+Specialized crawl command that can be used to reproduce
+a Hyphe crawl from a corpus exported in CSV.
+
+Positional Arguments:
+  corpus                        Path to the Hyphe corpus exported to CSV.
+
+Optional Arguments:
+  -z, --compress                Whether to compress the downloaded files when
+                                saving files on disk.
+  --domain-parallelism DOMAIN_PARALLELISM
+                                Max number of urls per domain to hit at the same
+                                time. Defaults to `1`.
+  --factory                     Whether crawl target is a crawler factory
+                                function.
+  --folder-strategy FOLDER_STRATEGY
+                                Name of the strategy to be used to dispatch the
+                                retrieved files into folders to alleviate issues
+                                on some filesystems when a folder contains too
+                                much files. Note that this will be applied on
+                                top of --filename-template. All of the
+                                strategies are described at the end of this
+                                help. Defaults to `fullpath`.
+  -f, --format {csv,jsonl,ndjson}
+                                Serialization format for scraped/extracted data.
+                                Defaults to `csv`.
+  --id-column ID_COLUMN         Name of the CSV column containing the webentity
+                                ids. Defaults to `ID`.
+  -k, --insecure                Whether to allow ssl errors when performing
+                                requests or not.
+  -m, --max-depth MAX_DEPTH     Maximum depth for the crawl.
+  -n, --normalized-url-cache    Whether to normalize url cache used to assess if
+                                some url was already visited.
+  -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.
+  --prefix-separator PREFIX_SEPARATOR
+                                Separator character for the webentity prefixes.
+                                Defaults to ` `.
+  --prefixes-column PREFIXES_COLUMN
+                                Name of the CSV column containing the webentity
+                                prefixes, separated by --prefix-separator.
+                                Defaults to `PREFIXES AS URL`.
+  --spoof-user-agent            Whether to use a plausible random "User-Agent"
+                                header when making requests.
+  --start-page-separator START_PAGE_SEPARATOR
+                                Separator character for the webentity start
+                                pages. Defaults to ` `.
+  --start-pages-column START_PAGES_COLUMN
+                                Name of the CSV column containing the webentity
+                                start pages, separated by
+                                --start-page-separator. Defaults to `START
+                                PAGES`.
+  --status-column STATUS_COLUMN
+                                Name of the CSV column containing the webentity
+                                statuses. Defaults to `STATUS`.
+  -t, --threads THREADS         Number of threads to use. You can use `0` if you
+                                want the crawler to remain completely
+                                synchronous. Defaults to `25`.
+  --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
+                                the same domain. Defaults to `0`.
+  -v, --verbose                 Whether to print information about crawl
+                                results.
+  -d, --write-data, -D, --dont-write-data
+                                Whether to write scraped/extracted data on disk.
+                                Defaults to `True`.
+  -w, --write-files             Whether to write downloaded files on disk in
+                                order to save them for later.
+  --resume                      Whether to resume an interrupted crawl.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+--folder-strategy options:
+
+. "flat": default choice, all files will be written in the indicated
+    content folder.
+
+. "fullpath": all files will be written in a folder consisting of the
+    url hostname and then its path.
+
+. "prefix-x": e.g. "prefix-4", files will be written in folders
+    having a name that is the first x characters of the file's name.
+    This is an efficient way to partition content into folders containing
+    roughly the same number of files if the file names are random (which
+    is the case by default since md5 hashes will be used).
+
+. "hostname": files will be written in folders based on their url's
+    full host name.
+
+. "normalized-hostname": files will be written in folders based on
+    their url's hostname stripped of some undesirable parts (such as
+    "www.", or "m." or "fr.", for instance).
+
+Examples:
+
+. Reproducing a crawl:
+    $ minet hyphe crawl corpus.csv
+```
 
 <h3 id="hyphe-declare">declare</h3>
 
