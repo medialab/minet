@@ -75,12 +75,16 @@ class HypheSpider(Spider):
         links: List[WebentityLink] = []
 
         for url in urls:
-            url = response.resolve(url)
+            url = response.urljoin(url)
 
             if not should_follow_href(url):
                 continue
 
-            match = self.trie.match(url)
+            # TODO: drop when issue is pinpointed
+            try:
+                match = self.trie.match(url)
+            except Exception:
+                raise TypeError(url)
 
             if match is None:
                 continue

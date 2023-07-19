@@ -827,7 +827,7 @@ class Response(object):
             return self.__url
         return self.__stack[-1].url
 
-    def resolve(self, url: str) -> str:
+    def urljoin(self, url: str) -> str:
         return urljoin(self.end_url, url)
 
     @property
