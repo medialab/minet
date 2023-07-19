@@ -24,8 +24,8 @@ from minet.executors import (
 )
 from minet.fs import FilenameBuilder, ThreadSafeFileWriter
 from minet.cookies import get_cookie_resolver_from_browser
+from minet.headers import parse_http_header
 from minet.web import (
-    parse_http_header,
     Response,
     RedirectionStack,
 )

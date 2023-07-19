@@ -36,13 +36,11 @@ from datetime import datetime
 from timeit import default_timer as timer
 from io import BytesIO
 from threading import Event
-from itertools import chain
 from urllib.parse import urljoin, quote
 from urllib.request import Request
 from urllib3 import HTTPResponse
 from urllib3.util.ssl_ import create_urllib3_context
 from ebbe import rcompose, noop, format_filesize, format_repr
-from collections import defaultdict
 from tenacity import (
     Retrying,
     RetryCallState,
@@ -54,11 +52,17 @@ from tenacity import (
 )
 from tenacity.wait import wait_base
 
+from minet.scrape.regex import (
+    extract_canonical_link,
+    extract_javascript_relocation,
+    extract_meta_refresh,
+)
 from minet.scrape.soup import suppress_xml_parsed_as_html_warnings, WonderfulSoup
-from minet.encodings import normalize_encoding, infer_encoding
+from minet.encodings import infer_encoding
 from minet.loggers import sleepers_logger
 from minet.utils import is_binary_mimetype
 from minet.cookies import dict_to_cookie_string
+from minet.headers import parse_http_refresh, get_encoding_from_content_type_header
 from minet.exceptions import (
     RedirectError,
     MaxRedirectsError,
@@ -82,26 +86,10 @@ mimetypes.init()
 # Types
 AnyTimeout = Union[float, urllib3.Timeout]
 
-# Handy regexes
-CHARSET_RE = re.compile(rb'<meta.*?charset=["\']*(.+?)["\'>]', flags=re.I)
-PRAGMA_RE = re.compile(rb'<meta.*?content=["\']*;?charset=(.+?)["\'>]', flags=re.I)
-XML_RE = re.compile(rb'^\s*<\?xml.*?encoding=["\']*(.+?)["\'>]', flags=re.I)
-NOSCRIPT_RE = re.compile(rb"<noscript[^>]*>.*</noscript[^>]*>", flags=re.I)
-META_REFRESH_RE = re.compile(
-    rb"""<meta\s+http-equiv=['"]?refresh['"]?\s+content=['"]?([^"']+)['">]?""",
-    flags=re.I,
-)
-JAVASCRIPT_LOCATION_RE = re.compile(
-    rb"""(?:window\.)?location(?:\s*=\s*|\.replace\(\s*)['"`](.*?)['"`]"""
-)
-ESCAPED_SLASH_RE = re.compile(rb"\\\/")
+# Patterns
 HTML_RE = re.compile(
     rb"^\s*<(?:html|head|body|title|meta|link|span|div|img|ul|ol|[ap!?])", flags=re.I
 )
-CANONICAL_LINK_RE = re.compile(
-    rb'<link\s*[^>]*\s+rel=(?:"\s*canonical\s*"|canonical|\'\s*canonical\s*\')\s+[^>]*\s?/?>'
-)
-HREF_RE = re.compile(rb'href=(\"[^"]+|\'[^\']+|[^\s]+)>?\s?', flags=re.I)
 
 # Constants
 REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
@@ -120,117 +108,8 @@ EXPECTED_WEB_ERRORS = (
 assert CONTENT_PREBUFFER_UP_TO < LARGE_CONTENT_PREBUFFER_UP_TO
 
 
-def infer_encoding_from_headers(response: urllib3.HTTPResponse) -> Optional[str]:
-    content_type_header = response.getheader("content-type")
-
-    if content_type_header is None:
-        return None
-
-    parsed_header = cgi.parse_header(content_type_header)
-
-    if len(parsed_header) > 1:
-        charset = parsed_header[1].get("charset")
-
-        if charset is not None:
-            return charset.lower()
-
-    return None
-
-
-def infer_encodings_from_xml(
-    body: bytes, chunk_size: Optional[int] = CONTENT_PREBUFFER_UP_TO
-) -> Dict[str, int]:
-    possibilities = defaultdict(list)
-
-    chunk = body
-
-    if chunk_size is not None:
-        chunk = body[:chunk_size]
-
-    matches = chain(
-        re.findall(CHARSET_RE, chunk),
-        re.findall(PRAGMA_RE, chunk),
-        re.findall(XML_RE, chunk),
-    )
-
-    for match in matches:
-        encoding = match.decode().lower()
-        possibilities[normalize_encoding(encoding)].append(encoding)
-
-    return {max(names, key=len): len(names) for names in possibilities.values()}
-
-
 def looks_like_html(html_chunk: bytes) -> bool:
     return HTML_RE.match(html_chunk) is not None
-
-
-def parse_http_header(header: str) -> Tuple[str, str]:
-    key, value = header.split(":", 1)
-
-    return key.strip(), value.strip()
-
-
-# TODO: take more cases into account...
-#   http://www.otsukare.info/2015/03/26/refresh-http-header
-def parse_http_refresh(value) -> Optional[Tuple[int, str]]:
-    try:
-        if isinstance(value, bytes):
-            value = value.decode()
-
-        duration, url = value.strip().split(";", 1)
-
-        if not url.lower().strip().startswith("url="):
-            return None
-
-        return int(duration), str(url.split("=", 1)[1])
-    except Exception:
-        return None
-
-
-def extract_href(value):
-    m = HREF_RE.search(value)
-
-    if not m:
-        return None
-
-    url = m.group(1)
-
-    try:
-        url = url.decode("utf-8")
-    except UnicodeDecodeError:
-        return None
-
-    return url.strip("\"'") or None
-
-
-def find_canonical_link(html_chunk: bytes):
-    m = CANONICAL_LINK_RE.search(html_chunk)
-
-    if not m:
-        return None
-
-    return extract_href(m.group())
-
-
-def find_meta_refresh(html_chunk: bytes):
-    m = META_REFRESH_RE.search(html_chunk)
-
-    if not m:
-        return None
-
-    return parse_http_refresh(m.group(1))
-
-
-def find_javascript_relocation(html_chunk: bytes):
-    m = JAVASCRIPT_LOCATION_RE.search(html_chunk)
-
-    if not m:
-        return None
-
-    try:
-        return ESCAPED_SLASH_RE.sub(b"/", m.group(1)).decode()
-    except Exception:
-        return None
 
 
 def create_pool_manager(
@@ -660,7 +539,7 @@ def atomic_resolve(
 
                     # Meta refresh
                     if location is None and follow_meta_refresh:
-                        meta_refresh = find_meta_refresh(buffered_response.body)
+                        meta_refresh = extract_meta_refresh(buffered_response.body)
 
                         if meta_refresh is not None:
                             location = meta_refresh[1]
@@ -668,7 +547,7 @@ def atomic_resolve(
 
                     # JavaScript relocation
                     if location is None and follow_js_relocation:
-                        js_relocation = find_javascript_relocation(
+                        js_relocation = extract_javascript_relocation(
                             buffered_response.body
                         )
 
@@ -685,7 +564,7 @@ def atomic_resolve(
                     if canonicalize:
                         buffered_response.prebuffer_up_to(LARGE_CONTENT_PREBUFFER_UP_TO)
 
-                        canonical = find_canonical_link(buffered_response.body)
+                        canonical = extract_canonical_link(buffered_response.body)
 
                         if canonical is not None and canonical != url:
                             canonical = urljoin(url, canonical)
@@ -1005,7 +884,9 @@ class Response(object):
 
     @property
     def encoding_from_headers(self) -> Optional[str]:
-        return infer_encoding_from_headers(self.__response)
+        return get_encoding_from_content_type_header(
+            self.__response.getheader("Content-Type")
+        )
 
     # TODO: add encoding_from_xml & possible_encodings when required
 

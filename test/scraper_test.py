@@ -161,7 +161,7 @@ THE_WORST_HTML = """
 """
 
 
-class TestScrape(object):
+class TestScraper(object):
     def test_basics(self):
         result = scrape({"iterator": "li"}, BASIC_HTML)
 
