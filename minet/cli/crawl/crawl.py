@@ -22,6 +22,7 @@ from minet.crawl import (
     SuccessfulCrawlResult,
     SpiderDeclaration,
     Spider,
+    BasicSpider,
 )
 from minet.cli.console import console
 from minet.cli.loading_bar import LoadingBar
@@ -225,15 +226,18 @@ def crawl_action(
     #     crawler_kwargs["retryer_kwargs"] = {"retry_on_timeout": True}
 
     if target is None:
-        try:
-            target = import_target(cli_args.target, "spider")
-        except ImportError:
-            raise FatalError(
-                [
-                    "Could not import %s!" % cli_args.target,
-                    "Are you sure the module exists?",
-                ]
-            )
+        if cli_args.module is not None:
+            try:
+                target = import_target(cli_args.module, "spider")
+            except ImportError:
+                raise FatalError(
+                    [
+                        "Could not import %s!" % cli_args.module,
+                        "Are you sure the module exists?",
+                    ]
+                )
+        else:
+            target = BasicSpider()
 
     # NOTE: target can be:
     #   - a crawler factory function

@@ -30,7 +30,7 @@ CRAWL_ARGUMENTS = {
         "action": "store_true",
     },
     "max_depth": {
-        "flags": ["-m", "--max-depth"],
+        "flag": "--max-depth",
         "help": "Maximum depth for the crawl.",
         "type": int,
     },
@@ -250,10 +250,18 @@ CRAWL_COMMAND = crawl_command(
     epilog=f"""
         Examples:
 
-        . Crawling using the `process` function in the `crawl` module:
-            $ minet crawl crawl:process -O crawl-data
+        . Using the most basic crawler following HTML links:
+            $ minet crawl url -i urls.csv --max-depth 1
+
+        . Crawling using the `process` function from the `crawl` module:
+            $ minet crawl -m crawl:process -O crawl-data
     """,
-    arguments=[{"name": "target", "help": "Crawling target."}],
+    arguments=[
+        {
+            "flags": ["-m", "--module"],
+            "help": "Python module to import to use as spider, spiders or crawler factory. Suffix it with `:` to give actual target within module e.g. `package.module:spider`.",
+        }
+    ],
 )
 
 

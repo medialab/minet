@@ -160,4 +160,7 @@ class BasicSpider(Spider[CrawlJobDataType, BasicSpiderLinks]):
     def tabulate(
         self, result: SuccessfulCrawlResult[CrawlJobDataType, BasicSpiderLinks]
     ) -> Iterator[AnyWritableCSVRowPart]:
+        if result.data is None:
+            return
+
         yield from result.data

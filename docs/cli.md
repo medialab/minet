@@ -220,15 +220,16 @@ Examples:
 ## crawl
 
 ```
-Usage: minet crawl [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                   [--single-line] [-O OUTPUT_DIR] [--factory] [--resume]
-                   [-m MAX_DEPTH] [--throttle THROTTLE]
+Usage: minet crawl [-h] [-m MODULE] [--silent]
+                   [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
+                   [-O OUTPUT_DIR] [--factory] [--resume]
+                   [--max-depth MAX_DEPTH] [--throttle THROTTLE]
                    [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS] [-z]
                    [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                    [-f {csv,jsonl,ndjson}] [-v] [-u] [-n] [-k]
                    [--spoof-user-agent] [-i INPUT] [--explode EXPLODE]
                    [-s SELECT] [--total TOTAL]
-                   target [url_or_url_column]
+                   [url_or_url_column]
 
 # Minet Crawl Command
 
@@ -236,7 +237,6 @@ Run a crawl using a minet crawler or spiders defined
 in a python module.
 
 Positional Arguments:
-  target                        Crawling target.
   url_or_url_column             Single start url to process or name of the CSV
                                 column containing start urls when using
                                 -i/--input. Defaults to "url".
@@ -262,7 +262,11 @@ Optional Arguments:
                                 Defaults to `csv`.
   -k, --insecure                Whether to allow ssl errors when performing
                                 requests or not.
-  -m, --max-depth MAX_DEPTH     Maximum depth for the crawl.
+  --max-depth MAX_DEPTH         Maximum depth for the crawl.
+  -m, --module MODULE           Python module to import to use as spider,
+                                spiders or crawler factory. Suffix it with `:`
+                                to give actual target within module e.g.
+                                `package.module:spider`.
   -n, --normalized-url-cache    Whether to normalize url cache used to assess if
                                 some url was already visited.
   -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.
@@ -334,8 +338,11 @@ Optional Arguments:
 
 Examples:
 
-. Crawling using the `process` function in the `crawl` module:
-    $ minet crawl crawl:process -O crawl-data
+. Using the most basic crawler following HTML links:
+    $ minet crawl url -i urls.csv --max-depth 1
+
+. Crawling using the `process` function from the `crawl` module:
+    $ minet crawl -m crawl:process -O crawl-data
 ```
 
 ## focus-crawl
@@ -347,7 +354,7 @@ Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
                          [--invert-content-match] [--invert-url-match]
                          [--extract] [--irrelevant-continue] [--only-html]
                          [--extraction-fields EXTRACTION_FIELDS] [-O OUTPUT_DIR]
-                         [--factory] [--resume] [-m MAX_DEPTH]
+                         [--factory] [--resume] [--max-depth MAX_DEPTH]
                          [--throttle THROTTLE]
                          [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS]
                          [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
@@ -411,7 +418,7 @@ Optional Arguments:
                                 rule.
   --irrelevant-continue         Continue exploration whether met content is
                                 relevant or not.
-  -m, --max-depth MAX_DEPTH     Maximum depth for the crawl.
+  --max-depth MAX_DEPTH         Maximum depth for the crawl.
   -n, --normalized-url-cache    Whether to normalize url cache used to assess if
                                 some url was already visited.
   --only-html                   Add URLs to the crawler queue only if they seem
@@ -2979,8 +2986,8 @@ Usage: minet hyphe crawl [-h] [--silent]
                          [--prefix-separator PREFIX_SEPARATOR]
                          [--start-pages-column START_PAGES_COLUMN]
                          [--start-page-separator START_PAGE_SEPARATOR]
-                         [-O OUTPUT_DIR] [--factory] [--resume] [-m MAX_DEPTH]
-                         [--throttle THROTTLE]
+                         [-O OUTPUT_DIR] [--factory] [--resume]
+                         [--max-depth MAX_DEPTH] [--throttle THROTTLE]
                          [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS]
                          [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-k]
@@ -3018,7 +3025,7 @@ Optional Arguments:
                                 ids. Defaults to `ID`.
   -k, --insecure                Whether to allow ssl errors when performing
                                 requests or not.
-  -m, --max-depth MAX_DEPTH     Maximum depth for the crawl.
+  --max-depth MAX_DEPTH         Maximum depth for the crawl.
   -n, --normalized-url-cache    Whether to normalize url cache used to assess if
                                 some url was already visited.
   -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.

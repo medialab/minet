@@ -13,7 +13,13 @@ import yaml
 from ebbe.decorators import with_defer
 from os import makedirs, PathLike
 from os.path import basename, join, splitext, abspath, normpath, dirname
-from ural import get_hostname, get_normalized_hostname, safe_urlsplit, pathsplit
+from ural import (
+    get_hostname,
+    get_normalized_hostname,
+    get_fingerprinted_hostname,
+    safe_urlsplit,
+    pathsplit,
+)
 from quenouille import NamedLocks
 
 from minet.exceptions import (
@@ -97,7 +103,11 @@ class FolderStrategy(object):
 
         . "normalized-hostname": files will be written in folders based on
             their url's hostname stripped of some undesirable parts (such as
-            "www.", or "m." or "fr.", for instance).
+            "www.", or "m.", for instance).
+
+        . "fingerprinted-hostname": files will be written in folders based on
+            their url's hostname stripped of some more undesirable parts (such as
+            "fr.", for instance) and their public suffix will be dropped.
     """
 
     def __call__(self):
@@ -116,6 +126,9 @@ class FolderStrategy(object):
 
         if name == "normalized-hostname":
             return NormalizedHostnameFolderStrategy()
+
+        if name == "fingerprinted-hostname":
+            return FingerprintedHostnameFolderStrategy()
 
         if name.startswith("prefix-"):
             length = name.split("prefix-")[-1]
@@ -180,6 +193,16 @@ class NormalizedHostnameFolderStrategy(FolderStrategy):
             normalize_amp=False,
             infer_redirection=False,
         )
+
+        if not hostname:
+            hostname = "unknown-host"
+
+        return join(hostname, filename)
+
+
+class FingerprintedHostnameFolderStrategy(FolderStrategy):
+    def __call__(self, filename, url, **kwargs):
+        hostname = get_fingerprinted_hostname(url, strip_suffix=True)
 
         if not hostname:
             hostname = "unknown-host"
