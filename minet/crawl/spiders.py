@@ -102,6 +102,9 @@ class Spider(Generic[CrawlJobDataType, CrawlResultDataType]):
     def tabulate(
         self, result: SuccessfulCrawlResult[CrawlJobDataType, CrawlResultDataType]
     ) -> Iterator[AnyWritableCSVRowPart]:
+        if result.data is None:
+            return
+
         yield result.data  # type: ignore
 
 
