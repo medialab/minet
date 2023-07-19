@@ -61,6 +61,7 @@ from minet.scrape.regex import (
     extract_canonical_link,
     extract_javascript_relocation,
     extract_meta_refresh,
+    extract_links,
 )
 from minet.scrape.soup import suppress_xml_parsed_as_html_warnings, WonderfulSoup
 from minet.encodings import infer_encoding
@@ -923,6 +924,19 @@ class Response(object):
     ) -> WonderfulSoup:
         with suppress_xml_parsed_as_html_warnings(bypass=not ignore_xhtml_warning):
             return WonderfulSoup(self.text(), engine, parse_only=strainer)
+
+    def links(self, unique: bool = True, strip_fragment: bool = False) -> List[str]:
+        if not self.is_html:
+            raise TypeError("cannot extract links from non-html responses")
+
+        return extract_links(
+            self.body,
+            self.end_url,
+            encoding=self.likely_encoding,
+            canonicalize=True,
+            unique=unique,
+            strip_fragment=strip_fragment,
+        )
 
     def __repr__(self) -> str:
         attr: List[Union[str, Tuple[str, Union[str, bool]]]] = ["status", "url"]
