@@ -22,7 +22,7 @@ As such, it has been designed to be:
 
 _How to cite?_
 
-**minet** is published on [Zenodo](https://zenodo.org/) as [![DOI](https://zenodo.org/badge/169059797.svg)](https://zenodo.org/badge/latestdoi/169059797)
+**minet** is published on [Zenodo](https://zenodo.org/) as [10.5281/zenodo.4564399](http://doi.org/10.5281/zenodo.4564399).
 
 You can cite it thusly:
 
