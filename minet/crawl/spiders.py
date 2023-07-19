@@ -12,11 +12,14 @@ from typing import (
     Iterable,
     Iterator,
     Generic,
+    List,
 )
 
 if TYPE_CHECKING:
     from minet.crawl.crawler import Crawler
 
+from dataclasses import dataclass
+from casanova import TabularRecord
 from casanova.types import AnyWritableCSVRowPart
 
 from minet.crawl.types import (
@@ -126,3 +129,35 @@ class FunctionSpider(Spider[CrawlJobDataType, CrawlResultDataType]):
         self, job: CrawlJob[CrawlJobDataType], response: Response
     ) -> SpiderResult[CrawlResultDataType, CrawlJobDataType]:
         return self.fn(job, response)
+
+
+# TODO: concretize output data type
+@dataclass
+class BasicSpiderLink(TabularRecord):
+    from_url: str
+    to_url: str
+
+
+BasicSpiderLinks = List[BasicSpiderLink]
+
+
+class BasicSpider(Spider[CrawlJobDataType, BasicSpiderLinks]):
+    def process(
+        self, job: CrawlJob[CrawlJobDataType], response: Response
+    ) -> SpiderResult[BasicSpiderLinks, CrawlJobDataType]:
+        if response.status != 200:
+            return
+
+        if not response.is_html:
+            return
+
+        next_urls = response.links()
+
+        links = [BasicSpiderLink(response.end_url, url) for url in next_urls]
+
+        return links, next_urls
+
+    def tabulate(
+        self, result: SuccessfulCrawlResult[CrawlJobDataType, BasicSpiderLinks]
+    ) -> Iterator[AnyWritableCSVRowPart]:
+        yield from result.data
