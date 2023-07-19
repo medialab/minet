@@ -4,13 +4,11 @@ from minet.types import AnyScrapableTarget
 from bs4 import SoupStrainer, BeautifulSoup
 from casanova import CSVSerializer
 from urllib.parse import urljoin
-from ural import should_follow_href
-from ural import could_be_rss
+from ural import should_follow_href, could_be_rss
 
 from minet.scrape.analysis import ScraperAnalysisOutputType
 from minet.scrape.utils import ensure_soup
 from minet.scrape.mixin import ScraperMixin
-from minet.web import request
 
 
 class NamedScraper(ScraperMixin):
@@ -138,13 +136,6 @@ class RssScraper(NamedScraper):
     output_type = "list"
     strainer = SoupStrainer(name=["a", "link"])
 
-    MIMETYPES = [
-        "application/rss+xml",
-        "application/rdf+xml",
-        "application/atom+xml" "application/xml",
-        "text/xml",
-    ]
-
     def scrape(self, soup: BeautifulSoup, context=None):
         rss_urls = []
         base_url = context.get("url") if context is not None else None
@@ -162,9 +153,7 @@ class RssScraper(NamedScraper):
                 href = link.attrs.get("href", None)
                 url = urljoin(base_url, href)
                 if could_be_rss(url):
-                    response = request(url)
-                    if response and response.mimetype in self.MIMETYPES:
-                        rss_urls.append(url)
+                    rss_urls.append(url)
         return rss_urls
 
 
