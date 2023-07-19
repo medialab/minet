@@ -20,18 +20,18 @@ LINKS = """
 class TestWonderfulSoup:
     def test_select_one_strict(self):
         with pytest.raises(SelectionError):
-            WonderfulSoup(HTML).select_one("li", strict=True)
+            WonderfulSoup(HTML).force_select_one("li")
 
     def test_get_display_text(self):
         soup = WonderfulSoup(HTML)
 
         assert soup.get_display_text() == "wut?"
-        assert soup.select_one("p", strict=True).get_display_text() == "wut?"
+        assert soup.force_select_one("p").get_display_text() == "wut?"
 
     def test_get_html(self):
         soup = WonderfulSoup(HTML)
 
-        p = soup.select_one("p", strict=True)
+        p = soup.force_select_one("p")
 
         assert p.get_html() == "wut?"
         assert p.get_inner_html() == "wut?"
@@ -54,7 +54,7 @@ class TestWonderfulSoup:
 
     def test_get(self):
         soup = WonderfulSoup('<div class=" a  b  ">Ok</div>')
-        div = soup.select_one("div", strict=True)
+        div = soup.force_select_one("div")
 
         assert div.get("class") == " a  b  "
         assert div.get("id") is None

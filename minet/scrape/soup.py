@@ -1,6 +1,5 @@
 import re
-from typing import List, Optional, overload, cast
-from minet.types import Literal
+from typing import List, Optional, cast
 
 import warnings
 from contextlib import contextmanager
@@ -37,44 +36,21 @@ def extract(elem: "MinetTag", target: Optional[str]) -> Optional[str]:
 
 
 class MinetTag(Tag):
-    @overload
-    def select_one(
-        self, css: str, *args, strict: Literal[False] = ..., **kwargs
-    ) -> Optional["MinetTag"]:
-        ...
-
-    @overload
-    def select_one(
-        self, css: str, *args, strict: Literal[True] = ..., **kwargs
-    ) -> "MinetTag":
-        ...
-
-    def select_one(
-        self, css: str, *args, strict: bool = False, **kwargs
-    ) -> Optional["MinetTag"]:
+    def force_select_one(self, css: str, *args, **kwargs) -> "MinetTag":
         elem = super().select_one(css, *args, **kwargs)
 
-        if strict and elem is None:
+        if elem is None:
             raise SelectionError(css)
 
         return cast(MinetTag, elem)
+
+    def select_one(self, css: str, *args, **kwargs) -> Optional["MinetTag"]:
+        return cast(Optional["MinetTag"], super().select_one(css, *args, **kwargs))
 
     def select(self, css: str, *args, **kwargs) -> List["MinetTag"]:
         css = css.replace(":contains(", ":-soup-contains(")
 
         return cast(List["MinetTag"], super().select(css, *args, **kwargs))
-
-    @overload
-    def scrape_one(
-        self, css: str, target: Optional[str] = ..., strict: Literal[False] = ...
-    ) -> Optional[str]:
-        ...
-
-    @overload
-    def scrape_one(
-        self, css: str, target: Optional[str] = ..., strict: Literal[True] = ...
-    ) -> str:
-        ...
 
     def scrape_one(
         self, css: str, target: Optional[str] = None, strict: bool = False
