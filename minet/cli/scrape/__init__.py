@@ -35,6 +35,7 @@ SCRAPE_COMMAND = command(
 
         . "canonical": scrape the <link rel="canonical"> tag href if any.
         . "metas": scrape the <meta> tags if any.
+        . "rss": scrape the RSS feed urls if any.
         . "title": scrape the <title> tag if any.
         . "urls": scrape all the relevant <a> tag href urls. Will join them
             with the correct base url if --url-column was given.
