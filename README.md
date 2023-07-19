@@ -20,6 +20,14 @@ As such, it has been designed to be:
 
 ![fetch](./docs/img/fetch.gif)
 
+_How to cite?_
+
+**minet** is published on [Zenodo](https://zenodo.org/) as [![DOI](https://zenodo.org/badge/169059797.svg)](https://zenodo.org/badge/latestdoi/169059797)
+
+You can cite it thusly:
+
+> Guillaume Plique, Pauline Breteau, Jules Farjas, Héloïse Théro, Jean Descamps, Amélie Pellé, Laura Miguel, & César Pichon. (2019, October 14). Minet, a webmining CLI tool & library for python. Zenodo. http://doi.org/10.5281/zenodo.4564399
+
 ## Whirlwind tour
 
 ```bash
@@ -55,7 +63,6 @@ minet youtube search -k "MY-YT-API-KEY" "médialab" > videos.csv
 - [Uninstallation](#uninstallation)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
-- [How to cite](#how-to-cite)
 
 ## What it does
 
@@ -175,11 +182,3 @@ pip uninstall minet
 ## Contributing
 
 To contribute to **minet** you can check out [this](./CONTRIBUTING.md) documentation.
-
-## How to cite
-
-**minet** is published on [Zenodo](https://zenodo.org/) as [![DOI](https://zenodo.org/badge/169059797.svg)](https://zenodo.org/badge/latestdoi/169059797)
-
-You can cite it thusly:
-
-> Guillaume Plique, Pauline Breteau, Jules Farjas, Héloïse Théro, Jean Descamps, Amélie Pellé, Laura Miguel, & César Pichon. (2019, October 14). Minet, a webmining CLI tool & library for python. Zenodo. http://doi.org/10.5281/zenodo.4564399
