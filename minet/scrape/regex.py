@@ -128,6 +128,12 @@ def extract_links(
         base_url = canonicalize_url(base_url, strip_fragment=strip_fragment)
 
     for url in urls_from_html(html_body, encoding=encoding, errors="replace"):
+        url = url.strip()  # TODO: might be done by ural at one point
+
+        # Empty url is basically self
+        if not url:
+            continue
+
         if not should_follow_href(url):
             continue
 
