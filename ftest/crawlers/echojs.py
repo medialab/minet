@@ -7,7 +7,7 @@ START_URL = "https://echojs.com/latest"
 
 def scrape(soup: WonderfulSoup) -> SpiderResult:
     next_links = soup.scrape("#newslist article > h2 > a[href]", "href")
-    title = soup.select_one("title", strict=True).get_text()
+    title = soup.force_select_one("title").get_text()
 
     return title, next_links
 

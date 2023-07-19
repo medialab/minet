@@ -3,13 +3,11 @@ from minet.types import Literal
 
 from dataclasses import dataclass
 from ural.lru import LRUTrie
-from ural import should_follow_href
 from casanova import TabularRecord
 
 from minet.crawl.spiders import Spider, SpiderResult
 from minet.crawl.types import CrawlJob, SuccessfulCrawlResult
 from minet.web import Response
-from minet.scrape.typical import UrlsScraper
 
 VALID_WEBENTITY_STATUSES = ["IN", "OUT", "UNDECIDED", "DISCOVERED"]
 
@@ -39,7 +37,6 @@ class HypheSpiderAddendum:
 class HypheSpider(Spider):
     def __init__(self):
         self.trie: LRUTrie[WebentityRecord] = LRUTrie(suffix_aware=True)
-        self.urls_scraper = UrlsScraper()
         self.start_pages: Set[str] = set()
 
     def start(self) -> Iterable[str]:
@@ -61,7 +58,7 @@ class HypheSpider(Spider):
         if response.status != 200:
             return
 
-        if not response.could_be_html:
+        if not response.is_html:
             return
 
         webentity = self.trie.match(response.end_url)
@@ -69,22 +66,13 @@ class HypheSpider(Spider):
         if webentity is None or webentity.status != "IN":
             return
 
-        urls = self.urls_scraper(response.text())
+        urls = response.links()
 
         urls_to_follow = []
         links: List[WebentityLink] = []
 
         for url in urls:
-            url = response.urljoin(url)
-
-            if not should_follow_href(url):
-                continue
-
-            # TODO: drop when issue is pinpointed
-            try:
-                match = self.trie.match(url)
-            except Exception:
-                raise TypeError(url)
+            match = self.trie.match(url)
 
             if match is None:
                 continue
