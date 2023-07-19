@@ -52,6 +52,11 @@ from tenacity import (
 )
 from tenacity.wait import wait_base
 
+try:
+    from urllib3 import HTTPHeaderDict
+except ImportError:
+    from urllib3._collections import HTTPHeaderDict
+
 from minet.scrape.regex import (
     extract_canonical_link,
     extract_javascript_relocation,
@@ -669,18 +674,19 @@ class Response(object):
     """
     Class representing a finalized HTTP response.
 
-    It wraps a urllib3.HTTPResponse as well as its raw body and exposes a
-    variety of useful utilities that will be used downstream.
+    It wraps a response binary body, headers & status and exposes a
+    variety of useful utilities that will be used by end users.
 
-    This class is used by high-level function of this module and is expected
-    to be found elsewhere.
+    This class is used by the high-level functions of this module and is
+    expected to be found elsewhere.
 
     Note that it will lazily compute required items when asked for certain
     properties.
     """
 
     __slots__ = (
-        "__response",
+        "__headers",
+        "__status",
         "__stack",
         "__body",
         "__text",
@@ -695,7 +701,8 @@ class Response(object):
         "__has_decoded_text",
     )
 
-    __response: urllib3.HTTPResponse
+    __headers: HTTPHeaderDict
+    __status: int
     __stack: Optional[RedirectionStack]
     __body: bytes
     __text: Optional[str]
@@ -714,13 +721,15 @@ class Response(object):
         self,
         url: str,
         stack: Optional[RedirectionStack],
-        response: urllib3.HTTPResponse,
+        headers: HTTPHeaderDict,
+        status: int,
         body: bytes,
         known_encoding: Optional[str] = None,
     ):
         self.__url = url
         self.__stack = stack
-        self.__response = response
+        self.__headers = headers
+        self.__status = status
         self.__body = body
         self.__text = None
         self.__datetime_utc = datetime.utcnow()
@@ -743,10 +752,10 @@ class Response(object):
         assert url is not None
         mimetype, _ = mimetypes.guess_type(url)
 
-        response = self.__response
+        headers = self.__headers
 
-        if "Content-Type" in response.headers:
-            content_type = response.headers["Content-Type"]
+        if "Content-Type" in headers:
+            content_type = headers["Content-Type"]
             parsed_header = cgi.parse_header(content_type)
 
             if parsed_header and parsed_header[0].strip():
@@ -822,7 +831,7 @@ class Response(object):
 
     @property
     def headers(self):
-        return self.__response.headers
+        return self.__headers
 
     @property
     def stack(self) -> Optional[RedirectionStack]:
@@ -834,7 +843,7 @@ class Response(object):
 
     @property
     def status(self) -> int:
-        return self.__response.status
+        return self.__status
 
     @property
     def end_datetime(self) -> datetime:
@@ -884,9 +893,7 @@ class Response(object):
 
     @property
     def encoding_from_headers(self) -> Optional[str]:
-        return get_encoding_from_content_type_header(
-            self.__response.getheader("Content-Type")
-        )
+        return get_encoding_from_content_type_header(self.__headers.get("Content-Type"))
 
     # TODO: add encoding_from_xml & possible_encodings when required
 
@@ -1008,7 +1015,14 @@ def request(
 
     response, body = buffered_response.read_and_unwrap()
 
-    return Response(url, stack, response, body, known_encoding=known_encoding)
+    return Response(
+        url,
+        stack,
+        response.headers,
+        response.status,
+        body,
+        known_encoding=known_encoding,
+    )
 
 
 def resolve(
