@@ -66,7 +66,7 @@ class HypheSpider(Spider):
         if webentity is None or webentity.status != "IN":
             return
 
-        urls = response.links()
+        urls = response.links(strip_fragment=True)
 
         urls_to_follow = []
         links: List[WebentityLink] = []

@@ -154,7 +154,7 @@ class BasicSpider(Spider[CrawlJobDataType, BasicSpiderLinks]):
         if not response.is_html:
             return
 
-        next_urls = response.links()
+        next_urls = response.links(strip_fragment=True)
 
         links = [BasicSpiderLink(response.end_url, url) for url in next_urls]
 

@@ -61,7 +61,6 @@ from minet.scrape.regex import (
     extract_canonical_link,
     extract_javascript_relocation,
     extract_meta_refresh,
-    extract_links,
 )
 from minet.scrape.soup import suppress_xml_parsed_as_html_warnings, WonderfulSoup
 from minet.encodings import infer_encoding
@@ -929,13 +928,15 @@ class Response(object):
         if not self.is_html:
             raise TypeError("cannot extract links from non-html responses")
 
-        return extract_links(
-            self.body,
-            self.end_url,
-            encoding=self.likely_encoding,
-            canonicalize=True,
-            unique=unique,
-            strip_fragment=strip_fragment,
+        return list(
+            ural.links_from_html(
+                self.end_url,
+                self.body,
+                encoding=self.likely_encoding,
+                canonicalize=True,
+                unique=unique,
+                strip_fragment=strip_fragment,
+            )
         )
 
     def __repr__(self) -> str:
