@@ -9,6 +9,6 @@ python -m minet.cli fetch url -i ftest/resources/urls.csv \
   --folder-strategy fullpath \
   --grab-cookies firefox \
   --compress \
-  --only-html -x proxy.medialab.sciences-po.fr:3128 \
+  --only-html \
   -s id,url \
   -t 25 > ftest/report.csv
