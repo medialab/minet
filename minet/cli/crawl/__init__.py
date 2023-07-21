@@ -19,11 +19,6 @@ CRAWL_ARGUMENTS = {
         "help": "Output directory.",
         "default": "crawl",
     },
-    "factory": {
-        "flag": "--factory",
-        "help": "Whether crawl target is a crawler factory function.",
-        "action": "store_true",
-    },
     "resume": {
         "flag": "--resume",
         "help": "Whether to resume an interrupted crawl.",
@@ -128,6 +123,18 @@ CRAWL_ARGUMENTS = {
     },
 }
 
+CRAWL_MODULE_ARGUMENTS = [
+    {
+        "flags": ["-m", "--module"],
+        "help": "Python module to import to use as spider, spiders or crawler factory. Suffix it with `:` to give actual target within module e.g. `package.module:spider`.",
+    },
+    {
+        "flag": "--factory",
+        "help": "Whether crawl target is a crawler factory function.",
+        "action": "store_true",
+    },
+]
+
 
 def crawl_command(
     name: str,
@@ -137,6 +144,7 @@ def crawl_command(
     epilog: Optional[str] = None,
     arguments: Optional[List] = None,
     accept_input: bool = True,
+    accept_module: bool = False,
     resolve=None,
     unique: bool = False,
     url_cache: bool = True,
@@ -190,9 +198,6 @@ def crawl_command(
         del arguments_dict["write_data"]
         del arguments_dict["format"]
 
-    if factory:
-        del arguments_dict["factory"]
-
     if default_folder_strategy is not None:
         arguments_dict["folder_strategy"] = {
             **arguments_dict["folder_strategy"],
@@ -221,6 +226,9 @@ def crawl_command(
         del arguments_dict["stateful_redirects"]
 
     arguments = (arguments or []) + list(arguments_dict.values())
+
+    if accept_module:
+        arguments.extend(CRAWL_MODULE_ARGUMENTS)
 
     additional_kwargs = {}
 
@@ -252,6 +260,10 @@ def crawl_command(
 
         if not write_data:
             cli_args.write_data = False
+
+        if not accept_module:
+            cli_args.module = None
+            cli_args.factory = False
 
         if factory:
             cli_args.factory = True
@@ -298,12 +310,7 @@ CRAWL_COMMAND = crawl_command(
         . Crawling using the `process` function from the `crawl` module:
             $ minet crawl -m crawl:process -O crawl-data
     """,
-    arguments=[
-        {
-            "flags": ["-m", "--module"],
-            "help": "Python module to import to use as spider, spiders or crawler factory. Suffix it with `:` to give actual target within module e.g. `package.module:spider`.",
-        }
-    ],
+    accept_module=True,
 )
 
 
