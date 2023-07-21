@@ -202,8 +202,12 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
     degree: int
 
     @classmethod
-    def fieldnames(cls) -> List[str]:
-        return cls.FIELDNAMES
+    def fieldnames(cls, singular: bool = False) -> List[str]:
+        return (
+            cls.FIELDNAMES
+            if not singular
+            else [f for f in cls.FIELDNAMES if f != "spider"]
+        )
 
     def __init__(self, job: CrawlJob[CrawlJobDataType]):
         self.job = job
@@ -231,19 +235,25 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
     def __csv_row__(self):
         job = self.job
 
-        return [
-            job.id,
-            job.parent,
-            job.spider,
-            job.depth,
-            job.url,
-            self.response.end_url if self.response else None,
-            self.error_code,
-            self.response.status if self.response else None,
-            self.response.mimetype if self.response else None,
-            self.degree,
-            len(self.response) if self.response else None,
-        ]
+        row = [job.id, job.parent]
+
+        if job.spider is not None:
+            row.append(job.spider)
+
+        row.extend(
+            [
+                job.depth,
+                job.url,
+                self.response.end_url if self.response else None,
+                self.error_code,
+                self.response.status if self.response else None,
+                self.response.mimetype if self.response else None,
+                self.degree,
+                len(self.response) if self.response else None,
+            ]
+        )
+
+        return row
 
     def as_csv_row(self):
         return self.__csv_row__()

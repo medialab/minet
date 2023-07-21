@@ -172,23 +172,6 @@ def crawl_action(
     # Scaffolding output directory
     os.makedirs(cli_args.output_dir, exist_ok=True)
 
-    jobs_output_path = join(cli_args.output_dir, "jobs.csv")
-    jobs_output = (
-        casanova.BasicResumer(jobs_output_path, encoding="utf-8")
-        if cli_args.resume
-        else open(jobs_output_path, "w", encoding="utf-8")
-    )
-    jobs_fieldnames = CrawlResult.fieldnames()
-
-    if cli_args.write_files:
-        jobs_fieldnames += ["path"]
-
-    if additional_job_fieldnames is not None:
-        jobs_fieldnames += additional_job_fieldnames
-
-    jobs_writer = casanova.Writer(jobs_output, fieldnames=jobs_fieldnames)
-    defer(jobs_output.close)
-
     crawler_kwargs = {
         "persistent_storage_path": persistent_storage_path,
         "writer_root_directory": writer_root_directory,
@@ -290,6 +273,24 @@ def crawl_action(
 
         if not isinstance(crawler, Crawler):
             raise FatalError("Factory did not return a crawler!")
+
+    # Jobs output
+    jobs_output_path = join(cli_args.output_dir, "jobs.csv")
+    jobs_output = (
+        casanova.BasicResumer(jobs_output_path, encoding="utf-8")
+        if cli_args.resume
+        else open(jobs_output_path, "w", encoding="utf-8")
+    )
+    jobs_fieldnames = CrawlResult.fieldnames(singular=crawler.singular)
+
+    if cli_args.write_files:
+        jobs_fieldnames += ["path"]
+
+    if additional_job_fieldnames is not None:
+        jobs_fieldnames += additional_job_fieldnames
+
+    jobs_writer = casanova.Writer(jobs_output, fieldnames=jobs_fieldnames)
+    defer(jobs_output.close)
 
     # TODO: refactor this as exception
     if crawler.finished:
