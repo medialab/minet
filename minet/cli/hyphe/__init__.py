@@ -47,6 +47,7 @@ HYPHE_CRAWL_SUBCOMMAND = crawl_command(
     default_throttle=0,
     default_connect_timeout=15,
     default_timeout=60,
+    default_retries=3,
     force_spoof_user_agent=True,
     force_stateful_redirects=True,
     arguments=[

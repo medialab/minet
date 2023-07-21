@@ -3079,7 +3079,7 @@ Optional Arguments:
   -p, --processes PROCESSES     Number of processes for the crawler process
                                 pool.
   --retries RETRIES             Number of times to retry on timeout & common
-                                network-related issues. Defaults to `0`.
+                                network-related issues. Defaults to `3`.
   --start-page-separator START_PAGE_SEPARATOR
                                 Separator character for the webentity start
                                 pages. Defaults to ` `.
