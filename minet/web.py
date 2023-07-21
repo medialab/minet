@@ -979,6 +979,7 @@ def request(
     urlencoded_body: Optional[Mapping[str, Union[str, int, float]]] = None,
     cancel_event: Optional[Event] = None,
     raise_on_statuses: Optional[Container[int]] = None,
+    stateful: bool = False,
 ) -> Response:
     # Formatting headers
     final_headers = build_request_headers(
@@ -1026,6 +1027,7 @@ def request(
             canonicalize=canonicalize,
             timeout=timeout,
             cancel_event=cancel_event,
+            stateful=stateful,
         )
 
     if raise_on_statuses is not None:
@@ -1061,6 +1063,7 @@ def resolve(
     canonicalize: bool = False,
     cancel_event: Optional[Event] = None,
     raise_on_statuses: Optional[Container[int]] = None,
+    stateful: bool = False,
 ) -> RedirectionStack:
     final_headers = build_request_headers(
         headers=headers, cookie=cookie, spoof_ua=spoof_ua
@@ -1079,6 +1082,7 @@ def resolve(
         timeout=timeout,
         canonicalize=canonicalize,
         cancel_event=cancel_event,
+        stateful=stateful,
     )
 
     buffered_response.close()

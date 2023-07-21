@@ -121,6 +121,11 @@ CRAWL_ARGUMENTS = {
         "type": int,
         "default": 0,
     },
+    "stateful_redirects": {
+        "flag": "--stateful-redirects",
+        "help": "Whether to keep a cookie jar while redirecting and allowing self redirections that track state.",
+        "action": "store_true",
+    },
 }
 
 
@@ -148,6 +153,7 @@ def crawl_command(
     default_output_dir: Optional[str] = None,
     default_retries: Optional[int] = None,
     force_spoof_user_agent: Optional[bool] = None,
+    force_stateful_redirects: Optional[bool] = None,
 ):
     arguments_dict = CRAWL_ARGUMENTS.copy()
 
@@ -211,6 +217,9 @@ def crawl_command(
     if force_spoof_user_agent is not None:
         del arguments_dict["spoof_user_agent"]
 
+    if force_stateful_redirects is not None:
+        del arguments_dict["stateful_redirects"]
+
     arguments = (arguments or []) + list(arguments_dict.values())
 
     additional_kwargs = {}
@@ -250,8 +259,11 @@ def crawl_command(
         if force_folder_strategy is not None:
             cli_args.folder_strategy = force_folder_strategy
 
-        if force_spoof_user_agent:
+        if force_spoof_user_agent is not None:
             cli_args.spoof_user_agent = force_spoof_user_agent
+
+        if force_stateful_redirects is not None:
+            cli_args.stateful_redirects = force_stateful_redirects
 
         if resolve is not None:
             resolve(cli_args)

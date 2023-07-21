@@ -228,8 +228,8 @@ Usage: minet crawl [-h] [-m MODULE] [--silent]
                    [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                    [-f {csv,jsonl,ndjson}] [-v] [-u] [-n] [-k]
                    [--spoof-user-agent] [-p PROCESSES] [--timeout TIMEOUT]
-                   [--retries RETRIES] [-i INPUT] [--explode EXPLODE]
-                   [-s SELECT] [--total TOTAL]
+                   [--retries RETRIES] [--stateful-redirects] [-i INPUT]
+                   [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                    [url_or_url_column]
 
 # Minet Crawl Command
@@ -277,6 +277,8 @@ Optional Arguments:
                                 network-related issues. Defaults to `0`.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
+  --stateful-redirects          Whether to keep a cookie jar while redirecting
+                                and allowing self redirections that track state.
   -t, --threads THREADS         Number of threads to use. You can use `0` if you
                                 want the crawler to remain completely
                                 synchronous. Defaults to `25`.
@@ -372,8 +374,8 @@ Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
                          [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-k]
                          [--spoof-user-agent] [-p PROCESSES] [--timeout TIMEOUT]
-                         [--retries RETRIES] [-i INPUT] [--explode EXPLODE]
-                         [-s SELECT] [--total TOTAL]
+                         [--retries RETRIES] [--stateful-redirects] [-i INPUT]
+                         [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                          [url_or_url_column]
 
 # Minet Focus Crawl Command
@@ -443,6 +445,8 @@ Optional Arguments:
                                 network-related issues. Defaults to `0`.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
+  --stateful-redirects          Whether to keep a cookie jar while redirecting
+                                and allowing self redirections that track state.
   -t, --threads THREADS         Number of threads to use. You can use `0` if you
                                 want the crawler to remain completely
                                 synchronous. Defaults to `25`.
@@ -3020,6 +3024,7 @@ Usage: minet hyphe crawl [-h] [--silent]
                          [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-k] [-p PROCESSES]
                          [--timeout TIMEOUT] [--retries RETRIES]
+                         [--stateful-redirects]
                          corpus
 
 # Minet Hyphe Crawl Command
@@ -3076,6 +3081,8 @@ Optional Arguments:
                                 start pages, separated by
                                 --start-page-separator. Defaults to `START
                                 PAGES`.
+  --stateful-redirects          Whether to keep a cookie jar while redirecting
+                                and allowing self redirections that track state.
   --status-column STATUS_COLUMN
                                 Name of the CSV column containing the webentity
                                 statuses. Defaults to `STATUS`.
