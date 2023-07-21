@@ -220,16 +220,17 @@ Examples:
 ## crawl
 
 ```
-Usage: minet crawl [-h] [-m MODULE] [--silent]
+Usage: minet crawl [-h] [-O OUTPUT_DIR] [--silent]
                    [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
-                   [-O OUTPUT_DIR] [--factory] [--resume]
-                   [--max-depth MAX_DEPTH] [--throttle THROTTLE]
+                   [--resume] [--max-depth MAX_DEPTH] [--throttle THROTTLE]
                    [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS] [-z]
                    [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                    [-f {csv,jsonl,ndjson}] [-v] [-u] [-n] [-k]
-                   [--spoof-user-agent] [-p PROCESSES] [--timeout TIMEOUT]
-                   [--retries RETRIES] [--stateful-redirects] [-i INPUT]
-                   [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                   [--spoof-user-agent] [-p PROCESSES]
+                   [--connect-timeout CONNECT_TIMEOUT] [--timeout TIMEOUT]
+                   [--retries RETRIES] [--stateful-redirects] [-m MODULE]
+                   [--factory] [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                   [--total TOTAL]
                    [url_or_url_column]
 
 # Minet Crawl Command
@@ -245,6 +246,9 @@ Positional Arguments:
 Optional Arguments:
   -z, --compress                Whether to compress the downloaded files when
                                 saving files on disk.
+  --connect-timeout CONNECT_TIMEOUT
+                                Maxium socket connection time to host. Default
+                                to ~5s. Defaults to `5`.
   --domain-parallelism DOMAIN_PARALLELISM
                                 Max number of urls per domain to hit at the same
                                 time. Defaults to `1`.
@@ -286,7 +290,7 @@ Optional Arguments:
                                 the same domain. Defaults to `0.2`.
   --timeout TIMEOUT             Maximum time - in seconds - to spend for each
                                 request before triggering a timeout. Defaults to
-                                ~30s.
+                                `30`.
   -v, --verbose                 Whether to print information about crawl
                                 results.
   -u, --visit-urls-only-once    Whether to ensure that any url will only be
@@ -368,12 +372,13 @@ Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
                          [--invert-content-match] [--invert-url-match]
                          [--extract] [--irrelevant-continue] [--only-html]
                          [--extraction-fields EXTRACTION_FIELDS] [-O OUTPUT_DIR]
-                         [--factory] [--resume] [--max-depth MAX_DEPTH]
+                         [--resume] [--max-depth MAX_DEPTH]
                          [--throttle THROTTLE]
                          [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS]
                          [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-k]
-                         [--spoof-user-agent] [-p PROCESSES] [--timeout TIMEOUT]
+                         [--spoof-user-agent] [-p PROCESSES]
+                         [--connect-timeout CONNECT_TIMEOUT] [--timeout TIMEOUT]
                          [--retries RETRIES] [--stateful-redirects] [-i INPUT]
                          [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                          [url_or_url_column]
@@ -396,6 +401,9 @@ Positional Arguments:
 Optional Arguments:
   -z, --compress                Whether to compress the downloaded files when
                                 saving files on disk.
+  --connect-timeout CONNECT_TIMEOUT
+                                Maxium socket connection time to host. Default
+                                to ~5s. Defaults to `5`.
   -C, --content-filter CONTENT_FILTER
                                 Regex used to filter fetched content.
   --domain-parallelism DOMAIN_PARALLELISM
@@ -412,8 +420,6 @@ Optional Arguments:
                                 `canonical_url`, `title`, `description`,
                                 `content`, `comments`, `author`, `categories`,
                                 `tags`, `date` and `sitename`.
-  --factory                     Whether crawl target is a crawler factory
-                                function.
   --folder-strategy FOLDER_STRATEGY
                                 Name of the strategy to be used to dispatch the
                                 retrieved files into folders to alleviate issues
@@ -454,7 +460,7 @@ Optional Arguments:
                                 the same domain. Defaults to `0.2`.
   --timeout TIMEOUT             Maximum time - in seconds - to spend for each
                                 request before triggering a timeout. Defaults to
-                                ~30s.
+                                `30`.
   -U, --url-filter URL_FILTER   Regex used to filter URLs added to crawler's
                                 queue.
   -v, --verbose                 Whether to print information about crawl
@@ -3018,12 +3024,13 @@ Usage: minet hyphe crawl [-h] [--silent]
                          [--prefix-separator PREFIX_SEPARATOR]
                          [--start-pages-column START_PAGES_COLUMN]
                          [--start-page-separator START_PAGE_SEPARATOR]
-                         [-O OUTPUT_DIR] [--factory] [--resume]
-                         [--max-depth MAX_DEPTH] [--throttle THROTTLE]
+                         [-O OUTPUT_DIR] [--resume] [--max-depth MAX_DEPTH]
+                         [--throttle THROTTLE]
                          [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS]
                          [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-k] [-p PROCESSES]
-                         [--timeout TIMEOUT] [--retries RETRIES]
+                         [--connect-timeout CONNECT_TIMEOUT] [--timeout TIMEOUT]
+                         [--retries RETRIES]
                          corpus
 
 # Minet Hyphe Crawl Command
@@ -3037,11 +3044,12 @@ Positional Arguments:
 Optional Arguments:
   -z, --compress                Whether to compress the downloaded files when
                                 saving files on disk.
+  --connect-timeout CONNECT_TIMEOUT
+                                Maxium socket connection time to host. Default
+                                to ~5s. Defaults to `15`.
   --domain-parallelism DOMAIN_PARALLELISM
                                 Max number of urls per domain to hit at the same
                                 time. Defaults to `1`.
-  --factory                     Whether crawl target is a crawler factory
-                                function.
   --folder-strategy FOLDER_STRATEGY
                                 Name of the strategy to be used to dispatch the
                                 retrieved files into folders to alleviate issues
@@ -3090,7 +3098,7 @@ Optional Arguments:
                                 the same domain. Defaults to `0`.
   --timeout TIMEOUT             Maximum time - in seconds - to spend for each
                                 request before triggering a timeout. Defaults to
-                                ~30s.
+                                `60`.
   -v, --verbose                 Whether to print information about crawl
                                 results.
   -d, --write-data, -D, --dont-write-data

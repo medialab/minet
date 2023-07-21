@@ -1,5 +1,7 @@
 from typing import List, Optional
 
+from urllib3 import Timeout
+
 from minet.cli.argparse import (
     command,
     FolderStrategyType,
@@ -105,10 +107,17 @@ CRAWL_ARGUMENTS = {
         "help": "Number of processes for the crawler process pool.",
         "type": int,
     },
+    "connect_timeout": {
+        "flag": "--connect-timeout",
+        "help": "Maxium socket connection time to host. Default to ~5s.",
+        "type": float,
+        "default": 5,
+    },
     "timeout": {
         "flag": "--timeout",
-        "help": "Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.",
+        "help": "Maximum time - in seconds - to spend for each request before triggering a timeout.",
         "type": float,
+        "default": 30,
     },
     "retries": {
         "flag": "--retries",
@@ -162,8 +171,16 @@ def crawl_command(
     default_retries: Optional[int] = None,
     force_spoof_user_agent: Optional[bool] = None,
     force_stateful_redirects: Optional[bool] = None,
+    default_timeout: Optional[float] = None,
+    default_connect_timeout: Optional[float] = None,
 ):
     arguments_dict = CRAWL_ARGUMENTS.copy()
+
+    def set_default_value(k, v):
+        arguments_dict[k] = {
+            **arguments_dict[k],
+            "default": v,
+        }
 
     # NOTE: missing a lot in the resolve here
     if unique:
@@ -180,10 +197,7 @@ def crawl_command(
         del arguments_dict["throttle"]
 
     if default_throttle is not None:
-        arguments_dict["throttle"] = {
-            **arguments_dict["throttle"],
-            "default": default_throttle,
-        }
+        set_default_value("throttle", default_throttle)
 
     if not threads:
         del arguments_dict["threads"]
@@ -199,22 +213,19 @@ def crawl_command(
         del arguments_dict["format"]
 
     if default_folder_strategy is not None:
-        arguments_dict["folder_strategy"] = {
-            **arguments_dict["folder_strategy"],
-            "default": default_folder_strategy,
-        }
+        set_default_value("folder_strategy", default_folder_strategy)
 
     if default_output_dir is not None:
-        arguments_dict["output_dir"] = {
-            **arguments_dict["output_dir"],
-            "default": default_output_dir,
-        }
+        set_default_value("output_dir", default_output_dir)
 
     if default_retries is not None:
-        arguments_dict["retries"] = {
-            **arguments_dict["retries"],
-            "default": default_retries,
-        }
+        set_default_value("retries", default_retries)
+
+    if default_timeout is not None:
+        set_default_value("timeout", default_timeout)
+
+    if default_connect_timeout is not None:
+        set_default_value("connect_timeout", default_connect_timeout)
 
     if force_folder_strategy is not None:
         del arguments_dict["folder_strategy"]
@@ -279,6 +290,10 @@ def crawl_command(
 
         if resolve is not None:
             resolve(cli_args)
+
+        cli_args.timeout = Timeout(
+            connect=cli_args.connect_timeout, total=cli_args.timeout
+        )
 
     return command(
         name,
