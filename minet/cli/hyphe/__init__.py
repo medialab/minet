@@ -45,6 +45,7 @@ HYPHE_CRAWL_SUBCOMMAND = crawl_command(
     accept_input=False,
     default_folder_strategy="fullpath",
     default_throttle=0,
+    force_spoof_user_agent=True,
     arguments=[
         {
             "name": "corpus",

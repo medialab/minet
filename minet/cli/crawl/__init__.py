@@ -147,6 +147,7 @@ def crawl_command(
     force_folder_strategy: Optional[str] = None,
     default_output_dir: Optional[str] = None,
     default_retries: Optional[int] = None,
+    force_spoof_user_agent: Optional[bool] = None,
 ):
     arguments_dict = CRAWL_ARGUMENTS.copy()
 
@@ -207,6 +208,9 @@ def crawl_command(
     if force_folder_strategy is not None:
         del arguments_dict["folder_strategy"]
 
+    if force_spoof_user_agent is not None:
+        del arguments_dict["spoof_user_agent"]
+
     arguments = (arguments or []) + list(arguments_dict.values())
 
     additional_kwargs = {}
@@ -245,6 +249,9 @@ def crawl_command(
 
         if force_folder_strategy is not None:
             cli_args.folder_strategy = force_folder_strategy
+
+        if force_spoof_user_agent:
+            cli_args.spoof_user_agent = force_spoof_user_agent
 
         if resolve is not None:
             resolve(cli_args)

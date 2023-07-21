@@ -3018,9 +3018,8 @@ Usage: minet hyphe crawl [-h] [--silent]
                          [--max-depth MAX_DEPTH] [--throttle THROTTLE]
                          [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS]
                          [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
-                         [-f {csv,jsonl,ndjson}] [-v] [-n] [-k]
-                         [--spoof-user-agent] [-p PROCESSES] [--timeout TIMEOUT]
-                         [--retries RETRIES]
+                         [-f {csv,jsonl,ndjson}] [-v] [-n] [-k] [-p PROCESSES]
+                         [--timeout TIMEOUT] [--retries RETRIES]
                          corpus
 
 # Minet Hyphe Crawl Command
@@ -3069,8 +3068,6 @@ Optional Arguments:
                                 pool.
   --retries RETRIES             Number of times to retry on timeout & common
                                 network-related issues. Defaults to `0`.
-  --spoof-user-agent            Whether to use a plausible random "User-Agent"
-                                header when making requests.
   --start-page-separator START_PAGE_SEPARATOR
                                 Separator character for the webentity start
                                 pages. Defaults to ` `.
