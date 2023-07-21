@@ -319,10 +319,15 @@ class BufferedResponse(object):
         # is important to close the connection before releasing it.
         # Ref: https://urllib3.readthedocs.io/en/stable/advanced-usage.html#streaming-and-i-o
         if not self.__finished:
-            # NOTE: closing connections has a performance cost but I am
-            # not really able to understand whether it would be safe not
-            # to close them at all.
-            self.__inner.close()
+            # NOTE: if the response is 3xx, we can afford to drain the connection
+            # not to lose it
+            if self.__inner.status in REDIRECT_STATUSES:
+                self.__inner.drain_conn()
+            else:
+                # NOTE: closing connections has a performance cost but I am
+                # not really able to understand whether it would be safe not
+                # to close them at all.
+                self.__inner.close()
 
         self.__inner.release_conn()
 
