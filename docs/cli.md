@@ -247,8 +247,8 @@ Optional Arguments:
   -z, --compress                Whether to compress the downloaded files when
                                 saving files on disk.
   --connect-timeout CONNECT_TIMEOUT
-                                Maxium socket connection time to host. Default
-                                to ~5s. Defaults to `5`.
+                                Maxium socket connection time to host. Defaults
+                                to `5`.
   --domain-parallelism DOMAIN_PARALLELISM
                                 Max number of urls per domain to hit at the same
                                 time. Defaults to `1`.
@@ -402,8 +402,8 @@ Optional Arguments:
   -z, --compress                Whether to compress the downloaded files when
                                 saving files on disk.
   --connect-timeout CONNECT_TIMEOUT
-                                Maxium socket connection time to host. Default
-                                to ~5s. Defaults to `5`.
+                                Maxium socket connection time to host. Defaults
+                                to `5`.
   -C, --content-filter CONTENT_FILTER
                                 Regex used to filter fetched content.
   --domain-parallelism DOMAIN_PARALLELISM
@@ -3045,8 +3045,8 @@ Optional Arguments:
   -z, --compress                Whether to compress the downloaded files when
                                 saving files on disk.
   --connect-timeout CONNECT_TIMEOUT
-                                Maxium socket connection time to host. Default
-                                to ~5s. Defaults to `15`.
+                                Maxium socket connection time to host. Defaults
+                                to `15`.
   --domain-parallelism DOMAIN_PARALLELISM
                                 Max number of urls per domain to hit at the same
                                 time. Defaults to `1`.
