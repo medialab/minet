@@ -5,10 +5,11 @@ from dataclasses import dataclass
 from ural.lru import LRUTrie
 from ural import links_from_html
 from casanova import TabularRecord
+from functools import lru_cache
 
 from minet.crawl.spiders import Spider, SpiderResult
 from minet.crawl.types import CrawlJob, SuccessfulCrawlResult
-from minet.web import Response
+from minet.web import Response, resolve
 
 VALID_WEBENTITY_STATUSES = ["IN", "OUT", "UNDECIDED", "DISCOVERED"]
 
@@ -46,6 +47,16 @@ def extract_links(url: str, body: bytes, encoding: str) -> List[str]:
             strip_fragment=True,
         )
     )
+
+
+@lru_cache(2048)
+def resolve_shortened_link(url: str) -> str:
+    try:
+        stack = resolve(url)
+        last_url = stack[-1].url
+        return last_url
+    except Exception:
+        return url
 
 
 class HypheSpider(Spider):
@@ -88,6 +99,11 @@ class HypheSpider(Spider):
         links: List[WebentityLink] = []
 
         for url in urls:
+            # url = infer_redirection(url)
+
+            # if is_shortened_url(url):
+            #     url = resolve_shortened_link(url)
+
             match = self.trie.match(url)
 
             if match is None:
