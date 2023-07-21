@@ -44,11 +44,6 @@ def run(name: str, version: str, commands: List, args: Optional[str] = None):
     # Freezing multiprocessing support for pyinstaller etc.
     multiprocessing.freeze_support()
 
-    # If compiled with pyinstaller we need to add current directory
-    # to path to be able to import arbitrary modules
-    if getattr(sys, "frozen", False):
-        sys.path.append("")
-
     # Default spawn context for multiprocessing
     multiprocessing.set_start_method("spawn")
 

@@ -6,11 +6,13 @@
 #
 import os
 import re
+import sys
 import hashlib
 import json
 import time
 import string
 import importlib
+from os.path import dirname, abspath, relpath
 from random import uniform
 
 
@@ -106,15 +108,25 @@ def parse_module_and_target(path, default: str = "main"):
     return path, default
 
 
-PY_EXT_RE = re.compile(r"\.py(?=:|$)", re.I)
-
-
 def import_target(path: str, default: str = "main"):
-    path = path.replace(os.sep, ".")
-    path = PY_EXT_RE.sub("", path)
+    module_path_or_name, function_name = parse_module_and_target(path, default=default)
 
-    module_name, function_name = parse_module_and_target(path, default=default)
-    m = importlib.import_module(module_name)
+    # NOTE: we normalize to a path, so we can add dir to sys.path
+    if not module_path_or_name.endswith(".py"):
+        module_path_or_name = module_path_or_name.replace(".", os.sep) + ".py"
+
+    module_path = abspath(module_path_or_name)
+    module_directory = dirname(module_path)
+
+    if module_directory not in sys.path:
+        sys.path.append(module_directory)
+
+    # NOTE: we renormalize to a module
+    module = relpath(module_path)[:-3].replace(os.sep, ".")
+
+    m = importlib.import_module(module)
+
+    sys.path.remove(module_directory)
 
     try:
         return getattr(m, function_name)
