@@ -171,9 +171,6 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
             except EXPECTED_WEB_ERRORS as error:
                 return ErroredCrawlResult(job, error)
 
-            finally:
-                job.attempts += 1
-
             if cancel_event.is_set():
                 return CANCELLED
 

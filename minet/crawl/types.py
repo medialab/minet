@@ -89,7 +89,6 @@ class CrawlJob(Generic[CrawlJobDataType]):
         "depth",
         "spider",
         "data",
-        "attempts",
         "parent",
         "__has_cached_domain",
         "__domain",
@@ -100,7 +99,6 @@ class CrawlJob(Generic[CrawlJobDataType]):
     depth: int
     spider: Optional[str]
     data: Optional[CrawlJobDataType]
-    attempts: int
     parent: Optional[str]
 
     # TODO: we should add headers, cookies and such here in the future
@@ -125,7 +123,6 @@ class CrawlJob(Generic[CrawlJobDataType]):
         self.depth = depth if depth is not None else 0
         self.spider = spider
         self.data = data
-        self.attempts = 0
         self.parent = parent
 
         self.__has_cached_domain = False
@@ -143,7 +140,6 @@ class CrawlJob(Generic[CrawlJobDataType]):
             self.data
             if not serialize_data
             else json.dumps(self.data, ensure_ascii=False),
-            self.attempts,
             self.parent,
         )
 
@@ -160,7 +156,6 @@ class CrawlJob(Generic[CrawlJobDataType]):
             self.depth,
             self.spider,
             self.data,
-            self.attempts,
             self.parent,
         ) = state
 
