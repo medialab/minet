@@ -105,6 +105,11 @@ CRAWL_ARGUMENTS = {
         "help": 'Whether to use a plausible random "User-Agent" header when making requests.',
         "action": "store_true",
     },
+    "processes": {
+        "flags": ["-p", "--processes"],
+        "help": "Number of processes for the crawler process pool.",
+        "type": int,
+    },
 }
 
 

@@ -18,6 +18,7 @@ from typing import (
     Iterator,
     Union,
 )
+from minet.types import ParamSpec
 
 from os import makedirs
 from os.path import join
@@ -55,6 +56,9 @@ from minet.constants import (
     DEFAULT_FETCH_MAX_REDIRECTS,
     DEFAULT_URLLIB3_TIMEOUT,
 )
+
+P = ParamSpec("P")
+T = TypeVar("T")
 
 DEFAULT_SPIDER_KEY = object()
 
@@ -564,7 +568,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             filename, contents, compress=compress, relative=relative
         )
 
-    def submit(self, fn, *args, **kwargs):
+    def submit(self, fn: Callable[P, T], *args: P.args, **kwargs: P.kwargs) -> T:
         # NOTE: this might be a footgun!
         if self.process_pool is None:
             return fn(*args, **kwargs)

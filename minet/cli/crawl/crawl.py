@@ -209,6 +209,7 @@ def crawl_action(
         ("spoof_user_agent", "spoof_ua"),
         "insecure",
         "domain_parallelism",
+        ("processes", "process_pool_workers"),
     ]
 
     for arg in cli_args_to_forward_to_crawler:

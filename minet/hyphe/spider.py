@@ -3,6 +3,7 @@ from minet.types import Literal
 
 from dataclasses import dataclass
 from ural.lru import LRUTrie
+from ural import links_from_html
 from casanova import TabularRecord
 
 from minet.crawl.spiders import Spider, SpiderResult
@@ -32,6 +33,19 @@ class WebentityLink(TabularRecord):
 class HypheSpiderAddendum:
     webentity_id: str
     links: List[WebentityLink]
+
+
+def extract_links(url: str, body: bytes, encoding: str) -> List[str]:
+    return list(
+        links_from_html(
+            url,
+            body,
+            encoding=encoding,
+            canonicalize=True,
+            unique=True,
+            strip_fragment=True,
+        )
+    )
 
 
 class HypheSpider(Spider):
@@ -66,7 +80,9 @@ class HypheSpider(Spider):
         if webentity is None or webentity.status != "IN":
             return
 
-        urls = response.links(strip_fragment=True)
+        urls = self.submit(
+            extract_links, response.end_url, response.body, response.likely_encoding
+        )
 
         urls_to_follow = []
         links: List[WebentityLink] = []

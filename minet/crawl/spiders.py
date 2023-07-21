@@ -5,6 +5,7 @@
 #
 from typing import (
     TYPE_CHECKING,
+    TypeVar,
     Optional,
     Tuple,
     Union,
@@ -14,6 +15,7 @@ from typing import (
     Generic,
     List,
 )
+from minet.types import ParamSpec
 
 if TYPE_CHECKING:
     from minet.crawl.crawler import Crawler
@@ -32,6 +34,9 @@ from minet.crawl.types import (
 )
 from minet.web import Response
 from minet.utils import PseudoFStringFormatter
+
+P = ParamSpec("P")
+T = TypeVar("T")
 
 FORMATTER = PseudoFStringFormatter()
 
@@ -96,7 +101,7 @@ class Spider(Generic[CrawlJobDataType, CrawlResultDataType]):
             filename, contents, compress=compress, relative=relative
         )
 
-    def submit(self, fn, *args, **kwargs):
+    def submit(self, fn: Callable[P, T], *args: P.args, **kwargs: P.kwargs) -> T:
         return self.crawler.submit(fn, *args, **kwargs)
 
     def tabulate(
