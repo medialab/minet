@@ -223,9 +223,14 @@ def crawl_action(
         if hasattr(cli_args, cli_arg_name):
             crawler_kwargs[crawler_arg_name] = getattr(cli_args, cli_arg_name)
 
-    # if getattr(cli_args, "retry", False):
-    #     crawler_kwargs["retry"] = True
-    #     crawler_kwargs["retryer_kwargs"] = {"retry_on_timeout": True}
+    retries = getattr(cli_args, "retries", 0)
+
+    if retries:
+        crawler_kwargs["retry"] = True
+        crawler_kwargs["retryer_kwargs"] = {
+            "retry_on_timeout": True,
+            "max_attempts": retries,
+        }
 
     if target is None:
         if cli_args.module is not None:

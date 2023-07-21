@@ -227,7 +227,8 @@ Usage: minet crawl [-h] [-m MODULE] [--silent]
                    [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS] [-z]
                    [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                    [-f {csv,jsonl,ndjson}] [-v] [-u] [-n] [-k]
-                   [--spoof-user-agent] [-i INPUT] [--explode EXPLODE]
+                   [--spoof-user-agent] [-p PROCESSES] [--timeout TIMEOUT]
+                   [--retries RETRIES] [-i INPUT] [--explode EXPLODE]
                    [-s SELECT] [--total TOTAL]
                    [url_or_url_column]
 
@@ -270,6 +271,10 @@ Optional Arguments:
   -n, --normalized-url-cache    Whether to normalize url cache used to assess if
                                 some url was already visited.
   -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.
+  -p, --processes PROCESSES     Number of processes for the crawler process
+                                pool.
+  --retries RETRIES             Number of times to retry on timeout & common
+                                network-related issues. Defaults to `0`.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
   -t, --threads THREADS         Number of threads to use. You can use `0` if you
@@ -277,6 +282,9 @@ Optional Arguments:
                                 synchronous. Defaults to `25`.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to `0.2`.
+  --timeout TIMEOUT             Maximum time - in seconds - to spend for each
+                                request before triggering a timeout. Defaults to
+                                ~30s.
   -v, --verbose                 Whether to print information about crawl
                                 results.
   -u, --visit-urls-only-once    Whether to ensure that any url will only be
@@ -334,7 +342,11 @@ Optional Arguments:
 
 . "normalized-hostname": files will be written in folders based on
     their url's hostname stripped of some undesirable parts (such as
-    "www.", or "m." or "fr.", for instance).
+    "www.", or "m.", for instance).
+
+. "fingerprinted-hostname": files will be written in folders based on
+    their url's hostname stripped of some more undesirable parts (such as
+    "fr.", for instance) and their public suffix will be dropped.
 
 Examples:
 
@@ -359,7 +371,8 @@ Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
                          [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS]
                          [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-k]
-                         [--spoof-user-agent] [-i INPUT] [--explode EXPLODE]
+                         [--spoof-user-agent] [-p PROCESSES] [--timeout TIMEOUT]
+                         [--retries RETRIES] [-i INPUT] [--explode EXPLODE]
                          [-s SELECT] [--total TOTAL]
                          [url_or_url_column]
 
@@ -424,6 +437,10 @@ Optional Arguments:
   --only-html                   Add URLs to the crawler queue only if they seem
                                 to lead to a HTML content.
   -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.
+  -p, --processes PROCESSES     Number of processes for the crawler process
+                                pool.
+  --retries RETRIES             Number of times to retry on timeout & common
+                                network-related issues. Defaults to `0`.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
   -t, --threads THREADS         Number of threads to use. You can use `0` if you
@@ -431,6 +448,9 @@ Optional Arguments:
                                 synchronous. Defaults to `25`.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to `0.2`.
+  --timeout TIMEOUT             Maximum time - in seconds - to spend for each
+                                request before triggering a timeout. Defaults to
+                                ~30s.
   -U, --url-filter URL_FILTER   Regex used to filter URLs added to crawler's
                                 queue.
   -v, --verbose                 Whether to print information about crawl
@@ -488,7 +508,11 @@ Optional Arguments:
 
 . "normalized-hostname": files will be written in folders based on
     their url's hostname stripped of some undesirable parts (such as
-    "www.", or "m." or "fr.", for instance).
+    "www.", or "m.", for instance).
+
+. "fingerprinted-hostname": files will be written in folders based on
+    their url's hostname stripped of some more undesirable parts (such as
+    "fr.", for instance) and their public suffix will be dropped.
 
 Examples:
 
@@ -655,7 +679,11 @@ Columns being added to the output:
 
 . "normalized-hostname": files will be written in folders based on
     their url's hostname stripped of some undesirable parts (such as
-    "www.", or "m." or "fr.", for instance).
+    "www.", or "m.", for instance).
+
+. "fingerprinted-hostname": files will be written in folders based on
+    their url's hostname stripped of some more undesirable parts (such as
+    "fr.", for instance) and their public suffix will be dropped.
 
 Examples:
 
@@ -2991,7 +3019,8 @@ Usage: minet hyphe crawl [-h] [--silent]
                          [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS]
                          [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-k]
-                         [--spoof-user-agent]
+                         [--spoof-user-agent] [-p PROCESSES] [--timeout TIMEOUT]
+                         [--retries RETRIES]
                          corpus
 
 # Minet Hyphe Crawl Command
@@ -3036,6 +3065,10 @@ Optional Arguments:
                                 Name of the CSV column containing the webentity
                                 prefixes, separated by --prefix-separator.
                                 Defaults to `PREFIXES AS URL`.
+  -p, --processes PROCESSES     Number of processes for the crawler process
+                                pool.
+  --retries RETRIES             Number of times to retry on timeout & common
+                                network-related issues. Defaults to `0`.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
   --start-page-separator START_PAGE_SEPARATOR
@@ -3054,6 +3087,9 @@ Optional Arguments:
                                 synchronous. Defaults to `25`.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to `0`.
+  --timeout TIMEOUT             Maximum time - in seconds - to spend for each
+                                request before triggering a timeout. Defaults to
+                                ~30s.
   -v, --verbose                 Whether to print information about crawl
                                 results.
   -d, --write-data, -D, --dont-write-data
@@ -3095,7 +3131,11 @@ Optional Arguments:
 
 . "normalized-hostname": files will be written in folders based on
     their url's hostname stripped of some undesirable parts (such as
-    "www.", or "m." or "fr.", for instance).
+    "www.", or "m.", for instance).
+
+. "fingerprinted-hostname": files will be written in folders based on
+    their url's hostname stripped of some more undesirable parts (such as
+    "fr.", for instance) and their public suffix will be dropped.
 
 Examples:
 

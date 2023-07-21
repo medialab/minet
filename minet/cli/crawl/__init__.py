@@ -115,6 +115,12 @@ CRAWL_ARGUMENTS = {
         "help": "Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.",
         "type": float,
     },
+    "retries": {
+        "flag": "--retries",
+        "help": "Number of times to retry on timeout & common network-related issues.",
+        "type": int,
+        "default": 0,
+    },
 }
 
 
@@ -140,6 +146,7 @@ def crawl_command(
     default_folder_strategy: Optional[str] = None,
     force_folder_strategy: Optional[str] = None,
     default_output_dir: Optional[str] = None,
+    default_retries: Optional[int] = None,
 ):
     arguments_dict = CRAWL_ARGUMENTS.copy()
 
@@ -189,6 +196,12 @@ def crawl_command(
         arguments_dict["output_dir"] = {
             **arguments_dict["output_dir"],
             "default": default_output_dir,
+        }
+
+    if default_retries is not None:
+        arguments_dict["retries"] = {
+            **arguments_dict["retries"],
+            "default": default_retries,
         }
 
     if force_folder_strategy is not None:
