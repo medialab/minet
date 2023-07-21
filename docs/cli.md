@@ -3024,7 +3024,6 @@ Usage: minet hyphe crawl [-h] [--silent]
                          [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-k] [-p PROCESSES]
                          [--timeout TIMEOUT] [--retries RETRIES]
-                         [--stateful-redirects]
                          corpus
 
 # Minet Hyphe Crawl Command
@@ -3081,8 +3080,6 @@ Optional Arguments:
                                 start pages, separated by
                                 --start-page-separator. Defaults to `START
                                 PAGES`.
-  --stateful-redirects          Whether to keep a cookie jar while redirecting
-                                and allowing self redirections that track state.
   --status-column STATUS_COLUMN
                                 Name of the CSV column containing the webentity
                                 statuses. Defaults to `STATUS`.

@@ -208,6 +208,10 @@ class URLCache:
             SQLiteStringSet(path, "urls.db") if path is not None else AtomicSet()
         )
 
+    def add(self, url: str) -> bool:
+        url = self.preprocessing(url)
+        return self.__cache.add(url)
+
     def register(
         self, jobs: Iterable[CrawlJob[CrawlJobDataType]]
     ) -> List[CrawlJob[CrawlJobDataType]]:

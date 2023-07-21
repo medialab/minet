@@ -167,6 +167,13 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
                 else:
                     response = request(job.url, **kwargs)
 
+                # If end url is different from job we add the url to visited cache
+                # NOTE: this is somewhat subject to race conditions but it should
+                # be benign and still be useful in some cases.
+                if self.crawler.url_cache is not None and job.url != response.end_url:
+                    with self.crawler.enqueue_lock:
+                        self.crawler.url_cache.add(response.end_url)
+
             except CancelledRequestError:
                 return CANCELLED
 
