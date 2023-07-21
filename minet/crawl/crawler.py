@@ -42,6 +42,7 @@ from minet.crawl.spiders import (
     FunctionSpider,
     FunctionSpiderCallable,
 )
+from minet.crawl.exceptions import CrawlerAlreadyFinishedError
 from minet.crawl.queue import CrawlerQueue
 from minet.crawl.state import CrawlerState
 from minet.crawl.url_cache import URLCache
@@ -242,7 +243,6 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
     started: bool
     stopped: bool
     resuming: bool
-    finished: bool
     singular: bool
 
     __spiders: Dict[Union[object, str], Spider[CrawlJobDataTypes, CrawlResultDataTypes]]
@@ -296,6 +296,65 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         if process_pool_workers:
             self.process_pool = Pool(process_pool_workers)
 
+        # Params
+        self.persistent_storage_path = persistent_storage_path
+        self.persistent = persistent_storage_path is not None
+        self.queue_path = None
+        self.url_cache_path = None
+        self.max_depth = max_depth
+
+        if self.persistent_storage_path is not None:
+            makedirs(self.persistent_storage_path, exist_ok=True)
+
+            self.queue_path = join(self.persistent_storage_path, "queue")
+            self.url_cache_path = join(self.persistent_storage_path, "urls")
+
+        # Threading
+        self.enqueue_lock = Lock()
+
+        # Lifecycle
+        self.started = False
+        self.stopped = False
+        self.resuming = False
+
+        # Queue
+        self.queue = CrawlerQueue(self.queue_path, resume=resume, dfs=dfs)
+        self.persistent = self.queue.persistent
+        self.resuming = (
+            self.queue.resuming
+        )  # TODO: should probably also check url cache integrity
+
+        if self.resuming and self.queue.qsize() == 0:
+            raise CrawlerAlreadyFinishedError
+
+        # Url cache
+        self.unique = visit_urls_only_once
+        self.url_cache = (
+            URLCache(self.url_cache_path, normalized=normalized_url_cache)
+            if self.unique
+            else None
+        )
+
+        # Initializing state
+        self.state = CrawlerState(jobs_queued=self.queue.qsize())
+
+        # Spiders
+        if isinstance(spider_or_spiders, Mapping):
+            self.__spiders = {}
+            self.singular = False
+
+            for name, spider in spider_or_spiders.items():
+                self.__spiders[name] = coerce_spider(spider)
+        elif isinstance(spider_or_spiders, Spider) or callable(spider_or_spiders):
+            self.__spiders = {DEFAULT_SPIDER_KEY: coerce_spider(spider_or_spiders)}
+            self.singular = True
+        else:
+            raise TypeError("expecting a single spider or a mapping of spiders")
+
+        # Attaching spiders
+        for spider in self.__spiders.values():
+            spider.attach(self)
+
         # Own executor and imap params
         # NOTE: the process pool is initialized before the HTTPThreadPoolExecutor
         # so that we don't have potential issues related to urllib3.PoolManager
@@ -325,66 +384,6 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             "stateful_redirects": stateful_redirects,
             "spoof_ua": spoof_ua,
         }
-
-        # Params
-        self.persistent_storage_path = persistent_storage_path
-        self.persistent = persistent_storage_path is not None
-        self.queue_path = None
-        self.url_cache_path = None
-        self.max_depth = max_depth
-
-        if self.persistent_storage_path is not None:
-            makedirs(self.persistent_storage_path, exist_ok=True)
-
-            self.queue_path = join(self.persistent_storage_path, "queue")
-            self.url_cache_path = join(self.persistent_storage_path, "urls")
-
-        # Threading
-        self.enqueue_lock = Lock()
-
-        # Lifecycle
-        self.started = False
-        self.stopped = False
-        self.resuming = False
-        self.finished = False
-
-        # Queue
-        self.queue = CrawlerQueue(self.queue_path, resume=resume, dfs=dfs)
-        self.persistent = self.queue.persistent
-        self.resuming = (
-            self.queue.resuming
-        )  # TODO: should probably also check url cache integrity
-
-        if self.resuming and self.queue.qsize() == 0:
-            self.finished = True
-
-        # Url cache
-        self.unique = visit_urls_only_once
-        self.url_cache = (
-            URLCache(self.url_cache_path, normalized=normalized_url_cache)
-            if self.unique
-            else None
-        )
-
-        # Initializing state
-        self.state = CrawlerState(jobs_queued=self.queue.qsize())
-
-        # Spiders
-        if isinstance(spider_or_spiders, Mapping):
-            self.__spiders = {}
-            self.singular = False
-
-            for name, spider in spider_or_spiders.items():
-                self.__spiders[name] = coerce_spider(spider)
-        elif isinstance(spider_or_spiders, Spider) or callable(spider_or_spiders):
-            self.__spiders = {DEFAULT_SPIDER_KEY: coerce_spider(spider_or_spiders)}
-            self.singular = True
-        else:
-            raise TypeError("expecting a single spider or a mapping of spiders")
-
-        # Attaching spiders
-        for spider in self.__spiders.values():
-            spider.attach(self)
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -428,9 +427,6 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         if self.stopped:
             # TODO: we could but we need to mind the condition below
             raise RuntimeError("Cannot restart a crawler")
-
-        if self.finished:
-            raise RuntimeError("Cannot start an already finished crawler")
 
         if self.started:
             raise RuntimeError("Crawler has already started")

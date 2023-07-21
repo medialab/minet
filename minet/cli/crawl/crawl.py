@@ -24,6 +24,7 @@ from minet.crawl import (
     Spider,
     BasicSpider,
 )
+from minet.crawl.exceptions import CrawlerAlreadyFinishedError
 from minet.cli.console import console
 from minet.cli.loading_bar import LoadingBar
 from minet.cli.utils import (
@@ -236,44 +237,49 @@ def crawl_action(
     #   - a spider instance
     #   - a dict of spider instances
     #   - a simple callable
-    if not cli_args.factory:
-        # Is target a Spider class?
-        if isclass(target) and issubclass(target, Spider):
-            target = target()
+    try:
+        if not cli_args.factory:
+            # Is target a Spider class?
+            if isclass(target) and issubclass(target, Spider):
+                target = target()
+            else:
+                # NOTE: at that point, target can be:
+                #   - a Spider instance
+                #   - a dict of Spider instances
+                #   - a callable
+                valid_spiders_dict = isinstance(target, Mapping) and all(
+                    isinstance(v, Spider) for v in target.values()
+                )
+
+                # TODO: inspect arity to weed out potential footguns
+                if (
+                    not valid_spiders_dict
+                    and not isinstance(target, Spider)
+                    and not callable(target)
+                ):
+                    # TODO: explain further
+                    raise FatalError("Invalid crawling target!")
+
+            # NOTE: target IS a spider declaration
+            target = cast(SpiderDeclaration, target)
+
+            crawler = Crawler(target, **crawler_kwargs)
+
         else:
-            # NOTE: at that point, target can be:
-            #   - a Spider instance
-            #   - a dict of Spider instances
-            #   - a callable
-            valid_spiders_dict = isinstance(target, Mapping) and all(
-                isinstance(v, Spider) for v in target.values()
-            )
+            if not callable(target):
+                raise FatalError("Factory should be callable!")
 
-            # TODO: inspect arity to weed out potential footguns
-            if (
-                not valid_spiders_dict
-                and not isinstance(target, Spider)
-                and not callable(target)
-            ):
-                # TODO: explain further
-                raise FatalError("Invalid crawling target!")
+            # NOTE: target is a crawler factory
+            target = cast(Callable[..., Crawler], target)
 
-        # NOTE: target IS a spider declaration
-        target = cast(SpiderDeclaration, target)
+            crawler = target(**crawler_kwargs)
 
-        crawler = Crawler(target, **crawler_kwargs)
+            if not isinstance(crawler, Crawler):
+                raise FatalError("Factory did not return a crawler!")
 
-    else:
-        if not callable(target):
-            raise FatalError("Factory should be callable!")
-
-        # NOTE: target is a crawler factory
-        target = cast(Callable[..., Crawler], target)
-
-        crawler = target(**crawler_kwargs)
-
-        if not isinstance(crawler, Crawler):
-            raise FatalError("Factory did not return a crawler!")
+    except CrawlerAlreadyFinishedError:
+        loading_bar.erase()
+        raise FatalError("[error]Crawler has already finished!")
 
     # Jobs output
     jobs_output_path = join(cli_args.output_dir, "jobs.csv")
@@ -292,12 +298,6 @@ def crawl_action(
 
     jobs_writer = casanova.Writer(jobs_output, fieldnames=jobs_fieldnames)
     defer(jobs_output.close)
-
-    # TODO: refactor this as exception
-    if crawler.finished:
-        crawler.stop()
-        loading_bar.erase()
-        raise FatalError("[error]Crawler has already finished!")
 
     with crawler:
         # Enqueuing extraneous start jobs?
