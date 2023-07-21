@@ -110,6 +110,11 @@ CRAWL_ARGUMENTS = {
         "help": "Number of processes for the crawler process pool.",
         "type": int,
     },
+    "timeout": {
+        "flag": "--timeout",
+        "help": "Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.",
+        "type": float,
+    },
 }
 
 
