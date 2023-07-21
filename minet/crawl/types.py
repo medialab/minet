@@ -258,7 +258,7 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
                     "spider",
                     ("error", self.error_code),
                     ("status", self.response.status if self.response else None),
-                    "degree",
+                    ("degree", self.degree if self.error is None else None),
                     (
                         "dtype",
                         type(self.data).__name__ if self.data is not None else None,
