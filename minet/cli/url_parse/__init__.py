@@ -224,5 +224,10 @@ URL_PARSE_COMMAND = command(
             "help": "Whether to strip the hostname suffix when fingerprinting the url.",
             "action": "store_true",
         },
+        {
+            "flag": "--plaftorm-aware",
+            "help": "Whether url parsing should know about some specififc platform such as Facebook, YouTube etc. into account when normalizing urls. Note that this is different than activating --facebook or --youtube.",
+            "action": "store_true",
+        },
     ],
 )
