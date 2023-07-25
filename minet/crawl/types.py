@@ -168,7 +168,10 @@ class CrawlJob(Generic[CrawlJobDataType]):
             return self.__domain
 
         if self.url is not None:
-            self.__domain = get_domain_name(self.url)
+            try:
+                self.__domain = get_domain_name(self.url)
+            except Exception:
+                pass
 
         self.__has_cached_domain = True
 
