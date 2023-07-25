@@ -3,6 +3,7 @@ from typing import Union
 from os import PathLike
 from io import FileIO
 from bs4 import BeautifulSoup
+from urllib3 import Timeout
 
 # NOTE: yes this is repetitive, but mypy only understands this, don't ask questions...
 if sys.version_info >= (3, 8):
@@ -23,3 +24,4 @@ else:
 AnyPath = Union[str, PathLike]
 AnyFileTarget = Union[AnyPath, FileIO]
 AnyScrapableTarget = Union[str, BeautifulSoup]
+AnyTimeout = Union[float, Timeout]

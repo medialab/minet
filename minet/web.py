@@ -16,7 +16,7 @@ from typing import (
     Dict,
     Container,
 )
-from minet.types import Literal
+from minet.types import Literal, AnyTimeout
 
 import re
 import cgi
@@ -87,9 +87,6 @@ from minet.constants import (
 )
 
 mimetypes.init()
-
-# Types
-AnyTimeout = Union[float, urllib3.Timeout]
 
 # Patterns
 HTML_RE = re.compile(
@@ -361,7 +358,7 @@ def atomic_request(
     url: str,
     method="GET",
     headers=None,
-    timeout=None,
+    timeout: Optional[AnyTimeout] = None,
     body=None,
     cancel_event: Optional[Event] = None,
     final_time: Optional[float] = None,
