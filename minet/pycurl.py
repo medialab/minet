@@ -1,4 +1,4 @@
-from typing import Optional, Dict, List, Tuple
+from typing import Optional, Dict, List, Tuple, Union
 from minet.types import AnyTimeout, RedirectionStack, Redirection
 
 import pycurl
@@ -11,12 +11,23 @@ from urllib3 import Timeout
 from ebbe import without_last
 
 from minet.constants import REDIRECT_STATUSES
-from minet.exceptions import CancelledRequestError
+from minet.exceptions import MinetError, CancelledRequestError
 
 try:
     from urllib3 import HTTPHeaderDict
 except ImportError:
     from urllib3._collections import HTTPHeaderDict
+
+
+class PycurlError(MinetError):
+    def __init__(self, reason: pycurl.error):
+        self.reason = reason
+        self.code = reason.args[0]
+        super().__init__("%s (%i)" % (reason.args[1], reason.args[0]))
+
+
+class PycurlTimeoutError(PycurlError):
+    pass
 
 
 @dataclass
@@ -31,6 +42,18 @@ class PycurlResult:
         return format_repr(
             self, ["url", "status", ("size", format_filesize(len(self.body)))]
         )
+
+
+def coerce_error(error: pycurl.error) -> Union[PycurlError, CancelledRequestError]:
+    code = error.args[0]
+
+    if code == pycurl.E_ABORTED_BY_CALLBACK:
+        return CancelledRequestError()
+
+    if code == pycurl.E_OPERATION_TIMEDOUT:
+        return PycurlTimeoutError(error)
+
+    return PycurlError(error)
 
 
 # TODO: body
@@ -171,12 +194,9 @@ def request_with_pycurl(
     try:
         curl.perform()
     except pycurl.error as error:
-        if error.args[0] == pycurl.E_ABORTED_BY_CALLBACK:
-            raise CancelledRequestError
-
         curl.close()
 
-        raise error
+        raise coerce_error(error)
 
     status = curl.getinfo(pycurl.HTTP_CODE)
 

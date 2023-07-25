@@ -10,15 +10,14 @@ result = request_with_pycurl(
     "http://lemonde.fr",
     cancel_event=cancel_event,
     headers={"User-Agent": get_random_user_agent()},
-    verbose=False,
 )
 
 print(result)
 print()
 
-print("HEADERS:")
+print("Headers:")
 for k, v in result.headers.items():
-    print(k, "//", v)
+    print(k + ":", v)
 
 print()
 print("Stack:")
