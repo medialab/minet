@@ -1,4 +1,5 @@
 from typing import Optional, Dict
+from minet.types import AnyTimeout
 
 import pycurl
 import certifi
@@ -6,6 +7,7 @@ from io import BytesIO
 from dataclasses import dataclass
 from ebbe import format_repr, format_filesize
 from threading import Event
+from urllib3 import Timeout
 
 from minet.exceptions import CancelledRequestError
 
@@ -30,16 +32,18 @@ class PycurlResult:
 
 # TODO: redirection stack (or handle it from minet.web?)
 # TODO: reset headers on redirection
-# TODO: timeout
 # TODO: body
 # TODO: set headers
-# TODO: pool of curl handles with multi
+# TODO: decompress?
+# TODO: error serialization, error retrying conversion
+# TODO: pool of curl handles with multi (tricks from https://github.com/tornadoweb/tornado/blob/master/tornado/curl_httpclient.py)
 def request_with_pycurl(
     url: str,
     method: str = "GET",
     headers: Optional[Dict[str, str]] = None,
     follow_redirects: bool = True,
     max_redirects: int = 5,
+    timeout: Optional[AnyTimeout] = None,
     cancel_event: Optional[Event] = None,
     verbose: bool = False,
 ) -> PycurlResult:
@@ -54,6 +58,8 @@ def request_with_pycurl(
     curl.setopt(pycurl.URL, url)
     curl.setopt(pycurl.WRITEDATA, buffer)
     curl.setopt(pycurl.CAINFO, certifi.where())
+
+    # NOTE: this is important for multithreading
     curl.setopt(pycurl.NOSIGNAL, True)
 
     if verbose:
@@ -69,9 +75,39 @@ def request_with_pycurl(
     elif method != "GET":
         curl.setopt(pycurl.CUSTOMREQUEST, method)
 
+    # Timeout
+    if timeout is not None:
+        if isinstance(timeout, Timeout):
+            total_timeout = None
+
+            if timeout.total is not None:
+                total_timeout = timeout.total
+            else:
+                if timeout.read_timeout is not None:
+                    total_timeout = timeout.read_timeout
+                if timeout.connect_timeout is not None:
+                    if total_timeout is not None:
+                        total_timeout += timeout.connect_timeout
+                    else:
+                        total_timeout = timeout.connect_timeout
+
+            if total_timeout is not None:
+                curl.setopt(pycurl.TIMEOUT_MS, int(total_timeout * 1000))
+
+            if timeout.connect_timeout is not None:
+                curl.setopt(
+                    pycurl.CONNECTTIMEOUT_MS, int(timeout.connect_timeout * 1000)
+                )
+
+        else:
+            curl.setopt(pycurl.TIMEOUT_MS, int(timeout * 1000))
+
     # Writing headers
     if headers is not None:
-        curl_headers = ["%s: %s" % (n, v) for n, v in headers.items()]
+        curl_headers = [
+            b"%s: %s" % (n.encode("ascii"), v.encode("latin1"))
+            for n, v in headers.items()
+        ]
         curl.setopt(pycurl.HTTPHEADER, curl_headers)
 
     # Reading headers

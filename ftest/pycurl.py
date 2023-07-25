@@ -11,6 +11,7 @@ result = request_with_pycurl(
     cancel_event=cancel_event,
     headers={"User-Agent": get_random_user_agent()},
     verbose=False,
+    timeout=0.1,
 )
 
 print(result)
