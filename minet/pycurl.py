@@ -33,6 +33,7 @@ class PycurlResult:
 # TODO: timeout
 # TODO: body
 # TODO: set headers
+# TODO: pool of curl handles with multi
 def request_with_pycurl(
     url: str,
     method: str = "GET",
@@ -53,6 +54,7 @@ def request_with_pycurl(
     curl.setopt(pycurl.URL, url)
     curl.setopt(pycurl.WRITEDATA, buffer)
     curl.setopt(pycurl.CAINFO, certifi.where())
+    curl.setopt(pycurl.NOSIGNAL, True)
 
     if verbose:
         curl.setopt(pycurl.VERBOSE, True)

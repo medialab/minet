@@ -10,7 +10,7 @@ result = request_with_pycurl(
     "http://lemonde.fr",
     cancel_event=cancel_event,
     headers={"User-Agent": get_random_user_agent()},
-    verbose=True,
+    verbose=False,
 )
 
 print(result)
