@@ -4,9 +4,11 @@
 #
 # Listing sane default values used throughout the whole library.
 #
-from urllib3 import Timeout
+from urllib3 import Timeout, HTTPResponse
 from minet.user_agents.data import USER_AGENTS
 
+# General
+REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
 
 # Fetch-related
 DEFAULT_DOMAIN_PARALLELISM = 1

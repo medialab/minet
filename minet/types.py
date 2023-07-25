@@ -1,5 +1,5 @@
 import sys
-from typing import Union
+from typing import Union, List, Optional
 from os import PathLike
 from io import FileIO
 from bs4 import BeautifulSoup
@@ -21,7 +21,47 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import TypedDict, Required, NotRequired
 
+# Useful Any types
 AnyPath = Union[str, PathLike]
 AnyFileTarget = Union[AnyPath, FileIO]
 AnyScrapableTarget = Union[str, BeautifulSoup]
 AnyTimeout = Union[float, Timeout]
+
+# Redirection types
+RedirectionType = Literal[
+    "hit",
+    "location-header",
+    "js-relocation",
+    "refresh-header",
+    "meta-refresh",
+    "infer",
+    "canonical",
+]
+
+
+class Redirection(object):
+    __slots__ = ("status", "type", "url")
+
+    status: Optional[int]
+    url: str
+    type: RedirectionType
+
+    def __init__(
+        self, url: str, _type: RedirectionType = "hit", status: Optional[int] = None
+    ):
+        self.status = status
+        self.url = url
+        self.type = _type
+
+    def __repr__(self):
+        class_name = self.__class__.__name__
+
+        return ("<%(class_name)s type=%(type)s status=%(status)s url=%(url)s>") % {
+            "class_name": class_name,
+            "type": self.type,
+            "status": self.status,
+            "url": self.url,
+        }
+
+
+RedirectionStack = List[Redirection]

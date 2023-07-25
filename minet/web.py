@@ -16,7 +16,7 @@ from typing import (
     Dict,
     Container,
 )
-from minet.types import Literal, AnyTimeout
+from minet.types import AnyTimeout, Redirection, RedirectionStack
 
 import re
 import cgi
@@ -38,7 +38,6 @@ from io import BytesIO
 from threading import Event
 from urllib.parse import urljoin, quote
 from urllib.request import Request
-from urllib3 import HTTPResponse
 from urllib3.util.ssl_ import create_urllib3_context
 from ebbe import rcompose, noop, format_filesize, format_repr
 from tenacity import (
@@ -84,6 +83,7 @@ from minet.constants import (
     DEFAULT_SPOOFED_TLS_CIPHERS,
     DEFAULT_URLLIB3_TIMEOUT,
     DEFAULT_SPOOFED_UA,
+    REDIRECT_STATUSES,
 )
 
 mimetypes.init()
@@ -94,7 +94,6 @@ HTML_RE = re.compile(
 )
 
 # Constants
-REDIRECT_STATUSES = set(HTTPResponse.REDIRECT_STATUSES)
 CONTENT_PREBUFFER_UP_TO = 1024
 STREAMING_CHUNK_SIZE: int = 2**12
 LARGE_CONTENT_PREBUFFER_UP_TO = 2**16
@@ -397,45 +396,6 @@ def atomic_request(
     response = pool_manager.request(method, url, **request_kwargs)
 
     return BufferedResponse(response, cancel_event=cancel_event, final_time=final_time)
-
-
-RedirectionType = Literal[
-    "hit",
-    "location-header",
-    "js-relocation",
-    "refresh-header",
-    "meta-refresh",
-    "infer",
-    "canonical",
-]
-
-
-class Redirection(object):
-    __slots__ = ("status", "type", "url")
-
-    status: Optional[int]
-    url: str
-    type: RedirectionType
-
-    def __init__(
-        self, url: str, _type: RedirectionType = "hit", status: Optional[int] = None
-    ):
-        self.status = status
-        self.url = url
-        self.type = _type
-
-    def __repr__(self):
-        class_name = self.__class__.__name__
-
-        return ("<%(class_name)s type=%(type)s status=%(status)s url=%(url)s>") % {
-            "class_name": class_name,
-            "type": self.type,
-            "status": self.status,
-            "url": self.url,
-        }
-
-
-RedirectionStack = List[Redirection]
 
 
 def atomic_resolve(

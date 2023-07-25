@@ -1,5 +1,5 @@
-from typing import Optional, Dict
-from minet.types import AnyTimeout
+from typing import Optional, Dict, List, Tuple
+from minet.types import AnyTimeout, RedirectionStack, Redirection
 
 import pycurl
 import certifi
@@ -8,7 +8,9 @@ from dataclasses import dataclass
 from ebbe import format_repr, format_filesize
 from threading import Event
 from urllib3 import Timeout
+from ebbe import without_last
 
+from minet.constants import REDIRECT_STATUSES
 from minet.exceptions import CancelledRequestError
 
 try:
@@ -23,6 +25,7 @@ class PycurlResult:
     body: bytes
     headers: HTTPHeaderDict
     status: int
+    stack: RedirectionStack
 
     def __repr__(self) -> str:
         return format_repr(
@@ -30,10 +33,7 @@ class PycurlResult:
         )
 
 
-# TODO: redirection stack (or handle it from minet.web?)
-# TODO: reset headers on redirection
 # TODO: body
-# TODO: set headers
 # TODO: decompress?
 # TODO: error serialization, error retrying conversion
 # TODO: pool of curl handles with multi (tricks from https://github.com/tornadoweb/tornado/blob/master/tornado/curl_httpclient.py)
@@ -112,9 +112,25 @@ def request_with_pycurl(
 
     # Reading headers
     response_headers = HTTPHeaderDict()
+    expecting_location_with_status: Optional[int] = None
+    locations: List[Tuple[str, int]] = []
 
     def header_function(header_line):
+        nonlocal expecting_location_with_status
+
+        header_line = header_line.rstrip()
         header_line = header_line.decode("iso-8859-1")
+
+        # Detecting new call, resetting headers
+        if header_line.startswith("HTTP/"):
+            response_headers.clear()
+
+            status = int(header_line.split(" ", 1)[1][:3])
+
+            if status in REDIRECT_STATUSES:
+                expecting_location_with_status = status
+
+            return
 
         if ":" not in header_line:
             return
@@ -123,6 +139,10 @@ def request_with_pycurl(
 
         name = name.strip()
         value = value.strip()
+
+        if expecting_location_with_status is not None and name.lower() == "location":
+            locations.append((value, expecting_location_with_status))
+            expecting_location_with_status = None
 
         response_headers[name] = value
 
@@ -154,12 +174,26 @@ def request_with_pycurl(
         if error.args[0] == pycurl.E_ABORTED_BY_CALLBACK:
             raise CancelledRequestError
 
+        curl.close()
+
         raise error
 
     status = curl.getinfo(pycurl.HTTP_CODE)
 
+    stack = [Redirection(url, status=status)]
+
+    for location, location_status in locations:
+        stack.append(Redirection(location, status=location_status))
+
+    for redirection in without_last(stack):
+        redirection.type = "location-header"
+
     curl.close()
 
     return PycurlResult(
-        url=url, body=buffer.getvalue(), headers=response_headers, status=status
+        url=url,
+        body=buffer.getvalue(),
+        headers=response_headers,
+        status=status,
+        stack=stack,
     )
