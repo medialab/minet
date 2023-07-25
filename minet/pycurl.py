@@ -9,25 +9,20 @@ from ebbe import format_repr, format_filesize
 from threading import Event
 from urllib3 import Timeout
 from ebbe import without_last
+from urllib.parse import urljoin
 
 from minet.constants import REDIRECT_STATUSES
-from minet.exceptions import MinetError, CancelledRequestError
+from minet.exceptions import (
+    CancelledRequestError,
+    PycurlError,
+    PycurlHostResolutionError,
+    PycurlTimeoutError,
+)
 
 try:
     from urllib3 import HTTPHeaderDict
 except ImportError:
     from urllib3._collections import HTTPHeaderDict
-
-
-class PycurlError(MinetError):
-    def __init__(self, reason: pycurl.error):
-        self.reason = reason
-        self.code = reason.args[0]
-        super().__init__("%s (%i)" % (reason.args[1], reason.args[0]))
-
-
-class PycurlTimeoutError(PycurlError):
-    pass
 
 
 @dataclass
@@ -52,6 +47,9 @@ def coerce_error(error: pycurl.error) -> Union[PycurlError, CancelledRequestErro
 
     if code == pycurl.E_OPERATION_TIMEDOUT:
         return PycurlTimeoutError(error)
+
+    if code == pycurl.E_COULDNT_RESOLVE_HOST:
+        return PycurlHostResolutionError(error)
 
     return PycurlError(error)
 
@@ -134,11 +132,13 @@ def request_with_pycurl(
         curl.setopt(pycurl.HTTPHEADER, curl_headers)
 
     # Reading headers
+    current_url = url
     response_headers = HTTPHeaderDict()
     expecting_location_with_status: Optional[int] = None
     locations: List[Tuple[str, int]] = []
 
     def header_function(header_line):
+        nonlocal current_url
         nonlocal expecting_location_with_status
 
         header_line = header_line.rstrip()
@@ -164,6 +164,9 @@ def request_with_pycurl(
         value = value.strip()
 
         if expecting_location_with_status is not None and name.lower() == "location":
+            next_location = urljoin(current_url, value).strip()
+            current_url = next_location
+
             locations.append((value, expecting_location_with_status))
             expecting_location_with_status = None
 

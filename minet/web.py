@@ -78,6 +78,8 @@ from minet.exceptions import (
     SelfRedirectError,
     CancelledRequestError,
     FinalTimeoutError,
+    PycurlTimeoutError,
+    PycurlHostResolutionError,
 )
 from minet.constants import (
     DEFAULT_SPOOFED_TLS_CIPHERS,
@@ -85,6 +87,17 @@ from minet.constants import (
     DEFAULT_SPOOFED_UA,
     REDIRECT_STATUSES,
 )
+
+PYCURL_SUPPORT = False
+
+try:
+    from minet.pycurl import request_with_pycurl
+
+    PYCURL_SUPPORT = True
+except ImportError:
+    pass
+
+USE_PYCURL = False
 
 mimetypes.init()
 
@@ -104,6 +117,8 @@ EXPECTED_WEB_ERRORS = (
     InvalidURLError,
     InvalidStatusError,
     FinalTimeoutError,
+    PycurlTimeoutError,
+    PycurlHostResolutionError,
 )
 
 assert CONTENT_PREBUFFER_UP_TO < LARGE_CONTENT_PREBUFFER_UP_TO
@@ -959,6 +974,26 @@ def request(
 
     stack: Optional[RedirectionStack] = None
 
+    if USE_PYCURL:
+        # NOTE: check valid url
+        pycurl_result = request_with_pycurl(
+            url,
+            method=method,
+            headers=final_headers,
+            follow_redirects=follow_redirects,
+            timeout=timeout,
+            cancel_event=cancel_event,
+        )
+
+        return Response(
+            url,
+            stack=pycurl_result.stack,
+            headers=pycurl_result.headers,
+            status=pycurl_result.status,
+            body=pycurl_result.body,
+            known_encoding=known_encoding,
+        )
+
     if not follow_redirects:
         buffered_response = atomic_request(
             pool_manager,
@@ -996,10 +1031,10 @@ def request(
 
     return Response(
         url,
-        stack,
-        response.headers,
-        response.status,
-        body,
+        stack=stack,
+        headers=response.headers,
+        status=response.status,
+        body=body,
         known_encoding=known_encoding,
     )
 
@@ -1168,12 +1203,13 @@ def create_request_retryer(
         ConnectionAbortedError,
         ConnectionRefusedError,
         ConnectionResetError,
+        # TODO: pycurl errors...
     ]
 
     # We also usually include most timeout errors
     if retry_on_timeout:
         retryable_exception_types.extend(
-            [FinalTimeoutError, urllib3_exceptions.TimeoutError]
+            [FinalTimeoutError, urllib3_exceptions.TimeoutError, PycurlTimeoutError]
         )
 
     if retry_on_statuses is not None:

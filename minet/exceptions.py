@@ -165,3 +165,19 @@ class UserAgentsUpdateError(MinetError):
     def __init__(self, message=None, reason: Optional[BaseException] = None):
         super().__init__(message)
         self.reason = reason
+
+
+# Pycurl errors
+class PycurlError(MinetError):
+    def __init__(self, reason):
+        self.reason = reason
+        self.code = reason.args[0]
+        super().__init__("%s (%i)" % (reason.args[1], reason.args[0]))
+
+
+class PycurlTimeoutError(PycurlError):
+    pass
+
+
+class PycurlHostResolutionError(PycurlError):
+    pass
