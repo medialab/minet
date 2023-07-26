@@ -179,5 +179,9 @@ class PycurlTimeoutError(PycurlError):
     pass
 
 
-class PycurlHostResolutionError(PycurlError):
+class PycurlHTTPError(PycurlError):
+    pass
+
+
+class PycurlHostResolutionError(PycurlHTTPError):
     pass

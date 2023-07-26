@@ -79,7 +79,7 @@ from minet.exceptions import (
     CancelledRequestError,
     FinalTimeoutError,
     PycurlTimeoutError,
-    PycurlHostResolutionError,
+    PycurlHTTPError,
 )
 from minet.constants import (
     DEFAULT_SPOOFED_TLS_CIPHERS,
@@ -118,7 +118,7 @@ EXPECTED_WEB_ERRORS = (
     InvalidStatusError,
     FinalTimeoutError,
     PycurlTimeoutError,
-    PycurlHostResolutionError,
+    PycurlHTTPError,
 )
 
 assert CONTENT_PREBUFFER_UP_TO < LARGE_CONTENT_PREBUFFER_UP_TO
