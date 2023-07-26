@@ -65,6 +65,7 @@ def coerce_error(
 
 # TODO: body
 # TODO: decompress?
+# TODO: invalid status error (pycurl has a way I think)?
 # TODO: error serialization, error retrying conversion
 # TODO: pool of curl handles with multi (tricks from https://github.com/tornadoweb/tornado/blob/master/tornado/curl_httpclient.py)
 def request_with_pycurl(
