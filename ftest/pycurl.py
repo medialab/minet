@@ -10,7 +10,7 @@ cancel_event = Event()
 # Timer(0.1, lambda: cancel_event.set()).start()
 
 result = request_with_pycurl(
-    "http://lemonde.fr",
+    "http://télérama.fr",
     cancel_event=cancel_event,
     headers={"User-Agent": get_random_user_agent()},
 )

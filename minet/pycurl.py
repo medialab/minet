@@ -20,6 +20,7 @@ from minet.exceptions import (
     PycurlTimeoutError,
     PycurlConnectionRefusedError,
     PycurlSSLError,
+    PycurlReceiveError,
 )
 
 
@@ -59,6 +60,9 @@ def coerce_error(
 
     if code == pycurl.E_PEER_FAILED_VERIFICATION or code == pycurl.E_SSL_CONNECT_ERROR:
         return PycurlSSLError(error)
+
+    if code == pycurl.E_RECV_ERROR:
+        return PycurlReceiveError(error)
 
     return PycurlError(error)
 

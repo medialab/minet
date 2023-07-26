@@ -193,3 +193,7 @@ class PycurlHostResolutionError(PycurlProtocolError):
 
 class PycurlConnectionRefusedError(PycurlProtocolError):
     pass
+
+
+class PycurlReceiveError(PycurlProtocolError):
+    pass

@@ -27,6 +27,7 @@ from minet.exceptions import (
     PycurlTimeoutError,
     PycurlConnectionRefusedError,
     PycurlSSLError,
+    PycurlReceiveError,
 )
 
 
@@ -108,6 +109,7 @@ ERROR_REPORTERS = {
     PycurlTimeoutError: "final-timeout",
     PycurlConnectionRefusedError: "connection-refused",
     PycurlSSLError: "ssl",
+    PycurlReceiveError: "receive-error",
 }
 
 
