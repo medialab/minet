@@ -218,6 +218,11 @@ def setup_curl_handle(
         curl.setopt(pycurl.XFERINFOFUNCTION, progress_function)
 
 
+SHARE = pycurl.CurlShare()
+SHARE.setopt(pycurl.SH_SHARE, pycurl.LOCK_DATA_DNS)
+SHARE.setopt(pycurl.SH_SHARE, pycurl.LOCK_DATA_SSL_SESSION)
+SHARE.setopt(pycurl.SH_SHARE, pycurl.LOCK_DATA_CONNECT)
+
 # TODO: body
 # TODO: decompress?
 # TODO: invalid status error (pycurl has a way I think)?
@@ -232,12 +237,17 @@ def request_with_pycurl(
     timeout: Optional[AnyTimeout] = None,
     cancel_event: Optional[Event] = None,
     verbose: bool = False,
+    share: bool = False,
 ) -> PycurlResult:
     # Preemptive cancellation
     if cancel_event is not None and cancel_event.is_set():
         raise CancelledRequestError
 
     curl = pycurl.Curl()
+
+    if share:
+        curl.setopt(pycurl.SHARE, SHARE)
+
     buffer = BytesIO()
     response_headers = HTTPHeaderDict()
     stack = []
