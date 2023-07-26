@@ -10,6 +10,7 @@ from threading import Event
 from urllib3 import Timeout
 from ebbe import without_last
 from urllib.parse import urljoin
+from urllib3.util.url import parse_url
 
 from minet.constants import REDIRECT_STATUSES
 from minet.exceptions import (
@@ -36,6 +37,10 @@ class PycurlResult:
         return format_repr(
             self, ["url", "status", ("size", format_filesize(len(self.body)))]
         )
+
+
+def sanitize_url(url: str) -> str:
+    return parse_url(url).url
 
 
 def coerce_error(
@@ -90,7 +95,7 @@ def request_with_pycurl(
     buffer = BytesIO()
 
     # Basics
-    curl.setopt(pycurl.URL, url)
+    curl.setopt(pycurl.URL, sanitize_url(url))
     curl.setopt(pycurl.WRITEDATA, buffer)
     curl.setopt(pycurl.CAINFO, certifi.where())
 
