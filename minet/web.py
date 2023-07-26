@@ -73,8 +73,9 @@ from minet.exceptions import (
     SelfRedirectError,
     CancelledRequestError,
     FinalTimeoutError,
+    PycurlError,
+    PycurlProtocolError,
     PycurlTimeoutError,
-    PycurlHTTPError,
 )
 from minet.constants import (
     DEFAULT_SPOOFED_TLS_CIPHERS,
@@ -112,8 +113,7 @@ EXPECTED_WEB_ERRORS = (
     InvalidURLError,
     InvalidStatusError,
     FinalTimeoutError,
-    PycurlTimeoutError,
-    PycurlHTTPError,
+    PycurlError,
 )
 
 assert CONTENT_PREBUFFER_UP_TO < LARGE_CONTENT_PREBUFFER_UP_TO
@@ -976,6 +976,7 @@ def request(
             method=method,
             headers=final_headers,
             follow_redirects=follow_redirects,
+            max_redirects=max_redirects,
             timeout=timeout,
             cancel_event=cancel_event,
         )
@@ -1198,7 +1199,8 @@ def create_request_retryer(
         ConnectionAbortedError,
         ConnectionRefusedError,
         ConnectionResetError,
-        # TODO: pycurl errors...
+        # pycurl errors
+        PycurlProtocolError,
     ]
 
     # We also usually include most timeout errors

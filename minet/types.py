@@ -4,6 +4,7 @@ from os import PathLike
 from io import FileIO
 from bs4 import BeautifulSoup
 from urllib3 import Timeout
+from ebbe import format_repr
 
 # NOTE: yes this is repetitive, but mypy only understands this, don't ask questions...
 if sys.version_info >= (3, 8):
@@ -60,14 +61,7 @@ class Redirection(object):
         self.type = _type
 
     def __repr__(self):
-        class_name = self.__class__.__name__
-
-        return ("<%(class_name)s type=%(type)s status=%(status)s url=%(url)s>") % {
-            "class_name": class_name,
-            "type": self.type,
-            "status": self.status,
-            "url": self.url,
-        }
+        return format_repr(self, ("type", "status", "url"))
 
 
 RedirectionStack = List[Redirection]

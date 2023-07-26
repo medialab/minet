@@ -14,9 +14,12 @@ from urllib.parse import urljoin
 from minet.constants import REDIRECT_STATUSES
 from minet.exceptions import (
     CancelledRequestError,
+    MaxRedirectsError,
     PycurlError,
     PycurlHostResolutionError,
     PycurlTimeoutError,
+    PycurlConnectionRefusedError,
+    PycurlSSLError,
 )
 
 
@@ -34,17 +37,28 @@ class PycurlResult:
         )
 
 
-def coerce_error(error: pycurl.error) -> Union[PycurlError, CancelledRequestError]:
+def coerce_error(
+    error: pycurl.error,
+) -> Union[PycurlError, CancelledRequestError, MaxRedirectsError]:
     code = error.args[0]
 
     if code == pycurl.E_ABORTED_BY_CALLBACK:
         return CancelledRequestError()
+
+    if code == pycurl.E_TOO_MANY_REDIRECTS:
+        return MaxRedirectsError()
 
     if code == pycurl.E_OPERATION_TIMEDOUT:
         return PycurlTimeoutError(error)
 
     if code == pycurl.E_COULDNT_RESOLVE_HOST:
         return PycurlHostResolutionError(error)
+
+    if code == pycurl.E_COULDNT_CONNECT:
+        return PycurlConnectionRefusedError(error)
+
+    if code == pycurl.E_PEER_FAILED_VERIFICATION or code == pycurl.E_SSL_CONNECT_ERROR:
+        return PycurlSSLError(error)
 
     return PycurlError(error)
 
@@ -159,10 +173,9 @@ def request_with_pycurl(
         value = value.strip()
 
         if expecting_location_with_status is not None and name.lower() == "location":
-            next_location = urljoin(current_url, value).strip()
-            current_url = next_location
-
-            locations.append((value, expecting_location_with_status))
+            locations.append((current_url, expecting_location_with_status))
+            next_url = urljoin(current_url, value).strip()
+            current_url = next_url
             expecting_location_with_status = None
 
         response_headers[name] = value
@@ -197,16 +210,17 @@ def request_with_pycurl(
         raise coerce_error(error)
 
     status = curl.getinfo(pycurl.HTTP_CODE)
+    curl.close()
 
-    stack = [Redirection(url, status=status)]
+    stack = []
 
     for location, location_status in locations:
         stack.append(Redirection(location, status=location_status))
 
+    stack.append(Redirection(current_url, status=status))
+
     for redirection in without_last(stack):
         redirection.type = "location-header"
-
-    curl.close()
 
     return PycurlResult(
         url=url,

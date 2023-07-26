@@ -25,6 +25,8 @@ from minet.exceptions import (
     InvalidStatusError,
     PycurlHostResolutionError,
     PycurlTimeoutError,
+    PycurlConnectionRefusedError,
+    PycurlSSLError,
 )
 
 
@@ -86,12 +88,10 @@ ERROR_REPORTERS = {
     LocationParseError: "invalid-url",
     SSLError: "ssl",
     NewConnectionError: serialize_new_connection_error,
-    PycurlHostResolutionError: "unknown-host",
     ProtocolError: serialize_protocol_error,
     ConnectTimeoutError: "connect-timeout",
     ReadTimeoutError: "read-timeout",
     FinalTimeoutError: "final-timeout",
-    PycurlTimeoutError: "final-timeout",
     MaxRedirectsError: "max-redirects",
     InfiniteRedirectsError: "infinite-redirects",
     SelfRedirectError: "self-redirect",
@@ -103,6 +103,11 @@ ERROR_REPORTERS = {
     CouldNotInferEncodingError: "could-not-infer-encoding",
     InvalidStatusError: serialize_invalid_status_error,
     ProxyError: "proxy-error",
+    #
+    PycurlHostResolutionError: "unknown-host",
+    PycurlTimeoutError: "final-timeout",
+    PycurlConnectionRefusedError: "connection-refused",
+    PycurlSSLError: "ssl",
 }
 
 
