@@ -1,3 +1,5 @@
+# for mac:
+# env PYCURL_SSL_LIBRARY=openssl LDFLAGS="-L$(brew --prefix openssl)/lib" CPPFLAGS="-I$(brew --prefix openssl)/include" pip install --no-cache-dir --compile --ignore-installed pycurl
 from threading import Timer, Event
 from minet.pycurl import request_with_pycurl
 from minet.user_agents import get_random_user_agent
