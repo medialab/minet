@@ -153,6 +153,7 @@ class FlatFolderStrategy(FolderStrategy):
 
 class FullPathFolderStrategy(FolderStrategy):
     def __call__(self, filename, url, **kwargs):
+        print(url)
         parsed = safe_urlsplit(url)
         final_path = [parsed.hostname]
 

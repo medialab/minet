@@ -21,6 +21,12 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import TypedDict, Required, NotRequired
 
+# Useful conditional imports
+try:
+    from urllib3 import HTTPHeaderDict
+except ImportError:
+    from urllib3._collections import HTTPHeaderDict
+
 # Useful Any types
 AnyPath = Union[str, PathLike]
 AnyFileTarget = Union[AnyPath, FileIO]

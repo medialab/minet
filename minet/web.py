@@ -16,7 +16,7 @@ from typing import (
     Dict,
     Container,
 )
-from minet.types import AnyTimeout, Redirection, RedirectionStack
+from minet.types import AnyTimeout, Redirection, RedirectionStack, HTTPHeaderDict
 
 import re
 import cgi
@@ -50,11 +50,6 @@ from tenacity import (
     sleep_using_event,
 )
 from tenacity.wait import wait_base
-
-try:
-    from urllib3 import HTTPHeaderDict
-except ImportError:
-    from urllib3._collections import HTTPHeaderDict
 
 from minet.scrape.regex import (
     extract_canonical_link,

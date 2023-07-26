@@ -1,5 +1,5 @@
 from typing import Optional, Dict, List, Tuple, Union
-from minet.types import AnyTimeout, RedirectionStack, Redirection
+from minet.types import AnyTimeout, RedirectionStack, Redirection, HTTPHeaderDict
 
 import pycurl
 import certifi
@@ -18,11 +18,6 @@ from minet.exceptions import (
     PycurlHostResolutionError,
     PycurlTimeoutError,
 )
-
-try:
-    from urllib3 import HTTPHeaderDict
-except ImportError:
-    from urllib3._collections import HTTPHeaderDict
 
 
 @dataclass
