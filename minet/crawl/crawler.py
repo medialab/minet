@@ -102,6 +102,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
         crawler: "Crawler",
         *,
         request_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
+        use_pycurl: bool = False,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         stateful_redirects: bool = False,
         spoof_ua: bool = False,
@@ -129,6 +130,10 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
             "spoof_ua": spoof_ua,
             "cancel_event": crawler.executor.cancel_event,
         }
+
+        if use_pycurl:
+            del self.default_kwargs["pool_manager"]
+            self.default_kwargs["use_pycurl"] = True
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType]
@@ -271,6 +276,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         retry: bool = False,
         retryer_kwargs: Optional[Dict[str, Any]] = None,
         request_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
+        use_pycurl: bool = False,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         stateful_redirects: bool = False,
         spoof_ua: bool = False,
@@ -383,6 +389,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             "max_redirects": max_redirects,
             "stateful_redirects": stateful_redirects,
             "spoof_ua": spoof_ua,
+            "use_pycurl": use_pycurl,
         }
 
     def __repr__(self):

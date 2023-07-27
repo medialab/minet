@@ -195,6 +195,11 @@ FETCH_COMMAND = command(
             ),
             "action": "store_true",
         },
+        {
+            "flag": "--pycurl",
+            "help": "Whether to use the pycurl library to perform the call.",
+            "action": "store_true",
+        },
     ],
 )
 

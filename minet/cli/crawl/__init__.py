@@ -130,6 +130,11 @@ CRAWL_ARGUMENTS = {
         "help": "Whether to keep a cookie jar while redirecting and allowing self redirections that track state.",
         "action": "store_true",
     },
+    "pycurl": {
+        "flag": "--pycurl",
+        "help": "Whether to use the pycurl library to perform the call.",
+        "action": "store_true",
+    },
 }
 
 CRAWL_MODULE_ARGUMENTS = [

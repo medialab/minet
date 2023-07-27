@@ -228,9 +228,9 @@ Usage: minet crawl [-h] [-O OUTPUT_DIR] [--silent]
                    [-f {csv,jsonl,ndjson}] [-v] [-u] [-n] [-k]
                    [--spoof-user-agent] [-p PROCESSES]
                    [--connect-timeout CONNECT_TIMEOUT] [--timeout TIMEOUT]
-                   [--retries RETRIES] [--stateful-redirects] [-m MODULE]
-                   [--factory] [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                   [--total TOTAL]
+                   [--retries RETRIES] [--stateful-redirects] [--pycurl]
+                   [-m MODULE] [--factory] [-i INPUT] [--explode EXPLODE]
+                   [-s SELECT] [--total TOTAL]
                    [url_or_url_column]
 
 # Minet Crawl Command
@@ -277,6 +277,8 @@ Optional Arguments:
   -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.
   -p, --processes PROCESSES     Number of processes for the crawler process
                                 pool.
+  --pycurl                      Whether to use the pycurl library to perform the
+                                call.
   --retries RETRIES             Number of times to retry on timeout & common
                                 network-related issues. Defaults to `0`.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
@@ -379,8 +381,9 @@ Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-k]
                          [--spoof-user-agent] [-p PROCESSES]
                          [--connect-timeout CONNECT_TIMEOUT] [--timeout TIMEOUT]
-                         [--retries RETRIES] [--stateful-redirects] [-i INPUT]
-                         [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                         [--retries RETRIES] [--stateful-redirects] [--pycurl]
+                         [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                         [--total TOTAL]
                          [url_or_url_column]
 
 # Minet Focus Crawl Command
@@ -447,6 +450,8 @@ Optional Arguments:
   -O, --output-dir OUTPUT_DIR   Output directory. Defaults to `crawl`.
   -p, --processes PROCESSES     Number of processes for the crawler process
                                 pool.
+  --pycurl                      Whether to use the pycurl library to perform the
+                                call.
   --retries RETRIES             Number of times to retry on timeout & common
                                 network-related issues. Defaults to `0`.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
@@ -543,7 +548,7 @@ Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                    [-O OUTPUT_DIR] [-f FILENAME]
                    [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [--keep-failed-contents]
-                   [--standardize-encoding] [--only-html] [-i INPUT]
+                   [--standardize-encoding] [--only-html] [--pycurl] [-i INPUT]
                    [--explode EXPLODE] [-s SELECT] [--total TOTAL] [--resume]
                    [-o OUTPUT]
                    url_or_url_column
@@ -606,6 +611,8 @@ Optional Arguments:
   -O, --output-dir OUTPUT_DIR   Directory where the fetched files will be
                                 written. Defaults to `downloaded`.
   -x, --proxy PROXY             Proxy server to use.
+  --pycurl                      Whether to use the pycurl library to perform the
+                                call.
   -X, --request METHOD          The http method to use. Will default to GET.
                                 Defaults to `GET`.
   -D, --dont-save               Use not to write any downloaded file on disk.
@@ -3035,7 +3042,7 @@ Usage: minet hyphe crawl [-h] [--silent]
                          [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-k] [-p PROCESSES]
                          [--connect-timeout CONNECT_TIMEOUT] [--timeout TIMEOUT]
-                         [--retries RETRIES]
+                         [--retries RETRIES] [--pycurl]
                          corpus
 
 # Minet Hyphe Crawl Command
@@ -3083,6 +3090,8 @@ Optional Arguments:
                                 Defaults to `PREFIXES AS URL`.
   -p, --processes PROCESSES     Number of processes for the crawler process
                                 pool.
+  --pycurl                      Whether to use the pycurl library to perform the
+                                call.
   --retries RETRIES             Number of times to retry on timeout & common
                                 network-related issues. Defaults to `3`.
   --start-page-separator START_PAGE_SEPARATOR

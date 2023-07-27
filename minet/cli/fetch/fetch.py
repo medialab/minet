@@ -321,6 +321,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                 request_args=request_args,
                 callback=worker_callback,
                 passthrough=True,
+                use_pycurl=cli_args.pycurl,
                 **common_imap_kwargs
             ):
                 with loading_bar.step():
