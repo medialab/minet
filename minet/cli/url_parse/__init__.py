@@ -225,7 +225,7 @@ URL_PARSE_COMMAND = command(
             "action": "store_true",
         },
         {
-            "flag": "--plaftorm-aware",
+            "flag": "--platform-aware",
             "help": "Whether url parsing should know about some specififc platform such as Facebook, YouTube etc. into account when normalizing urls. Note that this is different than activating --facebook or --youtube.",
             "action": "store_true",
         },

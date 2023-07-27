@@ -1326,9 +1326,9 @@ Usage: minet url-parse [-h] [--facebook] [--silent]
                        [--sort-query] [--strip-authentication]
                        [--strip-fragment] [--strip-index]
                        [--strip-irrelevant-subdomains] [--strip-protocol]
-                       [--strip-trailing-slash] [--strip-suffix] [-i INPUT]
-                       [--explode EXPLODE] [-s SELECT] [--total TOTAL]
-                       [-o OUTPUT]
+                       [--strip-trailing-slash] [--strip-suffix]
+                       [--platform-aware] [-i INPUT] [--explode EXPLODE]
+                       [-s SELECT] [--total TOTAL] [-o OUTPUT]
                        url_or_url_column
 
 # Minet Url Parse Command
@@ -1357,6 +1357,11 @@ Optional Arguments:
                                 Whether or not to attempt to normalize Google
                                 AMP urls when normalizing url. Defaults to
                                 `True`.
+  --platform-aware              Whether url parsing should know about some
+                                specififc platform such as Facebook, YouTube
+                                etc. into account when normalizing urls. Note
+                                that this is different than activating
+                                --facebook or --youtube.
   --quoted                      Whether to produce quoted canonical and
                                 normalized version.
   --sort-query, --dont-sort-query
