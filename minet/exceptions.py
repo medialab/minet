@@ -168,6 +168,10 @@ class UserAgentsUpdateError(MinetError):
 
 
 # Pycurl errors
+class PycurlNotInstalledError(MinetError):
+    pass
+
+
 class PycurlError(MinetError):
     def __init__(self, reason):
         self.reason = reason

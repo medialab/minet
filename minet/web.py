@@ -73,6 +73,7 @@ from minet.exceptions import (
     SelfRedirectError,
     CancelledRequestError,
     FinalTimeoutError,
+    PycurlNotInstalledError,
     PycurlError,
     PycurlProtocolError,
     PycurlTimeoutError,
@@ -92,8 +93,6 @@ try:
     PYCURL_SUPPORT = True
 except ImportError:
     pass
-
-USE_PYCURL = False
 
 mimetypes.init()
 
@@ -927,7 +926,7 @@ class Response(object):
 
 def request(
     url: str,
-    pool_manager: urllib3.PoolManager = DEFAULT_POOL_MANAGER,
+    pool_manager: Optional[urllib3.PoolManager] = None,
     method: str = "GET",
     headers: Optional[Dict[str, str]] = None,
     cookie: Optional[Union[str, Dict[str, str]]] = None,
@@ -947,7 +946,18 @@ def request(
     cancel_event: Optional[Event] = None,
     raise_on_statuses: Optional[Container[int]] = None,
     stateful: bool = False,
+    use_pycurl: bool = False,
 ) -> Response:
+    # Pycurl and pool manager
+    if use_pycurl:
+        if not PYCURL_SUPPORT:
+            raise PycurlNotInstalledError
+
+        if pool_manager is not None:
+            raise TypeError("use_pycurl is not compatible with pool_manager")
+    elif pool_manager is None:
+        pool_manager = DEFAULT_POOL_MANAGER
+
     # Formatting headers
     final_headers = build_request_headers(
         headers=headers,
@@ -969,8 +979,10 @@ def request(
 
     stack: Optional[RedirectionStack] = None
 
-    if USE_PYCURL:
-        # NOTE: check valid url
+    if use_pycurl:
+        if body is not None:
+            raise NotImplementedError
+
         pycurl_result = request_with_pycurl(
             url,
             method=method,
@@ -979,7 +991,11 @@ def request(
             max_redirects=max_redirects,
             timeout=timeout,
             cancel_event=cancel_event,
+            share=True,
         )
+
+        if raise_on_statuses is not None and pycurl_result.status in raise_on_statuses:
+            raise InvalidStatusError(pycurl_result.status)
 
         return Response(
             url,
@@ -989,6 +1005,8 @@ def request(
             body=pycurl_result.body,
             known_encoding=known_encoding,
         )
+
+    assert pool_manager is not None
 
     if not follow_redirects:
         buffered_response = atomic_request(
@@ -1018,10 +1036,9 @@ def request(
             stateful=stateful,
         )
 
-    if raise_on_statuses is not None:
-        if buffered_response.status in raise_on_statuses:
-            buffered_response.close()
-            raise InvalidStatusError(buffered_response.status)
+    if raise_on_statuses is not None and buffered_response.status in raise_on_statuses:
+        buffered_response.close()
+        raise InvalidStatusError(buffered_response.status)
 
     response, body = buffered_response.read_and_unwrap()
 

@@ -7,6 +7,7 @@ from io import BytesIO
 from dataclasses import dataclass
 from ebbe import format_repr, format_filesize
 from threading import Event
+from ural import is_url
 from urllib3 import Timeout
 from urllib.parse import urljoin
 from urllib3.util.url import parse_url
@@ -15,6 +16,7 @@ from minet.constants import REDIRECT_STATUSES
 from minet.exceptions import (
     CancelledRequestError,
     MaxRedirectsError,
+    InvalidURLError,
     PycurlError,
     PycurlHostResolutionError,
     PycurlTimeoutError,
@@ -85,7 +87,6 @@ def setup_curl_handle(
     cancel_event: Optional[Event] = None,
     verbose: bool = False,
 ) -> None:
-
     # Basics
     curl.setopt(pycurl.URL, sanitize_url(url))
     curl.setopt(pycurl.WRITEDATA, buffer)
@@ -223,6 +224,7 @@ SHARE.setopt(pycurl.SH_SHARE, pycurl.LOCK_DATA_DNS)
 SHARE.setopt(pycurl.SH_SHARE, pycurl.LOCK_DATA_SSL_SESSION)
 SHARE.setopt(pycurl.SH_SHARE, pycurl.LOCK_DATA_CONNECT)
 
+
 # TODO: body
 # TODO: decompress?
 # TODO: invalid status error (pycurl has a way I think)?
@@ -242,6 +244,11 @@ def request_with_pycurl(
     # Preemptive cancellation
     if cancel_event is not None and cancel_event.is_set():
         raise CancelledRequestError
+
+    if not is_url(
+        url, require_protocol=True, tld_aware=True, allow_spaces_in_path=True
+    ):
+        raise InvalidURLError(url)
 
     curl = pycurl.Curl()
 
