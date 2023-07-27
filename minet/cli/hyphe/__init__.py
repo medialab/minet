@@ -86,6 +86,11 @@ HYPHE_CRAWL_SUBCOMMAND = crawl_command(
             "default": " ",
             "help": "Separator character for the webentity start pages.",
         },
+        {
+            "flag": "--ignore-internal-links",
+            "help": "Whether not to write links internal to a webentity on disk.",
+            "action": "store_true",
+        },
     ],
 )
 

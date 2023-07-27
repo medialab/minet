@@ -60,9 +60,10 @@ def resolve_shortened_link(url: str) -> str:
 
 
 class HypheSpider(Spider):
-    def __init__(self):
+    def __init__(self, ignore_internal_links: bool = False):
         self.trie: LRUTrie[WebentityRecord] = LRUTrie(suffix_aware=True)
         self.start_pages: Set[str] = set()
+        self.ignore_internal_links = ignore_internal_links
 
     def start(self) -> Iterable[str]:
         yield from self.start_pages
@@ -112,14 +113,15 @@ class HypheSpider(Spider):
             if match.status != "IN":
                 continue
 
-            links.append(
-                WebentityLink(
-                    source_webentity=webentity.id,
-                    target_webentity=match.id,
-                    source_url=response.end_url,
-                    target_url=url,
+            if not self.ignore_internal_links or webentity.id != match.id:
+                links.append(
+                    WebentityLink(
+                        source_webentity=webentity.id,
+                        target_webentity=match.id,
+                        source_url=response.end_url,
+                        target_url=url,
+                    )
                 )
-            )
 
             if match.id != webentity.id:
                 continue

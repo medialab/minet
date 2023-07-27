@@ -11,7 +11,7 @@ from minet.cli.crawl.crawl import crawl_action
 
 
 def action(cli_args):
-    spider = HypheSpider()
+    spider = HypheSpider(ignore_internal_links=cli_args.ignore_internal_links)
 
     reader = casanova.reader(cli_args.corpus)
     headers = reader.headers
