@@ -77,7 +77,6 @@ def setup_curl_handle(
     curl: pycurl.Curl,
     url: str,
     response_headers: HTTPHeaderDict,
-    buffer: BytesIO,
     stack: RedirectionStack,
     method: str = "GET",
     headers: Optional[Dict[str, str]] = None,
@@ -89,7 +88,6 @@ def setup_curl_handle(
 ) -> None:
     # Basics
     curl.setopt(pycurl.URL, sanitize_url(url))
-    curl.setopt(pycurl.WRITEDATA, buffer)
     curl.setopt(pycurl.CAINFO, certifi.where())
 
     # NOTE: this is important for multithreading
@@ -255,7 +253,6 @@ def request_with_pycurl(
     if share:
         curl.setopt(pycurl.SHARE, SHARE)
 
-    buffer = BytesIO()
     response_headers = HTTPHeaderDict()
     stack = []
 
@@ -263,7 +260,6 @@ def request_with_pycurl(
         curl,
         url=url,
         response_headers=response_headers,
-        buffer=buffer,
         stack=stack,
         method=method,
         headers=headers,
@@ -276,7 +272,7 @@ def request_with_pycurl(
 
     # Performing
     try:
-        curl.perform()
+        body = curl.perform_rb()
     except pycurl.error as error:
         curl.close()
 
@@ -290,7 +286,7 @@ def request_with_pycurl(
 
     return PycurlResult(
         url=url,
-        body=buffer.getvalue(),
+        body=body,
         headers=response_headers,
         status=status,
         stack=stack,
