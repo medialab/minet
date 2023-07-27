@@ -4,7 +4,7 @@
 #
 # Multiple helper functions related to reading and writing files.
 #
-from typing import Union, Optional
+from typing import Union, Optional, cast
 
 import os
 import gzip
@@ -154,7 +154,7 @@ class FlatFolderStrategy(FolderStrategy):
 class FullPathFolderStrategy(FolderStrategy):
     def __call__(self, filename, url, **kwargs):
         parsed = safe_urlsplit(url)
-        final_path = [parsed.hostname]
+        final_path = [cast(str, parsed.hostname)]
 
         path = pathsplit(parsed.path)
 
@@ -162,6 +162,13 @@ class FullPathFolderStrategy(FolderStrategy):
             path.pop()
 
         final_path += path
+
+        # NOTE: dealing with typical max filename length
+        for i in range(len(final_path)):
+            item = final_path[i]
+
+            if len(item) > 255:
+                final_path[i] = item[:255]
 
         return join(os.sep.join(final_path), filename)
 
