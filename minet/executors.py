@@ -397,21 +397,20 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
         if url is None:
             return self.PassthroughResult(item)
 
-        kwargs = {}
+        kwargs = self.default_kwargs.copy()
 
         if self.cancel_event.is_set():
             return CANCELLED
 
         if self.get_args is not None:
             # NOTE: given callback must be threadsafe
-            kwargs = self.get_args(cast(HTTPWorkerPayload, payload))
+            kwargs.update(self.get_args(cast(HTTPWorkerPayload, payload)))
 
         if self.cancel_event.is_set():
             return CANCELLED
 
         try:
             retryer = getattr(self.local_context, "retryer", None)
-            kwargs.update(self.default_kwargs)
 
             if retryer is not None:
                 output = retryer(self.fn, url, **kwargs)

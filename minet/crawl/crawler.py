@@ -152,21 +152,20 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
             assert job.url is not None
             assert job.depth is not None
 
-            kwargs = {}
+            kwargs = self.default_kwargs.copy()
 
             if cancel_event.is_set():
                 return CANCELLED
 
             if self.request_args is not None:
                 # NOTE: request_args must be threadsafe
-                kwargs = self.request_args(job)
+                kwargs.update(self.request_args(job))
 
             if cancel_event.is_set():
                 return CANCELLED
 
             try:
                 retryer = getattr(self.local_context, "retryer", None)
-                kwargs.update(self.default_kwargs)
 
                 if retryer is not None:
                     response = retryer(request, job.url, **kwargs)
