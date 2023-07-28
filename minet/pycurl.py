@@ -148,12 +148,19 @@ def setup_curl_handle(
             curl.setopt(pycurl.TIMEOUT_MS, int(timeout * 1000))
 
     # Writing headers
-    if headers is not None:
-        curl_headers = [
-            b"%s: %s" % (n.encode("ascii"), v.encode("latin1"))
-            for n, v in headers.items()
-        ]
-        curl.setopt(pycurl.HTTPHEADER, curl_headers)
+    headers = headers.copy() if headers is not None else {}
+
+    # NOTE: we must override Expect and Pragma to avoid unwanted libcurl magic
+    if "Expect" not in headers:
+        headers["Expect"] = ""
+
+    if "Pragma" not in headers:
+        headers["Pragma"] = ""
+
+    curl_headers = [
+        b"%s: %s" % (n.encode("ascii"), v.encode("latin1")) for n, v in headers.items()
+    ]
+    curl.setopt(pycurl.HTTPHEADER, curl_headers)
 
     # Reading headers
     current_url = url
