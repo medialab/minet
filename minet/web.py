@@ -39,6 +39,7 @@ from threading import Event
 from urllib.parse import urljoin, quote
 from urllib.request import Request
 from urllib3.util.ssl_ import create_urllib3_context
+from urllib3.util.request import ACCEPT_ENCODING
 from ebbe import rcompose, noop, format_filesize, format_repr
 from tenacity import (
     Retrying,
@@ -616,6 +617,7 @@ def build_request_headers(
     spoof_ua: bool = False,
     json_body: bool = False,
     urlencoded_body: bool = False,
+    compressed: bool = False,
 ):
     # Formatting headers
     final_headers = {}
@@ -628,6 +630,9 @@ def build_request_headers(
             cookie = dict_to_cookie_string(cookie)
 
         final_headers["Cookie"] = cookie
+
+    if compressed:
+        final_headers["Accept-Encoding"] = ACCEPT_ENCODING
 
     if json_body:
         final_headers["Content-Type"] = "application/json"
@@ -947,6 +952,7 @@ def request(
     raise_on_statuses: Optional[Container[int]] = None,
     stateful: bool = False,
     use_pycurl: bool = False,
+    compressed: bool = False,
 ) -> Response:
     # Pycurl and pool manager
     if use_pycurl:
@@ -964,6 +970,7 @@ def request(
         cookie=cookie,
         spoof_ua=spoof_ua,
         json_body=json_body is not None,
+        compressed=compressed and not use_pycurl,
     )
 
     # Dealing with body
@@ -991,6 +998,7 @@ def request(
             max_redirects=max_redirects,
             timeout=timeout,
             cancel_event=cancel_event,
+            compressed=compressed,
         )
 
         if raise_on_statuses is not None and pycurl_result.status in raise_on_statuses:

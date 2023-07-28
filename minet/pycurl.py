@@ -88,6 +88,7 @@ def setup_curl_handle(
     headers: Optional[Dict[str, str]] = None,
     follow_redirects: bool = True,
     max_redirects: int = 5,
+    compressed: bool = False,
     timeout: Optional[AnyTimeout] = None,
     cancel_event: Optional[Event] = None,
     verbose: bool = False,
@@ -101,6 +102,9 @@ def setup_curl_handle(
 
     if verbose:
         curl.setopt(pycurl.VERBOSE, True)
+
+    if compressed:
+        curl.setopt(pycurl.ACCEPT_ENCODING, "")
 
     # Method
     method = method.upper()
@@ -218,7 +222,6 @@ def setup_curl_handle(
 
 
 # TODO: body
-# TODO: decompress?
 # TODO: invalid status error (pycurl has a way I think)?
 # TODO: error serialization, error retrying conversion
 # TODO: pool of curl handles with multi (tricks from https://github.com/tornadoweb/tornado/blob/master/tornado/curl_httpclient.py)
@@ -228,6 +231,7 @@ def request_with_pycurl(
     headers: Optional[Dict[str, str]] = None,
     follow_redirects: bool = True,
     max_redirects: int = 5,
+    compressed: bool = False,
     timeout: Optional[AnyTimeout] = None,
     cancel_event: Optional[Event] = None,
     verbose: bool = False,
@@ -260,6 +264,7 @@ def request_with_pycurl(
         headers=headers,
         follow_redirects=follow_redirects,
         max_redirects=max_redirects,
+        compressed=compressed,
         timeout=timeout,
         cancel_event=cancel_event,
         verbose=verbose,
