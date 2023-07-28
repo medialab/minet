@@ -22,6 +22,7 @@ from minet.exceptions import (
     PycurlConnectionRefusedError,
     PycurlSSLError,
     PycurlReceiveError,
+    PycurlSendError,
 )
 
 SHARE = pycurl.CurlShare()
@@ -75,6 +76,9 @@ def coerce_error(
 
     if code == pycurl.E_RECV_ERROR:
         return PycurlReceiveError(error)
+
+    if code == pycurl.E_SEND_ERROR:
+        return PycurlSendError(error)
 
     return PycurlError(error)
 

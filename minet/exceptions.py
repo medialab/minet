@@ -201,3 +201,7 @@ class PycurlConnectionRefusedError(PycurlProtocolError):
 
 class PycurlReceiveError(PycurlProtocolError):
     pass
+
+
+class PycurlSendError(PycurlProtocolError):
+    pass
