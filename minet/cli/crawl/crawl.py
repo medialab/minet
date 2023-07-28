@@ -197,6 +197,7 @@ def crawl_action(
         "timeout",
         "stateful_redirects",
         ("pycurl", "use_pycurl"),
+        ("compress_transfer", "compressed"),
     ]
 
     for arg in cli_args_to_forward_to_crawler:

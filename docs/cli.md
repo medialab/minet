@@ -224,9 +224,9 @@ Usage: minet crawl [-h] [-O OUTPUT_DIR] [--silent]
                    [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
                    [--resume] [--max-depth MAX_DEPTH] [--throttle THROTTLE]
                    [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS] [-z]
-                   [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
-                   [-f {csv,jsonl,ndjson}] [-v] [-u] [-n] [-k]
-                   [--spoof-user-agent] [-p PROCESSES]
+                   [--compress-transfer] [-w] [-d]
+                   [--folder-strategy FOLDER_STRATEGY] [-f {csv,jsonl,ndjson}]
+                   [-v] [-u] [-n] [-k] [--spoof-user-agent] [-p PROCESSES]
                    [--connect-timeout CONNECT_TIMEOUT] [--timeout TIMEOUT]
                    [--retries RETRIES] [--stateful-redirects] [--pycurl]
                    [-m MODULE] [--factory] [-i INPUT] [--explode EXPLODE]
@@ -246,6 +246,9 @@ Positional Arguments:
 Optional Arguments:
   -z, --compress-on-disk        Whether to compress the downloaded files when
                                 saving files on disk.
+  --compress-transfer           Whether to send a "Accept-Encoding" header
+                                asking for a compressed response. Usually better
+                                for bandwidth but at the cost of more CPU work.
   --connect-timeout CONNECT_TIMEOUT
                                 Maxium socket connection time to host. Defaults
                                 to `5`.
@@ -377,7 +380,8 @@ Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
                          [--resume] [--max-depth MAX_DEPTH]
                          [--throttle THROTTLE]
                          [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS]
-                         [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
+                         [-z] [--compress-transfer] [-w] [-d]
+                         [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-k]
                          [--spoof-user-agent] [-p PROCESSES]
                          [--connect-timeout CONNECT_TIMEOUT] [--timeout TIMEOUT]
@@ -404,6 +408,9 @@ Positional Arguments:
 Optional Arguments:
   -z, --compress-on-disk        Whether to compress the downloaded files when
                                 saving files on disk.
+  --compress-transfer           Whether to send a "Accept-Encoding" header
+                                asking for a compressed response. Usually better
+                                for bandwidth but at the cost of more CPU work.
   --connect-timeout CONNECT_TIMEOUT
                                 Maxium socket connection time to host. Defaults
                                 to `5`.
@@ -544,8 +551,8 @@ Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                    [-H HEADERS] [-k] [-t THREADS] [--throttle THROTTLE]
                    [--timeout TIMEOUT] [--url-template URL_TEMPLATE] [-X METHOD]
                    [-x PROXY] [--spoof-user-agent]
-                   [--max-redirects MAX_REDIRECTS] [-z] [-c] [-D]
-                   [-O OUTPUT_DIR] [-f FILENAME]
+                   [--max-redirects MAX_REDIRECTS] [-z] [--compress-transfer]
+                   [-c] [-D] [-O OUTPUT_DIR] [-f FILENAME]
                    [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [--keep-failed-contents]
                    [--standardize-encoding] [--only-html] [--pycurl] [-i INPUT]
@@ -566,6 +573,9 @@ Positional Arguments:
 
 Optional Arguments:
   -z, --compress-on-disk        Whether to compress the contents.
+  --compress-transfer           Whether to send a "Accept-Encoding" header
+                                asking for a compressed response. Usually better
+                                for bandwidth but at the cost of more CPU work.
   -c, --contents-in-report, -w, --no-contents-in-report
                                 Whether to include retrieved contents, e.g.
                                 html, directly in the report and avoid writing
@@ -3039,7 +3049,8 @@ Usage: minet hyphe crawl [-h] [--silent]
                          [--ignore-internal-links] [-O OUTPUT_DIR] [--resume]
                          [--max-depth MAX_DEPTH] [--throttle THROTTLE]
                          [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS]
-                         [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
+                         [-z] [--compress-transfer] [-w] [-d]
+                         [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-k] [-p PROCESSES]
                          [--connect-timeout CONNECT_TIMEOUT] [--timeout TIMEOUT]
                          [--retries RETRIES] [--pycurl]
@@ -3056,6 +3067,9 @@ Positional Arguments:
 Optional Arguments:
   -z, --compress-on-disk        Whether to compress the downloaded files when
                                 saving files on disk.
+  --compress-transfer           Whether to send a "Accept-Encoding" header
+                                asking for a compressed response. Usually better
+                                for bandwidth but at the cost of more CPU work.
   --connect-timeout CONNECT_TIMEOUT
                                 Maxium socket connection time to host. Defaults
                                 to `15`.

@@ -49,9 +49,14 @@ CRAWL_ARGUMENTS = {
         "type": int,
         "default": 25,
     },
-    "compress": {
+    "compress_on_disk": {
         "flags": ["-z", "--compress-on-disk"],
         "help": "Whether to compress the downloaded files when saving files on disk.",
+        "action": "store_true",
+    },
+    "compress_transfer": {
+        "flag": "--compress-transfer",
+        "help": 'Whether to send a "Accept-Encoding" header asking for a compressed response. Usually better for bandwidth but at the cost of more CPU work.',
         "action": "store_true",
     },
     "write_files": {

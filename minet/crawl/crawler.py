@@ -103,6 +103,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
         *,
         request_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
         use_pycurl: bool = False,
+        compressed: bool = False,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         stateful_redirects: bool = False,
         spoof_ua: bool = False,
@@ -134,6 +135,9 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
         if use_pycurl:
             del self.default_kwargs["pool_manager"]
             self.default_kwargs["use_pycurl"] = True
+
+        if compressed:
+            self.default_kwargs["compressed"] = True
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType]
@@ -276,6 +280,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         retryer_kwargs: Optional[Dict[str, Any]] = None,
         request_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
         use_pycurl: bool = False,
+        compressed: bool = False,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         stateful_redirects: bool = False,
         spoof_ua: bool = False,
@@ -389,6 +394,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             "stateful_redirects": stateful_redirects,
             "spoof_ua": spoof_ua,
             "use_pycurl": use_pycurl,
+            "compressed": compressed,
         }
 
     def __repr__(self):

@@ -148,6 +148,11 @@ FETCH_COMMAND = command(
             "action": "store_true",
         },
         {
+            "flag": "--compress-transfer",
+            "help": 'Whether to send a "Accept-Encoding" header asking for a compressed response. Usually better for bandwidth but at the cost of more CPU work.',
+            "action": "store_true",
+        },
+        {
             "flags": ["-c", "--contents-in-report", "-w", "--no-contents-in-report"],
             "help": "Whether to include retrieved contents, e.g. html, directly in the report and avoid writing them in a separate folder. This requires to standardize encoding and won't work on binary formats. Note that --contents-in-report is the default when no input file is given.",
             "dest": "contents_in_report",

@@ -346,6 +346,7 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
         resolving: bool = False,
         get_args: Optional[ArgsCallbackType[ItemType]] = None,
         use_pycurl: bool = False,
+        compressed: bool = False,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         follow_refresh_header: bool = True,
         follow_meta_refresh: bool = False,
@@ -387,6 +388,9 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
         if use_pycurl:
             del self.default_kwargs["pool_manager"]
             self.default_kwargs["use_pycurl"] = True
+
+        if compressed:
+            self.default_kwargs["compressed"] = True
 
     def __call__(
         self, payload: HTTPWorkerPayloadBase[ItemType]
@@ -515,6 +519,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         throttle: float = ...,
         request_args: Optional[ArgsCallbackType[ItemType]] = ...,
         use_pycurl: bool = ...,
+        compressed: bool = ...,
         buffer_size: int = ...,
         domain_parallelism: int = ...,
         max_redirects: int = ...,
@@ -533,6 +538,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         throttle: float = ...,
         request_args: Optional[ArgsCallbackType[ItemType]] = ...,
         use_pycurl: bool = ...,
+        compressed: bool = ...,
         buffer_size: int = ...,
         domain_parallelism: int = ...,
         max_redirects: int = ...,
@@ -550,6 +556,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         throttle: float = DEFAULT_THROTTLE,
         request_args: Optional[ArgsCallbackType[ItemType]] = None,
         use_pycurl: bool = False,
+        compressed: bool = False,
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
@@ -569,6 +576,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
             get_args=request_args,
             max_redirects=max_redirects,
             use_pycurl=use_pycurl,
+            compressed=compressed,
             callback=callback,
         )
 
