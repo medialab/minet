@@ -50,7 +50,7 @@ CRAWL_ARGUMENTS = {
         "default": 25,
     },
     "compress": {
-        "flags": ["-z", "--compress"],
+        "flags": ["-z", "--compress-on-disk"],
         "help": "Whether to compress the downloaded files when saving files on disk.",
         "action": "store_true",
     },

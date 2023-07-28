@@ -82,7 +82,7 @@ def resolve_fetch_arguments(cli_args):
 
     if cli_args.contents_in_report and cli_args.compress:
         raise InvalidArgumentsError(
-            "Cannot both --compress and get --contents-in-report!"
+            "Cannot both --compress-on-disk and get --contents-in-report!"
         )
 
 
@@ -143,7 +143,7 @@ FETCH_COMMAND = command(
             "default": DEFAULT_FETCH_MAX_REDIRECTS,
         },
         {
-            "flags": ["-z", "--compress"],
+            "flags": ["-z", "--compress-on-disk"],
             "help": "Whether to compress the contents.",
             "action": "store_true",
         },

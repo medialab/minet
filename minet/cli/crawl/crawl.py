@@ -162,11 +162,11 @@ def crawl_action(
         path = filename_builder(
             url=response.end_url,
             filename=filename,
-            compressed=cli_args.compress,
+            compressed=cli_args.compress_on_disk,
             ext=response.ext,
         )
 
-        self.write(path, response.body, compress=cli_args.compress)
+        self.write(path, response.body, compress=cli_args.compress_on_disk)
 
         setattr(result, "_path", path)
 

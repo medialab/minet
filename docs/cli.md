@@ -244,7 +244,7 @@ Positional Arguments:
                                 -i/--input. Defaults to "url".
 
 Optional Arguments:
-  -z, --compress                Whether to compress the downloaded files when
+  -z, --compress-on-disk        Whether to compress the downloaded files when
                                 saving files on disk.
   --connect-timeout CONNECT_TIMEOUT
                                 Maxium socket connection time to host. Defaults
@@ -402,7 +402,7 @@ Positional Arguments:
                                 -i/--input. Defaults to "url".
 
 Optional Arguments:
-  -z, --compress                Whether to compress the downloaded files when
+  -z, --compress-on-disk        Whether to compress the downloaded files when
                                 saving files on disk.
   --connect-timeout CONNECT_TIMEOUT
                                 Maxium socket connection time to host. Defaults
@@ -565,7 +565,7 @@ Positional Arguments:
                                 containing urls when using -i/--input.
 
 Optional Arguments:
-  -z, --compress                Whether to compress the contents.
+  -z, --compress-on-disk        Whether to compress the contents.
   -c, --contents-in-report, -w, --no-contents-in-report
                                 Whether to include retrieved contents, e.g.
                                 html, directly in the report and avoid writing
@@ -3036,8 +3036,8 @@ Usage: minet hyphe crawl [-h] [--silent]
                          [--prefix-separator PREFIX_SEPARATOR]
                          [--start-pages-column START_PAGES_COLUMN]
                          [--start-page-separator START_PAGE_SEPARATOR]
-                         [-O OUTPUT_DIR] [--resume] [--max-depth MAX_DEPTH]
-                         [--throttle THROTTLE]
+                         [--ignore-internal-links] [-O OUTPUT_DIR] [--resume]
+                         [--max-depth MAX_DEPTH] [--throttle THROTTLE]
                          [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS]
                          [-z] [-w] [-d] [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-k] [-p PROCESSES]
@@ -3054,7 +3054,7 @@ Positional Arguments:
   corpus                        Path to the Hyphe corpus exported to CSV.
 
 Optional Arguments:
-  -z, --compress                Whether to compress the downloaded files when
+  -z, --compress-on-disk        Whether to compress the downloaded files when
                                 saving files on disk.
   --connect-timeout CONNECT_TIMEOUT
                                 Maxium socket connection time to host. Defaults
@@ -3075,6 +3075,8 @@ Optional Arguments:
                                 Defaults to `csv`.
   --id-column ID_COLUMN         Name of the CSV column containing the webentity
                                 ids. Defaults to `ID`.
+  --ignore-internal-links       Whether not to write links internal to a
+                                webentity on disk.
   -k, --insecure                Whether to allow ssl errors when performing
                                 requests or not.
   --max-depth MAX_DEPTH         Maximum depth for the crawl.

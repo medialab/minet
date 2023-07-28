@@ -267,7 +267,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
             filename=filename_cell,
             ext=response.ext,
             formatter_kwargs=formatter_kwargs,
-            compressed=cli_args.compress,
+            compressed=cli_args.compress_on_disk,
         )
 
         addendum.filename = filename
@@ -288,7 +288,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
         if data and not cli_args.contents_in_report:
             assert file_writer is not None
 
-            file_writer.write(filename, data, compress=cli_args.compress)
+            file_writer.write(filename, data, compress=cli_args.compress_on_disk)
 
         return addendum
 
