@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Union
+from typing import Optional, Dict, List, Union
 from minet.types import AnyTimeout, RedirectionStack, Redirection, HTTPHeaderDict
 
 import pycurl
@@ -28,6 +28,8 @@ SHARE = pycurl.CurlShare()
 SHARE.setopt(pycurl.SH_SHARE, pycurl.LOCK_DATA_DNS)
 SHARE.setopt(pycurl.SH_SHARE, pycurl.LOCK_DATA_SSL_SESSION)
 SHARE.setopt(pycurl.SH_SHARE, pycurl.LOCK_DATA_CONNECT)
+
+CURL_HANDLE_POOL: List[pycurl.Curl] = []
 
 
 @dataclass
@@ -91,7 +93,6 @@ def setup_curl_handle(
     verbose: bool = False,
 ) -> None:
     # Basics
-    curl.setopt(pycurl.SHARE, SHARE)
     curl.setopt(pycurl.URL, sanitize_url(url))
     curl.setopt(pycurl.CAINFO, certifi.where())
 
@@ -240,7 +241,12 @@ def request_with_pycurl(
     ):
         raise InvalidURLError(url)
 
-    curl = pycurl.Curl()
+    try:
+        curl = CURL_HANDLE_POOL.pop()
+        curl.reset()
+    except IndexError:
+        curl = pycurl.Curl()
+        curl.setopt(pycurl.SHARE, SHARE)
 
     response_headers = HTTPHeaderDict()
     stack = []
@@ -263,13 +269,13 @@ def request_with_pycurl(
     try:
         body = curl.perform_rb()
     except pycurl.error as error:
-        curl.close()
+        CURL_HANDLE_POOL.append(curl)
 
         raise coerce_error(error)
 
     status = curl.getinfo(pycurl.HTTP_CODE)
     effective_url = curl.getinfo(pycurl.EFFECTIVE_URL)
-    curl.close()
+    CURL_HANDLE_POOL.append(curl)
 
     stack.append(Redirection(effective_url, status=status))
 
