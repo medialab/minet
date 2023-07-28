@@ -3,7 +3,6 @@ from minet.types import AnyTimeout, RedirectionStack, Redirection, HTTPHeaderDic
 
 import pycurl
 import certifi
-from io import BytesIO
 from dataclasses import dataclass
 from ebbe import format_repr, format_filesize
 from threading import Event
@@ -24,6 +23,11 @@ from minet.exceptions import (
     PycurlSSLError,
     PycurlReceiveError,
 )
+
+SHARE = pycurl.CurlShare()
+SHARE.setopt(pycurl.SH_SHARE, pycurl.LOCK_DATA_DNS)
+SHARE.setopt(pycurl.SH_SHARE, pycurl.LOCK_DATA_SSL_SESSION)
+SHARE.setopt(pycurl.SH_SHARE, pycurl.LOCK_DATA_CONNECT)
 
 
 @dataclass
@@ -87,6 +91,7 @@ def setup_curl_handle(
     verbose: bool = False,
 ) -> None:
     # Basics
+    curl.setopt(pycurl.SHARE, SHARE)
     curl.setopt(pycurl.URL, sanitize_url(url))
     curl.setopt(pycurl.CAINFO, certifi.where())
 
@@ -98,12 +103,6 @@ def setup_curl_handle(
 
     # Method
     method = method.upper()
-
-    curl.setopt(pycurl.HTTPGET, False)
-    curl.setopt(pycurl.NOBODY, False)
-    curl.setopt(pycurl.POST, False)
-    curl.setopt(pycurl.PUT, False)
-    curl.unsetopt(pycurl.CUSTOMREQUEST)
 
     if method == "GET":
         curl.setopt(pycurl.HTTPGET, True)
@@ -217,12 +216,6 @@ def setup_curl_handle(
         curl.setopt(pycurl.XFERINFOFUNCTION, progress_function)
 
 
-SHARE = pycurl.CurlShare()
-SHARE.setopt(pycurl.SH_SHARE, pycurl.LOCK_DATA_DNS)
-SHARE.setopt(pycurl.SH_SHARE, pycurl.LOCK_DATA_SSL_SESSION)
-SHARE.setopt(pycurl.SH_SHARE, pycurl.LOCK_DATA_CONNECT)
-
-
 # TODO: body
 # TODO: decompress?
 # TODO: invalid status error (pycurl has a way I think)?
@@ -237,7 +230,6 @@ def request_with_pycurl(
     timeout: Optional[AnyTimeout] = None,
     cancel_event: Optional[Event] = None,
     verbose: bool = False,
-    share: bool = False,
 ) -> PycurlResult:
     # Preemptive cancellation
     if cancel_event is not None and cancel_event.is_set():
@@ -249,9 +241,6 @@ def request_with_pycurl(
         raise InvalidURLError(url)
 
     curl = pycurl.Curl()
-
-    if share:
-        curl.setopt(pycurl.SHARE, SHARE)
 
     response_headers = HTTPHeaderDict()
     stack = []

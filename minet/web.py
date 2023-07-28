@@ -991,7 +991,6 @@ def request(
             max_redirects=max_redirects,
             timeout=timeout,
             cancel_event=cancel_event,
-            share=True,
         )
 
         if raise_on_statuses is not None and pycurl_result.status in raise_on_statuses:
