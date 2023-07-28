@@ -25,6 +25,8 @@ from minet.exceptions import (
     PycurlSendError,
 )
 
+pycurl.global_init(pycurl.GLOBAL_ALL)
+
 SHARE = pycurl.CurlShare()
 SHARE.setopt(pycurl.SH_SHARE, pycurl.LOCK_DATA_DNS)
 SHARE.setopt(pycurl.SH_SHARE, pycurl.LOCK_DATA_SSL_SESSION)
