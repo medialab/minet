@@ -80,7 +80,7 @@ def resolve_fetch_arguments(cli_args):
     if cli_args.dont_save:
         cli_args.contents_in_report = False
 
-    if cli_args.contents_in_report and cli_args.compress:
+    if cli_args.contents_in_report and cli_args.compress_on_disk:
         raise InvalidArgumentsError(
             "Cannot both --compress-on-disk and get --contents-in-report!"
         )
