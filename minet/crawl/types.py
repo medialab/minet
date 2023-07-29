@@ -21,11 +21,12 @@ class CrawlTarget(Generic[CrawlJobDataType]):
     rely on some necessary data that will be passed along).
     """
 
-    __slots__ = ("url", "depth", "spider", "data")
+    __slots__ = ("url", "depth", "spider", "priority", "data")
 
     url: str
     depth: Optional[int]
     spider: Optional[str]
+    priority: int
     data: Optional[CrawlJobDataType]
 
     def __init__(
@@ -33,6 +34,7 @@ class CrawlTarget(Generic[CrawlJobDataType]):
         url: str,
         depth: Optional[int] = None,
         spider: Optional[str] = None,
+        priority: int = 0,
         data: Optional[CrawlJobDataType] = None,
     ) -> None:
         if not isinstance(url, str):
@@ -49,6 +51,7 @@ class CrawlTarget(Generic[CrawlJobDataType]):
             raise TypeError("spider should be a string")
 
         self.spider = spider
+        self.priority = priority
         self.data = data
 
     def __eq__(self, other):
@@ -56,6 +59,7 @@ class CrawlTarget(Generic[CrawlJobDataType]):
             self.url == other.url
             and self.depth == other.depth
             and self.spider == other.spider
+            and self.priority == self.priority
             and self.data == other.data
         )
 
@@ -101,7 +105,8 @@ class CrawlJob(Generic[CrawlJobDataType]):
     data: Optional[CrawlJobDataType]
     parent: Optional[str]
 
-    # TODO: we should add headers, cookies and such here in the future
+    # TODO: we should add headers, method, cookies and such here in the future,
+    # but for now, a request_args override can do the trick based on job data
 
     __has_cached_domain: bool
     __domain: Optional[str]
