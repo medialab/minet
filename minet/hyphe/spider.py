@@ -3,7 +3,7 @@ from minet.types import Literal
 
 from dataclasses import dataclass
 from ural.lru import LRUTrie
-from ural import links_from_html
+from ural import links_from_html, could_be_html, infer_redirection
 from casanova import TabularRecord
 from functools import lru_cache
 
@@ -100,7 +100,10 @@ class HypheSpider(Spider):
         links: List[WebentityLink] = []
 
         for url in urls:
-            # url = infer_redirection(url)
+            url = infer_redirection(url)
+
+            if not could_be_html(url):
+                continue
 
             # if is_shortened_url(url):
             #     url = resolve_shortened_link(url)
