@@ -173,6 +173,18 @@ class CrawlerQueue:
     def put(self, job: CrawlJob) -> None:
         self.put_many((job,))
 
+    def __get_groups_blacklist(self) -> List[str]:
+        blacklist: List[str] = []
+
+        for group, tasks in self.tasks.items():
+            if group is None:
+                continue
+
+            if len(tasks) >= self.group_parallelism:
+                blacklist.append(group)
+
+        return blacklist
+
     def get(self, block: bool = True) -> CrawlJob:
         if block:
             raise NotImplementedError
