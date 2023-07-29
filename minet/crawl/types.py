@@ -49,6 +49,9 @@ class CrawlTarget(Generic[CrawlJobDataType]):
         if spider is not None and not isinstance(spider, str):
             raise TypeError("spider should be a string")
 
+        if not isinstance(priority, int):
+            raise TypeError("depth should be an int")
+
         self.spider = spider
         self.priority = priority
         self.data = data
