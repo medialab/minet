@@ -4,7 +4,6 @@ import json
 from nanoid import generate
 from ebbe import format_repr
 from functools import partial
-from ural import get_domain_name
 
 from minet.web import Response
 from minet.serialization import serialize_error_as_slug
@@ -64,7 +63,11 @@ class CrawlTarget(Generic[CrawlJobDataType]):
         )
 
     def __repr__(self):
-        return format_repr(self, conditionals=("spider", "data", "depth"))
+        return format_repr(
+            self,
+            ("url", "spider", "depth", ("priority", self.priority or None), "data"),
+            conditionals=("spider", "data", "depth", "priority"),
+        )
 
 
 UrlOrCrawlTarget = Union[str, CrawlTarget[CrawlJobDataType]]
@@ -87,29 +90,19 @@ class CrawlJob(Generic[CrawlJobDataType]):
     queues.
     """
 
-    __slots__ = (
-        "id",
-        "url",
-        "depth",
-        "spider",
-        "data",
-        "parent",
-        "__has_cached_domain",
-        "__domain",
-    )
+    __slots__ = ("id", "url", "group", "depth", "spider", "priority", "data", "parent")
 
     id: str
     url: str
+    group: Optional[str]
     depth: int
     spider: Optional[str]
+    priority: int
     data: Optional[CrawlJobDataType]
     parent: Optional[str]
 
     # TODO: we should add headers, method, cookies and such here in the future,
     # but for now, a request_args override can do the trick based on job data
-
-    __has_cached_domain: bool
-    __domain: Optional[str]
 
     @classmethod
     def fieldnames(cls):
@@ -118,20 +111,22 @@ class CrawlJob(Generic[CrawlJobDataType]):
     def __init__(
         self,
         url: str,
+        id: Optional[str] = None,
+        group: Optional[str] = None,
         depth: Optional[int] = None,
         spider: Optional[str] = None,
+        priority: int = 0,
         data: Optional[CrawlJobDataType] = None,
         parent: Optional[str] = None,
     ):
-        self.id = generate_crawl_job_id()
+        self.id = id if id is not None else generate_crawl_job_id()
         self.url = url
+        self.group = group
         self.depth = depth if depth is not None else 0
         self.spider = spider
+        self.priority = priority
         self.data = data
         self.parent = parent
-
-        self.__has_cached_domain = False
-        self.__domain = None
 
     def __hash__(self) -> int:
         return hash(self.id)
@@ -140,8 +135,10 @@ class CrawlJob(Generic[CrawlJobDataType]):
         return (
             self.id,
             self.url,
+            self.group,
             self.depth,
             self.spider,
+            self.priority,
             self.data
             if not serialize_data
             else json.dumps(self.data, ensure_ascii=False),
@@ -158,32 +155,28 @@ class CrawlJob(Generic[CrawlJobDataType]):
         (
             self.id,
             self.url,
+            self.group,
             self.depth,
             self.spider,
+            self.priority,
             self.data,
             self.parent,
         ) = state
 
-        self.__has_cached_domain = False
-        self.__domain = None
-
-    @property
-    def domain(self) -> Optional[str]:
-        if self.__has_cached_domain:
-            return self.__domain
-
-        if self.url is not None:
-            try:
-                self.__domain = get_domain_name(self.url)
-            except Exception:
-                pass
-
-        self.__has_cached_domain = True
-
-        return self.__domain
-
     def __repr__(self):
-        return format_repr(self, conditionals=("data", "spider", "parent"))
+        return format_repr(
+            self,
+            (
+                "id",
+                "url",
+                "depth",
+                "spider",
+                ("priority", self.priority or None),
+                "data",
+                "parent",
+            ),
+            conditionals=("data", "spider", "parent", "group"),
+        )
 
 
 class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):

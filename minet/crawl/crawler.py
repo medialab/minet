@@ -24,7 +24,7 @@ from os import makedirs
 from os.path import join
 from threading import Lock
 from urllib.parse import urljoin
-from ural import ensure_protocol
+from ural import ensure_protocol, get_domain_name
 from multiprocessing import Pool
 
 from minet.crawl.types import (
@@ -483,11 +483,11 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
     ) -> Iterator[AnyCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes]]:
         worker = CrawlWorker(self, **self.worker_kwargs)
 
-        def key_by_domain_name(job: CrawlJob) -> Optional[str]:
-            return job.domain
+        def key(job: CrawlJob) -> Optional[str]:
+            return job.group
 
         imap_unordered = self.executor.imap_unordered(
-            self.queue, worker, key=key_by_domain_name, **self.imap_kwargs
+            self.queue, worker, key=key, **self.imap_kwargs
         )
 
         def safe_wrapper():
@@ -535,6 +535,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
                         url=target.url,
                         depth=target.depth,
                         spider=target.spider,
+                        priority=target.priority,
                         data=target.data,
                     )
                 else:
@@ -547,6 +548,8 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
                 if base_url is not None:
                     job.url = urljoin(base_url, job.url)
+
+                job.group = get_domain_name(job.url)
 
                 if spider is not None and job.spider is None:
                     job.spider = spider
