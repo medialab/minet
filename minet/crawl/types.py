@@ -57,13 +57,14 @@ class CrawlTarget(Generic[CrawlJobDataType]):
         self.data = data
 
     def __eq__(self, other):
-        return (
-            self.url == other.url
-            and self.depth == other.depth
-            and self.spider == other.spider
-            and self.priority == self.priority
-            and self.data == other.data
-        )
+        if not isinstance(other, CrawlTarget):
+            return False
+
+        for k in self.__slots__:
+            if getattr(self, k) != getattr(other, k):
+                return False
+
+        return True
 
     def __repr__(self):
         return format_repr(
@@ -133,6 +134,16 @@ class CrawlJob(Generic[CrawlJobDataType]):
 
     def __hash__(self) -> int:
         return hash(self.id)
+
+    def __eq__(self, other):
+        if not isinstance(other, CrawlJob):
+            return False
+
+        for k in self.__slots__:
+            if getattr(self, k) != getattr(other, k):
+                return False
+
+        return True
 
     def __tabulate(self, serialize_data: bool = False):
         return (

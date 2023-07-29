@@ -1,75 +1,16 @@
-from typing import DefaultDict, List, Iterable, Optional, Tuple
+from typing import DefaultDict, List, Iterable, Optional
 
 import sqlite3
+import pickle
 from os import makedirs
 from os.path import join, isfile
 from shutil import rmtree
-from queue import PriorityQueue
+from queue import Empty
 from threading import Lock
 from contextlib import contextmanager
+from dataclasses import dataclass
 
 from minet.crawl.types import CrawlJob
-
-# NOTE: I don't think the queue can work with optimal=True, so this class
-# is never used in practice
-class TransientCrawlerQueue:
-    def __init__(self, lifo=False, optimal=False, group_parallelism: int = 1):
-        self.tasks: DefaultDict[Optional[str], List[str]] = DefaultDict(list)
-        self.queue: PriorityQueue[Tuple[int, int, CrawlJob]] = PriorityQueue()
-
-        self.is_lifo = lifo
-        self.is_optimal = optimal
-        self.group_parallelism = group_parallelism
-
-        self.counter = 0
-
-        self.put_lock = Lock()
-        self.task_lock = Lock()
-
-    def __len__(self) -> int:
-        return self.queue.qsize()
-
-    def qsize(self) -> int:
-        return self.queue.qsize()
-
-    def put_many(self, jobs: Iterable[CrawlJob]) -> None:
-        with self.put_lock:
-            for job in jobs:
-                queue_item = (job.priority, self.counter, job)
-                self.queue.put_nowait(queue_item)
-
-                self.counter += -1 if self.is_lifo else 1
-
-    def put(self, job: CrawlJob) -> None:
-        return self.put_many((job,))
-
-    def get(self, block=True) -> CrawlJob:
-        with self.task_lock:
-            _, _, job = self.queue.get(block)
-
-            # Job is now being worked
-            self.tasks[job.group].append(job.id)
-
-            return job
-
-    def get_nowait(self) -> CrawlJob:
-        return self.get(False)
-
-    def task_done(self, job: CrawlJob) -> None:
-        with self.task_lock:
-
-            task_group = self.tasks.get(job.group)
-
-            if task_group is None or job.id not in task_group:
-                raise RuntimeError("job was not being worked")
-
-            if len(task_group) == 1:
-                del self.tasks[job.group]
-            else:
-                task_group.remove(job.id)
-
-            self.queue.task_done()
-
 
 SQL_CREATE_TABLE = """
 PRAGMA journal_mode=wal;
@@ -85,16 +26,64 @@ CREATE TABLE "crawler_queue" (
     "data" BLOB,
     "parent" TEXT
 );
-CREATE INDEX "idx_priority" ON "crawler_queue" ("priority");
+CREATE INDEX "idx_priority_index" ON "crawler_queue" ("priority", "index");
 CREATE INDEX "idx_group" ON "crawler_queue" ("group");
 CREATE INDEX "idx_status" ON "crawler_queue" ("status");
 """
 
-# IMPORTANT: when resuming we need to read max index!
-# IMPORTANT: optimize multi index later
+SQL_INSERT = """
+INSERT INTO "crawler_queue" (
+    "index",
+    "id",
+    "url",
+    "group",
+    "depth",
+    "spider",
+    "priority",
+    "data",
+    "parent"
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+"""
+
+SQL_GET_FIFO = """
+SELECT
+    "index",
+    "id",
+    "url",
+    "group",
+    "depth",
+    "spider",
+    "priority",
+    "data",
+    "parent"
+FROM "crawler_queue"
+WHERE "status" = 0
+ORDER BY "priority" ASC, "index" ASC
+LIMIT 1;
+"""
+
+
+@dataclass
+class CrawlerQueueTask:
+    index: int
+    job: CrawlJob
 
 
 class CrawlerQueue:
+    # Params
+    persistent: bool
+    resuming: bool
+    is_lifo: bool
+    is_optimal: bool
+    group_parallelism: int
+
+    # State
+    tasks: DefaultDict[Optional[str], List[CrawlerQueueTask]]
+    connection: sqlite3.Connection
+    count: int
+    put_lock: Lock
+    task_lock: Lock
+
     def __init__(
         self,
         path: Optional[str] = None,
@@ -119,7 +108,7 @@ class CrawlerQueue:
             elif isfile(full_path):
                 self.resuming = True
 
-        self.tasks: DefaultDict[Optional[str], List[str]] = DefaultDict(list)
+        self.tasks = DefaultDict(list)
 
         self.is_lifo = lifo
         self.is_optimal = optimal
@@ -136,6 +125,10 @@ class CrawlerQueue:
         if not self.resuming:
             self.connection.executescript(SQL_CREATE_TABLE)
             self.connection.commit()
+        else:
+            with self.transaction(self.task_lock) as cursor:
+                cursor.execute('SELECT max("index") FROM "crawler_queue";')
+                self.counter = cursor.fetchone()[0]
 
     @contextmanager
     def transaction(self, lock: Lock):
@@ -148,5 +141,92 @@ class CrawlerQueue:
 
     def qsize(self) -> int:
         with self.transaction(self.task_lock) as cursor:
-            cursor.execute('SELECT count(*) FROM "crawler_queue";')
+            cursor.execute('SELECT count(*) FROM "crawler_queue" WHERE "status" = 0;')
             return cursor.fetchone()[0]
+
+    def __len__(self) -> int:
+        return self.qsize()
+
+    def put_many(self, jobs: Iterable[CrawlJob]) -> int:
+        with self.transaction(self.put_lock) as cursor:
+            rows = []
+
+            for job in jobs:
+                rows.append(
+                    (
+                        self.counter,
+                        job.id,
+                        job.url,
+                        job.group,
+                        job.depth,
+                        job.spider,
+                        job.priority,
+                        pickle.dumps(job.data) if job.data is not None else None,
+                        job.parent,
+                    )
+                )
+                self.counter += 1
+
+            cursor.executemany(SQL_INSERT, rows)
+            return cursor.rowcount
+
+    def put(self, job: CrawlJob) -> None:
+        self.put_many((job,))
+
+    def get(self, block: bool = True) -> CrawlJob:
+        if block:
+            raise NotImplementedError
+
+        with self.transaction(self.task_lock) as cursor:
+            cursor.execute(SQL_GET_FIFO)
+            row = cursor.fetchone()
+
+            if row is None:
+                raise Empty
+
+            index = row[0]
+
+            cursor.execute(
+                'UPDATE "crawler_queue" SET "status" = 1 WHERE "index" = ? LIMIT 1;',
+                (index,),
+            )
+
+            job = CrawlJob(
+                row[2],
+                id=row[1],
+                group=row[3],
+                depth=row[4],
+                spider=row[5],
+                priority=row[6],
+                data=pickle.loads(row[7]) if row[7] is not None else None,
+                parent=row[8],
+            )
+
+            self.tasks[job.group].append(CrawlerQueueTask(index, job))
+
+            return job
+
+    def get_nowait(self) -> CrawlJob:
+        return self.get(False)
+
+    def task_done(self, job: CrawlJob) -> None:
+        with self.transaction(self.task_lock) as cursor:
+            task_group = self.tasks.get(job.group)
+
+            if task_group is None:
+                raise RuntimeError("job is not being worked")
+
+            task = next((t for t in task_group if t.job.id == job.id), None)
+
+            if task is None:
+                raise RuntimeError("job is not being worked")
+
+            if len(task_group) == 1:
+                del self.tasks[job.group]
+            else:
+                self.tasks[job.group] = [t for t in task_group if t is not task]
+
+            cursor.execute('DELETE FROM "crawler_queue" WHERE "index" = ? LIMIT 1;')
+
+    def __del__(self) -> None:
+        self.connection.close()
