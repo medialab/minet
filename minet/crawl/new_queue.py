@@ -135,7 +135,7 @@ class CrawlerQueue:
         if path is None:
             self.persistent = False
             # NOTE: I am not sure this is advisable most of the time
-            full_path = "file:%s?mode=memory&cache=shared" % db_name
+            full_path = "file:%i.db?mode=memory&cache=shared" % id(self)
         else:
             full_path = join(path, db_name)
 
