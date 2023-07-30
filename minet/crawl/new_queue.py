@@ -179,7 +179,9 @@ class CrawlerQueue:
                 self.counter = cursor.fetchone()[0]
 
                 # We need to clear status=1
-                cursor.execute('UPDATE "queue" SET "status" = 0 WHERE "status" <> 0;')
+                # NOTE: we don't clear status > 1 just in case we need to use those
+                # to indicate something else
+                cursor.execute('UPDATE "queue" SET "status" = 0 WHERE "status" = 1;')
 
                 # We can safely drop parallelism info as it is bound to runtime
                 cursor.execute('DELETE FROM "parallelism";')
