@@ -101,7 +101,6 @@ INSERT OR REPLACE INTO "throttle" ("group", "timestamp") VALUES (?, ?);
 # TODO: callable throttle, callable parallelism
 # TODO: should be able to work with optional group parallelism
 # TODO: drop the new_queue name, drop old queue, drop persistqueue dep
-# TODO: also notify waiter when some item is added to the queue of course
 class CrawlerQueue:
     # Params
     persistent: bool
@@ -246,7 +245,14 @@ class CrawlerQueue:
                 self.counter += 1
 
             cursor.executemany(SQL_INSERT_JOB, rows)
-            return cursor.rowcount
+            count = cursor.rowcount
+
+        # NOTE: we notify the waiter because adding jobs to the queue means
+        # there might be one we can do right now
+        with self.waiter:
+            self.waiter.notify()
+
+        return count
 
     def put(self, job: CrawlJob) -> None:
         self.put_many((job,))
