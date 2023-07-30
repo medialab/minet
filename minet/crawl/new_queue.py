@@ -130,7 +130,7 @@ class CrawlerQueue:
         lifo: bool = False,
         group_parallelism: int = 1,
         throttle: float = 0,
-        cleanup_interval: int = 1000,
+        cleanup_interval: int = 5000,
     ):
         self.persistent = True
         self.resuming = False
