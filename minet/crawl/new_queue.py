@@ -358,6 +358,17 @@ class CrawlerQueue:
         with self.global_transaction() as cursor:
             self.__cleanup(cursor)
 
+    def __clear(self, cursor: sqlite3.Cursor) -> None:
+        self.current_task_done_count = 0
+        cursor.execute('DELETE FROM "parallelism";')
+        cursor.execute('DELETE FROM "throttle";')
+        cursor.connection.commit()
+        cursor.execute("VACUUM;")
+
+    def clear(self) -> None:
+        with self.global_transaction() as cursor:
+            self.__clear(cursor)
+
     def task_done(self, job: CrawlJob) -> None:
         with self.task_transaction() as cursor:
             index = self.tasks.get(job)
