@@ -60,10 +60,6 @@ class TestUrlCache:
 
         assert len(s) == 5
 
-        s.vacuum()
-
-        assert len(s) == 5
-
         assert set(s) == {"one", "two", "three", "four", "five"}
 
         del s

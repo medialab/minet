@@ -101,6 +101,7 @@ INSERT OR REPLACE INTO "throttle" ("group", "timestamp") VALUES (?, ?);
 # TODO: callable throttle, callable parallelism
 # TODO: should be able to work with optional group parallelism
 # TODO: drop the new_queue name, drop old queue, drop persistqueue dep
+# TODO: iteration over the queue for dumping purposes
 class CrawlerQueue:
     # Params
     persistent: bool
@@ -184,6 +185,7 @@ class CrawlerQueue:
                 # Cleanup throttle a bit
                 cursor.execute('DELETE FROM "throttle" WHERE "timestamp" < ?', (now(),))
 
+                cursor.connection.commit()
                 cursor.execute("VACUUM;")
 
     @contextmanager
@@ -349,6 +351,7 @@ class CrawlerQueue:
         self.current_task_done_count = 0
         cursor.execute('DELETE FROM "parallelism" WHERE "count" < 1;')
         cursor.execute('DELETE FROM "throttle" WHERE "timestamp" < ?', (now(),))
+        cursor.connection.commit()
         cursor.execute("VACUUM;")
 
     def cleanup(self) -> None:

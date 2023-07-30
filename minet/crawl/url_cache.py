@@ -120,10 +120,6 @@ class SQLiteStringSet:
         finally:
             cursor.close()
 
-    def vacuum(self) -> None:
-        with self.__transaction() as cursor:
-            cursor.execute("VACUUM;")
-
     def add(self, item: str) -> bool:
         with self.__transaction() as cursor:
             try:
