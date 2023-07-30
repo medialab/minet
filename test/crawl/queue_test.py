@@ -26,3 +26,14 @@ class TestCrawlerQueue:
 
         with raises(Empty):
             queue.get_nowait()
+
+    def test_worked_groups(self):
+        queue = CrawlerQueue(group_parallelism=2)
+
+        queue.put(CrawlJob("https://lemonde.fr", group="A"))
+        queue.put(CrawlJob("https://lefigaro.fr", group="A"))
+
+        queue.get_nowait()
+        queue.get_nowait()
+
+        assert queue.worked_groups() == {"A": 2}

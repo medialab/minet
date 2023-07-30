@@ -1,4 +1,4 @@
-from typing import Dict, Iterable, Optional
+from typing import Counter, Dict, Iterable, Iterator, List, Tuple, Optional
 
 import sqlite3
 import pickle
@@ -98,6 +98,13 @@ ORDER BY "priority" ASC, "index" %s
 LIMIT 1;
 """
 
+SQL_INCREMENT_PARALLELISM = """
+INSERT OR REPLACE INTO "parallelism" ("group", "count") VALUES (
+    ?,
+    COALESCE((SELECT ("count" + 1) FROM "parallelism" WHERE "group" = ? LIMIT 1), 1)
+)
+"""
+
 
 # TODO: the database should probably drop useless throttle info + parallelism + vacuum
 # once every task operation
@@ -178,6 +185,21 @@ class CrawlerQueue:
         finally:
             cursor.close()
 
+    def iterator_transaction(
+        self, lock: Lock, query: str, params: Tuple = tuple()
+    ) -> Iterator[List]:
+        with self.transaction(lock) as cursor:
+            cursor.execute(query, params)
+
+            while True:
+                rows = cursor.fetchmany(128)
+
+                if not rows:
+                    return
+
+                for row in rows:
+                    yield row
+
     def qsize(self) -> int:
         with self.transaction(self.task_lock) as cursor:
             cursor.execute('SELECT count(*) FROM "queue" WHERE "status" = 0;')
@@ -245,6 +267,10 @@ class CrawlerQueue:
                 parent=row[8],
             )
 
+            # TODO: callable group parallelism
+            if job.group is not None:
+                cursor.execute(SQL_INCREMENT_PARALLELISM, (job.group, job.group))
+
             # NOTE: jobs are hashable by id
             self.tasks[job] = index
 
@@ -257,6 +283,16 @@ class CrawlerQueue:
     # optimistic buffer that trumps the true ordering of the given queue.
     def get_nowait(self) -> CrawlJob:
         return self.get(False)
+
+    def worked_groups(self) -> Counter[str]:
+        g = Counter()
+
+        for row in self.iterator_transaction(
+            self.task_lock, 'SELECT "group", "count" FROM "parallelism";'
+        ):
+            g[row[0]] = row[1]
+
+        return g
 
     def __cleanup(self, cursor: sqlite3.Cursor) -> None:
         self.current_task_done_count = 0
@@ -272,6 +308,8 @@ class CrawlerQueue:
                 raise RuntimeError("job is not being worked")
 
             cursor.execute('DELETE FROM "queue" WHERE "index" = ? LIMIT 1;', (index,))
+
+            # TODO: update throttle info here and validate parallelism = 1
 
             self.current_task_done_count += 0
 
