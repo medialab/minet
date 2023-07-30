@@ -125,9 +125,10 @@ class CrawlerQueue:
 
             if not resume:
                 rmtree(path, ignore_errors=True)
-                makedirs(path, exist_ok=True)
             elif isfile(full_path):
                 self.resuming = True
+
+            makedirs(path, exist_ok=True)
 
         self.tasks = {}
 
@@ -153,6 +154,9 @@ class CrawlerQueue:
                 # We need to restart our counter
                 cursor.execute('SELECT max("index") FROM "queue";')
                 self.counter = cursor.fetchone()[0]
+
+                # We need to clear status=1
+                cursor.execute('UPDATE "queue" SET "status" = 0 WHERE "status" <> 0;')
 
                 # We can safely drop parallelism info as it is bound to runtime
                 cursor.execute('DELETE FROM "parallelism";')
