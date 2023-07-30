@@ -108,8 +108,8 @@ INSERT OR REPLACE INTO "throttle" ("group", "timestamp") VALUES (?, ?);
 # TODO: should be able to work with optional group parallelism
 # TODO: drop the new_queue name, drop old queue, drop persistqueue dep
 # TODO: iteration over the queue for dumping purposes
-# TODO: currently counter/max index cannot be safely retrieved on resume,
-# because max index has been deleted already
+# TODO: perform tests for basic throttling and parallelism
+# TODO: test resume integrity with low cleanup_interval and rethink the issue
 class CrawlerQueue:
     # Params
     persistent: bool
