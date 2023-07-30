@@ -43,7 +43,7 @@ from minet.crawl.spiders import (
     FunctionSpiderCallable,
 )
 from minet.crawl.exceptions import CrawlerAlreadyFinishedError
-from minet.crawl.queue import CrawlerQueue
+from minet.crawl.new_queue import CrawlerQueue
 from minet.crawl.state import CrawlerState
 from minet.crawl.url_cache import URLCache
 from minet.web import request, EXPECTED_WEB_ERRORS, AnyTimeout
@@ -52,7 +52,6 @@ from minet.executors import HTTPThreadPoolExecutor, CANCELLED
 from minet.exceptions import UnknownSpiderError, CancelledRequestError
 from minet.constants import (
     DEFAULT_DOMAIN_PARALLELISM,
-    DEFAULT_IMAP_BUFFER_SIZE,
     DEFAULT_THROTTLE,
     DEFAULT_FETCH_MAX_REDIRECTS,
     DEFAULT_URLLIB3_TIMEOUT,
@@ -243,7 +242,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
     enqueue_lock: Lock
 
-    queue: CrawlerQueue[CrawlJob[CrawlJobDataTypes]]
+    queue: CrawlerQueue
     persistent: bool
 
     state: CrawlerState
@@ -265,7 +264,6 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         resume: bool = False,
         dfs: bool = False,
         writer_root_directory: Optional[str] = None,
-        buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         throttle: float = DEFAULT_THROTTLE,
         process_pool_workers: Optional[int] = None,
@@ -328,7 +326,13 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         self.resuming = False
 
         # Queue
-        self.queue = CrawlerQueue(self.queue_path, resume=resume, dfs=dfs)
+        self.queue = CrawlerQueue(
+            self.queue_path,
+            resume=resume,
+            group_parallelism=domain_parallelism,
+            throttle=throttle,
+            lifo=dfs,  # TODO: rename
+        )
         self.persistent = self.queue.persistent
         self.resuming = (
             self.queue.resuming
@@ -381,11 +385,11 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             retryer_kwargs=retryer_kwargs,
         )
 
-        self.imap_kwargs = {
-            "buffer_size": buffer_size,
-            "parallelism": domain_parallelism,
-            "throttle": throttle,
-        }
+        # NOTE: buffer_size=0 is very important to avoid quenouille's optimistic
+        # buffer. Remember also that this cannot work if quenouille must handle
+        # group parallelism or throttle, which is why it's the crawler queue's
+        # job now.
+        self.imap_kwargs = {"buffer_size": 0}
 
         self.worker_kwargs = {
             "callback": callback,
@@ -497,7 +501,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
                 yield result
 
-                self.queue.ack(result.job)
+                self.queue.task_done(result.job)
 
             # If iterator ended properly we cleanup the queue
             self.queue.cleanup()

@@ -19,6 +19,7 @@ from ebbe import distinct
 from ural import canonicalize_url, normalize_url
 
 from minet.crawl.types import CrawlJob, CrawlJobDataType
+from minet.crawl.utils import iterate_over_cursor
 
 T = TypeVar("T")
 I = TypeVar("I")
@@ -184,14 +185,8 @@ class SQLiteStringSet:
         with self.__transaction() as cursor:
             cursor.execute('SELECT "key" FROM "set";')
 
-            while True:
-                rows = cursor.fetchmany(128)
-
-                if not rows:
-                    return
-
-                for row in rows:
-                    yield row[0]
+            for row in iterate_over_cursor(cursor):
+                yield row[0]
 
     def __del__(self) -> None:
         self.__connection.close()

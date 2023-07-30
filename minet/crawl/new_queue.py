@@ -1,4 +1,4 @@
-from typing import Counter, Dict, Iterable, Iterator, List, Tuple, Optional
+from typing import Counter, Dict, Iterable, Optional
 
 import sqlite3
 import pickle
@@ -12,6 +12,7 @@ from datetime import datetime
 from quenouille.constants import TIMER_EPSILON
 
 from minet.crawl.types import CrawlJob
+from minet.crawl.utils import iterate_over_cursor
 
 
 def now() -> float:
@@ -34,7 +35,6 @@ CREATE TABLE "queue" (
     "parent" TEXT
 );
 CREATE INDEX "idx_queue_priority_index" ON "queue" ("priority", "index");
-CREATE INDEX "idx_queue_group" ON "queue" ("group");
 CREATE INDEX "idx_queue_status" ON "queue" ("status");
 
 CREATE TABLE "throttle" (
@@ -100,6 +100,8 @@ INSERT OR REPLACE INTO "throttle" ("group", "timestamp") VALUES (?, ?);
 
 # TODO: callable throttle, callable parallelism
 # TODO: should be able to work with optional group parallelism
+# TODO: drop the new_queue name, drop old queue, drop persistqueue dep
+# TODO: also notify waiter when some item is added to the queue of course
 class CrawlerQueue:
     # Params
     persistent: bool
@@ -110,7 +112,8 @@ class CrawlerQueue:
 
     # State
     tasks: Dict[CrawlJob, int]
-    connection: sqlite3.Connection
+    put_connection: sqlite3.Connection
+    task_connection: sqlite3.Connection
     counter: int
     cleanup_interval: int
     waiter: Condition
@@ -132,7 +135,8 @@ class CrawlerQueue:
 
         if path is None:
             self.persistent = False
-            full_path = ":memory:"
+            # NOTE: I am not sure this is advisable most of the time
+            full_path = "file:%s?mode=memory&cache=shared" % db_name
         else:
             full_path = join(path, db_name)
 
@@ -158,12 +162,15 @@ class CrawlerQueue:
         self.put_lock = Lock()
         self.task_lock = Lock()
 
-        self.connection = sqlite3.connect(full_path, check_same_thread=False)
+        # NOTE: we need two connection if we are to allow concurrent
+        # put and task acquisition.
+        self.put_connection = sqlite3.connect(full_path, check_same_thread=False)
+        self.task_connection = sqlite3.connect(full_path, check_same_thread=False)
 
         # Setup
-        with self.transaction(self.task_lock) as cursor:
+        with self.global_transaction() as cursor:
             if not self.resuming:
-                self.connection.executescript(SQL_CREATE)
+                cursor.executescript(SQL_CREATE)
             else:
                 # We need to restart our counter
                 cursor.execute('SELECT max("index") FROM "queue";')
@@ -181,42 +188,45 @@ class CrawlerQueue:
                 cursor.execute("VACUUM;")
 
     @contextmanager
-    def transaction(self, lock: Lock):
+    def put_transaction(self):
         try:
-            with lock, self.connection:
-                cursor = self.connection.cursor()
+            with self.put_lock, self.put_connection:
+                cursor = self.put_connection.cursor()
                 yield cursor
         finally:
             cursor.close()
 
-    def iterator_transaction(
-        self, lock: Lock, query: str, params: Tuple = tuple()
-    ) -> Iterator[List]:
-        with self.transaction(lock) as cursor:
-            cursor.execute(query, params)
+    @contextmanager
+    def task_transaction(self):
+        try:
+            with self.task_lock, self.task_connection:
+                cursor = self.task_connection.cursor()
+                yield cursor
+        finally:
+            cursor.close()
 
-            while True:
-                rows = cursor.fetchmany(128)
-
-                if not rows:
-                    return
-
-                for row in rows:
-                    yield row
+    @contextmanager
+    def global_transaction(self):
+        try:
+            with self.put_lock, self.task_lock, self.task_connection:
+                cursor = self.task_connection.cursor()
+                yield cursor
+        finally:
+            cursor.close()
 
     def __count(self, cursor: sqlite3.Cursor) -> int:
         cursor.execute('SELECT count(*) FROM "queue" WHERE "status" = 0;')
         return cursor.fetchone()[0]
 
     def qsize(self) -> int:
-        with self.transaction(self.task_lock) as cursor:
+        with self.global_transaction() as cursor:
             return self.__count(cursor)
 
     def __len__(self) -> int:
         return self.qsize()
 
     def put_many(self, jobs: Iterable[CrawlJob]) -> int:
-        with self.transaction(self.put_lock) as cursor:
+        with self.put_transaction() as cursor:
             rows = []
 
             for job in jobs:
@@ -261,7 +271,7 @@ class CrawlerQueue:
                 need_to_wait = False
                 need_to_wait_for_at_least = None
 
-            with self.transaction(self.task_lock) as cursor:
+            with self.task_transaction() as cursor:
                 cursor.execute(
                     SQL_GET_JOB % ("ASC" if not self.is_lifo else "DESC"),
                     (now(), self.group_parallelism),
@@ -319,11 +329,13 @@ class CrawlerQueue:
     def worked_groups(self) -> Counter[str]:
         g = Counter()
 
-        for row in self.iterator_transaction(
-            self.task_lock,
-            'SELECT "group", "count" FROM "parallelism" WHERE "count" > 0;',
-        ):
-            g[row[0]] = row[1]
+        with self.global_transaction() as cursor:
+            cursor.execute(
+                'SELECT "group", "count" FROM "parallelism" WHERE "count" > 0;'
+            )
+
+            for row in iterate_over_cursor(cursor):
+                g[row[0]] = row[1]
 
         return g
 
@@ -333,8 +345,12 @@ class CrawlerQueue:
         cursor.execute('DELETE FROM "throttle" WHERE "timestamp" < ?', (now(),))
         cursor.execute("VACUUM;")
 
+    def cleanup(self) -> None:
+        with self.global_transaction() as cursor:
+            self.__cleanup(cursor)
+
     def task_done(self, job: CrawlJob) -> None:
-        with self.transaction(self.task_lock) as cursor:
+        with self.task_transaction() as cursor:
             index = self.tasks.get(job)
 
             if index is None:
@@ -358,5 +374,9 @@ class CrawlerQueue:
         with self.waiter:
             self.waiter.notify()
 
+    def close(self) -> None:
+        self.put_connection.close()
+        self.task_connection.close()
+
     def __del__(self) -> None:
-        self.connection.close()
+        self.close()
