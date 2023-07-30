@@ -30,10 +30,21 @@ class TestCrawlerQueue:
     def test_worked_groups(self):
         queue = CrawlerQueue(group_parallelism=2)
 
-        queue.put(CrawlJob("https://lemonde.fr", group="A"))
-        queue.put(CrawlJob("https://lefigaro.fr", group="A"))
+        job1 = CrawlJob("https://lemonde.fr", group="A")
+        job2 = CrawlJob("https://lefigaro.fr", group="A")
+
+        queue.put(job1)
+        queue.put(job2)
 
         queue.get_nowait()
         queue.get_nowait()
 
         assert queue.worked_groups() == {"A": 2}
+
+        queue.task_done(job2)
+
+        assert queue.worked_groups() == {"A": 1}
+
+        queue.task_done(job1)
+
+        assert queue.worked_groups() == {}

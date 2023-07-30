@@ -13,10 +13,6 @@ from datetime import datetime
 from minet.crawl.types import CrawlJob
 
 
-def timestamp() -> int:
-    return int(datetime.now().timestamp())
-
-
 SQL_CREATE = """
 PRAGMA journal_mode=wal;
 
@@ -38,7 +34,7 @@ CREATE INDEX "idx_queue_status" ON "queue" ("status");
 
 CREATE TABLE "throttle" (
     "group" TEXT PRIMARY KEY,
-    "timestamp" INTEGER NOT NULL
+    "timestamp" REAL NOT NULL
 ) WITHOUT ROWID;
 
 CREATE TABLE "parallelism" (
@@ -59,20 +55,6 @@ INSERT INTO "queue" (
     "data",
     "parent"
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-"""
-
-SQL_INSERT_THROTTLE = """
-INSERT INTO "throttle" (
-    "group",
-    "timestamp"
-) VALUES (?, ?);
-"""
-
-SQL_INSERT_PARALLELISM = """
-INSERT INTO "parallelism" (
-    "group",
-    "count"
-) VALUES (?, ?);
 """
 
 SQL_GET_JOB = """
@@ -200,10 +182,13 @@ class CrawlerQueue:
                 for row in rows:
                     yield row
 
+    def __count(self, cursor: sqlite3.Cursor) -> int:
+        cursor.execute('SELECT count(*) FROM "queue" WHERE "status" = 0;')
+        return cursor.fetchone()[0]
+
     def qsize(self) -> int:
         with self.transaction(self.task_lock) as cursor:
-            cursor.execute('SELECT count(*) FROM "queue" WHERE "status" = 0;')
-            return cursor.fetchone()[0]
+            return self.__count(cursor)
 
     def __len__(self) -> int:
         return self.qsize()
@@ -241,12 +226,17 @@ class CrawlerQueue:
         with self.transaction(self.task_lock) as cursor:
             cursor.execute(
                 SQL_GET_JOB % ("ASC" if not self.is_lifo else "DESC"),
-                (timestamp(), self.group_parallelism),
+                (datetime.now(), self.group_parallelism),
             )
             row = cursor.fetchone()
 
             if row is None:
-                raise Empty
+                # Queue really is drained
+                if self.__count(cursor) == 0:
+                    raise Empty
+
+                # We may need to wait for a suitable job
+                # TODO: wait through condition with timeout, wrap in while
 
             index = row[0]
 
@@ -288,7 +278,8 @@ class CrawlerQueue:
         g = Counter()
 
         for row in self.iterator_transaction(
-            self.task_lock, 'SELECT "group", "count" FROM "parallelism";'
+            self.task_lock,
+            'SELECT "group", "count" FROM "parallelism" WHERE "count" > 0;',
         ):
             g[row[0]] = row[1]
 
@@ -297,7 +288,9 @@ class CrawlerQueue:
     def __cleanup(self, cursor: sqlite3.Cursor) -> None:
         self.current_task_done_count = 0
         cursor.execute('DELETE FROM "parallelism" WHERE "count" < 1;')
-        cursor.execute('DELETE FROM "throttle" WHERE "timestamp" < ?', (timestamp(),))
+        cursor.execute(
+            'DELETE FROM "throttle" WHERE "timestamp" < ?', (datetime.now(),)
+        )
         cursor.execute("VACUUM;")
 
     def task_done(self, job: CrawlJob) -> None:
@@ -308,6 +301,10 @@ class CrawlerQueue:
                 raise RuntimeError("job is not being worked")
 
             cursor.execute('DELETE FROM "queue" WHERE "index" = ? LIMIT 1;', (index,))
+            cursor.execute(
+                'UPDATE "parallelism" SET "count" = "count" - 1 WHERE "group" = ?;',
+                (job.group,),
+            )
 
             # TODO: update throttle info here and validate parallelism = 1
 
