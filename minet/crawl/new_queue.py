@@ -6,11 +6,16 @@ from os import makedirs
 from os.path import join, isfile
 from shutil import rmtree
 from queue import Empty
-from threading import Lock
+from threading import Lock, Condition
 from contextlib import contextmanager
 from datetime import datetime
+from quenouille.constants import TIMER_EPSILON
 
 from minet.crawl.types import CrawlJob
+
+
+def now() -> float:
+    return datetime.now().timestamp()
 
 
 SQL_CREATE = """
@@ -36,6 +41,7 @@ CREATE TABLE "throttle" (
     "group" TEXT PRIMARY KEY,
     "timestamp" REAL NOT NULL
 ) WITHOUT ROWID;
+CREATE INDEX "idx_throttle_timestamp" ON "throttle" ("timestamp");
 
 CREATE TABLE "parallelism" (
     "group" TEXT PRIMARY KEY,
@@ -96,12 +102,14 @@ class CrawlerQueue:
     resuming: bool
     is_lifo: bool
     group_parallelism: int
+    throttle: float
 
     # State
     tasks: Dict[CrawlJob, int]
     connection: sqlite3.Connection
     counter: int
     cleanup_interval: int
+    waiter: Condition
     put_lock: Lock
     task_lock: Lock
 
@@ -112,6 +120,7 @@ class CrawlerQueue:
         resume: bool = False,
         lifo: bool = False,
         group_parallelism: int = 1,
+        throttle: float = 0,
         cleanup_interval: int = 1000,
     ):
         self.persistent = True
@@ -133,24 +142,25 @@ class CrawlerQueue:
         self.tasks = {}
 
         self.is_lifo = lifo
+
         self.group_parallelism = group_parallelism
+        self.throttle = throttle
 
         self.cleanup_interval = cleanup_interval
         self.counter = 0
         self.current_task_done_count = 0
 
+        self.waiter = Condition()
         self.put_lock = Lock()
         self.task_lock = Lock()
 
         self.connection = sqlite3.connect(full_path, check_same_thread=False)
 
         # Setup
-        if not self.resuming:
-            self.connection.executescript(SQL_CREATE)
-            self.connection.commit()
-        else:
-            with self.transaction(self.task_lock) as cursor:
-
+        with self.transaction(self.task_lock) as cursor:
+            if not self.resuming:
+                self.connection.executescript(SQL_CREATE)
+            else:
                 # We need to restart our counter
                 cursor.execute('SELECT max("index") FROM "queue";')
                 self.counter = cursor.fetchone()[0]
@@ -160,6 +170,10 @@ class CrawlerQueue:
 
                 # We can safely drop parallelism info as it is bound to runtime
                 cursor.execute('DELETE FROM "parallelism";')
+
+                # Cleanup throttle a bit
+                cursor.execute('DELETE FROM "throttle" WHERE "timestamp" < ?', (now(),))
+
                 cursor.execute("VACUUM;")
 
     @contextmanager
@@ -227,48 +241,74 @@ class CrawlerQueue:
         if block:
             raise NotImplementedError
 
-        with self.transaction(self.task_lock) as cursor:
-            cursor.execute(
-                SQL_GET_JOB % ("ASC" if not self.is_lifo else "DESC"),
-                (datetime.now(), self.group_parallelism),
-            )
-            row = cursor.fetchone()
+        need_to_wait = False
+        need_to_wait_for_at_least = None
 
-            if row is None:
-                # Queue really is drained
-                if self.__count(cursor) == 0:
-                    raise Empty
+        while True:
 
-                # We may need to wait for a suitable job
-                # TODO: wait through condition with timeout, wrap in while
+            # Waiting?
+            # NOTE: we wait here so we can: 1. avoid recursion and 2. release
+            # the transaction lock
+            if need_to_wait:
+                with self.waiter:
+                    self.waiter.wait(need_to_wait_for_at_least)
+                need_to_wait = False
+                need_to_wait_for_at_least = None
 
-            index = row[0]
+            with self.transaction(self.task_lock) as cursor:
+                cursor.execute(
+                    SQL_GET_JOB % ("ASC" if not self.is_lifo else "DESC"),
+                    (now(), self.group_parallelism),
+                )
+                row = cursor.fetchone()
 
-            # NOTE: sqlite does not always support LIMIT on UPDATE
-            cursor.execute(
-                'UPDATE "queue" SET "status" = 1 WHERE "index" = ?;',
-                (index,),
-            )
+                if row is None:
+                    # Queue really is drained
+                    if self.__count(cursor) == 0:
+                        raise Empty
 
-            job = CrawlJob(
-                row[2],
-                id=row[1],
-                group=row[3],
-                depth=row[4],
-                spider=row[5],
-                priority=row[6],
-                data=pickle.loads(row[7]) if row[7] is not None else None,
-                parent=row[8],
-            )
+                    # We may need to wait for a suitable job
+                    # NOTE: here we may wait either for one slot to become
+                    # open wrt parallelism or enough time wrt throttling
+                    need_to_wait = True
 
-            # TODO: callable group parallelism
-            if job.group is not None:
-                cursor.execute(SQL_INCREMENT_PARALLELISM, (job.group, job.group))
+                    cursor.execute('SELECT min("timestamp") FROM "throttle" LIMIT 1;')
+                    throttle_row = cursor.fetchone()
 
-            # NOTE: jobs are hashable by id
-            self.tasks[job] = index
+                    if throttle_row is not None:
+                        need_to_wait_for_at_least = (
+                            max(0, throttle_row[0] - now()) + TIMER_EPSILON
+                        )
 
-            return job
+                    continue
+
+                index = row[0]
+
+                # NOTE: sqlite does not always support LIMIT on UPDATE
+                cursor.execute(
+                    'UPDATE "queue" SET "status" = 1 WHERE "index" = ?;',
+                    (index,),
+                )
+
+                job = CrawlJob(
+                    row[2],
+                    id=row[1],
+                    group=row[3],
+                    depth=row[4],
+                    spider=row[5],
+                    priority=row[6],
+                    data=pickle.loads(row[7]) if row[7] is not None else None,
+                    parent=row[8],
+                )
+
+                # TODO: callable group parallelism
+                if job.group is not None:
+                    cursor.execute(SQL_INCREMENT_PARALLELISM, (job.group, job.group))
+
+                # NOTE: jobs are hashable by id
+                self.tasks[job] = index
+
+                return job
 
     # NOTE: we will need to cheat a little bit to work with quenouille here.
     # This method will actually block but raise Empty if the queue is drained.
@@ -292,9 +332,7 @@ class CrawlerQueue:
     def __cleanup(self, cursor: sqlite3.Cursor) -> None:
         self.current_task_done_count = 0
         cursor.execute('DELETE FROM "parallelism" WHERE "count" < 1;')
-        cursor.execute(
-            'DELETE FROM "throttle" WHERE "timestamp" < ?', (datetime.now(),)
-        )
+        cursor.execute('DELETE FROM "throttle" WHERE "timestamp" < ?', (now(),))
         cursor.execute("VACUUM;")
 
     def task_done(self, job: CrawlJob) -> None:
@@ -304,7 +342,7 @@ class CrawlerQueue:
             if index is None:
                 raise RuntimeError("job is not being worked")
 
-            cursor.execute('DELETE FROM "queue" WHERE "index" = ? LIMIT 1;', (index,))
+            cursor.execute('DELETE FROM "queue" WHERE "index" = ?;', (index,))
             cursor.execute(
                 'UPDATE "parallelism" SET "count" = "count" - 1 WHERE "group" = ?;',
                 (job.group,),
@@ -316,6 +354,9 @@ class CrawlerQueue:
 
             if self.current_task_done_count >= self.cleanup_interval:
                 self.__cleanup(cursor)
+
+        with self.waiter:
+            self.waiter.notify()
 
     def __del__(self) -> None:
         self.connection.close()
