@@ -1,4 +1,4 @@
-from typing import DefaultDict, List, Iterable, Optional
+from typing import Dict, Iterable, Optional
 
 import sqlite3
 import pickle
@@ -8,7 +8,6 @@ from shutil import rmtree
 from queue import Empty
 from threading import Lock
 from contextlib import contextmanager
-from dataclasses import dataclass
 from datetime import datetime
 
 from minet.crawl.types import CrawlJob
@@ -100,12 +99,6 @@ LIMIT 1;
 """
 
 
-@dataclass
-class CrawlerQueueTask:
-    index: int
-    job: CrawlJob
-
-
 # TODO: the database should probably drop useless throttle info + parallelism + vacuum
 # once every task operation
 class CrawlerQueue:
@@ -113,13 +106,13 @@ class CrawlerQueue:
     persistent: bool
     resuming: bool
     is_lifo: bool
-    is_optimal: bool
     group_parallelism: int
 
     # State
-    tasks: DefaultDict[Optional[str], List[CrawlerQueueTask]]
+    tasks: Dict[CrawlJob, int]
     connection: sqlite3.Connection
-    count: int
+    counter: int
+    cleanup_interval: int
     put_lock: Lock
     task_lock: Lock
 
@@ -129,8 +122,8 @@ class CrawlerQueue:
         db_name: str = "queue.db",
         resume: bool = False,
         lifo: bool = False,
-        optimal: bool = False,
         group_parallelism: int = 1,
+        cleanup_interval: int = 1000,
     ):
         self.persistent = True
         self.resuming = False
@@ -147,13 +140,14 @@ class CrawlerQueue:
             elif isfile(full_path):
                 self.resuming = True
 
-        self.tasks = DefaultDict(list)
+        self.tasks = {}
 
         self.is_lifo = lifo
-        self.is_optimal = optimal
         self.group_parallelism = group_parallelism
 
+        self.cleanup_interval = cleanup_interval
         self.counter = 0
+        self.current_task_done_count = 0
 
         self.put_lock = Lock()
         self.task_lock = Lock()
@@ -166,8 +160,12 @@ class CrawlerQueue:
             self.connection.commit()
         else:
             with self.transaction(self.task_lock) as cursor:
+
+                # We need to restart our counter
                 cursor.execute('SELECT max("index") FROM "queue";')
                 self.counter = cursor.fetchone()[0]
+
+                # We can safely drop parallelism info as it is bound to runtime
                 cursor.execute('DELETE FROM "parallelism";')
                 cursor.execute("VACUUM;")
 
@@ -247,7 +245,8 @@ class CrawlerQueue:
                 parent=row[8],
             )
 
-            self.tasks[job.group].append(CrawlerQueueTask(index, job))
+            # NOTE: jobs are hashable by id
+            self.tasks[job] = index
 
             return job
 
@@ -259,24 +258,25 @@ class CrawlerQueue:
     def get_nowait(self) -> CrawlJob:
         return self.get(False)
 
+    def __cleanup(self, cursor: sqlite3.Cursor) -> None:
+        self.current_task_done_count = 0
+        cursor.execute('DELETE FROM "parallelism" WHERE "count" < 1;')
+        cursor.execute('DELETE FROM "throttle" WHERE "timestamp" < ?', (timestamp(),))
+        cursor.execute("VACUUM;")
+
     def task_done(self, job: CrawlJob) -> None:
         with self.transaction(self.task_lock) as cursor:
-            task_group = self.tasks.get(job.group)
+            index = self.tasks.get(job)
 
-            if task_group is None:
+            if index is None:
                 raise RuntimeError("job is not being worked")
 
-            task = next((t for t in task_group if t.job.id == job.id), None)
+            cursor.execute('DELETE FROM "queue" WHERE "index" = ? LIMIT 1;', (index,))
 
-            if task is None:
-                raise RuntimeError("job is not being worked")
+            self.current_task_done_count += 0
 
-            if len(task_group) == 1:
-                del self.tasks[job.group]
-            else:
-                self.tasks[job.group] = [t for t in task_group if t is not task]
-
-            cursor.execute('DELETE FROM "queue" WHERE "index" = ? LIMIT 1;')
+            if self.current_task_done_count >= self.cleanup_interval:
+                self.__cleanup(cursor)
 
     def __del__(self) -> None:
         self.connection.close()
