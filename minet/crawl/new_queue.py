@@ -102,6 +102,8 @@ INSERT OR REPLACE INTO "throttle" ("group", "timestamp") VALUES (?, ?);
 # TODO: should be able to work with optional group parallelism
 # TODO: drop the new_queue name, drop old queue, drop persistqueue dep
 # TODO: iteration over the queue for dumping purposes
+# TODO: currently counter/max index cannot be safely retrieved on resume,
+# because max index has been deleted already
 class CrawlerQueue:
     # Params
     persistent: bool
@@ -190,30 +192,36 @@ class CrawlerQueue:
 
     @contextmanager
     def put_transaction(self):
+        cursor = None
         try:
             with self.put_lock, self.put_connection:
                 cursor = self.put_connection.cursor()
                 yield cursor
         finally:
-            cursor.close()
+            if cursor is not None:
+                cursor.close()
 
     @contextmanager
     def task_transaction(self):
+        cursor = None
         try:
             with self.task_lock, self.task_connection:
                 cursor = self.task_connection.cursor()
                 yield cursor
         finally:
-            cursor.close()
+            if cursor is not None:
+                cursor.close()
 
     @contextmanager
     def global_transaction(self):
+        cursor = None
         try:
             with self.put_lock, self.task_lock, self.task_connection:
                 cursor = self.task_connection.cursor()
                 yield cursor
         finally:
-            cursor.close()
+            if cursor is not None:
+                cursor.close()
 
     def __count(self, cursor: sqlite3.Cursor) -> int:
         cursor.execute('SELECT count(*) FROM "queue" WHERE "status" = 0;')

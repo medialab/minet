@@ -113,12 +113,14 @@ class SQLiteStringSet:
 
     @contextmanager
     def __transaction(self):
+        cursor = None
         try:
             with self.__lock, self.__connection:
                 cursor = self.__connection.cursor()
                 yield cursor
         finally:
-            cursor.close()
+            if cursor is not None:
+                cursor.close()
 
     def add(self, item: str) -> bool:
         with self.__transaction() as cursor:
