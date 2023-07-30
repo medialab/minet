@@ -14,7 +14,7 @@ from minet.crawl.types import CrawlJob
 
 SQL_CREATE_TABLE = """
 PRAGMA journal_mode=wal;
-CREATE TABLE "crawler_queue" (
+CREATE TABLE "queue" (
     "index" INTEGER PRIMARY KEY,
     "status" INTEGER NOT NULL DEFAULT 0,
     "id" TEXT NOT NULL,
@@ -26,13 +26,13 @@ CREATE TABLE "crawler_queue" (
     "data" BLOB,
     "parent" TEXT
 );
-CREATE INDEX "idx_priority_index" ON "crawler_queue" ("priority", "index");
-CREATE INDEX "idx_group" ON "crawler_queue" ("group");
-CREATE INDEX "idx_status" ON "crawler_queue" ("status");
+CREATE INDEX "idx_priority_index" ON "queue" ("priority", "index");
+CREATE INDEX "idx_group" ON "queue" ("group");
+CREATE INDEX "idx_status" ON "queue" ("status");
 """
 
 SQL_INSERT = """
-INSERT INTO "crawler_queue" (
+INSERT INTO "queue" (
     "index",
     "id",
     "url",
@@ -56,7 +56,7 @@ SELECT
     "priority",
     "data",
     "parent"
-FROM "crawler_queue"
+FROM "queue"
 WHERE "status" = 0
 ORDER BY "priority" ASC, "index" ASC
 LIMIT 1;
@@ -127,7 +127,7 @@ class CrawlerQueue:
             self.connection.commit()
         else:
             with self.transaction(self.task_lock) as cursor:
-                cursor.execute('SELECT max("index") FROM "crawler_queue";')
+                cursor.execute('SELECT max("index") FROM "queue";')
                 self.counter = cursor.fetchone()[0]
 
     @contextmanager
@@ -141,7 +141,7 @@ class CrawlerQueue:
 
     def qsize(self) -> int:
         with self.transaction(self.task_lock) as cursor:
-            cursor.execute('SELECT count(*) FROM "crawler_queue" WHERE "status" = 0;')
+            cursor.execute('SELECT count(*) FROM "queue" WHERE "status" = 0;')
             return cursor.fetchone()[0]
 
     def __len__(self) -> int:
@@ -200,7 +200,7 @@ class CrawlerQueue:
 
             # NOTE: sqlite does not always support LIMIT on UPDATE
             cursor.execute(
-                'UPDATE "crawler_queue" SET "status" = 1 WHERE "index" = ?;',
+                'UPDATE "queue" SET "status" = 1 WHERE "index" = ?;',
                 (index,),
             )
 
@@ -219,6 +219,11 @@ class CrawlerQueue:
 
             return job
 
+    # NOTE: we will need to cheat a little bit to work with quenouille here.
+    # This method will actually block but raise Empty if the queue is drained.
+    # We will also need to handle throttling and group parallelism
+    # on our own and use buffer_size=0 on quenouille's size to bypass the
+    # optimistic buffer that trumps the true ordering of the given queue.
     def get_nowait(self) -> CrawlJob:
         return self.get(False)
 
@@ -239,7 +244,7 @@ class CrawlerQueue:
             else:
                 self.tasks[job.group] = [t for t in task_group if t is not task]
 
-            cursor.execute('DELETE FROM "crawler_queue" WHERE "index" = ? LIMIT 1;')
+            cursor.execute('DELETE FROM "queue" WHERE "index" = ? LIMIT 1;')
 
     def __del__(self) -> None:
         self.connection.close()
