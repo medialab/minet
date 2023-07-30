@@ -9,11 +9,18 @@ from queue import Empty
 from threading import Lock
 from contextlib import contextmanager
 from dataclasses import dataclass
+from datetime import datetime
 
 from minet.crawl.types import CrawlJob
 
-SQL_CREATE_TABLE = """
+
+def timestamp() -> int:
+    return int(datetime.now().timestamp())
+
+
+SQL_CREATE = """
 PRAGMA journal_mode=wal;
+
 CREATE TABLE "queue" (
     "index" INTEGER PRIMARY KEY,
     "status" INTEGER NOT NULL DEFAULT 0,
@@ -26,12 +33,22 @@ CREATE TABLE "queue" (
     "data" BLOB,
     "parent" TEXT
 );
-CREATE INDEX "idx_priority_index" ON "queue" ("priority", "index");
-CREATE INDEX "idx_group" ON "queue" ("group");
-CREATE INDEX "idx_status" ON "queue" ("status");
+CREATE INDEX "idx_queue_priority_index" ON "queue" ("priority", "index");
+CREATE INDEX "idx_queue_group" ON "queue" ("group");
+CREATE INDEX "idx_queue_status" ON "queue" ("status");
+
+CREATE TABLE "throttle" (
+    "group" TEXT PRIMARY KEY,
+    "timestamp" INTEGER NOT NULL
+) WITHOUT ROWID;
+
+CREATE TABLE "parallelism" (
+    "group" TEXT PRIMARY KEY,
+    "count" INTEGER NOT NULL
+) WITHOUT ROWID;
 """
 
-SQL_INSERT = """
+SQL_INSERT_JOB = """
 INSERT INTO "queue" (
     "index",
     "id",
@@ -45,20 +62,40 @@ INSERT INTO "queue" (
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 """
 
-SQL_GET_FIFO = """
-SELECT
-    "index",
-    "id",
-    "url",
+SQL_INSERT_THROTTLE = """
+INSERT INTO "throttle" (
     "group",
-    "depth",
-    "spider",
-    "priority",
-    "data",
-    "parent"
+    "timestamp"
+) VALUES (?, ?);
+"""
+
+SQL_INSERT_PARALLELISM = """
+INSERT INTO "parallelism" (
+    "group",
+    "count"
+) VALUES (?, ?);
+"""
+
+SQL_GET_JOB = """
+SELECT
+    "queue"."index",
+    "queue"."id",
+    "queue"."url",
+    "queue"."group",
+    "queue"."depth",
+    "queue"."spider",
+    "queue"."priority",
+    "queue"."data",
+    "queue"."parent"
 FROM "queue"
-WHERE "status" = 0
-ORDER BY "priority" ASC, "index" ASC
+LEFT JOIN "throttle" ON "queue"."group" = "throttle"."group"
+LEFT JOIN "parallelism" ON "queue"."group" = "parallelism"."group"
+WHERE (
+   "queue"."status" = 0
+   AND ("throttle"."timestamp" IS NULL OR "throttle"."timestamp" <= ?)
+   AND ("parallelism"."count" IS NULL OR "parallelism"."count" < ?)
+)
+ORDER BY "priority" ASC, "index" %s
 LIMIT 1;
 """
 
@@ -69,6 +106,8 @@ class CrawlerQueueTask:
     job: CrawlJob
 
 
+# TODO: the database should probably drop useless throttle info + parallelism + vacuum
+# once every task operation
 class CrawlerQueue:
     # Params
     persistent: bool
@@ -123,12 +162,14 @@ class CrawlerQueue:
 
         # Setup
         if not self.resuming:
-            self.connection.executescript(SQL_CREATE_TABLE)
+            self.connection.executescript(SQL_CREATE)
             self.connection.commit()
         else:
             with self.transaction(self.task_lock) as cursor:
                 cursor.execute('SELECT max("index") FROM "queue";')
                 self.counter = cursor.fetchone()[0]
+                cursor.execute('DELETE FROM "parallelism";')
+                cursor.execute("VACUUM;")
 
     @contextmanager
     def transaction(self, lock: Lock):
@@ -167,30 +208,21 @@ class CrawlerQueue:
                 )
                 self.counter += 1
 
-            cursor.executemany(SQL_INSERT, rows)
+            cursor.executemany(SQL_INSERT_JOB, rows)
             return cursor.rowcount
 
     def put(self, job: CrawlJob) -> None:
         self.put_many((job,))
-
-    def __get_groups_blacklist(self) -> List[str]:
-        blacklist: List[str] = []
-
-        for group, tasks in self.tasks.items():
-            if group is None:
-                continue
-
-            if len(tasks) >= self.group_parallelism:
-                blacklist.append(group)
-
-        return blacklist
 
     def get(self, block: bool = True) -> CrawlJob:
         if block:
             raise NotImplementedError
 
         with self.transaction(self.task_lock) as cursor:
-            cursor.execute(SQL_GET_FIFO)
+            cursor.execute(
+                SQL_GET_JOB % ("ASC" if not self.is_lifo else "DESC"),
+                (timestamp(), self.group_parallelism),
+            )
             row = cursor.fetchone()
 
             if row is None:
