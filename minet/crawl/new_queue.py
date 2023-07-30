@@ -93,9 +93,12 @@ INSERT OR REPLACE INTO "parallelism" ("group", "count") VALUES (
 )
 """
 
+SQL_UPDATE_THROTTLE = """
+INSERT OR REPLACE INTO "throttle" ("group", "timestamp") VALUES (?, ?);
+"""
 
-# TODO: the database should probably drop useless throttle info + parallelism + vacuum
-# once every task operation
+
+# TODO: callable throttle, callable parallelism
 class CrawlerQueue:
     # Params
     persistent: bool
@@ -348,7 +351,9 @@ class CrawlerQueue:
                 (job.group,),
             )
 
-            # TODO: update throttle info here and validate parallelism = 1
+            # TODO: validate parallelism = 1?
+            if self.throttle != 0:
+                cursor.execute(SQL_UPDATE_THROTTLE, (job.group, now() + self.throttle))
 
             self.current_task_done_count += 0
 
