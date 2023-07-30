@@ -99,6 +99,7 @@ INSERT OR REPLACE INTO "throttle" ("group", "timestamp") VALUES (?, ?);
 
 
 # TODO: callable throttle, callable parallelism
+# TODO: should be able to work with optional group parallelism
 class CrawlerQueue:
     # Params
     persistent: bool
@@ -240,10 +241,12 @@ class CrawlerQueue:
     def put(self, job: CrawlJob) -> None:
         self.put_many((job,))
 
-    def get(self, block: bool = True) -> CrawlJob:
-        if block:
-            raise NotImplementedError
-
+    # NOTE: we will need to cheat a little bit to work with quenouille here.
+    # This method will actually block but raise Empty if the queue is drained.
+    # We will also need to handle throttling and group parallelism
+    # on our own and use buffer_size=0 on quenouille's size to bypass the
+    # optimistic buffer that trumps the true ordering of the given queue.
+    def get_nowait(self) -> CrawlJob:
         need_to_wait = False
         need_to_wait_for_at_least = None
 
@@ -312,14 +315,6 @@ class CrawlerQueue:
                 self.tasks[job] = index
 
                 return job
-
-    # NOTE: we will need to cheat a little bit to work with quenouille here.
-    # This method will actually block but raise Empty if the queue is drained.
-    # We will also need to handle throttling and group parallelism
-    # on our own and use buffer_size=0 on quenouille's size to bypass the
-    # optimistic buffer that trumps the true ordering of the given queue.
-    def get_nowait(self) -> CrawlJob:
-        return self.get(False)
 
     def worked_groups(self) -> Counter[str]:
         g = Counter()
