@@ -198,8 +198,9 @@ class CrawlerQueue:
 
             index = row[0]
 
+            # NOTE: sqlite does not always support LIMIT on UPDATE
             cursor.execute(
-                'UPDATE "crawler_queue" SET "status" = 1 WHERE "index" = ? LIMIT 1;',
+                'UPDATE "crawler_queue" SET "status" = 1 WHERE "index" = ?;',
                 (index,),
             )
 
