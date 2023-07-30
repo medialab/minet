@@ -9,6 +9,7 @@ from queue import Empty
 from threading import Lock, Condition
 from contextlib import contextmanager
 from datetime import datetime
+from random import randint
 from quenouille.constants import TIMER_EPSILON
 
 from minet.crawl.types import CrawlJob
@@ -18,6 +19,11 @@ from minet.crawl.utils import iterate_over_cursor
 def now() -> float:
     return datetime.now().timestamp()
 
+
+# NOTE:
+# status=0 is to do
+# status=1 is doing
+# status=2 is done, but kept until cleanup
 
 SQL_CREATE = """
 PRAGMA journal_mode=wal;
@@ -138,7 +144,10 @@ class CrawlerQueue:
         if path is None:
             self.persistent = False
             # NOTE: I am not sure this is advisable most of the time
-            full_path = "file:%i.db?mode=memory&cache=shared" % id(self)
+            full_path = "file:%i-%i.db?mode=memory&cache=shared" % (
+                id(self),
+                randint(0, 2**32 - 1),
+            )
         else:
             full_path = join(path, db_name)
 
@@ -176,7 +185,7 @@ class CrawlerQueue:
             else:
                 # We need to restart our counter
                 cursor.execute('SELECT max("index") FROM "queue";')
-                self.counter = cursor.fetchone()[0]
+                self.counter = cursor.fetchone()[0] + 1
 
                 # We need to clear status=1
                 # NOTE: we don't clear status > 1 just in case we need to use those
@@ -359,6 +368,10 @@ class CrawlerQueue:
 
     def __cleanup(self, cursor: sqlite3.Cursor) -> None:
         self.current_task_done_count = 0
+        # NOTE: we make sure to keep the last index given to ensure we can resume safely
+        cursor.execute(
+            'DELETE FROM "queue" WHERE "status" = 2 AND "index" <> (SELECT max("index") FROM "queue" ORDER BY "index");'
+        )
         cursor.execute('DELETE FROM "parallelism" WHERE "count" < 1;')
         cursor.execute('DELETE FROM "throttle" WHERE "timestamp" < ?', (now(),))
         cursor.connection.commit()
@@ -370,6 +383,7 @@ class CrawlerQueue:
 
     def __clear(self, cursor: sqlite3.Cursor) -> None:
         self.current_task_done_count = 0
+        cursor.execute('DELETE FROM "queue";')
         cursor.execute('DELETE FROM "parallelism";')
         cursor.execute('DELETE FROM "throttle";')
         cursor.connection.commit()
@@ -386,7 +400,9 @@ class CrawlerQueue:
             if index is None:
                 raise RuntimeError("job is not being worked")
 
-            cursor.execute('DELETE FROM "queue" WHERE "index" = ?;', (index,))
+            cursor.execute(
+                'UPDATE "queue" SET "status" = 2 WHERE "index" = ?;', (index,)
+            )
             cursor.execute(
                 'UPDATE "parallelism" SET "count" = "count" - 1 WHERE "group" = ?;',
                 (job.group,),
