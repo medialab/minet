@@ -262,7 +262,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         normalized_url_cache: bool = False,
         max_depth: Optional[int] = None,
         resume: bool = False,
-        dfs: bool = False,
+        lifo: bool = False,
         writer_root_directory: Optional[str] = None,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         throttle: float = DEFAULT_THROTTLE,
@@ -331,7 +331,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             resume=resume,
             group_parallelism=domain_parallelism,
             throttle=throttle,
-            lifo=dfs,  # TODO: rename
+            lifo=lifo,
         )
         self.persistent = self.queue.persistent
         self.resuming = (

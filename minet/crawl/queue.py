@@ -140,7 +140,6 @@ class CrawlerQueueRecord:
 
 
 # TODO: callable throttle, callable parallelism
-# TODO: rename dfs kwarg
 # TODO: deal with raising when condition is waiting (we need to have a cleanup callback from quenouille)
 # TODO: should be able to work with optional group parallelism
 # TODO: test resume integrity with low cleanup_interval and rethink the issue
