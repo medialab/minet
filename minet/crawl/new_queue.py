@@ -1,4 +1,6 @@
-from typing import Counter, Dict, Iterable, Optional
+from typing import Counter, Dict, Iterable, Iterator, Optional
+from minet.types import Literal
+from casanova.types import AnyWritableCSVRowPart
 
 import sqlite3
 import pickle
@@ -10,6 +12,7 @@ from threading import Lock, Condition
 from contextlib import contextmanager
 from datetime import datetime
 from random import randint
+from dataclasses import dataclass
 from quenouille.constants import TIMER_EPSILON
 
 from minet.crawl.types import CrawlJob
@@ -92,6 +95,22 @@ ORDER BY "priority" ASC, "index" %s
 LIMIT 1;
 """
 
+SQL_DUMP = """
+SELECT
+    "index",
+    "id",
+    "url",
+    "group",
+    "depth",
+    "spider",
+    "priority",
+    "data",
+    "parent",
+    "status"
+FROM "queue"
+ORDER BY "index";
+"""
+
 SQL_INCREMENT_PARALLELISM = """
 INSERT OR REPLACE INTO "parallelism" ("group", "count") VALUES (
     ?,
@@ -102,6 +121,19 @@ INSERT OR REPLACE INTO "parallelism" ("group", "count") VALUES (
 SQL_UPDATE_THROTTLE = """
 INSERT OR REPLACE INTO "throttle" ("group", "timestamp") VALUES (?, ?);
 """
+
+CrawlerQueueJobStatus = Literal["todo", "doing", "done"]
+
+
+@dataclass
+class CrawlerQueueRecord:
+    index: str
+    status: CrawlerQueueJobStatus
+    job: CrawlJob
+
+    def __csv_row__(self) -> AnyWritableCSVRowPart:
+        row = [self.index, self.status] + list(self.job.__csv_row__())
+        return row
 
 
 # TODO: callable throttle, callable parallelism
@@ -288,7 +320,6 @@ class CrawlerQueue:
         need_to_wait_for_at_least = None
 
         while True:
-
             # Waiting?
             # NOTE: we wait here so we can: 1. avoid recursion and 2. release
             # the transaction lock
@@ -365,6 +396,32 @@ class CrawlerQueue:
                 g[row[0]] = row[1]
 
         return g
+
+    def __iter__(self) -> Iterator[CrawlerQueueRecord]:
+        with self.global_transaction() as cursor:
+            cursor.execute(SQL_DUMP)
+
+            for row in iterate_over_cursor(cursor):
+                job = CrawlJob(
+                    row[2],
+                    id=row[1],
+                    group=row[3],
+                    depth=row[4],
+                    spider=row[5],
+                    priority=row[6],
+                    data=pickle.loads(row[7]) if row[7] is not None else None,
+                    parent=row[8],
+                )
+
+                status_code = row[9]
+                status = "todo"
+
+                if status_code == 1:
+                    status = "doing"
+                elif status_code == 2:
+                    status = "done"
+
+                yield CrawlerQueueRecord(index=row[0], status=status, job=job)
 
     def __cleanup(self, cursor: sqlite3.Cursor) -> None:
         self.current_task_done_count = 0

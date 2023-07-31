@@ -27,6 +27,12 @@ class TestCrawlerQueue:
         with raises(Empty):
             queue.get_nowait()
 
+        queue.put(CrawlJob("https://lefigaro.fr"))
+
+        jobs = list(queue)
+
+        assert [(j.index, j.status) for j in jobs] == [(0, "doing"), (1, "todo")]
+
     def test_worked_groups(self):
         queue = CrawlerQueue(group_parallelism=2)
 
