@@ -149,6 +149,7 @@ class CrawlerQueueRecord:
 # TODO: indices on the parallelism table?
 # TODO: write up concerns about right join
 # TODO: test where the group allowance is decremented instead
+# TODO: quenouille should have an option to block queue, switch to block
 # TODO: maybe we should put the conditions on the JOIN directives in which case we need indices? (nope, else the WHERE will be hard to anticipate)
 # TODO: deal with raising when condition is waiting (we need to have a cleanup callback from quenouille)
 # TODO: test resume integrity with low cleanup_interval and rethink the issue
@@ -494,6 +495,7 @@ class CrawlerQueue:
                 (job.group,),
             )
 
+            # TODO: currently, contrary to quenouille, null grpup can be throttled?
             throttle = self.throttle
 
             if callable(throttle):

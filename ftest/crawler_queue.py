@@ -10,6 +10,10 @@ def worker(job: CrawlJob) -> CrawlJob:
     return job
 
 
+# Typical tests:
+#   - throttling
+#   - group parallelism
+#   - None group
 queue = CrawlerQueue()
 
 jobs = [CrawlJob("1", group="A"), CrawlJob("2", group="A"), CrawlJob("3", group="A")]

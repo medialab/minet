@@ -115,3 +115,51 @@ class TestCrawlerQueue:
 
         output = consume(queue)
         assert output == [job3, job5, job1, job2, job6, job4]
+
+    def test_resuming(self, tmp_path):
+        job1 = CrawlJob("A", group="A")
+        job2 = CrawlJob("B", group="B")
+        job3 = CrawlJob("C", group="C")
+
+        queue = CrawlerQueue(tmp_path, cleanup_interval=1)
+
+        queue.put(job1)
+        queue.put(job2)
+        queue.put(job3)
+
+        assert len(queue) == 3
+
+        assert queue.get_nowait() == job1
+
+        assert len(queue) == 2
+
+        del queue
+
+        queue = CrawlerQueue(tmp_path, cleanup_interval=1, resume=True)
+
+        assert len(queue) == 3
+
+        assert queue.get_nowait() == job1
+        queue.task_done(job1)
+
+        del queue
+
+        queue = CrawlerQueue(tmp_path, cleanup_interval=1, resume=True)
+
+        assert queue.get_nowait() == job2
+        assert queue.get_nowait() == job3
+
+        queue.task_done(job2)
+        queue.task_done(job3)
+
+        assert len(queue) == 0
+
+        del queue
+
+        queue = CrawlerQueue(tmp_path, cleanup_interval=1, resume=True)
+
+        assert len(queue) == 0
+
+        queue.put(job1)
+        # TODO: cleanup interval is not respected?
+        # print(list(queue.dump()))
