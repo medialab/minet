@@ -17,8 +17,8 @@ from quenouille.constants import TIMER_EPSILON
 from minet.crawl.types import CrawlJob
 from minet.crawl.utils import iterate_over_cursor
 
-AnyThrottle = Union[float, Callable[[str], float]]
-AnyParallelism = Union[int, Callable[[str], int]]
+AnyThrottle = Union[float, Callable[[CrawlJob], float]]
+AnyParallelism = Union[int, Callable[[CrawlJob], int]]
 
 
 def now() -> float:
@@ -146,10 +146,11 @@ class CrawlerQueueRecord:
 
 # TODO: explain query plan
 # TODO: tests with null group
+# TODO: indices on the parallelism table?
 # TODO: test where the group allowance is decremented instead
 # TODO: maybe we should put the conditions on the JOIN directives in which case we need indices? (nope, else the WHERE will be hard to anticipate)
 # TODO: currently group parallelism cannot be callable, we need one more row in the related table
-# TODO: callable throttle, callable parallelism
+# TODO: callable throttle
 # TODO: deal with raising when condition is waiting (we need to have a cleanup callback from quenouille)
 # TODO: should be able to work with optional group parallelism
 # TODO: test resume integrity with low cleanup_interval and rethink the issue
@@ -158,7 +159,7 @@ class CrawlerQueue:
     persistent: bool
     resuming: bool
     is_lifo: bool
-    group_parallelism: int
+    group_parallelism: AnyParallelism
     throttle: float
 
     # State
@@ -178,7 +179,7 @@ class CrawlerQueue:
         resume: bool = False,
         inspect: bool = False,
         lifo: bool = False,
-        group_parallelism: int = 1,
+        group_parallelism: AnyParallelism = 1,
         throttle: float = 0,
         cleanup_interval: int = 5000,
     ):
@@ -398,11 +399,15 @@ class CrawlerQueue:
                     parent=row[8],
                 )
 
-                # TODO: callable group parallelism
                 if job.group is not None:
+                    allowed = self.group_parallelism
+
+                    if callable(allowed):
+                        allowed = allowed(job)
+
                     cursor.execute(
                         SQL_INCREMENT_PARALLELISM,
-                        (job.group, job.group, self.group_parallelism),
+                        (job.group, job.group, allowed),
                     )
 
                 # NOTE: jobs are hashable by id
