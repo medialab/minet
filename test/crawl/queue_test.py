@@ -70,7 +70,7 @@ class TestCrawlerQueue:
 
         assert queue.worked_groups() == {}
 
-    def test_fifo_lifo(self):
+    def test_fifo_lifo_order(self):
         job1 = CrawlJob("A", group="A")
         job2 = CrawlJob("B", group="B")
         job3 = CrawlJob("C", group="C")
@@ -92,3 +92,26 @@ class TestCrawlerQueue:
         output = consume(queue)
 
         assert output == list(reversed(jobs))
+
+    def test_priority_order(self):
+        job1 = CrawlJob("A", group="A", priority=2)
+        job2 = CrawlJob("B", group="B", priority=4)
+        job3 = CrawlJob("C", group="C", priority=0)
+        job4 = CrawlJob("D", group="D", priority=5)
+        job5 = CrawlJob("E", group="E", priority=1)
+        job6 = CrawlJob("F", group="F", priority=5)
+
+        jobs = [job1, job2, job3, job4, job5, job6]
+
+        queue = CrawlerQueue()
+        queue.put_many(jobs)
+
+        output = consume(queue)
+
+        assert output == [job3, job5, job1, job2, job4, job6]
+
+        queue = CrawlerQueue(lifo=True)
+        queue.put_many(jobs)
+
+        output = consume(queue)
+        assert output == [job3, job5, job1, job2, job6, job4]
