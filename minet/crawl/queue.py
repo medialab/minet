@@ -147,12 +147,10 @@ class CrawlerQueueRecord:
 # TODO: explain query plan
 # TODO: tests with null group
 # TODO: indices on the parallelism table?
+# TODO: write up concerns about right join
 # TODO: test where the group allowance is decremented instead
 # TODO: maybe we should put the conditions on the JOIN directives in which case we need indices? (nope, else the WHERE will be hard to anticipate)
-# TODO: currently group parallelism cannot be callable, we need one more row in the related table
-# TODO: callable throttle
 # TODO: deal with raising when condition is waiting (we need to have a cleanup callback from quenouille)
-# TODO: should be able to work with optional group parallelism
 # TODO: test resume integrity with low cleanup_interval and rethink the issue
 class CrawlerQueue:
     # Params
@@ -160,7 +158,7 @@ class CrawlerQueue:
     resuming: bool
     is_lifo: bool
     group_parallelism: AnyParallelism
-    throttle: float
+    throttle: AnyThrottle
 
     # State
     tasks: Dict[CrawlJob, int]
@@ -180,7 +178,7 @@ class CrawlerQueue:
         inspect: bool = False,
         lifo: bool = False,
         group_parallelism: AnyParallelism = 1,
-        throttle: float = 0,
+        throttle: AnyThrottle = 0,
         cleanup_interval: int = 5000,
     ):
         self.persistent = True
@@ -496,9 +494,13 @@ class CrawlerQueue:
                 (job.group,),
             )
 
-            # TODO: validate parallelism = 1?
-            if self.throttle > 0:
-                cursor.execute(SQL_UPDATE_THROTTLE, (job.group, now() + self.throttle))
+            throttle = self.throttle
+
+            if callable(throttle):
+                throttle = throttle(job)
+
+            if throttle > 0:
+                cursor.execute(SQL_UPDATE_THROTTLE, (job.group, now() + throttle))
 
             self.current_task_done_count += 0
 
