@@ -29,7 +29,7 @@ class TestCrawlerQueue:
 
         queue.put(CrawlJob("https://lefigaro.fr"))
 
-        jobs = list(queue)
+        jobs = list(queue.dump())
 
         assert [(j.index, j.status) for j in jobs] == [(0, "doing"), (1, "todo")]
 

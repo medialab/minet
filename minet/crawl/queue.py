@@ -1,4 +1,4 @@
-from typing import Counter, Dict, List, Iterable, Iterator, Optional
+from typing import Counter, Dict, List, Iterable, Iterator, Optional, Callable, Union
 from minet.types import Literal
 
 import sqlite3
@@ -16,6 +16,9 @@ from quenouille.constants import TIMER_EPSILON
 
 from minet.crawl.types import CrawlJob
 from minet.crawl.utils import iterate_over_cursor
+
+AnyThrottle = Union[float, Callable[[str], float]]
+AnyParallelism = Union[int, Callable[[str], int]]
 
 
 def now() -> float:
@@ -139,6 +142,8 @@ class CrawlerQueueRecord:
         return row
 
 
+# TODO: maybe we should put the conditions on the JOIN directives in which case we need indices?
+# TODO: currently group parallelism cannot be callable, we need one more row in the related table
 # TODO: callable throttle, callable parallelism
 # TODO: deal with raising when condition is waiting (we need to have a cleanup callback from quenouille)
 # TODO: should be able to work with optional group parallelism
