@@ -1,8 +1,23 @@
+from typing import List
+
 from pytest import raises
 from queue import Empty
 
 from minet.crawl.types import CrawlJob
 from minet.crawl.queue import CrawlerQueue
+
+
+# Beware: this may block if you are not careful
+def consume(q: CrawlerQueue) -> List[CrawlJob]:
+    jobs = []
+
+    while True:
+        try:
+            jobs.append(q.get_nowait())
+        except Empty:
+            break
+
+    return jobs
 
 
 class TestCrawlerQueue:
@@ -54,3 +69,26 @@ class TestCrawlerQueue:
         queue.task_done(job1)
 
         assert queue.worked_groups() == {}
+
+    def test_fifo_lifo(self):
+        job1 = CrawlJob("A", group="A")
+        job2 = CrawlJob("B", group="B")
+        job3 = CrawlJob("C", group="C")
+        job4 = CrawlJob("D", group="D")
+        job5 = CrawlJob("E", group="E")
+
+        jobs = [job1, job2, job3, job4, job5]
+
+        queue = CrawlerQueue()
+        queue.put_many(jobs)
+
+        output = consume(queue)
+
+        assert output == jobs
+
+        queue = CrawlerQueue(lifo=True)
+        queue.put_many(jobs)
+
+        output = consume(queue)
+
+        assert output == list(reversed(jobs))
