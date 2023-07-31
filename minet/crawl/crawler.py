@@ -43,7 +43,7 @@ from minet.crawl.spiders import (
     FunctionSpiderCallable,
 )
 from minet.crawl.exceptions import CrawlerAlreadyFinishedError
-from minet.crawl.queue import CrawlerQueue
+from minet.crawl.queue import CrawlerQueue, AnyParallelism, AnyThrottle
 from minet.crawl.state import CrawlerState
 from minet.crawl.url_cache import URLCache
 from minet.web import request, EXPECTED_WEB_ERRORS, AnyTimeout
@@ -264,8 +264,8 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         resume: bool = False,
         lifo: bool = False,
         writer_root_directory: Optional[str] = None,
-        domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
-        throttle: float = DEFAULT_THROTTLE,
+        domain_parallelism: AnyParallelism = DEFAULT_DOMAIN_PARALLELISM,
+        throttle: AnyThrottle = DEFAULT_THROTTLE,
         process_pool_workers: Optional[int] = None,
         max_workers: Optional[int] = None,
         wait: bool = True,
