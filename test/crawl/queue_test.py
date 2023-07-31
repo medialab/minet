@@ -45,11 +45,11 @@ class TestCrawlerQueue:
         queue.get_nowait()
         queue.get_nowait()
 
-        assert queue.worked_groups() == {"A": 2}
+        assert queue.worked_groups() == {"A": (2, 2)}
 
         queue.task_done(job2)
 
-        assert queue.worked_groups() == {"A": 1}
+        assert queue.worked_groups() == {"A": (1, 2)}
 
         queue.task_done(job1)
 

@@ -1,4 +1,4 @@
-from typing import Counter, Dict, List, Iterable, Iterator, Optional, Callable, Union
+from typing import Dict, List, Tuple, Iterable, Iterator, Optional, Callable, Union
 from minet.types import Literal
 
 import sqlite3
@@ -56,7 +56,8 @@ CREATE INDEX "idx_throttle_timestamp" ON "throttle" ("timestamp");
 
 CREATE TABLE "parallelism" (
     "group" TEXT PRIMARY KEY,
-    "count" INTEGER NOT NULL
+    "count" INTEGER NOT NULL,
+    "allowed" INTEGER NOT NULL
 ) WITHOUT ROWID;
 """
 
@@ -91,7 +92,7 @@ LEFT JOIN "parallelism" ON "queue"."group" = "parallelism"."group"
 WHERE (
    "queue"."status" = 0
    AND ("throttle"."timestamp" IS NULL OR "throttle"."timestamp" <= ?)
-   AND ("parallelism"."count" IS NULL OR "parallelism"."count" < ?)
+   AND ("parallelism"."count" IS NULL OR "parallelism"."count" < "parallelism"."allowed")
 )
 ORDER BY "priority" ASC, "index" %s
 LIMIT 1;
@@ -114,9 +115,10 @@ ORDER BY "index";
 """
 
 SQL_INCREMENT_PARALLELISM = """
-INSERT OR REPLACE INTO "parallelism" ("group", "count") VALUES (
+INSERT OR REPLACE INTO "parallelism" ("group", "count", "allowed") VALUES (
     ?,
-    COALESCE((SELECT ("count" + 1) FROM "parallelism" WHERE "group" = ? LIMIT 1), 1)
+    COALESCE((SELECT ("count" + 1) FROM "parallelism" WHERE "group" = ? LIMIT 1), 1),
+    ?
 )
 """
 
@@ -142,7 +144,10 @@ class CrawlerQueueRecord:
         return row
 
 
-# TODO: maybe we should put the conditions on the JOIN directives in which case we need indices?
+# TODO: explain query plan
+# TODO: tests with null group
+# TODO: test where the group allowance is decremented instead
+# TODO: maybe we should put the conditions on the JOIN directives in which case we need indices? (nope, else the WHERE will be hard to anticipate)
 # TODO: currently group parallelism cannot be callable, we need one more row in the related table
 # TODO: callable throttle, callable parallelism
 # TODO: deal with raising when condition is waiting (we need to have a cleanup callback from quenouille)
@@ -350,7 +355,7 @@ class CrawlerQueue:
             with self.task_transaction() as cursor:
                 cursor.execute(
                     SQL_GET_JOB % ("ASC" if not self.is_lifo else "DESC"),
-                    (now(), self.group_parallelism),
+                    (now(),),
                 )
                 row = cursor.fetchone()
 
@@ -395,23 +400,26 @@ class CrawlerQueue:
 
                 # TODO: callable group parallelism
                 if job.group is not None:
-                    cursor.execute(SQL_INCREMENT_PARALLELISM, (job.group, job.group))
+                    cursor.execute(
+                        SQL_INCREMENT_PARALLELISM,
+                        (job.group, job.group, self.group_parallelism),
+                    )
 
                 # NOTE: jobs are hashable by id
                 self.tasks[job] = index
 
                 return job
 
-    def worked_groups(self) -> Counter[str]:
-        g = Counter()
+    def worked_groups(self) -> Dict[str, Tuple[int, int]]:
+        g = {}
 
         with self.global_transaction() as cursor:
             cursor.execute(
-                'SELECT "group", "count" FROM "parallelism" WHERE "count" > 0;'
+                'SELECT "group", "count", "allowed" FROM "parallelism" WHERE "count" > 0;'
             )
 
             for row in iterate_over_cursor(cursor):
-                g[row[0]] = row[1]
+                g[row[0]] = (row[1], row[2])
 
         return g
 
