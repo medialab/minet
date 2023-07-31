@@ -193,7 +193,7 @@ class CrawlJob(Generic[CrawlJobDataType]):
                 "data",
                 "parent",
             ),
-            conditionals=("data", "spider", "parent", "group"),
+            conditionals=("data", "spider", "parent", "group", "priority"),
         )
 
 

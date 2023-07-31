@@ -16,5 +16,5 @@ def action(cli_args):
         cli_args.output, fieldnames=CrawlerQueueRecord.fieldnames()
     )
 
-    for record in queue:
+    for record in queue.dump():
         writer.writerow(record)

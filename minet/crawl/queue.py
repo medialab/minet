@@ -140,6 +140,7 @@ class CrawlerQueueRecord:
 
 
 # TODO: callable throttle, callable parallelism
+# TODO: deal with raising when condition is waiting
 # TODO: should be able to work with optional group parallelism
 # TODO: perform tests for basic throttling and parallelism
 # TODO: test resume integrity with low cleanup_interval and rethink the issue
@@ -362,7 +363,7 @@ class CrawlerQueue:
                     cursor.execute('SELECT min("timestamp") FROM "throttle" LIMIT 1;')
                     throttle_row = cursor.fetchone()
 
-                    if throttle_row is not None:
+                    if throttle_row is not None and throttle_row[0] is not None:
                         need_to_wait_for_at_least = (
                             max(0, throttle_row[0] - now()) + TIMER_EPSILON
                         )
@@ -410,7 +411,7 @@ class CrawlerQueue:
 
         return g
 
-    def __iter__(self) -> Iterator[CrawlerQueueRecord]:
+    def dump(self) -> Iterator[CrawlerQueueRecord]:
         with self.global_transaction() as cursor:
             cursor.execute(SQL_DUMP)
 
@@ -479,7 +480,7 @@ class CrawlerQueue:
             )
 
             # TODO: validate parallelism = 1?
-            if self.throttle != 0:
+            if self.throttle > 0:
                 cursor.execute(SQL_UPDATE_THROTTLE, (job.group, now() + self.throttle))
 
             self.current_task_done_count += 0
