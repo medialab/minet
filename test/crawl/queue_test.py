@@ -2,7 +2,7 @@ from pytest import raises
 from queue import Empty
 
 from minet.crawl.types import CrawlJob
-from minet.crawl.new_queue import CrawlerQueue
+from minet.crawl.queue import CrawlerQueue
 
 
 class TestCrawlerQueue:

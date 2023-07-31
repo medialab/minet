@@ -155,7 +155,11 @@ class CrawlJob(Generic[CrawlJobDataType]):
             self.priority,
             self.data
             if not serialize_data
-            else json.dumps(self.data, ensure_ascii=False),
+            else (
+                json.dumps(self.data, ensure_ascii=False)
+                if self.data is not None
+                else None
+            ),
             self.parent,
         )
 

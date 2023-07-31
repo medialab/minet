@@ -18,7 +18,6 @@ ebbe==1.13.2
 json5==0.9.11
 lxml==4.9.2
 nanoid==2.0.0
-persist-queue==0.8.0
 playwright==1.35.0
 playwright_stealth==1.0.5
 pyyaml==6.0.1

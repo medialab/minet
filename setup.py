@@ -33,7 +33,6 @@ setup(
         "json5>=0.8.5",
         "lxml>=4.3.0",
         "nanoid>=2,<3",
-        "persist-queue>=0.7,<0.9",
         "playwright>=1.35,<1.36",
         "playwright_stealth>=1,<2",
         "pyyaml",
