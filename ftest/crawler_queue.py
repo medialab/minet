@@ -5,7 +5,7 @@ from minet.crawl.queue import CrawlerQueue
 
 
 def worker(job: CrawlJob) -> CrawlJob:
-    time.sleep(2)
+    time.sleep(1)
     return job
 
 
