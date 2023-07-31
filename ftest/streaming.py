@@ -22,11 +22,11 @@ if cli_args.cancel_after is not None:
     Timer(cli_args.cancel_after, cancel).start()
 
 with BenchTimer("atomic_request"):
-    response, body = request(
+    response = request(
         "http://100poursciences.fr/stream",
         timeout=cli_args.timeout,
         cancel_event=cancel_event,
     )
 
 print("Status:", response.status)
-print("Body:", body)
+print("Body:", response.body)

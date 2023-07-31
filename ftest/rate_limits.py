@@ -1,5 +1,4 @@
-import time
-from minet import (
+from minet.rate_limiting import (
     RateLimitedIterator,
     RateLimiterState,
     RetryableIterator,
