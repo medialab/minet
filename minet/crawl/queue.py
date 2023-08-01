@@ -495,14 +495,15 @@ class CrawlerQueue:
                 (job.group,),
             )
 
-            # TODO: currently, contrary to quenouille, null grpup can be throttled?
-            throttle = self.throttle
+            # NOTE: null group is not throttled, the same as `quenouille`
+            if job.group is not None:
+                throttle = self.throttle
 
-            if callable(throttle):
-                throttle = throttle(job)
+                if callable(throttle):
+                    throttle = throttle(job)
 
-            if throttle > 0:
-                cursor.execute(SQL_UPDATE_THROTTLE, (job.group, now() + throttle))
+                if throttle > 0:
+                    cursor.execute(SQL_UPDATE_THROTTLE, (job.group, now() + throttle))
 
             self.current_task_done_count += 1
 
