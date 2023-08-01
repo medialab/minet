@@ -146,6 +146,13 @@ class CrawlerQueueRecord:
         return row
 
 
+# NOTE: this exception is only used when we need to manually
+# unblock the queue, e.g. when quenouille must teardown
+class BrokenCrawlerQueue(Exception):
+    pass
+
+
+# TODO: explain we must use buffer_size=0, no external parallelism/throttle, use block and panic
 # TODO: explain query plan
 # TODO: tests with null group
 # TODO: indices on the parallelism table?
@@ -170,8 +177,10 @@ class CrawlerQueue:
     counter: int
     cleanup_interval: int
     waiter: Condition
+    currently_waiting_count: int
     put_lock: Lock
     task_lock: Lock
+    broken: bool
 
     def __init__(
         self,
@@ -224,8 +233,10 @@ class CrawlerQueue:
         self.current_task_done_count = 0
 
         self.waiter = Condition()
+        self.currently_waiting_count = 0
         self.put_lock = Lock()
         self.task_lock = Lock()
+        self.broken = False
 
         # NOTE: we need two connection if we are to allow concurrent
         # put and task acquisition.
@@ -345,19 +356,32 @@ class CrawlerQueue:
     # We will also need to handle throttling and group parallelism
     # on our own and use buffer_size=0 on quenouille's size to bypass the
     # optimistic buffer that trumps the true ordering of the given queue.
-    def get_nowait(self) -> CrawlJob:
+    def get(self, block=True) -> CrawlJob:
+        if block:
+            raise NotImplementedError
+
         need_to_wait = False
         need_to_wait_for_at_least = None
 
         while True:
             # Waiting?
             # NOTE: we wait here so we can: 1. avoid recursion and 2. release
-            # the transaction lock
+            # the transaction lock to avoid an obvious deadlock.
             if need_to_wait:
                 with self.waiter:
+                    self.currently_waiting_count += 1
                     self.waiter.wait(need_to_wait_for_at_least)
+                    self.currently_waiting_count -= 1
+
                 need_to_wait = False
                 need_to_wait_for_at_least = None
+
+                # NOTE: this only happens when unblocking manually and
+                # usually the queue won't be used anymore afterwards.
+                # If we finally understand the contrary, we should
+                # add some #.repair method or change threading paradigm.
+                if self.broken:
+                    raise BrokenCrawlerQueue
 
             with self.task_transaction() as cursor:
                 cursor.execute(
@@ -420,6 +444,17 @@ class CrawlerQueue:
                 self.tasks[job] = index
 
                 return job
+
+    def get_nowait(self) -> CrawlJob:
+        return self.get(False)
+
+    def unblock(self) -> None:
+        with self.waiter:
+            if self.currently_waiting_count == 0:
+                return
+
+            self.broken = True
+            self.waiter.notify_all()
 
     def worked_groups(self) -> Dict[str, Tuple[int, int]]:
         g = {}

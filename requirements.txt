@@ -21,7 +21,7 @@ nanoid==2.0.0
 playwright==1.35.0
 playwright_stealth==1.0.5
 pyyaml==6.0.1
-quenouille==1.8.0
+quenouille==1.9.0
 rich==13.4.2
 rich-argparse==1.0.0
 soupsieve>=2.1,<3

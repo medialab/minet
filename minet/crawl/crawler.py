@@ -389,7 +389,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         # buffer. Remember also that this cannot work if quenouille must handle
         # group parallelism or throttle, which is why it's the crawler queue's
         # job now.
-        self.imap_kwargs = {"buffer_size": 0}
+        self.imap_kwargs = {"buffer_size": 0, "panic": self.queue.unblock}
 
         self.worker_kwargs = {
             "callback": callback,

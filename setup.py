@@ -36,7 +36,7 @@ setup(
         "playwright>=1.35,<1.36",
         "playwright_stealth>=1,<2",
         "pyyaml",
-        "quenouille>=1.8.0,<2",
+        "quenouille>=1.9,<2",
         "rich>=13,<14",
         "rich-argparse>=1,<2",
         "soupsieve>=2.1,<3",
