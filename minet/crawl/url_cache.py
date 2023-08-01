@@ -109,7 +109,7 @@ class SQLiteStringSet:
         # NOTE: it seems it's safer to reexecute pragmas anyway
         self.__connection.execute("PRAGMA journal_mode=wal;")
         self.__connection.execute(
-            'CREATE TABLE IF NOT EXISTS "set" ("key" TEXT PRIMARY KEY);'
+            'CREATE TABLE IF NOT EXISTS "set" ("key" TEXT PRIMARY KEY) WITHOUT ROWID;'
         )
         self.__connection.commit()
 
