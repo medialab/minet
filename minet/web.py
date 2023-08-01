@@ -391,7 +391,7 @@ def atomic_request(
         "headers": headers,
         "body": body,
         "preload_content": False,
-        "decode_content": False,
+        "decode_content": True,
         "release_conn": False,
         "redirect": False,
         "retries": False,
