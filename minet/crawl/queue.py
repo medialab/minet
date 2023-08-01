@@ -36,6 +36,8 @@ PRAGMA synchronous=normal;
 # status=1 is doing
 # status=2 is done, but kept until cleanup
 
+# NOTE: it seems a multi-index on ("piority", "status") is not
+# useful according to the explained query plan
 SQL_CREATE = """
 CREATE TABLE "queue" (
     "index" INTEGER PRIMARY KEY,
@@ -49,7 +51,6 @@ CREATE TABLE "queue" (
     "data" BLOB,
     "parent" TEXT
 );
-CREATE INDEX "idx_queue_priority_index" ON "queue" ("priority", "index");
 CREATE INDEX "idx_queue_status" ON "queue" ("status");
 
 CREATE TABLE "throttle" (
