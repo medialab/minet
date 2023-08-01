@@ -92,6 +92,9 @@ class AtomicSet(Generic[T]):
         with self.__lock:
             yield from self.__items
 
+    def close(self) -> None:
+        pass
+
 
 # NOTE: synchronous=normal is probably alright for our use-case
 SQL_CREATE = """
@@ -195,8 +198,11 @@ class SQLiteStringSet:
             for row in iterate_over_cursor(cursor):
                 yield row[0]
 
-    def __del__(self) -> None:
+    def close(self) -> None:
         self.__connection.close()
+
+    def __del__(self) -> None:
+        self.close()
 
 
 class URLCache:
@@ -235,3 +241,9 @@ class URLCache:
     def __contains__(self, url: str) -> bool:
         url = self.preprocessing(url)
         return url in self.__cache
+
+    def close(self) -> None:
+        self.__cache.close()
+
+    def __del__(self) -> None:
+        self.close()

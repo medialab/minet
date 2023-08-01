@@ -473,7 +473,11 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             self.process_pool.terminate()
 
         self.executor.shutdown(wait=self.executor.wait)
-        del self.queue
+
+        self.queue.close()
+
+        if self.url_cache:
+            self.url_cache.close()
 
     def __enter__(self):
         self.start()
