@@ -77,6 +77,11 @@ INSERT INTO "queue" (
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 """
 
+# NOTE: we thought about the opportunity of using
+# RIGHT JOIN as further optimization but it cannot work
+# without keeping a reference to all the groups in the "throttle"
+# and "parallelism" table at all time and this is hardly optimal
+# regarding disk space and query time, in spite of indices.
 SQL_GET_JOB = """
 SELECT
     "queue"."index",
@@ -116,6 +121,11 @@ FROM "queue"
 ORDER BY "index";
 """
 
+# NOTE: we thought about having a single allowance column that would
+# be decremented when worked by threads but it means we need to keep
+# a reference for each group in the "parallelism" table at all time
+# for this to work and this is hardly optimal regarding disk space
+# and query time, in spite of indices.
 SQL_INCREMENT_PARALLELISM = """
 INSERT OR REPLACE INTO "parallelism" ("group", "count", "allowed") VALUES (
     ?,
@@ -152,16 +162,20 @@ class BrokenCrawlerQueue(Exception):
     pass
 
 
-# TODO: explain we must use buffer_size=0, no external parallelism/throttle, use block and panic
-# TODO: explain query plan
+# TODO: explain query plan and tweak indices
 # TODO: tests with null group
 # TODO: indices on the parallelism table?
-# TODO: write up concerns about right join
-# TODO: test where the group allowance is decremented instead
-# TODO: quenouille should have an option to block queue, switch to block
-# TODO: maybe we should put the conditions on the JOIN directives in which case we need indices? (nope, else the WHERE will be hard to anticipate)
-# TODO: deal with raising when condition is waiting (we need to have a cleanup callback from quenouille)
-# TODO: test resume integrity with low cleanup_interval and rethink the issue
+
+# NOTE: this queue can be used by `quenouille` but since it handles
+# group parallelism and throttling on its own, we must shunt it on
+# `quenouille` side. Also, keep in mind that buffer_size must be
+# set to 0 to keep the queue ordering consistent and bypass `quenouille`
+# optimistic buffer that is tailored for lazy iterable, not processing
+# queues.
+# NOTE: this queue does not follow python's queue.Queue semantics exactly
+# because its #.get method can block, but will raise Empty when drained.
+# This is fine with `quenouille` if we don't forget to call #.unblock
+# on panic.
 class CrawlerQueue:
     # Params
     persistent: bool
