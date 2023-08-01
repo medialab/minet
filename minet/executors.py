@@ -494,7 +494,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         # so we reserve at least one connection for the pool.
         self.pool_manager = create_pool_manager(
             parallelism=max(1, self.max_workers),
-            num_pools=64,
+            num_pools=max(64, self.max_workers),
             insecure=insecure,
             timeout=timeout,
             spoof_tls_ciphers=spoof_tls_ciphers,
