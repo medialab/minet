@@ -4,7 +4,7 @@ from pytest import raises
 from queue import Empty
 
 from minet.crawl.types import CrawlJob
-from minet.crawl.queue import CrawlerQueue
+from minet.crawl.queue import CrawlerQueue, CrawlerQueueRecord
 
 
 # Beware: this may block if you are not careful
@@ -161,5 +161,16 @@ class TestCrawlerQueue:
         assert len(queue) == 0
 
         queue.put(job1)
-        # TODO: cleanup interval is not respected?
-        # print(list(queue.dump()))
+
+        # NOTE: the queue always retain highest index to be able to resume
+        assert list(queue.dump()) == [
+            CrawlerQueueRecord(index=2, status="done", job=job3),
+            CrawlerQueueRecord(index=3, status="todo", job=job1),
+        ]
+
+        queue.get_nowait()
+        queue.task_done(job1)
+
+        assert list(queue.dump()) == [
+            CrawlerQueueRecord(index=3, status="done", job=job1),
+        ]

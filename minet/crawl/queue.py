@@ -131,7 +131,7 @@ CrawlerQueueJobStatus = Literal["todo", "doing", "done"]
 
 @dataclass
 class CrawlerQueueRecord:
-    index: str
+    index: int
     status: CrawlerQueueJobStatus
     job: CrawlJob
 
@@ -504,7 +504,7 @@ class CrawlerQueue:
             if throttle > 0:
                 cursor.execute(SQL_UPDATE_THROTTLE, (job.group, now() + throttle))
 
-            self.current_task_done_count += 0
+            self.current_task_done_count += 1
 
             if self.current_task_done_count >= self.cleanup_interval:
                 self.__cleanup(cursor)
