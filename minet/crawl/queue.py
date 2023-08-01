@@ -36,8 +36,8 @@ PRAGMA synchronous=normal;
 # status=1 is doing
 # status=2 is done, but kept until cleanup
 
-# NOTE: it seems a multi-index on ("piority", "status") is not
-# useful according to the explained query plan
+# NOTE: the multi-index on ("status", "priority", "index") seems
+# to be the better one according to the query planner
 SQL_CREATE = """
 CREATE TABLE "queue" (
     "index" INTEGER PRIMARY KEY,
@@ -51,7 +51,7 @@ CREATE TABLE "queue" (
     "data" BLOB,
     "parent" TEXT
 );
-CREATE INDEX "idx_queue_status" ON "queue" ("status");
+CREATE INDEX "idx_queue_multi" ON "queue" ("status", "priority", "index");
 
 CREATE TABLE "throttle" (
     "group" TEXT PRIMARY KEY,
@@ -165,9 +165,7 @@ class BrokenCrawlerQueue(Exception):
     pass
 
 
-# TODO: tweak indices
 # TODO: tests with null group
-# TODO: indices on the parallelism table?
 
 
 # NOTE: this queue can be used by `quenouille` but since it handles
