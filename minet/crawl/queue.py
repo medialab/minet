@@ -164,7 +164,7 @@ class BrokenCrawlerQueue(Exception):
     pass
 
 
-# TODO: explain query plan and tweak indices
+# TODO: tweak indices
 # TODO: tests with null group
 # TODO: indices on the parallelism table?
 
@@ -323,6 +323,17 @@ class CrawlerQueue:
         finally:
             if cursor is not None:
                 cursor.close()
+
+    def explain_query_plan(self, sql: str) -> str:
+        if sql == "get":
+            sql = SQL_GET_JOB % ("ASC" if not self.is_lifo else "DESC")
+
+        sql = sql.replace("?", "1")
+
+        with self.global_transaction() as cursor:
+            cursor.execute("EXPLAIN QUERY PLAN %s" % sql)
+
+            return "\n".join(row[3] for row in iterate_over_cursor(cursor))
 
     def __count(self, cursor: sqlite3.Cursor) -> int:
         cursor.execute('SELECT count(*) FROM "queue" WHERE "status" = 0;')
