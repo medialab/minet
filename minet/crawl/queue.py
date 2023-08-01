@@ -25,14 +25,16 @@ def now() -> float:
     return datetime.now().timestamp()
 
 
-# NOTE:
+SQL_PRAGMAS = """
+PRAGMA journal_mode=wal;
+"""
+
+# NOTE about status:
 # status=0 is to do
 # status=1 is doing
 # status=2 is done, but kept until cleanup
 
 SQL_CREATE = """
-PRAGMA journal_mode=wal;
-
 CREATE TABLE "queue" (
     "index" INTEGER PRIMARY KEY,
     "status" INTEGER NOT NULL DEFAULT 0,
@@ -230,11 +232,16 @@ class CrawlerQueue:
         self.put_connection = sqlite3.connect(full_path, check_same_thread=False)
         self.task_connection = sqlite3.connect(full_path, check_same_thread=False)
 
-        if inspect:
-            return
-
         # Setup
         with self.global_transaction() as cursor:
+            # NOTE: it's seems it is safer and common practice to
+            # reexecute pragmas each time because they might not
+            # be stored persistently in some instances.
+            cursor.execute(SQL_PRAGMAS)
+
+            if inspect:
+                return
+
             if not self.resuming:
                 cursor.executescript(SQL_CREATE)
             else:

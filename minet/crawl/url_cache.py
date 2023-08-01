@@ -105,6 +105,8 @@ class SQLiteStringSet:
         self.__lock = Lock()
 
         # Setup
+        # NOTE: this is reexecuted on resume and this is fine
+        # NOTE: it seems it's safer to reexecute pragmas anyway
         self.__connection.execute("PRAGMA journal_mode=wal;")
         self.__connection.execute(
             'CREATE TABLE IF NOT EXISTS "set" ("key" TEXT PRIMARY KEY);'
