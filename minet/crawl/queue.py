@@ -25,8 +25,10 @@ def now() -> float:
     return datetime.now().timestamp()
 
 
+# NOTE: synchronous=normal is probably alright for our use-case
 SQL_PRAGMAS = """
 PRAGMA journal_mode=wal;
+PRAGMA synchronous=normal;
 """
 
 # NOTE about status:
@@ -166,6 +168,7 @@ class BrokenCrawlerQueue(Exception):
 # TODO: tests with null group
 # TODO: indices on the parallelism table?
 
+
 # NOTE: this queue can be used by `quenouille` but since it handles
 # group parallelism and throttling on its own, we must shunt it on
 # `quenouille` side. Also, keep in mind that buffer_size must be
@@ -262,7 +265,7 @@ class CrawlerQueue:
             # NOTE: it's seems it is safer and common practice to
             # reexecute pragmas each time because they might not
             # be stored persistently in some instances.
-            cursor.execute(SQL_PRAGMAS)
+            cursor.executescript(SQL_PRAGMAS)
 
             if inspect:
                 return

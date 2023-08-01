@@ -93,6 +93,16 @@ class AtomicSet(Generic[T]):
             yield from self.__items
 
 
+# NOTE: synchronous=normal is probably alright for our use-case
+SQL_CREATE = """
+PRAGMA journal_mode=wal;
+PRAGMA synchronous=normal;
+CREATE TABLE IF NOT EXISTS "set" (
+    "key" TEXT PRIMARY KEY
+) WITHOUT ROWID;
+"""
+
+
 class SQLiteStringSet:
     def __init__(self, path: str, db_name: str = "set.db"):
         makedirs(path, exist_ok=True)
@@ -107,10 +117,7 @@ class SQLiteStringSet:
         # Setup
         # NOTE: this is reexecuted on resume and this is fine
         # NOTE: it seems it's safer to reexecute pragmas anyway
-        self.__connection.execute("PRAGMA journal_mode=wal;")
-        self.__connection.execute(
-            'CREATE TABLE IF NOT EXISTS "set" ("key" TEXT PRIMARY KEY) WITHOUT ROWID;'
-        )
+        self.__connection.executescript(SQL_CREATE)
         self.__connection.commit()
 
     @contextmanager
