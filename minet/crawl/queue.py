@@ -192,6 +192,7 @@ class CrawlerQueue:
     task_connection: sqlite3.Connection
     counter: int
     cleanup_interval: int
+    vacuum_interval: int
     waiter: Condition
     currently_waiting_count: int
     put_lock: Lock
@@ -207,7 +208,8 @@ class CrawlerQueue:
         lifo: bool = False,
         group_parallelism: AnyParallelism = 1,
         throttle: AnyThrottle = 0,
-        cleanup_interval: int = 5000,
+        cleanup_interval: int = 1000,
+        vacuum_interval: int = 10_000,
     ):
         self.persistent = True
         self.resuming = False
@@ -245,6 +247,7 @@ class CrawlerQueue:
         self.throttle = throttle
 
         self.cleanup_interval = cleanup_interval
+        self.vacuum_interval = vacuum_interval
         self.counter = 0
         self.current_task_done_count = 0
 
@@ -534,20 +537,22 @@ class CrawlerQueue:
         )
         cursor.execute('DELETE FROM "parallelism" WHERE "count" < 1;')
         cursor.execute('DELETE FROM "throttle" WHERE "timestamp" < ?', (now(),))
+
+    def __clear(self, cursor: sqlite3.Cursor) -> None:
+        cursor.execute('DELETE FROM "queue";')
+        cursor.execute('DELETE FROM "parallelism";')
+        cursor.execute('DELETE FROM "throttle";')
+
+    def __vacuum_and_analyze(self, cursor: sqlite3.Cursor) -> None:
+        cursor.execute("PRAGMA analysis_limit=1000;")
+        cursor.execute("PRAGMA optimize;")
         cursor.connection.commit()
         cursor.execute("VACUUM;")
+        cursor.connection.commit()
 
     def cleanup(self) -> None:
         with self.global_transaction() as cursor:
             self.__cleanup(cursor)
-
-    def __clear(self, cursor: sqlite3.Cursor) -> None:
-        self.current_task_done_count = 0
-        cursor.execute('DELETE FROM "queue";')
-        cursor.execute('DELETE FROM "parallelism";')
-        cursor.execute('DELETE FROM "throttle";')
-        cursor.connection.commit()
-        cursor.execute("VACUUM;")
 
     def clear(self) -> None:
         with self.global_transaction() as cursor:
@@ -580,8 +585,11 @@ class CrawlerQueue:
 
             self.current_task_done_count += 1
 
-            if self.current_task_done_count >= self.cleanup_interval:
+            if self.current_task_done_count % self.cleanup_interval == 0:
                 self.__cleanup(cursor)
+
+            if self.current_task_done_count % self.vacuum_interval == 0:
+                self.__vacuum_and_analyze(cursor)
 
         with self.waiter:
             self.waiter.notify()

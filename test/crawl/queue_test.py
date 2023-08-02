@@ -121,7 +121,7 @@ class TestCrawlerQueue:
         job2 = CrawlJob("B", group="B")
         job3 = CrawlJob("C", group="C")
 
-        queue = CrawlerQueue(tmp_path, cleanup_interval=1)
+        queue = CrawlerQueue(tmp_path, cleanup_interval=1, vacuum_interval=1)
 
         queue.put(job1)
         queue.put(job2)
@@ -135,7 +135,9 @@ class TestCrawlerQueue:
 
         del queue
 
-        queue = CrawlerQueue(tmp_path, cleanup_interval=1, resume=True)
+        queue = CrawlerQueue(
+            tmp_path, cleanup_interval=1, vacuum_interval=1, resume=True
+        )
 
         assert len(queue) == 3
 
@@ -144,7 +146,9 @@ class TestCrawlerQueue:
 
         del queue
 
-        queue = CrawlerQueue(tmp_path, cleanup_interval=1, resume=True)
+        queue = CrawlerQueue(
+            tmp_path, cleanup_interval=1, vacuum_interval=1, resume=True
+        )
 
         assert queue.get_nowait() == job2
         assert queue.get_nowait() == job3
@@ -156,7 +160,9 @@ class TestCrawlerQueue:
 
         del queue
 
-        queue = CrawlerQueue(tmp_path, cleanup_interval=1, resume=True)
+        queue = CrawlerQueue(
+            tmp_path, cleanup_interval=1, vacuum_interval=1, resume=True
+        )
 
         assert len(queue) == 0
 
