@@ -38,6 +38,10 @@ PRAGMA synchronous=normal;
 
 # NOTE: the multi-index on ("status", "priority", "index") seems
 # to be the better one according to the query planner
+# NOTE: we are not relying on AUTOINCREMENT because it seems to
+# be bad for performance and because our queue can handle it on
+# its own. This means that the job having the max index must
+# never be deleted for this queue to be able to resume without issue.
 SQL_CREATE = """
 CREATE TABLE "queue" (
     "index" INTEGER PRIMARY KEY,
@@ -372,6 +376,7 @@ class CrawlerQueue:
                 )
                 self.counter += 1
 
+            # NOTE: executemany prepares the statement for us
             cursor.executemany(SQL_INSERT_JOB, rows)
             count = cursor.rowcount
 
