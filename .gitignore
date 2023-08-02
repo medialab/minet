@@ -18,3 +18,5 @@ ftest/*.csv
 *.egg-info
 *.pyc
 *.spec
+/crawl
+/downloaded
