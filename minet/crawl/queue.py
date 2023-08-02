@@ -259,16 +259,20 @@ class CrawlerQueue:
         self.put_connection = sqlite3.connect(full_path, check_same_thread=False)
         self.task_connection = sqlite3.connect(full_path, check_same_thread=False)
 
+        # NOTE: it's seems it is safer and common practice to
+        # reexecute pragmas each time because they might not
+        # be stored persistently in some instances.
+        self.put_connection.executescript(SQL_PRAGMAS)
+        self.put_connection.commit()
+
+        self.task_connection.executescript(SQL_PRAGMAS)
+        self.task_connection.commit()
+
+        if inspect:
+            return
+
         # Setup
         with self.global_transaction() as cursor:
-            # NOTE: it's seems it is safer and common practice to
-            # reexecute pragmas each time because they might not
-            # be stored persistently in some instances.
-            cursor.executescript(SQL_PRAGMAS)
-
-            if inspect:
-                return
-
             if not self.resuming:
                 cursor.executescript(SQL_CREATE)
             else:
