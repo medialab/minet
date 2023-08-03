@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from quenouille.constants import TIMER_EPSILON
 
 from minet.crawl.types import CrawlJob
-from minet.crawl.utils import iterate_over_cursor
+from minet.utils import iterate_over_sqlite_cursor
 
 AnyThrottle = Union[float, Callable[[CrawlJob], float]]
 AnyParallelism = Union[int, Callable[[CrawlJob], int]]
@@ -343,7 +343,7 @@ class CrawlerQueue:
         with self.global_transaction() as cursor:
             cursor.execute("EXPLAIN QUERY PLAN %s" % sql)
 
-            return "\n".join(row[3] for row in iterate_over_cursor(cursor))
+            return "\n".join(row[3] for row in iterate_over_sqlite_cursor(cursor))
 
     def __count(self, cursor: sqlite3.Cursor) -> int:
         cursor.execute('SELECT count(*) FROM "queue" WHERE "status" = 0;')
@@ -503,7 +503,7 @@ class CrawlerQueue:
                 'SELECT "group", "count", "allowed" FROM "parallelism" WHERE "count" > 0;'
             )
 
-            for row in iterate_over_cursor(cursor):
+            for row in iterate_over_sqlite_cursor(cursor):
                 g[row[0]] = (row[1], row[2])
 
         return g
@@ -512,7 +512,7 @@ class CrawlerQueue:
         with self.global_transaction() as cursor:
             cursor.execute(SQL_DUMP)
 
-            for row in iterate_over_cursor(cursor):
+            for row in iterate_over_sqlite_cursor(cursor):
                 job = CrawlJob(
                     row[2],
                     id=row[1],

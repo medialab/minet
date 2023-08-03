@@ -205,3 +205,12 @@ class PycurlReceiveError(PycurlProtocolError):
 
 class PycurlSendError(PycurlProtocolError):
     pass
+
+
+# sqlar
+class SQLArchiveError(MinetError):
+    pass
+
+
+class SQLArchiveInvalidError(SQLArchiveError):
+    pass

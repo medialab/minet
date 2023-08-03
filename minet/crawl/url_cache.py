@@ -19,7 +19,7 @@ from ebbe import distinct
 from ural import canonicalize_url, normalize_url
 
 from minet.crawl.types import CrawlJob, CrawlJobDataType
-from minet.crawl.utils import iterate_over_cursor
+from minet.utils import iterate_over_sqlite_cursor
 
 T = TypeVar("T")
 I = TypeVar("I")
@@ -195,7 +195,7 @@ class SQLiteStringSet:
         with self.__transaction() as cursor:
             cursor.execute('SELECT "key" FROM "set";')
 
-            for row in iterate_over_cursor(cursor):
+            for row in iterate_over_sqlite_cursor(cursor):
                 yield row[0]
 
     def close(self) -> None:

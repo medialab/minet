@@ -4,6 +4,8 @@
 #
 # Miscellaneous helper function used throughout the library.
 #
+from typing import Iterator, Any
+
 import os
 import re
 import sys
@@ -11,6 +13,7 @@ import hashlib
 import json
 import time
 import string
+import sqlite3
 import importlib
 from os.path import dirname, abspath, relpath
 from random import uniform
@@ -132,3 +135,14 @@ def import_target(path: str, default: str = "main"):
         return getattr(m, function_name)
     except AttributeError:
         raise ImportError
+
+
+def iterate_over_sqlite_cursor(cursor: sqlite3.Cursor) -> Iterator[Any]:
+    while True:
+        rows = cursor.fetchmany(128)
+
+        if not rows:
+            return
+
+        for row in rows:
+            yield row
