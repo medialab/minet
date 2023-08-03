@@ -74,14 +74,7 @@ def sqlar_uncompress(data: bytes, size: int) -> bytes:
 def is_sqlar(cursor: sqlite3.Cursor) -> bool:
     cursor.execute('PRAGMA table_info("sqlar")')
 
-    rows = cursor.fetchall()
-
-    if len(rows) != SQLAR_TABLE_EXPECTED_RESULT:
-        return False
-
-    return all(
-        row == expected for row, expected in zip(rows, SQLAR_TABLE_EXPECTED_RESULT)
-    )
+    return cursor.fetchall() == SQLAR_TABLE_EXPECTED_RESULT
 
 
 def get_safe_path(name: str) -> str:
