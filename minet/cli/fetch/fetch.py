@@ -236,7 +236,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
             template=cli_args.filename_template,
         )
 
-        file_writer = ThreadSafeFileWriter(cli_args.output_dir)
+        file_writer = ThreadSafeFileWriter(cli_args.output_dir, sqlar=cli_args.sqlar)
 
     def worker_callback(item, url: str, response: Response) -> Optional[WorkerAddendum]:
         if cli_args.dont_save:

@@ -85,6 +85,10 @@ def resolve_fetch_arguments(cli_args):
             "Cannot both --compress-on-disk and get --contents-in-report!"
         )
 
+    # --sqlar disables --compress-on-disk
+    if cli_args.sqlar:
+        cli_args.compress_on_disk = False
+
 
 FETCH_COMMAND = command(
     "fetch",
@@ -203,6 +207,11 @@ FETCH_COMMAND = command(
         {
             "flag": "--pycurl",
             "help": "Whether to use the pycurl library to perform the call.",
+            "action": "store_true",
+        },
+        {
+            "flag": "--sqlar",
+            "help": "Whether to write files into a single-file sqlite archive rather than as individual files on the disk.",
             "action": "store_true",
         },
     ],

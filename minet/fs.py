@@ -29,6 +29,7 @@ from minet.exceptions import (
 )
 from minet.utils import md5, PseudoFStringFormatter
 from minet.encodings import infer_encoding
+from minet.sqlar import SQLiteArchive
 
 
 def read_potentially_gzipped_path(
@@ -269,10 +270,16 @@ class FilenameBuilder(object):
 
 
 class ThreadSafeFileWriter(object):
-    def __init__(self, root_directory: Optional[str] = None):
+    def __init__(self, root_directory: Optional[str] = None, sqlar: bool = False):
         self.root_directory = root_directory or ""
         self.folder_locks = NamedLocks()
         self.file_locks = NamedLocks()
+        self.sqlar = sqlar
+        self.archive = None
+
+        if self.sqlar:
+            self.root_directory += ".sqlar"
+            self.archive = SQLiteArchive(self.root_directory)
 
     def resolve(self, filename: str, relative: bool = False, compress: bool = False):
         full_path = join(self.root_directory, filename)
@@ -300,6 +307,16 @@ class ThreadSafeFileWriter(object):
         compress: bool = False,
         relative: bool = False,
     ) -> str:
+        if self.sqlar:
+            assert self.archive is not None
+
+            if not isinstance(contents, bytes):
+                contents = contents.encode("utf-8")
+
+            self.archive.write(filename, contents)
+
+            return filename
+
         binary = isinstance(contents, bytes)
         filename = self.resolve(filename, relative=relative, compress=compress)
         directory = dirname(filename)

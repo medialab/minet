@@ -37,7 +37,7 @@ PRAGMA page_size=16384;
 """
 
 SQL_CREATE = """
-CREATE TABLE sqlar(
+CREATE TABLE sqlar (
   name TEXT PRIMARY KEY,  -- name of the file
   mode INT,               -- access permissions
   mtime INT,              -- last modification time

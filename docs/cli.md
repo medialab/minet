@@ -555,9 +555,9 @@ Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                    [-c] [-D] [-O OUTPUT_DIR] [-f FILENAME]
                    [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [--keep-failed-contents]
-                   [--standardize-encoding] [--only-html] [--pycurl] [-i INPUT]
-                   [--explode EXPLODE] [-s SELECT] [--total TOTAL] [--resume]
-                   [-o OUTPUT]
+                   [--standardize-encoding] [--only-html] [--pycurl] [--sqlar]
+                   [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                   [--resume] [-o OUTPUT]
                    url_or_url_column
 
 # Minet Fetch Command
@@ -628,6 +628,9 @@ Optional Arguments:
   -D, --dont-save               Use not to write any downloaded file on disk.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
+  --sqlar                       Whether to write files into a single-file sqlite
+                                archive rather than as individual files on the
+                                disk.
   --standardize-encoding        Whether to systematically convert retrieved text
                                 to UTF-8.
   -t, --threads THREADS         Number of threads to use. Defaults to `25`.
