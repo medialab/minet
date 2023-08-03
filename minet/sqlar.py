@@ -15,6 +15,7 @@ from minet.utils import iterate_over_sqlite_cursor
 
 # Extraction using the sqlite3 command line:
 #   $ sqlite3 -Axvf archive.sqlar
+#   $ sqlite3 archive.sqlar ".ar -xv --directory archive"
 
 # References:
 #  - https://www.sqlite.org/sqlar/doc/trunk/README.md
@@ -152,11 +153,6 @@ class SQLiteArchive:
                 if not is_sqlar(cursor):
                     raise SQLArchiveInvalidError
 
-    def __len__(self) -> int:
-        with self.transaction() as cursor:
-            cursor.execute("SELECT count(*) FROM sqlar;")
-            return cursor.fetchone()[0]
-
     @contextmanager
     def transaction(self):
         cursor = None
@@ -168,6 +164,11 @@ class SQLiteArchive:
         finally:
             if cursor is not None:
                 cursor.close()
+
+    def __len__(self) -> int:
+        with self.transaction() as cursor:
+            cursor.execute("SELECT count(*) FROM sqlar;")
+            return cursor.fetchone()[0]
 
     def write(self, name: str, data: bytes, mtime: Optional[int] = None) -> None:
         with self.transaction() as cursor:
