@@ -73,7 +73,13 @@ def coerce_error(
     if code == pycurl.E_COULDNT_CONNECT:
         return PycurlConnectionRefusedError(error)
 
-    if code == pycurl.E_PEER_FAILED_VERIFICATION or code == pycurl.E_SSL_CONNECT_ERROR:
+    if code in (
+        pycurl.E_SSL_CACERT,
+        pycurl.E_PEER_FAILED_VERIFICATION,
+        pycurl.E_SSL_CONNECT_ERROR,
+        pycurl.E_SSL_CERTPROBLEM,
+        pycurl.E_SSL_CIPHER,
+    ):
         return PycurlSSLError(error)
 
     if code == pycurl.E_RECV_ERROR:
