@@ -3,7 +3,7 @@ from minet.types import Literal
 
 from dataclasses import dataclass
 from ural.lru import LRUTrie
-from ural import links_from_html, could_be_html, infer_redirection
+from ural import links_from_html, could_be_html, infer_redirection, canonicalize_url
 from casanova import TabularRecord
 from functools import lru_cache
 
@@ -72,7 +72,7 @@ class HypheSpider(Spider):
         if self.is_attached:
             raise RuntimeError("cannot add start page if spider is already attached")
 
-        self.start_pages.add(url)
+        self.start_pages.add(canonicalize_url(url, strip_fragment=True))
 
     def set(self, prefix, webentity, status: WebentityStatus = "IN") -> None:
         if status not in VALID_WEBENTITY_STATUSES:
