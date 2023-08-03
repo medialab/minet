@@ -13,6 +13,9 @@ from datetime import datetime
 from minet.exceptions import SQLArchiveInvalidError
 from minet.utils import iterate_over_sqlite_cursor
 
+# Extraction using the sqlite3 command line:
+#   $ sqlite3 -Axvf archive.sqlar
+
 # References:
 #  - https://www.sqlite.org/sqlar/doc/trunk/README.md
 #  - https://www.sqlite.org/sqlar.html

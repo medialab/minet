@@ -258,6 +258,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         self,
         spider_or_spiders: SpiderDeclaration[CrawlJobDataTypes, CrawlResultDataTypes],
         persistent_storage_path: Optional[str] = None,
+        sqlar: bool = False,
         visit_urls_only_once: bool = False,
         normalized_url_cache: bool = False,
         max_depth: Optional[int] = None,
@@ -297,7 +298,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             raise TypeError("cannot resume a non-persistent crawler")
 
         # Utilities
-        self.file_writer = ThreadSafeFileWriter(writer_root_directory)
+        self.file_writer = ThreadSafeFileWriter(writer_root_directory, sqlar=sqlar)
         self.process_pool = None
 
         # NOTE: if not None and not 0 basically

@@ -229,8 +229,8 @@ Usage: minet crawl [-h] [-O OUTPUT_DIR] [--silent]
                    [-v] [-u] [-n] [-k] [--spoof-user-agent] [-p PROCESSES]
                    [--connect-timeout CONNECT_TIMEOUT] [--timeout TIMEOUT]
                    [--retries RETRIES] [--stateful-redirects] [--pycurl]
-                   [-m MODULE] [--factory] [-i INPUT] [--explode EXPLODE]
-                   [-s SELECT] [--total TOTAL]
+                   [--sqlar] [-m MODULE] [--factory] [-i INPUT]
+                   [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                    [url_or_url_column]
 
 # Minet Crawl Command
@@ -286,6 +286,9 @@ Optional Arguments:
                                 network-related issues. Defaults to `0`.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
+  --sqlar                       Whether to write files into a single-file sqlite
+                                archive rather than as individual files on the
+                                disk.
   --stateful-redirects          Whether to keep a cookie jar while redirecting
                                 and allowing self redirections that track state.
   -t, --threads THREADS         Number of threads to use. You can use `0` if you
@@ -386,7 +389,7 @@ Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
                          [--spoof-user-agent] [-p PROCESSES]
                          [--connect-timeout CONNECT_TIMEOUT] [--timeout TIMEOUT]
                          [--retries RETRIES] [--stateful-redirects] [--pycurl]
-                         [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                         [--sqlar] [-i INPUT] [--explode EXPLODE] [-s SELECT]
                          [--total TOTAL]
                          [url_or_url_column]
 
@@ -463,6 +466,9 @@ Optional Arguments:
                                 network-related issues. Defaults to `0`.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
+  --sqlar                       Whether to write files into a single-file sqlite
+                                archive rather than as individual files on the
+                                disk.
   --stateful-redirects          Whether to keep a cookie jar while redirecting
                                 and allowing self redirections that track state.
   -t, --threads THREADS         Number of threads to use. You can use `0` if you
@@ -3056,7 +3062,7 @@ Usage: minet hyphe crawl [-h] [--silent]
                          [--folder-strategy FOLDER_STRATEGY]
                          [-f {csv,jsonl,ndjson}] [-v] [-n] [-k] [-p PROCESSES]
                          [--connect-timeout CONNECT_TIMEOUT] [--timeout TIMEOUT]
-                         [--retries RETRIES] [--pycurl]
+                         [--retries RETRIES] [--pycurl] [--sqlar]
                          corpus
 
 # Minet Hyphe Crawl Command
@@ -3113,6 +3119,9 @@ Optional Arguments:
                                 call.
   --retries RETRIES             Number of times to retry on timeout & common
                                 network-related issues. Defaults to `3`.
+  --sqlar                       Whether to write files into a single-file sqlite
+                                archive rather than as individual files on the
+                                disk.
   --start-page-separator START_PAGE_SEPARATOR
                                 Separator character for the webentity start
                                 pages. Defaults to ` `.

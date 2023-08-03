@@ -140,6 +140,11 @@ CRAWL_ARGUMENTS = {
         "help": "Whether to use the pycurl library to perform the call.",
         "action": "store_true",
     },
+    "sqlar": {
+        "flag": "--sqlar",
+        "help": "Whether to write files into a single-file sqlite archive rather than as individual files on the disk.",
+        "action": "store_true",
+    },
 }
 
 CRAWL_MODULE_ARGUMENTS = [
@@ -304,6 +309,10 @@ def crawl_command(
         cli_args.timeout = Timeout(
             connect=cli_args.connect_timeout, total=cli_args.timeout
         )
+
+        # --sqlar disables --compress-on-disk
+        if cli_args.sqlar:
+            cli_args.compress_on_disk = False
 
     return command(
         name,
