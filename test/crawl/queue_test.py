@@ -180,3 +180,15 @@ class TestCrawlerQueue:
         assert list(queue.dump()) == [
             CrawlerQueueRecord(index=3, status="done", job=job1),
         ]
+
+    def test_memory_leak(self):
+        queue = CrawlerQueue()
+
+        queue.put(CrawlJob("http://lemonde.fr"))
+        job = queue.get_nowait()
+
+        assert len(queue.tasks) == 1
+
+        queue.task_done(job)
+
+        assert len(queue.tasks) == 0

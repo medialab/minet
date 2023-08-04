@@ -191,7 +191,7 @@ class CrawlerQueue:
     throttle: AnyThrottle
 
     # State
-    tasks: Dict[CrawlJob, int]
+    tasks: Dict[str, int]
     put_connection: sqlite3.Connection
     task_connection: sqlite3.Connection
     counter: int
@@ -479,8 +479,7 @@ class CrawlerQueue:
                         (job.group, job.group, allowed),
                     )
 
-                # NOTE: jobs are hashable by id
-                self.tasks[job] = index
+                self.tasks[job.id] = index
 
                 return job
 
@@ -565,7 +564,7 @@ class CrawlerQueue:
 
     def task_done(self, job: CrawlJob) -> None:
         with self.task_transaction() as cursor:
-            index = self.tasks.get(job)
+            index = self.tasks.pop(job.id, None)
 
             if index is None:
                 raise RuntimeError("job is not being worked")
