@@ -134,10 +134,10 @@ Else, **minet** can be installed directly as a python CLI tool and library using
 # Minet is currently rolling out its v1 alpha
 # If you need stability, until Twitter sort its things out,
 # run the second command.
-pip install minet==1.0.0-a48
+pip install minet==1.0.0-a49
 
 # For more stability (v0.67.1)
-# Note that the present documentation targets 1.0.0-a48,
+# Note that the present documentation targets 1.0.0-a49,
 # not 0.67.1 (use -h to get the relevant help).
 pip install minet
 ```
