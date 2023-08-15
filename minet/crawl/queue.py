@@ -534,7 +534,6 @@ class CrawlerQueue:
                 yield CrawlerQueueRecord(index=row[0], status=status, job=job)
 
     def __cleanup(self, cursor: sqlite3.Cursor) -> None:
-        self.current_task_done_count = 0
         # NOTE: we make sure to keep the last index given to ensure we can resume safely
         cursor.execute(
             'DELETE FROM "queue" WHERE "status" = 2 AND "index" <> (SELECT max("index") FROM "queue" ORDER BY "index");'
@@ -562,16 +561,19 @@ class CrawlerQueue:
         with self.global_transaction() as cursor:
             self.__clear(cursor)
 
-    def task_done(self, job: CrawlJob) -> None:
+    # NOTE: there is a subtle difference between #.release_group
+    # and #.task_done. The first indicates to the queue that we
+    # finished network actions related to the given group so
+    # we can update parallelism & throttling info. The latter that
+    # the task is completely done, i.e. after outputs were flushed
+    # in the crawler loop so that we can safely forget about the given
+    # task. This is important to ensure atomicity as well as possible.
+    # Without creating backpressure on the queue's constraints.
+    def release_group(self, job: CrawlJob) -> None:
         with self.task_transaction() as cursor:
-            index = self.tasks.pop(job.id, None)
-
-            if index is None:
+            if job.id not in self.tasks:
                 raise RuntimeError("job is not being worked")
 
-            cursor.execute(
-                'UPDATE "queue" SET "status" = 2 WHERE "index" = ?;', (index,)
-            )
             cursor.execute(
                 'UPDATE "parallelism" SET "count" = "count" - 1 WHERE "group" = ?;',
                 (job.group,),
@@ -587,6 +589,28 @@ class CrawlerQueue:
                 if throttle > 0:
                     cursor.execute(SQL_UPDATE_THROTTLE, (job.group, now() + throttle))
 
+        # We notify one waiter that parallelism was updated
+        with self.waiter:
+            self.waiter.notify()
+
+    @contextmanager
+    def group_releaser(self, job: CrawlJob):
+        try:
+            yield
+        finally:
+            self.release_group(job)
+
+    def task_done(self, job: CrawlJob) -> None:
+        with self.task_transaction() as cursor:
+            index = self.tasks.pop(job.id, None)
+
+            if index is None:
+                raise RuntimeError("job is not being worked")
+
+            cursor.execute(
+                'UPDATE "queue" SET "status" = 2 WHERE "index" = ?;', (index,)
+            )
+
             self.current_task_done_count += 1
 
             if self.current_task_done_count % self.cleanup_interval == 0:
@@ -594,9 +618,6 @@ class CrawlerQueue:
 
             if self.current_task_done_count % self.vacuum_interval == 0:
                 self.__vacuum_and_analyze(cursor)
-
-        with self.waiter:
-            self.waiter.notify()
 
     def close(self) -> None:
         self.put_connection.close()

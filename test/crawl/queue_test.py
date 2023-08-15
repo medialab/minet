@@ -62,11 +62,11 @@ class TestCrawlerQueue:
 
         assert queue.worked_groups() == {"A": (2, 2)}
 
-        queue.task_done(job2)
+        queue.release_group(job1)
 
         assert queue.worked_groups() == {"A": (1, 2)}
 
-        queue.task_done(job1)
+        queue.release_group(job2)
 
         assert queue.worked_groups() == {}
 
