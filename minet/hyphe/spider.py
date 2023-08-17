@@ -2,7 +2,7 @@ from typing import Iterable, List, Set, Iterator, Any, Optional
 from minet.types import Literal
 
 from dataclasses import dataclass
-from ural.lru import LRUTrie
+from ural.lru import CanonicalizedLRUTrie
 from ural import links_from_html, could_be_html, infer_redirection, canonicalize_url
 from casanova import TabularRecord
 from functools import lru_cache
@@ -61,7 +61,9 @@ def resolve_shortened_link(url: str) -> str:
 
 class HypheSpider(Spider):
     def __init__(self, ignore_internal_links: bool = False):
-        self.trie: LRUTrie[WebentityRecord] = LRUTrie(suffix_aware=True)
+        self.trie: CanonicalizedLRUTrie[WebentityRecord] = CanonicalizedLRUTrie(
+            suffix_aware=True, strip_fragment=True
+        )
         self.start_pages: Set[str] = set()
         self.ignore_internal_links = ignore_internal_links
 
