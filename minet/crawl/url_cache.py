@@ -32,14 +32,14 @@ class AtomicSet(Generic[T]):
     """
 
     __items: Set[T]
-    __lock: Lock
+    lock: Lock
 
     def __init__(self):
         self.__items = set()
-        self.__lock = Lock()
+        self.lock = Lock()
 
     def add(self, item: T) -> bool:
-        with self.__lock:
+        with self.lock:
             len_before = len(self.__items)
 
             self.__items.add(item)
@@ -47,7 +47,7 @@ class AtomicSet(Generic[T]):
             return len(self.__items) > len_before
 
     def add_many(self, items: Iterable[T]) -> int:
-        with self.__lock:
+        with self.lock:
             len_before = len(self.__items)
 
             for item in items:
@@ -66,7 +66,7 @@ class AtomicSet(Generic[T]):
         ...
 
     def add_many_and_keep_new(self, items, key=None):
-        with self.__lock:
+        with self.lock:
             new = []
 
             for item in items:
@@ -81,15 +81,15 @@ class AtomicSet(Generic[T]):
             return new
 
     def __len__(self) -> int:
-        with self.__lock:
+        with self.lock:
             return len(self.__items)
 
     def __contains__(self, item: T) -> bool:
-        with self.__lock:
+        with self.lock:
             return item in self.__items
 
     def __iter__(self) -> Iterator[T]:
-        with self.__lock:
+        with self.lock:
             yield from self.__items
 
     def close(self) -> None:
@@ -112,30 +112,30 @@ class SQLiteStringSet:
 
         self.path = path
 
-        self.__connection = sqlite3.connect(
+        self.connection = sqlite3.connect(
             join(self.path, db_name), check_same_thread=False
         )
-        self.__lock = Lock()
+        self.lock = Lock()
 
         # Setup
         # NOTE: this is reexecuted on resume and this is fine
         # NOTE: it seems it's safer to reexecute pragmas anyway
-        self.__connection.executescript(SQL_CREATE)
-        self.__connection.commit()
+        self.connection.executescript(SQL_CREATE)
+        self.connection.commit()
 
     @contextmanager
-    def __transaction(self):
+    def transaction(self):
         cursor = None
         try:
-            with self.__lock, self.__connection:
-                cursor = self.__connection.cursor()
+            with self.lock, self.connection:
+                cursor = self.connection.cursor()
                 yield cursor
         finally:
             if cursor is not None:
                 cursor.close()
 
     def add(self, item: str) -> bool:
-        with self.__transaction() as cursor:
+        with self.transaction() as cursor:
             try:
                 cursor.execute('INSERT INTO "set" ("key") VALUES (?);', (item,))
             except sqlite3.IntegrityError:
@@ -144,7 +144,7 @@ class SQLiteStringSet:
             return True
 
     def add_many(self, items: Iterable[str]) -> int:
-        with self.__transaction() as cursor:
+        with self.transaction() as cursor:
             rows = [(item,) for item in items]
             cursor.executemany('INSERT OR IGNORE INTO "set" ("key") VALUES (?);', rows)
             return cursor.rowcount
@@ -160,7 +160,7 @@ class SQLiteStringSet:
         ...
 
     def add_many_and_keep_new(self, items, key=None):
-        with self.__transaction() as cursor:
+        with self.transaction() as cursor:
             new = []
 
             for item in items:
@@ -175,31 +175,31 @@ class SQLiteStringSet:
 
     # NOTE: I keep this for the ugly trick.
     # def contains_many(self, items: Iterable[str]) -> List[str]:
-    #     with self.__transaction() as cursor:
+    #     with self.transaction() as cursor:
     #         cursor.execute(
     #             'SELECT "key" FROM "set" WHERE "key" in (SELECT "value" FROM JSON_EACH(?));',
     #             (json.dumps(items),),
     #         )
 
     def __contains__(self, item: str) -> bool:
-        with self.__transaction() as cursor:
+        with self.transaction() as cursor:
             cursor.execute('SELECT 1 FROM "set" WHERE "key" = ?;', (item,))
             return cursor.fetchone() is not None
 
     def __len__(self) -> int:
-        with self.__transaction() as cursor:
+        with self.transaction() as cursor:
             cursor.execute('SELECT COUNT(*) FROM "set";')
             return cursor.fetchone()[0]
 
     def __iter__(self) -> Iterator[str]:
-        with self.__transaction() as cursor:
+        with self.transaction() as cursor:
             cursor.execute('SELECT "key" FROM "set";')
 
             for row in iterate_over_sqlite_cursor(cursor):
                 yield row[0]
 
     def close(self) -> None:
-        self.__connection.close()
+        self.connection.close()
 
     def __del__(self) -> None:
         self.close()

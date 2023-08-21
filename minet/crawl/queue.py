@@ -182,6 +182,10 @@ class BrokenCrawlerQueue(Exception):
 # because its #.get method can block, but will raise Empty when drained.
 # This is fine with `quenouille` if we don't forget to call #.unblock
 # on panic.
+# NOTE: sqlite needs to serialize writes, which means it is not particularly
+# useful in our case to allow for concurrent access to the queue because most
+# of its operations need to update the database somehow. This also means we
+# can rely on a single lock to make multithreaded transactions safe.
 class CrawlerQueue:
     # Params
     persistent: bool
@@ -192,15 +196,13 @@ class CrawlerQueue:
 
     # State
     tasks: Dict[str, int]
-    put_connection: sqlite3.Connection
-    task_connection: sqlite3.Connection
+    connection: sqlite3.Connection
     counter: int
     cleanup_interval: int
     vacuum_interval: int
     waiter: Condition
     currently_waiting_count: int
-    put_lock: Lock
-    task_lock: Lock
+    transaction_lock: Lock
     broken: bool
 
     def __init__(
@@ -257,29 +259,22 @@ class CrawlerQueue:
 
         self.waiter = Condition()
         self.currently_waiting_count = 0
-        self.put_lock = Lock()
-        self.task_lock = Lock()
+        self.transaction_lock = Lock()
         self.broken = False
 
-        # NOTE: we need two connection if we are to allow concurrent
-        # put and task acquisition.
-        self.put_connection = sqlite3.connect(full_path, check_same_thread=False)
-        self.task_connection = sqlite3.connect(full_path, check_same_thread=False)
+        self.connection = sqlite3.connect(full_path, check_same_thread=False)
 
         # NOTE: it's seems it is safer and common practice to
         # reexecute pragmas each time because they might not
         # be stored persistently in some instances.
-        self.put_connection.executescript(SQL_PRAGMAS)
-        self.put_connection.commit()
-
-        self.task_connection.executescript(SQL_PRAGMAS)
-        self.task_connection.commit()
+        self.connection.executescript(SQL_PRAGMAS)
+        self.connection.commit()
 
         if inspect:
             return
 
         # Setup
-        with self.global_transaction() as cursor:
+        with self.transaction() as cursor:
             if not self.resuming:
                 cursor.executescript(SQL_CREATE)
             else:
@@ -302,33 +297,11 @@ class CrawlerQueue:
                 cursor.execute("VACUUM;")
 
     @contextmanager
-    def put_transaction(self):
+    def transaction(self):
         cursor = None
         try:
-            with self.put_lock, self.put_connection:
-                cursor = self.put_connection.cursor()
-                yield cursor
-        finally:
-            if cursor is not None:
-                cursor.close()
-
-    @contextmanager
-    def task_transaction(self):
-        cursor = None
-        try:
-            with self.task_lock, self.task_connection:
-                cursor = self.task_connection.cursor()
-                yield cursor
-        finally:
-            if cursor is not None:
-                cursor.close()
-
-    @contextmanager
-    def global_transaction(self):
-        cursor = None
-        try:
-            with self.put_lock, self.task_lock, self.task_connection:
-                cursor = self.task_connection.cursor()
+            with self.transaction_lock, self.connection:
+                cursor = self.connection.cursor()
                 yield cursor
         finally:
             if cursor is not None:
@@ -340,7 +313,7 @@ class CrawlerQueue:
 
         sql = sql.replace("?", "1")
 
-        with self.global_transaction() as cursor:
+        with self.transaction() as cursor:
             cursor.execute("EXPLAIN QUERY PLAN %s" % sql)
 
             return "\n".join(row[3] for row in iterate_over_sqlite_cursor(cursor))
@@ -350,14 +323,14 @@ class CrawlerQueue:
         return cursor.fetchone()[0]
 
     def qsize(self) -> int:
-        with self.global_transaction() as cursor:
+        with self.transaction() as cursor:
             return self.__count(cursor)
 
     def __len__(self) -> int:
         return self.qsize()
 
     def put_many(self, jobs: Iterable[CrawlJob]) -> int:
-        with self.put_transaction() as cursor:
+        with self.transaction() as cursor:
             rows = []
 
             for job in jobs:
@@ -422,7 +395,7 @@ class CrawlerQueue:
                 if self.broken:
                     raise BrokenCrawlerQueue
 
-            with self.task_transaction() as cursor:
+            with self.transaction() as cursor:
                 cursor.execute(
                     SQL_GET_JOB % ("ASC" if not self.is_lifo else "DESC"),
                     (now(),),
@@ -497,7 +470,7 @@ class CrawlerQueue:
     def worked_groups(self) -> Dict[str, Tuple[int, int]]:
         g = {}
 
-        with self.global_transaction() as cursor:
+        with self.transaction() as cursor:
             cursor.execute(
                 'SELECT "group", "count", "allowed" FROM "parallelism" WHERE "count" > 0;'
             )
@@ -508,7 +481,7 @@ class CrawlerQueue:
         return g
 
     def dump(self) -> Iterator[CrawlerQueueRecord]:
-        with self.global_transaction() as cursor:
+        with self.transaction() as cursor:
             cursor.execute(SQL_DUMP)
 
             for row in iterate_over_sqlite_cursor(cursor):
@@ -554,11 +527,11 @@ class CrawlerQueue:
         cursor.connection.commit()
 
     def cleanup(self) -> None:
-        with self.global_transaction() as cursor:
+        with self.transaction() as cursor:
             self.__cleanup(cursor)
 
     def clear(self) -> None:
-        with self.global_transaction() as cursor:
+        with self.transaction() as cursor:
             self.__clear(cursor)
 
     # NOTE: there is a subtle difference between #.release_group
@@ -570,7 +543,7 @@ class CrawlerQueue:
     # task. This is important to ensure atomicity as well as possible.
     # Without creating backpressure on the queue's constraints.
     def release_group(self, job: CrawlJob) -> None:
-        with self.task_transaction() as cursor:
+        with self.transaction() as cursor:
             if job.id not in self.tasks:
                 raise RuntimeError("job is not being worked")
 
@@ -601,7 +574,7 @@ class CrawlerQueue:
             self.release_group(job)
 
     def task_done(self, job: CrawlJob) -> None:
-        with self.task_transaction() as cursor:
+        with self.transaction() as cursor:
             index = self.tasks.pop(job.id, None)
 
             if index is None:
@@ -620,8 +593,7 @@ class CrawlerQueue:
                 self.__vacuum_and_analyze(cursor)
 
     def close(self) -> None:
-        self.put_connection.close()
-        self.task_connection.close()
+        self.connection.close()
 
     def __del__(self) -> None:
         self.close()
