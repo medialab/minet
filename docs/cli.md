@@ -37,6 +37,7 @@ _Platform-related commands_
   - [summary](#summary)
 - [facebook (fb)](#facebook)
   - [comments](#facebook-comments)
+  - [group](#facebook-group)
   - [post](#facebook-post)
   - [posts](#facebook-posts)
   - [post-authors](#facebook-post-authors)
@@ -2387,7 +2388,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet facebook [-h]
-                      {comments,post-authors,post-stats,post,posts,url-likes}
+                      {comments,group,post-authors,post-stats,post,posts,url-likes}
                       ...
 
 # Minet Facebook Command
@@ -2398,7 +2399,7 @@ Optional Arguments:
   -h, --help                    show this help message and exit
 
 Subcommands:
-  {comments,post-authors,post-stats,post,posts,url-likes}
+  {comments,group,post-authors,post-stats,post,posts,url-likes}
                                 Subcommand to use.
 ```
 
@@ -2510,6 +2511,110 @@ how to use the command with a CSV file?
 
 . This also works with single values:
     $ minet facebook comments "value1,value2" --explode ","
+```
+
+<h3 id="facebook-group">group</h3>
+
+```
+Usage: minet facebook group [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                            [--refresh-per-second REFRESH_PER_SECOND]
+                            [--single-line] [--throttle THROTTLE] [-i INPUT]
+                            [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                            [-o OUTPUT]
+                            group_url_or_group_url_column
+
+# Minet Facebook Group Command
+
+Scrape Facebook group metadata.
+
+This requires to be logged in to a Facebook account, so
+by default this command will attempt to grab the relevant
+authentication cookies from a local Firefox browser.
+
+If you want to grab cookies from another browser or want
+to directly pass the cookie as a string, check out the
+-c/--cookie flag.
+
+Positional Arguments:
+  group_url_or_group_url_column
+                                Single group url to process or name of the CSV
+                                column containing group urls when using
+                                -i/--input.
+
+Optional Arguments:
+  -c, --cookie COOKIE           Authenticated cookie to use or browser from
+                                which to extract it (supports "firefox",
+                                "chrome", "chromium", "opera" and "edge").
+                                Defaults to `firefox`. Can also be configured in
+                                a .minetrc file as "facebook.cookie" or read
+                                from the MINET_FACEBOOK_COOKIE env variable.
+  --throttle THROTTLE           Throttling time, in seconds, to wait between
+                                each request. Defaults to `2.0`.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the group urls you want to process. Will
+                                consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Examples:
+
+TODO
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet facebook group "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet facebook group column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet facebook group column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet facebook group column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet facebook group "value1,value2" --explode ","
 ```
 
 <h3 id="facebook-post">post</h3>

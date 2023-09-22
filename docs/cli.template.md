@@ -37,6 +37,7 @@ _Platform-related commands_
   - [summary](#summary)
 - [facebook (fb)](#facebook)
   - [comments](#facebook-comments)
+  - [group](#facebook-group)
   - [post](#facebook-post)
   - [posts](#facebook-posts)
   - [post-authors](#facebook-post-authors)
@@ -257,6 +258,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 <h3 id="facebook-comments">comments</h3>
 
 <% fb/comments %>
+
+<h3 id="facebook-group">group</h3>
+
+<% fb/group %>
 
 <h3 id="facebook-post">post</h3>
 

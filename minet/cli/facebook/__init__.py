@@ -56,6 +56,30 @@ FACEBOOK_COMMENTS_SUBCOMMAND = command(
     arguments=[*MOBILE_ARGUMENTS],
 )
 
+FACEBOOK_GROUP_SUBCOMMAND = command(
+    "group",
+    "minet.cli.facebook.group",
+    title="Minet Facebook Group Command",
+    description="""
+        Scrape Facebook group metadata.
+
+        This requires to be logged in to a Facebook account, so
+        by default this command will attempt to grab the relevant
+        authentication cookies from a local Firefox browser.
+
+        If you want to grab cookies from another browser or want
+        to directly pass the cookie as a string, check out the
+        -c/--cookie flag.
+    """,
+    epilog="""
+        Examples:
+
+        TODO
+    """,
+    variadic_input={"dummy_column": "group_url", "item_label": "group url"},
+    arguments=[*MOBILE_ARGUMENTS],
+)
+
 FACEBOOK_POST_AUTHORS_SUBCOMMAND = command(
     "post-authors",
     "minet.cli.facebook.post_authors",
@@ -232,6 +256,7 @@ FACEBOOK_COMMAND = command(
     """,
     subcommands=[
         FACEBOOK_COMMENTS_SUBCOMMAND,
+        FACEBOOK_GROUP_SUBCOMMAND,
         FACEBOOK_POST_AUTHORS_SUBCOMMAND,
         FACEBOOK_POST_STATS_SUBCOMMAND,
         FACEBOOK_POST_SUBCOMMAND,

@@ -780,7 +780,7 @@ class FacebookMobileScraper(object):
         # TODO: return FacebookGroup
         parsed = parse_facebook_url(url)
         if not isinstance(parsed, ParsedFacebookGroup):
-            raise FacebookNotPostError
+            raise FacebookNotPostError  # TODO: faire une NotGroupError
         url = convert_url_to_mobile(parsed.url)
 
         html = self.request_page(url)
