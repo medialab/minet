@@ -42,6 +42,7 @@ from minet.facebook.formatters import (
     FacebookPost,
     FacebookUser,
     FacebookPostWithReaction,
+    FacebookGroup,
 )
 from minet.facebook.exceptions import (
     FacebookInvalidCookieError,
@@ -617,6 +618,11 @@ def scrape_post(html):
     return post
 
 
+def scrape_group(html):
+    # TODO: return FacebookGroup
+    pass
+
+
 class FacebookMobileScraper(object):
     def __init__(self, cookie, throttle=FACEBOOK_MOBILE_DEFAULT_THROTTLE):
         # Grabbing cookie
@@ -746,6 +752,10 @@ class FacebookMobileScraper(object):
         html = self.request_page(url)
 
         return scrape_post(html)
+
+    def group(self, url):
+        # TODO: return FacebookGroup
+        pass
 
     def post_author(self, url):
         if not has_facebook_comments(url):
