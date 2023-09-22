@@ -87,4 +87,4 @@ FACEBOOK_POST_WITH_REACTIONS_CSV_HEADERS = FACEBOOK_POST_CSV_HEADERS + [
     "reactions_types"
 ]
 
-FACEBOOK_GROUP_CSV_HEADERS = ["description"]
+FACEBOOK_GROUP_CSV_HEADERS = ["canonical_url", "id", "handheld", "title", "description"]

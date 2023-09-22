@@ -514,7 +514,7 @@ def scrape_photo(soup):
 
 
 def scrape_post(html):
-    soup = BeautifulSoupWithoutXHTMLWarnings(html, "lxml")
+    soup = BeautifulSoupWithoutXHTMLWarnings(html, "html")
 
     # with open("./dump.html", "w") as f:
     #     f.write(html)
@@ -620,7 +620,30 @@ def scrape_post(html):
 
 def scrape_group(html):
     # TODO: return FacebookGroup
-    pass
+    soup = BeautifulSoupWithoutXHTMLWarnings(html, "lxml")
+
+    url = soup.select_one("[rel='canonical']")["href"]
+
+    title = soup.head.select_one("title").get_text().lower()
+
+    description = soup.select_one("[property='og:image:alt']")["content"]
+
+    id = soup.select_one("[property='al:android:url']")["content"]
+
+    idclean = id.rsplit("/", 1)[-1]
+
+    handheld = soup.select_one("[media='handheld']")["href"]
+    handheldclean = handheld.rstrip("/").rsplit("/", 1)[-1]
+
+    post = FacebookGroup(
+        canonical_url=url,
+        id=idclean,
+        handheld=handheldclean,
+        title=title,
+        description=description,
+    )
+
+    return post
 
 
 class FacebookMobileScraper(object):
@@ -755,7 +778,14 @@ class FacebookMobileScraper(object):
 
     def group(self, url):
         # TODO: return FacebookGroup
-        pass
+        parsed = parse_facebook_url(url)
+        if not isinstance(parsed, ParsedFacebookGroup):
+            raise FacebookNotPostError
+        url = convert_url_to_mobile(parsed.url)
+
+        html = self.request_page(url)
+
+        return scrape_group(html)
 
     def post_author(self, url):
         if not has_facebook_comments(url):
