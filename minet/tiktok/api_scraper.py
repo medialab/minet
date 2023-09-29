@@ -31,11 +31,14 @@ from minet.tiktok.formatters import (
 )
 
 
-def forge_video_search_url(query, offset):
+def forge_video_search_url(query, offset, search_id=None):
     url = (
         "https://www.tiktok.com/api/search/general/full/?aid=1988&keyword=%s&offset=%s"
         % (quote(query), offset)
     )
+
+    if search_id is not None:
+        url += "&search_id=%s" % search_id
 
     return url
 
@@ -79,12 +82,17 @@ class TiktokAPIScraper(object):
 
     def search_videos(self, query):
         cursor = None
+        search_id = None
+
+        # NOTE: search is not very consistent and return the same often more than once
+        # Since there is a hard limit of max results around ~500, we can tolerate
+        # saving all ids in memory
+        already_seen = set()
 
         while True:
-            url = forge_video_search_url(query, cursor)
+            url = forge_video_search_url(query, cursor, search_id)
 
             data = self.request_json(url)
-
             item_list = data.get("data")
 
             if not item_list:
@@ -93,12 +101,21 @@ class TiktokAPIScraper(object):
             for item in item_list:
                 if item["type"] != 1:
                     continue
+
                 item = item["item"]
-                yield format_video(item)
+                video = format_video(item)
+
+                # NOTE: avoiding pagination hiccups
+                if video.id in already_seen:
+                    continue
+
+                already_seen.add(video.id)
+                yield video
 
             has_next_page = getpath(data, ["has_more"])
+            search_id = getpath(data, ["extra", "logid"])
 
-            if has_next_page != 1:
+            if has_next_page != 1 or search_id is None:
                 break
 
             cursor = getpath(data, ["cursor"])

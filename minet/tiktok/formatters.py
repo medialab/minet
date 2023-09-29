@@ -57,6 +57,9 @@ def format_video(item):
             effect_stickers_names.append(effect.get("name"))
 
     duet_from_id = getpath(item, ["duetInfo", "duetFromId"])
+    duet_from_user_id = None
+    duet_from_user_name = None
+    duet_from_user_is_commerce = None
 
     if duet_from_id == "0":
         duet_from_id = None
