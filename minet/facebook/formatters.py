@@ -10,7 +10,8 @@ from minet.facebook.constants import (
     FACEBOOK_COMMENT_CSV_HEADERS,
     FACEBOOK_POST_CSV_HEADERS,
     FACEBOOK_POST_WITH_REACTIONS_CSV_HEADERS,
-    FACEBOOK_GROUP_CSV_HEADERS,
+    FACEBOOK_GROUP_OR_PAGE_CSV_HEADERS,
+    FACEBOOK_PAGE_CSV_HEADERS,
 )
 
 
@@ -20,4 +21,5 @@ FacebookUser = namedrecord("FacebookUser", ["label", "id", "handle", "url"])
 FacebookPostWithReaction = namedrecord(
     "FacebookPostWithReaction", FACEBOOK_POST_WITH_REACTIONS_CSV_HEADERS
 )
-FacebookGroup = namedrecord("FacebookGroup", FACEBOOK_GROUP_CSV_HEADERS)
+FacebookGroupOrPage = namedrecord("FacebookGroup", FACEBOOK_GROUP_OR_PAGE_CSV_HEADERS)
+FacebookPage = namedrecord("FacebookPage", FACEBOOK_PAGE_CSV_HEADERS)

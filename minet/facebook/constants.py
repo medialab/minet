@@ -11,7 +11,7 @@ from minet.rate_limiting import RateLimiterState
 FACEBOOK_URL = "https://www.facebook.com"
 FACEBOOK_MOBILE_URL = "https://m.facebook.com"
 
-FACEBOOK_MOBILE_DEFAULT_THROTTLE = 2.0
+FACEBOOK_MOBILE_DEFAULT_THROTTLE = 20.0
 FACEBOOK_WEB_DEFAULT_THROTTLE = 20.0
 
 FACEBOOK_MOBILE_RATE_LIMITER_STATE = RateLimiterState(
@@ -87,4 +87,28 @@ FACEBOOK_POST_WITH_REACTIONS_CSV_HEADERS = FACEBOOK_POST_CSV_HEADERS + [
     "reactions_types"
 ]
 
-FACEBOOK_GROUP_CSV_HEADERS = ["canonical_url", "id", "handheld", "title", "description"]
+FACEBOOK_GROUP_OR_PAGE_CSV_HEADERS = [
+    "canonical_url",
+    "id",
+    "handle",
+    "type",
+    "title",
+    "description",
+    "profile_picture",
+    "background_picture",
+    "category",
+    "about",
+    "is_verified",
+]
+FACEBOOK_PAGE_CSV_HEADERS = [
+    "url",
+    "id",
+    "handle",
+    "titre",
+    "description",
+    "photo_profil",
+    "photo_fond",
+    "categorie",
+    "a_propos",
+    "page_verifiee",
+]

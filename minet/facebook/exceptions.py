@@ -25,3 +25,11 @@ class FacebookNotPostError(FacebookError):
 
 class FacebookWatchError(FacebookError):
     pass
+
+
+class FacebookCouldNotExtractError(FacebookError):
+    pass
+
+
+class FacebookBlock(FacebookError):
+    pass

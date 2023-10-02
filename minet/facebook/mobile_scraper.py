@@ -31,6 +31,7 @@ from minet.dates import parse_date
 from minet.web import (
     create_pool_manager,
     request,
+    resolve,
     create_request_retryer,
     retrying_method,
 )
@@ -42,13 +43,16 @@ from minet.facebook.formatters import (
     FacebookPost,
     FacebookUser,
     FacebookPostWithReaction,
-    FacebookGroup,
+    FacebookGroupOrPage,
+    FacebookPage,
 )
 from minet.facebook.exceptions import (
     FacebookInvalidCookieError,
     FacebookInvalidTargetError,
     FacebookNotPostError,
     FacebookWatchError,
+    FacebookCouldNotExtractError,
+    FacebookBlock,
 )
 from minet.facebook.constants import (
     FACEBOOK_MOBILE_DEFAULT_THROTTLE,
@@ -635,12 +639,75 @@ def scrape_group(html):
     handheld = soup.select_one("[media='handheld']")["href"]
     handheldclean = handheld.rstrip("/").rsplit("/", 1)[-1]
 
-    post = FacebookGroup(
+    handle_final = handheldclean if not handheldclean.isnumeric() else ""
+    if ...:
+        raise FacebookCouldNotExtractError
+
+    post = FacebookGroupOrPage(
         canonical_url=url,
         id=idclean,
-        handheld=handheldclean,
+        handle=handle_final,
+        type="group",
         title=title,
         description=description,
+        profile_picture="",
+        background_picture="",
+        category="",
+        about="",
+        is_verified="",
+    )
+
+    return post
+
+
+def scrape_page(html):
+    soup = BeautifulSoupWithoutXHTMLWarnings(html, "lxml")
+    description_lm = soup.select_one(
+        "#objects_container > div > div > div > div:nth-of-type(2) > div:nth-of-type(2)"
+    )
+
+    if "https://m.facebook.com/help/contact" in soup.select("a"):
+        raise FacebookBlock
+    if description_lm == None:
+        raise FacebookCouldNotExtractError
+
+    description = get_display_text(description_lm) if description_lm != None else ""
+
+    categorie_lm = soup.select_one("#category > div > div:last-of-type")
+    categorie = categorie_lm.get_text() if categorie_lm != None else ""
+
+    url_lm = soup.select_one(
+        "#contact-info table tr td:-soup-contains('Facebook') + td"
+    )
+    handle = url_lm.get_text().strip() if url_lm != None else ""
+
+    id = ""
+    a_propos_lm = soup.select_one("#bio > div > div:last-of-type")
+    a_propos = a_propos_lm.get_text() if a_propos_lm != None else ""
+
+    page_verifiee_lm = soup.select_one(".cd.ce.cf.cg")
+
+    page_verifiee = "yes" if page_verifiee_lm != None else "no"
+
+    titre_lm = soup.select_one("head > title")
+    titre = titre_lm.get_text() if titre_lm != None else ""
+
+    profile = soup.select_one("img.q")["src"]
+
+    fond = soup.select_one(".br.bs.bt.q")["src"]
+
+    post = FacebookGroupOrPage(
+        canonical_url="",
+        id=id,
+        handle=handle,
+        type="page",
+        title=titre,
+        description=description,
+        profile_picture=profile,
+        background_picture=fond,
+        category=categorie,
+        about=a_propos,
+        is_verified=page_verifiee,
     )
 
     return post
@@ -673,6 +740,12 @@ class FacebookMobileScraper(object):
         )
 
         return response.text()
+
+    @rate_limited_method()
+    @retrying_method()
+    def resolve(self, url):
+        stack = resolve(url, pool_manager=self.pool_manager)
+        return stack[-1].url
 
     def comments(self, url, detailed=False, per_call=False):
         if not has_facebook_comments(url):
@@ -776,16 +849,28 @@ class FacebookMobileScraper(object):
 
         return scrape_post(html)
 
-    def group(self, url):
+    def group_or_page(self, url):
         # TODO: return FacebookGroup
+        # issue : when parsing facebook urls with numerical non-handles
+        # need redirecting of url before converting to mobile
         parsed = parse_facebook_url(url)
-        if not isinstance(parsed, ParsedFacebookGroup):
-            raise FacebookNotPostError  # TODO: faire une NotGroupError
+
+        if isinstance(parsed, ParsedFacebookHandle) and parsed.handle.isnumeric():
+            url = self.resolve(url)
+            parsed = parse_facebook_url(url)
+        print(url)
         url = convert_url_to_mobile(parsed.url)
 
         html = self.request_page(url)
-
-        return scrape_group(html)
+        if isinstance(parsed, ParsedFacebookGroup):
+            return scrape_group(html)
+        else:
+            if isinstance(parsed, ParsedFacebookHandle) or isinstance(
+                parsed, ParsedFacebookUser
+            ):
+                return scrape_page(html)
+            else:
+                raise FacebookNotPostError  # TODO: faire une NotGroupError
 
     def post_author(self, url):
         if not has_facebook_comments(url):
