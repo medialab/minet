@@ -15,6 +15,7 @@ from ebbe.decorators import with_defer
 
 from minet.utils import import_target
 from minet.fs import FilenameBuilder
+from minet.exceptions import ModuleNotFoundError, TargetInModuleNotFoundError
 from minet.cli.exceptions import FatalError
 from minet.crawl import (
     Crawler,
@@ -224,11 +225,19 @@ def crawl_action(
         if cli_args.module is not None:
             try:
                 target = import_target(cli_args.module, "spider")
-            except ImportError:
+            except ModuleNotFoundError:
                 raise FatalError(
                     [
                         "Could not import %s!" % cli_args.module,
                         "Are you sure the module exists?",
+                    ]
+                )
+            except TargetInModuleNotFoundError as e:
+                raise FatalError(
+                    [
+                        "Could not find the %s target in the %s module!"
+                        % (e.name, e.path),
+                        "Are you sure this class/function/variable exists in the module?",
                     ]
                 )
         else:

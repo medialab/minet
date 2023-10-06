@@ -6,7 +6,13 @@
 #
 from typing import Optional
 
-from minet.utils import message_flatmap
+
+# NOTE: duplicated from `minet.utils` to avoid dependency cycles
+def message_flatmap(*messages, sep=" ", end="\n"):
+    return sep.join(
+        end.join(m for m in message) if not isinstance(message, str) else message
+        for message in messages
+    )
 
 
 # Base minet error
@@ -158,6 +164,21 @@ class FilenameFormattingError(MinetError):
         super().__init__(message)
         self.reason = reason
         self.template = template
+
+
+class ModuleNotFoundError(MinetError):
+    def __init__(self, path: str, target: str):
+        self.path = path
+        self.target = target
+        super().__init__("module %s not found" % self.path)
+
+
+class TargetInModuleNotFoundError(MinetError):
+    def __init__(self, path: str, target: str, name: str):
+        self.path = path
+        self.target = target
+        self.name = name
+        super().__init__("target %s in module %s not found" % (self.name, self.path))
 
 
 # User Agents error
