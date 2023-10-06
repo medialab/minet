@@ -10,7 +10,7 @@ from urllib.parse import quote
 from minet.rate_limiting import RateLimiterState, rate_limited_method
 from minet.web import create_request_retryer, retrying_method, request
 
-from minet.buzzsumo.formatters import format_article
+from minet.buzzsumo.formatters import format_article, format_exact_url
 from minet.buzzsumo.exceptions import (
     BuzzSumoInvalidTokenError,
     BuzzSumoOutageError,
@@ -121,6 +121,24 @@ class BuzzSumoAPIClient(object):
             "total_results": int(data["total_results"]),
             "total_pages": data["total_pages"],
         }
+
+    def exact_url(self, search_url, begin_timestamp, end_timestamp):
+        url = (
+            construct_url(
+                "/search/articles.json",
+                token=self.token,
+                q=search_url,
+                begin_timestamp=begin_timestamp,
+                end_timestamp=end_timestamp,
+            )
+            + "&exact_url=True"
+        )
+
+        _, data = self.request(url)
+
+        if isinstance(data.get("results"), list) and len(data["results"]) == 1:
+            match = data["results"][0]
+            return format_exact_url(match)
 
     def __get_nb_pages_per_period_dates(self, domain, period_timestamps):
         nb_pages = []
