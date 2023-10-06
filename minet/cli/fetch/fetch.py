@@ -395,7 +395,12 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                         # Reporting in output
                         last = result.stack[-1]
                         status = last.status
-                        loading_bar.inc_stat(status, style=get_style_for_status(status))
+
+                        # Status can be None with inference etc.
+                        if status is not None:
+                            loading_bar.inc_stat(
+                                status, style=get_style_for_status(status)
+                            )
 
                         addendum.infos_from_stack(result.stack)
                         enricher.writerow(index, row, addendum)
