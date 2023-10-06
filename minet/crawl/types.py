@@ -6,6 +6,7 @@ from ebbe import format_repr
 from functools import partial
 
 from minet.web import Response
+from minet.encodings import normalize_encoding
 from minet.serialization import serialize_error_as_slug
 
 CrawlJobDataType = TypeVar("CrawlJobDataType")
@@ -212,6 +213,7 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
         "mimetype",
         "degree",
         "body_size",
+        "encoding",
     ]
 
     job: CrawlJob[CrawlJobDataType]
@@ -269,6 +271,7 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
                 self.response.mimetype if self.response else None,
                 self.degree,
                 len(self.response) if self.response else None,
+                self.response.encoding if self.response else None,
             ]
         )
 
@@ -278,6 +281,11 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
         return self.__csv_row__()
 
     def __repr__(self) -> str:
+        encoding = self.response.encoding if self.response else None
+
+        if encoding and normalize_encoding(encoding) == "utf8":
+            encoding = None
+
         return format_repr(
             self,
             attributes=(
@@ -294,6 +302,7 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
                     ),
                     ("size", self.response.human_size if self.response else None),
                     ("mimetype", self.response.mimetype if self.response else None),
+                    ("encoding", encoding),
                 )
             ),
             conditionals=(
@@ -304,6 +313,7 @@ class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
                 "dtype",
                 "size",
                 "mimetype",
+                "encoding",
             ),
         )
 
