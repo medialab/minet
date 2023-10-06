@@ -28,6 +28,7 @@ _Platform-related commands_
   - [limit](#buzzsumo-limit)
   - [domain-summary](#buzzsumo-domain-summary)
   - [domain](#buzzsumo-domain)
+  - [exact-url](#exact-url)
 - [crowdtangle (ct)](#crowdtangle)
   - [leaderboard](#leaderboard)
   - [lists](#lists)
