@@ -28,7 +28,7 @@ _Platform-related commands_
   - [limit](#buzzsumo-limit)
   - [domain-summary](#buzzsumo-domain-summary)
   - [domain](#buzzsumo-domain)
-  - [exact-url](#exact-url)
+  - [exact-url](#buzzsumo-exact-url)
 - [crowdtangle (ct)](#crowdtangle)
   - [leaderboard](#leaderboard)
   - [lists](#lists)
@@ -222,6 +222,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 <h3 id="buzzsumo-domain">domain</h3>
 
 <% bz/domain %>
+
+<h3 id="buzzsumo-exact-url">exact-url</h3>
+
+<% bz/exact-url %>
 
 ## CrowdTangle
 
