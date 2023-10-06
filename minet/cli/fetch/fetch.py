@@ -38,7 +38,7 @@ from minet.cli.utils import with_enricher_and_loading_bar, with_ctrl_c_warning
 
 @dataclass
 class WorkerAddendum:
-    filename: Optional[str] = None
+    path: Optional[str] = None
     decoded_contents: Optional[str] = None
 
 
@@ -48,7 +48,7 @@ class FetchAddendum(TabularRecord):
     http_status: Optional[int] = None
     datetime_utc: Optional[datetime] = None
     fetch_error: Optional[str] = None
-    filename: Optional[str] = None
+    path: Optional[str] = None
     mimetype: Optional[str] = None
     encoding: Optional[str] = None
     body_size: Optional[int] = None
@@ -59,7 +59,7 @@ class FetchAddendum(TabularRecord):
         self.resolved_url = response.end_url
         self.http_status = response.status
         self.datetime_utc = response.end_datetime
-        self.filename = addendum.filename if addendum else None
+        self.path = addendum.path if addendum else None
         self.encoding = response.encoding
         self.mimetype = response.mimetype
         self.body_size = len(response)
@@ -270,7 +270,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
             compressed=cli_args.compress_on_disk,
         )
 
-        addendum.filename = filename
+        addendum.path = filename
 
         # Decoding the response data?
         data: Union[str, bytes] = response.body

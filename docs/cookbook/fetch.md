@@ -96,7 +96,7 @@ _urls.csv_
 | 54038 | https://news.ycombinator.com |
 
 ```bash
-minet fetch url -i urls.csv --filename id > report.csv
+minet fetch url -i urls.csv --filename-column id > report.csv
 
 ls content
 >>> 1.html 2.html 3.html ...
