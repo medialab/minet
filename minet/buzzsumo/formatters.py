@@ -6,7 +6,7 @@
 #
 from casanova import namedrecord
 
-from minet.buzzsumo.constants import ARTICLES_CSV_HEADERS
+from minet.buzzsumo.constants import ARTICLES_CSV_HEADERS, EXACT_URL_HEADERS
 
 
 BuzzSumoArticle = namedrecord(
@@ -23,3 +23,19 @@ def format_article(data):
         keep[k] = data[k]
 
     return BuzzSumoArticle(**keep)
+
+
+BuzzSumoExactURL = namedrecord(
+    "BuzzSumoExactURL",
+    EXACT_URL_HEADERS,
+    plural=["article_types"],
+)
+
+
+def format_exact_url(data):
+    keep = {}
+
+    for k in EXACT_URL_HEADERS:
+        keep[k] = data[k]
+
+    return BuzzSumoExactURL(**keep)

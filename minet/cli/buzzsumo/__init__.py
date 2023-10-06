@@ -109,6 +109,27 @@ BUZZSUMO_DOMAIN_SUMMARY_COMMAND = command(
     ],
 )
 
+
+BUZZSUMO_EXACT_URL_COMMAND = command(
+    "exact-url",
+    "minet.cli.buzzsumo.exact_url",
+    title="Minet Buzzsumo Exact URL Command",
+    description="""
+        Gather metadata about a specific URL crawled by BuzzSumo in a given time period.
+    """,
+    epilog="""
+        Examples:
+
+        . Returning the metadata found in BuzzSumo for a URL:
+            $ minet bz exact-url --begin-date 2020-01-01 --end-date 2023-10-06 --token YOUR_TOKEN 'https://www.lemonde.fr/politique/article/2023/10/06/trois-mois-apres-les-emeutes-emmanuel-macron-tarde-a-prendre-la-mesure-de-la-crise-des-banlieues_6192720_823448.html'
+    """,
+    variadic_input={"dummy_column": "exact_url", "item_label": "exact url"},
+    arguments=[
+        *DATE_ARGUMENTS,
+    ],
+)
+
+
 BUZZSUMO_COMMAND = command(
     "buzzsumo",
     "minet.cli.buzzsumo",
@@ -130,5 +151,6 @@ BUZZSUMO_COMMAND = command(
         BUZZSUMO_LIMIT_SUBCOMMAND,
         BUZZSUMO_DOMAIN_COMMAND,
         BUZZSUMO_DOMAIN_SUMMARY_COMMAND,
+        BUZZSUMO_EXACT_URL_COMMAND,
     ],
 )
