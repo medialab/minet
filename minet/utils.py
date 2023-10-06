@@ -18,6 +18,8 @@ import importlib
 from os.path import dirname, abspath, relpath
 from random import uniform
 
+from minet.exceptions import ModuleNotFoundError, TargetInModuleNotFoundError
+
 
 def fuzzy_int(value):
     try:
@@ -127,14 +129,17 @@ def import_target(path: str, default: str = "main"):
     # NOTE: we renormalize to a module
     module = relpath(module_path)[:-3].replace(os.sep, ".")
 
-    m = importlib.import_module(module)
+    try:
+        m = importlib.import_module(module)
+    except ImportError:
+        raise ModuleNotFoundError(module_path_or_name, path)
 
     sys.path.remove(module_directory)
 
     try:
         return getattr(m, function_name)
     except AttributeError:
-        raise ImportError
+        raise TargetInModuleNotFoundError(module_path_or_name, path, function_name)
 
 
 def iterate_over_sqlite_cursor(cursor: sqlite3.Cursor) -> Iterator[Any]:
