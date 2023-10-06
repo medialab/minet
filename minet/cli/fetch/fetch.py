@@ -171,14 +171,14 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
     filename_pos = None
 
-    if not resolve and cli_args.filename is not None:
-        if cli_args.filename not in enricher.headers:
+    if not resolve and cli_args.filename_column is not None:
+        if cli_args.filename_column not in enricher.headers:
             raise InvalidArgumentsError(
                 'Could not find the "%s" column containing the filenames in the given CSV file.'
-                % cli_args.filename
+                % cli_args.filename_column
             )
 
-        filename_pos = enricher.headers[cli_args.filename]
+        filename_pos = enricher.headers[cli_args.filename_column]
 
     only_shortened = getattr(cli_args, "only_shortened", False)
     only_html = getattr(cli_args, "only_html", False)
