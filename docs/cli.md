@@ -28,7 +28,11 @@ _Platform-related commands_
   - [limit](#buzzsumo-limit)
   - [domain-summary](#buzzsumo-domain-summary)
   - [domain](#buzzsumo-domain)
+<<<<<<< HEAD
   - [exact-url](#exact-url)
+=======
+  - [exact-url](#buzzsumo-exact-url)
+>>>>>>> 22b55b20 (Adding the bz exact-url command)
 - [crowdtangle (ct)](#crowdtangle)
   - [leaderboard](#leaderboard)
   - [lists](#lists)
@@ -559,7 +563,7 @@ Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                    [--timeout TIMEOUT] [--url-template URL_TEMPLATE] [-X METHOD]
                    [-x PROXY] [--spoof-user-agent]
                    [--max-redirects MAX_REDIRECTS] [-z] [--compress-transfer]
-                   [-c] [-D] [-O OUTPUT_DIR] [-f FILENAME]
+                   [-c] [-D] [-O OUTPUT_DIR] [-f FILENAME_COLUMN]
                    [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [--keep-failed-contents]
                    [--standardize-encoding] [--only-html] [--pycurl] [--sqlar]
@@ -593,7 +597,8 @@ Options:
   --domain-parallelism DOMAIN_PARALLELISM
                                 Max number of urls per domain to hit at the same
                                 time. Defaults to `1`.
-  -f, --filename FILENAME       Name of the column used to build retrieved file
+  -f, --filename-column FILENAME_COLUMN
+                                Name of the column used to build retrieved file
                                 names. Defaults to a md5 hash of final url. If
                                 the provided file names have no extension (e.g.
                                 ".jpg", ".pdf", etc.) the correct extension will
@@ -1832,6 +1837,104 @@ how to use the command with a CSV file?
 
 . This also works with single values:
     $ minet buzzsumo domain "value1,value2" --explode ","
+```
+
+<h3 id="buzzsumo-exact-url">exact-url</h3>
+
+```
+Usage: minet buzzsumo exact-url [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
+                                [--refresh-per-second REFRESH_PER_SECOND]
+                                [--single-line] --begin-date BEGIN_DATE
+                                --end-date END_DATE [-i INPUT]
+                                [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                                [-o OUTPUT]
+                                exact_url_or_exact_url_column
+
+# Minet Buzzsumo Exact URL Command
+
+Gather metadata about a specific URL crawled by BuzzSumo in a given time period.
+
+Positional Arguments:
+  exact_url_or_exact_url_column
+                                Single exact url to process or name of the CSV
+                                column containing exact urls when using
+                                -i/--input.
+
+Optional Arguments:
+  --begin-date BEGIN_DATE       The date you wish to fetch articles from. UTC
+                                date should have the following format :
+                                YYYY-MM-DD
+  --end-date END_DATE           The date you wish to fetch articles to. UTC date
+                                should have the following format : YYYY-MM-DD
+  -t, --token TOKEN             BuzzSumo API token. Can also be configured in a
+                                .minetrc file as "buzzsumo.token" or read from
+                                the MINET_BUZZSUMO_TOKEN env variable.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the exact urls you want to process. Will
+                                consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --single-line                 Whether to simplify the progress bar to make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Examples:
+
+. Returning the metadata found in BuzzSumo for a URL:
+    $ minet bz exact-url --begin-date 2020-01-01 --end-date 2023-10-06 --token YOUR_TOKEN 'https://www.lemonde.fr/politique/article/2023/10/06/trois-mois-apres-les-emeutes-emmanuel-macron-tarde-a-prendre-la-mesure-de-la-crise-des-banlieues_6192720_823448.html'
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet buzzsumo exact-url "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet buzzsumo exact-url column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet buzzsumo exact-url column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet buzzsumo exact-url column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet buzzsumo exact-url "value1,value2" --explode ","
 ```
 
 ## CrowdTangle
