@@ -22,3 +22,5 @@ def action(cli_args, enricher, loading_bar):
             data = client.exact_url(url, cli_args.begin_date, cli_args.end_date)
             if data:
                 enricher.writerow(row, data.as_csv_row())
+            else:
+                enricher.writerow(row)
