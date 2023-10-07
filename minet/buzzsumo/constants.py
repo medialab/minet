@@ -95,6 +95,7 @@ EXACT_URL_HEADERS = [
     "evergreen_score",
     "evergreen_score2",
     "article_types",
+    "author_image",
     "ecommerce",
     "general_article",
     "how_to_article",

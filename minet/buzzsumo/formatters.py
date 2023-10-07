@@ -36,6 +36,6 @@ def format_exact_url(data):
     keep = {}
 
     for k in EXACT_URL_HEADERS:
-        keep[k] = data[k]
+        keep[k] = data.get(k)
 
     return BuzzSumoExactURL(**keep)
