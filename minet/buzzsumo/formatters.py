@@ -36,10 +36,6 @@ def format_exact_url(data):
     keep = {}
 
     for k in EXACT_URL_HEADERS:
-<<<<<<< HEAD
         keep[k] = data.get(k)
-=======
-        keep[k] = data[k]
->>>>>>> 22b55b20 (Adding the bz exact-url command)
 
     return BuzzSumoExactURL(**keep)
