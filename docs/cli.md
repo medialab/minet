@@ -76,7 +76,7 @@ _Platform-related commands_
   - [list-followers](#list-followers)
   - [list-members](#list-members)
   - [retweeters](#retweeters)
-  - [scrape](#twitter-scrape)
+  - [scrape](#scrape-1)
   - [tweet-date](#tweet-date)
   - [tweet-search](#tweet-search)
   - [tweet-count](#tweet-count)
