@@ -18,9 +18,9 @@ else:
     from typing_extensions import TypeGuard, Concatenate, ParamSpec
 
 if sys.version_info >= (3, 11):
-    from typing import TypedDict, Required, NotRequired
+    from typing import TypedDict, Required, NotRequired, Unpack
 else:
-    from typing_extensions import TypedDict, Required, NotRequired
+    from typing_extensions import TypedDict, Required, NotRequired, Unpack
 
 # Useful conditional imports
 try:

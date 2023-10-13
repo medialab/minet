@@ -18,7 +18,7 @@ from typing import (
     Union,
     Any,
 )
-from minet.types import Literal
+from minet.types import Literal, TypedDict, Unpack, NotRequired
 
 import urllib3
 import threading
@@ -89,6 +89,37 @@ class HTTPWorkerPayload(HTTPWorkerPayloadBase[ItemType]):
 
 
 ArgsCallbackType = Callable[[HTTPWorkerPayload[ItemType]], Dict]
+
+
+class ExecutorRequestKwargs(TypedDict, Generic[ItemType, AddendumType]):
+    ordered: NotRequired[bool]
+    key: NotRequired[Optional[Callable[[ItemType], Optional[str]]]]
+    throttle: NotRequired[float]
+    request_args: NotRequired[Optional[ArgsCallbackType[ItemType]]]
+    use_pycurl: NotRequired[bool]
+    compressed: NotRequired[bool]
+    buffer_size: NotRequired[int]
+    domain_parallelism: NotRequired[int]
+    max_redirects: NotRequired[int]
+    callback: NotRequired[Optional[Callable[[ItemType, str, Response], AddendumType]]]
+
+
+class ExecutorResolveKwargs(TypedDict, Generic[ItemType, AddendumType]):
+    ordered: NotRequired[bool]
+    key: NotRequired[Optional[Callable[[ItemType], Optional[str]]]]
+    throttle: NotRequired[float]
+    resolve_args: NotRequired[Optional[ArgsCallbackType[ItemType]]]
+    buffer_size: NotRequired[int]
+    domain_parallelism: NotRequired[int]
+    max_redirects: NotRequired[int]
+    follow_refresh_header: NotRequired[bool]
+    follow_meta_refresh: NotRequired[bool]
+    follow_js_relocation: NotRequired[bool]
+    infer_redirection: NotRequired[bool]
+    canonicalize: NotRequired[bool]
+    callback: NotRequired[
+        Optional[Callable[[ItemType, str, RedirectionStack], AddendumType]]
+    ]
 
 
 class RequestResult(Generic[ItemType, AddendumType]):
@@ -514,17 +545,8 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         self,
         iterator: Iterable[ItemType],
         *,
-        ordered: bool = ...,
-        key: Optional[Callable[[ItemType], Optional[str]]] = ...,
-        throttle: float = ...,
-        request_args: Optional[ArgsCallbackType[ItemType]] = ...,
-        use_pycurl: bool = ...,
-        compressed: bool = ...,
-        buffer_size: int = ...,
-        domain_parallelism: int = ...,
-        max_redirects: int = ...,
-        callback: Optional[Callable[[ItemType, str, Response], AddendumType]] = ...,
-        passthrough: Literal[False] = False,
+        passthrough: Literal[False] = ...,
+        **kwargs: Unpack[ExecutorRequestKwargs[ItemType, AddendumType]],
     ) -> Iterator[AnyActualRequestResult[ItemType, AddendumType]]:
         ...
 
@@ -533,17 +555,8 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         self,
         iterator: Iterable[ItemType],
         *,
-        ordered: bool = ...,
-        key: Optional[Callable[[ItemType], Optional[str]]] = ...,
-        throttle: float = ...,
-        request_args: Optional[ArgsCallbackType[ItemType]] = ...,
-        use_pycurl: bool = ...,
-        compressed: bool = ...,
-        buffer_size: int = ...,
-        domain_parallelism: int = ...,
-        max_redirects: int = ...,
-        callback: Optional[Callable[[ItemType, str, Response], AddendumType]] = ...,
         passthrough: Literal[True] = ...,
+        **kwargs: Unpack[ExecutorRequestKwargs[ItemType, AddendumType]],
     ) -> Iterator[AnyRequestResult[ItemType, AddendumType]]:
         ...
 
@@ -598,22 +611,8 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         self,
         iterator: Iterable[ItemType],
         *,
-        ordered: bool = ...,
-        key: Optional[Callable[[ItemType], Optional[str]]] = ...,
-        throttle: float = ...,
-        resolve_args: Optional[ArgsCallbackType[ItemType]] = ...,
-        buffer_size: int = ...,
-        domain_parallelism: int = ...,
-        max_redirects: int = ...,
-        follow_refresh_header: bool = ...,
-        follow_meta_refresh: bool = ...,
-        follow_js_relocation: bool = ...,
-        infer_redirection: bool = ...,
-        canonicalize: bool = ...,
-        callback: Optional[
-            Callable[[ItemType, str, RedirectionStack], AddendumType]
-        ] = ...,
-        passthrough: Literal[False] = False,
+        passthrough: Literal[False] = ...,
+        **kwargs: Unpack[ExecutorResolveKwargs],
     ) -> Iterator[AnyActualResolveResult[ItemType, AddendumType]]:
         ...
 
@@ -622,22 +621,8 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         self,
         iterator: Iterable[ItemType],
         *,
-        ordered: bool = ...,
-        key: Optional[Callable[[ItemType], Optional[str]]] = ...,
-        throttle: float = ...,
-        resolve_args: Optional[ArgsCallbackType[ItemType]] = ...,
-        buffer_size: int = ...,
-        domain_parallelism: int = ...,
-        max_redirects: int = ...,
-        follow_refresh_header: bool = ...,
-        follow_meta_refresh: bool = ...,
-        follow_js_relocation: bool = ...,
-        infer_redirection: bool = ...,
-        canonicalize: bool = ...,
-        callback: Optional[
-            Callable[[ItemType, str, RedirectionStack], AddendumType]
-        ] = ...,
         passthrough: Literal[True] = ...,
+        **kwargs: Unpack[ExecutorResolveKwargs],
     ) -> Iterator[AnyResolveResult[ItemType, AddendumType]]:
         ...
 
