@@ -1,8 +1,10 @@
 from typing import Callable, Optional, TypeVar, Awaitable
 from minet.types import Literal, Concatenate, ParamSpec
 
+import os
 import asyncio
 import platform
+from os.path import expanduser
 from threading import Thread, Event
 from playwright.async_api import async_playwright, Page, Browser
 from playwright_stealth import stealth_async
@@ -40,6 +42,10 @@ class ThreadsafeBrowser:
 
         self.stealthy = stealthy
         self.browser_name = browser
+
+        os.environ.setdefault(
+            "PLAYWRIGHT_BROWSERS_PATH", expanduser("~/.minet-browsers")
+        )
 
         run_playwright("install", self.browser_name)
 
