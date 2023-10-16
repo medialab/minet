@@ -266,6 +266,25 @@ def crawl_command(
             "no_help": True,
         }
 
+    epilog = (
+        (epilog or "")
+        + """
+        Notes regarding sqlite storage temporary files:
+
+        If you spawn a persistent crawler, some of its state will be kept using
+        specialized sqlite databases on disk.
+
+        Be aware that sqlite sometimes need to perform cleanup operations that rely
+        on temporary files that will be written in a folder configured as the
+        `SQLITE_TMPDIR` env variable. Be sure to set this variable when running this
+        command, especially when the crawler files will be stored on a different disk
+        and if writing in the host's `/tmp` directory can be risky due to insufficient
+        storage available.
+
+        For more info, check out: https://www.sqlite.org/tempfiles.html
+        """
+    )
+
     if "folder_strategy" in arguments_dict:
         # NOTE: text indentation IS important
         epilog = f"""
