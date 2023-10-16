@@ -48,7 +48,7 @@ from minet.crawl.state import CrawlerState
 from minet.crawl.url_cache import URLCache
 from minet.web import request, EXPECTED_WEB_ERRORS, AnyTimeout
 from minet.fs import ThreadSafeFileWriter
-from minet.executors import HTTPThreadPoolExecutor, CANCELLED
+from minet.executors import HTTPThreadPoolExecutor
 from minet.exceptions import UnknownSpiderError, CancelledRequestError
 from minet.constants import (
     DEFAULT_DOMAIN_PARALLELISM,
@@ -140,7 +140,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType]
-    ) -> Union[object, AnyCrawlResult[CrawlJobDataType, CrawlResultDataType]]:
+    ) -> Optional[AnyCrawlResult[CrawlJobDataType, CrawlResultDataType]]:
         # Registering work
         with self.crawler.state.task(), self.crawler.queue.group_releaser(job):
             cancel_event = self.cancel_event
@@ -158,14 +158,14 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
             kwargs = self.default_kwargs.copy()
 
             if cancel_event.is_set():
-                return CANCELLED
+                return
 
             if self.request_args is not None:
                 # NOTE: request_args must be threadsafe
                 kwargs.update(self.request_args(job))
 
             if cancel_event.is_set():
-                return CANCELLED
+                return
 
             try:
                 retryer = getattr(self.local_context, "retryer", None)
@@ -183,13 +183,13 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
                         self.crawler.url_cache.add(response.end_url)
 
             except CancelledRequestError:
-                return CANCELLED
+                return
 
             except EXPECTED_WEB_ERRORS as error:
                 return ErroredCrawlResult(job, error)
 
             if cancel_event.is_set():
-                return CANCELLED
+                return
 
             spider_result = spider.process(job, response)
 
@@ -200,7 +200,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
                 next_jobs = None
 
             if cancel_event.is_set():
-                return CANCELLED
+                return
 
             degree = 0
 
@@ -221,7 +221,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
             if self.callback is not None:
                 self.callback(self.crawler, result)  # type: ignore
 
-            return result
+            return result # type: ignore
 
 
 CrawlJobDataTypes = TypeVar("CrawlJobDataTypes")
@@ -501,7 +501,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
         def safe_wrapper():
             for result in imap_unordered:
-                if result is CANCELLED:
+                if result is None:
                     continue
 
                 yield result

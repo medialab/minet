@@ -52,8 +52,6 @@ ItemType = TypeVar("ItemType")
 ResultType = TypeVar("ResultType")
 AddendumType = TypeVar("AddendumType")
 
-CANCELLED = object()
-
 
 class HTTPWorkerPayloadBase(Generic[ItemType]):
     __slots__ = ("item", "url", "__has_cached_domain", "__domain")
@@ -425,7 +423,12 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
 
     def __call__(
         self, payload: HTTPWorkerPayloadBase[ItemType]
-    ) -> Union[object, RequestResult[ItemType, AddendumType]]:
+    ) -> Optional[
+        Union[
+            AnyRequestResult[ItemType, AddendumType],
+            AnyResolveResult[ItemType, AddendumType],
+        ]
+    ]:
         item, url = payload.item, payload.url
 
         # Noop
@@ -435,14 +438,14 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
         kwargs = self.default_kwargs.copy()
 
         if self.cancel_event.is_set():
-            return CANCELLED
+            return
 
         if self.get_args is not None:
             # NOTE: given callback must be threadsafe
             kwargs.update(self.get_args(cast(HTTPWorkerPayload, payload)))
 
         if self.cancel_event.is_set():
-            return CANCELLED
+            return
 
         try:
             retryer = getattr(self.local_context, "retryer", None)
@@ -453,7 +456,7 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
                 output = self.fn(url, **kwargs)
 
         except CancelledRequestError:
-            return CANCELLED
+            return
 
         except EXPECTED_WEB_ERRORS as error:
             return self.ErroredResult(item, url, error)
@@ -463,7 +466,7 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
 
             if self.callback is not None:
                 if self.cancel_event.is_set():
-                    return CANCELLED
+                    return
 
                 try:
                     if retryer is not None:
@@ -604,7 +607,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
             throttle=throttle,
         )
 
-        return (item for item in imap_unordered if item is not CANCELLED)  # type: ignore
+        return (item for item in imap_unordered if item is not None)  # type: ignore
 
     @overload
     def resolve(
@@ -679,4 +682,4 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
             throttle=throttle,
         )
 
-        return (item for item in imap_unordered if item is not CANCELLED)  # type: ignore
+        return (item for item in imap_unordered if item is not None)  # type: ignore
