@@ -166,14 +166,14 @@ class FilenameFormattingError(MinetError):
         self.template = template
 
 
-class ModuleNotFoundError(MinetError):
+class GenericModuleNotFoundError(MinetError):
     def __init__(self, path: str, target: str):
         self.path = path
         self.target = target
         super().__init__("module %s not found" % self.path)
 
 
-class TargetInModuleNotFoundError(MinetError):
+class TargetInGenericModuleNotFoundError(MinetError):
     def __init__(self, path: str, target: str, name: str):
         self.path = path
         self.target = target
