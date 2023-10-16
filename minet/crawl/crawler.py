@@ -6,6 +6,7 @@
 #
 from typing import (
     cast,
+    overload,
     Optional,
     TypeVar,
     Callable,
@@ -48,7 +49,7 @@ from minet.crawl.state import CrawlerState
 from minet.crawl.url_cache import URLCache
 from minet.web import request, EXPECTED_WEB_ERRORS, AnyTimeout
 from minet.fs import ThreadSafeFileWriter
-from minet.executors import HTTPThreadPoolExecutor
+from minet.executors import HTTPThreadPoolExecutor, CallbackResultType
 from minet.exceptions import UnknownSpiderError, CancelledRequestError
 from minet.constants import (
     DEFAULT_DOMAIN_PARALLELISM,
@@ -95,7 +96,7 @@ def spider_start_iter(spider: Spider) -> Iterable[UrlOrCrawlTarget]:
 RequestArgsType = Callable[[CrawlJob[CrawlJobDataType]], Dict]
 
 
-class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
+class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType, CallbackResultType]):
     def __init__(
         self,
         crawler: "Crawler",
@@ -112,7 +113,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
                     "Crawler",
                     SuccessfulCrawlResult[CrawlJobDataType, CrawlResultDataType],
                 ],
-                None,
+                CallbackResultType,
             ]
         ] = None
     ):
@@ -140,7 +141,12 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType]
-    ) -> Optional[AnyCrawlResult[CrawlJobDataType, CrawlResultDataType]]:
+    ) -> Optional[
+        Tuple[
+            AnyCrawlResult[CrawlJobDataType, CrawlResultDataType],
+            Optional[CallbackResultType],
+        ]
+    ]:
         # Registering work
         with self.crawler.state.task(), self.crawler.queue.group_releaser(job):
             cancel_event = self.cancel_event
@@ -149,7 +155,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
 
             if spider is None:
                 assert job.spider is not None
-                return ErroredCrawlResult(job, UnknownSpiderError(job.spider))
+                return ErroredCrawlResult(job, UnknownSpiderError(job.spider)), None
 
             # NOTE: crawl job must have a url and a depth at that point
             assert job.url is not None
@@ -186,7 +192,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
                 return
 
             except EXPECTED_WEB_ERRORS as error:
-                return ErroredCrawlResult(job, error)
+                return ErroredCrawlResult(job, error), None
 
             if cancel_event.is_set():
                 return
@@ -218,10 +224,12 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType]):
 
             # NOTE: at one point we might want to retry the callback like
             # in the HTTPWorker
-            if self.callback is not None:
-                self.callback(self.crawler, result)  # type: ignore
+            callback_result = None
 
-            return result # type: ignore
+            if self.callback is not None:
+                callback_result = self.callback(self.crawler, result)  # type: ignore
+
+            return result, callback_result  # type: ignore
 
 
 CrawlJobDataTypes = TypeVar("CrawlJobDataTypes")
@@ -283,15 +291,6 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         stateful_redirects: bool = False,
         spoof_ua: bool = False,
-        callback: Optional[
-            Callable[
-                [
-                    "Crawler",
-                    SuccessfulCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes],
-                ],
-                None,
-            ]
-        ] = None,
     ):
         # Validation
         if resume and persistent_storage_path is None:
@@ -393,7 +392,6 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         self.imap_kwargs = {"buffer_size": 0, "panic": self.queue.unblock}
 
         self.worker_kwargs = {
-            "callback": callback,
             "request_args": request_args,
             "max_redirects": max_redirects,
             "stateful_redirects": stateful_redirects,
@@ -487,10 +485,52 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
     def __exit__(self, *exc):
         self.stop()
 
-    def __iter__(
+    @overload
+    def crawl(
         self,
+        callback: None = ...,
     ) -> Iterator[AnyCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes]]:
-        worker = CrawlWorker(self, **self.worker_kwargs)
+        ...
+
+    @overload
+    def crawl(
+        self,
+        callback: Callable[
+            [
+                "Crawler",
+                SuccessfulCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes],
+            ],
+            CallbackResultType,
+        ] = ...,
+    ) -> Iterator[
+        Tuple[
+            AnyCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes],
+            CallbackResultType,
+        ]
+    ]:
+        ...
+
+    def crawl(
+        self,
+        callback: Optional[
+            Callable[
+                [
+                    "Crawler",
+                    SuccessfulCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes],
+                ],
+                CallbackResultType,
+            ]
+        ] = None,
+    ) -> Union[
+        Iterator[AnyCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes]],
+        Iterator[
+            Tuple[
+                AnyCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes],
+                CallbackResultType,
+            ]
+        ],
+    ]:
+        worker = CrawlWorker(self, callback=callback, **self.worker_kwargs)
 
         def key(job: CrawlJob) -> Optional[str]:
             return job.group
@@ -499,19 +539,26 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             self.queue, worker, key=key, **self.imap_kwargs
         )
 
-        def safe_wrapper():
-            for result in imap_unordered:
-                if result is None:
-                    continue
+        for item in imap_unordered:
+            if item is None:
+                continue
 
+            result, callback_result = item
+
+            if callback is not None:
+                yield result, callback_result  # type: ignore
+            else:
                 yield result
 
-                self.queue.task_done(result.job)
+            self.queue.task_done(result.job)
 
-            # If iterator ended properly we cleanup the queue
-            self.queue.cleanup()
+        # If iterator ended properly we cleanup the queue
+        self.queue.cleanup()
 
-        return safe_wrapper()
+    def __iter__(
+        self,
+    ) -> Iterator[AnyCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes]]:
+        return self.crawl()
 
     def enqueue(
         self,

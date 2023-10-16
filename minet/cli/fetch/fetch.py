@@ -37,7 +37,7 @@ from minet.cli.utils import with_enricher_and_loading_bar, with_ctrl_c_warning
 
 
 @dataclass
-class WorkerAddendum:
+class WorkerCallbackResult:
     path: Optional[str] = None
     decoded_contents: Optional[str] = None
 
@@ -54,12 +54,12 @@ class FetchAddendum(TabularRecord):
     body_size: Optional[int] = None
 
     def infos_from_response(
-        self, response: Response, addendum: Optional[WorkerAddendum]
+        self, response: Response, callback_result: Optional[WorkerCallbackResult]
     ) -> None:
         self.resolved_url = response.end_url
         self.http_status = response.status
         self.datetime_utc = response.end_datetime
-        self.path = addendum.path if addendum else None
+        self.path = callback_result.path if callback_result else None
         self.encoding = response.encoding
         self.mimetype = response.mimetype
         self.body_size = len(response)
@@ -70,10 +70,10 @@ class FetchAddendumWithBody(FetchAddendum):
     body: Optional[str] = None
 
     def infos_from_response(
-        self, response: Response, addendum: Optional[WorkerAddendum]
+        self, response: Response, callback_result: Optional[WorkerCallbackResult]
     ) -> None:
-        super().infos_from_response(response, addendum)
-        self.body = addendum.decoded_contents if addendum else None
+        super().infos_from_response(response, callback_result)
+        self.body = callback_result.decoded_contents if callback_result else None
 
 
 @dataclass
@@ -238,7 +238,9 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
         file_writer = ThreadSafeFileWriter(cli_args.output_dir, sqlar=cli_args.sqlar)
 
-    def worker_callback(item, url: str, response: Response) -> Optional[WorkerAddendum]:
+    def worker_callback(
+        item, url: str, response: Response
+    ) -> Optional[WorkerCallbackResult]:
         if cli_args.dont_save:
             return
 
@@ -250,7 +252,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
         if cli_args.only_html and not response.is_html:
             return
 
-        addendum = WorkerAddendum()
+        addendum = WorkerCallbackResult()
 
         # First we need to build a filename
         filename_cell = row[filename_pos] if filename_pos is not None else None
@@ -316,7 +318,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
         )
 
         with HTTPThreadPoolExecutor(**common_executor_kwargs) as executor:
-            for result in executor.request(
+            for result, callback_result in executor.request(
                 enricher,
                 request_args=request_args,
                 callback=worker_callback,
@@ -342,7 +344,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
                         loading_bar.inc_stat(status, style=get_style_for_status(status))
 
-                        addendum.infos_from_response(response, result.addendum)
+                        addendum.infos_from_response(response, callback_result)
                         enricher.writerow(index, row, addendum)
 
                     # Handling potential errors

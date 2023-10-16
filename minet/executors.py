@@ -16,6 +16,7 @@ from typing import (
     Iterable,
     Dict,
     Union,
+    Tuple,
     Any,
 )
 from minet.types import Literal, TypedDict, Unpack, NotRequired
@@ -50,7 +51,7 @@ from minet.constants import (
 
 ItemType = TypeVar("ItemType")
 ResultType = TypeVar("ResultType")
-AddendumType = TypeVar("AddendumType")
+CallbackResultType = TypeVar("CallbackResultType")
 
 
 class HTTPWorkerPayloadBase(Generic[ItemType]):
@@ -89,7 +90,7 @@ class HTTPWorkerPayload(HTTPWorkerPayloadBase[ItemType]):
 ArgsCallbackType = Callable[[HTTPWorkerPayload[ItemType]], Dict]
 
 
-class ExecutorRequestKwargs(TypedDict, Generic[ItemType, AddendumType]):
+class ExecutorRequestKwargs(TypedDict, Generic[ItemType, CallbackResultType]):
     ordered: NotRequired[bool]
     key: NotRequired[Optional[Callable[[ItemType], Optional[str]]]]
     throttle: NotRequired[float]
@@ -99,10 +100,9 @@ class ExecutorRequestKwargs(TypedDict, Generic[ItemType, AddendumType]):
     buffer_size: NotRequired[int]
     domain_parallelism: NotRequired[int]
     max_redirects: NotRequired[int]
-    callback: NotRequired[Optional[Callable[[ItemType, str, Response], AddendumType]]]
 
 
-class ExecutorResolveKwargs(TypedDict, Generic[ItemType, AddendumType]):
+class ExecutorResolveKwargs(TypedDict, Generic[ItemType, CallbackResultType]):
     ordered: NotRequired[bool]
     key: NotRequired[Optional[Callable[[ItemType], Optional[str]]]]
     throttle: NotRequired[float]
@@ -115,26 +115,21 @@ class ExecutorResolveKwargs(TypedDict, Generic[ItemType, AddendumType]):
     follow_js_relocation: NotRequired[bool]
     infer_redirection: NotRequired[bool]
     canonicalize: NotRequired[bool]
-    callback: NotRequired[
-        Optional[Callable[[ItemType, str, RedirectionStack], AddendumType]]
-    ]
 
 
-class RequestResult(Generic[ItemType, AddendumType]):
-    __slots__ = ("item", "url", "error", "response", "addendum")
+class RequestResult(Generic[ItemType]):
+    __slots__ = ("item", "url", "error", "response")
 
     item: ItemType
     url: Optional[str]
     error: Optional[Exception]
     response: Optional[Response]
-    addendum: Optional[AddendumType]
 
     def __init__(self, item: ItemType, url: Optional[str]):
         self.item = item
         self.url = url
         self.error = None
         self.response = None
-        self.addendum = None
 
     @property
     def error_code(self) -> Optional[str]:
@@ -161,90 +156,79 @@ class RequestResult(Generic[ItemType, AddendumType]):
         )
 
 
-class PassthroughRequestResult(RequestResult[ItemType, None]):
+class PassthroughRequestResult(RequestResult[ItemType]):
     item: ItemType
     url: None
     error: None
     response: None
-    addendum: None
 
     def __init__(self, item: ItemType):
         self.item = item
         self.url = None
         self.error = None
         self.response = None
-        self.addendum = None
 
     @property
     def error_code(self) -> None:
         return None
 
 
-class ErroredRequestResult(RequestResult[ItemType, None]):
+class ErroredRequestResult(RequestResult[ItemType]):
     item: ItemType
     url: str
     error: Exception
     response: None
-    addendum: None
 
     def __init__(self, item: ItemType, url: str, error: Exception):
         self.item = item
         self.url = url
         self.error = error
         self.response = None
-        self.addendum = None
 
     @property
     def error_code(self) -> str:
         return serialize_error_as_slug(self.error)
 
 
-class SuccessfulRequestResult(RequestResult[ItemType, AddendumType]):
+class SuccessfulRequestResult(RequestResult[ItemType]):
     item: ItemType
     url: str
     error: None
     response: Response
-    addendum: AddendumType
 
-    def __init__(
-        self, item: ItemType, url: str, response: Response, addendum: AddendumType
-    ):
+    def __init__(self, item: ItemType, url: str, response: Response):
         self.item = item
         self.url = url
         self.error = None
         self.response = response
-        self.addendum = addendum
 
     @property
     def error_code(self) -> None:
         return None
 
 
-AnyRequestResult = Union[
-    PassthroughRequestResult[ItemType],
-    ErroredRequestResult[ItemType],
-    SuccessfulRequestResult[ItemType, AddendumType],
-]
 AnyActualRequestResult = Union[
-    ErroredRequestResult[ItemType], SuccessfulRequestResult[ItemType, AddendumType]
+    ErroredRequestResult[ItemType], SuccessfulRequestResult[ItemType]
+]
+
+AnyRequestResult = Union[
+    AnyActualRequestResult[ItemType], PassthroughRequestResult[ItemType]
 ]
 
 
-class ResolveResult(Generic[ItemType, AddendumType]):
-    __slots__ = ("item", "url", "error", "stack", "addendum")
+class ResolveResult(Generic[ItemType]):
+    __slots__ = ("item", "url", "error", "stack")
 
     item: ItemType
     url: Optional[str]
     error: Optional[Exception]
     stack: Optional[RedirectionStack]
-    addendum: Optional[AddendumType]
 
     def __init__(self, item: ItemType, url: Optional[str]):
         self.item = item
         self.url = url
         self.error = None
         self.stack = None
-        self.addendum = None
 
     @property
     def error_code(self) -> Optional[str]:
@@ -271,72 +255,63 @@ class ResolveResult(Generic[ItemType, AddendumType]):
         )
 
 
-class PassthroughResolveResult(ResolveResult[ItemType, None]):
+class PassthroughResolveResult(ResolveResult[ItemType]):
     item: ItemType
     url: None
     error: None
     stack: None
-    addendum: None
 
     def __init__(self, item: ItemType):
         self.item = item
         self.url = None
         self.error = None
         self.stack = None
-        self.addendum = None
 
     @property
     def error_code(self) -> None:
         return None
 
 
-class ErroredResolveResult(ResolveResult[ItemType, None]):
+class ErroredResolveResult(ResolveResult[ItemType]):
     item: ItemType
     url: str
     error: Exception
     stack: None
-    addendum: None
 
     def __init__(self, item: ItemType, url: str, error: Exception):
         self.item = item
         self.url = url
         self.error = error
         self.stack = None
-        self.addendum = None
 
     @property
     def error_code(self) -> str:
         return serialize_error_as_slug(self.error)
 
 
-class SuccessfulResolveResult(ResolveResult[ItemType, AddendumType]):
+class SuccessfulResolveResult(ResolveResult[ItemType]):
     item: ItemType
     url: str
     error: None
     stack: RedirectionStack
-    addendum: AddendumType
 
-    def __init__(
-        self, item: ItemType, url: str, stack: RedirectionStack, addendum: AddendumType
-    ):
+    def __init__(self, item: ItemType, url: str, stack: RedirectionStack):
         self.item = item
         self.url = url
         self.error = None
         self.stack = stack
-        self.addendum = addendum
 
     @property
     def error_code(self) -> None:
         return None
 
 
-AnyResolveResult = Union[
-    PassthroughResolveResult[ItemType],
-    ErroredResolveResult[ItemType],
-    SuccessfulResolveResult[ItemType, AddendumType],
-]
 AnyActualResolveResult = Union[
-    ErroredResolveResult[ItemType], SuccessfulResolveResult[ItemType, AddendumType]
+    ErroredResolveResult[ItemType], SuccessfulResolveResult[ItemType]
+]
+
+AnyResolveResult = Union[
+    AnyActualResolveResult[ItemType], PassthroughResolveResult[ItemType]
 ]
 
 
@@ -365,7 +340,7 @@ def payloads_iter(
         yield HTTPWorkerPayloadBase(item=item, url=url)
 
 
-class HTTPWorker(Generic[ItemType, AddendumType]):
+class HTTPWorker(Generic[ItemType, CallbackResultType]):
     def __init__(
         self,
         pool_manager: urllib3.PoolManager,
@@ -383,7 +358,10 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
         infer_redirection: bool = False,
         canonicalize: bool = False,
         callback: Optional[
-            Callable[[ItemType, str, Union[Response, RedirectionStack]], AddendumType]
+            Union[
+                Callable[[ItemType, str, Response], CallbackResultType],
+                Callable[[ItemType, str, RedirectionStack], CallbackResultType],
+            ]
         ] = None,
     ):
         self.cancel_event = cancel_event
@@ -424,16 +402,19 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
     def __call__(
         self, payload: HTTPWorkerPayloadBase[ItemType]
     ) -> Optional[
-        Union[
-            AnyRequestResult[ItemType, AddendumType],
-            AnyResolveResult[ItemType, AddendumType],
+        Tuple[
+            Union[
+                AnyRequestResult[ItemType],
+                AnyResolveResult[ItemType],
+            ],
+            Optional[CallbackResultType],
         ]
     ]:
         item, url = payload.item, payload.url
 
         # Noop
         if url is None:
-            return self.PassthroughResult(item)
+            return self.PassthroughResult(item), None  # type: ignore
 
         kwargs = self.default_kwargs.copy()
 
@@ -459,10 +440,10 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
             return
 
         except EXPECTED_WEB_ERRORS as error:
-            return self.ErroredResult(item, url, error)
+            return self.ErroredResult(item, url, error), None
 
         else:
-            addendum = None
+            callback_result = None
 
             if self.callback is not None:
                 if self.cancel_event.is_set():
@@ -470,13 +451,16 @@ class HTTPWorker(Generic[ItemType, AddendumType]):
 
                 try:
                     if retryer is not None:
-                        addendum = retryer(self.callback, item, url, output)
+                        callback_result = retryer(self.callback, item, url, output)
                     else:
-                        addendum = self.callback(item, url, output)
+                        callback_result = self.callback(item, url, output)  # type: ignore
                 except Exception as reason:
-                    return self.ErroredResult(item, url, HTTPCallbackError(reason))
+                    return (
+                        self.ErroredResult(item, url, HTTPCallbackError(reason)),
+                        None,
+                    )
 
-        return self.SuccessfulResult(item, url, output, addendum)  # type: ignore
+        return self.SuccessfulResult(item, url, output), callback_result  # type: ignore
 
 
 class HTTPThreadPoolExecutor(ThreadPoolExecutor):
@@ -549,8 +533,9 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         iterator: Iterable[ItemType],
         *,
         passthrough: Literal[False] = ...,
-        **kwargs: Unpack[ExecutorRequestKwargs[ItemType, AddendumType]],
-    ) -> Iterator[AnyActualRequestResult[ItemType, AddendumType]]:
+        callback: None = ...,
+        **kwargs: Unpack[ExecutorRequestKwargs[ItemType, CallbackResultType]],
+    ) -> Iterator[AnyActualRequestResult[ItemType]]:
         ...
 
     @overload
@@ -559,8 +544,31 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         iterator: Iterable[ItemType],
         *,
         passthrough: Literal[True] = ...,
-        **kwargs: Unpack[ExecutorRequestKwargs[ItemType, AddendumType]],
-    ) -> Iterator[AnyRequestResult[ItemType, AddendumType]]:
+        callback: None = ...,
+        **kwargs: Unpack[ExecutorRequestKwargs[ItemType, CallbackResultType]],
+    ) -> Iterator[AnyRequestResult[ItemType]]:
+        ...
+
+    @overload
+    def request(
+        self,
+        iterator: Iterable[ItemType],
+        *,
+        passthrough: Literal[False] = ...,
+        callback: Callable[[ItemType, str, Response], CallbackResultType] = ...,
+        **kwargs: Unpack[ExecutorRequestKwargs[ItemType, CallbackResultType]],
+    ) -> Iterator[Tuple[AnyActualRequestResult[ItemType], CallbackResultType]]:
+        ...
+
+    @overload
+    def request(
+        self,
+        iterator: Iterable[ItemType],
+        *,
+        passthrough: Literal[True] = ...,
+        callback: Callable[[ItemType, str, Response], CallbackResultType] = ...,
+        **kwargs: Unpack[ExecutorRequestKwargs[ItemType, CallbackResultType]],
+    ) -> Iterator[Tuple[AnyRequestResult[ItemType], CallbackResultType]]:
         ...
 
     def request(
@@ -576,14 +584,17 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
-        callback: Optional[Callable[[ItemType, str, Response], AddendumType]] = None,
+        callback: Optional[
+            Callable[[ItemType, str, Response], CallbackResultType]
+        ] = None,
         passthrough: bool = False,
-    ) -> Iterator[
-        Union[
-            AnyRequestResult[ItemType, AddendumType],
-            AnyActualRequestResult[ItemType, AddendumType],
-        ]
+    ) -> Union[
+        Iterator[AnyRequestResult[ItemType]],
+        Iterator[AnyActualRequestResult[ItemType]],
+        Iterator[Tuple[AnyRequestResult[ItemType], CallbackResultType]],
+        Iterator[Tuple[AnyActualRequestResult[ItemType], CallbackResultType]],
     ]:
+
         # TODO: validate
         worker = HTTPWorker(
             self.pool_manager,
@@ -598,7 +609,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
 
         method = super().imap if ordered else super().imap_unordered
 
-        imap_unordered = method(
+        imap = method(
             payloads_iter(iterator, key=key, passthrough=passthrough),
             worker,
             key=key_by_domain_name,
@@ -607,16 +618,24 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
             throttle=throttle,
         )
 
-        return (item for item in imap_unordered if item is not None)  # type: ignore
+        for item in imap:
+            if item is None:
+                continue
+
+            if callback is not None:
+                yield item  # type: ignore
+            else:
+                yield item[0]  # type: ignore
 
     @overload
     def resolve(
         self,
         iterator: Iterable[ItemType],
         *,
+        callback: None = ...,
         passthrough: Literal[False] = ...,
-        **kwargs: Unpack[ExecutorResolveKwargs],
-    ) -> Iterator[AnyActualResolveResult[ItemType, AddendumType]]:
+        **kwargs: Unpack[ExecutorResolveKwargs[ItemType, CallbackResultType]],
+    ) -> Iterator[AnyActualResolveResult[ItemType]]:
         ...
 
     @overload
@@ -624,9 +643,32 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         self,
         iterator: Iterable[ItemType],
         *,
+        callback: None = ...,
         passthrough: Literal[True] = ...,
-        **kwargs: Unpack[ExecutorResolveKwargs],
-    ) -> Iterator[AnyResolveResult[ItemType, AddendumType]]:
+        **kwargs: Unpack[ExecutorResolveKwargs[ItemType, CallbackResultType]],
+    ) -> Iterator[AnyResolveResult[ItemType]]:
+        ...
+
+    @overload
+    def resolve(
+        self,
+        iterator: Iterable[ItemType],
+        *,
+        callback: Callable[[ItemType, str, RedirectionStack], CallbackResultType],
+        passthrough: Literal[False] = ...,
+        **kwargs: Unpack[ExecutorResolveKwargs[ItemType, CallbackResultType]],
+    ) -> Iterator[Tuple[AnyActualResolveResult[ItemType], CallbackResultType]]:
+        ...
+
+    @overload
+    def resolve(
+        self,
+        iterator: Iterable[ItemType],
+        *,
+        callback: Callable[[ItemType, str, RedirectionStack], CallbackResultType],
+        passthrough: Literal[True] = ...,
+        **kwargs: Unpack[ExecutorResolveKwargs[ItemType, CallbackResultType]],
+    ) -> Iterator[Tuple[AnyResolveResult[ItemType], CallbackResultType]]:
         ...
 
     def resolve(
@@ -646,14 +688,14 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         infer_redirection: bool = False,
         canonicalize: bool = False,
         callback: Optional[
-            Callable[[ItemType, str, RedirectionStack], AddendumType]
+            Callable[[ItemType, str, RedirectionStack], CallbackResultType]
         ] = None,
         passthrough: bool = False,
-    ) -> Iterator[
-        Union[
-            AnyResolveResult[ItemType, AddendumType],
-            AnyActualResolveResult[ItemType, AddendumType],
-        ]
+    ) -> Union[
+        Iterator[AnyResolveResult[ItemType]],
+        Iterator[AnyActualResolveResult[ItemType]],
+        Iterator[Tuple[AnyResolveResult[ItemType], CallbackResultType]],
+        Iterator[Tuple[AnyActualResolveResult[ItemType], CallbackResultType]],
     ]:
         # TODO: validate
         worker = HTTPWorker(
@@ -673,7 +715,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
 
         method = super().imap if ordered else super().imap_unordered
 
-        imap_unordered = method(
+        imap = method(
             payloads_iter(iterator, key=key, passthrough=passthrough),
             worker,
             key=key_by_domain_name,
@@ -682,4 +724,11 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
             throttle=throttle,
         )
 
-        return (item for item in imap_unordered if item is not None)  # type: ignore
+        for item in imap:
+            if item is None:
+                continue
+
+            if callback is not None:
+                yield item  # type: ignore
+            else:
+                yield item[0]  # type: ignore

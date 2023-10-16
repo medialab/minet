@@ -153,7 +153,7 @@ def crawl_action(
 
     filename_builder = FilenameBuilder(cli_args.folder_strategy)
 
-    def callback(self: Crawler, result: SuccessfulCrawlResult) -> None:
+    def callback(self: Crawler, result: SuccessfulCrawlResult) -> Optional[str]:
         if not cli_args.write_files:
             return
 
@@ -169,7 +169,7 @@ def crawl_action(
 
         self.write(path, response.body, compress=cli_args.compress_on_disk)
 
-        setattr(result, "_path", path)
+        return path
 
     # Scaffolding output directory
     os.makedirs(cli_args.output_dir, exist_ok=True)
@@ -178,7 +178,6 @@ def crawl_action(
         "persistent_storage_path": persistent_storage_path,
         "writer_root_directory": writer_root_directory,
         "resume": cli_args.resume,
-        "callback": callback,
         "wait": False,
         "daemonic": False,
     }
@@ -344,7 +343,7 @@ def crawl_action(
         track_crawler_state_with_loading_bar(loading_bar, crawler.state)
 
         # Running crawler
-        for result in crawler:
+        for result, result_path in crawler.crawl(callback=callback):
             with loading_bar.step():
                 if cli_args.verbose:
                     console.print(result, highlight=True)
@@ -355,7 +354,7 @@ def crawl_action(
                 job_row = result.as_csv_row()
 
                 if cli_args.write_files:
-                    job_row += [getattr(result, "_path", "")]
+                    job_row += [result_path]
 
                 if format_job_row_addendum is not None:
                     job_row += format_job_row_addendum(result)
