@@ -17,9 +17,14 @@ from typing import (
     Dict,
     Union,
     Tuple,
+    Awaitable,
     Any,
+    TYPE_CHECKING,
 )
 from minet.types import Literal, TypedDict, Unpack, NotRequired
+
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 
 import urllib3
 import threading
@@ -594,7 +599,6 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         Iterator[Tuple[AnyRequestResult[ItemType], CallbackResultType]],
         Iterator[Tuple[AnyActualRequestResult[ItemType], CallbackResultType]],
     ]:
-
         # TODO: validate
         worker = HTTPWorker(
             self.pool_manager,
@@ -732,3 +736,64 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
                 yield item  # type: ignore
             else:
                 yield item[0]  # type: ignore
+
+
+class BrowserThreadPoolExecutor(ThreadPoolExecutor):
+    def __init__(
+        self,
+        max_workers: Optional[int] = None,
+        wait: bool = True,
+        daemonic: bool = False,
+        **kwargs,
+    ):
+        from minet.browser import ThreadsafeBrowser
+
+        self.browser = ThreadsafeBrowser()
+
+        super().__init__(
+            max_workers,
+            wait=wait,
+            daemonic=daemonic,
+            **kwargs,
+        )
+
+    def __enter__(self):
+        self.browser.__enter__()
+        return super().__enter__()
+
+    def shutdown(self, wait=True) -> None:
+        self.browser.stop()
+        return super().shutdown(wait=wait)
+
+    def run_with_new_page(
+        self,
+        iterator: Iterable[ItemType],
+        fn: Callable[["Page"], Awaitable[ResultType]],
+        *,
+        ordered: bool = False,
+        key: Optional[Callable[[ItemType], Optional[str]]] = None,
+        passthrough: bool = False,
+        throttle: float = DEFAULT_THROTTLE,
+        buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
+        domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
+    ) -> Iterator[Tuple[ItemType, Optional[ResultType]]]:
+        method = super().imap if ordered else super().imap_unordered
+
+        def worker(
+            payload: HTTPWorkerPayloadBase[ItemType],
+        ) -> Tuple[ItemType, Optional[ResultType]]:
+            if payload.url is None:
+                return payload.item, None
+
+            return payload.item, self.browser.run_with_new_page(fn, payload.url)
+
+        imap = method(
+            payloads_iter(iterator, key=key, passthrough=passthrough),
+            worker,
+            key=key_by_domain_name,
+            parallelism=domain_parallelism,
+            buffer_size=buffer_size,
+            throttle=throttle,
+        )
+
+        yield from imap

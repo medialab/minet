@@ -1,4 +1,5 @@
 from quenouille import imap_unordered
+from minet.executors import BrowserThreadPoolExecutor
 from minet.browser import ThreadsafeBrowser
 from playwright.async_api import Page
 from ural import get_normalized_hostname
@@ -20,11 +21,15 @@ async def get_title(page: Page) -> str:
     return await page.title()
 
 
-with ThreadsafeBrowser() as browser:
+# with ThreadsafeBrowser() as browser:
 
-    def worker(url):
-        title = browser.run_with_new_page(get_title, url=url)
-        return title
+#     def worker(url):
+#         title = browser.run_with_new_page(get_title, url=url)
+#         return title
 
-    for title in imap_unordered(URLS, worker, 3):
-        print(title)
+#     for title in imap_unordered(URLS, worker, 3):
+#         print(title)
+
+with BrowserThreadPoolExecutor() as pool:
+    for result in pool.run_with_new_page(URLS, get_title):
+        print(result)
