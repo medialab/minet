@@ -27,8 +27,7 @@ deps:
 
 lint:
 	@echo Searching for unused imports...
-	importchecker $(SOURCE) | grep -v __init__ | grep -v idna || true
-	importchecker test | grep -v __init__ || true
+	ruff $(SOURCE) test
 	@echo
 
 format:

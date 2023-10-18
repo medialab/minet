@@ -11,10 +11,10 @@ from rich.console import Console
 from rich.theme import Theme
 from rich.table import Table
 
+from minet.utils import message_flatmap
+
 NOW_TIME_FORMAT = r"%H:%M:%S"
 NOW_DATETIME_FORMAT = r"%Y-%m-%d %H:%M:%S"
-
-from minet.utils import message_flatmap
 
 MINET_COLORS = {
     "info": "blue",

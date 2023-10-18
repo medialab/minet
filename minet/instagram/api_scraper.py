@@ -24,7 +24,6 @@ from minet.web import (
     create_request_retryer,
     request,
     retrying_method,
-    request,
 )
 from minet.instagram.constants import (
     INSTAGRAM_DEFAULT_THROTTLE,

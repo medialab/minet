@@ -17,7 +17,9 @@ import shlex
 import platform
 from casanova.exceptions import MissingColumnError
 from contextlib import ExitStack
-from encodings import idna  # NOTE: this is necessary for pyinstaller build still...
+
+# NOTE: this is necessary for pyinstaller build still...
+from encodings import idna  # noqa: F401
 
 from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
 from minet.loggers import sleepers_logger

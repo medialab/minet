@@ -6,7 +6,6 @@
 #
 from typing import Optional, Iterable, Callable, Any, Dict, Type, List
 from minet.types import TypedDict, NotRequired
-from ebbe import and_join
 
 import os
 import re
@@ -579,7 +578,7 @@ class ConfigAction(Action):
 
         self.plural = plural
 
-        if plural == True:
+        if plural:
             self.list_values = []
 
         super().__init__(
@@ -876,7 +875,7 @@ def command(
         )
 
         if epilog_addendum is not None:
-            if not "epilog" in data:
+            if "epilog" not in data:
                 data["epilog"] = epilog_addendum
             else:
                 data["epilog"] += "\n\n" + epilog_addendum

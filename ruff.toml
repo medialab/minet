@@ -1,0 +1,3 @@
+ignore-init-module-imports = true
+exclude = ["__init__.py", "./minet/types.py"]
+ignore = ["E741"]
