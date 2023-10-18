@@ -93,6 +93,13 @@ class ResolveAddendum(TabularRecord):
         self.redirect_chain = [step.type for step in stack]
 
 
+@dataclass
+class ScreenshotAddendum(TabularRecord):
+    http_status: Optional[int] = None
+    screenshot_error: Optional[str] = None
+    path: Optional[str] = None
+
+
 def get_style_for_status(status: int) -> str:
     if status < 400:
         return "info"
@@ -114,12 +121,15 @@ def loading_bar_stats_sort_key(item):
 
 def get_headers(cli_args):
     if cli_args.action == "resolve":
-        headers = ResolveAddendum
-    else:
-        headers = FetchAddendum
+        return ResolveAddendum
 
-        if cli_args.contents_in_report:
-            headers = FetchAddendumWithBody
+    if cli_args.action == "screenshot":
+        return ScreenshotAddendum
+
+    headers = FetchAddendum
+
+    if cli_args.contents_in_report:
+        headers = FetchAddendumWithBody
 
     return headers
 
@@ -128,13 +138,16 @@ def get_title(cli_args):
     if cli_args.action == "resolve":
         return "Resolving"
 
+    if cli_args.action == "screenshot":
+        return "Screenshotting"
+
     return "Fetching"
 
 
 @with_enricher_and_loading_bar(
     headers=get_headers,
     enricher_type="threadsafe",
-    index_column="fetch_original_index",
+    index_column="original_index",
     title=get_title,
     unit="urls",
     stats_sort_key=loading_bar_stats_sort_key,
@@ -145,16 +158,18 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
     resolve = cli_args.action == "resolve"
 
     # HTTP method
-    http_method = cli_args.method
+    http_method = getattr(cli_args, "method", None)
 
     # Cookie grabber
     get_cookie = None
-    if cli_args.grab_cookies:
+
+    if getattr(cli_args, "grab_cookies", False):
         get_cookie = get_cookie_resolver_from_browser(cli_args.grab_cookies)
 
     # Global headers
     global_headers = None
-    if cli_args.headers:
+
+    if getattr(cli_args, "headers", None):
         global_headers = {}
 
         for header in cli_args.headers:
@@ -236,7 +251,9 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
             template=cli_args.filename_template,
         )
 
-        file_writer = ThreadSafeFileWriter(cli_args.output_dir, sqlar=cli_args.sqlar)
+        file_writer = ThreadSafeFileWriter(
+            cli_args.output_dir, sqlar=getattr(cli_args, "sqlar", False)
+        )
 
     def worker_callback(
         item, url: str, response: Response
@@ -295,29 +312,36 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
         return addendum
 
     common_executor_kwargs = {
-        "insecure": cli_args.insecure,
         "max_workers": cli_args.threads,
         "wait": False,
         "daemonic": False,
+    }
+    common_http_executor_kwargs = {
+        **common_executor_kwargs,
+        "insecure": cli_args.insecure,
         "proxy": cli_args.proxy,
     }
+
     common_imap_kwargs = {
         "key": url_key,
         "throttle": cli_args.throttle,
         "domain_parallelism": cli_args.domain_parallelism,
+    }
+    common_http_imap_kwargs = {
+        **common_imap_kwargs,
         "max_redirects": cli_args.max_redirects,
     }
 
     if cli_args.timeout is not None:
-        common_executor_kwargs["timeout"] = cli_args.timeout
+        common_http_executor_kwargs["timeout"] = cli_args.timeout
 
     # Normal fetch
-    if not resolve:
+    if cli_args.action == "fetch":
         Addendum = (
             FetchAddendum if not cli_args.contents_in_report else FetchAddendumWithBody
         )
 
-        with HTTPThreadPoolExecutor(**common_executor_kwargs) as executor:
+        with HTTPThreadPoolExecutor(**common_http_executor_kwargs) as executor:
             for result, callback_result in executor.request(
                 enricher,
                 request_args=request_args,
@@ -325,7 +349,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                 passthrough=True,
                 use_pycurl=cli_args.pycurl,
                 compressed=cli_args.compress_transfer,
-                **common_imap_kwargs
+                **common_http_imap_kwargs
             ):
                 with loading_bar.step():
                     index, row = result.item
@@ -370,8 +394,8 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                         enricher.writerow(index, row, addendum)
 
     # Resolve
-    else:
-        with HTTPThreadPoolExecutor(**common_executor_kwargs) as executor:
+    elif cli_args.action == "resolve":
+        with HTTPThreadPoolExecutor(**common_http_executor_kwargs) as executor:
             for result in executor.resolve(
                 enricher,
                 resolve_args=request_args,
@@ -380,7 +404,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                 infer_redirection=cli_args.infer_redirection,
                 canonicalize=cli_args.canonicalize,
                 passthrough=True,
-                **common_imap_kwargs
+                **common_http_imap_kwargs
             ):
                 with loading_bar.step():
                     index, row = result.item
@@ -413,3 +437,10 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
                         addendum.resolution_error = result.error_code
                         enricher.writerow(index, row, addendum)
+
+    # Screenshot
+    elif cli_args.action == "screenshot":
+        print(cli_args)
+
+    else:
+        raise NotImplementedError

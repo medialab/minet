@@ -582,13 +582,13 @@ For more info, check out: https://www.sqlite.org/tempfiles.html
 ```
 Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                    [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
+                   [-t THREADS] [--throttle THROTTLE]
                    [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
-                   [-H HEADERS] [-k] [-t THREADS] [--throttle THROTTLE]
-                   [--timeout TIMEOUT] [--url-template URL_TEMPLATE] [-X METHOD]
-                   [-x PROXY] [--spoof-user-agent]
-                   [--max-redirects MAX_REDIRECTS] [-z] [--compress-transfer]
-                   [-c] [-D] [-O OUTPUT_DIR] [-f FILENAME_COLUMN]
-                   [--filename-template FILENAME_TEMPLATE]
+                   [-H HEADERS] [-k] [--timeout TIMEOUT]
+                   [--url-template URL_TEMPLATE] [-X METHOD] [-x PROXY]
+                   [--spoof-user-agent] [--max-redirects MAX_REDIRECTS] [-z]
+                   [--compress-transfer] [-c] [-D] [-O OUTPUT_DIR]
+                   [-f FILENAME_COLUMN] [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [--keep-failed-contents]
                    [--standardize-encoding] [--only-html] [--pycurl] [--sqlar]
                    [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
@@ -718,7 +718,7 @@ Columns being added to the output:
 . "http_status": HTTP status code of the request, e.g. 200, 404, 503 etc.
 . "datetime_utc": datetime when the response was finished.
 . "fetch_error": an error code if anything went wrong when performing the request.
-. "filename": path to the downloaded file, relative to the folder given
+. "path": path to the downloaded file, relative to the folder given
     through -O/--output-dir.
 . "mimetype": detected mimetype of the requested file.
 . "encoding": detected encoding of the requested file if relevant.
@@ -949,15 +949,15 @@ Examples:
 ```
 Usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                      [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
+                     [-t THREADS] [--throttle THROTTLE]
                      [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
-                     [-H HEADERS] [-k] [-t THREADS] [--throttle THROTTLE]
-                     [--timeout TIMEOUT] [--url-template URL_TEMPLATE]
-                     [-X METHOD] [-x PROXY] [--spoof-user-agent]
-                     [--max-redirects MAX_REDIRECTS] [--follow-meta-refresh]
-                     [--follow-js-relocation] [--infer-redirection]
-                     [--canonicalize] [--only-shortened] [-i INPUT]
-                     [--explode EXPLODE] [-s SELECT] [--total TOTAL] [--resume]
-                     [-o OUTPUT]
+                     [-H HEADERS] [-k] [--timeout TIMEOUT]
+                     [--url-template URL_TEMPLATE] [-X METHOD] [-x PROXY]
+                     [--spoof-user-agent] [--max-redirects MAX_REDIRECTS]
+                     [--follow-meta-refresh] [--follow-js-relocation]
+                     [--infer-redirection] [--canonicalize] [--only-shortened]
+                     [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                     [--resume] [-o OUTPUT]
                      url_or_url_column
 
 # Minet Resolve Command

@@ -2,7 +2,7 @@ from minet.cli.cookies import COOKIES_COMMAND
 from minet.cli.crawl import CRAWL_COMMAND, FOCUS_CRAWL_COMMAND
 from minet.cli.dump import DUMP_QUEUE_COMMAND, DUMP_URLS_COMMAND, DUMP_GRAPH_COMMAND
 from minet.cli.extract import EXTRACT_COMMAND
-from minet.cli.fetch import FETCH_COMMAND, RESOLVE_COMMAND
+from minet.cli.fetch import FETCH_COMMAND, RESOLVE_COMMAND, SCREENSHOT_COMMAND
 from minet.cli.scrape import SCRAPE_COMMAND
 from minet.cli.url_extract import URL_EXTRACT_COMMAND
 from minet.cli.url_join import URL_JOIN_COMMAND
@@ -33,6 +33,7 @@ MINET_COMMANDS = [
     FETCH_COMMAND,
     RESOLVE_COMMAND,
     SCRAPE_COMMAND,
+    SCREENSHOT_COMMAND,
     URL_EXTRACT_COMMAND,
     URL_JOIN_COMMAND,
     URL_PARSE_COMMAND,

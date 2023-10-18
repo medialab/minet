@@ -13,13 +13,29 @@ from minet.constants import (
     DEFAULT_RESOLVE_MAX_REDIRECTS,
 )
 
-COMMON_ARGUMENTS = [
+PARALLELISM_ARGUMENTS = [
     {
         "flag": "--domain-parallelism",
         "help": "Max number of urls per domain to hit at the same time.",
         "type": int,
         "default": 1,
     },
+    {
+        "flags": ["-t", "--threads"],
+        "help": "Number of threads to use.",
+        "type": int,
+        "default": 25,
+    },
+    {
+        "flag": "--throttle",
+        "help": "Time to wait - in seconds - between 2 calls to the same domain.",
+        "type": float,
+        "default": DEFAULT_THROTTLE,
+    },
+]
+
+COMMON_ARGUMENTS = [
+    *PARALLELISM_ARGUMENTS,
     {
         "flags": ["-g", "--grab-cookies"],
         "help": 'Whether to attempt to grab cookies from your computer\'s browser (supports "firefox", "chrome", "chromium", "opera" and "edge").',
@@ -35,18 +51,6 @@ COMMON_ARGUMENTS = [
         "flags": ["-k", "--insecure"],
         "help": "Whether to allow ssl errors when performing requests or not.",
         "action": "store_true",
-    },
-    {
-        "flags": ["-t", "--threads"],
-        "help": "Number of threads to use.",
-        "type": int,
-        "default": 25,
-    },
-    {
-        "flag": "--throttle",
-        "help": "Time to wait - in seconds - between 2 calls to the same domain.",
-        "type": float,
-        "default": DEFAULT_THROTTLE,
     },
     {
         "flag": "--timeout",
@@ -68,6 +72,28 @@ COMMON_ARGUMENTS = [
         "flag": "--spoof-user-agent",
         "help": 'Whether to use a plausible random "User-Agent" header when making requests.',
         "action": "store_true",
+    },
+]
+
+COMMON_IO_ARGUMENTS = [
+    {
+        "flags": ["-O", "--output-dir"],
+        "help": "Directory where the fetched files will be written.",
+        "default": DEFAULT_CONTENT_FOLDER,
+    },
+    {
+        "flags": ["-f", "--filename-column"],
+        "help": 'Name of the column used to build retrieved file names. Defaults to a md5 hash of final url. If the provided file names have no extension (e.g. ".jpg", ".pdf", etc.) the correct extension will be added depending on the file type.',
+    },
+    {
+        "flag": "--filename-template",
+        "help": "A template for the name of the fetched files.",
+    },
+    {
+        "flag": "--folder-strategy",
+        "help": "Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. All of the strategies are described at the end of this help.",
+        "default": "flat",
+        "type": FolderStrategyType(),
     },
 ]
 
@@ -103,13 +129,13 @@ FETCH_COMMAND = command(
     epilog=f"""
         Columns being added to the output:
 
-        . "fetch_original_index": index of the line in the original file (the output will be
+        . "original_index": index of the line in the original file (the output will be
             arbitrarily ordered since multiple requests are performed concurrently).
         . "resolved_url": final resolved url (after templating & solving redirects).
         . "http_status": HTTP status code of the request, e.g. 200, 404, 503 etc.
         . "datetime_utc": datetime when the response was finished.
         . "fetch_error": an error code if anything went wrong when performing the request.
-        . "filename": path to the downloaded file, relative to the folder given
+        . "path": path to the downloaded file, relative to the folder given
             through -O/--output-dir.
         . "mimetype": detected mimetype of the requested file.
         . "encoding": detected encoding of the requested file if relevant.
@@ -140,6 +166,7 @@ FETCH_COMMAND = command(
     variadic_input={"dummy_column": "url"},
     arguments=[
         *COMMON_ARGUMENTS,
+        *COMMON_IO_ARGUMENTS,
         {
             "flag": "--max-redirects",
             "help": "Maximum number of redirections to follow before breaking.",
@@ -166,25 +193,6 @@ FETCH_COMMAND = command(
             "flags": ["-D", "--dont-save"],
             "help": "Use not to write any downloaded file on disk.",
             "action": "store_true",
-        },
-        {
-            "flags": ["-O", "--output-dir"],
-            "help": "Directory where the fetched files will be written.",
-            "default": DEFAULT_CONTENT_FOLDER,
-        },
-        {
-            "flags": ["-f", "--filename-column"],
-            "help": 'Name of the column used to build retrieved file names. Defaults to a md5 hash of final url. If the provided file names have no extension (e.g. ".jpg", ".pdf", etc.) the correct extension will be added depending on the file type.',
-        },
-        {
-            "flag": "--filename-template",
-            "help": "A template for the name of the fetched files.",
-        },
-        {
-            "flag": "--folder-strategy",
-            "help": "Name of the strategy to be used to dispatch the retrieved files into folders to alleviate issues on some filesystems when a folder contains too much files. Note that this will be applied on top of --filename-template. All of the strategies are described at the end of this help.",
-            "default": "flat",
-            "type": FolderStrategyType(),
         },
         {
             "flag": "--keep-failed-contents",
@@ -284,4 +292,43 @@ RESOLVE_COMMAND = command(
             "action": "store_true",
         },
     ],
+)
+
+SCREENSHOT_COMMAND = command(
+    "screenshot",
+    "minet.cli.fetch.fetch",
+    title="Minet Screenshot Command",
+    description="""
+        Use multithreaded browser emulation to screenshot batches of urls
+        from a CSV file. The command outputs a CSV report with additional
+        metadata about the HTTP calls and the produced screenshots on disk.
+    """,
+    epilog="""
+        Columns being added to the output:
+
+        . "original_index": index of the line in the original file (the output will be
+            arbitrarily ordered since multiple requests are performed concurrently).
+        . "http_status": HTTP status code of the request, e.g. 200, 404, 503 etc.
+        . "screenshot_error": an error code if anything went wrong when performing the request.
+        . "path": path to the downloaded file, relative to the folder given
+            through -O/--output-dir.
+
+        --folder-strategy options:
+
+        {FolderStrategy.DOCUMENTATION}
+
+        Examples:
+
+        . Screenshot a batch of url from existing CSV file:
+            $ minet screenshot url_column file.csv > report.csv
+
+        . CSV input from stdin (mind the `-`):
+            $ xsv select url_column file.csv | minet screenshot url_column - > report.csv
+
+        . Screenshot a single url:
+            $ minet screenshot https://lemonde.fr
+    """,
+    resumer=ThreadSafeResumer,
+    variadic_input={"dummy_column": "url"},
+    arguments=[*PARALLELISM_ARGUMENTS, *COMMON_IO_ARGUMENTS],
 )
