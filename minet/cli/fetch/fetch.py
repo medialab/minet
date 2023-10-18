@@ -6,7 +6,10 @@
 # in the given column. This is done in a respectful multithreaded fashion to
 # optimize both running time & memory.
 #
-from typing import Optional, List, Union
+from typing import Optional, List, Union, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from playwright.async_api import Page
 
 import casanova
 from casanova import TabularRecord
@@ -17,6 +20,7 @@ from ural import is_shortened_url, could_be_html
 from minet.executors import (
     HTTPWorkerPayload,
     HTTPThreadPoolExecutor,
+    BrowserThreadPoolExecutor,
     PassthroughRequestResult,
     SuccessfulRequestResult,
     PassthroughResolveResult,
@@ -318,8 +322,8 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
     }
     common_http_executor_kwargs = {
         **common_executor_kwargs,
-        "insecure": cli_args.insecure,
-        "proxy": cli_args.proxy,
+        "insecure": getattr(cli_args, "insecure", None),
+        "proxy": getattr(cli_args, "proxy", None),
     }
 
     common_imap_kwargs = {
@@ -329,10 +333,10 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
     }
     common_http_imap_kwargs = {
         **common_imap_kwargs,
-        "max_redirects": cli_args.max_redirects,
+        "max_redirects": getattr(cli_args, "max_redirects", None),
     }
 
-    if cli_args.timeout is not None:
+    if getattr(cli_args, "timeout", None) is not None:
         common_http_executor_kwargs["timeout"] = cli_args.timeout
 
     # Normal fetch
@@ -440,7 +444,18 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
 
     # Screenshot
     elif cli_args.action == "screenshot":
-        print(cli_args)
+
+        async def screenshot(page: "Page") -> str:
+            await page.screenshot(path="screenshot.png")
+
+            return ""
+
+        # TODO: fullpage, page dimensions
+        with BrowserThreadPoolExecutor(**common_executor_kwargs) as executor:
+            for result in executor.run_with_new_page(
+                enricher, screenshot, passthrough=True, **common_imap_kwargs
+            ):
+                print(result)
 
     else:
         raise NotImplementedError

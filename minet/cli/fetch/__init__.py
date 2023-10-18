@@ -1,7 +1,7 @@
 from casanova import ThreadSafeResumer
 
 from minet.cli.argparse import command, BooleanAction, FolderStrategyType
-from minet.cli.constants import DEFAULT_CONTENT_FOLDER
+from minet.cli.constants import DEFAULT_CONTENT_FOLDER, DEFAULT_SCREENSHOT_FOLDER
 from minet.cli.exceptions import InvalidArgumentsError
 
 # TODO: lazyloading issue
@@ -32,6 +32,10 @@ PARALLELISM_ARGUMENTS = [
         "type": float,
         "default": DEFAULT_THROTTLE,
     },
+    {
+        "flag": "--url-template",
+        "help": "A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.",
+    },
 ]
 
 COMMON_ARGUMENTS = [
@@ -58,10 +62,6 @@ COMMON_ARGUMENTS = [
         "type": float,
     },
     {
-        "flag": "--url-template",
-        "help": "A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.",
-    },
-    {
         "flags": ["-X", "--request"],
         "help": "The http method to use. Will default to GET.",
         "dest": "method",
@@ -76,11 +76,6 @@ COMMON_ARGUMENTS = [
 ]
 
 COMMON_IO_ARGUMENTS = [
-    {
-        "flags": ["-O", "--output-dir"],
-        "help": "Directory where the fetched files will be written.",
-        "default": DEFAULT_CONTENT_FOLDER,
-    },
     {
         "flags": ["-f", "--filename-column"],
         "help": 'Name of the column used to build retrieved file names. Defaults to a md5 hash of final url. If the provided file names have no extension (e.g. ".jpg", ".pdf", etc.) the correct extension will be added depending on the file type.',
@@ -167,6 +162,11 @@ FETCH_COMMAND = command(
     arguments=[
         *COMMON_ARGUMENTS,
         *COMMON_IO_ARGUMENTS,
+        {
+            "flags": ["-O", "--output-dir"],
+            "help": "Directory where the fetched files will be written.",
+            "default": DEFAULT_CONTENT_FOLDER,
+        },
         {
             "flag": "--max-redirects",
             "help": "Maximum number of redirections to follow before breaking.",
@@ -330,5 +330,13 @@ SCREENSHOT_COMMAND = command(
     """,
     resumer=ThreadSafeResumer,
     variadic_input={"dummy_column": "url"},
-    arguments=[*PARALLELISM_ARGUMENTS, *COMMON_IO_ARGUMENTS],
+    arguments=[
+        *PARALLELISM_ARGUMENTS,
+        *COMMON_IO_ARGUMENTS,
+        {
+            "flags": ["-O", "--output-dir"],
+            "help": "Directory where the screenshots will be written.",
+            "default": DEFAULT_SCREENSHOT_FOLDER,
+        },
+    ],
 )
