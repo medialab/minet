@@ -90,7 +90,7 @@ def get_video_captions(video_target, langs):
         known_encoding="utf-8",
     )
 
-    soup = WonderfulSoup(response.text(), "lxml")
+    soup = WonderfulSoup(response.text(), "xml")
 
     captions = []
 
