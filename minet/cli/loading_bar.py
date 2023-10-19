@@ -273,8 +273,8 @@ class LoadingBar(object):
         if not nested or single_line:
             columns.append(SpinnerColumn("dots", style=None, finished_text="·"))
 
-        columns.append(PercentageColumn())
-        columns.append(TimeElapsedColumn())
+        columns.append(PercentageColumn(Column(overflow="ellipsis", no_wrap=True)))
+        columns.append(TimeElapsedColumn(Column(overflow="ellipsis", no_wrap=True)))
         columns.append(ThroughputColumn(Column(overflow="ellipsis", no_wrap=True)))
 
         if nested and single_line:
