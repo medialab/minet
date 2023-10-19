@@ -495,9 +495,9 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
             for result in executor.run(
                 enricher, screenshot, passthrough=True, **common_imap_kwargs
             ):
-                (index, row), addendum = result
-
-                enricher.writerow(index, row, addendum)
+                with loading_bar.step():
+                    (index, row), addendum = result
+                    enricher.writerow(index, row, addendum)
 
     else:
         raise NotImplementedError
