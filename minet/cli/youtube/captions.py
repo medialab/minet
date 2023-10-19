@@ -4,25 +4,32 @@
 #
 # Action retrieving the captions of YouTube videos using the API.
 #
+from minet.youtube import YouTubeScraper
+from minet.youtube.types import YouTubeCaptionTrack, YouTubeCaptionLine
+
 from minet.cli.utils import with_enricher_and_loading_bar
-from minet.youtube import get_video_captions
-from minet.youtube.constants import YOUTUBE_CAPTIONS_CSV_HEADERS
+from minet.cli.loading_bar import LoadingBar
+
+HEADERS = YouTubeCaptionTrack.fieldnames(
+    prefix="caption_track_"
+) + YouTubeCaptionLine.fieldnames(prefix="caption_line_")
 
 
 @with_enricher_and_loading_bar(
-    headers=YOUTUBE_CAPTIONS_CSV_HEADERS, title="Retrieving captions", unit="videos"
+    headers=HEADERS, title="Retrieving captions", unit="videos"
 )
-def action(cli_args, enricher, loading_bar):
+def action(cli_args, enricher, loading_bar: LoadingBar):
+    scraper = YouTubeScraper()
+
     with loading_bar.step():
         for row, video in enricher.cells(cli_args.column, with_rows=True):
-            result = get_video_captions(video, langs=cli_args.lang)
+            result = scraper.get_video_captions(video, langs=cli_args.lang)
 
             if result is None:
+                loading_bar.inc_stat("not-found", style="error")
                 continue
 
             track, lines = result
 
-            prefix = [track.lang, "1" if track.generated else ""]
-
             for line in lines:
-                enricher.writerow(row, prefix + list(line))
+                enricher.writerow(row, track, line)

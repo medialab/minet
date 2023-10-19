@@ -3,4 +3,4 @@
 # =============================================================================
 #
 from minet.youtube.client import YouTubeAPIClient
-from minet.youtube.scrapers import get_video_captions
+from minet.youtube.scraper import YouTubeScraper

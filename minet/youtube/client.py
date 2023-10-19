@@ -4,6 +4,8 @@
 #
 # A handy API client used by the CLI actions.
 #
+from typing import Deque, Tuple
+
 import time
 from ebbe import as_chunks
 from collections import deque
@@ -49,15 +51,15 @@ from minet.youtube.formatters import (
     format_playlist_item_snippet,
     format_channel,
 )
-from minet.youtube.scrapers import scrape_channel_id
+from minet.youtube.scraper import YouTubeScraper
 
 
-def get_channel_id(channel_target):
+def get_channel_id(scraper: YouTubeScraper, channel_target: str) -> str:
     should_scrape, channel_id = ensure_channel_id(channel_target)
 
     # is a youtube url without the channel ID
     if should_scrape:
-        channel_id = scrape_channel_id(channel_target)
+        channel_id = scraper.get_channel_id(channel_target)
 
     # is not a url
     elif channel_id == channel_target:
@@ -65,7 +67,7 @@ def get_channel_id(channel_target):
         if not channel_target.startswith("@"):
             username = "@" + channel_target
 
-        channel_id = scrape_channel_id("https://www.youtube.com/" + username)
+        channel_id = scraper.get_channel_id("https://www.youtube.com/" + username)
 
         # we didn't get any ID by scraping, channel_target could already be an ID
         if not channel_id:
@@ -85,6 +87,7 @@ class YouTubeAPIClient(object):
         self.keys = {k: True for k in key}
         self.current_key = key[0]
         self.pool_manager = create_pool_manager()
+        self.scraper = YouTubeScraper()
 
         # YouTube's API is known to crash sometimes...
         self.retryer = create_request_retryer(retry_on_statuses=(503,))
@@ -177,8 +180,9 @@ class YouTubeAPIClient(object):
 
             for item in group:
                 target = key(item) if key is not None else item
+
                 try:
-                    channel_id = get_channel_id(target)
+                    channel_id = get_channel_id(self.scraper, target)
                     group_data.append((channel_id, item))
                 except YouTubeInvalidChannelTargetError:
                     group_data.append((None, item))
@@ -268,7 +272,9 @@ class YouTubeAPIClient(object):
         def generator():
             starting_url = self.url_formatter.comments(video_id)
 
-            queue = deque([(False, video_id, starting_url)])
+            queue: Deque[Tuple[bool, str, str]] = deque(
+                [(False, video_id, starting_url)]
+            )
 
             while len(queue) != 0:
                 is_reply, item_id, url = queue.popleft()
@@ -321,7 +327,7 @@ class YouTubeAPIClient(object):
         return generator()
 
     def channel_videos(self, channel_target):
-        channel_id = get_channel_id(channel_target)
+        channel_id = get_channel_id(self.scraper, channel_target)
 
         playlist_id = get_channel_main_playlist_id(channel_id)
 
