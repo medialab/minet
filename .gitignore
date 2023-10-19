@@ -3,6 +3,7 @@
 .minetrc
 .pytest_cache
 .python-version
+.ruff_cache
 .vscode
 __pycache__
 build
