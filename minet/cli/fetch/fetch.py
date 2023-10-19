@@ -9,7 +9,7 @@
 from typing import Optional, List, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from playwright.async_api import Page
+    from playwright.async_api import Browser
 
 import casanova
 from casanova import TabularRecord
@@ -446,36 +446,53 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
     # Screenshot
     elif cli_args.action == "screenshot":
 
-        async def screenshot(page: "Page", item) -> ScreenshotAddendum:
-            row = item[1]
-            filename_cell = row[filename_pos] if filename_pos is not None else None
+        async def screenshot(
+            browser: "Browser", payload: HTTPWorkerPayload
+        ) -> ScreenshotAddendum:
+            async with await browser.new_context(
+                viewport={"width": cli_args.width, "height": cli_args.height}
+            ) as context:
+                async with await context.new_page() as page:
+                    response = await page.goto(payload.url)
 
-            formatter_kwargs = {}
+                    assert response is not None
 
-            if cli_args.filename_template and "row" in cli_args.filename_template:
-                formatter_kwargs["row"] = enricher.wrap(row)
+                    row = payload.item[1]
 
-            assert filename_builder is not None
+                    filename_cell = (
+                        row[filename_pos] if filename_pos is not None else None
+                    )
 
-            filename = filename_builder(
-                page.url,
-                filename=filename_cell,
-                ext=".png",
-                formatter_kwargs=formatter_kwargs,
-            )
+                    formatter_kwargs = {}
 
-            await page.screenshot(
-                path=pathjoin(cli_args.output_dir, filename),
-                full_page=cli_args.full_page,
-            )
+                    if (
+                        cli_args.filename_template
+                        and "row" in cli_args.filename_template
+                    ):
+                        formatter_kwargs["row"] = enricher.wrap(row)
 
-            return ScreenshotAddendum(
-                http_status=999, screenshot_error=None, path=filename
-            )
+                    assert filename_builder is not None
 
-        # TODO: fullpage, page dimensions
+                    filename = filename_builder(
+                        page.url,
+                        filename=filename_cell,
+                        ext=".png",
+                        formatter_kwargs=formatter_kwargs,
+                    )
+
+                    await page.screenshot(
+                        path=pathjoin(cli_args.output_dir, filename),
+                        full_page=cli_args.full_page,
+                    )
+
+                    return ScreenshotAddendum(
+                        http_status=response.status,
+                        screenshot_error=None,
+                        path=filename,
+                    )
+
         with BrowserThreadPoolExecutor(**common_executor_kwargs) as executor:
-            for result in executor.run_with_new_page(
+            for result in executor.run(
                 enricher, screenshot, passthrough=True, **common_imap_kwargs
             ):
                 (index, row), addendum = result

@@ -24,7 +24,7 @@ from typing import (
 from minet.types import Literal, TypedDict, Unpack, NotRequired
 
 if TYPE_CHECKING:
-    from playwright.async_api import Page
+    from playwright.async_api import Browser
 
 import urllib3
 import threading
@@ -765,10 +765,10 @@ class BrowserThreadPoolExecutor(ThreadPoolExecutor):
         self.browser.stop()
         return super().shutdown(wait=wait)
 
-    def run_with_new_page(
+    def run(
         self,
         iterator: Iterable[ItemType],
-        fn: Callable[["Page", ItemType], Awaitable[ResultType]],
+        fn: Callable[["Browser", HTTPWorkerPayload[ItemType]], Awaitable[ResultType]],
         *,
         ordered: bool = False,
         key: Optional[Callable[[ItemType], Optional[str]]] = None,
@@ -785,8 +785,8 @@ class BrowserThreadPoolExecutor(ThreadPoolExecutor):
             if payload.url is None:
                 return payload.item, None
 
-            return payload.item, self.browser.run_with_new_page(
-                fn, payload.url, payload.item
+            return payload.item, self.browser.run(
+                fn, cast(HTTPWorkerPayload[ItemType], payload)
             )
 
         imap = method(
