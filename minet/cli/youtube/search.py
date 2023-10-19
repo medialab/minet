@@ -8,11 +8,11 @@ from itertools import islice
 
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.youtube import YouTubeAPIClient
-from minet.youtube.constants import YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS
+from minet.youtube.types import YouTubeVideoSnippet
 
 
 @with_enricher_and_loading_bar(
-    headers=YOUTUBE_VIDEO_SNIPPET_CSV_HEADERS,
+    headers=YouTubeVideoSnippet,
     title="Searching videos",
     unit="queries",
     sub_unit="videos",
@@ -30,4 +30,4 @@ def action(cli_args, enricher, loading_bar):
 
             for video in searcher:
                 loading_bar.nested_advance()
-                enricher.writerow(row, video.as_csv_row())
+                enricher.writerow(row, video)

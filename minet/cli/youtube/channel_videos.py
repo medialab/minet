@@ -7,11 +7,11 @@
 #
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.youtube import YouTubeAPIClient
-from minet.youtube.constants import YOUTUBE_PLAYLIST_VIDEO_SNIPPET_CSV_HEADERS
+from minet.youtube.types import YouTubePlaylistVideoSnippet
 
 
 @with_enricher_and_loading_bar(
-    headers=YOUTUBE_PLAYLIST_VIDEO_SNIPPET_CSV_HEADERS,
+    headers=YouTubePlaylistVideoSnippet,
     title="Retrieving channel videos",
     unit="channels",
     sub_unit="videos",
@@ -23,5 +23,5 @@ def action(cli_args, enricher, loading_bar):
     for row, channel_id in enricher.cells(cli_args.column, with_rows=True):
         with loading_bar.step(channel_id):
             for video in client.channel_videos(channel_id):
-                enricher.writerow(row, video.as_csv_row())
+                enricher.writerow(row, video)
                 loading_bar.nested_advance()

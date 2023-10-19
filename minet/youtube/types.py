@@ -2,6 +2,7 @@ from typing import Optional, List
 
 from casanova import TabularRecord
 from dataclasses import dataclass
+from ebbe import getpath
 
 
 def get_int(item, key) -> Optional[int]:
@@ -36,10 +37,37 @@ class YouTubeVideoSnippet(TabularRecord):
     channel_id: str
     channel_title: str
 
+    @classmethod
+    def from_payload(cls, payload) -> "YouTubeVideoSnippet":
+        snippet = payload["snippet"]
+
+        return cls(
+            video_id=payload["id"]["videoId"],
+            published_at=snippet["publishedAt"],
+            channel_id=snippet["channelId"],
+            channel_title=snippet["title"],
+            description=snippet["description"],
+            title=snippet["channelTitle"],
+        )
+
 
 @dataclass
 class YouTubePlaylistVideoSnippet(YouTubeVideoSnippet):
     position: int
+
+    @classmethod
+    def from_payload(cls, payload) -> "YouTubePlaylistVideoSnippet":
+        snippet = payload["snippet"]
+
+        return cls(
+            video_id=snippet["resourceId"]["videoId"],
+            published_at=snippet["publishedAt"],
+            channel_id=snippet["channelId"],
+            title=snippet["title"],
+            description=snippet["description"],
+            channel_title=snippet["channelTitle"],
+            position=snippet["position"],
+        )
 
 
 @dataclass
@@ -58,7 +86,7 @@ class YouTubeVideo(YouTubeVideoSnippet):
         stats = payload["statistics"]
         details = payload["contentDetails"]
 
-        return YouTubeVideo(
+        return cls(
             video_id=payload["id"],
             published_at=snippet["publishedAt"],
             channel_id=snippet["channelId"],
@@ -83,8 +111,45 @@ class YouTubeComment(TabularRecord):
     like_count: int
     published_at: str
     updated_at: str
-    reply_count: int
+    reply_count: Optional[int]
     parent_comment_id: Optional[str]
+
+    @classmethod
+    def from_parent_comment_payload(cls, payload) -> "YouTubeComment":
+        meta = payload["snippet"]
+        snippet = getpath(payload, ["snippet", "topLevelComment", "snippet"])
+
+        return cls(
+            meta["videoId"],
+            payload["id"],
+            snippet["authorDisplayName"],
+            getpath(snippet, ["authorChannelId", "value"]),
+            snippet["textOriginal"],
+            int(snippet["likeCount"]),
+            snippet["publishedAt"],
+            snippet["updatedAt"],
+            int(meta["totalReplyCount"]),
+            None,
+        )
+
+    @classmethod
+    def from_reply_payload(
+        cls, payload, video_id: Optional[str] = None
+    ) -> "YouTubeComment":
+        snippet = payload["snippet"]
+
+        return cls(
+            video_id if video_id is not None else snippet["videoId"],
+            payload["id"],
+            snippet["authorDisplayName"],
+            getpath(snippet, ["authorChannelId", "value"]),
+            snippet["textOriginal"],
+            int(snippet["likeCount"]),
+            snippet["publishedAt"],
+            snippet["updatedAt"],
+            None,
+            snippet["parentId"],
+        )
 
 
 @dataclass
@@ -112,3 +177,47 @@ class YouTubeChannel(TabularRecord):
     moderate_comments: bool
     unsubscribed_trailer: str
     banner_external_url: str
+
+    @classmethod
+    def from_payload(cls, payload) -> "YouTubeChannel":
+        snippet = payload.get("snippet")
+        statistics = payload.get("statistics")
+        topic_details = payload.get("topicDetails", {})
+        status = payload.get("status")
+        branding_settings = payload.get("brandingSettings")
+
+        topic_ids = topic_details.get("topicIds", [])
+        topic_categories = topic_details.get("topicCategories", [])
+        topic_keywords = [url.rsplit("/", 1)[1] for url in topic_categories]
+
+        keywords = getpath(branding_settings, ["channel", "keywords"])
+        if keywords:
+            keywords = [
+                keyword.strip() for keyword in keywords.split('"') if keyword.strip()
+            ]
+
+        return YouTubeChannel(
+            payload.get("id"),
+            snippet.get("title"),
+            snippet.get("description"),
+            snippet.get("customUrl"),
+            snippet.get("publishedAt"),
+            getpath(snippet, ["thumbnails", "high", "url"]),
+            snippet.get("defaultLanguage"),
+            snippet.get("country"),
+            getpath(payload, ["contentDetails", "relatedPlaylists", "uploads"]),
+            statistics.get("viewCount"),
+            statistics.get("hiddenSubscriberCount"),
+            statistics.get("subscriberCount"),
+            statistics.get("videoCount"),
+            topic_ids,
+            topic_categories,
+            topic_keywords,
+            status.get("privacyStatus"),
+            status.get("madeForKids"),
+            status.get("longUploadsStatus"),
+            keywords,
+            getpath(branding_settings, ["channel", "moderateComments"]),
+            getpath(branding_settings, ["channel", "unsubscribedTrailer"]),
+            getpath(branding_settings, ["image", "bannerExternalUrl"]),
+        )

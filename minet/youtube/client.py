@@ -43,14 +43,13 @@ from minet.youtube.exceptions import (
     YouTubeUnknown403Error,
     YouTubeAccessNotConfiguredError,
 )
-from minet.youtube.formatters import (
-    format_video_snippet,
-    format_comment,
-    format_reply,
-    format_playlist_item_snippet,
-    format_channel,
+from minet.youtube.types import (
+    YouTubeVideo,
+    YouTubeVideoSnippet,
+    YouTubeComment,
+    YouTubePlaylistVideoSnippet,
+    YouTubeChannel,
 )
-from minet.youtube.types import YouTubeVideo
 from minet.youtube.scraper import YouTubeScraper
 
 
@@ -173,7 +172,9 @@ class YouTubeAPIClient(object):
 
             self.keys[key] = True
 
-    def channels(self, channels_target, key=None, raw=False):
+    def channels(
+        self, channels_target, key=None, raw=False
+    ) -> Iterator[Tuple[Any, Optional[YouTubeChannel]]]:
         # TODO: we could chunk per not None
         for group in as_chunks(YOUTUBE_API_MAX_CHANNELS_PER_CALL, channels_target):
             group_data = []
@@ -202,7 +203,7 @@ class YouTubeAPIClient(object):
                 channel_id = item["id"]
 
                 if not raw:
-                    item = format_channel(item)
+                    item = YouTubeChannel.from_payload(item)
 
                 indexed_result[channel_id] = item
 
@@ -240,7 +241,9 @@ class YouTubeAPIClient(object):
             for video_id, item in group_data:
                 yield item, indexed_result.get(video_id)
 
-    def search(self, query, order=YOUTUBE_API_DEFAULT_SEARCH_ORDER, raw=False):
+    def search(
+        self, query, order=YOUTUBE_API_DEFAULT_SEARCH_ORDER, raw=False
+    ) -> Iterator[YouTubeVideoSnippet]:
         if order not in YOUTUBE_API_SEARCH_ORDERS:
             raise TypeError('unknown search order "%s"' % order)
 
@@ -256,7 +259,7 @@ class YouTubeAPIClient(object):
 
                 for item in result["items"]:
                     if not raw:
-                        item = format_video_snippet(item)
+                        item = YouTubeVideoSnippet.from_payload(item)
 
                     yield item
 
@@ -265,7 +268,9 @@ class YouTubeAPIClient(object):
 
         return generator()
 
-    def comments(self, video_target, raw=False, full_replies=True):
+    def comments(
+        self, video_target, raw=False, full_replies=True
+    ) -> Iterator[YouTubeComment]:
         video_id = ensure_video_id(video_target)
 
         if video_id is None:
@@ -290,9 +295,11 @@ class YouTubeAPIClient(object):
 
                     if not raw:
                         item = (
-                            format_comment(item)
+                            YouTubeComment.from_parent_comment_payload(item)
                             if not is_reply
-                            else format_reply(item, video_id=video_id)
+                            else YouTubeComment.from_reply_payload(
+                                item, video_id=video_id
+                            )
                         )
 
                     yield item
@@ -304,7 +311,7 @@ class YouTubeAPIClient(object):
                     if not full_replies or len(replies) >= total_reply_count:
                         for reply in replies:
                             if not raw:
-                                reply = format_reply(reply)
+                                reply = YouTubeComment.from_reply_payload(reply)
 
                             yield reply
                     elif total_reply_count > 0:
@@ -328,7 +335,7 @@ class YouTubeAPIClient(object):
 
         return generator()
 
-    def channel_videos(self, channel_target):
+    def channel_videos(self, channel_target) -> Iterator[YouTubePlaylistVideoSnippet]:
         channel_id = get_channel_id(self.scraper, channel_target)
 
         playlist_id = get_channel_main_playlist_id(channel_id)
@@ -344,7 +351,7 @@ class YouTubeAPIClient(object):
                 token = result.get("nextPageToken")
 
                 for item in result["items"]:
-                    item = format_playlist_item_snippet(item)
+                    item = YouTubePlaylistVideoSnippet.from_payload(item)
 
                     yield item
 

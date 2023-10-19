@@ -6,7 +6,7 @@
 #
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.youtube import YouTubeAPIClient
-from minet.youtube.constants import YOUTUBE_COMMENT_CSV_HEADERS
+from minet.youtube.types import YouTubeComment
 from minet.youtube.exceptions import (
     YouTubeDisabledCommentsError,
     YouTubeVideoNotFoundError,
@@ -16,7 +16,7 @@ from minet.youtube.exceptions import (
 
 
 @with_enricher_and_loading_bar(
-    headers=YOUTUBE_COMMENT_CSV_HEADERS,
+    headers=YouTubeComment,
     title="Collecting video comments",
     unit="videos",
     sub_unit="comments",
@@ -37,7 +37,7 @@ def action(cli_args, enricher, loading_bar):
 
             try:
                 for comment in generator:
-                    enricher.writerow(row, comment.as_csv_row())
+                    enricher.writerow(row, comment)
                     loading_bar.nested_advance()
 
             except YouTubeDisabledCommentsError:
