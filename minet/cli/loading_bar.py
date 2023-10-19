@@ -263,6 +263,9 @@ class LoadingBar(object):
         # Main progress line
         self.bar_column = CautiousBarColumn(pulse_style="white")
 
+        if simple:
+            self.bar_column = BarColumn(pulse_style="white", bar_width=10)
+
         columns = [
             TextColumn("[progress.description]{task.description}"),
             self.bar_column,
