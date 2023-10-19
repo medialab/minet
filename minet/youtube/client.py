@@ -4,7 +4,7 @@
 #
 # A handy API client used by the CLI actions.
 #
-from typing import Deque, Tuple
+from typing import Deque, Tuple, Iterator, Any, Optional
 
 import time
 from ebbe import as_chunks
@@ -44,13 +44,13 @@ from minet.youtube.exceptions import (
     YouTubeAccessNotConfiguredError,
 )
 from minet.youtube.formatters import (
-    format_video,
     format_video_snippet,
     format_comment,
     format_reply,
     format_playlist_item_snippet,
     format_channel,
 )
+from minet.youtube.types import YouTubeVideo
 from minet.youtube.scraper import YouTubeScraper
 
 
@@ -209,7 +209,9 @@ class YouTubeAPIClient(object):
             for channel_id, item in group_data:
                 yield item, indexed_result.get(channel_id)
 
-    def videos(self, videos, key=None, raw=False):
+    def videos(
+        self, videos, key=None, raw=False
+    ) -> Iterator[Tuple[Any, Optional[YouTubeVideo]]]:
         # TODO: we could chunk per not None
         for group in as_chunks(YOUTUBE_API_MAX_VIDEOS_PER_CALL, videos):
             group_data = []
@@ -231,7 +233,7 @@ class YouTubeAPIClient(object):
                 video_id = item["id"]
 
                 if not raw:
-                    item = format_video(item)
+                    item = YouTubeVideo.from_payload(item)
 
                 indexed_result[video_id] = item
 

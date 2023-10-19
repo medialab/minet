@@ -59,8 +59,6 @@ YOUTUBE_COMMENT_CSV_HEADERS = [
     "parent_comment_id",
 ]
 
-YOUTUBE_CAPTIONS_CSV_HEADERS = ["lang", "generated", "start", "duration", "text"]
-
 YOUTUBE_CHANNEL_CSV_HEADERS = [
     "id",
     "title",
