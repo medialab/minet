@@ -5,15 +5,18 @@
 .python-version
 .ruff_cache
 .vscode
+
 __pycache__
 build
 cookbook/notebooks/*.csv
 data
 dist
+
 ftest/content
 ftest/corpus
 ftest/crawl
 ftest/*.csv
+
 *.q
 *.jsonl
 *.egg-info
@@ -22,5 +25,7 @@ ftest/*.csv
 *.sqlar
 *-wal
 *-shm
+
 /crawl
 /downloaded
+/screenshots

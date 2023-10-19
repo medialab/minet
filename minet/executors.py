@@ -768,7 +768,7 @@ class BrowserThreadPoolExecutor(ThreadPoolExecutor):
     def run_with_new_page(
         self,
         iterator: Iterable[ItemType],
-        fn: Callable[["Page"], Awaitable[ResultType]],
+        fn: Callable[["Page", ItemType], Awaitable[ResultType]],
         *,
         ordered: bool = False,
         key: Optional[Callable[[ItemType], Optional[str]]] = None,
@@ -785,7 +785,9 @@ class BrowserThreadPoolExecutor(ThreadPoolExecutor):
             if payload.url is None:
                 return payload.item, None
 
-            return payload.item, self.browser.run_with_new_page(fn, payload.url)
+            return payload.item, self.browser.run_with_new_page(
+                fn, payload.url, payload.item
+            )
 
         imap = method(
             payloads_iter(iterator, key=key, passthrough=passthrough),

@@ -16,6 +16,7 @@ from casanova import TabularRecord
 from dataclasses import dataclass
 from datetime import datetime
 from ural import is_shortened_url, could_be_html
+from os.path import join as pathjoin
 
 from minet.executors import (
     HTTPWorkerPayload,
@@ -445,17 +446,38 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
     # Screenshot
     elif cli_args.action == "screenshot":
 
-        async def screenshot(page: "Page") -> str:
-            await page.screenshot(path="screenshot.png")
+        async def screenshot(page: "Page", item) -> ScreenshotAddendum:
+            row = item[1]
+            filename_cell = row[filename_pos] if filename_pos is not None else None
 
-            return ""
+            formatter_kwargs = {}
+
+            if cli_args.filename_template and "row" in cli_args.filename_template:
+                formatter_kwargs["row"] = enricher.wrap(row)
+
+            assert filename_builder is not None
+
+            filename = filename_builder(
+                page.url,
+                filename=filename_cell,
+                ext=".png",
+                formatter_kwargs=formatter_kwargs,
+            )
+
+            await page.screenshot(path=pathjoin(cli_args.output_dir, filename))
+
+            return ScreenshotAddendum(
+                http_status=999, screenshot_error=None, path=filename
+            )
 
         # TODO: fullpage, page dimensions
         with BrowserThreadPoolExecutor(**common_executor_kwargs) as executor:
             for result in executor.run_with_new_page(
                 enricher, screenshot, passthrough=True, **common_imap_kwargs
             ):
-                print(result)
+                (index, row), addendum = result
+
+                enricher.writerow(index, row, addendum)
 
     else:
         raise NotImplementedError

@@ -250,6 +250,10 @@ class FilenameBuilder(object):
         # on the provided one if any (usually inferred from http response)
         ext = original_ext if original_ext else (ext or "")
 
+        # Extension normalization
+        if ext:
+            ext = "." + ext.lstrip(".")
+
         if self.template is not None:
             try:
                 filename = self.formatter.format(
