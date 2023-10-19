@@ -169,7 +169,7 @@ Finally note that command line arguments and flags will take precedence over env
 
 ```
 Usage: minet cookies [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                     [--single-line] [--csv] [--url URL] [-o OUTPUT]
+                     [--simple-progress] [--csv] [--url URL] [-o OUTPUT]
                      {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}
 
 # Minet Cookies Command
@@ -195,7 +195,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -222,7 +222,7 @@ Examples:
 
 ```
 Usage: minet crawl [-h] [-O OUTPUT_DIR] [--silent]
-                   [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
+                   [--refresh-per-second REFRESH_PER_SECOND] [--simple-progress]
                    [--resume] [--max-depth MAX_DEPTH] [--throttle THROTTLE]
                    [--domain-parallelism DOMAIN_PARALLELISM] [-t THREADS] [-z]
                    [--compress-transfer] [-w] [-d]
@@ -330,7 +330,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -391,7 +391,7 @@ For more info, check out: https://www.sqlite.org/tempfiles.html
 ```
 Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
                          [--refresh-per-second REFRESH_PER_SECOND]
-                         [--single-line] [-U URL_FILTER]
+                         [--simple-progress] [-U URL_FILTER]
                          [--invert-content-match] [--invert-url-match]
                          [--extract] [--irrelevant-continue] [--only-html]
                          [--extraction-fields EXTRACTION_FIELDS] [-O OUTPUT_DIR]
@@ -524,7 +524,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -581,18 +581,19 @@ For more info, check out: https://www.sqlite.org/tempfiles.html
 
 ```
 Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
-                   [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
+                   [--refresh-per-second REFRESH_PER_SECOND] [--simple-progress]
                    [-t THREADS] [--throttle THROTTLE]
+                   [--url-template URL_TEMPLATE]
                    [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
-                   [-H HEADERS] [-k] [--timeout TIMEOUT]
-                   [--url-template URL_TEMPLATE] [-X METHOD] [-x PROXY]
-                   [--spoof-user-agent] [--max-redirects MAX_REDIRECTS] [-z]
-                   [--compress-transfer] [-c] [-D] [-O OUTPUT_DIR]
-                   [-f FILENAME_COLUMN] [--filename-template FILENAME_TEMPLATE]
-                   [--folder-strategy FOLDER_STRATEGY] [--keep-failed-contents]
-                   [--standardize-encoding] [--only-html] [--pycurl] [--sqlar]
-                   [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
-                   [--resume] [-o OUTPUT]
+                   [-H HEADERS] [-k] [--timeout TIMEOUT] [-X METHOD] [-x PROXY]
+                   [--spoof-user-agent] [-f FILENAME_COLUMN]
+                   [--filename-template FILENAME_TEMPLATE]
+                   [--folder-strategy FOLDER_STRATEGY] [-O OUTPUT_DIR]
+                   [--max-redirects MAX_REDIRECTS] [-z] [--compress-transfer]
+                   [-c] [-D] [--keep-failed-contents] [--standardize-encoding]
+                   [--only-html] [--pycurl] [--sqlar] [-i INPUT]
+                   [--explode EXPLODE] [-s SELECT] [--total TOTAL] [--resume]
+                   [-o OUTPUT]
                    url_or_url_column
 
 # Minet Fetch Command
@@ -702,7 +703,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -712,7 +713,7 @@ Optional Arguments:
 
 Columns being added to the output:
 
-. "fetch_original_index": index of the line in the original file (the output will be
+. "original_index": index of the line in the original file (the output will be
     arbitrarily ordered since multiple requests are performed concurrently).
 . "resolved_url": final resolved url (after templating & solving redirects).
 . "http_status": HTTP status code of the request, e.g. 200, 404, 503 etc.
@@ -797,9 +798,10 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet extract [-h] [-g] [--silent]
-                     [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
-                     [-I INPUT_DIR] [-p PROCESSES] [--chunk-size CHUNK_SIZE]
-                     [--body-column BODY_COLUMN] [--error-column ERROR_COLUMN]
+                     [--refresh-per-second REFRESH_PER_SECOND]
+                     [--simple-progress] [-I INPUT_DIR] [-p PROCESSES]
+                     [--chunk-size CHUNK_SIZE] [--body-column BODY_COLUMN]
+                     [--error-column ERROR_COLUMN]
                      [--status-column STATUS_COLUMN]
                      [--encoding-column ENCODING_COLUMN]
                      [--mimetype-column MIMETYPE_COLUMN] [--encoding ENCODING]
@@ -886,7 +888,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -948,16 +950,17 @@ Examples:
 
 ```
 Usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
-                     [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
-                     [-t THREADS] [--throttle THROTTLE]
+                     [--refresh-per-second REFRESH_PER_SECOND]
+                     [--simple-progress] [-t THREADS] [--throttle THROTTLE]
+                     [--url-template URL_TEMPLATE]
                      [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
-                     [-H HEADERS] [-k] [--timeout TIMEOUT]
-                     [--url-template URL_TEMPLATE] [-X METHOD] [-x PROXY]
-                     [--spoof-user-agent] [--max-redirects MAX_REDIRECTS]
-                     [--follow-meta-refresh] [--follow-js-relocation]
-                     [--infer-redirection] [--canonicalize] [--only-shortened]
-                     [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
-                     [--resume] [-o OUTPUT]
+                     [-H HEADERS] [-k] [--timeout TIMEOUT] [-X METHOD]
+                     [-x PROXY] [--spoof-user-agent]
+                     [--max-redirects MAX_REDIRECTS] [--follow-meta-refresh]
+                     [--follow-js-relocation] [--infer-redirection]
+                     [--canonicalize] [--only-shortened] [-i INPUT]
+                     [--explode EXPLODE] [-s SELECT] [--total TOTAL] [--resume]
+                     [-o OUTPUT]
                      url_or_url_column
 
 # Minet Resolve Command
@@ -1037,7 +1040,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -1100,7 +1103,7 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 ```
 Usage: minet scrape [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                    [--single-line] [-g] [-I INPUT_DIR] [-p PROCESSES]
+                    [--simple-progress] [-g] [-I INPUT_DIR] [-p PROCESSES]
                     [--chunk-size CHUNK_SIZE] [--body-column BODY_COLUMN]
                     [--url-column URL_COLUMN] [--error-column ERROR_COLUMN]
                     [--status-column STATUS_COLUMN]
@@ -1196,7 +1199,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -1257,7 +1260,7 @@ Examples:
 ```
 Usage: minet url-extract [-h] [--silent]
                          [--refresh-per-second REFRESH_PER_SECOND]
-                         [--single-line] [--base-url BASE_URL]
+                         [--simple-progress] [--base-url BASE_URL]
                          [--from {html,text}] [-s SELECT] [--total TOTAL]
                          [-o OUTPUT]
                          column input
@@ -1291,7 +1294,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -1312,7 +1315,7 @@ Examples:
 
 ```
 Usage: minet url-join [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                      [--single-line] [-p MATCH_COLUMN_PREFIX]
+                      [--simple-progress] [-p MATCH_COLUMN_PREFIX]
                       [--separator SEPARATOR] [-s SELECT] [-o OUTPUT]
                       column1 input1 column2 input2
 
@@ -1349,7 +1352,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -1376,15 +1379,16 @@ Examples:
 
 ```
 Usage: minet url-parse [-h] [--facebook] [--silent]
-                       [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
-                       [--twitter] [--youtube] [--infer-redirection]
-                       [--fix-common-mistakes] [--normalize-amp] [--quoted]
-                       [--sort-query] [--strip-authentication]
-                       [--strip-fragment] [--strip-index]
-                       [--strip-irrelevant-subdomains] [--strip-protocol]
-                       [--strip-trailing-slash] [--strip-suffix]
-                       [--platform-aware] [-i INPUT] [--explode EXPLODE]
-                       [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                       [--refresh-per-second REFRESH_PER_SECOND]
+                       [--simple-progress] [--twitter] [--youtube]
+                       [--infer-redirection] [--fix-common-mistakes]
+                       [--normalize-amp] [--quoted] [--sort-query]
+                       [--strip-authentication] [--strip-fragment]
+                       [--strip-index] [--strip-irrelevant-subdomains]
+                       [--strip-protocol] [--strip-trailing-slash]
+                       [--strip-suffix] [--platform-aware] [-i INPUT]
+                       [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                       [-o OUTPUT]
                        url_or_url_column
 
 # Minet Url Parse Command
@@ -1475,7 +1479,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -1580,7 +1584,8 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet buzzsumo [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
-                      [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
+                      [--refresh-per-second REFRESH_PER_SECOND]
+                      [--simple-progress]
                       {limit,domain,domain-summary,exact-url} ...
 
 # Minet Buzzsumo Command
@@ -1601,7 +1606,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -1619,7 +1624,7 @@ Subcommands:
 ```
 Usage: minet buzzsumo limit [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
                             [--refresh-per-second REFRESH_PER_SECOND]
-                            [--single-line] [-o OUTPUT]
+                            [--simple-progress] [-o OUTPUT]
 
 # Minet Buzzsumo Limit Command
 
@@ -1643,7 +1648,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -1663,7 +1668,7 @@ Examples:
 Usage: minet buzzsumo domain-summary [-h] [-t TOKEN] [--rcfile RCFILE]
                                      [--silent]
                                      [--refresh-per-second REFRESH_PER_SECOND]
-                                     [--single-line] --begin-date BEGIN_DATE
+                                     [--simple-progress] --begin-date BEGIN_DATE
                                      --end-date END_DATE [-i INPUT]
                                      [--explode EXPLODE] [-s SELECT]
                                      [--total TOTAL] [-o OUTPUT]
@@ -1717,7 +1722,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -1766,9 +1771,9 @@ how to use the command with a CSV file?
 ```
 Usage: minet buzzsumo domain [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
                              [--refresh-per-second REFRESH_PER_SECOND]
-                             [--single-line] --begin-date BEGIN_DATE --end-date
-                             END_DATE [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                             [--total TOTAL] [-o OUTPUT]
+                             [--simple-progress] --begin-date BEGIN_DATE
+                             --end-date END_DATE [-i INPUT] [--explode EXPLODE]
+                             [-s SELECT] [--total TOTAL] [-o OUTPUT]
                              domain_name_or_domain_name_column
 
 # Minet Buzzsumo Domain Command
@@ -1819,7 +1824,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -1868,7 +1873,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet buzzsumo exact-url [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
                                 [--refresh-per-second REFRESH_PER_SECOND]
-                                [--single-line] --begin-date BEGIN_DATE
+                                [--simple-progress] --begin-date BEGIN_DATE
                                 --end-date END_DATE [-i INPUT]
                                 [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                                 [-o OUTPUT]
@@ -1920,7 +1925,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -1966,7 +1971,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet crowdtangle [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
                          [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                         [--single-line] [-t TOKEN]
+                         [--simple-progress] [-t TOKEN]
                          {leaderboard,lists,posts-by-id,posts,search,summary}
                          ...
 
@@ -1993,7 +1998,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -2012,8 +2017,8 @@ Subcommands:
 Usage: minet crowdtangle leaderboard [-h] [--rate-limit RATE_LIMIT]
                                      [--rcfile RCFILE] [--silent]
                                      [--refresh-per-second REFRESH_PER_SECOND]
-                                     [--single-line] [-t TOKEN] [--breakdown]
-                                     [-f {csv,jsonl}] [-l LIMIT]
+                                     [--simple-progress] [-t TOKEN]
+                                     [--breakdown] [-f {csv,jsonl}] [-l LIMIT]
                                      [--list-id LIST_ID]
                                      [--start-date START_DATE] [-o OUTPUT]
 
@@ -2055,7 +2060,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -2075,7 +2080,7 @@ Examples:
 Usage: minet crowdtangle lists [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
                                [--silent]
                                [--refresh-per-second REFRESH_PER_SECOND]
-                               [--single-line] [-t TOKEN] [-o OUTPUT]
+                               [--simple-progress] [-t TOKEN] [-o OUTPUT]
 
 # Minet CrowdTangle Lists Command
 
@@ -2105,7 +2110,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -2125,7 +2130,7 @@ Examples:
 Usage: minet crowdtangle posts-by-id [-h] [--rate-limit RATE_LIMIT]
                                      [--rcfile RCFILE] [--silent]
                                      [--refresh-per-second REFRESH_PER_SECOND]
-                                     [--single-line] [-t TOKEN] [-i INPUT]
+                                     [--simple-progress] [-t TOKEN] [-i INPUT]
                                      [--explode EXPLODE] [-s SELECT]
                                      [--total TOTAL] [--resume] [-o OUTPUT]
                                      post_url_or_id_or_post_url_or_id_column
@@ -2180,7 +2185,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -2230,7 +2235,7 @@ how to use the command with a CSV file?
 Usage: minet crowdtangle posts [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
                                [--silent]
                                [--refresh-per-second REFRESH_PER_SECOND]
-                               [--single-line] [-t TOKEN]
+                               [--simple-progress] [-t TOKEN]
                                [--chunk-size CHUNK_SIZE] [--end-date END_DATE]
                                [-f {csv,jsonl}] [--language LANGUAGE] [-l LIMIT]
                                [--list-ids LIST_IDS]
@@ -2286,7 +2291,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -2315,7 +2320,7 @@ To know the different list ids associated with your dashboard:
 Usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
                                 [--silent]
                                 [--refresh-per-second REFRESH_PER_SECOND]
-                                [--single-line] [-t TOKEN] [--and AND]
+                                [--simple-progress] [-t TOKEN] [--and AND]
                                 [--chunk-size CHUNK_SIZE] [--end-date END_DATE]
                                 [-f {csv,jsonl}] [--in-list-ids IN_LIST_IDS]
                                 [--language LANGUAGE] [-l LIMIT]
@@ -2387,7 +2392,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -2407,7 +2412,7 @@ Examples:
 Usage: minet crowdtangle summary [-h] [--rate-limit RATE_LIMIT]
                                  [--rcfile RCFILE] [--silent]
                                  [--refresh-per-second REFRESH_PER_SECOND]
-                                 [--single-line] [-t TOKEN] [-p PLATFORMS]
+                                 [--simple-progress] [-t TOKEN] [-p PLATFORMS]
                                  [--posts POSTS]
                                  [--sort-by {date,subscriber_count,total_interactions}]
                                  --start-date START_DATE [-i INPUT]
@@ -2470,7 +2475,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -2535,9 +2540,9 @@ Subcommands:
 ```
 Usage: minet facebook comments [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                [--refresh-per-second REFRESH_PER_SECOND]
-                               [--single-line] [--throttle THROTTLE] [-i INPUT]
-                               [--explode EXPLODE] [-s SELECT] [--total TOTAL]
-                               [-o OUTPUT]
+                               [--simple-progress] [--throttle THROTTLE]
+                               [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                               [--total TOTAL] [-o OUTPUT]
                                post_url_or_post_url_column
 
 # Minet Facebook Comments Command
@@ -2593,7 +2598,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -2645,7 +2650,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet facebook post [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                            [--refresh-per-second REFRESH_PER_SECOND]
-                           [--single-line] [--throttle THROTTLE] [-i INPUT]
+                           [--simple-progress] [--throttle THROTTLE] [-i INPUT]
                            [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                            [-o OUTPUT]
                            post_url_or_post_url_column
@@ -2724,7 +2729,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -2776,7 +2781,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet facebook posts [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                             [--refresh-per-second REFRESH_PER_SECOND]
-                            [--single-line] [--throttle THROTTLE] [-i INPUT]
+                            [--simple-progress] [--throttle THROTTLE] [-i INPUT]
                             [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                             [-o OUTPUT]
                             group_url_or_group_url_column
@@ -2855,7 +2860,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -2907,7 +2912,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet facebook post-authors [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                    [--refresh-per-second REFRESH_PER_SECOND]
-                                   [--single-line] [--throttle THROTTLE]
+                                   [--simple-progress] [--throttle THROTTLE]
                                    [-i INPUT] [--explode EXPLODE] [-s SELECT]
                                    [--total TOTAL] [-o OUTPUT]
                                    post_url_or_post_url_column
@@ -2959,7 +2964,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -3005,8 +3010,9 @@ how to use the command with a CSV file?
 ```
 Usage: minet facebook url-likes [-h] [--silent]
                                 [--refresh-per-second REFRESH_PER_SECOND]
-                                [--single-line] [-i INPUT] [--explode EXPLODE]
-                                [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                                [--simple-progress] [-i INPUT]
+                                [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                                [-o OUTPUT]
                                 url_or_url_column
 
 # Minet Facebook Url Likes Command
@@ -3050,7 +3056,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -3114,7 +3120,8 @@ Subcommands:
 ```
 Usage: minet google sheets [-h] [--silent]
                            [--refresh-per-second REFRESH_PER_SECOND]
-                           [--single-line] [-a AUTHUSER] [-c COOKIE] [-o OUTPUT]
+                           [--simple-progress] [-a AUTHUSER] [-c COOKIE]
+                           [-o OUTPUT]
                            url
 
 # Minet Google Sheets Command
@@ -3153,7 +3160,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -3177,7 +3184,7 @@ Examples:
 ```
 Usage: minet hyphe crawl [-h] [--silent]
                          [--refresh-per-second REFRESH_PER_SECOND]
-                         [--single-line] [--id-column ID_COLUMN]
+                         [--simple-progress] [--id-column ID_COLUMN]
                          [--status-column STATUS_COLUMN]
                          [--prefixes-column PREFIXES_COLUMN]
                          [--prefix-separator PREFIX_SEPARATOR]
@@ -3283,7 +3290,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -3341,8 +3348,8 @@ For more info, check out: https://www.sqlite.org/tempfiles.html
 ```
 Usage: minet hyphe declare [-h] [--silent]
                            [--refresh-per-second REFRESH_PER_SECOND]
-                           [--single-line] [--password PASSWORD] [--total TOTAL]
-                           [-o OUTPUT]
+                           [--simple-progress] [--password PASSWORD]
+                           [--total TOTAL] [-o OUTPUT]
                            url corpus webentities
 
 # Minet Hyphe Declare Command
@@ -3373,7 +3380,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -3392,7 +3399,7 @@ Examples:
 ```
 Usage: minet hyphe destroy [-h] [--silent]
                            [--refresh-per-second REFRESH_PER_SECOND]
-                           [--single-line] [--password PASSWORD] [-o OUTPUT]
+                           [--simple-progress] [--password PASSWORD] [-o OUTPUT]
                            url corpus
 
 # Minet Hyphe Destroy Command
@@ -3414,7 +3421,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -3433,7 +3440,7 @@ Examples:
 ```
 Usage: minet hyphe dump [-h] [--silent]
                         [--refresh-per-second REFRESH_PER_SECOND]
-                        [--single-line] [-O OUTPUT_DIR] [--body]
+                        [--simple-progress] [-O OUTPUT_DIR] [--body]
                         [--statuses STATUSES] [--page-count PAGE_COUNT]
                         [--password PASSWORD] [-o OUTPUT]
                         url corpus
@@ -3467,7 +3474,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -3486,7 +3493,7 @@ Examples:
 ```
 Usage: minet hyphe reset [-h] [--silent]
                          [--refresh-per-second REFRESH_PER_SECOND]
-                         [--single-line] [--password PASSWORD] [-o OUTPUT]
+                         [--simple-progress] [--password PASSWORD] [-o OUTPUT]
                          url corpus
 
 # Minet Hyphe Reset Command
@@ -3508,7 +3515,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -3526,7 +3533,7 @@ Examples:
 
 ```
 Usage: minet hyphe tag [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                       [--single-line] [--separator SEPARATOR]
+                       [--simple-progress] [--separator SEPARATOR]
                        [--password PASSWORD] [--total TOTAL] [-o OUTPUT]
                        url corpus webentity_id_column tag_columns data
 
@@ -3560,7 +3567,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -3578,7 +3585,8 @@ Examples:
 
 ```
 Usage: minet instagram [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                       [--refresh-per-second REFRESH_PER_SECOND] [--single-line]
+                       [--refresh-per-second REFRESH_PER_SECOND]
+                       [--simple-progress]
                        {comments,hashtag,post-infos,user-followers,user-following,user-infos,user-posts}
                        ...
 
@@ -3603,7 +3611,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -3621,7 +3629,7 @@ Subcommands:
 ```
 Usage: minet instagram comments [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                 [--refresh-per-second REFRESH_PER_SECOND]
-                                [--single-line] [-l LIMIT] [-i INPUT]
+                                [--simple-progress] [-l LIMIT] [-i INPUT]
                                 [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                                 [-o OUTPUT]
                                 post_or_post_column
@@ -3679,7 +3687,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -3725,7 +3733,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet instagram hashtag [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                [--refresh-per-second REFRESH_PER_SECOND]
-                               [--single-line] [-l LIMIT] [-i INPUT]
+                               [--simple-progress] [-l LIMIT] [-i INPUT]
                                [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                                [-o OUTPUT]
                                hashtag_or_hashtag_column
@@ -3785,7 +3793,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -3831,8 +3839,9 @@ how to use the command with a CSV file?
 ```
 Usage: minet instagram post-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                   [--refresh-per-second REFRESH_PER_SECOND]
-                                  [--single-line] [-i INPUT] [--explode EXPLODE]
-                                  [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                                  [--simple-progress] [-i INPUT]
+                                  [--explode EXPLODE] [-s SELECT]
+                                  [--total TOTAL] [-o OUTPUT]
                                   post_or_post_column
 
 # Instagram post-infos
@@ -3892,7 +3901,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -3939,7 +3948,7 @@ how to use the command with a CSV file?
 Usage: minet instagram user-followers [-h] [-c COOKIE] [--rcfile RCFILE]
                                       [--silent]
                                       [--refresh-per-second REFRESH_PER_SECOND]
-                                      [--single-line] [-l LIMIT] [-i INPUT]
+                                      [--simple-progress] [-l LIMIT] [-i INPUT]
                                       [--explode EXPLODE] [-s SELECT]
                                       [--total TOTAL] [-o OUTPUT]
                                       user_or_user_column
@@ -4006,7 +4015,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -4053,7 +4062,7 @@ how to use the command with a CSV file?
 Usage: minet instagram user-following [-h] [-c COOKIE] [--rcfile RCFILE]
                                       [--silent]
                                       [--refresh-per-second REFRESH_PER_SECOND]
-                                      [--single-line] [-l LIMIT] [-i INPUT]
+                                      [--simple-progress] [-l LIMIT] [-i INPUT]
                                       [--explode EXPLODE] [-s SELECT]
                                       [--total TOTAL] [-o OUTPUT]
                                       user_or_user_column
@@ -4118,7 +4127,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -4164,8 +4173,9 @@ how to use the command with a CSV file?
 ```
 Usage: minet instagram user-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                   [--refresh-per-second REFRESH_PER_SECOND]
-                                  [--single-line] [-i INPUT] [--explode EXPLODE]
-                                  [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                                  [--simple-progress] [-i INPUT]
+                                  [--explode EXPLODE] [-s SELECT]
+                                  [--total TOTAL] [-o OUTPUT]
                                   user_or_user_column
 
 # Instagram user-infos
@@ -4227,7 +4237,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -4273,7 +4283,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet instagram user-posts [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                   [--refresh-per-second REFRESH_PER_SECOND]
-                                  [--single-line] [-l LIMIT] [-i INPUT]
+                                  [--simple-progress] [-l LIMIT] [-i INPUT]
                                   [--explode EXPLODE] [-s SELECT]
                                   [--total TOTAL] [-o OUTPUT]
                                   user_or_user_column
@@ -4340,7 +4350,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -4388,7 +4398,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet mediacloud medias [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
                                [--refresh-per-second REFRESH_PER_SECOND]
-                               [--single-line] [--feeds FEEDS] [-i INPUT]
+                               [--simple-progress] [--feeds FEEDS] [-i INPUT]
                                [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                                [-o OUTPUT]
                                media_or_media_column
@@ -4436,7 +4446,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -4477,7 +4487,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet mediacloud search [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
                                [--refresh-per-second REFRESH_PER_SECOND]
-                               [--single-line] [-c COLLECTIONS]
+                               [--simple-progress] [-c COLLECTIONS]
                                [--filter-query FILTER_QUERY] [-m MEDIAS]
                                [--publish-day PUBLISH_DAY]
                                [--publish-month PUBLISH_MONTH]
@@ -4529,7 +4539,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -4546,7 +4556,7 @@ Optional Arguments:
 Usage: minet mediacloud topic stories [-h] [-t TOKEN] [--rcfile RCFILE]
                                       [--silent]
                                       [--refresh-per-second REFRESH_PER_SECOND]
-                                      [--single-line] [--media-id MEDIA_ID]
+                                      [--simple-progress] [--media-id MEDIA_ID]
                                       [--from-media-id FROM_MEDIA_ID]
                                       [-o OUTPUT]
                                       topic_id
@@ -4581,7 +4591,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -4597,7 +4607,7 @@ Optional Arguments:
 ```
 Usage: minet telegram channel-infos [-h] [--throttle THROTTLE] [--silent]
                                     [--refresh-per-second REFRESH_PER_SECOND]
-                                    [--single-line] [-i INPUT]
+                                    [--simple-progress] [-i INPUT]
                                     [--explode EXPLODE] [-s SELECT]
                                     [--total TOTAL] [-o OUTPUT]
                                     channel_name_or_channel_name_column
@@ -4638,7 +4648,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -4683,7 +4693,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet telegram channel-messages [-h] [--throttle THROTTLE] [--silent]
                                        [--refresh-per-second REFRESH_PER_SECOND]
-                                       [--single-line] [-i INPUT]
+                                       [--simple-progress] [-i INPUT]
                                        [--explode EXPLODE] [-s SELECT]
                                        [--total TOTAL] [-o OUTPUT]
                                        channel_name_or_channel_name_column
@@ -4724,7 +4734,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -4785,7 +4795,7 @@ Subcommands:
 ```
 Usage: minet tiktok search-videos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                   [--refresh-per-second REFRESH_PER_SECOND]
-                                  [--single-line] [-l LIMIT] [-i INPUT]
+                                  [--simple-progress] [-l LIMIT] [-i INPUT]
                                   [--explode EXPLODE] [-s SELECT]
                                   [--total TOTAL] [-o OUTPUT]
                                   query_or_query_column
@@ -4852,7 +4862,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -4900,7 +4910,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter attrition [-h] [--user USER] [--silent]
                                [--refresh-per-second REFRESH_PER_SECOND]
-                               [--single-line] [--retweeted-id RETWEETED_ID]
+                               [--simple-progress] [--retweeted-id RETWEETED_ID]
                                [--ids] [--api-key API_KEY] [--rcfile RCFILE]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
@@ -5008,7 +5018,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -5057,7 +5067,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter followers [-h] [--ids] [--silent]
                                [--refresh-per-second REFRESH_PER_SECOND]
-                               [--single-line] [--v2] [--api-key API_KEY]
+                               [--simple-progress] [--v2] [--api-key API_KEY]
                                [--rcfile RCFILE]
                                [--api-secret-key API_SECRET_KEY]
                                [--access-token ACCESS_TOKEN]
@@ -5127,7 +5137,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -5173,7 +5183,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter friends [-h] [--ids] [--silent]
                              [--refresh-per-second REFRESH_PER_SECOND]
-                             [--single-line] [--v2] [--api-key API_KEY]
+                             [--simple-progress] [--v2] [--api-key API_KEY]
                              [--rcfile RCFILE] [--api-secret-key API_SECRET_KEY]
                              [--access-token ACCESS_TOKEN]
                              [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -5242,7 +5252,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -5289,7 +5299,7 @@ how to use the command with a CSV file?
 Usage: minet twitter list-followers [-h] [--api-key API_KEY] [--rcfile RCFILE]
                                     [--silent]
                                     [--refresh-per-second REFRESH_PER_SECOND]
-                                    [--single-line]
+                                    [--simple-progress]
                                     [--api-secret-key API_SECRET_KEY]
                                     [--access-token ACCESS_TOKEN]
                                     [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -5351,7 +5361,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -5398,7 +5408,7 @@ how to use the command with a CSV file?
 Usage: minet twitter list-members [-h] [--api-key API_KEY] [--rcfile RCFILE]
                                   [--silent]
                                   [--refresh-per-second REFRESH_PER_SECOND]
-                                  [--single-line]
+                                  [--simple-progress]
                                   [--api-secret-key API_SECRET_KEY]
                                   [--access-token ACCESS_TOKEN]
                                   [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -5460,7 +5470,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -5506,7 +5516,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter retweeters [-h] [--timezone TIMEZONE] [--silent]
                                 [--refresh-per-second REFRESH_PER_SECOND]
-                                [--single-line] [--api-key API_KEY]
+                                [--simple-progress] [--api-key API_KEY]
                                 [--rcfile RCFILE]
                                 [--api-secret-key API_SECRET_KEY]
                                 [--access-token ACCESS_TOKEN]
@@ -5571,7 +5581,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -5617,7 +5627,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter scrape [-h] [--silent]
                             [--refresh-per-second REFRESH_PER_SECOND]
-                            [--single-line] [--include-refs] [-l LIMIT]
+                            [--simple-progress] [--include-refs] [-l LIMIT]
                             [--query-template QUERY_TEMPLATE] [-c COOKIE]
                             [--rcfile RCFILE] [--timezone TIMEZONE] [-i INPUT]
                             [--explode EXPLODE] [-s SELECT] [--total TOTAL]
@@ -5711,7 +5721,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -5778,8 +5788,9 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter tweet-date [-h] [--timezone TIMEZONE] [--silent]
                                 [--refresh-per-second REFRESH_PER_SECOND]
-                                [--single-line] [-i INPUT] [--explode EXPLODE]
-                                [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                                [--simple-progress] [-i INPUT]
+                                [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                                [-o OUTPUT]
                                 tweet_or_tweet_column
 
 # Minet Twitter Tweet Date Command
@@ -5817,7 +5828,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -5862,7 +5873,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter tweet-search [-h] [--since-id SINCE_ID] [--silent]
                                   [--refresh-per-second REFRESH_PER_SECOND]
-                                  [--single-line] [--until-id UNTIL_ID]
+                                  [--simple-progress] [--until-id UNTIL_ID]
                                   [--start-time START_TIME]
                                   [--end-time END_TIME] [--academic]
                                   [--timezone TIMEZONE]
@@ -5953,7 +5964,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -6003,7 +6014,7 @@ how to use the command with a CSV file?
 Usage: minet twitter tweet-count [-h] [--granularity {day,hour,minute}]
                                  [--silent]
                                  [--refresh-per-second REFRESH_PER_SECOND]
-                                 [--single-line] [--since-id SINCE_ID]
+                                 [--simple-progress] [--since-id SINCE_ID]
                                  [--until-id UNTIL_ID] [--start-time START_TIME]
                                  [--end-time END_TIME] [--academic]
                                  [--api-key API_KEY] [--rcfile RCFILE]
@@ -6115,7 +6126,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -6167,7 +6178,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter tweets [-h] [--v2] [--silent]
                             [--refresh-per-second REFRESH_PER_SECOND]
-                            [--single-line] [--timezone TIMEZONE]
+                            [--simple-progress] [--timezone TIMEZONE]
                             [--api-key API_KEY] [--rcfile RCFILE]
                             [--api-secret-key API_SECRET_KEY]
                             [--access-token ACCESS_TOKEN]
@@ -6236,7 +6247,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -6282,7 +6293,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter users [-h] [--ids] [--silent]
                            [--refresh-per-second REFRESH_PER_SECOND]
-                           [--single-line] [--v2] [--timezone TIMEZONE]
+                           [--simple-progress] [--v2] [--timezone TIMEZONE]
                            [--api-key API_KEY] [--rcfile RCFILE]
                            [--api-secret-key API_SECRET_KEY]
                            [--access-token ACCESS_TOKEN]
@@ -6353,7 +6364,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -6399,7 +6410,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter user-search [-h] [--timezone TIMEZONE] [--silent]
                                  [--refresh-per-second REFRESH_PER_SECOND]
-                                 [--single-line] [--api-key API_KEY]
+                                 [--simple-progress] [--api-key API_KEY]
                                  [--rcfile RCFILE]
                                  [--api-secret-key API_SECRET_KEY]
                                  [--access-token ACCESS_TOKEN]
@@ -6467,7 +6478,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -6516,7 +6527,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet twitter user-tweets [-h] [--ids] [--silent]
                                  [--refresh-per-second REFRESH_PER_SECOND]
-                                 [--single-line] [--min-date MIN_DATE]
+                                 [--simple-progress] [--min-date MIN_DATE]
                                  [--exclude-retweets] [--v2]
                                  [--timezone TIMEZONE] [--api-key API_KEY]
                                  [--rcfile RCFILE]
@@ -6593,7 +6604,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -6641,7 +6652,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet wikipedia pageviews [-h] --start-date START_DATE [--silent]
                                  [--refresh-per-second REFRESH_PER_SECOND]
-                                 [--single-line] --end-date END_DATE
+                                 [--simple-progress] --end-date END_DATE
                                  [--agent AGENT] [--access ACCESS] [-t THREADS]
                                  [--granularity GRANULARITY] [--sum]
                                  [--lang LANG] [--lang-column LANG_COLUMN]
@@ -6701,7 +6712,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -6744,7 +6755,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet youtube captions [-h] [--lang LANG] [--silent]
                               [--refresh-per-second REFRESH_PER_SECOND]
-                              [--single-line] [-i INPUT] [--explode EXPLODE]
+                              [--simple-progress] [-i INPUT] [--explode EXPLODE]
                               [-s SELECT] [--total TOTAL] [-o OUTPUT]
                               video_or_video_column
 
@@ -6785,7 +6796,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -6834,7 +6845,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet youtube channel-videos [-h] [-k KEY] [--rcfile RCFILE] [--silent]
                                     [--refresh-per-second REFRESH_PER_SECOND]
-                                    [--single-line] [-i INPUT]
+                                    [--simple-progress] [-i INPUT]
                                     [--explode EXPLODE] [-s SELECT]
                                     [--total TOTAL] [-o OUTPUT]
                                     channel_or_channel_column
@@ -6885,7 +6896,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -6937,7 +6948,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet youtube channels [-h] [-k KEY] [--rcfile RCFILE] [--silent]
                               [--refresh-per-second REFRESH_PER_SECOND]
-                              [--single-line] [-i INPUT] [--explode EXPLODE]
+                              [--simple-progress] [-i INPUT] [--explode EXPLODE]
                               [-s SELECT] [--total TOTAL] [-o OUTPUT]
                               channel_or_channel_column
 
@@ -6986,7 +6997,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -7038,7 +7049,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet youtube comments [-h] [-k KEY] [--rcfile RCFILE] [--silent]
                               [--refresh-per-second REFRESH_PER_SECOND]
-                              [--single-line] [-i INPUT] [--explode EXPLODE]
+                              [--simple-progress] [-i INPUT] [--explode EXPLODE]
                               [-s SELECT] [--total TOTAL] [-o OUTPUT]
                               video_or_video_column
 
@@ -7082,7 +7093,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -7128,7 +7139,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet youtube search [-h] [-l LIMIT] [--silent]
                             [--refresh-per-second REFRESH_PER_SECOND]
-                            [--single-line]
+                            [--simple-progress]
                             [--order {date,rating,relevance,title,videoCount,viewCount}]
                             [-k KEY] [--rcfile RCFILE] [-i INPUT]
                             [--explode EXPLODE] [-s SELECT] [--total TOTAL]
@@ -7182,7 +7193,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.
@@ -7228,7 +7239,7 @@ how to use the command with a CSV file?
 ```
 Usage: minet youtube videos [-h] [-k KEY] [--rcfile RCFILE] [--silent]
                             [--refresh-per-second REFRESH_PER_SECOND]
-                            [--single-line] [-i INPUT] [--explode EXPLODE]
+                            [--simple-progress] [-i INPUT] [--explode EXPLODE]
                             [-s SELECT] [--total TOTAL] [-o OUTPUT]
                             video_or_video_column
 
@@ -7272,7 +7283,7 @@ Optional Arguments:
                                 every two seconds. Use this to limit CPU usage
                                 when launching multiple commands at once.
                                 Defaults to `10`.
-  --single-line                 Whether to simplify the progress bar to make it
+  --simple-progress             Whether to simplify the progress bar and make it
                                 fit on a single line. Can be useful in terminals
                                 with partial ANSI support, e.g. a Jupyter
                                 notebook cell.

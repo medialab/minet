@@ -51,7 +51,7 @@ FLAG_SORTING_PRIORITIES = {
             "resume",
             "rcfile",
             "refresh-per-second",
-            "single-line",
+            "simple-progress",
             "silent",
             "help",
         ],
@@ -208,8 +208,8 @@ def add_arguments(subparser, arguments):
 
         add_argument_once(
             subparser,
-            "--single-line",
-            help="Whether to simplify the progress bar to make it fit on a single line. Can be useful in terminals with partial ANSI support, e.g. a Jupyter notebook cell.",
+            "--simple-progress",
+            help="Whether to simplify the progress bar and make it fit on a single line. Can be useful in terminals with partial ANSI support, e.g. a Jupyter notebook cell.",
             action="store_true",
         )
 

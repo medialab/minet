@@ -222,7 +222,7 @@ class LoadingBar(object):
         sub_unit: Optional[str] = None,
         transient: bool = False,
         refresh_per_second: float = 10,
-        single_line: bool = False,
+        simple: bool = False,
     ):
         self.sub_total_sum = 0
         self.nested = nested
@@ -230,7 +230,7 @@ class LoadingBar(object):
         self.transient = transient
         self.known_total = total is not None
         self.already_stopped = False
-        self.single_line = single_line
+        self.simple = simple
 
         self.bar_column = None
         self.label_progress = None
@@ -257,7 +257,7 @@ class LoadingBar(object):
                 description="", total=None
             )
 
-            if not single_line:
+            if not simple:
                 self.table.add_row(self.label_progress)
 
         # Main progress line
@@ -270,14 +270,14 @@ class LoadingBar(object):
 
         columns.append(CompletionColumn(Column(overflow="ellipsis", no_wrap=True)))
 
-        if not nested or single_line:
+        if not nested or simple:
             columns.append(SpinnerColumn("dots", style=None, finished_text="·"))
 
         columns.append(PercentageColumn(Column(overflow="ellipsis", no_wrap=True)))
         columns.append(TimeElapsedColumn(Column(overflow="ellipsis", no_wrap=True)))
         columns.append(ThroughputColumn(Column(overflow="ellipsis", no_wrap=True)))
 
-        if nested and single_line:
+        if nested and simple:
             columns.append(SingleLineNestedTotalColumn(self, sub_unit))
 
         self.progress = Progress(*columns)
@@ -313,7 +313,7 @@ class LoadingBar(object):
                 unit=sub_unit,
             )
 
-            if not single_line:
+            if not simple:
                 self.table.add_row(self.sub_progress)
 
         # Stats line
@@ -333,7 +333,7 @@ class LoadingBar(object):
         self.stats_progress = Progress(StatsColumn(sort_key=stats_sort_key))
         self.stats_task_id = self.stats_progress.add_task("", stats=self.stats)
 
-        if self.stats_are_shown and not single_line:
+        if self.stats_are_shown and not simple:
             self.table.add_row(self.stats_progress)
 
         # Internal live instance
@@ -455,7 +455,7 @@ class LoadingBar(object):
     def __refresh_stats(self):
         self.stats_progress.update(self.stats_task_id, stats=self.stats)
 
-        if not self.single_line and not self.stats_are_shown:
+        if not self.simple and not self.stats_are_shown:
             self.stats_are_shown = True
             self.table.add_row(self.stats_progress)
 
