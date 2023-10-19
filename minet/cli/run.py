@@ -35,9 +35,17 @@ from minet.cli.exceptions import NotResumableError, InvalidArgumentsError, Fatal
 
 WINDOWS = "windows" in platform.system().lower()
 
+GLOBAL_SETUP_IS_DONE = False
 
-@with_cli_exceptions
-def run(name: str, version: str, commands: List, args: Optional[str] = None):
+
+def global_setup() -> None:
+    global GLOBAL_SETUP_IS_DONE
+
+    if GLOBAL_SETUP_IS_DONE:
+        return
+
+    GLOBAL_SETUP_IS_DONE = True
+
     # Issue #497, utf-8 encoding for windows stdout
     if WINDOWS:
         sys.__stdout__.reconfigure(encoding="utf-8")
@@ -61,6 +69,11 @@ def run(name: str, version: str, commands: List, args: Optional[str] = None):
 
     # Adding handlers for sleepers
     sleepers_logger.addHandler(CLIRetryerHandler())
+
+
+@with_cli_exceptions
+def run(name: str, version: str, commands: List, args: Optional[str] = None):
+    global_setup()
 
     # Building parser
     parser, subparser_index = build_parser(name, version, commands)
