@@ -18,6 +18,7 @@ _Generic commands_
 - [extract](#extract)
 - [resolve](#resolve)
 - [scrape](#scrape)
+- [screenshot](#screenshot)
 - [url-extract](#url-extract)
 - [url-join](#url-join)
 - [url-parse](#url-parse)
@@ -1253,6 +1254,145 @@ Examples:
 
 . Using a builtin scraper:
     $ minet scrape title -i report.csv > titles.csv
+```
+
+## screenshot
+
+```
+Usage: minet screenshot [-h] [--domain-parallelism DOMAIN_PARALLELISM]
+                        [--silent] [--refresh-per-second REFRESH_PER_SECOND]
+                        [--simple-progress] [-t THREADS] [--throttle THROTTLE]
+                        [--url-template URL_TEMPLATE] [-f FILENAME_COLUMN]
+                        [--filename-template FILENAME_TEMPLATE]
+                        [--folder-strategy FOLDER_STRATEGY] [-O OUTPUT_DIR]
+                        [--full-page] [--width WIDTH] [--height HEIGHT]
+                        [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                        [--total TOTAL] [--resume] [-o OUTPUT]
+                        url_or_url_column
+
+# Minet Screenshot Command
+
+Use multithreaded browser emulation to screenshot batches of urls
+from a CSV file. The command outputs a CSV report with additional
+metadata about the HTTP calls and the produced screenshots on disk.
+
+Positional Arguments:
+  url_or_url_column             Single url to process or name of the CSV column
+                                containing urls when using -i/--input.
+
+Optional Arguments:
+  --domain-parallelism DOMAIN_PARALLELISM
+                                Max number of urls per domain to hit at the same
+                                time. Defaults to `1`.
+  -f, --filename-column FILENAME_COLUMN
+                                Name of the column used to build retrieved file
+                                names. Defaults to a md5 hash of final url. If
+                                the provided file names have no extension (e.g.
+                                ".jpg", ".pdf", etc.) the correct extension will
+                                be added depending on the file type.
+  --filename-template FILENAME_TEMPLATE
+                                A template for the name of the fetched files.
+  --folder-strategy FOLDER_STRATEGY
+                                Name of the strategy to be used to dispatch the
+                                retrieved files into folders to alleviate issues
+                                on some filesystems when a folder contains too
+                                much files. Note that this will be applied on
+                                top of --filename-template. All of the
+                                strategies are described at the end of this
+                                help. Defaults to `flat`.
+  --full-page                   Whether to create full page screenshots.
+  --height HEIGHT               Page height in pixels. Defaults to `768`.
+  -O, --output-dir OUTPUT_DIR   Directory where the screenshots will be written.
+                                Defaults to `screenshots`.
+  -t, --threads THREADS         Number of threads to use. Defaults to `25`.
+  --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
+                                the same domain. Defaults to `0.2`.
+  --url-template URL_TEMPLATE   A template for the urls to fetch. Handy e.g. if
+                                you need to build urls from ids etc.
+  --width WIDTH                 Page width in pixels. Defaults to `1024`.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the urls you want to process. Will consider `-`
+                                as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --resume                      "Whether to resume from an aborted collection.
+                                Need -o to be set.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Columns being added to the output:
+
+. "original_index": index of the line in the original file (the output will be
+    arbitrarily ordered since multiple requests are performed concurrently).
+. "http_status": HTTP status code of the request, e.g. 200, 404, 503 etc.
+. "screenshot_error": an error code if anything went wrong when performing the request.
+. "path": path to the downloaded file, relative to the folder given
+    through -O/--output-dir.
+
+--folder-strategy options:
+
+{FolderStrategy.DOCUMENTATION}
+
+Examples:
+
+. Screenshot a batch of url from existing CSV file:
+    $ minet screenshot url_column file.csv > report.csv
+
+. CSV input from stdin (mind the `-`):
+    $ xsv select url_column file.csv | minet screenshot url_column - > report.csv
+
+. Screenshot a single url:
+    $ minet screenshot https://lemonde.fr
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet fetch "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet fetch column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet fetch column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet fetch column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet fetch "value1,value2" --explode ","
 ```
 
 ## url-extract

@@ -18,6 +18,7 @@ _Generic commands_
 - [extract](#extract)
 - [resolve](#resolve)
 - [scrape](#scrape)
+- [screenshot](#screenshot)
 - [url-extract](#url-extract)
 - [url-join](#url-join)
 - [url-parse](#url-parse)
@@ -194,6 +195,10 @@ Finally note that command line arguments and flags will take precedence over env
 For more documentation about minet's scraping DSL check this [page](../cookbook/scraping_dsl.md) from the Cookbook.
 
 <% scrape %>
+
+## screenshot
+
+<% screenshot %>
 
 ## url-extract
 

@@ -338,5 +338,22 @@ SCREENSHOT_COMMAND = command(
             "help": "Directory where the screenshots will be written.",
             "default": DEFAULT_SCREENSHOT_FOLDER,
         },
+        {
+            "flag": "--full-page",
+            "help": "Whether to create full page screenshots.",
+            "action": "store_true",
+        },
+        {
+            "flag": "--width",
+            "help": "Page width in pixels.",
+            "type": int,
+            "default": 1024,
+        },
+        {
+            "flag": "--height",
+            "help": "Page height in pixels.",
+            "type": int,
+            "default": 768,
+        },
     ],
 )

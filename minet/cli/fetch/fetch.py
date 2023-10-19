@@ -464,7 +464,10 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                 formatter_kwargs=formatter_kwargs,
             )
 
-            await page.screenshot(path=pathjoin(cli_args.output_dir, filename))
+            await page.screenshot(
+                path=pathjoin(cli_args.output_dir, filename),
+                full_page=cli_args.full_page,
+            )
 
             return ScreenshotAddendum(
                 http_status=999, screenshot_error=None, path=filename
