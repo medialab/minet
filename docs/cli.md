@@ -6947,10 +6947,10 @@ Optional Arguments:
 Examples:
 
 . Fetching captions for a list of videos:
-    $ minet yt captions video_id videos.csv > captions.csv
+    $ minet yt captions video_id -i videos.csv > captions.csv
 
 . Fetching French captions with a fallback to English:
-    $ minet yt captions video_id videos.csv --lang fr,en > captions.csv
+    $ minet yt captions video_id -i videos.csv --lang fr,en > captions.csv
 
 how to use the command with a CSV file?
 
@@ -7066,8 +7066,8 @@ example:
     $ minet youtube channel-videos UCprclkVrNPls7PR-nHhf1Ow -k my-api-key > tonyheller_videos.csv
 
 . Fetching multiple channels' videos:
-    $ minet youtube channel-videos channel_id channels_id.csv -k my-api-key > channels_videos.csv
-    $ minet youtube channel-videos channel_url channels_url.csv -k my-api-key > channels_videos.csv
+    $ minet youtube channel-videos channel_id -i channels_id.csv -k my-api-key > channels_videos.csv
+    $ minet youtube channel-videos channel_url -i channels_url.csv -k my-api-key > channels_videos.csv
 
 how to use the command with a CSV file?
 
@@ -7167,8 +7167,8 @@ example:
     $ minet youtube channels UCprclkVrNPls7PR-nHhf1Ow -k my-api-key > tonyheller_meta.csv
 
 . Fetching multiple channels' metadata:
-    $ minet youtube channels channel_id channels_id.csv -k my-api-key > channels.csv
-    $ minet youtube channels channel_url channels_url.csv -k my-api-key > channels.csv
+    $ minet youtube channels channel_id -i channels_id.csv -k my-api-key > channels.csv
+    $ minet youtube channels channel_url -i channels_url.csv -k my-api-key > channels.csv
 
 how to use the command with a CSV file?
 
