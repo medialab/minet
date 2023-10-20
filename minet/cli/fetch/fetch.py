@@ -488,32 +488,34 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar: Loading
                     assert response is not None
 
                     row = payload.item[1]
+                    filename = None
 
-                    filename_cell = (
-                        row[filename_pos] if filename_pos is not None else None
-                    )
+                    if response.status == 200:
+                        filename_cell = (
+                            row[filename_pos] if filename_pos is not None else None
+                        )
 
-                    formatter_kwargs = {}
+                        formatter_kwargs = {}
 
-                    if (
-                        cli_args.filename_template
-                        and "row" in cli_args.filename_template
-                    ):
-                        formatter_kwargs["row"] = enricher.wrap(row)
+                        if (
+                            cli_args.filename_template
+                            and "row" in cli_args.filename_template
+                        ):
+                            formatter_kwargs["row"] = enricher.wrap(row)
 
-                    assert filename_builder is not None
+                        assert filename_builder is not None
 
-                    filename = filename_builder(
-                        page.url,
-                        filename=filename_cell,
-                        ext=".png",
-                        formatter_kwargs=formatter_kwargs,
-                    )
+                        filename = filename_builder(
+                            page.url,
+                            filename=filename_cell,
+                            ext=".png",
+                            formatter_kwargs=formatter_kwargs,
+                        )
 
-                    await page.screenshot(
-                        path=pathjoin(cli_args.output_dir, filename),
-                        full_page=cli_args.full_page,
-                    )
+                        await page.screenshot(
+                            path=pathjoin(cli_args.output_dir, filename),
+                            full_page=cli_args.full_page,
+                        )
 
                     return ScreenshotAddendum(
                         http_status=response.status,
