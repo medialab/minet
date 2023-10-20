@@ -96,7 +96,7 @@ CROWDTANGLE_POSTS_BY_ID_SUBCOMMAND = command(
         Examples:
 
         . Retrieving information about a batch of posts:
-            $ minet ct posts-by-id post-url posts.csv --token YOUR_TOKEN > metadata.csv
+            $ minet ct posts-by-id post-url -i posts.csv --token YOUR_TOKEN > metadata.csv
 
         . Retrieving information about a single post:
             $ minet ct posts-by-id 1784333048289665 --token YOUR_TOKEN
@@ -270,7 +270,7 @@ CROWDTANGLE_SUMMARY_SUBCOMMAND = command(
         Examples:
 
         . Computing a summary of aggregated stats for urls contained in a CSV row:
-            $ minet ct summary url urls.csv --token YOUR_TOKEN --start-date 2019-01-01 > summary.csv
+            $ minet ct summary url -i urls.csv --token YOUR_TOKEN --start-date 2019-01-01 > summary.csv
     """,
     variadic_input={"dummy_column": "url", "item_label": "URL"},
     arguments=[

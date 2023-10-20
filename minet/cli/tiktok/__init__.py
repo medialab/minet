@@ -32,7 +32,7 @@ TIKTOK_SEARCH_VIDEOS_SUBCOMMAND = command(
         profile).
     """,
     epilog="""
-        example:
+        Example:
 
         . Searching videos with the keyword paris:
             $ minet tiktok search-videos paris > paris_videos.csv

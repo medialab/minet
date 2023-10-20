@@ -76,7 +76,7 @@ BUZZSUMO_DOMAIN_COMMAND = command(
             $ minet bz domain 'trump-feed.com' --begin-date 2021-01-01 --end-date 2021-06-30 --token YOUR_TOKEN > trump_feed_articles.csv
 
         . Returning social media information for a list of domain names in a CSV:
-            $ minet bz domain domain_name domain_names.csv --select domain_name --begin-date 2019-01-01 --end-date 2020-12-31 --token YOUR_TOKEN > domain_name_articles.csv
+            $ minet bz domain domain_name -i domain_names.csv --select domain_name --begin-date 2019-01-01 --end-date 2020-12-31 --token YOUR_TOKEN > domain_name_articles.csv
     """,
     variadic_input={"dummy_column": "domain_name", "item_label": "domain name"},
     arguments=[
@@ -101,7 +101,7 @@ BUZZSUMO_DOMAIN_SUMMARY_COMMAND = command(
             $ minet bz domain-summary 'nytimes.com' --begin-date 2019-01-01 --end-date 2019-03-01 --token YOUR_TOKEN
 
         . Returning the number of articles and pages found in BuzzSumo for a list of domain names in a CSV:
-            $ minet bz domain-summary domain_name domain_names.csv --begin-date 2020-01-01 --end-date 2021-06-15 --token YOUR_TOKEN  > domain_name_summary.csv
+            $ minet bz domain-summary domain_name -i domain_names.csv --begin-date 2020-01-01 --end-date 2021-06-15 --token YOUR_TOKEN  > domain_name_summary.csv
     """,
     variadic_input={"dummy_column": "domain_name", "item_label": "domain name"},
     arguments=[

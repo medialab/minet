@@ -1064,7 +1064,7 @@ Columns being added to the output:
 Examples:
 
 . Resolving a batch of url from existing CSV file:
-    $ minet resolve url_column file.csv > report.csv
+    $ minet resolve url_column -i file.csv > report.csv
 
 . CSV input from stdin (mind the `-`):
     $ xsv select url_column file.csv | minet resolve url_column - > report.csv
@@ -1367,7 +1367,7 @@ Columns being added to the output:
 Examples:
 
 . Screenshot a batch of url from existing CSV file:
-    $ minet screenshot url_column file.csv > report.csv
+    $ minet screenshot url_column -i file.csv > report.csv
 
 . CSV input from stdin (mind the `-`):
     $ xsv select url_column file.csv | minet screenshot url_column - > report.csv
@@ -1453,10 +1453,10 @@ Optional Arguments:
 Examples:
 
 . Extracting urls from a text column:
-    $ minet url-extract text posts.csv > urls.csv
+    $ minet url-extract text -i posts.csv > urls.csv
 
 . Extracting urls from a html column:
-    $ minet url-extract html --from html posts.csv > urls.csv
+    $ minet url-extract html --from html -i posts.csv > urls.csv
 ```
 
 ## url-join
@@ -1884,7 +1884,7 @@ Examples:
     $ minet bz domain-summary 'nytimes.com' --begin-date 2019-01-01 --end-date 2019-03-01 --token YOUR_TOKEN
 
 . Returning the number of articles and pages found in BuzzSumo for a list of domain names in a CSV:
-    $ minet bz domain-summary domain_name domain_names.csv --begin-date 2020-01-01 --end-date 2021-06-15 --token YOUR_TOKEN  > domain_name_summary.csv
+    $ minet bz domain-summary domain_name -i domain_names.csv --begin-date 2020-01-01 --end-date 2021-06-15 --token YOUR_TOKEN  > domain_name_summary.csv
 
 how to use the command with a CSV file?
 
@@ -1986,7 +1986,7 @@ Examples:
     $ minet bz domain 'trump-feed.com' --begin-date 2021-01-01 --end-date 2021-06-30 --token YOUR_TOKEN > trump_feed_articles.csv
 
 . Returning social media information for a list of domain names in a CSV:
-    $ minet bz domain domain_name domain_names.csv --select domain_name --begin-date 2019-01-01 --end-date 2020-12-31 --token YOUR_TOKEN > domain_name_articles.csv
+    $ minet bz domain domain_name -i domain_names.csv --select domain_name --begin-date 2019-01-01 --end-date 2020-12-31 --token YOUR_TOKEN > domain_name_articles.csv
 
 how to use the command with a CSV file?
 
@@ -2344,7 +2344,7 @@ Optional Arguments:
 Examples:
 
 . Retrieving information about a batch of posts:
-    $ minet ct posts-by-id post-url posts.csv --token YOUR_TOKEN > metadata.csv
+    $ minet ct posts-by-id post-url -i posts.csv --token YOUR_TOKEN > metadata.csv
 
 . Retrieving information about a single post:
     $ minet ct posts-by-id 1784333048289665 --token YOUR_TOKEN
@@ -2634,7 +2634,7 @@ Optional Arguments:
 Examples:
 
 . Computing a summary of aggregated stats for urls contained in a CSV row:
-    $ minet ct summary url urls.csv --token YOUR_TOKEN --start-date 2019-01-01 > summary.csv
+    $ minet ct summary url -i urls.csv --token YOUR_TOKEN --start-date 2019-01-01 > summary.csv
 
 how to use the command with a CSV file?
 
@@ -3843,7 +3843,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Example:
 
 . Searching comments from the post https://www.instagram.com/p/CpA46rmU26Y/:
     $ minet instagram comments https://www.instagram.com/p/CpA46rmU26Y/ > comments.csv
@@ -3949,7 +3949,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Example:
 
 . Searching posts with the hashtag paris:
     $ minet instagram hashtag paris > paris_posts.csv
@@ -4057,7 +4057,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Example:
 
 . Searching infos for the post https://www.instagram.com/p/CpA46rmU26Y/:
     $ minet instagram post-infos https://www.instagram.com/p/CpA46rmU26Y/ > post_infos.csv
@@ -4171,7 +4171,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Example:
 
 . Searching followers with the username banksrepeta:
     $ minet instagram user-followers banksrepeta > banksrepeta_followers.csv
@@ -4283,7 +4283,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Example:
 
 . Searching accounts followed with the username paramountplus:
     $ minet instagram user-following paramountplus > paramountplus_following.csv
@@ -4393,7 +4393,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Example:
 
 . Searching infos with the username banksrepeta:
     $ minet instagram user-infos banksrepeta > banksrepeta_infos.csv
@@ -4506,7 +4506,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Example:
 
 . Searching posts from the account paramountplus:
     $ minet instagram user-posts paramountplus > paramountplus_posts.csv
@@ -5018,7 +5018,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Example:
 
 . Searching videos with the keyword paris:
     $ minet tiktok search-videos paris > paris_videos.csv
@@ -6068,9 +6068,9 @@ Optional Arguments:
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
   --end-time END_TIME           The newest UTC datetime from which the tweets
-                                will be counted. The date should have the format
-                                : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates
-                                will be completed for you e.g. "2002-04".
+                                will be counted. The date should have the
+                                format: "YYYY-MM-DDTHH:mm:ssZ" but incomplete
+                                dates will be completed for you e.g. "2002-04".
   --since-id SINCE_ID           Will return tweets with ids that are greater
                                 than the specified id. Takes precedence over
                                 --start-time.
@@ -6078,9 +6078,9 @@ Optional Arguments:
                                 How to sort retrieved tweets. Defaults to
                                 `recency`.
   --start-time START_TIME       The oldest UTC datetime from which the tweets
-                                will be counted. The date should have the format
-                                : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates
-                                will be completed for you e.g. "2002-04".
+                                will be counted. The date should have the
+                                format: "YYYY-MM-DDTHH:mm:ssZ" but incomplete
+                                dates will be completed for you e.g. "2002-04".
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   --until-id UNTIL_ID           Will return tweets that are older than the tweet
@@ -6232,9 +6232,9 @@ Optional Arguments:
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
   --end-time END_TIME           The newest UTC datetime from which the tweets
-                                will be counted. The date should have the format
-                                : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates
-                                will be completed for you e.g. "2002-04".
+                                will be counted. The date should have the
+                                format: "YYYY-MM-DDTHH:mm:ssZ" but incomplete
+                                dates will be completed for you e.g. "2002-04".
   --granularity {day,hour,minute}
                                 Granularity used to group the data by. Defaults
                                 to `day`.
@@ -6242,9 +6242,9 @@ Optional Arguments:
                                 than the specified id. Takes precedence over
                                 --start-time.
   --start-time START_TIME       The oldest UTC datetime from which the tweets
-                                will be counted. The date should have the format
-                                : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates
-                                will be completed for you e.g. "2002-04".
+                                will be counted. The date should have the
+                                format: "YYYY-MM-DDTHH:mm:ssZ" but incomplete
+                                dates will be completed for you e.g. "2002-04".
   --until-id UNTIL_ID           Will return tweets that are older than the tweet
                                 with the specified id.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -6955,10 +6955,10 @@ Optional Arguments:
 Examples:
 
 . Fetching captions for a list of videos:
-    $ minet yt captions video_id videos.csv > captions.csv
+    $ minet yt captions video_id -i videos.csv > captions.csv
 
 . Fetching French captions with a fallback to English:
-    $ minet yt captions video_id videos.csv --lang fr,en > captions.csv
+    $ minet yt captions video_id -i videos.csv --lang fr,en > captions.csv
 
 how to use the command with a CSV file?
 
@@ -6991,9 +6991,10 @@ how to use the command with a CSV file?
 ### channel-videos
 
 ```
-Usage: minet youtube channel-videos [-h] [-k KEY] [--rcfile RCFILE] [--silent]
+Usage: minet youtube channel-videos [-h] [--start-time START_TIME] [--silent]
                                     [--refresh-per-second REFRESH_PER_SECOND]
-                                    [--simple-progress] [-i INPUT]
+                                    [--simple-progress] [--end-time END_TIME]
+                                    [-k KEY] [--rcfile RCFILE] [-i INPUT]
                                     [--explode EXPLODE] [-s SELECT]
                                     [--total TOTAL] [-o OUTPUT]
                                     channel_or_channel_column
@@ -7013,10 +7014,23 @@ Positional Arguments:
                                 -i/--input.
 
 Optional Arguments:
+  --end-time END_TIME           The newest UTC datetime from which the videos
+                                will be retrieved (end-time is excluded).
+                                Warning: videos more recent than end-time will
+                                still be retrieved from the API, but they will
+                                not be written in the output file. The date
+                                should have the format: "YYYY-MM-DDTHH:mm:ssZ"
+                                but incomplete dates will be completed for you
+                                e.g. "2002-04".
   -k, --key KEY                 YouTube API Data dashboard API key. Can be used
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
                                 MINET_YOUTUBE_KEY env variable.
+  --start-time START_TIME       The oldest UTC datetime from which the videos
+                                will be retrieved (start-time is included). The
+                                date should have the format:
+                                "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates will
+                                be completed for you e.g. "2002-04".
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -7052,7 +7066,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Examples:
 
 . Fetching all the videos from a channel based on the channel's id or url:
     $ minet youtube channel-videos https://www.youtube.com/c/LinksOff -k my-api-key > linksoff_videos.csv
@@ -7060,8 +7074,8 @@ example:
     $ minet youtube channel-videos UCprclkVrNPls7PR-nHhf1Ow -k my-api-key > tonyheller_videos.csv
 
 . Fetching multiple channels' videos:
-    $ minet youtube channel-videos channel_id channels_id.csv -k my-api-key > channels_videos.csv
-    $ minet youtube channel-videos channel_url channels_url.csv -k my-api-key > channels_videos.csv
+    $ minet youtube channel-videos channel_id -i channels_id.csv -k my-api-key > channels_videos.csv
+    $ minet youtube channel-videos channel_url -i channels_url.csv -k my-api-key > channels_videos.csv
 
 how to use the command with a CSV file?
 
@@ -7153,7 +7167,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Examples:
 
 . Fetching metadata from a channel based on the channel's id or url:
     $ minet youtube channels https://www.youtube.com/c/LinksOff -k my-api-key > linksoff_meta.csv
@@ -7161,8 +7175,8 @@ example:
     $ minet youtube channels UCprclkVrNPls7PR-nHhf1Ow -k my-api-key > tonyheller_meta.csv
 
 . Fetching multiple channels' metadata:
-    $ minet youtube channels channel_id channels_id.csv -k my-api-key > channels.csv
-    $ minet youtube channels channel_url channels_url.csv -k my-api-key > channels.csv
+    $ minet youtube channels channel_id -i channels_id.csv -k my-api-key > channels.csv
+    $ minet youtube channels channel_url -i channels_url.csv -k my-api-key > channels.csv
 
 how to use the command with a CSV file?
 
@@ -7249,7 +7263,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Examples:
 
 . Fetching a video's comments:
     $ minet yt comments https://www.youtube.com/watch?v=7JTb2vf1OQQ -k my-api-key > comments.csv
@@ -7349,7 +7363,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Examples:
 
 . Searching videos about birds:
     $ minet youtube search bird -k my-api-key > bird_videos.csv

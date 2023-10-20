@@ -22,6 +22,8 @@ def action(cli_args, enricher, loading_bar):
 
     for row, channel_id in enricher.cells(cli_args.column, with_rows=True):
         with loading_bar.step(channel_id):
-            for video in client.channel_videos(channel_id):
+            for video in client.channel_videos(
+                channel_id, cli_args.start_time, cli_args.end_time
+            ):
                 enricher.writerow(row, video)
                 loading_bar.nested_advance()
