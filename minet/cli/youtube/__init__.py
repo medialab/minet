@@ -73,7 +73,7 @@ YOUTUBE_CHANNEL_VIDEOS_SUBCOMMAND = youtube_api_subcommand(
         supposed to contain all the channel's videos.
     """,
     epilog="""
-        example:
+        Examples:
 
         . Fetching all the videos from a channel based on the channel's id or url:
             $ minet youtube channel-videos https://www.youtube.com/c/LinksOff -k my-api-key > linksoff_videos.csv
@@ -113,7 +113,7 @@ YOUTUBE_CHANNELS_SUBCOMMAND = youtube_api_subcommand(
         information about the channel.
     """,
     epilog="""
-        example:
+        Examples:
 
         . Fetching metadata from a channel based on the channel's id or url:
             $ minet youtube channels https://www.youtube.com/c/LinksOff -k my-api-key > linksoff_meta.csv
@@ -133,7 +133,7 @@ YOUTUBE_COMMENTS_SUBCOMMAND = youtube_api_subcommand(
     title="Youtube comments",
     description="Retrieve metadata about Youtube comments using the API.",
     epilog="""
-        example:
+        Examples:
 
         . Fetching a video's comments:
             $ minet yt comments https://www.youtube.com/watch?v=7JTb2vf1OQQ -k my-api-key > comments.csv
@@ -152,7 +152,7 @@ YOUTUBE_SEARCH_SUBCOMMAND = youtube_api_subcommand(
         more than approx. 500 videos for a given query.
     """,
     epilog="""
-        example:
+        Examples:
 
         . Searching videos about birds:
             $ minet youtube search bird -k my-api-key > bird_videos.csv

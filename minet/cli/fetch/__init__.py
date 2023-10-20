@@ -248,7 +248,7 @@ RESOLVE_COMMAND = command(
         Examples:
 
         . Resolving a batch of url from existing CSV file:
-            $ minet resolve url_column file.csv > report.csv
+            $ minet resolve url_column -i file.csv > report.csv
 
         . CSV input from stdin (mind the `-`):
             $ xsv select url_column file.csv | minet resolve url_column - > report.csv
@@ -320,7 +320,7 @@ SCREENSHOT_COMMAND = command(
         Examples:
 
         . Screenshot a batch of url from existing CSV file:
-            $ minet screenshot url_column file.csv > report.csv
+            $ minet screenshot url_column -i file.csv > report.csv
 
         . CSV input from stdin (mind the `-`):
             $ xsv select url_column file.csv | minet screenshot url_column - > report.csv

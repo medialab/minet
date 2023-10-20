@@ -22,7 +22,7 @@ INSTAGRAM_COMMENTS_SUBCOMMAND = command(
         -c/--cookie flag.
     """,
     epilog="""
-        example:
+        Example:
 
         . Searching comments from the post https://www.instagram.com/p/CpA46rmU26Y/:
             $ minet instagram comments https://www.instagram.com/p/CpA46rmU26Y/ > comments.csv
@@ -61,7 +61,7 @@ INSTAGRAM_HASHTAG_SUBCOMMAND = command(
         There is no way with this command to get the media urls.
     """,
     epilog="""
-        example:
+        Example:
 
         . Searching posts with the hashtag paris:
             $ minet instagram hashtag paris > paris_posts.csv
@@ -101,7 +101,7 @@ INSTAGRAM_USER_FOLLOWERS_SUBCOMMAND = command(
         considered as an id.
     """,
     epilog="""
-        example:
+        Example:
 
         . Searching followers with the username banksrepeta:
             $ minet instagram user-followers banksrepeta > banksrepeta_followers.csv
@@ -141,7 +141,7 @@ INSTAGRAM_POST_INFOS_SUBCOMMAND = command(
         use the `minet fetch` command for that, and won't need to use cookies).
     """,
     epilog="""
-        example:
+        Example:
 
         . Searching infos for the post https://www.instagram.com/p/CpA46rmU26Y/:
             $ minet instagram post-infos https://www.instagram.com/p/CpA46rmU26Y/ > post_infos.csv
@@ -178,7 +178,7 @@ INSTAGRAM_USER_FOLLOWING_SUBCOMMAND = command(
         considered as an id.
     """,
     epilog="""
-        example:
+        Example:
 
         . Searching accounts followed with the username paramountplus:
             $ minet instagram user-following paramountplus > paramountplus_following.csv
@@ -221,7 +221,7 @@ INSTAGRAM_USER_INFOS_SUBCOMMAND = command(
         considered as an id.
     """,
     epilog="""
-        example:
+        Example:
 
         . Searching infos with the username banksrepeta:
             $ minet instagram user-infos banksrepeta > banksrepeta_infos.csv
@@ -259,7 +259,7 @@ INSTAGRAM_USER_POSTS_SUBCOMMAND = command(
         considered as an id.
     """,
     epilog="""
-        example:
+        Example:
 
         . Searching posts from the account paramountplus:
             $ minet instagram user-posts paramountplus > paramountplus_posts.csv

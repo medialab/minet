@@ -1062,7 +1062,7 @@ Columns being added to the output:
 Examples:
 
 . Resolving a batch of url from existing CSV file:
-    $ minet resolve url_column file.csv > report.csv
+    $ minet resolve url_column -i file.csv > report.csv
 
 . CSV input from stdin (mind the `-`):
     $ xsv select url_column file.csv | minet resolve url_column - > report.csv
@@ -1359,7 +1359,7 @@ Columns being added to the output:
 Examples:
 
 . Screenshot a batch of url from existing CSV file:
-    $ minet screenshot url_column file.csv > report.csv
+    $ minet screenshot url_column -i file.csv > report.csv
 
 . CSV input from stdin (mind the `-`):
     $ xsv select url_column file.csv | minet screenshot url_column - > report.csv
@@ -1445,10 +1445,10 @@ Optional Arguments:
 Examples:
 
 . Extracting urls from a text column:
-    $ minet url-extract text posts.csv > urls.csv
+    $ minet url-extract text -i posts.csv > urls.csv
 
 . Extracting urls from a html column:
-    $ minet url-extract html --from html posts.csv > urls.csv
+    $ minet url-extract html --from html -i posts.csv > urls.csv
 ```
 
 ## url-join
@@ -1876,7 +1876,7 @@ Examples:
     $ minet bz domain-summary 'nytimes.com' --begin-date 2019-01-01 --end-date 2019-03-01 --token YOUR_TOKEN
 
 . Returning the number of articles and pages found in BuzzSumo for a list of domain names in a CSV:
-    $ minet bz domain-summary domain_name domain_names.csv --begin-date 2020-01-01 --end-date 2021-06-15 --token YOUR_TOKEN  > domain_name_summary.csv
+    $ minet bz domain-summary domain_name -i domain_names.csv --begin-date 2020-01-01 --end-date 2021-06-15 --token YOUR_TOKEN  > domain_name_summary.csv
 
 how to use the command with a CSV file?
 
@@ -1978,7 +1978,7 @@ Examples:
     $ minet bz domain 'trump-feed.com' --begin-date 2021-01-01 --end-date 2021-06-30 --token YOUR_TOKEN > trump_feed_articles.csv
 
 . Returning social media information for a list of domain names in a CSV:
-    $ minet bz domain domain_name domain_names.csv --select domain_name --begin-date 2019-01-01 --end-date 2020-12-31 --token YOUR_TOKEN > domain_name_articles.csv
+    $ minet bz domain domain_name -i domain_names.csv --select domain_name --begin-date 2019-01-01 --end-date 2020-12-31 --token YOUR_TOKEN > domain_name_articles.csv
 
 how to use the command with a CSV file?
 
@@ -2336,7 +2336,7 @@ Optional Arguments:
 Examples:
 
 . Retrieving information about a batch of posts:
-    $ minet ct posts-by-id post-url posts.csv --token YOUR_TOKEN > metadata.csv
+    $ minet ct posts-by-id post-url -i posts.csv --token YOUR_TOKEN > metadata.csv
 
 . Retrieving information about a single post:
     $ minet ct posts-by-id 1784333048289665 --token YOUR_TOKEN
@@ -2626,7 +2626,7 @@ Optional Arguments:
 Examples:
 
 . Computing a summary of aggregated stats for urls contained in a CSV row:
-    $ minet ct summary url urls.csv --token YOUR_TOKEN --start-date 2019-01-01 > summary.csv
+    $ minet ct summary url -i urls.csv --token YOUR_TOKEN --start-date 2019-01-01 > summary.csv
 
 how to use the command with a CSV file?
 
@@ -3835,7 +3835,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Example:
 
 . Searching comments from the post https://www.instagram.com/p/CpA46rmU26Y/:
     $ minet instagram comments https://www.instagram.com/p/CpA46rmU26Y/ > comments.csv
@@ -3941,7 +3941,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Example:
 
 . Searching posts with the hashtag paris:
     $ minet instagram hashtag paris > paris_posts.csv
@@ -4049,7 +4049,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Example:
 
 . Searching infos for the post https://www.instagram.com/p/CpA46rmU26Y/:
     $ minet instagram post-infos https://www.instagram.com/p/CpA46rmU26Y/ > post_infos.csv
@@ -4163,7 +4163,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Example:
 
 . Searching followers with the username banksrepeta:
     $ minet instagram user-followers banksrepeta > banksrepeta_followers.csv
@@ -4275,7 +4275,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Example:
 
 . Searching accounts followed with the username paramountplus:
     $ minet instagram user-following paramountplus > paramountplus_following.csv
@@ -4385,7 +4385,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Example:
 
 . Searching infos with the username banksrepeta:
     $ minet instagram user-infos banksrepeta > banksrepeta_infos.csv
@@ -4498,7 +4498,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Example:
 
 . Searching posts from the account paramountplus:
     $ minet instagram user-posts paramountplus > paramountplus_posts.csv
@@ -5010,7 +5010,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Example:
 
 . Searching videos with the keyword paris:
     $ minet tiktok search-videos paris > paris_videos.csv
@@ -7058,7 +7058,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Examples:
 
 . Fetching all the videos from a channel based on the channel's id or url:
     $ minet youtube channel-videos https://www.youtube.com/c/LinksOff -k my-api-key > linksoff_videos.csv
@@ -7159,7 +7159,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Examples:
 
 . Fetching metadata from a channel based on the channel's id or url:
     $ minet youtube channels https://www.youtube.com/c/LinksOff -k my-api-key > linksoff_meta.csv
@@ -7255,7 +7255,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Examples:
 
 . Fetching a video's comments:
     $ minet yt comments https://www.youtube.com/watch?v=7JTb2vf1OQQ -k my-api-key > comments.csv
@@ -7355,7 +7355,7 @@ Optional Arguments:
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
 
-example:
+Examples:
 
 . Searching videos about birds:
     $ minet youtube search bird -k my-api-key > bird_videos.csv

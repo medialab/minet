@@ -52,7 +52,7 @@ DUMP_GRAPH_COMMAND = command(
         Examples:
 
         . Dumping a graph file from crawler jobs:
-            $ minet dump-graph ./jobs.csv > graph.json
+            $ minet dump-graph -i ./jobs.csv > graph.json
     """,
     select=True,
     arguments=[

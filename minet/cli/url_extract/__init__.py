@@ -12,10 +12,10 @@ URL_EXTRACT_COMMAND = command(
         Examples:
 
         . Extracting urls from a text column:
-            $ minet url-extract text posts.csv > urls.csv
+            $ minet url-extract text -i posts.csv > urls.csv
 
         . Extracting urls from a html column:
-            $ minet url-extract html --from html posts.csv > urls.csv
+            $ minet url-extract html --from html -i posts.csv > urls.csv
     """,
     select=True,
     total=True,
