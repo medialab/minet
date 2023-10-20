@@ -44,7 +44,6 @@ from ebbe import rcompose, noop, format_filesize, format_repr
 from tenacity import (
     Retrying,
     RetryCallState,
-    retry_if_exception_type,
     retry_if_exception,
     stop_after_attempt,
     stop_when_event_set,
