@@ -1,5 +1,6 @@
 from typing import Union
 
+from os.path import expanduser, join
 from playwright.async_api import (
     Error as PlaywrightError,
     TimeoutError as PlaywrightTimeoutError,
@@ -15,6 +16,7 @@ from minet.exceptions import (
     BrowserUnknownError,
     BrowserSSLError,
 )
+from minet.browser.constants import BROWSERS_PATH
 
 AnyPlaywrightError = Union[PlaywrightError, PlaywrightTimeoutError]
 
@@ -42,3 +44,7 @@ def convert_playwright_error(error: AnyPlaywrightError) -> BrowserError:
         return BrowserSSLError()
 
     return BrowserUnknownError()
+
+
+def get_browsers_path() -> str:
+    return expanduser(join("~", BROWSERS_PATH))

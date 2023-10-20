@@ -5,12 +5,12 @@ import os
 import asyncio
 import platform
 from concurrent.futures import Future
-from os.path import expanduser
 from threading import Thread, Event, Lock
 from playwright.async_api import async_playwright, Page, Browser
 
 from minet.__future__.threaded_child_watcher import ThreadedChildWatcher
 from minet.browser.plawright_shim import run_playwright
+from minet.browser.utils import get_browsers_path
 
 UNIX = "windows" not in platform.system().lower()
 LTE_PY37 = platform.python_version_tuple()[:2] <= ("3", "7")
@@ -41,9 +41,7 @@ class ThreadsafeBrowser:
         self.stealthy = stealthy
         self.browser_name = browser
 
-        os.environ.setdefault(
-            "PLAYWRIGHT_BROWSERS_PATH", expanduser("~/.minet-browsers")
-        )
+        os.environ.setdefault("PLAYWRIGHT_BROWSERS_PATH", get_browsers_path())
 
         run_playwright("install", self.browser_name)
 
