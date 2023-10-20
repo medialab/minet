@@ -13,7 +13,7 @@ from minet.constants import (
     DEFAULT_RESOLVE_MAX_REDIRECTS,
 )
 
-PARALLELISM_ARGUMENTS = [
+COMMON_ARGUMENTS = [
     {
         "flag": "--domain-parallelism",
         "help": "Max number of urls per domain to hit at the same time.",
@@ -35,10 +35,15 @@ PARALLELISM_ARGUMENTS = [
         "flag": "--url-template",
         "help": "A template for the urls to fetch. Handy e.g. if you need to build urls from ids etc.",
     },
+    {
+        "flag": "--timeout",
+        "help": "Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.",
+        "type": float,
+    },
 ]
 
-COMMON_ARGUMENTS = [
-    *PARALLELISM_ARGUMENTS,
+FETCH_RESOLVE_COMMON_ARGUMENTS = [
+    *COMMON_ARGUMENTS,
     {
         "flags": ["-g", "--grab-cookies"],
         "help": 'Whether to attempt to grab cookies from your computer\'s browser (supports "firefox", "chrome", "chromium", "opera" and "edge").',
@@ -54,11 +59,6 @@ COMMON_ARGUMENTS = [
         "flags": ["-k", "--insecure"],
         "help": "Whether to allow ssl errors when performing requests or not.",
         "action": "store_true",
-    },
-    {
-        "flag": "--timeout",
-        "help": "Maximum time - in seconds - to spend for each request before triggering a timeout. Defaults to ~30s.",
-        "type": float,
     },
     {
         "flags": ["-X", "--request"],
@@ -159,7 +159,7 @@ FETCH_COMMAND = command(
     resumer=ThreadSafeResumer,
     variadic_input={"dummy_column": "url"},
     arguments=[
-        *COMMON_ARGUMENTS,
+        *FETCH_RESOLVE_COMMON_ARGUMENTS,
         *COMMON_IO_ARGUMENTS,
         {
             "flags": ["-O", "--output-dir"],
@@ -258,7 +258,7 @@ RESOLVE_COMMAND = command(
     resumer=ThreadSafeResumer,
     variadic_input={"dummy_column": "url"},
     arguments=[
-        *COMMON_ARGUMENTS,
+        *FETCH_RESOLVE_COMMON_ARGUMENTS,
         {
             "flag": "--max-redirects",
             "help": "Maximum number of redirections to follow before breaking.",
@@ -330,7 +330,7 @@ SCREENSHOT_COMMAND = command(
     resumer=ThreadSafeResumer,
     variadic_input={"dummy_column": "url"},
     arguments=[
-        *PARALLELISM_ARGUMENTS,
+        *COMMON_ARGUMENTS,
         *COMMON_IO_ARGUMENTS,
         {
             "flags": ["-O", "--output-dir"],

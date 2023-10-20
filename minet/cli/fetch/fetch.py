@@ -338,7 +338,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar: Loading
         "max_redirects": getattr(cli_args, "max_redirects", None),
     }
 
-    if getattr(cli_args, "timeout", None) is not None:
+    if cli_args.timeout is not None:
         common_http_executor_kwargs["timeout"] = cli_args.timeout
 
     # Normal fetch
@@ -458,6 +458,10 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar: Loading
         from minet.exceptions import BrowserUnknownError
         from minet.serialization import serialize_error_as_slug
 
+        goto_timeout = int(
+            (cli_args.timeout if cli_args.timeout is not None else 30) * 1000
+        )
+
         async def screenshot(
             browser: "Browser", payload: HTTPWorkerPayload
         ) -> ScreenshotAddendum:
@@ -466,7 +470,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar: Loading
             ) as context:
                 async with await context.new_page() as page:
                     try:
-                        response = await page.goto(payload.url)
+                        response = await page.goto(payload.url, timeout=goto_timeout)
                     except (PlaywrightError, PlaywrightTimeoutError) as e:
                         error = convert_playwright_error(e)
 

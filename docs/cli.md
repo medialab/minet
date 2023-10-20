@@ -584,11 +584,10 @@ For more info, check out: https://www.sqlite.org/tempfiles.html
 Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                    [--refresh-per-second REFRESH_PER_SECOND] [--simple-progress]
                    [-t THREADS] [--throttle THROTTLE]
-                   [--url-template URL_TEMPLATE]
+                   [--url-template URL_TEMPLATE] [--timeout TIMEOUT]
                    [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
-                   [-H HEADERS] [-k] [--timeout TIMEOUT] [-X METHOD] [-x PROXY]
-                   [--spoof-user-agent] [-f FILENAME_COLUMN]
-                   [--filename-template FILENAME_TEMPLATE]
+                   [-H HEADERS] [-k] [-X METHOD] [-x PROXY] [--spoof-user-agent]
+                   [-f FILENAME_COLUMN] [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [-O OUTPUT_DIR]
                    [--max-redirects MAX_REDIRECTS] [-z] [--compress-transfer]
                    [-c] [-D] [--keep-failed-contents] [--standardize-encoding]
@@ -955,15 +954,14 @@ Examples:
 Usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                      [--refresh-per-second REFRESH_PER_SECOND]
                      [--simple-progress] [-t THREADS] [--throttle THROTTLE]
-                     [--url-template URL_TEMPLATE]
+                     [--url-template URL_TEMPLATE] [--timeout TIMEOUT]
                      [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
-                     [-H HEADERS] [-k] [--timeout TIMEOUT] [-X METHOD]
-                     [-x PROXY] [--spoof-user-agent]
-                     [--max-redirects MAX_REDIRECTS] [--follow-meta-refresh]
-                     [--follow-js-relocation] [--infer-redirection]
-                     [--canonicalize] [--only-shortened] [-i INPUT]
-                     [--explode EXPLODE] [-s SELECT] [--total TOTAL] [--resume]
-                     [-o OUTPUT]
+                     [-H HEADERS] [-k] [-X METHOD] [-x PROXY]
+                     [--spoof-user-agent] [--max-redirects MAX_REDIRECTS]
+                     [--follow-meta-refresh] [--follow-js-relocation]
+                     [--infer-redirection] [--canonicalize] [--only-shortened]
+                     [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                     [--resume] [-o OUTPUT]
                      url_or_url_column
 
 # Minet Resolve Command
@@ -1266,7 +1264,8 @@ Examples:
 Usage: minet screenshot [-h] [--domain-parallelism DOMAIN_PARALLELISM]
                         [--silent] [--refresh-per-second REFRESH_PER_SECOND]
                         [--simple-progress] [-t THREADS] [--throttle THROTTLE]
-                        [--url-template URL_TEMPLATE] [-f FILENAME_COLUMN]
+                        [--url-template URL_TEMPLATE] [--timeout TIMEOUT]
+                        [-f FILENAME_COLUMN]
                         [--filename-template FILENAME_TEMPLATE]
                         [--folder-strategy FOLDER_STRATEGY] [-O OUTPUT_DIR]
                         [--full-page] [--width WIDTH] [--height HEIGHT]
@@ -1313,6 +1312,9 @@ Optional Arguments:
                                 available cores. Feel free to increase.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to `0.2`.
+  --timeout TIMEOUT             Maximum time - in seconds - to spend for each
+                                request before triggering a timeout. Defaults to
+                                ~30s.
   --url-template URL_TEMPLATE   A template for the urls to fetch. Handy e.g. if
                                 you need to build urls from ids etc.
   --width WIDTH                 Page width in pixels. Defaults to `1024`.
