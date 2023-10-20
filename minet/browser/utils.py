@@ -31,7 +31,10 @@ def convert_playwright_error(error: AnyPlaywrightError) -> BrowserError:
     if "net::ERR_CONNECTION_REFUSED" in error.message:
         return BrowserConnectionRefusedError()
 
-    if "net::ERR_CERT_AUTHORITY_INVALID" in error.message:
+    if (
+        "net::ERR_CERT_AUTHORITY_INVALID" in error.message
+        or "net::ERR_CERT_COMMON_NAME_INVALID" in error.message
+    ):
         return BrowserSSLError()
 
     return BrowserUnknownError()
