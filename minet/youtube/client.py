@@ -356,7 +356,6 @@ class YouTubeAPIClient(object):
                 token = result.get("nextPageToken")
 
                 for item in result["items"]:
-
                     item = YouTubePlaylistVideoSnippet.from_payload(item)
 
                     if start_time and start_time > item.published_at:
