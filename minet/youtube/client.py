@@ -336,7 +336,10 @@ class YouTubeAPIClient(object):
         return generator()
 
     def channel_videos(
-        self, channel_target, start_time, end_time
+        self,
+        channel_target: str,
+        start_time: Optional[str] = None,
+        end_time: Optional[str] = None,
     ) -> Iterator[YouTubePlaylistVideoSnippet]:
         channel_id = get_channel_id(self.scraper, channel_target)
 
@@ -354,14 +357,12 @@ class YouTubeAPIClient(object):
 
                 for item in result["items"]:
 
-                    item_published_at = item["snippet"]["publishedAt"]
+                    item = YouTubePlaylistVideoSnippet.from_payload(item)
 
-                    if start_time and start_time > item_published_at:
+                    if start_time and start_time > item.published_at:
                         break
 
-                    elif end_time is None or item_published_at < end_time:
-                        item = YouTubePlaylistVideoSnippet.from_payload(item)
-
+                    elif end_time is None or item.published_at < end_time:
                         yield item
 
                 if token is None or len(result["items"]) == 0:

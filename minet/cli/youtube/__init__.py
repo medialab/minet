@@ -88,13 +88,13 @@ YOUTUBE_CHANNEL_VIDEOS_SUBCOMMAND = youtube_api_subcommand(
     arguments=[
         {
             "flag": "--start-time",
-            "help": 'The oldest UTC datetime from which the videos will be retrieved (start-time is included). The date should have the format : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates will be completed for you e.g. "2002-04".',
+            "help": 'The oldest UTC datetime from which the videos will be retrieved (start-time is included). The date should have the format: "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates will be completed for you e.g. "2002-04".',
             "type": PartialISODatetimeType(as_string=True),
             "default": None,
         },
         {
             "flag": "--end-time",
-            "help": 'The newest UTC datetime from which the videos will be retrieved (end-time is excluded). Warning: videos more recent than end-time will still be retrieved from the API, but they will not be written in the output file. The date should have the format : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates will be completed for you e.g. "2002-04".',
+            "help": 'The newest UTC datetime from which the videos will be retrieved (end-time is excluded). Warning: videos more recent than end-time will still be retrieved from the API, but they will not be written in the output file. The date should have the format: "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates will be completed for you e.g. "2002-04".',
             "type": PartialISODatetimeType(as_string=True),
             "default": None,
         },

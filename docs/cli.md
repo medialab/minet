@@ -6060,9 +6060,9 @@ Optional Arguments:
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
   --end-time END_TIME           The newest UTC datetime from which the tweets
-                                will be counted. The date should have the format
-                                : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates
-                                will be completed for you e.g. "2002-04".
+                                will be counted. The date should have the
+                                format: "YYYY-MM-DDTHH:mm:ssZ" but incomplete
+                                dates will be completed for you e.g. "2002-04".
   --since-id SINCE_ID           Will return tweets with ids that are greater
                                 than the specified id. Takes precedence over
                                 --start-time.
@@ -6070,9 +6070,9 @@ Optional Arguments:
                                 How to sort retrieved tweets. Defaults to
                                 `recency`.
   --start-time START_TIME       The oldest UTC datetime from which the tweets
-                                will be counted. The date should have the format
-                                : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates
-                                will be completed for you e.g. "2002-04".
+                                will be counted. The date should have the
+                                format: "YYYY-MM-DDTHH:mm:ssZ" but incomplete
+                                dates will be completed for you e.g. "2002-04".
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   --until-id UNTIL_ID           Will return tweets that are older than the tweet
@@ -6224,9 +6224,9 @@ Optional Arguments:
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
   --end-time END_TIME           The newest UTC datetime from which the tweets
-                                will be counted. The date should have the format
-                                : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates
-                                will be completed for you e.g. "2002-04".
+                                will be counted. The date should have the
+                                format: "YYYY-MM-DDTHH:mm:ssZ" but incomplete
+                                dates will be completed for you e.g. "2002-04".
   --granularity {day,hour,minute}
                                 Granularity used to group the data by. Defaults
                                 to `day`.
@@ -6234,9 +6234,9 @@ Optional Arguments:
                                 than the specified id. Takes precedence over
                                 --start-time.
   --start-time START_TIME       The oldest UTC datetime from which the tweets
-                                will be counted. The date should have the format
-                                : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates
-                                will be completed for you e.g. "2002-04".
+                                will be counted. The date should have the
+                                format: "YYYY-MM-DDTHH:mm:ssZ" but incomplete
+                                dates will be completed for you e.g. "2002-04".
   --until-id UNTIL_ID           Will return tweets that are older than the tweet
                                 with the specified id.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -7011,7 +7011,7 @@ Optional Arguments:
                                 Warning: videos more recent than end-time will
                                 still be retrieved from the API, but they will
                                 not be written in the output file. The date
-                                should have the format : "YYYY-MM-DDTHH:mm:ssZ"
+                                should have the format: "YYYY-MM-DDTHH:mm:ssZ"
                                 but incomplete dates will be completed for you
                                 e.g. "2002-04".
   -k, --key KEY                 YouTube API Data dashboard API key. Can be used
@@ -7020,7 +7020,7 @@ Optional Arguments:
                                 MINET_YOUTUBE_KEY env variable.
   --start-time START_TIME       The oldest UTC datetime from which the videos
                                 will be retrieved (start-time is included). The
-                                date should have the format :
+                                date should have the format:
                                 "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates will
                                 be completed for you e.g. "2002-04".
   -s, --select SELECT           Columns of -i/--input CSV file to include in the

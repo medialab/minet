@@ -79,12 +79,12 @@ COMMON_V2_SEARCH_ARGUMENTS = [
     },
     {
         "flag": "--start-time",
-        "help": 'The oldest UTC datetime from which the tweets will be counted. The date should have the format : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates will be completed for you e.g. "2002-04".',
+        "help": 'The oldest UTC datetime from which the tweets will be counted. The date should have the format: "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates will be completed for you e.g. "2002-04".',
         "type": PartialISODatetimeType(as_string=True),
     },
     {
         "flag": "--end-time",
-        "help": 'The newest UTC datetime from which the tweets will be counted. The date should have the format : "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates will be completed for you e.g. "2002-04".',
+        "help": 'The newest UTC datetime from which the tweets will be counted. The date should have the format: "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates will be completed for you e.g. "2002-04".',
         "type": PartialISODatetimeType(as_string=True, upper_bound=True),
     },
 ]
