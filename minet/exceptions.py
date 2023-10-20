@@ -212,6 +212,9 @@ class PycurlProtocolError(PycurlError):
     pass
 
 
+# NOTE: we cannot distinguish connexion error and unknown host errors
+# This is the reason why `PycurlHostResolutionError` inherits from
+# `PycurlProtocolError` so we can retry it.
 class PycurlHostResolutionError(PycurlProtocolError):
     pass
 

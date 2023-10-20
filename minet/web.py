@@ -1240,14 +1240,11 @@ def create_request_retryer(
         for exc in additional_exceptions:
             retryable_exception_types.append(exc)
 
-    retry_condition = retry_if_exception_type(
-        exception_types=tuple(retryable_exception_types)
-    )
+    retryable_exception_types = tuple(retryable_exception_types)
 
-    # By default we also retry subsets of new connection error
-    def temporary_failure_predicate(exc: BaseException) -> bool:
+    def default_retry_exception_predicate(exc: BaseException) -> bool:
         if not isinstance(exc, urllib3_exceptions.NewConnectionError):
-            return False
+            return isinstance(exc, retryable_exception_types)
 
         msg = str(exc).lower()
 
@@ -1256,7 +1253,7 @@ def create_request_retryer(
 
         return False
 
-    retry_condition &= retry_if_exception(temporary_failure_predicate)
+    retry_condition = retry_if_exception(default_retry_exception_predicate)
 
     if retry_on_statuses is not None:
 
