@@ -1,7 +1,8 @@
+import asyncio
 from quenouille import imap_unordered
 from minet.executors import BrowserThreadPoolExecutor
 from minet.browser import ThreadsafeBrowser
-from playwright.async_api import Page
+from playwright.async_api import Page, Browser
 from ural import get_normalized_hostname
 
 # ref: https://github.com/microsoft/playwright-python/issues/342
@@ -30,6 +31,11 @@ async def get_title(page: Page) -> str:
 #     for title in imap_unordered(URLS, worker, 3):
 #         print(title)
 
-with BrowserThreadPoolExecutor() as pool:
-    for result in pool.run_with_new_page(URLS, get_title):
-        print(result)
+with ThreadsafeBrowser(adblock=True, automatic_consent=True) as browser:
+
+    async def worker(b: Browser):
+        async with await b.new_page() as page:
+            await page.goto("https://www.lemonde.fr")
+            await asyncio.sleep(10)
+
+    browser.run(worker)

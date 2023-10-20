@@ -1,5 +1,6 @@
 from typing import Union
 
+from tempfile import gettempdir
 from os.path import expanduser, join
 from playwright.async_api import (
     Error as PlaywrightError,
@@ -48,3 +49,7 @@ def convert_playwright_error(error: AnyPlaywrightError) -> BrowserError:
 
 def get_browsers_path() -> str:
     return expanduser(join("~", BROWSERS_PATH))
+
+
+def get_temp_persistent_context_path() -> str:
+    return join(gettempdir(), "minet-browser-temporary-persistent-context")

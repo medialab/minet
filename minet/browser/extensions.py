@@ -51,6 +51,13 @@ def ensure_extension_is_downloaded(name: str) -> bool:
     return False
 
 
+def get_extension_path(name: str) -> str:
+    if name not in AVAILABLE_EXTENSIONS:
+        raise TypeError("unknown extension %s" % name)
+
+    return join(get_browsers_path(), "extensions", name)
+
+
 if __name__ == "__main__":
     print("Downloading missing extensions...\n")
 
