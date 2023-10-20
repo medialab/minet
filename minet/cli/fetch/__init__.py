@@ -22,9 +22,8 @@ PARALLELISM_ARGUMENTS = [
     },
     {
         "flags": ["-t", "--threads"],
-        "help": "Number of threads to use.",
+        "help": "Number of threads to use. Will default to a conservative number, based on the number of available cores. Feel free to increase.",
         "type": int,
-        "default": 25,
     },
     {
         "flag": "--throttle",

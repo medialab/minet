@@ -45,9 +45,8 @@ CRAWL_ARGUMENTS = {
     },
     "threads": {
         "flags": ["-t", "--threads"],
-        "help": "Number of threads to use. You can use `0` if you want the crawler to remain completely synchronous.",
+        "help": "Number of threads to use. Will default to a conservative number, based on the number of available cores. Feel free to increase.",
         "type": int,
-        "default": 25,
     },
     "compress_on_disk": {
         "flags": ["-z", "--compress-on-disk"],

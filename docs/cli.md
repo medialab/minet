@@ -293,9 +293,9 @@ Optional Arguments:
                                 disk.
   --stateful-redirects          Whether to keep a cookie jar while redirecting
                                 and allowing self redirections that track state.
-  -t, --threads THREADS         Number of threads to use. You can use `0` if you
-                                want the crawler to remain completely
-                                synchronous. Defaults to `25`.
+  -t, --threads THREADS         Number of threads to use. Will default to a
+                                conservative number, based on the number of
+                                available cores. Feel free to increase.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to `0.2`.
   --timeout TIMEOUT             Maximum time - in seconds - to spend for each
@@ -487,9 +487,9 @@ Optional Arguments:
                                 disk.
   --stateful-redirects          Whether to keep a cookie jar while redirecting
                                 and allowing self redirections that track state.
-  -t, --threads THREADS         Number of threads to use. You can use `0` if you
-                                want the crawler to remain completely
-                                synchronous. Defaults to `25`.
+  -t, --threads THREADS         Number of threads to use. Will default to a
+                                conservative number, based on the number of
+                                available cores. Feel free to increase.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to `0.2`.
   --timeout TIMEOUT             Maximum time - in seconds - to spend for each
@@ -671,7 +671,9 @@ Optional Arguments:
                                 disk.
   --standardize-encoding        Whether to systematically convert retrieved text
                                 to UTF-8.
-  -t, --threads THREADS         Number of threads to use. Defaults to `25`.
+  -t, --threads THREADS         Number of threads to use. Will default to a
+                                conservative number, based on the number of
+                                available cores. Feel free to increase.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to `0.2`.
   --timeout TIMEOUT             Maximum time - in seconds - to spend for each
@@ -1008,7 +1010,9 @@ Optional Arguments:
                                 Defaults to `GET`.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
-  -t, --threads THREADS         Number of threads to use. Defaults to `25`.
+  -t, --threads THREADS         Number of threads to use. Will default to a
+                                conservative number, based on the number of
+                                available cores. Feel free to increase.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to `0.2`.
   --timeout TIMEOUT             Maximum time - in seconds - to spend for each
@@ -1304,7 +1308,9 @@ Optional Arguments:
   --height HEIGHT               Page height in pixels. Defaults to `768`.
   -O, --output-dir OUTPUT_DIR   Directory where the screenshots will be written.
                                 Defaults to `screenshots`.
-  -t, --threads THREADS         Number of threads to use. Defaults to `25`.
+  -t, --threads THREADS         Number of threads to use. Will default to a
+                                conservative number, based on the number of
+                                available cores. Feel free to increase.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to `0.2`.
   --url-template URL_TEMPLATE   A template for the urls to fetch. Handy e.g. if
@@ -3408,9 +3414,9 @@ Optional Arguments:
   --status-column STATUS_COLUMN
                                 Name of the CSV column containing the webentity
                                 statuses. Defaults to `STATUS`.
-  -t, --threads THREADS         Number of threads to use. You can use `0` if you
-                                want the crawler to remain completely
-                                synchronous. Defaults to `25`.
+  -t, --threads THREADS         Number of threads to use. Will default to a
+                                conservative number, based on the number of
+                                available cores. Feel free to increase.
   --throttle THROTTLE           Time to wait - in seconds - between 2 calls to
                                 the same domain. Defaults to `0`.
   --timeout TIMEOUT             Maximum time - in seconds - to spend for each
