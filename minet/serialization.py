@@ -33,6 +33,10 @@ from minet.exceptions import (
     #
     BrowserUnknownError,
     BrowserNameNotResolvedError,
+    BrowserConnectionAbortedError,
+    BrowserConnectionRefusedError,
+    BrowserTimeoutError,
+    BrowserSSLError,
 )
 
 
@@ -97,7 +101,7 @@ ERROR_REPORTERS = {
     ProtocolError: serialize_protocol_error,
     ConnectTimeoutError: "connect-timeout",
     ReadTimeoutError: "read-timeout",
-    FinalTimeoutError: "final-timeout",
+    FinalTimeoutError: "timeout",
     MaxRedirectsError: "max-redirects",
     InfiniteRedirectsError: "infinite-redirects",
     SelfRedirectError: "self-redirect",
@@ -111,7 +115,7 @@ ERROR_REPORTERS = {
     ProxyError: "proxy-error",
     #
     PycurlHostResolutionError: "unknown-host",
-    PycurlTimeoutError: "final-timeout",
+    PycurlTimeoutError: "timeout",
     PycurlConnectionRefusedError: "connection-refused",
     PycurlSSLError: "ssl",
     PycurlReceiveError: "receive-error",
@@ -119,6 +123,10 @@ ERROR_REPORTERS = {
     #
     BrowserUnknownError: "unknown-browser-error",
     BrowserNameNotResolvedError: "unknown-host",
+    BrowserConnectionAbortedError: "connection-aborted",
+    BrowserConnectionRefusedError: "connection-refused",
+    BrowserTimeoutError: "timeout",
+    BrowserSSLError: "ssl",
 }
 
 

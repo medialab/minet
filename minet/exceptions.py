@@ -251,3 +251,19 @@ class BrowserUnknownError(BrowserError):
 
 class BrowserNameNotResolvedError(BrowserError):
     pass
+
+
+class BrowserConnectionAbortedError(BrowserError):
+    pass
+
+
+class BrowserConnectionRefusedError(BrowserError):
+    pass
+
+
+class BrowserTimeoutError(BrowserError):
+    pass
+
+
+class BrowserSSLError(BrowserError):
+    pass
