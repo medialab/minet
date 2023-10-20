@@ -34,7 +34,7 @@ from minet.youtube.constants import (
 )
 from minet.youtube.exceptions import (
     YouTubeDisabledCommentsError,
-    YouTubeVideoNotFoundError,
+    YouTubeNotFoundError,
     YouTubeInvalidAPIKeyError,
     YouTubeInvalidAPICallError,
     YouTubeInvalidVideoTargetError,
@@ -139,7 +139,7 @@ class YouTubeAPIClient(object):
                 raise YouTubeUnknown403Error
 
             if response.status == 404:
-                raise YouTubeVideoNotFoundError
+                raise YouTubeNotFoundError
 
             if response.status >= 400:
                 if data is not None and "API key not valid" in getpath(

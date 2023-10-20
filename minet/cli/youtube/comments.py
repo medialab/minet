@@ -9,7 +9,7 @@ from minet.youtube import YouTubeAPIClient
 from minet.youtube.types import YouTubeComment
 from minet.youtube.exceptions import (
     YouTubeDisabledCommentsError,
-    YouTubeVideoNotFoundError,
+    YouTubeNotFoundError,
     YouTubeExclusiveMemberError,
     YouTubeUnknown403Error,
 )
@@ -43,7 +43,7 @@ def action(cli_args, enricher, loading_bar):
             except YouTubeDisabledCommentsError:
                 loading_bar.inc_stat("disabled")
 
-            except YouTubeVideoNotFoundError:
+            except YouTubeNotFoundError:
                 loading_bar.inc_stat("not-found")
 
             except YouTubeExclusiveMemberError:

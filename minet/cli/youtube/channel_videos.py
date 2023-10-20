@@ -8,6 +8,7 @@
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.youtube import YouTubeAPIClient
 from minet.youtube.types import YouTubePlaylistVideoSnippet
+from minet.youtube.exceptions import YouTubeNotFoundError
 
 
 @with_enricher_and_loading_bar(
@@ -22,8 +23,11 @@ def action(cli_args, enricher, loading_bar):
 
     for row, channel_id in enricher.cells(cli_args.column, with_rows=True):
         with loading_bar.step(channel_id):
-            for video in client.channel_videos(
-                channel_id, cli_args.start_time, cli_args.end_time
-            ):
-                enricher.writerow(row, video)
-                loading_bar.nested_advance()
+            try:
+                for video in client.channel_videos(
+                    channel_id, cli_args.start_time, cli_args.end_time
+                ):
+                    enricher.writerow(row, video)
+                    loading_bar.nested_advance()
+            except YouTubeNotFoundError:
+                loading_bar.inc_stat("not-found", style="error")

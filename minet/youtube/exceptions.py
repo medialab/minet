@@ -44,7 +44,7 @@ class YouTubeDisabledCommentsError(YouTubeError):
     pass
 
 
-class YouTubeVideoNotFoundError(YouTubeError):
+class YouTubeNotFoundError(YouTubeError):
     pass
 
 
