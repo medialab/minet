@@ -6983,9 +6983,10 @@ how to use the command with a CSV file?
 ### channel-videos
 
 ```
-Usage: minet youtube channel-videos [-h] [-k KEY] [--rcfile RCFILE] [--silent]
+Usage: minet youtube channel-videos [-h] [--start-time START_TIME] [--silent]
                                     [--refresh-per-second REFRESH_PER_SECOND]
-                                    [--simple-progress] [-i INPUT]
+                                    [--simple-progress] [--end-time END_TIME]
+                                    [-k KEY] [--rcfile RCFILE] [-i INPUT]
                                     [--explode EXPLODE] [-s SELECT]
                                     [--total TOTAL] [-o OUTPUT]
                                     channel_or_channel_column
@@ -7005,10 +7006,23 @@ Positional Arguments:
                                 -i/--input.
 
 Optional Arguments:
+  --end-time END_TIME           The newest UTC datetime from which the videos
+                                will be retrieved (end-time is excluded).
+                                Warning: videos more recent than end-time will
+                                still be retrieved from the API, but they will
+                                not be written in the output file. The date
+                                should have the format : "YYYY-MM-DDTHH:mm:ssZ"
+                                but incomplete dates will be completed for you
+                                e.g. "2002-04".
   -k, --key KEY                 YouTube API Data dashboard API key. Can be used
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
                                 MINET_YOUTUBE_KEY env variable.
+  --start-time START_TIME       The oldest UTC datetime from which the videos
+                                will be retrieved (start-time is included). The
+                                date should have the format :
+                                "YYYY-MM-DDTHH:mm:ssZ" but incomplete dates will
+                                be completed for you e.g. "2002-04".
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
