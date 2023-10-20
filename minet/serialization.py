@@ -38,7 +38,7 @@ def serialize_new_connection_error(error):
     if "no route to host" in msg or "errno 113" in msg:
         return "no-route-to-host"
 
-    if "name or service not known" in msg or "errno 8" in msg:
+    if "name or service not known" in msg or "errno 8" in msg or "errno -2" in msg:
         return "unknown-host"
 
     if "connection refused" in msg:

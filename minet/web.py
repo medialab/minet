@@ -1256,7 +1256,7 @@ def create_request_retryer(
 
         return False
 
-    retry_condition |= retry_if_exception(temporary_failure_predicate)
+    retry_condition &= retry_if_exception(temporary_failure_predicate)
 
     if retry_on_statuses is not None:
 
