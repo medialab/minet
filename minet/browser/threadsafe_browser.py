@@ -79,6 +79,12 @@ class ThreadsafeBrowser:
         await self.playwright.stop()
 
     def stop(self) -> None:
+        # NOTE: if we don't do this and some job sent
+        # to a threadpool executor raises and triggers
+        # the closing of the playwright driver, then a
+        # catastrophic chain reaction of exception will
+        # make some jobs hang up and block indefinitely
+        # which will cause a deadlock.
         with self.running_futures_lock:
             for fut in self.running_futures:
                 if not fut.done():
