@@ -1269,6 +1269,7 @@ Usage: minet screenshot [-h] [--domain-parallelism DOMAIN_PARALLELISM]
                         [--filename-template FILENAME_TEMPLATE]
                         [--folder-strategy FOLDER_STRATEGY] [-O OUTPUT_DIR]
                         [--full-page] [--width WIDTH] [--height HEIGHT]
+                        [--wait-until {commit,domcontentloaded,load,networkidle}]
                         [-i INPUT] [--explode EXPLODE] [-s SELECT]
                         [--total TOTAL] [--resume] [-o OUTPUT]
                         url_or_url_column
@@ -1317,6 +1318,9 @@ Optional Arguments:
                                 ~30s.
   --url-template URL_TEMPLATE   A template for the urls to fetch. Handy e.g. if
                                 you need to build urls from ids etc.
+  --wait-until {commit,domcontentloaded,load,networkidle}
+                                What to wait to consider the web page loaded.
+                                Defaults to `load`.
   --width WIDTH                 Page width in pixels. Defaults to `1024`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string

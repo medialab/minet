@@ -470,7 +470,11 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar: Loading
             ) as context:
                 async with await context.new_page() as page:
                     try:
-                        response = await page.goto(payload.url, timeout=goto_timeout)
+                        response = await page.goto(
+                            payload.url,
+                            timeout=goto_timeout,
+                            wait_until=cli_args.wait_until,
+                        )
                     except (PlaywrightError, PlaywrightTimeoutError) as e:
                         error = convert_playwright_error(e)
 

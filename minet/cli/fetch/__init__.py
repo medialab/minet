@@ -354,5 +354,11 @@ SCREENSHOT_COMMAND = command(
             "type": int,
             "default": 768,
         },
+        {
+            "flag": "--wait-until",
+            "help": "What to wait to consider the web page loaded.",
+            "default": "load",
+            "choices": ["domcontentloaded", "load", "networkidle", "commit"],
+        },
     ],
 )
