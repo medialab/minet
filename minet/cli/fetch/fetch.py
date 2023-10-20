@@ -450,6 +450,10 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar: Loading
 
     # Screenshot
     elif cli_args.action == "screenshot":
+        from playwright.async_api import Error as PlaywrightError
+        from minet.browser.utils import convert_playwright_error
+        from minet.exceptions import BrowserUnknownError
+        from minet.serialization import serialize_error_as_slug
 
         async def screenshot(
             browser: "Browser", payload: HTTPWorkerPayload
@@ -458,7 +462,17 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar: Loading
                 viewport={"width": cli_args.width, "height": cli_args.height}
             ) as context:
                 async with await context.new_page() as page:
-                    response = await page.goto(payload.url)
+                    try:
+                        response = await page.goto(payload.url)
+                    except PlaywrightError as e:
+                        error = convert_playwright_error(e)
+
+                        if isinstance(error, BrowserUnknownError):
+                            raise e
+
+                        return ScreenshotAddendum(
+                            screenshot_error=serialize_error_as_slug(error)
+                        )
 
                     assert response is not None
 

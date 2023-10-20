@@ -238,3 +238,16 @@ class SQLArchiveError(MinetError):
 
 class SQLArchiveInvalidError(SQLArchiveError):
     pass
+
+
+# Browser emulation
+class BrowserError(MinetError):
+    pass
+
+
+class BrowserUnknownError(BrowserError):
+    pass
+
+
+class BrowserNameNotResolvedError(BrowserError):
+    pass

@@ -23,12 +23,16 @@ from minet.exceptions import (
     FinalTimeoutError,
     CouldNotInferEncodingError,
     InvalidStatusError,
+    #
     PycurlHostResolutionError,
     PycurlTimeoutError,
     PycurlConnectionRefusedError,
     PycurlSSLError,
     PycurlReceiveError,
     PycurlSendError,
+    #
+    BrowserUnknownError,
+    BrowserNameNotResolvedError,
 )
 
 
@@ -112,6 +116,9 @@ ERROR_REPORTERS = {
     PycurlSSLError: "ssl",
     PycurlReceiveError: "receive-error",
     PycurlSendError: "send-error",
+    #
+    BrowserUnknownError: "unknown-browser-error",
+    BrowserNameNotResolvedError: "unknown-host",
 }
 
 
