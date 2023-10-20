@@ -261,6 +261,10 @@ class BrowserConnectionRefusedError(BrowserError):
     pass
 
 
+class BrowserConnectionClosedError(BrowserError):
+    pass
+
+
 class BrowserTimeoutError(BrowserError):
     pass
 

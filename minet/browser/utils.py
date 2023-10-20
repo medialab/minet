@@ -10,6 +10,7 @@ from minet.exceptions import (
     BrowserNameNotResolvedError,
     BrowserConnectionAbortedError,
     BrowserConnectionRefusedError,
+    BrowserConnectionClosedError,
     BrowserTimeoutError,
     BrowserUnknownError,
     BrowserSSLError,
@@ -30,6 +31,9 @@ def convert_playwright_error(error: AnyPlaywrightError) -> BrowserError:
 
     if "net::ERR_CONNECTION_REFUSED" in error.message:
         return BrowserConnectionRefusedError()
+
+    if "net::ERR_CONNECTION_CLOSED" in error.message:
+        return BrowserConnectionClosedError()
 
     if (
         "net::ERR_CERT_AUTHORITY_INVALID" in error.message

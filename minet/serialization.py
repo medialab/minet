@@ -35,6 +35,7 @@ from minet.exceptions import (
     BrowserNameNotResolvedError,
     BrowserConnectionAbortedError,
     BrowserConnectionRefusedError,
+    BrowserConnectionClosedError,
     BrowserTimeoutError,
     BrowserSSLError,
 )
@@ -125,6 +126,7 @@ ERROR_REPORTERS = {
     BrowserNameNotResolvedError: "unknown-host",
     BrowserConnectionAbortedError: "connection-aborted",
     BrowserConnectionRefusedError: "connection-refused",
+    BrowserConnectionClosedError: "connection-closed",
     BrowserTimeoutError: "timeout",
     BrowserSSLError: "ssl",
 }
