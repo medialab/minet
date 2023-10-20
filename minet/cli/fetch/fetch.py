@@ -38,6 +38,7 @@ from minet.exceptions import InvalidURLError, FilenameFormattingError, HTTPCallb
 from minet.heuristics import should_spoof_ua_when_resolving
 from minet.cli.exceptions import InvalidArgumentsError
 from minet.cli.reporters import report_filename_formatting_error
+from minet.cli.loading_bar import LoadingBar
 from minet.cli.utils import with_enricher_and_loading_bar, with_ctrl_c_warning
 
 
@@ -158,7 +159,7 @@ def get_title(cli_args):
     stats_sort_key=loading_bar_stats_sort_key,
 )
 @with_ctrl_c_warning
-def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
+def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar: LoadingBar):
     # Resolving or fetching?
     resolve = cli_args.action == "resolve"
 
@@ -347,6 +348,8 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
         )
 
         with HTTPThreadPoolExecutor(**common_http_executor_kwargs) as executor:
+            loading_bar.append_to_title(" (t=%i)" % executor.max_workers)
+
             for result, callback_result in executor.request(
                 enricher,
                 request_args=request_args,
@@ -401,6 +404,8 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
     # Resolve
     elif cli_args.action == "resolve":
         with HTTPThreadPoolExecutor(**common_http_executor_kwargs) as executor:
+            loading_bar.append_to_title("(t=%i)" % executor.max_workers)
+
             for result in executor.resolve(
                 enricher,
                 resolve_args=request_args,
@@ -492,6 +497,8 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar):
                     )
 
         with BrowserThreadPoolExecutor(**common_executor_kwargs) as executor:
+            loading_bar.append_to_title(" (t=%i)" % executor.max_workers)
+
             for result in executor.run(
                 enricher, screenshot, passthrough=True, **common_imap_kwargs
             ):

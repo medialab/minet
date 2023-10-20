@@ -10,5 +10,4 @@ python -m minet.cli fetch url -i ftest/resources/urls.csv \
   --grab-cookies firefox \
   -z \
   --only-html \
-  -s id,url \
-  -t 25 > ftest/report.csv
+  -s id,url > ftest/report.csv

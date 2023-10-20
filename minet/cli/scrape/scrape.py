@@ -249,7 +249,7 @@ def action(cli_args):
             ),
         )
 
-        loading_bar.set_title("Scraping (p=%i)" % pool.processes)
+        loading_bar.append_to_title(" (p=%i)" % pool.processes)
 
         warned_about_input_dir = False
 

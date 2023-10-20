@@ -113,7 +113,7 @@ def action(cli_args, enricher: ThreadSafeEnricher, loading_bar):
 
     pool = LazyPool(cli_args.processes)
 
-    loading_bar.set_title("Extracting text (p=%i)" % pool.processes)
+    loading_bar.append_to_title(" (p=%i)" % pool.processes)
 
     warned_about_input_dir = False
 

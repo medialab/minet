@@ -224,6 +224,7 @@ class LoadingBar(object):
         refresh_per_second: float = 10,
         simple: bool = False,
     ):
+        self.title = title
         self.sub_total_sum = 0
         self.nested = nested
         self.show_label = show_label
@@ -463,7 +464,11 @@ class LoadingBar(object):
             self.table.add_row(self.stats_progress)
 
     def set_title(self, title: str):
+        self.title = title
         self.progress.update(self.task_id, description=title)
+
+    def append_to_title(self, string: str):
+        self.set_title((self.title or "") + string)
 
     def set_total(self, total: Optional[int] = None):
         self.progress.update(self.task_id, total=total)
