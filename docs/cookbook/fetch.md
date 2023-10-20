@@ -17,6 +17,7 @@ Let's use the `minet fetch` command to do so!
   - [Keeping only selected columns in report](#keeping-only-selected-columns-in-report)
   - [Standardizing encoding of fetched files](#standardizing-encoding-of-fetched-files)
   - [Resuming an operation](#resuming-an-operation)
+  - [Compressing files on disk](#compressing-files-on-disk)
 - [Unix compliance](#unix-compliance)
 - [Fetching from a python script](#fetching-from-a-python-script)
 
@@ -191,6 +192,18 @@ Well you perfectly can and here is what you would need to change:
 ```bash
 minet fetch url -i urls.csv -o report.csv --resume
 ```
+
+### Compressing files on disk
+
+If you know you are going to download a large amount of urls, you should probably compress the retrieved files using the `-z/--compress-on-disk` flag, to minimize the space necessary to store the files on your hard drive.
+
+```bash
+minet fetch url -i urls.csv -o report.csv -z
+```
+
+This will enable automatic gzip compression for all downloaded files. Don't worry, other minet commands, such as `extract` or `scrape`, know how to uncompress those files on the fly.
+
+Also, if you want to download the files as a single monolithic archive, rather than creating one file per download, you can also use the `--sqlar` flag. This will create a [sqlar](https://www.sqlite.org/sqlar/doc/trunk/README.md) file containing all the downloaded files.
 
 ## Unix compliance
 
