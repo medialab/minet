@@ -511,7 +511,11 @@ def atomic_resolve(
                     if location is None and (
                         follow_meta_refresh or follow_js_relocation
                     ):
-                        buffered_response.prebuffer_up_to(CONTENT_PREBUFFER_UP_TO)
+                        buffered_response.prebuffer_up_to(
+                            CONTENT_PREBUFFER_UP_TO
+                            if not follow_js_relocation
+                            else LARGE_CONTENT_PREBUFFER_UP_TO
+                        )
 
                     # Meta refresh
                     if location is None and follow_meta_refresh:
