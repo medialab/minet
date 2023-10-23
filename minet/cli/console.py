@@ -59,6 +59,9 @@ class MinetConsole(Console):
 
         self.print(table)
 
+    def info(self, *messages):
+        self.logh("info", *messages, header_style="info")
+
     def error(self, *messages):
         self.logh("error", *messages, header_style="error")
 

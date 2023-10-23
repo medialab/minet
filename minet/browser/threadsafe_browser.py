@@ -13,7 +13,7 @@ from minet.__future__.threaded_child_watcher import ThreadedChildWatcher
 from minet.exceptions import UnknownBrowserError
 from minet.browser.plawright_shim import run_playwright
 from minet.browser.utils import get_browsers_path, get_temp_persistent_context_path
-from minet.browser.extensions import get_extension_path
+from minet.browser.extensions import get_extension_path, ensure_extension_is_downloaded
 
 UNIX = "windows" not in platform.system().lower()
 LTE_PY37 = platform.python_version_tuple()[:2] <= ("3", "7")
@@ -89,6 +89,8 @@ class ThreadsafeBrowser:
             disable_extensions_except = []
 
             for ext in self.extensions:
+                ensure_extension_is_downloaded(ext)
+
                 p = get_extension_path(ext)
                 disable_extensions_except.append(p)
                 args.append(f"--load-extension={p}")

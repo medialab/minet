@@ -131,6 +131,11 @@ class CLIRetryerHandler(Handler):
         console.log_with_time("\n".join(msg), style="warning")
 
 
+class CLIDownloaderHandler(Handler):
+    def emit(self, record):
+        console.info(record.message)
+
+
 def acquire_cross_platform_stdout():
     # As per #254: stdout need to be wrapped so that windows get a correct csv
     # stream output

@@ -22,12 +22,13 @@ from contextlib import ExitStack
 from encodings import idna  # noqa: F401
 
 from minet.cli.constants import DEFAULT_PREBUFFER_BYTES
-from minet.loggers import sleepers_logger
+from minet.loggers import sleepers_logger, downloaders_logger
 from minet.cli.console import console
 from minet.cli.utils import (
     die,
     get_rcfile,
     CLIRetryerHandler,
+    CLIDownloaderHandler,
     with_cli_exceptions,
 )
 from minet.cli.argparse import resolve_arg_dependencies, build_parser, get_subparser
@@ -67,8 +68,9 @@ def global_setup() -> None:
         strip_null_bytes_on_write=True,
     )
 
-    # Adding handlers for sleepers
+    # Adding handlers for various loggers
     sleepers_logger.addHandler(CLIRetryerHandler())
+    downloaders_logger.addHandler(CLIDownloaderHandler())
 
 
 @with_cli_exceptions

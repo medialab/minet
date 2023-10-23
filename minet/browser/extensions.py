@@ -7,6 +7,7 @@ from glob import iglob
 
 from minet.web import request
 from minet.browser.utils import get_browsers_path
+from minet.loggers import downloaders_logger
 
 AVAILABLE_EXTENSIONS = {
     "i-still-dont-care-about-cookies": {
@@ -35,6 +36,10 @@ def ensure_extension_is_downloaded(name: str) -> bool:
     if isdir(extension_dir):
         return True
 
+    downloaders_logger.info(
+        "Downloading browser extension: %s" % name,
+        extra={"namespace": "extension", "target": name},
+    )
     response = request(extension_info["url"])
 
     with zipfile.ZipFile(io.BytesIO(response.body)) as z:
