@@ -32,6 +32,7 @@ BrowserOrBrowserContextCallable = Callable[
 
 # TODO: introduce stealth back
 # TODO: abstract screenshot function
+# TODO: helper for stealth page, monkey patch some function?
 
 
 class ThreadsafeBrowser:
@@ -130,12 +131,13 @@ class ThreadsafeBrowser:
                 headless=False,
                 args=args,
                 viewport={"width": self.width, "height": self.height},
+                locale="en-US",
             )
 
         else:
             self.browser = await browser_type.launch(headless=self.headless)
             self.default_browser_context = await self.browser.new_context(
-                viewport={"width": self.width, "height": self.height}
+                viewport={"width": self.width, "height": self.height}, locale="en-US"
             )
 
     async def __stop_playwright(self) -> None:

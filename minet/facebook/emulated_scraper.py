@@ -1,5 +1,6 @@
 import json
 from playwright.async_api import BrowserContext, Response
+from playwright_stealth import stealth_async
 
 from minet.browser import ThreadsafeBrowser
 
@@ -29,6 +30,8 @@ class FacebookEmulatedScraper:
 
     async def __scrape_comments(self, context: "BrowserContext", url: str):
         async with await context.new_page() as page:
+            await stealth_async(page)
+
             await page.goto(url)
             await page.get_by_label("Decline optional cookies").first.click()
             await page.get_by_label("Close").first.click()
