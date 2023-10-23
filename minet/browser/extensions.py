@@ -6,6 +6,7 @@ from shutil import move
 from glob import iglob
 
 from minet.web import request
+from minet.exceptions import InvalidStatusError
 from minet.browser.utils import get_browsers_path
 from minet.loggers import downloaders_logger
 
@@ -15,7 +16,7 @@ AVAILABLE_EXTENSIONS = {
         "root": "./",
     },
     "ublock-origin": {
-        "url": "https://github.com/gorhill/uBlock/releases/download/1.52.3b16/uBlock0_1.52.3b16.chromium.zip",
+        "url": "https://github.com/gorhill/uBlock/releases/download/1.52.2/uBlock0_1.52.2.chromium.zip",
         "root": "./uBlock0.chromium",
     },
 }
@@ -41,6 +42,9 @@ def ensure_extension_is_downloaded(name: str) -> bool:
         extra={"namespace": "extension", "target": name},
     )
     response = request(extension_info["url"])
+
+    if response.status != 200:
+        raise InvalidStatusError(response.status)
 
     with zipfile.ZipFile(io.BytesIO(response.body)) as z:
         z.extractall(extension_dir)
