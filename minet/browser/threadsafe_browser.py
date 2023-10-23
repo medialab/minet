@@ -84,7 +84,9 @@ class ThreadsafeBrowser:
 
         self.loop = asyncio.new_event_loop()
         self.start_event = Event()
-        self.thread = Thread(target=self.__thread_worker)
+        self.thread = Thread(
+            name="Thread-browser-%i" % id(self), target=self.__thread_worker
+        )
 
         self.running_futures: Set[Future] = set()
         self.running_futures_lock = Lock()

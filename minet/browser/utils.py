@@ -17,6 +17,9 @@ from minet.exceptions import (
     BrowserUnknownError,
     BrowserSSLError,
     BrowserHTTPResponseCodeFailureError,
+    BrowserConnectionTimeoutError,
+    BrowserContextAlreadyClosedError,
+    BrowserSocketError,
 )
 from minet.browser.constants import BROWSERS_PATH
 
@@ -24,6 +27,8 @@ AnyPlaywrightError = Union[PlaywrightError, PlaywrightTimeoutError]
 
 
 def convert_playwright_error(error: AnyPlaywrightError) -> BrowserError:
+    lower_message = error.message.lower()
+
     if isinstance(error, PlaywrightTimeoutError):
         return BrowserTimeoutError()
 
@@ -47,6 +52,19 @@ def convert_playwright_error(error: AnyPlaywrightError) -> BrowserError:
 
     if "net::ERR_HTTP_RESPONSE_CODE_FAILURE" in error.message:
         return BrowserHTTPResponseCodeFailureError()
+
+    if "net::ERR_CONNECTION_TIMED_OUT" in error.message:
+        return BrowserConnectionTimeoutError()
+
+    if (
+        "target page, context or browser has been closed" in lower_message
+        or "browser closed" in lower_message
+        or "maybe frame was detached?" in lower_message
+    ):
+        return BrowserContextAlreadyClosedError()
+
+    if "net::ERR_SOCKET_NOT_CONNECTED" in error.message:
+        return BrowserSocketError()
 
     return BrowserUnknownError()
 

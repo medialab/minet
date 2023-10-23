@@ -374,7 +374,9 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar: Loading
                         response = result.response
                         status = response.status
 
-                        loading_bar.inc_stat(status, style=get_style_for_status(status))
+                        loading_bar.inc_stat(
+                            str(status), style=get_style_for_status(status)
+                        )
 
                         addendum.infos_from_response(response, callback_result)
                         enricher.writerow(index, row, addendum)
@@ -435,7 +437,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar: Loading
                         # Status can be None with inference etc.
                         if status is not None:
                             loading_bar.inc_stat(
-                                status, style=get_style_for_status(status)
+                                str(status), style=get_style_for_status(status)
                             )
 
                         addendum.infos_from_stack(result.stack)
@@ -539,6 +541,18 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar: Loading
             ):
                 with loading_bar.step():
                     (index, row), addendum = result
+
+                    if addendum:
+                        if addendum.screenshot_error is not None:
+                            loading_bar.inc_stat(
+                                addendum.screenshot_error, style="error"
+                            )
+                        elif addendum.http_status:
+                            loading_bar.inc_stat(
+                                str(addendum.http_status),
+                                style=get_style_for_status(addendum.http_status),
+                            )
+
                     enricher.writerow(index, row, addendum)
 
     else:

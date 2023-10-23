@@ -265,6 +265,10 @@ class BrowserConnectionClosedError(BrowserError):
     pass
 
 
+class BrowserConnectionTimeoutError(BrowserError):
+    pass
+
+
 class BrowserTimeoutError(BrowserError):
     pass
 
@@ -274,4 +278,12 @@ class BrowserSSLError(BrowserError):
 
 
 class BrowserHTTPResponseCodeFailureError(BrowserError):
+    pass
+
+
+class BrowserContextAlreadyClosedError(BrowserError):
+    pass
+
+
+class BrowserSocketError(BrowserError):
     pass
