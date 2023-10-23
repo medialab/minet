@@ -84,6 +84,7 @@ INSTAGRAM_POST_CSV_HEADERS = [
     "usertags_medias",
     "taken_at_timestamp",
     "utc_time",
+    "coauthor_usernames",
 ]
 
 INSTAGRAM_USER_CSV_HEADERS = [

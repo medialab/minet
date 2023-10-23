@@ -57,6 +57,7 @@ InstagramPost = namedrecord(
         "usertags_medias",
         "mentioned_names",
         "hashtags",
+        "coauthor_usernames",
     ],
 )
 
@@ -228,6 +229,16 @@ def format_post(item):
         item_usertags = get_usertags(item)
         usertags_medias = usertags_medias.union(item_usertags)
 
+    coauthor_usernames = set()
+
+    for other_user in item.get("coauthor_producers", []) + item.get(
+        "invited_coauthor_producers", []
+    ):
+        coauthor_username = other_user.get("username")
+
+        if coauthor_username is not None:
+            coauthor_usernames.add(coauthor_username)
+
     row = InstagramPost(
         getpath(item, ["user", "username"]),
         getpath(item, ["user", "full_name"]),
@@ -248,6 +259,7 @@ def format_post(item):
         usertags_medias,
         item["taken_at"],
         timestamp_to_isoformat(item["taken_at"]),
+        list(coauthor_usernames),
     )
 
     return row

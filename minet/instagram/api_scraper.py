@@ -165,27 +165,23 @@ def forge_user_following_url(
     return url
 
 
-def forge_user_posts_url(
-    name,
-    count=50,
-    max_id=None,
-):
+def forge_user_posts_url(name: str, count: int = 50, max_id=None, user_id=None) -> str:
     if max_id is not None:
-        u = INSTAGRAM_GET_USER_ID_PATTERN.search(max_id)
+        assert user_id is not None
 
-        if u is not None:
-            user = u.group(1)
-            url = "https://i.instagram.com/api/v1/feed/user/%s/?count=%s&max_id=%s" % (
-                user,
-                count,
-                max_id,
-            )
-            return url
+        url = "https://i.instagram.com/api/v1/feed/user/%s/?count=%s&max_id=%s" % (
+            user_id,
+            count,
+            max_id,
+        )
+
+        return url
 
     url = "https://i.instagram.com/api/v1/feed/user/%s/username/?count=%s" % (
         name,
         count,
     )
+
     return url
 
 
@@ -221,6 +217,7 @@ class InstagramAPIScraper(object):
     @retrying_method()
     def request_json(self, url, magic_token=False):
         headers = {"Cookie": self.cookie}
+
         if magic_token:
             headers["X-IG-App-ID"] = self.magic_token
 
@@ -533,14 +530,20 @@ class InstagramAPIScraper(object):
         name = self.get_username(name)
 
         max_id = None
+        user_id = None
 
         while True:
-            url = forge_user_posts_url(name, max_id=max_id)
+            url = forge_user_posts_url(name, max_id=max_id, user_id=user_id)
 
             data = self.request_json(url, magic_token=True)
 
             if not data:
                 break
+
+            # NOTE: user id must not be inferred from max_id because of
+            # posts that were co-authored
+            if user_id is None:
+                user_id = data["user"]["pk"]
 
             items = data.get("items")
 
