@@ -11,6 +11,7 @@ import csv
 import sys
 import ctypes
 import importlib
+import logging
 import multiprocessing
 import casanova
 import shlex
@@ -71,6 +72,7 @@ def global_setup() -> None:
     # Adding handlers for various loggers
     sleepers_logger.addHandler(CLIRetryerHandler())
     downloaders_logger.addHandler(CLIDownloaderHandler())
+    downloaders_logger.setLevel(level=logging.INFO)
 
 
 @with_cli_exceptions

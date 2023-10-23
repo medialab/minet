@@ -24,7 +24,7 @@ from typing import (
 from minet.types import Literal, TypedDict, Unpack, NotRequired
 
 if TYPE_CHECKING:
-    from playwright.async_api import Browser
+    from minet.browser.threadsafe_browser import BrowserOrBrowserContext
 
 import urllib3
 import threading
@@ -744,11 +744,20 @@ class BrowserThreadPoolExecutor(ThreadPoolExecutor):
         max_workers: Optional[int] = None,
         wait: bool = True,
         daemonic: bool = False,
+        height: int = 1920,
+        width: int = 1080,
+        adblock: bool = False,
+        automatic_consent: bool = False,
         **kwargs,
     ):
         from minet.browser import ThreadsafeBrowser
 
-        self.browser = ThreadsafeBrowser()
+        self.browser = ThreadsafeBrowser(
+            width=width,
+            height=height,
+            adblock=adblock,
+            automatic_consent=automatic_consent,
+        )
 
         super().__init__(
             max_workers,
@@ -768,7 +777,7 @@ class BrowserThreadPoolExecutor(ThreadPoolExecutor):
     def run(
         self,
         iterator: Iterable[ItemType],
-        fn: Callable[["Browser", HTTPWorkerPayload[ItemType]], Awaitable[ResultType]],
+        fn: Callable[["BrowserOrBrowserContext", HTTPWorkerPayload[ItemType]], Awaitable[ResultType]],
         *,
         ordered: bool = False,
         key: Optional[Callable[[ItemType], Optional[str]]] = None,
@@ -785,7 +794,7 @@ class BrowserThreadPoolExecutor(ThreadPoolExecutor):
             if payload.url is None:
                 return payload.item, None
 
-            return payload.item, self.browser.run(
+            return payload.item, self.browser.run_in_browser_or_default_context(
                 fn, cast(HTTPWorkerPayload[ItemType], payload)
             )
 

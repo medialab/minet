@@ -9,7 +9,7 @@
 from typing import Optional, List, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from playwright.async_api import Browser
+    from minet.browser.threadsafe_browser import BrowserOrBrowserContext
 
 import casanova
 from casanova import TabularRecord
@@ -463,67 +463,70 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar: Loading
         )
 
         async def screenshot(
-            browser: "Browser", payload: HTTPWorkerPayload
+            context: "BrowserOrBrowserContext", payload: HTTPWorkerPayload
         ) -> ScreenshotAddendum:
-            async with await browser.new_context(
-                viewport={"width": cli_args.width, "height": cli_args.height}
-            ) as context:
-                async with await context.new_page() as page:
-                    try:
-                        response = await page.goto(
-                            payload.url,
-                            timeout=goto_timeout,
-                            wait_until=cli_args.wait_until,
-                        )
-                    except (PlaywrightError, PlaywrightTimeoutError) as e:
-                        error = convert_playwright_error(e)
+            async with await context.new_page() as page:
+                try:
+                    response = await page.goto(
+                        payload.url,
+                        timeout=goto_timeout,
+                        wait_until=cli_args.wait_until,
+                    )
+                except (PlaywrightError, PlaywrightTimeoutError) as e:
+                    error = convert_playwright_error(e)
 
-                        if isinstance(error, BrowserUnknownError):
-                            raise e
-
-                        return ScreenshotAddendum(
-                            screenshot_error=serialize_error_as_slug(error)
-                        )
-
-                    assert response is not None
-
-                    row = payload.item[1]
-                    filename = None
-
-                    if response.status == 200:
-                        filename_cell = (
-                            row[filename_pos] if filename_pos is not None else None
-                        )
-
-                        formatter_kwargs = {}
-
-                        if (
-                            cli_args.filename_template
-                            and "row" in cli_args.filename_template
-                        ):
-                            formatter_kwargs["row"] = enricher.wrap(row)
-
-                        assert filename_builder is not None
-
-                        filename = filename_builder(
-                            page.url,
-                            filename=filename_cell,
-                            ext=".png",
-                            formatter_kwargs=formatter_kwargs,
-                        )
-
-                        await page.screenshot(
-                            path=pathjoin(cli_args.output_dir, filename),
-                            full_page=cli_args.full_page,
-                        )
+                    if isinstance(error, BrowserUnknownError):
+                        raise e
 
                     return ScreenshotAddendum(
-                        http_status=response.status,
-                        screenshot_error=None,
-                        path=filename,
+                        screenshot_error=serialize_error_as_slug(error)
                     )
 
-        with BrowserThreadPoolExecutor(**common_executor_kwargs) as executor:
+                assert response is not None
+
+                row = payload.item[1]
+                filename = None
+
+                if response.status == 200:
+                    filename_cell = (
+                        row[filename_pos] if filename_pos is not None else None
+                    )
+
+                    formatter_kwargs = {}
+
+                    if (
+                        cli_args.filename_template
+                        and "row" in cli_args.filename_template
+                    ):
+                        formatter_kwargs["row"] = enricher.wrap(row)
+
+                    assert filename_builder is not None
+
+                    filename = filename_builder(
+                        page.url,
+                        filename=filename_cell,
+                        ext=".png",
+                        formatter_kwargs=formatter_kwargs,
+                    )
+
+                    await page.screenshot(
+                        path=pathjoin(cli_args.output_dir, filename),
+                        full_page=cli_args.full_page,
+                    )
+
+                return ScreenshotAddendum(
+                    http_status=response.status,
+                    screenshot_error=None,
+                    path=filename,
+                )
+
+        with BrowserThreadPoolExecutor(
+            width=cli_args.width,
+            height=cli_args.height,
+            adblock=cli_args.adblock,
+            automatic_consent=cli_args.automatic_consent,
+            **common_executor_kwargs
+        ) as executor:
             loading_bar.append_to_title(" (t=%i)" % executor.max_workers)
 
             for result in executor.run(

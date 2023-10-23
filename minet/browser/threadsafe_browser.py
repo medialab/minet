@@ -1,4 +1,4 @@
-from typing import Callable, TypeVar, Awaitable, Set
+from typing import Callable, TypeVar, Awaitable, Set, Optional, Union
 from minet.types import Literal, Concatenate, ParamSpec
 
 import os
@@ -7,7 +7,7 @@ import platform
 from shutil import rmtree
 from concurrent.futures import Future
 from threading import Thread, Event, Lock
-from playwright.async_api import async_playwright, Browser
+from playwright.async_api import async_playwright, Browser, BrowserContext
 
 from minet.__future__.threaded_child_watcher import ThreadedChildWatcher
 from minet.exceptions import UnknownBrowserError
@@ -23,7 +23,12 @@ SUPPORTED_BROWSERS = ("chromium", "firefox")
 BrowserName = Literal["chromium", "firefox"]
 T = TypeVar("T")
 P = ParamSpec("P")
+BrowserOrBrowserContext = Union[Browser, BrowserContext]
 BrowserCallable = Callable[Concatenate[Browser, P], Awaitable[T]]
+BrowserContextCallable = Callable[Concatenate[BrowserContext, P], Awaitable[T]]
+BrowserOrBrowserContextCallable = Callable[
+    Concatenate[BrowserOrBrowserContext, P], Awaitable[T]
+]
 
 # TODO: introduce stealth back
 # TODO: abstract screenshot function
@@ -33,8 +38,11 @@ class ThreadsafeBrowser:
     def __init__(
         self,
         browser: BrowserName = "chromium",
+        headless: bool = True,
         automatic_consent: bool = False,
         adblock: bool = False,
+        width: int = 1920,
+        height: int = 1080,
     ) -> None:
         if browser not in SUPPORTED_BROWSERS:
             raise UnknownBrowserError(browser)
@@ -47,7 +55,13 @@ class ThreadsafeBrowser:
         if adblock:
             self.extensions.append("ublock-origin")
 
+        # NOTE: doing this in constructor to avoid threading issues down the line
+        for ext in self.extensions:
+            ensure_extension_is_downloaded(ext)
+
         self.requires_extensions = bool(self.extensions)
+        self.persistent_user_data_dir = None
+        self.persistent = self.requires_extensions
 
         if self.requires_extensions and browser != "chromium":
             raise TypeError("adblock and automatic_consent only work with chromium")
@@ -57,7 +71,12 @@ class ThreadsafeBrowser:
         if UNIX and LTE_PY37:
             asyncio.set_child_watcher(ThreadedChildWatcher())
 
-        self.browser_name = browser
+        self.browser_name: str = browser
+        self.browser: Optional[Browser] = None
+        self.default_browser_context: Optional[BrowserContext] = None
+        self.headless = headless
+        self.width = width
+        self.height = height
 
         os.environ.setdefault("PLAYWRIGHT_BROWSERS_PATH", get_browsers_path())
 
@@ -89,8 +108,6 @@ class ThreadsafeBrowser:
             disable_extensions_except = []
 
             for ext in self.extensions:
-                ensure_extension_is_downloaded(ext)
-
                 p = get_extension_path(ext)
                 disable_extensions_except.append(p)
                 args.append(f"--load-extension={p}")
@@ -99,24 +116,35 @@ class ThreadsafeBrowser:
                 f"--disable-extensions-except={','.join(disable_extensions_except)}"
             )
 
+            if self.headless:
+                args.append("--headless=new")
+
             user_data_dir = get_temp_persistent_context_path()
             rmtree(user_data_dir, ignore_errors=True)
+            self.persistent_user_data_dir = user_data_dir
 
-            # TODO: so now there is an issue because we are returning a
-            # context, not a browser
-            self.browser = await browser_type.launch_persistent_context(
+            self.default_browser_context = await browser_type.launch_persistent_context(
                 user_data_dir,
                 headless=False,
                 args=args,
+                viewport={"width": self.width, "height": self.height},
             )
 
         else:
-            self.browser = await browser_type.launch(headless=True)
+            self.browser = await browser_type.launch(headless=self.headless)
+            self.default_browser_context = await self.browser.new_context(
+                viewport={"width": self.width, "height": self.height}
+            )
 
     async def __stop_playwright(self) -> None:
         # NOTE: we need to make sure those were actually launched, in
         # case of a nasty race condition
-        await self.browser.close()
+
+        if self.default_browser_context is not None:
+            await self.default_browser_context.close()
+
+        if self.browser is not None:
+            await self.browser.close()
 
         # NOTE: this hangs without the proper child watcher
         await self.playwright.stop()
@@ -155,14 +183,7 @@ class ThreadsafeBrowser:
 
         self.loop.run_until_complete(self.__stop_playwright())
 
-    async def __call(self, fn: Callable, *args, **kwargs):
-        return await fn(self.browser, *args, **kwargs)
-
-    def run(self, fn: BrowserCallable[P, T], *args: P.args, **kwargs: P.kwargs) -> T:
-        future = asyncio.run_coroutine_threadsafe(
-            self.__call(fn, *args, **kwargs), self.loop
-        )
-
+    def __handle_future(self, future: Future):
         with self.running_futures_lock:
             self.running_futures.add(future)
 
@@ -171,3 +192,43 @@ class ThreadsafeBrowser:
         finally:
             with self.running_futures_lock:
                 self.running_futures.remove(future)
+
+    def run(self, fn: BrowserCallable[P, T], *args: P.args, **kwargs: P.kwargs) -> T:
+        if self.browser is None:
+            raise TypeError("cannot run browser-level callable with persistent context")
+
+        future = asyncio.run_coroutine_threadsafe(
+            fn(self.browser, *args, **kwargs), self.loop
+        )
+
+        return self.__handle_future(future)
+
+    def run_in_default_context(
+        self, fn: BrowserContextCallable[P, T], *args: P.args, **kwargs: P.kwargs
+    ) -> T:
+        assert self.default_browser_context is not None
+
+        future = asyncio.run_coroutine_threadsafe(
+            fn(self.default_browser_context, *args, **kwargs), self.loop
+        )
+
+        return self.__handle_future(future)
+
+    def run_in_browser_or_default_context(
+        self,
+        fn: BrowserOrBrowserContextCallable[P, T],
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> T:
+        target = self.browser
+
+        if target is None:
+            target = self.default_browser_context
+
+        assert target is not None
+
+        future = asyncio.run_coroutine_threadsafe(
+            fn(target, *args, **kwargs), self.loop
+        )
+
+        return self.__handle_future(future)

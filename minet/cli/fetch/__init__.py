@@ -346,19 +346,29 @@ SCREENSHOT_COMMAND = command(
             "flag": "--width",
             "help": "Page width in pixels.",
             "type": int,
-            "default": 1024,
+            "default": 1920,
         },
         {
             "flag": "--height",
             "help": "Page height in pixels.",
             "type": int,
-            "default": 768,
+            "default": 1080,
         },
         {
             "flag": "--wait-until",
             "help": "What to wait to consider the web page loaded.",
             "default": "load",
             "choices": ["domcontentloaded", "load", "networkidle", "commit"],
+        },
+        {
+            "flag": "--adblock",
+            "help": "Whether to use the ublock-origin browser extension.",
+            "action": "store_true",
+        },
+        {
+            "flag": "--automatic-consent",
+            "help": 'Whether to use the "I still don\'t care about cookies" browser extension to try and get rid of GDPR/cookies consent forms when screenshotting.',
+            "action": "store_true",
         },
     ],
 )

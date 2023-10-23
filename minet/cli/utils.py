@@ -133,7 +133,7 @@ class CLIRetryerHandler(Handler):
 
 class CLIDownloaderHandler(Handler):
     def emit(self, record):
-        console.info(record.message)
+        console.info(record.msg)
 
 
 def acquire_cross_platform_stdout():
