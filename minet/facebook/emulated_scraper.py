@@ -1,11 +1,17 @@
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from playwright.async_api import BrowserContext
-
-import asyncio
+import json
+from playwright.async_api import BrowserContext, Response
 
 from minet.browser import ThreadsafeBrowser
+
+
+def is_graphql_comments_response(response: "Response") -> bool:
+    if "/api/graphql/" not in response.url:
+        return False
+
+    return (
+        response.request.headers.get("x-fb-friendly-name")
+        == "CometUFICommentsProviderForDisplayCommentsQuery"
+    )
 
 
 class FacebookEmulatedScraper:
@@ -26,10 +32,18 @@ class FacebookEmulatedScraper:
             await page.goto(url)
             await page.get_by_label("Decline optional cookies").first.click()
             await page.get_by_label("Close").first.click()
-            await page.get_by_text("Most relevant").first.click()
-            await page.get_by_text("All comments").first.click()
 
-            await asyncio.sleep(60)
+            async with page.expect_response(
+                is_graphql_comments_response
+            ) as response_catcher:
+                await page.get_by_text("Most relevant").first.click()
+                await page.get_by_text("All comments").first.click()
+
+            response = await response_catcher.value
+            data = await response.json()
+
+            with open("./dump.json", "w") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
 
     def scrape_comments(self, url: str):
         self.browser.run_in_default_context(self.__scrape_comments, url)
