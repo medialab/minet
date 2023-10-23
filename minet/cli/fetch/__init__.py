@@ -370,5 +370,10 @@ SCREENSHOT_COMMAND = command(
             "help": 'Whether to use the "I still don\'t care about cookies" browser extension to try and get rid of GDPR/cookies consent forms when screenshotting.',
             "action": "store_true",
         },
+        {
+            "flag": "--wait",
+            "help": "Time to wait, in seconds, before taking the screenshot. This might be a good idea if none of the --wait-until strategies work for you and if you need to give more time to the browser extensions to kick in. This obviously makes the whole process slower.",
+            "type": float,
+        },
     ],
 )

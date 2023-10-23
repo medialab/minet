@@ -450,10 +450,12 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar: Loading
 
     # Screenshot
     elif cli_args.action == "screenshot":
+        import asyncio
         from playwright.async_api import (
             Error as PlaywrightError,
             TimeoutError as PlaywrightTimeoutError,
         )
+
         from minet.browser.utils import convert_playwright_error
         from minet.exceptions import BrowserUnknownError
         from minet.serialization import serialize_error_as_slug
@@ -508,6 +510,9 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar: Loading
                         ext=".png",
                         formatter_kwargs=formatter_kwargs,
                     )
+
+                    if cli_args.wait is not None:
+                        await asyncio.sleep(cli_args.wait)
 
                     await page.screenshot(
                         path=pathjoin(cli_args.output_dir, filename),

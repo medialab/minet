@@ -1270,6 +1270,7 @@ Usage: minet screenshot [-h] [--domain-parallelism DOMAIN_PARALLELISM]
                         [--folder-strategy FOLDER_STRATEGY] [-O OUTPUT_DIR]
                         [--full-page] [--width WIDTH] [--height HEIGHT]
                         [--wait-until {commit,domcontentloaded,load,networkidle}]
+                        [--adblock] [--automatic-consent] [--wait WAIT]
                         [-i INPUT] [--explode EXPLODE] [-s SELECT]
                         [--total TOTAL] [--resume] [-o OUTPUT]
                         url_or_url_column
@@ -1285,6 +1286,11 @@ Positional Arguments:
                                 containing urls when using -i/--input.
 
 Optional Arguments:
+  --adblock                     Whether to use the ublock-origin browser
+                                extension.
+  --automatic-consent           Whether to use the "I still don't care about
+                                cookies" browser extension to try and get rid of
+                                GDPR/cookies consent forms when screenshotting.
   --domain-parallelism DOMAIN_PARALLELISM
                                 Max number of urls per domain to hit at the same
                                 time. Defaults to `1`.
@@ -1305,7 +1311,7 @@ Optional Arguments:
                                 strategies are described at the end of this
                                 help. Defaults to `flat`.
   --full-page                   Whether to create full page screenshots.
-  --height HEIGHT               Page height in pixels. Defaults to `768`.
+  --height HEIGHT               Page height in pixels. Defaults to `1080`.
   -O, --output-dir OUTPUT_DIR   Directory where the screenshots will be written.
                                 Defaults to `screenshots`.
   -t, --threads THREADS         Number of threads to use. Will default to a
@@ -1318,10 +1324,16 @@ Optional Arguments:
                                 ~30s.
   --url-template URL_TEMPLATE   A template for the urls to fetch. Handy e.g. if
                                 you need to build urls from ids etc.
+  --wait WAIT                   Time to wait, in seconds, before taking the
+                                screenshot. This might be a good idea if none of
+                                the --wait-until strategies work for you and if
+                                you need to give more time to the browser
+                                extensions to kick in. This obviously makes the
+                                whole process slower.
   --wait-until {commit,domcontentloaded,load,networkidle}
                                 What to wait to consider the web page loaded.
                                 Defaults to `load`.
-  --width WIDTH                 Page width in pixels. Defaults to `1024`.
+  --width WIDTH                 Page width in pixels. Defaults to `1920`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
