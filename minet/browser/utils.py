@@ -16,6 +16,7 @@ from minet.exceptions import (
     BrowserTimeoutError,
     BrowserUnknownError,
     BrowserSSLError,
+    BrowserHTTPResponseCodeFailureError,
 )
 from minet.browser.constants import BROWSERS_PATH
 
@@ -43,6 +44,9 @@ def convert_playwright_error(error: AnyPlaywrightError) -> BrowserError:
         or "net::ERR_CERT_COMMON_NAME_INVALID" in error.message
     ):
         return BrowserSSLError()
+
+    if "net::ERR_HTTP_RESPONSE_CODE_FAILURE" in error.message:
+        return BrowserHTTPResponseCodeFailureError()
 
     return BrowserUnknownError()
 

@@ -271,3 +271,7 @@ class BrowserTimeoutError(BrowserError):
 
 class BrowserSSLError(BrowserError):
     pass
+
+
+class BrowserHTTPResponseCodeFailureError(BrowserError):
+    pass

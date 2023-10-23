@@ -38,6 +38,7 @@ from minet.exceptions import (
     BrowserConnectionClosedError,
     BrowserTimeoutError,
     BrowserSSLError,
+    BrowserHTTPResponseCodeFailureError,
 )
 
 
@@ -129,6 +130,7 @@ ERROR_REPORTERS = {
     BrowserConnectionClosedError: "connection-closed",
     BrowserTimeoutError: "timeout",
     BrowserSSLError: "ssl",
+    BrowserHTTPResponseCodeFailureError: "http-response-code-failure",
 }
 
 
