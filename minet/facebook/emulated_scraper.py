@@ -1,8 +1,7 @@
-from typing import Callable, Awaitable
+from typing import Callable, Awaitable, Optional, Any
 
 import re
 import json
-import asyncio
 from playwright.async_api import BrowserContext, Response, Page, TimeoutError
 from playwright_stealth import stealth_async
 
@@ -23,15 +22,18 @@ def is_graphql_comments_response(response: Response) -> bool:
     )
 
 
-async def expect_comments(page: Page, fn: Callable[[], Awaitable[None]]):
+async def expect_comments(
+    page: Page, fn: Callable[[], Awaitable[None]]
+) -> Optional[Any]:
     async with page.expect_response(is_graphql_comments_response) as response_catcher:
-        try:
-            await fn()
-        except TimeoutError:
-            print("timeout")
-            return None
+        await fn()
 
-    response = await response_catcher.value
+    try:
+        response = await response_catcher.value
+    except TimeoutError:
+        print("timeout")
+        return None
+
     data = await response.json()
 
     return data
@@ -72,10 +74,10 @@ class FacebookEmulatedScraper:
                 await page.get_by_text("All comments").first.click()
 
             async def view_more_replies():
-                await page.get_by_text(VIEW_MORE_REPLIES_RE).first.click(timeout=3)
+                await page.get_by_text(VIEW_MORE_REPLIES_RE).first.click(timeout=3000)
 
             async def view_more_comments():
-                await page.get_by_text(VIEW_MORE_COMMENTS_RE).click(timeout=10)
+                await page.get_by_text(VIEW_MORE_COMMENTS_RE).first.click(timeout=3000)
 
             data = await expect_comments(page, select_all_comments)
 
@@ -87,15 +89,25 @@ class FacebookEmulatedScraper:
             #         break
 
             while True:
-                # await asyncio.sleep(1)
+                await page.wait_for_timeout(1000)
                 data = await expect_comments(page, view_more_comments)
+
+                print(type(data))
+
+                if data is None:
+                    break
+
+            while True:
+                print("replies")
+                await page.wait_for_timeout(1000)
+                data = await expect_comments(page, view_more_replies)
 
                 if data is None:
                     break
 
             # TODO: View x more replies, View x more comments
 
-            await asyncio.sleep(1000000)
+            await page.wait_for_timeout(1000000)
 
             with open("./dump.json", "w") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
