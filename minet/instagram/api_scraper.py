@@ -316,6 +316,13 @@ class InstagramAPIScraper(object):
 
         min_id = None
 
+        # NOTE: Instagram's comment pagination does not seem very consistent
+        # so we cache the ids of already seen comments just to be on the safe
+        # side here.
+        # NOTE: this could become an issue if memory runs out, but better safe
+        # than sorry for now...
+        already_seen = set()
+
         while True:
             url = forge_comments_url(post, min_or_max_id=min_id)
 
@@ -332,6 +339,11 @@ class InstagramAPIScraper(object):
             for item in items:
                 if item.get("type") == 2:
                     continue
+
+                if item["pk"] in already_seen:
+                    continue
+
+                already_seen.add(item["pk"])
 
                 yield format_comment(item)
 
