@@ -34,8 +34,8 @@ def action(cli_args, enricher, loading_bar):
                 if cli_args.limit:
                     generator = islice(generator, cli_args.limit)
 
-                for post in generator:
-                    enricher.writerow(row, post.as_csv_row())
+                for comment in generator:
+                    enricher.writerow(row, comment)
                     loading_bar.nested_advance()
 
             except InstagramInvalidTargetError:
