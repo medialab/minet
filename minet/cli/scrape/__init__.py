@@ -74,7 +74,7 @@ SCRAPE_COMMAND = command(
         . Using a strainer to optimize performance:
             $ minet scrape links-scraper.yml --strain "a[href]" -i report.csv > links.csv
 
-        . Keeping some columns from input CSV file:
+        . Keeping only some columns from input CSV file:
             $ minet scrape scraper.yml -i report.csv -s name,url > scraped.csv
 
         . Using a builtin scraper:
