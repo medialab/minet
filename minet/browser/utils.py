@@ -1,10 +1,13 @@
-from typing import Union
+from typing import Union, Callable, Awaitable
 
+import asyncio
 from tempfile import gettempdir
 from os.path import expanduser, join
 from playwright.async_api import (
     Error as PlaywrightError,
     TimeoutError as PlaywrightTimeoutError,
+    Page,
+    Response,
 )
 
 from minet.exceptions import (
@@ -75,3 +78,41 @@ def get_browsers_path() -> str:
 
 def get_temp_persistent_context_path() -> str:
     return join(gettempdir(), "minet-browser-temporary-persistent-context")
+
+
+async def try_expect_response(
+    page: Page,
+    action: Callable[[Page], Awaitable[None]],
+    response_predicate: Callable[[Response], bool],
+) -> Response:
+    selected_response = None
+    event = asyncio.Event()
+
+    def release() -> None:
+        page.remove_listener("response", listener)
+        event.set()
+
+    def listener(response: Response) -> None:
+        nonlocal selected_response
+
+        if not response_predicate(response):
+            return
+
+        selected_response = response
+
+        release()
+
+    async def guarded_action() -> None:
+        try:
+            await action(page)
+        except Exception:
+            release()
+            raise
+
+    page.on("response", listener)
+
+    await asyncio.gather(guarded_action(), event.wait())
+
+    assert selected_response is not None
+
+    return selected_response
