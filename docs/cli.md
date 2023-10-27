@@ -283,7 +283,7 @@ Optional Arguments:
   -p, --processes PROCESSES     Number of processes for the crawler process
                                 pool.
   --pycurl                      Whether to use the pycurl library to perform the
-                                call.
+                                calls.
   --retries RETRIES             Number of times to retry on timeout & common
                                 network-related issues. Defaults to `0`.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
@@ -477,7 +477,7 @@ Optional Arguments:
   -p, --processes PROCESSES     Number of processes for the crawler process
                                 pool.
   --pycurl                      Whether to use the pycurl library to perform the
-                                call.
+                                calls.
   --retries RETRIES             Number of times to retry on timeout & common
                                 network-related issues. Defaults to `0`.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
@@ -587,7 +587,8 @@ Usage: minet fetch [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                    [--url-template URL_TEMPLATE] [--timeout TIMEOUT]
                    [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
                    [-H HEADERS] [-k] [-X METHOD] [-x PROXY] [--spoof-user-agent]
-                   [-f FILENAME_COLUMN] [--filename-template FILENAME_TEMPLATE]
+                   [--retries RETRIES] [-f FILENAME_COLUMN]
+                   [--filename-template FILENAME_TEMPLATE]
                    [--folder-strategy FOLDER_STRATEGY] [-O OUTPUT_DIR]
                    [--max-redirects MAX_REDIRECTS] [-z] [--compress-transfer]
                    [-c] [-D] [--keep-failed-contents] [--standardize-encoding]
@@ -659,9 +660,11 @@ Optional Arguments:
                                 written. Defaults to `downloaded`.
   -x, --proxy PROXY             Proxy server to use.
   --pycurl                      Whether to use the pycurl library to perform the
-                                call.
+                                calls.
   -X, --request METHOD          The http method to use. Will default to GET.
                                 Defaults to `GET`.
+  --retries RETRIES             Number of times to retry on timeout & common
+                                network-related issues. Defaults to `0`.
   -D, --dont-save               Use not to write any downloaded file on disk.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
@@ -957,11 +960,12 @@ Usage: minet resolve [-h] [--domain-parallelism DOMAIN_PARALLELISM] [--silent]
                      [--url-template URL_TEMPLATE] [--timeout TIMEOUT]
                      [-g {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}]
                      [-H HEADERS] [-k] [-X METHOD] [-x PROXY]
-                     [--spoof-user-agent] [--max-redirects MAX_REDIRECTS]
-                     [--follow-meta-refresh] [--follow-js-relocation]
-                     [--infer-redirection] [--canonicalize] [--only-shortened]
-                     [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
-                     [--resume] [-o OUTPUT]
+                     [--spoof-user-agent] [--retries RETRIES]
+                     [--max-redirects MAX_REDIRECTS] [--follow-meta-refresh]
+                     [--follow-js-relocation] [--infer-redirection]
+                     [--canonicalize] [--only-shortened] [-i INPUT]
+                     [--explode EXPLODE] [-s SELECT] [--total TOTAL] [--resume]
+                     [-o OUTPUT]
                      url_or_url_column
 
 # Minet Resolve Command
@@ -1006,6 +1010,8 @@ Optional Arguments:
   -x, --proxy PROXY             Proxy server to use.
   -X, --request METHOD          The http method to use. Will default to GET.
                                 Defaults to `GET`.
+  --retries RETRIES             Number of times to retry on timeout & common
+                                network-related issues. Defaults to `0`.
   --spoof-user-agent            Whether to use a plausible random "User-Agent"
                                 header when making requests.
   -t, --threads THREADS         Number of threads to use. Will default to a
@@ -3415,7 +3421,7 @@ Optional Arguments:
   -p, --processes PROCESSES     Number of processes for the crawler process
                                 pool.
   --pycurl                      Whether to use the pycurl library to perform the
-                                call.
+                                calls.
   --retries RETRIES             Number of times to retry on timeout & common
                                 network-related issues. Defaults to `3`.
   --sqlar                       Whether to write files into a single-file sqlite

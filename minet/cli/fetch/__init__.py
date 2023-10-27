@@ -72,6 +72,12 @@ FETCH_RESOLVE_COMMON_ARGUMENTS = [
         "help": 'Whether to use a plausible random "User-Agent" header when making requests.',
         "action": "store_true",
     },
+    {
+        "flag": "--retries",
+        "help": "Number of times to retry on timeout & common network-related issues.",
+        "type": int,
+        "default": 0,
+    },
 ]
 
 COMMON_IO_ARGUMENTS = [
@@ -213,7 +219,7 @@ FETCH_COMMAND = command(
         },
         {
             "flag": "--pycurl",
-            "help": "Whether to use the pycurl library to perform the call.",
+            "help": "Whether to use the pycurl library to perform the calls.",
             "action": "store_true",
         },
         {

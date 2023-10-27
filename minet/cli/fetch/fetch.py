@@ -328,6 +328,15 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar: Loading
         "proxy": getattr(cli_args, "proxy", None),
     }
 
+    retries = getattr(cli_args, "retries", 0)
+
+    if retries:
+        common_http_executor_kwargs["retry"] = True
+        common_http_executor_kwargs["retryer_kwargs"] = {
+            "retry_on_timeout": True,
+            "max_attempts": retries,
+        }
+
     common_imap_kwargs = {
         "key": url_key,
         "throttle": cli_args.throttle,

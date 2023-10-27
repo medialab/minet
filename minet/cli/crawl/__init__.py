@@ -136,7 +136,7 @@ CRAWL_ARGUMENTS = {
     },
     "pycurl": {
         "flag": "--pycurl",
-        "help": "Whether to use the pycurl library to perform the call.",
+        "help": "Whether to use the pycurl library to perform the calls.",
         "action": "store_true",
     },
     "sqlar": {
