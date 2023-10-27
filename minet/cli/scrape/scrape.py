@@ -262,8 +262,11 @@ def action(cli_args):
         warned_about_input_dir = False
 
         with pool:
-            for result in pool.imap_unordered(
-                worker, payloads(), chunksize=cli_args.chunk_size
+            for result in pool.imap(
+                worker,
+                payloads(),
+                chunksize=cli_args.chunk_size,
+                unordered=cli_args.unordered,
             ):
                 with loading_bar.step():
                     original_item = worked_on.pop(result.id)

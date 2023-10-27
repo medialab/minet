@@ -810,8 +810,8 @@ Usage: minet extract [-h] [-g] [--silent]
                      [--status-column STATUS_COLUMN]
                      [--encoding-column ENCODING_COLUMN]
                      [--mimetype-column MIMETYPE_COLUMN] [--encoding ENCODING]
-                     [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
-                     [--resume] [-o OUTPUT]
+                     [-u] [-i INPUT] [--explode EXPLODE] [-s SELECT]
+                     [--total TOTAL] [--resume] [-o OUTPUT]
                      [path_or_path_column]
 
 # Minet Extract Command
@@ -868,6 +868,9 @@ Optional Arguments:
   --status-column STATUS_COLUMN
                                 Name of the CSV column containing HTTP status.
                                 Defaults to `http_status`.
+  -u, --unordered               Whether to allow the result to be written in an
+                                arbitrary order dependent on the multiprocessing
+                                scheduling. Can improve performance.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -1119,7 +1122,7 @@ Usage: minet scrape [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
                     [--encoding-column ENCODING_COLUMN]
                     [--mimetype-column MIMETYPE_COLUMN] [--encoding ENCODING]
                     [--base-url BASE_URL] [-f {csv,jsonl,ndjson}]
-                    [--plural-separator PLURAL_SEPARATOR] [--strain STRAIN]
+                    [--plural-separator PLURAL_SEPARATOR] [--strain STRAIN] [-u]
                     [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                     [-o OUTPUT]
                     scraper [path_or_path_column]
@@ -1184,6 +1187,9 @@ Optional Arguments:
   --strain STRAIN               Optional CSS selector used to strain, i.e. only
                                 parse matched tags in the parsed html files in
                                 order to optimize performance.
+  -u, --unordered               Whether to allow the result to be written in an
+                                arbitrary order dependent on the multiprocessing
+                                scheduling. Can improve performance.
   --url-column URL_COLUMN       Name of the CSV column containing the url.
                                 Defaults to `resolved_url`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -1260,7 +1266,7 @@ Examples:
 . Using a strainer to optimize performance:
     $ minet scrape links-scraper.yml --strain "a" -i report.csv > links.csv
 
-. Keeping some columns from input CSV file:
+. Keeping only some columns from input CSV file:
     $ minet scrape scraper.yml -i report.csv -s name,url > scraped.csv
 
 . Using a builtin scraper:

@@ -142,5 +142,10 @@ EXTRACT_COMMAND = command(
             "flag": "--encoding",
             "help": "Name of the default encoding to use. If not given the command will infer it for you.",
         },
+        {
+            "flags": ["-u", "--unordered"],
+            "help": "Whether to allow the result to be written in an arbitrary order dependent on the multiprocessing scheduling. Can improve performance.",
+            "action": "store_true",
+        },
     ],
 )

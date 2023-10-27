@@ -55,27 +55,36 @@ class LazyPool(object):
 
         if self.actually_multiprocessed:
             self.inner_pool = multiprocessing.Pool(
-                processes, initializer=initializer, initargs=initargs
+                processes, initializer=initializer, initargs=initargs or tuple()
             )
         else:
             if initializer is not None:
                 initializer(*initargs)
 
-    def imap_unordered(self, worker, tasks, chunksize: int = 1):
+    def imap(self, worker, tasks, chunksize: int = 1, unordered: bool = False):
         if self.actually_multiprocessed:
-            yield from self.inner_pool.imap_unordered(
-                WorkerWrapper(worker), tasks, chunksize=chunksize
-            )
+            assert self.inner_pool is not None
+
+            fn = self.inner_pool.imap_unordered if unordered else self.inner_pool.imap
+
+            yield from fn(WorkerWrapper(worker), tasks, chunksize=chunksize)
         else:
             for task in tasks:
                 yield worker(task)
 
+    def imap_unordered(self, worker, tasks, chunksize: int = 1):
+        return self.imap(worker, tasks, chunksize=chunksize, unordered=False)
+
     def __enter__(self):
         if self.actually_multiprocessed:
+            assert self.inner_pool is not None
+
             self.inner_pool.__enter__()
 
         return self
 
     def __exit__(self, *args):
         if self.actually_multiprocessed:
+            assert self.inner_pool is not None
+
             self.inner_pool.__exit__(*args)

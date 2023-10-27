@@ -118,8 +118,11 @@ def action(cli_args, enricher: ThreadSafeEnricher, loading_bar):
     warned_about_input_dir = False
 
     with pool:
-        for result in pool.imap_unordered(
-            worker, payloads(), chunksize=cli_args.chunk_size
+        for result in pool.imap(
+            worker,
+            payloads(),
+            chunksize=cli_args.chunk_size,
+            unordered=cli_args.unordered,
         ):
             with loading_bar.step():
                 assert isinstance(result, ExtractResult)

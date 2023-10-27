@@ -157,5 +157,10 @@ SCRAPE_COMMAND = command(
             "flag": "--strain",
             "help": "Optional CSS selector used to strain, i.e. only parse matched tags in the parsed html files in order to optimize performance.",
         },
+        {
+            "flags": ["-u", "--unordered"],
+            "help": "Whether to allow the result to be written in an arbitrary order dependent on the multiprocessing scheduling. Can improve performance.",
+            "action": "store_true",
+        },
     ],
 )
