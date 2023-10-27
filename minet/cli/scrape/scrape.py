@@ -179,34 +179,24 @@ def action(cli_args):
             )
         )
 
-    reader = casanova.reader(cli_args.input, total=cli_args.total)
-
     if cli_args.format == "csv":
         output_fieldnames = scraper.fieldnames
 
-        # TODO: deal with files without headers?
-        # TODO: I am sure casanova could provide some helpers here...
-        assert reader.headers is not None
-        assert reader.fieldnames is not None
-        assert output_fieldnames is not None
-
-        selected_indices: List[int] = list(range(reader.row_len))
-
-        if cli_args.select is not None:
-            selected_indices: List[int] = reader.headers.select(cli_args.select)
-
-        output_fieldnames = [
-            reader.fieldnames[i] for i in selected_indices
-        ] + output_fieldnames
+        enricher = casanova.enricher(
+            cli_args.input,
+            cli_args.output,
+            total=cli_args.total,
+            select=cli_args.select,
+            add=output_fieldnames,
+        )
+        reader = enricher
 
         def writerow(row, item):
-            keep = [row[i] for i in selected_indices]
-            writer.writerow(keep + item)
-
-        writer = casanova.writer(cli_args.output, fieldnames=output_fieldnames)
+            enricher.writerow(row, item)
 
     else:
-        # TODO: should yield row probably
+        # TODO: casanova should probably expose some ndjson enricher
+        reader = casanova.reader(cli_args.input, total=cli_args.total)
         writer = ndjson.writer(cli_args.output)
 
         def writerow(row, item):
