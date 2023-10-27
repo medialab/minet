@@ -334,7 +334,7 @@ def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar: Loading
         common_http_executor_kwargs["retry"] = True
         common_http_executor_kwargs["retryer_kwargs"] = {
             "retry_on_timeout": True,
-            "max_attempts": retries,
+            "max_attempts": 1 + retries,
         }
 
     common_imap_kwargs = {

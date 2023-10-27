@@ -220,7 +220,7 @@ def crawl_action(
         crawler_kwargs["retry"] = True
         crawler_kwargs["retryer_kwargs"] = {
             "retry_on_timeout": True,
-            "max_attempts": retries,
+            "max_attempts": 1 + retries,
         }
 
     if target is None:
