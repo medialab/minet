@@ -5,7 +5,7 @@ from minet.cli.argparse import command
 
 def resolve_arguments(cli_args):
     if cli_args.column is None:
-        cli_args.column = "filename"
+        cli_args.column = "path"
 
 
 EXTRACT_COMMAND = command(
@@ -74,8 +74,8 @@ EXTRACT_COMMAND = command(
         . Extracting content from a single url:
             $ minet fetch "https://lemonde.fr" | minet extract -i -
 
-        . Indicating a custom filename column (named "path"):
-            $ minet extract path -i report.csv -I downloaded > extracted.csv
+        . Indicating a custom path column (e.g. "file"):
+            $ minet extract file -i report.csv -I downloaded > extracted.csv
 
         . Extracting content from a CSV column containing HTML directly:
             $ minet extract -i report.csv --body-column html > extracted.csv
@@ -90,12 +90,12 @@ EXTRACT_COMMAND = command(
             $ minet fetch url file.csv | minet extract -i - -I downloaded > extracted.csv
     """,
     resolve=resolve_arguments,
-    variadic_input={"dummy_column": "filename", "optional": True, "no_help": True},
+    variadic_input={"dummy_column": "path", "optional": True, "no_help": True},
     resumer=ThreadSafeResumer,
     arguments=[
         {
             "flags": ["-g", "--glob"],
-            "help": "Will interpret given filename as glob patterns to resolve if given.",
+            "help": "Will interpret given paths as glob patterns to resolve if given.",
             "action": "store_true",
         },
         {

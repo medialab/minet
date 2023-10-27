@@ -77,6 +77,8 @@ def init_process(options):
 
 
 def worker(payload: ScrapeWorkerPayload) -> ScrapeResult:
+    assert SCRAPER is not None
+
     text = payload.text
 
     result = ScrapeResult(id=payload.id)

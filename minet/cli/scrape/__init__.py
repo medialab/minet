@@ -3,7 +3,7 @@ from minet.cli.argparse import command
 
 def resolve_arguments(cli_args):
     if cli_args.column is None:
-        cli_args.column = "filename"
+        cli_args.column = "path"
 
 
 SCRAPE_COMMAND = command(
@@ -51,8 +51,8 @@ SCRAPE_COMMAND = command(
         . Scraping a single url:
             $ minet fetch "https://lemonde.fr" | minet scrape scraper.yml -i -
 
-        . Indicating a custom filename column (named "path"):
-            $ minet scrape scraper.yml path -i report.csv -I downloaded > scraped.csv
+        . Indicating a custom path column (e.g. "file"):
+            $ minet scrape scraper.yml file -i report.csv -I downloaded > scraped.csv
 
         . Scraping a CSV column containing HTML directly:
             $ minet scrape scraper.yml -i report.csv --body-column html > scraped.csv
@@ -79,7 +79,7 @@ SCRAPE_COMMAND = command(
             $ minet scrape title -i report.csv > titles.csv
     """,
     resolve=resolve_arguments,
-    variadic_input={"dummy_column": "filename", "optional": True, "no_help": True},
+    variadic_input={"dummy_column": "path", "optional": True, "no_help": True},
     arguments=[
         {
             "name": "scraper",
@@ -87,7 +87,7 @@ SCRAPE_COMMAND = command(
         },
         {
             "flags": ["-g", "--glob"],
-            "help": "Will interpret given filename as glob patterns to resolve if given.",
+            "help": "Will interpret given paths as glob patterns to resolve if given.",
             "action": "store_true",
         },
         {

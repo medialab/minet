@@ -812,7 +812,7 @@ Usage: minet extract [-h] [-g] [--silent]
                      [--mimetype-column MIMETYPE_COLUMN] [--encoding ENCODING]
                      [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                      [--resume] [-o OUTPUT]
-                     [filename_or_filename_column]
+                     [path_or_path_column]
 
 # Minet Extract Command
 
@@ -842,9 +842,9 @@ and can also be fed CSV columns containing HTML content directly if
 required.
 
 Positional Arguments:
-  filename_or_filename_column   Single filename to process or name of the CSV
-                                column containing filenames when using
-                                -i/--input. Defaults to "filename".
+  path_or_path_column           Single path to process or name of the CSV column
+                                containing paths when using -i/--input. Defaults
+                                to "path".
 
 Optional Arguments:
   --body-column BODY_COLUMN     Name of the CSV column containing html bodies.
@@ -857,8 +857,8 @@ Optional Arguments:
                                 Defaults to `encoding`.
   --error-column ERROR_COLUMN   Name of the CSV column containing a fetch error.
                                 Defaults to `fetch_error`.
-  -g, --glob                    Will interpret given filename as glob patterns
-                                to resolve if given.
+  -g, --glob                    Will interpret given paths as glob patterns to
+                                resolve if given.
   -I, --input-dir INPUT_DIR     Directory where the HTML files are stored.
   --mimetype-column MIMETYPE_COLUMN
                                 Name of the CSV column containing file mimetype.
@@ -880,8 +880,8 @@ Optional Arguments:
                                 progress indicator for large files given as
                                 input to the command.
   -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the filenames you want to process. Will consider
-                                `-` as stdin.
+                                the paths you want to process. Will consider `-`
+                                as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -935,8 +935,8 @@ Examples:
 . Extracting content from a single url:
     $ minet fetch "https://lemonde.fr" | minet extract -i -
 
-. Indicating a custom filename column (named "path"):
-    $ minet extract path -i report.csv -I downloaded > extracted.csv
+. Indicating a custom path column (e.g. "file"):
+    $ minet extract file -i report.csv -I downloaded > extracted.csv
 
 . Extracting content from a CSV column containing HTML directly:
     $ minet extract -i report.csv --body-column html > extracted.csv
@@ -1122,7 +1122,7 @@ Usage: minet scrape [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
                     [--plural-separator PLURAL_SEPARATOR] [--strain STRAIN]
                     [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                     [-o OUTPUT]
-                    scraper [filename_or_filename_column]
+                    scraper [path_or_path_column]
 
 # Minet Scrape Command
 
@@ -1149,9 +1149,9 @@ Positional Arguments:
   scraper                       Path to a scraper definition file, or name of a
                                 builtin scraper, e.g. "title". See the complete
                                 list below.
-  filename_or_filename_column   Single filename to process or name of the CSV
-                                column containing filenames when using
-                                -i/--input. Defaults to "filename".
+  path_or_path_column           Single path to process or name of the CSV column
+                                containing paths when using -i/--input. Defaults
+                                to "path".
 
 Optional Arguments:
   --body-column BODY_COLUMN     Name of the CSV column containing html bodies.
@@ -1166,8 +1166,8 @@ Optional Arguments:
                                 Defaults to `fetch_error`.
   -f, --format {csv,jsonl,ndjson}
                                 Output format. Defaults to `csv`.
-  -g, --glob                    Will interpret given filename as glob patterns
-                                to resolve if given.
+  -g, --glob                    Will interpret given paths as glob patterns to
+                                resolve if given.
   -I, --input-dir INPUT_DIR     Directory where the HTML files are stored.
   --mimetype-column MIMETYPE_COLUMN
                                 Name of the CSV column containing file mimetype.
@@ -1197,8 +1197,8 @@ Optional Arguments:
                                 progress indicator for large files given as
                                 input to the command.
   -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the filenames you want to process. Will consider
-                                `-` as stdin.
+                                the paths you want to process. Will consider `-`
+                                as stdin.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
@@ -1236,8 +1236,8 @@ Examples:
 . Scraping a single url:
     $ minet fetch "https://lemonde.fr" | minet scrape scraper.yml -i -
 
-. Indicating a custom filename column (named "path"):
-    $ minet scrape scraper.yml path -i report.csv -I downloaded > scraped.csv
+. Indicating a custom path column (e.g. "file"):
+    $ minet scrape scraper.yml file -i report.csv -I downloaded > scraped.csv
 
 . Scraping a CSV column containing HTML directly:
     $ minet scrape scraper.yml -i report.csv --body-column html > scraped.csv

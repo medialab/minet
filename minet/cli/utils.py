@@ -175,7 +175,7 @@ def create_fetch_like_report_iterator(
 
     url_column = getattr(cli_args, "url_column", None)
 
-    filename_pos = headers.get(cli_args.column) if cli_args.column is not None else None
+    path_pos = headers.get(cli_args.column) if cli_args.column is not None else None
     error_pos = headers.get(cli_args.error_column)
     status_pos = headers.get(cli_args.status_column)
     encoding_pos = headers.get(cli_args.encoding_column)
@@ -219,11 +219,11 @@ def create_fetch_like_report_iterator(
                 yield item
                 continue
 
-        if filename_pos is not None:
-            filename = get(row, filename_pos, "").strip()
+        if path_pos is not None:
+            path = get(row, path_pos, "").strip()
 
-            if filename:
-                item.path = join(input_dir, filename)
+            if path:
+                item.path = join(input_dir, path)
 
         if body_pos is not None:
             body = get(row, body_pos)
@@ -232,7 +232,7 @@ def create_fetch_like_report_iterator(
                 item.text = body
 
         if item.path is None and item.text is None:
-            item.error = "no-filename-nor-body"
+            item.error = "no-path-nor-body"
             yield item
             continue
 
