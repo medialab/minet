@@ -31,7 +31,6 @@ except ImportError:
 # Useful Any types
 AnyPath = Union[str, PathLike]
 AnyFileTarget = Union[AnyPath, FileIO]
-AnyScrapableTarget = Union[str, BeautifulSoup]
 AnyTimeout = Union[float, Timeout]
 
 # Redirection types

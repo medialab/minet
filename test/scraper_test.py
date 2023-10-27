@@ -336,6 +336,8 @@ class TestScraper(object):
 
         assert result == [["One", "1"], ["Two", "2"]]
 
+    # NOTE: with bs4 the result is not correct because it returns a list on some attributes
+    # such as class etc.
     def test_selection_eval(self):
         result = scrape(
             {"iterator": "li", "item": {"sel_eval": 'element.select_one("span")'}},
@@ -352,7 +354,7 @@ class TestScraper(object):
             NESTED_HTML,
         )
 
-        assert result == [["li"], ["li"], ["first"], ["second"], ["first"], ["second"]]
+        assert result == ["li", "li", "first", "second", "first", "second"]
 
         result = scrape({"iterator": "li", "item": {"sel_eval": '"span"'}}, NESTED_HTML)
 
@@ -362,7 +364,7 @@ class TestScraper(object):
             {"iterator_eval": '"li, span"', "item": {"attr": "class"}}, NESTED_HTML
         )
 
-        assert result == [["li"], ["first"], ["second"], ["li"], ["first"], ["second"]]
+        assert result == ["li", "first", "second", "li", "first", "second"]
 
     def test_eval(self):
         result = scrape(

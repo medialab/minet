@@ -360,6 +360,8 @@ def interpret_scraper(scraper, element, root=None, context=None, path=[], scope=
                     continue
 
             if "uniq" in scraper:
+                assert already_seen is not None
+
                 uniq_clause = scraper["uniq"]
                 k = value
 

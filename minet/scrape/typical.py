@@ -1,5 +1,4 @@
-from typing import Optional, List, Any
-from minet.types import AnyScrapableTarget
+from typing import Optional, List, Any, Dict, Type, cast
 
 from bs4 import SoupStrainer, BeautifulSoup
 from casanova import CSVSerializer
@@ -8,10 +7,10 @@ from ural import should_follow_href, could_be_rss
 
 from minet.scrape.analysis import ScraperAnalysisOutputType
 from minet.scrape.utils import ensure_soup
-from minet.scrape.mixin import ScraperMixin
+from minet.scrape.types import AnyScrapableTarget, ScraperBase
 
 
-class NamedScraper(ScraperMixin):
+class NamedScraper(ScraperBase):
     name: str
     fieldnames: List[str]
     plural: bool
@@ -61,7 +60,7 @@ class CanonicalScraper(NamedScraper):
         if url is None:
             return None
 
-        url = url.strip()
+        url = cast(str, url).strip()
 
         if not url:
             return None
@@ -88,7 +87,7 @@ class UrlsScraper(NamedScraper):
             if url is None:
                 continue
 
-            url = url.strip()
+            url = cast(str, url).strip()
 
             if not url:
                 continue
@@ -138,7 +137,8 @@ class RssScraper(NamedScraper):
 
     def scrape(self, soup: BeautifulSoup, context=None):
         rss_urls = []
-        base_url = context.get("url") if context is not None else None
+        base_url = context.get("url") if context is not None else ""
+
         for link in soup.find_all():
             if link.name == "link":
                 type_attr = link.attrs.get("type", None)
@@ -154,10 +154,11 @@ class RssScraper(NamedScraper):
                 url = urljoin(base_url, href)
                 if could_be_rss(url):
                     rss_urls.append(url)
+
         return rss_urls
 
 
-TYPICAL_SCRAPERS = {
+TYPICAL_SCRAPERS: Dict[str, Type[NamedScraper]] = {
     s.name: s
     for s in [TitleScraper, CanonicalScraper, UrlsScraper, MetasScraper, RssScraper]
 }

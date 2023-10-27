@@ -1,14 +1,16 @@
-from typing import Optional, List, Dict, Any
-from minet.types import AnyScrapableTarget
+from typing import Union, Optional, List, Dict, Any
 
-from bs4 import SoupStrainer
+from bs4 import BeautifulSoup, SoupStrainer
 from casanova import CSVSerializer
 
+from minet.scrape.soup import WonderfulSoup
 from minet.scrape.analysis import ScraperAnalysisOutputType
 from minet.scrape.exceptions import ScraperNotTabularError
 
+AnyScrapableTarget = Union[str, WonderfulSoup, BeautifulSoup]
 
-class ScraperMixin(object):
+
+class ScraperBase(object):
     fieldnames: Optional[List[str]]
     plural: bool
     output_type: ScraperAnalysisOutputType
@@ -23,7 +25,7 @@ class ScraperMixin(object):
         return "<{name} plural={plural} output_type={output_type} strain={strain} fieldnames={fieldnames!r}>".format(
             name=self.__class__.__name__,
             plural=self.plural,
-            strain=self.strainer.css if self.strainer else None,
+            strain=getattr(self.strainer, "css", None) if self.strainer else None,
             output_type=self.output_type,
             fieldnames=self.fieldnames,
         )
@@ -51,6 +53,8 @@ class ScraperMixin(object):
 
             for item in result:
                 if isinstance(item, dict):
+                    assert self.fieldnames
+
                     item = self.serializer.serialize_dict_row(
                         item, self.fieldnames, plural_separator=plural_separator
                     )

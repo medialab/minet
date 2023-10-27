@@ -4,7 +4,7 @@
 #
 # Multiple helper functions related to reading and writing files.
 #
-from typing import Union, Optional, cast
+from typing import Union, Optional, cast, Dict
 
 import os
 import gzip
@@ -63,7 +63,7 @@ def read_potentially_gzipped_path(
 
 
 @with_defer()
-def load_definition(f, *, defer=None, encoding="utf-8"):
+def load_definition(f, *, defer=None, encoding: str = "utf-8") -> Dict:
     if isinstance(f, (str, PathLike)):
         path = str(f)
         f = open(path, encoding=encoding)

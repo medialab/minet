@@ -14,6 +14,7 @@ from os.path import basename, isdir
 
 from minet.scrape import Scraper
 from minet.scrape.typical import TYPICAL_SCRAPERS
+from minet.scrape.types import ScraperBase
 from minet.multiprocessing import LazyPool
 from minet.exceptions import (
     DefinitionInvalidFormatError,
@@ -54,7 +55,7 @@ class ScrapeResult:
     items: Optional[Any] = None
 
 
-SCRAPER: Optional[Scraper] = None
+SCRAPER: Optional[ScraperBase] = None
 FORMAT: Optional[str] = None
 PLURAL_SEPARATOR: Optional[str] = None
 HEADERS: Optional[casanova.headers] = None
@@ -78,6 +79,8 @@ def init_process(options):
 
 def worker(payload: ScrapeWorkerPayload) -> ScrapeResult:
     assert SCRAPER is not None
+    assert PLURAL_SEPARATOR is not None
+    assert HEADERS is not None
 
     text = payload.text
 
@@ -187,7 +190,12 @@ def action(cli_args):
                 writer.writerow(item)
 
         else:
-            selected_indices = reader.headers.select(cli_args.select)
+            # TODO: deal with files without headers?
+            assert reader.headers is not None
+            assert reader.fieldnames is not None
+            assert output_fieldnames is not None
+
+            selected_indices: List[int] = reader.headers.select(cli_args.select)
             output_fieldnames = [
                 reader.fieldnames[i] for i in selected_indices
             ] + output_fieldnames
@@ -240,9 +248,7 @@ def action(cli_args):
             initargs=(
                 {
                     "name": cli_args.scraper if using_typical_scraper else None,
-                    "definition": scraper.definition
-                    if not using_typical_scraper
-                    else None,
+                    "definition": getattr(scraper, "definition", None),
                     "strain": cli_args.strain if not using_typical_scraper else None,
                     "format": cli_args.format,
                     "plural_separator": cli_args.plural_separator,

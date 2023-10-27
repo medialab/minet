@@ -4,13 +4,16 @@
 #
 # Miscellaneous helper functions used throughout the minet.scrape package.
 #
-from typing import Optional
-from minet.types import AnyScrapableTarget
+from typing import Optional, Union, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from minet.scrape.types import AnyScrapableTarget
+
 
 from bs4 import BeautifulSoup, SoupStrainer
 from functools import partial
 
-from minet.scrape.soup import suppress_xml_parsed_as_html_warnings
+from minet.scrape.soup import suppress_xml_parsed_as_html_warnings, WonderfulSoup
 from minet.scrape.constants import SELECT_ALIASES, ITERATOR_ALIASES
 
 
@@ -38,13 +41,11 @@ def BeautifulSoupWithoutXHTMLWarnings(html, engine):
 
 
 def ensure_soup(
-    html_or_soup: AnyScrapableTarget,
+    html_or_soup: "AnyScrapableTarget",
     engine: str = "lxml",
     strainer: Optional[SoupStrainer] = None,
-) -> BeautifulSoup:
-    is_already_soup = isinstance(html_or_soup, BeautifulSoup)
-
-    if not is_already_soup:
-        return BeautifulSoup(html_or_soup, engine, parse_only=strainer)
+) -> Union[BeautifulSoup, WonderfulSoup]:
+    if not isinstance(html_or_soup, (WonderfulSoup, BeautifulSoup)):
+        return WonderfulSoup(html_or_soup, engine, parse_only=strainer)
 
     return html_or_soup

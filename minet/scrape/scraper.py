@@ -3,14 +3,14 @@ from typing import Dict, Optional, Union, List
 from bs4 import SoupStrainer
 from casanova import CSVSerializer
 
-from minet.types import AnyFileTarget, AnyScrapableTarget
+from minet.types import AnyFileTarget
 from minet.fs import load_definition
 from minet.scrape.interpreter import interpret_scraper
 from minet.scrape.analysis import analyse, validate, ScraperAnalysisOutputType
 from minet.scrape.straining import strainer_from_css
 from minet.scrape.exceptions import InvalidScraperError
-from minet.scrape.mixin import ScraperMixin
 from minet.scrape.utils import ensure_soup
+from minet.scrape.types import AnyScrapableTarget, ScraperBase
 
 
 def scrape(
@@ -25,7 +25,7 @@ def scrape(
     return interpret_scraper(scraper, soup, root=soup, context=context)
 
 
-class Scraper(ScraperMixin):
+class Scraper(ScraperBase):
     definition: Dict
     fieldnames: Optional[List[str]]
     plural: bool
