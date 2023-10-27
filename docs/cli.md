@@ -1118,7 +1118,7 @@ Usage: minet scrape [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
                     [--status-column STATUS_COLUMN]
                     [--encoding-column ENCODING_COLUMN]
                     [--mimetype-column MIMETYPE_COLUMN] [--encoding ENCODING]
-                    [-f {csv,jsonl,ndjson}]
+                    [--base-url BASE_URL] [-f {csv,jsonl,ndjson}]
                     [--plural-separator PLURAL_SEPARATOR] [--strain STRAIN]
                     [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                     [-o OUTPUT]
@@ -1154,6 +1154,7 @@ Positional Arguments:
                                 to "path".
 
 Optional Arguments:
+  --base-url BASE_URL           Base url to use if --url-column is not valid.
   --body-column BODY_COLUMN     Name of the CSV column containing html bodies.
                                 Defaults to `body`.
   --chunk-size CHUNK_SIZE       Chunk size for multiprocessing. Defaults to `1`.
@@ -1223,7 +1224,9 @@ Builtin scrapers:
 . "rss": scrape the RSS feed urls if any.
 . "title": scrape the <title> tag if any.
 . "urls": scrape all the relevant <a> tag href urls. Will join them
-    with the correct base url if --url-column was given.
+    with the correct base url if --url-column is valid.
+. "images": scrape all the relevant <img> tag src urls. Will join them
+    with the correct base url if --url-column is valid.
 
 Examples:
 

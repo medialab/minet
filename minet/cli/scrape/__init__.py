@@ -38,7 +38,9 @@ SCRAPE_COMMAND = command(
         . "rss": scrape the RSS feed urls if any.
         . "title": scrape the <title> tag if any.
         . "urls": scrape all the relevant <a> tag href urls. Will join them
-            with the correct base url if --url-column was given.
+            with the correct base url if --url-column is valid.
+        . "images": scrape all the relevant <img> tag src urls. Will join them
+            with the correct base url if --url-column is valid.
 
         Examples:
 
@@ -139,6 +141,7 @@ SCRAPE_COMMAND = command(
             "flag": "--encoding",
             "help": "Name of the default encoding to use. If not given the command will infer it for you.",
         },
+        {"flag": "--base-url", "help": "Base url to use if --url-column is not valid."},
         {
             "flags": ["-f", "--format"],
             "help": "Output format.",

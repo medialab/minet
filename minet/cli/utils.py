@@ -186,6 +186,8 @@ def create_fetch_like_report_iterator(
     for i, row in reader.enumerate():
         item = FetchReportLikeItem(index=i, row=row)
 
+        item.url = getattr(cli_args, "base_url", None)
+
         if url_pos is not None:
             url = get(row, url_pos, "").strip()
 

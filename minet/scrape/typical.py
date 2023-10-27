@@ -70,7 +70,7 @@ class CanonicalScraper(NamedScraper):
 
 class UrlsScraper(NamedScraper):
     name = "urls"
-    fieldnames = ["scraped_url"]
+    fieldnames = ["url"]
     plural = True
     output_type = "list"
     strainer = SoupStrainer(name="a")
@@ -83,6 +83,41 @@ class UrlsScraper(NamedScraper):
 
         for a in a_elems:
             url = a.get("href")
+
+            if url is None:
+                continue
+
+            url = cast(str, url).strip()
+
+            if not url:
+                continue
+
+            if not should_follow_href(url):
+                continue
+
+            if base_url:
+                url = urljoin(base_url, url)
+
+            urls.append(url)
+
+        return urls
+
+
+class ImagesScraper(NamedScraper):
+    name = "images"
+    fieldnames = ["image_url"]
+    plural = True
+    output_type = "list"
+    strainer = SoupStrainer(name="img")
+
+    def scrape(self, soup: BeautifulSoup, context=None) -> Any:
+        img_elems = soup.select("img[src]")
+        base_url = context.get("url") if context is not None else None
+
+        urls = []
+
+        for img in img_elems:
+            url = img.get("src")
 
             if url is None:
                 continue
@@ -160,5 +195,12 @@ class RssScraper(NamedScraper):
 
 TYPICAL_SCRAPERS: Dict[str, Type[NamedScraper]] = {
     s.name: s
-    for s in [TitleScraper, CanonicalScraper, UrlsScraper, MetasScraper, RssScraper]
+    for s in [
+        TitleScraper,
+        CanonicalScraper,
+        UrlsScraper,
+        ImagesScraper,
+        MetasScraper,
+        RssScraper,
+    ]
 }
