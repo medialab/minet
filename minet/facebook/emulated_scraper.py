@@ -1,15 +1,14 @@
-from typing import Callable, Awaitable, Optional, Any
-
 import re
 import json
-from playwright.async_api import BrowserContext, Response, Page, TimeoutError
+from playwright.async_api import BrowserContext, Response, TimeoutError
 from playwright_stealth import stealth_async
 
 from minet.browser import ThreadsafeBrowser
+from minet.browser.utils import try_expect_response
 
 
 VIEW_MORE_COMMENTS_RE = re.compile(r"View\s+.+more\s+comments?", re.I)
-VIEW_MORE_REPLIES_RE = re.compile(r"(?:View\s+.+more\s+replies|\d+\s+replies)", re.I)
+VIEW_MORE_REPLIES_RE = re.compile(r"View\s+.+more\s+replies", re.I)
 
 
 def is_graphql_comments_response(response: Response) -> bool:
@@ -20,23 +19,6 @@ def is_graphql_comments_response(response: Response) -> bool:
         response.request.headers.get("x-fb-friendly-name")
         == "CometUFICommentsProviderForDisplayCommentsQuery"
     )
-
-
-async def expect_comments(
-    page: Page, fn: Callable[[], Awaitable[None]]
-) -> Optional[Any]:
-    async with page.expect_response(is_graphql_comments_response) as response_catcher:
-        await fn()
-
-    try:
-        response = await response_catcher.value
-    except TimeoutError:
-        print("timeout")
-        return None
-
-    data = await response.json()
-
-    return data
 
 
 class FacebookEmulatedScraper:
@@ -69,6 +51,13 @@ class FacebookEmulatedScraper:
                 """
             )
 
+            async def expect_comments(action):
+                response = await try_expect_response(
+                    page, action, is_graphql_comments_response
+                )
+
+                return await response.json()
+
             async def select_all_comments():
                 await page.get_by_text("Most relevant").first.click()
                 await page.get_by_text("All comments").first.click()
@@ -79,38 +68,30 @@ class FacebookEmulatedScraper:
             async def view_more_comments():
                 await page.get_by_text(VIEW_MORE_COMMENTS_RE).first.click(timeout=3000)
 
-            data = await expect_comments(page, select_all_comments)
+            # comments = []
 
-            # while True:
-            #     await asyncio.sleep(1)
-            #     data = await expect_comments(page, view_more_replies)
-
-            #     if data is None:
-            #         break
+            data = await expect_comments(select_all_comments)
 
             while True:
                 await page.wait_for_timeout(1000)
-                data = await expect_comments(page, view_more_comments)
 
-                print(type(data))
-
-                if data is None:
+                try:
+                    data = await expect_comments(view_more_comments)
+                except TimeoutError:
                     break
 
             while True:
-                print("replies")
                 await page.wait_for_timeout(1000)
-                data = await expect_comments(page, view_more_replies)
 
-                if data is None:
+                try:
+                    data = await expect_comments(view_more_replies)
+                except TimeoutError:
                     break
-
-            # TODO: View x more replies, View x more comments
-
-            await page.wait_for_timeout(1000000)
 
             with open("./dump.json", "w") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
+
+            await page.wait_for_timeout(1000000)
 
     def scrape_comments(self, url: str):
         self.browser.run_in_default_context(self.__scrape_comments, url)

@@ -82,7 +82,7 @@ def get_temp_persistent_context_path() -> str:
 
 async def try_expect_response(
     page: Page,
-    action: Callable[[Page], Awaitable[None]],
+    action: Callable[[], Awaitable[None]],
     response_predicate: Callable[[Response], bool],
 ) -> Response:
     selected_response = None
@@ -104,7 +104,7 @@ async def try_expect_response(
 
     async def guarded_action() -> None:
         try:
-            await action(page)
+            await action()
         except Exception:
             release()
             raise
