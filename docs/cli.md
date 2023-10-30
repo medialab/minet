@@ -1123,8 +1123,8 @@ Usage: minet scrape [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
                     [--mimetype-column MIMETYPE_COLUMN] [--encoding ENCODING]
                     [--base-url BASE_URL] [-f {csv,jsonl,ndjson}]
                     [--plural-separator PLURAL_SEPARATOR] [--strain STRAIN] [-u]
-                    [-i INPUT] [--explode EXPLODE] [-s SELECT] [--total TOTAL]
-                    [-o OUTPUT]
+                    [--scraped-column-prefix SCRAPED_COLUMN_PREFIX] [-i INPUT]
+                    [--explode EXPLODE] [-s SELECT] [--total TOTAL] [-o OUTPUT]
                     scraper [path_or_path_column]
 
 # Minet Scrape Command
@@ -1189,6 +1189,10 @@ Optional Arguments:
                                 serializing to CSV. Defaults to `|`.
   -p, --processes PROCESSES     Number of processes to use. Defaults to roughly
                                 half of the available CPUs.
+  --scraped-column-prefix SCRAPED_COLUMN_PREFIX
+                                Prefix to prepend to the names of columns added
+                                by the scraper so they can be easily
+                                distinguished from columns of the input.
   --status-column STATUS_COLUMN
                                 Name of the CSV column containing HTTP status.
                                 Defaults to `http_status`.

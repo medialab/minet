@@ -180,7 +180,14 @@ def action(cli_args):
         )
 
     if cli_args.format == "csv":
+        assert scraper.fieldnames is not None
+
         output_fieldnames = scraper.fieldnames
+
+        if cli_args.scraped_column_prefix is not None:
+            output_fieldnames = [
+                cli_args.scraped_column_prefix + h for h in output_fieldnames
+            ]
 
         enricher = casanova.enricher(
             cli_args.input,

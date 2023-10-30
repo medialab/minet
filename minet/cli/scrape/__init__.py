@@ -170,5 +170,9 @@ SCRAPE_COMMAND = command(
             "help": "Whether to allow the result to be written in an arbitrary order dependent on the multiprocessing scheduling. Can improve performance.",
             "action": "store_true",
         },
+        {
+            "flag": "--scraped-column-prefix",
+            "help": "Prefix to prepend to the names of columns added by the scraper so they can be easily distinguished from columns of the input.",
+        },
     ],
 )
