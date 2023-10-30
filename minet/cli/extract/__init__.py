@@ -27,7 +27,7 @@ EXTRACT_COMMAND = command(
 
         Note that this command has been geared towards working in tandem with
         the fetch command. This means the command expects, by default, CSV files
-        containing columns like "filename", "http_status", "encoding" etc. as
+        containing columns like "path", "http_status", "encoding" etc. that
         you can find in a fetch command CSV report.
 
         This said, you can of course feed this command any kind of CSV data,

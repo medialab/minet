@@ -830,7 +830,7 @@ https://github.com/adbar/trafilatura
 
 Note that this command has been geared towards working in tandem with
 the fetch command. This means the command expects, by default, CSV files
-containing columns like "filename", "http_status", "encoding" etc. as
+containing columns like "path", "http_status", "encoding" etc. that
 you can find in a fetch command CSV report.
 
 This said, you can of course feed this command any kind of CSV data,
@@ -1137,7 +1137,7 @@ It will output the scraped items as a CSV or NDJSON file.
 
 Note that this command has been geared towards working in tandem with
 the fetch command. This means the command expects, by default, CSV files
-containing columns like "filename", "http_status", "encoding" etc. as
+containing columns like "path", "http_status", "encoding" etc. that
 you can find in a fetch command CSV report.
 
 This said, you can of course feed this command any kind of CSV data,
@@ -1147,6 +1147,14 @@ to inform the command about your specific table.
 The command is also able to work on glob patterns, such as: "downloaded/**/*.html",
 and can also be fed CSV columns containing HTML content directly if
 required.
+
+Note that a scraper can be "singular", i.e. emitting a single item per scraped
+HTML file, or "plural" if it can emit 0 or n items per file.
+
+Know that, for convenience, "singular" scraper will always emit a line
+per line in your input, contrary to "plural" ones. This means that sometimes
+said lines will be empty because the scraper did not match anything or if
+an error occurred.
 
 Positional Arguments:
   scraper                       Path to a scraper definition file, or name of a

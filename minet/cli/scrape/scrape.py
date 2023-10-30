@@ -217,6 +217,9 @@ def action(cli_args):
                 if item.error is not None:
                     loading_bar.advance()
                     loading_bar.inc_stat(item.error, style="error")
+
+                    # NOTE: we emit an empty line on error if scraper is singular
+                    writerow(item.row, None)
                     continue
 
                 item_id = next(current_id)
@@ -251,6 +254,8 @@ def action(cli_args):
 
         warned_about_input_dir = False
 
+        is_singular = scraper.singular
+
         with pool:
             for result in pool.imap(
                 worker,
@@ -262,6 +267,10 @@ def action(cli_args):
                     original_item = worked_on.pop(result.id)
 
                     if result.error is not None:
+                        # NOTE: we emit an empty line on error if scraper is singular
+                        if is_singular:
+                            writerow(original_item.row, None)
+
                         if isinstance(
                             result.error,
                             (
@@ -302,6 +311,10 @@ def action(cli_args):
 
                     for item in items:
                         writerow(original_item.row, item)
+
+                    # NOTE: we emit an empty line for singular scraper if no match occurred
+                    if is_singular and not items:
+                        writerow(original_item.row, None)
 
                     loading_bar.inc_stat(
                         "scraped-items", count=len(items), style="info"
