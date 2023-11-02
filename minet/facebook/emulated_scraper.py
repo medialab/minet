@@ -1,10 +1,15 @@
+from typing import List
+
 import re
-import json
 from playwright.async_api import BrowserContext, Response, TimeoutError
 from playwright_stealth import stealth_async
+from ural.facebook import has_facebook_comments
 
 from minet.browser import ThreadsafeBrowser
 from minet.browser.utils import try_expect_response
+
+from minet.facebook.exceptions import FacebookInvalidTargetError
+from minet.facebook.types import FacebookComment
 
 
 VIEW_MORE_COMMENTS_RE = re.compile(r"View\s+.+more\s+comments?", re.I)
@@ -22,8 +27,8 @@ def is_graphql_comments_response(response: Response) -> bool:
 
 
 class FacebookEmulatedScraper:
-    def __init__(self):
-        self.browser = ThreadsafeBrowser(headless=False, width=1024, height=768)
+    def __init__(self, headless=True):
+        self.browser = ThreadsafeBrowser(headless=headless, width=1024, height=768)
 
     def __enter__(self):
         return self
@@ -34,7 +39,9 @@ class FacebookEmulatedScraper:
     def __exit__(self, *args):
         self.stop()
 
-    async def __scrape_comments(self, context: BrowserContext, url: str):
+    async def __scrape_comments(
+        self, context: BrowserContext, url: str
+    ) -> List[FacebookComment]:
         async with await context.new_page() as page:
             await stealth_async(page)
 
@@ -43,20 +50,28 @@ class FacebookEmulatedScraper:
             await page.get_by_label("Close").first.click()
 
             # NOTE: this is only needed for debug
-            await page.evaluate(
-                """
-                () => {
-                    document.querySelector('[data-nosnippet]').remove();
-                }
-                """
-            )
+            if not self.browser.headless:
+                await page.evaluate(
+                    """
+                    () => {
+                        document.querySelector('[data-nosnippet]').remove();
+                    }
+                    """
+                )
 
-            async def expect_comments(action):
+            async def expect_comments(action) -> List[FacebookComment]:
                 response = await try_expect_response(
                     page, action, is_graphql_comments_response
                 )
 
-                return await response.json()
+                payload = await response.json()
+
+                # with open("./dump.json", "w") as f:
+                #     import json
+
+                #     json.dump(payload, f, ensure_ascii=False, indent=2)
+
+                return FacebookComment.from_payload(payload)
 
             async def select_all_comments():
                 await page.get_by_text("Most relevant").first.click()
@@ -68,30 +83,32 @@ class FacebookEmulatedScraper:
             async def view_more_comments():
                 await page.get_by_text(VIEW_MORE_COMMENTS_RE).first.click(timeout=3000)
 
-            # comments = []
+            comments: List[FacebookComment] = []
 
-            data = await expect_comments(select_all_comments)
+            comments.extend(await expect_comments(select_all_comments))
 
+            # Deploying comments
             while True:
                 await page.wait_for_timeout(1000)
 
                 try:
-                    data = await expect_comments(view_more_comments)
+                    comments.extend(await expect_comments(view_more_comments))
                 except TimeoutError:
                     break
 
+            # Deploying replies
             while True:
                 await page.wait_for_timeout(1000)
 
                 try:
-                    data = await expect_comments(view_more_replies)
+                    comments.extend(await expect_comments(view_more_replies))
                 except TimeoutError:
                     break
 
-            with open("./dump.json", "w") as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
+            return FacebookComment.sort(comments)
 
-            await page.wait_for_timeout(1000000)
+    def scrape_comments(self, url: str) -> List[FacebookComment]:
+        if not has_facebook_comments(url):
+            raise FacebookInvalidTargetError
 
-    def scrape_comments(self, url: str):
-        self.browser.run_in_default_context(self.__scrape_comments, url)
+        return self.browser.run_in_default_context(self.__scrape_comments, url)

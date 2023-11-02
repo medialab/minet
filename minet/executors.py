@@ -777,7 +777,10 @@ class BrowserThreadPoolExecutor(ThreadPoolExecutor):
     def run(
         self,
         iterator: Iterable[ItemType],
-        fn: Callable[["BrowserOrBrowserContext", HTTPWorkerPayload[ItemType]], Awaitable[ResultType]],
+        fn: Callable[
+            ["BrowserOrBrowserContext", HTTPWorkerPayload[ItemType]],
+            Awaitable[ResultType],
+        ],
         *,
         ordered: bool = False,
         key: Optional[Callable[[ItemType], Optional[str]]] = None,
