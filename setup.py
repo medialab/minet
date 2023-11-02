@@ -10,6 +10,8 @@ meta_package = {}
 with open("./minet/__version__.py") as f:
     exec(f.read(), meta_package)
 
+packages = [pkg for pkg in find_packages() if pkg.startswith("minet")]
+
 setup(
     name="minet",
     version=meta_package["__version__"],
@@ -21,7 +23,7 @@ setup(
     keywords="webmining",
     license="GPL-3.0",
     python_requires=">=3.7",
-    packages=find_packages(exclude=["ftest", "scripts", "test"]),
+    packages=packages,
     install_requires=[
         "about-time>=4,<5",
         "beautifulsoup4>=4.7.1,<5",
