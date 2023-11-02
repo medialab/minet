@@ -56,6 +56,33 @@ FACEBOOK_COMMENTS_SUBCOMMAND = command(
     arguments=[*MOBILE_ARGUMENTS],
 )
 
+FACEBOOK_EXPERIMENTAL_COMMENTS_SUBCOMMAND = command(
+    "experimental-comments",
+    "minet.cli.facebook.experimental_comments",
+    title="Minet Experimental Facebook Comments Command",
+    description="""
+        Scrape a Facebook post's comments using an experimental scraper
+        based on browser emulation.
+    """,
+    epilog="""
+        Examples:
+
+        . Scraping a post's comments:
+            $ minet fb experimental-comments https://www.facebook.com/groups/186982532676569/permalink/4096995827030341/ > comments.csv
+
+        . Scraping comments from multiple posts listed in a CSV file:s
+            $ minet fb experimental-comments post_url -i posts.csv > comments.csv
+    """,
+    variadic_input={"dummy_column": "post_url", "item_label": "post url"},
+    arguments=[
+        {
+            "flag": "--headful",
+            "help": "Whether to disable the browser's headless mode for debugging purposes.",
+            "action": "store_true",
+        }
+    ],
+)
+
 FACEBOOK_POST_AUTHORS_SUBCOMMAND = command(
     "post-authors",
     "minet.cli.facebook.post_authors",
@@ -232,6 +259,7 @@ FACEBOOK_COMMAND = command(
     """,
     subcommands=[
         FACEBOOK_COMMENTS_SUBCOMMAND,
+        FACEBOOK_EXPERIMENTAL_COMMENTS_SUBCOMMAND,
         FACEBOOK_POST_AUTHORS_SUBCOMMAND,
         FACEBOOK_POST_STATS_SUBCOMMAND,
         FACEBOOK_POST_SUBCOMMAND,

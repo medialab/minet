@@ -88,9 +88,20 @@ async def try_expect_response(
     selected_response = None
     event = asyncio.Event()
 
+    released = False
+
     def release() -> None:
+        nonlocal released
+
+        if released:
+            return
+
+        released = True
+
         page.remove_listener("response", listener)
-        event.set()
+
+        if not event.is_set():
+            event.set()
 
     def listener(response: Response) -> None:
         nonlocal selected_response

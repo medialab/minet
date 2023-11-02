@@ -49,15 +49,16 @@ class FacebookEmulatedScraper:
             await page.get_by_label("Decline optional cookies").first.click()
             await page.get_by_label("Close").first.click()
 
-            # NOTE: this is only needed for debug
-            if not self.browser.headless:
-                await page.evaluate(
-                    """
-                    () => {
-                        document.querySelector('[data-nosnippet]').remove();
-                    }
-                    """
-                )
+            # NOTE: this removes the overlay prompting you to login. This is
+            # useful for debug, but not only because we need to be able to
+            # click & scroll the page and the overlay prevents us from doing so.
+            await page.evaluate(
+                """
+                () => {
+                    document.querySelector('[data-nosnippet]').remove();
+                }
+                """
+            )
 
             async def expect_comments(action) -> List[FacebookComment]:
                 response = await try_expect_response(
