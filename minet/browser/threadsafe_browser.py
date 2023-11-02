@@ -11,7 +11,7 @@ from playwright.async_api import async_playwright, Browser, BrowserContext
 
 from minet.__future__.threaded_child_watcher import ThreadedChildWatcher
 from minet.exceptions import UnknownBrowserError
-from minet.browser.plawright_shim import run_playwright
+from minet.browser.plawright_shim import install_browser
 from minet.browser.utils import get_browsers_path, get_temp_persistent_context_path
 from minet.browser.extensions import get_extension_path, ensure_extension_is_downloaded
 
@@ -81,7 +81,7 @@ class ThreadsafeBrowser:
 
         os.environ.setdefault("PLAYWRIGHT_BROWSERS_PATH", get_browsers_path())
 
-        run_playwright("install", self.browser_name)
+        install_browser(self.browser_name)
 
         self.loop = asyncio.new_event_loop()
         self.start_event = Event()
