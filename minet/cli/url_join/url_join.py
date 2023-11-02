@@ -6,7 +6,9 @@
 #
 import casanova
 from ural.lru import NormalizedLRUTrie
+from ebbe import format_int
 
+from minet.cli.console import console
 from minet.cli.loading_bar import LoadingBar
 
 
@@ -15,9 +17,13 @@ def action(cli_args):
     left_headers = left_reader.fieldnames
     left_idx = None
 
+    assert left_headers is not None
+
     if cli_args.select:
-        left_idx = left_reader.headers.collect(cli_args.select)
-        left_headers = list(cli_args.select)
+        assert left_reader.headers is not None
+
+        left_idx = left_reader.headers.select(cli_args.select)
+        left_headers = [left_headers[i] for i in left_idx]
 
     # Applying column prefix now
     left_headers = [cli_args.match_column_prefix + h for h in left_headers]
@@ -45,9 +51,16 @@ def action(cli_args):
                 for url in urls:
                     url = url.strip()
 
-                    # NOTE: should we filter invalid urls here?
-                    if url:
+                    if not url:
+                        continue
+
+                    try:
                         trie.set(url, row)
+                    except Exception:
+                        loading_bar.inc_stat("invalid-url", style="error")
+                        continue
+
+    console.print("Indexed [cyan]{}[/cyan] prefixes.\n".format(format_int(len(trie))))
 
     with LoadingBar(
         title="Matching lines in second file", unit="lines", total=right_enricher.total
@@ -58,9 +71,11 @@ def action(cli_args):
 
                 match = None
 
-                # NOTE: should we filter invalid urls here?
                 if url:
-                    match = trie.match(url)
+                    try:
+                        match = trie.match(url)
+                    except Exception:
+                        loading_bar.inc_stat("invalid-url", style="error")
 
                 if match is None:
                     right_enricher.writerow(row)
