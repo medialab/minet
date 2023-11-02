@@ -1,3 +1,5 @@
+from typing import List, Tuple
+
 import re
 import playwright_stealth
 import trafilatura
@@ -8,7 +10,7 @@ from PyInstaller.utils.hooks import collect_submodules
 
 SLASH_RE = re.compile(r"[\/\\]")
 
-hiddenimports = []
+hiddenimports = ["minet.__future__", "mine.__future__.threaded_child_watcher"]
 
 for p in iglob("minet/cli/**/*.py", recursive=True):
     if "__main__" in p:
@@ -24,7 +26,7 @@ for p in iglob("minet/cli/**/*.py", recursive=True):
 hiddenimports.extend(collect_submodules("pkg_resources"))
 hiddenimports.append("charset_normalizer.md__mypyc")
 
-datas = [
+datas: List[Tuple[str, str]] = [
     (join(dirname(trafilatura.__file__), "settings.cfg"), "trafilatura"),
 ]
 

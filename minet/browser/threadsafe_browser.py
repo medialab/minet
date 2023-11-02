@@ -9,7 +9,6 @@ from concurrent.futures import Future
 from threading import Thread, Event, Lock
 from playwright.async_api import async_playwright, Browser, BrowserContext
 
-from minet.__future__.threaded_child_watcher import ThreadedChildWatcher
 from minet.exceptions import UnknownBrowserError
 from minet.browser.plawright_shim import install_browser
 from minet.browser.utils import get_browsers_path, get_temp_persistent_context_path
@@ -70,6 +69,8 @@ class ThreadsafeBrowser:
         # NOTE: on unix python 3.7, child watching does not
         # work properly when asyncio is not running from the main thread
         if UNIX and LTE_PY37:
+            from minet.__future__.threaded_child_watcher import ThreadedChildWatcher
+
             asyncio.set_child_watcher(ThreadedChildWatcher())
 
         self.browser_name: str = browser
