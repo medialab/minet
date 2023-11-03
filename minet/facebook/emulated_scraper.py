@@ -1,7 +1,7 @@
 from typing import List
 
 import re
-from playwright.async_api import BrowserContext, Response, TimeoutError
+from playwright.async_api import BrowserContext, Response, TimeoutError, Locator
 from playwright_stealth import stealth_async
 from ural.facebook import has_facebook_comments
 
@@ -26,6 +26,13 @@ def is_graphql_comments_response(response: Response) -> bool:
     )
 
 
+async def try_to_click(locator: Locator, timeout: int = 500) -> None:
+    try:
+        await locator.click(timeout=timeout)
+    except TimeoutError:
+        pass
+
+
 class FacebookEmulatedScraper:
     def __init__(self, headless=True):
         self.browser = ThreadsafeBrowser(headless=headless, width=1024, height=768)
@@ -46,8 +53,9 @@ class FacebookEmulatedScraper:
             await stealth_async(page)
 
             await page.goto(url)
-            await page.get_by_label("Decline optional cookies").first.click()
-            await page.get_by_label("Close").first.click()
+
+            await try_to_click(page.get_by_label("Decline optional cookies").first)
+            await try_to_click(page.get_by_label("Close").first)
 
             # NOTE: this removes the overlay prompting you to login. This is
             # useful for debug, but not only because we need to be able to
@@ -105,6 +113,8 @@ class FacebookEmulatedScraper:
                     comments.extend(await expect_comments(view_more_replies))
                 except TimeoutError:
                     break
+
+            # await page.wait_for_timeout(1000000)
 
             return FacebookComment.sort(comments)
 
