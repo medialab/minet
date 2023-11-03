@@ -13,8 +13,8 @@ from minet.facebook.exceptions import FacebookInvalidTargetError
 from minet.facebook.types import FacebookComment
 
 
-VIEW_MORE_COMMENTS_RE = re.compile(r"View\s+.+more\s+comments?", re.I)
-VIEW_MORE_REPLIES_RE = re.compile(r"View\s+.+more\s+replies", re.I)
+VIEW_MORE_COMMENTS_RE = re.compile(r"View\s+.*more\s+comments?", re.I)
+VIEW_MORE_REPLIES_RE = re.compile(r"View\s+.*more\s+replies", re.I)
 VIEW_MORE_SUBREPLIES_RE = re.compile(r"^\s*\d+\s+replies", re.I)
 
 
