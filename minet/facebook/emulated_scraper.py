@@ -1,6 +1,7 @@
 from typing import List
 
 import re
+from asyncio import gather
 from playwright.async_api import BrowserContext, Response, TimeoutError, Locator
 from playwright_stealth import stealth_async
 from ural.facebook import has_facebook_comments
@@ -57,18 +58,34 @@ class FacebookEmulatedScraper:
 
             await page.goto(url)
 
-            await try_to_click(page.get_by_label("Decline optional cookies").first)
-            await try_to_click(page.get_by_label("Close").first)
-
             # NOTE: this removes the overlay prompting you to login. This is
             # useful for debug, but not only because we need to be able to
             # click & scroll the page and the overlay prevents us from doing so.
-            await page.evaluate(
-                """
-                () => {
-                    document.querySelector('[data-nosnippet]').remove();
-                }
-                """
+            async def destroy_overlay():
+                try:
+                    await page.get_by_text(
+                        "Log in or sign up for Facebook to connect with friends, family and people you know."
+                    ).wait_for(timeout=3000)
+                    await page.evaluate(
+                        """
+                        () => {
+                            const overlay = document.querySelector('[data-nosnippet]');
+
+                            if (!overlay) return;
+
+                            overlay.remove();
+                        }
+                        """
+                    )
+                except TimeoutError:
+                    pass
+
+            await gather(
+                try_to_click(
+                    page.get_by_label("Decline optional cookies").first, timeout=3000
+                ),
+                try_to_click(page.get_by_label("Close").first, timeout=3000),
+                destroy_overlay(),
             )
 
             async def expect_comments(action) -> List[FacebookComment]:
@@ -131,7 +148,7 @@ class FacebookEmulatedScraper:
                 except TimeoutError:
                     break
 
-            # await page.wait_for_timeout(1000000)
+            await page.wait_for_timeout(1000000)
 
             return FacebookComment.sort(comments)
 
