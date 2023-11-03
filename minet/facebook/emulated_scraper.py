@@ -14,15 +14,18 @@ from minet.facebook.types import FacebookComment
 
 VIEW_MORE_COMMENTS_RE = re.compile(r"View\s+.+more\s+comments?", re.I)
 VIEW_MORE_REPLIES_RE = re.compile(r"View\s+.+more\s+replies", re.I)
+VIEW_MORE_SUBREPLIES_RE = re.compile(r"^\s*\d+\s+replies", re.I)
 
 
 def is_graphql_comments_response(response: Response) -> bool:
     if "/api/graphql/" not in response.url:
         return False
 
+    friendly_name = response.request.headers.get("x-fb-friendly-name")
+
     return (
-        response.request.headers.get("x-fb-friendly-name")
-        == "CometUFICommentsProviderForDisplayCommentsQuery"
+        friendly_name == "CometUFICommentsProviderForDisplayCommentsQuery"
+        or friendly_name == "CometUFIFullThreadedSubRepliesListDataProviderQuery"
     )
 
 
@@ -86,11 +89,16 @@ class FacebookEmulatedScraper:
                 await page.get_by_text("Most relevant").first.click()
                 await page.get_by_text("All comments").first.click()
 
+            async def view_more_comments():
+                await page.get_by_text(VIEW_MORE_COMMENTS_RE).first.click(timeout=3000)
+
             async def view_more_replies():
                 await page.get_by_text(VIEW_MORE_REPLIES_RE).first.click(timeout=3000)
 
-            async def view_more_comments():
-                await page.get_by_text(VIEW_MORE_COMMENTS_RE).first.click(timeout=3000)
+            async def view_more_subreplies():
+                await page.get_by_text(VIEW_MORE_SUBREPLIES_RE).first.click(
+                    timeout=3000
+                )
 
             comments: List[FacebookComment] = []
 
@@ -111,6 +119,15 @@ class FacebookEmulatedScraper:
 
                 try:
                     comments.extend(await expect_comments(view_more_replies))
+                except TimeoutError:
+                    break
+
+            # Deploying subreplies
+            while True:
+                await page.wait_for_timeout(1000)
+
+                try:
+                    comments.extend(await expect_comments(view_more_subreplies))
                 except TimeoutError:
                     break
 

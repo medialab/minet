@@ -1,4 +1,4 @@
-from typing import List, Optional, Dict, Tuple
+from typing import List, Optional, Dict, Tuple, Iterable
 
 from dataclasses import dataclass
 from casanova import TabularRecord
@@ -28,12 +28,13 @@ class FacebookCommentAuthor(TabularRecord):
 class FacebookComment(TabularRecord):
     id: str
     fbid: str
+    depth: int
     parent_id: Optional[str]
     author: FacebookCommentAuthor
     created_time: int
     text: str
     reactions: int
-    replies: Optional[int]
+    replies: int
 
     @classmethod
     def from_graphql_node(cls, node) -> "FacebookComment":
@@ -42,29 +43,45 @@ class FacebookComment(TabularRecord):
         return cls(
             id=node["id"],
             fbid=node["legacy_fbid"],
-            parent_id=getpath(node, ["comment_parent", "id"]),
+            depth=node.get("depth", 0),
+            parent_id=getpath(
+                node,
+                ("reply_parent_comment", "id"),
+                getpath(node, ("comment_parent", "id")),
+            ),
             author=FacebookCommentAuthor.from_graphql_node(node["author"]),
             created_time=node["created_time"],
             text=node["preferred_body"]["text"],
             reactions=feedback["reactors"]["count"],
-            replies=feedback.get("total_comment_count"),
+            replies=feedback.get("total_comment_count", 0),
         )
 
     @classmethod
     def from_payload(cls, payload) -> List["FacebookComment"]:
         comments = []
 
-        for edge in payload["data"]["node"]["display_comments"]["edges"]:
+        # Top-level
+        edges = getpath(payload, ("data", "node", "display_comments", "edges"))
+
+        # Replies
+        if edges is None:
+            edges = getpath(payload, ("display_comments", "edges"))
+
+        # Sub-replies
+        if edges is None:
+            edges = getpath(payload, ("data", "feedback", "display_comments", "edges"))
+
+        # Tail call
+        if not isinstance(edges, list):
+            return comments
+
+        for edge in edges:
             node = edge["node"]
             comments.append(cls.from_graphql_node(node))
 
+            # Recursion
             feedback = node["feedback"]
-
-            if "display_comments" not in feedback:
-                continue
-
-            for sub_edge in feedback["display_comments"]["edges"]:
-                comments.append(cls.from_graphql_node(sub_edge["node"]))
+            comments.extend(cls.from_payload(feedback))
 
         return comments
 
@@ -72,16 +89,21 @@ class FacebookComment(TabularRecord):
     def sort(comments: List["FacebookComment"]) -> List["FacebookComment"]:
         index: Dict[str, Tuple["FacebookComment", List["FacebookComment"]]] = {}
 
-        for comment in sorted(comments, key=lambda c: c.parent_id is not None):
-            if comment.parent_id is None:
-                index[comment.id] = (comment, [])
-            else:
+        for comment in sorted(comments, key=lambda c: c.depth):
+            index[comment.id] = (comment, [])
+
+            if comment.parent_id is not None:
                 index[comment.parent_id][1].append(comment)
 
         sorted_comments: List["FacebookComment"] = []
 
-        for comment, replies in sorted(index.values(), key=lambda t: t[0].created_time):
-            sorted_comments.append(comment)
-            sorted_comments.extend(sorted(replies, key=lambda r: r.created_time))
+        # NOTE: we sort in visual DFS order
+        def walk(entries: Iterable[Tuple["FacebookComment", List["FacebookComment"]]]):
+            for comment, replies in entries:
+                sorted_comments.append(comment)
+
+                walk((index[reply.id] for reply in replies))
+
+        walk(filter(lambda entry: entry[0].depth == 0, index.values()))
 
         return sorted_comments
