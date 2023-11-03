@@ -148,7 +148,7 @@ class FacebookEmulatedScraper:
                 except TimeoutError:
                     break
 
-            await page.wait_for_timeout(1000000)
+            # await page.wait_for_timeout(1000000)
 
             return FacebookComment.sort(comments)
 
