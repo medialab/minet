@@ -24,6 +24,7 @@ class FacebookCommentAuthor(TabularRecord):
         )
 
 
+# NOTE: we could better collect attachments, and we could get the reaction details
 @dataclass
 class FacebookComment(TabularRecord):
     id: str
@@ -32,13 +33,15 @@ class FacebookComment(TabularRecord):
     parent_id: Optional[str]
     author: FacebookCommentAuthor
     created_time: int
-    text: str
+    text: Optional[str]
+    attachments: int
     reactions: int
     replies: int
 
     @classmethod
     def from_graphql_node(cls, node) -> "FacebookComment":
         feedback = node["feedback"]
+        attachments = node.get("attachments", [])
 
         return cls(
             id=node["id"],
@@ -51,7 +54,8 @@ class FacebookComment(TabularRecord):
             ),
             author=FacebookCommentAuthor.from_graphql_node(node["author"]),
             created_time=node["created_time"],
-            text=node["preferred_body"]["text"],
+            text=getpath(node, ("preferred_body", "text")),
+            attachments=len(attachments),
             reactions=feedback["reactors"]["count"],
             replies=feedback.get("total_comment_count", 0),
         )

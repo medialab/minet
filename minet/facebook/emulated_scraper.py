@@ -1,6 +1,7 @@
 from typing import List
 
 import re
+import json
 from asyncio import gather
 from playwright.async_api import BrowserContext, Response, TimeoutError, Locator
 from playwright_stealth import stealth_async
@@ -93,11 +94,13 @@ class FacebookEmulatedScraper:
                     page, action, is_graphql_comments_response
                 )
 
-                payload = await response.json()
+                # NOTE: sometimes FB will pack multiple payload in a single
+                # ndjson-like body
+                text = await response.text()
+                first_doc = text.splitlines()[0]
+                payload = json.loads(first_doc)
 
                 # with open("./dump.json", "w") as f:
-                #     import json
-
                 #     json.dump(payload, f, ensure_ascii=False, indent=2)
 
                 return FacebookComment.from_payload(payload)
