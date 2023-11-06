@@ -9,7 +9,7 @@ from typing import Deque, Tuple, Iterator, Any, Optional
 import time
 from ebbe import as_chunks
 from collections import deque
-from ural import urls_from_text, add_query_argument
+from ural import urls_from_text, add_query_argument, is_url
 from ebbe import getpath
 
 from minet.web import (
@@ -54,23 +54,15 @@ from minet.youtube.scraper import YouTubeScraper
 
 
 def get_channel_id(scraper: YouTubeScraper, channel_target: str) -> str:
-    should_scrape, channel_id = ensure_channel_id(channel_target)
+    channel_id = ensure_channel_id(channel_target)
 
-    # is a youtube url without the channel ID
-    if should_scrape:
-        channel_id = scraper.get_channel_id(channel_target)
+    if channel_id is not None:
+        return channel_id
 
-    # is not a url
-    elif channel_id == channel_target:
-        username = channel_target
-        if not channel_target.startswith("@"):
-            username = "@" + channel_target
+    if not is_url(channel_target):
+        channel_target = "https://www.youtube.com/@" + channel_target.lstrip("@")
 
-        channel_id = scraper.get_channel_id("https://www.youtube.com/" + username)
-
-        # we didn't get any ID by scraping, channel_target could already be an ID
-        if not channel_id:
-            channel_id = channel_target
+    channel_id = scraper.get_channel_id(channel_target)
 
     if channel_id is None:
         raise YouTubeInvalidChannelTargetError

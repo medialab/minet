@@ -118,7 +118,7 @@ class YouTubeScraper:
         )
 
         soup = WonderfulSoup(response.text(), "lxml")
-        tag = soup.force_select_one("meta[itemprop=identifier]")
+        tag = soup.select_one("meta[itemprop=identifier]")
 
         if tag:
             return tag.get("content")
