@@ -101,10 +101,14 @@ class YouTubeScraper:
         captions = []
 
         for item in soup.select("text"):
+
+            # NOTE: sometimes duration is absent. I don't really
+            # know what is the best solution there (merging with
+            # previous item?). So for now, we default duration to 0.
             captions.append(
                 YouTubeCaptionLine(
                     float(item["start"]),
-                    float(item["dur"]),
+                    float(item.get("dur", "0")),
                     unescape(item.get_text().strip()),
                 )
             )

@@ -1,5 +1,5 @@
 import re
-from typing import List, Optional, cast
+from typing import List, Optional, cast, overload
 
 import warnings
 from contextlib import contextmanager
@@ -94,8 +94,16 @@ class MinetTag(Tag):
     def __getitem__(self, name: str) -> str:
         return cast(str, super().__getitem__(name))
 
-    def get(self, name: str) -> Optional[str]:
-        return cast(Optional[str], super().get(name))
+    @overload
+    def get(self, name: str, default: str = ...) -> str:
+        ...
+
+    @overload
+    def get(self, name: str, default: None = ...) -> Optional[str]:
+        ...
+
+    def get(self, name: str, default: Optional[str] = None) -> Optional[str]:
+        return cast(Optional[str], super().get(name, default))
 
     def get_list(self, name: str) -> List[str]:
         value = super().get(name)
