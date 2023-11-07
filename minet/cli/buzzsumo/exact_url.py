@@ -4,15 +4,15 @@
 #
 # Logic of the `bz exact-url` action.
 #
-from minet.cli.utils import with_enricher_and_loading_bar
-from minet.cli.buzzsumo.utils import with_buzzsumo_fatal_errors
 from minet.buzzsumo import BuzzSumoAPIClient
-from minet.buzzsumo.constants import EXACT_URL_HEADERS
+from minet.buzzsumo.types import BuzzsumoArticle
+from minet.cli.buzzsumo.utils import with_buzzsumo_fatal_errors
+from minet.cli.utils import with_enricher_and_loading_bar
 
 
 @with_buzzsumo_fatal_errors
 @with_enricher_and_loading_bar(
-    title="Retrieving url metadata", headers=EXACT_URL_HEADERS, unit="urls"
+    title="Retrieving url metadata", headers=BuzzsumoArticle.fieldnames(), unit="urls"
 )
 def action(cli_args, enricher, loading_bar):
     client = BuzzSumoAPIClient(cli_args.token)
