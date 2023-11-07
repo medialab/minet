@@ -1,14 +1,8 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Dict, List, Optional
 
 from casanova import TabularRecord
-
-
-def parse_booleans(num) -> bool:
-    if not num or num == 0:
-        return False
-    else:
-        return True
 
 
 @dataclass
@@ -17,11 +11,11 @@ class BuzzsumoArticle(TabularRecord):
     twitter_shares: Optional[int]
     facebook_shares: Optional[int]
     url: Optional[str]
-    updated_at: Optional[int]
+    updated_at: Optional[datetime]
     facebook_likes: Optional[int]
     total_facebook_shares: Optional[int]
     title: Optional[str]
-    published_date: Optional[int]
+    published_date: Optional[datetime]
     pinterest_shares: Optional[int]
     og_url: Optional[str]
     article_amplifiers: Optional[str]
@@ -29,7 +23,7 @@ class BuzzsumoArticle(TabularRecord):
     author_name: Optional[str]
     num_words: Optional[int]
     subdomain: Optional[str]
-    twitter_user_id: Optional[int]
+    twitter_user_id: Optional[str]
     video_length: Optional[int]
     language: Optional[str]
     alexa_rank: Optional[int]
@@ -83,11 +77,11 @@ class BuzzsumoArticle(TabularRecord):
             twitter_shares=payload.get("twitter_shares"),
             facebook_shares=payload.get("facebook_shares"),
             url=payload.get("url"),
-            updated_at=payload.get("updated_at"),
+            updated_at=datetime.fromtimestamp(payload["updated_at"]) or None,
             facebook_likes=payload.get("facebook_likes"),
             total_facebook_shares=payload.get("total_facebook_shares"),
             title=payload.get("title"),
-            published_date=payload.get("published_date"),
+            published_date=datetime.fromtimestamp(payload["updated_at"]) or None,
             pinterest_shares=payload.get("pinterest_shares"),
             og_url=payload.get("og_url"),
             article_amplifiers=payload.get("article_amplifiers"),
@@ -128,17 +122,17 @@ class BuzzsumoArticle(TabularRecord):
             article_types=payload.get("article_types"),
             author_image=payload.get("author_image"),
             ecommerce=payload.get("ecommerce"),
-            is_general_article=parse_booleans(payload.get("general_article")),
-            is_how_to_article=parse_booleans(payload.get("how_to_article")),
-            is_infographic=parse_booleans(payload.get("infographic")),
-            is_interview=parse_booleans(payload.get("interview")),
-            is_list=parse_booleans(payload.get("list")),
-            is_newsletter=parse_booleans(payload.get("newsletter")),
-            is_podcast=parse_booleans(payload.get("podcast")),
-            is_presentation=parse_booleans(payload.get("presentation")),
-            is_press_release=parse_booleans(payload.get("press_release")),
-            is_review=parse_booleans(payload.get("review")),
-            is_video=parse_booleans(payload.get("video")),
-            is_what_post=parse_booleans(payload.get("what_post")),
-            is_why_post=parse_booleans(payload.get("why_post")),
+            is_general_article=bool(payload.get("general_article")),
+            is_how_to_article=bool(payload.get("how_to_article")),
+            is_infographic=bool(payload.get("infographic")),
+            is_interview=bool(payload.get("interview")),
+            is_list=bool(payload.get("list")),
+            is_newsletter=bool(payload.get("newsletter")),
+            is_podcast=bool(payload.get("podcast")),
+            is_presentation=bool(payload.get("presentation")),
+            is_press_release=bool(payload.get("press_release")),
+            is_review=bool(payload.get("review")),
+            is_video=bool(payload.get("video")),
+            is_what_post=bool(payload.get("what_post")),
+            is_why_post=bool(payload.get("why_post")),
         )
