@@ -14,7 +14,7 @@ from minet.cli.utils import with_enricher_and_loading_bar
 @with_enricher_and_loading_bar(
     title="Retrieving articles",
     unit="articles",
-    headers=BuzzsumoArticle.fieldnames(),
+    headers=BuzzsumoArticle,
     nested=True,
 )
 def action(cli_args, enricher, loading_bar):

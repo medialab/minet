@@ -1,7 +1,14 @@
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from casanova import TabularRecord
+
+
+def parse_booleans(num) -> bool:
+    if not num or num == 0:
+        return False
+    else:
+        return True
 
 
 @dataclass
@@ -10,11 +17,11 @@ class BuzzsumoArticle(TabularRecord):
     twitter_shares: Optional[int]
     facebook_shares: Optional[int]
     url: Optional[str]
-    updated_at: Optional[str]
+    updated_at: Optional[int]
     facebook_likes: Optional[int]
     total_facebook_shares: Optional[int]
     title: Optional[str]
-    published_date: Optional[str]
+    published_date: Optional[int]
     pinterest_shares: Optional[int]
     og_url: Optional[str]
     article_amplifiers: Optional[str]
@@ -22,10 +29,10 @@ class BuzzsumoArticle(TabularRecord):
     author_name: Optional[str]
     num_words: Optional[int]
     subdomain: Optional[str]
-    twitter_user_id: Optional[str]
-    video_length: Optional[str]
+    twitter_user_id: Optional[int]
+    video_length: Optional[int]
     language: Optional[str]
-    alexa_rank: Optional[str]
+    alexa_rank: Optional[int]
     facebook_comments: Optional[int]
     num_linking_domains: Optional[int]
     youtube_views: Optional[int]
@@ -50,8 +57,8 @@ class BuzzsumoArticle(TabularRecord):
     total_shares: Optional[int]
     thumbnail: Optional[str]
     total_reddit_engagements: Optional[int]
-    evergreen_score: Optional[str]
-    evergreen_score2: Optional[str]
+    evergreen_score: Optional[float]
+    evergreen_score2: Optional[float]
     article_types: Optional[List[str]]
     author_image: Optional[str]
     ecommerce: Optional[str]
@@ -70,15 +77,8 @@ class BuzzsumoArticle(TabularRecord):
     is_why_post: bool
 
     @classmethod
-    def parse_booleans(cls, num) -> bool:
-        if not num or num == 0:
-            return False
-        else:
-            return True
-
-    @classmethod
-    def from_payload(cls, payload: dict) -> "BuzzsumoArticle":
-        return BuzzsumoArticle(
+    def from_payload(cls, payload: Dict) -> "BuzzsumoArticle":
+        return cls(
             buzzsumo_id=payload.get("id"),
             twitter_shares=payload.get("twitter_shares"),
             facebook_shares=payload.get("facebook_shares"),
@@ -128,17 +128,17 @@ class BuzzsumoArticle(TabularRecord):
             article_types=payload.get("article_types"),
             author_image=payload.get("author_image"),
             ecommerce=payload.get("ecommerce"),
-            is_general_article=cls.parse_booleans(payload.get("general_article")),
-            is_how_to_article=cls.parse_booleans(payload.get("how_to_article")),
-            is_infographic=cls.parse_booleans(payload.get("infographic")),
-            is_interview=cls.parse_booleans(payload.get("interview")),
-            is_list=cls.parse_booleans(payload.get("list")),
-            is_newsletter=cls.parse_booleans(payload.get("newsletter")),
-            is_podcast=cls.parse_booleans(payload.get("podcast")),
-            is_presentation=cls.parse_booleans(payload.get("presentation")),
-            is_press_release=cls.parse_booleans(payload.get("press_release")),
-            is_review=cls.parse_booleans(payload.get("review")),
-            is_video=cls.parse_booleans(payload.get("video")),
-            is_what_post=cls.parse_booleans(payload.get("what_post")),
-            is_why_post=cls.parse_booleans(payload.get("why_post")),
+            is_general_article=parse_booleans(payload.get("general_article")),
+            is_how_to_article=parse_booleans(payload.get("how_to_article")),
+            is_infographic=parse_booleans(payload.get("infographic")),
+            is_interview=parse_booleans(payload.get("interview")),
+            is_list=parse_booleans(payload.get("list")),
+            is_newsletter=parse_booleans(payload.get("newsletter")),
+            is_podcast=parse_booleans(payload.get("podcast")),
+            is_presentation=parse_booleans(payload.get("presentation")),
+            is_press_release=parse_booleans(payload.get("press_release")),
+            is_review=parse_booleans(payload.get("review")),
+            is_video=parse_booleans(payload.get("video")),
+            is_what_post=parse_booleans(payload.get("what_post")),
+            is_why_post=parse_booleans(payload.get("why_post")),
         )

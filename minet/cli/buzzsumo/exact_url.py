@@ -12,7 +12,7 @@ from minet.cli.utils import with_enricher_and_loading_bar
 
 @with_buzzsumo_fatal_errors
 @with_enricher_and_loading_bar(
-    title="Retrieving url metadata", headers=BuzzsumoArticle.fieldnames(), unit="urls"
+    title="Retrieving url metadata", headers=BuzzsumoArticle, unit="urls"
 )
 def action(cli_args, enricher, loading_bar):
     client = BuzzSumoAPIClient(cli_args.token)
