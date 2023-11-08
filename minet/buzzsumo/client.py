@@ -7,16 +7,15 @@
 from json import JSONDecodeError
 from urllib.parse import quote
 
-from minet.rate_limiting import RateLimiterState, rate_limited_method
-from minet.web import create_request_retryer, retrying_method, request
-
-from minet.buzzsumo.formatters import format_article, format_exact_url
 from minet.buzzsumo.exceptions import (
-    BuzzSumoInvalidTokenError,
-    BuzzSumoOutageError,
     BuzzSumoBadRequestError,
     BuzzSumoInvalidQueryError,
+    BuzzSumoInvalidTokenError,
+    BuzzSumoOutageError,
 )
+from minet.buzzsumo.types import BuzzsumoArticle
+from minet.rate_limiting import RateLimiterState, rate_limited_method
+from minet.web import create_request_retryer, request, retrying_method
 
 URL_TEMPLATE = "https://api.buzzsumo.com%s?api_key=%s"
 MAXIMUM_PAGE_NB = 98
@@ -138,7 +137,7 @@ class BuzzSumoAPIClient(object):
 
         if isinstance(data.get("results"), list) and len(data["results"]) == 1:
             match = data["results"][0]
-            return format_exact_url(match)
+            return BuzzsumoArticle.from_payload(match)
 
     def __get_nb_pages_per_period_dates(self, domain, period_timestamps):
         nb_pages = []
@@ -191,6 +190,6 @@ class BuzzSumoAPIClient(object):
                     break
 
                 for article in data["results"]:
-                    yield format_article(article)
+                    yield BuzzsumoArticle.from_payload(article)
 
                 page += 1
