@@ -37,6 +37,7 @@ from minet.youtube.exceptions import (
     YouTubeNotFoundError,
     YouTubeInvalidAPIKeyError,
     YouTubeInvalidAPICallError,
+    YouTubePotentiallyTransientInvalidAPICallError,
     YouTubeInvalidVideoTargetError,
     YouTubeInvalidChannelTargetError,
     YouTubeExclusiveMemberError,
@@ -81,7 +82,10 @@ class YouTubeAPIClient(object):
         self.scraper = YouTubeScraper()
 
         # YouTube's API is known to crash sometimes...
-        self.retryer = create_request_retryer(retry_on_statuses=(503,))
+        self.retryer = create_request_retryer(
+            retry_on_statuses=(503,),
+            additional_exceptions=[YouTubePotentiallyTransientInvalidAPICallError],
+        )
         self.url_formatter = YouTubeAPIURLFormatter()
 
     @retrying_method()
@@ -134,10 +138,18 @@ class YouTubeAPIClient(object):
                 raise YouTubeNotFoundError
 
             if response.status >= 400:
-                if data is not None and "API key not valid" in getpath(
-                    data, ["error", "message"], ""
-                ):
+                error_message = ""
+
+                if data is not None:
+                    error_message = getpath(data, ["error", "message"], "").lower()
+
+                if "api key not valid" in error_message:
                     raise YouTubeInvalidAPIKeyError
+
+                if "transient" in error_message:
+                    raise YouTubePotentiallyTransientInvalidAPICallError(
+                        url, response.status, data
+                    )
 
                 raise YouTubeInvalidAPICallError(url, response.status, data)
 
