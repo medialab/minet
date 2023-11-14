@@ -4,10 +4,10 @@
 
 _Global utilities_
 
-- [-h/--help/help](#help-flag)
-- [--version](#version-flag)
-- [minetrc config files](#minetrc)
-- [minet environment variables](#envvars)
+- [-h/--help/help](#h--help)
+- [--version](#version)
+- [minetrc config files](#minetrc-config-files)
+- [minet environment variables](#minet-environment-variables)
 
 _Generic commands_
 
@@ -26,43 +26,43 @@ _Generic commands_
 _Platform-related commands_
 
 - [buzzsumo (bz)](#buzzsumo)
-  - [limit](#buzzsumo-limit)
-  - [domain-summary](#buzzsumo-domain-summary)
-  - [domain](#buzzsumo-domain)
-  - [exact-url](#buzzsumo-exact-url)
+  - [limit](#limit)
+  - [domain-summary](#domain-summary)
+  - [domain](#domain)
+  - [exact-url](#exact-url)
 - [crowdtangle (ct)](#crowdtangle)
   - [leaderboard](#leaderboard)
   - [lists](#lists)
   - [posts-by-id](#posts-by-id)
   - [posts](#posts)
-  - [search](#ct-search)
+  - [search](#search)
   - [summary](#summary)
 - [facebook (fb)](#facebook)
-  - [comments](#facebook-comments)
-  - [post](#facebook-post)
-  - [posts](#facebook-posts)
-  - [post-authors](#facebook-post-authors)
-  - [url-likes](#facebook-url-likes)
+  - [comments](#comments)
+  - [post](#post)
+  - [posts](#posts-1)
+  - [post-authors](#post-authors)
+  - [url-likes](#url-likes)
 - [google](#google)
-  - [sheets](#google-sheets)
+  - [sheets](#sheets)
 - [hyphe](#hyphe)
-  - [crawl](#hyphe-crawl)
-  - [declare](#hyphe-declare)
-  - [destroy](#hyphe-destroy)
-  - [dump](#hyphe-dump)
-  - [reset](#hyphe-reset)
-  - [tag](#hyphe-tag)
+  - [crawl](#crawl)
+  - [declare](#declare)
+  - [destroy](#destroy)
+  - [dump](#dump)
+  - [reset](#reset)
+  - [tag](#tag)
 - [instagram (insta)](#instagram)
-  - [comments](#insta-comments)
+  - [comments](#comments-1)
   - [hashtag](#hashtag)
-  - [post-infos](#insta-post-infos)
+  - [post-infos](#post-infos)
   - [user-followers](#user-followers)
   - [user-following](#user-following)
   - [user-infos](#user-infos)
   - [user-posts](#user-posts)
 - [mediacloud (mc)](#mediacloud)
-  - [medias](#mc-medias)
-  - [search](#mc-search)
+  - [medias](#medias)
+  - [search](#search-1)
   - [topic](#topic)
     - [stories](#stories)
 - [telegram (tl)](#telegram)
@@ -91,11 +91,11 @@ _Platform-related commands_
   - [captions](#captions)
   - [channel-videos](#channel-videos)
   - [channels](#channels)
-  - [comments](#youtube-comments)
-  - [search](#youtube-search)
+  - [comments](#comments-2)
+  - [search](#search-2)
   - [videos](#videos)
 
-<h2 id="help-flag">-h/--help</h2>
+## -h/--help
 
 If you need help about a command, don't hesitate to use the `-h/--help` flag or the `help` command:
 
@@ -107,7 +107,7 @@ minet ct posts --help
 minet help ct posts
 ```
 
-<h2 id="version-flag"></h2>
+## --version
 
 To check the installed version of `minet`, you can use the `--version` flag:
 
@@ -116,7 +116,7 @@ minet --version
 >>> minet x.x.x
 ```
 
-<h2 id="minetrc">minetrc config files</h2>
+## minetrc config files
 
 Minet supports configuration files so you can skip some tedious command line arguments that you would need to provide each time you call `minet` otherwise (such as `--token` for crowdtangle commands).
 
@@ -152,11 +152,11 @@ youtube:
   key: "MY_YT_API_KEY" # Used as --key for `minet yt` commands
 ```
 
-<h2 id="envvars">minet environment variables</h2>
+## minet environment variables
 
 Alternatively you can also set some arguments using environment variables whose name starts with `MINET_` and followed by the proper key.
 
-To build the name of the variable, first check what can be configured in a minet [rcfile](#minetrc) and build your variable name by joining its path using an underscore:
+To build the name of the variable, first check what can be configured in a minet [rcfile](#minetrc-config-files) and build your variable name by joining its path using an underscore:
 
 For instance, to override `facebook.cookie`, the variable will be `MINET_FACEBOOK_COOKIE`.
 
@@ -1810,7 +1810,7 @@ Subcommands:
                                 Subcommand to use.
 ```
 
-<h3 id="buzzsumo-limit">limit</h3>
+### limit
 
 ```
 Usage: minet buzzsumo limit [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
@@ -1853,7 +1853,7 @@ Examples:
     $ minet bz limit --token YOUR_TOKEN
 ```
 
-<h3 id="buzzsumo-domain-summary">domain-summary</h3>
+### domain-summary
 
 ```
 Usage: minet buzzsumo domain-summary [-h] [-t TOKEN] [--rcfile RCFILE]
@@ -1957,7 +1957,7 @@ how to use the command with a CSV file?
     $ minet buzzsumo domain-summary "value1,value2" --explode ","
 ```
 
-<h3 id="buzzsumo-domain">domain</h3>
+### domain
 
 ```
 Usage: minet buzzsumo domain [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
@@ -2059,7 +2059,7 @@ how to use the command with a CSV file?
     $ minet buzzsumo domain "value1,value2" --explode ","
 ```
 
-<h3 id="buzzsumo-exact-url">exact-url</h3>
+### exact-url
 
 ```
 Usage: minet buzzsumo exact-url [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
@@ -2505,7 +2505,7 @@ To know the different list ids associated with your dashboard:
     $ minet ct lists --token YOUR_TOKEN
 ```
 
-<h3 id="ct-search">search</h3>
+### search
 
 ```
 Usage: minet crowdtangle search [-h] [--rate-limit RATE_LIMIT] [--rcfile RCFILE]
@@ -2711,7 +2711,7 @@ how to use the command with a CSV file?
 
 ```
 Usage: minet facebook [-h]
-                      {comments,post-authors,post-stats,post,posts,url-likes}
+                      {comments,experimental-comments,post-authors,post-stats,post,posts,url-likes}
                       ...
 
 # Minet Facebook Command
@@ -2722,11 +2722,11 @@ Optional Arguments:
   -h, --help                    show this help message and exit
 
 Subcommands:
-  {comments,post-authors,post-stats,post,posts,url-likes}
+  {comments,experimental-comments,post-authors,post-stats,post,posts,url-likes}
                                 Subcommand to use.
 ```
 
-<h3 id="facebook-comments">comments</h3>
+### comments
 
 ```
 Usage: minet facebook comments [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
@@ -2836,7 +2836,7 @@ how to use the command with a CSV file?
     $ minet facebook comments "value1,value2" --explode ","
 ```
 
-<h3 id="facebook-post">post</h3>
+### post
 
 ```
 Usage: minet facebook post [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
@@ -2967,7 +2967,7 @@ how to use the command with a CSV file?
     $ minet facebook post "value1,value2" --explode ","
 ```
 
-<h3 id="facebook-posts">posts</h3>
+### posts
 
 ```
 Usage: minet facebook posts [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
@@ -3098,7 +3098,7 @@ how to use the command with a CSV file?
     $ minet facebook posts "value1,value2" --explode ","
 ```
 
-<h3 id="facebook-post-authors">post-authors</h3>
+### post-authors
 
 ```
 Usage: minet facebook post-authors [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
@@ -3196,7 +3196,7 @@ how to use the command with a CSV file?
     $ minet facebook post-authors "value1,value2" --explode ","
 ```
 
-<h3 id="facebook-url-likes">url-likes</h3>
+### url-likes
 
 ```
 Usage: minet facebook url-likes [-h] [--silent]
@@ -3306,7 +3306,7 @@ Subcommands:
   {sheets}    Subcommand to use.
 ```
 
-<h3 id="google-sheets">sheets</h3>
+### sheets
 
 ```
 Usage: minet google sheets [-h] [--silent]
@@ -3370,7 +3370,7 @@ Examples:
 
 ## Hyphe
 
-<h3 id="hyphe-crawl">crawl</h3>
+### crawl
 
 ```
 Usage: minet hyphe crawl [-h] [--silent]
@@ -3534,7 +3534,7 @@ storage available.
 For more info, check out: https://www.sqlite.org/tempfiles.html
 ```
 
-<h3 id="hyphe-declare">declare</h3>
+### declare
 
 ```
 Usage: minet hyphe declare [-h] [--silent]
@@ -3585,7 +3585,7 @@ Examples:
     $ minet hyphe declare http://myhyphe.com/api/ target-corpus export.csv
 ```
 
-<h3 id="hyphe-destroy">destroy</h3>
+### destroy
 
 ```
 Usage: minet hyphe destroy [-h] [--silent]
@@ -3626,7 +3626,7 @@ Examples:
     $ minet hyphe destroy http://myhyphe.com/api/ my-corpus
 ```
 
-<h3 id="hyphe-dump">dump</h3>
+### dump
 
 ```
 Usage: minet hyphe dump [-h] [--silent]
@@ -3679,7 +3679,7 @@ Examples:
     $ minet hyphe dump http://myhyphe.com/api/ corpus-name -O corpus
 ```
 
-<h3 id="hyphe-reset">reset</h3>
+### reset
 
 ```
 Usage: minet hyphe reset [-h] [--silent]
@@ -3720,7 +3720,7 @@ Examples:
     $ minet hyphe reset http://myhyphe.com/api/ my-corpus
 ```
 
-<h3 id="hyphe-tag">tag</h3>
+### tag
 
 ```
 Usage: minet hyphe tag [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
@@ -3815,7 +3815,7 @@ Subcommands:
                                 Subcommand to use.
 ```
 
-<h3 id="insta-comments">comments</h3>
+### comments
 
 ```
 Usage: minet instagram comments [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
@@ -4025,7 +4025,7 @@ how to use the command with a CSV file?
     $ minet instagram hashtag "value1,value2" --explode ","
 ```
 
-<h3 id="insta-post-infos">post-infos</h3>
+### post-infos
 
 ```
 Usage: minet instagram post-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
@@ -4584,7 +4584,7 @@ how to use the command with a CSV file?
 
 ## Mediacloud
 
-<h3 id="mc-medias">medias</h3>
+### medias
 
 ```
 Usage: minet mediacloud medias [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
@@ -4673,7 +4673,7 @@ how to use the command with a CSV file?
     $ minet mediacloud medias "value1,value2" --explode ","
 ```
 
-<h3 id="mc-search">search</h3>
+### search
 
 ```
 Usage: minet mediacloud search [-h] [-t TOKEN] [--rcfile RCFILE] [--silent]
@@ -7249,7 +7249,7 @@ how to use the command with a CSV file?
     $ minet youtube channels "value1,value2" --explode ","
 ```
 
-<h3 id="youtube-comments">comments</h3>
+### comments
 
 ```
 Usage: minet youtube comments [-h] [-k KEY] [--rcfile RCFILE] [--silent]
@@ -7339,7 +7339,7 @@ how to use the command with a CSV file?
     $ minet youtube comments "value1,value2" --explode ","
 ```
 
-<h3 id="youtube-search">search</h3>
+### search
 
 ```
 Usage: minet youtube search [-h] [-l LIMIT] [--silent]

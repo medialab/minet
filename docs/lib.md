@@ -1,10 +1,10 @@
 # Minet Library Usage
 
+**NOTE**: this part of the documentation is widly out-of-date, beware!
+
 ## Summary
 
 Note that if you are interested in the url cleaning, extraction and join methods exposed by minet's CLI, all of the used functions can be found in the [ural](https://github.com/medialab/ural) package instead.
-
-**NOTE**: this part of the documentation is mostly out-of-date, beware!
 
 *Generic utilities*
 

@@ -4,10 +4,10 @@
 
 _Global utilities_
 
-- [-h/--help/help](#help-flag)
-- [--version](#version-flag)
-- [minetrc config files](#minetrc)
-- [minet environment variables](#envvars)
+- [-h/--help/help](#h--help)
+- [--version](#version)
+- [minetrc config files](#minetrc-config-files)
+- [minet environment variables](#minet-environment-variables)
 
 _Generic commands_
 
@@ -26,43 +26,43 @@ _Generic commands_
 _Platform-related commands_
 
 - [buzzsumo (bz)](#buzzsumo)
-  - [limit](#buzzsumo-limit)
-  - [domain-summary](#buzzsumo-domain-summary)
-  - [domain](#buzzsumo-domain)
-  - [exact-url](#buzzsumo-exact-url)
+  - [limit](#limit)
+  - [domain-summary](#domain-summary)
+  - [domain](#domain)
+  - [exact-url](#exact-url)
 - [crowdtangle (ct)](#crowdtangle)
   - [leaderboard](#leaderboard)
   - [lists](#lists)
   - [posts-by-id](#posts-by-id)
   - [posts](#posts)
-  - [search](#ct-search)
+  - [search](#search)
   - [summary](#summary)
 - [facebook (fb)](#facebook)
-  - [comments](#facebook-comments)
-  - [post](#facebook-post)
-  - [posts](#facebook-posts)
-  - [post-authors](#facebook-post-authors)
-  - [url-likes](#facebook-url-likes)
+  - [comments](#comments)
+  - [post](#post)
+  - [posts](#posts-1)
+  - [post-authors](#post-authors)
+  - [url-likes](#url-likes)
 - [google](#google)
-  - [sheets](#google-sheets)
+  - [sheets](#sheets)
 - [hyphe](#hyphe)
-  - [crawl](#hyphe-crawl)
-  - [declare](#hyphe-declare)
-  - [destroy](#hyphe-destroy)
-  - [dump](#hyphe-dump)
-  - [reset](#hyphe-reset)
-  - [tag](#hyphe-tag)
+  - [crawl](#crawl)
+  - [declare](#declare)
+  - [destroy](#destroy)
+  - [dump](#dump)
+  - [reset](#reset)
+  - [tag](#tag)
 - [instagram (insta)](#instagram)
-  - [comments](#insta-comments)
+  - [comments](#comments-1)
   - [hashtag](#hashtag)
-  - [post-infos](#insta-post-infos)
+  - [post-infos](#post-infos)
   - [user-followers](#user-followers)
   - [user-following](#user-following)
   - [user-infos](#user-infos)
   - [user-posts](#user-posts)
 - [mediacloud (mc)](#mediacloud)
-  - [medias](#mc-medias)
-  - [search](#mc-search)
+  - [medias](#medias)
+  - [search](#search-1)
   - [topic](#topic)
     - [stories](#stories)
 - [telegram (tl)](#telegram)
@@ -91,11 +91,11 @@ _Platform-related commands_
   - [captions](#captions)
   - [channel-videos](#channel-videos)
   - [channels](#channels)
-  - [comments](#youtube-comments)
-  - [search](#youtube-search)
+  - [comments](#comments-2)
+  - [search](#search-2)
   - [videos](#videos)
 
-<h2 id="help-flag">-h/--help</h2>
+## -h/--help
 
 If you need help about a command, don't hesitate to use the `-h/--help` flag or the `help` command:
 
@@ -107,7 +107,7 @@ minet ct posts --help
 minet help ct posts
 ```
 
-<h2 id="version-flag"></h2>
+## --version
 
 To check the installed version of `minet`, you can use the `--version` flag:
 
@@ -116,7 +116,7 @@ minet --version
 >>> minet x.x.x
 ```
 
-<h2 id="minetrc">minetrc config files</h2>
+## minetrc config files
 
 Minet supports configuration files so you can skip some tedious command line arguments that you would need to provide each time you call `minet` otherwise (such as `--token` for crowdtangle commands).
 
@@ -152,11 +152,11 @@ youtube:
   key: "MY_YT_API_KEY" # Used as --key for `minet yt` commands
 ```
 
-<h2 id="envvars">minet environment variables</h2>
+## minet environment variables
 
 Alternatively you can also set some arguments using environment variables whose name starts with `MINET_` and followed by the proper key.
 
-To build the name of the variable, first check what can be configured in a minet [rcfile](#minetrc) and build your variable name by joining its path using an underscore:
+To build the name of the variable, first check what can be configured in a minet [rcfile](#minetrc-config-files) and build your variable name by joining its path using an underscore:
 
 For instance, to override `facebook.cookie`, the variable will be `MINET_FACEBOOK_COOKIE`.
 
@@ -216,19 +216,19 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% bz %>
 
-<h3 id="buzzsumo-limit">limit</h3>
+### limit
 
 <% bz/limit %>
 
-<h3 id="buzzsumo-domain-summary">domain-summary</h3>
+### domain-summary
 
 <% bz/domain-summary %>
 
-<h3 id="buzzsumo-domain">domain</h3>
+### domain
 
 <% bz/domain %>
 
-<h3 id="buzzsumo-exact-url">exact-url</h3>
+### exact-url
 
 <% bz/exact-url %>
 
@@ -252,7 +252,7 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% ct/posts %>
 
-<h3 id="ct-search">search</h3>
+### search
 
 <% ct/search %>
 
@@ -264,23 +264,23 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% fb %>
 
-<h3 id="facebook-comments">comments</h3>
+### comments
 
 <% fb/comments %>
 
-<h3 id="facebook-post">post</h3>
+### post
 
 <% fb/post %>
 
-<h3 id="facebook-posts">posts</h3>
+### posts
 
 <% fb/posts %>
 
-<h3 id="facebook-post-authors">post-authors</h3>
+### post-authors
 
 <% fb/post-authors %>
 
-<h3 id="facebook-url-likes">url-likes</h3>
+### url-likes
 
 <% fb/url-likes %>
 
@@ -288,33 +288,33 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% google %>
 
-<h3 id="google-sheets">sheets</h3>
+### sheets
 
 <% google/sheets %>
 
 ## Hyphe
 
-<h3 id="hyphe-crawl">crawl</h3>
+### crawl
 
 <% hyphe/crawl %>
 
-<h3 id="hyphe-declare">declare</h3>
+### declare
 
 <% hyphe/declare %>
 
-<h3 id="hyphe-destroy">destroy</h3>
+### destroy
 
 <% hyphe/destroy %>
 
-<h3 id="hyphe-dump">dump</h3>
+### dump
 
 <% hyphe/dump %>
 
-<h3 id="hyphe-reset">reset</h3>
+### reset
 
 <% hyphe/reset %>
 
-<h3 id="hyphe-tag">tag</h3>
+### tag
 
 <% hyphe/tag %>
 
@@ -322,7 +322,7 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% insta %>
 
-<h3 id="insta-comments">comments</h3>
+### comments
 
 <% insta/comments %>
 
@@ -330,7 +330,7 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% insta/hashtag %>
 
-<h3 id="insta-post-infos">post-infos</h3>
+### post-infos
 
 <% insta/post-infos %>
 
@@ -352,11 +352,11 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 ## Mediacloud
 
-<h3 id="mc-medias">medias</h3>
+### medias
 
 <% mc/medias %>
 
-<h3 id="mc-search">search</h3>
+### search
 
 <% mc/search %>
 
@@ -462,11 +462,11 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% yt/channels %>
 
-<h3 id="youtube-comments">comments</h3>
+### comments
 
 <% yt/comments %>
 
-<h3 id="youtube-search">search</h3>
+### search
 
 <% yt/search %>
 

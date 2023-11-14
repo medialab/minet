@@ -2,7 +2,7 @@
 
 ## Summary
 
-* [macOS](macOS)
+* [macOS](#macos)
 
 ## macOS
 
