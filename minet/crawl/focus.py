@@ -144,7 +144,7 @@ class FocusSpider(Spider):
             if not should_follow_href(url):
                 continue
 
-            unique_urls.add(response.resolve(url))
+            unique_urls.add(response.urljoin(url))
 
         has_relevant_content, relevant_size = self.content_relevance(content)
 
