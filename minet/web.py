@@ -687,7 +687,7 @@ class Response(object):
     __text: Optional[str]
     __url: str
     __datetime_utc: datetime
-    __is_text: Optional[bool]
+    __is_text: bool
     __encoding: Optional[str]
     __ext: Optional[str]
     __mimetype: Optional[str]
@@ -712,7 +712,7 @@ class Response(object):
         self.__body = body
         self.__text = None
         self.__datetime_utc = datetime.utcnow()
-        self.__is_text = None
+        self.__is_text = True
         self.__encoding = known_encoding
         self.__ext = None
         self.__mimetype = None
@@ -782,8 +782,6 @@ class Response(object):
 
         self.__guess_extension()
         self.__guess_encoding()
-
-        assert self.__is_text is not None
 
         if not self.__is_text:
             raise TypeError("response is binary and cannot be decoded")
