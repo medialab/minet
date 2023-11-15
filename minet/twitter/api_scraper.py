@@ -378,9 +378,9 @@ def tweets_payload_iter(payload):
             ]["legacy"]
 
             # Quote
-            if "quoted_status_result" in tweet_root:
-                quoted_root = tweet_root["quoted_status_result"]["result"]
+            quoted_root = getpath(tweet_root, ["quoted_status_result", "result"])
 
+            if quoted_root is not None:
                 if quoted_root["__typename"] == "TweetWithVisibilityResults":
                     quoted_root = quoted_root["tweet"]
 
