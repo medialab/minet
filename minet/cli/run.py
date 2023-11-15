@@ -15,7 +15,6 @@ import logging
 import multiprocessing
 import casanova
 import shlex
-import platform
 from casanova.exceptions import MissingColumnError
 from contextlib import ExitStack
 
@@ -35,7 +34,6 @@ from minet.cli.utils import (
 from minet.cli.argparse import resolve_arg_dependencies, build_parser, get_subparser
 from minet.cli.exceptions import NotResumableError, InvalidArgumentsError, FatalError
 
-WINDOWS = "windows" in platform.system().lower()
 
 GLOBAL_SETUP_IS_DONE = False
 
@@ -47,11 +45,6 @@ def global_setup() -> None:
         return
 
     GLOBAL_SETUP_IS_DONE = True
-
-    # Issue #497, utf-8 encoding for windows stdout
-    if WINDOWS:
-        sys.__stdout__.reconfigure(encoding="utf-8")
-        sys.__stderr__.reconfigure(encoding="utf-8")
 
     # Freezing multiprocessing support for pyinstaller etc.
     multiprocessing.freeze_support()
