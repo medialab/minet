@@ -123,7 +123,7 @@ Class representing a completed HTTP response (that is to say the body was fully 
 - **urljoin(target: str) -> str**: shorthand for `urllib.parse.urljoin(response.end_url, target)`.
 - **text() -> str**: method returning the decoded (as per inferred or known encoding) body of the response as text.
 - **json() -> Any**: method parsing the response's text as JSON.
-- **soup() -> [WonderfulSoup](./soup.md#wonderfulsoup)**: method parsing the response's text as HTML and returning a soup useful for scraping etc.
+- **soup() -> [WonderfulSoup](./soup.md)**: method parsing the response's text as HTML and returning a soup useful for scraping etc.
 - **links() -> List[str]**: method extracting links from the response's html body by finding `<a>` tags containing relevant urls.
 
 ## Redirection
