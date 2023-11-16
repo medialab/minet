@@ -64,11 +64,7 @@ class TiktokAPIScraper(object):
         headers = {"Cookie": self.cookie}
 
         response = request(
-            url,
-            pool_manager=self.pool_manager,
-            spoof_ua=True,
-            headers=headers,
-            known_encoding="utf-8",
+            url, pool_manager=self.pool_manager, spoof_ua=True, headers=headers
         )
 
         if response.status >= 400:

@@ -77,7 +77,7 @@ class BuzzSumoAPIClient(object):
     @rate_limited_method()
     def request(self, url):
         try:
-            response = request(url, known_encoding="utf-8")
+            response = request(url)
             data = response.json()
         except JSONDecodeError:
             raise BuzzSumoBadRequestError

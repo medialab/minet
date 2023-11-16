@@ -105,6 +105,7 @@ class ExecutorRequestKwargs(TypedDict, Generic[ItemType, CallbackResultType]):
     buffer_size: NotRequired[int]
     domain_parallelism: NotRequired[int]
     max_redirects: NotRequired[int]
+    known_encoding: NotRequired[Optional[str]]
 
 
 class ExecutorResolveKwargs(TypedDict, Generic[ItemType, CallbackResultType]):
@@ -362,6 +363,7 @@ class HTTPWorker(Generic[ItemType, CallbackResultType]):
         follow_js_relocation: bool = False,
         infer_redirection: bool = False,
         canonicalize: bool = False,
+        known_encoding: Optional[str] = None,
         callback: Optional[
             Union[
                 Callable[[ItemType, str, Response], CallbackResultType],
@@ -403,6 +405,9 @@ class HTTPWorker(Generic[ItemType, CallbackResultType]):
 
         if compressed:
             self.default_kwargs["compressed"] = True
+
+        if known_encoding is not None:
+            self.default_kwargs["known_encoding"] = known_encoding
 
     def __call__(
         self, payload: HTTPWorkerPayloadBase[ItemType]
@@ -589,6 +594,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         buffer_size: int = DEFAULT_IMAP_BUFFER_SIZE,
         domain_parallelism: int = DEFAULT_DOMAIN_PARALLELISM,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
+        known_encoding: Optional[str] = None,
         callback: Optional[
             Callable[[ItemType, str, Response], CallbackResultType]
         ] = None,
@@ -608,6 +614,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
             max_redirects=max_redirects,
             use_pycurl=use_pycurl,
             compressed=compressed,
+            known_encoding=known_encoding,
             callback=callback,
         )
 

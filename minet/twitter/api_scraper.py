@@ -481,8 +481,7 @@ class TwitterAPIScraper(object):
             pool_manager=self.pool_manager,
             spoof_ua=True,
             method=method,
-            headers=headers,
-            known_encoding="utf-8",
+            headers=headers
         )
 
     # def acquire_guest_token(self):

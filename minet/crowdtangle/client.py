@@ -56,7 +56,7 @@ class CrowdTangleAPIClient(object):
 
     @retrying_method()
     def __request(self, url):
-        response = request(url, pool_manager=self.pool_manager, known_encoding="utf-8")
+        response = request(url, pool_manager=self.pool_manager)
 
         # Bad auth
         if response.status == 401:

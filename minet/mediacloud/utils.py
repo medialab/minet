@@ -56,7 +56,7 @@ def make_simple_call(
     if query is not None:
         url += "&" + ("&".join("%s=%s" % (str(k), str(v)) for k, v in query.items()))
 
-    response = request(url, pool_manager=pool_manager, known_encoding="utf-8")
+    response = request(url, pool_manager=pool_manager)
     data = response.json()
 
     if response.status >= 500:

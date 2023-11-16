@@ -133,7 +133,7 @@ def mediacloud_search(
                 last_processed_stories_id=last_processed_stories_id,
             )
 
-            response = request(url, pool_manager=pool_manager, known_encoding="utf-8")
+            response = request(url, pool_manager=pool_manager)
             data = response.json()
 
             if response.status >= 500:

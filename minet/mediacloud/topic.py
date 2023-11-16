@@ -50,7 +50,7 @@ def mediacloud_topic_stories(
             from_media_id=from_media_id,
         )
 
-        response = request(url, pool_manager=pool_manager, known_encoding="utf-8")
+        response = request(url, pool_manager=pool_manager)
         data = response.json()
 
         if "stories" not in data or len(data["stories"]) == 0:

@@ -107,6 +107,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType, CallbackResultT
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         stateful_redirects: bool = False,
         spoof_ua: bool = False,
+        known_encoding: Optional[str] = None,
         callback: Optional[
             Callable[
                 [
@@ -138,6 +139,9 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType, CallbackResultT
 
         if compressed:
             self.default_kwargs["compressed"] = True
+
+        if known_encoding is not None:
+            self.default_kwargs["known_encoding"] = known_encoding
 
     def __call__(
         self, job: CrawlJob[CrawlJobDataType]
@@ -288,6 +292,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         request_args: Optional[RequestArgsType[CrawlJobDataType]] = None,
         use_pycurl: bool = False,
         compressed: bool = False,
+        known_encoding: Optional[str] = None,
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         stateful_redirects: bool = False,
         spoof_ua: bool = False,
@@ -398,6 +403,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             "spoof_ua": spoof_ua,
             "use_pycurl": use_pycurl,
             "compressed": compressed,
+            "known_encoding": known_encoding
         }
 
     def __repr__(self):

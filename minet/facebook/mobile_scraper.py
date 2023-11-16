@@ -640,7 +640,6 @@ class FacebookMobileScraper(object):
             pool_manager=self.pool_manager,
             cookie=self.cookie,
             headers={"User-Agent": "curl/7.68.0", "Accept-Language": "en"},
-            known_encoding="utf-8",
         )
 
         return response.text()

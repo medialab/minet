@@ -48,7 +48,6 @@ class YouTubeScraper:
     def request(self, url, spoof_ua: bool = False) -> Response:
         return request(
             url,
-            known_encoding="utf-8",
             pool_manager=self.pool_manager,
             spoof_ua=spoof_ua,
         )

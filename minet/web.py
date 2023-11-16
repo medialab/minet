@@ -703,7 +703,7 @@ class Response(object):
         headers: HTTPHeaderDict,
         status: int,
         body: bytes,
-        known_encoding: Optional[str] = None,
+        known_encoding: Optional[str] = "utf-8",
     ):
         self.__url = url
         self.__stack = stack
@@ -944,7 +944,7 @@ def request(
     follow_js_relocation: bool = False,
     infer_redirection: bool = False,
     canonicalize: bool = False,
-    known_encoding: Optional[str] = None,
+    known_encoding: Optional[str] = "utf-8",
     timeout: Optional[AnyTimeout] = None,
     body: Optional[Union[str, bytes]] = None,
     json_body: Optional[Any] = None,
@@ -1127,8 +1127,7 @@ def request_jsonrpc(
         url,
         pool_manager=pool_manager,
         method="POST",
-        json_body={"method": method, "params": params},
-        known_encoding="utf-8",
+        json_body={"method": method, "params": params}
     )
 
 
