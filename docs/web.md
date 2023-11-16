@@ -8,6 +8,7 @@ Documentation for web-related utilities exported by the `minet.web` module, such
 - [resolve](#resolve)
 - [Response](#response)
 - [Redirection](#redirection)
+- [create_request_retryer](#create_request_retryer)
 
 ## request
 
@@ -135,3 +136,22 @@ Class representing a single step in a redirection stack, as returned by the [res
 - **url** *str*: url of the redirection.
 - **type** *str*: the type of redirection. Must be one of `hit`, `location-header`, `js-relocation`, `refresh-header`, `meta-refresh`, `infer` or `canonical`.
 - **status** *Optional[int]*: status of the related HTTP response, if applicable (e.g. if the redirection type is `infer`, `status` will be `None`).
+
+## create_request_retryer
+
+Create a [Tenacity](https://tenacity.readthedocs.io) `Retrying` instance that can be use to wrap your calls to [`request`](#request) or [`resolve`](#resolve).
+
+By default, the returned retryer will implement some flavor of exponential backoff that is usually used when crawling the web.
+
+Note also that the returned retryer knows about most network-related exceptions but that you can always indicate custom additional exception types using the `additional_exceptions` kwarg.
+
+*Arguments*
+
+- **min** *Optional[float]* [`10`]: approximate minimum number of seconds to wait before next attempt.
+- **max** *Optional[float]*: approximate maximum number of seconds to wait before next attempt. Defaults to ~1 day.
+- **max_attempts** *Optional[int]* [`9`]: maximum number of attempts allowed.
+- **before_sleep** *Optional[Callable[[RetryState], None]]*: callback function that will be called before the retryer starts sleeping.
+- **additional_exceptions** *Optional[Iterable[Type[Exception]]]*: additional exception types to retry.
+- **retry_on_timeout** *bool* [`True`]: whether to retry on timeout errors.
+- **retry_on_statuses** *Optional[Container[int]]*: whether to retry on some specific HTTP statuses.
+- **predicate** *Optional[Callable[[RetryState], bool]]*: function that will be called to assess whether the current attempt can be retried.
