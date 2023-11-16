@@ -96,7 +96,7 @@ with HTTPThreadPoolExecutor() as executor:
 
 ##### request
 
-Download urls as fast as possible.
+Download urls as fast as possible. Yields [RequestResult](#requestresult) objects.
 
 *Arguments*
 
@@ -116,7 +116,7 @@ Download urls as fast as possible.
 
 ##### resolve
 
-Resolve urls as fast as possible.
+Resolve urls as fast as possible. Yields [ResolveResult](#resolveresult) objects.
 
 *Arguments*
 
@@ -147,7 +147,7 @@ Resolve urls as fast as possible.
 - **url** *Optional[str]*: url for the wrapped item, if any.
 - **error** *Optional[Exception]*: any error that was raised when peforming the HTTP request.
 - **error_code** *Optional[str]*: human-readable error code if any error was raised when performing the HTTP request.
-- **response** *Optional[Response]*: the completed response, if no error was raised.
+- **response** *Optional[[Response](./web.md#response)]*: the completed response, if no error was raised.
 
 *Typed variants*
 
