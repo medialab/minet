@@ -98,12 +98,56 @@ def spider(job: CrawlJob, response: Response) -> SpiderResult[str]:
   return title, urls
 ```
 
-<!-- TODO: plural spiders, crawl targets -->
+<!-- TODO: plural spiders, crawl targets, auto join, auto depth, auto spider dispatch -->
 
 ## Crawler
 
 ## CrawlTarget
 
+A crawl target is an object that will be used by the crawler to spawn new jobs. You can of course directly ask the crawler to enqueue urls directly but using a `CrawlTarget` object enables you to provide more details.
+
+You can for instance specify a custom depth or priority, redirect the job that will be created to other spiders and even pass some useful data along the crawler queue that will be used by spiders to perform their processing.
+
+*Example*
+
+```python
+# CrawlTarget with only a url is the same as giving the url directly
+target = CrawlTarget("https://www.lemonde.fr")
+
+# Custom priority (lower will be processed first)
+target = CrawlTarget("https://www.lemonde.fr", priority=5)
+
+# Delegate to a specific spider for processing and pass some data along
+target = CrawlTarget(
+  "https://www.lemonde.fr",
+  spider="homepage",
+  data={"media_type": "national"}
+)
+```
+
+*Properties*
+
+- **url** *str*: url to request.
+- **depth** *Optional[int]*: override depth for the upcoming crawl job.
+- **spider** *Optional[str]*: name of target spider for the upcoming crawl job.
+- **priority** *int* [`0`]: custom priority for the upcoming crawl job. Lower means earlier.
+- **data** *Optional[T]*: data to pass along.
+
 ## CrawlJob
+
+A crawl job is an actual job that was enqueued by the crawler. They are created and managed by the crawler itself and are usually derived from a url or a [CrawlTarget](#crawltarget) object.
+
+Those jobs are also provided to spider's processing functions and can be accessed from a [CrawlResult](#crawlresult) downstream.
+
+*Properties*
+
+- **id** *str*: a unique id referencing the job.
+- **url** *str*: the url meant to be requested.
+- **group** *str*: the job's group wrt allowed concurrency and throttling. By default, a job's group is the url's domain.
+- **depth** *int*: the job's depth.
+- **spider** *Optional[str]*: name of the spider tasked to process the job.
+- **priority** *int*: the job's priority. Lower means earlier.
+- **data** *Optional[T]*: data that was provided by the user along with the job.
+- **parent** *Optional[str]*: id of the parent job, if any.
 
 ## CrawlResult
