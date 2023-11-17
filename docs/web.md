@@ -38,7 +38,7 @@ response = request(
 - **method** *Optional[str]* `GET`: HTTP method to use.
 - **headers** *Optional[dict[str, str]]*: HTTP headers, as a dict, to use for the request.
 - **cookie** *Optional[str | dict[str, str]]*: cookie string to pass as the `Cookie` header value. Can also be a cookie morsel dict mapping names to their values.
-- **spoof_ua** *bool* `False`: whether to use a plausible `User-Agent` header when performing the query.
+- **spoof_ua** *bool* `False`: whether to use a plausible `User-Agent` header when performing the request.
 - **follow_redirects** *bool* `True`: whether to allow the request to follow redirections.
 - **max_redirects** *int* `5`: maximum number of redirections the request will be allowed to follow before raising an error.
 - **follow_refresh_header** *bool* `True`: whether to allow the request to follow non-standard `Refresh` header redirections.
@@ -69,7 +69,7 @@ from minet.web import resolve
 
 # Basic GET call
 redirections = resolve("https://www.lemonde.fr/")
-print('Resolved url:', redirections[-1].url)
+print("Resolved url:", redirections[-1].url)
 
 # Overcome some GDPR compliance issues related to cookies
 redirections = resolve("https://www.lemonde.fr/", stateful=True)
@@ -104,7 +104,7 @@ Class representing a completed HTTP response (that is to say the body was fully 
 - **end_url** *str*: last reached url (after redirection). Shorthand for `response.stack[-1].url`.
 - **status** *int*: HTTP status for the response, e.g. `200`, `404`.
 - **headers** *urllib3.HTTPHeaderDict*: dict of the response's headers.
-- **body** *bytes*: content of the response.
+- **body** *bytes*: body of the response (not decoded, use the `#.text()` method to get decoded text).
 - **stack** *list[[Redirection](#redirection)]*: redirection stack of the response.
 - **was_redirected** *bool*: whether the response followed at least one redirection or not.
 - **end_datetime** *datetime*: time when the response finally completed.
@@ -126,6 +126,7 @@ Class representing a completed HTTP response (that is to say the body was fully 
 - **json() -> Any**: method parsing the response's text as JSON.
 - **soup() -> [WonderfulSoup](./soup.md)**: method parsing the response's text as HTML and returning a soup useful for scraping etc.
 - **links() -> List[str]**: method extracting links from the response's html body by finding `<a>` tags containing relevant urls.
+- **\_\_len\_\_ -> int**: returns the size of the response's body in bytes.
 
 ## Redirection
 

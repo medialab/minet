@@ -7,16 +7,25 @@ As such, `minet` crawlers are multi-threaded, can defer computations to a proces
 ## Summary
 
 - [Examples](#examples)
-  - [The most simple crawler](#the-most-simple-crawler)
-  - [The most simple crawler, with typings](#the-most-simple-crawler-with-typings)
+  - [The simplest crawler](#the-simplest-crawler)
+  - [The simplest crawler, with typings](#the-simplest-crawler-with-typings)
 - [Crawler](#crawler)
+  - [\_\_len\_\_](#__len__)
+  - [\_\_iter\_\_](#__iter__)
+  - [crawl](#crawl)
+  - [enqueue](#enqueue)
+  - [start](#start)
+  - [stop](#stop)
+  - [write](#write)
+  - [submit](#submit)
+- [Spider](#spider)
 - [CrawlTarget](#crawltarget)
 - [CrawlJob](#crawljob)
 - [CrawlResult](#crawlresult)
 
 ## Examples
 
-### The most simple crawler
+### The simplest crawler
 
 In `minet`, a crawler is a multithreaded executor that reads from a queue of jobs (the combination of a url to request alongside some additional data & parameters) and perform HTTP requests for you.
 
@@ -37,7 +46,7 @@ def spider(job, response):
     return
 
   # Scraping the page's title
-  title = response.soup().scrape('meta > title')
+  title = response.soup().scrape("meta > title")
 
   # Extracting links
   urls = response.links()
@@ -69,7 +78,7 @@ with Crawler(spider) as crawler:
       print("Title", result.data)
 ```
 
-### The most simple crawler, with typings
+### The simplest crawler, with typings
 
 If you want to rely on python [typings](https://docs.python.org/3/library/typing.html) when writing your spider, know that `minet.crawl` APIs are all completely typed.
 
@@ -98,9 +107,196 @@ def spider(job: CrawlJob, response: Response) -> SpiderResult[str]:
   return title, urls
 ```
 
-<!-- TODO: plural spiders, crawl targets, auto join, auto depth, auto spider dispatch -->
+And when using the crawler:
+
+```python
+from minet.crawl import Crawler, ErroredCrawlResult
+
+# Always prefer using the context manager that ensures the resources
+# managed by the crawler will be correctly cleaned up:
+with Crawler(spider) as crawler:
+
+  # Enqueuing our start url:
+  crawler.enqueue("https://www.lemonde.fr")
+
+  # Iterating over the crawler's results (after spider processing)
+  for result in crawler:
+    print("Url", result.url)
+
+    if isintance(result, ErroredCrawlResult):
+      print("Error", result.error)
+      continue
+
+    # NOTE: here result is correctly narrowed to SuccessfulCrawlResult
+    print("Depth", result.depth)
+    print("Title", result.data)
+```
+
+<!-- TODO: plural spiders, crawl targets, auto join, auto depth, auto spider dispatch, threaded callback -->
 
 ## Crawler
+
+### Arguments
+
+- **spider_or_spiders** *Spider | dict[str, Spider]*: either a single spider (only a processing function or a [Spider](#spider) instance) or a dict mapping a name to processing functions or [Spider](#spider) instances.
+- **max_workers** *Optional[int]*: number of threads to be spawned by the pool. Will default to some sensible number based on your number of CPUs.
+- **persistent_storage_path** *Optional[str]*: path to a folder that will contain persistent on-disk resources for the crawler's queue and url cache. If not given, the crawler will work entirely in-memory, which means memory could be exceeded if the url queue or cache becomes too large and you also won't be able to resume if your python process crashes.
+- **resume** *bool* `False`: whether to attempt to resume from persistent storage. Will raise if `persistent_storage_path=None`.
+- **visit_urls_only_once** *bool* `False`: whether to guarantee the crawler won't visit the same url twice.
+- **normalized_url_cache** *bool* `False`: whether to use [`ural.normalize_url`](https://github.com/medialab/ural#normalize_url) before adding a url to the crawler's cache. This can be handy to avoid visting a same page having subtly different urls twice. This will do nothing if `visit_urls_only_once=False`.
+- **max_depth** *Optional[int]*: global maximum allowed depth for the crawler to accept a job.
+- **writer_root_directory** *Optional[str]*: root directory that will be used to resolve path written by the crawler's own threadsafe file writer.
+- **sqlar** *bool* `False`: whether the crawler's threadsafe file writer should target a [sqlar](https://www.sqlite.org/sqlar/doc/trunk/README.md) archive instead.
+- **lifo** *bool* `False`: whether to process the crawler queue if Last-In, First-Out (LIFO) order. By default the crawler queue is First-In, First-Out (FIFO). Note that this may not hold if you provide a custom `priority` with your jobs. What's more, given the multithreaded nature and complex scheduling of the crawler, the order may not hold locally.
+- **domain_parallelism** *int* `1`: maximum number of concurrent calls allowed on a same domain.
+- **throttle** *float* `0.2`: time to wait, in seconds, between two calls to the same domain.
+- **process_pool_workers** *Optional[int]*: number of processes to spawn that can be used by the crawler and its spiders to delegate CPU-intensive tasks through their `#.submit` method.
+- **wait** *bool* `True`: whether to wait for the threads to be joined when terminating the pool.
+- **daemonic** *bool* `False`: whether to spawn daemon threads.
+- **timeout** *Optional[float | urllib3.Timeout]*: default timeout to be used for any HTTP call.
+- **insecure** *bool*: whether to allow insecure HTTPS connections.
+- **spoof_tls_ciphers** *bool* `False`: whether to spoof the TLS ciphers.
+- **proxy** *Optional[str]*: url to a proxy server to be used.
+- **retry** *bool* `False`: whether to allow the HTTP calls to be retried.
+- **retryer_kwargs** *Optional[dict]*: arguments that will be given to [create_reques.t_retryer](./web.md#create_request_retryer) to create the retryer for each of the spawned threads.
+- **request_args** *Optional[Callable[[T], dict]]*: function returning arguments that will be given to the threaded [request](./web.md#request) call for a given item from the iterable.
+- **use_pycurl** *bool* `False`: whether to use [`pycurl`](http://pycurl.io/) instead of [`urllib3`](https://urllib3.readthedocs.io/en/stable/) to perform the request. The `pycurl` library must be installed for this kwarg to work.
+- **compressed** *bool* `False`: whether to automatically specifiy the `Accept` header to ask the server to compress the response's body on the wire.
+- **known_encoding** *Optional[str]*: encoding of the body of requested urls. Defaults to `None` which means this encoding will be inferred from the body itself.
+- **max_redirects** *int* `5`: maximum number of redirections the request will be allowed to follow before raising an error.
+- **stateful_redirects** *bool* `False`: whether to allow the resolver to be stateful and store cookies along the redirection chain. This is useful when dealing with GDPR compliance patterns from websites etc. but can hurt performance a little bit.
+- **spoof_ua** *bool* `False`: whether to use a plausible `User-Agent` header when performing requests.
+
+### Properties
+
+- **singular** *bool*: `True` if the crawler handles a single spider.
+- **plural** *bool*: `True` if the crawler handles multiple spiders.
+
+### Methods
+
+#### \_\_len\_\_
+
+Returns the current length of the queue.
+
+```python
+crawler.enqueue("https://www.lemonde.fr")
+
+len(crawler)
+>>> 1
+```
+
+#### \_\_iter\_\_
+
+Actually starts the crawler's scheduling and iterate over the crawler's results yielded as [CrawlResult](#crawlresult) objects.
+
+Same as calling the [#.crawl](#crawl) method without arguments.
+
+```python
+for result in crawler:
+  print(result)
+```
+
+#### crawl
+
+Actually starts the crawler's scheduling and iterate over the crawler's results yielded as [CrawlResult](#crawlresult) objects.
+
+
+```python
+# Basic usage
+for result in crawler.crawl():
+  print(result)
+
+# Using a callback
+def callback(crawler, result):
+  path = result.data.path + ".html"
+  crawler.write(path, result.response.body)
+
+  return path
+
+for result, written_path in crawler.crawl(callback=callback):
+  print("Response was written to:", written_path)
+```
+
+*Arguments*
+
+- **callback** *Optional[Callable[[Crawler, SuccessfulCrawlResult], T]]*: callback that can be used to perform IO-intensive tasks within the same thread used for peforming the crawler's request and to return additional information. If callback is given, the iterator returned by the method will yield `(result, callback_result)` instead of just `result`. Note that this callback must be threadsafe.
+
+#### enqueue
+
+Method used to atomically add a single target to crawl or an iterable of targets to crawl.
+
+Will return the number of jobs actually created an enqueued (if `visit_urls_only_once=True` or `max_depth!=None`, for instance, some targets might be discarded).
+
+Note that, usually, new targets are not enqueued manually to the crawler but rather as an implicit result of some spider's processing or when specifying start targets when implementing a [Spider](#spider).
+
+```python
+from minet.crawl import CrawlTarget
+
+# Can take a single url
+crawler.enqueue("https://www.lemonde.fr")
+
+# Can take a single crawl target
+crawler.enqueue(CrawlTarget(url="https://www.lemonde.fr", priority=5))
+
+# Can take an iterable of urls
+crawler.enqueue([
+  "https://www.lemonde.fr",
+  "https://lefigaro.fr"
+])
+
+# Can take an iterable of crawl targets
+crawler.enqueue([
+  CrawlTarget(url="https://www.lemonde.fr", priority=5)
+  CrawlTarget(url="https://lefigaro.fr", priority=6)
+])
+```
+
+*Arguments*
+
+- **target_or_targets** *str | CrawlTarget | Iterable[str] | Iterable[CrawlTarget]*: targets to enqueue.
+- **spider** *Optional[str]*: override target spider.
+- **depth** *Optional[int]*: override target depth.
+- **base_url** *Optional[str]*: optional base url that will be used to resolve relative targets.
+- **parent** *Optional[[CrawlJob](#crawljob)]: override parent job.
+
+#### start
+
+Method used to manually start the crawler and enqueue start jobs if necessary (when not resuming).
+
+This method is automatically called when using the crawler as a context manager.
+
+#### stop
+
+Method used to manually stop the crawler and cleanup the associated resources (the thread pool, the process pool, flush the persistent caches and close the SQLite connections etc.).
+
+This method is automatically called when using the crawler as a context manager.
+
+#### write
+
+Use the crawler's internal threadsafe file writer to write the given binary or text content to disk.
+
+Returns the actually written path after resolution and extension mangling.
+
+*Arguments*
+
+- **filename** *str*: path to write. Will be resolved with the crawler's `writer_root_directory` if relative.
+- **relative** *bool* `False`: if `True`, the returned path will be relative instead of absolute.
+- **compress** *bool* `False`: whether to gzip the file when writing. Will add `.gz` to the path if necessary.
+
+#### submit
+
+Submit a function to be run in a process from the pool managed by the crawler. If `process_pool_workers` is less than `1`, the function will run synchronously in the same process as the crawler.
+
+```python
+def heavy_html_processing(html: bytes):
+  return something_hard_to_compute(html)
+
+result = crawler.submit(heavy_html_processing, some_html)
+```
+
+## Spider
+
+TODO...
 
 ## CrawlTarget
 
@@ -151,3 +347,36 @@ Those jobs are also provided to spider's processing functions and can be accesse
 - **parent** *Optional[str]*: id of the parent job, if any.
 
 ## CrawlResult
+
+*Properties*
+
+- **job** *[CrawlJob](#crawljob)*: job that was completed or errored.
+- **data** *Optional[T]*: data extracted by the spider for the job.
+- **error** *Optional[Exception]*: error that happend when requesting the job's url.
+- **error_code** *Optional[str]*: human-readable error code if an error happened when requesting the job's url.
+- **response** *Optional[[Response](./web.md#response)]*: HTTP response if the job did not error.
+- **degree** *int*: number of new jobs enqueued when processing this job.
+- **url** *str*: shorthand for `result.job.url`.
+- **depth** *int*: shorthand for `result.job.depth`.
+- **spider** *Optional[str]*: shorthand for `result.job.spider`.
+
+*Typed variants*
+
+```python
+from minet.crawl import (
+  ErroredCrawlResult,
+  SuccessfulCrawlResult
+)
+
+errored_result: ErroredCrawlResult
+assert errored_result.data is None
+assert errored_result.error is not None
+assert errored_result.error_code is not None
+assert errored_result.response is None
+
+successful_result: SuccessfulCrawlResult
+assert successful_result.data is not None
+assert successful_result.error is None
+assert successful_result.error_code is None
+assert successful_result.response is not None
+```

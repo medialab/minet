@@ -14,7 +14,7 @@ The interface is mostly identical, except for the parts documented hereafter.
 from minet.scrape import WonderfulSoup
 
 soup = WonderfulSoup(html)
-urls = soup.scrape('a', 'href')
+urls = soup.scrape("a", "href")
 ```
 
 ## A note on CSS selection
@@ -47,7 +47,7 @@ This is useful but can muddy the class usage when relying on python typing. As s
 Method "forcing" the selection of the first matching element wrt given CSS selector. That is to say this method will never return `None` if the selector does not match anything but will raise instead. This is often useful when scraping and/or when using python typings.
 
 ```python
-element = soup.force_select_one('#main_title')
+element = soup.force_select_one("#main_title")
 ```
 
 ### get_display_text
@@ -71,7 +71,7 @@ Method returning the outer html of the element.
 Return an attribute as a list of whitespace-separated values.
 
 ```python
-classes = element.get_list('class')
+classes = element.get_list("class")
 ```
 
 ### scrape_one
@@ -80,13 +80,13 @@ Method scraping text or an attribute value from the first result matching some C
 
 ```python
 # Scraping text content
-text = soup.scrape_one('.content')
+text = soup.scrape_one(".content")
 
 # Scraping display text
-text = soup.scrape_one('.content', 'display_text')
+text = soup.scrape_one(".content", "display_text")
 
 # Scraping some attribute value
-url = soup.scrape_one('#next', 'href')
+url = soup.scrape_one("#next", "href")
 ```
 
 *Arguments*
@@ -100,13 +100,13 @@ Method scraping text or an attribute value from all the elements matching some C
 
 ```python
 # Scraping text content
-texts = soup.scrape('.content')
+texts = soup.scrape(".content")
 
 # Scraping display text
-texts = soup.scrape('.content', 'display_text')
+texts = soup.scrape(".content", "display_text")
 
 # Scraping some attribute value
-urls = soup.scrape('.page-link', 'href')
+urls = soup.scrape(".page-link", "href")
 ```
 
 *Arguments*

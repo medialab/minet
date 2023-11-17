@@ -12,7 +12,7 @@ They internally leverage the [quenouille](https://github.com/medialab/quenouille
 - [RequestResult](#requestresult)
 - [ResolveResult](#resolveresult)
 
-### HTTPThreadPoolExecutor
+## HTTPThreadPoolExecutor
 
 *Examples*
 
@@ -30,12 +30,12 @@ with HTTPThreadPoolExecutor() as executor:
     # NOTE: result is an object representing the result of one job
     # given to the executor by the request method per url.
     print(result)
-    print('Url:', result.url)
+    print("Url:", result.url)
 
     if result.error is not None:
-      print('Error:', result.error)
+      print("Error:", result.error)
     else:
-      print('Response:', result.response)
+      print("Response:", result.response)
 
   # Resolving an iterable of urls
   # -----------------------------
@@ -45,8 +45,8 @@ with HTTPThreadPoolExecutor() as executor:
   # Arbitrary iterable (key must return an url for each item)
   # ---------------------------------------------------------
   for result in executor.request(items, key: lambda item: item["url"]):
-    print('Item:' result.item)
-    print('Url:', result.url)
+    print("Item:" result.item)
+    print("Url:", result.url)
     pass
 
   # Using typed variants (when using typings)
@@ -55,24 +55,24 @@ with HTTPThreadPoolExecutor() as executor:
 
   for result in executor.request(urls):
     if isinstance(result, ErroredRequestResult):
-      print('Error:', result.error)
+      print("Error:", result.error)
       continue
 
     # NOTE: here result is correctly narrowed to SuccessfulRequestResult
-    print('Response:', result.response)
+    print("Response:", result.response)
 
   # Using a threaded callback
   # -------------------------
   def callback(item, url, response):
-    path = item.path + '.html'
+    path = item.path + ".html"
 
-    with open(path, 'w') as f:
+    with open(path, "w") as f:
       f.write(response.body)
 
     return path
 
   for result, written_path in executor.request(items, key=..., callback=callback):
-    print('Response was written to:', written_path)
+    print("Response was written to:", written_path)
 
   # Shunting domain-wise precautions
   # --------------------------------
@@ -80,7 +80,7 @@ with HTTPThreadPoolExecutor() as executor:
     pass
 ```
 
-#### Arguments
+### Arguments
 
 - **max_workers** *Optional[int]*: number of threads to be spawned by the pool. Will default to some sensible number based on your number of CPUs.
 - **wait** *bool* `True`: whether to wait for the threads to be joined when terminating the pool.
@@ -92,9 +92,9 @@ with HTTPThreadPoolExecutor() as executor:
 - **retry** *bool* `False`: whether to allow the HTTP calls to be retried.
 - **retryer_kwargs** *Optional[dict]*: arguments that will be given to [create_request_retryer](./web.md#create_request_retryer) to create the retryer for each of the spawned threads.
 
-#### Methods
+### Methods
 
-##### request
+#### request
 
 Download urls as fast as possible. Yields [RequestResult](#requestresult) objects.
 
@@ -114,7 +114,7 @@ Download urls as fast as possible. Yields [RequestResult](#requestresult) object
 - **max_redirects** *int* `5`: maximum number of redirections the request will be allowed to follow before raising an error.
 - **known_encoding** *Optional[str]*: encoding of the body of requested urls. Defaults to `None` which means this encoding will be inferred from the body itself.
 
-##### resolve
+#### resolve
 
 Resolve urls as fast as possible. Yields [ResolveResult](#resolveresult) objects.
 
@@ -125,7 +125,7 @@ Resolve urls as fast as possible. Yields [ResolveResult](#resolveresult) objects
 - **ordered** *bool* `False`: force the order of the output to be the same as the input, at the cost of performance and increased memory usage.
 - **passthrough** *bool* `False`: whether to allow items having no url to "pass through" instead of raising an error.
 - **callback** *Optional[Callable[[T, str, Response], C]]*: callback that can be used to perform IO-intensive tasks within the same thread used for the request and to return additional information. If callback is given, the iterator returned by the pool will yield `(result, callback_result)` instead of just `result`. Note that this callback must be threadsafe.
-- **request_args** *Optional[Callable[[T], dict]]*: function returning arguments that will be given to the threaded [request](./web.md#request) call for a given item from the iterable.
+- **resolve_args** *Optional[Callable[[T], dict]]*: function returning arguments that will be given to the threaded [resolve](./web.md#resolve) call for a given item from the iterable.
 - **use_pycurl** *bool* `False`: whether to use [`pycurl`](http://pycurl.io/) instead of [`urllib3`](https://urllib3.readthedocs.io/en/stable/) to perform the request. The `pycurl` library must be installed for this kwarg to work.
 - **compressed** *bool* `False`: whether to automatically specifiy the `Accept` header to ask the server to compress the response's body on the wire.
 - **throttle** *float* `0.2`: time to wait, in seconds, between two calls to the same domain.
@@ -139,7 +139,7 @@ Resolve urls as fast as possible. Yields [ResolveResult](#resolveresult) objects
 - **canonicalize** *bool* `False`: whether to allow the request to sniff the response body to find a different canonical url in the a relevant `<link>` tag and push it as a virtual redirection in the stack.
 
 
-### RequestResult
+## RequestResult
 
 *Properties*
 
@@ -177,7 +177,7 @@ assert successful_result.error_code is None
 assert successful_result.response is not None
 ```
 
-### ResolveResult
+## ResolveResult
 
 *Properties*
 
