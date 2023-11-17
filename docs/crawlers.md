@@ -9,6 +9,8 @@ As such, `minet` crawlers are multi-threaded, can defer computations to a proces
 - [Examples](#examples)
   - [The simplest crawler](#the-simplest-crawler)
   - [The simplest crawler, with typings](#the-simplest-crawler-with-typings)
+  - [Using multiple spiders](#using-multiple-spiders)
+  - [Implementing a more complex spider](#implementing-a-more-complex-spider)
 - [Crawler](#crawler)
   - [\_\_len\_\_](#__len__)
   - [\_\_iter\_\_](#__iter__)
@@ -19,6 +21,17 @@ As such, `minet` crawlers are multi-threaded, can defer computations to a proces
   - [write](#write)
   - [submit](#submit)
 - [Spider](#spider)
+  - [Implementable class properties](#implementable-class-properties)
+    - [START_URL](#start_url)
+    - [START_URLS](#start_urls)
+    - [START_TARGET](#start_target)
+    - [START_TARGETS](#start_targets)
+  - [Implementable methods](#implementable-methods)
+    - [start](#start-1)
+    - [process](#process)
+  - [Methods](#methods-1)
+    - [write](#write-1)
+    - [submit](#submit-1)
 - [CrawlTarget](#crawltarget)
 - [CrawlJob](#crawljob)
 - [CrawlResult](#crawlresult)
@@ -132,7 +145,105 @@ with Crawler(spider) as crawler:
     print("Title", result.data)
 ```
 
-<!-- TODO: plural spiders, crawl targets, auto join, auto depth, auto spider dispatch, threaded callback -->
+### Using multiple spiders
+
+Sometimes you might want to separate the processing logic into multiple functions/spiders.
+
+For instance, one of the spider might scrape and navigate some pagination, while some other one might be scraping the articles found in said pagination.
+
+In that case, know that a crawler is able to accept multiple spiders given as a dict mapping names to spider function or [Spider](#spider) instances.
+
+```python
+from minet.crawl import Crawler, CrawlTarget
+
+def pagination_spider(job, response):
+  next_link = response.soup().scrape("a.next", "href")
+
+  if next_link is None:
+    return
+
+  return None, CrawlTarget(next_link, spider="article")
+
+def article_spider(job, response):
+  titles = response.soup().scrape("h2")
+
+  return titles, None
+
+spiders = {
+  "pagination": pagination_spider,
+  "article": article_spider
+}
+
+with Crawler(spiders) as crawler:
+  crawler.enqueue("http://someurl.com", spider="pagination")
+
+  for result in crawler:
+    print("From spider:", result.spider, 'got result:', result)
+```
+
+### Implementing a more complex spider
+
+Sometimes a function might not be enough and you might want to be able to design more complex spiders. Indeed, what if you want to specify custom starting logic, custom request arguments for the calls or use the crawler's utilities wrt the threadsafe file writer or process pool?
+
+For this, you need to implement your own spider, that must inherit from the [Spider](#spider) class.
+
+A spider class MVP needs at least to implement a `process` method that will perform the same job as its function counterpart that we learnt about earlier.
+
+```python
+from minet.crawl import Crawler, Spider
+
+class MySpider(Spider):
+  def process(self, job, response):
+    if response.status != 200 or not response.is_html:
+      return
+
+    return None, response.links()
+
+# NOTE: we are now giving an instance of MySpider to the Crawler, not the class itself
+# This means you can now use your spider class __init__ to parametrize the spider if
+# required.
+with Crawler(MySpider()) as crawler:
+  for result in crawler:
+    ...
+```
+
+*Declaring starting targets*
+
+```python
+from minet.crawl import Spider, CrawlTarget
+
+# Using any of those class attributes:
+class MySpider(Spider):
+  START_URL = "http://lemonde.fr"
+  START_URLS = ["http://lemonde.fr", "http://lefigaro.fr"],
+  START_TARGET = CrawlTarget(url="http://lemonde.fr")
+  START_TARGETS = [CrawlTarget(url="http://lemonde.fr"), CrawlTarget(url="http://lefigaro.fr")]
+
+# Implementing the start method
+class MySpider(Spider):
+  def start():
+    yield "http://lemonde.fr"
+    yield CrawlTarget(url="http://lefigaro.fr")
+```
+
+*Accessing the crawler's utilities*
+
+```python
+from minet.crawl import Crawler, Spider
+
+class MySpider(Spider):
+  def process(self, job, response):
+    if response.status != 200 or not response.is_html:
+      return
+
+    # Submitting a computation to the process pool:
+    data = self.submit(heavy_computation_function, response.body)
+
+    # Writing a file to disk in a threadsafe manner:
+    self.write(data.path, response.body, compress=True)
+
+    return data, response.links()
+```
 
 ## Crawler
 
@@ -280,6 +391,7 @@ Returns the actually written path after resolution and extension mangling.
 *Arguments*
 
 - **filename** *str*: path to write. Will be resolved with the crawler's `writer_root_directory` if relative.
+- **contents** *str | bytes*: text content, binary or text, to write to disk.
 - **relative** *bool* `False`: if `True`, the returned path will be relative instead of absolute.
 - **compress** *bool* `False`: whether to gzip the file when writing. Will add `.gz` to the path if necessary.
 
@@ -296,7 +408,71 @@ result = crawler.submit(heavy_html_processing, some_html)
 
 ## Spider
 
-TODO...
+### Implementable class properties
+
+#### START_URL
+
+Class property that you can use to specify a single starting url.
+
+#### START_URLS
+
+Class property that you can use to specify multiple starting urls as a non-lazy iterable (implement the [#.start](#start-1) method for lazy iterables, generators etc.).
+
+#### START_TARGET
+
+Class property that you can use to specify a single starting [CrawlTarget](#crawltarget).
+
+#### START_TARGETS
+
+Class property that you can use to specify multiple starting [[CrawlTarget](#crawltarget)] objects as a non-lazy iterable (implement the [#.start](#start-1) method for lazy iterables, generators etc.).
+
+### Implementable methods
+
+#### start
+
+Method that must return an iterable of crawl targets as urls or [CrawlTarget](#crawltarget) instances.
+
+Note that this method is only called the first time the crawler starts, and will not be called again when resuming.
+
+```python
+from minet.crawl import Spider
+
+class MySpider(Spider):
+  def start():
+    yield "http://lemonde.fr"
+```
+
+#### process
+
+Method that must be implemented for the spider to be able to process the crawler's completed jobs.
+
+The method takes a [CrawlJob](#crawljob) instance, a HTTP [Response](./web.md#response) and must return either `None` or a 2-tuple containing: 1. some optional & arbitraty data extracted from the response, 2. an iterable of next targets for the crawler to enqueue.
+
+Note that next crawl targets can be relative (they will be resolved wrt current's job last redirected url) and that their depth, if not provided, will default to the current job's depth + 1.
+
+Note also that if the crawler is plural (handling multiple spiders), next target will be dispatched to the same spider by default if a spider name for the target is not provided.
+
+```python
+from minet.web import Response
+from minet.crawl import Spider, CrawlJob, SpiderResult
+
+class MySpider(Spider):
+  def process(self, job: CrawlJob, response: Response) -> SpiderResult:
+    if response.status != 200 or not response.is_html:
+      return
+
+    return None, response.links()
+```
+
+### Methods
+
+#### write
+
+Same as calling the attached crawler's [#.write](#write) method.
+
+#### submit
+
+Same as calling the attached crawler's [#.submit](#submit) method.
 
 ## CrawlTarget
 
