@@ -85,7 +85,7 @@ with HTTPThreadPoolExecutor() as executor:
 - **max_workers** *Optional[int]*: number of threads to be spawned by the pool. Will default to some sensible number based on your number of CPUs.
 - **wait** *bool* [`True`]: whether to wait for the threads to be joined when terminating the pool.
 - **daemonic** *bool* [`False`]: whether to spawn daemon threads.
-- **timeout** *Optional[float | urllib3.Timeout]: default timeout to be used for any HTTP call.
+- **timeout** *Optional[float | urllib3.Timeout]*: default timeout to be used for any HTTP call.
 - **insecure** *bool*: whether to allow insecure HTTPS connections.
 - **spoof_tls_ciphers** *bool* [`False`]: whether to spoof the TLS ciphers.
 - **proxy** *Optional[str]*: url to a proxy server to be used.
