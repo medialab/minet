@@ -35,27 +35,27 @@ response = request(
 *Arguments*
 
 - **url** *str*: url to request.
-- **method** *Optional[str]* [`GET`]: HTTP method to use.
+- **method** *Optional[str]* `GET`: HTTP method to use.
 - **headers** *Optional[dict[str, str]]*: HTTP headers, as a dict, to use for the request.
 - **cookie** *Optional[str | dict[str, str]]*: cookie string to pass as the `Cookie` header value. Can also be a cookie morsel dict mapping names to their values.
-- **spoof_ua** *bool* [`False`]: whether to use a plausible `User-Agent` header when performing the query.
-- **follow_redirects** *bool* [`True`]: whether to allow the request to follow redirections.
-- **max_redirects** *int* [`5`]: maximum number of redirections the request will be allowed to follow before raising an error.
-- **follow_refresh_header** *bool* [`True`]: whether to allow the request to follow non-standard `Refresh` header redirections.
-- **follow_meta_refresh** *bool* [`False`]: whether to allow the request to sniff the response body to find a `<meta>` tag containing non-standard redirection information.
-- **follow_js_relocation** *bool* [`False`]: whether to allow the request to sniff the response body to find typical patterns of JavaScript url relocation.
-- **infer_redirection** *bool* [`False`]: whether to use [`ural.infer_redirection`](https://github.com/medialab/ural#infer_redirection) to allow redirection inference directly from analyzing the traversed urls.
-- **canonicalize** *bool* [`False`]: whether to allow the request to sniff the response body to find a different canonical url in the a relevant `<link>` tag and push it as a virtual redirection in the stack.
-- **known_encoding** *Optional[str]* [`utf-8`]: encoding of the response's text, if known beforehand. Set `known_encoding` to `None` if you want the request to infer the response's encoding.
+- **spoof_ua** *bool* `False`: whether to use a plausible `User-Agent` header when performing the query.
+- **follow_redirects** *bool* `True`: whether to allow the request to follow redirections.
+- **max_redirects** *int* `5`: maximum number of redirections the request will be allowed to follow before raising an error.
+- **follow_refresh_header** *bool* `True`: whether to allow the request to follow non-standard `Refresh` header redirections.
+- **follow_meta_refresh** *bool* `False`: whether to allow the request to sniff the response body to find a `<meta>` tag containing non-standard redirection information.
+- **follow_js_relocation** *bool* `False`: whether to allow the request to sniff the response body to find typical patterns of JavaScript url relocation.
+- **infer_redirection** *bool* `False`: whether to use [`ural.infer_redirection`](https://github.com/medialab/ural#infer_redirection) to allow redirection inference directly from analyzing the traversed urls.
+- **canonicalize** *bool* `False`: whether to allow the request to sniff the response body to find a different canonical url in the a relevant `<link>` tag and push it as a virtual redirection in the stack.
+- **known_encoding** *Optional[str]* `utf-8`: encoding of the response's text, if known beforehand. Set `known_encoding` to `None` if you want the request to infer the response's encoding.
 - **timeout** *Optional[float | urllib3.Timeout]*: timeout in seconds before raising an error.
 - **body** *Optional[str | bytes]*: body of the request as a string or raw bytes.
 - **json_body** *Optional[Any]*: data to serialize as JSON and to be sent as the request's body.
 - **urlencoded_body** *Optional[dict[str, str | int | float]]*: dict to serialize as a key-value urlencoded body to be sent with the request.
 - **cancel_event** *Optional[threading.Event]*: threading event that will be used to assess whether the request should be cancelled while we are still downloading its response's body.
 - **raise_on_statuses** *Optional[Container[int]]*: if given, request will raise if the response has a status in the given set, instead of returning the response.
-- **stateful** *bool* [`False`]: whether to allow the resolver to be stateful and store cookies along the redirection chain. This is useful when dealing with GDPR compliance patterns from websites etc. but can hurt performance a little bit.
-- **use_pycurl** *bool* [`False`]: whether to use [`pycurl`](http://pycurl.io/) instead of [`urllib3`](https://urllib3.readthedocs.io/en/stable/) to perform the request. The `pycurl` library must be installed for this kwarg to work.
-- **compressed** *bool* [`False`]: whether to automatically specifiy the `Accept` header to ask the server to compress the response's body on the wire.
+- **stateful** *bool* `False`: whether to allow the resolver to be stateful and store cookies along the redirection chain. This is useful when dealing with GDPR compliance patterns from websites etc. but can hurt performance a little bit.
+- **use_pycurl** *bool* `False`: whether to use [`pycurl`](http://pycurl.io/) instead of [`urllib3`](https://urllib3.readthedocs.io/en/stable/) to perform the request. The `pycurl` library must be installed for this kwarg to work.
+- **compressed** *bool* `False`: whether to automatically specifiy the `Accept` header to ask the server to compress the response's body on the wire.
 - **pool_manager** *Optional[urllib3.PoolManager]*: urllib3 pool manager to use to perform the request. Will use a default sensible pool manager if not given. This should only be cared about when you want to use a custom pool manager. This will not be used if `pycurl=True`.
 
 ## resolve
@@ -80,17 +80,17 @@ redirections = resolve("https://www.lemonde.fr/", stateful=True)
 - **url** *str*: url to request.
 - **headers** *Optional[dict[str, str]]*: HTTP headers, as a dict, to use for the request.
 - **cookie** *Optional[str | dict[str, str]]*: cookie string to pass as the `Cookie` header value. Can also be a cookie morsel dict mapping names to their values.
-- **spoof_ua** *bool* [`False`]: whether to use a plausible `User-Agent` header when performing the query.
-- **max_redirects** *int* [`5`]: maximum number of redirections the request will be allowed to follow before raising an error.
-- **follow_refresh_header** *bool* [`True`]: whether to allow the request to follow non-standard `Refresh` header redirections.
-- **follow_meta_refresh** *bool* [`False`]: whether to allow the request to sniff the response body to find a `<meta>` tag containing non-standard redirection information.
-- **follow_js_relocation** *bool* [`False`]: whether to allow the request to sniff the response body to find typical patterns of JavaScript url relocation.
-- **infer_redirection** *bool* [`False`]: whether to use [`ural.infer_redirection`](https://github.com/medialab/ural#infer_redirection) to allow redirection inference directly from analyzing the traversed urls.
-- **canonicalize** *bool* [`False`]: whether to allow the request to sniff the response body to find a different canonical url in the a relevant `<link>` tag and push it as a virtual redirection in the stack.
+- **spoof_ua** *bool* `False`: whether to use a plausible `User-Agent` header when performing the query.
+- **max_redirects** *int* `5`: maximum number of redirections the request will be allowed to follow before raising an error.
+- **follow_refresh_header** *bool* `True`: whether to allow the request to follow non-standard `Refresh` header redirections.
+- **follow_meta_refresh** *bool* `False`: whether to allow the request to sniff the response body to find a `<meta>` tag containing non-standard redirection information.
+- **follow_js_relocation** *bool* `False`: whether to allow the request to sniff the response body to find typical patterns of JavaScript url relocation.
+- **infer_redirection** *bool* `False`: whether to use [`ural.infer_redirection`](https://github.com/medialab/ural#infer_redirection) to allow redirection inference directly from analyzing the traversed urls.
+- **canonicalize** *bool* `False`: whether to allow the request to sniff the response body to find a different canonical url in the a relevant `<link>` tag and push it as a virtual redirection in the stack.
 - **timeout** *Optional[float | urllib3.Timeout]*: timeout in seconds before raising an error.
 - **cancel_event** *Optional[threading.Event]*: threading event that will be used to assess whether the request should be cancelled while we are still downloading its response's body.
 - **raise_on_statuses** *Optional[Container[int]]*: if given, request will raise if the response has a status in the given set, instead of returning the response.
-- **stateful** *bool* [`False`]: whether to allow the resolver to be stateful and store cookies along the redirection chain. This is useful when dealing with GDPR compliance patterns from websites etc. but can hurt performance a little bit.
+- **stateful** *bool* `False`: whether to allow the resolver to be stateful and store cookies along the redirection chain. This is useful when dealing with GDPR compliance patterns from websites etc. but can hurt performance a little bit.
 - **pool_manager** *Optional[urllib3.PoolManager]*: urllib3 pool manager to use to perform the request. Will use a default sensible pool manager if not given. This should only be cared about when you want to use a custom pool manager.
 
 ## Response
@@ -147,11 +147,11 @@ Note also that the returned retryer knows about most network-related exceptions 
 
 *Arguments*
 
-- **min** *Optional[float]* [`10`]: approximate minimum number of seconds to wait before next attempt.
+- **min** *Optional[float]* `10`: approximate minimum number of seconds to wait before next attempt.
 - **max** *Optional[float]*: approximate maximum number of seconds to wait before next attempt. Defaults to ~1 day.
-- **max_attempts** *Optional[int]* [`9`]: maximum number of attempts allowed.
+- **max_attempts** *Optional[int]* `9`: maximum number of attempts allowed.
 - **before_sleep** *Optional[Callable[[RetryState], None]]*: callback function that will be called before the retryer starts sleeping.
 - **additional_exceptions** *Optional[Iterable[Type[Exception]]]*: additional exception types to retry.
-- **retry_on_timeout** *bool* [`True`]: whether to retry on timeout errors.
+- **retry_on_timeout** *bool* `True`: whether to retry on timeout errors.
 - **retry_on_statuses** *Optional[Container[int]]*: whether to retry on some specific HTTP statuses.
 - **predicate** *Optional[Callable[[RetryState], bool]]*: function that will be called to assess whether the current attempt can be retried.

@@ -83,13 +83,13 @@ with HTTPThreadPoolExecutor() as executor:
 #### Arguments
 
 - **max_workers** *Optional[int]*: number of threads to be spawned by the pool. Will default to some sensible number based on your number of CPUs.
-- **wait** *bool* [`True`]: whether to wait for the threads to be joined when terminating the pool.
-- **daemonic** *bool* [`False`]: whether to spawn daemon threads.
+- **wait** *bool* `True`: whether to wait for the threads to be joined when terminating the pool.
+- **daemonic** *bool* `False`: whether to spawn daemon threads.
 - **timeout** *Optional[float | urllib3.Timeout]*: default timeout to be used for any HTTP call.
 - **insecure** *bool*: whether to allow insecure HTTPS connections.
-- **spoof_tls_ciphers** *bool* [`False`]: whether to spoof the TLS ciphers.
+- **spoof_tls_ciphers** *bool* `False`: whether to spoof the TLS ciphers.
 - **proxy** *Optional[str]*: url to a proxy server to be used.
-- **retry** *bool* [`False`]: whether to allow the HTTP calls to be retried.
+- **retry** *bool* `False`: whether to allow the HTTP calls to be retried.
 - **retryer_kwargs** *Optional[dict]*: arguments that will be given to [create_request_retryer](./web.md#create_request_retryer) to create the retryer for each of the spawned threads.
 
 #### Methods
@@ -102,16 +102,16 @@ Download urls as fast as possible. Yields [RequestResult](#requestresult) object
 
 - **urls** *Iterable[str | T]*: either an iterable of urls or an arbitrary iterable, in which case you must give a `key` returning an url for each item in the iterable.
 - **key** *Callable[[T], Optional[str]]*: function returning a url for each item in the given iterable.
-- **ordered** *bool* [`False`]: force the order of the output to be the same as the input, at the cost of performance and increased memory usage.
-- **passthrough** *bool* [`False`]: whether to allow items having no url to "pass through" instead of raising an error.
+- **ordered** *bool* `False`: force the order of the output to be the same as the input, at the cost of performance and increased memory usage.
+- **passthrough** *bool* `False`: whether to allow items having no url to "pass through" instead of raising an error.
 - **callback** *Optional[Callable[[T, str, Response], C]]*: callback that can be used to perform IO-intensive tasks within the same thread used for the request and to return additional information. If callback is given, the iterator returned by the pool will yield `(result, callback_result)` instead of just `result`. Note that this callback must be threadsafe.
 - **request_args** *Optional[Callable[[T], dict]]*: function returning arguments that will be given to the threaded [request](./web.md#request) call for a given item from the iterable.
-- **use_pycurl** *bool* [`False`]: whether to use [`pycurl`](http://pycurl.io/) instead of [`urllib3`](https://urllib3.readthedocs.io/en/stable/) to perform the request. The `pycurl` library must be installed for this kwarg to work.
-- **compressed** *bool* [`False`]: whether to automatically specifiy the `Accept` header to ask the server to compress the response's body on the wire.
-- **throttle** *float* [`0.2`]: time to wait, in seconds, between two calls to the same domain.
-- **buffer_size** *int* [`1024`]: number of items to pull ahead of time from the iterable in hope of finding some url that can be requested immediately. Decreasing this number will ease up memory usage but can slow down overall performance.
-- **domain_parallelism** *int* [`1`]: maximum number of concurrent calls allowed on a same domain.
-- **max_redirects** *int* [`5`]: maximum number of redirections the request will be allowed to follow before raising an error.
+- **use_pycurl** *bool* `False`: whether to use [`pycurl`](http://pycurl.io/) instead of [`urllib3`](https://urllib3.readthedocs.io/en/stable/) to perform the request. The `pycurl` library must be installed for this kwarg to work.
+- **compressed** *bool* `False`: whether to automatically specifiy the `Accept` header to ask the server to compress the response's body on the wire.
+- **throttle** *float* `0.2`: time to wait, in seconds, between two calls to the same domain.
+- **buffer_size** *int* `1024`: number of items to pull ahead of time from the iterable in hope of finding some url that can be requested immediately. Decreasing this number will ease up memory usage but can slow down overall performance.
+- **domain_parallelism** *int* `1`: maximum number of concurrent calls allowed on a same domain.
+- **max_redirects** *int* `5`: maximum number of redirections the request will be allowed to follow before raising an error.
 - **known_encoding** *Optional[str]*: encoding of the body of requested urls. Defaults to `None` which means this encoding will be inferred from the body itself.
 
 ##### resolve
@@ -122,21 +122,21 @@ Resolve urls as fast as possible. Yields [ResolveResult](#resolveresult) objects
 
 - **urls** *Iterable[str | T]*: either an iterable of urls or an arbitrary iterable, in which case you must give a `key` returning an url for each item in the iterable.
 - **key** *Callable[[T], Optional[str]]*: function returning a url for each item in the given iterable.
-- **ordered** *bool* [`False`]: force the order of the output to be the same as the input, at the cost of performance and increased memory usage.
-- **passthrough** *bool* [`False`]: whether to allow items having no url to "pass through" instead of raising an error.
+- **ordered** *bool* `False`: force the order of the output to be the same as the input, at the cost of performance and increased memory usage.
+- **passthrough** *bool* `False`: whether to allow items having no url to "pass through" instead of raising an error.
 - **callback** *Optional[Callable[[T, str, Response], C]]*: callback that can be used to perform IO-intensive tasks within the same thread used for the request and to return additional information. If callback is given, the iterator returned by the pool will yield `(result, callback_result)` instead of just `result`. Note that this callback must be threadsafe.
 - **request_args** *Optional[Callable[[T], dict]]*: function returning arguments that will be given to the threaded [request](./web.md#request) call for a given item from the iterable.
-- **use_pycurl** *bool* [`False`]: whether to use [`pycurl`](http://pycurl.io/) instead of [`urllib3`](https://urllib3.readthedocs.io/en/stable/) to perform the request. The `pycurl` library must be installed for this kwarg to work.
-- **compressed** *bool* [`False`]: whether to automatically specifiy the `Accept` header to ask the server to compress the response's body on the wire.
-- **throttle** *float* [`0.2`]: time to wait, in seconds, between two calls to the same domain.
-- **buffer_size** *int* [`1024`]: number of items to pull ahead of time from the iterable in hope of finding some url that can be requested immediately. Decreasing this number will ease up memory usage but can slow down overall performance.
-- **domain_parallelism** *int* [`1`]: maximum number of concurrent calls allowed on a same domain.
-- **max_redirects** *int* [`5`]: maximum number of redirections the request will be allowed to follow before raising an error.
-- **follow_refresh_header** *bool* [`True`]: whether to allow the request to follow non-standard `Refresh` header redirections.
-- **follow_meta_refresh** *bool* [`False`]: whether to allow the request to sniff the response body to find a `<meta>` tag containing non-standard redirection information.
-- **follow_js_relocation** *bool* [`False`]: whether to allow the request to sniff the response body to find typical patterns of JavaScript url relocation.
-- **infer_redirection** *bool* [`False`]: whether to use [`ural.infer_redirection`](https://github.com/medialab/ural#infer_redirection) to allow redirection inference directly from analyzing the traversed urls.
-- **canonicalize** *bool* [`False`]: whether to allow the request to sniff the response body to find a different canonical url in the a relevant `<link>` tag and push it as a virtual redirection in the stack.
+- **use_pycurl** *bool* `False`: whether to use [`pycurl`](http://pycurl.io/) instead of [`urllib3`](https://urllib3.readthedocs.io/en/stable/) to perform the request. The `pycurl` library must be installed for this kwarg to work.
+- **compressed** *bool* `False`: whether to automatically specifiy the `Accept` header to ask the server to compress the response's body on the wire.
+- **throttle** *float* `0.2`: time to wait, in seconds, between two calls to the same domain.
+- **buffer_size** *int* `1024`: number of items to pull ahead of time from the iterable in hope of finding some url that can be requested immediately. Decreasing this number will ease up memory usage but can slow down overall performance.
+- **domain_parallelism** *int* `1`: maximum number of concurrent calls allowed on a same domain.
+- **max_redirects** *int* `5`: maximum number of redirections the request will be allowed to follow before raising an error.
+- **follow_refresh_header** *bool* `True`: whether to allow the request to follow non-standard `Refresh` header redirections.
+- **follow_meta_refresh** *bool* `False`: whether to allow the request to sniff the response body to find a `<meta>` tag containing non-standard redirection information.
+- **follow_js_relocation** *bool* `False`: whether to allow the request to sniff the response body to find typical patterns of JavaScript url relocation.
+- **infer_redirection** *bool* `False`: whether to use [`ural.infer_redirection`](https://github.com/medialab/ural#infer_redirection) to allow redirection inference directly from analyzing the traversed urls.
+- **canonicalize** *bool* `False`: whether to allow the request to sniff the response body to find a different canonical url in the a relevant `<link>` tag and push it as a virtual redirection in the stack.
 
 
 ### RequestResult

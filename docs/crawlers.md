@@ -130,7 +130,7 @@ target = CrawlTarget(
 - **url** *str*: url to request.
 - **depth** *Optional[int]*: override depth for the upcoming crawl job.
 - **spider** *Optional[str]*: name of target spider for the upcoming crawl job.
-- **priority** *int* [`0`]: custom priority for the upcoming crawl job. Lower means earlier.
+- **priority** *int* `0`: custom priority for the upcoming crawl job. Lower means earlier.
 - **data** *Optional[T]*: data to pass along.
 
 ## CrawlJob

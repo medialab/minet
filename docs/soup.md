@@ -92,7 +92,7 @@ url = soup.scrape_one('#next', 'href')
 *Arguments*
 
 - **selector** *str*: CSS selector to match.
-- **target** *Optional[str]* [`text`]: target to extract. Can be one of `text`, `display_text`, `html`, `inner_html`, `outer_html` or the name of an attribute.
+- **target** *Optional[str]* `text`: target to extract. Can be one of `text`, `display_text`, `html`, `inner_html`, `outer_html` or the name of an attribute.
 
 ### scrape
 
@@ -112,4 +112,4 @@ urls = soup.scrape('.page-link', 'href')
 *Arguments*
 
 - **selector** *str*: CSS selector to match.
-- **target** *Optional[str]* [`text`]: target to extract. Can be one of `text`, `display_text`, `html`, `inner_html`, `outer_html` or the name of an attribute.
+- **target** *Optional[str]* `text`: target to extract. Can be one of `text`, `display_text`, `html`, `inner_html`, `outer_html` or the name of an attribute.
