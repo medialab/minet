@@ -26,7 +26,7 @@ deps:
 	pip3 install -r requirements.txt
 
 lint:
-	@echo Searching for unused imports...
+	@echo Linting source code...
 	ruff $(SOURCE) test
 	@echo
 
