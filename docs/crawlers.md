@@ -59,7 +59,7 @@ def spider(job, response):
     return
 
   # Scraping the page's title
-  title = response.soup().scrape("meta > title")
+  title = response.soup().scrape_one("meta > title")
 
   # Extracting links
   urls = response.links()
@@ -111,7 +111,7 @@ def spider(job: CrawlJob, response: Response) -> SpiderResult[str]:
     return
 
   # Scraping the page's title
-  title = response.soup().scrape('meta > title')
+  title = response.soup().scrape_one('meta > title')
 
   # Extracting links
   urls = response.links()
@@ -157,7 +157,7 @@ In that case, know that a crawler is able to accept multiple spiders given as a 
 from minet.crawl import Crawler, CrawlTarget
 
 def pagination_spider(job, response):
-  next_link = response.soup().scrape("a.next", "href")
+  next_link = response.soup().scrape_one("a.next", "href")
 
   if next_link is None:
     return
