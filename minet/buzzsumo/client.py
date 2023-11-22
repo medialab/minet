@@ -12,6 +12,7 @@ from minet.buzzsumo.exceptions import (
     BuzzSumoInvalidQueryError,
     BuzzSumoInvalidTokenError,
     BuzzSumoOutageError,
+    BuzzSumoRateLimitedError
 )
 from minet.buzzsumo.types import BuzzsumoArticle
 from minet.rate_limiting import RateLimiterState, rate_limited_method
@@ -67,7 +68,7 @@ class BuzzSumoAPIClient(object):
     def __init__(self, token):
         self.token = token
         self.retryer = create_request_retryer(
-            additional_exceptions=[BuzzSumoOutageError]
+            additional_exceptions=[BuzzSumoOutageError, BuzzSumoRateLimitedError]
         )
 
         # 10 calls per ~12s
@@ -87,6 +88,9 @@ class BuzzSumoAPIClient(object):
 
         if response.status == 406:
             raise BuzzSumoInvalidQueryError(data.get("error"), url=url, data=data)
+
+        if response.status == 420:
+            raise BuzzSumoRateLimitedError
 
         if response.status == 500:
             raise BuzzSumoBadRequestError

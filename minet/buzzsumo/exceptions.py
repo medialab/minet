@@ -26,3 +26,7 @@ class BuzzSumoBadRequestError(BuzzSumoError):
 
 class BuzzSumoOutageError(BuzzSumoError):
     pass
+
+
+class BuzzSumoRateLimitedError(BuzzSumoError):
+    pass
