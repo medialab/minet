@@ -1,8 +1,11 @@
+from typing import Optional
+
 import time
 import functools
+from threading import Event, Lock
 
 
-class RateLimiter(object):
+class RateLimiter:
     """
     Naive rate limiter context manager with smooth output.
 
@@ -70,7 +73,7 @@ class RateLimiter(object):
         return self.exit()
 
 
-class RetryableIterator(object):
+class RetryableIterator:
     """
     Iterator exposing a #.retry method that will make sure the next item
     is the same as the current one.
@@ -99,7 +102,7 @@ class RetryableIterator(object):
         self.retried = True
 
 
-class RateLimitedIterator(object):
+class RateLimitedIterator:
     """
     Handy iterator wrapper that will yield its items while respecting a given
     rate limit and that will not sleep needlessly when the iterator is
@@ -143,7 +146,7 @@ class RateLimitedIterator(object):
             self.rate_limiter.exit()
 
 
-class RateLimiterState(object):
+class RateLimiterState:
     def __init__(self, max_per_period: int, period: float = 1.0):
         max_per_second = max_per_period / period
         self.min_interval = 1.0 / max_per_second
@@ -161,6 +164,47 @@ class RateLimiterState(object):
 
     def update(self):
         self.last_entry = time.perf_counter()
+
+
+class ThreadsafeBurstyRateLimiterState:
+    def __init__(self, max_per_period: int, period: float = 1.0):
+        self.max_per_period = max_per_period
+        self.period = period
+
+        self.current_burst = 0
+        self.time_of_next_burst: Optional[float] = None
+
+        self.event = Event()
+        self.lock = Lock()
+
+        self.event.set()
+
+    def wait_if_needed(self):
+        self.event.wait()
+        self.lock.acquire()
+
+        if self.current_burst < self.max_per_period:
+            if self.time_of_next_burst is None:
+                self.time_of_next_burst = time.perf_counter() + self.period
+
+            self.current_burst += 1
+            self.lock.release()
+            return
+
+        assert self.time_of_next_burst is not None
+
+        delta = time.perf_counter() - self.time_of_next_burst
+
+        self.time_of_next_burst = None
+        self.current_burst = 0
+
+        if delta > 0:
+            self.event.clear()
+            self.lock.release()
+            time.sleep(delta)
+            self.event.set()
+        else:
+            self.lock.release()
 
 
 def rate_limited(max_per_period, period=1.0):

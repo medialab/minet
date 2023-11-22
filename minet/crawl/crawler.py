@@ -403,7 +403,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             "spoof_ua": spoof_ua,
             "use_pycurl": use_pycurl,
             "compressed": compressed,
-            "known_encoding": known_encoding
+            "known_encoding": known_encoding,
         }
 
     def __repr__(self):

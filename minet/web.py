@@ -1127,7 +1127,7 @@ def request_jsonrpc(
         url,
         pool_manager=pool_manager,
         method="POST",
-        json_body={"method": method, "params": params}
+        json_body={"method": method, "params": params},
     )
 
 
