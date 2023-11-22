@@ -1212,7 +1212,7 @@ def create_request_retryer(
     predicate: Optional[Callable[[BaseException], bool]] = None,
     epilog: Optional[Callable[[RetryCallState], Optional[str]]] = None,
     cancel_event: Optional[Event] = None,
-):
+) -> RequestRetrying:
     # By default we only retry network issues, such as Internet being cut off etc.
     retryable_exception_types = [
         # urllib3 errors
@@ -1300,6 +1300,39 @@ def retrying_method(attr="retryer"):
 
             if not isinstance(retryer, Retrying):
                 raise ValueError
+
+            return retryer(fn, self, *args, **kwargs)
+
+        return decorated
+
+    return decorate
+
+
+class ThreadsafeRetryers:
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+        self.local_context = threading.local()
+
+    def acquire(self) -> RequestRetrying:
+        retryer = getattr(self.local_context, "retryer", None)
+
+        if retryer is None:
+            retryer = create_request_retryer(**self.kwargs)
+            setattr(self.local_context, "retryer", retryer)
+
+        return retryer
+
+
+def threadsafe_retrying_method(attr="retryers"):
+    def decorate(fn):
+        @functools.wraps(fn)
+        def decorated(self, *args, **kwargs):
+            retryers = getattr(self, attr)
+
+            if not isinstance(retryers, ThreadsafeRetryers):
+                raise ValueError
+
+            retryer = retryers.acquire()
 
             return retryer(fn, self, *args, **kwargs)
 
