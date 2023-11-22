@@ -206,6 +206,10 @@ class ThreadsafeBurstyRateLimiterState:
         else:
             self.lock.release()
 
+    # NOTE: noop
+    def update(self):
+        pass
+
 
 def rate_limited(max_per_period, period=1.0):
     state = RateLimiterState(max_per_period, period)
@@ -245,7 +249,9 @@ def rate_limited_method(attr: str = "rate_limiter_state"):
         def decorated(self, *args, **kwargs):
             state = getattr(self, attr)
 
-            if not isinstance(state, RateLimiterState):
+            if not isinstance(
+                state, (RateLimiterState, ThreadsafeBurstyRateLimiterState)
+            ):
                 raise ValueError
 
             state.wait_if_needed()

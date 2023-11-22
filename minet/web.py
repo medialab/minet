@@ -1308,7 +1308,7 @@ def retrying_method(attr="retryer"):
     return decorate
 
 
-class ThreadsafeRetryers:
+class ThreadsafeRequestRetryers:
     def __init__(self, **kwargs):
         self.kwargs = kwargs
         self.local_context = threading.local()
@@ -1329,7 +1329,7 @@ def threadsafe_retrying_method(attr="retryers"):
         def decorated(self, *args, **kwargs):
             retryers = getattr(self, attr)
 
-            if not isinstance(retryers, ThreadsafeRetryers):
+            if not isinstance(retryers, ThreadsafeRequestRetryers):
                 raise ValueError
 
             retryer = retryers.acquire()

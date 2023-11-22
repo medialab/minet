@@ -12,11 +12,16 @@ from minet.buzzsumo.exceptions import (
     BuzzSumoInvalidQueryError,
     BuzzSumoInvalidTokenError,
     BuzzSumoOutageError,
-    BuzzSumoRateLimitedError
+    BuzzSumoRateLimitedError,
 )
 from minet.buzzsumo.types import BuzzsumoArticle
-from minet.rate_limiting import RateLimiterState, rate_limited_method
-from minet.web import create_request_retryer, request, retrying_method
+from minet.rate_limiting import ThreadsafeBurstyRateLimiterState, rate_limited_method
+from minet.web import (
+    ThreadsafeRequestRetryers,
+    request,
+    threadsafe_retrying_method,
+    create_pool_manager,
+)
 
 URL_TEMPLATE = "https://api.buzzsumo.com%s?api_key=%s"
 MAXIMUM_PAGE_NB = 98
@@ -64,21 +69,23 @@ def optimize_period_timestamps_wrt_nb_pages(
     return period_timestamps
 
 
-class BuzzSumoAPIClient(object):
+class BuzzSumoAPIClient:
     def __init__(self, token):
         self.token = token
-        self.retryer = create_request_retryer(
+        self.pool_manager = create_pool_manager(num_pools=1, parallelism=100)
+        self.retryers = ThreadsafeRequestRetryers(
             additional_exceptions=[BuzzSumoOutageError, BuzzSumoRateLimitedError]
         )
 
         # 10 calls per ~12s
-        self.rate_limiter_state = RateLimiterState(10, 12)
+        self.rate_limiter_state = ThreadsafeBurstyRateLimiterState(10, 12)
 
-    @retrying_method()
+    @threadsafe_retrying_method()
     @rate_limited_method()
     def request(self, url):
+        response = request(url, pool_manager=self.pool_manager)
+
         try:
-            response = request(url)
             data = response.json()
         except JSONDecodeError:
             raise BuzzSumoBadRequestError
