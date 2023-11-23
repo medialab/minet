@@ -2,7 +2,7 @@ from typing import Optional
 
 import time
 import functools
-from threading import Event, Lock
+from threading import Lock
 
 
 class RateLimiter:
@@ -174,37 +174,34 @@ class ThreadsafeBurstyRateLimiterState:
         self.current_burst = 0
         self.time_of_next_burst: Optional[float] = None
 
-        self.event = Event()
         self.lock = Lock()
 
-        self.event.set()
-
     def wait_if_needed(self):
-        self.event.wait()
-        self.lock.acquire()
+        while True:
+            self.lock.acquire()
 
-        if self.current_burst < self.max_per_period:
-            if self.time_of_next_burst is None:
-                self.time_of_next_burst = time.perf_counter() + self.period
+            if self.current_burst < self.max_per_period:
+                if self.time_of_next_burst is None:
+                    self.time_of_next_burst = time.perf_counter() + self.period
 
-            self.current_burst += 1
-            self.lock.release()
-            return
+                self.current_burst += 1
+                self.lock.release()
+                return
 
-        assert self.time_of_next_burst is not None
+            assert self.time_of_next_burst is not None
 
-        delta = time.perf_counter() - self.time_of_next_burst
+            delta = self.time_of_next_burst - time.perf_counter()
 
-        self.time_of_next_burst = None
-        self.current_burst = 0
+            self.time_of_next_burst = None
+            self.current_burst = 0
 
-        if delta > 0:
-            self.event.clear()
-            self.lock.release()
-            time.sleep(delta)
-            self.event.set()
-        else:
-            self.lock.release()
+            if delta > 0:
+                time.sleep(delta)
+                self.lock.release()
+                continue
+            else:
+                self.lock.release()
+                return
 
     # NOTE: noop
     def update(self):
