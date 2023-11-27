@@ -7,11 +7,11 @@
 #
 import json
 
-from minet.rate_limiting import RateLimiterState, rate_limited_method
+from minet.rate_limiting import ThreadsafeBurstyRateLimiterState, rate_limited_method
 from minet.web import (
     create_pool_manager,
-    create_request_retryer,
-    retrying_method,
+    threadsafe_retrying_method,
+    ThreadsafeRequestRetryers,
     request,
 )
 from minet.crowdtangle.constants import (
@@ -45,16 +45,20 @@ class CrowdTangleAPIClient(object):
             summary_rate_limit = rate_limit
 
         self.token = token
-        self.rate_limiter_state = RateLimiterState(rate_limit, period=60)
-        self.summary_rate_limiter_state = RateLimiterState(
+        self.rate_limiter_state = ThreadsafeBurstyRateLimiterState(
+            rate_limit, period=60
+        )
+        self.summary_rate_limiter_state = ThreadsafeBurstyRateLimiterState(
             summary_rate_limit, period=60
         )
-        self.pool_manager = create_pool_manager(timeout=CROWDTANGLE_DEFAULT_TIMEOUT)
-        self.retryer = create_request_retryer(
+        self.pool_manager = create_pool_manager(
+            timeout=CROWDTANGLE_DEFAULT_TIMEOUT, num_pools=1, parallelism=100
+        )
+        self.retryers = ThreadsafeRequestRetryers(
             additional_exceptions=[CrowdTangleInvalidJSONError, CrowdTangleServerError]
         )
 
-    @retrying_method()
+    @threadsafe_retrying_method()
     def __request(self, url):
         response = request(url, pool_manager=self.pool_manager)
 
