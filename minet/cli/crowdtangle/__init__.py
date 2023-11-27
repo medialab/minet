@@ -6,7 +6,7 @@
 #
 from casanova import RowCountResumer, LastCellResumer
 
-from minet.cli.argparse import BooleanAction, SplitterType, OutputAction
+from minet.cli.argparse import BooleanAction, SplitterType, CSVFileType
 
 # TODO: lazyloading issue
 from minet.crowdtangle.constants import (
@@ -282,7 +282,7 @@ CROWDTANGLE_SUMMARY_SUBCOMMAND = command(
         {
             "name": "--posts",
             "help": "Path to a file containing the retrieved posts.",
-            "action": OutputAction,
+            "type": CSVFileType("w"),
         },
         {
             "flag": "--sort-by",

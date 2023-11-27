@@ -7,7 +7,7 @@
 from minet.cli.argparse import (
     command,
     ConfigAction,
-    OutputAction,
+    CSVFileType,
     SplitterType,
 )
 
@@ -23,7 +23,7 @@ MEDIACLOUD_MEDIAS_SUBCOMMAND = command(
         {
             "flag": "--feeds",
             "help": "If given, path of the CSV file listing media RSS feeds.",
-            "action": OutputAction,
+            "type": CSVFileType("w"),
         }
     ],
 )

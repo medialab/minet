@@ -15,17 +15,23 @@ from minet.mediacloud.constants import (
 )
 
 
+def get_headers(cli_args):
+    headers = MEDIACLOUD_MEDIA_CSV_HEADER[1:]
+
+    if cli_args.feeds is not None:
+        headers.append("feeds")
+
+    return headers
+
+
 @with_mediacloud_fatal_errors
 @with_enricher_and_loading_bar(
-    headers=MEDIACLOUD_MEDIA_CSV_HEADER[1:], title="Fetching medias", unit="medias"
+    headers=get_headers, title="Fetching medias", unit="medias"
 )
 def action(cli_args, enricher, loading_bar):
-    added_headers = MEDIACLOUD_MEDIA_CSV_HEADER[1:]
-
     feeds_writer = None
 
     if cli_args.feeds:
-        added_headers.append("feeds")
         feeds_writer = casanova.writer(
             cli_args.feeds, fieldnames=MEDIACLOUD_FEED_CSV_HEADER
         )
@@ -33,17 +39,18 @@ def action(cli_args, enricher, loading_bar):
     client = MediacloudAPIClient(cli_args.token)
 
     for row, media_id in enricher.cells(cli_args.column, with_rows=True):
-        result = client.media(media_id)
-        result = result.as_csv_row()[1:]
+        with loading_bar.step():
+            result = client.media(media_id)
+            result = result.as_csv_row()[1:]
 
-        if cli_args.feeds:
-            feeds = client.feeds(media_id)
+            if cli_args.feeds:
+                assert feeds_writer is not None
 
-            enricher.writerow(row, result + [len(feeds)])
+                feeds = client.feeds(media_id)
 
-            for feed in feeds:
-                feeds_writer.writerow(feed.as_csv_row())
-        else:
-            enricher.writerow(row, result)
+                enricher.writerow(row, result + [len(feeds)])
 
-        loading_bar.advance()
+                for feed in feeds:
+                    feeds_writer.writerow(feed.as_csv_row())
+            else:
+                enricher.writerow(row, result)

@@ -345,6 +345,25 @@ class PartialISODatetimeType:
         return d
 
 
+class CSVFileType:
+    def __init__(self, mode="r"):
+        self.mode = mode
+
+    def __call__(self, string):
+        if string == "-":
+            return acquire_cross_platform_stdout()
+
+        try:
+            # As per #254: newline='' is necessary for CSV output on windows to avoid
+            # outputting extra lines because of a '\r\r\n' end of line...
+            return open(string, self.mode, encoding="utf-8", newline="")
+        except OSError as e:
+            raise ArgumentTypeError(
+                "can't open '%(filename)s': %(error)s"
+                % {"filename": string, "error": e}
+            )
+
+
 class SplitterType:
     def __init__(self, splitchar=","):
         self.splitchar = splitchar
