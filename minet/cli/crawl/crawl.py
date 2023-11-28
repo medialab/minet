@@ -326,7 +326,7 @@ def crawl_action(
             loading_bar.print("[log.time]Crawler will now resume…")
         elif getattr(cli_args, "input", None):
             for url in casanova.reader(cli_args.input).cells(cli_args.column):
-                crawler.enqueue(url)  # type: ignore
+                crawler.enqueue(url, spider=cli_args.input_spider)  # type: ignore
 
         data_writer = None
 

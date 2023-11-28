@@ -265,6 +265,13 @@ def crawl_command(
             "no_help": True,
         }
 
+        arguments.append(
+            {
+                "flag": "--input-spider",
+                "help": "Name of the spider that will process jobs given using -i/--input.",
+            }
+        )
+
     epilog = (
         (epilog or "")
         + """

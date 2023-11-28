@@ -231,8 +231,9 @@ Usage: minet crawl [-h] [-O OUTPUT_DIR] [--silent]
                    [-v] [-u] [-n] [-k] [--spoof-user-agent] [-p PROCESSES]
                    [--connect-timeout CONNECT_TIMEOUT] [--timeout TIMEOUT]
                    [--retries RETRIES] [--stateful-redirects] [--pycurl]
-                   [--sqlar] [-m MODULE] [--factory] [-i INPUT]
-                   [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                   [--sqlar] [-m MODULE] [--factory]
+                   [--input-spider INPUT_SPIDER] [-i INPUT] [--explode EXPLODE]
+                   [-s SELECT] [--total TOTAL]
                    [url_or_url_column]
 
 # Minet Crawl Command
@@ -270,6 +271,8 @@ Optional Arguments:
   -f, --format {csv,jsonl,ndjson}
                                 Serialization format for scraped/extracted data.
                                 Defaults to `csv`.
+  --input-spider INPUT_SPIDER   Name of the spider that will process jobs given
+                                using -i/--input.
   -k, --insecure                Whether to allow ssl errors when performing
                                 requests or not.
   --max-depth MAX_DEPTH         Maximum depth for the crawl.
@@ -405,8 +408,8 @@ Usage: minet focus-crawl [-h] [-C CONTENT_FILTER] [--silent]
                          [--spoof-user-agent] [-p PROCESSES]
                          [--connect-timeout CONNECT_TIMEOUT] [--timeout TIMEOUT]
                          [--retries RETRIES] [--stateful-redirects] [--pycurl]
-                         [--sqlar] [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                         [--total TOTAL]
+                         [--sqlar] [--input-spider INPUT_SPIDER] [-i INPUT]
+                         [--explode EXPLODE] [-s SELECT] [--total TOTAL]
                          [url_or_url_column]
 
 # Minet Focus Crawl Command
@@ -460,6 +463,8 @@ Optional Arguments:
   -f, --format {csv,jsonl,ndjson}
                                 Serialization format for scraped/extracted data.
                                 Defaults to `csv`.
+  --input-spider INPUT_SPIDER   Name of the spider that will process jobs given
+                                using -i/--input.
   -k, --insecure                Whether to allow ssl errors when performing
                                 requests or not.
   --invert-content-match        Flag to turn the content filter into an
