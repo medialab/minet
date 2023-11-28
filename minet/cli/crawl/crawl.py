@@ -262,7 +262,7 @@ def crawl_action(
                 #   - a dict of Spider instances
                 #   - a callable
                 valid_spiders_dict = isinstance(target, Mapping) and all(
-                    isinstance(v, Spider) for v in target.values()
+                    isinstance(v, Spider) or callable(v) for v in target.values()
                 )
 
                 # TODO: inspect arity to weed out potential footguns
@@ -271,8 +271,15 @@ def crawl_action(
                     and not isinstance(target, Spider)
                     and not callable(target)
                 ):
-                    # TODO: explain further
-                    raise FatalError("Invalid crawling target!")
+                    raise FatalError(
+                        [
+                            "Invalid crawling target!",
+                            "Expecting either:",
+                            "  - a function",
+                            "  - a Spider instance",
+                            "  - a dict mapping spider names to functions and/or Spider instances",
+                        ]
+                    )
 
             # NOTE: target IS a spider declaration
             target = cast(SpiderDeclaration, target)
@@ -289,7 +296,7 @@ def crawl_action(
             crawler = target(**crawler_kwargs)
 
             if not isinstance(crawler, Crawler):
-                raise FatalError("Factory did not return a crawler!")
+                raise FatalError("Factory did not return a crawler instance!")
 
     except CrawlerAlreadyFinishedError:
         loading_bar.erase()
