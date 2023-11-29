@@ -10,6 +10,7 @@ from os.path import isdir
 from dataclasses import dataclass
 from itertools import count
 from casanova import ThreadSafeEnricher
+from threading import Lock
 
 from minet.exceptions import TrafilaturaError
 from minet.extraction import extract, TrafilaturaResult
@@ -91,7 +92,11 @@ def action(cli_args, enricher: ThreadSafeEnricher, loading_bar):
     items = create_fetch_like_report_iterator(cli_args, enricher)
 
     worked_on: Dict[int, FetchReportLikeItem] = {}
+    worked_on_lock = Lock()
 
+    writer_lock = Lock()
+
+    # Fun fact: Pool.imap consumes the given iterator in a separate thread...
     def payloads() -> Iterator[ExtractWorkerPayload]:
         current_id = count()
 
@@ -100,12 +105,16 @@ def action(cli_args, enricher: ThreadSafeEnricher, loading_bar):
             if item.error is not None:
                 loading_bar.advance()
                 loading_bar.inc_stat(item.error, style="error")
-                enricher.writerow(item.index, item.row)
+
+                with writer_lock:
+                    enricher.writerow(item.index, item.row)
+
                 continue
 
             item_id = next(current_id)
 
-            worked_on[item_id] = item
+            with worked_on_lock:
+                worked_on[item_id] = item
 
             yield ExtractWorkerPayload(
                 id=item_id, encoding=item.encoding, path=item.path, text=item.text
@@ -127,7 +136,9 @@ def action(cli_args, enricher: ThreadSafeEnricher, loading_bar):
             with loading_bar.step():
                 assert isinstance(result, ExtractResult)
 
-                item = worked_on.pop(result.id)
+                with worked_on_lock:
+                    item = worked_on.pop(result.id)
+
                 row = item.row
 
                 if result.error is not None:
@@ -148,7 +159,8 @@ def action(cli_args, enricher: ThreadSafeEnricher, loading_bar):
                                 )
                             )
 
-                    enricher.writerow(item.index, row, [error_code], PADDING)
+                    with writer_lock:
+                        enricher.writerow(item.index, row, [error_code], PADDING)
 
                     continue
 
@@ -161,8 +173,10 @@ def action(cli_args, enricher: ThreadSafeEnricher, loading_bar):
                             "did you forget to use [cyan]-i/--input[/cyan]?"
                         )
 
-                    enricher.writerow(
-                        item.index, row, ["no-trafilatura-result"], PADDING
-                    )
+                    with writer_lock:
+                        enricher.writerow(
+                            item.index, row, ["no-trafilatura-result"], PADDING
+                        )
                 else:
-                    enricher.writerow(item.index, row, [None], data)
+                    with writer_lock:
+                        enricher.writerow(item.index, row, [None], data)

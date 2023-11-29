@@ -10,6 +10,7 @@ import casanova
 import casanova.ndjson as ndjson
 from dataclasses import dataclass
 from itertools import count
+from threading import Lock
 from os.path import basename, isdir
 
 from minet.scrape import Scraper
@@ -179,6 +180,8 @@ def action(cli_args):
             )
         )
 
+    writer_lock = Lock()
+
     if cli_args.format == "csv":
         assert scraper.fieldnames is not None
 
@@ -215,7 +218,9 @@ def action(cli_args):
         items = create_fetch_like_report_iterator(cli_args, reader)
 
         worked_on: Dict[int, FetchReportLikeItem] = {}
+        worked_on_lock = Lock()
 
+        # Fun fact: Pool.imap consumes the given iterator in a separate thread...
         def payloads() -> Iterator[ScrapeWorkerPayload]:
             current_id = count()
 
@@ -226,12 +231,16 @@ def action(cli_args):
                     loading_bar.inc_stat(item.error, style="error")
 
                     # NOTE: we emit an empty line on error if scraper is singular
-                    writerow(item.row, None)
+                    if is_singular:
+                        with writer_lock:
+                            writerow(item.row, None)
+
                     continue
 
                 item_id = next(current_id)
 
-                worked_on[item_id] = item
+                with worked_on_lock:
+                    worked_on[item_id] = item
 
                 yield ScrapeWorkerPayload(
                     id=item_id,
@@ -271,12 +280,14 @@ def action(cli_args):
                 unordered=cli_args.unordered,
             ):
                 with loading_bar.step():
-                    original_item = worked_on.pop(result.id)
+                    with worked_on_lock:
+                        original_item = worked_on.pop(result.id)
 
                     if result.error is not None:
                         # NOTE: we emit an empty line on error if scraper is singular
                         if is_singular:
-                            writerow(original_item.row, None)
+                            with writer_lock:
+                                writerow(original_item.row, None)
 
                         if isinstance(
                             result.error,
@@ -316,12 +327,13 @@ def action(cli_args):
                     assert result.items is not None
                     items = result.items
 
-                    for item in items:
-                        writerow(original_item.row, item)
+                    with writer_lock:
+                        for item in items:
+                            writerow(original_item.row, item)
 
-                    # NOTE: we emit an empty line for singular scraper if no match occurred
-                    if is_singular and not items:
-                        writerow(original_item.row, None)
+                        # NOTE: we emit an empty line for singular scraper if no match occurred
+                        if is_singular and not items:
+                            writerow(original_item.row, None)
 
                     loading_bar.inc_stat(
                         "scraped-items", count=len(items), style="info"
