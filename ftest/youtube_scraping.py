@@ -1,3 +1,8 @@
-from minet.youtube.scrapers import scrape_channel_id
+from minet.youtube.scraper import YouTubeScraper
 
-print(scrape_channel_id("https://www.youtube.com/@MonsieurPhi"))
+scraper = YouTubeScraper()
+
+links = scraper.get_channel_links(
+    "https://www.youtube.com/channel/UCHGFbA0KWBgf6gMbyUCZeCQ"
+)
+print(links)

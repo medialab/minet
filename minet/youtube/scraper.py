@@ -1,9 +1,10 @@
-from typing import List, Tuple, Optional
+from typing import List, Set, Tuple, Optional
 
 import re
 import json
 from html import unescape
 from urllib.parse import unquote
+from ural import infer_redirection
 
 from minet.scrape import WonderfulSoup
 from minet.web import (
@@ -20,6 +21,30 @@ from minet.youtube.exceptions import YouTubeInvalidVideoTargetError
 
 
 CAPTION_TRACKS_RE = re.compile(r'"captionTracks":(\[.*?\])')
+INITIAL_DATA_RE = re.compile(
+    rb"(?:const|let|var)\s+ytInitialData\s*=\s*({.+});</script>"
+)
+
+
+def gather_url_endpoints(data):
+    if isinstance(data, dict):
+        for k, v in data.items():
+            if k == "urlEndpoint":
+                if not isinstance(v, dict):
+                    return
+
+                yield infer_redirection(v["url"])
+
+                return
+
+            yield from gather_url_endpoints(v)
+
+    elif isinstance(data, list):
+        for v in data:
+            yield from gather_url_endpoints(v)
+
+    else:
+        return
 
 
 def select_caption_track(
@@ -126,3 +151,18 @@ class YouTubeScraper:
             return tag.get("content")
 
         return None
+
+    def get_channel_links(self, channel_url: str) -> Optional[Set[str]]:
+        response = self.request(channel_url, spoof_ua=True)
+
+        match = INITIAL_DATA_RE.search(response.body)
+
+        if match is None:
+            return None
+
+        try:
+            data = json.loads(match.group(1))
+        except json.JSONDecodeError:
+            return None
+
+        return set(gather_url_endpoints(data))
