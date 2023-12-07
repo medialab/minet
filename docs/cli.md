@@ -6951,8 +6951,9 @@ how to use the command with a CSV file?
 ```
 Usage: minet youtube captions [-h] [--lang LANG] [--silent]
                               [--refresh-per-second REFRESH_PER_SECOND]
-                              [--simple-progress] [-i INPUT] [--explode EXPLODE]
-                              [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                              [--simple-progress] [-c] [-i INPUT]
+                              [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                              [-o OUTPUT]
                               video_or_video_column
 
 # Youtube captions
@@ -6965,6 +6966,10 @@ Positional Arguments:
                                 using -i/--input.
 
 Optional Arguments:
+  -c, --collapse                Use this flag to only emit one line per video,
+                                with the subtitle lines joined together in a
+                                single cell. Note that this means losing start &
+                                duration information of the subtitles.
   --lang LANG                   Language (ISO code like "en") of captions to
                                 retrieve. You can specify several languages by
                                 preferred order separated by commas. Defaults to

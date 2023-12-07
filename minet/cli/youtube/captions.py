@@ -11,13 +11,18 @@ from minet.youtube.exceptions import YouTubeInvalidVideoTargetError
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.loading_bar import LoadingBar
 
-HEADERS = YouTubeCaptionTrack.fieldnames(
-    prefix="caption_track_"
-) + YouTubeCaptionLine.fieldnames(prefix="caption_line_")
+
+def get_headers(cli_args):
+    headers = YouTubeCaptionTrack.fieldnames(prefix="caption_track_")
+
+    if cli_args.collapse:
+        return headers + ["caption_track_text"]
+
+    return headers + YouTubeCaptionLine.fieldnames(prefix="caption_line_")
 
 
 @with_enricher_and_loading_bar(
-    headers=HEADERS, title="Retrieving captions", unit="videos"
+    headers=get_headers, title="Retrieving captions", unit="videos"
 )
 def action(cli_args, enricher, loading_bar: LoadingBar):
     scraper = YouTubeScraper()
@@ -44,5 +49,8 @@ def action(cli_args, enricher, loading_bar: LoadingBar):
 
             track, lines = result
 
-            for line in lines:
-                enricher.writerow(row, track, line)
+            if cli_args.collapse:
+                enricher.writerow(row, track, ["\n".join(line.text for line in lines)])
+            else:
+                for line in lines:
+                    enricher.writerow(row, track, line)

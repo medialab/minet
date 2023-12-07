@@ -56,7 +56,12 @@ YOUTUBE_CAPTIONS_SUBCOMMAND = command(
             "help": 'Language (ISO code like "en") of captions to retrieve. You can specify several languages by preferred order separated by commas.',
             "default": ["en"],
             "type": SplitterType(),
-        }
+        },
+        {
+            "flags": ["-c", "--collapse"],
+            "help": "Use this flag to only emit one line per video, with the subtitle lines joined together in a single cell. Note that this means losing start & duration information of the subtitles.",
+            "action": "store_true",
+        },
     ],
 )
 
