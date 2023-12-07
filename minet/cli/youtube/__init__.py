@@ -1,5 +1,5 @@
 # =============================================================================
-# Minet Youtube CLI Action
+# Minet YouTube CLI Action
 # =============================================================================
 #
 # Logic of the `yt` action.
@@ -34,7 +34,7 @@ def youtube_api_subcommand(*args, arguments=[], **kwargs):
 YOUTUBE_CAPTIONS_SUBCOMMAND = command(
     "captions",
     "minet.cli.youtube.captions",
-    title="Youtube captions",
+    title="YouTube captions",
     description="Retrieve captions for the given YouTube videos.",
     epilog="""
         Examples:
@@ -65,12 +65,22 @@ YOUTUBE_CAPTIONS_SUBCOMMAND = command(
     ],
 )
 
+YOUTUBE_CHANNEL_LINKS_SUBCOMMAND = command(
+    "channel-links",
+    "minet.cli.youtube.channel_links",
+    title="YouTube channel links",
+    description="""
+        Scrape official links from channel YouTube pages.
+    """,
+    variadic_input={"dummy_column": "channel"},
+)
+
 YOUTUBE_CHANNEL_VIDEOS_SUBCOMMAND = youtube_api_subcommand(
     "channel-videos",
     "minet.cli.youtube.channel_videos",
-    title="Youtube channel videos",
+    title="YouTube channel videos",
     description="""
-        Retrieve metadata about all Youtube videos from one or many channel(s) using the API.
+        Retrieve metadata about all YouTube videos from one or many channel(s) using the API.
 
         Under the hood, this command extract the channel id from the given url or scrape the
         website to find it if necessary. Then the command uses the API to retrieve
@@ -109,9 +119,9 @@ YOUTUBE_CHANNEL_VIDEOS_SUBCOMMAND = youtube_api_subcommand(
 YOUTUBE_CHANNELS_SUBCOMMAND = youtube_api_subcommand(
     "channels",
     "minet.cli.youtube.channels",
-    title="Youtube Channels Command",
+    title="YouTube Channels Command",
     description="""
-        Retrieve metadata about Youtube channel from one or many name(s) using the API.
+        Retrieve metadata about YouTube channel from one or many name(s) using the API.
 
         Under the hood, this command extract the channel id from the given url or scrape the
         website to find it if necessary. Then the command uses the API to retrieve
@@ -135,8 +145,8 @@ YOUTUBE_CHANNELS_SUBCOMMAND = youtube_api_subcommand(
 YOUTUBE_COMMENTS_SUBCOMMAND = youtube_api_subcommand(
     "comments",
     "minet.cli.youtube.comments",
-    title="Youtube comments",
-    description="Retrieve metadata about Youtube comments using the API.",
+    title="YouTube comments",
+    description="Retrieve metadata about YouTube comments using the API.",
     epilog="""
         Examples:
 
@@ -149,7 +159,7 @@ YOUTUBE_COMMENTS_SUBCOMMAND = youtube_api_subcommand(
 YOUTUBE_SEARCH_SUBCOMMAND = youtube_api_subcommand(
     "search",
     "minet.cli.youtube.search",
-    title="Youtube search",
+    title="YouTube search",
     description="""
         Search videos using the YouTube API.
 
@@ -181,8 +191,8 @@ YOUTUBE_SEARCH_SUBCOMMAND = youtube_api_subcommand(
 YOUTUBE_VIDEOS_SUBCOMMAND = youtube_api_subcommand(
     "videos",
     "minet.cli.youtube.videos",
-    title="Youtube videos",
-    description="Retrieve metadata about Youtube videos using the API.",
+    title="YouTube videos",
+    description="Retrieve metadata about YouTube videos using the API.",
     variadic_input={"dummy_column": "video"},
 )
 
@@ -192,10 +202,11 @@ YOUTUBE_COMMAND = command(
     "Minet YouTube Command",
     aliases=["yt"],
     description="""
-        Gather data from Youtube.
+        Gather data from YouTube.
     """,
     subcommands=[
         YOUTUBE_CAPTIONS_SUBCOMMAND,
+        YOUTUBE_CHANNEL_LINKS_SUBCOMMAND,
         YOUTUBE_CHANNEL_VIDEOS_SUBCOMMAND,
         YOUTUBE_CHANNELS_SUBCOMMAND,
         YOUTUBE_COMMENTS_SUBCOMMAND,

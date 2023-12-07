@@ -6956,7 +6956,7 @@ Usage: minet youtube captions [-h] [--lang LANG] [--silent]
                               [-o OUTPUT]
                               video_or_video_column
 
-# Youtube captions
+# YouTube captions
 
 Retrieve captions for the given YouTube videos.
 
@@ -7052,9 +7052,9 @@ Usage: minet youtube channel-videos [-h] [--start-time START_TIME] [--silent]
                                     [--total TOTAL] [-o OUTPUT]
                                     channel_or_channel_column
 
-# Youtube channel videos
+# YouTube channel videos
 
-Retrieve metadata about all Youtube videos from one or many channel(s) using the API.
+Retrieve metadata about all YouTube videos from one or many channel(s) using the API.
 
 Under the hood, this command extract the channel id from the given url or scrape the
 website to find it if necessary. Then the command uses the API to retrieve
@@ -7167,9 +7167,9 @@ Usage: minet youtube channels [-h] [-k KEY] [--rcfile RCFILE] [--silent]
                               [-s SELECT] [--total TOTAL] [-o OUTPUT]
                               channel_or_channel_column
 
-# Youtube Channels Command
+# YouTube Channels Command
 
-Retrieve metadata about Youtube channel from one or many name(s) using the API.
+Retrieve metadata about YouTube channel from one or many name(s) using the API.
 
 Under the hood, this command extract the channel id from the given url or scrape the
 website to find it if necessary. Then the command uses the API to retrieve
@@ -7268,9 +7268,9 @@ Usage: minet youtube comments [-h] [-k KEY] [--rcfile RCFILE] [--silent]
                               [-s SELECT] [--total TOTAL] [-o OUTPUT]
                               video_or_video_column
 
-# Youtube comments
+# YouTube comments
 
-Retrieve metadata about Youtube comments using the API.
+Retrieve metadata about YouTube comments using the API.
 
 Positional Arguments:
   video_or_video_column         Single video to process or name of the CSV
@@ -7361,7 +7361,7 @@ Usage: minet youtube search [-h] [-l LIMIT] [--silent]
                             [-o OUTPUT]
                             query_or_query_column
 
-# Youtube search
+# YouTube search
 
 Search videos using the YouTube API.
 
@@ -7458,9 +7458,9 @@ Usage: minet youtube videos [-h] [-k KEY] [--rcfile RCFILE] [--silent]
                             [-s SELECT] [--total TOTAL] [-o OUTPUT]
                             video_or_video_column
 
-# Youtube videos
+# YouTube videos
 
-Retrieve metadata about Youtube videos using the API.
+Retrieve metadata about YouTube videos using the API.
 
 Positional Arguments:
   video_or_video_column         Single video to process or name of the CSV
