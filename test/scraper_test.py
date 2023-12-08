@@ -8,6 +8,7 @@ from textwrap import dedent
 from minet.scrape import scrape, Scraper
 from minet.scrape.analysis import (
     fieldnames_from_definition,
+    infer_scraper_function_is_singular,
     validate,
     analyse,
     ScraperAnalysis,
@@ -547,6 +548,12 @@ class TestScraper(object):
         assert analysis == ScraperAnalysis(
             plural=True, fieldnames=["url", "title"], output_type="collection"
         )
+
+    def test_singular_inference(self):
+        def scraper(row, soup) -> str:
+            return ""
+
+        infer_scraper_function_is_singular(scraper)
 
     def test_absent_tail_call(self):
         item = scrape({"sel": "quote", "fields": {"url": "href"}}, BASIC_HTML)

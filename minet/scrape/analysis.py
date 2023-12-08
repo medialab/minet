@@ -4,8 +4,8 @@
 #
 # Functions performing analysis of scraper definitions.
 #
-from typing import Optional, List
-from minet.types import Literal
+from typing import Optional, List, Callable, Iterable, Iterator, Generator
+from minet.types import Literal, get_type_hints
 
 import ast
 import soupsieve
@@ -111,6 +111,32 @@ def analyse(scraper):
         analysis.output_type = "unknown"
 
     return analysis
+
+
+NoneType = type(None)
+
+# TODO: what about singular tuples and lists?
+PluralTypes = (list, frozenset, set, tuple, Iterator, Iterable, Generator)
+
+
+def infer_scraper_return_type_is_singular(t) -> bool:
+    # NOTE: we default to plural
+    return False
+
+
+def infer_scraper_function_is_singular(fn: Callable) -> bool:
+    if not callable(fn):
+        raise TypeError("expecting a function")
+
+    hints = get_type_hints(fn)
+    return_type = hints.get("return")
+
+    if return_type is None:
+        return False
+
+    # TODO: handle unions
+
+    return infer_scraper_return_type_is_singular(return_type)
 
 
 ERRORS_PRIORITY = {
