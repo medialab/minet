@@ -618,13 +618,11 @@ Optional Arguments:
   --compress-transfer           Whether to send a "Accept-Encoding" header
                                 asking for a compressed response. Usually better
                                 for bandwidth but at the cost of more CPU work.
-  -c, --contents-in-report, -w, --no-contents-in-report
-                                Whether to include retrieved contents, e.g.
+  -c, --contents-in-report      Whether to include retrieved contents, e.g.
                                 html, directly in the report and avoid writing
                                 them in a separate folder. This requires to
                                 standardize encoding and won't work on binary
-                                formats. Note that --contents-in-report is the
-                                default when no input file is given.
+                                formats.
   --domain-parallelism DOMAIN_PARALLELISM
                                 Max number of urls per domain to hit at the same
                                 time. Defaults to `1`.
@@ -769,6 +767,9 @@ Examples:
 
 . Fetching a batch of url from existing CSV file:
     $ minet fetch url -i file.csv > report.csv
+
+. Piping to minet extract:
+    $ minet fetch url -i file.csv -c | minet extract -i -
 
 . CSV input from stdin (mind the `-`):
     $ xsv select url file.csv | minet fetch url -i - > report.csv

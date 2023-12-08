@@ -22,7 +22,7 @@ $MINET scrape -p 1 $EXTRACT_DIR/scraper.yml name -i $EXTRACT_DIR/articles.csv -I
 echo "  - CSV bodies"
 $MINET scrape -p 1 $EXTRACT_DIR/scraper.yml -i $EXTRACT_DIR/bodies.csv --body-column html | wc -l
 echo "  - Piping fetch"
-$MINET fetch https://github.com/medialab/minet | $MINET scrape -p 1 $EXTRACT_DIR/scraper.yml -i - | wc -l
+$MINET fetch https://github.com/medialab/minet -c | $MINET scrape -p 1 $EXTRACT_DIR/scraper.yml -i - | wc -l
 echo
 
 echo "Extract"
@@ -35,7 +35,7 @@ $MINET extract -p 1 name -i $EXTRACT_DIR/articles.csv -I $EXTRACT_DIR | wc -l
 echo "  - CSV bodies"
 $MINET extract -p 1 -i $EXTRACT_DIR/bodies.csv --body-column html | wc -l
 echo "  - Piping fetch"
-$MINET fetch https://github.com/medialab/minet | $MINET extract -p 1 -i - | wc -l
+$MINET fetch https://github.com/medialab/minet -c | $MINET extract -p 1 -i - | wc -l
 echo
 
 echo "Resolve"
@@ -43,7 +43,7 @@ $MINET resolve https://medialab.sciencespo.fr/ | grep hit
 echo
 
 echo "Url Extract"
-$MINET fetch https://news.ycombinator.com/ | $MINET url-extract body - --from html | wc -l
+$MINET fetch https://news.ycombinator.com/ -c | $MINET url-extract body - --from html | wc -l
 echo
 
 echo "Url Join"

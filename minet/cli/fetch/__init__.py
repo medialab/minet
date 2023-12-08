@@ -99,10 +99,6 @@ COMMON_IO_ARGUMENTS = [
 
 
 def resolve_fetch_arguments(cli_args):
-    # If we are hitting a single url we enable contents_in_report by default
-    if cli_args.has_dummy_csv and cli_args.contents_in_report is None:
-        cli_args.contents_in_report = True
-
     if cli_args.dont_save:
         cli_args.contents_in_report = False
 
@@ -155,6 +151,9 @@ FETCH_COMMAND = command(
         . Fetching a batch of url from existing CSV file:
             $ minet fetch url -i file.csv > report.csv
 
+        . Piping to minet extract:
+            $ minet fetch url -i file.csv -c | minet extract -i -
+
         . CSV input from stdin (mind the `-`):
             $ xsv select url file.csv | minet fetch url -i - > report.csv
 
@@ -189,10 +188,10 @@ FETCH_COMMAND = command(
             "action": "store_true",
         },
         {
-            "flags": ["-c", "--contents-in-report", "-w", "--no-contents-in-report"],
-            "help": "Whether to include retrieved contents, e.g. html, directly in the report and avoid writing them in a separate folder. This requires to standardize encoding and won't work on binary formats. Note that --contents-in-report is the default when no input file is given.",
+            "flags": ["-c", "--contents-in-report"],
+            "help": "Whether to include retrieved contents, e.g. html, directly in the report and avoid writing them in a separate folder. This requires to standardize encoding and won't work on binary formats.",
             "dest": "contents_in_report",
-            "action": BooleanAction,
+            "action": "store_true",
         },
         {
             "flags": ["-D", "--dont-save"],
