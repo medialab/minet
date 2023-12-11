@@ -15,6 +15,8 @@ echo
 echo "Scrape"
 echo "  - Single HTML file"
 $MINET scrape -p 1 $EXTRACT_DIR/scraper.yml $EXTRACT_DIR/article.html | wc -l
+echo "  - Single HTML file, typical scraper"
+$MINET scrape -p 1 title $EXTRACT_DIR/article.html | wc -l
 echo "  - Single glob pattern"
 $MINET scrape -p 1 $EXTRACT_DIR/scraper.yml "$EXTRACT_DIR/*.html" -g | wc -l
 echo "  - CSV input"

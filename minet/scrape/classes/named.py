@@ -1,22 +1,22 @@
 from typing import Optional, List, Any, Dict, Type, cast
 
 from bs4 import SoupStrainer, BeautifulSoup
-from casanova import CSVSerializer
 from urllib.parse import urljoin
 from ural import should_follow_href, could_be_rss
 
 from minet.scrape.analysis import ScraperAnalysisOutputType
 from minet.scrape.utils import ensure_soup
-from minet.scrape.types import AnyScrapableTarget, ScraperBase
+from minet.scrape.types import AnyScrapableTarget
+from minet.scrape.classes.base import ScraperBase
 
 
 class NamedScraper(ScraperBase):
     name: str
     fieldnames: List[str]
     plural: bool
+    tabular = True
     output_type: ScraperAnalysisOutputType
     strainer: Optional[SoupStrainer]
-    serializer = CSVSerializer()
 
     def scrape(self, soup: BeautifulSoup, context=None) -> Any:
         raise NotImplementedError
@@ -28,7 +28,7 @@ class NamedScraper(ScraperBase):
 
 class TitleScraper(NamedScraper):
     name = "title"
-    fieldnames = ["page_title"]
+    fieldnames = ["title"]
     plural = False
     output_type = "scalar"
     strainer = SoupStrainer(name="title")
@@ -105,7 +105,7 @@ class UrlsScraper(NamedScraper):
 
 class ImagesScraper(NamedScraper):
     name = "images"
-    fieldnames = ["image_url"]
+    fieldnames = ["src"]
     plural = True
     output_type = "list"
     strainer = SoupStrainer(name="img")
@@ -193,7 +193,7 @@ class RssScraper(NamedScraper):
         return rss_urls
 
 
-TYPICAL_SCRAPERS: Dict[str, Type[NamedScraper]] = {
+NAMED_SCRAPERS: Dict[str, Type[NamedScraper]] = {
     s.name: s
     for s in [
         TitleScraper,

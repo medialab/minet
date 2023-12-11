@@ -13,12 +13,18 @@ from itertools import count
 from threading import Lock
 from os.path import basename, isdir
 
-from minet.scrape import Scraper
-from minet.scrape.typical import TYPICAL_SCRAPERS
-from minet.scrape.types import ScraperBase
+from minet.utils import import_target
+from minet.scrape.classes import (
+    NAMED_SCRAPERS,
+    ScraperBase,
+    DefinitionScraper,
+    FunctionScraper,
+)
 from minet.multiprocessing import LazyPool
 from minet.exceptions import (
     DefinitionInvalidFormatError,
+    GenericModuleNotFoundError,
+    TargetInGenericModuleNotFoundError,
 )
 from minet.scrape.exceptions import (
     InvalidScraperError,
@@ -57,30 +63,19 @@ class ScrapeResult:
 
 
 SCRAPER: Optional[ScraperBase] = None
-FORMAT: Optional[str] = None
-PLURAL_SEPARATOR: Optional[str] = None
 HEADERS: Optional[casanova.headers] = None
 
 
-def init_process(options):
+def init_process(scraper: ScraperBase, fieldnames: List[str]):
     global SCRAPER
-    global FORMAT
-    global PLURAL_SEPARATOR
     global HEADERS
 
-    if options["name"] is not None:
-        SCRAPER = TYPICAL_SCRAPERS[options["name"]]()
-    else:
-        SCRAPER = Scraper(options["definition"], strain=options["strain"])
-
-    FORMAT = options["format"]
-    PLURAL_SEPARATOR = options["plural_separator"]
-    HEADERS = casanova.headers(options["fieldnames"])
+    SCRAPER = scraper
+    HEADERS = casanova.headers(fieldnames)
 
 
 def worker(payload: ScrapeWorkerPayload) -> ScrapeResult:
     assert SCRAPER is not None
-    assert PLURAL_SEPARATOR is not None
     assert HEADERS is not None
 
     text = payload.text
@@ -109,12 +104,7 @@ def worker(payload: ScrapeWorkerPayload) -> ScrapeResult:
         context["basename"] = basename(payload.path)
 
     # Attempting to scrape
-    if FORMAT == "csv":
-        items = SCRAPER.as_csv_rows(
-            text, context=context, plural_separator=PLURAL_SEPARATOR
-        )
-    else:
-        items = SCRAPER.as_records(text, context=context)
+    items = SCRAPER.items(text, context=context)
 
     # NOTE: errors might be raised when we consume the generators created above
     try:
@@ -129,19 +119,39 @@ def worker(payload: ScrapeWorkerPayload) -> ScrapeResult:
 
 
 def action(cli_args):
-    using_typical_scraper = False
-
     # Parsing scraper definition
     try:
-        if cli_args.scraper in TYPICAL_SCRAPERS:
-            using_typical_scraper = True
-            scraper = TYPICAL_SCRAPERS[cli_args.scraper]()
+        if cli_args.module:
+            fn = import_target(cli_args.scraper, default="scrape")
+            scraper = FunctionScraper(fn, strain=cli_args.strain)
+        elif cli_args.scraper in NAMED_SCRAPERS:
+            scraper = NAMED_SCRAPERS[cli_args.scraper]()
         else:
-            scraper = Scraper(cli_args.scraper, strain=cli_args.strain)
+            scraper = DefinitionScraper(cli_args.scraper, strain=cli_args.strain)
+
+    except GenericModuleNotFoundError:
+        raise FatalError(
+            [
+                "Could not import %s!" % cli_args.scraper,
+                "Are you sure the module exists?",
+            ]
+        )
+
+    except TargetInGenericModuleNotFoundError as e:
+        raise FatalError(
+            [
+                "Could not find the %s target in the %s module!" % (e.name, e.path),
+                "Are you sure this class/function/variable exists in the module?",
+            ]
+        )
 
     except DefinitionInvalidFormatError:
         raise FatalError(
-            ["Unknown scraper format!", "It should be a JSON or YAML file."]
+            [
+                "Unknown scraper format!",
+                "It should be a JSON or YAML file.",
+                "Or did you forget the -m/--module flag?",
+            ]
         )
 
     except FileNotFoundError:
@@ -165,7 +175,7 @@ def action(cli_args):
             ]
         )
 
-    if scraper.fieldnames is None and cli_args.format == "csv":
+    if not scraper.tabular and cli_args.format == "csv":
         raise FatalError(
             [
                 "Your scraper does not yield tabular data.",
@@ -183,26 +193,54 @@ def action(cli_args):
     writer_lock = Lock()
 
     if cli_args.format == "csv":
-        assert scraper.fieldnames is not None
+        if isinstance(scraper, FunctionScraper):
+            reader = casanova.reader(cli_args.input, total=cli_args.total)
 
-        output_fieldnames = scraper.fieldnames
+            # TODO: support for inferring_enricher
+            # TODO: support forwarding cases that will yield None
+            writer = casanova.inferring_writer(
+                cli_args.output, plural_separator=cli_args.plural_separator
+            )
 
-        if cli_args.scraped_column_prefix is not None:
-            output_fieldnames = [
-                cli_args.scraped_column_prefix + h for h in output_fieldnames
-            ]
+            def writerow(row, item):
+                writer.writerow(item)
 
-        enricher = casanova.enricher(
-            cli_args.input,
-            cli_args.output,
-            total=cli_args.total,
-            select=cli_args.select,
-            add=output_fieldnames,
-        )
-        reader = enricher
+        else:
+            assert scraper.fieldnames is not None
 
-        def writerow(row, item):
-            enricher.writerow(row, item)
+            serializer = casanova.CSVSerializer(
+                plural_separator=cli_args.plural_separator
+            )
+
+            output_fieldnames = scraper.fieldnames
+
+            if cli_args.scraped_column_prefix is not None:
+                output_fieldnames = [
+                    cli_args.scraped_column_prefix + h for h in output_fieldnames
+                ]
+
+            enricher = casanova.enricher(
+                cli_args.input,
+                cli_args.output,
+                total=cli_args.total,
+                select=cli_args.select,
+                add=output_fieldnames,
+            )
+            reader = enricher
+
+            def writerow(row, item):
+                assert scraper.fieldnames is not None
+
+                if item is None:
+                    enricher.writerow(row)
+                    return
+
+                if isinstance(item, dict):
+                    item = [item.get(f) for f in scraper.fieldnames]
+                else:
+                    item = [item]
+
+                enricher.writerow(row, (serializer(v) for v in item))  # type: ignore
 
     else:
         # TODO: casanova should probably expose some ndjson enricher
@@ -254,16 +292,7 @@ def action(cli_args):
         pool = LazyPool(
             cli_args.processes,
             initializer=init_process,
-            initargs=(
-                {
-                    "name": cli_args.scraper if using_typical_scraper else None,
-                    "definition": getattr(scraper, "definition", None),
-                    "strain": cli_args.strain if not using_typical_scraper else None,
-                    "format": cli_args.format,
-                    "plural_separator": cli_args.plural_separator,
-                    "fieldnames": reader.fieldnames,
-                },
-            ),
+            initargs=(scraper, reader.fieldnames),
         )
 
         loading_bar.append_to_title(" (p=%i)" % pool.processes)

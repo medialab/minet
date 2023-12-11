@@ -19,10 +19,6 @@ class CSSSelectorTooComplex(ScrapeError):
     pass
 
 
-class ScraperNotTabularError(ScrapeError):
-    pass
-
-
 class ScraperRuntimeError(ScrapeError):
     def __init__(self, msg=None, reason=None, expression=None, path=None):
         super().__init__(msg)

@@ -14,6 +14,8 @@ SCRAPE_COMMAND = command(
         Use multiple processes to scrape data from a batch of HTML files using
         minet scraping DSL documented here:
         https://github.com/medialab/minet/blob/master/docs/cookbook/scraping_dsl.md
+        or a python function given using the -m/--module flag, or an already
+        implemented typical scraping routine (listed below).
 
         It will output the scraped items as a CSV or NDJSON file.
 
@@ -61,6 +63,15 @@ SCRAPE_COMMAND = command(
         . Scraping a single url:
             $ minet fetch "https://lemonde.fr" | minet scrape scraper.yml -i -
 
+        . Using a builtin scraper:
+            $ minet scrape title -i report.csv > titles.csv
+
+        . Using the `scrape` (default) function of target python module:
+            $ minet scrape scraper.py -i report.csv > titles.csv
+
+        . Using the `scrape_title` function of target python module:
+            $ minet scrape scraper.py:scrape_title -i report.csv > titles.csv
+
         . Indicating a custom path column (e.g. "file"):
             $ minet scrape scraper.yml file -i report.csv -I downloaded > scraped.csv
 
@@ -84,16 +95,18 @@ SCRAPE_COMMAND = command(
 
         . Keeping only some columns from input CSV file:
             $ minet scrape scraper.yml -i report.csv -s name,url > scraped.csv
-
-        . Using a builtin scraper:
-            $ minet scrape title -i report.csv > titles.csv
     """,
     resolve=resolve_arguments,
     variadic_input={"dummy_column": "path", "optional": True, "no_help": True},
     arguments=[
         {
             "name": "scraper",
-            "help": 'Path to a scraper definition file, or name of a builtin scraper, e.g. "title". See the complete list below.',
+            "help": 'Path to a scraper definition file, or name of a builtin scraper, e.g. "title" (see the complete list below), or a path to a python module and function (e.g. scraper.py, scraper.py:scrape_title).',
+        },
+        {
+            "flags": ["-m", "--module"],
+            "help": "Whether given scraper is a python target to import.",
+            "action": "store_true",
         },
         {
             "flags": ["-g", "--glob"],

@@ -1121,7 +1121,7 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 ```
 Usage: minet scrape [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                    [--simple-progress] [-g] [-I INPUT_DIR] [-p PROCESSES]
+                    [--simple-progress] [-m] [-g] [-I INPUT_DIR] [-p PROCESSES]
                     [--chunk-size CHUNK_SIZE] [--body-column BODY_COLUMN]
                     [--url-column URL_COLUMN] [--error-column ERROR_COLUMN]
                     [--status-column STATUS_COLUMN]
@@ -1138,6 +1138,8 @@ Usage: minet scrape [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
 Use multiple processes to scrape data from a batch of HTML files using
 minet scraping DSL documented here:
 https://github.com/medialab/minet/blob/master/docs/cookbook/scraping_dsl.md
+or a python function given using the -m/--module flag, or an already
+implemented typical scraping routine (listed below).
 
 It will output the scraped items as a CSV or NDJSON file.
 
@@ -1164,8 +1166,10 @@ an error occurred.
 
 Positional Arguments:
   scraper                       Path to a scraper definition file, or name of a
-                                builtin scraper, e.g. "title". See the complete
-                                list below.
+                                builtin scraper, e.g. "title" (see the complete
+                                list below), or a path to a python module and
+                                function (e.g. scraper.py,
+                                scraper.py:scrape_title).
   path_or_path_column           Single path to process or name of the CSV column
                                 containing paths when using -i/--input. Defaults
                                 to "path".
@@ -1190,6 +1194,8 @@ Optional Arguments:
   --mimetype-column MIMETYPE_COLUMN
                                 Name of the CSV column containing file mimetype.
                                 Defaults to `mimetype`.
+  -m, --module                  Whether given scraper is a python target to
+                                import.
   --plural-separator PLURAL_SEPARATOR
                                 Separator use to join lists of values when
                                 serializing to CSV. Defaults to `|`.
@@ -1263,6 +1269,15 @@ Examples:
 . Scraping a single url:
     $ minet fetch "https://lemonde.fr" | minet scrape scraper.yml -i -
 
+. Using a builtin scraper:
+    $ minet scrape title -i report.csv > titles.csv
+
+. Using the `scrape` (default) function of target python module:
+    $ minet scrape scraper.py -i report.csv > titles.csv
+
+. Using the `scrape_title` function of target python module:
+    $ minet scrape scraper.py:scrape_title -i report.csv > titles.csv
+
 . Indicating a custom path column (e.g. "file"):
     $ minet scrape scraper.yml file -i report.csv -I downloaded > scraped.csv
 
@@ -1286,9 +1301,6 @@ Examples:
 
 . Keeping only some columns from input CSV file:
     $ minet scrape scraper.yml -i report.csv -s name,url > scraped.csv
-
-. Using a builtin scraper:
-    $ minet scrape title -i report.csv > titles.csv
 ```
 
 ## screenshot

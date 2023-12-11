@@ -5,7 +5,7 @@ import pytest
 from bs4 import BeautifulSoup, Tag, SoupStrainer
 from textwrap import dedent
 
-from minet.scrape import scrape, Scraper
+from minet.scrape import scrape, DefinitionScraper
 from minet.scrape.analysis import (
     fieldnames_from_definition,
     validate,
@@ -30,7 +30,6 @@ from minet.scrape.exceptions import (
     ScraperValidationInvalidExtractorError,
     ScraperValidationMixedConcernError,
     ScraperValidationUnknownKeyError,
-    ScraperNotTabularError,
 )
 
 BASIC_HTML = """
@@ -161,7 +160,7 @@ THE_WORST_HTML = """
 """
 
 
-class TestScraper(object):
+class TestDefinitionScraper(object):
     def test_basics(self):
         result = scrape({"iterator": "li"}, BASIC_HTML)
 
@@ -523,7 +522,7 @@ class TestScraper(object):
 
         fieldnames = fieldnames_from_definition({"sel": "table", "tabulate": True})
 
-        scraper = Scraper({"iterator": "li", "fields": {"id": "id"}})
+        scraper = DefinitionScraper({"iterator": "li", "fields": {"id": "id"}})
 
         assert scraper.fieldnames == ["id"]
 
@@ -780,7 +779,7 @@ class TestScraper(object):
         assert errors == expecting
 
         with pytest.raises(InvalidScraperError) as info:
-            Scraper(bad_definition)
+            DefinitionScraper(bad_definition)
 
         errors = sorted(
             [(e.path, type(e)) for e in info.value.validation_errors], key=key
@@ -950,57 +949,11 @@ class TestScraper(object):
             '<span color="blue">One</span>',
         )
 
-        scraper = Scraper({"iterator": "li"}, strain="div")
+        scraper = DefinitionScraper({"iterator": "li"}, strain="div")
 
         html = "<div>Hello</div><ul><li>ok</li>"
 
         assert scraper(html) == []
-
-    def test_as_csv_row(self):
-        with pytest.raises(ScraperNotTabularError):
-            scraper = Scraper(
-                {"iterator": "li", "fields": {"nested": {"fields": {"text": "text"}}}}
-            )
-
-            scraper.as_csv_dict_rows(BASIC_HTML)
-
-        scraper = Scraper({"iterator": "li"})
-
-        assert list(scraper.as_csv_dict_rows(BASIC_HTML)) == [
-            {"value": "One"},
-            {"value": "Two"},
-        ]
-        assert list(scraper.as_csv_rows(BASIC_HTML)) == [["One"], ["Two"]]
-
-        scraper = Scraper(
-            {
-                "iterator": "li",
-                "fields": {
-                    "text": "text",
-                    "list": {"default": [1, 2]},
-                    "false": {"default": False},
-                    "true": {"default": True},
-                },
-            }
-        )
-
-        assert list(scraper.as_csv_dict_rows(BASIC_HTML)) == [
-            {"text": "One", "list": "1|2", "false": "false", "true": "true"},
-            {"text": "Two", "list": "1|2", "false": "false", "true": "true"},
-        ]
-        assert list(scraper.as_csv_rows(BASIC_HTML)) == [
-            ["One", "1|2", "false", "true"],
-            ["Two", "1|2", "false", "true"],
-        ]
-
-        assert list(scraper.as_csv_dict_rows(BASIC_HTML, plural_separator="§")) == [
-            {"text": "One", "list": "1§2", "false": "false", "true": "true"},
-            {"text": "Two", "list": "1§2", "false": "false", "true": "true"},
-        ]
-        assert list(scraper.as_csv_rows(BASIC_HTML, plural_separator="§")) == [
-            ["One", "1§2", "false", "true"],
-            ["Two", "1§2", "false", "true"],
-        ]
 
     def test_get_display_test(self):
         soup = BeautifulSoup(THE_WORST_HTML, "lxml")

@@ -1,7 +1,6 @@
 from typing import Dict, Optional, Union, List
 
 from bs4 import SoupStrainer
-from casanova import CSVSerializer
 
 from minet.types import AnyFileTarget
 from minet.fs import load_definition
@@ -10,7 +9,8 @@ from minet.scrape.analysis import analyse, validate, ScraperAnalysisOutputType
 from minet.scrape.straining import strainer_from_css
 from minet.scrape.exceptions import InvalidScraperError
 from minet.scrape.utils import ensure_soup
-from minet.scrape.types import AnyScrapableTarget, ScraperBase
+from minet.scrape.types import AnyScrapableTarget
+from minet.scrape.classes.base import ScraperBase
 
 
 def scrape(
@@ -25,12 +25,11 @@ def scrape(
     return interpret_scraper(scraper, soup, root=soup, context=context)
 
 
-class Scraper(ScraperBase):
+class DefinitionScraper(ScraperBase):
     definition: Dict
     fieldnames: Optional[List[str]]
     plural: bool
     output_type: ScraperAnalysisOutputType
-    serializer: CSVSerializer
     strainer: Optional[SoupStrainer]
 
     def __init__(
@@ -51,11 +50,9 @@ class Scraper(ScraperBase):
         analysis = analyse(definition)
 
         self.fieldnames = analysis.fieldnames
+        self.tabular = self.fieldnames is not None
         self.plural = analysis.plural
         self.output_type = analysis.output_type
-
-        # Serializer
-        self.serializer = CSVSerializer()
 
         # Strainer
         self.strainer = None
