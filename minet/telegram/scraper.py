@@ -30,7 +30,7 @@ from ural.telegram import (
     TelegramGroup as ParsedTelegramGroup,
     TelegramMessage as ParsedTelegramMessage,
 )
-from minet.telegram.formatters import TelegramChannelInfos, TelegramChannelMessages
+from minet.telegram.types import TelegramChannelInfos, TelegramChannelMessages
 from minet.telegram.exceptions import TelegramInvalidTargetError
 
 TELEGRAM_IMG_RE = re.compile(r"background-image:url\(\'(.*?)\'\)")
@@ -47,7 +47,7 @@ def forge_telegram_channel_url_next(url, next_after):
     return url
 
 
-def scrape_channel_infos(html):
+def scrape_channel_infos(html) -> TelegramChannelInfos:
     soup = BeautifulSoup(html, "lxml")
 
     channel_infos = soup.select_one("div[class='tgme_channel_info']")

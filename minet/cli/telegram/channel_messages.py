@@ -6,12 +6,12 @@
 #
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.telegram import TelegramScraper
-from minet.telegram.constants import TELEGRAM_MESSAGES_CSV_HEADERS
+from minet.telegram.types import TelegramChannelMessages
 from minet.telegram.exceptions import TelegramInvalidTargetError
 
 
 @with_enricher_and_loading_bar(
-    headers=TELEGRAM_MESSAGES_CSV_HEADERS,
+    headers=TelegramChannelMessages,
     title="Collecting channel messages",
     unit="channels",
     nested=True,

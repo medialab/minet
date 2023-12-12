@@ -6,12 +6,12 @@
 #
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.telegram import TelegramScraper
-from minet.telegram.constants import TELEGRAM_INFOS_CSV_HEADERS
+from minet.telegram.types import TelegramChannelInfos
 from minet.telegram.exceptions import TelegramInvalidTargetError
 
 
 @with_enricher_and_loading_bar(
-    headers=TELEGRAM_INFOS_CSV_HEADERS, title="Retrieving info", unit="channels"
+    headers=TelegramChannelInfos, title="Retrieving info", unit="channels"
 )
 def action(cli_args, enricher, loading_bar):
     scraper = TelegramScraper(throttle=cli_args.throttle)
