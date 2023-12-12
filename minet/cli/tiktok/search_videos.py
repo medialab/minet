@@ -8,11 +8,11 @@ from itertools import islice
 
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.tiktok import TiktokAPIScraper
-from minet.tiktok.constants import TIKTOK_VIDEO_CSV_HEADERS
+from minet.tiktok.types import TiktokVideo
 
 
 @with_enricher_and_loading_bar(
-    headers=TIKTOK_VIDEO_CSV_HEADERS,
+    headers=TiktokVideo,
     title="Searching videos",
     unit="queries",
     nested=True,

@@ -26,9 +26,7 @@ from minet.tiktok.exceptions import (
     TiktokInvalidCookieError,
     TiktokPublicAPIInvalidResponseError,
 )
-from minet.tiktok.formatters import (
-    format_video,
-)
+from minet.tiktok.types import TiktokVideo
 
 
 def forge_video_search_url(query, offset, search_id=None):
@@ -99,7 +97,7 @@ class TiktokAPIScraper(object):
                     continue
 
                 item = item["item"]
-                video = format_video(item)
+                video = TiktokVideo.from_payload(item)
 
                 # NOTE: avoiding pagination hiccups
                 if video.id in already_seen:
