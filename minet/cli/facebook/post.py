@@ -10,9 +10,7 @@ from minet.cli.facebook.utils import (
     print_translation_warning_if_needed,
 )
 from minet.facebook import FacebookMobileScraper
-from minet.facebook.constants import (
-    FACEBOOK_POST_WITH_REACTIONS_CSV_HEADERS,
-)
+from minet.facebook.types import MobileFacebookPostWithReactions
 from minet.facebook.exceptions import (
     FacebookInvalidTargetError,
     FacebookNotPostError,
@@ -28,7 +26,7 @@ CATCH = {
 
 @with_facebook_fatal_errors
 @with_enricher_and_loading_bar(
-    headers=FACEBOOK_POST_WITH_REACTIONS_CSV_HEADERS,
+    headers=MobileFacebookPostWithReactions,
     title="Scraping posts",
     unit="posts",
 )

@@ -7,13 +7,13 @@
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.facebook.utils import with_facebook_fatal_errors
 from minet.facebook import FacebookMobileScraper
-from minet.facebook.constants import FACEBOOK_COMMENT_CSV_HEADERS
+from minet.facebook.types import MobileFacebookComment
 from minet.facebook.exceptions import FacebookInvalidTargetError
 
 
 @with_facebook_fatal_errors
 @with_enricher_and_loading_bar(
-    headers=FACEBOOK_COMMENT_CSV_HEADERS,
+    headers=MobileFacebookComment,
     title="Scraping comments",
     unit="posts",
     nested=True,

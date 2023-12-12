@@ -7,13 +7,13 @@
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.facebook.utils import with_facebook_fatal_errors
 from minet.facebook import FacebookMobileScraper
-from minet.facebook.constants import FACEBOOK_USER_CSV_HEADERS
+from minet.facebook.types import MobileFacebookUser
 from minet.facebook.exceptions import FacebookInvalidTargetError
 
 
 @with_facebook_fatal_errors
 @with_enricher_and_loading_bar(
-    headers=FACEBOOK_USER_CSV_HEADERS, title="Finding authors", unit="posts"
+    headers=MobileFacebookUser, title="Finding authors", unit="posts"
 )
 def action(cli_args, enricher, loading_bar):
     scraper = FacebookMobileScraper(cli_args.cookie, throttle=cli_args.throttle)

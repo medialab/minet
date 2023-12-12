@@ -37,11 +37,11 @@ from minet.web import (
 from minet.scrape.utils import BeautifulSoupWithoutXHTMLWarnings
 from minet.scrape.std import get_display_text
 from minet.facebook.utils import grab_facebook_cookie
-from minet.facebook.formatters import (
-    FacebookComment,
-    FacebookPost,
-    FacebookUser,
-    FacebookPostWithReaction,
+from minet.facebook.types import (
+    MobileFacebookComment,
+    MobileFacebookUser,
+    MobileFacebookPost,
+    MobileFacebookPostWithReactions,
 )
 from minet.facebook.exceptions import (
     FacebookInvalidCookieError,
@@ -80,7 +80,7 @@ def resolve_relative_url(url):
     return urljoin(FACEBOOK_MOBILE_URL, url)
 
 
-def scrape_comments(html, direction=None, in_reply_to=None):
+def scrape_comments(html, direction=None, in_reply_to=None) -> MobileFacebookComment:
     soup = BeautifulSoupWithoutXHTMLWarnings(html, "lxml")
 
     data = {
@@ -139,7 +139,7 @@ def scrape_comments(html, direction=None, in_reply_to=None):
     )
 
     for item in valid_items:
-        item_id = item.get("id")
+        item_id = item["id"]
 
         # Skipping comment if same as commented
         if item_id == in_reply_to:
@@ -206,7 +206,7 @@ def scrape_comments(html, direction=None, in_reply_to=None):
                     data["replies"].append((resolve_relative_url(replies_url), item_id))
 
         data["comments"].append(
-            FacebookComment(
+            MobileFacebookComment(
                 post_id=post_id,
                 id=item_id,
                 user_id=getattr(user, "id", ""),
@@ -302,7 +302,7 @@ def scrape_posts(html):
             else None
         )
 
-        post = FacebookPost(
+        post = MobileFacebookPost(
             url=post_url,
             user_id=getattr(user, "id", ""),
             user_handle=getattr(user, "handle", ""),
@@ -401,7 +401,7 @@ def scrape_video(soup):
         else None
     )
 
-    post = FacebookPostWithReaction(
+    post = MobileFacebookPostWithReactions(
         url=video_url,
         user_id=getattr(user, "id", ""),
         user_handle=getattr(user, "handle", ""),
@@ -492,7 +492,7 @@ def scrape_photo(soup):
         else None
     )
 
-    post = FacebookPostWithReaction(
+    post = MobileFacebookPostWithReactions(
         url=photo_url,
         user_id=getattr(user, "id", ""),
         user_handle=getattr(user, "handle", ""),
@@ -597,7 +597,7 @@ def scrape_post(html):
         else None
     )
 
-    post = FacebookPostWithReaction(
+    post = MobileFacebookPostWithReactions(
         url=post_url,
         user_id=getattr(user, "id", ""),
         user_handle=getattr(user, "handle", ""),
@@ -765,8 +765,8 @@ class FacebookMobileScraper(object):
         user_label = user_item.get_text().strip()
 
         if isinstance(parsed, ParsedFacebookHandle):
-            return FacebookUser(user_label, None, parsed.handle, parsed.url)
+            return MobileFacebookUser(user_label, None, parsed.handle, parsed.url)
         elif isinstance(parsed, ParsedFacebookUser):
-            return FacebookUser(user_label, parsed.id, parsed.handle, parsed.url)
+            return MobileFacebookUser(user_label, parsed.id, parsed.handle, parsed.url)
         else:
             raise TypeError

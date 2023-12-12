@@ -19,56 +19,6 @@ FACEBOOK_MOBILE_RATE_LIMITER_STATE = RateLimiterState(
 )
 FACEBOOK_WEB_RATE_LIMITER_STATE = RateLimiterState(1, FACEBOOK_WEB_DEFAULT_THROTTLE)
 
-FACEBOOK_USER_CSV_HEADERS = ["user_label", "user_id", "user_handle", "user_url"]
-
-FACEBOOK_COMMENT_CSV_HEADERS = [
-    "post_id",
-    "id",
-    "user_id",
-    "user_handle",
-    "user_url",
-    "user_label",
-    "text",
-    "html",
-    "formatted_date",
-    "date",
-    "reactions",
-    "replies",
-    "in_reply_to",
-]
-
-FACEBOOK_POST_CSV_HEADERS = [
-    "url",
-    "user_id",
-    "user_handle",
-    "user_url",
-    "user_label",
-    "text",
-    "html",
-    "translated_text",
-    "translated_html",
-    "translated_from",
-    "formatted_date",
-    "date",
-    "reactions",
-    "comments",
-]
-
-FACEBOOK_POST_STATS_CSV_HEADERS = [
-    "error",
-    "canonical",
-    "account_name",
-    "timestamp",
-    "time",
-    "link",
-    "aria_label",
-    "text",
-    "share_count",
-    "comment_count",
-    "reaction_count",
-    "video_view_count",
-]
-
 FACEBOOK_REACTION_KEYS = OrderedDict(
     {
         1: "like",
@@ -82,7 +32,3 @@ FACEBOOK_REACTION_KEYS = OrderedDict(
         16: "care",
     }
 )
-
-FACEBOOK_POST_WITH_REACTIONS_CSV_HEADERS = FACEBOOK_POST_CSV_HEADERS + [
-    "reactions_types"
-]

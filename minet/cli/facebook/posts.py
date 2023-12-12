@@ -10,13 +10,13 @@ from minet.cli.facebook.utils import (
     print_translation_warning_if_needed,
 )
 from minet.facebook import FacebookMobileScraper
-from minet.facebook.constants import FACEBOOK_POST_CSV_HEADERS
+from minet.facebook.types import MobileFacebookPost
 from minet.facebook.exceptions import FacebookInvalidTargetError
 
 
 @with_facebook_fatal_errors
 @with_enricher_and_loading_bar(
-    headers=FACEBOOK_POST_CSV_HEADERS,
+    headers=MobileFacebookPost,
     title="Scraping group posts",
     unit="groups",
     nested=True,
