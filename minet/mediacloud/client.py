@@ -10,7 +10,7 @@ from minet.mediacloud.constants import MEDIACLOUD_DEFAULT_TIMEOUT
 from minet.mediacloud.utils import make_simple_call
 from minet.mediacloud.search import mediacloud_search
 from minet.mediacloud.topic import mediacloud_topic_stories
-from minet.mediacloud.formatters import format_media, format_feed
+from minet.mediacloud.types import MediacloudFeed, MediacloudMedia
 
 
 class MediacloudAPIClient(object):
@@ -38,7 +38,7 @@ class MediacloudAPIClient(object):
             self.pool_manager,
             self.token,
             "/media/single",
-            format_media,
+            MediacloudFeed.from_payload,
             arg=media_id,
             single=True,
             **kwargs
@@ -49,7 +49,7 @@ class MediacloudAPIClient(object):
             self.pool_manager,
             self.token,
             "/feeds/list",
-            format_feed,
+            MediacloudMedia.from_payload,
             query={"media_id": media_id, "rows": 100},
             **kwargs
         )

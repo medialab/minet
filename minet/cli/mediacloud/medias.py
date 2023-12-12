@@ -9,14 +9,11 @@ import casanova
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.mediacloud.utils import with_mediacloud_fatal_errors
 from minet.mediacloud import MediacloudAPIClient
-from minet.mediacloud.constants import (
-    MEDIACLOUD_MEDIA_CSV_HEADER,
-    MEDIACLOUD_FEED_CSV_HEADER,
-)
+from minet.mediacloud.types import MediacloudFeed, MediacloudMedia
 
 
 def get_headers(cli_args):
-    headers = MEDIACLOUD_MEDIA_CSV_HEADER[1:]
+    headers = MediacloudMedia.fieldnames()[1:]
 
     if cli_args.feeds is not None:
         headers.append("feeds")
@@ -32,9 +29,7 @@ def action(cli_args, enricher, loading_bar):
     feeds_writer = None
 
     if cli_args.feeds:
-        feeds_writer = casanova.writer(
-            cli_args.feeds, fieldnames=MEDIACLOUD_FEED_CSV_HEADER
-        )
+        feeds_writer = casanova.writer(cli_args.feeds, fieldnames=MediacloudFeed)
 
     client = MediacloudAPIClient(cli_args.token)
 

@@ -9,12 +9,12 @@ import casanova
 from minet.cli.loading_bar import LoadingBar
 from minet.cli.mediacloud.utils import with_mediacloud_fatal_errors
 from minet.mediacloud import MediacloudAPIClient
-from minet.mediacloud.constants import MEDIACLOUD_STORIES_CSV_HEADER
+from minet.mediacloud.types import MediacloudStory
 
 
 @with_mediacloud_fatal_errors
 def action(cli_args):
-    writer = casanova.writer(cli_args.output, fieldnames=MEDIACLOUD_STORIES_CSV_HEADER)
+    writer = casanova.writer(cli_args.output, fieldnames=MediacloudStory)
 
     client = MediacloudAPIClient(cli_args.token)
 

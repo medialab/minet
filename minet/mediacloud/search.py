@@ -9,7 +9,7 @@ from urllib.parse import quote_plus
 from minet.web import request
 from minet.mediacloud.constants import MEDIACLOUD_API_BASE_URL, MEDIACLOUD_DEFAULT_BATCH
 from minet.mediacloud.exceptions import MediacloudServerError
-from minet.mediacloud.formatters import format_story
+from minet.mediacloud.types import MediacloudStory
 from minet.mediacloud.utils import get_last_processed_stories_id
 
 
@@ -145,7 +145,7 @@ def mediacloud_search(
 
             for story in data:
                 if not raw:
-                    story = format_story(story)
+                    story = MediacloudStory.from_payload(story)
 
                 yield story
 

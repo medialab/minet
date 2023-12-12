@@ -102,7 +102,7 @@ class TiktokVideo(TabularRecord):
                     duet_from_user_name = text["userUniqueId"]
                     duet_from_user_is_commerce = text["isCommerce"]
 
-        return TiktokVideo(
+        return cls(
             payload.get("id"),
             payload.get("desc"),
             payload.get("createTime"),

@@ -7,7 +7,7 @@
 from minet.web import request
 from minet.mediacloud.constants import MEDIACLOUD_API_BASE_URL, MEDIACLOUD_DEFAULT_BATCH
 from minet.mediacloud.utils import get_next_link_id
-from minet.mediacloud.formatters import format_topic_story
+from minet.mediacloud.types import MediacloudTopicStory
 
 
 def url_forge(
@@ -60,7 +60,7 @@ def mediacloud_topic_stories(
 
         for story in data["stories"]:
             if not raw:
-                story = format_topic_story(story, next_link_id)
+                story = MediacloudTopicStory.from_payload(story, next_link_id)
 
             yield story
 

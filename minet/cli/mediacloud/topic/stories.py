@@ -8,13 +8,11 @@ import casanova
 
 from minet.cli.loading_bar import LoadingBar
 from minet.mediacloud import MediacloudAPIClient
-from minet.mediacloud.constants import MEDIACLOUD_TOPIC_STORIES_CSV_HEADERS
+from minet.mediacloud.types import MediacloudTopicStory
 
 
 def action(cli_args):
-    writer = casanova.writer(
-        cli_args.output, fieldnames=MEDIACLOUD_TOPIC_STORIES_CSV_HEADERS
-    )
+    writer = casanova.writer(cli_args.output, fieldnames=MediacloudTopicStory)
 
     with LoadingBar(title="Fetching stories", unit="stories") as loading_bar:
         client = MediacloudAPIClient(cli_args.token)
