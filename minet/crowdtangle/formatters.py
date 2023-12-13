@@ -10,7 +10,6 @@ from minet.crowdtangle.constants import (
     CROWDTANGLE_POST_TYPES,
     CROWDTANGLE_REACTION_TYPES,
     CROWDTANGLE_POST_CSV_HEADERS,
-    CROWDTANGLE_POST_CSV_HEADERS_WITH_LINK,
     CROWDTANGLE_SUMMARY_CSV_HEADERS,
     CROWDTANGLE_LEADERBOARD_CSV_HEADERS,
     CROWDTANGLE_LEADERBOARD_CSV_HEADERS_WITH_BREAKDOWN,
@@ -22,14 +21,6 @@ from minet.crowdtangle.constants import (
 CrowdTanglePost = namedrecord(
     "CrowdTanglePost",
     CROWDTANGLE_POST_CSV_HEADERS,
-    boolean=["account_verified"],
-    plural=["links", "expanded_links"],
-    json=["media"],
-)
-
-CrowdTanglePostWithLink = namedrecord(
-    "CrowdTanglePostWithLink",
-    CROWDTANGLE_POST_CSV_HEADERS_WITH_LINK,
     boolean=["account_verified"],
     plural=["links", "expanded_links"],
     json=["media"],
@@ -54,7 +45,7 @@ def map_key(key, target):
     return [item[key] for item in target]
 
 
-def format_post(post, link=None):
+def format_post(post):
     row = [
         post["id"],
         post["platformId"],
@@ -73,9 +64,6 @@ def format_post(post, link=None):
         post.get("videoLengthMS"),
         post.get("liveVideoStatus"),
     ]
-
-    if link:
-        row = [link] + row
 
     stats = post["statistics"]
     actual_stats = stats["actual"]
@@ -109,9 +97,6 @@ def format_post(post, link=None):
             post.get("media"),
         ]
     )
-
-    if link is not None:
-        return CrowdTanglePostWithLink(*row)
 
     return CrowdTanglePost(*row)
 

@@ -76,6 +76,6 @@ def crowdtangle_summary(
 
     else:
         if not raw:
-            posts = [format_post(post, link=link) for post in posts]
+            posts = [format_post(post) for post in posts]
 
         return stats, posts

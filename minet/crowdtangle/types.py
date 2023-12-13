@@ -68,11 +68,6 @@ class CrowdTanglePost(TabularRecord):
 
 
 @dataclass
-class CrowdTanglePostWithLink(TabularRecord):
-    pass
-
-
-@dataclass
 class CrowdTangleSummary(TabularRecord):
     pass
 
