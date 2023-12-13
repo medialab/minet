@@ -165,6 +165,4 @@ for post_type in CROWDTANGLE_POST_TYPES:
             "%s_%s" % (post_type, substitute_key)
         )
 
-CROWDTANGLE_LIST_CSV_HEADERS = ["id", "title", "type"]
-
 CROWDTANGLE_DEFAULT_START_DATE = "2010"

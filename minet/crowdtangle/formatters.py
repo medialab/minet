@@ -13,7 +13,6 @@ from minet.crowdtangle.constants import (
     CROWDTANGLE_SUMMARY_CSV_HEADERS,
     CROWDTANGLE_LEADERBOARD_CSV_HEADERS,
     CROWDTANGLE_LEADERBOARD_CSV_HEADERS_WITH_BREAKDOWN,
-    CROWDTANGLE_LIST_CSV_HEADERS,
     CROWDTANGLE_STATISTICS,
     CROWDTANGLE_FULL_STATISTICS,
 )
@@ -37,8 +36,6 @@ CrowdTangleLeaderboardWithBreakdown = namedrecord(
     CROWDTANGLE_LEADERBOARD_CSV_HEADERS_WITH_BREAKDOWN,
     boolean=["verified"],
 )
-
-CrowdTangleList = namedrecord("CrowdTangleList", CROWDTANGLE_LIST_CSV_HEADERS)
 
 
 def map_key(key, target):
@@ -141,7 +138,3 @@ def format_leaderboard(item, with_breakdown=False):
         return CrowdTangleLeaderboardWithBreakdown(*row)
 
     return CrowdTangleLeaderboard(*row)
-
-
-def format_list(item):
-    return CrowdTangleList(item["id"], item["title"], item["type"])

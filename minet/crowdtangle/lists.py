@@ -5,7 +5,7 @@
 # Function used to retrieved lists from a given dashboard.
 #
 from minet.crowdtangle.exceptions import CrowdTangleMissingTokenError
-from minet.crowdtangle.formatters import format_list
+from minet.crowdtangle.types import CrowdTangleList
 
 URL_TEMPLATE = "https://api.crowdtangle.com/lists?token=%s"
 
@@ -21,6 +21,6 @@ def crowdtangle_lists(request, token=None, raw=False):
     lists = data["lists"]
 
     if not raw:
-        return [format_list(l) for l in lists]
+        return [CrowdTangleList.from_payload(l) for l in lists]
 
     return lists

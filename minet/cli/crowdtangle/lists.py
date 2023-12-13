@@ -7,12 +7,12 @@
 import casanova
 
 from minet.cli.crowdtangle.utils import with_crowdtangle_utilities
-from minet.crowdtangle.constants import CROWDTANGLE_LIST_CSV_HEADERS
+from minet.crowdtangle.types import CrowdTangleList
 
 
 @with_crowdtangle_utilities
 def action(cli_args, client):
-    writer = casanova.writer(cli_args.output, fieldnames=CROWDTANGLE_LIST_CSV_HEADERS)
+    writer = casanova.writer(cli_args.output, fieldnames=CrowdTangleList)
 
     lists = client.lists()
 

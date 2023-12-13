@@ -84,4 +84,10 @@ class CrowdTangleLeaderboardWithBreakdown(TabularRecord):
 
 @dataclass
 class CrowdTangleList(TabularRecord):
-    pass
+    id: str
+    title: str
+    type: str
+
+    @classmethod
+    def from_payload(cls, payload) -> "CrowdTangleList":
+        return cls(payload["id"], payload["title"], payload["type"])
