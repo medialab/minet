@@ -547,7 +547,11 @@ def atomic_resolve(
                         canonical = extract_canonical_link(buffered_response.body)
 
                         if canonical is not None and canonical != url:
-                            canonical = urljoin(url, canonical)
+                            try:
+                                canonical = urljoin(url, canonical)
+                            except ValueError:
+                                raise InvalidRedirectError("Canonical url is invalid")
+
                             redirection = Redirection(canonical, "canonical")
                             url_stack[canonical] = redirection
 
@@ -584,7 +588,11 @@ def atomic_resolve(
                 )
 
             # Resolving next url
-            next_url = urljoin(url, location.strip())
+            try:
+                next_url = urljoin(url, location.strip())
+            except ValueError:
+                # NOTE: sometimes this will fail because the next location is invalid
+                raise InvalidRedirectError("Next location is an invalid url")
 
             # Self loop?
             if not stateful and next_url == url:
