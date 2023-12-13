@@ -9,13 +9,13 @@ from itertools import islice
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.instagram.utils import with_instagram_fatal_errors
 from minet.instagram import InstagramAPIScraper
-from minet.instagram.constants import INSTAGRAM_COMMENT_CSV_HEADERS
+from minet.instagram.types import InstagramComment
 from minet.instagram.exceptions import InstagramInvalidTargetError
 
 
 @with_instagram_fatal_errors
 @with_enricher_and_loading_bar(
-    headers=INSTAGRAM_COMMENT_CSV_HEADERS,
+    headers=InstagramComment,
     title="Scraping post comments",
     unit="posts",
     nested=True,

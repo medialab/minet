@@ -9,7 +9,7 @@ from itertools import islice
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.instagram.utils import with_instagram_fatal_errors
 from minet.instagram import InstagramAPIScraper
-from minet.instagram.constants import INSTAGRAM_POST_CSV_HEADERS
+from minet.instagram.types import InstagramPost
 from minet.instagram.exceptions import (
     InstagramNoPublicationError,
     InstagramPrivateOrNonExistentAccountError,
@@ -19,7 +19,7 @@ from minet.instagram.exceptions import (
 
 @with_instagram_fatal_errors
 @with_enricher_and_loading_bar(
-    headers=INSTAGRAM_POST_CSV_HEADERS,
+    headers=InstagramPost,
     title="Scraping posts",
     unit="users",
     nested=True,
@@ -39,7 +39,7 @@ def action(cli_args, enricher, loading_bar):
                     generator = islice(generator, cli_args.limit)
 
                 for post in generator:
-                    enricher.writerow(row, post.as_csv_row())
+                    enricher.writerow(row, post)
                     loading_bar.nested_advance()
 
             except InstagramInvalidTargetError:

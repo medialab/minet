@@ -4,6 +4,8 @@
 #
 # Instagram public API "scraper".
 #
+from typing import Dict, Iterator
+
 import json
 from urllib.parse import quote
 from ebbe import getpath
@@ -50,12 +52,12 @@ from minet.instagram.exceptions import (
     InstagramAccountNoFollowError,
     InstagramPrivateAccountError,
 )
-from minet.instagram.formatters import (
-    format_comment,
-    format_hashtag_post,
-    format_post,
-    format_user,
-    format_user_info,
+from minet.instagram.types import (
+    InstagramComment,
+    InstagramHashtagPost,
+    InstagramPost,
+    InstagramUser,
+    InstagramUserInfo,
 )
 
 INSTAGRAM_GRAPHQL_ENDPOINT = "https://www.instagram.com/graphql/query/"
@@ -216,9 +218,10 @@ class InstagramAPIScraper(object):
 
     @retrying_method()
     def request_json(self, url, magic_token=False):
-        headers = {"Cookie": self.cookie}
+        headers: Dict[str, str] = {"Cookie": self.cookie}
 
         if magic_token:
+            assert self.magic_token is not None
             headers["X-IG-App-ID"] = self.magic_token
 
         response = request(
@@ -290,7 +293,7 @@ class InstagramAPIScraper(object):
         return self.magic_token
 
     @ensure_magic_token
-    def comments(self, post):
+    def comments(self, post) -> Iterator[InstagramComment]:
         if not INSTAGRAM_ID_PATTERN.match(post):
             parsed = parse_instagram_url(post)
             if isinstance(parsed, (ParsedInstagramPost, ParsedInstagramReel)):
@@ -341,7 +344,7 @@ class InstagramAPIScraper(object):
 
                 already_seen.add(item["pk"])
 
-                yield format_comment(item)
+                yield InstagramComment.from_payload(item)
 
                 if item.get("child_comment_count") > 0:
                     max_id = ""
@@ -359,7 +362,7 @@ class InstagramAPIScraper(object):
                         children_items = data_comment.get("child_comments")
 
                         for children_item in children_items:
-                            yield format_comment(children_item)
+                            yield InstagramComment.from_payload(children_item)
 
                         more_available = data_comment.get(
                             "has_more_tail_child_comments"
@@ -375,7 +378,7 @@ class InstagramAPIScraper(object):
             if not min_id:
                 break
 
-    def search_hashtag(self, hashtag):
+    def search_hashtag(self, hashtag) -> Iterator[InstagramHashtagPost]:
         hashtag = hashtag.lstrip("#")
         cursor = None
 
@@ -395,7 +398,7 @@ class InstagramAPIScraper(object):
             edges = data.get("edges")
 
             for edge in edges:
-                yield format_hashtag_post(edge["node"])
+                yield InstagramHashtagPost.from_payload(edge["node"])
 
             has_next_page = getpath(data, ["page_info", "has_next_page"])
 
@@ -405,7 +408,7 @@ class InstagramAPIScraper(object):
             cursor = getpath(data, ["page_info", "end_cursor"])
 
     @ensure_magic_token
-    def post_infos(self, name):
+    def post_infos(self, name) -> InstagramPost:
         if INSTAGRAM_ID_PATTERN.match(name):
             url = forge_post_url_from_id(name)
 
@@ -427,7 +430,7 @@ class InstagramAPIScraper(object):
         if not data:
             raise InstagramInvalidTargetError
 
-        return format_post(getpath(data, ["items", 0]))
+        return InstagramPost.from_payload(getpath(data, ["items", 0]))
 
     def get_username(self, name):
         if INSTAGRAM_ID_PATTERN.match(name):
@@ -464,7 +467,7 @@ class InstagramAPIScraper(object):
         return self.request_json(url, magic_token=True)
 
     @ensure_magic_token
-    def user_followers(self, name):
+    def user_followers(self, name) -> Iterator[InstagramUser]:
         name = self.get_username(name)
 
         max_id = None
@@ -491,7 +494,7 @@ class InstagramAPIScraper(object):
                 raise InstagramAccountNoFollowError
 
             for item in items:
-                yield format_user(item)
+                yield InstagramUser.from_payload(item)
 
             max_id = data.get("next_max_id")
 
@@ -499,7 +502,7 @@ class InstagramAPIScraper(object):
                 break
 
     @ensure_magic_token
-    def user_following(self, name):
+    def user_following(self, name) -> Iterator[InstagramUser]:
         name = self.get_username(name)
 
         max_id = None
@@ -526,7 +529,7 @@ class InstagramAPIScraper(object):
                 raise InstagramAccountNoFollowError
 
             for item in items:
-                yield format_user(item)
+                yield InstagramUser.from_payload(item)
 
             max_id = data.get("next_max_id")
 
@@ -534,7 +537,7 @@ class InstagramAPIScraper(object):
                 break
 
     @ensure_magic_token
-    def user_posts(self, name):
+    def user_posts(self, name) -> Iterator[InstagramPost]:
         name = self.get_username(name)
 
         max_id = None
@@ -562,7 +565,7 @@ class InstagramAPIScraper(object):
                 raise InstagramPrivateOrNonExistentAccountError
 
             for item in items:
-                yield format_post(item)
+                yield InstagramPost.from_payload(item)
 
             more_available = data.get("more_available")
 
@@ -572,7 +575,7 @@ class InstagramAPIScraper(object):
             max_id = data.get("next_max_id")
 
     @ensure_magic_token
-    def user_infos(self, name):
+    def user_infos(self, name) -> InstagramUserInfo:
         name = self.get_username(name)
 
         data = self.get_user(name)
@@ -585,4 +588,4 @@ class InstagramAPIScraper(object):
         if not user:
             raise InstagramInvalidTargetError
 
-        return format_user_info(user)
+        return InstagramUserInfo.from_payload(user)
