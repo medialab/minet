@@ -7,7 +7,7 @@
 from ebbe import getpath
 
 from minet.crowdtangle.exceptions import CrowdTangleMissingTokenError
-from minet.crowdtangle.formatters import format_post
+from minet.crowdtangle.types import CrowdTanglePost
 
 URL_TEMPLATE = "https://api.crowdtangle.com/post/%s?token=%s"
 
@@ -31,6 +31,6 @@ def crowdtangle_post(request, post_id, token=None, raw=False):
         return
 
     if not raw:
-        return format_post(post)
+        return CrowdTanglePost.from_payload(post)
 
     return post

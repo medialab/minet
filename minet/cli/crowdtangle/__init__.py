@@ -6,7 +6,7 @@
 #
 from casanova import RowCountResumer, LastCellResumer
 
-from minet.cli.argparse import BooleanAction, SplitterType, CSVFileType
+from minet.cli.argparse import SplitterType, CSVFileType
 
 # TODO: lazyloading issue
 from minet.crowdtangle.constants import (
@@ -42,13 +42,6 @@ CROWDTANGLE_LEADERBOARD_SUBCOMMAND = command(
             $ minet ct leaderboard --token YOUR_TOKEN > accounts-stats.csv
     """,
     arguments=[
-        {
-            "flags": ["--breakdown", "--no-breakdown"],
-            "help": "Whether to skip statistics breakdown by post type in the CSV output.",
-            "dest": "breakdown",
-            "action": BooleanAction,
-            "default": True,
-        },
         FORMAT_ARGUMENT,
         {
             "flags": ["-l", "--limit"],

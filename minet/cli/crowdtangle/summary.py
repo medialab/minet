@@ -8,24 +8,21 @@ import casanova
 
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.crowdtangle.utils import with_crowdtangle_utilities
-from minet.crowdtangle.constants import (
-    CROWDTANGLE_SUMMARY_CSV_HEADERS,
-    CROWDTANGLE_POST_CSV_HEADERS,
-)
+from minet.crowdtangle.types import CrowdTanglePost, CrowdTangleSummary
 
 # TODO: could be a nested loading bar
 
 
 @with_crowdtangle_utilities
 @with_enricher_and_loading_bar(
-    headers=CROWDTANGLE_SUMMARY_CSV_HEADERS, title="Collecting data", unit="urls"
+    headers=CrowdTangleSummary, title="Collecting data", unit="urls"
 )
 def action(cli_args, client, enricher, loading_bar):
     posts_writer = None
 
     if cli_args.posts is not None:
         posts_writer = casanova.writer(
-            cli_args.posts, fieldnames=["url"] + CROWDTANGLE_POST_CSV_HEADERS
+            cli_args.posts, fieldnames=["url"] + CrowdTanglePost.fieldnames()
         )
 
     for row, url in enricher.cells(cli_args.column, with_rows=True):

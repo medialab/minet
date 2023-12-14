@@ -3,7 +3,11 @@ from typing import Optional, List, Any
 from dataclasses import dataclass
 from casanova import TabularRecord, tabular_field
 
-# TODO: the conversion was pretty lazy...
+from minet.crowdtangle.constants import (
+    CROWDTANGLE_STATISTICS,
+    CROWDTANGLE_REACTION_TYPES,
+    CROWDTANGLE_FULL_STATISTICS,
+)
 
 
 @dataclass
@@ -18,7 +22,11 @@ class CrowdTangleAccount(TabularRecord):
     url: str
     verified: bool
     type: str
-    page_admin_top_country: str
+    page_admin_top_country: Optional[str]
+
+
+def map_key(key, target):
+    return [item[key] for item in target]
 
 
 @dataclass
@@ -66,20 +74,135 @@ class CrowdTanglePost(TabularRecord):
     expanded_links: List[str]
     media: Any = tabular_field(as_json=True)
 
+    @classmethod
+    def from_payload(cls, payload) -> "CrowdTanglePost":
+        row = [
+            payload["id"],
+            payload["platformId"],
+            payload["platform"],
+            payload["type"],
+            payload.get("title"),
+            payload.get("caption"),
+            payload.get("message"),
+            payload.get("description"),
+            payload["date"].split(" ", 1)[0],
+            payload["date"],
+            payload["updated"],
+            payload.get("link"),
+            payload.get("postUrl"),
+            payload["score"],
+            payload.get("videoLengthMS"),
+            payload.get("liveVideoStatus"),
+        ]
+
+        stats = payload["statistics"]
+        actual_stats = stats["actual"]
+        expected_stats = stats["expected"]
+
+        for name in CROWDTANGLE_STATISTICS:
+            key = "%sCount" % name
+
+            row.append(actual_stats.get(key, ""))
+            row.append(expected_stats.get(key, ""))
+
+        account = payload["account"]
+        account = CrowdTangleAccount(
+            account["id"],
+            account.get("platformId"),
+            account.get("platform"),
+            account["name"],
+            account.get("handle"),
+            account.get("profileImage"),
+            account["subscriberCount"],
+            account["url"],
+            account["verified"],
+            account.get("accountType"),
+            account.get("pageAdminTopCountry"),
+        )
+
+        row.extend(
+            [
+                # Account
+                account,
+                # Remaining
+                map_key("original", payload.get("expandedLinks", [])),
+                map_key("expanded", payload.get("expandedLinks", [])),
+                payload.get("media"),
+            ]
+        )
+
+        return cls(*row)
+
 
 @dataclass
 class CrowdTangleSummary(TabularRecord):
-    pass
+    angry_count: int
+    comment_count: int
+    haha_count: int
+    like_count: int
+    love_count: int
+    sad_count: int
+    share_count: int
+    thankful_count: int
+    wow_count: int
+
+    @classmethod
+    def from_payload(cls, payload) -> "CrowdTangleSummary":
+        row = (payload["%sCount" % t] for t in CROWDTANGLE_REACTION_TYPES)
+        return cls(*row)
 
 
 @dataclass
 class CrowdTangleLeaderboard(TabularRecord):
-    pass
+    ct_id: str
+    name: str
+    handle: str
+    profile_image: str
+    subscriber_count: int
+    url: str
+    verified: bool
+    initial_subscriber_count: int
+    final_subscriber_count: int
+    subscriber_data_notes: str
+    love_count: int
+    wow_count: int
+    thankful_count: int
+    interaction_rate: int
+    like_count: int
+    haha_count: int
+    comment_count: int
+    share_count: int
+    sad_count: int
+    angry_count: int
+    post_count: int
+    total_interaction_count: int
+    total_video_time_ms: int
+    three_plus_minute_video_count: int
 
+    @classmethod
+    def from_payload(cls, payload) -> "CrowdTangleLeaderboard":
+        account = payload["account"]
+        subscriber_data = payload["subscriberData"]
 
-@dataclass
-class CrowdTangleLeaderboardWithBreakdown(TabularRecord):
-    pass
+        row = [
+            account["id"],
+            account["name"],
+            account.get("handle"),
+            account.get("profileImage"),
+            account["subscriberCount"],
+            account["url"],
+            account["verified"],
+            subscriber_data["initialCount"],
+            subscriber_data["finalCount"],
+            subscriber_data.get("notes"),
+        ]
+
+        summary = payload["summary"]
+
+        for key, _ in CROWDTANGLE_FULL_STATISTICS:
+            row.append(summary.get(key))
+
+        return cls(*row)
 
 
 @dataclass

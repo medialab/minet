@@ -5,7 +5,7 @@
 # Function related to leaderboards
 #
 from minet.crowdtangle.utils import make_paginated_iterator
-from minet.crowdtangle.formatters import format_leaderboard
+from minet.crowdtangle.types import CrowdTangleLeaderboard
 
 URL_TEMPLATE = "https://api.crowdtangle.com/leaderboard?count=100&token=%s"
 
@@ -26,5 +26,5 @@ crowdtangle_leaderboard = make_paginated_iterator(
     url_forge,
     item_key="accountStatistics",
     item_id_getter=lambda x: x["account"]["id"],
-    formatter=format_leaderboard,
+    formatter=CrowdTangleLeaderboard.from_payload,
 )

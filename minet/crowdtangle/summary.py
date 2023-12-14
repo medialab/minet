@@ -12,7 +12,7 @@ from minet.crowdtangle.constants import (
     CROWDTANGLE_SUMMARY_DEFAULT_SORT_TYPE,
     CROWDTANGLE_SUMMARY_SORT_TYPES,
 )
-from minet.crowdtangle.formatters import format_post, format_summary
+from minet.crowdtangle.types import CrowdTanglePost, CrowdTangleSummary
 
 URL_TEMPLATE = (
     "https://api.crowdtangle.com/links"
@@ -69,13 +69,13 @@ def crowdtangle_summary(
 
     if stats is not None:
         if not raw:
-            stats = format_summary(stats)
+            stats = CrowdTangleSummary.from_payload(stats)
 
     if not with_top_posts:
         return stats
 
     else:
         if not raw:
-            posts = [format_post(post) for post in posts]
+            posts = [CrowdTanglePost.from_payload(post) for post in posts]
 
         return stats, posts

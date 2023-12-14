@@ -5,7 +5,7 @@
 # Function related to posts fetching.
 #
 from minet.crowdtangle.utils import make_paginated_iterator
-from minet.crowdtangle.formatters import format_post
+from minet.crowdtangle.types import CrowdTanglePost
 
 URL_TEMPLATE = (
     "https://api.crowdtangle.com/posts?count=100&sortBy=%(sort_by)s&token=%(token)s"
@@ -39,5 +39,5 @@ def url_forge(
 
 
 crowdtangle_posts = make_paginated_iterator(
-    url_forge, item_key="posts", formatter=format_post
+    url_forge, item_key="posts", formatter=CrowdTanglePost.from_payload
 )

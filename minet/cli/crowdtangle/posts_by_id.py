@@ -10,7 +10,7 @@ from ural.facebook import is_facebook_post_url
 import minet.facebook as facebook
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.crowdtangle.utils import with_crowdtangle_utilities
-from minet.crowdtangle.constants import CROWDTANGLE_POST_CSV_HEADERS
+from minet.crowdtangle.types import CrowdTanglePost
 from minet.crowdtangle.exceptions import (
     CrowdTanglePostNotFound,
 )
@@ -18,7 +18,7 @@ from minet.crowdtangle.exceptions import (
 
 @with_crowdtangle_utilities
 @with_enricher_and_loading_bar(
-    headers=CROWDTANGLE_POST_CSV_HEADERS, title="Retrieving posts", unit="posts"
+    headers=CrowdTanglePost, title="Retrieving posts", unit="posts"
 )
 def action(cli_args, client, enricher, loading_bar):
     for row, url in enricher.cells(cli_args.column, with_rows=True):
@@ -45,7 +45,7 @@ def action(cli_args, client, enricher, loading_bar):
                 post = client.post(post_id)
 
                 if post is not None:
-                    enricher.writerow(row, post.as_csv_row())
+                    enricher.writerow(row, post)
                 else:
                     enricher.writerow(row)
             except CrowdTanglePostNotFound as error:

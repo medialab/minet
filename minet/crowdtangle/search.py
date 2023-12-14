@@ -7,7 +7,7 @@
 from urllib.parse import quote
 
 from minet.crowdtangle.utils import make_paginated_iterator
-from minet.crowdtangle.formatters import format_post
+from minet.crowdtangle.types import CrowdTanglePost
 
 URL_TEMPLATE = "https://api.crowdtangle.com/posts/search?count=100&sortBy=%(sort_by)s&token=%(token)s&searchTerm=%(terms)s"
 
@@ -53,5 +53,5 @@ def url_forge(**kwargs):
 
 
 crowdtangle_search = make_paginated_iterator(
-    url_forge, item_key="posts", formatter=format_post
+    url_forge, item_key="posts", formatter=CrowdTanglePost.from_payload
 )
