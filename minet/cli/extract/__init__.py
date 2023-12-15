@@ -1,4 +1,4 @@
-from casanova import ThreadSafeResumer
+from casanova import IndexedResumer
 
 from minet.cli.argparse import command
 
@@ -91,7 +91,7 @@ EXTRACT_COMMAND = command(
     """,
     resolve=resolve_arguments,
     variadic_input={"dummy_column": "path", "optional": True, "no_help": True},
-    resumer=ThreadSafeResumer,
+    resumer=IndexedResumer,
     arguments=[
         {
             "flags": ["-g", "--glob"],

@@ -9,7 +9,7 @@ from typing import Optional, Dict, Iterator
 from os.path import isdir
 from dataclasses import dataclass
 from itertools import count
-from casanova import ThreadSafeEnricher
+from casanova import IndexedEnricher
 from threading import Lock
 
 from minet.exceptions import TrafilaturaError
@@ -72,13 +72,13 @@ PADDING = [""] * len(TrafilaturaResult.fieldnames())
 
 @with_enricher_and_loading_bar(
     headers=HEADERS,
-    enricher_type="threadsafe",
+    enricher_type="indexed",
     index_column="extract_original_index",
     title="Extracting text",
     unit="docs",
     total_from_enricher=False,
 )
-def action(cli_args, enricher: ThreadSafeEnricher, loading_bar):
+def action(cli_args, enricher: IndexedEnricher, loading_bar):
     if cli_args.input_dir is not None and not isdir(cli_args.input_dir):
         raise FatalError(
             'Could not find the [cyan]-I/--input-dir "{}"[/cyan] directory!'.format(

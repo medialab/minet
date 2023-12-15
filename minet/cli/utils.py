@@ -12,7 +12,7 @@ import stat
 import yaml
 import platform
 import casanova
-from casanova.namedrecord import is_tabular_record_class
+from casanova import is_tabular_record_class
 from dataclasses import dataclass
 from glob import iglob
 from copy import copy
@@ -386,7 +386,7 @@ def with_enricher_and_loading_bar(
                 and cli_args.resume
                 and isinstance(
                     cli_args.output,
-                    (casanova.RowCountResumer, casanova.ThreadSafeResumer),
+                    (casanova.RowCountResumer, casanova.IndexedResumer),
                 )
                 and cli_args.output.can_resume()
             ):
@@ -407,8 +407,8 @@ def with_enricher_and_loading_bar(
 
             enricher_fn = casanova.enricher
 
-            if enricher_type == "threadsafe":
-                enricher_fn = casanova.threadsafe_enricher
+            if enricher_type == "indexed":
+                enricher_fn = casanova.indexed_enricher
 
             elif enricher_type == "batch":
                 enricher_fn = casanova.batch_enricher

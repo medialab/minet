@@ -152,14 +152,14 @@ def get_title(cli_args):
 
 @with_enricher_and_loading_bar(
     headers=get_headers,
-    enricher_type="threadsafe",
+    enricher_type="indexed",
     index_column="original_index",
     title=get_title,
     unit="urls",
     stats_sort_key=loading_bar_stats_sort_key,
 )
 @with_ctrl_c_warning
-def action(cli_args, enricher: casanova.ThreadSafeEnricher, loading_bar: LoadingBar):
+def action(cli_args, enricher: casanova.IndexedEnricher, loading_bar: LoadingBar):
     # Resolving or fetching?
     resolve = cli_args.action == "resolve"
 

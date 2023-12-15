@@ -1,6 +1,6 @@
-from casanova import ThreadSafeResumer
+from casanova import IndexedResumer
 
-from minet.cli.argparse import command, BooleanAction, FolderStrategyType
+from minet.cli.argparse import command, FolderStrategyType
 from minet.cli.constants import DEFAULT_CONTENT_FOLDER, DEFAULT_SCREENSHOT_FOLDER
 from minet.cli.exceptions import InvalidArgumentsError
 
@@ -161,7 +161,7 @@ FETCH_COMMAND = command(
             $ minet fetch url -i file.csv -O html > report.csv
     """,
     resolve=resolve_fetch_arguments,
-    resumer=ThreadSafeResumer,
+    resumer=IndexedResumer,
     variadic_input={"dummy_column": "url"},
     arguments=[
         *FETCH_RESOLVE_COMMON_ARGUMENTS,
@@ -260,7 +260,7 @@ RESOLVE_COMMAND = command(
         . Resolving a single url:
             $ minet resolve https://lemonde.fr
     """,
-    resumer=ThreadSafeResumer,
+    resumer=IndexedResumer,
     variadic_input={"dummy_column": "url"},
     arguments=[
         *FETCH_RESOLVE_COMMON_ARGUMENTS,
@@ -332,7 +332,7 @@ SCREENSHOT_COMMAND = command(
         . Screenshot a single url:
             $ minet screenshot https://lemonde.fr
     """,
-    resumer=ThreadSafeResumer,
+    resumer=IndexedResumer,
     variadic_input={"dummy_column": "url"},
     arguments=[
         *COMMON_ARGUMENTS,
