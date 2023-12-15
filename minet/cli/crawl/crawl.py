@@ -85,7 +85,7 @@ class DataWriter:
 
         if self.format == "csv":
             # TODO: ability to pass fieldnames? from spider?
-            w = casanova.InferringWriter(f, add=["job_id"])
+            w = casanova.InferringWriter(f, prepend=["job_id"])
         elif self.format == "jsonl" or self.format == "ndjson":
             w = ndjson.writer(f)
         else:
@@ -97,7 +97,7 @@ class DataWriter:
         job_id = result.job.id
 
         if self.format == "csv":
-            return (data, [job_id])
+            return ([job_id], data)
 
         return ({"job_id": job_id, "data": data},)
 

@@ -194,16 +194,19 @@ def action(cli_args):
 
     if cli_args.format == "csv":
         if isinstance(scraper, FunctionScraper):
-            reader = casanova.reader(cli_args.input, total=cli_args.total)
-
-            # TODO: support for inferring_enricher
-            # TODO: support forwarding cases that will yield None
-            writer = casanova.inferring_writer(
-                cli_args.output, plural_separator=cli_args.plural_separator
+            enricher = casanova.inferring_enricher(
+                cli_args.input,
+                cli_args.output,
+                total=cli_args.total,
+                plural_separator=cli_args.plural_separator,
+                select=cli_args.select,
+                mapping_sample_size=512,
+                buffer_optionals=True,
             )
+            reader = enricher
 
             def writerow(row, item):
-                writer.writerow(item)
+                enricher.writerow(row, item)
 
         else:
             assert scraper.fieldnames is not None
@@ -355,6 +358,8 @@ def action(cli_args):
                     # No errors
                     assert result.items is not None
                     items = result.items
+
+                    print(items)
 
                     with writer_lock:
                         for item in items:
