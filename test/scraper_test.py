@@ -1,6 +1,8 @@
 # =============================================================================
 # Minet Scrape Unit Tests
 # =============================================================================
+from typing import Optional
+
 import pytest
 from bs4 import BeautifulSoup, Tag, SoupStrainer
 from textwrap import dedent
@@ -31,6 +33,7 @@ from minet.scrape.exceptions import (
     ScraperValidationMixedConcernError,
     ScraperValidationUnknownKeyError,
 )
+from minet.scrape.classes.function import infer_fieldnames_from_function_return_type
 
 BASIC_HTML = """
     <ul>
@@ -160,7 +163,7 @@ THE_WORST_HTML = """
 """
 
 
-class TestDefinitionScraper(object):
+class TestDefinitionScraper:
     def test_basics(self):
         result = scrape({"iterator": "li"}, BASIC_HTML)
 
@@ -1055,3 +1058,31 @@ class TestDefinitionScraper(object):
         text = get_display_text(elements)
 
         assert text == "L'internationale."
+
+
+class TestFunctionScraper:
+    def test_infer_fieldnames_from_function_return_type(self):
+        def basic_string() -> str:
+            return "ok"
+
+        def basic_int() -> int:
+            return 4
+
+        def basic_float() -> float:
+            return 4.0
+
+        def basic_bool() -> bool:
+            return True
+
+        def basic_void() -> None:
+            return
+
+        def basic_optional_scalar() -> Optional[str]:
+            return
+
+        assert infer_fieldnames_from_function_return_type(basic_string) == ["value"]
+        assert infer_fieldnames_from_function_return_type(basic_int) == ["value"]
+        assert infer_fieldnames_from_function_return_type(basic_float) == ["value"]
+        assert infer_fieldnames_from_function_return_type(basic_bool) == ["value"]
+        assert infer_fieldnames_from_function_return_type(basic_void) == ["value"]
+        assert infer_fieldnames_from_function_return_type(basic_optional_scalar) == ["value"]

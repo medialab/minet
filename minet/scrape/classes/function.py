@@ -1,14 +1,38 @@
-from typing import Optional, Callable, Any, cast, Dict
+from typing import Union, Optional, Callable, Any, cast, Dict, List
 
 import inspect
+
 from casanova import RowWrapper
 from bs4 import SoupStrainer
 
+from minet.types import get_type_hints, get_origin, get_args
 from minet.scrape.classes.base import ScraperBase
 from minet.scrape.soup import WonderfulSoup
 from minet.scrape.straining import strainer_from_css
 from minet.scrape.utils import ensure_soup
 from minet.scrape.types import AnyScrapableTarget
+
+
+def infer_fieldnames_from_function_return_type(fn: Callable) -> Optional[List[str]]:
+    if not callable(fn):
+        raise TypeError
+
+    return_type = get_type_hints(fn)["return"]
+
+    origin = get_origin(return_type)
+
+    if origin is Union:
+        args = get_args(return_type)
+
+        # Optionals
+        if len(args) == 2:
+            if args[1] is type(None):
+                return_type = args[0]
+
+    if return_type in (str, int, float, bool, type(None)):
+        return ["value"]
+
+    return None
 
 
 class FunctionScraper(ScraperBase):
