@@ -359,8 +359,6 @@ def action(cli_args):
                     assert result.items is not None
                     items = result.items
 
-                    print(items)
-
                     with writer_lock:
                         for item in items:
                             writerow(original_item.row, item)
