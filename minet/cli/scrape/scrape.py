@@ -124,6 +124,8 @@ def action(cli_args):
         if cli_args.module:
             fn = import_target(cli_args.scraper, default="scrape")
             scraper = FunctionScraper(fn, strain=cli_args.strain)
+        elif cli_args.eval:
+            scraper = FunctionScraper(cli_args.scraper, strain=cli_args.strain)
         elif cli_args.scraper in NAMED_SCRAPERS:
             scraper = NAMED_SCRAPERS[cli_args.scraper]()
         else:

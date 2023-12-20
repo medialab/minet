@@ -36,7 +36,7 @@ def infer_fieldnames_from_function_return_type(fn: Callable) -> Optional[List[st
 
 
 class FunctionScraper(ScraperBase):
-    fn: Callable[[RowWrapper, WonderfulSoup], Any]
+    fn: Union[str, Callable[[RowWrapper, WonderfulSoup], Any]]
     fieldnames = None
     plural: bool
     tabular = True
@@ -45,9 +45,10 @@ class FunctionScraper(ScraperBase):
 
     def __init__(
         self,
-        fn: Callable[[RowWrapper, WonderfulSoup], Any],
+        fn: Union[str, Callable[[RowWrapper, WonderfulSoup], Any]],
         strain: Optional[str] = None,
     ):
+        # NOTE: closures cannot be pickled without using third-party library `dill`.
         self.fn = fn
         self.plural = inspect.isgeneratorfunction(fn)
 
@@ -61,5 +62,8 @@ class FunctionScraper(ScraperBase):
 
         row = context["row"]
         soup = cast(WonderfulSoup, ensure_soup(html, strainer=self.strainer))
+
+        if isinstance(self.fn, str):
+            return eval(self.fn, {"row": row, 'soup': soup}, None)
 
         return self.fn(row, soup)

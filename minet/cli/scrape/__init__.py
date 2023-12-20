@@ -14,8 +14,9 @@ SCRAPE_COMMAND = command(
         Use multiple processes to scrape data from a batch of HTML files using
         minet scraping DSL documented here:
         https://github.com/medialab/minet/blob/master/docs/cookbook/scraping_dsl.md
-        or a python function given using the -m/--module flag, or an already
-        implemented typical scraping routine (listed below).
+        or a python function given using the -m/--module flag, or a simple inline
+        python expression given using the -e/--eval flag, or an already implemented
+        typical scraping routine (listed below).
 
         It will output the scraped items as a CSV or NDJSON file.
 
@@ -67,10 +68,13 @@ SCRAPE_COMMAND = command(
             $ minet scrape title -i report.csv > titles.csv
 
         . Using the `scrape` (default) function of target python module:
-            $ minet scrape scraper.py -i report.csv > titles.csv
+            $ minet scrape -m scraper.py -i report.csv > titles.csv
 
         . Using the `scrape_title` function of target python module:
-            $ minet scrape scraper.py:scrape_title -i report.csv > titles.csv
+            $ minet scrape -m scraper.py:scrape_title -i report.csv > titles.csv
+
+        . Using an inline python expression to evaluate:
+            $ minet scrape -e 'soup.scrape_one("title")' -i report.csv > titles.csv
 
         . Indicating a custom path column (e.g. "file"):
             $ minet scrape scraper.yml file -i report.csv -I downloaded > scraped.csv
@@ -107,6 +111,11 @@ SCRAPE_COMMAND = command(
             "flags": ["-m", "--module"],
             "help": "Whether given scraper is a python target to import.",
             "action": "store_true",
+        },
+        {
+            "flags": ["-e", "--eval"],
+            "help": "Whether given scraper should be a simple expression to evaluate.",
+            "action": "store_true"
         },
         {
             "flags": ["-g", "--glob"],

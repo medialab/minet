@@ -1121,9 +1121,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 ```
 Usage: minet scrape [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
-                    [--simple-progress] [-m] [-g] [-I INPUT_DIR] [-p PROCESSES]
-                    [--chunk-size CHUNK_SIZE] [--body-column BODY_COLUMN]
-                    [--url-column URL_COLUMN] [--error-column ERROR_COLUMN]
+                    [--simple-progress] [-m] [-e] [-g] [-I INPUT_DIR]
+                    [-p PROCESSES] [--chunk-size CHUNK_SIZE]
+                    [--body-column BODY_COLUMN] [--url-column URL_COLUMN]
+                    [--error-column ERROR_COLUMN]
                     [--status-column STATUS_COLUMN]
                     [--encoding-column ENCODING_COLUMN]
                     [--mimetype-column MIMETYPE_COLUMN] [--encoding ENCODING]
@@ -1138,8 +1139,9 @@ Usage: minet scrape [-h] [--silent] [--refresh-per-second REFRESH_PER_SECOND]
 Use multiple processes to scrape data from a batch of HTML files using
 minet scraping DSL documented here:
 https://github.com/medialab/minet/blob/master/docs/cookbook/scraping_dsl.md
-or a python function given using the -m/--module flag, or an already
-implemented typical scraping routine (listed below).
+or a python function given using the -m/--module flag, or a simple inline
+python expression given using the -e/--eval flag, or an already implemented
+typical scraping routine (listed below).
 
 It will output the scraped items as a CSV or NDJSON file.
 
@@ -1186,6 +1188,8 @@ Optional Arguments:
                                 Defaults to `encoding`.
   --error-column ERROR_COLUMN   Name of the CSV column containing a fetch error.
                                 Defaults to `fetch_error`.
+  -e, --eval                    Whether given scraper should be a simple
+                                expression to evaluate.
   -f, --format {csv,jsonl,ndjson}
                                 Output format. Defaults to `csv`.
   -g, --glob                    Will interpret given paths as glob patterns to
@@ -1273,10 +1277,13 @@ Examples:
     $ minet scrape title -i report.csv > titles.csv
 
 . Using the `scrape` (default) function of target python module:
-    $ minet scrape scraper.py -i report.csv > titles.csv
+    $ minet scrape -m scraper.py -i report.csv > titles.csv
 
 . Using the `scrape_title` function of target python module:
-    $ minet scrape scraper.py:scrape_title -i report.csv > titles.csv
+    $ minet scrape -m scraper.py:scrape_title -i report.csv > titles.csv
+
+. Using an inline python expression to evaluate:
+    $ minet scrape -e 'soup.scrape_one("title")' -i report.csv > titles.csv
 
 . Indicating a custom path column (e.g. "file"):
     $ minet scrape scraper.yml file -i report.csv -I downloaded > scraped.csv
