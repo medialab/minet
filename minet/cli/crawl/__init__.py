@@ -191,6 +191,7 @@ def crawl_command(
     default_retries: Optional[int] = None,
     force_spoof_user_agent: Optional[bool] = None,
     force_stateful_redirects: Optional[bool] = None,
+    timeout: bool = True,
     default_timeout: Optional[float] = None,
     default_connect_timeout: Optional[float] = None,
 ):
@@ -241,11 +242,16 @@ def crawl_command(
     if default_retries is not None:
         set_default_value("retries", default_retries)
 
-    if default_timeout is not None:
-        set_default_value("timeout", default_timeout)
+    if not timeout:
+        del arguments_dict["timeout"]
+        del arguments_dict["connect_timeout"]
 
-    if default_connect_timeout is not None:
-        set_default_value("connect_timeout", default_connect_timeout)
+    else:
+        if default_timeout is not None:
+            set_default_value("timeout", default_timeout)
+
+        if default_connect_timeout is not None:
+            set_default_value("connect_timeout", default_connect_timeout)
 
     if force_folder_strategy is not None:
         del arguments_dict["folder_strategy"]
@@ -337,9 +343,10 @@ def crawl_command(
         if resolve is not None:
             resolve(cli_args)
 
-        cli_args.timeout = Timeout(
-            connect=cli_args.connect_timeout, total=cli_args.timeout
-        )
+        if timeout:
+            cli_args.timeout = Timeout(
+                connect=cli_args.connect_timeout, total=cli_args.timeout
+            )
 
         # --sqlar disables --compress-on-disk
         if cli_args.sqlar:
