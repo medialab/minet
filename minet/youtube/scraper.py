@@ -35,7 +35,7 @@ def gather_external_links(data) -> Iterator[Tuple[str, str]]:
                     return
 
                 yield (
-                    getpath(v, ("title", "content")),
+                    getpath(v, ("title", "content")).strip(),
                     infer_redirection(
                         getpath(
                             v,
