@@ -158,6 +158,12 @@ CRAWL_MODULE_ARGUMENTS = [
     },
 ]
 
+def delete(o, k):
+    try:
+        del o[k]
+    except KeyError:
+        pass
+
 
 def crawl_command(
     name: str,
@@ -198,11 +204,11 @@ def crawl_command(
 
     # NOTE: missing a lot in the resolve here
     if unique:
-        del arguments_dict["visit_urls_only_once"]
+        delete(arguments_dict, "visit_urls_only_once")
 
     if not url_cache:
-        del arguments_dict["visit_urls_only_once"]
-        del arguments_dict["normalized_url_cache"]
+        delete(arguments_dict, "visit_urls_only_once")
+        delete(arguments_dict, "normalized_url_cache")
 
     if not max_depth:
         del arguments_dict["max_depth"]
