@@ -1085,4 +1085,6 @@ class TestFunctionScraper:
         assert infer_fieldnames_from_function_return_type(basic_float) == ["value"]
         assert infer_fieldnames_from_function_return_type(basic_bool) == ["value"]
         assert infer_fieldnames_from_function_return_type(basic_void) == ["value"]
-        assert infer_fieldnames_from_function_return_type(basic_optional_scalar) == ["value"]
+        assert infer_fieldnames_from_function_return_type(basic_optional_scalar) == [
+            "value"
+        ]

@@ -3,7 +3,7 @@ from minet.youtube.scraper import YouTubeScraper
 
 
 @with_enricher_and_loading_bar(
-    headers=["url"],
+    headers=["title", "url"],
     title="Retrieving channel links",
     unit="channels",
     sub_unit="links",
@@ -19,5 +19,5 @@ def action(cli_args, enricher, loading_bar):
             if links is None:
                 continue
 
-            for link in links:
-                enricher.writerow(row, [link])
+            for title, link in links:
+                enricher.writerow(row, [title, link])

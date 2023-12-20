@@ -1,10 +1,11 @@
-from typing import List, Set, Tuple, Optional
+from typing import List, Tuple, Optional, Iterator
 
 import re
 import json
 from html import unescape
 from urllib.parse import unquote
 from ural import infer_redirection
+from ebbe import getpath
 
 from minet.scrape import WonderfulSoup
 from minet.web import (
@@ -22,26 +23,42 @@ from minet.youtube.exceptions import YouTubeInvalidVideoTargetError
 
 CAPTION_TRACKS_RE = re.compile(r'"captionTracks":(\[.*?\])')
 INITIAL_DATA_RE = re.compile(
-    rb"(?:const|let|var)\s+ytInitialData\s*=\s*({.+});</script>"
+    rb"(?:const|let|var)\s+ytInitialData\s*=\s*({.+})\s*;</script>"
 )
 
 
-def gather_url_endpoints(data):
+def gather_external_links(data) -> Iterator[Tuple[str, str]]:
     if isinstance(data, dict):
         for k, v in data.items():
-            if k == "urlEndpoint":
+            if k == "channelExternalLinkViewModel":
                 if not isinstance(v, dict):
                     return
 
-                yield infer_redirection(v["url"])
+                yield (
+                    getpath(v, ("title", "content")),
+                    infer_redirection(
+                        getpath(
+                            v,
+                            (
+                                "link",
+                                "commandRuns",
+                                0,
+                                "onTap",
+                                "innertubeCommand",
+                                "urlEndpoint",
+                                "url",
+                            ),
+                        )
+                    ),
+                )
 
                 return
 
-            yield from gather_url_endpoints(v)
+            yield from gather_external_links(v)
 
     elif isinstance(data, list):
         for v in data:
-            yield from gather_url_endpoints(v)
+            yield from gather_external_links(v)
 
     else:
         return
@@ -152,7 +169,12 @@ class YouTubeScraper:
 
         return None
 
-    def get_channel_links(self, channel_url: str) -> Optional[Set[str]]:
+    def get_channel_links(self, channel_url: str) -> Optional[List[Tuple[str, str]]]:
+        # NOTE: for some weird reason, the /about page has more info in
+        # the ytInitialData global variable even if visual content is
+        # strictly identical.
+        channel_url = channel_url.split("?", 1)[0].split("#")[0].rstrip("/") + "/about"
+
         response = self.request(channel_url, spoof_ua=True)
 
         match = INITIAL_DATA_RE.search(response.body)
@@ -165,4 +187,7 @@ class YouTubeScraper:
         except json.JSONDecodeError:
             return None
 
-        return set(gather_url_endpoints(data))
+        # with open("./dump.json", "w") as f:
+        #     json.dump(data, f, ensure_ascii=False, indent=2)
+
+        return list(gather_external_links(data))
