@@ -73,6 +73,7 @@ _Platform-related commands_
 - [twitter](#twitter)
   - [attrition](#attrition)
   - [followers](#followers)
+  - [followers-you-know](#followers-you-know)
   - [friends](#friends)
   - [list-followers](#list-followers)
   - [list-members](#list-members)
@@ -5390,6 +5391,113 @@ how to use the command with a CSV file?
 
 . This also works with single values:
     $ minet twitter followers "value1,value2" --explode ","
+```
+
+### followers-you-know
+
+```
+Usage: minet twitter followers-you-know [-h] [-c COOKIE] [--rcfile RCFILE]
+                                        [--silent]
+                                        [--refresh-per-second REFRESH_PER_SECOND]
+                                        [--simple-progress]
+                                        [--timezone TIMEZONE] [-i INPUT]
+                                        [--explode EXPLODE] [-s SELECT]
+                                        [--total TOTAL] [-o OUTPUT]
+                                        user_id_or_user_id_column
+
+# Minet Twitter Followers You Know Command
+
+Scrape Twitter's public facing "followers you know" lists such
+as the one shown here on the website:
+https://twitter.com/DEFACTO_UE/followers_you_follow
+
+Note that this command only work when you provide user ids, as
+providing screen names will not work.
+
+Be aware that follower lists on Twitter currently are known
+to be inconsistent when the actual number of users is roughly
+over 50.
+
+Positional Arguments:
+  user_id_or_user_id_column     Single user_id to process or name of the CSV
+                                column containing user ids when using
+                                -i/--input.
+
+Optional Arguments:
+  -c, --cookie COOKIE           Authenticated cookie to use or browser from
+                                which to extract it (supports "firefox",
+                                "chrome", "chromium", "opera" and "edge").
+                                Defaults to `firefox`. Can also be configured in
+                                a .minetrc file as "twitter.cookie" or read from
+                                the MINET_TWITTER_COOKIE env variable.
+  --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
+                                Defaults to UTC.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the user ids you want to process. Will consider
+                                `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Examples:
+
+. Collecting the followers you know from some user id:
+    $ minet tw followers-you-know 794083798912827393 > users.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet twitter followers-you-know "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet twitter followers-you-know column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xsv search -s col . | minet twitter followers-you-know column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet twitter followers-you-know column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet twitter followers-you-know "value1,value2" --explode ","
 ```
 
 ### friends

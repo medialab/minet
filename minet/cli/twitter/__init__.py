@@ -393,6 +393,41 @@ TWITTER_SCRAPE_SUBCOMMAND = command(
     ],
 )
 
+TWITTER_FOLLOWERS_YOU_KNOW_SUBCOMMAND = command(
+    "followers-you-know",
+    "minet.cli.twitter.followers_you_know",
+    title="Minet Twitter Followers You Know Command",
+    description="""
+        Scrape Twitter's public facing "followers you know" lists such
+        as the one shown here on the website:
+        https://twitter.com/DEFACTO_UE/followers_you_follow
+
+        Note that this command only work when you provide user ids, as
+        providing screen names will not work.
+
+        Be aware that follower lists on Twitter currently are known
+        to be inconsistent when the actual number of users is roughly
+        over 50.
+    """,
+    epilog="""
+        Examples:
+
+        . Collecting the followers you know from some user id:
+            $ minet tw followers-you-know 794083798912827393 > users.csv
+    """,
+    variadic_input={"dummy_column": "user_id", "item_label_plural": "user ids"},
+    arguments=[
+        {
+            "flags": ["-c", "--cookie"],
+            "help": 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge").',
+            "default": "firefox",
+            "rc_key": ["twitter", "cookie"],
+            "action": ConfigAction,
+        },
+        TIMEZONE_ARGUMENT,
+    ],
+)
+
 TWITTER_TWEET_COUNT_SUBCOMMAND = twitter_api_subcommand(
     "tweet-count",
     "minet.cli.twitter.tweet_count",
@@ -620,6 +655,7 @@ TWITTER_COMMAND = command(
         TWITTER_LIST_MEMBERS_SUBCOMMAND,
         TWITTER_RETWEETERS_SUBCOMMAND,
         TWITTER_SCRAPE_SUBCOMMAND,
+        TWITTER_FOLLOWERS_YOU_KNOW_SUBCOMMAND,
         TWITTER_TWEET_COUNT_SUBCOMMAND,
         TWITTER_TWEET_DATE_SUBCOMMAND,
         TWITTER_TWEET_SEARCH_SUBCOMMAND,

@@ -7,7 +7,7 @@
 import time
 import datetime
 from urllib.parse import urlencode, quote
-from twitwi import normalize_tweet
+from twitwi import normalize_tweet, normalize_user
 from ebbe import with_is_first, getpath, pathgetter
 from json import JSONDecodeError
 from tenacity import RetryCallState
@@ -254,6 +254,10 @@ CURSOR_USER_PATH_GETTER = pathgetter(
     ]
 )
 
+ENTRIES_FOLLOWER_YOU_KNOW_PATH_GETTER = pathgetter(
+    ["data", "user", "result", "timeline", "timeline", "instructions", -1, "entries"]
+)
+
 
 def extract_cursor_from_tweets_payload(payload):
     found_cursor = CURSOR_FIRST_POSSIBLE_PATH_GETTER(payload)
@@ -272,6 +276,27 @@ def extract_cursor_from_tweets_payload(payload):
 
 def extract_cursor_from_users_payload(payload):
     return CURSOR_USER_PATH_GETTER(payload)
+
+
+def extract_data_from_followers_you_know_payload(payload):
+    entries = ENTRIES_FOLLOWER_YOU_KNOW_PATH_GETTER(payload)
+
+    if entries is None:
+        return None, []
+
+    bottom_cursor_node = next(
+        (entry for entry in entries if entry["entryId"].startswith("cursor-bottom")),
+        None,
+    )
+
+    if bottom_cursor_node is None:
+        return None, []
+
+    return bottom_cursor_node["content"]["value"], [
+        entry["content"]["itemContent"]["user_results"]["result"]
+        for entry in entries
+        if entry["entryId"].startswith("user-")
+    ]
 
 
 def process_single_tweet(tweet_id, tweet_index, user_index):
@@ -644,11 +669,36 @@ class TwitterAPIScraper(object):
         #     return data
 
         # users = [
-        #     normalize_user(user, locale=locale)
+        #      (user, locale=locale)
         #     for user in data["globalObjects"]["users"].values()
         # ]
 
         # return next_cursor, users
+
+    @retrying_method()
+    def request_followers_you_know(self, user_id, cursor=None):
+        url = "https://twitter.com/i/api/graphql/sT_K0qB2bqpWfL3-cq4zaQ/FollowersYouKnow?variables=%7B%22userId%22%3A%22{}%22%2C%22count%22%3A20%2C%22includePromotedContent%22%3Afalse%7D&features=%7B%22responsive_web_graphql_exclude_directive_enabled%22%3Atrue%2C%22verified_phone_label_enabled%22%3Afalse%2C%22creator_subscriptions_tweet_preview_api_enabled%22%3Atrue%2C%22responsive_web_graphql_timeline_navigation_enabled%22%3Atrue%2C%22responsive_web_graphql_skip_user_profile_image_extensions_enabled%22%3Afalse%2C%22c9s_tweet_anatomy_moderator_badge_enabled%22%3Atrue%2C%22tweetypie_unmention_optimization_enabled%22%3Atrue%2C%22responsive_web_edit_tweet_api_enabled%22%3Atrue%2C%22graphql_is_translatable_rweb_tweet_is_translatable_enabled%22%3Atrue%2C%22view_counts_everywhere_api_enabled%22%3Atrue%2C%22longform_notetweets_consumption_enabled%22%3Atrue%2C%22responsive_web_twitter_article_tweet_consumption_enabled%22%3Afalse%2C%22tweet_awards_web_tipping_enabled%22%3Afalse%2C%22freedom_of_speech_not_reach_fetch_enabled%22%3Atrue%2C%22standardized_nudges_misinfo%22%3Atrue%2C%22tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled%22%3Atrue%2C%22rweb_video_timestamps_enabled%22%3Atrue%2C%22longform_notetweets_rich_text_read_enabled%22%3Atrue%2C%22longform_notetweets_inline_media_enabled%22%3Atrue%2C%22responsive_web_media_download_video_enabled%22%3Afalse%2C%22responsive_web_enhance_cards_enabled%22%3Afalse%7D".format(
+            quote(user_id)
+        )
+
+        if cursor is not None:
+            url = "https://twitter.com/i/api/graphql/sT_K0qB2bqpWfL3-cq4zaQ/FollowersYouKnow?variables=%7B%22userId%22%3A%22{}%22%2C%22count%22%3A20%2C%22cursor%22%3A%22{}%22%2C%22includePromotedContent%22%3Afalse%7D&features=%7B%22responsive_web_graphql_exclude_directive_enabled%22%3Atrue%2C%22verified_phone_label_enabled%22%3Afalse%2C%22creator_subscriptions_tweet_preview_api_enabled%22%3Atrue%2C%22responsive_web_graphql_timeline_navigation_enabled%22%3Atrue%2C%22responsive_web_graphql_skip_user_profile_image_extensions_enabled%22%3Afalse%2C%22c9s_tweet_anatomy_moderator_badge_enabled%22%3Atrue%2C%22tweetypie_unmention_optimization_enabled%22%3Atrue%2C%22responsive_web_edit_tweet_api_enabled%22%3Atrue%2C%22graphql_is_translatable_rweb_tweet_is_translatable_enabled%22%3Atrue%2C%22view_counts_everywhere_api_enabled%22%3Atrue%2C%22longform_notetweets_consumption_enabled%22%3Atrue%2C%22responsive_web_twitter_article_tweet_consumption_enabled%22%3Afalse%2C%22tweet_awards_web_tipping_enabled%22%3Afalse%2C%22freedom_of_speech_not_reach_fetch_enabled%22%3Atrue%2C%22standardized_nudges_misinfo%22%3Atrue%2C%22tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled%22%3Atrue%2C%22rweb_video_timestamps_enabled%22%3Atrue%2C%22longform_notetweets_rich_text_read_enabled%22%3Atrue%2C%22longform_notetweets_inline_media_enabled%22%3Atrue%2C%22responsive_web_media_download_video_enabled%22%3Afalse%2C%22responsive_web_enhance_cards_enabled%22%3Afalse%7D".format(
+                quote(user_id), quote(cursor)
+            )
+
+        data = self.request_search(url)
+
+        next_cursor, user_entries = extract_data_from_followers_you_know_payload(data)
+
+        users = []
+
+        for user_entry in user_entries:
+            user_data = user_entry["legacy"]
+            user_data["id_str"] = user_entry["rest_id"]
+            user_data["protected"] = user_data.get("protected", False)
+            users.append(user_data)
+
+        return next_cursor, users
 
     def search_tweets(
         self,
@@ -716,3 +766,20 @@ class TwitterAPIScraper(object):
                 return
 
             cursor = new_cursor
+
+    def followers_you_know(self, user_id, locale=None):
+        cursor = None
+
+        while True:
+            next_cursor, users = self.request_followers_you_know(user_id, cursor=cursor)
+
+            if not users:
+                return
+
+            for user in users:
+                yield normalize_user(user, locale=locale)
+
+            if next_cursor is None or next_cursor == cursor:
+                return
+
+            cursor = next_cursor

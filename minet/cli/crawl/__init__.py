@@ -158,6 +158,7 @@ CRAWL_MODULE_ARGUMENTS = [
     },
 ]
 
+
 def delete(o, k):
     try:
         del o[k]

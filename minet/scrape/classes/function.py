@@ -64,6 +64,6 @@ class FunctionScraper(ScraperBase):
         soup = cast(WonderfulSoup, ensure_soup(html, strainer=self.strainer))
 
         if isinstance(self.fn, str):
-            return eval(self.fn, {"row": row, 'soup': soup}, None)
+            return eval(self.fn, {"row": row, "soup": soup}, None)
 
         return self.fn(row, soup)

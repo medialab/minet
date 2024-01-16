@@ -73,6 +73,7 @@ _Platform-related commands_
 - [twitter](#twitter)
   - [attrition](#attrition)
   - [followers](#followers)
+  - [followers-you-know](#followers-you-know)
   - [friends](#friends)
   - [list-followers](#list-followers)
   - [list-members](#list-members)
@@ -393,6 +394,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### followers
 
 <% twitter/followers %>
+
+### followers-you-know
+
+<% twitter/followers-you-know %>
 
 ### friends
 

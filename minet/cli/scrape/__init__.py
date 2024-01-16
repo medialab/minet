@@ -115,7 +115,7 @@ SCRAPE_COMMAND = command(
         {
             "flags": ["-e", "--eval"],
             "help": "Whether given scraper should be a simple expression to evaluate.",
-            "action": "store_true"
+            "action": "store_true",
         },
         {
             "flags": ["-g", "--glob"],
