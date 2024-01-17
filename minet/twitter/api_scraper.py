@@ -374,7 +374,12 @@ def tweets_payload_iter(payload):
                 continue
                 # raise TwitterPublicAPIParsingError
 
-            if tweet_root["__typename"] == "TweetWithVisibilityResults":
+            __typename = tweet_root["__typename"]
+
+            if __typename == "TweetUnavailable":
+                continue
+
+            if __typename == "TweetWithVisibilityResults":
                 tweet_root = tweet_root["tweet"]
 
             try:
@@ -448,8 +453,8 @@ class TwitterAPIScraper(object):
             timeout=TWITTER_PUBLIC_API_DEFAULT_TIMEOUT, spoof_tls_ciphers=True
         )
 
-        # NOTE: expressed as number of calls (returning ~20 tweets) per seconds
-        self.rate_limiter_state = RateLimiterState(25, 60)
+        # NOTE: 10 calls per minute
+        self.rate_limiter_state = RateLimiterState(10, 60)
 
         # self.reset()
 
