@@ -308,7 +308,7 @@ def scrape_channel_messages(html):
             link_site=link_site,
             link_title=link_title,
             link_description=link_description,
-            views=clean_human_readable_numbers(views),
+            views=clean_human_readable_numbers(views) if views is not None else None,
             datetime=datetime,
             edited=edited,
         )
