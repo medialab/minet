@@ -97,6 +97,8 @@ TABLE_TH_HTML = """
     </table>
 """
 
+
+# NOTE: CDATA is handled very differently depending on lxml & bs4 versions
 THE_WORST_HTML = """
     <div>Some text isn't
     it?
@@ -136,8 +138,6 @@ THE_WORST_HTML = """
                 <li>Other</li>
                 <li>Again</li>
             </ol>
-            <p>
-            <![CDATA[some very interesting stuff]]></p>
             <p>
                 This is      <span>a large span  </span>
                     with something else over <strong>here</strong>.
@@ -996,8 +996,6 @@ class TestDefinitionScraper:
 
             Other
             Again
-
-            some very interesting stuff
 
             This is a large span with something else over here.
 
