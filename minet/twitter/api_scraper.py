@@ -808,8 +808,8 @@ class TwitterGuestAPIScraper:
             timeout=TWITTER_PUBLIC_API_DEFAULT_TIMEOUT, spoof_tls_ciphers=True
         )
 
-        # NOTE: 10 calls per minute
-        self.rate_limiter_state = RateLimiterState(10, 60)
+        # NOTE: 1 call per second
+        self.rate_limiter_state = RateLimiterState(1)
 
         self.reset()
 
