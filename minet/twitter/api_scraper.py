@@ -735,6 +735,9 @@ class TwitterAPIScraper:
                 query, locale, cursor, refs=refs
             )
 
+            if not tweets:
+                return
+
             for tweet, meta in tweets:
                 if with_meta:
                     yield tweet, meta
