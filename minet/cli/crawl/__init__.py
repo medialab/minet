@@ -6,13 +6,12 @@ from minet.cli.argparse import (
     command,
     FolderStrategyType,
     BooleanAction,
-    ExtractionSelectionAction,
+    ExtractionSelectionAction,FOLDER_STRATEGY_DOCUMENTATION
 )
 from minet.cli.exceptions import InvalidArgumentsError
 
 # TODO: lazyloading issue
 from minet.constants import DEFAULT_THROTTLE
-from minet.fs import FolderStrategy
 
 # TODO: negative int forbiding type
 CRAWL_ARGUMENTS = {
@@ -309,7 +308,7 @@ def crawl_command(
         epilog = f"""
         --folder-strategy options:
 
-        {FolderStrategy.DOCUMENTATION}
+        {FOLDER_STRATEGY_DOCUMENTATION}
 
         """ + (
             epilog or ""

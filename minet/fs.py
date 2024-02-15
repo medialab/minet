@@ -84,33 +84,6 @@ def load_definition(f, *, defer=None, encoding: str = "utf-8") -> Dict:
 
 
 class FolderStrategy(object):
-    CHOICES = ["flat", "fullpath", "hostname", "normalize-hostname", "prefix-x"]
-
-    DOCUMENTATION = """
-        . "flat": default choice, all files will be written in the indicated
-            content folder.
-
-        . "fullpath": all files will be written in a folder consisting of the
-            url hostname and then its path.
-
-        . "prefix-x": e.g. "prefix-4", files will be written in folders
-            having a name that is the first x characters of the file's name.
-            This is an efficient way to partition content into folders containing
-            roughly the same number of files if the file names are random (which
-            is the case by default since md5 hashes will be used).
-
-        . "hostname": files will be written in folders based on their url's
-            full host name.
-
-        . "normalized-hostname": files will be written in folders based on
-            their url's hostname stripped of some undesirable parts (such as
-            "www.", or "m.", for instance).
-
-        . "fingerprinted-hostname": files will be written in folders based on
-            their url's hostname stripped of some more undesirable parts (such as
-            "fr.", for instance) and their public suffix will be dropped.
-    """
-
     def __call__(self):
         raise NotImplementedError
 

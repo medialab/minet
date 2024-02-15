@@ -29,8 +29,6 @@ from pytz import timezone
 from pytz.exceptions import UnknownTimeZoneError
 
 from minet.dates import datetime_from_partial_iso_format
-from minet.fs import FolderStrategy
-from minet.extraction import TrafilaturaResult
 
 from minet.cli.console import MINET_COLORS
 from minet.cli.exceptions import NotResumableError, InvalidArgumentsError
@@ -295,15 +293,44 @@ def build_parser(name, version, commands):
 
     return parser, subparser_index
 
+FOLDER_STRATEGY_CHOICES = ["flat", "fullpath", "hostname", "normalize-hostname", "prefix-x"]
+
+# NOTE: indentation IS important
+FOLDER_STRATEGY_DOCUMENTATION = """
+        . "flat": default choice, all files will be written in the indicated
+            content folder.
+
+        . "fullpath": all files will be written in a folder consisting of the
+            url hostname and then its path.
+
+        . "prefix-x": e.g. "prefix-4", files will be written in folders
+            having a name that is the first x characters of the file's name.
+            This is an efficient way to partition content into folders containing
+            roughly the same number of files if the file names are random (which
+            is the case by default since md5 hashes will be used).
+
+        . "hostname": files will be written in folders based on their url's
+            full host name.
+
+        . "normalized-hostname": files will be written in folders based on
+            their url's hostname stripped of some undesirable parts (such as
+            "www.", or "m.", for instance).
+
+        . "fingerprinted-hostname": files will be written in folders based on
+            their url's hostname stripped of some more undesirable parts (such as
+            "fr.", for instance) and their public suffix will be dropped.
+"""
 
 class FolderStrategyType:
     def __call__(self, name):
+        from minet.fs import FolderStrategy
+
         try:
             return FolderStrategy.from_name(name)
         except TypeError:
             raise ArgumentTypeError(
                 "should be one of %s"
-                % and_join(('"%s"' % c for c in FolderStrategy.CHOICES), copula="or")
+                % and_join(('"%s"' % c for c in FOLDER_STRATEGY_CHOICES), copula="or")
             )
 
 
@@ -548,6 +575,22 @@ class WrappedConfigValue(object):
         return value
 
 
+# NOTE: this is in fact duplicated from minet.extraction. This is necessary
+# for the CLI startup lazy-loading.
+TRAFILATURA_FIELDNAMES = [
+    "canonical_url",
+    "title",
+    "description",
+    "content",
+    "comments",
+    "author",
+    "categories",
+    "tags",
+    "date",
+    "sitename",
+]
+
+
 class ExtractionSelectionAction(Action):
     def __init__(
         self,
@@ -557,9 +600,8 @@ class ExtractionSelectionAction(Action):
         default=None,
         **kwargs,
     ):
-        self.fields = TrafilaturaResult.fieldnames()
         fields_help = (
-            "Available flags are: " + and_join([f"`{f}`" for f in self.fields]) + "."
+            "Available flags are: " + and_join([f"`{f}`" for f in TRAFILATURA_FIELDNAMES]) + "."
         )
         help = fields_help if not help else help + " " + fields_help
         super().__init__(option_strings, dest, help=help, default=default, **kwargs)
@@ -567,10 +609,10 @@ class ExtractionSelectionAction(Action):
     def __call__(self, _, cli_args, value, *args):
         selection = value.split(",")
         for s in selection:
-            if s not in self.fields:
+            if s not in TRAFILATURA_FIELDNAMES:
                 messages = [
                     f"The trafilatura field `{s}` doesn't exist. Available fields are:"
-                ] + [f"  - {a}" for a in self.fields]
+                ] + [f"  - {a}" for a in TRAFILATURA_FIELDNAMES]
                 raise ArgumentError(self, "\n".join(messages))
         selection = set(selection) if selection else None
         setattr(cli_args, self.dest, selection)
