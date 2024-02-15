@@ -2,7 +2,16 @@ from typing import Optional, List, Dict, Any
 
 from dataclasses import dataclass, field
 from casanova import TabularRecord
-from trafilatura.core import bare_extraction
+
+try:
+    from trafilatura.core import bare_extraction
+except ModuleNotFoundError as e:
+    if "lzma" in str(e):
+        raise ImportError(
+            "cannot import trafilatura because your version of python was not compiled with lzma.\nSee https://stackoverflow.com/questions/57743230/userwarning-could-not-import-the-lzma-module-your-installed-python-is-incomple for potential solutions."
+        )
+
+    raise
 
 from minet.exceptions import TrafilaturaError
 from minet.encodings import fix_surrogates

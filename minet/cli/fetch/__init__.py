@@ -1,6 +1,10 @@
 from casanova import IndexedResumer
 
-from minet.cli.argparse import command, FolderStrategyType, FOLDER_STRATEGY_DOCUMENTATION
+from minet.cli.argparse import (
+    command,
+    FolderStrategyType,
+    FOLDER_STRATEGY_DOCUMENTATION,
+)
 from minet.cli.constants import DEFAULT_CONTENT_FOLDER, DEFAULT_SCREENSHOT_FOLDER
 from minet.cli.exceptions import InvalidArgumentsError
 

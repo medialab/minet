@@ -293,7 +293,14 @@ def build_parser(name, version, commands):
 
     return parser, subparser_index
 
-FOLDER_STRATEGY_CHOICES = ["flat", "fullpath", "hostname", "normalize-hostname", "prefix-x"]
+
+FOLDER_STRATEGY_CHOICES = [
+    "flat",
+    "fullpath",
+    "hostname",
+    "normalize-hostname",
+    "prefix-x",
+]
 
 # NOTE: indentation IS important
 FOLDER_STRATEGY_DOCUMENTATION = """
@@ -320,6 +327,7 @@ FOLDER_STRATEGY_DOCUMENTATION = """
             their url's hostname stripped of some more undesirable parts (such as
             "fr.", for instance) and their public suffix will be dropped.
 """
+
 
 class FolderStrategyType:
     def __call__(self, name):
@@ -601,7 +609,9 @@ class ExtractionSelectionAction(Action):
         **kwargs,
     ):
         fields_help = (
-            "Available flags are: " + and_join([f"`{f}`" for f in TRAFILATURA_FIELDNAMES]) + "."
+            "Available flags are: "
+            + and_join([f"`{f}`" for f in TRAFILATURA_FIELDNAMES])
+            + "."
         )
         help = fields_help if not help else help + " " + fields_help
         super().__init__(option_strings, dest, help=help, default=default, **kwargs)

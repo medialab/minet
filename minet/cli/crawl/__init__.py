@@ -6,7 +6,8 @@ from minet.cli.argparse import (
     command,
     FolderStrategyType,
     BooleanAction,
-    ExtractionSelectionAction,FOLDER_STRATEGY_DOCUMENTATION
+    ExtractionSelectionAction,
+    FOLDER_STRATEGY_DOCUMENTATION,
 )
 from minet.cli.exceptions import InvalidArgumentsError
 
