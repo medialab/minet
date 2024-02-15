@@ -106,9 +106,9 @@ Minet can single-handedly:
 ## Features (from a technical standpoint)
 
 - Multithreaded, memory-efficient fetching from the web.
-- Multithreaded, scalable crawling using a comfy DSL.
+- Multithreaded, scalable crawling.
 - Multiprocessed raw text content extraction from HTML pages.
-- Multiprocessed scraping from HTML pages using a comfy DSL.
+- Multiprocessed scraping from HTML pages.
 - URL-related heuristics utilities such as extraction, normalization and matching.
 - Data collection from various APIs such as [CrowdTangle](https://www.crowdtangle.com/).
 
