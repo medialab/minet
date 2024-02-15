@@ -107,3 +107,6 @@ class TwitterPublicAPIHiccupError(TwitterPublicAPIError):
 
 class TwitterPublicAPINotWorkingAnymore(TwitterPublicAPIError):
     pass
+
+class TwitterPublicAPINotFound(TwitterPublicAPIError):
+    pass

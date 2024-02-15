@@ -43,6 +43,7 @@ from minet.twitter.exceptions import (
     TwitterPublicAPIInvalidCookieError,
     TwitterPublicAPIBadAuthError,
     TwitterPublicAPINotWorkingAnymore,
+    TwitterPublicAPINotFound
 )
 
 # =============================================================================
@@ -933,6 +934,10 @@ class TwitterGuestAPIScraper:
         data = self.api_call(url)
 
         tweet_root = getpath(data, ("data", "tweetResult", "result"))
+
+        if tweet_root is None:
+            raise TwitterPublicAPINotFound(tweet_id)
+
         tweet = recombobulate_tweet(tweet_root)
         tweet = normalize_tweet(
             tweet,
