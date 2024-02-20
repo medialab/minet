@@ -1262,6 +1262,7 @@ Builtin scrapers:
     with the correct base url if --url-column is valid.
 . "images": scrape all the relevant <img> tag src urls. Will join them
     with the correct base url if --url-column is valid.
+. "europresse": scrape the articles from europresse HTML files.
 
 Examples:
 
