@@ -548,6 +548,23 @@ TWITTER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
     "minet.cli.twitter.tweets",
     title="Minet Twitter Tweets Command",
     description="""
+        Collecting tweet metadata by scraping the website.
+    """,
+    epilog="""
+        Examples:
+
+        . Getting metadata from tweets in a CSV file:
+            $ minet tw tweets tweet_id -i tweets.csv > tweets_metadata.csv
+    """,
+    variadic_input={"dummy_column": "tweet_id", "item_label": "tweet id"},
+    resumer=RowCountResumer,
+)
+
+TWITTER_LEGACY_TWEETS_SUBCOMMAND = command(
+    "legacy-tweets",
+    "minet.cli.twitter.legacy_tweets",
+    title="Minet Twitter Tweets Command",
+    description="""
         Collecting tweet metadata from the given tweet ids, using the API.
     """,
     epilog="""
@@ -659,6 +676,7 @@ TWITTER_COMMAND = command(
         TWITTER_TWEET_COUNT_SUBCOMMAND,
         TWITTER_TWEET_DATE_SUBCOMMAND,
         TWITTER_TWEET_SEARCH_SUBCOMMAND,
+        TWITTER_LEGACY_TWEETS_SUBCOMMAND,
         TWITTER_TWEETS_SUBCOMMAND,
         TWITTER_USER_SEARCH_SUBCOMMAND,
         TWITTER_USER_TWEETS_SUBCOMMAND,

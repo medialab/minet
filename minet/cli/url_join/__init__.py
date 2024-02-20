@@ -22,7 +22,7 @@ URL_JOIN_COMMAND = command(
             $ minet url-join url webentities.csv post_url posts.csv -s url,id > joined.csv
 
         . Reading one of the files from stdin:
-            $ xsv select url webentities.csv | minet url-join url - post_url posts.csv > joined.csv
+            $ xan select url webentities.csv | minet url-join url - post_url posts.csv > joined.csv
     """,
     select=True,
     arguments=[

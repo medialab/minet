@@ -43,7 +43,7 @@ from minet.twitter.exceptions import (
     TwitterPublicAPIInvalidCookieError,
     TwitterPublicAPIBadAuthError,
     TwitterPublicAPINotWorkingAnymore,
-    TwitterPublicAPINotFound
+    TwitterPublicAPINotFound,
 )
 
 # =============================================================================

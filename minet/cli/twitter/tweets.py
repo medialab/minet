@@ -4,65 +4,40 @@
 #
 # Logic of the `tw tweets` action.
 #
-from twitwi import normalize_tweet, normalize_tweets_payload_v2, format_tweet_as_csv_row
-from twitwi.constants import TWEET_FIELDS, TWEET_EXPANSIONS, TWEET_PARAMS
-from twitter import TwitterHTTPError
-from ebbe import as_chunks
+from casanova import Enricher
+from twitwi.constants import TWEET_FIELDS
+from twitwi import format_tweet_as_csv_row
+from ural.twitter import is_twitter_url, parse_twitter_url, TwitterTweet
 
 from minet.cli.utils import with_enricher_and_loading_bar
-from minet.cli.twitter.utils import with_twitter_client
+from minet.cli.loading_bar import LoadingBar
+from minet.twitter import TwitterGuestAPIScraper
+from minet.twitter.exceptions import TwitterPublicAPINotFound
 
 
 @with_enricher_and_loading_bar(
-    headers=TWEET_FIELDS, title="Retrieving tweets", unit="tweets"
+    headers=TWEET_FIELDS,
+    title="Scraping",
+    unit="tweets",
 )
-@with_twitter_client()
-def action(cli_args, client, enricher, loading_bar):
-    def call_client(ids):
-        if cli_args.v2:
-            kwargs = {
-                "ids": ids,
-                "expansions": ",".join(TWEET_EXPANSIONS),
-                "params": TWEET_PARAMS,
-            }
-            return client.call(["tweets"], **kwargs)
-        else:
-            kwargs = {"_id": ids, "tweet_mode": "extended"}
-            return client.call(["statuses", "lookup"], **kwargs)
+def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
+    scraper = TwitterGuestAPIScraper()
 
-    for chunk in as_chunks(100, enricher.cells(cli_args.column, with_rows=True)):
-        tweets = ",".join(row[1] for row in chunk)
+    for row, tweet_id_or_url in enricher.cells(cli_args.column, with_rows=True):
+        with loading_bar.step():
+            tweet_id = tweet_id_or_url
 
-        with loading_bar.step(count=len(chunk)):
+            if is_twitter_url(tweet_id_or_url):
+                parsed = parse_twitter_url(tweet_id_or_url)
+
+                if isinstance(parsed, TwitterTweet):
+                    tweet_id = parsed.id
+
             try:
-                result = call_client(tweets)
-            except TwitterHTTPError as e:
-                if e.e.code == 404:
-                    for row, tweet in chunk:
-                        enricher.writerow(row)
-                else:
-                    raise e
-
+                tweet = scraper.tweet(tweet_id)
+                tweet = format_tweet_as_csv_row(tweet)
+                enricher.writerow(row, tweet)
+            except TwitterPublicAPINotFound:
+                loading_bar.inc_stat("not-found", style="warning")
+                enricher.writerow(row)
                 continue
-
-            indexed_result = {}
-
-            if cli_args.v2:
-                normalized_tweets = normalize_tweets_payload_v2(
-                    result, locale=cli_args.timezone, collection_source="api"
-                )
-                for normalized_tweet in normalized_tweets:
-                    addendum = format_tweet_as_csv_row(normalized_tweet)
-                    indexed_result[normalized_tweet["id"]] = addendum
-
-            else:
-                for tweet in result:
-                    tweet = normalize_tweet(
-                        tweet, locale=cli_args.timezone, collection_source="api"
-                    )
-                    addendum = format_tweet_as_csv_row(tweet)
-                    indexed_result[tweet["id"]] = addendum
-
-            for row, tweet in chunk:
-                addendum = indexed_result.get(tweet)
-                enricher.writerow(row, addendum)

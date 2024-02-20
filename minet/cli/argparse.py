@@ -820,7 +820,7 @@ def resolve_typical_arguments(
             $ {name} {cmd} column_name -i file.csv
 
         . Here is how to read CSV file from stdin using `-`:
-            $ xsv search -s col . | {name} {cmd} column_name -i -
+            $ xan search -s col . | {name} {cmd} column_name -i -
 
         . Here is how to indicate that the CSV column may contain multiple
           values separated by a special character:
@@ -833,7 +833,7 @@ def resolve_typical_arguments(
             )
 
     if select or variadic_input is not None:
-        # TODO: actually one can use xsv mini dsl here
+        # TODO: actually one can use xan mini dsl here
         args.append(
             {
                 "flags": ["-s", "--select"],

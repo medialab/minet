@@ -158,7 +158,7 @@ FETCH_COMMAND = command(
             $ minet fetch url -i file.csv -c | minet extract -i -
 
         . CSV input from stdin (mind the `-`):
-            $ xsv select url file.csv | minet fetch url -i - > report.csv
+            $ xan select url file.csv | minet fetch url -i - > report.csv
 
         . Downloading files in specific output directory:
             $ minet fetch url -i file.csv -O html > report.csv
@@ -258,7 +258,7 @@ RESOLVE_COMMAND = command(
             $ minet resolve url_column -i file.csv > report.csv
 
         . CSV input from stdin (mind the `-`):
-            $ xsv select url_column file.csv | minet resolve url_column - > report.csv
+            $ xan select url_column file.csv | minet resolve url_column - > report.csv
 
         . Resolving a single url:
             $ minet resolve https://lemonde.fr
@@ -330,7 +330,7 @@ SCREENSHOT_COMMAND = command(
             $ minet screenshot url_column -i file.csv > report.csv
 
         . CSV input from stdin (mind the `-`):
-            $ xsv select url_column file.csv | minet screenshot url_column - > report.csv
+            $ xan select url_column file.csv | minet screenshot url_column - > report.csv
 
         . Screenshot a single url:
             $ minet screenshot https://lemonde.fr

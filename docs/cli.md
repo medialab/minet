@@ -773,7 +773,7 @@ Examples:
     $ minet fetch url -i file.csv -c | minet extract -i -
 
 . CSV input from stdin (mind the `-`):
-    $ xsv select url file.csv | minet fetch url -i - > report.csv
+    $ xan select url file.csv | minet fetch url -i - > report.csv
 
 . Downloading files in specific output directory:
     $ minet fetch url -i file.csv -O html > report.csv
@@ -796,7 +796,7 @@ how to use the command with a CSV file?
     $ minet fetch column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet fetch column_name -i -
+    $ xan search -s col . | minet fetch column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -1083,7 +1083,7 @@ Examples:
     $ minet resolve url_column -i file.csv > report.csv
 
 . CSV input from stdin (mind the `-`):
-    $ xsv select url_column file.csv | minet resolve url_column - > report.csv
+    $ xan select url_column file.csv | minet resolve url_column - > report.csv
 
 . Resolving a single url:
     $ minet resolve https://lemonde.fr
@@ -1106,7 +1106,7 @@ how to use the command with a CSV file?
     $ minet fetch column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet fetch column_name -i -
+    $ xan search -s col . | minet fetch column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -1439,7 +1439,7 @@ Examples:
     $ minet screenshot url_column -i file.csv > report.csv
 
 . CSV input from stdin (mind the `-`):
-    $ xsv select url_column file.csv | minet screenshot url_column - > report.csv
+    $ xan select url_column file.csv | minet screenshot url_column - > report.csv
 
 . Screenshot a single url:
     $ minet screenshot https://lemonde.fr
@@ -1462,7 +1462,7 @@ how to use the command with a CSV file?
     $ minet fetch column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet fetch column_name -i -
+    $ xan search -s col . | minet fetch column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -1589,7 +1589,7 @@ Examples:
     $ minet url-join url webentities.csv post_url posts.csv -s url,id > joined.csv
 
 . Reading one of the files from stdin:
-    $ xsv select url webentities.csv | minet url-join url - post_url posts.csv > joined.csv
+    $ xan select url webentities.csv | minet url-join url - post_url posts.csv > joined.csv
 ```
 
 ## url-parse
@@ -1787,7 +1787,7 @@ how to use the command with a CSV file?
     $ minet url-parse column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet url-parse column_name -i -
+    $ xan search -s col . | minet url-parse column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -1973,7 +1973,7 @@ how to use the command with a CSV file?
     $ minet buzzsumo domain-summary column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet buzzsumo domain-summary column_name -i -
+    $ xan search -s col . | minet buzzsumo domain-summary column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -2075,7 +2075,7 @@ how to use the command with a CSV file?
     $ minet buzzsumo domain column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet buzzsumo domain column_name -i -
+    $ xan search -s col . | minet buzzsumo domain column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -2173,7 +2173,7 @@ how to use the command with a CSV file?
     $ minet buzzsumo exact-url column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet buzzsumo exact-url column_name -i -
+    $ xan search -s col . | minet buzzsumo exact-url column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -2434,7 +2434,7 @@ how to use the command with a CSV file?
     $ minet crowdtangle posts-by-id column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet crowdtangle posts-by-id column_name -i -
+    $ xan search -s col . | minet crowdtangle posts-by-id column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -2721,7 +2721,7 @@ how to use the command with a CSV file?
     $ minet crowdtangle summary column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet crowdtangle summary column_name -i -
+    $ xan search -s col . | minet crowdtangle summary column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -2850,7 +2850,7 @@ how to use the command with a CSV file?
     $ minet facebook comments column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet facebook comments column_name -i -
+    $ xan search -s col . | minet facebook comments column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -2981,7 +2981,7 @@ how to use the command with a CSV file?
     $ minet facebook post column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet facebook post column_name -i -
+    $ xan search -s col . | minet facebook post column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -3112,7 +3112,7 @@ how to use the command with a CSV file?
     $ minet facebook posts column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet facebook posts column_name -i -
+    $ xan search -s col . | minet facebook posts column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -3210,7 +3210,7 @@ how to use the command with a CSV file?
     $ minet facebook post-authors column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet facebook post-authors column_name -i -
+    $ xan search -s col . | minet facebook post-authors column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -3304,7 +3304,7 @@ how to use the command with a CSV file?
     $ minet facebook url-likes column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet facebook url-likes column_name -i -
+    $ xan search -s col . | minet facebook url-likes column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -3933,7 +3933,7 @@ how to use the command with a CSV file?
     $ minet instagram comments column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet instagram comments column_name -i -
+    $ xan search -s col . | minet instagram comments column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -4039,7 +4039,7 @@ how to use the command with a CSV file?
     $ minet instagram hashtag column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet instagram hashtag column_name -i -
+    $ xan search -s col . | minet instagram hashtag column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -4147,7 +4147,7 @@ how to use the command with a CSV file?
     $ minet instagram post-infos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet instagram post-infos column_name -i -
+    $ xan search -s col . | minet instagram post-infos column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -4261,7 +4261,7 @@ how to use the command with a CSV file?
     $ minet instagram user-followers column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet instagram user-followers column_name -i -
+    $ xan search -s col . | minet instagram user-followers column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -4373,7 +4373,7 @@ how to use the command with a CSV file?
     $ minet instagram user-following column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet instagram user-following column_name -i -
+    $ xan search -s col . | minet instagram user-following column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -4483,7 +4483,7 @@ how to use the command with a CSV file?
     $ minet instagram user-infos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet instagram user-infos column_name -i -
+    $ xan search -s col . | minet instagram user-infos column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -4596,7 +4596,7 @@ how to use the command with a CSV file?
     $ minet instagram user-posts column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet instagram user-posts column_name -i -
+    $ xan search -s col . | minet instagram user-posts column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -4687,7 +4687,7 @@ how to use the command with a CSV file?
     $ minet mediacloud medias column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet mediacloud medias column_name -i -
+    $ xan search -s col . | minet mediacloud medias column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -4893,7 +4893,7 @@ how to use the command with a CSV file?
     $ minet telegram channel-infos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet telegram channel-infos column_name -i -
+    $ xan search -s col . | minet telegram channel-infos column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -4979,7 +4979,7 @@ how to use the command with a CSV file?
     $ minet telegram channel-messages column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet telegram channel-messages column_name -i -
+    $ xan search -s col . | minet telegram channel-messages column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -5108,7 +5108,7 @@ how to use the command with a CSV file?
     $ minet tiktok search-videos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet tiktok search-videos column_name -i -
+    $ xan search -s col . | minet tiktok search-videos column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -5267,7 +5267,7 @@ how to use the command with a CSV file?
     $ minet twitter attrition column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet twitter attrition column_name -i -
+    $ xan search -s col . | minet twitter attrition column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -5383,7 +5383,7 @@ how to use the command with a CSV file?
     $ minet twitter followers column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet twitter followers column_name -i -
+    $ xan search -s col . | minet twitter followers column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -5490,7 +5490,7 @@ how to use the command with a CSV file?
     $ minet twitter followers-you-know column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet twitter followers-you-know column_name -i -
+    $ xan search -s col . | minet twitter followers-you-know column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -5605,7 +5605,7 @@ how to use the command with a CSV file?
     $ minet twitter friends column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet twitter friends column_name -i -
+    $ xan search -s col . | minet twitter friends column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -5714,7 +5714,7 @@ how to use the command with a CSV file?
     $ minet twitter list-followers column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet twitter list-followers column_name -i -
+    $ xan search -s col . | minet twitter list-followers column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -5823,7 +5823,7 @@ how to use the command with a CSV file?
     $ minet twitter list-members column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet twitter list-members column_name -i -
+    $ xan search -s col . | minet twitter list-members column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -5934,7 +5934,7 @@ how to use the command with a CSV file?
     $ minet twitter retweeters column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet twitter retweeters column_name -i -
+    $ xan search -s col . | minet twitter retweeters column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -6095,7 +6095,7 @@ how to use the command with a CSV file?
     $ minet twitter scrape column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet twitter scrape column_name -i -
+    $ xan search -s col . | minet twitter scrape column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -6180,7 +6180,7 @@ how to use the command with a CSV file?
     $ minet twitter tweet-date column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet twitter tweet-date column_name -i -
+    $ xan search -s col . | minet twitter tweet-date column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -6320,7 +6320,7 @@ how to use the command with a CSV file?
     $ minet twitter tweet-search column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet twitter tweet-search column_name -i -
+    $ xan search -s col . | minet twitter tweet-search column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -6485,7 +6485,7 @@ how to use the command with a CSV file?
     $ minet twitter tweet-count column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet twitter tweet-count column_name -i -
+    $ xan search -s col . | minet twitter tweet-count column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -6498,10 +6498,9 @@ how to use the command with a CSV file?
 ### tweets
 
 ```
-Usage: minet twitter tweets [-h] [--v2] [--silent]
-                            [--refresh-per-second REFRESH_PER_SECOND]
-                            [--simple-progress] [--timezone TIMEZONE]
-                            [--api-key API_KEY] [--rcfile RCFILE]
+Usage: minet twitter tweets [-h] [--api-key API_KEY] [--rcfile RCFILE]
+                            [--silent] [--refresh-per-second REFRESH_PER_SECOND]
+                            [--simple-progress]
                             [--api-secret-key API_SECRET_KEY]
                             [--access-token ACCESS_TOKEN]
                             [--access-token-secret ACCESS_TOKEN_SECRET]
@@ -6511,7 +6510,7 @@ Usage: minet twitter tweets [-h] [--v2] [--silent]
 
 # Minet Twitter Tweets Command
 
-Collecting tweet metadata from the given tweet ids, using the API.
+Collecting tweet metadata by scraping the website.
 
 Positional Arguments:
   tweet_id_or_tweet_id_column   Single tweet id to process or name of the CSV
@@ -6536,10 +6535,6 @@ Optional Arguments:
                                 in a .minetrc file as "twitter.api_secret_key"
                                 or read from the MINET_TWITTER_API_SECRET_KEY
                                 env variable.
-  --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
-                                Defaults to UTC.
-  --v2                          Whether to use latest Twitter API v2 rather than
-                                v1.1.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -6600,7 +6595,7 @@ how to use the command with a CSV file?
     $ minet twitter tweets column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet twitter tweets column_name -i -
+    $ xan search -s col . | minet twitter tweets column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -6717,7 +6712,7 @@ how to use the command with a CSV file?
     $ minet twitter users column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet twitter users column_name -i -
+    $ xan search -s col . | minet twitter users column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -6834,7 +6829,7 @@ how to use the command with a CSV file?
     $ minet twitter user-search column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet twitter user-search column_name -i -
+    $ xan search -s col . | minet twitter user-search column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -6957,7 +6952,7 @@ how to use the command with a CSV file?
     $ minet twitter user-tweets column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet twitter user-tweets column_name -i -
+    $ xan search -s col . | minet twitter user-tweets column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -7060,7 +7055,7 @@ how to use the command with a CSV file?
     $ minet wikipedia pageviews column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet wikipedia pageviews column_name -i -
+    $ xan search -s col . | minet wikipedia pageviews column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -7157,7 +7152,7 @@ how to use the command with a CSV file?
     $ minet youtube captions column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet youtube captions column_name -i -
+    $ xan search -s col . | minet youtube captions column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -7274,7 +7269,7 @@ how to use the command with a CSV file?
     $ minet youtube channel-videos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet youtube channel-videos column_name -i -
+    $ xan search -s col . | minet youtube channel-videos column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -7375,7 +7370,7 @@ how to use the command with a CSV file?
     $ minet youtube channels column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet youtube channels column_name -i -
+    $ xan search -s col . | minet youtube channels column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -7465,7 +7460,7 @@ how to use the command with a CSV file?
     $ minet youtube comments column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet youtube comments column_name -i -
+    $ xan search -s col . | minet youtube comments column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -7565,7 +7560,7 @@ how to use the command with a CSV file?
     $ minet youtube search column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet youtube search column_name -i -
+    $ xan search -s col . | minet youtube search column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
@@ -7650,7 +7645,7 @@ how to use the command with a CSV file?
     $ minet youtube videos column_name -i file.csv
 
 . Here is how to read CSV file from stdin using `-`:
-    $ xsv search -s col . | minet youtube videos column_name -i -
+    $ xan search -s col . | minet youtube videos column_name -i -
 
 . Here is how to indicate that the CSV column may contain multiple
   values separated by a special character:
