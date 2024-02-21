@@ -1,6 +1,5 @@
 from typing import Any
 
-import locale
 import warnings
 from datetime import datetime
 from html import unescape
@@ -10,60 +9,17 @@ from .types import NamedScraper
 
 warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
 
-DAYS_OF_WEEK_FR = [
-    "lundi",
-    "mardi",
-    "mercredi",
-    "jeudi",
-    "vendredi",
-    "samedi",
-    "dimanche",
-]
 
-DAYS_OF_WEEK_EN = [
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday",
-    "sunday",
-]
+def extract_content(content):
+    return BeautifulSoup(unescape(content), "html.parser").get_text().strip()
 
 
-def extract_date(doc_header):
-    date = ""
-    date_index = 0
-    found_date = False
-    doc_header_list = doc_header.split(" ")
+def extract_date(doc_id):
+    return datetime.strptime(doc_id.split("·")[1], "%Y%m%d").date().isoformat()
 
-    for enum, word in enumerate(doc_header_list):
-        if word.lower() in DAYS_OF_WEEK_FR:
-            found_date = True
-            date_index = enum
-            loc = locale.setlocale(locale.LC_ALL, "fr_FR.utf8")
-        elif word.strip(",").lower() in DAYS_OF_WEEK_EN:
-            found_date = True
-            date_index = enum
-            loc = locale.setlocale(locale.LC_ALL, "en_US.utf8")
 
-        if found_date:
-            if enum in range(date_index, date_index + 3):
-                date += word + " "
-
-            elif enum == date_index + 3:
-                date += word
-
-                try:
-                    if loc[:2] == "fr":
-                        formatted_date = datetime.strptime(date, "%A %d %B %Y")
-                    else:
-                        formatted_date = datetime.strptime(date, "%A, %B %d, %Y")
-
-                    return formatted_date.date().isoformat()
-
-                except ValueError:
-                    return extract_date(" ".join(doc_header_list[enum:]))
+def extract_media(media):
+    return media.split(",", 1)[0].split("\n", 1)[0].split(" " * 16, 1)[0].strip()
 
 
 def select_and_strip(elem, selector):
@@ -77,7 +33,7 @@ def select_and_strip(elem, selector):
 
 class EuropresseScraper(NamedScraper):
     name = "europresse"
-    fieldnames = ["id", "title", "content", "url", "date", "media"]
+    fieldnames = ["id", "title", "content", "url", "date", "media", "media_id"]
     plural = True
     output_type = "collection"
     strainer = SoupStrainer(name="article")
@@ -87,7 +43,6 @@ class EuropresseScraper(NamedScraper):
         selectors = {
             "title": ".titreArticle",
             "id": ".publiC-lblNodoc",
-            "date": ".DocHeader",
             "media": ".DocPublicationName",
         }
 
@@ -105,20 +60,14 @@ class EuropresseScraper(NamedScraper):
                         break
                 content = content.get_text()
 
+            row["content"] = extract_content(content)
+
             for field, selector in selectors.items():
                 row[field] = select_and_strip(elem, selector)
 
-            row["content"] = (
-                BeautifulSoup(unescape(content), "html.parser").get_text().strip()
-            )
-            row["date"] = extract_date(row["date"])
-            row["media"] = (
-                row["media"]
-                .split(",", 1)[0]
-                .split("\n", 1)[0]
-                .split(" " * 16, 1)[0]
-                .strip()
-            )
+            row["date"] = extract_date(row["id"])
+            row["media"] = extract_media(row["media"])
+            row["media_id"] = row["id"].split("·")[2]
 
             articles.append(row)
 
