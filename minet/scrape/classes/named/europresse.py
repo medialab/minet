@@ -7,11 +7,11 @@ from bs4 import SoupStrainer, BeautifulSoup, MarkupResemblesLocatorWarning
 
 from .types import NamedScraper
 
-warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
-
 
 def extract_content(content):
-    return BeautifulSoup(unescape(content), "html.parser").get_text().strip()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=MarkupResemblesLocatorWarning)
+        return BeautifulSoup(unescape(content), "html.parser").get_text().strip()
 
 
 def extract_date(doc_id):
