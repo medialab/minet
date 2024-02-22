@@ -42,6 +42,7 @@ from minet.facebook.types import (
     MobileFacebookUser,
     MobileFacebookPost,
     MobileFacebookPostWithReactions,
+    MobileFacebookUserInfo,
 )
 from minet.facebook.exceptions import (
     FacebookInvalidCookieError,
@@ -770,3 +771,41 @@ class FacebookMobileScraper(object):
             return MobileFacebookUser(user_label, parsed.id, parsed.handle, parsed.url)
         else:
             raise TypeError
+
+    def user_infos(self, url) : 
+        
+        url = convert_url_to_mobile(url)
+
+        html = self.request_page(url)
+        soup = BeautifulSoupWithoutXHTMLWarnings(html, "lxml")
+
+        name = soup.find('title').text
+        if name == 'Content Not Found' :
+            name = None
+
+        hometown_field = soup.find('span', string='Hometown')
+        if hometown_field is not None : 
+            hometown = hometown_field.parent.parent.next_sibling.text
+        else :
+            hometown = None
+
+        current_city_field = soup.find('span', string='Current city')
+        if current_city_field is not None : 
+            current_city = current_city_field.parent.parent.next_sibling.text
+        else :
+            current_city = None
+
+        gender_field = soup.find('span', string='Gender')
+        if gender_field is not None : 
+            gender = gender_field.parent.parent.next_sibling.text
+        else :
+            gender = None
+
+        return MobileFacebookUserInfo(name, hometown, current_city, gender)
+
+
+        
+
+
+
+
