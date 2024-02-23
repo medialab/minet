@@ -1,13 +1,9 @@
-import csv
-import sys
-from tqdm import tqdm
-import time
 from minet.facebook import FacebookMobileScraper
+from minet.cli.console import console
 
 scraper = FacebookMobileScraper(cookie="firefox")
 
-USERS_URL = [
-]
+USERS_URL = ["https://www.facebook.com/guillaume.plique.9/"]
 
 for url in USERS_URL:
-    print(scraper.user_infos(url))
+    console.print(scraper.user_infos(url), highlight=True)

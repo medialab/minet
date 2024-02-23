@@ -137,12 +137,14 @@ class MobileFacebookUser(TabularRecord):
     handle: Optional[str]
     url: str
 
+
 @dataclass
 class MobileFacebookUserInfo(TabularRecord):
     name: Optional[str]
     hometown: Optional[str]
     current_city: Optional[str]
     gender: Optional[str]
+
 
 @dataclass
 class MobileFacebookPost(TabularRecord):

@@ -43,6 +43,7 @@ _Platform-related commands_
   - [posts](#posts-1)
   - [post-authors](#post-authors)
   - [url-likes](#url-likes)
+  - [user-infos](#user-infos)
 - [google](#google)
   - [sheets](#sheets)
 - [hyphe](#hyphe)
@@ -58,7 +59,7 @@ _Platform-related commands_
   - [post-infos](#post-infos)
   - [user-followers](#user-followers)
   - [user-following](#user-following)
-  - [user-infos](#user-infos)
+  - [user-infos](#user-infos-1)
   - [user-posts](#user-posts)
 - [mediacloud (mc)](#mediacloud)
   - [medias](#medias)
@@ -284,6 +285,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### url-likes
 
 <% fb/url-likes %>
+
+### user-infos
+
+<% fb/user-infos %>
 
 ## Google
 
