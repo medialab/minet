@@ -247,6 +247,24 @@ FACEBOOK_URL_LIKES_SUBCOMMAND = command(
             $ minet fb url-likes url -i url.csv > url_likes.csv
     """,
     variadic_input={"dummy_column": "url", "item_label": "url"},
+
+)
+
+FACEBOOK_USER_INFOS_SUBCOMMAND = command(
+    "user-infos",
+    "minet.cli.facebook.user_infos",
+    title="Minet Facebook User Infos Command",
+    description="""
+        Retrieve the name, hometow, current city and gender of a given Facebook user..
+    """,
+    epilog="""
+        Examples:
+
+        . Fetching user infos of a series of users in a CSV file:
+            $ minet fb user-infos user_url -i fb-users.csv > user-infos.csv
+    """,
+    variadic_input={"dummy_column": "user_url", "item_label": "user"},
+    arguments=[*MOBILE_ARGUMENTS],
 )
 
 FACEBOOK_COMMAND = command(
@@ -265,5 +283,6 @@ FACEBOOK_COMMAND = command(
         FACEBOOK_POST_SUBCOMMAND,
         FACEBOOK_POSTS_SUBCOMMAND,
         FACEBOOK_URL_LIKES_SUBCOMMAND,
+        FACEBOOK_USER_INFOS_SUBCOMMAND
     ],
 )
