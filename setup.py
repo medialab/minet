@@ -45,7 +45,7 @@ setup(
         "tenacity>=8,<9",
         "trafilatura>=1.7,<1.8",
         "twitwi>=0.18.2,<0.19",
-        "ural>=1.2.3,<2",
+        "ural>=1.3.1,<2",
         "urllib3>=1.26.16,<2",
     ],
     extras_require={
