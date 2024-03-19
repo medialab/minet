@@ -543,7 +543,7 @@ TWITTER_TWEET_SEARCH_SUBCOMMAND = twitter_api_subcommand(
     ],
 )
 
-TWITTER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
+TWITTER_TWEETS_SUBCOMMAND = command(
     "tweets",
     "minet.cli.twitter.tweets",
     title="Minet Twitter Tweets Command",
@@ -560,7 +560,7 @@ TWITTER_TWEETS_SUBCOMMAND = twitter_api_subcommand(
     resumer=RowCountResumer,
 )
 
-TWITTER_LEGACY_TWEETS_SUBCOMMAND = command(
+TWITTER_LEGACY_TWEETS_SUBCOMMAND = twitter_api_subcommand(
     "legacy-tweets",
     "minet.cli.twitter.legacy_tweets",
     title="Minet Twitter Tweets Command",
