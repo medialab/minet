@@ -322,19 +322,17 @@ class ErroredCrawlResult(CrawlResult[CrawlJobDataType, None]):
     job: CrawlJob[CrawlJobDataType]
     data: None
     error: Exception
-    response: Optional[Response]
+    response: None
     degree: int
 
     def __init__(
         self,
         job: CrawlJob[CrawlJobDataType],
-        error: Exception,
-        response: Optional[Response] = None,
-    ):
+        error: Exception,    ):
         self.job = job
         self.data = None
         self.error = error
-        self.response = response
+        self.response = None
         self.degree = 0
 
     @property
