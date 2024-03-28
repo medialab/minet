@@ -33,7 +33,10 @@ class YouTubeAPIURLFormatter(URLFormatter):
     def videos(self, ids: Iterable[str]) -> str:
         return self.format(
             path="videos",
-            args={"id": ids, "part": ["snippet", "statistics", "contentDetails"]},
+            args={
+                "id": ids,
+                "part": ["snippet", "statistics", "contentDetails", "topicDetails"],
+            },
         )
 
     def channels(self, ids: Iterable[str]) -> str:

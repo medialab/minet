@@ -7,6 +7,6 @@ assert config is not None
 
 client = YouTubeAPIClient(config["youtube"]["key"])
 console.print(
-    client.video("https://www.youtube.com/watch?v=uH7e9wumYWg", raw=True),
+    client.video("https://www.youtube.com/watch?v=auPMtIFJGsQ", raw=False),
     highlight=True,
 )

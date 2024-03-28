@@ -90,6 +90,7 @@ class YouTubeVideo(YouTubeVideoSnippet):
     has_captions: bool
     category_id: str
     category: Optional[str]
+    topics: List[str]
     tags: List[str]
 
     @classmethod
@@ -98,6 +99,7 @@ class YouTubeVideo(YouTubeVideoSnippet):
         stats = payload["statistics"]
         details = payload["contentDetails"]
         category_id = snippet["categoryId"]
+        topics = getpath(payload, ("topicDetails", "topicCategories"), [])
 
         return cls(
             video_id=payload["id"],
@@ -117,6 +119,7 @@ class YouTubeVideo(YouTubeVideoSnippet):
             duration=details["duration"],
             has_captions=details["caption"] == "true",
             tags=snippet.get("tags", []),
+            topics=topics,
         )
 
 
