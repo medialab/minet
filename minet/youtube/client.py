@@ -43,6 +43,7 @@ from minet.youtube.exceptions import (
     YouTubeExclusiveMemberError,
     YouTubeUnknown403Error,
     YouTubeAccessNotConfiguredError,
+    YouTubeAPILimitReached,
 )
 from minet.youtube.types import (
     YouTubeVideo,
@@ -72,7 +73,7 @@ def get_channel_id(scraper: YouTubeScraper, channel_target: str) -> str:
 
 
 class YouTubeAPIClient(object):
-    def __init__(self, key):
+    def __init__(self, key, sleep: bool = True):
         if not isinstance(key, list):
             key = [key]
 
@@ -80,6 +81,7 @@ class YouTubeAPIClient(object):
         self.current_key = key[0]
         self.pool_manager = create_pool_manager()
         self.scraper = YouTubeScraper()
+        self.sleep = sleep
 
         # YouTube's API is known to crash sometimes...
         self.retryer = create_request_retryer(
@@ -113,6 +115,9 @@ class YouTubeAPIClient(object):
                     elif reason == "quotaExceeded":
                         # Current key is exhausted, disabling it and switching to another if there is one
                         if not self.rotate_key():
+                            if not self.sleep:
+                                raise YouTubeAPILimitReached
+
                             # If all keys are exhausted, start waiting until tomorrow and reset keys
                             sleep_time = seconds_to_midnight_pacific_time() + 10
 
