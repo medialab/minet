@@ -23,7 +23,7 @@ def action(cli_args, enricher, loading_bar):
 
     for row, query in enricher.cells(cli_args.column, with_rows=True):
         with loading_bar.step(query):
-            searcher = client.search(query, order=cli_args.order)
+            searcher = client.search_videos(query, order=cli_args.order)
 
             if cli_args.limit:
                 searcher = islice(searcher, cli_args.limit)

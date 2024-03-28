@@ -215,8 +215,10 @@ class YouTubeAPIClient(object):
             for channel_id, item in group_data:
                 yield item, indexed_result.get(channel_id)
 
-    def channel(self, channel_target: str) -> Optional[YouTubeChannel]:
-        result = next(self.channels([channel_target]), None)
+    def channel(
+        self, channel_target: str, raw: bool = False
+    ) -> Optional[YouTubeChannel]:
+        result = next(self.channels([channel_target], raw=raw), None)
 
         if result is not None:
             return result[1]
@@ -257,15 +259,15 @@ class YouTubeAPIClient(object):
             for video_id, item in group_data:
                 yield item, indexed_result.get(video_id)
 
-    def video(self, video_target: str) -> Optional[YouTubeVideo]:
-        result = next(self.videos([video_target]), None)
+    def video(self, video_target: str, raw: bool = False) -> Optional[YouTubeVideo]:
+        result = next(self.videos([video_target], raw=raw), None)
 
         if result is not None:
             return result[1]
 
         return None
 
-    def search(
+    def search_videos(
         self,
         query: str,
         order: str = YOUTUBE_API_DEFAULT_SEARCH_ORDER,
@@ -367,6 +369,7 @@ class YouTubeAPIClient(object):
         channel_target: str,
         start_time: Optional[str] = None,
         end_time: Optional[str] = None,
+        raw: bool = False,
     ) -> Iterator[YouTubePlaylistVideoSnippet]:
         channel_id = get_channel_id(self.scraper, channel_target)
 
@@ -383,7 +386,8 @@ class YouTubeAPIClient(object):
                 token = result.get("nextPageToken")
 
                 for item in result["items"]:
-                    item = YouTubePlaylistVideoSnippet.from_payload(item)
+                    if not raw:
+                        item = YouTubePlaylistVideoSnippet.from_payload(item)
 
                     if start_time and start_time > item.published_at:
                         break
