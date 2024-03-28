@@ -4,6 +4,8 @@ from casanova import TabularRecord
 from dataclasses import dataclass
 from ebbe import getpath
 
+from minet.youtube.constants import YOUTUBE_API_CATEGORIES
+
 
 def get_int(item, key) -> Optional[int]:
     nb = item.get(key)
@@ -36,6 +38,7 @@ class YouTubeVideoSnippet(TabularRecord):
     description: str
     channel_id: str
     channel_title: str
+    default_language: Optional[str]
 
     @classmethod
     def from_payload(cls, payload) -> "YouTubeVideoSnippet":
@@ -48,6 +51,9 @@ class YouTubeVideoSnippet(TabularRecord):
             channel_title=snippet["title"],
             description=snippet["description"],
             title=snippet["channelTitle"],
+            default_language=snippet.get(
+                "defaultLanguage", snippet.get("defaultAudioLanguage")
+            ),
         )
 
 
@@ -67,6 +73,9 @@ class YouTubePlaylistVideoSnippet(YouTubeVideoSnippet):
             description=snippet["description"],
             channel_title=snippet["channelTitle"],
             position=snippet["position"],
+            default_language=snippet.get(
+                "defaultLanguage", snippet.get("defaultAudioLanguage")
+            ),
         )
 
 
@@ -79,12 +88,16 @@ class YouTubeVideo(YouTubeVideoSnippet):
     comment_count: Optional[int]
     duration: str
     has_captions: bool
+    category_id: str
+    category: Optional[str]
+    tags: List[str]
 
     @classmethod
     def from_payload(cls, payload) -> "YouTubeVideo":
         snippet = payload["snippet"]
         stats = payload["statistics"]
         details = payload["contentDetails"]
+        category_id = snippet["categoryId"]
 
         return cls(
             video_id=payload["id"],
@@ -92,12 +105,18 @@ class YouTubeVideo(YouTubeVideoSnippet):
             channel_id=snippet["channelId"],
             title=snippet["title"],
             description=snippet["description"],
+            category_id=category_id,
+            category=YOUTUBE_API_CATEGORIES.get(category_id),
+            default_language=snippet.get(
+                "defaultLanguage", snippet.get("defaultAudioLanguage")
+            ),
             channel_title=snippet["channelTitle"],
             view_count=get_int(stats, "viewCount"),
             like_count=get_int(stats, "likeCount"),
             comment_count=get_int(stats, "commentCount"),
             duration=details["duration"],
             has_captions=details["caption"] == "true",
+            tags=snippet.get("tags", []),
         )
 
 
