@@ -4,7 +4,7 @@
 #
 # A handy API client used by the CLI actions.
 #
-from typing import Deque, Tuple, Iterator, Any, Optional
+from typing import Deque, Tuple, Iterator, Iterable, Any, Optional, Callable
 
 import time
 from ebbe import as_chunks
@@ -175,7 +175,10 @@ class YouTubeAPIClient(object):
             self.keys[key] = True
 
     def channels(
-        self, channels_target, key=None, raw=False
+        self,
+        channels_target: Iterable[Any],
+        key: Optional[Callable[[Any], str]] = None,
+        raw: bool = False,
     ) -> Iterator[Tuple[Any, Optional[YouTubeChannel]]]:
         # TODO: we could chunk per not None
         for group in as_chunks(YOUTUBE_API_MAX_CHANNELS_PER_CALL, channels_target):
@@ -212,8 +215,19 @@ class YouTubeAPIClient(object):
             for channel_id, item in group_data:
                 yield item, indexed_result.get(channel_id)
 
+    def channel(self, channel_target: str) -> Optional[YouTubeChannel]:
+        result = next(self.channels([channel_target]), None)
+
+        if result is not None:
+            return result[1]
+
+        return None
+
     def videos(
-        self, videos, key=None, raw=False
+        self,
+        videos: Iterable[Any],
+        key: Optional[Callable[[Any], str]] = None,
+        raw: bool = False,
     ) -> Iterator[Tuple[Any, Optional[YouTubeVideo]]]:
         # TODO: we could chunk per not None
         for group in as_chunks(YOUTUBE_API_MAX_VIDEOS_PER_CALL, videos):
@@ -243,8 +257,19 @@ class YouTubeAPIClient(object):
             for video_id, item in group_data:
                 yield item, indexed_result.get(video_id)
 
+    def video(self, video_target: str) -> Optional[YouTubeVideo]:
+        result = next(self.videos([video_target]), None)
+
+        if result is not None:
+            return result[1]
+
+        return None
+
     def search(
-        self, query, order=YOUTUBE_API_DEFAULT_SEARCH_ORDER, raw=False
+        self,
+        query: str,
+        order: str = YOUTUBE_API_DEFAULT_SEARCH_ORDER,
+        raw: bool = False,
     ) -> Iterator[YouTubeVideoSnippet]:
         if order not in YOUTUBE_API_SEARCH_ORDERS:
             raise TypeError('unknown search order "%s"' % order)
@@ -271,7 +296,7 @@ class YouTubeAPIClient(object):
         return generator()
 
     def comments(
-        self, video_target, raw=False, full_replies=True
+        self, video_target: str, raw: bool = False, full_replies: bool = True
     ) -> Iterator[YouTubeComment]:
         video_id = ensure_video_id(video_target)
 

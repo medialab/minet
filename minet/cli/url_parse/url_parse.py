@@ -36,7 +36,7 @@ from ural.youtube import (
     YoutubeVideo,
     YoutubeUser,
     YoutubeChannel,
-    YoutubeShort
+    YoutubeShort,
 )
 from ural.twitter import parse_twitter_url, TwitterTweet, TwitterUser
 
@@ -122,7 +122,7 @@ YOUTUBE_TYPES = {
     YoutubeVideo: "video",
     YoutubeUser: "user",
     YoutubeChannel: "channel",
-    YoutubeShort: "short"
+    YoutubeShort: "short",
 }
 
 

@@ -328,7 +328,8 @@ class ErroredCrawlResult(CrawlResult[CrawlJobDataType, None]):
     def __init__(
         self,
         job: CrawlJob[CrawlJobDataType],
-        error: Exception,    ):
+        error: Exception,
+    ):
         self.job = job
         self.data = None
         self.error = error
