@@ -20,5 +20,9 @@ def action(cli_args, enricher, loading_bar: LoadingBar):
 
     for row, user_url in enricher.cells(cli_args.column, with_rows=True):
         with loading_bar.step():
-            user_infos = scraper.user_infos(user_url)
-            enricher.writerow(row, user_infos)
+            try:
+                user_infos = scraper.user_infos(user_url)
+                enricher.writerow(row, user_infos)
+            except TypeError:
+                enricher.writerow(row)
+                loading_bar.inc_stat("invalid-url", style="error")
