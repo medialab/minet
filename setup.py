@@ -33,7 +33,7 @@ setup(
         "dateparser>=1.1.1",
         "ebbe>=1.13,<2",
         "json5>=0.8.5",
-        "lxml>=4.3.0",
+        "lxml>=4.3.0,<5.2",
         "nanoid>=2,<3",
         "playwright>=1.35,<1.36",
         "playwright_stealth>=1,<2",
