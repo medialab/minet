@@ -3323,7 +3323,7 @@ Usage: minet facebook user-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                  [--refresh-per-second REFRESH_PER_SECOND]
                                  [--simple-progress] [--throttle THROTTLE]
                                  [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                                 [--total TOTAL] [-o OUTPUT]
+                                 [--total TOTAL] [--resume] [-o OUTPUT]
                                  user_url_or_user_url_column
 
 # Minet Facebook User Infos Command
@@ -3361,6 +3361,8 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --resume                      "Whether to resume from an aborted collection.
+                                Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do

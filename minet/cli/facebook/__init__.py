@@ -4,6 +4,8 @@
 #
 # Logic of the `fb` action.
 #
+from casanova import RowCountResumer
+
 from minet.cli.argparse import command, ConfigAction
 
 # TODO: lazyloading issue
@@ -265,6 +267,7 @@ FACEBOOK_USER_INFOS_SUBCOMMAND = command(
     """,
     variadic_input={"dummy_column": "user_url", "item_label": "user"},
     arguments=[*MOBILE_ARGUMENTS],
+    resumer=RowCountResumer,
 )
 
 FACEBOOK_COMMAND = command(
