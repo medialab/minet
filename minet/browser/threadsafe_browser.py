@@ -3,7 +3,6 @@ from minet.types import Concatenate, ParamSpec
 
 import os
 import asyncio
-import platform
 from shutil import rmtree
 from concurrent.futures import Future
 from threading import Thread, Event, Lock
@@ -14,8 +13,6 @@ from minet.browser.plawright_shim import install_browser
 from minet.browser.utils import get_browsers_path, get_temp_persistent_context_path
 from minet.browser.extensions import get_extension_path, ensure_extension_is_downloaded
 
-UNIX = "windows" not in platform.system().lower()
-LTE_PY37 = platform.python_version_tuple()[:2] <= ("3", "7")
 SUPPORTED_BROWSERS = ("chromium", "firefox")
 
 
@@ -65,13 +62,6 @@ class ThreadsafeBrowser:
 
         if self.requires_extensions and browser != "chromium":
             raise TypeError("adblock and automatic_consent only work with chromium")
-
-        # NOTE: on unix python 3.7, child watching does not
-        # work properly when asyncio is not running from the main thread
-        if UNIX and LTE_PY37:
-            from minet.__future__.threaded_child_watcher import ThreadedChildWatcher
-
-            asyncio.set_child_watcher(ThreadedChildWatcher())
 
         self.browser_name: str = browser
         self.browser: Optional[Browser] = None

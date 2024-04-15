@@ -10,7 +10,7 @@ from PyInstaller.utils.hooks import collect_submodules
 
 SLASH_RE = re.compile(r"[\/\\]")
 
-hiddenimports = ["minet.__future__", "mine.__future__.threaded_child_watcher"]
+hiddenimports = []
 
 for p in iglob("minet/cli/**/*.py", recursive=True):
     if "__main__" in p:
