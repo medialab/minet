@@ -126,7 +126,7 @@ def looks_like_html(html_chunk: bytes) -> bool:
 def create_pool_manager(
     proxy: Optional[str] = None,
     parallelism: int = 1,
-    num_pools: Optional[int] = None,
+    num_pools: int = 4,
     insecure: bool = False,
     spoof_tls_ciphers: bool = False,
     **kwargs,
