@@ -6,13 +6,24 @@ import asyncio
 from shutil import rmtree
 from concurrent.futures import Future
 from threading import Thread, Event, Lock
-from playwright.async_api import async_playwright, Browser, BrowserContext
+from playwright.async_api import (
+    async_playwright,
+    Browser,
+    BrowserContext,
+    Error as PlaywrightError,
+    TimeoutError as PlaywrightTimeoutError,
+)
 from urllib3._collections import HTTPHeaderDict
 
-from minet.exceptions import UnknownBrowserError
+from minet.constants import REDIRECT_STATUSES
+from minet.exceptions import UnknownBrowserError, BrowserYetUnimplementedError
 from minet.web import Response
 from minet.browser.plawright_shim import install_browser
-from minet.browser.utils import get_browsers_path, get_temp_persistent_context_path
+from minet.browser.utils import (
+    get_browsers_path,
+    get_temp_persistent_context_path,
+    convert_playwright_error,
+)
 from minet.browser.extensions import get_extension_path, ensure_extension_is_downloaded
 from minet.types import Redirection
 
@@ -233,7 +244,15 @@ class ThreadsafeBrowser:
 
     async def __request(self, context: BrowserContext, url: str) -> Response:
         async with await context.new_page() as page:
-            emulated_response = await page.goto(url)
+            try:
+                emulated_response = await page.goto(url)
+            except (PlaywrightError, PlaywrightTimeoutError) as e:
+                error = convert_playwright_error(e)
+
+                if isinstance(error, BrowserYetUnimplementedError):
+                    raise e
+
+                raise error
 
             assert emulated_response is not None
 
@@ -258,7 +277,9 @@ class ThreadsafeBrowser:
                 redirection_stack.append(
                     Redirection(
                         r.url,
-                        "hit" if r.status == 200 else "location-header",
+                        "hit"
+                        if r.status not in REDIRECT_STATUSES
+                        else "location-header",
                         status=r.status,
                     )
                 )

@@ -31,7 +31,7 @@ from minet.exceptions import (
     PycurlReceiveError,
     PycurlSendError,
     #
-    BrowserUnknownError,
+    BrowserYetUnimplementedError,
     BrowserNameNotResolvedError,
     BrowserConnectionAbortedError,
     BrowserConnectionRefusedError,
@@ -126,7 +126,7 @@ ERROR_REPORTERS = {
     PycurlReceiveError: "receive-error",
     PycurlSendError: "send-error",
     #
-    BrowserUnknownError: "unknown-browser-error",
+    BrowserYetUnimplementedError: "unknown-browser-error",
     BrowserNameNotResolvedError: "unknown-host",
     BrowserConnectionAbortedError: "connection-aborted",
     BrowserConnectionRefusedError: "connection-refused",

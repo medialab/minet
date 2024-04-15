@@ -17,7 +17,7 @@ from minet.exceptions import (
     BrowserConnectionRefusedError,
     BrowserConnectionClosedError,
     BrowserTimeoutError,
-    BrowserUnknownError,
+    BrowserYetUnimplementedError,
     BrowserSSLError,
     BrowserHTTPResponseCodeFailureError,
     BrowserConnectionTimeoutError,
@@ -69,7 +69,7 @@ def convert_playwright_error(error: AnyPlaywrightError) -> BrowserError:
     if "net::ERR_SOCKET_NOT_CONNECTED" in error.message:
         return BrowserSocketError()
 
-    return BrowserUnknownError()
+    return BrowserYetUnimplementedError()
 
 
 def get_browsers_path() -> str:

@@ -245,7 +245,7 @@ class BrowserError(MinetError):
     pass
 
 
-class BrowserUnknownError(BrowserError):
+class BrowserYetUnimplementedError(BrowserError):
     pass
 
 

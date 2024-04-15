@@ -468,7 +468,7 @@ def action(cli_args, enricher: casanova.IndexedEnricher, loading_bar: LoadingBar
         )
 
         from minet.browser.utils import convert_playwright_error
-        from minet.exceptions import BrowserUnknownError
+        from minet.exceptions import BrowserYetUnimplementedError
         from minet.serialization import serialize_error_as_slug
 
         goto_timeout = int(
@@ -488,7 +488,7 @@ def action(cli_args, enricher: casanova.IndexedEnricher, loading_bar: LoadingBar
                 except (PlaywrightError, PlaywrightTimeoutError) as e:
                     error = convert_playwright_error(e)
 
-                    if isinstance(error, BrowserUnknownError):
+                    if isinstance(error, BrowserYetUnimplementedError):
                         raise e
 
                     return ScreenshotAddendum(
