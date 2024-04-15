@@ -16,7 +16,7 @@ from typing import (
     Dict,
     Container,
 )
-from minet.types import AnyTimeout, Redirection, RedirectionStack, HTTPHeaderDict
+from minet.types import AnyTimeout, Redirection, RedirectionStack
 
 import re
 import cgi
@@ -40,6 +40,7 @@ from urllib.parse import urljoin, quote
 from urllib.request import Request
 from urllib3.util.ssl_ import create_urllib3_context
 from urllib3.util.request import ACCEPT_ENCODING
+from urllib3._collections import HTTPHeaderDict
 from ebbe import rcompose, noop, format_filesize, format_repr
 from tenacity import (
     Retrying,

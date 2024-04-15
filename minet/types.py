@@ -2,7 +2,6 @@ import sys
 from typing import Union, List, Optional, Literal
 from os import PathLike
 from io import FileIO
-from bs4 import BeautifulSoup
 from urllib3 import Timeout
 from ebbe import format_repr
 
@@ -16,12 +15,6 @@ if sys.version_info >= (3, 11):
     from typing import TypedDict, Required, NotRequired, Unpack
 else:
     from typing_extensions import TypedDict, Required, NotRequired, Unpack
-
-# Useful conditional imports
-try:
-    from urllib3 import HTTPHeaderDict
-except ImportError:
-    from urllib3._collections import HTTPHeaderDict
 
 # Useful Any types
 AnyPath = Union[str, PathLike]

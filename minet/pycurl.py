@@ -1,5 +1,5 @@
 from typing import Optional, Dict, List, Union
-from minet.types import AnyTimeout, RedirectionStack, Redirection, HTTPHeaderDict
+from minet.types import AnyTimeout, RedirectionStack, Redirection
 
 import pycurl
 import certifi
@@ -10,6 +10,7 @@ from ural import is_url
 from urllib3 import Timeout
 from urllib.parse import urljoin
 from urllib3.util.url import parse_url
+from urllib3._collections import HTTPHeaderDict
 
 from minet.constants import REDIRECT_STATUSES
 from minet.exceptions import (
