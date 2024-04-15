@@ -1,7 +1,7 @@
 # Dev dependencies
 ipywidgets
 jupyterlab
-PyInstaller==5.8.0
+PyInstaller==6.6.0
 pytest==7.2.1
 ruff
 twine==4.0.2
