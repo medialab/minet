@@ -495,8 +495,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
     def crawl(
         self,
         callback: None = ...,
-    ) -> Iterator[AnyCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes]]:
-        ...
+    ) -> Iterator[AnyCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes]]: ...
 
     @overload
     def crawl(
@@ -513,8 +512,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
             AnyCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes],
             CallbackResultType,
         ]
-    ]:
-        ...
+    ]: ...
 
     def crawl(
         self,

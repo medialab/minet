@@ -1,5 +1,14 @@
-from typing import Dict, List, Tuple, Iterable, Iterator, Optional, Callable, Union
-from minet.types import Literal
+from typing import (
+    Dict,
+    List,
+    Tuple,
+    Iterable,
+    Iterator,
+    Optional,
+    Callable,
+    Union,
+    Literal,
+)
 
 import sqlite3
 import pickle

@@ -433,8 +433,7 @@ class BooleanAction(Action):
         )
 
 
-class DummyCSVInput(object):
-    ...
+class DummyCSVInput(object): ...
 
 
 class SingleColumnDummyCSVInput(DummyCSVInput):

@@ -1,5 +1,4 @@
-from typing import List, Optional, Any
-from minet.types import Literal
+from typing import List, Optional, Any, Literal
 
 import re
 from ural import could_be_html, normalize_url, should_follow_href

@@ -20,8 +20,9 @@ from typing import (
     Awaitable,
     Any,
     TYPE_CHECKING,
+    Literal,
 )
-from minet.types import Literal, TypedDict, Unpack, NotRequired
+from minet.types import TypedDict, Unpack, NotRequired
 
 if TYPE_CHECKING:
     from minet.browser.threadsafe_browser import BrowserOrBrowserContext
@@ -545,8 +546,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         passthrough: Literal[False] = ...,
         callback: None = ...,
         **kwargs: Unpack[ExecutorRequestKwargs[ItemType, CallbackResultType]],
-    ) -> Iterator[AnyActualRequestResult[ItemType]]:
-        ...
+    ) -> Iterator[AnyActualRequestResult[ItemType]]: ...
 
     @overload
     def request(
@@ -556,8 +556,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         passthrough: Literal[True] = ...,
         callback: None = ...,
         **kwargs: Unpack[ExecutorRequestKwargs[ItemType, CallbackResultType]],
-    ) -> Iterator[AnyRequestResult[ItemType]]:
-        ...
+    ) -> Iterator[AnyRequestResult[ItemType]]: ...
 
     @overload
     def request(
@@ -567,8 +566,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         passthrough: Literal[False] = ...,
         callback: Callable[[ItemType, str, Response], CallbackResultType] = ...,
         **kwargs: Unpack[ExecutorRequestKwargs[ItemType, CallbackResultType]],
-    ) -> Iterator[Tuple[AnyActualRequestResult[ItemType], CallbackResultType]]:
-        ...
+    ) -> Iterator[Tuple[AnyActualRequestResult[ItemType], CallbackResultType]]: ...
 
     @overload
     def request(
@@ -578,8 +576,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         passthrough: Literal[True] = ...,
         callback: Callable[[ItemType, str, Response], CallbackResultType] = ...,
         **kwargs: Unpack[ExecutorRequestKwargs[ItemType, CallbackResultType]],
-    ) -> Iterator[Tuple[AnyRequestResult[ItemType], CallbackResultType]]:
-        ...
+    ) -> Iterator[Tuple[AnyRequestResult[ItemType], CallbackResultType]]: ...
 
     def request(
         self,
@@ -646,8 +643,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         callback: None = ...,
         passthrough: Literal[False] = ...,
         **kwargs: Unpack[ExecutorResolveKwargs[ItemType, CallbackResultType]],
-    ) -> Iterator[AnyActualResolveResult[ItemType]]:
-        ...
+    ) -> Iterator[AnyActualResolveResult[ItemType]]: ...
 
     @overload
     def resolve(
@@ -657,8 +653,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         callback: None = ...,
         passthrough: Literal[True] = ...,
         **kwargs: Unpack[ExecutorResolveKwargs[ItemType, CallbackResultType]],
-    ) -> Iterator[AnyResolveResult[ItemType]]:
-        ...
+    ) -> Iterator[AnyResolveResult[ItemType]]: ...
 
     @overload
     def resolve(
@@ -668,8 +663,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         callback: Callable[[ItemType, str, RedirectionStack], CallbackResultType],
         passthrough: Literal[False] = ...,
         **kwargs: Unpack[ExecutorResolveKwargs[ItemType, CallbackResultType]],
-    ) -> Iterator[Tuple[AnyActualResolveResult[ItemType], CallbackResultType]]:
-        ...
+    ) -> Iterator[Tuple[AnyActualResolveResult[ItemType], CallbackResultType]]: ...
 
     @overload
     def resolve(
@@ -679,8 +673,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         callback: Callable[[ItemType, str, RedirectionStack], CallbackResultType],
         passthrough: Literal[True] = ...,
         **kwargs: Unpack[ExecutorResolveKwargs[ItemType, CallbackResultType]],
-    ) -> Iterator[Tuple[AnyResolveResult[ItemType], CallbackResultType]]:
-        ...
+    ) -> Iterator[Tuple[AnyResolveResult[ItemType], CallbackResultType]]: ...
 
     def resolve(
         self,

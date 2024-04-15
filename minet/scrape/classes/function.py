@@ -1,11 +1,21 @@
-from typing import Union, Optional, Callable, Any, cast, Dict, List
+from typing import (
+    Union,
+    Optional,
+    Callable,
+    Any,
+    cast,
+    Dict,
+    List,
+    get_origin,
+    get_args,
+    get_type_hints,
+)
 
 import inspect
 
 from casanova import RowWrapper
 from bs4 import SoupStrainer
 
-from minet.types import get_type_hints, get_origin, get_args
 from minet.scrape.classes.base import ScraperBase
 from minet.scrape.soup import WonderfulSoup
 from minet.scrape.straining import strainer_from_css

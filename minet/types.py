@@ -1,5 +1,5 @@
 import sys
-from typing import Union, List, Optional
+from typing import Union, List, Optional, Literal
 from os import PathLike
 from io import FileIO
 from bs4 import BeautifulSoup
@@ -7,11 +7,6 @@ from urllib3 import Timeout
 from ebbe import format_repr
 
 # NOTE: yes this is repetitive, but mypy only understands this, don't ask questions...
-if sys.version_info >= (3, 8):
-    from typing import Literal, get_origin, get_type_hints, get_args
-else:
-    from typing_extensions import Literal, get_origin, get_type_hints, get_args
-
 if sys.version_info >= (3, 10):
     from typing import TypeGuard, Concatenate, ParamSpec
 else:

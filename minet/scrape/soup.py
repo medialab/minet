@@ -95,12 +95,10 @@ class MinetTag(Tag):
         return cast(str, super().__getitem__(name))
 
     @overload
-    def get(self, name: str, default: str = ...) -> str:
-        ...
+    def get(self, name: str, default: str = ...) -> str: ...
 
     @overload
-    def get(self, name: str, default: None = ...) -> Optional[str]:
-        ...
+    def get(self, name: str, default: None = ...) -> Optional[str]: ...
 
     def get(self, name: str, default: Optional[str] = None) -> Optional[str]:
         return cast(Optional[str], super().get(name, default))

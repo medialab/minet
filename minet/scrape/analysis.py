@@ -4,8 +4,7 @@
 #
 # Functions performing analysis of scraper definitions.
 #
-from typing import Optional, List
-from minet.types import Literal
+from typing import Optional, List, Literal
 
 import ast
 import soupsieve

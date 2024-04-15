@@ -1,5 +1,4 @@
-from typing import Iterable, List, Set, Iterator, Any, Optional
-from minet.types import Literal
+from typing import Iterable, List, Set, Iterator, Any, Optional, Literal
 
 from dataclasses import dataclass
 from ural.lru import CanonicalizedLRUTrie

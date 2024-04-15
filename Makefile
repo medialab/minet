@@ -28,7 +28,7 @@ deps:
 
 lint:
 	@echo Linting source code...
-	ruff $(SOURCE) test
+	ruff check $(SOURCE) test
 	@echo
 
 format:

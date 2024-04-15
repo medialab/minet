@@ -1,5 +1,5 @@
-from typing import Callable, TypeVar, Awaitable, Set, Optional, Union
-from minet.types import Literal, Concatenate, ParamSpec
+from typing import Callable, TypeVar, Awaitable, Set, Optional, Union, Literal
+from minet.types import Concatenate, ParamSpec
 
 import os
 import asyncio

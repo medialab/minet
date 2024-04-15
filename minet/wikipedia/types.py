@@ -1,4 +1,4 @@
-from minet.types import Literal
+from typing import Literal
 
 from dataclasses import dataclass
 from casanova import TabularRecord

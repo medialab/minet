@@ -22,7 +22,7 @@ setup(
     author="Guillaume Plique, Pauline Breteau, Jules Farjas, Héloïse Théro, Jean Descamps, Amélie Pellé, Laura Miguel, César Pichon, Kelly Christensen",
     keywords="webmining",
     license="GPL-3.0",
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     packages=packages,
     install_requires=[
         "about-time>=4,<5",
