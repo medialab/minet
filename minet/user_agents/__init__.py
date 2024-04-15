@@ -1,5 +1,6 @@
 from typing import Tuple, List
 
+import json
 import random
 from os.path import join, dirname
 
@@ -18,11 +19,13 @@ def update_user_agents(transient: bool = False) -> None:
     from minet.web import request
 
     def download_useragentsme_data() -> List[Tuple[float, str]]:
-        response = request("https://www.useragents.me/api")
-        results = response.json()
+        response = request("https://www.useragents.me")
+        json_text = response.soup().force_select_one("#most-common-desktop-useragents-json-csv textarea").get_text()
+        data = json.loads(json_text)
+
         return [
             (row["pct"], row["ua"])
-            for row in results.get("data", [])
+            for row in data
             if not "Trident" in row["ua"]  # Filtering out windows shenanigans etc.
         ]
 
