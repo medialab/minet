@@ -903,7 +903,7 @@ class Response(object):
 
     def soup(
         self,
-        engine: str = "lxml",
+        engine: str = "html.parser",
         ignore_xhtml_warning=False,
         strainer: Optional[SoupStrainer] = None,
     ) -> WonderfulSoup:
