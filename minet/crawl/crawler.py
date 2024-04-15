@@ -204,7 +204,13 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType, CallbackResultT
             spider_result = spider.process(job, response)
 
             if spider_result is not None:
-                data, next_jobs = spider_result
+                try:
+                    data, next_jobs = spider_result
+                except (ValueError, TypeError):
+                    raise TypeError(
+                        'Spider.process is expected to return either None or a 2-tuple containing data and next targets to enqueue. Got a "%s" instead.'
+                        % spider_result.__class__.__name__
+                    )
             else:
                 data = None
                 next_jobs = None
@@ -505,12 +511,12 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
                 "Crawler",
                 SuccessfulCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes],
             ],
-            CallbackResultType,
-        ] = ...,
+            Optional[CallbackResultType],
+        ],
     ) -> Iterator[
         Tuple[
             AnyCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes],
-            CallbackResultType,
+            Optional[CallbackResultType],
         ]
     ]: ...
 
@@ -522,7 +528,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
                     "Crawler",
                     SuccessfulCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes],
                 ],
-                CallbackResultType,
+                Optional[CallbackResultType],
             ]
         ] = None,
     ) -> Union[
@@ -530,7 +536,7 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         Iterator[
             Tuple[
                 AnyCrawlResult[CrawlJobDataTypes, CrawlResultDataTypes],
-                CallbackResultType,
+                Optional[CallbackResultType],
             ]
         ],
     ]:
