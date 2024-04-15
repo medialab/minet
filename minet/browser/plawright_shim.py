@@ -14,9 +14,10 @@ def run_playwright(*args: str) -> int:
     env = get_driver_env()
     env.setdefault("PLAYWRIGHT_BROWSERS_PATH", get_browsers_path())
 
-    driver_executable = compute_driver_executable()
+    node, pw = compute_driver_executable()
+
     completed_process = subprocess.run(
-        [str(driver_executable), *args], env=env, stdout=subprocess.DEVNULL
+        [node, pw, *args], env=env, stdout=subprocess.DEVNULL
     )
 
     return completed_process.returncode

@@ -7,11 +7,14 @@ from shutil import rmtree
 from concurrent.futures import Future
 from threading import Thread, Event, Lock
 from playwright.async_api import async_playwright, Browser, BrowserContext
+from urllib3._collections import HTTPHeaderDict
 
 from minet.exceptions import UnknownBrowserError
+from minet.web import Response
 from minet.browser.plawright_shim import install_browser
 from minet.browser.utils import get_browsers_path, get_temp_persistent_context_path
 from minet.browser.extensions import get_extension_path, ensure_extension_is_downloaded
+from minet.types import Redirection
 
 SUPPORTED_BROWSERS = ("chromium", "firefox")
 
@@ -227,3 +230,28 @@ class ThreadsafeBrowser:
         )
 
         return self.__handle_future(future)
+
+    async def __request(self, context: BrowserContext, url: str) -> Response:
+        async with await context.new_page() as page:
+            emulated_response = await page.goto(url)
+
+            assert emulated_response is not None
+
+            headers = HTTPHeaderDict()
+
+            for header in await emulated_response.headers_array():
+                headers[header["name"]] = header["value"]
+
+            response = Response(
+                url,
+                [Redirection(url, status=emulated_response.status)],
+                headers,
+                emulated_response.status,
+                (await page.content()).encode(),
+                known_encoding="utf-8",
+            )
+
+            return response
+
+    def request(self, url: str) -> Response:
+        return self.run_in_default_context(self.__request, url)
