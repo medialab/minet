@@ -564,9 +564,9 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         iterator: Iterable[ItemType],
         *,
         passthrough: Literal[False] = ...,
-        callback: Callable[[ItemType, str, Response], CallbackResultType],
+        callback: Callable[[ItemType, str, Response], Optional[CallbackResultType]],
         **kwargs: Unpack[ExecutorRequestKwargs[ItemType]],
-    ) -> Iterator[Tuple[AnyActualRequestResult[ItemType], CallbackResultType]]: ...
+    ) -> Iterator[Tuple[AnyActualRequestResult[ItemType], Optional[CallbackResultType]]]: ...
 
     @overload
     def request(
@@ -574,9 +574,9 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         iterator: Iterable[ItemType],
         *,
         passthrough: Literal[True] = ...,
-        callback: Callable[[ItemType, str, Response], CallbackResultType],
+        callback: Callable[[ItemType, str, Response], Optional[CallbackResultType]],
         **kwargs: Unpack[ExecutorRequestKwargs[ItemType]],
-    ) -> Iterator[Tuple[AnyRequestResult[ItemType], CallbackResultType]]: ...
+    ) -> Iterator[Tuple[AnyRequestResult[ItemType], Optional[CallbackResultType]]]: ...
 
     def request(
         self,
@@ -593,14 +593,14 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         known_encoding: Optional[str] = None,
         callback: Optional[
-            Callable[[ItemType, str, Response], CallbackResultType]
+            Callable[[ItemType, str, Response], Optional[CallbackResultType]]
         ] = None,
         passthrough: bool = False,
     ) -> Union[
         Iterator[AnyRequestResult[ItemType]],
         Iterator[AnyActualRequestResult[ItemType]],
-        Iterator[Tuple[AnyRequestResult[ItemType], CallbackResultType]],
-        Iterator[Tuple[AnyActualRequestResult[ItemType], CallbackResultType]],
+        Iterator[Tuple[AnyRequestResult[ItemType], Optional[CallbackResultType]]],
+        Iterator[Tuple[AnyActualRequestResult[ItemType], Optional[CallbackResultType]]],
     ]:
         # TODO: validate
         worker = HTTPWorker(
@@ -660,20 +660,20 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         self,
         iterator: Iterable[ItemType],
         *,
-        callback: Callable[[ItemType, str, RedirectionStack], CallbackResultType],
+        callback: Callable[[ItemType, str, RedirectionStack], Optional[CallbackResultType]],
         passthrough: Literal[False] = ...,
         **kwargs: Unpack[ExecutorResolveKwargs[ItemType]],
-    ) -> Iterator[Tuple[AnyActualResolveResult[ItemType], CallbackResultType]]: ...
+    ) -> Iterator[Tuple[AnyActualResolveResult[ItemType], Optional[CallbackResultType]]]: ...
 
     @overload
     def resolve(
         self,
         iterator: Iterable[ItemType],
         *,
-        callback: Callable[[ItemType, str, RedirectionStack], CallbackResultType],
+        callback: Callable[[ItemType, str, RedirectionStack], Optional[CallbackResultType]],
         passthrough: Literal[True] = ...,
         **kwargs: Unpack[ExecutorResolveKwargs[ItemType]],
-    ) -> Iterator[Tuple[AnyResolveResult[ItemType], CallbackResultType]]: ...
+    ) -> Iterator[Tuple[AnyResolveResult[ItemType], Optional[CallbackResultType]]]: ...
 
     def resolve(
         self,
@@ -692,14 +692,14 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         infer_redirection: bool = False,
         canonicalize: bool = False,
         callback: Optional[
-            Callable[[ItemType, str, RedirectionStack], CallbackResultType]
+            Callable[[ItemType, str, RedirectionStack], Optional[CallbackResultType]]
         ] = None,
         passthrough: bool = False,
     ) -> Union[
         Iterator[AnyResolveResult[ItemType]],
         Iterator[AnyActualResolveResult[ItemType]],
-        Iterator[Tuple[AnyResolveResult[ItemType], CallbackResultType]],
-        Iterator[Tuple[AnyActualResolveResult[ItemType], CallbackResultType]],
+        Iterator[Tuple[AnyResolveResult[ItemType], Optional[CallbackResultType]]],
+        Iterator[Tuple[AnyActualResolveResult[ItemType], Optional[CallbackResultType]]],
     ]:
         # TODO: validate
         worker = HTTPWorker(
