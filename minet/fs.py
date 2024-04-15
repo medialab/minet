@@ -249,7 +249,6 @@ class FilenameBuilder(object):
 class ThreadSafeFileWriter(object):
     def __init__(self, root_directory: Optional[str] = None, sqlar: bool = False):
         self.root_directory = root_directory or ""
-        self.folder_locks = NamedLocks()
         self.file_locks = NamedLocks()
         self.sqlar = sqlar
         self.archive = None
@@ -273,9 +272,8 @@ class ThreadSafeFileWriter(object):
         if not directory:
             return
 
-        # TODO: cache
-        with self.folder_locks[directory]:
-            makedirs(directory, exist_ok=True)
+        # NOTE: os.makedirs is already threadsafe
+        makedirs(directory, exist_ok=True)
 
     def write(
         self,
