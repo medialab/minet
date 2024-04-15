@@ -1,4 +1,13 @@
-from typing import Callable, TypeVar, Awaitable, Set, Optional, Union, Literal
+from typing import (
+    Callable,
+    TypeVar,
+    Awaitable,
+    Set,
+    Optional,
+    Union,
+    Literal,
+    Container,
+)
 from minet.types import Concatenate, ParamSpec
 
 import os
@@ -16,7 +25,11 @@ from playwright.async_api import (
 from urllib3._collections import HTTPHeaderDict
 
 from minet.constants import REDIRECT_STATUSES
-from minet.exceptions import UnknownBrowserError, BrowserYetUnimplementedError
+from minet.exceptions import (
+    UnknownBrowserError,
+    BrowserYetUnimplementedError,
+    InvalidStatusError,
+)
 from minet.web import Response
 from minet.browser.plawright_shim import install_browser
 from minet.browser.utils import (
@@ -242,7 +255,12 @@ class ThreadsafeBrowser:
 
         return self.__handle_future(future)
 
-    async def __request(self, context: BrowserContext, url: str) -> Response:
+    async def __request(
+        self,
+        context: BrowserContext,
+        url: str,
+        raise_on_statuses: Optional[Container[int]] = None,
+    ) -> Response:
         async with await context.new_page() as page:
             try:
                 emulated_response = await page.goto(url)
@@ -255,6 +273,13 @@ class ThreadsafeBrowser:
                 raise error
 
             assert emulated_response is not None
+
+            # Invalid status?
+            if (
+                raise_on_statuses is not None
+                and emulated_response.status in raise_on_statuses
+            ):
+                raise InvalidStatusError(emulated_response.status)
 
             # Collection redirections
             responses = []
@@ -302,5 +327,9 @@ class ThreadsafeBrowser:
 
             return response
 
-    def request(self, url: str) -> Response:
-        return self.run_in_default_context(self.__request, url)
+    def request(
+        self, url: str, raise_on_statuses: Optional[Container[int]] = None
+    ) -> Response:
+        return self.run_in_default_context(
+            self.__request, url, raise_on_statuses=raise_on_statuses
+        )
