@@ -237,17 +237,45 @@ class ThreadsafeBrowser:
 
             assert emulated_response is not None
 
+            # Collection redirections
+            responses = []
+
+            current = emulated_response
+
+            while True:
+                responses.append(current)
+
+                if not current.request.redirected_from:
+                    break
+
+                current = await current.request.redirected_from.response()
+
+                assert current is not None
+
+            redirection_stack = []
+
+            for r in reversed(responses):
+                redirection_stack.append(
+                    Redirection(
+                        r.url,
+                        "hit" if r.status == 200 else "location-header",
+                        status=r.status,
+                    )
+                )
+
+            # Building headers
             headers = HTTPHeaderDict()
 
             for header in await emulated_response.headers_array():
                 headers[header["name"]] = header["value"]
 
+            # Building response
             response = Response(
                 url,
-                [Redirection(url, status=emulated_response.status)],
+                redirection_stack,
                 headers,
                 emulated_response.status,
-                (await page.content()).encode(),
+                (await page.content()).encode(),  # NOTE: we can do better
                 known_encoding="utf-8",
             )
 
