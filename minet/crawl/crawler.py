@@ -18,8 +18,14 @@ from typing import (
     Iterable,
     Iterator,
     Union,
+    Awaitable,
+    TYPE_CHECKING,
 )
 from minet.types import ParamSpec
+
+if TYPE_CHECKING:
+    from playwright.async_api import BrowserContext
+    from minet.browser import ThreadsafeBrowser
 
 from os import makedirs
 from os.path import join
@@ -125,13 +131,16 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType, CallbackResultT
         self.max_depth = crawler.max_depth
         self.callback = callback
 
-        self.default_kwargs = {
-            "pool_manager": crawler.executor.pool_manager,
-            "max_redirects": max_redirects,
-            "stateful": stateful_redirects,
-            "spoof_ua": spoof_ua,
-            "cancel_event": crawler.executor.cancel_event,
-        }
+        self.default_kwargs = {}
+
+        if self.crawler.browser is None:
+            self.default_kwargs = {
+                "pool_manager": crawler.executor.pool_manager,
+                "max_redirects": max_redirects,
+                "stateful": stateful_redirects,
+                "spoof_ua": spoof_ua,
+                "cancel_event": crawler.executor.cancel_event,
+            }
 
         if use_pycurl:
             del self.default_kwargs["pool_manager"]
@@ -179,11 +188,16 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType, CallbackResultT
 
             try:
                 retryer = getattr(self.local_context, "retryer", None)
+                request_fn = (
+                    request
+                    if self.crawler.browser is None
+                    else self.crawler.browser.request
+                )
 
                 if retryer is not None:
-                    response = retryer(request, job.url, **kwargs)
+                    response = retryer(request_fn, job.url, **kwargs)
                 else:
-                    response = request(job.url, **kwargs)
+                    response = request_fn(job.url, **kwargs)
 
                 # If end url is different from job we add the url to visited cache
                 # NOTE: this is somewhat subject to race conditions but it should
@@ -260,6 +274,8 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
     enqueue_lock: Lock
 
+    browser: Optional["ThreadsafeBrowser"]
+
     queue: CrawlerQueue
     persistent: bool
 
@@ -302,10 +318,26 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
         max_redirects: int = DEFAULT_FETCH_MAX_REDIRECTS,
         stateful_redirects: bool = False,
         spoof_ua: bool = False,
+        browser_emulation: bool = False,
+        browser_kwargs: Dict[str, Any] = {},
+        browser_context_init: Optional[
+            Callable[["BrowserContext"], Awaitable[None]]
+        ] = None,
     ):
         # Validation
         if resume and persistent_storage_path is None:
             raise TypeError("cannot resume a non-persistent crawler")
+
+        # Browser emulation?
+        self.browser = None
+
+        if browser_emulation:
+            from minet.browser import ThreadsafeBrowser
+
+            self.browser = ThreadsafeBrowser(**browser_kwargs)
+
+            if browser_context_init is not None:
+                self.browser.run_in_default_context(browser_context_init)
 
         # Utilities
         self.file_writer = ThreadSafeFileWriter(writer_root_directory, sqlar=sqlar)
@@ -489,6 +521,9 @@ class Crawler(Generic[CrawlJobDataTypes, CrawlResultDataTypes]):
 
         if self.url_cache:
             self.url_cache.close()
+
+        if self.browser is not None:
+            self.browser.stop()
 
     def __enter__(self):
         self.start()

@@ -7,9 +7,9 @@ START_URL = "https://echojs.com/latest"
 
 def scrape(soup: WonderfulSoup) -> SpiderResult:
     next_links = soup.scrape("#newslist article > h2 > a[href]", "href")
-    title = soup.force_select_one("title").get_text()
+    title = soup.select_one("title")
 
-    return title, next_links
+    return title.get_text() if title is not None else None, next_links
 
 
 def spider(job: CrawlJob, response: Response) -> SpiderResult:
@@ -60,3 +60,16 @@ class EchoJSCrawler(Crawler):
 
 def factory(**crawler_kwargs):
     return EchoJSCrawler(**crawler_kwargs)
+
+
+def emulation_factory(**crawler_kwargs):
+    async def init(context):
+        print(context)
+
+    return Crawler(
+        EchoJSSpider(),
+        browser_emulation=True,
+        browser_kwargs={"adblock": True},
+        browser_context_init=init,
+        **crawler_kwargs,
+    )
