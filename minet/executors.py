@@ -96,7 +96,7 @@ class HTTPWorkerPayload(HTTPWorkerPayloadBase[ItemType]):
 ArgsCallbackType = Callable[[HTTPWorkerPayload[ItemType]], Dict]
 
 
-class ExecutorRequestKwargs(TypedDict, Generic[ItemType, CallbackResultType]):
+class ExecutorRequestKwargs(TypedDict, Generic[ItemType]):
     ordered: NotRequired[bool]
     key: NotRequired[Optional[Callable[[ItemType], Optional[str]]]]
     throttle: NotRequired[float]
@@ -109,7 +109,7 @@ class ExecutorRequestKwargs(TypedDict, Generic[ItemType, CallbackResultType]):
     known_encoding: NotRequired[Optional[str]]
 
 
-class ExecutorResolveKwargs(TypedDict, Generic[ItemType, CallbackResultType]):
+class ExecutorResolveKwargs(TypedDict, Generic[ItemType]):
     ordered: NotRequired[bool]
     key: NotRequired[Optional[Callable[[ItemType], Optional[str]]]]
     throttle: NotRequired[float]
@@ -545,7 +545,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         *,
         passthrough: Literal[False] = ...,
         callback: None = ...,
-        **kwargs: Unpack[ExecutorRequestKwargs[ItemType, CallbackResultType]],
+        **kwargs: Unpack[ExecutorRequestKwargs[ItemType]],
     ) -> Iterator[AnyActualRequestResult[ItemType]]: ...
 
     @overload
@@ -555,7 +555,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         *,
         passthrough: Literal[True] = ...,
         callback: None = ...,
-        **kwargs: Unpack[ExecutorRequestKwargs[ItemType, CallbackResultType]],
+        **kwargs: Unpack[ExecutorRequestKwargs[ItemType]],
     ) -> Iterator[AnyRequestResult[ItemType]]: ...
 
     @overload
@@ -564,8 +564,8 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         iterator: Iterable[ItemType],
         *,
         passthrough: Literal[False] = ...,
-        callback: Callable[[ItemType, str, Response], CallbackResultType] = ...,
-        **kwargs: Unpack[ExecutorRequestKwargs[ItemType, CallbackResultType]],
+        callback: Callable[[ItemType, str, Response], CallbackResultType],
+        **kwargs: Unpack[ExecutorRequestKwargs[ItemType]],
     ) -> Iterator[Tuple[AnyActualRequestResult[ItemType], CallbackResultType]]: ...
 
     @overload
@@ -574,8 +574,8 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         iterator: Iterable[ItemType],
         *,
         passthrough: Literal[True] = ...,
-        callback: Callable[[ItemType, str, Response], CallbackResultType] = ...,
-        **kwargs: Unpack[ExecutorRequestKwargs[ItemType, CallbackResultType]],
+        callback: Callable[[ItemType, str, Response], CallbackResultType],
+        **kwargs: Unpack[ExecutorRequestKwargs[ItemType]],
     ) -> Iterator[Tuple[AnyRequestResult[ItemType], CallbackResultType]]: ...
 
     def request(
@@ -642,7 +642,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         *,
         callback: None = ...,
         passthrough: Literal[False] = ...,
-        **kwargs: Unpack[ExecutorResolveKwargs[ItemType, CallbackResultType]],
+        **kwargs: Unpack[ExecutorResolveKwargs[ItemType]],
     ) -> Iterator[AnyActualResolveResult[ItemType]]: ...
 
     @overload
@@ -652,7 +652,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         *,
         callback: None = ...,
         passthrough: Literal[True] = ...,
-        **kwargs: Unpack[ExecutorResolveKwargs[ItemType, CallbackResultType]],
+        **kwargs: Unpack[ExecutorResolveKwargs[ItemType]],
     ) -> Iterator[AnyResolveResult[ItemType]]: ...
 
     @overload
@@ -662,7 +662,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         *,
         callback: Callable[[ItemType, str, RedirectionStack], CallbackResultType],
         passthrough: Literal[False] = ...,
-        **kwargs: Unpack[ExecutorResolveKwargs[ItemType, CallbackResultType]],
+        **kwargs: Unpack[ExecutorResolveKwargs[ItemType]],
     ) -> Iterator[Tuple[AnyActualResolveResult[ItemType], CallbackResultType]]: ...
 
     @overload
@@ -672,7 +672,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
         *,
         callback: Callable[[ItemType, str, RedirectionStack], CallbackResultType],
         passthrough: Literal[True] = ...,
-        **kwargs: Unpack[ExecutorResolveKwargs[ItemType, CallbackResultType]],
+        **kwargs: Unpack[ExecutorResolveKwargs[ItemType]],
     ) -> Iterator[Tuple[AnyResolveResult[ItemType], CallbackResultType]]: ...
 
     def resolve(
