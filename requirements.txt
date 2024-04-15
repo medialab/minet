@@ -1,5 +1,4 @@
 # Dev dependencies
-black
 ipywidgets
 jupyterlab
 PyInstaller==5.8.0

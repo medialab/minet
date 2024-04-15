@@ -3,6 +3,7 @@ SOURCE = minet
 
 # Functions
 define clean
+	rm -rf .ruff_cache
 	rm -rf *.egg-info .pytest_cache build dist
 	find . -name "*.pyc" | xargs rm -f
 	find . -name "*.pyo" | xargs rm -f
@@ -31,14 +32,14 @@ lint:
 	@echo
 
 format:
-	@echo Formatting source code using black
-	black $(SOURCE) ftest hooks scripts test
+	@echo Formatting source code
+	ruff format $(SOURCE) ftest hooks scripts test
 	@echo
 
 ua:
 	@echo Upgrading internals...
 	python -m minet.cli ua update
-	black minet/user_agents/data.py
+	ruff format minet/user_agents/data.py
 	@echo
 
 readme:

@@ -19,7 +19,7 @@ def url_forge(
     start_date=None,
     end_date=None,
     list_ids=None,
-    **kwargs
+    **kwargs,
 ):
     base_url = URL_TEMPLATE % {"sort_by": sort_by, "token": token}
 

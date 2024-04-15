@@ -116,7 +116,7 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType, CallbackResultT
                 ],
                 CallbackResultType,
             ]
-        ] = None
+        ] = None,
     ):
         self.crawler = crawler
         self.cancel_event = self.crawler.executor.cancel_event

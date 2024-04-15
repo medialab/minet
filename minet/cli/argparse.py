@@ -640,11 +640,13 @@ class ConfigAction(Action):
         **kwargs,
     ):
         if "help" in kwargs:
-            kwargs["help"] = kwargs["help"].rstrip(
-                "."
-            ) + '. Can also be configured in a .minetrc file as "%s" or read from the %s env variable.' % (
-                ".".join(rc_key),
-                rc_key_to_env_var(rc_key),
+            kwargs["help"] = (
+                kwargs["help"].rstrip(".")
+                + '. Can also be configured in a .minetrc file as "%s" or read from the %s env variable.'
+                % (
+                    ".".join(rc_key),
+                    rc_key_to_env_var(rc_key),
+                )
             )
 
         self.plural = plural
@@ -828,9 +830,7 @@ def resolve_typical_arguments(
 
         . This also works with single values:
             $ {name} {cmd} "value1,value2" --explode ","
-        """.format(
-                name=name, cmd=cmd
-            )
+        """.format(name=name, cmd=cmd)
 
     if select or variadic_input is not None:
         # TODO: actually one can use xan mini dsl here

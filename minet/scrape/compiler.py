@@ -71,7 +71,7 @@ class CompilerContext(object):
             parent=self.parent.identifier,
             id=self.identifier,
             next=self.identifier + 1,
-            **kwargs
+            **kwargs,
         )
 
     def yield_to_parent(self, expr, **kwargs):
@@ -81,7 +81,7 @@ class CompilerContext(object):
             self.print(
                 "value_{parent}[%s] = %s"
                 % (escape_string_as_literal(self.parent.container_key), expr),
-                **kwargs
+                **kwargs,
             )
         else:
             self.print("value_{parent} = %s" % expr, **kwargs)

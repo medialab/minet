@@ -128,7 +128,7 @@ def create_pool_manager(
     num_pools: Optional[int] = None,
     insecure: bool = False,
     spoof_tls_ciphers: bool = False,
-    **kwargs
+    **kwargs,
 ) -> urllib3.PoolManager:
     """
     Helper function returning a urllib3 pool manager with sane defaults.
@@ -1122,7 +1122,7 @@ def request_jsonrpc(
     method: str,
     pool_manager: urllib3.PoolManager = DEFAULT_POOL_MANAGER,
     *args,
-    **kwargs
+    **kwargs,
 ) -> Response:
     params = []
 

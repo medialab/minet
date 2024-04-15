@@ -82,8 +82,7 @@ def scrape_channel_infos(html) -> TelegramChannelInfos:
     counters_infos = {
         counter.select_one("span[class='counter_type']")
         .get_text()
-        .rstrip("s"): counter.select_one("span[class='counter_value']")
-        .get_text()
+        .rstrip("s"): counter.select_one("span[class='counter_value']").get_text()
         for counter in channel_infos.select("div[class='tgme_channel_info_counter']")
     }
 

@@ -41,7 +41,7 @@ class MediacloudAPIClient(object):
             MediacloudFeed.from_payload,
             arg=media_id,
             single=True,
-            **kwargs
+            **kwargs,
         )
 
     def feeds(self, media_id, **kwargs):
@@ -51,5 +51,5 @@ class MediacloudAPIClient(object):
             "/feeds/list",
             MediacloudMedia.from_payload,
             query={"media_id": media_id, "rows": 100},
-            **kwargs
+            **kwargs,
         )

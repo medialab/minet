@@ -366,7 +366,7 @@ def action(cli_args, enricher: casanova.IndexedEnricher, loading_bar: LoadingBar
                 passthrough=True,
                 use_pycurl=cli_args.pycurl,
                 compressed=cli_args.compress_transfer,
-                **common_http_imap_kwargs
+                **common_http_imap_kwargs,
             ):
                 with loading_bar.step():
                     index, row = result.item
@@ -425,7 +425,7 @@ def action(cli_args, enricher: casanova.IndexedEnricher, loading_bar: LoadingBar
                 infer_redirection=cli_args.infer_redirection,
                 canonicalize=cli_args.canonicalize,
                 passthrough=True,
-                **common_http_imap_kwargs
+                **common_http_imap_kwargs,
             ):
                 with loading_bar.step():
                     index, row = result.item
@@ -541,7 +541,7 @@ def action(cli_args, enricher: casanova.IndexedEnricher, loading_bar: LoadingBar
             height=cli_args.height,
             adblock=cli_args.adblock,
             automatic_consent=cli_args.automatic_consent,
-            **common_executor_kwargs
+            **common_executor_kwargs,
         ) as executor:
             loading_bar.append_to_title(" (t=%i)" % executor.max_workers)
 

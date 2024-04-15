@@ -103,7 +103,7 @@ def make_paginated_iterator(
         per_call=False,
         detailed=False,
         namespace=None,
-        **kwargs
+        **kwargs,
     ):
         if namespace is not None:
             kwargs = vars(namespace)

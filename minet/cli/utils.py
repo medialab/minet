@@ -347,7 +347,7 @@ def with_loading_bar(stats: Optional[Iterable[StatsItem]] = None, **loading_bar_
                 stats=stats,
                 refresh_per_second=getattr(cli_args, "refresh_per_second", 10),
                 simple=getattr(cli_args, "simple_progress", False),
-                **loading_bar_kwargs
+                **loading_bar_kwargs,
             ) as loading_bar:
                 additional_kwargs = {
                     "loading_bar": loading_bar,
@@ -436,7 +436,7 @@ def with_enricher_and_loading_bar(
                     select=cli_args.select,
                     total=getattr(cli_args, "total", None),
                     multiplex=multiplex,
-                    **enricher_kwargs
+                    **enricher_kwargs,
                 )
 
             completed = 0

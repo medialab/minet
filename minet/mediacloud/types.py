@@ -87,7 +87,7 @@ class MediacloudStory(TabularRecord):
             payload["media_id"],
             payload["media_name"],
             payload["media_url"],
-            *explode_tags(tags)
+            *explode_tags(tags),
         )
 
 
@@ -121,7 +121,7 @@ class MediacloudMedia(TabularRecord):
             payload["num_stories_90"],
             payload["num_sentences_90"],
             payload["start_date"],
-            *explode_tags(tags)
+            *explode_tags(tags),
         )
 
 

@@ -35,7 +35,7 @@ def with_crowdtangle_client(fn):
                     cli_args.token, rate_limit=cli_args.rate_limit
                 ),
                 **kwargs,
-            }
+            },
         )
 
     return wrapped
@@ -99,7 +99,7 @@ def make_paginated_action(
             raw=cli_args.format != "csv",
             per_call=True,
             detailed=True,
-            namespace=cli_args
+            namespace=cli_args,
         )
 
         with loading_bar:

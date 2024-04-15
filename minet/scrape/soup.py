@@ -129,7 +129,13 @@ class WonderfulSoup(BeautifulSoup, MinetTag):
         features: str = "lxml",
         parse_only: Optional[SoupStrainer] = None,
     ) -> None:
-        super().__init__(markup, features, element_classes=WONDERFUL_ELEMENT_CLASSES, parse_only=parse_only, multi_valued_attributes=None)  # type: ignore
+        super().__init__(
+            markup,
+            features,
+            element_classes=WONDERFUL_ELEMENT_CLASSES,
+            parse_only=parse_only,
+            multi_valued_attributes=None,
+        )  # type: ignore
 
 
 @contextmanager
