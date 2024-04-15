@@ -102,6 +102,12 @@ fi
 # Generic install script
 cleanup
 
+# Creating /usr/local/bin if missing
+if test ! -d /usr/local/bin; then
+  echo "Creating missing /usr/local/bin directory"
+  sudo mkdir -p /usr/local/bin
+fi
+
 echo "Downloading $os binaries for $latest release..."
 mkdir /tmp/minet
 curl -sSL  "https://github.com/medialab/minet/releases/download/$latest/$os.zip" > /tmp/minet.zip
