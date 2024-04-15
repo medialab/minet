@@ -197,6 +197,15 @@ class CrawlJob(Generic[CrawlJobDataType]):
             conditionals=("data", "spider", "parent", "group", "priority"),
         )
 
+    def retry(self, priority: Optional[int] = 0) -> CrawlTarget[CrawlJobDataType]:
+        return CrawlTarget(
+            url=self.url,
+            depth=self.depth,
+            spider=self.spider,
+            priority=priority if priority is not None else self.priority,
+            data=self.data,
+        )
+
 
 class CrawlResult(Generic[CrawlJobDataType, CrawlResultDataType]):
     __slots__ = ("job", "data", "error", "response", "degree")
