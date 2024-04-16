@@ -21,6 +21,7 @@ from playwright.async_api import (
     BrowserContext,
     Error as PlaywrightError,
     TimeoutError as PlaywrightTimeoutError,
+    Response as PlaywrightResponse,
 )
 from urllib3._collections import HTTPHeaderDict
 
@@ -263,13 +264,21 @@ class ThreadsafeBrowser:
         timeout: Optional[AnyTimeout] = None,
     ) -> Response:
         async with await context.new_page() as page:
+            responses = []
+
+            def response_handler(response: PlaywrightResponse):
+                if response.request.is_navigation_request():
+                    responses.append(response)
+
+            page.on("response", response_handler)
+
             try:
                 actual_timeout = None
 
                 if timeout is not None:
                     actual_timeout = coerce_timeout_to_milliseconds(timeout)
 
-                emulated_response = await page.goto(url, timeout=actual_timeout)
+                await page.goto(url, timeout=actual_timeout)
             except (PlaywrightError, PlaywrightTimeoutError) as e:
                 error = convert_playwright_error(e)
 
@@ -278,33 +287,22 @@ class ThreadsafeBrowser:
 
                 raise error
 
-            assert emulated_response is not None
+            page.remove_listener("response", response_handler)
+            assert len(responses) >= 1
+
+            last_response = responses[-1]
 
             # Invalid status?
             if (
                 raise_on_statuses is not None
-                and emulated_response.status in raise_on_statuses
+                and last_response.status in raise_on_statuses
             ):
-                raise InvalidStatusError(emulated_response.status)
+                raise InvalidStatusError(last_response.status)
 
-            # Collection redirections
-            responses = []
-
-            current = emulated_response
-
-            while True:
-                responses.append(current)
-
-                if not current.request.redirected_from:
-                    break
-
-                current = await current.request.redirected_from.response()
-
-                assert current is not None
-
+            # Collecting redirections
             redirection_stack = []
 
-            for r in reversed(responses):
+            for r in responses:
                 redirection_stack.append(
                     Redirection(
                         r.url,
@@ -318,7 +316,7 @@ class ThreadsafeBrowser:
             # Building headers
             headers = HTTPHeaderDict()
 
-            for header in await emulated_response.headers_array():
+            for header in await last_response.headers_array():
                 headers[header["name"]] = header["value"]
 
             # Building response
@@ -326,7 +324,7 @@ class ThreadsafeBrowser:
                 url,
                 redirection_stack,
                 headers,
-                emulated_response.status,
+                last_response.status,
                 (await page.content()).encode(),  # NOTE: we can do better
                 known_encoding="utf-8",
             )
