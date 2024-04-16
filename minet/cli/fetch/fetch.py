@@ -461,7 +461,6 @@ def action(cli_args, enricher: casanova.IndexedEnricher, loading_bar: LoadingBar
 
     # Screenshot
     elif cli_args.action == "screenshot":
-        import asyncio
         from playwright.async_api import (
             Error as PlaywrightError,
             TimeoutError as PlaywrightTimeoutError,
@@ -523,7 +522,7 @@ def action(cli_args, enricher: casanova.IndexedEnricher, loading_bar: LoadingBar
                     )
 
                     if cli_args.wait is not None:
-                        await asyncio.sleep(cli_args.wait)
+                        await page.wait_for_timeout(cli_args.wait * 1000)
 
                     await page.screenshot(
                         path=pathjoin(cli_args.output_dir, filename),
