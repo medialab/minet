@@ -4,6 +4,8 @@
 #
 # Logic of the `insta` action.
 #
+from casanova import RowCountResumer
+
 from minet.cli.argparse import command, ConfigAction
 
 INSTAGRAM_COMMENTS_SUBCOMMAND = command(
@@ -152,6 +154,7 @@ INSTAGRAM_POST_INFOS_SUBCOMMAND = command(
         "item_label_plural": "post urls, post shortcodes or post ids",
     },
     select=True,
+    resumer=RowCountResumer,
 )
 
 INSTAGRAM_USER_FOLLOWING_SUBCOMMAND = command(
@@ -231,6 +234,7 @@ INSTAGRAM_USER_INFOS_SUBCOMMAND = command(
         "item_label": "username, user url or user id",
         "item_label_plural": "usernames, user urls or user ids",
     },
+    resumer=RowCountResumer
 )
 
 INSTAGRAM_USER_POSTS_SUBCOMMAND = command(

@@ -4156,7 +4156,7 @@ Usage: minet instagram post-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                   [--refresh-per-second REFRESH_PER_SECOND]
                                   [--simple-progress] [-i INPUT]
                                   [--explode EXPLODE] [-s SELECT]
-                                  [--total TOTAL] [-o OUTPUT]
+                                  [--total TOTAL] [--resume] [-o OUTPUT]
                                   post_or_post_column
 
 # Instagram post-infos
@@ -4206,6 +4206,8 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --resume                      "Whether to resume from an aborted collection.
+                                Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
@@ -4490,7 +4492,7 @@ Usage: minet instagram user-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                                   [--refresh-per-second REFRESH_PER_SECOND]
                                   [--simple-progress] [-i INPUT]
                                   [--explode EXPLODE] [-s SELECT]
-                                  [--total TOTAL] [-o OUTPUT]
+                                  [--total TOTAL] [--resume] [-o OUTPUT]
                                   user_or_user_column
 
 # Instagram user-infos
@@ -4542,6 +4544,8 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
+  --resume                      "Whether to resume from an aborted collection.
+                                Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
                                 https://github.com/medialab/minet/blob/master/do
