@@ -19,6 +19,7 @@ from playwright.async_api import (
     async_playwright,
     Browser,
     BrowserContext,
+    Page,
     Error as PlaywrightError,
     TimeoutError as PlaywrightTimeoutError,
     Response as PlaywrightResponse,
@@ -262,6 +263,7 @@ class ThreadsafeBrowser:
         url: str,
         raise_on_statuses: Optional[Container[int]] = None,
         timeout: Optional[AnyTimeout] = None,
+        callback: Optional[Callable[[Page], Awaitable[None]]] = None,
     ) -> Response:
         async with await context.new_page() as page:
             responses = []
@@ -279,6 +281,10 @@ class ThreadsafeBrowser:
                     actual_timeout = coerce_timeout_to_milliseconds(timeout)
 
                 await page.goto(url, timeout=actual_timeout)
+
+                if callback is not None:
+                    await callback(page)
+
             except (PlaywrightError, PlaywrightTimeoutError) as e:
                 error = convert_playwright_error(e)
 
@@ -336,7 +342,12 @@ class ThreadsafeBrowser:
         url: str,
         raise_on_statuses: Optional[Container[int]] = None,
         timeout: Optional[AnyTimeout] = None,
+        callback: Optional[Callable[[Page], Awaitable[None]]] = None,
     ) -> Response:
         return self.run_in_default_context(
-            self.__request, url, raise_on_statuses=raise_on_statuses, timeout=timeout
+            self.__request,
+            url,
+            raise_on_statuses=raise_on_statuses,
+            timeout=timeout,
+            callback=callback,
         )
