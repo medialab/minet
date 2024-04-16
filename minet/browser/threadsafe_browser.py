@@ -8,7 +8,7 @@ from typing import (
     Literal,
     Container,
 )
-from minet.types import Concatenate, ParamSpec
+from minet.types import Concatenate, ParamSpec, AnyTimeout
 
 import os
 import asyncio
@@ -30,7 +30,7 @@ from minet.exceptions import (
     BrowserYetUnimplementedError,
     InvalidStatusError,
 )
-from minet.web import Response
+from minet.web import Response, coerce_timeout_to_milliseconds
 from minet.browser.plawright_shim import install_browser
 from minet.browser.utils import (
     get_browsers_path,
@@ -260,10 +260,16 @@ class ThreadsafeBrowser:
         context: BrowserContext,
         url: str,
         raise_on_statuses: Optional[Container[int]] = None,
+        timeout: Optional[AnyTimeout] = None,
     ) -> Response:
         async with await context.new_page() as page:
             try:
-                emulated_response = await page.goto(url)
+                actual_timeout = None
+
+                if timeout is not None:
+                    actual_timeout = coerce_timeout_to_milliseconds(timeout)
+
+                emulated_response = await page.goto(url, timeout=actual_timeout)
             except (PlaywrightError, PlaywrightTimeoutError) as e:
                 error = convert_playwright_error(e)
 
@@ -328,8 +334,11 @@ class ThreadsafeBrowser:
             return response
 
     def request(
-        self, url: str, raise_on_statuses: Optional[Container[int]] = None
+        self,
+        url: str,
+        raise_on_statuses: Optional[Container[int]] = None,
+        timeout: Optional[AnyTimeout] = None,
     ) -> Response:
         return self.run_in_default_context(
-            self.__request, url, raise_on_statuses=raise_on_statuses
+            self.__request, url, raise_on_statuses=raise_on_statuses, timeout=timeout
         )

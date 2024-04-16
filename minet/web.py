@@ -168,7 +168,7 @@ def create_pool_manager(
 DEFAULT_POOL_MANAGER = create_pool_manager()
 
 
-def timeout_to_final_time(timeout: AnyTimeout) -> float:
+def coerce_timeout_to_seconds(timeout: AnyTimeout) -> float:
     seconds: float
 
     if isinstance(timeout, urllib3.Timeout):
@@ -178,6 +178,16 @@ def timeout_to_final_time(timeout: AnyTimeout) -> float:
             seconds = timeout.connect_timeout + timeout.read_timeout
     else:
         seconds = timeout
+
+    return seconds
+
+
+def coerce_timeout_to_milliseconds(timeout: AnyTimeout) -> float:
+    return coerce_timeout_to_seconds(timeout) * 1000
+
+
+def timeout_to_final_time(timeout: AnyTimeout) -> float:
+    seconds = coerce_timeout_to_seconds(timeout)
 
     # Some epsilon so sockets can timeout themselves properly
     seconds += 0.01
