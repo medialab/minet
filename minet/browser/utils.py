@@ -23,6 +23,7 @@ from minet.exceptions import (
     BrowserConnectionTimeoutError,
     BrowserContextAlreadyClosedError,
     BrowserSocketError,
+    BrowserUnableToRetrieveContentError,
 )
 from minet.browser.constants import BROWSERS_PATH
 
@@ -68,6 +69,9 @@ def convert_playwright_error(error: AnyPlaywrightError) -> BrowserError:
 
     if "net::ERR_SOCKET_NOT_CONNECTED" in error.message:
         return BrowserSocketError()
+
+    if "Page.content" in error.message:
+        return BrowserUnableToRetrieveContentError()
 
     return BrowserYetUnimplementedError()
 

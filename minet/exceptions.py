@@ -287,3 +287,7 @@ class BrowserContextAlreadyClosedError(BrowserError):
 
 class BrowserSocketError(BrowserError):
     pass
+
+
+class BrowserUnableToRetrieveContentError(BrowserError):
+    pass

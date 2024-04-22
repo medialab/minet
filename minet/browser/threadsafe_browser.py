@@ -285,6 +285,28 @@ class ThreadsafeBrowser:
                 if callback is not None:
                     await callback(page)
 
+                content: Optional[str] = None
+
+                # NOTE: sometimes, the page will navigate while retrieving content
+                # in which case we must retry later
+                content_attempts = 0
+
+                while True:
+                    content_attempts += 1
+
+                    try:
+                        content = await page.content()
+                        break
+                    except PlaywrightError as e:
+                        if "Page.content" in e.message:
+                            if content_attempts > 3:
+                                raise
+
+                            await page.wait_for_load_state("load")
+                            continue
+
+                        raise
+
             except (PlaywrightError, PlaywrightTimeoutError) as e:
                 error = convert_playwright_error(e)
 
@@ -295,6 +317,7 @@ class ThreadsafeBrowser:
 
             page.remove_listener("response", response_handler)
             assert len(responses) >= 1
+            assert content is not None
 
             last_response = responses[-1]
 
@@ -331,7 +354,7 @@ class ThreadsafeBrowser:
                 redirection_stack,
                 headers,
                 last_response.status,
-                (await page.content()).encode(),  # NOTE: we can do better
+                content.encode(),  # NOTE: we can do better
                 known_encoding="utf-8",
             )
 
