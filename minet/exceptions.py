@@ -245,6 +245,10 @@ class BrowserError(MinetError):
     pass
 
 
+class BrowserProtocolError(BrowserError):
+    pass
+
+
 class BrowserYetUnimplementedError(BrowserError):
     pass
 
@@ -253,15 +257,15 @@ class BrowserNameNotResolvedError(BrowserError):
     pass
 
 
-class BrowserConnectionAbortedError(BrowserError):
+class BrowserConnectionAbortedError(BrowserProtocolError):
     pass
 
 
-class BrowserConnectionRefusedError(BrowserError):
+class BrowserConnectionRefusedError(BrowserProtocolError):
     pass
 
 
-class BrowserConnectionClosedError(BrowserError):
+class BrowserConnectionClosedError(BrowserProtocolError):
     pass
 
 
@@ -277,7 +281,7 @@ class BrowserSSLError(BrowserError):
     pass
 
 
-class BrowserHTTPResponseCodeFailureError(BrowserError):
+class BrowserHTTPResponseCodeFailureError(BrowserProtocolError):
     pass
 
 

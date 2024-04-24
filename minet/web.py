@@ -78,6 +78,10 @@ from minet.exceptions import (
     PycurlError,
     PycurlProtocolError,
     PycurlTimeoutError,
+    BrowserError,
+    BrowserProtocolError,
+    BrowserConnectionTimeoutError,
+    BrowserTimeoutError,
 )
 from minet.constants import (
     DEFAULT_SPOOFED_TLS_CIPHERS,
@@ -114,6 +118,7 @@ EXPECTED_WEB_ERRORS = (
     InvalidStatusError,
     FinalTimeoutError,
     PycurlError,
+    BrowserError,
 )
 
 assert CONTENT_PREBUFFER_UP_TO < LARGE_CONTENT_PREBUFFER_UP_TO
@@ -1244,12 +1249,20 @@ def create_request_retryer(
         ConnectionResetError,
         # pycurl errors
         PycurlProtocolError,
+        # browser errors
+        BrowserProtocolError,
     ]
 
     # We also usually include most timeout errors
     if retry_on_timeout:
         retryable_exception_types.extend(
-            [FinalTimeoutError, urllib3_exceptions.TimeoutError, PycurlTimeoutError]
+            [
+                FinalTimeoutError,
+                urllib3_exceptions.TimeoutError,
+                PycurlTimeoutError,
+                BrowserTimeoutError,
+                BrowserConnectionTimeoutError,
+            ]
         )
 
     if retry_on_statuses is not None:
