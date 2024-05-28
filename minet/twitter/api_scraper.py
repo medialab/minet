@@ -481,6 +481,10 @@ class TwitterAPIScraper:
             cookie, TWITTER_PUBLIC_SEARCH_ENDPOINT
         )
 
+        # NOTE: we might need to check the x.com domain for the cookie
+        if not is_cookie_valid(self.cookie):
+            self.cookie = coerce_cookie_for_url_from_browser(cookie, "https://x.com")
+
         if not is_cookie_valid(self.cookie):
             raise TwitterPublicAPIInvalidCookieError
 
