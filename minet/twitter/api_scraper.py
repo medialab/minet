@@ -460,8 +460,8 @@ class TwitterAPIScraper:
             timeout=TWITTER_PUBLIC_API_DEFAULT_TIMEOUT, spoof_tls_ciphers=True
         )
 
-        # NOTE: 10 calls per minute
-        self.rate_limiter_state = RateLimiterState(10, 60)
+        # NOTE: 5 calls per minute
+        self.rate_limiter_state = RateLimiterState(5, 60)
 
         # self.reset()
 
