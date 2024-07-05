@@ -118,7 +118,7 @@ class FocusSpider(Spider):
         if not response.is_text:
             return FocusCrawlInfo(invalidity="binary"), None
         if not html:
-            return FocusCrawlInfo(invalidity="empty")
+            return FocusCrawlInfo(invalidity="empty"), None
 
         html = response.text()
         soup = response.soup(ignore_xhtml_warning=True)
