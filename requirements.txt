@@ -4,7 +4,7 @@ jupyterlab
 PyInstaller==6.6.0
 pytest==7.2.1
 ruff
-twine==4.0.2
+twine
 wheel
 
 # Dependencies
