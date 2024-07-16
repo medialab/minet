@@ -80,7 +80,7 @@ To use a scraper from the command line, you can use the `scrape` command thusly:
 minet scrape scraper.yml -i report.csv > scraped.csv
 
 # To scrape html file found by using a glob pattern:
-minet scrape scraper.yml 'files/**/*.html --glob' > scraped.csv
+minet scrape scraper.yml 'files/**/*.html' --glob > scraped.csv
 ```
 
 If you want to learn about glob patterns, [this](https://en.wikipedia.org/wiki/Glob_(programming)) wikipedia page can teach you how to build them. In our example `files/**/*.html` basically means we are searching for any file having the `.html` extension in any recursive subfolder found under `files/`.
