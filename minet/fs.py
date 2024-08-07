@@ -140,9 +140,13 @@ class FullPathFolderStrategy(FolderStrategy):
         # NOTE: dealing with typical max filename length
         for i in range(len(final_path)):
             item = final_path[i]
+            item_bytes = item.encode()
 
-            if len(item) > 255:
-                final_path[i] = item[:255]
+            if len(item_bytes) > 255:
+                try:
+                    final_path[i] = item_bytes[:255].decode()
+                except UnicodeDecodeError as e:
+                    final_path[i] = item_bytes[: e.start].decode()
 
         return join(os.sep.join(final_path), filename)
 
