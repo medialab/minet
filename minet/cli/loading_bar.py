@@ -352,6 +352,15 @@ class LoadingBar(object):
         # NOTE: cursor 1up
         console.file.write("\x1b[1A")
 
+    def set_style(self, style: str) -> None:
+        if self.bar_column is None:
+            return
+
+        self.bar_column.complete_style = style
+        self.bar_column.finished_style = style
+        self.bar_column.pulse_style = style
+        self.bar_column.style = style
+
     def start(self) -> None:
         self.live.start()
         self.live.refresh()
@@ -365,6 +374,10 @@ class LoadingBar(object):
 
         self.live.stop()
         self.already_stopped = True
+
+    def fail(self) -> None:
+        self.set_style("error")
+        self.stop()
 
     def erase(self) -> None:
         self.stop(erase=True)

@@ -49,7 +49,10 @@ from minet.crawl.spiders import (
     FunctionSpider,
     FunctionSpiderCallable,
 )
-from minet.crawl.exceptions import CrawlerAlreadyFinishedError
+from minet.crawl.exceptions import (
+    CrawlerAlreadyFinishedError,
+    CrawlerSpiderProcessError,
+)
 from minet.crawl.queue import CrawlerQueue, AnyParallelism, AnyThrottle
 from minet.crawl.state import CrawlerState
 from minet.crawl.url_cache import URLCache
@@ -215,7 +218,12 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType, CallbackResultT
             if cancel_event.is_set():
                 return
 
-            spider_result = spider.process(job, response)
+            try:
+                spider_result = spider.process(job, response)
+            except Exception as reason:
+                raise CrawlerSpiderProcessError(
+                    reason=reason, job=job, response=response
+                )
 
             if spider_result is not None:
                 try:

@@ -28,7 +28,10 @@ from minet.crawl import (
     Spider,
     BasicSpider,
 )
-from minet.crawl.exceptions import CrawlerAlreadyFinishedError
+from minet.crawl.exceptions import (
+    CrawlerAlreadyFinishedError,
+    CrawlerSpiderProcessError,
+)
 from minet.cli.console import console
 from minet.cli.loading_bar import LoadingBar
 from minet.cli.utils import (
@@ -353,33 +356,52 @@ def crawl_action(
         track_crawler_state_with_loading_bar(loading_bar, crawler.state)
 
         # Running crawler
-        for result, result_path in crawler.crawl(callback=callback):
-            with loading_bar.step():
-                if cli_args.verbose:
-                    console.print(result, highlight=True)
+        try:
+            for result, result_path in crawler.crawl(callback=callback):
+                with loading_bar.step():
+                    if cli_args.verbose:
+                        console.print(result, highlight=True)
 
-                if result_callback is not None:
-                    result_callback(cli_args, loading_bar, result)
+                    if result_callback is not None:
+                        result_callback(cli_args, loading_bar, result)
 
-                job_row = result.as_csv_row()
+                    job_row = result.as_csv_row()
 
-                if cli_args.write_files:
-                    job_row += [result_path]
+                    if cli_args.write_files:
+                        job_row += [result_path]
 
-                if format_job_row_addendum is not None:
-                    job_row += format_job_row_addendum(result)
+                    if format_job_row_addendum is not None:
+                        job_row += format_job_row_addendum(result)
 
-                jobs_writer.writerow(job_row)
+                    jobs_writer.writerow(job_row)
 
-                # Flushing to avoid sync issues as well as possible
-                jobs_output.flush()
+                    # Flushing to avoid sync issues as well as possible
+                    jobs_output.flush()
 
-                if result.error is not None:
-                    loading_bar.inc_stat(result.error_code, style="error")
-                    continue
+                    if result.error is not None:
+                        loading_bar.inc_stat(result.error_code, style="error")
+                        continue
 
-                if data_writer is not None:
-                    data_writer.write(result)
+                    if data_writer is not None:
+                        data_writer.write(result)
+
+        except CrawlerSpiderProcessError as error:
+            loading_bar.fail()
+            job = error.job
+
+            base_msg = (
+                "Default spider process errored"
+                if job.spider is None
+                else ('Spider "%s" process errored' % job.spider)
+            )
+
+            base_msg += " with %s!" % error.reason.__class__.__name__
+
+            console.print(base_msg, style="error")
+            console.print(job, highlight=True)
+            console.print(error.response, highlight=True)
+
+            raise error.reason
 
 
 action = crawl_action

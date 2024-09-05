@@ -33,6 +33,13 @@ class DummyEchoJSSpider(Spider):
         return
 
 
+class CrashingEchoJSSpider(Spider):
+    START_URL = "https://echojs.com/latest"
+
+    def process(self, job, response):
+        raise RuntimeError("crashed!")
+
+
 class EchoJSStartSpider(Spider):
     START_URL = "https://echojs.com/latest"
 
