@@ -868,6 +868,7 @@ Optional Arguments:
   -g, --glob                    Will interpret given paths as glob patterns to
                                 resolve if given.
   -I, --input-dir INPUT_DIR     Directory where the HTML files are stored.
+                                Defaults to `downloaded`.
   --mimetype-column MIMETYPE_COLUMN
                                 Name of the CSV column containing file mimetype.
                                 Defaults to `mimetype`.
@@ -1197,6 +1198,7 @@ Optional Arguments:
   -g, --glob                    Will interpret given paths as glob patterns to
                                 resolve if given.
   -I, --input-dir INPUT_DIR     Directory where the HTML files are stored.
+                                Defaults to `downloaded`.
   --mimetype-column MIMETYPE_COLUMN
                                 Name of the CSV column containing file mimetype.
                                 Defaults to `mimetype`.
