@@ -35,7 +35,7 @@ setup(
         "json5>=0.8.5",
         "lxml>=4.3.0,<5.2",
         "nanoid>=2,<3",
-        "playwright>=1.43,<1.44",
+        "playwright>=1.46,<1.47",
         "playwright_stealth>=1.0.6,<2",
         "pyyaml",
         "quenouille>=1.9.1,<2",

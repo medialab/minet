@@ -18,7 +18,7 @@ ebbe==1.13.2
 json5==0.9.11
 lxml>=4.9.2,<5.2
 nanoid==2.0.0
-playwright==1.43.0
+playwright==1.46.0
 playwright-stealth==1.0.6
 pyyaml==6.0.1
 quenouille==1.9.1

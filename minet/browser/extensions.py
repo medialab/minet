@@ -12,11 +12,11 @@ from minet.loggers import downloaders_logger
 
 AVAILABLE_EXTENSIONS = {
     "i-still-dont-care-about-cookies": {
-        "url": "https://github.com/OhMyGuus/I-Still-Dont-Care-About-Cookies/releases/download/v1.1.1/ISDCAC-chrome-source.zip",
+        "url": "https://github.com/OhMyGuus/I-Still-Dont-Care-About-Cookies/releases/download/v1.1.4/ISDCAC-chrome-source.zip",
         "root": "./",
     },
     "ublock-origin": {
-        "url": "https://github.com/gorhill/uBlock/releases/download/1.52.2/uBlock0_1.52.2.chromium.zip",
+        "url": "https://github.com/gorhill/uBlock/releases/download/1.58.0/uBlock0_1.58.0.chromium.zip",
         "root": "./uBlock0.chromium",
     },
 }
