@@ -48,7 +48,7 @@ class EchoJSStartSpider(Spider):
         next_links = response.soup().scrape("#newslist article > h2 > a[href]", "href")
         next_targets = [CrawlTarget(url=link) for link in next_links]
 
-        return job.group, next_targets
+        return None, next_targets
 
 
 class ArticleSpider(Spider):
