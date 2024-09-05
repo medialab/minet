@@ -50,6 +50,8 @@ class Spider(Generic[CrawlJobDataType, CrawlResultDataType]):
     START_TARGET: Optional[CrawlTarget[CrawlJobDataType]] = None
     START_TARGETS: Optional[Iterable[CrawlTarget[CrawlJobDataType]]] = None
 
+    FORWARD_SPIDER: Optional[str] = None
+
     @property
     def crawler(self) -> "Crawler":
         c = getattr(self, "_crawler", None)

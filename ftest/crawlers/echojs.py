@@ -42,10 +42,11 @@ class CrashingEchoJSSpider(Spider):
 
 class EchoJSStartSpider(Spider):
     START_URL = "https://echojs.com/latest"
+    FORWARD_SPIDER = "article"
 
     def process(self, job: CrawlJob, response: Response) -> SpiderResult:
         next_links = response.soup().scrape("#newslist article > h2 > a[href]", "href")
-        next_targets = [CrawlTarget(url=link, spider="article") for link in next_links]
+        next_targets = [CrawlTarget(url=link) for link in next_links]
 
         return job.group, next_targets
 
