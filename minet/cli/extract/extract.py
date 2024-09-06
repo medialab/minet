@@ -89,6 +89,11 @@ def action(cli_args, enricher: IndexedEnricher, loading_bar):
     if not cli_args.glob:
         loading_bar.set_total(enricher.total)
 
+    if not cli_args.has_dummy_csv and cli_args.input_dir is None:
+        from minet.cli.constants import DEFAULT_CONTENT_FOLDER
+
+        cli_args.input_dir = DEFAULT_CONTENT_FOLDER
+
     items = create_fetch_like_report_iterator(cli_args, enricher)
 
     worked_on: Dict[int, FetchReportLikeItem] = {}

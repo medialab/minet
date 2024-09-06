@@ -258,6 +258,11 @@ def action(cli_args):
     with LoadingBar(
         "Scraping", unit="pages", total=reader.total if not cli_args.glob else None
     ) as loading_bar:
+        if not cli_args.has_dummy_csv and cli_args.input_dir is None:
+            from minet.cli.constants import DEFAULT_CONTENT_FOLDER
+
+            cli_args.input_dir = DEFAULT_CONTENT_FOLDER
+
         items = create_fetch_like_report_iterator(cli_args, reader)
 
         worked_on: Dict[int, FetchReportLikeItem] = {}
