@@ -19,6 +19,10 @@ class SelectionError(Exception):
     pass
 
 
+class ExtractionError(Exception):
+    pass
+
+
 def extract(elem: "MinetTag", target: Optional[str]) -> Optional[str]:
     if target is None or target == "text":
         return elem.get_text()
@@ -52,15 +56,23 @@ class MinetTag(Tag):
 
         return cast(List["MinetTag"], super().select(css, *args, **kwargs))
 
-    def scrape_one(
-        self, css: str, target: Optional[str] = None, strict: bool = False
-    ) -> Optional[str]:
+    def force_scrape_one(self, css: str, target: Optional[str] = None) -> str:
         elem = self.select_one(css)
 
         if elem is None:
-            if strict:
-                raise SelectionError(css)
+            raise SelectionError(css)
 
+        value = extract(elem, target)
+
+        if value is None:
+            raise ExtractionError(target)
+
+        return value
+
+    def scrape_one(self, css: str, target: Optional[str] = None) -> Optional[str]:
+        elem = self.select_one(css)
+
+        if elem is None:
             return None
 
         return extract(elem, target)
@@ -130,10 +142,10 @@ class WonderfulSoup(BeautifulSoup, MinetTag):
         super().__init__(
             markup,
             features,
-            element_classes=WONDERFUL_ELEMENT_CLASSES,
+            element_classes=WONDERFUL_ELEMENT_CLASSES,  # type: ignore
             parse_only=parse_only,
             multi_valued_attributes=None,
-        )  # type: ignore
+        )
 
 
 @contextmanager

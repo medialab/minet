@@ -1,6 +1,6 @@
 import pytest
 
-from minet.scrape.soup import WonderfulSoup, SelectionError
+from minet.scrape.soup import WonderfulSoup, SelectionError, ExtractionError
 
 HTML = """
 <div>
@@ -50,7 +50,10 @@ class TestWonderfulSoup:
         assert soup.scrape_one("link") is None
 
         with pytest.raises(SelectionError):
-            assert soup.scrape_one("link", strict=True)
+            assert soup.force_scrape_one("link")
+
+        with pytest.raises(ExtractionError):
+            assert soup.force_scrape_one("h1", "blabla")
 
     def test_get(self):
         soup = WonderfulSoup('<div class=" a  b  ">Ok</div>')
