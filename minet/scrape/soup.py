@@ -23,6 +23,10 @@ class ExtractionError(Exception):
     pass
 
 
+def normalize_css(css: str) -> str:
+    return css.replace(":contains(", ":-soup-contains(")
+
+
 def extract(elem: "MinetTag", target: Optional[str]) -> Optional[str]:
     if target is None or target == "text":
         return elem.get_text()
@@ -41,6 +45,8 @@ def extract(elem: "MinetTag", target: Optional[str]) -> Optional[str]:
 
 class MinetTag(Tag):
     def force_select_one(self, css: str, *args, **kwargs) -> "MinetTag":
+        css = normalize_css(css)
+
         elem = super().select_one(css, *args, **kwargs)
 
         if elem is None:
@@ -49,11 +55,11 @@ class MinetTag(Tag):
         return cast(MinetTag, elem)
 
     def select_one(self, css: str, *args, **kwargs) -> Optional["MinetTag"]:
+        css = normalize_css(css)
         return cast(Optional["MinetTag"], super().select_one(css, *args, **kwargs))
 
     def select(self, css: str, *args, **kwargs) -> List["MinetTag"]:
-        css = css.replace(":contains(", ":-soup-contains(")
-
+        css = normalize_css(css)
         return cast(List["MinetTag"], super().select(css, *args, **kwargs))
 
     def force_scrape_one(self, css: str, target: Optional[str] = None) -> str:
@@ -136,7 +142,7 @@ class WonderfulSoup(BeautifulSoup, MinetTag):
     def __init__(
         self,
         markup: str,
-        features: str = "lxml",
+        features: str = "html.parser",
         parse_only: Optional[SoupStrainer] = None,
     ) -> None:
         super().__init__(

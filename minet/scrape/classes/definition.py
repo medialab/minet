@@ -16,7 +16,7 @@ from minet.scrape.classes.base import ScraperBase
 def scrape(
     scraper: Dict,
     html: AnyScrapableTarget,
-    engine: str = "lxml",
+    engine: str = "html.parser",
     context: Optional[Dict] = None,
     strainer: Optional[SoupStrainer] = None,
 ):

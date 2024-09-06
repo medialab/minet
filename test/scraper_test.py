@@ -163,6 +163,7 @@ THE_WORST_HTML = """
 """
 
 
+@pytest.mark.filterwarnings("ignore")
 class TestDefinitionScraper:
     def test_basics(self):
         result = scrape({"iterator": "li"}, BASIC_HTML)

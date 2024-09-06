@@ -1,7 +1,6 @@
 from casanova import IndexedResumer
 
 from minet.cli.argparse import command
-from minet.cli.constants import DEFAULT_CONTENT_FOLDER
 
 
 def resolve_arguments(cli_args):
@@ -101,8 +100,7 @@ EXTRACT_COMMAND = command(
         },
         {
             "flags": ["-I", "--input-dir"],
-            "help": "Directory where the HTML files are stored.",
-            "default": DEFAULT_CONTENT_FOLDER
+            "help": "Directory where the HTML files are stored. Will default to fetch default output directory.",
         },
         {
             "flags": ["-p", "--processes"],

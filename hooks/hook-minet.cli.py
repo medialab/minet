@@ -30,8 +30,9 @@ datas: List[Tuple[str, str]] = [
     (join(dirname(trafilatura.__file__), "settings.cfg"), "trafilatura"),
 ]
 
-for p in iglob(join(dirname(trafilatura.__file__), "data", "*.lzma")):
-    datas.append((p, "trafilatura/data"))
+# NOTE: I don't think we need DTD files for our purpose
+# for p in iglob(join(dirname(trafilatura.__file__), "data", "*.dtd")):
+#     datas.append((p, "trafilatura/data"))
 
 for p in iglob(join(dirname(playwright_stealth.__file__), "js", "*.js")):
     datas.append((p, "playwright_stealth/js"))

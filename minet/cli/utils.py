@@ -26,6 +26,7 @@ from types import SimpleNamespace
 
 from minet.crawl import CrawlerState
 from minet.encodings import is_supported_encoding
+from minet.cli.constants import DEFAULT_CONTENT_FOLDER
 from minet.cli.console import console
 from minet.cli.loading_bar import LoadingBar, StatsItem
 from minet.cli.exceptions import FatalError
@@ -189,7 +190,10 @@ def create_fetch_like_report_iterator(
     cli_args: SimpleNamespace, reader: casanova.Reader
 ) -> Iterator[FetchReportLikeItem]:
     headers = reader.headers
-    input_dir = cli_args.input_dir or ""
+    input_dir = cli_args.input_dir
+
+    if input_dir is None:
+        input_dir = DEFAULT_CONTENT_FOLDER
 
     # TODO: deal with no_headers
     assert headers is not None
