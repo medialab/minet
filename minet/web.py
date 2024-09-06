@@ -1096,7 +1096,7 @@ def request(
 def resolve(
     url: str,
     pool_manager: urllib3.PoolManager = DEFAULT_POOL_MANAGER,
-    method: str = "GET",
+    method: Optional[str] = None,
     headers: Optional[Dict[str, str]] = None,
     cookie: Optional[Union[str, Dict[str, str]]] = None,
     spoof_ua: bool = False,
@@ -1111,6 +1111,12 @@ def resolve(
     raise_on_statuses: Optional[Container[int]] = None,
     stateful: bool = False,
 ) -> RedirectionStack:
+    if method is None:
+        method = "HEAD"
+
+        if follow_meta_refresh or follow_js_relocation or canonicalize:
+            method = "GET"
+
     final_headers = build_request_headers(
         headers=headers, cookie=cookie, spoof_ua=spoof_ua
     )

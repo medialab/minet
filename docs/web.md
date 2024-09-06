@@ -78,6 +78,7 @@ redirections = resolve("https://www.lemonde.fr/", stateful=True)
 *Arguments*
 
 - **url** *str*: url to request.
+- **method** *Optional[str]*: HTTP method to use when resolving. Default to `HEAD` if no body sniffing is required, else `GET`.
 - **headers** *Optional[dict[str, str]]*: HTTP headers, as a dict, to use for the request.
 - **cookie** *Optional[str | dict[str, str]]*: cookie string to pass as the `Cookie` header value. Can also be a cookie morsel dict mapping names to their values.
 - **spoof_ua** *bool* `False`: whether to use a plausible `User-Agent` header when performing the query.
