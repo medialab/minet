@@ -25,11 +25,6 @@ _Generic commands_
 
 _Platform-related commands_
 
-- [buzzsumo (bz)](#buzzsumo)
-  - [limit](#limit)
-  - [domain-summary](#domain-summary)
-  - [domain](#domain)
-  - [exact-url](#exact-url)
 - [facebook (fb)](#facebook)
   - [comments](#comments)
   - [post](#post)
@@ -124,8 +119,6 @@ _Configuration file_
 
 ```yml
 ---
-buzzsumo:
-  token: "MY_BZ_TOKEN" # Used as --token for `minet bz` commands
 facebook:
   cookie: "MY_FACEBOOK_COOKIE" # Used as --cookie for `minet fb` commands
 instagram:
@@ -203,26 +196,6 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ## url-parse
 
 <% url-parse %>
-
-## BuzzSumo
-
-<% bz %>
-
-### limit
-
-<% bz/limit %>
-
-### domain-summary
-
-<% bz/domain-summary %>
-
-### domain
-
-<% bz/domain %>
-
-### exact-url
-
-<% bz/exact-url %>
 
 ## Facebook
 
