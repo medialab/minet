@@ -10,7 +10,6 @@ from minet.cli.url_parse import URL_PARSE_COMMAND
 from minet.cli.user_agents import USER_AGENTS_COMMAND
 
 from minet.cli.buzzsumo import BUZZSUMO_COMMAND
-from minet.cli.crowdtangle import CROWDTANGLE_COMMAND
 from minet.cli.facebook import FACEBOOK_COMMAND
 from minet.cli.google import GOOGLE_COMMAND
 from minet.cli.hyphe import HYPHE_COMMAND
@@ -40,7 +39,6 @@ MINET_COMMANDS = [
     USER_AGENTS_COMMAND,
     #
     BUZZSUMO_COMMAND,
-    CROWDTANGLE_COMMAND,
     FACEBOOK_COMMAND,
     GOOGLE_COMMAND,
     HYPHE_COMMAND,

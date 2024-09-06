@@ -2,7 +2,7 @@
 
 ![Minet](docs/img/minet.png)
 
-**minet** is a webmining command line tool & library for python (>= 3.7) that can be used to collect and extract data from a large variety of web sources such as raw webpages, Facebook, CrowdTangle, YouTube, Twitter, Media Cloud etc.
+**minet** is a webmining command line tool & library for python (>= 3.7) that can be used to collect and extract data from a large variety of web sources such as raw webpages, Facebook, YouTube, Twitter, Media Cloud etc.
 
 It adopts a very simple approach to various webmining problems by letting you perform a wide array of tasks from the comfort of the command line. No database needed: raw CSV files should be sufficient to do most of the work.
 
@@ -80,7 +80,6 @@ Minet can single-handedly:
 - Crawl (using a declarative language to define a browsing behavior, and what to harvest)
 - Mine or search:
   - _[Buzzsumo](https://buzzsumo.com/)_ (requires API access)
-  - _[Crowdtangle](https://www.crowdtangle.com/)_ (requires API access)
   - _[Mediacloud](https://mediacloud.org/)_ (requires free API access)
   - _[Twitter](https://twitter.com)_ (requires free API access)
   - _[Wikipedia](https://ww.wikipedia.org)_
@@ -110,7 +109,7 @@ Minet can single-handedly:
 - Multiprocessed raw text content extraction from HTML pages.
 - Multiprocessed scraping from HTML pages.
 - URL-related heuristics utilities such as extraction, normalization and matching.
-- Data collection from various APIs such as [CrowdTangle](https://www.crowdtangle.com/).
+- Data collection from various APIs such as [YouTube](https://www.youtube.com/).
 
 ## Installation
 

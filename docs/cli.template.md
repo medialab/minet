@@ -30,17 +30,10 @@ _Platform-related commands_
   - [domain-summary](#domain-summary)
   - [domain](#domain)
   - [exact-url](#exact-url)
-- [crowdtangle (ct)](#crowdtangle)
-  - [leaderboard](#leaderboard)
-  - [lists](#lists)
-  - [posts-by-id](#posts-by-id)
-  - [posts](#posts)
-  - [search](#search)
-  - [summary](#summary)
 - [facebook (fb)](#facebook)
   - [comments](#comments)
   - [post](#post)
-  - [posts](#posts-1)
+  - [posts](#posts)
   - [post-authors](#post-authors)
   - [url-likes](#url-likes)
   - [user-infos](#user-infos)
@@ -63,7 +56,7 @@ _Platform-related commands_
   - [user-posts](#user-posts)
 - [mediacloud (mc)](#mediacloud)
   - [medias](#medias)
-  - [search](#search-1)
+  - [search](#search)
   - [topic](#topic)
     - [stories](#stories)
 - [telegram (tl)](#telegram)
@@ -94,7 +87,7 @@ _Platform-related commands_
   - [channel-videos](#channel-videos)
   - [channels](#channels)
   - [comments](#comments-2)
-  - [search](#search-2)
+  - [search](#search-1)
   - [videos](#videos)
 
 ## -h/--help
@@ -120,7 +113,7 @@ minet --version
 
 ## minetrc config files
 
-Minet supports configuration files so you can skip some tedious command line arguments that you would need to provide each time you call `minet` otherwise (such as `--token` for crowdtangle commands).
+Minet supports configuration files so you can skip some tedious command line arguments that you would need to provide each time you call `minet` otherwise (such as `--key` for `youtube` commands).
 
 Those configuration files can be written in YAML or JSON and can either be passed to minet using the `--rcfile` argument or will be searched at the following paths (with this precedence):
 
@@ -133,9 +126,6 @@ _Configuration file_
 ---
 buzzsumo:
   token: "MY_BZ_TOKEN" # Used as --token for `minet bz` commands
-crowdtangle:
-  token: "MY_CT_TOKEN" # Used as --token for `minet ct` commands
-  rate_limit: 10 # Used as --rate-limit for `minet ct` commands
 facebook:
   cookie: "MY_FACEBOOK_COOKIE" # Used as --cookie for `minet fb` commands
 instagram:
@@ -164,7 +154,7 @@ For instance, to override `facebook.cookie`, the variable will be `MINET_FACEBOO
 
 If one of the path's key already contains underscore, it will work all the same. So to override `twitter.api_key`, the variable will be `MINET_TWITTER_API_KEY`.
 
-Note that the given variable will be cast to the proper type as if it was passed as a command line argument (for instance, `MINET_CROWDTANGLE_RATE_LIMIT` will correctly be cast as an integer).
+Note that the given variable will be cast to the proper type as if it was passed as a command line argument.
 
 Finally note that command line arguments and flags will take precedence over environment variables, and that environment variables will take precedence over any rcfile configuration, but you can of course mix and match.
 
@@ -233,34 +223,6 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### exact-url
 
 <% bz/exact-url %>
-
-## CrowdTangle
-
-<% ct %>
-
-### leaderboard
-
-<% ct/leaderboard %>
-
-### lists
-
-<% ct/lists %>
-
-### posts-by-id
-
-<% ct/posts-by-id %>
-
-### posts
-
-<% ct/posts %>
-
-### search
-
-<% ct/search %>
-
-### summary
-
-<% ct/summary %>
 
 ## Facebook
 
