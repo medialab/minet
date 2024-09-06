@@ -1190,6 +1190,8 @@ class log_request_retryer_before_sleep:
 
         exception = retry_state.outcome.exception()
 
+        assert retry_state.next_action is not None
+
         sleepers_logger.warn(
             "request_retryer starts sleeping",
             extra={
@@ -1321,7 +1323,8 @@ def create_request_retryer(
         "retry": retry_condition,
         "stop": stop_after_attempt(max_attempts),
         "before_sleep": rcompose(
-            log_request_retryer_before_sleep(epilog), before_sleep
+            log_request_retryer_before_sleep(epilog),  # type: ignore
+            before_sleep,
         ),
     }
 
