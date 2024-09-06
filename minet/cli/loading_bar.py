@@ -4,7 +4,7 @@
 #
 # Various loading bar utilities used by minet CLI.
 #
-from typing import Optional, Iterable
+from typing import Optional, Iterable, TypeVar, Iterator
 from minet.types import TypedDict, NotRequired
 
 from contextlib import contextmanager
@@ -25,6 +25,8 @@ from ebbe import format_int
 
 from minet.utils import message_flatmap
 from minet.cli.console import console
+
+T = TypeVar("T")
 
 
 class CautiousBarColumn(BarColumn):
@@ -410,6 +412,7 @@ class LoadingBar(object):
                 if not self.known_total:
                     self.bar_column.style = style
         else:
+            assert self.bar_column is not None
             self.bar_column.pulse_style = "success"
             self.bar_column.style = "success"
 
@@ -443,6 +446,11 @@ class LoadingBar(object):
             if not interrupted:
                 self.advance(count)
 
+    def track(self, iterable: Iterable[T]) -> Iterator[T]:
+        for item in iterable:
+            with self.step(item):
+                yield item
+
     @contextmanager
     def nested_step(self, count=1):
         assert self.nested
@@ -461,15 +469,19 @@ class LoadingBar(object):
         self.progress.update(self.task_id, advance=count)
 
     def nested_advance(self, count=1):
+        assert self.sub_progress is not None and self.sub_task_id is not None
+
         self.sub_total_sum += count
         self.sub_progress.update(
             self.sub_task_id, advance=count, sub_total_sum=self.sub_total_sum
         )
 
     def nested_reset(self):
+        assert self.sub_progress is not None and self.sub_task_id is not None
         self.sub_progress.reset(self.sub_task_id)
 
     def __refresh_stats(self):
+        assert self.stats_progress is not None
         self.stats_progress.update(self.stats_task_id, stats=self.stats)
 
         if not self.simple and not self.stats_are_shown:
@@ -488,14 +500,15 @@ class LoadingBar(object):
         self.known_total = total is not None
 
     def set_sub_total(self, total: Optional[int] = None):
+        assert self.sub_progress is not None and self.sub_task_id is not None
         self.sub_progress.update(self.sub_task_id, total=total)
 
     def set_label(self, label: str):
-        assert self.label_progress is not None
+        assert self.label_progress is not None and self.label_progress_task_id
         self.label_progress.update(self.label_progress_task_id, description=label)
 
     # TODO: factorize
-    def set_stat(self, name: str, count: Optional[int], style: str = None):
+    def set_stat(self, name: str, count: Optional[int], style: Optional[str] = None):
         assert self.stats is not None
 
         if name not in self.stats:
@@ -534,6 +547,7 @@ class LoadingBar(object):
             self.nested_advance(sub_count)
 
         if sub_title is not None:
+            assert self.sub_progress is not None and self.sub_task_id is not None
             self.sub_progress.update(self.sub_task_id, description=sub_title)
 
         if label is not None:
