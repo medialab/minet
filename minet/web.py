@@ -107,6 +107,7 @@ HTML_RE = re.compile(
 )
 
 # Constants
+METHODS_WITHOUT_BODY = ["HEAD", "OPTIONS"]
 CONTENT_PREBUFFER_UP_TO = 1024
 STREAMING_CHUNK_SIZE: int = 2**12
 LARGE_CONTENT_PREBUFFER_UP_TO = 2**16
@@ -269,6 +270,7 @@ class BufferedResponse(object):
     """
 
     __slots__ = (
+        "__method",
         "__inner",
         "__body",
         "__cancel_event",
@@ -279,10 +281,12 @@ class BufferedResponse(object):
 
     def __init__(
         self,
+        method: str,
         response: urllib3.HTTPResponse,
         cancel_event: Optional[Event],
         final_time: Optional[float] = None,
     ):
+        self.__method = method
         self.__inner = response
         self.__cancel_event = cancel_event
         self.__final_time = final_time
@@ -342,7 +346,10 @@ class BufferedResponse(object):
         if not self.__finished:
             # NOTE: if the response is 3xx, we can afford to drain the connection
             # not to lose it
-            if self.__inner.status in REDIRECT_STATUSES:
+            if (
+                self.__method in METHODS_WITHOUT_BODY
+                or self.__inner.status in REDIRECT_STATUSES
+            ):
                 self.__inner.drain_conn()
             else:
                 # NOTE: closing connections has a performance cost but I am
@@ -420,7 +427,9 @@ def atomic_request(
 
     response = pool_manager.request(method, url, **request_kwargs)
 
-    return BufferedResponse(response, cancel_event=cancel_event, final_time=final_time)
+    return BufferedResponse(
+        method, response, cancel_event=cancel_event, final_time=final_time
+    )
 
 
 def atomic_resolve(
