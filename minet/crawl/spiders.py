@@ -40,7 +40,11 @@ T = TypeVar("T")
 
 FORMATTER = PseudoFStringFormatter()
 
-SpiderNextTargets = Optional[Iterable[UrlOrCrawlTarget[CrawlJobDataType]]]
+SpiderNextTargets = Optional[
+    Union[
+        UrlOrCrawlTarget[CrawlJobDataType], Iterable[UrlOrCrawlTarget[CrawlJobDataType]]
+    ]
+]
 SpiderResult = Optional[Tuple[CrawlResultDataType, SpiderNextTargets[CrawlJobDataType]]]
 
 

@@ -243,6 +243,9 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType, CallbackResultT
             degree = 0
 
             if next_jobs is not None:
+                if isinstance(next_jobs, (str, CrawlTarget)):
+                    next_jobs = [next_jobs]
+
                 if self.max_depth is None or job.depth < self.max_depth:
                     degree = self.crawler.enqueue(
                         next_jobs,
