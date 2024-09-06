@@ -4,6 +4,8 @@
 #
 # Twitter public API "scraper".
 #
+from typing import Optional
+
 import time
 import json
 import datetime
@@ -63,7 +65,10 @@ def is_query_too_long(query):
     return len(quote(query)) > MAXIMUM_QUERY_LENGTH
 
 
-def is_cookie_valid(cookie: str) -> bool:
+def is_cookie_valid(cookie: Optional[str]) -> bool:
+    if cookie is None:
+        return False
+
     dict_cookie = cookie_string_to_dict(cookie)
 
     return bool(
