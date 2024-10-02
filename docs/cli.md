@@ -238,7 +238,7 @@ Optional Arguments:
                                 asking for a compressed response. Usually better
                                 for bandwidth but at the cost of more CPU work.
   --connect-timeout CONNECT_TIMEOUT
-                                Maxium socket connection time to host. Defaults
+                                Maximum socket connection time to host. Defaults
                                 to `5`.
   --domain-parallelism DOMAIN_PARALLELISM
                                 Max number of urls per domain to hit at the same
@@ -419,7 +419,7 @@ Optional Arguments:
                                 asking for a compressed response. Usually better
                                 for bandwidth but at the cost of more CPU work.
   --connect-timeout CONNECT_TIMEOUT
-                                Maxium socket connection time to host. Defaults
+                                Maximum socket connection time to host. Defaults
                                 to `5`.
   -C, --content-filter CONTENT_FILTER
                                 Regex used to filter fetched content.
@@ -1622,7 +1622,7 @@ Optional Arguments:
                                 AMP urls when normalizing url. Defaults to
                                 `True`.
   --platform-aware              Whether url parsing should know about some
-                                specififc platform such as Facebook, YouTube
+                                specific platform such as Facebook, YouTube
                                 etc. into account when normalizing urls. Note
                                 that this is different than activating
                                 --facebook or --youtube.
@@ -2581,7 +2581,7 @@ Optional Arguments:
                                 asking for a compressed response. Usually better
                                 for bandwidth but at the cost of more CPU work.
   --connect-timeout CONNECT_TIMEOUT
-                                Maxium socket connection time to host. Defaults
+                                Maximum socket connection time to host. Defaults
                                 to `15`.
   --domain-parallelism DOMAIN_PARALLELISM
                                 Max number of urls per domain to hit at the same

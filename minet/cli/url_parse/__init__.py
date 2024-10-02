@@ -226,7 +226,7 @@ URL_PARSE_COMMAND = command(
         },
         {
             "flag": "--platform-aware",
-            "help": "Whether url parsing should know about some specififc platform such as Facebook, YouTube etc. into account when normalizing urls. Note that this is different than activating --facebook or --youtube.",
+            "help": "Whether url parsing should know about some specific platform such as Facebook, YouTube etc. into account when normalizing urls. Note that this is different than activating --facebook or --youtube.",
             "action": "store_true",
         },
     ],

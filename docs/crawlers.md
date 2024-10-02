@@ -254,7 +254,7 @@ class MySpider(Spider):
 - **persistent_storage_path** *Optional[str]*: path to a folder that will contain persistent on-disk resources for the crawler's queue and url cache. If not given, the crawler will work entirely in-memory, which means memory could be exceeded if the url queue or cache becomes too large and you also won't be able to resume if your python process crashes.
 - **resume** *bool* `False`: whether to attempt to resume from persistent storage. Will raise if `persistent_storage_path=None`.
 - **visit_urls_only_once** *bool* `False`: whether to guarantee the crawler won't visit the same url twice.
-- **normalized_url_cache** *bool* `False`: whether to use [`ural.normalize_url`](https://github.com/medialab/ural#normalize_url) before adding a url to the crawler's cache. This can be handy to avoid visting a same page having subtly different urls twice. This will do nothing if `visit_urls_only_once=False`.
+- **normalized_url_cache** *bool* `False`: whether to use [`ural.normalize_url`](https://github.com/medialab/ural#normalize_url) before adding a url to the crawler's cache. This can be handy to avoid visiting a same page having subtly different urls twice. This will do nothing if `visit_urls_only_once=False`.
 - **max_depth** *Optional[int]*: global maximum allowed depth for the crawler to accept a job.
 - **writer_root_directory** *Optional[str]*: root directory that will be used to resolve path written by the crawler's own threadsafe file writer.
 - **sqlar** *bool* `False`: whether the crawler's threadsafe file writer should target a [sqlar](https://www.sqlite.org/sqlar/doc/trunk/README.md) archive instead.
@@ -272,7 +272,7 @@ class MySpider(Spider):
 - **retryer_kwargs** *Optional[dict]*: arguments that will be given to [create_reques.t_retryer](./web.md#create_request_retryer) to create the retryer for each of the spawned threads.
 - **request_args** *Optional[Callable[[T], dict]]*: function returning arguments that will be given to the threaded [request](./web.md#request) call for a given item from the iterable.
 - **use_pycurl** *bool* `False`: whether to use [`pycurl`](http://pycurl.io/) instead of [`urllib3`](https://urllib3.readthedocs.io/en/stable/) to perform the request. The `pycurl` library must be installed for this kwarg to work.
-- **compressed** *bool* `False`: whether to automatically specifiy the `Accept` header to ask the server to compress the response's body on the wire.
+- **compressed** *bool* `False`: whether to automatically specify the `Accept` header to ask the server to compress the response's body on the wire.
 - **known_encoding** *Optional[str]*: encoding of the body of requested urls. Defaults to `None` which means this encoding will be inferred from the body itself.
 - **max_redirects** *int* `5`: maximum number of redirections the request will be allowed to follow before raising an error.
 - **stateful_redirects** *bool* `False`: whether to allow the resolver to be stateful and store cookies along the redirection chain. This is useful when dealing with GDPR compliance patterns from websites etc. but can hurt performance a little bit.
@@ -330,7 +330,7 @@ for result, written_path in crawler.crawl(callback=callback):
 
 *Arguments*
 
-- **callback** *Optional[Callable[[Crawler, SuccessfulCrawlResult], T]]*: callback that can be used to perform IO-intensive tasks within the same thread used for peforming the crawler's request and to return additional information. If callback is given, the iterator returned by the method will yield `(result, callback_result)` instead of just `result`. Note that this callback must be threadsafe.
+- **callback** *Optional[Callable[[Crawler, SuccessfulCrawlResult], T]]*: callback that can be used to perform IO-intensive tasks within the same thread used for performing the crawler's request and to return additional information. If callback is given, the iterator returned by the method will yield `(result, callback_result)` instead of just `result`. Note that this callback must be threadsafe.
 
 #### enqueue
 
@@ -446,7 +446,7 @@ class MySpider(Spider):
 
 Method that must be implemented for the spider to be able to process the crawler's completed jobs.
 
-The method takes a [CrawlJob](#crawljob) instance, a HTTP [Response](./web.md#response) and must return either `None` or a 2-tuple containing: 1. some optional & arbitraty data extracted from the response, 2. an iterable of next targets for the crawler to enqueue.
+The method takes a [CrawlJob](#crawljob) instance, a HTTP [Response](./web.md#response) and must return either `None` or a 2-tuple containing: 1. some optional & arbitrary data extracted from the response, 2. an iterable of next targets for the crawler to enqueue.
 
 Note that next crawl targets can be relative (they will be resolved wrt current's job last redirected url) and that their depth, if not provided, will default to the current job's depth + 1.
 
@@ -528,7 +528,7 @@ Those jobs are also provided to spider's processing functions and can be accesse
 
 - **job** *[CrawlJob](#crawljob)*: job that was completed or errored.
 - **data** *Optional[T]*: data extracted by the spider for the job.
-- **error** *Optional[Exception]*: error that happend when requesting the job's url.
+- **error** *Optional[Exception]*: error that happened when requesting the job's url.
 - **error_code** *Optional[str]*: human-readable error code if an error happened when requesting the job's url.
 - **response** *Optional[[Response](./web.md#response)]*: HTTP response if the job did not error.
 - **degree** *int*: number of new jobs enqueued when processing this job.
