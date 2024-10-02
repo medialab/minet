@@ -63,7 +63,10 @@ spiders = {"start": EchoJSStartSpider(), "article": ArticleSpider()}
 
 class EchoJSCrawler(Crawler):
     def __init__(self, **kwargs):
-        super().__init__(EchoJSSpider(), **kwargs)
+        super().__init__(
+            EchoJSSpider(),
+            **kwargs,
+        )
 
 
 def factory(**crawler_kwargs):

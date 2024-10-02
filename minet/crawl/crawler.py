@@ -26,6 +26,7 @@ from minet.types import ParamSpec
 if TYPE_CHECKING:
     from playwright.async_api import BrowserContext
     from minet.browser import ThreadsafeBrowser
+    from minet.web import Response
 
 from os import makedirs
 from os.path import join
@@ -189,53 +190,73 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType, CallbackResultT
             if cancel_event.is_set():
                 return
 
-            try:
-                retryer = getattr(self.local_context, "retryer", None)
-                request_fn = (
-                    request
-                    if self.crawler.browser is None
-                    else self.crawler.browser.request
-                )
+            request_fn = (
+                request
+                if self.crawler.browser is None
+                else self.crawler.browser.request
+            )
 
-                if retryer is not None:
-                    response = retryer(request_fn, job.url, **kwargs)
+            # NOTE: we create an atomic unit of work that will retry both the request
+            # and the subsequent spider processing
+            response = None
+
+            # NOTE: the function takes "url" and "raise_on_statuses" because of RequestRetrying quirks
+            def retryable_work(
+                url: str, raise_on_statuses=None
+            ) -> Optional[Tuple["Response", Any, Any]]:
+                nonlocal response
+
+                try:
+                    response = request_fn(
+                        url, raise_on_statuses=raise_on_statuses, **kwargs
+                    )
+
+                except CancelledRequestError:
+                    return
+
+                if cancel_event.is_set():
+                    return
+
+                spider_result = spider.process(job, response)
+
+                if spider_result is not None:
+                    try:
+                        data, next_jobs = spider_result
+                    except (ValueError, TypeError):
+                        raise TypeError(
+                            'Spider.process is expected to return either None or a 2-tuple containing data and next targets to enqueue. Got a "%s" instead.'
+                            % spider_result.__class__.__name__
+                        )
                 else:
-                    response = request_fn(job.url, **kwargs)
+                    data = None
+                    next_jobs = None
 
-                # If end url is different from job we add the url to visited cache
-                # NOTE: this is somewhat subject to race conditions but it should
-                # be benign and still be useful in some cases.
-                if self.crawler.url_cache is not None and job.url != response.end_url:
-                    with self.crawler.enqueue_lock:
-                        self.crawler.url_cache.add(response.end_url)
+                return response, data, next_jobs
 
-            except CancelledRequestError:
-                return
+            retryer = getattr(self.local_context, "retryer", None)
+
+            try:
+                if retryer is None:
+                    output = retryable_work(job.url)
+                else:
+                    output = retryer(retryable_work, job.url)
 
             except EXPECTED_WEB_ERRORS as error:
                 return ErroredCrawlResult(job, error), None
 
-            if cancel_event.is_set():
-                return
-
-            try:
-                spider_result = spider.process(job, response)
             except Exception as reason:
+                if response is None:
+                    raise
+
                 raise CrawlerSpiderProcessError(
                     reason=reason, job=job, response=response
                 )
 
-            if spider_result is not None:
-                try:
-                    data, next_jobs = spider_result
-                except (ValueError, TypeError):
-                    raise TypeError(
-                        'Spider.process is expected to return either None or a 2-tuple containing data and next targets to enqueue. Got a "%s" instead.'
-                        % spider_result.__class__.__name__
-                    )
-            else:
-                data = None
-                next_jobs = None
+            # Was cancelled?
+            if output is None:
+                return
+
+            response, data, next_jobs = output
 
             if cancel_event.is_set():
                 return

@@ -1236,7 +1236,7 @@ class RequestRetrying(Retrying):
         super().__init__(*args, **kwargs)
 
     def __call__(self, fn, *args, **kwargs):
-        if self._invalid_statuses is not None and fn in (request, resolve):
+        if self._invalid_statuses is not None:
             kwargs["raise_on_statuses"] = self._invalid_statuses
 
         return super().__call__(fn, *args, **kwargs)

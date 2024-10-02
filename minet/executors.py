@@ -535,7 +535,8 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
 
     def shutdown(self, wait=True) -> None:
         self.cancel()
-        self.pool_manager.clear()
+        if hasattr(self, "pool_manager"):
+            self.pool_manager.clear()
         return super().shutdown(wait=wait)
 
     @overload
