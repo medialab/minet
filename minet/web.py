@@ -1228,20 +1228,6 @@ class request_retryer_custom_exponential_backoff(wait_base):
         return max(0, min(result, self.max))
 
 
-class RequestRetrying(Retrying):
-    def __init__(
-        self, *args, invalid_statuses: Optional[Container[int]] = None, **kwargs
-    ):
-        self._invalid_statuses = invalid_statuses
-        super().__init__(*args, **kwargs)
-
-    def __call__(self, fn, *args, **kwargs):
-        if self._invalid_statuses is not None:
-            kwargs["raise_on_statuses"] = self._invalid_statuses
-
-        return super().__call__(fn, *args, **kwargs)
-
-
 def create_request_retryer(
     min: float = 10,
     max: float = ONE_DAY,
@@ -1253,7 +1239,7 @@ def create_request_retryer(
     predicate: Optional[Callable[[BaseException], bool]] = None,
     epilog: Optional[Callable[[RetryCallState], Optional[str]]] = None,
     cancel_event: Optional[Event] = None,
-) -> RequestRetrying:
+) -> Retrying:
     # By default we only retry network issues, such as Internet being cut off etc.
     retryable_exception_types = [
         # urllib3 errors
@@ -1339,7 +1325,7 @@ def create_request_retryer(
             lambda _: not cancel_event.is_set()
         )
 
-    return RequestRetrying(invalid_statuses=retry_on_statuses, **retrying_kwargs)
+    return Retrying(**retrying_kwargs)
 
 
 def retrying_method(attr="retryer"):
@@ -1363,7 +1349,7 @@ class ThreadsafeRequestRetryers:
         self.kwargs = kwargs
         self.local_context = threading.local()
 
-    def acquire(self) -> RequestRetrying:
+    def acquire(self) -> Retrying:
         retryer = getattr(self.local_context, "retryer", None)
 
         if retryer is None:

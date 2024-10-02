@@ -18,6 +18,7 @@ from typing import (
     Union,
     Tuple,
     Awaitable,
+    Container,
     Any,
     TYPE_CHECKING,
     Literal,
@@ -365,6 +366,7 @@ class HTTPWorker(Generic[ItemType, CallbackResultType]):
         infer_redirection: bool = False,
         canonicalize: bool = False,
         known_encoding: Optional[str] = None,
+        raise_on_statuses: Optional[Container[int]] = None,
         callback: Optional[
             Union[
                 Callable[[ItemType, str, Response], CallbackResultType],
@@ -398,6 +400,7 @@ class HTTPWorker(Generic[ItemType, CallbackResultType]):
             "follow_js_relocation": follow_js_relocation,
             "infer_redirection": infer_redirection,
             "canonicalize": canonicalize,
+            "raise_on_statuses": raise_on_statuses,
         }
 
         if use_pycurl:
@@ -490,6 +493,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
     ):
         self.cancel_event = Event()
         self.local_context = threading.local()
+        self.retry_on_statuses = None
 
         if retry:
 
@@ -504,6 +508,8 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
             }
 
             default_retryer_kwargs.update(retryer_kwargs or {})
+
+            self.retry_on_statuses = default_retryer_kwargs.get("retry_on_statuses")
 
             def init_local_context():
                 self.local_context.retryer = create_request_retryer(
@@ -615,6 +621,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
             use_pycurl=use_pycurl,
             compressed=compressed,
             known_encoding=known_encoding,
+            raise_on_statuses=self.retry_on_statuses,
             callback=callback,
         )
 
@@ -723,6 +730,7 @@ class HTTPThreadPoolExecutor(ThreadPoolExecutor):
             follow_js_relocation=follow_js_relocation,
             infer_redirection=infer_redirection,
             canonicalize=canonicalize,
+            raise_on_statuses=self.retry_on_statuses,
             callback=callback,
         )
 

@@ -146,6 +146,11 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType, CallbackResultT
                 "cancel_event": crawler.executor.cancel_event,
             }
 
+        if self.crawler.executor.retry_on_statuses is not None:
+            self.default_kwargs["raise_on_statuses"] = (
+                self.crawler.executor.retry_on_statuses
+            )
+
         if use_pycurl:
             del self.default_kwargs["pool_manager"]
             self.default_kwargs["use_pycurl"] = True
@@ -200,16 +205,12 @@ class CrawlWorker(Generic[CrawlJobDataType, CrawlResultDataType, CallbackResultT
             # and the subsequent spider processing
             response = None
 
-            # NOTE: the function takes "url" and "raise_on_statuses" because of RequestRetrying quirks
-            def retryable_work(
-                url: str, raise_on_statuses=None
-            ) -> Optional[Tuple["Response", Any, Any]]:
+            # NOTE: the function takes "url" so that the executor may format the warning's epilog
+            def retryable_work(url: str) -> Optional[Tuple["Response", Any, Any]]:
                 nonlocal response
 
                 try:
-                    response = request_fn(
-                        url, raise_on_statuses=raise_on_statuses, **kwargs
-                    )
+                    response = request_fn(url, **kwargs)
 
                 except CancelledRequestError:
                     return
