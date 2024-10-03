@@ -107,7 +107,7 @@ Download urls as fast as possible. Yields [RequestResult](#requestresult) object
 - **callback** *Optional[Callable[[T, str, Response], C]]*: callback that can be used to perform IO-intensive tasks within the same thread used for the request and to return additional information. If callback is given, the iterator returned by the pool will yield `(result, callback_result)` instead of just `result`. Note that this callback must be threadsafe.
 - **request_args** *Optional[Callable[[T], dict]]*: function returning arguments that will be given to the threaded [request](./web.md#request) call for a given item from the iterable.
 - **use_pycurl** *bool* `False`: whether to use [`pycurl`](http://pycurl.io/) instead of [`urllib3`](https://urllib3.readthedocs.io/en/stable/) to perform the request. The `pycurl` library must be installed for this kwarg to work.
-- **compressed** *bool* `False`: whether to automatically specifiy the `Accept` header to ask the server to compress the response's body on the wire.
+- **compressed** *bool* `False`: whether to automatically specify the `Accept` header to ask the server to compress the response's body on the wire.
 - **throttle** *float* `0.2`: time to wait, in seconds, between two calls to the same domain.
 - **buffer_size** *int* `1024`: number of items to pull ahead of time from the iterable in hope of finding some url that can be requested immediately. Decreasing this number will ease up memory usage but can slow down overall performance.
 - **domain_parallelism** *int* `1`: maximum number of concurrent calls allowed on a same domain.
@@ -127,7 +127,7 @@ Resolve urls as fast as possible. Yields [ResolveResult](#resolveresult) objects
 - **callback** *Optional[Callable[[T, str, Response], C]]*: callback that can be used to perform IO-intensive tasks within the same thread used for the request and to return additional information. If callback is given, the iterator returned by the pool will yield `(result, callback_result)` instead of just `result`. Note that this callback must be threadsafe.
 - **resolve_args** *Optional[Callable[[T], dict]]*: function returning arguments that will be given to the threaded [resolve](./web.md#resolve) call for a given item from the iterable.
 - **use_pycurl** *bool* `False`: whether to use [`pycurl`](http://pycurl.io/) instead of [`urllib3`](https://urllib3.readthedocs.io/en/stable/) to perform the request. The `pycurl` library must be installed for this kwarg to work.
-- **compressed** *bool* `False`: whether to automatically specifiy the `Accept` header to ask the server to compress the response's body on the wire.
+- **compressed** *bool* `False`: whether to automatically specify the `Accept` header to ask the server to compress the response's body on the wire.
 - **throttle** *float* `0.2`: time to wait, in seconds, between two calls to the same domain.
 - **buffer_size** *int* `1024`: number of items to pull ahead of time from the iterable in hope of finding some url that can be requested immediately. Decreasing this number will ease up memory usage but can slow down overall performance.
 - **domain_parallelism** *int* `1`: maximum number of concurrent calls allowed on a same domain.
@@ -145,7 +145,7 @@ Resolve urls as fast as possible. Yields [ResolveResult](#resolveresult) objects
 
 - **item** *str | T*: item from the iterable given to [request](#request).
 - **url** *Optional[str]*: url for the wrapped item, if any.
-- **error** *Optional[Exception]*: any error that was raised when peforming the HTTP request.
+- **error** *Optional[Exception]*: any error that was raised when performing the HTTP request.
 - **error_code** *Optional[str]*: human-readable error code if any error was raised when performing the HTTP request.
 - **response** *Optional[[Response](./web.md#response)]*: the completed response, if no error was raised.
 
@@ -183,7 +183,7 @@ assert successful_result.response is not None
 
 - **item** *str | T*: item from the iterable given to [resolve](#resolve).
 - **url** *Optional[str]*: url for the wrapped item, if any.
-- **error** *Optional[Exception]*: any error that was raised when peforming the HTTP request.
+- **error** *Optional[Exception]*: any error that was raised when performing the HTTP request.
 - **error_code** *Optional[str]*: human-readable error code if any error was raised when performing the HTTP request.
 - **stack** *Optional[List[[Redirection](./web.md#redirection)]]*: the redirection stack if no error was raised.
 

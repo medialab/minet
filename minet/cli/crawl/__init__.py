@@ -113,7 +113,7 @@ CRAWL_ARGUMENTS = {
     },
     "connect_timeout": {
         "flag": "--connect-timeout",
-        "help": "Maxium socket connection time to host.",
+        "help": "Maximum socket connection time to host.",
         "type": float,
         "default": 5,
     },
