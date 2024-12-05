@@ -11,7 +11,7 @@ from minet.reddit.types import RedditPost
 
 
 @with_enricher_and_loading_bar(
-    headers={"post_url"},
+    headers=RedditPost,
     title="Scraping posts",
     unit="groups",
     nested=True,
@@ -26,9 +26,9 @@ def action(cli_args, enricher, loading_bar):
         with loading_bar.step(url):
             try:
                 if cli_args.number:
-                    posts = scraper.get_posts_urls(url, cli_args.number)
+                    posts = scraper.get_posts(url, cli_args.number)
                 else:
-                    posts = scraper.get_posts_urls(url)
+                    posts = scraper.get_posts(url)
             except :
                 loading_bar.print(
                     "problème"
@@ -37,7 +37,7 @@ def action(cli_args, enricher, loading_bar):
         
             list_posts = []
             for post in posts:
-                list_posts.append({post})
+                list_posts.append(post)
             
             for post in list_posts:
                 loading_bar.nested_advance()

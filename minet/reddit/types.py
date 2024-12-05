@@ -11,7 +11,7 @@ class RedditPost(TabularRecord):
     title: str
     url: str
     author: str
-    author_text: str
+    author_text: Optional[str]
     upvote: str
     published_date: str
     link: Optional[str]
