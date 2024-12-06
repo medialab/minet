@@ -7,6 +7,7 @@
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.reddit.scraper import RedditScraper
 from minet.reddit.types import RedditPost
+from minet.reddit.exceptions import RedditInvalidTargetError
 
 
 @with_enricher_and_loading_bar(
@@ -34,7 +35,7 @@ def action(cli_args, enricher, loading_bar):
                         posts = scraper.get_posts(url, True)
                     else:
                         posts = scraper.get_posts(url, False)
-            except:
+            except RedditInvalidTargetError:
                 loading_bar.print(
                     "the script could not complete normally on line %i" % (i)
                 )
