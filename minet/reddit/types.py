@@ -27,7 +27,3 @@ class RedditComment(TabularRecord):
     # points: Optional[str]
     # published_date: str
     comment: str
-
-
-
-

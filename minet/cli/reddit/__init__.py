@@ -4,9 +4,8 @@
 #
 # Logic of the `rd` action.
 #
-from casanova import RowCountResumer
 
-from minet.cli.argparse import command, ConfigAction
+from minet.cli.argparse import command
 
 REDDIT_POSTS_SUBCOMMAND = command(
     "posts",
@@ -21,7 +20,7 @@ REDDIT_POSTS_SUBCOMMAND = command(
         . Searching posts from the subreddit r/france:
             $ minet reddit posts https://www.reddit.com/r/france > r_france_posts.csv
     """,
-    variadic_input= {
+    variadic_input={
         "dummy_column": "subreddit",
         "item_label": "subreddit url, subreddit shortcode or subreddit id",
         "item_label_plural": "subreddit urls, subreddit shortcodes or subreddits ids",
@@ -36,9 +35,10 @@ REDDIT_POSTS_SUBCOMMAND = command(
             "flags": ["-t", "--text"],
             "help": "Retrieve the text of the post. Note that it will require one request per post.",
             "action": "store_true",
-        }
+        },
     ],
 )
+
 
 REDDIT_COMMAND = command(
     "reddit",

@@ -3,6 +3,7 @@ from math import ceil
 from ural import get_domain_name, urlpathsplit, is_url
 from time import sleep
 from minet.reddit.types import RedditPost
+from minet.reddit.exceptions import RedditInvalidTargetError
 import re
 
 
@@ -31,9 +32,10 @@ def reddit_request(url, pool_manager):
     sleep(1)
     response = request(url, pool_manager=pool_manager)
     soup = response.soup()
-    if response.status == 404 or (soup.scrape("p[id='noresults']") and not soup.scrape("div[class='commentarea']")):
-        print("invalid url!")
-        return
+    if response.status == 404 or (
+        soup.scrape("p[id='noresults']") and not soup.scrape("div[class='commentarea']")
+    ):
+        raise RedditInvalidTargetError
     remaining_requests = float(response.headers["x-ratelimit-remaining"])
     if remaining_requests == 1:
         time_remaining = int(response.headers["x-ratelimit-reset"])
@@ -70,7 +72,8 @@ class RedditScraper(object):
                         "a[class^='bylink comments']", "href"
                     )
                     n_comments = list_buttons.select_one(
-                        "a[class^='bylink comments']").get_text()
+                        "a[class^='bylink comments']"
+                    ).get_text()
                     match = re.match(r"(\d+)\s+comments", n_comments)
                     if match:
                         n_comments = int(match.group(1))
@@ -84,7 +87,9 @@ class RedditScraper(object):
                     if add_text:
                         text_response = reddit_request(post_url, self.pool_manager)
                         text_soup = text_response.soup()
-                        try_content = text_soup.select_one("div[id='siteTable'] div[class^='usertext']")
+                        try_content = text_soup.select_one(
+                            "div[id='siteTable'] div[class^='usertext']"
+                        )
                         if try_content:
                             content = try_content.get_text()
                         else:

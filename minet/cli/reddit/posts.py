@@ -9,7 +9,6 @@ from minet.reddit.scraper import RedditScraper
 from minet.reddit.types import RedditPost
 
 
-
 @with_enricher_and_loading_bar(
     headers=RedditPost,
     title="Scraping posts",
@@ -35,16 +34,16 @@ def action(cli_args, enricher, loading_bar):
                         posts = scraper.get_posts(url, True)
                     else:
                         posts = scraper.get_posts(url, False)
-            except :
+            except:
                 loading_bar.print(
                     "the script could not complete normally on line %i" % (i)
                 )
                 continue
-        
+
             list_posts = []
             for post in posts:
                 list_posts.append(post)
-            
+
             for post in list_posts:
                 loading_bar.nested_advance()
                 enricher.writerow(row, post)
