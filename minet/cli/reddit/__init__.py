@@ -22,16 +22,16 @@ REDDIT_POSTS_SUBCOMMAND = command(
             $ minet reddit posts https://www.reddit.com/r/france > r_france_posts.csv
     """,
     variadic_input= {
-        "dummy_column": "post",
-        "item_label": "post url, post shortcode or post id",
-        "item_label_plural": "post urls, post shortcodes or post ids",
+        "dummy_column": "subreddit",
+        "item_label": "subreddit url, subreddit shortcode or subreddit id",
+        "item_label_plural": "subreddit urls, subreddit shortcodes or subreddits ids",
     },
     arguments=[
         {
             "flags": ["-n", "--number"],
             "help": "Number of posts to retrieve.",
             "type": int,
-        }
+        },
     ],
 )
 

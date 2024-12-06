@@ -13,6 +13,7 @@ class RedditPost(TabularRecord):
     author: str
     author_text: Optional[str]
     upvote: str
+    number_comments: int
     published_date: str
     link: Optional[str]
 
