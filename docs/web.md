@@ -55,7 +55,7 @@ response = request(
 - **raise_on_statuses** *Optional[Container[int]]*: if given, request will raise if the response has a status in the given set, instead of returning the response.
 - **stateful** *bool* `False`: whether to allow the resolver to be stateful and store cookies along the redirection chain. This is useful when dealing with GDPR compliance patterns from websites etc. but can hurt performance a little bit.
 - **use_pycurl** *bool* `False`: whether to use [`pycurl`](http://pycurl.io/) instead of [`urllib3`](https://urllib3.readthedocs.io/en/stable/) to perform the request. The `pycurl` library must be installed for this kwarg to work.
-- **compressed** *bool* `False`: whether to automatically specifiy the `Accept` header to ask the server to compress the response's body on the wire.
+- **compressed** *bool* `False`: whether to automatically specify the `Accept` header to ask the server to compress the response's body on the wire.
 - **pool_manager** *Optional[urllib3.PoolManager]*: urllib3 pool manager to use to perform the request. Will use a default sensible pool manager if not given. This should only be cared about when you want to use a custom pool manager. This will not be used if `pycurl=True`.
 
 ## resolve

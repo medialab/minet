@@ -14,7 +14,7 @@ jobs:
             pypi: yes
           - os: ubuntu-22.04
             name: ubuntu_22
-          - os: macos-12
+          - os: macos-latest
             name: macos
           - os: windows-latest
             name: windows

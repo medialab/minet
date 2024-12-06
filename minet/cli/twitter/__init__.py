@@ -13,7 +13,7 @@ from minet.cli.argparse import (
     TimestampAsUTCDateType,
     PartialISODatetimeType,
 )
-from minet.cli.exceptions import InvalidArgumentsError
+from minet.cli.exceptions import InvalidArgumentsError, FatalError
 
 TWITTER_API_COMMON_ARGUMENTS = [
     {
@@ -296,10 +296,25 @@ TWITTER_RETWEETERS_SUBCOMMAND = twitter_api_subcommand(
     arguments=[TIMEZONE_ARGUMENT],
 )
 
+def twitter_scrape_confirm(cli_args):
+    if cli_args.force:
+        return
+
+    from minet.cli.console import console
+
+    console.print("BEWARE: we have recently noticed that people using the scrape command\nrisk getting their account temporarily or permanently banned!\n\nConfirm you understand the risks by typing \"yes\" and hitting Enter,\nor use the -f/--force flag to bypass this message next time.", style="warning")
+
+    user_response = input()
+
+    if user_response.strip().lower() != "yes":
+        import sys
+        sys.exit(1)
+
 TWITTER_SCRAPE_SUBCOMMAND = command(
     "scrape",
     "minet.cli.twitter.scrape",
     title="Minet Twitter Scrape Command",
+    resolve=twitter_scrape_confirm,
     description="""
         Scrape Twitter's public facing search API to collect tweets or users.
 
@@ -388,6 +403,11 @@ TWITTER_SCRAPE_SUBCOMMAND = command(
             "default": "firefox",
             "rc_key": ["twitter", "cookie"],
             "action": ConfigAction,
+        },
+        {
+            "flags": ["-f", "--force"],
+            "help": "Bypass confirmation.",
+            "action": "store_true"
         },
         TIMEZONE_ARGUMENT,
     ],
