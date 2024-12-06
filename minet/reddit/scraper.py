@@ -31,7 +31,7 @@ def reddit_request(url, pool_manager):
     sleep(1)
     response = request(url, pool_manager=pool_manager)
     soup = response.soup()
-    if response.status == 404 or soup.scrape("p[id='noresults']"):
+    if response.status == 404 or (soup.scrape("p[id='noresults']") and not soup.scrape("div[class='commentarea']")):
         print("invalid url!")
         return
     remaining_requests = float(response.headers["x-ratelimit-remaining"])
@@ -49,7 +49,7 @@ class RedditScraper(object):
     def __init__(self):
         self.pool_manager = create_pool_manager()
 
-    def get_posts(self, url, nb_post=25):
+    def get_posts(self, url: str, add_text: bool, nb_post=25):
         list_posts = []
         nb_pages = ceil(int(nb_post) / 25)
         old_url = get_old_url(get_url_from_subreddit(url))
@@ -81,12 +81,22 @@ class RedditScraper(object):
                     upvote = post.select_one("div[class='score unvoted']").get_text()
                     published_date = post.scrape_one("time", "datetime")
                     link = post.scrape_one("a[class*='title']", "href")
+                    if add_text:
+                        text_response = reddit_request(post_url, self.pool_manager)
+                        text_soup = text_response.soup()
+                        try_content = text_soup.select_one("div[id='siteTable'] div[class^='usertext']")
+                        if try_content:
+                            content = try_content.get_text()
+                        else:
+                            content = ""
+                    else:
+                        content = ""
 
                     data = RedditPost(
                         title=title,
                         url=post_url,
                         author=author,
-                        author_text=None,
+                        author_text=content,
                         upvote=upvote,
                         number_comments=n_comments,
                         published_date=published_date,

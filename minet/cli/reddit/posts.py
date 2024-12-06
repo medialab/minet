@@ -15,7 +15,7 @@ from minet.reddit.types import RedditPost
     title="Scraping posts",
     unit="groups",
     nested=True,
-    sub_unit="posts",
+    sub_unit="subreddits",
 )
 def action(cli_args, enricher, loading_bar):
     scraper = RedditScraper()
@@ -26,12 +26,18 @@ def action(cli_args, enricher, loading_bar):
         with loading_bar.step(url):
             try:
                 if cli_args.number:
-                    posts = scraper.get_posts(url, cli_args.number)
+                    if cli_args.text:
+                        posts = scraper.get_posts(url, True, cli_args.number)
+                    else:
+                        posts = scraper.get_posts(url, False, cli_args.number)
                 else:
-                    posts = scraper.get_posts(url)
+                    if cli_args.text:
+                        posts = scraper.get_posts(url, True)
+                    else:
+                        posts = scraper.get_posts(url, False)
             except :
                 loading_bar.print(
-                    "problème"
+                    "the script could not complete normally on line %i" % (i)
                 )
                 continue
         
