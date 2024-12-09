@@ -39,6 +39,34 @@ REDDIT_POSTS_SUBCOMMAND = command(
     ],
 )
 
+REDDIT_COMMENTS_SUBCOMMAND = command(
+    "comments",
+    "minet.cli.reddit.comments",
+    title="Minet Reddit Comments Command",
+    description="""
+        Retrieve comments from a reddit post link.
+        Note that it will only retrieve the comments displayed on the page. If you want all the comments you need to use -A, --all but it will require a request per comment, and you can only make 100 requests per 10 minutes.
+    """,
+    epilog="""
+        Example:
+
+        . Searching comments from a reddit post:
+            $ minet reddit comments https://www.reddit.com/r/france/comments/... > r_france_comments.csv
+    """,
+    variadic_input={
+        "dummy_column": "post",
+        "item_label": "post url, post shortcode or post id",
+        "item_label_plural": "posts urls, posts shortcodes or posts ids",
+    },
+    arguments=[
+        {
+            "flags": ["-A", "--all"],
+            "help": "Retrieve all comments.",
+            "action": "store_true",
+        },
+    ],
+)
+
 
 REDDIT_COMMAND = command(
     "reddit",
@@ -50,5 +78,6 @@ REDDIT_COMMAND = command(
     """,
     subcommands=[
         REDDIT_POSTS_SUBCOMMAND,
+        REDDIT_COMMENTS_SUBCOMMAND,
     ],
 )

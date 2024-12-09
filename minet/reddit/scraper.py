@@ -2,9 +2,14 @@ from minet.web import request, create_pool_manager
 from math import ceil
 from ural import get_domain_name, urlpathsplit, is_url
 from time import sleep
-from minet.reddit.types import RedditPost
+from minet.reddit.types import RedditPost, RedditComment
 from minet.reddit.exceptions import RedditInvalidTargetError
 import re
+from urllib.parse import urljoin
+
+
+def resolve_relative_url(path):
+    return urljoin("https://old.reddit.com", path)
 
 
 def get_old_url(url):
@@ -47,9 +52,46 @@ def reddit_request(url, pool_manager):
     return response
 
 
+def extract_t1_ids(text):
+    pattern = r"t1_(\w+)"
+    return [match.group(1) for match in re.finditer(pattern, text)]
+
+
+def get_current_id(com):
+    current_id = com.get("id")
+    if current_id:
+        current_id = current_id.split("_")[-1]
+    else:
+        current_id = com.get("data-permalink").split("/")[-2]
+    return current_id
+
+
 class RedditScraper(object):
     def __init__(self):
         self.pool_manager = create_pool_manager()
+
+    def get_childs_l500(self, url, list_comments, parent_id):
+        response = reddit_request(url, self.pool_manager)
+        soup = response.soup()
+        comments = soup.select("div[class='commentarea']>div>div[class*='comment']")
+        for com in comments:
+            child = com.find("div", class_="child")
+            if child.text != "":
+                child = child.find("div")
+                child_com = child.find_all(
+                    "div",
+                    class_=lambda x: x
+                    and (
+                        "comment" in x
+                        or "deleted comment" in x
+                        or "morerecursion" in x
+                        or "morechildren" in x
+                    ),
+                    recursive=False,
+                )
+                for ele in child_com:
+                    list_comments.append((parent_id, ele))
+        return list_comments
 
     def get_posts(self, url: str, add_text: bool, nb_post=25):
         list_posts = []
@@ -82,6 +124,8 @@ class RedditScraper(object):
                     try_author = post.select_one("a[class*='author']")
                     author = try_author.get_text() if try_author else "Deleted"
                     upvote = post.select_one("div[class='score unvoted']").get_text()
+                    if upvote == '•':
+                        upvote = ""
                     published_date = post.scrape_one("time", "datetime")
                     link = post.scrape_one("a[class*='title']", "href")
                     if add_text:
@@ -105,10 +149,68 @@ class RedditScraper(object):
                         upvote=upvote,
                         number_comments=n_comments,
                         published_date=published_date,
-                        link=link,
+                        link=resolve_relative_url(link),
                     )
 
                     list_posts.append(data)
                     n_crawled += 1
             old_url = soup.scrape("span[class='next-button'] a", "href")[0]
         return list(list_posts)
+    
+
+    def get_comments(self, url: str, all):
+        list_return = []
+        m_comments = []
+        old_url = get_old_url(url)
+        url_limit = old_url + "?limit=500"
+        response = reddit_request(url_limit, self.pool_manager)
+        soup = response.soup()
+        first_comments = soup.select("div[class='commentarea']>div>div[class*='comment']")
+        for ele in first_comments:
+            m_comments.append((None, ele))
+        while m_comments:
+            parent, com = m_comments.pop()
+            current_id = get_current_id(com)
+            if "morerecursion" in com.get("class") and all:
+                url_rec = f"https://old.reddit.com{com.scrape_one('a', 'href')}"
+                m_comments = self.get_childs_l500(url_rec, m_comments, parent)
+            elif "morechildren" in com.get("class") and all:
+                a = com.select_one("a")
+                onclick = a["onclick"]
+                id_list = extract_t1_ids(onclick)
+                for id in id_list:
+                    comment_url = f"{old_url}{id}"
+                    m_comments = self.get_childs_l500(comment_url, m_comments, current_id)
+            else:
+                child = com.find("div", class_="child")
+                if child.text != "":
+                    child = child.find("div")
+                    if all:
+                        child_com = child.find_all(
+                            "div",
+                            class_=lambda x: x
+                            and (
+                                "comment" in x
+                                or "deleted comment" in x
+                                or "morerecursion" in x
+                                or "morechildren" in x
+                            ),
+                            recursive=False,
+                        )
+                    else:
+                        child_com = child.find_all(
+                            "div",
+                            class_=lambda x: x
+                            and ("comment" in x or "deleted comment" in x),
+                            recursive=False,
+                        )
+                    for ele in child_com:
+                        m_comments.append((current_id, ele))
+                data = RedditComment(
+                    id=current_id,
+                    parent=parent,
+                    comment=com.scrape_one("div[class='md']:not(div.child a)"),
+                )
+                if data.id != "":
+                    list_return.append(data)
+        return list_return

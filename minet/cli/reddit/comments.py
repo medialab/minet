@@ -1,21 +1,21 @@
 # =============================================================================
-# Minet Reddit Posts CLI Action
+# Minet Reddit Comments CLI Action
 # =============================================================================
 #
-# Logic of the `rd posts` action.
+# Logic of the `rd comments` action.
 #
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.reddit.scraper import RedditScraper
-from minet.reddit.types import RedditPost
+from minet.reddit.types import RedditComment
 from minet.reddit.exceptions import RedditInvalidTargetError
 
 
 @with_enricher_and_loading_bar(
-    headers=RedditPost,
-    title="Scraping posts",
+    headers=RedditComment,
+    title="Scraping comments",
     unit="groups",
     nested=True,
-    sub_unit="posts",
+    sub_unit="comments",
 )
 def action(cli_args, enricher, loading_bar):
     scraper = RedditScraper()
@@ -25,26 +25,17 @@ def action(cli_args, enricher, loading_bar):
     ):
         with loading_bar.step(url):
             try:
-                if cli_args.number:
-                    if cli_args.text:
-                        posts = scraper.get_posts(url, True, cli_args.number)
-                    else:
-                        posts = scraper.get_posts(url, False, cli_args.number)
+                if cli_args.all:
+                    comments = scraper.get_comments(url, True)
                 else:
-                    if cli_args.text:
-                        posts = scraper.get_posts(url, True)
-                    else:
-                        posts = scraper.get_posts(url, False)
+                    comments = scraper.get_comments(url, False)
+
             except RedditInvalidTargetError:
                 loading_bar.print(
                     "the script could not complete normally on line %i" % (i)
                 )
                 continue
 
-            list_posts = []
-            for post in posts:
-                list_posts.append(post)
-
-            for post in list_posts:
+            for comment in comments:
                 loading_bar.nested_advance()
-                enricher.writerow(row, post)
+                enricher.writerow(row, comment)
