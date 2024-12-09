@@ -171,6 +171,13 @@ class RedditScraper(object):
         while m_comments:
             parent, com = m_comments.pop()
             current_id = get_current_id(com)
+            comment_url = com.scrape_one("a[class='bylink']", 'href')
+            try_author = com.scrape_one("a[class^='author']", 'href')
+            author = try_author.get_text() if try_author else "Deleted"
+            com_points = com.scrape_one("span[class='score unvoted']")
+            match = re.search(r"-?\d+\s+point(?:s)?", com_points)
+            com_points = int(re.search(r"-?\d+", match.group()).group())
+            published_date = com.scrape_one("time", "datetime")
             if "morerecursion" in com.get("class") and all:
                 url_rec = f"https://old.reddit.com{com.scrape_one('a', 'href')}"
                 m_comments = self.get_childs_l500(url_rec, m_comments, parent)
@@ -207,8 +214,12 @@ class RedditScraper(object):
                     for ele in child_com:
                         m_comments.append((current_id, ele))
                 data = RedditComment(
+                    comment_url=comment_url,
+                    author=author,
                     id=current_id,
                     parent=parent,
+                    points=com_points,
+                    published_date=published_date,
                     comment=com.scrape_one("div[class='md']:not(div.child a)"),
                 )
                 if data.id != "":
