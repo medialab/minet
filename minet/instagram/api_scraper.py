@@ -55,7 +55,6 @@ from minet.instagram.exceptions import (
 from minet.instagram.types import (
     InstagramComment,
     InstagramHashtagPost,
-    InstagramLocationPost,
     InstagramPost,
     InstagramUser,
     InstagramUserInfo,
@@ -64,7 +63,6 @@ from minet.instagram.types import (
 INSTAGRAM_GRAPHQL_ENDPOINT = "https://www.instagram.com/graphql/query/"
 INSTAGRAM_HASHTAG_QUERY_HASH = "9b498c08113f1e09617a1703c22b2f32"
 INSTAGRAM_USER_ID_QUERY_HASH = "c9100bf9110dd6361671f113dd02e7d6"
-INSTAGRAM_LOCATION_QUERY_HASH = "ac38b90f0f3981c42092016a37c59bf7"
 INSTAGRAM_MAGIC_TOKEN_PATTERN = re.compile(r"\"X-IG-App-ID\"\s*:\s*\"(\d+)\"")
 INSTAGRAM_ID_PATTERN = re.compile(r"\d+")
 INSTAGRAM_GET_USER_ID_PATTERN = re.compile(r"\d+_(\d+)")
@@ -104,19 +102,6 @@ def forge_hashtag_search_url(name, cursor=None, count=50):
 
     url = INSTAGRAM_GRAPHQL_ENDPOINT + "?query_hash=%s&variables=%s" % (
         INSTAGRAM_HASHTAG_QUERY_HASH,
-        quote(json.dumps(params)),
-    )
-
-    return url
-
-def forge_location_search_url(id, cursor=None, count=50):
-    params = {"id": id, "first": count}
-
-    if cursor is not None:
-        params["after"] = cursor
-
-    url = INSTAGRAM_GRAPHQL_ENDPOINT + "?query_hash=%s&variables=%s" % (
-        INSTAGRAM_LOCATION_QUERY_HASH,
         quote(json.dumps(params)),
     )
 
@@ -414,35 +399,6 @@ class InstagramAPIScraper(object):
 
             for edge in edges:
                 yield InstagramHashtagPost.from_payload(edge["node"])
-
-            has_next_page = getpath(data, ["page_info", "has_next_page"])
-
-            if not has_next_page:
-                break
-
-            cursor = getpath(data, ["page_info", "end_cursor"])
-
-    def search_location(self, location) -> Iterator[InstagramLocationPost]:
-        # hashtag = hashtag.lstrip("#")
-        cursor = None
-
-        while True:
-            url = forge_location_search_url(location, cursor=cursor)
-
-            data = self.request_json(url)
-
-            if not getpath(data, ["data", "location"]):
-                raise InstagramHashtagNeverUsedError
-
-            data = getpath(data, ["data", "location", "edge_location_to_media"])
-
-            if not data:
-                break
-
-            edges = data.get("edges")
-
-            for edge in edges:
-                yield InstagramLocationPost.from_payload(edge["node"])
 
             has_next_page = getpath(data, ["page_info", "has_next_page"])
 

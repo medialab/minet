@@ -131,55 +131,6 @@ class InstagramHashtagPost(TabularRecord):
             short_code_to_url(payload["shortcode"]) + "media/?size=l",
         )
 
-@dataclass
-class InstagramLocationPost(TabularRecord):
-    id: str
-    is_video: str
-    shortcode: str
-    url: str
-    caption: str
-    hashtags: List[str]
-    mentioned_names: List[str]
-    liked_by_count: int
-    comments_disabled: bool
-    comment_count: int
-    preview_like_count: int
-    video_view_count: int
-    owner_id: str
-    taken_at_timestamp: str
-    utc_time: str
-    display_url: str
-
-    @classmethod
-    def from_payload(cls, payload) -> "InstagramHashtagPost":
-        text = getpath(payload, ["edge_media_to_caption", "edges", 0, "node", "text"])
-
-        hashtags = []
-        mentioned_names = []
-
-        if text:
-            hashtags = extract_hashtags(text)
-            mentioned_names = extract_handles(text)
-
-        return cls(
-            payload["id"],
-            payload["is_video"],
-            payload["shortcode"],
-            short_code_to_url(payload["shortcode"]),
-            text,
-            hashtags,
-            mentioned_names,
-            payload["edge_liked_by"]["count"],
-            payload["comments_disabled"],
-            payload["edge_media_to_comment"]["count"],
-            payload["edge_media_preview_like"]["count"],
-            payload.get("video_view_count"),
-            payload["owner"]["id"],
-            payload["taken_at_timestamp"],
-            timestamp_to_isoformat(payload["taken_at_timestamp"]),
-            short_code_to_url(payload["shortcode"]) + "media/?size=l",
-        )
-
 
 def get_usertags(item):
     users = getpath(item, ["usertags", "in"])

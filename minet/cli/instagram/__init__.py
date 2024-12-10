@@ -78,40 +78,6 @@ INSTAGRAM_HASHTAG_SUBCOMMAND = command(
     ],
 )
 
-INSTAGRAM_LOCATION_SUBCOMMAND = command(
-    "location",
-    "minet.cli.instagram.location",
-    title="Instagram location",
-    description="""
-        Scrape Instagram posts with a given location id.
-
-        This requires to be logged in to an Instagram account, so
-        by default this command will attempt to grab the relevant
-        authentication cookies from a local Firefox browser.
-
-        If you want to grab cookies from another browser or want
-        to directly pass the cookie as a string, check out the
-        -c/--cookie flag.
-
-        display_url is not the media url, but a thumbnail of the post.
-        There is no way with this command to get the media urls.
-    """,
-    epilog="""
-        Example:
-
-        . Searching posts with the location id for Milan, Italy:
-            $ minet instagram location 213050058 > 213050058_posts.csv
-    """,
-    variadic_input={"dummy_column": "location"},
-    arguments=[
-        {
-            "flags": ["-l", "--limit"],
-            "help": "Maximum number of posts to retrieve per location.",
-            "type": int,
-        },
-    ],
-)
-
 INSTAGRAM_USER_FOLLOWERS_SUBCOMMAND = command(
     "user-followers",
     "minet.cli.instagram.user_followers",
@@ -336,7 +302,6 @@ INSTAGRAM_COMMAND = command(
     subcommands=[
         INSTAGRAM_COMMENTS_SUBCOMMAND,
         INSTAGRAM_HASHTAG_SUBCOMMAND,
-        INSTAGRAM_LOCATION_SUBCOMMAND,
         INSTAGRAM_POST_INFOS_SUBCOMMAND,
         INSTAGRAM_USER_FOLLOWERS_SUBCOMMAND,
         INSTAGRAM_USER_FOLLOWING_SUBCOMMAND,
