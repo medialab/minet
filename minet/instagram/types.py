@@ -152,7 +152,7 @@ class InstagramLocationPost(TabularRecord):
     display_url: str
 
     @classmethod
-    def from_payload(cls, payload) -> "InstagramHashtagPost":
+    def from_payload(cls, payload) -> "InstagramLocationPost":
         text = getpath(payload, ["edge_media_to_caption", "edges", 0, "node", "text"])
 
         hashtags = []
