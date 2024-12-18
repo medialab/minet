@@ -109,6 +109,7 @@ def forge_hashtag_search_url(name, cursor=None, count=50):
 
     return url
 
+
 def forge_location_search_url(id, cursor=None, count=50):
     params = {"id": id, "first": count}
 

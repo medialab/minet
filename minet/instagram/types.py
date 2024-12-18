@@ -131,6 +131,7 @@ class InstagramHashtagPost(TabularRecord):
             short_code_to_url(payload["shortcode"]) + "media/?size=l",
         )
 
+
 @dataclass
 class InstagramLocationPost(TabularRecord):
     id: str

@@ -10,7 +10,10 @@ from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.instagram.utils import with_instagram_fatal_errors
 from minet.instagram import InstagramAPIScraper
 from minet.instagram.types import InstagramLocationPost
-from minet.instagram.exceptions import InstagramInvalidTargetError, InstagramNoPublicationError
+from minet.instagram.exceptions import (
+    InstagramInvalidTargetError,
+    InstagramNoPublicationError,
+)
 
 
 @with_instagram_fatal_errors
@@ -46,5 +49,6 @@ def action(cli_args, enricher, loading_bar):
 
             except InstagramNoPublicationError:
                 loading_bar.print(
-                    "Given location (line %i) has probably no publication: %s" % (i, location)
+                    "Given location (line %i) has probably no publication: %s"
+                    % (i, location)
                 )
