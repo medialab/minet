@@ -44,6 +44,7 @@ _Platform-related commands_
 - [instagram (insta)](#instagram)
   - [comments](#comments-1)
   - [hashtag](#hashtag)
+  - [location](#location)
   - [post-infos](#post-infos)
   - [user-followers](#user-followers)
   - [user-following](#user-following)
@@ -270,6 +271,10 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ### hashtag
 
 <% insta/hashtag %>
+
+### location
+
+<% insta/location %>
 
 ### post-infos
 
