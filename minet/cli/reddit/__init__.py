@@ -91,6 +91,11 @@ REDDIT_USER_POSTS_SUBCOMMAND = command(
             "help": "Number of posts to retrieve.",
             "type": int,
         },
+        {
+            "flags": ["-t", "--text"],
+            "help": "Retrieve the text of the post. Note that it will require one request per post.",
+            "action": "store_true",
+        },
     ],
 )
 
@@ -106,6 +111,6 @@ REDDIT_COMMAND = command(
     subcommands=[
         REDDIT_POSTS_SUBCOMMAND,
         REDDIT_COMMENTS_SUBCOMMAND,
-        REDDIT_USER_POSTS_SUBCOMMAND
+        REDDIT_USER_POSTS_SUBCOMMAND,
     ],
 )

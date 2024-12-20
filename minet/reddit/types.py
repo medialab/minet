@@ -31,6 +31,7 @@ class RedditComment(TabularRecord):
 class RedditUserPost(TabularRecord):
     title: str
     url: str
+    author_text: str
     points: int
     number_comments: int
     published_date: str
