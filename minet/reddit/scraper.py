@@ -242,7 +242,9 @@ class RedditScraper(object):
                     nb_comments = int(match.group(1))
                 else:
                     nb_comments = 0
-                link = post.scrape_one("a[class^='title']", "href")
+                link = resolve_relative_url(post.scrape_one("a[class^='title']", "href"))
+                if link == post_url:
+                    link = ""
                 published_date = post.scrape("time", "datetime")
 
                 data = RedditUserPost(
