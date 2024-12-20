@@ -67,6 +67,33 @@ REDDIT_COMMENTS_SUBCOMMAND = command(
     ],
 )
 
+REDDIT_USER_POSTS_SUBCOMMAND = command(
+    "user_posts",
+    "minet.cli.reddit.user_posts",
+    title="Minet Reddit User Posts Command",
+    description="""
+        Retrieve reddit posts from a user link.
+    """,
+    epilog="""
+        Example:
+
+        . Searching posts from the user page of u/random_user:
+            $ minet reddit posts https://www.reddit.com/user/random_user/submitted/ > random_user_posts.csv
+    """,
+    variadic_input={
+        "dummy_column": "user",
+        "item_label": "user url, user shortcode or user id",
+        "item_label_plural": "user urls, user shortcodes or user ids",
+    },
+    arguments=[
+        {
+            "flags": ["-n", "--number"],
+            "help": "Number of posts to retrieve.",
+            "type": int,
+        },
+    ],
+)
+
 
 REDDIT_COMMAND = command(
     "reddit",
@@ -79,5 +106,6 @@ REDDIT_COMMAND = command(
     subcommands=[
         REDDIT_POSTS_SUBCOMMAND,
         REDDIT_COMMENTS_SUBCOMMAND,
+        REDDIT_USER_POSTS_SUBCOMMAND
     ],
 )

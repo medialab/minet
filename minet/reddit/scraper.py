@@ -2,7 +2,7 @@ from minet.web import request, create_pool_manager
 from math import ceil
 from ural import get_domain_name, urlpathsplit, is_url
 from time import sleep
-from minet.reddit.types import RedditPost, RedditComment
+from minet.reddit.types import RedditPost, RedditComment, RedditUserPost
 from minet.reddit.exceptions import RedditInvalidTargetError
 import re
 from urllib.parse import urljoin
@@ -145,7 +145,7 @@ class RedditScraper(object):
                         url=post_url,
                         author=author,
                         author_text=content,
-                        upvote=upvote,
+                        points=upvote,
                         number_comments=n_comments,
                         published_date=published_date,
                         link=resolve_relative_url(link),
@@ -220,3 +220,53 @@ class RedditScraper(object):
                 )
                 if data.id != "":
                     yield data
+
+    def get_user_posts(self, url: str, nb = 25):
+        nb_pages = ceil(int(nb) / 25)
+        n_crawled = 0
+        old_url = get_old_url(url)
+        for _ in range(nb_pages):
+            if n_crawled == int(nb):
+                break
+            response = reddit_request(old_url, self.pool_manager)
+            soup = response.soup()
+            posts = soup.select("div[id^='thing_t3_']")
+            for post in posts:
+                sub = post.scrape_one("a[class*='subreddit']", "href")
+                title = post.scrape_one("a[class^='title']")
+                points = post.scrape_one("div[class='score unvoted']")
+                post_url = post.scrape_one("a[class^='bylink comment']", "href")
+                nb_comments = post.scrape_one("a[class^='bylink comment']")
+                match = re.match(r"(\d+)\s+comments", nb_comments)
+                if match:
+                    nb_comments = int(match.group(1))
+                else:
+                    nb_comments = 0
+                link = post.scrape_one("a[class^='title']", "href")
+                published_date = post.scrape("time", "datetime")
+
+                data = RedditUserPost(
+                    title=title,
+                    url=post_url,
+                    points=points,
+                    number_comments=nb_comments,
+                    published_date=published_date,
+                    link=link,
+                    subreddit=sub
+                )
+
+                yield data
+                n_crawled += 1
+            old_url = soup.scrape("span[class='next-button'] a", "href")[0]
+
+
+
+
+
+
+
+
+
+
+    def get_user_comments(self, url: str, nb = 25):
+        old_url = get_old_url(url)

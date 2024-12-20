@@ -10,7 +10,7 @@ class RedditPost(TabularRecord):
     url: str
     author: str
     author_text: Optional[str]
-    upvote: int
+    points: int
     number_comments: int
     published_date: str
     link: Optional[str]
@@ -25,3 +25,14 @@ class RedditComment(TabularRecord):
     points: int
     published_date: str
     comment: str
+
+
+@dataclass
+class RedditUserPost(TabularRecord):
+    title: str
+    url: str
+    points: int
+    number_comments: int
+    published_date: str
+    link: str
+    subreddit: str
