@@ -66,6 +66,41 @@ def get_current_id(com):
     return current_id
 
 
+def data_posts(
+    post, title, url, author_text, points, number_comments, published_date, link
+):
+    try_author = post.select_one("a[class*='author']")
+    author = try_author.get_text() if try_author else "Deleted"
+    data = RedditPost(
+        title=title,
+        url=url,
+        author=author,
+        author_text=author_text,
+        points=points,
+        number_comments=number_comments,
+        published_date=published_date,
+        external_link=link,
+    )
+    return data
+
+
+def data_user_posts(
+    post, title, url, author_text, points, number_comments, published_date, link
+):
+    sub = post.scrape_one("a[class*='subreddit']", "href")
+    data = RedditUserPost(
+        title=title,
+        url=url,
+        author_text=author_text,
+        points=points,
+        number_comments=number_comments,
+        published_date=published_date,
+        external_link=link,
+        subreddit=sub,
+    )
+    return data
+
+
 class RedditScraper(object):
     def __init__(self):
         self.pool_manager = create_pool_manager()
@@ -92,81 +127,6 @@ class RedditScraper(object):
                 for ele in child_com:
                     list_comments.append((parent_id, ele))
         return list_comments
-
-    def get_post_standard_info(self, post, add_text):
-        list_buttons = post.select_one("ul[class='flat-list buttons']")
-        if len(list_buttons.scrape("span[class='promoted-span']")) == 0:
-            title = post.force_select_one("a[class*='title']").get_text()
-            post_url = list_buttons.scrape_one("a[class^='bylink comments']", "href")
-            n_comments = list_buttons.select_one(
-                "a[class^='bylink comments']"
-            ).get_text()
-            match = re.match(r"(\d+)\s+comments", n_comments)
-            if match:
-                n_comments = int(match.group(1))
-            else:
-                n_comments = 0
-            upvote = post.select_one("div[class='score unvoted']").get_text()
-            if upvote == "•":
-                upvote = ""
-            published_date = post.scrape_one("time", "datetime")
-            link = resolve_relative_url(post.scrape_one("a[class*='title']", "href"))
-            if link == post_url:
-                link = ""
-            if add_text:
-                text_response = reddit_request(post_url, self.pool_manager)
-                text_soup = text_response.soup()
-                try_content = text_soup.select_one(
-                    "div[id='siteTable'] div[class^='usertext']"
-                )
-                if try_content:
-                    content = try_content.get_text()
-                else:
-                    content = ""
-            else:
-                content = ""
-
-            data = {
-                "title": title,
-                "url": post_url,
-                "author_text": content,
-                "points": upvote,
-                "number_comments": n_comments,
-                "published_date": published_date,
-                "link": link,
-            }
-            return data
-
-    def get_posts(self, url: str, add_text: bool, nb_post=25):
-        nb_pages = ceil(int(nb_post) / 25)
-        old_url = get_old_url(get_url_from_subreddit(url))
-        n_crawled = 0
-        for _ in range(nb_pages):
-            if n_crawled == int(nb_post):
-                break
-            response = reddit_request(old_url, self.pool_manager)
-            soup = response.soup()
-            posts = soup.select("div[id^='thing_t3_']")
-            for post in posts:
-                if n_crawled == int(nb_post):
-                    break
-                data = self.get_post_standard_info(post, add_text)
-                if data:
-                    try_author = post.select_one("a[class*='author']")
-                    author = try_author.get_text() if try_author else "Deleted"
-                    post = RedditPost(
-                        title=data["title"],
-                        url=data["url"],
-                        author=author,
-                        author_text=data["author_text"],
-                        points=data["points"],
-                        number_comments=data["number_comments"],
-                        published_date=data["published_date"],
-                        external_link=data["link"],
-                    )
-                    yield post
-                n_crawled += 1
-            old_url = soup.scrape("span[class='next-button'] a", "href")[0]
 
     def get_comments(self, url: str, all):
         m_comments = []
@@ -238,7 +198,7 @@ class RedditScraper(object):
                 if data.id != "":
                     yield data
 
-    def get_user_posts(self, url: str, add_text: bool, nb=25):
+    def get_general_post(self, url: str, type: str, add_text: bool, nb=25):
         nb_pages = ceil(int(nb) / 25)
         n_crawled = 0
         old_url = get_old_url(url)
@@ -251,19 +211,64 @@ class RedditScraper(object):
             for post in posts:
                 if n_crawled == int(nb):
                     break
-                data = self.get_post_standard_info(post, add_text)
-                if data:
-                    sub = post.scrape_one("a[class*='subreddit']", "href")
-                    post = RedditUserPost(
-                        title=data["title"],
-                        url=data["url"],
-                        author_text=data["author_text"],
-                        points=data["points"],
-                        number_comments=data["number_comments"],
-                        published_date=data["published_date"],
-                        external_link=data["link"],
-                        subreddit=sub,
+                list_buttons = post.select_one("ul[class='flat-list buttons']")
+                if len(list_buttons.scrape("span[class='promoted-span']")) == 0:
+                    title = post.force_select_one("a[class*='title']").get_text()
+                    post_url = list_buttons.scrape_one(
+                        "a[class^='bylink comments']", "href"
                     )
+                    n_comments = list_buttons.select_one(
+                        "a[class^='bylink comments']"
+                    ).get_text()
+                    match = re.match(r"(\d+)\s+comments", n_comments)
+                    if match:
+                        n_comments = int(match.group(1))
+                    else:
+                        n_comments = 0
+                    upvote = post.select_one("div[class='score unvoted']").get_text()
+                    if upvote == "•":
+                        upvote = ""
+                    published_date = post.scrape_one("time", "datetime")
+                    link = resolve_relative_url(
+                        post.scrape_one("a[class*='title']", "href")
+                    )
+                    if link == post_url:
+                        link = ""
+                    if add_text:
+                        text_response = reddit_request(post_url, self.pool_manager)
+                        text_soup = text_response.soup()
+                        try_content = text_soup.select_one(
+                            "div[id='siteTable'] div[class^='usertext']"
+                        )
+                        if try_content:
+                            content = try_content.get_text()
+                        else:
+                            content = ""
+                    else:
+                        content = ""
+                    if type == "subreddit":
+                        post = data_posts(
+                            post,
+                            title,
+                            post_url,
+                            content,
+                            upvote,
+                            n_comments,
+                            published_date,
+                            link,
+                        )
+                    else:
+                        post = data_user_posts(
+                            post,
+                            title,
+                            post_url,
+                            content,
+                            upvote,
+                            n_comments,
+                            published_date,
+                            link,
+                        )
+
                     yield post
                 n_crawled += 1
             old_url = soup.scrape("span[class='next-button'] a", "href")[0]

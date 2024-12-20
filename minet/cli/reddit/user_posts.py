@@ -20,6 +20,8 @@ from minet.reddit.exceptions import RedditInvalidTargetError
 def action(cli_args, enricher, loading_bar):
     scraper = RedditScraper()
 
+    type_page = 'user'
+
     for i, row, url in enricher.enumerate_cells(
         cli_args.column, with_rows=True, start=1
     ):
@@ -27,14 +29,14 @@ def action(cli_args, enricher, loading_bar):
             try:
                 if cli_args.number:
                     if cli_args.text:
-                        posts = scraper.get_user_posts(url, True, cli_args.number)
+                        posts = scraper.get_general_post(url, type_page, True, cli_args.number)
                     else:
-                        posts = scraper.get_user_posts(url, False, cli_args.number)
+                        posts = scraper.get_general_post(url, type_page, False, cli_args.number)
                 else:
                     if cli_args.text:
-                        posts = scraper.get_user_posts(url, True)
+                        posts = scraper.get_general_post(url, type_page, True)
                     else:
-                        posts = scraper.get_user_posts(url, False)
+                        posts = scraper.get_general_post(url, type_page, False)
             except RedditInvalidTargetError:
                 loading_bar.print(
                     "the script could not complete normally on line %i" % (i)
