@@ -13,7 +13,7 @@ class RedditPost(TabularRecord):
     points: int
     number_comments: int
     published_date: str
-    link: Optional[str]
+    external_link: Optional[str]
 
 
 @dataclass
@@ -35,5 +35,5 @@ class RedditUserPost(TabularRecord):
     points: int
     number_comments: int
     published_date: str
-    link: str
+    external_link: str
     subreddit: str
