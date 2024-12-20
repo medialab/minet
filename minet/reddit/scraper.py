@@ -94,7 +94,6 @@ class RedditScraper(object):
         return list_comments
 
     def get_posts(self, url: str, add_text: bool, nb_post=25):
-        list_posts = []
         nb_pages = ceil(int(nb_post) / 25)
         old_url = get_old_url(get_url_from_subreddit(url))
         n_crawled = 0
@@ -151,15 +150,12 @@ class RedditScraper(object):
                         published_date=published_date,
                         link=resolve_relative_url(link),
                     )
-
-                    list_posts.append(data)
+                    yield data
                     n_crawled += 1
             old_url = soup.scrape("span[class='next-button'] a", "href")[0]
-        return list(list_posts)
     
 
     def get_comments(self, url: str, all):
-        list_return = []
         m_comments = []
         old_url = get_old_url(url)
         url_limit = old_url + "?limit=500"
@@ -173,7 +169,7 @@ class RedditScraper(object):
             current_id = get_current_id(com)
             comment_url = com.scrape_one("a[class='bylink']", 'href')
             try_author = com.scrape_one("a[class^='author']", 'href')
-            author = try_author.get_text() if try_author else "Deleted"
+            author = try_author if try_author else "Deleted"
             com_points = com.scrape_one("span[class='score unvoted']")
             match = re.search(r"-?\d+\s+point(?:s)?", com_points)
             com_points = int(re.search(r"-?\d+", match.group()).group())
@@ -223,5 +219,4 @@ class RedditScraper(object):
                     comment=com.scrape_one("div[class='md']:not(div.child a)"),
                 )
                 if data.id != "":
-                    list_return.append(data)
-        return list_return
+                    yield data

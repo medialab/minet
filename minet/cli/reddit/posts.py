@@ -41,10 +41,6 @@ def action(cli_args, enricher, loading_bar):
                 )
                 continue
 
-            list_posts = []
             for post in posts:
-                list_posts.append(post)
-
-            for post in list_posts:
                 loading_bar.nested_advance()
                 enricher.writerow(row, post)
