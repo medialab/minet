@@ -99,6 +99,32 @@ REDDIT_USER_POSTS_SUBCOMMAND = command(
     ],
 )
 
+REDDIT_USER_COMMENTS_SUBCOMMAND = command(
+    "user_comments",
+    "minet.cli.reddit.user_comments",
+    title="Minet Reddit User Comments Command",
+    description="""
+        Retrieve reddit comments from a user link.
+    """,
+    epilog="""
+        Example:
+
+        . Searching posts from the user page of u/random_user:
+            $ minet reddit posts https://www.reddit.com/user/random_user/comments/ > random_user_comments.csv
+    """,
+    variadic_input={
+        "dummy_column": "user",
+        "item_label": "user url, user shortcode or user id",
+        "item_label_plural": "user urls, user shortcodes or user ids",
+    },
+    arguments=[
+        {
+            "flags": ["-n", "--number"],
+            "help": "Number of posts to retrieve.",
+            "type": int,
+        },
+    ],
+)
 
 REDDIT_COMMAND = command(
     "reddit",
@@ -112,5 +138,6 @@ REDDIT_COMMAND = command(
         REDDIT_POSTS_SUBCOMMAND,
         REDDIT_COMMENTS_SUBCOMMAND,
         REDDIT_USER_POSTS_SUBCOMMAND,
+        REDDIT_USER_COMMENTS_SUBCOMMAND,
     ],
 )

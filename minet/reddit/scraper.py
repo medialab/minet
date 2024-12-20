@@ -2,7 +2,7 @@ from minet.web import request, create_pool_manager
 from math import ceil
 from ural import get_domain_name, urlpathsplit, is_url
 from time import sleep
-from minet.reddit.types import RedditPost, RedditComment, RedditUserPost
+from minet.reddit.types import RedditPost, RedditComment, RedditUserPost, RedditUserComment
 from minet.reddit.exceptions import RedditInvalidTargetError
 import re
 from urllib.parse import urljoin
@@ -273,5 +273,34 @@ class RedditScraper(object):
                 n_crawled += 1
             old_url = soup.scrape("span[class='next-button'] a", "href")[0]
 
-    # def get_user_comments(self, url: str, nb=25):
-    #     old_url = get_old_url(url)
+    def get_user_comments(self, url: str, nb=25):
+        nb_pages = ceil(int(nb) / 25)
+        n_crawled = 0
+        old_url = get_old_url(url)
+        for _ in range(nb_pages):
+            if n_crawled == int(nb):
+                break
+            response = reddit_request(old_url, self.pool_manager)
+            soup = response.soup()
+            comments = soup.select("[data-type='comment']")
+            for comment in comments:
+                if n_crawled == int(nb):
+                    break
+                post_title = resolve_relative_url(comment.scrape_one("a[class='title']", "href"))
+                post_author = comment.scrape_one("p[class='parent']>a[class^='author']", "href")
+                post_subreddit = comment.scrape_one("a[class^='subreddit']", "href")
+                points = comment.scrape_one("span[class='score unvoted']")
+                published_date = comment.scrape_one("time", "datetime")
+                text = comment.scrape_one("div[class='content'] div[class='md']")
+                comment_url = comment.scrape_one("a[class='bylink']", "href")
+                data = RedditUserComment(
+                    post_title=post_title,
+                    post_author=post_author,
+                    post_subreddit=post_subreddit,
+                    points=points,
+                    published_date=published_date,
+                    text=text,
+                    comment_url=comment_url
+                )
+                yield data
+                n_crawled += 1

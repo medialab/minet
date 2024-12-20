@@ -37,3 +37,14 @@ class RedditUserPost(TabularRecord):
     published_date: str
     external_link: str
     subreddit: str
+
+
+@dataclass
+class RedditUserComment(TabularRecord):
+    post_title: str
+    post_author: str
+    post_subreddit: str
+    points: int
+    published_date: str
+    text: str
+    comment_url: str
