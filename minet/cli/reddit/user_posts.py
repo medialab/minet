@@ -15,7 +15,7 @@ from minet.reddit.exceptions import RedditInvalidTargetError
     title="Scraping user posts",
     unit="groups",
     nested=True,
-    sub_unit="user",
+    sub_unit="posts",
 )
 def action(cli_args, enricher, loading_bar):
     scraper = RedditScraper()

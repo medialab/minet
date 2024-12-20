@@ -232,6 +232,8 @@ class RedditScraper(object):
             soup = response.soup()
             posts = soup.select("div[id^='thing_t3_']")
             for post in posts:
+                if n_crawled == int(nb):
+                    break
                 sub = post.scrape_one("a[class*='subreddit']", "href")
                 title = post.scrape_one("a[class^='title']")
                 points = post.scrape_one("div[class='score unvoted']")
