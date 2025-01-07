@@ -67,16 +67,18 @@ def get_current_id(com):
 
 
 def data_posts(
-    post, title, url, author_text, points, number_comments, published_date, link
+    post, title, url, author_text, real_points, points, scraped_number_comments, number_comments, published_date, link
 ):
     try_author = post.select_one("a[class*='author']")
     author = try_author.get_text() if try_author else "Deleted"
     data = RedditPost(
         title=title,
-        url=url,
+        url=get_new_url(url),
         author=author,
         author_text=author_text,
-        points=points,
+        scraped_points=points,
+        approximated_points=real_points,
+        scraped_number_comments=scraped_number_comments,
         number_comments=number_comments,
         published_date=published_date,
         external_link=link,
@@ -85,14 +87,16 @@ def data_posts(
 
 
 def data_user_posts(
-    post, title, url, author_text, points, number_comments, published_date, link
+    post, title, url, author_text, real_points, points, scraped_number_comments, number_comments, published_date, link
 ):
     sub = post.scrape_one("a[class*='subreddit']", "href")
     data = RedditUserPost(
         title=title,
-        url=url,
+        url=get_new_url(url),
         author_text=author_text,
-        points=points,
+        scraped_points=points,
+        approximated_points=real_points,
+        scraped_number_comments=scraped_number_comments,
         number_comments=number_comments,
         published_date=published_date,
         external_link=link,
@@ -217,17 +221,18 @@ class RedditScraper(object):
                     post_url = list_buttons.scrape_one(
                         "a[class^='bylink comments']", "href"
                     )
-                    n_comments = list_buttons.select_one(
+                    n_comments_scraped = list_buttons.select_one(
                         "a[class^='bylink comments']"
                     ).get_text()
-                    match = re.match(r"(\d+)\s+comments", n_comments)
+                    match = re.match(r"(\d+)\s+comment(s)?", n_comments_scraped)
                     if match:
                         n_comments = int(match.group(1))
                     else:
                         n_comments = 0
                     upvote = post.select_one("div[class='score unvoted']").get_text()
-                    if upvote == "•":
-                        upvote = ""
+                    real_points = "" if upvote == "•" else upvote
+                    if real_points[-1] == "k":
+                        real_points = int(float(real_points[:-1]) * 1000)
                     published_date = post.scrape_one("time", "datetime")
                     link = resolve_relative_url(
                         post.scrape_one("a[class*='title']", "href")
@@ -252,7 +257,9 @@ class RedditScraper(object):
                             title,
                             post_url,
                             content,
+                            real_points,
                             upvote,
+                            n_comments_scraped,
                             n_comments,
                             published_date,
                             link,
@@ -263,7 +270,9 @@ class RedditScraper(object):
                             title,
                             post_url,
                             content,
+                            real_points,
                             upvote,
+                            n_comments_scraped,
                             n_comments,
                             published_date,
                             link,
