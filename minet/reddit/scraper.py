@@ -86,6 +86,12 @@ def get_points(ele):
     return scrapped_points
 
 
+def get_dates(ele):
+    published_date = ele.scrape_one("time[class='']", "datetime")
+    edited_date = ele.scrape_one("time[class='edited-timestamp']", "datetime")
+    return published_date, edited_date
+
+
 def data_posts(
     post,
     title,
@@ -95,6 +101,7 @@ def data_posts(
     scraped_number_comments,
     number_comments,
     published_date,
+    edited_date,
     link,
     error,
 ):
@@ -109,6 +116,7 @@ def data_posts(
         scraped_number_comments=scraped_number_comments,
         number_comments=number_comments,
         published_date=published_date,
+        edited_date=edited_date,
         external_link=link,
         error=error,
     )
@@ -124,6 +132,7 @@ def data_user_posts(
     scraped_number_comments,
     number_comments,
     published_date,
+    edited_date,
     link,
     error,
 ):
@@ -136,6 +145,7 @@ def data_user_posts(
         scraped_number_comments=scraped_number_comments,
         number_comments=number_comments,
         published_date=published_date,
+        edited_date=edited_date,
         external_link=link,
         subreddit=sub,
         error=error,
@@ -198,7 +208,7 @@ class RedditScraper(object):
                 try_author = com.scrape_one("a[class^='author']")
                 author = try_author if try_author else "Deleted"
                 points = get_points(com)
-                published_date = com.scrape_one("time", "datetime")
+                published_date, edited_date = get_dates(com)
                 if "morerecursion" in com.get("class") and all:
                     url_rec = f"https://old.reddit.com{com.scrape_one('a', 'href')}"
                     m_comments = self.get_childs_l500(url_rec, m_comments, parent)
@@ -243,6 +253,7 @@ class RedditScraper(object):
                         parent=parent,
                         points=points,
                         published_date=published_date,
+                        edited_date=edited_date,
                         comment=com.scrape_one("div[class='md']:not(div.child a)"),
                         error=error,
                     )
@@ -276,11 +287,7 @@ class RedditScraper(object):
                     else:
                         n_comments = 0
                     upvote = get_points(post)
-                    # upvote = post.select_one("div[class='score unvoted']").get_text()
-                    # real_points = "" if upvote == "•" else upvote
-                    # if real_points[-1] == "k":
-                    #     real_points = int(float(real_points[:-1]) * 1000)
-                    published_date = post.scrape_one("time", "datetime")
+                    published_date, edited_date = get_dates(post)
                     link = resolve_relative_url(
                         post.scrape_one("a[class*='title']", "href")
                     )
@@ -301,6 +308,7 @@ class RedditScraper(object):
                                     n_comments_scraped,
                                     n_comments,
                                     published_date,
+                                    edited_date,
                                     link,
                                     text_error,
                                 )
@@ -314,6 +322,7 @@ class RedditScraper(object):
                                     n_comments_scraped,
                                     n_comments,
                                     published_date,
+                                    edited_date,
                                     link,
                                     text_error,
                                 )
@@ -336,6 +345,7 @@ class RedditScraper(object):
                             n_comments_scraped,
                             n_comments,
                             published_date,
+                            edited_date,
                             link,
                             error,
                         )
@@ -349,6 +359,7 @@ class RedditScraper(object):
                             n_comments_scraped,
                             n_comments,
                             published_date,
+                            edited_date,
                             link,
                             error,
                         )
@@ -372,6 +383,7 @@ class RedditScraper(object):
                     post_subreddit="",
                     points="",
                     published_date="",
+                    edited_date="",
                     text="",
                     comment_url="",
                     error=error,
@@ -389,7 +401,7 @@ class RedditScraper(object):
                     )
                     post_subreddit = comment.scrape_one("a[class^='subreddit']", "href")
                     points = get_points(comment)
-                    published_date = comment.scrape_one("time", "datetime")
+                    published_date, edited_date = get_dates(comment)
                     text = comment.scrape_one("div[class='content'] div[class='md']")
                     comment_url = comment.scrape_one("a[class='bylink']", "href")
                     data = RedditUserComment(
@@ -398,6 +410,7 @@ class RedditScraper(object):
                         post_subreddit=post_subreddit,
                         points=points,
                         published_date=published_date,
+                        edited_date=edited_date,
                         text=text,
                         comment_url=comment_url,
                         error=error,

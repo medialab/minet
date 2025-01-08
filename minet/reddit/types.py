@@ -14,6 +14,7 @@ class RedditPost(TabularRecord):
     scraped_number_comments: str
     number_comments: int
     published_date: str
+    edited_date: str
     external_link: Optional[str]
     error: str
 
@@ -26,6 +27,7 @@ class RedditComment(TabularRecord):
     parent: str
     points: str
     published_date: str
+    edited_date: str
     comment: str
     error: str
 
@@ -39,6 +41,7 @@ class RedditUserPost(TabularRecord):
     scraped_number_comments: str
     number_comments: int
     published_date: str
+    edited_date: str
     external_link: str
     subreddit: str
     error: str
@@ -51,6 +54,7 @@ class RedditUserComment(TabularRecord):
     post_subreddit: str
     points: int
     published_date: str
+    edited_date: str
     text: str
     comment_url: str
     error: str
