@@ -13,12 +13,6 @@ import re
 from urllib.parse import urljoin
 
 
-def broken_reddit(soup, response):
-    if response.status == 500 and soup.scrape("title") == "reddit broke!":
-        return 0
-    return 1
-
-
 def resolve_relative_url(path):
     return urljoin("https://old.reddit.com", path)
 
@@ -81,12 +75,22 @@ def get_current_id(com):
     return current_id
 
 
+def get_points(ele):
+    scrapped_points = ele.select_one("[class='score unvoted']")
+    score_hidden = ele.select_one("[class='score-hidden']")
+    if not scrapped_points and not score_hidden:
+        return "deleted"
+    scrapped_points = ele.scrape_one("[class='score unvoted']", "title")
+    if not scrapped_points:
+        return "score hidden"
+    return scrapped_points
+
+
 def data_posts(
     post,
     title,
     url,
     author_text,
-    real_points,
     points,
     scraped_number_comments,
     number_comments,
@@ -101,8 +105,7 @@ def data_posts(
         url=get_new_url(url),
         author=author,
         author_text=author_text,
-        scraped_points=points,
-        approximated_points=real_points,
+        points=points,
         scraped_number_comments=scraped_number_comments,
         number_comments=number_comments,
         published_date=published_date,
@@ -117,7 +120,6 @@ def data_user_posts(
     title,
     url,
     author_text,
-    real_points,
     points,
     scraped_number_comments,
     number_comments,
@@ -130,8 +132,7 @@ def data_user_posts(
         title=title,
         url=get_new_url(url),
         author_text=author_text,
-        scraped_points=points,
-        approximated_points=real_points,
+        points=points,
         scraped_number_comments=scraped_number_comments,
         number_comments=number_comments,
         published_date=published_date,
@@ -194,11 +195,9 @@ class RedditScraper(object):
                 parent, com = m_comments.pop()
                 current_id = get_current_id(com)
                 comment_url = com.scrape_one("a[class='bylink']", "href")
-                try_author = com.scrape_one("a[class^='author']", "href")
+                try_author = com.scrape_one("a[class^='author']")
                 author = try_author if try_author else "Deleted"
-                com_points = com.scrape_one("span[class='score unvoted']")
-                match = re.search(r"-?\d+\s+point(?:s)?", com_points)
-                com_points = int(re.search(r"-?\d+", match.group()).group())
+                points = get_points(com)
                 published_date = com.scrape_one("time", "datetime")
                 if "morerecursion" in com.get("class") and all:
                     url_rec = f"https://old.reddit.com{com.scrape_one('a', 'href')}"
@@ -238,11 +237,11 @@ class RedditScraper(object):
                         for ele in child_com:
                             m_comments.append((current_id, ele))
                     data = RedditComment(
-                        comment_url=get_new_url(comment_url),
+                        comment_url=get_new_url(comment_url) if comment_url else None,
                         author=author,
                         id=current_id,
                         parent=parent,
-                        points=com_points,
+                        points=points,
                         published_date=published_date,
                         comment=com.scrape_one("div[class='md']:not(div.child a)"),
                         error=error,
@@ -276,10 +275,11 @@ class RedditScraper(object):
                         n_comments = int(match.group(1))
                     else:
                         n_comments = 0
-                    upvote = post.select_one("div[class='score unvoted']").get_text()
-                    real_points = "" if upvote == "•" else upvote
-                    if real_points[-1] == "k":
-                        real_points = int(float(real_points[:-1]) * 1000)
+                    upvote = get_points(post)
+                    # upvote = post.select_one("div[class='score unvoted']").get_text()
+                    # real_points = "" if upvote == "•" else upvote
+                    # if real_points[-1] == "k":
+                    #     real_points = int(float(real_points[:-1]) * 1000)
                     published_date = post.scrape_one("time", "datetime")
                     link = resolve_relative_url(
                         post.scrape_one("a[class*='title']", "href")
@@ -297,7 +297,6 @@ class RedditScraper(object):
                                     title,
                                     post_url,
                                     "",
-                                    real_points,
                                     upvote,
                                     n_comments_scraped,
                                     n_comments,
@@ -311,7 +310,6 @@ class RedditScraper(object):
                                     title,
                                     post_url,
                                     "",
-                                    real_points,
                                     upvote,
                                     n_comments_scraped,
                                     n_comments,
@@ -334,7 +332,6 @@ class RedditScraper(object):
                             title,
                             post_url,
                             content,
-                            real_points,
                             upvote,
                             n_comments_scraped,
                             n_comments,
@@ -348,7 +345,6 @@ class RedditScraper(object):
                             title,
                             post_url,
                             content,
-                            real_points,
                             upvote,
                             n_comments_scraped,
                             n_comments,
@@ -389,10 +385,10 @@ class RedditScraper(object):
                         comment.scrape_one("a[class='title']", "href")
                     )
                     post_author = comment.scrape_one(
-                        "p[class='parent']>a[class^='author']", "href"
+                        "p[class='parent']>a[class^='author']"
                     )
                     post_subreddit = comment.scrape_one("a[class^='subreddit']", "href")
-                    points = comment.scrape_one("span[class='score unvoted']")
+                    points = get_points(comment)
                     published_date = comment.scrape_one("time", "datetime")
                     text = comment.scrape_one("div[class='content'] div[class='md']")
                     comment_url = comment.scrape_one("a[class='bylink']", "href")

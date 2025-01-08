@@ -10,8 +10,7 @@ class RedditPost(TabularRecord):
     url: str
     author: str
     author_text: Optional[str]
-    scraped_points: str
-    approximated_points: int
+    points: str
     scraped_number_comments: str
     number_comments: int
     published_date: str
@@ -25,7 +24,7 @@ class RedditComment(TabularRecord):
     author: str
     id: str
     parent: str
-    points: int
+    points: str
     published_date: str
     comment: str
     error: str
@@ -36,8 +35,7 @@ class RedditUserPost(TabularRecord):
     title: str
     url: str
     author_text: str
-    scraped_points: str
-    approximated_points: int
+    points: str
     scraped_number_comments: str
     number_comments: int
     published_date: str
