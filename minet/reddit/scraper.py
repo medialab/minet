@@ -87,7 +87,7 @@ def get_points(ele):
 
 
 def get_dates(ele):
-    published_date = ele.scrape_one("time[class='']", "datetime")
+    published_date = ele.scrape_one("time", "datetime")
     edited_date = ele.scrape_one("time[class='edited-timestamp']", "datetime")
     return published_date, edited_date
 
@@ -265,7 +265,7 @@ class RedditScraper(object):
         n_crawled = 0
         old_url = get_old_url(url)
         for _ in range(nb_pages):
-            if n_crawled == int(nb):
+            if n_crawled == int(nb) or not old_url:
                 break
             _, soup, error = reddit_request(old_url, self.pool_manager)
             posts = soup.select("div[id^='thing_t3_']")
@@ -366,7 +366,9 @@ class RedditScraper(object):
 
                     yield post
                 n_crawled += 1
-            old_url = soup.scrape("span[class='next-button'] a", "href")[0]
+            old_url = soup.scrape("span[class='next-button'] a")
+            if old_url:
+                old_url = old_url[0].get("href")
 
     def get_user_comments(self, url: str, nb=25):
         nb_pages = ceil(int(nb) / 25)
