@@ -107,6 +107,8 @@ def data_posts(
 ):
     try_author = post.select_one("a[class*='author']")
     author = try_author.get_text() if try_author else "Deleted"
+    if get_domain_name(link) == "reddit.com":
+        link = ""
     data = RedditPost(
         title=title,
         url=get_new_url(url),
@@ -147,7 +149,7 @@ def data_user_posts(
         published_date=published_date,
         edited_date=edited_date,
         external_link=link,
-        subreddit=sub,
+        subreddit=get_new_url(sub),
         error=error,
     )
     return data
@@ -366,9 +368,7 @@ class RedditScraper(object):
 
                     yield post
                 n_crawled += 1
-            old_url = soup.scrape("span[class='next-button'] a")
-            if old_url:
-                old_url = old_url[0].get("href")
+            old_url = soup.scrape_one("span[class='next-button'] a", "href")
 
     def get_user_comments(self, url: str, nb=25):
         nb_pages = ceil(int(nb) / 25)
@@ -395,9 +395,8 @@ class RedditScraper(object):
                 for comment in comments:
                     if n_crawled == int(nb):
                         break
-                    post_title = resolve_relative_url(
-                        comment.scrape_one("a[class='title']", "href")
-                    )
+                    post_title = comment.scrape_one("a[class='title']")
+                    post_url = comment.scrape_one("a[class='bylink may-blank']", "href")
                     post_author = comment.scrape_one(
                         "p[class='parent']>a[class^='author']"
                     )
@@ -405,17 +404,23 @@ class RedditScraper(object):
                     points = get_points(comment)
                     published_date, edited_date = get_dates(comment)
                     text = comment.scrape_one("div[class='content'] div[class='md']")
+                    link = comment.scrape_one(
+                        "div[class='content'] div[class='md'] a", "href"
+                    )
                     comment_url = comment.scrape_one("a[class='bylink']", "href")
                     data = RedditUserComment(
                         post_title=post_title,
+                        post_url=get_new_url(post_url),
                         post_author=post_author,
-                        post_subreddit=post_subreddit,
+                        post_subreddit=get_new_url(post_subreddit),
                         points=points,
                         published_date=published_date,
                         edited_date=edited_date,
                         text=text,
-                        comment_url=comment_url,
+                        link=link,
+                        comment_url=get_new_url(comment_url),
                         error=error,
                     )
                     yield data
                     n_crawled += 1
+            old_url = soup.scrape_one("span[class='next-button'] a", "href")

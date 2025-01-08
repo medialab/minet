@@ -50,11 +50,13 @@ class RedditUserPost(TabularRecord):
 @dataclass
 class RedditUserComment(TabularRecord):
     post_title: str
+    post_url: str
     post_author: str
     post_subreddit: str
     points: int
     published_date: str
     edited_date: str
     text: str
+    link: str
     comment_url: str
     error: str
