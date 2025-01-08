@@ -1,16 +1,17 @@
-from minet.web import request, create_pool_manager
 from math import ceil
-from ural import get_domain_name, urlpathsplit, is_url
+import re
 from time import sleep
+from ural import get_domain_name, urlpathsplit, is_url
+from urllib.parse import urljoin
+
+from minet.reddit.exceptions import RedditInvalidTargetError
 from minet.reddit.types import (
     RedditPost,
     RedditComment,
     RedditUserPost,
     RedditUserComment,
 )
-from minet.reddit.exceptions import RedditInvalidTargetError
-import re
-from urllib.parse import urljoin
+from minet.web import request, create_pool_manager
 
 
 def resolve_relative_url(path):
@@ -20,13 +21,19 @@ def resolve_relative_url(path):
 def get_old_url(url):
     domain = get_domain_name(url)
     path = urlpathsplit(url)
-    return f"https://old.{domain}/" + "/".join(path) + "/"
+    old_url = f"https://old.{domain}"
+    for ele in path:
+        old_url = urljoin(old_url, f"{ele}/")
+    return old_url
 
 
 def get_new_url(url):
     domain = get_domain_name(url)
     path = urlpathsplit(url)
-    return f"https://www.{domain}/" + "/".join(path) + "/"
+    new_url = f"https://old.{domain}"
+    for ele in path:
+        new_url = urljoin(new_url, f"{ele}/")
+    return new_url
 
 
 def get_url_from_subreddit(name: str):
@@ -34,8 +41,8 @@ def get_url_from_subreddit(name: str):
         return name
     name = name.lstrip("/")
     if name.startswith("r/"):
-        return "https://old.reddit.com/" + name
-    return "https://old.reddit.com/r/" + name
+        return urljoin("https://old.reddit.com/", name)
+    return urljoin("https://old.reddit.com/r/", name)
 
 
 def reddit_request(url, pool_manager):
@@ -265,7 +272,7 @@ class RedditScraper(object):
     def get_general_post(self, url: str, type: str, add_text: bool, nb=25):
         nb_pages = ceil(int(nb) / 25)
         n_crawled = 0
-        old_url = get_old_url(url)
+        old_url = get_old_url(get_url_from_subreddit(url))
         for _ in range(nb_pages):
             if n_crawled == int(nb) or not old_url:
                 break

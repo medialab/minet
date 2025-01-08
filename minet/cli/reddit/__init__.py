@@ -19,6 +19,8 @@ REDDIT_POSTS_SUBCOMMAND = command(
 
         . Searching posts from the subreddit r/france:
             $ minet reddit posts https://www.reddit.com/r/france > r_france_posts.csv
+            $ minet reddit posts france > r_france_posts.csv
+            $ minet reddit posts r/france > r_france_posts.csv
     """,
     variadic_input={
         "dummy_column": "subreddit",
