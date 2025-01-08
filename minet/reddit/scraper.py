@@ -2,10 +2,21 @@ from minet.web import request, create_pool_manager
 from math import ceil
 from ural import get_domain_name, urlpathsplit, is_url
 from time import sleep
-from minet.reddit.types import RedditPost, RedditComment, RedditUserPost, RedditUserComment
+from minet.reddit.types import (
+    RedditPost,
+    RedditComment,
+    RedditUserPost,
+    RedditUserComment,
+)
 from minet.reddit.exceptions import RedditInvalidTargetError
 import re
 from urllib.parse import urljoin
+
+
+def broken_reddit(soup, response):
+    if response.status == 500 and soup.scrape("title") == "reddit broke!":
+        return 0
+    return 1
 
 
 def resolve_relative_url(path):
@@ -37,6 +48,10 @@ def reddit_request(url, pool_manager):
     sleep(1)
     response = request(url, pool_manager=pool_manager)
     soup = response.soup()
+    if response.status == 500 and soup.scrape_one("img", "alt") == "you broke reddit":
+        return response, soup, "broken page"
+    if response.status == 404 and soup.scrape_one("img", "alt") == "banned":
+        return response, soup, "banned"
     if response.status == 404 or (
         soup.scrape("p[id='noresults']") and not soup.scrape("div[class='commentarea']")
     ):
@@ -49,7 +64,7 @@ def reddit_request(url, pool_manager):
         return reddit_request(url)
     if response.status == 429:
         return reddit_request(url)
-    return response
+    return response, soup, None
 
 
 def extract_t1_ids(text):
@@ -67,7 +82,17 @@ def get_current_id(com):
 
 
 def data_posts(
-    post, title, url, author_text, real_points, points, scraped_number_comments, number_comments, published_date, link
+    post,
+    title,
+    url,
+    author_text,
+    real_points,
+    points,
+    scraped_number_comments,
+    number_comments,
+    published_date,
+    link,
+    error,
 ):
     try_author = post.select_one("a[class*='author']")
     author = try_author.get_text() if try_author else "Deleted"
@@ -82,12 +107,23 @@ def data_posts(
         number_comments=number_comments,
         published_date=published_date,
         external_link=link,
+        error=error,
     )
     return data
 
 
 def data_user_posts(
-    post, title, url, author_text, real_points, points, scraped_number_comments, number_comments, published_date, link
+    post,
+    title,
+    url,
+    author_text,
+    real_points,
+    points,
+    scraped_number_comments,
+    number_comments,
+    published_date,
+    link,
+    error,
 ):
     sub = post.scrape_one("a[class*='subreddit']", "href")
     data = RedditUserPost(
@@ -101,6 +137,7 @@ def data_user_posts(
         published_date=published_date,
         external_link=link,
         subreddit=sub,
+        error=error,
     )
     return data
 
@@ -110,8 +147,7 @@ class RedditScraper(object):
         self.pool_manager = create_pool_manager()
 
     def get_childs_l500(self, url, list_comments, parent_id):
-        response = reddit_request(url, self.pool_manager)
-        soup = response.soup()
+        _, soup, _ = reddit_request(url, self.pool_manager)
         comments = soup.select("div[class='commentarea']>div>div[class*='comment']")
         for com in comments:
             child = com.find("div", class_="child")
@@ -136,71 +172,83 @@ class RedditScraper(object):
         m_comments = []
         old_url = get_old_url(url)
         url_limit = old_url + "?limit=500"
-        response = reddit_request(url_limit, self.pool_manager)
-        soup = response.soup()
-        first_comments = soup.select(
-            "div[class='commentarea']>div>div[class*='comment']"
-        )
-        for ele in first_comments:
-            m_comments.append((None, ele))
-        while m_comments:
-            parent, com = m_comments.pop()
-            current_id = get_current_id(com)
-            comment_url = com.scrape_one("a[class='bylink']", "href")
-            try_author = com.scrape_one("a[class^='author']", "href")
-            author = try_author if try_author else "Deleted"
-            com_points = com.scrape_one("span[class='score unvoted']")
-            match = re.search(r"-?\d+\s+point(?:s)?", com_points)
-            com_points = int(re.search(r"-?\d+", match.group()).group())
-            published_date = com.scrape_one("time", "datetime")
-            if "morerecursion" in com.get("class") and all:
-                url_rec = f"https://old.reddit.com{com.scrape_one('a', 'href')}"
-                m_comments = self.get_childs_l500(url_rec, m_comments, parent)
-            elif "morechildren" in com.get("class") and all:
-                a = com.select_one("a")
-                onclick = a["onclick"]
-                id_list = extract_t1_ids(onclick)
-                for id in id_list:
-                    comment_url = f"{old_url}{id}"
-                    m_comments = self.get_childs_l500(
-                        comment_url, m_comments, current_id
+        _, soup, error = reddit_request(url_limit, self.pool_manager)
+        if error:
+            yield RedditComment(
+                comment_url="",
+                author="",
+                id="",
+                parent="",
+                points="",
+                published_date="",
+                comment="",
+                error=error,
+            )
+        else:
+            first_comments = soup.select(
+                "div[class='commentarea']>div>div[class*='comment']"
+            )
+            for ele in first_comments:
+                m_comments.append((None, ele))
+            while m_comments:
+                parent, com = m_comments.pop()
+                current_id = get_current_id(com)
+                comment_url = com.scrape_one("a[class='bylink']", "href")
+                try_author = com.scrape_one("a[class^='author']", "href")
+                author = try_author if try_author else "Deleted"
+                com_points = com.scrape_one("span[class='score unvoted']")
+                match = re.search(r"-?\d+\s+point(?:s)?", com_points)
+                com_points = int(re.search(r"-?\d+", match.group()).group())
+                published_date = com.scrape_one("time", "datetime")
+                if "morerecursion" in com.get("class") and all:
+                    url_rec = f"https://old.reddit.com{com.scrape_one('a', 'href')}"
+                    m_comments = self.get_childs_l500(url_rec, m_comments, parent)
+                elif "morechildren" in com.get("class") and all:
+                    a = com.select_one("a")
+                    onclick = a["onclick"]
+                    id_list = extract_t1_ids(onclick)
+                    for id in id_list:
+                        comment_url = f"{old_url}{id}"
+                        m_comments = self.get_childs_l500(
+                            comment_url, m_comments, current_id
+                        )
+                else:
+                    child = com.find("div", class_="child")
+                    if child.text != "":
+                        child = child.find("div")
+                        if all:
+                            child_com = child.find_all(
+                                "div",
+                                class_=lambda x: x
+                                and (
+                                    "comment" in x
+                                    or "deleted comment" in x
+                                    or "morerecursion" in x
+                                    or "morechildren" in x
+                                ),
+                                recursive=False,
+                            )
+                        else:
+                            child_com = child.find_all(
+                                "div",
+                                class_=lambda x: x
+                                and ("comment" in x or "deleted comment" in x),
+                                recursive=False,
+                            )
+                        for ele in child_com:
+                            m_comments.append((current_id, ele))
+                    data = RedditComment(
+                        comment_url=get_new_url(comment_url),
+                        author=author,
+                        id=current_id,
+                        parent=parent,
+                        points=com_points,
+                        published_date=published_date,
+                        comment=com.scrape_one("div[class='md']:not(div.child a)"),
+                        error=error,
                     )
-            else:
-                child = com.find("div", class_="child")
-                if child.text != "":
-                    child = child.find("div")
-                    if all:
-                        child_com = child.find_all(
-                            "div",
-                            class_=lambda x: x
-                            and (
-                                "comment" in x
-                                or "deleted comment" in x
-                                or "morerecursion" in x
-                                or "morechildren" in x
-                            ),
-                            recursive=False,
-                        )
-                    else:
-                        child_com = child.find_all(
-                            "div",
-                            class_=lambda x: x
-                            and ("comment" in x or "deleted comment" in x),
-                            recursive=False,
-                        )
-                    for ele in child_com:
-                        m_comments.append((current_id, ele))
-                data = RedditComment(
-                    comment_url=comment_url,
-                    author=author,
-                    id=current_id,
-                    parent=parent,
-                    points=com_points,
-                    published_date=published_date,
-                    comment=com.scrape_one("div[class='md']:not(div.child a)"),
-                )
-                if data.id != "":
-                    yield data
+                    if data.id != "":
+                        yield data
 
     def get_general_post(self, url: str, type: str, add_text: bool, nb=25):
         nb_pages = ceil(int(nb) / 25)
@@ -209,8 +257,7 @@ class RedditScraper(object):
         for _ in range(nb_pages):
             if n_crawled == int(nb):
                 break
-            response = reddit_request(old_url, self.pool_manager)
-            soup = response.soup()
+            _, soup, error = reddit_request(old_url, self.pool_manager)
             posts = soup.select("div[id^='thing_t3_']")
             for post in posts:
                 if n_crawled == int(nb):
@@ -240,8 +287,38 @@ class RedditScraper(object):
                     if link == post_url:
                         link = ""
                     if add_text:
-                        text_response = reddit_request(post_url, self.pool_manager)
-                        text_soup = text_response.soup()
+                        _, text_soup, text_error = reddit_request(
+                            post_url, self.pool_manager
+                        )
+                        if text_error:
+                            if type == "subreddit":
+                                yield data_posts(
+                                    post,
+                                    title,
+                                    post_url,
+                                    "",
+                                    real_points,
+                                    upvote,
+                                    n_comments_scraped,
+                                    n_comments,
+                                    published_date,
+                                    link,
+                                    text_error,
+                                )
+                            else:
+                                yield data_user_posts(
+                                    post,
+                                    title,
+                                    post_url,
+                                    "",
+                                    real_points,
+                                    upvote,
+                                    n_comments_scraped,
+                                    n_comments,
+                                    published_date,
+                                    link,
+                                    text_error,
+                                )
                         try_content = text_soup.select_one(
                             "div[id='siteTable'] div[class^='usertext']"
                         )
@@ -263,6 +340,7 @@ class RedditScraper(object):
                             n_comments,
                             published_date,
                             link,
+                            error,
                         )
                     else:
                         post = data_user_posts(
@@ -276,6 +354,7 @@ class RedditScraper(object):
                             n_comments,
                             published_date,
                             link,
+                            error,
                         )
 
                     yield post
@@ -289,27 +368,43 @@ class RedditScraper(object):
         for _ in range(nb_pages):
             if n_crawled == int(nb):
                 break
-            response = reddit_request(old_url, self.pool_manager)
-            soup = response.soup()
-            comments = soup.select("[data-type='comment']")
-            for comment in comments:
-                if n_crawled == int(nb):
-                    break
-                post_title = resolve_relative_url(comment.scrape_one("a[class='title']", "href"))
-                post_author = comment.scrape_one("p[class='parent']>a[class^='author']", "href")
-                post_subreddit = comment.scrape_one("a[class^='subreddit']", "href")
-                points = comment.scrape_one("span[class='score unvoted']")
-                published_date = comment.scrape_one("time", "datetime")
-                text = comment.scrape_one("div[class='content'] div[class='md']")
-                comment_url = comment.scrape_one("a[class='bylink']", "href")
-                data = RedditUserComment(
-                    post_title=post_title,
-                    post_author=post_author,
-                    post_subreddit=post_subreddit,
-                    points=points,
-                    published_date=published_date,
-                    text=text,
-                    comment_url=comment_url
+            _, soup, error = reddit_request(old_url, self.pool_manager)
+            if error:
+                yield RedditUserComment(
+                    post_title="",
+                    post_author="",
+                    post_subreddit="",
+                    points="",
+                    published_date="",
+                    text="",
+                    comment_url="",
+                    error=error,
                 )
-                yield data
-                n_crawled += 1
+            else:
+                comments = soup.select("[data-type='comment']")
+                for comment in comments:
+                    if n_crawled == int(nb):
+                        break
+                    post_title = resolve_relative_url(
+                        comment.scrape_one("a[class='title']", "href")
+                    )
+                    post_author = comment.scrape_one(
+                        "p[class='parent']>a[class^='author']", "href"
+                    )
+                    post_subreddit = comment.scrape_one("a[class^='subreddit']", "href")
+                    points = comment.scrape_one("span[class='score unvoted']")
+                    published_date = comment.scrape_one("time", "datetime")
+                    text = comment.scrape_one("div[class='content'] div[class='md']")
+                    comment_url = comment.scrape_one("a[class='bylink']", "href")
+                    data = RedditUserComment(
+                        post_title=post_title,
+                        post_author=post_author,
+                        post_subreddit=post_subreddit,
+                        points=points,
+                        published_date=published_date,
+                        text=text,
+                        comment_url=comment_url,
+                        error=error,
+                    )
+                    yield data
+                    n_crawled += 1

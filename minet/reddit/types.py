@@ -16,6 +16,7 @@ class RedditPost(TabularRecord):
     number_comments: int
     published_date: str
     external_link: Optional[str]
+    error: str
 
 
 @dataclass
@@ -27,6 +28,7 @@ class RedditComment(TabularRecord):
     points: int
     published_date: str
     comment: str
+    error: str
 
 
 @dataclass
@@ -41,6 +43,7 @@ class RedditUserPost(TabularRecord):
     published_date: str
     external_link: str
     subreddit: str
+    error: str
 
 
 @dataclass
@@ -52,3 +55,4 @@ class RedditUserComment(TabularRecord):
     published_date: str
     text: str
     comment_url: str
+    error: str
