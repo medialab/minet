@@ -25,10 +25,7 @@ def action(cli_args, enricher, loading_bar):
     ):
         with loading_bar.step(url):
             try:
-                if cli_args.all:
-                    comments = scraper.get_comments(url, True)
-                else:
-                    comments = scraper.get_comments(url, False)
+                comments = scraper.get_comments(url, cli_args.all)
 
             except RedditInvalidTargetError:
                 loading_bar.print(

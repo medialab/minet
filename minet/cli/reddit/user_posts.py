@@ -28,19 +28,12 @@ def action(cli_args, enricher, loading_bar):
         with loading_bar.step(url):
             try:
                 if cli_args.number:
-                    if cli_args.text:
-                        posts = scraper.get_general_post(
-                            url, type_page, True, cli_args.number
-                        )
-                    else:
-                        posts = scraper.get_general_post(
-                            url, type_page, False, cli_args.number
-                        )
+                    posts = scraper.get_general_post(
+                        url, type_page, cli_args.text, cli_args.number
+                    )
                 else:
-                    if cli_args.text:
-                        posts = scraper.get_general_post(url, type_page, True)
-                    else:
-                        posts = scraper.get_general_post(url, type_page, False)
+                    posts = scraper.get_general_post(url, type_page, cli_args.text)
+
             except RedditInvalidTargetError:
                 loading_bar.print(
                     "the script could not complete normally on line %i" % (i)
