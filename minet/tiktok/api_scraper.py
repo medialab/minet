@@ -31,7 +31,7 @@ from minet.tiktok.types import TiktokVideo
 
 def forge_video_search_url(query, offset, search_id=None):
     url = (
-        "https://www.tiktok.com/api/search/general/full/?aid=1988&keyword=%s&offset=%s"
+        "https://t.tiktok.com/api/search/general/full/?aid=1988&keyword=%s&offset=%s"
         % (quote(query), offset)
     )
 

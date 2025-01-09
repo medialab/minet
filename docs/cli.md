@@ -44,6 +44,7 @@ _Platform-related commands_
 - [instagram (insta)](#instagram)
   - [comments](#comments-1)
   - [hashtag](#hashtag)
+  - [location](#location)
   - [post-infos](#post-infos)
   - [user-followers](#user-followers)
   - [user-following](#user-following)
@@ -167,7 +168,7 @@ Positional Arguments:
   {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}
                                 Name of the browser from which to grab cookies.
 
-Optional Arguments:
+Options:
   --csv                         Whether to format the output as CSV. If --url is
                                 set, will output the cookie's morsels as CSV.
   --url URL                     If given, only returns full cookie header value
@@ -231,7 +232,7 @@ Positional Arguments:
                                 column containing start urls when using
                                 -i/--input. Defaults to "url".
 
-Optional Arguments:
+Options:
   -z, --compress-on-disk        Whether to compress the downloaded files when
                                 saving files on disk.
   --compress-transfer           Whether to send a "Accept-Encoding" header
@@ -412,7 +413,7 @@ Positional Arguments:
                                 column containing start urls when using
                                 -i/--input. Defaults to "url".
 
-Optional Arguments:
+Options:
   -z, --compress-on-disk        Whether to compress the downloaded files when
                                 saving files on disk.
   --compress-transfer           Whether to send a "Accept-Encoding" header
@@ -598,7 +599,7 @@ Positional Arguments:
   url_or_url_column             Single url to process or name of the CSV column
                                 containing urls when using -i/--input.
 
-Optional Arguments:
+Options:
   -z, --compress-on-disk        Whether to compress the contents.
   --compress-transfer           Whether to send a "Accept-Encoding" header
                                 asking for a compressed response. Usually better
@@ -837,7 +838,7 @@ Positional Arguments:
                                 containing paths when using -i/--input. Defaults
                                 to "path".
 
-Optional Arguments:
+Options:
   --body-column BODY_COLUMN     Name of the CSV column containing html bodies.
                                 Defaults to `body`.
   --chunk-size CHUNK_SIZE       Chunk size for multiprocessing. Defaults to `1`.
@@ -973,7 +974,7 @@ Positional Arguments:
   url_or_url_column             Single url to process or name of the CSV column
                                 containing urls when using -i/--input.
 
-Optional Arguments:
+Options:
   --canonicalize                Whether to extract the canonical url from the
                                 html source code of the web page if found.
                                 Requires to buffer part of the response body, so
@@ -1162,7 +1163,7 @@ Positional Arguments:
                                 containing paths when using -i/--input. Defaults
                                 to "path".
 
-Optional Arguments:
+Options:
   --base-url BASE_URL           Base url to use if --url-column is not valid.
   --body-column BODY_COLUMN     Name of the CSV column containing html bodies.
                                 Defaults to `body`.
@@ -1325,7 +1326,7 @@ Positional Arguments:
   url_or_url_column             Single url to process or name of the CSV column
                                 containing urls when using -i/--input.
 
-Optional Arguments:
+Options:
   --adblock                     Whether to use the ublock-origin browser
                                 extension.
   --automatic-consent           Whether to use the "I still don't care about
@@ -1478,7 +1479,7 @@ Positional Arguments:
   column                        Name of the column containing text or html.
   input                         Target CSV file.
 
-Optional Arguments:
+Options:
   --base-url BASE_URL           Base url used to resolve relative urls.
   --from {html,text}            Extract urls from which kind of source? Defaults
                                 to `text`.
@@ -1539,7 +1540,7 @@ Positional Arguments:
   input2                        Path to the second file. Will understand `-` as
                                 stdin.
 
-Optional Arguments:
+Options:
   -p, --match-column-prefix MATCH_COLUMN_PREFIX
                                 Optional prefix to add to the first file's
                                 column names to avoid conflicts. Defaults to ``.
@@ -1605,7 +1606,7 @@ Positional Arguments:
   url_or_url_column             Single url to process or name of the CSV column
                                 containing urls when using -i/--input.
 
-Optional Arguments:
+Options:
   --facebook                    Whether to consider and parse the given urls as
                                 coming from Facebook.
   --fix-common-mistakes, --dont-fix-common-mistakes
@@ -1795,7 +1796,7 @@ Usage: minet facebook [-h]
 
 Collect data from Facebook.
 
-Optional Arguments:
+Options:
   -h, --help                    show this help message and exit
 
 Subcommands:
@@ -1830,7 +1831,7 @@ Positional Arguments:
                                 column containing post urls when using
                                 -i/--input.
 
-Optional Arguments:
+Options:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -1961,7 +1962,7 @@ Positional Arguments:
                                 column containing post urls when using
                                 -i/--input.
 
-Optional Arguments:
+Options:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -2092,7 +2093,7 @@ Positional Arguments:
                                 column containing group urls when using
                                 -i/--input.
 
-Optional Arguments:
+Options:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -2196,7 +2197,7 @@ Positional Arguments:
   post_url_or_post_url_column   Single post to process or name of the CSV column
                                 containing posts when using -i/--input.
 
-Optional Arguments:
+Options:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -2300,7 +2301,7 @@ Positional Arguments:
   url_or_url_column             Single url to process or name of the CSV column
                                 containing urls when using -i/--input.
 
-Optional Arguments:
+Options:
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -2386,7 +2387,7 @@ Positional Arguments:
   user_url_or_user_url_column   Single user to process or name of the CSV column
                                 containing users when using -i/--input.
 
-Optional Arguments:
+Options:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -2474,7 +2475,7 @@ Usage: minet google [-h] {sheets} ...
 
 Collect data from Google.
 
-Optional Arguments:
+Options:
   -h, --help  show this help message and exit
 
 Subcommands:
@@ -2512,7 +2513,7 @@ Positional Arguments:
   url                           Url, sharing url or id of the spreadsheet to
                                 export.
 
-Optional Arguments:
+Options:
   -a, --authuser AUTHUSER       Connected google account number to use.
   -c, --cookie COOKIE           Google Drive cookie or browser from which to
                                 extract it (supports "firefox", "chrome",
@@ -2574,7 +2575,7 @@ a Hyphe crawl from a corpus exported in CSV.
 Positional Arguments:
   corpus                        Path to the Hyphe corpus exported to CSV.
 
-Optional Arguments:
+Options:
   -z, --compress-on-disk        Whether to compress the downloaded files when
                                 saving files on disk.
   --compress-transfer           Whether to send a "Accept-Encoding" header
@@ -2731,7 +2732,7 @@ Positional Arguments:
   corpus                        Id of the corpus.
   webentities                   CSV file of webentities (exported from Hyphe).
 
-Optional Arguments:
+Options:
   --password PASSWORD           The corpus's password if required.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
@@ -2776,7 +2777,7 @@ Positional Arguments:
   url                           Url of the Hyphe API.
   corpus                        Id of the corpus.
 
-Optional Arguments:
+Options:
   --password PASSWORD           The corpus's password if required.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
@@ -2820,7 +2821,7 @@ Positional Arguments:
   url                           Url of the Hyphe API.
   corpus                        Id of the corpus.
 
-Optional Arguments:
+Options:
   --body                        Whether to download pages body.
   -O, --output-dir OUTPUT_DIR   Output directory for dumped files. Will default
                                 to some name based on corpus name.
@@ -2870,7 +2871,7 @@ Positional Arguments:
   url                           Url of the Hyphe API.
   corpus                        Id of the corpus.
 
-Optional Arguments:
+Options:
   --password PASSWORD           The corpus's password if required.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
@@ -2916,7 +2917,7 @@ Positional Arguments:
   tag_columns                   Columns, separated by comma, to use as tags.
   data                          CSV file of webentities (exported from Hyphe).
 
-Optional Arguments:
+Options:
   --password PASSWORD           The corpus's password if required.
   --separator SEPARATOR         Separator use to split multiple tag values in
                                 the same column. Defaults to `|`.
@@ -2953,14 +2954,14 @@ Examples:
 Usage: minet instagram [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                        [--refresh-per-second REFRESH_PER_SECOND]
                        [--simple-progress]
-                       {comments,hashtag,post-infos,user-followers,user-following,user-infos,user-posts}
+                       {comments,hashtag,location,post-infos,user-followers,user-following,user-infos,user-posts}
                        ...
 
 # Minet Instagram Command
 
 Gather data from Instagram.
 
-Optional Arguments:
+Options:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -2986,7 +2987,7 @@ Optional Arguments:
   -h, --help                    show this help message and exit
 
 Subcommands:
-  {comments,hashtag,post-infos,user-followers,user-following,user-infos,user-posts}
+  {comments,hashtag,location,post-infos,user-followers,user-following,user-infos,user-posts}
                                 Subcommand to use.
 ```
 
@@ -3018,7 +3019,7 @@ Positional Arguments:
                                 post urls, post shortcodes or post ids when
                                 using -i/--input.
 
-Optional Arguments:
+Options:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -3124,7 +3125,7 @@ Positional Arguments:
                                 column containing hashtags when using
                                 -i/--input.
 
-Optional Arguments:
+Options:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -3200,6 +3201,113 @@ how to use the command with a CSV file?
     $ minet instagram hashtag "value1,value2" --explode ","
 ```
 
+### location
+
+```
+Usage: minet instagram location [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
+                                [--refresh-per-second REFRESH_PER_SECOND]
+                                [--simple-progress] [-l LIMIT] [-i INPUT]
+                                [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                                [-o OUTPUT]
+                                location_or_location_column
+
+# Instagram location
+
+Scrape Instagram posts with a given location id.
+
+This requires to be logged in to an Instagram account, so
+by default this command will attempt to grab the relevant
+authentication cookies from a local Firefox browser.
+
+If you want to grab cookies from another browser or want
+to directly pass the cookie as a string, check out the
+-c/--cookie flag.
+
+display_url is not the media url, but a thumbnail of the post.
+There is no way with this command to get the media urls.
+
+Positional Arguments:
+  location_or_location_column   Single location to process or name of the CSV
+                                column containing locations when using
+                                -i/--input.
+
+Options:
+  -c, --cookie COOKIE           Authenticated cookie to use or browser from
+                                which to extract it (supports "firefox",
+                                "chrome", "chromium", "opera" and "edge").
+                                Defaults to `firefox`. Can also be configured in
+                                a .minetrc file as "instagram.cookie" or read
+                                from the MINET_INSTAGRAM_COOKIE env variable.
+  -l, --limit LIMIT             Maximum number of posts to retrieve per
+                                location.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the locations you want to process. Will consider
+                                `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Example:
+
+. Searching posts with the location id for Milan, Italy:
+    $ minet instagram location 213050058 > 213050058_posts.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet instagram location "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet instagram location column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xan search -s col . | minet instagram location column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet instagram location column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet instagram location "value1,value2" --explode ","
+```
+
 ### post-infos
 
 ```
@@ -3233,7 +3341,7 @@ Positional Arguments:
                                 post urls, post shortcodes or post ids when
                                 using -i/--input.
 
-Optional Arguments:
+Options:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -3347,7 +3455,7 @@ Positional Arguments:
                                 or name of the CSV column containing usernames,
                                 user urls or user ids when using -i/--input.
 
-Optional Arguments:
+Options:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -3460,7 +3568,7 @@ Positional Arguments:
                                 or name of the CSV column containing usernames,
                                 user urls or user ids when using -i/--input.
 
-Optional Arguments:
+Options:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -3571,7 +3679,7 @@ Positional Arguments:
                                 or name of the CSV column containing usernames,
                                 user urls or user ids when using -i/--input.
 
-Optional Arguments:
+Options:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -3685,7 +3793,7 @@ Positional Arguments:
                                 or name of the CSV column containing usernames,
                                 user urls or user ids when using -i/--input.
 
-Optional Arguments:
+Options:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -3782,7 +3890,7 @@ Positional Arguments:
                                 the CSV column containing Mediacloud media ids
                                 when using -i/--input.
 
-Optional Arguments:
+Options:
   --feeds FEEDS                 If given, path of the CSV file listing media RSS
                                 feeds.
   -t, --token TOKEN             Mediacloud API token (also called "key"
@@ -3875,7 +3983,7 @@ https://mediacloud.org/support/query-guide
 Positional Arguments:
   query                         Search query.
 
-Optional Arguments:
+Options:
   -c, --collections COLLECTIONS
                                 List of collection ids to search, separated by
                                 commas.
@@ -3938,7 +4046,7 @@ Retrieves the list of stories from a mediacloud topic.
 Positional Arguments:
   topic_id                      Id of the topic.
 
-Optional Arguments:
+Options:
   --from-media-id FROM_MEDIA_ID
                                 Return only stories that are linked from stories
                                 in the given media_id.
@@ -3992,7 +4100,7 @@ Positional Arguments:
                                 the CSV column containing channel names / urls
                                 when using -i/--input.
 
-Optional Arguments:
+Options:
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `0.5`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -4078,7 +4186,7 @@ Positional Arguments:
                                 the CSV column containing channel names / urls
                                 when using -i/--input.
 
-Optional Arguments:
+Options:
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `0.5`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -4153,7 +4261,7 @@ Usage: minet tiktok [-h] {search-videos} ...
 
 Gather data from Tiktok.
 
-Optional Arguments:
+Options:
   -h, --help       show this help message and exit
 
 Subcommands:
@@ -4197,7 +4305,7 @@ Positional Arguments:
                                 CSV column containing tiktok keywords when using
                                 -i/--input.
 
-Optional Arguments:
+Options:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -4332,7 +4440,7 @@ Positional Arguments:
                                 CSV column containing tweet urls or ids when
                                 using -i/--input.
 
-Optional Arguments:
+Options:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -4456,7 +4564,7 @@ Positional Arguments:
                                 Twitter account screen names or ids when using
                                 -i/--input.
 
-Optional Arguments:
+Options:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -4578,7 +4686,7 @@ Positional Arguments:
                                 column containing user ids when using
                                 -i/--input.
 
-Optional Arguments:
+Options:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -4678,7 +4786,7 @@ Positional Arguments:
                                 Twitter account screen names or ids when using
                                 -i/--input.
 
-Optional Arguments:
+Options:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -4793,7 +4901,7 @@ Positional Arguments:
                                 of the CSV column containing Twitter list ids or
                                 urls when using -i/--input.
 
-Optional Arguments:
+Options:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -4902,7 +5010,7 @@ Positional Arguments:
                                 of the CSV column containing Twitter list ids or
                                 urls when using -i/--input.
 
-Optional Arguments:
+Options:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -5011,7 +5119,7 @@ Positional Arguments:
                                 column containing tweet ids when using
                                 -i/--input.
 
-Optional Arguments:
+Options:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -5152,7 +5260,7 @@ Positional Arguments:
   query_or_query_column         Single query to process or name of the CSV
                                 column containing queries when using -i/--input.
 
-Optional Arguments:
+Options:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -5280,7 +5388,7 @@ Positional Arguments:
                                 CSV column containing tweet urls or ids when
                                 using -i/--input.
 
-Optional Arguments:
+Options:
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -5376,7 +5484,7 @@ Positional Arguments:
   query_or_query_column         Single query to process or name of the CSV
                                 column containing queries when using -i/--input.
 
-Optional Arguments:
+Options:
   --academic                    Flag to add if you want to use your academic
                                 research access (in order to search the complete
                                 history of public tweets).
@@ -5540,7 +5648,7 @@ Positional Arguments:
   query_or_query_column         Single query to process or name of the CSV
                                 column containing queries when using -i/--input.
 
-Optional Arguments:
+Options:
   --academic                    Flag to add if you want to use your academic
                                 research access (in order to search the complete
                                 history of public tweets).
@@ -5669,7 +5777,7 @@ Positional Arguments:
                                 column containing tweet ids when using
                                 -i/--input.
 
-Optional Arguments:
+Options:
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -5759,7 +5867,7 @@ Positional Arguments:
                                 CSV column containing Twitter users when using
                                 -i/--input.
 
-Optional Arguments:
+Options:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -5879,7 +5987,7 @@ Positional Arguments:
   query_or_query_column         Single query to process or name of the CSV
                                 column containing queries when using -i/--input.
 
-Optional Arguments:
+Options:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -5997,7 +6105,7 @@ Positional Arguments:
                                 Twitter account screen names or ids when using
                                 -i/--input.
 
-Optional Arguments:
+Options:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -6120,7 +6228,7 @@ Positional Arguments:
   page_or_page_column           Single page to process or name of the CSV column
                                 containing pages when using -i/--input.
 
-Optional Arguments:
+Options:
   --access ACCESS               Get pageviews by access. Defaults to
                                 `all-access`.
   --agent AGENT                 Get pageviews by target agent. Defaults to
@@ -6217,7 +6325,7 @@ Positional Arguments:
                                 CSV column containing video urls or ids when
                                 using -i/--input.
 
-Optional Arguments:
+Options:
   -c, --collapse                Use this flag to only emit one line per video,
                                 with the subtitle lines joined together in a
                                 single cell. Note that this means losing start &
@@ -6318,7 +6426,7 @@ Positional Arguments:
                                 column containing channels when using
                                 -i/--input.
 
-Optional Arguments:
+Options:
   --end-time END_TIME           The newest UTC datetime from which the videos
                                 will be retrieved (end-time is excluded).
                                 Warning: videos more recent than end-time will
@@ -6432,7 +6540,7 @@ Positional Arguments:
                                 column containing channels when using
                                 -i/--input.
 
-Optional Arguments:
+Options:
   -k, --key KEY                 YouTube API Data dashboard API key. Can be used
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
@@ -6528,7 +6636,7 @@ Positional Arguments:
   video_or_video_column         Single video to process or name of the CSV
                                 column containing videos when using -i/--input.
 
-Optional Arguments:
+Options:
   -k, --key KEY                 YouTube API Data dashboard API key. Can be used
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
@@ -6624,7 +6732,7 @@ Positional Arguments:
   query_or_query_column         Single query to process or name of the CSV
                                 column containing queries when using -i/--input.
 
-Optional Arguments:
+Options:
   -k, --key KEY                 YouTube API Data dashboard API key. Can be used
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
@@ -6718,7 +6826,7 @@ Positional Arguments:
   video_or_video_column         Single video to process or name of the CSV
                                 column containing videos when using -i/--input.
 
-Optional Arguments:
+Options:
   -k, --key KEY                 YouTube API Data dashboard API key. Can be used
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
