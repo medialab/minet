@@ -13,7 +13,7 @@ from minet.reddit.exceptions import RedditInvalidTargetError
 @with_enricher_and_loading_bar(
     headers=RedditComment,
     title="Scraping comments",
-    unit="groups",
+    unit="pages",
     nested=True,
     sub_unit="comments",
 )
