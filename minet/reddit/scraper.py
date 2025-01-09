@@ -56,9 +56,10 @@ def reddit_request(url, pool_manager):
             return response, soup, "broken page"
         if response.status == 404 and soup.scrape_one("img", "alt") == "banned":
             return response, soup, "banned"
-        if response.status == 404 or (
-            soup.scrape("p[id='noresults']")
-            and not soup.scrape("div[class='commentarea']")
+        if (
+            soup.scrape_one("span.pagename.selected") == "page not found"
+            or "search?q=" in url
+            and soup.scrape_one("p.error")
         ):
             raise RedditInvalidTargetError
         remaining_requests = float(response.headers["x-ratelimit-remaining"])
@@ -116,7 +117,7 @@ def data_posts(
     error,
 ):
     try_author = post.select_one("a[class*='author']")
-    author = try_author.get_text() if try_author else "Deleted"
+    author = try_author.get_text() if try_author else "[Deleted]"
     if get_domain_name(link) == "reddit.com":
         link = ""
     data = RedditPost(
@@ -216,10 +217,14 @@ class RedditScraper(object):
             while m_comments:
                 parent, com = m_comments.pop()
                 current_id = get_current_id(com)
-                comment_url = com.scrape_one("a[class='bylink']", "href")
-                try_author = com.scrape_one("a[class^='author']")
-                author = try_author if try_author else "Deleted"
-                points = get_points(com)
+                if com.get("class") == " thing noncollapsed   deleted comment ":
+                    comment_url = None
+                    author = "[Deleted]"
+                    points = None
+                else:
+                    comment_url = com.scrape_one("a[class='bylink']", "href")
+                    author = com.scrape_one("a[class^='author']")
+                    points = get_points(com)
                 published_date, edited_date = get_dates(com)
                 if "morerecursion" in com.get("class") and all:
                     url_rec = f"https://old.reddit.com{com.scrape_one('a', 'href')}"
@@ -272,17 +277,16 @@ class RedditScraper(object):
                     if data.id != "":
                         yield data
 
-    def get_general_post(self, url: str, type: str, add_text: bool, nb=25):
-        nb_pages = ceil(int(nb) / 25)
+    def get_general_post(self, url: str, type: str, add_text: bool, limit: int):
         n_crawled = 0
         old_url = get_old_url(get_url_from_subreddit(url))
-        for _ in range(nb_pages):
-            if n_crawled == int(nb) or not old_url:
+        while old_url and (limit is None or n_crawled < limit):
+            if limit is not None and n_crawled == limit:
                 break
             _, soup, error = reddit_request(old_url, self.pool_manager)
             posts = soup.select("div[id^='thing_t3_']")
             for post in posts:
-                if n_crawled == int(nb):
+                if limit is not None and n_crawled == limit:
                     break
                 list_buttons = post.select_one("ul[class='flat-list buttons']")
                 if len(list_buttons.scrape("span[class='promoted-span']")) == 0:
@@ -380,12 +384,11 @@ class RedditScraper(object):
                 n_crawled += 1
             old_url = soup.scrape_one("span[class='next-button'] a", "href")
 
-    def get_user_comments(self, url: str, nb=25):
-        nb_pages = ceil(int(nb) / 25)
+    def get_user_comments(self, url: str, limit: int):
         n_crawled = 0
         old_url = get_old_url(url)
-        for _ in range(nb_pages):
-            if n_crawled == int(nb):
+        while old_url and (limit is None or n_crawled < limit):
+            if limit is not None and n_crawled == limit:
                 break
             _, soup, error = reddit_request(old_url, self.pool_manager)
             if error:
@@ -403,7 +406,7 @@ class RedditScraper(object):
             else:
                 comments = soup.select("[data-type='comment']")
                 for comment in comments:
-                    if n_crawled == int(nb):
+                    if limit is not None and n_crawled == limit:
                         break
                     post_title = comment.scrape_one("a[class='title']")
                     post_url = comment.scrape_one("a[class='bylink may-blank']", "href")

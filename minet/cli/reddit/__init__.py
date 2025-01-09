@@ -29,8 +29,8 @@ REDDIT_POSTS_SUBCOMMAND = command(
     },
     arguments=[
         {
-            "flags": ["-n", "--number"],
-            "help": "Number of posts to retrieve.",
+            "flags": ["-l", "--limit"],
+            "help": "Maximum number of posts to retrieve.",
             "type": int,
         },
         {
@@ -89,8 +89,8 @@ REDDIT_USER_POSTS_SUBCOMMAND = command(
     },
     arguments=[
         {
-            "flags": ["-n", "--number"],
-            "help": "Number of posts to retrieve.",
+            "flags": ["-l", "--limit"],
+            "help": "Maximum number of posts to retrieve.",
             "type": int,
         },
         {
@@ -121,8 +121,8 @@ REDDIT_USER_COMMENTS_SUBCOMMAND = command(
     },
     arguments=[
         {
-            "flags": ["-n", "--number"],
-            "help": "Number of comments to retrieve.",
+            "flags": ["-l", "--limit"],
+            "help": "Maximum number of comments to retrieve.",
             "type": int,
         },
     ],
