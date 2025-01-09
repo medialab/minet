@@ -1,4 +1,3 @@
-from math import ceil
 import re
 from time import sleep
 from ural import get_domain_name, urlpathsplit, is_url
