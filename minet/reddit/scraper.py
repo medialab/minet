@@ -30,7 +30,7 @@ def get_old_url(url):
 def get_new_url(url):
     domain = get_domain_name(url)
     path = urlpathsplit(url)
-    new_url = f"https://old.{domain}"
+    new_url = f"https://www.{domain}"
     for ele in path:
         new_url = urljoin(new_url, f"{ele}/")
     return new_url
