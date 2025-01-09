@@ -24,8 +24,8 @@ REDDIT_POSTS_SUBCOMMAND = command(
     """,
     variadic_input={
         "dummy_column": "subreddit",
-        "item_label": "subreddit url, subreddit shortcode or subreddit id",
-        "item_label_plural": "subreddit urls, subreddit shortcodes or subreddits ids",
+        "item_label": "subreddit url, shortcode or id",
+        "item_label_plural": "subreddit urls, shortcodes or ids",
     },
     arguments=[
         {
@@ -57,8 +57,8 @@ REDDIT_COMMENTS_SUBCOMMAND = command(
     """,
     variadic_input={
         "dummy_column": "post",
-        "item_label": "post url, post shortcode or post id",
-        "item_label_plural": "posts urls, posts shortcodes or posts ids",
+        "item_label": "post url, shortcode or id",
+        "item_label_plural": "posts urls, shortcodes or ids",
     },
     arguments=[
         {
@@ -70,7 +70,7 @@ REDDIT_COMMENTS_SUBCOMMAND = command(
 )
 
 REDDIT_USER_POSTS_SUBCOMMAND = command(
-    "user_posts",
+    "user-posts",
     "minet.cli.reddit.user_posts",
     title="Minet Reddit User Posts Command",
     description="""
@@ -80,12 +80,12 @@ REDDIT_USER_POSTS_SUBCOMMAND = command(
         Example:
 
         . Searching posts from the user page of u/random_user:
-            $ minet reddit user_posts https://www.reddit.com/user/random_user/submitted/ > random_user_posts.csv
+            $ minet reddit user-posts https://www.reddit.com/user/random_user/submitted/ > random_user_posts.csv
     """,
     variadic_input={
         "dummy_column": "user",
-        "item_label": "user url, user shortcode or user id",
-        "item_label_plural": "user urls, user shortcodes or user ids",
+        "item_label": "user url, shortcode or id",
+        "item_label_plural": "user urls, shortcodes or ids",
     },
     arguments=[
         {
@@ -102,7 +102,7 @@ REDDIT_USER_POSTS_SUBCOMMAND = command(
 )
 
 REDDIT_USER_COMMENTS_SUBCOMMAND = command(
-    "user_comments",
+    "user-comments",
     "minet.cli.reddit.user_comments",
     title="Minet Reddit User Comments Command",
     description="""
@@ -112,12 +112,12 @@ REDDIT_USER_COMMENTS_SUBCOMMAND = command(
         Example:
 
         . Searching comments from the user page of u/random_user:
-            $ minet reddit user_comments https://www.reddit.com/user/random_user/comments/ > random_user_comments.csv
+            $ minet reddit user-comments https://www.reddit.com/user/random_user/comments/ > random_user_comments.csv
     """,
     variadic_input={
         "dummy_column": "user",
-        "item_label": "user url, user shortcode or user id",
-        "item_label_plural": "user urls, user shortcodes or user ids",
+        "item_label": "user url, shortcode or id",
+        "item_label_plural": "user urls, shortcodes or ids",
     },
     arguments=[
         {
