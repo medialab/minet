@@ -46,24 +46,29 @@ def get_url_from_subreddit(name: str):
 
 
 def reddit_request(url, pool_manager):
-    response = request(url, pool_manager=pool_manager)
-    soup = response.soup()
-    if response.status == 500 and soup.scrape_one("img", "alt") == "you broke reddit":
-        return response, soup, "broken page"
-    if response.status == 404 and soup.scrape_one("img", "alt") == "banned":
-        return response, soup, "banned"
-    if response.status == 404 or (
-        soup.scrape("p[id='noresults']") and not soup.scrape("div[class='commentarea']")
-    ):
-        raise RedditInvalidTargetError
-    remaining_requests = float(response.headers["x-ratelimit-remaining"])
-    if remaining_requests == 1:
-        time_remaining = int(response.headers["x-ratelimit-reset"])
-        sleep(time_remaining)
-        return reddit_request(url)
-    if response.status == 429:
-        return reddit_request(url)
-    return response, soup, None
+    while True:
+        response = request(url, pool_manager=pool_manager)
+        soup = response.soup()
+        if (
+            response.status == 500
+            and soup.scrape_one("img", "alt") == "you broke reddit"
+        ):
+            return response, soup, "broken page"
+        if response.status == 404 and soup.scrape_one("img", "alt") == "banned":
+            return response, soup, "banned"
+        if response.status == 404 or (
+            soup.scrape("p[id='noresults']")
+            and not soup.scrape("div[class='commentarea']")
+        ):
+            raise RedditInvalidTargetError
+        remaining_requests = float(response.headers["x-ratelimit-remaining"])
+        if remaining_requests == 1:
+            time_remaining = int(response.headers["x-ratelimit-reset"])
+            sleep(time_remaining)
+            continue
+        if response.status == 429:
+            continue
+        return response, soup, None
 
 
 def extract_t1_ids(text):
