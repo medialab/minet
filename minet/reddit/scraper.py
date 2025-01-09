@@ -46,7 +46,6 @@ def get_url_from_subreddit(name: str):
 
 
 def reddit_request(url, pool_manager):
-    sleep(1)
     response = request(url, pool_manager=pool_manager)
     soup = response.soup()
     if response.status == 500 and soup.scrape_one("img", "alt") == "you broke reddit":
@@ -60,7 +59,6 @@ def reddit_request(url, pool_manager):
     remaining_requests = float(response.headers["x-ratelimit-remaining"])
     if remaining_requests == 1:
         time_remaining = int(response.headers["x-ratelimit-reset"])
-        print(f"Time before next request : {time_remaining}s")
         sleep(time_remaining)
         return reddit_request(url)
     if response.status == 429:
