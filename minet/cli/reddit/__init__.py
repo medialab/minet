@@ -12,7 +12,7 @@ REDDIT_POSTS_SUBCOMMAND = command(
     "minet.cli.reddit.posts",
     title="Minet Reddit Posts Command",
     description="""
-        Retrieve reddit posts from a subreddit link.
+        Retrieve reddit posts from a subreddit link or name.
     """,
     epilog="""
         Example:
@@ -80,7 +80,7 @@ REDDIT_USER_POSTS_SUBCOMMAND = command(
         Example:
 
         . Searching posts from the user page of u/random_user:
-            $ minet reddit posts https://www.reddit.com/user/random_user/submitted/ > random_user_posts.csv
+            $ minet reddit user_posts https://www.reddit.com/user/random_user/submitted/ > random_user_posts.csv
     """,
     variadic_input={
         "dummy_column": "user",
@@ -111,8 +111,8 @@ REDDIT_USER_COMMENTS_SUBCOMMAND = command(
     epilog="""
         Example:
 
-        . Searching posts from the user page of u/random_user:
-            $ minet reddit posts https://www.reddit.com/user/random_user/comments/ > random_user_comments.csv
+        . Searching comments from the user page of u/random_user:
+            $ minet reddit user_comments https://www.reddit.com/user/random_user/comments/ > random_user_comments.csv
     """,
     variadic_input={
         "dummy_column": "user",
@@ -122,7 +122,7 @@ REDDIT_USER_COMMENTS_SUBCOMMAND = command(
     arguments=[
         {
             "flags": ["-n", "--number"],
-            "help": "Number of posts to retrieve.",
+            "help": "Number of comments to retrieve.",
             "type": int,
         },
     ],
