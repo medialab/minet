@@ -12,6 +12,8 @@ from minet.reddit.types import (
 )
 from minet.web import request, create_pool_manager
 
+ID_RE = re.compile(r"t1_(\w+)")
+
 
 def add_slash(url: str):
     path = url.split("/")
@@ -86,8 +88,7 @@ def reddit_request(url, pool_manager):
 
 
 def extract_t1_ids(text):
-    pattern = r"t1_(\w+)"
-    return [match.group(1) for match in re.finditer(pattern, text)]
+    return [match.group(1) for match in re.finditer(ID_RE, text)]
 
 
 def get_current_id(com):
