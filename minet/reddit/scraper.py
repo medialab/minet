@@ -249,7 +249,10 @@ class RedditScraper(object):
                     points = None
                 else:
                     comment_url = com.scrape_one("a[class='bylink']", "href")
-                    author = com.scrape_one("a[class^='author']")
+                    try_author = com.select_one("div.entry.unvoted")
+                    author = try_author.scrape_one("a[class^='author']")
+                    if not author:
+                        author = "[Deleted]"
                     points = get_points(com)
                 published_date, edited_date = get_dates(com)
                 if "morerecursion" in com.get("class") and all:
