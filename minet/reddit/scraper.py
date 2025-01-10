@@ -1,3 +1,4 @@
+from random import choice
 import re
 from time import sleep
 from ural import get_domain_name, urlpathsplit, is_url
@@ -11,6 +12,28 @@ from minet.reddit.types import (
     RedditUserComment,
 )
 from minet.web import request, create_pool_manager
+
+USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.2420.81",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 OPR/109.0.0.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14.4; rv:124.0) Gecko/20100101 Firefox/124.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Safari/605.1.15",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 OPR/109.0.0.0",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (X11; Linux i686; rv:124.0) Gecko/20100101 Firefox/124.0",
+]
+
+
+def add_slash(url: str):
+    path = url.split("/")
+    if path[-1] == "?limit=500":
+        return url
+    elif url[-1] != "/":
+        return url + "/"
+    return url
 
 
 def resolve_relative_url(path):
@@ -46,8 +69,16 @@ def get_url_from_subreddit(name: str):
 
 def reddit_request(url, pool_manager):
     while True:
-        response = request(url, pool_manager=pool_manager)
+        response = request(
+            add_slash(url),
+            pool_manager=pool_manager,
+            headers={"User-Agent": choice(USER_AGENTS)},
+        )
         soup = response.soup()
+        remaining_requests = float(response.headers["x-ratelimit-remaining"])
+        if response.status == 429 and remaining_requests > 1:
+            sleep(1)
+            continue
         if (
             response.status == 500
             and soup.scrape_one("img", "alt") == "you broke reddit"
@@ -61,12 +92,9 @@ def reddit_request(url, pool_manager):
             and soup.scrape_one("p.error")
         ):
             raise RedditInvalidTargetError
-        remaining_requests = float(response.headers["x-ratelimit-remaining"])
-        if remaining_requests == 1:
+        if remaining_requests == 1 or response.status == 429:
             time_remaining = int(response.headers["x-ratelimit-reset"])
             sleep(time_remaining)
-            continue
-        if response.status == 429:
             continue
         return response, soup, None
 
@@ -172,23 +200,27 @@ class RedditScraper(object):
     def get_childs_l500(self, url, list_comments, parent_id):
         _, soup, _ = reddit_request(url, self.pool_manager)
         comments = soup.select("div[class='commentarea']>div>div[class*='comment']")
-        for com in comments:
-            child = com.find("div", class_="child")
-            if child.text != "":
-                child = child.find("div")
-                child_com = child.find_all(
-                    "div",
-                    class_=lambda x: x
-                    and (
-                        "comment" in x
-                        or "deleted comment" in x
-                        or "morerecursion" in x
-                        or "morechildren" in x
-                    ),
-                    recursive=False,
-                )
-                for ele in child_com:
-                    list_comments.append((parent_id, ele))
+        if parent_id == None:
+            for com in comments:
+                list_comments.append((None, com))
+        else:
+            for com in comments:
+                child = com.find("div", class_="child")
+                if child.text != "":
+                    child = child.find("div")
+                    child_com = child.find_all(
+                        "div",
+                        class_=lambda x: x
+                        and (
+                            "comment" in x
+                            or "deleted comment" in x
+                            or "morerecursion" in x
+                            or "morechildren" in x
+                        ),
+                        recursive=False,
+                    )
+                    for ele in child_com:
+                        list_comments.append((parent_id, ele))
         return list_comments
 
     def get_comments(self, url: str, all):
@@ -211,13 +243,22 @@ class RedditScraper(object):
             first_comments = soup.select(
                 "div[class='commentarea']>div>div[class*='comment']"
             )
+            if all:
+                more = soup.select("div.commentarea>div>div[class*='morechildren']")
+                for ele in more:
+                    a = ele.select_one("a")
+                    onclick = a["onclick"]
+                    id_list = extract_t1_ids(onclick)
+                    for id in id_list:
+                        comment_url = f"{old_url}{id}/"
+                        m_comments = self.get_childs_l500(comment_url, m_comments, None)
             for ele in first_comments:
                 m_comments.append((None, ele))
             while m_comments:
                 parent, com = m_comments.pop()
                 current_id = get_current_id(com)
-                if com.get("class") == " thing noncollapsed   deleted comment ":
-                    comment_url = None
+                if "deleted comment" in com.get("class"):
+                    comment_url = com.get("data-permalink")
                     author = "[Deleted]"
                     points = None
                 else:
@@ -233,7 +274,7 @@ class RedditScraper(object):
                     onclick = a["onclick"]
                     id_list = extract_t1_ids(onclick)
                     for id in id_list:
-                        comment_url = f"{old_url}{id}"
+                        comment_url = f"{old_url}{id}/"
                         m_comments = self.get_childs_l500(
                             comment_url, m_comments, current_id
                         )
@@ -263,7 +304,7 @@ class RedditScraper(object):
                         for ele in child_com:
                             m_comments.append((current_id, ele))
                     data = RedditComment(
-                        comment_url=get_new_url(comment_url) if comment_url else None,
+                        comment_url=get_new_url(resolve_relative_url(comment_url)),
                         author=author,
                         id=current_id,
                         parent=parent,
