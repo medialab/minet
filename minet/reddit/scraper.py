@@ -13,19 +13,6 @@ from minet.reddit.types import (
 )
 from minet.web import request, create_pool_manager
 
-USER_AGENTS = [
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.2420.81",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 OPR/109.0.0.0",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14.4; rv:124.0) Gecko/20100101 Firefox/124.0",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Safari/605.1.15",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 OPR/109.0.0.0",
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (X11; Linux i686; rv:124.0) Gecko/20100101 Firefox/124.0",
-]
-
 
 def add_slash(url: str):
     path = url.split("/")
@@ -72,7 +59,7 @@ def reddit_request(url, pool_manager):
         response = request(
             add_slash(url),
             pool_manager=pool_manager,
-            headers={"User-Agent": choice(USER_AGENTS)},
+            spoof_ua=True,
         )
         soup = response.soup()
         remaining_requests = float(response.headers["x-ratelimit-remaining"])
@@ -200,7 +187,7 @@ class RedditScraper(object):
     def get_childs_l500(self, url, list_comments, parent_id):
         _, soup, _ = reddit_request(url, self.pool_manager)
         comments = soup.select("div[class='commentarea']>div>div[class*='comment']")
-        if parent_id == None:
+        if parent_id is None:
             for com in comments:
                 list_comments.append((None, com))
         else:
@@ -257,7 +244,7 @@ class RedditScraper(object):
             while m_comments:
                 parent, com = m_comments.pop()
                 current_id = get_current_id(com)
-                if "deleted comment" in com.get("class"):
+                if "deleted" in com.get("class") and "comment" in com.get("class"):
                     comment_url = com.get("data-permalink")
                     author = "[Deleted]"
                     points = None
