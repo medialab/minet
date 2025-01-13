@@ -409,7 +409,7 @@ class RedditScraper(object):
                         )
 
                     yield post
-                n_crawled += 1
+                    n_crawled += 1
             old_url = soup.scrape_one("span.next-button a", "href")
 
     def get_user_comments(self, url: str, limit: int):
