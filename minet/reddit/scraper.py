@@ -87,8 +87,11 @@ def reddit_request(url, pool_manager):
         return response, soup, None
 
 
-def extract_t1_ids(text):
-    return [match.group(1) for match in re.finditer(ID_RE, text)]
+def extract_t1_ids(text: str):
+    ids = [match.group(1) for match in re.finditer(ID_RE, text)]
+    if ids:
+        return ids
+    return text.split("'")[-4].split(",")
 
 
 def get_current_id(com):
