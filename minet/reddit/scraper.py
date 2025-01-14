@@ -17,7 +17,7 @@ ID_RE = re.compile(r"t1_(\w+)")
 
 def add_slash(url: str):
     path = url.split("/")
-    if path[-1] == "?limit=500":
+    if path[-1][0] == "?":
         return url
     elif url[-1] != "/":
         return url + "/"
@@ -29,21 +29,11 @@ def resolve_relative_url(path):
 
 
 def get_old_url(url):
-    domain = get_domain_name(url)
-    path = urlpathsplit(url)
-    old_url = f"https://old.{domain}"
-    for ele in path:
-        old_url = urljoin(old_url, f"{ele}/")
-    return old_url
+    return url.replace("www.reddit", "old.reddit")
 
 
 def get_new_url(url):
-    domain = get_domain_name(url)
-    path = urlpathsplit(url)
-    new_url = f"https://www.{domain}"
-    for ele in path:
-        new_url = urljoin(new_url, f"{ele}/")
-    return new_url
+    return url.replace("old.reddit", "www.reddit")
 
 
 def get_url_from_subreddit(name: str):
@@ -133,14 +123,13 @@ def data_posts(
     link,
     error,
 ):
-    try_author = post.select_one("a[class*='author']")
-    author = try_author.get_text() if try_author else "[Deleted]"
+    author = post.scrape_one("a[class*='author']")
     if get_domain_name(link) == "reddit.com":
         link = ""
     data = RedditPost(
         title=title,
         url=get_new_url(url),
-        author=author,
+        author=author if author else "[Deleted]",
         author_text=author_text,
         points=points,
         scraped_number_comments=scraped_number_comments,
