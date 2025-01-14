@@ -1,6 +1,6 @@
 import re
 from time import sleep
-from ural import get_domain_name, urlpathsplit, is_url
+from ural import get_domain_name, is_url
 from urllib.parse import urljoin
 
 from minet.reddit.exceptions import RedditInvalidTargetError
