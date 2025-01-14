@@ -15,6 +15,7 @@ from minet.web import request, create_pool_manager
 ID_RE = re.compile(r"t1_(\w+)")
 
 
+# when missing a '/' at the end of an url, reddit will make a redirection and it will reduce by 2 the number of requests remaining
 def add_slash(url: str):
     path = url.split("/")
     if path[-1][0] == "?":
@@ -94,11 +95,11 @@ def get_current_id(com):
 
 
 def get_points(ele):
-    scrapped_points = ele.select_one("[class='score unvoted']")
-    score_hidden = ele.select_one("[class='score-hidden']")
+    scrapped_points = ele.select_one(".score.unvoted")
+    score_hidden = ele.select_one(".score-hidden")
     if not scrapped_points and not score_hidden:
         return "deleted"
-    scrapped_points = ele.scrape_one("[class='score unvoted']", "title")
+    scrapped_points = ele.scrape_one(".score.unvoted", "title")
     if not scrapped_points:
         return "score hidden"
     return scrapped_points
@@ -123,9 +124,9 @@ def data_posts(
     link,
     error,
 ):
-    author = post.scrape_one("a[class*='author']")
-    if get_domain_name(link) == "reddit.com":
-        link = ""
+    author = post.scrape_one("a.author")
+    if "reddit.com/" in link:
+        link = None
     data = RedditPost(
         title=title,
         url=get_new_url(url),
