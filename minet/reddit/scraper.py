@@ -1,6 +1,6 @@
 import re
 from time import sleep
-from ural import get_domain_name, is_url
+from ural import is_url
 from urllib.parse import urljoin
 
 from minet.reddit.exceptions import RedditInvalidTargetError
@@ -156,7 +156,7 @@ def data_user_posts(
     link,
     error,
 ):
-    sub = post.scrape_one("a[class*='subreddit']", "href")
+    sub = post.scrape_one("a.subreddit", "href")
     data = RedditUserPost(
         title=title,
         url=get_new_url(url),
@@ -179,28 +179,28 @@ class RedditScraper(object):
 
     def get_childs_l500(self, url, list_comments, parent_id):
         _, soup, _ = reddit_request(url, self.pool_manager)
-        comments = soup.select("div.commentarea>div>div[class*='comment']")
+        comments = soup.select("div.commentarea>div>div.comment")
         if parent_id is None:
             for com in comments:
                 list_comments.append((None, com))
-        else:
-            for com in comments:
-                child = com.find("div", class_="child")
-                if child.text != "":
-                    child = child.find("div")
-                    child_com = child.find_all(
-                        "div",
-                        class_=lambda x: x
-                        and (
-                            "comment" in x
-                            or "deleted comment" in x
-                            or "morerecursion" in x
-                            or "morechildren" in x
-                        ),
-                        recursive=False,
-                    )
-                    for ele in child_com:
-                        list_comments.append((parent_id, ele))
+            return list_comments
+        for com in comments:
+            child = com.find("div", class_="child")
+            if child.text != "":
+                child = child.find("div")
+                child_com = child.find_all(
+                    "div",
+                    class_=lambda x: x
+                    and (
+                        "comment" in x
+                        or "deleted comment" in x
+                        or "morerecursion" in x
+                        or "morechildren" in x
+                    ),
+                    recursive=False,
+                )
+                for ele in child_com:
+                    list_comments.append((parent_id, ele))
         return list_comments
 
     def get_comments(self, url: str, all):
@@ -220,9 +220,9 @@ class RedditScraper(object):
                 error=error,
             )
         else:
-            first_comments = soup.select("div.commentarea>div>div[class*='comment']")
+            first_comments = soup.select("div.commentarea>div>div.comment")
             if all:
-                more = soup.select("div.commentarea>div>div[class*='morechildren']")
+                more = soup.select("div.commentarea>div>div.morechildren")
                 for ele in more:
                     a = ele.select_one("a")
                     onclick = a["onclick"]
@@ -241,8 +241,7 @@ class RedditScraper(object):
                     points = None
                 else:
                     comment_url = com.scrape_one("a.bylink", "href")
-                    try_author = com.select_one("div.entry.unvoted")
-                    author = try_author.scrape_one("a[class^='author']")
+                    author = com.scrape_one("div.entry.unvoted a.author")
                     if not author:
                         author = "[Deleted]"
                     points = get_points(com)
@@ -286,7 +285,7 @@ class RedditScraper(object):
                             m_comments.append((current_id, ele))
                     data = RedditComment(
                         comment_url=get_new_url(resolve_relative_url(comment_url)),
-                        author=author,
+                        author=author if author else "[Deleted]",
                         id=current_id,
                         parent=parent,
                         points=points,
@@ -311,12 +310,10 @@ class RedditScraper(object):
                     break
                 list_buttons = post.select_one("ul.flat-list.buttons")
                 if len(list_buttons.scrape("span.promoted-span")) == 0:
-                    title = post.force_select_one("a[class*='title']").get_text()
-                    post_url = list_buttons.scrape_one(
-                        "a[class^='bylink comments']", "href"
-                    )
+                    title = post.force_select_one("a.title").get_text()
+                    post_url = list_buttons.scrape_one("a.bylink.comments", "href")
                     n_comments_scraped = list_buttons.select_one(
-                        "a[class^='bylink comments']"
+                        "a.bylink.comments"
                     ).get_text()
                     match = re.match(r"(\d+)\s+comment(s)?", n_comments_scraped)
                     if match:
@@ -325,9 +322,7 @@ class RedditScraper(object):
                         n_comments = 0
                     upvote = get_points(post)
                     published_date, edited_date = get_dates(post)
-                    link = resolve_relative_url(
-                        post.scrape_one("a[class*='title']", "href")
-                    )
+                    link = resolve_relative_url(post.scrape_one("a.title", "href"))
                     if link == post_url:
                         link = ""
                     if add_text:
@@ -363,9 +358,7 @@ class RedditScraper(object):
                                     link,
                                     text_error,
                                 )
-                        try_content = text_soup.select_one(
-                            "div#siteTable div[class^='usertext']"
-                        )
+                        try_content = text_soup.select_one("div#siteTable div.usertext")
                         if try_content:
                             content = try_content.get_text()
                         else:
@@ -431,8 +424,8 @@ class RedditScraper(object):
                         break
                     post_title = comment.scrape_one("a.title")
                     post_url = comment.scrape_one("a.bylink.may-blank", "href")
-                    post_author = comment.scrape_one("p.parent>a[class^='author']")
-                    post_subreddit = comment.scrape_one("a[class^='subreddit']", "href")
+                    post_author = comment.scrape_one("p.parent>a.author")
+                    post_subreddit = comment.scrape_one("a.subreddit", "href")
                     points = get_points(comment)
                     published_date, edited_date = get_dates(comment)
                     text = comment.scrape_one("div.content div.md")
