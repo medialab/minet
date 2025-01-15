@@ -25,7 +25,6 @@ ftest/*.csv
 *.sqlar
 *-wal
 *-shm
-*.csv
 
 /crawl
 /downloaded

@@ -296,6 +296,7 @@ class RedditScraper(object):
                         yield data
 
     def get_general_post(self, url: str, type: str, add_text: bool, limit: int):
+        fn = data_posts if type == "subreddit" else data_user_posts
         n_crawled = 0
         old_url = get_old_url(get_url_from_subreddit(url))
         while old_url and (limit is None or n_crawled < limit):
@@ -328,71 +329,37 @@ class RedditScraper(object):
                             post_url, self.pool_manager
                         )
                         if text_error:
-                            if type == "subreddit":
-                                yield data_posts(
-                                    post,
-                                    title,
-                                    post_url,
-                                    "",
-                                    upvote,
-                                    n_comments_scraped,
-                                    n_comments,
-                                    published_date,
-                                    edited_date,
-                                    link,
-                                    text_error,
-                                )
-                            else:
-                                yield data_user_posts(
-                                    post,
-                                    title,
-                                    post_url,
-                                    "",
-                                    upvote,
-                                    n_comments_scraped,
-                                    n_comments,
-                                    published_date,
-                                    edited_date,
-                                    link,
-                                    text_error,
-                                )
-                        try_content = text_soup.select_one("div#siteTable div.usertext")
-                        if try_content:
-                            content = try_content.get_text()
-                        else:
-                            content = ""
+                            yield fn(
+                                post,
+                                title,
+                                post_url,
+                                None,
+                                upvote,
+                                n_comments_scraped,
+                                n_comments,
+                                published_date,
+                                edited_date,
+                                link,
+                                text_error,
+                            )
+                        content = text_soup.scrape_one(
+                            "div#siteTable div.usertext-body"
+                        )
                     else:
                         content = ""
-                    if type == "subreddit":
-                        post = data_posts(
-                            post,
-                            title,
-                            post_url,
-                            content,
-                            upvote,
-                            n_comments_scraped,
-                            n_comments,
-                            published_date,
-                            edited_date,
-                            link,
-                            error,
-                        )
-                    else:
-                        post = data_user_posts(
-                            post,
-                            title,
-                            post_url,
-                            content,
-                            upvote,
-                            n_comments_scraped,
-                            n_comments,
-                            published_date,
-                            edited_date,
-                            link,
-                            error,
-                        )
-
-                    yield post
+                    yield fn(
+                        post,
+                        title,
+                        post_url,
+                        content,
+                        upvote,
+                        n_comments_scraped,
+                        n_comments,
+                        published_date,
+                        edited_date,
+                        link,
+                        error,
+                    )
                     n_crawled += 1
             old_url = soup.scrape_one("span.next-button a", "href")
 
