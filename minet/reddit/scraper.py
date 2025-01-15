@@ -18,9 +18,7 @@ ID_RE = re.compile(r"t1_(\w+)")
 # when missing a '/' at the end of an url, reddit will make a redirection and it will reduce by 2 the number of requests remaining
 def add_slash(url: str):
     path = url.split("/")
-    if path[-1][0] == "?":
-        return url
-    elif url[-1] != "/":
+    if path[-1] != "" and not path[-1].startswith("?"):
         return url + "/"
     return url
 
