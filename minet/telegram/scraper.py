@@ -87,9 +87,9 @@ def scrape_channel_infos(html) -> TelegramChannelInfos:
     }
 
     nb_subscribers = counters_infos["subscriber"]
-    nb_photos = counters_infos["photo"]
-    nb_videos = counters_infos["video"]
-    nb_links = counters_infos["link"]
+    nb_photos = counters_infos.get("photo", "0")
+    nb_videos = counters_infos.get("video", "0")
+    nb_links = counters_infos.get("link", "0")
 
     return TelegramChannelInfos(
         title=title,
