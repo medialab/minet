@@ -14,6 +14,7 @@ class TelegramChannelInfos(TabularRecord):
     nb_subscribers: str
     nb_photos: str
     nb_videos: str
+    nb_files: str
     nb_links: str
 
 
