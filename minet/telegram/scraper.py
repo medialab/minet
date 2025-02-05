@@ -248,6 +248,10 @@ def scrape_channel_messages(html):
                 videos_times = video_time.get_text()
             nb_videos = 1
 
+        nb_files = 0
+        if message.select_one(".tgme_widget_message_document_icon.accent_bg"):
+            nb_files = 1
+
         link_img = None
         link_site = None
         link_title = None
@@ -303,6 +307,7 @@ def scrape_channel_messages(html):
             nb_videos=nb_videos,
             videos=videos,
             videos_times=videos_times,
+            nb_files=nb_files,
             nb_links=nb_links,
             links=links,
             link_img=link_img,

@@ -37,6 +37,7 @@ class TelegramChannelMessages(TabularRecord):
     nb_videos: int
     videos: List[str]
     videos_times: List[str]
+    nb_files: int
     nb_links: int
     links: List[str]
     link_img: str
