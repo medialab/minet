@@ -81,7 +81,7 @@ Minet can single-handedly:
 - Mine or search:
   - _[Mediacloud](https://mediacloud.org/)_ (requires free API access)
   - _[Twitter](https://twitter.com)_ (requires free API access)
-  - _[Wikipedia](https://ww.wikipedia.org)_
+  - _[Wikipedia](https://www.wikipedia.org)_
   - _[Youtube](https://www.youtube.com/)_ (requires free API access)
 - Scrape (without requiring special access, often just a user account):
   - _[Facebook](https://www.facebook.com/)_
