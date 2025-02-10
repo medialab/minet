@@ -1,6 +1,7 @@
 from typing import Iterable, Iterator, TypeVar, Callable, Tuple, List, Optional
 
 from urllib.parse import quote, unquote
+from ural import urlpathsplit
 
 from minet.executors import HTTPThreadPoolExecutor, ErroredRequestResult
 
@@ -40,6 +41,8 @@ def build_pageviews_url(
     agent: Agent = "all-agents",
     granularity: Granularity = "monthly",
 ) -> str:
+    if "/" in name:
+        name = urlpathsplit(name)[-1]
     return "{base_url}/metrics/pageviews/per-article/{lang}.wikipedia/{access}/{agent}/{name}/{granularity}/{start_date}/{end_date}".format(
         base_url=BASE_URL,
         name=ensure_is_quoted(name),
