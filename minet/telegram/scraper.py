@@ -249,7 +249,7 @@ def scrape_channel_messages(html):
             nb_videos = 1
 
         nb_files = 0
-        if message.select_one(".tgme_widget_message_document_icon.accent_bg"):
+        if message.select_one(".tgme_widget_message_document_icon"):
             nb_files = 1
 
         link_img = None
