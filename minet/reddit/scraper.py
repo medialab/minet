@@ -266,7 +266,6 @@ class RedditScraper(object):
                                 class_=lambda x: x
                                 and (
                                     "comment" in x
-                                    or "deleted comment" in x
                                     or "morerecursion" in x
                                     or "morechildren" in x
                                 ),
@@ -276,7 +275,7 @@ class RedditScraper(object):
                             child_com = child.find_all(
                                 "div",
                                 class_=lambda x: x
-                                and ("comment" in x or "deleted comment" in x),
+                                and ("comment" in x),
                                 recursive=False,
                             )
                         for ele in child_com:
