@@ -25,6 +25,8 @@ _Generic commands_
 
 _Platform-related commands_
 
+- [bluesky (bsky)](#bluesky)
+  - [search-posts](#search-posts)
 - [facebook (fb)](#facebook)
   - [url-likes](#url-likes)
 - [google](#google)
@@ -198,6 +200,14 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ## url-parse
 
 <% url-parse %>
+
+## Bluesky
+
+<% bsky %>
+
+### search-posts
+
+<% bsky/search-posts %>
 
 ## Facebook
 

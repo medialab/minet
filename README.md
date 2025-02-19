@@ -79,6 +79,7 @@ Minet can single-handedly:
   - ...and scrape structured data (using a declarative language to define your heuristics)
 - Crawl (using a declarative language to define a browsing behavior, and what to harvest)
 - Mine or search:
+  - _[Bluesky](https://bsky.app/)_ (requires a free user account)
   - _[Mediacloud](https://mediacloud.org/)_ (requires free API access)
   - _[Twitter](https://twitter.com)_ (requires free API access)
   - _[Wikipedia](https://www.wikipedia.org)_
