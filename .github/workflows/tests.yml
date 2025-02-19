@@ -8,16 +8,16 @@ jobs:
       matrix:
         include:
           # Ubuntu
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             python-version: "3.8"
             pyinstaller: yes
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             python-version: "3.9"
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             python-version: "3.10"
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             python-version: "3.11"
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             python-version: "3.12"
 
           # Mac

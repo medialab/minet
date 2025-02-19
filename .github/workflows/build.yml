@@ -9,11 +9,11 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-20.04
-            name: ubuntu_20
-            pypi: yes
           - os: ubuntu-22.04
             name: ubuntu_22
+            pypi: yes
+          - os: ubuntu-24.04
+            name: ubuntu_24
           - os: macos-latest
             name: macos
           - os: windows-latest

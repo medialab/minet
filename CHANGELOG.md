@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.0.0 (provisional)
+## 4.0.0
 
 *Breaking*
 
@@ -9,6 +9,7 @@
 
 *Features*
 
+- Adding `bluesky` commands.
 - Adding `reddit` commands.
 - Adding `image` and `pagetype` features to `minet extract` outputs.
 

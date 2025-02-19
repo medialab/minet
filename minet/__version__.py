@@ -1,3 +1,3 @@
-__version__ = "3.2.0"
-__published__ = "2024-12-18"
+__version__ = "4.0.0"
+__published__ = "2025-02-19"
 __identifier__ = "%s (%s)" % (__version__, __published__)
