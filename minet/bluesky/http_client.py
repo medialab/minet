@@ -102,9 +102,18 @@ class BlueskyHTTPClient:
         return response
 
     def search_posts(self, query: str) -> Iterator[BlueskyPost]:
-        url = self.urls.search_posts(query)
+        cursor = None
 
-        response = self.request(url)
+        while True:
+            url = self.urls.search_posts(query, cursor=cursor)
 
-        for post in response.json()["posts"]:
-            yield BlueskyPost.from_payload(post)
+            response = self.request(url)
+            data = response.json()
+
+            for post in data["posts"]:
+                yield BlueskyPost.from_payload(post)
+
+            cursor = data.get("cursor")
+
+            if cursor is None:
+                break
