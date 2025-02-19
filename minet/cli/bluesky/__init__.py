@@ -15,6 +15,15 @@ BLUESKY_HTTP_API_COMMON_ARGUMENTS = [
     },
 ]
 
+BLUESKY_FIREHOSE_COMMAND = command(
+    "firehose",
+    "minet.cli.bluesky.firehose",
+    title="Minet Bluesky Firehose Command",
+    description="""
+        Plug into the Bluesky Firehose.
+    """,
+)
+
 BLUESKY_SEARCH_POSTS_COMMAND = command(
     "search-posts",
     "minet.cli.bluesky.search_posts",
@@ -34,5 +43,5 @@ BLUESKY_COMMAND = command(
     description="""
         Collect data from Bluesky.
     """,
-    subcommands=[BLUESKY_SEARCH_POSTS_COMMAND],
+    subcommands=[BLUESKY_FIREHOSE_COMMAND, BLUESKY_SEARCH_POSTS_COMMAND],
 )
