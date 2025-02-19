@@ -9,3 +9,7 @@
 *Features*
 
 - Adding `reddit` commands.
+
+*Fixes*
+
+- Fixing typings wrt `WonderfulSoup.find*` methods.

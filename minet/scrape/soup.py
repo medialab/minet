@@ -1,5 +1,5 @@
 import re
-from typing import List, Optional, Union, Callable, Any, TypeVar, cast, overload
+from typing import List, Optional, Union, TypeVar, cast, overload
 
 import warnings
 from contextlib import contextmanager
@@ -14,7 +14,6 @@ except ImportError:
 
 WHITESPACE_RE = re.compile(r"\s+")
 
-Strainable = Union[str, Callable[[str], Any]]
 T = TypeVar("T")
 
 
@@ -68,21 +67,25 @@ class MinetTag(Tag):
     def find(
         self,
         name: Optional[str] = None,
+        attrs={},
         recursive: bool = True,
-        class_: Optional[Strainable] = None,
+        string=None,
+        **kwargs,
     ) -> Optional["MinetTag"]:
         return cast(
             Optional[MinetTag],
-            super().find(name=name, recursive=recursive, class_=class_),
+            super().find(name, attrs, recursive, string, **kwargs),
         )
 
     def force_find(
         self,
         name: Optional[str] = None,
+        attrs={},
         recursive: bool = True,
-        class_: Optional[Strainable] = None,
+        string=None,
+        **kwargs,
     ) -> "MinetTag":
-        elem = super().find(name=name, recursive=recursive, class_=class_)
+        elem = super().find(name, attrs, recursive, string, **kwargs)
 
         if elem is None:
             raise SelectionError
@@ -92,12 +95,15 @@ class MinetTag(Tag):
     def find_all(
         self,
         name: Optional[str] = None,
+        attrs={},
         recursive: bool = True,
-        class_: Optional[Strainable] = None,
+        string=None,
+        limit: Optional[int] = None,
+        **kwargs,
     ) -> List["MinetTag"]:
         return cast(
             List["MinetTag"],
-            super().find_all(name=name, recursive=recursive, class_=class_),
+            super().find_all(name, attrs, recursive, string, limit, **kwargs),
         )
 
     def force_scrape_one(self, css: str, target: Optional[str] = None) -> str:
