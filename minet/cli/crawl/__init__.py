@@ -311,9 +311,7 @@ def crawl_command(
 
         {FOLDER_STRATEGY_DOCUMENTATION}
 
-        """ + (
-            epilog or ""
-        )
+        """ + (epilog or "")
 
     def wrapped_resolve(cli_args):
         if unique:

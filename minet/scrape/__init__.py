@@ -5,7 +5,12 @@
 # Module exposing utilities related to minet's scraping DSL.
 #
 from minet.scrape.classes.definition import scrape, DefinitionScraper, validate
-from minet.scrape.soup import WonderfulSoup, MinetTag as Tag, SelectionError, ExtractionError
+from minet.scrape.soup import (
+    WonderfulSoup,
+    MinetTag as Tag,
+    SelectionError,
+    ExtractionError,
+)
 from minet.scrape.regex import (
     extract_encodings_from_xml,
     extract_canonical_link,

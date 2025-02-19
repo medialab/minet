@@ -11,6 +11,7 @@ from minet.web import (
 from minet.bluesky.urls import BlueskyHTTPAPIUrlFormatter
 from minet.bluesky.jwt import parse_jwt_for_expiration
 from minet.bluesky.types import BlueskyPost
+from minet.bluesky.exceptions import BlueskyAuthenticationError
 
 
 # TODO: token refresh, split request method in specifics for create_session and refresh_session
@@ -22,16 +23,25 @@ class BlueskyHTTPClient:
         self.pool_manager = create_pool_manager()
         self.retryer = create_request_retryer()
 
-        response = self.request(
+        # First auth
+        self.create_session(identifier, password)
+
+    @retrying_method()
+    def create_session(self, identifier: str, password: str):
+        response = request(
             self.urls.create_session(),
+            pool_manager=self.pool_manager,
             method="POST",
             json_body={"identifier": identifier, "password": password},
-            unauthenticated=True,
-        ).json()
+        )
 
-        self.access_jwt = response["accessJwt"]
-        self.refresh_jwt = response["refreshJwt"]
+        if response.status != 200:
+            raise BlueskyAuthenticationError
 
+        data = response.json()
+
+        self.access_jwt = data["accessJwt"]
+        self.refresh_jwt = data["refreshJwt"]
         self.access_jwt_expiration = parse_jwt_for_expiration(self.access_jwt)
 
     @retrying_method()
@@ -40,12 +50,8 @@ class BlueskyHTTPClient:
         url: str,
         method: str = "GET",
         json_body=None,
-        unauthenticated: bool = False,
     ) -> Response:
-        headers = {}
-
-        if not unauthenticated:
-            headers["Authorization"] = "Bearer {}".format(self.access_jwt)
+        headers = {"Authorization": "Bearer {}".format(self.access_jwt)}
 
         response = request(
             url,

@@ -13,6 +13,7 @@ def resolve_pageviews_args(cli_args):
     if cli_args.resume and not cli_args.sum:
         raise InvalidArgumentsError("Can only --resume with --sum.")
 
+
 WIKIPEDIA_PAGEVIEWS_SUBCOMMAND = command(
     "pageviews",
     "minet.cli.wikipedia.pageviews",

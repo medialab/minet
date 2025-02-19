@@ -25,15 +25,15 @@ from minet.bluesky import BlueskyHTTPClient, BlueskyWebSocketClient
 # response = client.app.bsky.feed.search_posts({"q": "test", "cursor": "25"})
 # console.print(models.get_model_as_json(response), highlight=True)
 
-# client = BlueskyHTTPClient(sys.argv[1], sys.argv[2])
+client = BlueskyHTTPClient(sys.argv[1], sys.argv[2])
 
-# for post in client.search_posts("test"):
-#     console.print(post, highlight=True)
+for post in client.search_posts("test"):
+    console.print(post, highlight=True)
 
-client = BlueskyWebSocketClient()
+# client = BlueskyWebSocketClient()
 
-with client.subscribe_repos() as socket:
-    payload = socket.recv()
-
-    for message in libipld.decode_dag_cbor_multi(payload):
-        print(message)
+# with client.subscribe_repos() as socket:
+#     while True:
+#         payload = socket.recv()
+#         header, body = libipld.decode_dag_cbor_multi(payload)
+#         console.print(header, highlight=True)

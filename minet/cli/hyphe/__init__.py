@@ -23,7 +23,7 @@ def hyphe_corpus_subcommand(*args, arguments=[], **kwargs):
         arguments=[HYPHE_API_URL_ARGUMENT, HYPHE_CORPUS_ARGUMENT]
         + arguments
         + [HYPHE_PASSWORD_ARGUMENT],
-        **kwargs
+        **kwargs,
     )
 
 

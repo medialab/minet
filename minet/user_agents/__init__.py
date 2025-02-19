@@ -20,7 +20,11 @@ def update_user_agents(transient: bool = False) -> None:
 
     def download_useragentsme_data() -> List[Tuple[float, str]]:
         response = request("https://www.useragents.me")
-        json_text = response.soup().force_select_one("#most-common-desktop-useragents-json-csv textarea").get_text()
+        json_text = (
+            response.soup()
+            .force_select_one("#most-common-desktop-useragents-json-csv textarea")
+            .get_text()
+        )
         data = json.loads(json_text)
 
         return [

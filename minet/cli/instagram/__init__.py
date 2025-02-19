@@ -268,7 +268,7 @@ INSTAGRAM_USER_INFOS_SUBCOMMAND = command(
         "item_label": "username, user url or user id",
         "item_label_plural": "usernames, user urls or user ids",
     },
-    resumer=RowCountResumer
+    resumer=RowCountResumer,
 )
 
 INSTAGRAM_USER_POSTS_SUBCOMMAND = command(

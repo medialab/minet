@@ -33,6 +33,7 @@ setup(
         "dateparser>=1.1.1",
         "ebbe>=1.13,<2",
         "json5>=0.8.5",
+        "libipld>=3,<4",
         "lxml == 4.9.2; platform_system == 'Darwin' and python_version <= '3.8'",
         "lxml >= 5.3.0; platform_system != 'Darwin' or python_version > '3.8'",
         "nanoid>=2,<3",
@@ -48,6 +49,7 @@ setup(
         "twitwi>=0.19.2,<0.20",
         "ural>=1.4.0,<2",
         "urllib3>=1.26.16,<2",
+        "websockets>=13,<14",
     ],
     extras_require={
         ":python_version<'3.11'": ["typing_extensions>=4.3"],

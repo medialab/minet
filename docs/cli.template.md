@@ -120,6 +120,9 @@ _Configuration file_
 
 ```yml
 ---
+bluesky:
+  identifier: "MY_BLUESKY_IDENTIFIER" # Used as --identifier for `minet bsky` commands
+  password: "MY_BLUESKY_APP_PASSWORD" # Used as --password for `minet bsky` commands
 instagram:
   cookie: "MY_INSTAGRAM_COOKIE" # Used as --cookie for `minet insta` commands
 mediacloud:
