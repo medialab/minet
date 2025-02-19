@@ -48,9 +48,9 @@ class YouTubeVideoSnippet(TabularRecord):
             video_id=payload["id"]["videoId"],
             published_at=snippet["publishedAt"],
             channel_id=snippet["channelId"],
-            channel_title=snippet["title"],
+            channel_title=snippet["channelTitle"],
             description=snippet["description"],
-            title=snippet["channelTitle"],
+            title=snippet["title"],
             default_language=snippet.get(
                 "defaultLanguage", snippet.get("defaultAudioLanguage")
             ),

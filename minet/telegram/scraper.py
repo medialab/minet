@@ -87,9 +87,10 @@ def scrape_channel_infos(html) -> TelegramChannelInfos:
     }
 
     nb_subscribers = counters_infos["subscriber"]
-    nb_photos = counters_infos["photo"]
-    nb_videos = counters_infos["video"]
-    nb_links = counters_infos["link"]
+    nb_photos = counters_infos.get("photo", "0")
+    nb_videos = counters_infos.get("video", "0")
+    nb_files = counters_infos.get("file", "0")
+    nb_links = counters_infos.get("link", "0")
 
     return TelegramChannelInfos(
         title=title,
@@ -100,6 +101,7 @@ def scrape_channel_infos(html) -> TelegramChannelInfos:
         nb_subscribers=clean_human_readable_numbers(nb_subscribers),
         nb_photos=clean_human_readable_numbers(nb_photos),
         nb_videos=clean_human_readable_numbers(nb_videos),
+        nb_files=clean_human_readable_numbers(nb_files),
         nb_links=clean_human_readable_numbers(nb_links),
     )
 
@@ -246,6 +248,10 @@ def scrape_channel_messages(html):
                 videos_times = video_time.get_text()
             nb_videos = 1
 
+        nb_files = 0
+        if message.select_one(".tgme_widget_message_document_icon"):
+            nb_files = 1
+
         link_img = None
         link_site = None
         link_title = None
@@ -301,6 +307,7 @@ def scrape_channel_messages(html):
             nb_videos=nb_videos,
             videos=videos,
             videos_times=videos_times,
+            nb_files=nb_files,
             nb_links=nb_links,
             links=links,
             link_img=link_img,
