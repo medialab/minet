@@ -62,6 +62,8 @@ EXTRACT_COMMAND = command(
         . "date": date of publication of the web page article when found in
             its metadata.
         . "sitename": canonical name as declared by the website.
+        . "image": main image of the web page when found.
+        . "pagetype": some page type as part of trafilatura's heuristics.
 
         Examples:
 
