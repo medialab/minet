@@ -34,5 +34,5 @@ BLUESKY_COMMAND = command(
     description="""
         Collect data from Bluesky.
     """,
-    subcommands=[],
+    subcommands=[BLUESKY_SEARCH_POSTS_COMMAND],
 )

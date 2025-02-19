@@ -75,8 +75,9 @@ RawDescriptionRichHelpFormatter.highlights = [
     r"(?P<title>BEWARE):",  # beware
     r"\s+\$\s+(?P<args>.+)",  # examples
     r"(?P<dim>\n>\s+.+)",  # caret sections
-    r'"(?P<metavar>[^"]+)"',  # double-quote literals
-    r"`(?P<metavar>[^`]+)`",  # backtick literals
+    r"(?P<metavar>MINET_[A-Z_]+)",  # env vars
+    r'(?P<metavar>"[^"]+")',  # double-quote literals
+    r"(?P<metavar>`[^`]+`)",  # backtick literals
     r"(?P<metavar><[a-z\s=\"]+>)",  # tags
     r"(?P<emphasis>how to use the command with.+)",  # emphasis
     r"(?P<args>https?://\S+)",  # urls

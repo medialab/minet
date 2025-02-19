@@ -7,8 +7,8 @@ def fatal_errors_hook(_, e):
     if isinstance(e, BlueskyAuthenticationError):
         return [
             "Invalid Bluesky authentication!",
-            "Did you give correct information to the --identifier (did you forget `.bsky.social` at the end?) and --password flags?",
-            "If you don't have a password, you can create one here: https://bsky.app/settings/app-passwords",
+            "Did you give correct information to --identifier (did you forget `.bsky.social` at the end?) and --password flags?",
+            "If you don't have a password, you can create one here: [cyan]https://bsky.app/settings/app-passwords",
         ]
 
 
