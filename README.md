@@ -84,7 +84,6 @@ Minet can single-handedly:
   - _[Wikipedia](https://www.wikipedia.org)_
   - _[Youtube](https://www.youtube.com/)_ (requires free API access)
 - Scrape (without requiring special access, often just a user account):
-  - _[Facebook](https://www.facebook.com/)_
   - _[Instagram](https://www.instagram.com/)_
   - _[Telegram](https://telegram.org/)_
   - _[TikTok](https://www.tiktok.com)_

@@ -26,12 +26,7 @@ _Generic commands_
 _Platform-related commands_
 
 - [facebook (fb)](#facebook)
-  - [comments](#comments)
-  - [post](#post)
-  - [posts](#posts)
-  - [post-authors](#post-authors)
   - [url-likes](#url-likes)
-  - [user-infos](#user-infos)
 - [google](#google)
   - [sheets](#sheets)
 - [hyphe](#hyphe)
@@ -42,7 +37,7 @@ _Platform-related commands_
   - [reset](#reset)
   - [tag](#tag)
 - [instagram (insta)](#instagram)
-  - [comments](#comments-1)
+  - [comments](#comments)
   - [hashtag](#hashtag)
   - [location](#location)
   - [post-infos](#post-infos)
@@ -82,7 +77,7 @@ _Platform-related commands_
   - [captions](#captions)
   - [channel-videos](#channel-videos)
   - [channels](#channels)
-  - [comments](#comments-2)
+  - [comments](#comments-1)
   - [search](#search-1)
   - [videos](#videos)
 
@@ -120,8 +115,6 @@ _Configuration file_
 
 ```yml
 ---
-facebook:
-  cookie: "MY_FACEBOOK_COOKIE" # Used as --cookie for `minet fb` commands
 instagram:
   cookie: "MY_INSTAGRAM_COOKIE" # Used as --cookie for `minet insta` commands
 mediacloud:
@@ -144,7 +137,7 @@ Alternatively you can also set some arguments using environment variables whose 
 
 To build the name of the variable, first check what can be configured in a minet [rcfile](#minetrc-config-files) and build your variable name by joining its path using an underscore:
 
-For instance, to override `facebook.cookie`, the variable will be `MINET_FACEBOOK_COOKIE`.
+For instance, to override `youtube.key`, the variable will be `MINET_YOUTUBE_KEY`.
 
 If one of the path's key already contains underscore, it will work all the same. So to override `twitter.api_key`, the variable will be `MINET_TWITTER_API_KEY`.
 
@@ -168,7 +161,7 @@ Positional Arguments:
   {brave,chrome,chromium,edge,firefox,opera,opera_gx,safari,vivaldi}
                                 Name of the browser from which to grab cookies.
 
-Options:
+Optional Arguments:
   --csv                         Whether to format the output as CSV. If --url is
                                 set, will output the cookie's morsels as CSV.
   --url URL                     If given, only returns full cookie header value
@@ -232,7 +225,7 @@ Positional Arguments:
                                 column containing start urls when using
                                 -i/--input. Defaults to "url".
 
-Options:
+Optional Arguments:
   -z, --compress-on-disk        Whether to compress the downloaded files when
                                 saving files on disk.
   --compress-transfer           Whether to send a "Accept-Encoding" header
@@ -413,7 +406,7 @@ Positional Arguments:
                                 column containing start urls when using
                                 -i/--input. Defaults to "url".
 
-Options:
+Optional Arguments:
   -z, --compress-on-disk        Whether to compress the downloaded files when
                                 saving files on disk.
   --compress-transfer           Whether to send a "Accept-Encoding" header
@@ -599,7 +592,7 @@ Positional Arguments:
   url_or_url_column             Single url to process or name of the CSV column
                                 containing urls when using -i/--input.
 
-Options:
+Optional Arguments:
   -z, --compress-on-disk        Whether to compress the contents.
   --compress-transfer           Whether to send a "Accept-Encoding" header
                                 asking for a compressed response. Usually better
@@ -838,7 +831,7 @@ Positional Arguments:
                                 containing paths when using -i/--input. Defaults
                                 to "path".
 
-Options:
+Optional Arguments:
   --body-column BODY_COLUMN     Name of the CSV column containing html bodies.
                                 Defaults to `body`.
   --chunk-size CHUNK_SIZE       Chunk size for multiprocessing. Defaults to `1`.
@@ -974,7 +967,7 @@ Positional Arguments:
   url_or_url_column             Single url to process or name of the CSV column
                                 containing urls when using -i/--input.
 
-Options:
+Optional Arguments:
   --canonicalize                Whether to extract the canonical url from the
                                 html source code of the web page if found.
                                 Requires to buffer part of the response body, so
@@ -1163,7 +1156,7 @@ Positional Arguments:
                                 containing paths when using -i/--input. Defaults
                                 to "path".
 
-Options:
+Optional Arguments:
   --base-url BASE_URL           Base url to use if --url-column is not valid.
   --body-column BODY_COLUMN     Name of the CSV column containing html bodies.
                                 Defaults to `body`.
@@ -1326,7 +1319,7 @@ Positional Arguments:
   url_or_url_column             Single url to process or name of the CSV column
                                 containing urls when using -i/--input.
 
-Options:
+Optional Arguments:
   --adblock                     Whether to use the ublock-origin browser
                                 extension.
   --automatic-consent           Whether to use the "I still don't care about
@@ -1479,7 +1472,7 @@ Positional Arguments:
   column                        Name of the column containing text or html.
   input                         Target CSV file.
 
-Options:
+Optional Arguments:
   --base-url BASE_URL           Base url used to resolve relative urls.
   --from {html,text}            Extract urls from which kind of source? Defaults
                                 to `text`.
@@ -1540,7 +1533,7 @@ Positional Arguments:
   input2                        Path to the second file. Will understand `-` as
                                 stdin.
 
-Options:
+Optional Arguments:
   -p, --match-column-prefix MATCH_COLUMN_PREFIX
                                 Optional prefix to add to the first file's
                                 column names to avoid conflicts. Defaults to ``.
@@ -1606,7 +1599,7 @@ Positional Arguments:
   url_or_url_column             Single url to process or name of the CSV column
                                 containing urls when using -i/--input.
 
-Options:
+Optional Arguments:
   --facebook                    Whether to consider and parse the given urls as
                                 coming from Facebook.
   --fix-common-mistakes, --dont-fix-common-mistakes
@@ -1788,490 +1781,18 @@ how to use the command with a CSV file?
 ## Facebook
 
 ```
-Usage: minet facebook [-h]
-                      {comments,experimental-comments,post-authors,post-stats,post,posts,url-likes,user-infos}
-                      ...
+Usage: minet facebook [-h] {experimental-comments,url-likes} ...
 
 # Minet Facebook Command
 
 Collect data from Facebook.
 
-Options:
+Optional Arguments:
   -h, --help                    show this help message and exit
 
 Subcommands:
-  {comments,experimental-comments,post-authors,post-stats,post,posts,url-likes,user-infos}
+  {experimental-comments,url-likes}
                                 Subcommand to use.
-```
-
-### comments
-
-```
-Usage: minet facebook comments [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                               [--refresh-per-second REFRESH_PER_SECOND]
-                               [--simple-progress] [--throttle THROTTLE]
-                               [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                               [--total TOTAL] [-o OUTPUT]
-                               post_url_or_post_url_column
-
-# Minet Facebook Comments Command
-
-Scrape a Facebook post's comments.
-
-This requires to be logged in to a Facebook account, so
-by default this command will attempt to grab the relevant
-authentication cookies from a local Firefox browser.
-
-If you want to grab cookies from another browser or want
-to directly pass the cookie as a string, check out the
--c/--cookie flag.
-
-Positional Arguments:
-  post_url_or_post_url_column   Single post url to process or name of the CSV
-                                column containing post urls when using
-                                -i/--input.
-
-Options:
-  -c, --cookie COOKIE           Authenticated cookie to use or browser from
-                                which to extract it (supports "firefox",
-                                "chrome", "chromium", "opera" and "edge").
-                                Defaults to `firefox`. Can also be configured in
-                                a .minetrc file as "facebook.cookie" or read
-                                from the MINET_FACEBOOK_COOKIE env variable.
-  --throttle THROTTLE           Throttling time, in seconds, to wait between
-                                each request. Defaults to `2.0`.
-  -s, --select SELECT           Columns of -i/--input CSV file to include in the
-                                output (separated by `,`). Use an empty string
-                                if you don't want to keep anything: --select ''.
-  --explode EXPLODE             Use to indicate the character used to separate
-                                multiple values in a single CSV cell. Defaults
-                                to none, i.e. CSV cells having a single values,
-                                which is usually the case.
-  --total TOTAL                 Total number of items to process. Might be
-                                necessary when you want to display a finite
-                                progress indicator for large files given as
-                                input to the command.
-  -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the post urls you want to process. Will consider
-                                `-` as stdin.
-  -o, --output OUTPUT           Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
-  --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here:
-                                https://github.com/medialab/minet/blob/master/do
-                                cs/cli.md#minetrc
-  --refresh-per-second REFRESH_PER_SECOND
-                                Number of times to refresh the progress bar per
-                                second. Can be a float e.g. `0.5` meaning once
-                                every two seconds. Use this to limit CPU usage
-                                when launching multiple commands at once.
-                                Defaults to `10`.
-  --simple-progress             Whether to simplify the progress bar and make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
-  --silent                      Whether to suppress all the log and progress
-                                bars. Can be useful when piping.
-  -h, --help                    show this help message and exit
-
-Examples:
-
-. Scraping a post's comments:
-    $ minet fb comments https://www.facebook.com/groups/186982532676569/permalink/4096995827030341/ > comments.csv
-
-. Grabbing cookies from chrome:
-    $ minet fb comments -c chrome https://www.facebook.com/groups/186982532676569/permalink/4096995827030341/ > comments.csv
-
-. Scraping comments from multiple posts listed in a CSV file:
-    $ minet fb comments post_url -i posts.csv > comments.csv
-
-how to use the command with a CSV file?
-
-> A lot of minet commands, including this one, can both be
-> given a single value to process or a bunch of them if
-> given the column of a CSV file passed to -i/--input instead.
-
-> Note that when given a CSV file as input, minet will
-> concatenate the input file columns with the ones added
-> by the command. You can always restrict the input file
-> columns to keep by using the -s/--select flag.
-
-. Here is how to use a command with a single value:
-    $ minet facebook comments "value"
-
-. Here is how to use a command with a CSV file:
-    $ minet facebook comments column_name -i file.csv
-
-. Here is how to read CSV file from stdin using `-`:
-    $ xan search -s col . | minet facebook comments column_name -i -
-
-. Here is how to indicate that the CSV column may contain multiple
-  values separated by a special character:
-    $ minet facebook comments column_name -i file.csv --explode "|"
-
-. This also works with single values:
-    $ minet facebook comments "value1,value2" --explode ","
-```
-
-### post
-
-```
-Usage: minet facebook post [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                           [--refresh-per-second REFRESH_PER_SECOND]
-                           [--simple-progress] [--throttle THROTTLE] [-i INPUT]
-                           [--explode EXPLODE] [-s SELECT] [--total TOTAL]
-                           [-o OUTPUT]
-                           post_url_or_post_url_column
-
-# Minet Facebook Post Command
-
-Scrape Facebook post.
-
-This requires to be logged in to a Facebook account, so
-by default this command will attempt to grab the relevant
-authentication cookies from a local Firefox browser.
-
-If you want to grab cookies from another browser or want
-to directly pass the cookie as a string, check out the
--c/--cookie flag.
-
-You must set your account language to English (US) for the
-command to work.
-
-Note that, by default, Facebook will translate post text
-when they are not written in a language whitelisted here:
-https://www.facebook.com/settings/?tab=language
-
-In this case, minet will output both the original text and
-the translated one. But be aware that original text may be
-truncated, so you might want to edit your Facebook settings
-using the url above to make sure text won't be translated
-for posts you are interested in.
-
-Of course, the CLI will warn you when translated text is
-found so you can choose to edit your settings early as
-as possible.
-
-Finally, some post text is always truncated on Facebook
-when displayed in lists. This text is not yet entirely
-scraped by minet at this time.
-
-Positional Arguments:
-  post_url_or_post_url_column   Single post url to process or name of the CSV
-                                column containing post urls when using
-                                -i/--input.
-
-Options:
-  -c, --cookie COOKIE           Authenticated cookie to use or browser from
-                                which to extract it (supports "firefox",
-                                "chrome", "chromium", "opera" and "edge").
-                                Defaults to `firefox`. Can also be configured in
-                                a .minetrc file as "facebook.cookie" or read
-                                from the MINET_FACEBOOK_COOKIE env variable.
-  --throttle THROTTLE           Throttling time, in seconds, to wait between
-                                each request. Defaults to `2.0`.
-  -s, --select SELECT           Columns of -i/--input CSV file to include in the
-                                output (separated by `,`). Use an empty string
-                                if you don't want to keep anything: --select ''.
-  --explode EXPLODE             Use to indicate the character used to separate
-                                multiple values in a single CSV cell. Defaults
-                                to none, i.e. CSV cells having a single values,
-                                which is usually the case.
-  --total TOTAL                 Total number of items to process. Might be
-                                necessary when you want to display a finite
-                                progress indicator for large files given as
-                                input to the command.
-  -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the post urls you want to process. Will consider
-                                `-` as stdin.
-  -o, --output OUTPUT           Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
-  --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here:
-                                https://github.com/medialab/minet/blob/master/do
-                                cs/cli.md#minetrc
-  --refresh-per-second REFRESH_PER_SECOND
-                                Number of times to refresh the progress bar per
-                                second. Can be a float e.g. `0.5` meaning once
-                                every two seconds. Use this to limit CPU usage
-                                when launching multiple commands at once.
-                                Defaults to `10`.
-  --simple-progress             Whether to simplify the progress bar and make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
-  --silent                      Whether to suppress all the log and progress
-                                bars. Can be useful when piping.
-  -h, --help                    show this help message and exit
-
-Examples:
-
-. Scraping a post:
-    $ minet fb post https://m.facebook.com/watch/?v=448540820705115 > post.csv
-
-. Grabbing cookies from chrome:
-    $ minet fb posts -c chrome https://m.facebook.com/watch/?v=448540820705115 > post.csv
-
-. Scraping post from multiple urls listed in a CSV file:
-    $ minet fb post url -i urls.csv > post.csv
-
-how to use the command with a CSV file?
-
-> A lot of minet commands, including this one, can both be
-> given a single value to process or a bunch of them if
-> given the column of a CSV file passed to -i/--input instead.
-
-> Note that when given a CSV file as input, minet will
-> concatenate the input file columns with the ones added
-> by the command. You can always restrict the input file
-> columns to keep by using the -s/--select flag.
-
-. Here is how to use a command with a single value:
-    $ minet facebook post "value"
-
-. Here is how to use a command with a CSV file:
-    $ minet facebook post column_name -i file.csv
-
-. Here is how to read CSV file from stdin using `-`:
-    $ xan search -s col . | minet facebook post column_name -i -
-
-. Here is how to indicate that the CSV column may contain multiple
-  values separated by a special character:
-    $ minet facebook post column_name -i file.csv --explode "|"
-
-. This also works with single values:
-    $ minet facebook post "value1,value2" --explode ","
-```
-
-### posts
-
-```
-Usage: minet facebook posts [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                            [--refresh-per-second REFRESH_PER_SECOND]
-                            [--simple-progress] [--throttle THROTTLE] [-i INPUT]
-                            [--explode EXPLODE] [-s SELECT] [--total TOTAL]
-                            [-o OUTPUT]
-                            group_url_or_group_url_column
-
-# Minet Facebook Posts Command
-
-Scrape Facebook posts.
-
-This requires to be logged in to a Facebook account, so
-by default this command will attempt to grab the relevant
-authentication cookies from a local Firefox browser.
-
-If you want to grab cookies from another browser or want
-to directly pass the cookie as a string, check out the
--c/--cookie flag.
-
-Scraping posts currently only works for Facebook groups.
-
-Note that, by default, Facebook will translate post text
-when they are not written in a language whitelisted here:
-https://www.facebook.com/settings/?tab=language
-
-In this case, minet will output both the original text and
-the translated one. But be aware that original text may be
-truncated, so you might want to edit your Facebook settings
-using the url above to make sure text won't be translated
-for posts you are interested in.
-
-Of course, the CLI will warn you when translated text is
-found so you can choose to edit your settings early as
-as possible.
-
-Finally, some post text is always truncated on Facebook
-when displayed in lists. This text is not yet entirely
-scraped by minet at this time.
-
-Positional Arguments:
-  group_url_or_group_url_column
-                                Single group url to process or name of the CSV
-                                column containing group urls when using
-                                -i/--input.
-
-Options:
-  -c, --cookie COOKIE           Authenticated cookie to use or browser from
-                                which to extract it (supports "firefox",
-                                "chrome", "chromium", "opera" and "edge").
-                                Defaults to `firefox`. Can also be configured in
-                                a .minetrc file as "facebook.cookie" or read
-                                from the MINET_FACEBOOK_COOKIE env variable.
-  --throttle THROTTLE           Throttling time, in seconds, to wait between
-                                each request. Defaults to `2.0`.
-  -s, --select SELECT           Columns of -i/--input CSV file to include in the
-                                output (separated by `,`). Use an empty string
-                                if you don't want to keep anything: --select ''.
-  --explode EXPLODE             Use to indicate the character used to separate
-                                multiple values in a single CSV cell. Defaults
-                                to none, i.e. CSV cells having a single values,
-                                which is usually the case.
-  --total TOTAL                 Total number of items to process. Might be
-                                necessary when you want to display a finite
-                                progress indicator for large files given as
-                                input to the command.
-  -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the group urls you want to process. Will
-                                consider `-` as stdin.
-  -o, --output OUTPUT           Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
-  --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here:
-                                https://github.com/medialab/minet/blob/master/do
-                                cs/cli.md#minetrc
-  --refresh-per-second REFRESH_PER_SECOND
-                                Number of times to refresh the progress bar per
-                                second. Can be a float e.g. `0.5` meaning once
-                                every two seconds. Use this to limit CPU usage
-                                when launching multiple commands at once.
-                                Defaults to `10`.
-  --simple-progress             Whether to simplify the progress bar and make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
-  --silent                      Whether to suppress all the log and progress
-                                bars. Can be useful when piping.
-  -h, --help                    show this help message and exit
-
-Examples:
-
-. Scraping a group's posts:
-    $ minet fb posts https://www.facebook.com/groups/444175323127747 > posts.csv
-
-. Grabbing cookies from chrome:
-    $ minet fb posts -c chrome https://www.facebook.com/groups/444175323127747 > posts.csv
-
-. Scraping posts from multiple groups listed in a CSV file:
-    $ minet fb posts group_url -i groups.csv > posts.csv
-
-how to use the command with a CSV file?
-
-> A lot of minet commands, including this one, can both be
-> given a single value to process or a bunch of them if
-> given the column of a CSV file passed to -i/--input instead.
-
-> Note that when given a CSV file as input, minet will
-> concatenate the input file columns with the ones added
-> by the command. You can always restrict the input file
-> columns to keep by using the -s/--select flag.
-
-. Here is how to use a command with a single value:
-    $ minet facebook posts "value"
-
-. Here is how to use a command with a CSV file:
-    $ minet facebook posts column_name -i file.csv
-
-. Here is how to read CSV file from stdin using `-`:
-    $ xan search -s col . | minet facebook posts column_name -i -
-
-. Here is how to indicate that the CSV column may contain multiple
-  values separated by a special character:
-    $ minet facebook posts column_name -i file.csv --explode "|"
-
-. This also works with single values:
-    $ minet facebook posts "value1,value2" --explode ","
-```
-
-### post-authors
-
-```
-Usage: minet facebook post-authors [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                                   [--refresh-per-second REFRESH_PER_SECOND]
-                                   [--simple-progress] [--throttle THROTTLE]
-                                   [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                                   [--total TOTAL] [-o OUTPUT]
-                                   post_url_or_post_url_column
-
-# Minet Facebook Post Authors Command
-
-Retrieve the author of the given Facebook posts.
-
-Note that it is only relevant for group posts since
-only administrators can post something on pages.
-
-Positional Arguments:
-  post_url_or_post_url_column   Single post to process or name of the CSV column
-                                containing posts when using -i/--input.
-
-Options:
-  -c, --cookie COOKIE           Authenticated cookie to use or browser from
-                                which to extract it (supports "firefox",
-                                "chrome", "chromium", "opera" and "edge").
-                                Defaults to `firefox`. Can also be configured in
-                                a .minetrc file as "facebook.cookie" or read
-                                from the MINET_FACEBOOK_COOKIE env variable.
-  --throttle THROTTLE           Throttling time, in seconds, to wait between
-                                each request. Defaults to `2.0`.
-  -s, --select SELECT           Columns of -i/--input CSV file to include in the
-                                output (separated by `,`). Use an empty string
-                                if you don't want to keep anything: --select ''.
-  --explode EXPLODE             Use to indicate the character used to separate
-                                multiple values in a single CSV cell. Defaults
-                                to none, i.e. CSV cells having a single values,
-                                which is usually the case.
-  --total TOTAL                 Total number of items to process. Might be
-                                necessary when you want to display a finite
-                                progress indicator for large files given as
-                                input to the command.
-  -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the posts you want to process. Will consider `-`
-                                as stdin.
-  -o, --output OUTPUT           Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
-  --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here:
-                                https://github.com/medialab/minet/blob/master/do
-                                cs/cli.md#minetrc
-  --refresh-per-second REFRESH_PER_SECOND
-                                Number of times to refresh the progress bar per
-                                second. Can be a float e.g. `0.5` meaning once
-                                every two seconds. Use this to limit CPU usage
-                                when launching multiple commands at once.
-                                Defaults to `10`.
-  --simple-progress             Whether to simplify the progress bar and make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
-  --silent                      Whether to suppress all the log and progress
-                                bars. Can be useful when piping.
-  -h, --help                    show this help message and exit
-
-Examples:
-
-. Fetching authors of a series of posts in a CSV file:
-    $ minet fb post-authors post_url -i fb-posts.csv > authors.csv
-
-how to use the command with a CSV file?
-
-> A lot of minet commands, including this one, can both be
-> given a single value to process or a bunch of them if
-> given the column of a CSV file passed to -i/--input instead.
-
-> Note that when given a CSV file as input, minet will
-> concatenate the input file columns with the ones added
-> by the command. You can always restrict the input file
-> columns to keep by using the -s/--select flag.
-
-. Here is how to use a command with a single value:
-    $ minet facebook post-authors "value"
-
-. Here is how to use a command with a CSV file:
-    $ minet facebook post-authors column_name -i file.csv
-
-. Here is how to read CSV file from stdin using `-`:
-    $ xan search -s col . | minet facebook post-authors column_name -i -
-
-. Here is how to indicate that the CSV column may contain multiple
-  values separated by a special character:
-    $ minet facebook post-authors column_name -i file.csv --explode "|"
-
-. This also works with single values:
-    $ minet facebook post-authors "value1,value2" --explode ","
 ```
 
 ### url-likes
@@ -2301,7 +1822,7 @@ Positional Arguments:
   url_or_url_column             Single url to process or name of the CSV column
                                 containing urls when using -i/--input.
 
-Options:
+Optional Arguments:
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -2368,104 +1889,6 @@ how to use the command with a CSV file?
     $ minet facebook url-likes "value1,value2" --explode ","
 ```
 
-### user-infos
-
-```
-Usage: minet facebook user-infos [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
-                                 [--refresh-per-second REFRESH_PER_SECOND]
-                                 [--simple-progress] [--throttle THROTTLE]
-                                 [-i INPUT] [--explode EXPLODE] [-s SELECT]
-                                 [--total TOTAL] [--resume] [-o OUTPUT]
-                                 user_url_or_user_url_column
-
-# Minet Facebook User Infos Command
-
-Retrieve various information about Facebook users like their name, hometown,
-current city, gender etc.
-
-Positional Arguments:
-  user_url_or_user_url_column   Single user to process or name of the CSV column
-                                containing users when using -i/--input.
-
-Options:
-  -c, --cookie COOKIE           Authenticated cookie to use or browser from
-                                which to extract it (supports "firefox",
-                                "chrome", "chromium", "opera" and "edge").
-                                Defaults to `firefox`. Can also be configured in
-                                a .minetrc file as "facebook.cookie" or read
-                                from the MINET_FACEBOOK_COOKIE env variable.
-  --throttle THROTTLE           Throttling time, in seconds, to wait between
-                                each request. Defaults to `2.0`.
-  -s, --select SELECT           Columns of -i/--input CSV file to include in the
-                                output (separated by `,`). Use an empty string
-                                if you don't want to keep anything: --select ''.
-  --explode EXPLODE             Use to indicate the character used to separate
-                                multiple values in a single CSV cell. Defaults
-                                to none, i.e. CSV cells having a single values,
-                                which is usually the case.
-  --total TOTAL                 Total number of items to process. Might be
-                                necessary when you want to display a finite
-                                progress indicator for large files given as
-                                input to the command.
-  -i, --input INPUT             CSV file (potentially gzipped) containing all
-                                the users you want to process. Will consider `-`
-                                as stdin.
-  -o, --output OUTPUT           Path to the output file. Will consider `-` as
-                                stdout. If not given, results will also be
-                                printed to stdout.
-  --resume                      "Whether to resume from an aborted collection.
-                                Need -o to be set.
-  --rcfile RCFILE               Custom path to a minet configuration file. More
-                                info about this here:
-                                https://github.com/medialab/minet/blob/master/do
-                                cs/cli.md#minetrc
-  --refresh-per-second REFRESH_PER_SECOND
-                                Number of times to refresh the progress bar per
-                                second. Can be a float e.g. `0.5` meaning once
-                                every two seconds. Use this to limit CPU usage
-                                when launching multiple commands at once.
-                                Defaults to `10`.
-  --simple-progress             Whether to simplify the progress bar and make it
-                                fit on a single line. Can be useful in terminals
-                                with partial ANSI support, e.g. a Jupyter
-                                notebook cell.
-  --silent                      Whether to suppress all the log and progress
-                                bars. Can be useful when piping.
-  -h, --help                    show this help message and exit
-
-Examples:
-
-. Fetching user infos of a series of users in a CSV file:
-    $ minet fb user-infos user_url -i fb-users.csv > user-infos.csv
-
-how to use the command with a CSV file?
-
-> A lot of minet commands, including this one, can both be
-> given a single value to process or a bunch of them if
-> given the column of a CSV file passed to -i/--input instead.
-
-> Note that when given a CSV file as input, minet will
-> concatenate the input file columns with the ones added
-> by the command. You can always restrict the input file
-> columns to keep by using the -s/--select flag.
-
-. Here is how to use a command with a single value:
-    $ minet facebook user-infos "value"
-
-. Here is how to use a command with a CSV file:
-    $ minet facebook user-infos column_name -i file.csv
-
-. Here is how to read CSV file from stdin using `-`:
-    $ xan search -s col . | minet facebook user-infos column_name -i -
-
-. Here is how to indicate that the CSV column may contain multiple
-  values separated by a special character:
-    $ minet facebook user-infos column_name -i file.csv --explode "|"
-
-. This also works with single values:
-    $ minet facebook user-infos "value1,value2" --explode ","
-```
-
 ## Google
 
 ```
@@ -2475,7 +1898,7 @@ Usage: minet google [-h] {sheets} ...
 
 Collect data from Google.
 
-Options:
+Optional Arguments:
   -h, --help  show this help message and exit
 
 Subcommands:
@@ -2513,7 +1936,7 @@ Positional Arguments:
   url                           Url, sharing url or id of the spreadsheet to
                                 export.
 
-Options:
+Optional Arguments:
   -a, --authuser AUTHUSER       Connected google account number to use.
   -c, --cookie COOKIE           Google Drive cookie or browser from which to
                                 extract it (supports "firefox", "chrome",
@@ -2575,7 +1998,7 @@ a Hyphe crawl from a corpus exported in CSV.
 Positional Arguments:
   corpus                        Path to the Hyphe corpus exported to CSV.
 
-Options:
+Optional Arguments:
   -z, --compress-on-disk        Whether to compress the downloaded files when
                                 saving files on disk.
   --compress-transfer           Whether to send a "Accept-Encoding" header
@@ -2732,7 +2155,7 @@ Positional Arguments:
   corpus                        Id of the corpus.
   webentities                   CSV file of webentities (exported from Hyphe).
 
-Options:
+Optional Arguments:
   --password PASSWORD           The corpus's password if required.
   --total TOTAL                 Total number of items to process. Might be
                                 necessary when you want to display a finite
@@ -2777,7 +2200,7 @@ Positional Arguments:
   url                           Url of the Hyphe API.
   corpus                        Id of the corpus.
 
-Options:
+Optional Arguments:
   --password PASSWORD           The corpus's password if required.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
@@ -2821,7 +2244,7 @@ Positional Arguments:
   url                           Url of the Hyphe API.
   corpus                        Id of the corpus.
 
-Options:
+Optional Arguments:
   --body                        Whether to download pages body.
   -O, --output-dir OUTPUT_DIR   Output directory for dumped files. Will default
                                 to some name based on corpus name.
@@ -2871,7 +2294,7 @@ Positional Arguments:
   url                           Url of the Hyphe API.
   corpus                        Id of the corpus.
 
-Options:
+Optional Arguments:
   --password PASSWORD           The corpus's password if required.
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
@@ -2917,7 +2340,7 @@ Positional Arguments:
   tag_columns                   Columns, separated by comma, to use as tags.
   data                          CSV file of webentities (exported from Hyphe).
 
-Options:
+Optional Arguments:
   --password PASSWORD           The corpus's password if required.
   --separator SEPARATOR         Separator use to split multiple tag values in
                                 the same column. Defaults to `|`.
@@ -2961,7 +2384,7 @@ Usage: minet instagram [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
 
 Gather data from Instagram.
 
-Options:
+Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -3019,7 +2442,7 @@ Positional Arguments:
                                 post urls, post shortcodes or post ids when
                                 using -i/--input.
 
-Options:
+Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -3125,7 +2548,7 @@ Positional Arguments:
                                 column containing hashtags when using
                                 -i/--input.
 
-Options:
+Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -3231,7 +2654,7 @@ Positional Arguments:
                                 column containing locations when using
                                 -i/--input.
 
-Options:
+Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -3341,7 +2764,7 @@ Positional Arguments:
                                 post urls, post shortcodes or post ids when
                                 using -i/--input.
 
-Options:
+Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -3455,7 +2878,7 @@ Positional Arguments:
                                 or name of the CSV column containing usernames,
                                 user urls or user ids when using -i/--input.
 
-Options:
+Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -3568,7 +2991,7 @@ Positional Arguments:
                                 or name of the CSV column containing usernames,
                                 user urls or user ids when using -i/--input.
 
-Options:
+Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -3679,7 +3102,7 @@ Positional Arguments:
                                 or name of the CSV column containing usernames,
                                 user urls or user ids when using -i/--input.
 
-Options:
+Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -3793,7 +3216,7 @@ Positional Arguments:
                                 or name of the CSV column containing usernames,
                                 user urls or user ids when using -i/--input.
 
-Options:
+Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -3890,7 +3313,7 @@ Positional Arguments:
                                 the CSV column containing Mediacloud media ids
                                 when using -i/--input.
 
-Options:
+Optional Arguments:
   --feeds FEEDS                 If given, path of the CSV file listing media RSS
                                 feeds.
   -t, --token TOKEN             Mediacloud API token (also called "key"
@@ -3983,7 +3406,7 @@ https://mediacloud.org/support/query-guide
 Positional Arguments:
   query                         Search query.
 
-Options:
+Optional Arguments:
   -c, --collections COLLECTIONS
                                 List of collection ids to search, separated by
                                 commas.
@@ -4046,7 +3469,7 @@ Retrieves the list of stories from a mediacloud topic.
 Positional Arguments:
   topic_id                      Id of the topic.
 
-Options:
+Optional Arguments:
   --from-media-id FROM_MEDIA_ID
                                 Return only stories that are linked from stories
                                 in the given media_id.
@@ -4100,7 +3523,7 @@ Positional Arguments:
                                 the CSV column containing channel names / urls
                                 when using -i/--input.
 
-Options:
+Optional Arguments:
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `0.5`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -4186,7 +3609,7 @@ Positional Arguments:
                                 the CSV column containing channel names / urls
                                 when using -i/--input.
 
-Options:
+Optional Arguments:
   --throttle THROTTLE           Throttling time, in seconds, to wait between
                                 each request. Defaults to `0.5`.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -4261,7 +3684,7 @@ Usage: minet tiktok [-h] {search-videos} ...
 
 Gather data from Tiktok.
 
-Options:
+Optional Arguments:
   -h, --help       show this help message and exit
 
 Subcommands:
@@ -4305,7 +3728,7 @@ Positional Arguments:
                                 CSV column containing tiktok keywords when using
                                 -i/--input.
 
-Options:
+Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -4440,7 +3863,7 @@ Positional Arguments:
                                 CSV column containing tweet urls or ids when
                                 using -i/--input.
 
-Options:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -4564,7 +3987,7 @@ Positional Arguments:
                                 Twitter account screen names or ids when using
                                 -i/--input.
 
-Options:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -4686,7 +4109,7 @@ Positional Arguments:
                                 column containing user ids when using
                                 -i/--input.
 
-Options:
+Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -4786,7 +4209,7 @@ Positional Arguments:
                                 Twitter account screen names or ids when using
                                 -i/--input.
 
-Options:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -4901,7 +4324,7 @@ Positional Arguments:
                                 of the CSV column containing Twitter list ids or
                                 urls when using -i/--input.
 
-Options:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -5010,7 +4433,7 @@ Positional Arguments:
                                 of the CSV column containing Twitter list ids or
                                 urls when using -i/--input.
 
-Options:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -5119,7 +4542,7 @@ Positional Arguments:
                                 column containing tweet ids when using
                                 -i/--input.
 
-Options:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -5260,7 +4683,7 @@ Positional Arguments:
   query_or_query_column         Single query to process or name of the CSV
                                 column containing queries when using -i/--input.
 
-Options:
+Optional Arguments:
   -c, --cookie COOKIE           Authenticated cookie to use or browser from
                                 which to extract it (supports "firefox",
                                 "chrome", "chromium", "opera" and "edge").
@@ -5388,7 +4811,7 @@ Positional Arguments:
                                 CSV column containing tweet urls or ids when
                                 using -i/--input.
 
-Options:
+Optional Arguments:
   --timezone TIMEZONE           Timezone for dates, for example 'Europe/Paris'.
                                 Defaults to UTC.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
@@ -5484,7 +4907,7 @@ Positional Arguments:
   query_or_query_column         Single query to process or name of the CSV
                                 column containing queries when using -i/--input.
 
-Options:
+Optional Arguments:
   --academic                    Flag to add if you want to use your academic
                                 research access (in order to search the complete
                                 history of public tweets).
@@ -5648,7 +5071,7 @@ Positional Arguments:
   query_or_query_column         Single query to process or name of the CSV
                                 column containing queries when using -i/--input.
 
-Options:
+Optional Arguments:
   --academic                    Flag to add if you want to use your academic
                                 research access (in order to search the complete
                                 history of public tweets).
@@ -5777,7 +5200,7 @@ Positional Arguments:
                                 column containing tweet ids when using
                                 -i/--input.
 
-Options:
+Optional Arguments:
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -5867,7 +5290,7 @@ Positional Arguments:
                                 CSV column containing Twitter users when using
                                 -i/--input.
 
-Options:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -5987,7 +5410,7 @@ Positional Arguments:
   query_or_query_column         Single query to process or name of the CSV
                                 column containing queries when using -i/--input.
 
-Options:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -6105,7 +5528,7 @@ Positional Arguments:
                                 Twitter account screen names or ids when using
                                 -i/--input.
 
-Options:
+Optional Arguments:
   --access-token ACCESS_TOKEN   Twitter API access token. Can also be configured
                                 in a .minetrc file as "twitter.access_token" or
                                 read from the MINET_TWITTER_ACCESS_TOKEN env
@@ -6228,7 +5651,7 @@ Positional Arguments:
   page_or_page_column           Single page to process or name of the CSV column
                                 containing pages when using -i/--input.
 
-Options:
+Optional Arguments:
   --access ACCESS               Get pageviews by access. Defaults to
                                 `all-access`.
   --agent AGENT                 Get pageviews by target agent. Defaults to
@@ -6325,7 +5748,7 @@ Positional Arguments:
                                 CSV column containing video urls or ids when
                                 using -i/--input.
 
-Options:
+Optional Arguments:
   -c, --collapse                Use this flag to only emit one line per video,
                                 with the subtitle lines joined together in a
                                 single cell. Note that this means losing start &
@@ -6426,7 +5849,7 @@ Positional Arguments:
                                 column containing channels when using
                                 -i/--input.
 
-Options:
+Optional Arguments:
   --end-time END_TIME           The newest UTC datetime from which the videos
                                 will be retrieved (end-time is excluded).
                                 Warning: videos more recent than end-time will
@@ -6540,7 +5963,7 @@ Positional Arguments:
                                 column containing channels when using
                                 -i/--input.
 
-Options:
+Optional Arguments:
   -k, --key KEY                 YouTube API Data dashboard API key. Can be used
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
@@ -6636,7 +6059,7 @@ Positional Arguments:
   video_or_video_column         Single video to process or name of the CSV
                                 column containing videos when using -i/--input.
 
-Options:
+Optional Arguments:
   -k, --key KEY                 YouTube API Data dashboard API key. Can be used
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
@@ -6732,7 +6155,7 @@ Positional Arguments:
   query_or_query_column         Single query to process or name of the CSV
                                 column containing queries when using -i/--input.
 
-Options:
+Optional Arguments:
   -k, --key KEY                 YouTube API Data dashboard API key. Can be used
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the
@@ -6826,7 +6249,7 @@ Positional Arguments:
   video_or_video_column         Single video to process or name of the CSV
                                 column containing videos when using -i/--input.
 
-Options:
+Optional Arguments:
   -k, --key KEY                 YouTube API Data dashboard API key. Can be used
                                 more than once. Can also be configured in a
                                 .minetrc file as "youtube.key" or read from the

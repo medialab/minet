@@ -26,12 +26,7 @@ _Generic commands_
 _Platform-related commands_
 
 - [facebook (fb)](#facebook)
-  - [comments](#comments)
-  - [post](#post)
-  - [posts](#posts)
-  - [post-authors](#post-authors)
   - [url-likes](#url-likes)
-  - [user-infos](#user-infos)
 - [google](#google)
   - [sheets](#sheets)
 - [hyphe](#hyphe)
@@ -42,7 +37,7 @@ _Platform-related commands_
   - [reset](#reset)
   - [tag](#tag)
 - [instagram (insta)](#instagram)
-  - [comments](#comments-1)
+  - [comments](#comments)
   - [hashtag](#hashtag)
   - [location](#location)
   - [post-infos](#post-infos)
@@ -82,7 +77,7 @@ _Platform-related commands_
   - [captions](#captions)
   - [channel-videos](#channel-videos)
   - [channels](#channels)
-  - [comments](#comments-2)
+  - [comments](#comments-1)
   - [search](#search-1)
   - [videos](#videos)
 
@@ -120,8 +115,6 @@ _Configuration file_
 
 ```yml
 ---
-facebook:
-  cookie: "MY_FACEBOOK_COOKIE" # Used as --cookie for `minet fb` commands
 instagram:
   cookie: "MY_INSTAGRAM_COOKIE" # Used as --cookie for `minet insta` commands
 mediacloud:
@@ -144,7 +137,7 @@ Alternatively you can also set some arguments using environment variables whose 
 
 To build the name of the variable, first check what can be configured in a minet [rcfile](#minetrc-config-files) and build your variable name by joining its path using an underscore:
 
-For instance, to override `facebook.cookie`, the variable will be `MINET_FACEBOOK_COOKIE`.
+For instance, to override `youtube.key`, the variable will be `MINET_YOUTUBE_KEY`.
 
 If one of the path's key already contains underscore, it will work all the same. So to override `twitter.api_key`, the variable will be `MINET_TWITTER_API_KEY`.
 
@@ -202,29 +195,9 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 
 <% fb %>
 
-### comments
-
-<% fb/comments %>
-
-### post
-
-<% fb/post %>
-
-### posts
-
-<% fb/posts %>
-
-### post-authors
-
-<% fb/post-authors %>
-
 ### url-likes
 
 <% fb/url-likes %>
-
-### user-infos
-
-<% fb/user-infos %>
 
 ## Google
 
