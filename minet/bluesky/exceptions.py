@@ -7,3 +7,7 @@ class BlueskyError(MinetError):
 
 class BlueskyAuthenticationError(BlueskyError):
     pass
+
+
+class BlueskySessionRefreshError(BlueskyError):
+    pass

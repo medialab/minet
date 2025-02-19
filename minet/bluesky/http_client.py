@@ -1,4 +1,6 @@
-from typing import Iterator
+from typing import Iterator, Optional
+
+from time import time, sleep
 
 from minet.web import (
     create_request_retryer,
@@ -11,10 +13,10 @@ from minet.web import (
 from minet.bluesky.urls import BlueskyHTTPAPIUrlFormatter
 from minet.bluesky.jwt import parse_jwt_for_expiration
 from minet.bluesky.types import BlueskyPost
-from minet.bluesky.exceptions import BlueskyAuthenticationError
-
-
-# TODO: token refresh, split request method in specifics for create_session and refresh_session
+from minet.bluesky.exceptions import (
+    BlueskyAuthenticationError,
+    BlueskySessionRefreshError,
+)
 
 
 class BlueskyHTTPClient:
@@ -22,6 +24,7 @@ class BlueskyHTTPClient:
         self.urls = BlueskyHTTPAPIUrlFormatter()
         self.pool_manager = create_pool_manager()
         self.retryer = create_request_retryer()
+        self.rate_limit_reset: Optional[int] = None
 
         # First auth
         self.create_session(identifier, password)
@@ -44,6 +47,28 @@ class BlueskyHTTPClient:
         self.refresh_jwt = data["refreshJwt"]
         self.access_jwt_expiration = parse_jwt_for_expiration(self.access_jwt)
 
+    def is_access_jwt_expired(self) -> bool:
+        # If the token has 10 seconds left, we consider it expired to avoid network-related issues
+        return self.access_jwt_expiration - time() < 10
+
+    @retrying_method()
+    def refresh_session(self):
+        response = request(
+            self.urls.refresh_session(),
+            pool_manager=self.pool_manager,
+            method="POST",
+            headers={"Authorization": "Bearer {}".format(self.refresh_jwt)},
+        )
+
+        if response.status != 200:
+            raise BlueskySessionRefreshError
+
+        data = response.json()
+
+        self.access_jwt = data["accessJwt"]
+        self.refresh_jwt = data["refreshJwt"]
+        self.access_jwt_expiration = parse_jwt_for_expiration(self.access_jwt)
+
     @retrying_method()
     def request(
         self,
@@ -51,6 +76,13 @@ class BlueskyHTTPClient:
         method: str = "GET",
         json_body=None,
     ) -> Response:
+        if self.rate_limit_reset is not None:
+            sleep(self.rate_limit_reset - time() + 0.1)
+            self.rate_limit_reset = None
+
+        if self.is_access_jwt_expired():
+            self.refresh_session()
+
         headers = {"Authorization": "Bearer {}".format(self.access_jwt)}
 
         response = request(
@@ -61,6 +93,11 @@ class BlueskyHTTPClient:
             known_encoding="utf-8",
             headers=headers,
         )
+
+        remaining = int(response.headers["RateLimit-Remaining"])
+
+        if remaining <= 0:
+            self.rate_limit_reset = int(response.headers["RateLimit-Reset"])
 
         return response
 

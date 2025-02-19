@@ -13,6 +13,9 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             path="com.atproto.server.createSession",
         )
 
+    def refresh_session(self) -> str:
+        return self.format(path="com.atproto.server.refreshSession")
+
     def search_posts(
         self, q: str, cursor: Optional[int] = None, limit: int = 100
     ) -> str:

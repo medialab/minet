@@ -1,6 +1,7 @@
 import sys
 import websockets
 import libipld
+import time
 from atproto import (
     Client,
     models,
@@ -26,9 +27,12 @@ from minet.bluesky import BlueskyHTTPClient, BlueskyWebSocketClient
 # console.print(models.get_model_as_json(response), highlight=True)
 
 client = BlueskyHTTPClient(sys.argv[1], sys.argv[2])
+print(client.is_access_jwt_expired())
+time.sleep(1)
+print(client.refresh_session())
 
-for post in client.search_posts("test"):
-    console.print(post, highlight=True)
+# for post in client.search_posts("test"):
+#     console.print(post, highlight=True)
 
 # client = BlueskyWebSocketClient()
 
