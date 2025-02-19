@@ -1,5 +1,5 @@
 import re
-from typing import List, Optional, cast, overload
+from typing import List, Optional, Union, Callable, Any, TypeVar, cast, overload
 
 import warnings
 from contextlib import contextmanager
@@ -13,6 +13,9 @@ except ImportError:
     XMLParsedAsHTMLWarning = None
 
 WHITESPACE_RE = re.compile(r"\s+")
+
+Strainable = Union[str, Callable[[str], Any]]
+T = TypeVar("T")
 
 
 class SelectionError(Exception):
@@ -60,7 +63,42 @@ class MinetTag(Tag):
 
     def select(self, css: str, *args, **kwargs) -> List["MinetTag"]:
         css = normalize_css(css)
-        return cast(List["MinetTag"], super().select(css, *args, **kwargs))
+        return cast(List[MinetTag], super().select(css, *args, **kwargs))
+
+    def find(
+        self,
+        name: Optional[str] = None,
+        recursive: bool = True,
+        class_: Optional[Strainable] = None,
+    ) -> Optional["MinetTag"]:
+        return cast(
+            Optional[MinetTag],
+            super().find(name=name, recursive=recursive, class_=class_),
+        )
+
+    def force_find(
+        self,
+        name: Optional[str] = None,
+        recursive: bool = True,
+        class_: Optional[Strainable] = None,
+    ) -> "MinetTag":
+        elem = super().find(name=name, recursive=recursive, class_=class_)
+
+        if elem is None:
+            raise SelectionError
+
+        return cast(MinetTag, elem)
+
+    def find_all(
+        self,
+        name: Optional[str] = None,
+        recursive: bool = True,
+        class_: Optional[Strainable] = None,
+    ) -> List["MinetTag"]:
+        return cast(
+            List["MinetTag"],
+            super().find_all(name=name, recursive=recursive, class_=class_),
+        )
 
     def force_scrape_one(self, css: str, target: Optional[str] = None) -> str:
         elem = self.select_one(css)
@@ -113,12 +151,12 @@ class MinetTag(Tag):
         return cast(str, super().__getitem__(name))
 
     @overload
-    def get(self, name: str, default: str = ...) -> str: ...
-
-    @overload
     def get(self, name: str, default: None = ...) -> Optional[str]: ...
 
-    def get(self, name: str, default: Optional[str] = None) -> Optional[str]:
+    @overload
+    def get(self, name: str, default: T = ...) -> Union[T, str]: ...
+
+    def get(self, name: str, default: Optional[T] = None) -> Optional[Union[T, str]]:
         return cast(Optional[str], super().get(name, default))
 
     def get_list(self, name: str) -> List[str]:
