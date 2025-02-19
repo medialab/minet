@@ -5,6 +5,7 @@
 # Logic of the `rd posts` action.
 #
 from minet.cli.utils import with_enricher_and_loading_bar
+
 from minet.reddit.scraper import RedditScraper
 from minet.reddit.types import RedditPost
 from minet.reddit.exceptions import RedditInvalidTargetError
@@ -20,15 +21,13 @@ from minet.reddit.exceptions import RedditInvalidTargetError
 def action(cli_args, enricher, loading_bar):
     scraper = RedditScraper()
 
-    type_page = "subreddit"
-
     for i, row, url in enricher.enumerate_cells(
         cli_args.column, with_rows=True, start=1
     ):
         with loading_bar.step(url):
             try:
-                posts = scraper.get_general_post(
-                    url, type_page, cli_args.text, cli_args.limit
+                posts = scraper.get_posts(
+                    url, "subreddit", cli_args.text, cli_args.limit
                 )
 
             except RedditInvalidTargetError:

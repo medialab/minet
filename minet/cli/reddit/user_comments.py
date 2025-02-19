@@ -5,6 +5,7 @@
 # Logic of the `rd user_comments` action.
 #
 from minet.cli.utils import with_enricher_and_loading_bar
+
 from minet.reddit.scraper import RedditScraper
 from minet.reddit.types import RedditUserComment
 from minet.reddit.exceptions import RedditInvalidTargetError
