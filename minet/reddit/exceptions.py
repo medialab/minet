@@ -11,7 +11,3 @@ class RedditError(MinetError):
 
 class RedditInvalidTargetError(RedditError):
     pass
-
-
-class RedditNotPostError(RedditError):
-    pass
