@@ -236,6 +236,7 @@ def build_subparsers(
     for name, command in commands.items():
         subparser = subparsers.add_parser(
             name,
+            help=command.get("title"),
             description=build_description(command),
             epilog=dedent(command.get("epilog", "")),
             formatter_class=custom_formatter,
