@@ -15,14 +15,15 @@ BLUESKY_HTTP_API_COMMON_ARGUMENTS = [
     },
 ]
 
-BLUESKY_SEARCH_POSTS_COMMAND = command("search-posts",
+BLUESKY_SEARCH_POSTS_COMMAND = command(
+    "search-posts",
     "minet.cli.bluesky.search_posts",
     title="Minet Bluesky Search Post Command",
     description="""
         Search for Bluesky posts using their HTTP API.
     """,
     variadic_input={"dummy_column": "query"},
-    arguments=[*BLUESKY_HTTP_API_COMMON_ARGUMENTS]
+    arguments=[*BLUESKY_HTTP_API_COMMON_ARGUMENTS],
 )
 
 BLUESKY_COMMAND = command(

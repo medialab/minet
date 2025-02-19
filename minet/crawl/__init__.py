@@ -16,3 +16,22 @@ from minet.crawl.spiders import (
     BasicSpider,
 )
 from minet.crawl.crawler import Crawler, AnySpider, SpiderDeclaration
+
+__all__ = [
+    "CrawlResult",
+    "AnyCrawlResult",
+    "SuccessfulCrawlResult",
+    "ErroredCrawlResult",
+    "CrawlJob",
+    "CrawlTarget",
+    "UrlOrCrawlTarget",
+    "CrawlerState",
+    "Spider",
+    "SpiderResult",
+    "SpiderNextTargets",
+    "FunctionSpider",
+    "BasicSpider",
+    "Crawler",
+    "AnySpider",
+    "SpiderDeclaration",
+]

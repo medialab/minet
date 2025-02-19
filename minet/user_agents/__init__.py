@@ -30,7 +30,7 @@ def update_user_agents(transient: bool = False) -> None:
         return [
             (row["pct"], row["ua"])
             for row in data
-            if not "Trident" in row["ua"]  # Filtering out windows shenanigans etc.
+            if "Trident" not in row["ua"]  # Filtering out windows shenanigans etc.
         ]
 
     try:

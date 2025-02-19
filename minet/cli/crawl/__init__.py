@@ -372,7 +372,7 @@ CRAWL_COMMAND = crawl_command(
         Run a crawl using a minet crawler or spiders defined
         in a python module.
     """,
-    epilog=f"""
+    epilog="""
         Examples:
 
         . Using the most basic crawler following HTML links:
