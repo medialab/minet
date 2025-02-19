@@ -2,7 +2,7 @@
 
 ![Minet](docs/img/minet.png)
 
-**minet** is a webmining command line tool & library for python (>= 3.7) that can be used to collect and extract data from a large variety of web sources such as raw webpages, Facebook, YouTube, Twitter, Media Cloud etc.
+**minet** is a webmining command line tool & library for python (>= 3.8) that can be used to collect and extract data from a large variety of web sources such as raw webpages, Facebook, YouTube, Twitter, Media Cloud etc.
 
 It adopts a very simple approach to various webmining problems by letting you perform a wide array of tasks from the comfort of the command line. No database needed: raw CSV files should be sufficient to do most of the work.
 
@@ -86,7 +86,7 @@ Minet can single-handedly:
   - _[Youtube](https://www.youtube.com/)_ (requires free API access)
 - Scrape (without requiring special access, often just a user account):
   - _[Instagram](https://www.instagram.com/)_
-  _ _[Reddit](https://www.reddit.com/)_
+  - _[Reddit](https://www.reddit.com/)_
   - _[Telegram](https://telegram.org/)_
   - _[TikTok](https://www.tiktok.com)_
   - _[Twitter](https://twitter.com)_
