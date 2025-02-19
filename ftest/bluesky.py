@@ -1,11 +1,16 @@
 import sys
 import websockets
-import dag_cbor
-from atproto import Client, models
+import libipld
+from atproto import (
+    Client,
+    models,
+    FirehoseSubscribeLabelsClient,
+    FirehoseSubscribeReposClient,
+)
 
 from minet.cli.console import console
 from minet.web import request
-from minet.bluesky import BlueskyHTTPClient
+from minet.bluesky import BlueskyHTTPClient, BlueskyWebSocketClient
 
 # response = request("https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts?q=test")
 
@@ -20,7 +25,15 @@ from minet.bluesky import BlueskyHTTPClient
 # response = client.app.bsky.feed.search_posts({"q": "test", "cursor": "25"})
 # console.print(models.get_model_as_json(response), highlight=True)
 
-client = BlueskyHTTPClient(sys.argv[1], sys.argv[2])
+# client = BlueskyHTTPClient(sys.argv[1], sys.argv[2])
 
-for post in client.search_posts("test"):
-    console.print(post, highlight=True)
+# for post in client.search_posts("test"):
+#     console.print(post, highlight=True)
+
+client = BlueskyWebSocketClient()
+
+with client.subscribe_repos() as socket:
+    payload = socket.recv()
+
+    for message in libipld.decode_dag_cbor_multi(payload):
+        print(message)
