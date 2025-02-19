@@ -50,6 +50,11 @@ _Platform-related commands_
   - [search](#search)
   - [topic](#topic)
     - [stories](#stories)
+- [reddit (rd)](#reddit)
+  - [comments](#comments-1)
+  - [posts](#posts)
+  - [user-comments](#user-comments)
+  - [user-posrs](#user-posts-1)
 - [telegram (tl)](#telegram)
   - [channel-infos](#channel-infos)
   - [channel-messages](#channel-messages)
@@ -77,7 +82,7 @@ _Platform-related commands_
   - [captions](#captions)
   - [channel-videos](#channel-videos)
   - [channels](#channels)
-  - [comments](#comments-1)
+  - [comments](#comments-2)
   - [search](#search-1)
   - [videos](#videos)
 
@@ -3499,6 +3504,370 @@ Optional Arguments:
   --silent                      Whether to suppress all the log and progress
                                 bars. Can be useful when piping.
   -h, --help                    show this help message and exit
+```
+
+## Reddit
+
+```
+Usage: minet reddit [-h] {posts,comments,user-posts,user-comments} ...
+
+# Minet Reddit Command
+
+Collect data from Reddit.
+
+Optional Arguments:
+  -h, --help                    show this help message and exit
+
+Subcommands:
+  {posts,comments,user-posts,user-comments}
+                                Subcommand to use.
+```
+
+### comments
+
+```
+Usage: minet reddit comments [-h] [-A] [--silent]
+                             [--refresh-per-second REFRESH_PER_SECOND]
+                             [--simple-progress] [-i INPUT] [--explode EXPLODE]
+                             [-s SELECT] [--total TOTAL] [-o OUTPUT]
+                             post_or_post_column
+
+# Minet Reddit Comments Command
+
+Retrieve comments from a reddit post link.
+Note that it will only retrieve the comments displayed on the page. If you want all the comments you need to use -A, --all but it will require a request per comment, and you can only make 100 requests per 10 minutes.
+
+Positional Arguments:
+  post_or_post_column           Single post url, shortcode or id to process or
+                                name of the CSV column containing posts urls,
+                                shortcodes or ids when using -i/--input.
+
+Optional Arguments:
+  -A, --all                     Retrieve all comments.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the posts urls, shortcodes or ids you want to
+                                process. Will consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Example:
+
+. Searching comments from a reddit post:
+    $ minet reddit comments https://www.reddit.com/r/france/comments/... > r_france_comments.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet reddit comments "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet reddit comments column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xan search -s col . | minet reddit comments column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet reddit comments column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet reddit comments "value1,value2" --explode ","
+```
+
+### posts
+
+```
+Usage: minet reddit posts [-h] [-l LIMIT] [--silent]
+                          [--refresh-per-second REFRESH_PER_SECOND]
+                          [--simple-progress] [-t] [-i INPUT]
+                          [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                          [-o OUTPUT]
+                          subreddit_or_subreddit_column
+
+# Minet Reddit Posts Command
+
+Retrieve reddit posts from a subreddit link or name.
+
+Positional Arguments:
+  subreddit_or_subreddit_column
+                                Single subreddit url, shortcode or id to process
+                                or name of the CSV column containing subreddit
+                                urls, shortcodes or ids when using -i/--input.
+
+Optional Arguments:
+  -l, --limit LIMIT             Maximum number of posts to retrieve.
+  -t, --text                    Retrieve the text of the post. Note that it will
+                                require one request per post.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the subreddit urls, shortcodes or ids you want
+                                to process. Will consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Example:
+
+. Searching posts from the subreddit r/france:
+    $ minet reddit posts https://www.reddit.com/r/france > r_france_posts.csv
+    $ minet reddit posts france > r_france_posts.csv
+    $ minet reddit posts r/france > r_france_posts.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet reddit posts "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet reddit posts column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xan search -s col . | minet reddit posts column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet reddit posts column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet reddit posts "value1,value2" --explode ","
+```
+
+### user-comments
+
+```
+Usage: minet reddit user-comments [-h] [-l LIMIT] [--silent]
+                                  [--refresh-per-second REFRESH_PER_SECOND]
+                                  [--simple-progress] [-i INPUT]
+                                  [--explode EXPLODE] [-s SELECT]
+                                  [--total TOTAL] [-o OUTPUT]
+                                  user_or_user_column
+
+# Minet Reddit User Comments Command
+
+Retrieve reddit comments from a user link.
+
+Positional Arguments:
+  user_or_user_column           Single user url, shortcode or id to process or
+                                name of the CSV column containing user urls,
+                                shortcodes or ids when using -i/--input.
+
+Optional Arguments:
+  -l, --limit LIMIT             Maximum number of comments to retrieve.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the user urls, shortcodes or ids you want to
+                                process. Will consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Example:
+
+. Searching comments from the user page of u/random_user:
+    $ minet reddit user-comments https://www.reddit.com/user/random_user/comments/ > random_user_comments.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet reddit user-comments "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet reddit user-comments column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xan search -s col . | minet reddit user-comments column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet reddit user-comments column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet reddit user-comments "value1,value2" --explode ","
+```
+
+### user-posts
+
+```
+Usage: minet reddit user-posts [-h] [-l LIMIT] [--silent]
+                               [--refresh-per-second REFRESH_PER_SECOND]
+                               [--simple-progress] [-t] [-i INPUT]
+                               [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                               [-o OUTPUT]
+                               user_or_user_column
+
+# Minet Reddit User Posts Command
+
+Retrieve reddit posts from a user link.
+
+Positional Arguments:
+  user_or_user_column           Single user url, shortcode or id to process or
+                                name of the CSV column containing user urls,
+                                shortcodes or ids when using -i/--input.
+
+Optional Arguments:
+  -l, --limit LIMIT             Maximum number of posts to retrieve.
+  -t, --text                    Retrieve the text of the post. Note that it will
+                                require one request per post.
+  -s, --select SELECT           Columns of -i/--input CSV file to include in the
+                                output (separated by `,`). Use an empty string
+                                if you don't want to keep anything: --select ''.
+  --explode EXPLODE             Use to indicate the character used to separate
+                                multiple values in a single CSV cell. Defaults
+                                to none, i.e. CSV cells having a single values,
+                                which is usually the case.
+  --total TOTAL                 Total number of items to process. Might be
+                                necessary when you want to display a finite
+                                progress indicator for large files given as
+                                input to the command.
+  -i, --input INPUT             CSV file (potentially gzipped) containing all
+                                the user urls, shortcodes or ids you want to
+                                process. Will consider `-` as stdin.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Example:
+
+. Searching posts from the user page of u/random_user:
+    $ minet reddit user-posts https://www.reddit.com/user/random_user/submitted/ > random_user_posts.csv
+
+how to use the command with a CSV file?
+
+> A lot of minet commands, including this one, can both be
+> given a single value to process or a bunch of them if
+> given the column of a CSV file passed to -i/--input instead.
+
+> Note that when given a CSV file as input, minet will
+> concatenate the input file columns with the ones added
+> by the command. You can always restrict the input file
+> columns to keep by using the -s/--select flag.
+
+. Here is how to use a command with a single value:
+    $ minet reddit user-posts "value"
+
+. Here is how to use a command with a CSV file:
+    $ minet reddit user-posts column_name -i file.csv
+
+. Here is how to read CSV file from stdin using `-`:
+    $ xan search -s col . | minet reddit user-posts column_name -i -
+
+. Here is how to indicate that the CSV column may contain multiple
+  values separated by a special character:
+    $ minet reddit user-posts column_name -i file.csv --explode "|"
+
+. This also works with single values:
+    $ minet reddit user-posts "value1,value2" --explode ","
 ```
 
 ## Telegram

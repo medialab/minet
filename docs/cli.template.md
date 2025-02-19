@@ -50,6 +50,11 @@ _Platform-related commands_
   - [search](#search)
   - [topic](#topic)
     - [stories](#stories)
+- [reddit (rd)](#reddit)
+  - [comments](#comments-1)
+  - [posts](#posts)
+  - [user-comments](#user-comments)
+  - [user-posrs](#user-posts-1)
 - [telegram (tl)](#telegram)
   - [channel-infos](#channel-infos)
   - [channel-messages](#channel-messages)
@@ -77,7 +82,7 @@ _Platform-related commands_
   - [captions](#captions)
   - [channel-videos](#channel-videos)
   - [channels](#channels)
-  - [comments](#comments-1)
+  - [comments](#comments-2)
   - [search](#search-1)
   - [videos](#videos)
 
@@ -284,6 +289,26 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 #### stories
 
 <% mc/topic/stories %>
+
+## Reddit
+
+<% rd %>
+
+### comments
+
+<% rd/comments %>
+
+### posts
+
+<% rd/posts %>
+
+### user-comments
+
+<% rd/user-comments %>
+
+### user-posts
+
+<% rd/user-posts %>
 
 ## Telegram
 

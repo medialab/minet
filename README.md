@@ -85,6 +85,7 @@ Minet can single-handedly:
   - _[Youtube](https://www.youtube.com/)_ (requires free API access)
 - Scrape (without requiring special access, often just a user account):
   - _[Instagram](https://www.instagram.com/)_
+  _ _[Reddit](https://www.reddit.com/)_
   - _[Telegram](https://telegram.org/)_
   - _[TikTok](https://www.tiktok.com)_
   - _[Twitter](https://twitter.com)_
