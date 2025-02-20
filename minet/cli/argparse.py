@@ -853,7 +853,7 @@ def resolve_typical_arguments(
 
     if resumer is not None:
         resumer_arg_help = (
-            '"Whether to resume from an aborted collection. Need -o to be set.'
+            "Whether to resume from an aborted collection. Need -o to be set."
         )
 
         if resumer_epilog is not None:
