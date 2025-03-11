@@ -692,7 +692,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      "Whether to resume from an aborted collection.
+  --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
   --refresh-per-second REFRESH_PER_SECOND
                                 Number of times to refresh the progress bar per
@@ -884,7 +884,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      "Whether to resume from an aborted collection.
+  --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
   --refresh-per-second REFRESH_PER_SECOND
                                 Number of times to refresh the progress bar per
@@ -1042,7 +1042,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      "Whether to resume from an aborted collection.
+  --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
   --refresh-per-second REFRESH_PER_SECOND
                                 Number of times to refresh the progress bar per
@@ -1397,7 +1397,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      "Whether to resume from an aborted collection.
+  --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
   --refresh-per-second REFRESH_PER_SECOND
                                 Number of times to refresh the progress bar per
@@ -1804,6 +1804,8 @@ Optional Arguments:
 
 Subcommands:
   {firehose,search-posts}  Subcommand to use.
+    firehose               Minet Bluesky Firehose Command
+    search-posts           Minet Bluesky Search Post Command
 ```
 
 ### search-posts
@@ -1915,6 +1917,8 @@ Optional Arguments:
 Subcommands:
   {experimental-comments,url-likes}
                                 Subcommand to use.
+    experimental-comments       Minet Experimental Facebook Comments Command
+    url-likes                   Minet Facebook Url Likes Command
 ```
 
 ### url-likes
@@ -2025,6 +2029,7 @@ Optional Arguments:
 
 Subcommands:
   {sheets}    Subcommand to use.
+    sheets    Minet Google Sheets Command
 ```
 
 ### sheets
@@ -2534,6 +2539,14 @@ Optional Arguments:
 Subcommands:
   {comments,hashtag,location,post-infos,user-followers,user-following,user-infos,user-posts}
                                 Subcommand to use.
+    comments                    Instagram Comments Command
+    hashtag                     Instagram hashtag
+    location                    Instagram location
+    post-infos                  Instagram post-infos
+    user-followers              Instagram User Followers Command
+    user-following              Instagram User Following Command
+    user-infos                  Instagram user-infos
+    user-posts                  Instagram User Posts Command
 ```
 
 ### comments
@@ -2910,7 +2923,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      "Whether to resume from an aborted collection.
+  --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
@@ -3248,7 +3261,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      "Whether to resume from an aborted collection.
+  --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
@@ -3638,6 +3651,10 @@ Optional Arguments:
 Subcommands:
   {posts,comments,user-posts,user-comments}
                                 Subcommand to use.
+    posts                       Minet Reddit Posts Command
+    comments                    Minet Reddit Comments Command
+    user-posts                  Minet Reddit User Posts Command
+    user-comments               Minet Reddit User Comments Command
 ```
 
 ### comments
@@ -4175,6 +4192,7 @@ Optional Arguments:
 
 Subcommands:
   {search-videos}  Subcommand to use.
+    search-videos  Tiktok Search Videos Command
 ```
 
 ### search-videos
@@ -4393,7 +4411,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      "Whether to resume from an aborted collection.
+  --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
@@ -4512,7 +4530,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      "Whether to resume from an aborted collection.
+  --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
@@ -4734,7 +4752,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      "Whether to resume from an aborted collection.
+  --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
@@ -5671,10 +5689,11 @@ how to use the command with a CSV file?
 ### tweets
 
 ```
-Usage: minet twitter tweets [-h] [--silent]
+Usage: minet twitter tweets [-h] [-c COOKIE] [--rcfile RCFILE] [--silent]
                             [--refresh-per-second REFRESH_PER_SECOND]
-                            [--simple-progress] [-i INPUT] [--explode EXPLODE]
-                            [-s SELECT] [--total TOTAL] [--resume] [-o OUTPUT]
+                            [--simple-progress] [-f] [-i INPUT]
+                            [--explode EXPLODE] [-s SELECT] [--total TOTAL]
+                            [--resume] [-o OUTPUT]
                             tweet_id_or_tweet_id_column
 
 # Minet Twitter Tweets Command
@@ -5687,6 +5706,13 @@ Positional Arguments:
                                 -i/--input.
 
 Optional Arguments:
+  -c, --cookie COOKIE           Authenticated cookie to use or browser from
+                                which to extract it (supports "firefox",
+                                "chrome", "chromium", "opera" and "edge").
+                                Defaults to `firefox`. Can also be configured in
+                                a .minetrc file as "twitter.cookie" or read from
+                                the MINET_TWITTER_COOKIE env variable.
+  -f, --force                   Bypass confirmation.
   -s, --select SELECT           Columns of -i/--input CSV file to include in the
                                 output (separated by `,`). Use an empty string
                                 if you don't want to keep anything: --select ''.
@@ -5704,8 +5730,12 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      "Whether to resume from an aborted collection.
+  --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
   --refresh-per-second REFRESH_PER_SECOND
                                 Number of times to refresh the progress bar per
                                 second. Can be a float e.g. `0.5` meaning once
@@ -5817,7 +5847,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      "Whether to resume from an aborted collection.
+  --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set.
   --rcfile RCFILE               Custom path to a minet configuration file. More
                                 info about this here:
@@ -6169,7 +6199,7 @@ Optional Arguments:
   -o, --output OUTPUT           Path to the output file. Will consider `-` as
                                 stdout. If not given, results will also be
                                 printed to stdout.
-  --resume                      "Whether to resume from an aborted collection.
+  --resume                      Whether to resume from an aborted collection.
                                 Need -o to be set. Will only work with --sum.
   --refresh-per-second REFRESH_PER_SECOND
                                 Number of times to refresh the progress bar per

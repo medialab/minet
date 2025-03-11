@@ -582,8 +582,23 @@ TWITTER_TWEETS_SUBCOMMAND = command(
         . Getting metadata from tweets in a CSV file:
             $ minet tw tweets tweet_id -i tweets.csv > tweets_metadata.csv
     """,
+    resolve=twitter_scrape_confirm,
     variadic_input={"dummy_column": "tweet_id", "item_label": "tweet id"},
     resumer=RowCountResumer,
+    arguments=[
+        {
+            "flags": ["-c", "--cookie"],
+            "help": 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge").',
+            "default": "firefox",
+            "rc_key": ["twitter", "cookie"],
+            "action": ConfigAction,
+        },
+        {
+            "flags": ["-f", "--force"],
+            "help": "Bypass confirmation.",
+            "action": "store_true",
+        },
+    ],
 )
 
 TWITTER_LEGACY_TWEETS_SUBCOMMAND = twitter_api_subcommand(

@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.1
+
+*Fixes*
+
+- Fixing `minet twitter tweets` for now.
+
 ## 4.0.0
 
 *Breaking*

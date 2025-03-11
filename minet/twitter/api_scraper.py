@@ -591,7 +591,7 @@ class TwitterAPIScraper:
             data = response.json()
         except JSONDecodeError:
             raise TwitterPublicAPIInvalidResponseError(
-                status=response.status, response_text=response.text
+                status=response.status, response_text=response.text()
             )
 
         if response.status >= 400:
@@ -604,7 +604,7 @@ class TwitterAPIScraper:
                 raise TwitterPublicAPIOverCapacityError
 
             raise TwitterPublicAPIInvalidResponseError(
-                status=response.status, response_text=response.text
+                status=response.status, response_text=response.text()
             )
 
         return data
@@ -723,6 +723,42 @@ class TwitterAPIScraper:
             users.append(user_data)
 
         return next_cursor, users
+
+    @retrying_method()
+    def request_tweet_details(self, tweet_id):
+        url = "https://x.com/i/api/graphql/Ez6kRPyXbqNlhBwcNMpU-Q/TweetDetail?variables=%7B%22focalTweetId%22%3A%22{}%22%2C%22with_rux_injections%22%3Afalse%2C%22rankingMode%22%3A%22Relevance%22%2C%22includePromotedContent%22%3Atrue%2C%22withCommunity%22%3Atrue%2C%22withQuickPromoteEligibilityTweetFields%22%3Atrue%2C%22withBirdwatchNotes%22%3Atrue%2C%22withVoice%22%3Atrue%7D&features=%7B%22profile_label_improvements_pcf_label_in_post_enabled%22%3Atrue%2C%22rweb_tipjar_consumption_enabled%22%3Atrue%2C%22responsive_web_graphql_exclude_directive_enabled%22%3Atrue%2C%22verified_phone_label_enabled%22%3Afalse%2C%22creator_subscriptions_tweet_preview_api_enabled%22%3Atrue%2C%22responsive_web_graphql_timeline_navigation_enabled%22%3Atrue%2C%22responsive_web_graphql_skip_user_profile_image_extensions_enabled%22%3Afalse%2C%22premium_content_api_read_enabled%22%3Afalse%2C%22communities_web_enable_tweet_community_results_fetch%22%3Atrue%2C%22c9s_tweet_anatomy_moderator_badge_enabled%22%3Atrue%2C%22responsive_web_grok_analyze_button_fetch_trends_enabled%22%3Afalse%2C%22responsive_web_grok_analyze_post_followups_enabled%22%3Atrue%2C%22responsive_web_jetfuel_frame%22%3Afalse%2C%22responsive_web_grok_share_attachment_enabled%22%3Atrue%2C%22articles_preview_enabled%22%3Atrue%2C%22responsive_web_edit_tweet_api_enabled%22%3Atrue%2C%22graphql_is_translatable_rweb_tweet_is_translatable_enabled%22%3Atrue%2C%22view_counts_everywhere_api_enabled%22%3Atrue%2C%22longform_notetweets_consumption_enabled%22%3Atrue%2C%22responsive_web_twitter_article_tweet_consumption_enabled%22%3Atrue%2C%22tweet_awards_web_tipping_enabled%22%3Afalse%2C%22responsive_web_grok_analysis_button_from_backend%22%3Atrue%2C%22creator_subscriptions_quote_tweet_preview_enabled%22%3Afalse%2C%22freedom_of_speech_not_reach_fetch_enabled%22%3Atrue%2C%22standardized_nudges_misinfo%22%3Atrue%2C%22tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled%22%3Atrue%2C%22rweb_video_timestamps_enabled%22%3Atrue%2C%22longform_notetweets_rich_text_read_enabled%22%3Atrue%2C%22longform_notetweets_inline_media_enabled%22%3Atrue%2C%22responsive_web_grok_image_annotation_enabled%22%3Atrue%2C%22responsive_web_enhance_cards_enabled%22%3Afalse%7D&fieldToggles=%7B%22withArticleRichContentState%22%3Atrue%2C%22withArticlePlainText%22%3Afalse%2C%22withGrokAnalyze%22%3Afalse%2C%22withDisallowedReplyControls%22%3Afalse%7D".format(
+            tweet_id
+        )
+
+        data = self.api_call(url)
+
+        tweet_root = getpath(
+            data,
+            (
+                "data",
+                "threaded_conversation_with_injections_v2",
+                "instructions",
+                0,
+                "entries",
+                0,
+                "content",
+                "itemContent",
+                "tweet_results",
+                "result",
+            ),
+        )
+
+        if tweet_root is None or tweet_root["__typename"] == "TweetTombstone":
+            raise TwitterPublicAPINotFound(tweet_id)
+
+        tweet = recombobulate_tweet(tweet_root)
+        tweet = normalize_tweet(
+            tweet,
+            locale=None,
+            collection_source="scraping",
+        )
+
+        return tweet
 
     def search_tweets(
         self,
@@ -869,14 +905,14 @@ class TwitterGuestAPIScraper:
 
         if response.status >= 400:
             raise TwitterPublicAPIInvalidResponseError(
-                status=response.status, response_text=response.text
+                status=response.status, response_text=response.text()
             )
 
         try:
             api_token_response = response.json()
         except JSONDecodeError:
             raise TwitterPublicAPIInvalidResponseError(
-                status=response.status, response_text=response.text
+                status=response.status, response_text=response.text()
             )
 
         guest_token = api_token_response.get("guest_token")
@@ -917,7 +953,7 @@ class TwitterGuestAPIScraper:
             data = response.json()
         except JSONDecodeError:
             raise TwitterPublicAPIInvalidResponseError(
-                status=response.status, response_text=response.text
+                status=response.status, response_text=response.text()
             )
 
         if response.status >= 400:
@@ -930,7 +966,7 @@ class TwitterGuestAPIScraper:
                 raise TwitterPublicAPIOverCapacityError
 
             raise TwitterPublicAPIInvalidResponseError(
-                status=response.status, response_text=response.text
+                status=response.status, response_text=response.text()
             )
 
         return data
