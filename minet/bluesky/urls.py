@@ -1,8 +1,30 @@
-from typing import Optional
+from typing import Optional, List, Tuple
 
-from ural import URLFormatter
+from ural import URLFormatter, urlpathsplit
+from urllib.parse import quote
 
 from minet.bluesky.constants import BLUESKY_HTTP_API_BASE_URL
+
+
+def parse_post_url(url: str) -> Tuple[str, str]:
+    path = urlpathsplit(url)
+
+    did = path[1]
+    rkey = path[3]
+
+    return did, rkey
+
+
+def format_post_at_uri(did: str, rkey: str) -> str:
+    return "at://{}/app.bsky.feed.post/{}".format(did, rkey)
+
+
+def plural(key: str, params: List[str]) -> str:
+    key = quote(key)
+
+    pairs = ["{}={}".format(key, quote(param)) for param in params]
+
+    return "&".join(pairs)
 
 
 class BlueskyHTTPAPIUrlFormatter(URLFormatter):
@@ -15,6 +37,17 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
 
     def refresh_session(self) -> str:
         return self.format(path="com.atproto.server.refreshSession")
+
+    def resolve_handle(self, handle: str) -> str:
+        return self.format(
+            path="com.atproto.identity.resolveHandle", args={"handle": handle}
+        )
+
+    def get_posts(self, uris: List[str]) -> str:
+        url = self.format(path="app.bsky.feed.getPosts")
+        url += "?" + plural("uris", uris)
+
+        return url
 
     def search_posts(
         self, q: str, cursor: Optional[str] = None, limit: int = 100

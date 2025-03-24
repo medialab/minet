@@ -10,7 +10,11 @@ from minet.web import (
     Response,
 )
 
-from minet.bluesky.urls import BlueskyHTTPAPIUrlFormatter
+from minet.bluesky.urls import (
+    BlueskyHTTPAPIUrlFormatter,
+    parse_post_url,
+    format_post_at_uri,
+)
 from minet.bluesky.jwt import parse_jwt_for_expiration
 from minet.bluesky.types import BlueskyPost
 from minet.bluesky.exceptions import (
@@ -117,3 +121,17 @@ class BlueskyHTTPClient:
 
             if cursor is None:
                 break
+
+    def resolve_handle(self, identifier: str) -> str:
+        url = self.urls.resolve_handle(identifier)
+
+        response = self.request(url)
+        data = response.json()
+
+        return data["did"]
+
+    def post_url_to_did_at_uri(self, url: str) -> str:
+        handle, rkey = parse_post_url(url)
+        did = self.resolve_handle(handle)
+
+        return format_post_at_uri(did, rkey)
