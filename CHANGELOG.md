@@ -2,7 +2,10 @@
 
 ## 4.0.2 (provisional)
 
+*Fixes*
+
 - Extracting `twitwi.TwitterWrapper` into `minet.twitter.client_wrapper`.
+- Upgrading `twitwi`.
 
 ## 4.0.1
 
