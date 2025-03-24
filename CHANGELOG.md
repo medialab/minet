@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.2 (provisional)
+
+- Extracting `twitwi.TwitterWrapper` into `minet.twitter.client_wrapper`.
+
 ## 4.0.1
 
 *Fixes*

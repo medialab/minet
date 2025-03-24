@@ -46,6 +46,7 @@ setup(
         "soupsieve>=2.1,<3",
         "tenacity>=8,<9",
         "trafilatura>=2,<2.1",
+        "twitter==2.0a2",
         "twitwi>=0.19.2,<0.20",
         "ural>=1.4.0,<2",
         "urllib3>=1.26.16,<2",

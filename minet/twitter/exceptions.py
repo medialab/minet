@@ -5,6 +5,10 @@
 from minet.exceptions import MinetError
 
 
+class TwitterWrapperMaxAttemptsExceeded(Exception):
+    pass
+
+
 class TwitterError(MinetError):
     pass
 

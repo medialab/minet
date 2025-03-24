@@ -13,3 +13,5 @@ TWITTER_PUBLIC_API_AUTH_HEADER = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUe
 TWITTER_API_MAX_STATUSES_COUNT = 200
 
 ADDITIONAL_TWEET_FIELDS = ["intervention_type", "intervention_text", "intervention_url"]
+
+APP_ONLY_ROUTES = {"tweets/counts/recent", "tweets/counts/all", "tweets/search/all"}

@@ -5,14 +5,12 @@
 # Twitter public API client.
 #
 from json import JSONDecodeError
-from twitwi import TwitterWrapper
-from twitwi.exceptions import (
-    TwitterWrapperMaxAttemptsExceeded,
-    TwitterPayloadV2IncompleteIncludesError,
-)
+from twitwi.exceptions import TwitterPayloadV2IncompleteIncludesError
 from twitter import TwitterError
 
 from minet.web import create_request_retryer, retrying_method
+from minet.twitter.exceptions import TwitterWrapperMaxAttemptsExceeded
+from minet.twitter.client_wrapper import TwitterWrapper
 
 
 def retryer_predicate(exc):

@@ -30,6 +30,7 @@ soupsieve>=2.1,<3
 tenacity==8.2.1
 trafilatura==2.0.0
 typing_extensions>=4.3; python_version < '3.11'
+twitter==2.0a2
 twitwi==0.19.2
 ural==1.4.0
 urllib3==1.26.16
