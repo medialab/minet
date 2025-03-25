@@ -31,7 +31,7 @@ setup(
         "casanova>=2.0.1,<3",
         "charset-normalizer>=3,<4",
         "dateparser>=1.1.1",
-        "ebbe>=1.13,<2",
+        "ebbe>=1.14,<2",
         "json5>=0.8.5",
         "libipld>=3,<4",
         "lxml == 4.9.2; platform_system == 'Darwin' and python_version <= '3.8'",

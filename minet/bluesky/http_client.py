@@ -1,6 +1,7 @@
-from typing import Iterator, Optional
+from typing import Iterator, Iterable, Optional, Any, List, Dict
 
 from time import time, sleep
+from ebbe import as_reconciled_chunks
 
 from minet.web import (
     create_request_retryer,
@@ -135,3 +136,17 @@ class BlueskyHTTPClient:
         did = self.resolve_handle(handle)
 
         return format_post_at_uri(did, rkey)
+
+    def get_posts(self, did_at_uris: Iterable[str]) -> Iterator[Any]:
+        def work(chunk: List[str]) -> Dict[str, Any]:
+            url = self.urls.get_posts(chunk)
+            response = self.request(url)
+            data = response.json()
+
+            return {post["uri"]: post for post in data["posts"]}
+
+        def reconcile(data: Dict[str, Any], uri: str) -> Any:
+            return data.get(uri)
+
+        for _, post_data in as_reconciled_chunks(25, did_at_uris, work, reconcile):
+            yield post_data
