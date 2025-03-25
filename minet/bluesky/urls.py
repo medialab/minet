@@ -35,11 +35,15 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
         )
 
     def get_posts(self, uris: List[str]) -> str:
-        url = self.format(
+        return self.format(
             path="app.bsky.feed.getPosts", args=[("uris", uri) for uri in uris]
         )
 
-        return url
+    def get_profiles(self, identifiers: List[str]) -> str:
+        return self.format(
+            path="app.bsky.actor.getProfiles",
+            args=[("actors", identifier) for identifier in identifiers],
+        )
 
     def search_posts(
         self, q: str, cursor: Optional[str] = None, limit: int = 100

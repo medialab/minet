@@ -37,32 +37,43 @@ client = BlueskyHTTPClient(conf["bluesky"]["identifier"], conf["bluesky"]["passw
 # time.sleep(1)
 # print(client.refresh_session())
 
-post_urls = [
-    "https://bsky.app/profile/pecqueuxanthony.bsky.social/post/3lkizm6uvhc2b",
-    "https://bsky.app/profile/annemascret.bsky.social/post/3lkksxdlabk2y",
-    "https://bsky.app/profile/pierre.senellart.com/post/3lkhaibfxv22b",
-    "https://bsky.app/profile/servannemarzin.bsky.social/post/3lkgoqgzhg22k",
-    "https://bsky.app/profile/roppick.bsky.social/post/3lk7najt7s22j",
-    "https://bsky.app/profile/tracklist.com.br/post/3lk7xgxguf22k",
-    "https://bsky.app/profile/snesupfsu.bsky.social/post/3lkkbdz7uxs2s",
-    "https://bsky.app/profile/p4bl0.net/post/3lkgnjzh6ec2g",
-    "https://bsky.app/profile/p4bl0.net/post/3lkeafh3kt22v",
-    "https://bsky.app/profile/bricabraque.bsky.social/post/3lkdnb2gtzk2c",
-    "https://bsky.app/profile/alinenaft.bsky.social/post/3kcoegjbnp525",
-    "https://bsky.app/profile/zahiahamdane.bsky.social/post/3lk4jgruhzk2s",
-    "https://bsky.app/profile/boogheta.bsky.social/post/3ljpthyfcqs2e",
-    "https://bsky.app/profile/shiseptiana.bsky.social/post/3lkbalaxeys2v",
-    "https://bsky.app/profile/danabra.mov/post/3ll4whwghy22y",
-    "https://bsky.app/profile/yomguithereal.bsky.social/post/3kbg7jgtddn2w",
-]
+# post_urls = [
+#     "https://bsky.app/profile/pecqueuxanthony.bsky.social/post/3lkizm6uvhc2b",
+#     "https://bsky.app/profile/annemascret.bsky.social/post/3lkksxdlabk2y",
+#     "https://bsky.app/profile/pierre.senellart.com/post/3lkhaibfxv22b",
+#     "https://bsky.app/profile/servannemarzin.bsky.social/post/3lkgoqgzhg22k",
+#     "https://bsky.app/profile/roppick.bsky.social/post/3lk7najt7s22j",
+#     "https://bsky.app/profile/tracklist.com.br/post/3lk7xgxguf22k",
+#     "https://bsky.app/profile/snesupfsu.bsky.social/post/3lkkbdz7uxs2s",
+#     "https://bsky.app/profile/p4bl0.net/post/3lkgnjzh6ec2g",
+#     "https://bsky.app/profile/p4bl0.net/post/3lkeafh3kt22v",
+#     "https://bsky.app/profile/bricabraque.bsky.social/post/3lkdnb2gtzk2c",
+#     "https://bsky.app/profile/alinenaft.bsky.social/post/3kcoegjbnp525",
+#     "https://bsky.app/profile/zahiahamdane.bsky.social/post/3lk4jgruhzk2s",
+#     "https://bsky.app/profile/boogheta.bsky.social/post/3ljpthyfcqs2e",
+#     "https://bsky.app/profile/shiseptiana.bsky.social/post/3lkbalaxeys2v",
+#     "https://bsky.app/profile/danabra.mov/post/3ll4whwghy22y",
+#     "https://bsky.app/profile/yomguithereal.bsky.social/post/3kbg7jgtddn2w",
+# ]
 
-did_at_uris = [client.post_url_to_did_at_uri(post_url) for post_url in post_urls]
+# did_at_uris = [client.post_url_to_did_at_uri(post_url) for post_url in post_urls]
 
 DATA = []
 
-for post_data in client.get_posts(did_at_uris):
-    console.print(post_data, highlight=True)
-    DATA.append(post_data)
+# for post_data in client.get_posts(did_at_uris):
+#     console.print(post_data, highlight=True)
+#     DATA.append(post_data)
+
+profiles = [
+    "yomguithereal.bsky.social",
+    "boogheta.bsky.social",
+    "medialab-scpo.bsky.social",
+    "nytimes.com",
+]
+
+for profile in client.get_profiles(profiles):
+    DATA.append(profile)
+    console.print(profile, highlight=True)
 
 with open("dump.json", "w") as f:
     json.dump(DATA, f, ensure_ascii=False, indent=2)

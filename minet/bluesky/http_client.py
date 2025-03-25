@@ -150,3 +150,23 @@ class BlueskyHTTPClient:
 
         for _, post_data in as_reconciled_chunks(25, did_at_uris, work, reconcile):
             yield post_data
+
+    def get_profiles(self, identifiers: Iterable[str]) -> Iterator[Any]:
+        def work(chunk: List[str]) -> Dict[str, Any]:
+            url = self.urls.get_profiles(chunk)
+            response = self.request(url)
+            data = response.json()
+
+            index = {}
+
+            for profile in data["profiles"]:
+                index[profile["did"]] = profile
+                index[profile["handle"]] = profile
+
+            return index
+
+        def reconcile(data: Dict[str, Any], identifier: str) -> Any:
+            return data.get(identifier)
+
+        for _, profile_data in as_reconciled_chunks(25, identifiers, work, reconcile):
+            yield profile_data
