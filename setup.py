@@ -48,7 +48,7 @@ setup(
         "trafilatura>=2,<2.1",
         "twitter==2.0a2",
         "twitwi>=0.20,<0.21",
-        "ural>=1.4.0,<2",
+        "ural>=1.5.0,<2",
         "urllib3>=1.26.16,<2",
         "websockets>=13,<14",
     ],
