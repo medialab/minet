@@ -137,6 +137,7 @@ class BlueskyHTTPClient:
 
         return format_post_at_uri(did, rkey)
 
+    # NOTE: this API route that not return any results for at-uris containing handles!
     def get_posts(self, did_at_uris: Iterable[str]) -> Iterator[Any]:
         def work(chunk: List[str]) -> Dict[str, Any]:
             url = self.urls.get_posts(chunk)
