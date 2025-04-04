@@ -38,3 +38,11 @@ class BlueskyPost(TabularRecord):
             quote_count=payload["quoteCount"],
             langs=record.get("langs", []),
         )
+
+    @classmethod
+    def from_feed(cls, feed) -> "BlueskyPost":
+        post = feed["post"]
+        # reply = feed.get("reply")
+        # reason = feed.get("reason")
+
+        return cls.from_payload(post)
