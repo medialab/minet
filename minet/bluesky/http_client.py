@@ -152,6 +152,35 @@ class BlueskyHTTPClient:
         for _, post_data in as_reconciled_chunks(25, did_at_uris, work, reconcile):
             yield post_data
 
+    def get_user_posts(
+        self, identifier: str, limit: Optional[int] = -1
+    ) -> Iterator[Any]:
+        if not identifier.startswith("did:"):
+            did = self.resolve_handle(identifier)
+        else:
+            did = identifier
+
+        cursor = None
+
+        count = 0
+        while True:
+            url = self.urls.get_user_posts(did, cursor=cursor)
+
+            response = self.request(url)
+            data = response.json()
+
+            for post in data["feed"]:
+                yield post
+                # yield BlueskyPost.from_feed(post)
+                count += 1
+                if count == limit:
+                    break
+
+            cursor = data.get("cursor")
+
+            if cursor is None or count == limit:
+                break
+
     def get_profiles(self, identifiers: Iterable[str]) -> Iterator[Any]:
         def work(chunk: List[str]) -> Dict[str, Any]:
             url = self.urls.get_profiles(chunk)

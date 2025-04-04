@@ -59,3 +59,20 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
             path="app.bsky.feed.searchPosts",
             args={"q": q, "cursor": cursor, "limit": limit},
         )
+
+    def get_user_posts(
+        self,
+        identifier: str,
+        cursor: Optional[str] = None,
+        filter: Optional[str] = None,
+        limit: int = 100,
+    ) -> str:
+        return self.format(
+            path="app.bsky.feed.getAuthorFeed",
+            args={
+                "actor": identifier,
+                "cursor": cursor,
+                "filter": filter,
+                "limit": limit,
+            },
+        )
