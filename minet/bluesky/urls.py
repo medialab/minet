@@ -2,7 +2,10 @@ from typing import Optional, List, Tuple
 
 from ural import URLFormatter, urlpathsplit
 
-from minet.bluesky.constants import BLUESKY_HTTP_API_BASE_URL
+from minet.bluesky.constants import (
+    BLUESKY_HTTP_API_BASE_URL,
+    BLUESKY_HTTP_API_ALTERNATE_URL,
+)
 
 
 def parse_post_url(url: str) -> Tuple[str, str]:
@@ -30,8 +33,12 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
         return self.format(path="com.atproto.server.refreshSession")
 
     def resolve_handle(self, handle: str) -> str:
+        # Handles resolving of special handles based on a different DNS do not work on the regular API, we need to use the alternate endpoint from the public facing API
+        # cf https://github.com/bluesky-social/indigo/issues/833
         return self.format(
-            path="com.atproto.identity.resolveHandle", args={"handle": handle}
+            base_url=BLUESKY_HTTP_API_ALTERNATE_URL,
+            path="com.atproto.identity.resolveHandle",
+            args={"handle": handle},
         )
 
     def get_posts(self, uris: List[str]) -> str:
