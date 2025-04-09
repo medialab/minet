@@ -1,5 +1,6 @@
 from typing import Iterator, Iterable, Optional, Any, List, Dict
 
+import sys
 from time import time, sleep
 from ebbe import as_reconciled_chunks
 
@@ -103,6 +104,8 @@ class BlueskyHTTPClient:
 
         if remaining <= 0:
             self.rate_limit_reset = int(response.headers["RateLimit-Reset"])
+
+        print("RATE LIMITS for %s (%s): %s / %s for the next %ss" % (url.split("/")[2], response.headers["RateLimit-Policy"], response.headers["RateLimit-Remaining"], response.headers["RateLimit-Limit"], int(response.headers["RateLimit-Reset"]) - time()), file=sys.stderr)
 
         return response
 
