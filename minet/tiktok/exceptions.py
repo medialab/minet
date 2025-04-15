@@ -26,3 +26,7 @@ class TiktokPublicAPIInvalidResponseError(TiktokError):
 
 class TiktokInvalidCookieError(TiktokError):
     pass
+
+
+class BlueskyAuthenticationError(TiktokError):
+    pass
