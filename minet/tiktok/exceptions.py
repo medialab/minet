@@ -28,5 +28,5 @@ class TiktokInvalidCookieError(TiktokError):
     pass
 
 
-class BlueskyAuthenticationError(TiktokError):
+class TiktokAuthenticationError(TiktokError):
     pass
