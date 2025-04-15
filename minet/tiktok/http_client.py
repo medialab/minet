@@ -11,7 +11,7 @@ from minet.tiktok.urls import (
     TikTokHTTPAPIUrlFormatter,
 )
 from minet.tiktok.constants import TIKTOK_COMMERCIAL_CONTENTS_MAX_COUNT
-from minet.bluesky.exceptions import BlueskyAuthenticationError
+from minet.tiktok.exceptions import TiktokAuthenticationError
 
 
 class TikTokHTTPClient:
@@ -36,7 +36,7 @@ class TikTokHTTPClient:
         response = requests.post(self.urls.create_session(), headers=headers, data=data)
 
         if response.status_code != 200:
-            raise BlueskyAuthenticationError
+            raise TiktokAuthenticationError
 
         data = response.json()
 
