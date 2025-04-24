@@ -10,6 +10,7 @@ from minet.web import (
 from minet.tiktok.urls import (
     TikTokHTTPAPIUrlFormatter,
 )
+from minet.tiktok.types import TiktokCommercialContent
 from minet.tiktok.constants import TIKTOK_COMMERCIAL_CONTENTS_MAX_COUNT
 from minet.tiktok.exceptions import TiktokAuthenticationError
 
@@ -88,11 +89,11 @@ class TikTokHTTPClient:
 
             data = response.json()
 
-            for video in data["data"]["commercial_contents"]:
+            for content in data["data"]["commercial_contents"]:
                 if counter >= max_results:
                     return
 
-                yield video
+                yield TiktokCommercialContent.from_payload(content)
                 counter += 1
 
             has_more = data["data"]["has_more"]

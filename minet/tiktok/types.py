@@ -156,3 +156,39 @@ class TiktokVideo(TabularRecord):
             payload.get("shareEnabled"),
             payload.get("isAd"),
         )
+
+
+@dataclass
+class TiktokCommercialContent(TabularRecord):
+    id: str
+    creator_username: str
+    brand_names: List[str]
+    create_date: str
+    create_timestamp: int
+    label: str
+    video_cover_image_urls: List[str]
+    video_urls: List[str]
+
+    @classmethod
+    def from_payload(cls, payload) -> "TiktokCommercialContent":
+        video_cover_image_urls = []
+        video_urls = []
+
+        videos = payload["videos"]
+        if videos:
+            for video in videos:
+                video_cover_image_urls.append(video.get("cover_image_url"))
+                video_urls.append(video.get("url"))
+
+        creator = payload["creator"]
+
+        return cls(
+            id=payload["id"],
+            creator_username=creator["username"],
+            brand_names=payload["brand_names"],
+            create_date=payload["create_date"],
+            create_timestamp=payload["create_timestamp"],
+            label=payload["label"],
+            video_cover_image_urls=video_cover_image_urls,
+            video_urls=video_urls,
+        )

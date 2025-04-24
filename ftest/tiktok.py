@@ -1,4 +1,5 @@
 from minet.cli.utils import get_rcfile
+from minet.cli.console import console
 
 from minet.tiktok import TikTokHTTPClient
 
@@ -12,10 +13,10 @@ end_date = "20241002"
 country = "RO"
 max_results = 10
 
-for video in client.search_commercial_contents(
+for content in client.search_commercial_contents(
     country_code=country,
     start_date=start_date,
     end_date=end_date,
     max_results=max_results,
 ):
-    print(video)
+    console.print(content, highlight=True)
