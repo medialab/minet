@@ -5,6 +5,22 @@
 # Logic of the `tk` action.
 #
 from minet.cli.argparse import command, ConfigAction
+from datetime import date, timedelta
+
+TIKTOK_HTTP_API_COMMON_ARGUMENTS = [
+    {
+        "flag": "--key",
+        "help": "TikTok API identification key.",
+        "rc_key": ["tiktok", "api_key"],
+        "action": ConfigAction,
+    },
+    {
+        "flag": "--secret",
+        "help": "TikTok API identification secret",
+        "rc_key": ["tiktok", "api_secret"],
+        "action": ConfigAction,
+    },
+]
 
 TIKTOK_SEARCH_VIDEOS_SUBCOMMAND = command(
     "search-videos",
@@ -54,6 +70,47 @@ TIKTOK_SEARCH_VIDEOS_SUBCOMMAND = command(
     ],
 )
 
+TIKTOK_SEARCH_COMMERCIALS_SUBCOMMAND = command(
+    "search-commercials",
+    "minet.cli.tiktok.search_commercials",
+    title="Tiktok Search Commercial Contents Command",
+    description="""
+        Query TikTok commercial contents using the Ad Library API.
+    """,
+    epilog="""
+        Example:
+
+        . Searching all commercial contents published in Romania from October 1st to October 2nd 2024:
+            $ minet tiktok search-commercials --country RO --min-date 20241001 --max-date 20241002 > romania.csv
+    """,
+    arguments=[
+        {
+            "flags": ["-c", "--country"],
+            "help": "The country of the commercial content's author.",
+            "type": str,
+            "default": "ALL",
+        },
+        {
+            "flags": ["--min-date"],
+            "help": "Needs to be after October 1st, 2022.",
+            "type": str,
+            "default": "20221001",
+        },
+        {
+            "flags": ["--max-date"],
+            "help": "The end of the time range during which the commercial contents were published.",
+            "type": str,
+            "default": (date.today() - timedelta(days=1)).strftime("%Y%m%d"),
+        },
+        {
+            "flags": ["-t", "--total"],
+            "help": "Maximum number of contents to retrieve in total.",
+            "type": int,
+        },
+        *TIKTOK_HTTP_API_COMMON_ARGUMENTS,
+    ],
+)
+
 TIKTOK_COMMAND = command(
     "tiktok",
     "minet.cli.tiktok",
@@ -62,5 +119,5 @@ TIKTOK_COMMAND = command(
     description="""
         Gather data from Tiktok.
     """,
-    subcommands=[TIKTOK_SEARCH_VIDEOS_SUBCOMMAND],
+    subcommands=[TIKTOK_SEARCH_VIDEOS_SUBCOMMAND, TIKTOK_SEARCH_COMMERCIALS_SUBCOMMAND],
 )
