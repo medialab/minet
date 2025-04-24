@@ -12,7 +12,7 @@ from minet.tiktok.urls import (
 )
 from minet.tiktok.types import TiktokCommercialContent
 from minet.tiktok.constants import TIKTOK_COMMERCIAL_CONTENTS_MAX_COUNT
-from minet.tiktok.exceptions import TiktokAuthenticationError
+from minet.tiktok.exceptions import TiktokAuthenticationError, TiktokHTTPAPIError
 
 
 class TikTokHTTPClient:
@@ -52,11 +52,11 @@ class TikTokHTTPClient:
 
     def search_commercial_contents(
         self,
-        country_code: str,
-        start_date: str,
-        end_date: str,
+        country: str,
+        min_date: str,
+        max_date: str,
         usernames: Optional[List[str]] = [],
-        max_results: Optional[int] = None,
+        total: Optional[int] = None,
     ) -> Iterator[Dict]:
         headers = {
             "authorization": "Bearer {}".format(self.access_token),
@@ -64,16 +64,17 @@ class TikTokHTTPClient:
         }
 
         filters = {
-            "content_published_date_range": {"min": start_date, "max": end_date},
-            "creator_country_code": country_code,
+            "content_published_date_range": {"min": min_date, "max": max_date},
+            "creator_country_code": country,
         }
 
-        params = {"filters": filters, "max_count": TIKTOK_COMMERCIAL_CONTENTS_MAX_COUNT}
+        params = {
+            "filters": filters,
+            "max_count": TIKTOK_COMMERCIAL_CONTENTS_MAX_COUNT,
+        }
 
         if usernames:
             filters["creator_usernames"] = usernames
-
-        counter = 0
 
         while True:
             url = self.urls.search_commercial_contents()
@@ -89,12 +90,11 @@ class TikTokHTTPClient:
 
             data = response.json()
 
-            for content in data["data"]["commercial_contents"]:
-                if counter >= max_results:
-                    return
+            if data["error"]["code"] != "ok":
+                raise TiktokHTTPAPIError(data["error"])
 
+            for content in data["data"]["commercial_contents"]:
                 yield TiktokCommercialContent.from_payload(content)
-                counter += 1
 
             has_more = data["data"]["has_more"]
 
