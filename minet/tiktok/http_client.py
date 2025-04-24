@@ -1,7 +1,7 @@
 from typing import Iterator, Optional, List, Dict
-import requests
 
 from minet.web import (
+    request,
     create_request_retryer,
     create_pool_manager,
     retrying_method,
@@ -33,9 +33,15 @@ class TikTokHTTPClient:
             "grant_type": "client_credentials",
         }
 
-        response = requests.post(self.urls.create_session(), headers=headers, data=data)
+        response = request(
+            self.urls.create_session(),
+            pool_manager=self.pool_manager,
+            method="POST",
+            urlencoded_body=data,
+            headers=headers,
+        )
 
-        if response.status_code != 200:
+        if response.status != 200:
             raise TiktokAuthenticationError
 
         data = response.json()
@@ -71,7 +77,15 @@ class TikTokHTTPClient:
         while True:
             url = self.urls.search_commercial_contents()
 
-            response = requests.post(url, headers=headers, json=params)
+            response = request(
+                url,
+                pool_manager=self.pool_manager,
+                method="POST",
+                json_body=params,
+                known_encoding="utf-8",
+                headers=headers,
+            )
+
             data = response.json()
 
             for video in data["data"]["commercial_contents"]:
