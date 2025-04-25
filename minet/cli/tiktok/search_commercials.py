@@ -19,10 +19,13 @@ from minet.tiktok.types import TiktokCommercialContent
 )
 def action(cli_args, loading_bar):
     client = TikTokHTTPClient(identifier=cli_args.key, password=cli_args.secret)
+
     generator = client.search_commercial_contents(
         country=cli_args.country, min_date=cli_args.min_date, max_date=cli_args.max_date
     )
+
     writer = casanova.writer(cli_args.output, fieldnames=TiktokCommercialContent)
+
     if cli_args.total:
         generator = islice(generator, cli_args.total)
 

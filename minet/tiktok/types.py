@@ -5,6 +5,7 @@ from casanova import TabularRecord
 from ebbe import getpath
 
 from minet.dates import timestamp_to_isoformat
+from minet.tiktok.constants import TIKTOK_COMMERCIAL_CONTENTS_LABELS
 
 
 @dataclass
@@ -168,27 +169,46 @@ class TiktokCommercialContent(TabularRecord):
     label: str
     video_cover_image_urls: List[str]
     video_urls: List[str]
+    audit_status: Optional[int]
+    show_mode: Optional[int]
+    video_views: Optional[str]
+    collected_via: str
 
     @classmethod
-    def from_payload(cls, payload) -> "TiktokCommercialContent":
+    def from_payload(cls, payload, collected_via) -> "TiktokCommercialContent":
         video_cover_image_urls = []
         video_urls = []
 
         videos = payload["videos"]
+
+        timestamp = payload.get("create_timestamp")
+        if timestamp is None:
+            timestamp = payload["posted_time"]
+        date = timestamp_to_isoformat(timestamp)
+
         if videos:
             for video in videos:
-                video_cover_image_urls.append(video.get("cover_image_url"))
-                video_urls.append(video.get("url"))
+                video_cover_image_urls.append(
+                    video.get("cover_image_url", video.get("cover_img"))
+                )
+                video_urls.append(video.get("url", video.get("video_url")))
 
         creator = payload["creator"]
+        label = payload.get(
+            "label", TIKTOK_COMMERCIAL_CONTENTS_LABELS[payload.get("content_label")]
+        )
 
         return cls(
             id=payload["id"],
             creator_username=creator["username"],
             brand_names=payload["brand_names"],
-            create_date=payload["create_date"],
-            create_timestamp=payload["create_timestamp"],
-            label=payload["label"],
+            create_date=date,
+            create_timestamp=timestamp,
+            label=label,
             video_cover_image_urls=video_cover_image_urls,
             video_urls=video_urls,
+            audit_status=payload.get("audit_status"),
+            show_mode=payload.get("show_mode"),
+            video_views=payload.get("video_views"),
+            collected_via=collected_via,
         )
