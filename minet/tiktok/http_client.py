@@ -1,4 +1,5 @@
 from typing import Iterator, Optional, List, Dict
+from time import time
 
 from minet.web import (
     request,
@@ -20,7 +21,6 @@ class TikTokHTTPClient:
         self.urls = TikTokHTTPAPIUrlFormatter()
         self.pool_manager = create_pool_manager()
         self.retryer = create_request_retryer()
-        self.rate_limit_reset: Optional[int] = None
 
         # First auth
         self.create_session(identifier, password)
@@ -47,8 +47,11 @@ class TikTokHTTPClient:
 
         data = response.json()
 
+        self.expired_at = time() + data["expires_in"]
         self.access_token = data["access_token"]
-        self.expired_in = data["expires_in"]
+
+    def is_token_expired(self):
+        return self.expired_at - time() < 10
 
     def search_commercial_contents(
         self,
@@ -56,7 +59,6 @@ class TikTokHTTPClient:
         min_date: str,
         max_date: str,
         usernames: Optional[List[str]] = [],
-        total: Optional[int] = None,
     ) -> Iterator[Dict]:
         headers = {
             "authorization": "Bearer {}".format(self.access_token),
@@ -78,6 +80,9 @@ class TikTokHTTPClient:
 
         while True:
             url = self.urls.search_commercial_contents()
+
+            if self.is_token_expired():
+                self.create_session()
 
             response = request(
                 url,
