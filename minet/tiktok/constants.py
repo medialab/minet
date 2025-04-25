@@ -17,3 +17,8 @@ TIKTOK_COMMERCIAL_CONTENTS_FIELDS = (
     "id,create_timestamp,create_date,label,brand_names,creator,videos"
 )
 TIKTOK_COMMERCIAL_CONTENTS_MAX_COUNT = 50
+
+TIKTOK_COMMERCIAL_CONTENTS_LABELS = {
+    "1": "Paid Partnership",
+    "2": "Promotional Content",
+}

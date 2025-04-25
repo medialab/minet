@@ -99,7 +99,7 @@ class TikTokHTTPClient:
                 raise TiktokHTTPAPIError(data["error"])
 
             for content in data["data"]["commercial_contents"]:
-                yield TiktokCommercialContent.from_payload(content)
+                yield TiktokCommercialContent.from_payload(content, collected_via="api")
 
             has_more = data["data"]["has_more"]
 

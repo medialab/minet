@@ -6,6 +6,7 @@
 #
 from ebbe import getpath
 from urllib.parse import quote
+from typing import Optional, Dict
 
 from minet.utils import sleep_with_entropy
 from minet.cookies import coerce_cookie_for_url_from_browser
@@ -21,12 +22,13 @@ from minet.tiktok.constants import (
     TIKTOK_URL,
     TIKTOK_MIN_TIME_RETRYER,
     TIKTOK_MAX_RANDOM_ADDENDUM,
+    TIKTOK_COMMERCIAL_CONTENTS_MAX_COUNT,
 )
 from minet.tiktok.exceptions import (
     TiktokInvalidCookieError,
     TiktokPublicAPIInvalidResponseError,
 )
-from minet.tiktok.types import TiktokVideo
+from minet.tiktok.types import TiktokVideo, TiktokCommercialContent
 
 
 def forge_video_search_url(query, offset, search_id=None):
@@ -39,6 +41,19 @@ def forge_video_search_url(query, offset, search_id=None):
         url += "&search_id=%s" % search_id
 
     return url
+
+
+def forge_commercials_raw_data(
+    username: str = "",
+    search_id: str = "",
+):
+    return {
+        "order": "posted_date,desc",
+        "cursor": 0,
+        "size": TIKTOK_COMMERCIAL_CONTENTS_MAX_COUNT,
+        "search_id": search_id,
+        "query": username,
+    }
 
 
 class TiktokAPIScraper(object):
@@ -58,11 +73,16 @@ class TiktokAPIScraper(object):
         )
 
     @retrying_method()
-    def request_json(self, url):
+    def request_json(self, url: str, body: Optional[Dict] = None, method: str = "GET"):
         headers = {"Cookie": self.cookie}
 
         response = request(
-            url, pool_manager=self.pool_manager, spoof_ua=True, headers=headers
+            url,
+            pool_manager=self.pool_manager,
+            spoof_ua=True,
+            headers=headers,
+            json_body=body,
+            method=method,
         )
 
         if response.status >= 400:
@@ -73,6 +93,39 @@ class TiktokAPIScraper(object):
         sleep_with_entropy(TIKTOK_DEFAULT_THROTTLE, TIKTOK_MAX_RANDOM_ADDENDUM)
 
         return response.json()
+
+    def search_commercial_contents(
+        self,
+        country: str,
+        min_date: str,
+        max_date: str,
+        username: str = "",
+    ):
+        search_id = ""
+        url = (
+            "https://library.tiktok.com/api/v1/other-commercial-contents/search?region=%s&start_time=%i&end_time=%i"
+            % (country, min_date, max_date)
+        )
+
+        while True:
+            body = forge_commercials_raw_data(username, search_id)
+            data = self.request_json(url, body, "POST")
+            item_list = data.get("data")
+
+            if not item_list:
+                break
+
+            for item in item_list:
+                commercial = TiktokCommercialContent.from_payload(
+                    item, collected_via="scrape"
+                )
+                yield commercial
+
+            has_next_page = getpath(data, ["has_more"])
+            search_id = getpath(data, ["search_id"])
+
+            if not has_next_page or search_id is None:
+                break
 
     def search_videos(self, query):
         cursor = None
