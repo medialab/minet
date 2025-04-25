@@ -1,20 +1,9 @@
-from typing import Tuple
-
-from ural import URLFormatter, urlpathsplit
+from ural import URLFormatter
 
 from minet.tiktok.constants import (
     TIKTOK_HTTP_API_BASE_URL,
     TIKTOK_COMMERCIAL_CONTENTS_FIELDS,
 )
-
-
-def parse_post_url(url: str) -> Tuple[str, str]:
-    path = urlpathsplit(url)
-
-    did = path[1]
-    rkey = path[3]
-
-    return did, rkey
 
 
 class TikTokHTTPAPIUrlFormatter(URLFormatter):
