@@ -111,6 +111,54 @@ TIKTOK_SEARCH_COMMERCIALS_SUBCOMMAND = command(
     ],
 )
 
+TIKTOK_SCRAPE_COMMERCIALS_SUBCOMMAND = command(
+    "scrape-commercials",
+    "minet.cli.tiktok.scrape_commercials",
+    title="Tiktok Scrape Commercial Contents Command",
+    description="""
+        Query TikTok commercial contents from the Ad Library website.
+    """,
+    epilog="""
+        Example:
+
+        . Searching all commercial contents published in Romania from October 1st to October 2nd 2024:
+            $ minet tiktok scrape-commercials --country RO --min-date 20241001 --max-date 20241002 > romania.csv
+    """,
+    arguments=[
+        {
+            "flags": ["-c", "--country"],
+            "help": "The country of the commercial content's author.",
+            "type": str,
+            "default": "ALL",
+        },
+        {
+            "flags": ["--cookie"],
+            "help": 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge").',
+            "default": "firefox",
+            "rc_key": ["tiktok", "cookie"],
+            "action": ConfigAction,
+        },
+        {
+            "flags": ["--min-date"],
+            "help": "Needs to be after October 1st, 2022.",
+            "type": str,
+            "default": "20221001",
+        },
+        {
+            "flags": ["--max-date"],
+            "help": "The end of the time range during which the commercial contents were published.",
+            "type": str,
+            "default": date.today().strftime("%Y%m%d"),
+        },
+        {
+            "flags": ["-t", "--total"],
+            "help": "Maximum number of contents to retrieve in total.",
+            "type": int,
+        },
+        *TIKTOK_HTTP_API_COMMON_ARGUMENTS,
+    ],
+)
+
 TIKTOK_COMMAND = command(
     "tiktok",
     "minet.cli.tiktok",
@@ -119,5 +167,9 @@ TIKTOK_COMMAND = command(
     description="""
         Gather data from Tiktok.
     """,
-    subcommands=[TIKTOK_SEARCH_VIDEOS_SUBCOMMAND, TIKTOK_SEARCH_COMMERCIALS_SUBCOMMAND],
+    subcommands=[
+        TIKTOK_SEARCH_VIDEOS_SUBCOMMAND,
+        TIKTOK_SEARCH_COMMERCIALS_SUBCOMMAND,
+        TIKTOK_SCRAPE_COMMERCIALS_SUBCOMMAND,
+    ],
 )

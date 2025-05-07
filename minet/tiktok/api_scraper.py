@@ -7,6 +7,7 @@
 from ebbe import getpath
 from urllib.parse import quote
 from typing import Optional, Dict
+from datetime import datetime
 
 from minet.utils import sleep_with_entropy
 from minet.cookies import coerce_cookie_for_url_from_browser
@@ -102,9 +103,11 @@ class TiktokAPIScraper(object):
         username: str = "",
     ):
         search_id = ""
+        min_timestamp = int(datetime.strptime(min_date, "%Y%m%d").timestamp())
+        max_timestamp = int(datetime.strptime(max_date, "%Y%m%d").timestamp())
         url = (
             "https://library.tiktok.com/api/v1/other-commercial-contents/search?region=%s&start_time=%i&end_time=%i"
-            % (country, min_date, max_date)
+            % (country, min_timestamp, max_timestamp)
         )
 
         while True:
