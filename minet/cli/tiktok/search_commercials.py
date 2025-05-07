@@ -1,8 +1,8 @@
 # =============================================================================
-# Minet Tiktok Search-videos CLI Action
+# Minet Tiktok Search Commercial Contents CLI Action
 # =============================================================================
 #
-# Logic of the `tiktok search-videos` action.
+# Logic of the `tiktok search-commercials` action.
 #
 from itertools import islice
 import casanova
