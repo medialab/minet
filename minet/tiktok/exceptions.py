@@ -26,3 +26,22 @@ class TiktokPublicAPIInvalidResponseError(TiktokError):
 
 class TiktokInvalidCookieError(TiktokError):
     pass
+
+
+class TiktokAuthenticationError(TiktokError):
+    pass
+
+
+class TiktokHTTPAPIError(TiktokError):
+    def __init__(self, error):
+        super().__init__()
+        self.code = error["code"]
+        self.message = error["message"]
+        self.log_id = error["log_id"]
+
+    def __str__(self):
+        return "Error: %s, message: %s, log_id: %s" % (
+            self.code,
+            self.message,
+            self.log_id,
+        )
