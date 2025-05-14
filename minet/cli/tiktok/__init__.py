@@ -129,7 +129,7 @@ TIKTOK_SCRAPE_COMMERCIALS_SUBCOMMAND = command(
             "flags": ["-c", "--country"],
             "help": "The country of the commercial content's author.",
             "type": str,
-            "default": "ALL",
+            "default": "all",
         },
         {
             "flags": ["--cookie"],
