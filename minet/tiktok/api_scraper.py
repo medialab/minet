@@ -25,6 +25,7 @@ from minet.tiktok.constants import (
     TIKTOK_MAX_RANDOM_ADDENDUM,
     TIKTOK_COMMERCIAL_CONTENTS_MAX_COUNT,
 )
+from minet.exceptions import CookieGrabbingError
 from minet.tiktok.exceptions import (
     TiktokInvalidCookieError,
     TiktokPublicAPIInvalidResponseError,
@@ -64,7 +65,10 @@ class TiktokAPIScraper(object):
         )
         self.cookie = None
 
-        cookie = coerce_cookie_for_url_from_browser(cookie, TIKTOK_URL)
+        try:
+            cookie = coerce_cookie_for_url_from_browser(cookie, TIKTOK_URL)
+        except CookieGrabbingError:
+            cookie = None
 
         if cookie:
             self.cookie = cookie
