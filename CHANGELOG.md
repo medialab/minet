@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.1.0 (provisional)
+## 4.1.0
 
 *Features*
 
