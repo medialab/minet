@@ -194,9 +194,11 @@ class TiktokCommercialContent(TabularRecord):
                 video_urls.append(video.get("url", video.get("video_url")))
 
         creator = payload["creator"]
-        label = payload.get(
-            "label", TIKTOK_COMMERCIAL_CONTENTS_LABELS[payload.get("content_label")]
-        )
+
+        if "content_label" in payload:
+            label = TIKTOK_COMMERCIAL_CONTENTS_LABELS[payload["content_label"]]
+        else:
+            label = payload.get("label")
 
         return cls(
             id=payload["id"],
