@@ -6,7 +6,7 @@ from minet.tiktok.constants import (
 )
 
 
-class TikTokHTTPAPIUrlFormatter(URLFormatter):
+class TiktokHTTPAPIUrlFormatter(URLFormatter):
     BASE_URL = TIKTOK_HTTP_API_BASE_URL
 
     def create_session(self) -> str:

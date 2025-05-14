@@ -8,7 +8,7 @@ from itertools import islice
 import casanova
 
 from minet.cli.utils import with_loading_bar
-from minet.tiktok import TikTokHTTPClient
+from minet.tiktok import TiktokHTTPClient
 from minet.tiktok.types import TiktokCommercialContent
 
 
@@ -18,7 +18,7 @@ from minet.tiktok.types import TiktokCommercialContent
     nested=False,
 )
 def action(cli_args, loading_bar):
-    client = TikTokHTTPClient(identifier=cli_args.key, password=cli_args.secret)
+    client = TiktokHTTPClient(identifier=cli_args.key, password=cli_args.secret)
 
     generator = client.search_commercial_contents(
         country=cli_args.country, min_date=cli_args.min_date, max_date=cli_args.max_date

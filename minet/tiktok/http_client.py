@@ -9,16 +9,16 @@ from minet.web import (
 )
 
 from minet.tiktok.urls import (
-    TikTokHTTPAPIUrlFormatter,
+    TiktokHTTPAPIUrlFormatter,
 )
 from minet.tiktok.types import TiktokCommercialContent
 from minet.tiktok.constants import TIKTOK_COMMERCIAL_CONTENTS_MAX_COUNT
 from minet.tiktok.exceptions import TiktokAuthenticationError, TiktokHTTPAPIError
 
 
-class TikTokHTTPClient:
+class TiktokHTTPClient:
     def __init__(self, identifier: str, password: str):
-        self.urls = TikTokHTTPAPIUrlFormatter()
+        self.urls = TiktokHTTPAPIUrlFormatter()
         self.pool_manager = create_pool_manager()
         self.retryer = create_request_retryer()
 

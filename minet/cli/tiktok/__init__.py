@@ -10,13 +10,13 @@ from datetime import date, timedelta
 TIKTOK_HTTP_API_COMMON_ARGUMENTS = [
     {
         "flag": "--key",
-        "help": "TikTok API identification key.",
+        "help": "Tiktok API identification key.",
         "rc_key": ["tiktok", "api_key"],
         "action": ConfigAction,
     },
     {
         "flag": "--secret",
-        "help": "TikTok API identification secret",
+        "help": "Tiktok API identification secret",
         "rc_key": ["tiktok", "api_secret"],
         "action": ConfigAction,
     },
@@ -75,7 +75,7 @@ TIKTOK_SEARCH_COMMERCIALS_SUBCOMMAND = command(
     "minet.cli.tiktok.search_commercials",
     title="Tiktok Search Commercial Contents Command",
     description="""
-        Query TikTok commercial contents using the Ad Library API.
+        Query Tiktok commercial contents using the Ad Library API.
     """,
     epilog="""
         Example:
@@ -116,7 +116,7 @@ TIKTOK_SCRAPE_COMMERCIALS_SUBCOMMAND = command(
     "minet.cli.tiktok.scrape_commercials",
     title="Tiktok Scrape Commercial Contents Command",
     description="""
-        Query TikTok commercial contents from the Ad Library website.
+        Query Tiktok commercial contents from the Ad Library website.
     """,
     epilog="""
         Example:
