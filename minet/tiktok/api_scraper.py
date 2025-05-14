@@ -27,7 +27,6 @@ from minet.tiktok.constants import (
 )
 from minet.exceptions import CookieGrabbingError
 from minet.tiktok.exceptions import (
-    TiktokInvalidCookieError,
     TiktokPublicAPIInvalidResponseError,
 )
 from minet.tiktok.types import TiktokVideo, TiktokCommercialContent
