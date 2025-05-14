@@ -81,6 +81,7 @@ Minet can single-handedly:
 - Mine or search:
   - _[Bluesky](https://bsky.app/)_ (requires a free user account)
   - _[Mediacloud](https://mediacloud.org/)_ (requires free API access)
+  - _[TikTok](https://www.tiktok.com)_ (requires API access)
   - _[Twitter](https://twitter.com)_ (requires free API access)
   - _[Wikipedia](https://www.wikipedia.org)_
   - _[Youtube](https://www.youtube.com/)_ (requires free API access)

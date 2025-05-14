@@ -1,6 +1,11 @@
 # Changelog
 
-## 4.0.2 (provisional)
+## 4.1.0 (provisional)
+
+*Features*
+
+- Adding `minet tiktok search-commercials`.
+- Adding `minet tiktok scrape-commercials`.
 
 *Fixes*
 
