@@ -53,6 +53,22 @@ class TiktokHTTPClient:
     def is_token_expired(self):
         return self.expired_at - time() < 10
 
+    @retrying_method()
+    def request(self, url: str, params: Dict, headers: Dict):
+        if self.is_token_expired():
+            self.create_session()
+
+        response = request(
+            url,
+            pool_manager=self.pool_manager,
+            method="POST",
+            json_body=params,
+            known_encoding="utf-8",
+            headers=headers,
+        )
+
+        return response
+
     def search_commercial_contents(
         self,
         country: str,
@@ -78,20 +94,10 @@ class TiktokHTTPClient:
         if usernames:
             filters["creator_usernames"] = usernames
 
+        url = self.urls.search_commercial_contents()
+
         while True:
-            url = self.urls.search_commercial_contents()
-
-            if self.is_token_expired():
-                self.create_session()
-
-            response = request(
-                url,
-                pool_manager=self.pool_manager,
-                method="POST",
-                json_body=params,
-                known_encoding="utf-8",
-                headers=headers,
-            )
+            response = self.request(url, params, headers)
 
             data = response.json()
 
