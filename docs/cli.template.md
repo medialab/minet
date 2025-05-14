@@ -61,6 +61,8 @@ _Platform-related commands_
   - [channel-infos](#channel-infos)
   - [channel-messages](#channel-messages)
 - [tiktok (tk)](#tiktok)
+  - [scrape-commercials](#scrape-commercials)
+  - [search-commercials](#search-commercials)
   - [search-videos](#search-videos)
 - [twitter](#twitter)
   - [attrition](#attrition)
@@ -131,6 +133,8 @@ mediacloud:
   token: "MY_MC_TOKEN" # Used as --token for `minet mc` commands
 tiktok:
   cookie: "MY_TIKTOK_COOKIE" # Used as --cookie for `minet tk` commands
+  api_key: "MY_TIKTOK_API_KEY" # Used as --api-key for `minet tk` commands
+  api_secret: "MY_TIKTOK_API_SECRET" # Used as --api-secret for `minet tk` commands
 twitter:
   cookie: "MY_TWITTER_COOKIE" # Used as --cookie for `minet tw scrape` command
   api_key: "MY_API_KEY" # Used as --api-key for `minet tw` commands
@@ -336,6 +340,14 @@ For more documentation about minet's scraping DSL check this [page](../cookbook/
 ## Tiktok
 
 <% tk %>
+
+### scrape-commercials
+
+<% tiktok/scrape-commercials %>
+
+### search-commercials
+
+<% tiktok/search-commercials %>
 
 ### search-videos
 
