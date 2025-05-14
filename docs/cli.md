@@ -61,6 +61,8 @@ _Platform-related commands_
   - [channel-infos](#channel-infos)
   - [channel-messages](#channel-messages)
 - [tiktok (tk)](#tiktok)
+  - [scrape-commercials](#scrape-commercials)
+  - [search-commercials](#search-commercials)
   - [search-videos](#search-videos)
 - [twitter](#twitter)
   - [attrition](#attrition)
@@ -131,6 +133,8 @@ mediacloud:
   token: "MY_MC_TOKEN" # Used as --token for `minet mc` commands
 tiktok:
   cookie: "MY_TIKTOK_COOKIE" # Used as --cookie for `minet tk` commands
+  api_key: "MY_TIKTOK_API_KEY" # Used as --api-key for `minet tk` commands
+  api_secret: "MY_TIKTOK_API_SECRET" # Used as --api-secret for `minet tk` commands
 twitter:
   cookie: "MY_TWITTER_COOKIE" # Used as --cookie for `minet tw scrape` command
   api_key: "MY_API_KEY" # Used as --api-key for `minet tw` commands
@@ -4181,18 +4185,144 @@ how to use the command with a CSV file?
 ## Tiktok
 
 ```
-Usage: minet tiktok [-h] {search-videos} ...
+Usage: minet tiktok [-h]
+                    {search-videos,search-commercials,scrape-commercials} ...
 
 # Minet Tiktok Command
 
 Gather data from Tiktok.
 
 Optional Arguments:
-  -h, --help       show this help message and exit
+  -h, --help                    show this help message and exit
 
 Subcommands:
-  {search-videos}  Subcommand to use.
-    search-videos  Tiktok Search Videos Command
+  {search-videos,search-commercials,scrape-commercials}
+                                Subcommand to use.
+    search-videos               Tiktok Search Videos Command
+    search-commercials          Tiktok Search Commercial Contents Command
+    scrape-commercials          Tiktok Scrape Commercial Contents Command
+```
+
+### scrape-commercials
+
+```
+Usage: minet tiktok scrape-commercials [-h] [-c COUNTRY] [--silent]
+                                       [--refresh-per-second REFRESH_PER_SECOND]
+                                       [--simple-progress] [--cookie COOKIE]
+                                       [--rcfile RCFILE] [--min-date MIN_DATE]
+                                       [--max-date MAX_DATE] [-t TOTAL]
+                                       [--key KEY] [--secret SECRET] [-o OUTPUT]
+
+# Tiktok Scrape Commercial Contents Command
+
+Query Tiktok commercial contents from the Ad Library website.
+
+Optional Arguments:
+  --cookie COOKIE               Authenticated cookie to use or browser from
+                                which to extract it (supports "firefox",
+                                "chrome", "chromium", "opera" and "edge").
+                                Defaults to `firefox`. Can also be configured in
+                                a .minetrc file as "tiktok.cookie" or read from
+                                the MINET_TIKTOK_COOKIE env variable.
+  -c, --country COUNTRY         The country of the commercial content's author.
+                                Defaults to `ALL`.
+  --key KEY                     Tiktok API identification key. Can also be
+                                configured in a .minetrc file as
+                                "tiktok.api_key" or read from the
+                                MINET_TIKTOK_API_KEY env variable.
+  --max-date MAX_DATE           The end of the time range during which the
+                                commercial contents were published. Defaults to
+                                `20250514`.
+  --min-date MIN_DATE           Needs to be after October 1st, 2022. Defaults to
+                                `20221001`.
+  --secret SECRET               Tiktok API identification secret. Can also be
+                                configured in a .minetrc file as
+                                "tiktok.api_secret" or read from the
+                                MINET_TIKTOK_API_SECRET env variable.
+  -t, --total TOTAL             Maximum number of contents to retrieve in total.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Example:
+
+. Searching all commercial contents published in Romania from October 1st to October 2nd 2024:
+    $ minet tiktok scrape-commercials --country RO --min-date 20241001 --max-date 20241002 > romania.csv
+```
+
+### search-commercials
+
+```
+Usage: minet tiktok search-commercials [-h] [-c COUNTRY] [--silent]
+                                       [--refresh-per-second REFRESH_PER_SECOND]
+                                       [--simple-progress] [--min-date MIN_DATE]
+                                       [--max-date MAX_DATE] [-t TOTAL]
+                                       [--key KEY] [--rcfile RCFILE]
+                                       [--secret SECRET] [-o OUTPUT]
+
+# Tiktok Search Commercial Contents Command
+
+Query Tiktok commercial contents using the Ad Library API.
+
+Optional Arguments:
+  -c, --country COUNTRY         The country of the commercial content's author.
+                                Defaults to `ALL`.
+  --key KEY                     Tiktok API identification key. Can also be
+                                configured in a .minetrc file as
+                                "tiktok.api_key" or read from the
+                                MINET_TIKTOK_API_KEY env variable.
+  --max-date MAX_DATE           The end of the time range during which the
+                                commercial contents were published. Defaults to
+                                `20250513`.
+  --min-date MIN_DATE           Needs to be after October 1st, 2022. Defaults to
+                                `20221001`.
+  --secret SECRET               Tiktok API identification secret. Can also be
+                                configured in a .minetrc file as
+                                "tiktok.api_secret" or read from the
+                                MINET_TIKTOK_API_SECRET env variable.
+  -t, --total TOTAL             Maximum number of contents to retrieve in total.
+  -o, --output OUTPUT           Path to the output file. Will consider `-` as
+                                stdout. If not given, results will also be
+                                printed to stdout.
+  --rcfile RCFILE               Custom path to a minet configuration file. More
+                                info about this here:
+                                https://github.com/medialab/minet/blob/master/do
+                                cs/cli.md#minetrc
+  --refresh-per-second REFRESH_PER_SECOND
+                                Number of times to refresh the progress bar per
+                                second. Can be a float e.g. `0.5` meaning once
+                                every two seconds. Use this to limit CPU usage
+                                when launching multiple commands at once.
+                                Defaults to `10`.
+  --simple-progress             Whether to simplify the progress bar and make it
+                                fit on a single line. Can be useful in terminals
+                                with partial ANSI support, e.g. a Jupyter
+                                notebook cell.
+  --silent                      Whether to suppress all the log and progress
+                                bars. Can be useful when piping.
+  -h, --help                    show this help message and exit
+
+Example:
+
+. Searching all commercial contents published in Romania from October 1st to October 2nd 2024:
+    $ minet tiktok search-commercials --country RO --min-date 20241001 --max-date 20241002 > romania.csv
 ```
 
 ### search-videos
