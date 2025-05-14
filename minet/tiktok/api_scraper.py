@@ -62,20 +62,20 @@ class TiktokAPIScraper(object):
         self.pool_manager = create_pool_manager(
             timeout=TIKTOK_PUBLIC_API_DEFAULT_TIMEOUT
         )
+        self.cookie = None
 
         cookie = coerce_cookie_for_url_from_browser(cookie, TIKTOK_URL)
 
-        if not cookie:
-            raise TiktokInvalidCookieError
+        if cookie:
+            self.cookie = cookie
 
-        self.cookie = cookie
         self.retryer = create_request_retryer(
             min=TIKTOK_MIN_TIME_RETRYER,
         )
 
     @retrying_method()
     def request_json(self, url: str, body: Optional[Dict] = None, method: str = "GET"):
-        headers = {"Cookie": self.cookie}
+        headers = {"Cookie": self.cookie} if self.cookie else {}
 
         response = request(
             url,
