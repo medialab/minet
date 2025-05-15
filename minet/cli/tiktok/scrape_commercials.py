@@ -18,7 +18,7 @@ from minet.tiktok.types import TiktokCommercialContent
     nested=False,
 )
 def action(cli_args, loading_bar):
-    client = TiktokAPIScraper(cookie=cli_args.cookie)
+    client = TiktokAPIScraper()
     generator = client.search_commercial_contents(
         country=cli_args.country, min_date=cli_args.min_date, max_date=cli_args.max_date
     )

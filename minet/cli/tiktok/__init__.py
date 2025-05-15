@@ -132,13 +132,6 @@ TIKTOK_SCRAPE_COMMERCIALS_SUBCOMMAND = command(
             "default": "all",
         },
         {
-            "flags": ["--cookie"],
-            "help": 'Authenticated cookie to use or browser from which to extract it (supports "firefox", "chrome", "chromium", "opera" and "edge").',
-            "default": "firefox",
-            "rc_key": ["tiktok", "cookie"],
-            "action": ConfigAction,
-        },
-        {
             "flags": ["--min-date"],
             "help": "Needs to be after October 1st, 2022.",
             "type": str,

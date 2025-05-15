@@ -25,8 +25,8 @@ from minet.tiktok.constants import (
     TIKTOK_MAX_RANDOM_ADDENDUM,
     TIKTOK_COMMERCIAL_CONTENTS_MAX_COUNT,
 )
-from minet.exceptions import CookieGrabbingError
 from minet.tiktok.exceptions import (
+    TiktokInvalidCookieError,
     TiktokPublicAPIInvalidResponseError,
 )
 from minet.tiktok.types import TiktokVideo, TiktokCommercialContent
@@ -58,19 +58,18 @@ def forge_commercials_raw_data(
 
 
 class TiktokAPIScraper(object):
-    def __init__(self, cookie="firefox"):
+    def __init__(self, cookie=None):
         self.pool_manager = create_pool_manager(
             timeout=TIKTOK_PUBLIC_API_DEFAULT_TIMEOUT
         )
-        self.cookie = None
-
-        try:
-            cookie = coerce_cookie_for_url_from_browser(cookie, TIKTOK_URL)
-        except CookieGrabbingError:
-            cookie = None
 
         if cookie:
-            self.cookie = cookie
+            cookie = coerce_cookie_for_url_from_browser(cookie, TIKTOK_URL)
+
+            if not cookie:
+                raise TiktokInvalidCookieError
+
+        self.cookie = cookie
 
         self.retryer = create_request_retryer(
             min=TIKTOK_MIN_TIME_RETRYER,
