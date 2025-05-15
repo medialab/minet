@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.1.2
+
+*Fixes*
+
+- Fixing pypi upload
+
 ## 4.1.1
 
 *Fixes*
