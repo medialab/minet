@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.1.1
+
+*Fixes*
+
+- Fixing cookie error in `minet tiktok scrape-commercials`
+
 ## 4.1.0
 
 *Features*
