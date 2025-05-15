@@ -4208,31 +4208,25 @@ Subcommands:
 ```
 Usage: minet tiktok scrape-commercials [-h] [-c COUNTRY] [--silent]
                                        [--refresh-per-second REFRESH_PER_SECOND]
-                                       [--simple-progress] [--cookie COOKIE]
-                                       [--rcfile RCFILE] [--min-date MIN_DATE]
+                                       [--simple-progress] [--min-date MIN_DATE]
                                        [--max-date MAX_DATE] [-t TOTAL]
-                                       [--key KEY] [--secret SECRET] [-o OUTPUT]
+                                       [--key KEY] [--rcfile RCFILE]
+                                       [--secret SECRET] [-o OUTPUT]
 
 # Tiktok Scrape Commercial Contents Command
 
 Query Tiktok commercial contents from the Ad Library website.
 
 Optional Arguments:
-  --cookie COOKIE               Authenticated cookie to use or browser from
-                                which to extract it (supports "firefox",
-                                "chrome", "chromium", "opera" and "edge").
-                                Defaults to `firefox`. Can also be configured in
-                                a .minetrc file as "tiktok.cookie" or read from
-                                the MINET_TIKTOK_COOKIE env variable.
   -c, --country COUNTRY         The country of the commercial content's author.
-                                Defaults to `ALL`.
+                                Defaults to `all`.
   --key KEY                     Tiktok API identification key. Can also be
                                 configured in a .minetrc file as
                                 "tiktok.api_key" or read from the
                                 MINET_TIKTOK_API_KEY env variable.
   --max-date MAX_DATE           The end of the time range during which the
                                 commercial contents were published. Defaults to
-                                `20250514`.
+                                current date.
   --min-date MIN_DATE           Needs to be after October 1st, 2022. Defaults to
                                 `20221001`.
   --secret SECRET               Tiktok API identification secret. Can also be
@@ -4290,7 +4284,7 @@ Optional Arguments:
                                 MINET_TIKTOK_API_KEY env variable.
   --max-date MAX_DATE           The end of the time range during which the
                                 commercial contents were published. Defaults to
-                                `20250513`.
+                                yesterday.
   --min-date MIN_DATE           Needs to be after October 1st, 2022. Defaults to
                                 `20221001`.
   --secret SECRET               Tiktok API identification secret. Can also be
