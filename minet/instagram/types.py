@@ -7,7 +7,7 @@ from ebbe import getpath
 from minet.instagram.utils import (
     extract_hashtags,
     extract_handles,
-    short_code_to_url,
+    shortcode_to_url,
 )
 from minet.instagram.constants import INSTAGRAM_MEDIA_TYPE
 from minet.dates import timestamp_to_isoformat
@@ -115,7 +115,7 @@ class InstagramHashtagPost(TabularRecord):
             payload["id"],
             payload["__typename"],
             payload["shortcode"],
-            short_code_to_url(payload["shortcode"]),
+            shortcode_to_url(payload["shortcode"]),
             text,
             hashtags,
             mentioned_names,
@@ -128,7 +128,7 @@ class InstagramHashtagPost(TabularRecord):
             payload["taken_at_timestamp"],
             timestamp_to_isoformat(payload["taken_at_timestamp"]),
             payload["accessibility_caption"],
-            short_code_to_url(payload["shortcode"]) + "media/?size=l",
+            shortcode_to_url(payload["shortcode"]) + "media/?size=l",
         )
 
 
@@ -166,7 +166,7 @@ class InstagramLocationPost(TabularRecord):
             payload["id"],
             payload["is_video"],
             payload["shortcode"],
-            short_code_to_url(payload["shortcode"]),
+            shortcode_to_url(payload["shortcode"]),
             text,
             hashtags,
             mentioned_names,
@@ -178,7 +178,7 @@ class InstagramLocationPost(TabularRecord):
             payload["owner"]["id"],
             payload["taken_at_timestamp"],
             timestamp_to_isoformat(payload["taken_at_timestamp"]),
-            short_code_to_url(payload["shortcode"]) + "media/?size=l",
+            shortcode_to_url(payload["shortcode"]) + "media/?size=l",
         )
 
 
@@ -281,14 +281,14 @@ class InstagramPost(TabularRecord):
             payload["pk"],
             media_type,
             payload["code"],
-            short_code_to_url(payload["code"]),
+            shortcode_to_url(payload["code"]),
             text,
             hashtags,
             mentioned_names,
             payload["like_and_view_counts_disabled"],
             payload["like_count"],
             payload["comment_count"],
-            short_code_to_url(payload["code"]) + "media/?size=l",
+            shortcode_to_url(payload["code"]) + "media/?size=l",
             medias_type,
             medias_url,
             usertags_medias,

@@ -60,6 +60,7 @@ from minet.instagram.types import (
     InstagramUser,
     InstagramUserInfo,
 )
+from minet.instagram.utils import shortcode_to_id
 
 INSTAGRAM_GRAPHQL_ENDPOINT = "https://www.instagram.com/graphql/query/"
 INSTAGRAM_HASHTAG_QUERY_HASH = "9b498c08113f1e09617a1703c22b2f32"
@@ -128,6 +129,7 @@ def forge_post_url_from_id(post_id):
     return "https://www.instagram.com/api/v1/media/%s/info/" % post_id
 
 
+# NOTE: does not seem to be working anymore
 def forge_post_url_from_shortcode(post_shortcode):
     return "https://www.instagram.com/p/%s/?__a=1&__d=dis" % post_shortcode
 
@@ -321,13 +323,7 @@ class InstagramAPIScraper(object):
             else:
                 raise InstagramInvalidTargetError
 
-            url = forge_post_url_from_shortcode(shortcode)
-
-            data_post = self.request_json(url, magic_token=True)
-            if not data_post:
-                raise InstagramInvalidTargetError
-
-            post = getpath(data_post, ["items", 0, "pk"])
+            post = shortcode_to_id(shortcode)
 
         min_id = None
 
