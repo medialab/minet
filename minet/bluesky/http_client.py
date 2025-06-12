@@ -3,6 +3,9 @@ from typing import Iterator, Iterable, Optional, Any, List, Dict
 from time import time, sleep
 from ebbe import as_reconciled_chunks
 
+from twitwi.bluesky import normalize_profile, normalize_post
+from twitwi.bluesky.types import BlueskyPost, BlueskyProfile
+
 from minet.web import (
     create_request_retryer,
     create_pool_manager,
@@ -17,7 +20,6 @@ from minet.bluesky.urls import (
     format_post_at_uri,
 )
 from minet.bluesky.jwt import parse_jwt_for_expiration
-from minet.bluesky.types import BlueskyPost
 from minet.bluesky.exceptions import (
     BlueskyAuthenticationError,
     BlueskySessionRefreshError,
@@ -116,7 +118,8 @@ class BlueskyHTTPClient:
             data = response.json()
 
             for post in data["posts"]:
-                yield BlueskyPost.from_payload(post)
+                # TODO : handle locale + extract_referenced_posts + collected_via
+                yield normalize_post(post)
 
             cursor = data.get("cursor")
 
@@ -137,8 +140,8 @@ class BlueskyHTTPClient:
 
         return format_post_at_uri(did, rkey)
 
-    # NOTE: this API route that not return any results for at-uris containing handles!
-    def get_posts(self, did_at_uris: Iterable[str]) -> Iterator[Any]:
+    # NOTE: this API route does not return any results for at-uris containing handles!
+    def get_posts(self, did_at_uris: Iterable[str]) -> Iterator[BlueskyPost]:
         def work(chunk: List[str]) -> Dict[str, Any]:
             url = self.urls.get_posts(chunk)
             response = self.request(url)
@@ -150,11 +153,12 @@ class BlueskyHTTPClient:
             return data.get(uri)
 
         for _, post_data in as_reconciled_chunks(25, did_at_uris, work, reconcile):
-            yield post_data
+            # TODO : handle locale + extract_referenced_posts + collected_via
+            yield normalize_post(post_data)
 
     def get_user_posts(
         self, identifier: str, limit: Optional[int] = -1
-    ) -> Iterator[Any]:
+    ) -> Iterator[BlueskyPost]:
         if not identifier.startswith("did:"):
             did = self.resolve_handle(identifier)
         else:
@@ -170,8 +174,8 @@ class BlueskyHTTPClient:
             data = response.json()
 
             for post in data["feed"]:
-                yield post
-                # yield BlueskyPost.from_feed(post)
+                # TODO : handle locale + extract_referenced_posts + collected_via
+                yield normalize_post(post)
                 count += 1
                 if count == limit:
                     break
@@ -181,7 +185,7 @@ class BlueskyHTTPClient:
             if cursor is None or count == limit:
                 break
 
-    def get_profiles(self, identifiers: Iterable[str]) -> Iterator[Any]:
+    def get_profiles(self, identifiers: Iterable[str]) -> Iterator[BlueskyProfile]:
         def work(chunk: List[str]) -> Dict[str, Any]:
             url = self.urls.get_profiles(chunk)
             response = self.request(url)
@@ -199,4 +203,5 @@ class BlueskyHTTPClient:
             return data.get(identifier)
 
         for _, profile_data in as_reconciled_chunks(25, identifiers, work, reconcile):
-            yield profile_data
+            # TODO: handle locale + collected_via
+            yield normalize_profile(profile_data)
