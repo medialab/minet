@@ -145,7 +145,7 @@ class BlueskyHTTPClient:
         return format_post_at_uri(did, rkey)
 
     # NOTE: this API route does not return any results for at-uris containing handles!
-    def get_posts(self, did_at_uris: Iterable[str]) -> Iterator[BlueskyPost]:
+    def get_posts(self, did_at_uris: Iterable[str], return_raw=False) -> Iterator[BlueskyPost]:
         def work(chunk: List[str]) -> Dict[str, Any]:
             url = self.urls.get_posts(chunk)
             response = self.request(url)
@@ -157,8 +157,12 @@ class BlueskyHTTPClient:
             return data.get(uri)
 
         for _, post_data in as_reconciled_chunks(25, did_at_uris, work, reconcile):
+            if return_raw:
+                yield post_data
             # TODO : handle locale + extract_referenced_posts + collected_via
-            yield normalize_post(post_data)
+            else:
+                yield normalize_post(post_data)
+
 
     def get_user_posts(
         self, identifier: str, limit: Optional[int] = -1
