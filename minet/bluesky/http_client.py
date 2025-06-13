@@ -126,17 +126,18 @@ class BlueskyHTTPClient:
             if cursor is None:
                 break
 
-    def resolve_handle(self, identifier: str) -> str:
-        url = self.urls.resolve_handle(identifier)
+    def resolve_handle(self, identifier: str, _alternate_api=False) -> str:
+        url = self.urls.resolve_handle(identifier, _alternate_api=_alternate_api)
 
-        try:
-            response = self.request(url)
-        except Exception:
-            url = self.urls.resolve_handle(identifier, alternate_api=True)
-            response = self.request(url)
+        response = self.request(url)
         data = response.json()
-
-        return data["did"]
+        try:
+            return data["did"]
+        except KeyError as e:
+            if not _alternate_api:
+                return self.resolve_handle(identifier, _alternate_api=True)
+            else:
+                raise e
 
     def post_url_to_did_at_uri(self, url: str) -> str:
         handle, rkey = parse_post_url(url)
