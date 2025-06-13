@@ -129,7 +129,11 @@ class BlueskyHTTPClient:
     def resolve_handle(self, identifier: str) -> str:
         url = self.urls.resolve_handle(identifier)
 
-        response = self.request(url)
+        try:
+            response = self.request(url)
+        except:
+            url = self.urls.resolve_handle(identifier, alternate_api=True)
+            response = self.request(url)
         data = response.json()
 
         return data["did"]
