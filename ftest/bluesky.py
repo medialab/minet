@@ -37,7 +37,7 @@ client = BlueskyHTTPClient(conf["bluesky"]["identifier"], conf["bluesky"]["passw
 # time.sleep(1)
 # print(client.refresh_session())
 
-# post_urls = [
+post_urls = [
 #     "https://bsky.app/profile/pecqueuxanthony.bsky.social/post/3lkizm6uvhc2b",
 #     "https://bsky.app/profile/annemascret.bsky.social/post/3lkksxdlabk2y",
 #     "https://bsky.app/profile/pierre.senellart.com/post/3lkhaibfxv22b",
@@ -54,26 +54,28 @@ client = BlueskyHTTPClient(conf["bluesky"]["identifier"], conf["bluesky"]["passw
 #     "https://bsky.app/profile/shiseptiana.bsky.social/post/3lkbalaxeys2v",
 #     "https://bsky.app/profile/danabra.mov/post/3ll4whwghy22y",
 #     "https://bsky.app/profile/yomguithereal.bsky.social/post/3kbg7jgtddn2w",
-# ]
+#     "https://bsky.app/profile/fredbourget.bsky.social/post/3lpoug3ljdw27"
+      "https://bsky.app/profile/NewYork.activitypub.awakari.com.ap.brid.gy/post/3lkctsyce5f42"
+]
 
-# did_at_uris = [client.post_url_to_did_at_uri(post_url) for post_url in post_urls]
+did_at_uris = [client.post_url_to_did_at_uri(post_url) for post_url in post_urls]
 
 DATA = []
 
-# for post_data in client.get_posts(did_at_uris):
-#     console.print(post_data, highlight=True)
-#     DATA.append(post_data)
+for post_data in client.get_posts(did_at_uris, return_raw=True):
+    console.print(post_data, highlight=True)
+    DATA.append(post_data)
 
-profiles = [
-    "yomguithereal.bsky.social",
-    "boogheta.bsky.social",
-    "medialab-scpo.bsky.social",
-    "nytimes.com",
-]
+#profiles = [
+#    "yomguithereal.bsky.social",
+#    "boogheta.bsky.social",
+#    "medialab-scpo.bsky.social",
+#    "nytimes.com",
+#]
 
-for profile in client.get_profiles(profiles):
-    DATA.append(profile)
-    console.print(profile, highlight=True)
+#for profile in client.get_profiles(profiles):
+#    DATA.append(profile)
+#    console.print(profile, highlight=True)
 
 with open("dump.json", "w") as f:
     json.dump(DATA, f, ensure_ascii=False, indent=2)
