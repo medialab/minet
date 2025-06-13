@@ -131,7 +131,7 @@ class BlueskyHTTPClient:
 
         try:
             response = self.request(url)
-        except:
+        except Exception:
             url = self.urls.resolve_handle(identifier, alternate_api=True)
             response = self.request(url)
         data = response.json()
