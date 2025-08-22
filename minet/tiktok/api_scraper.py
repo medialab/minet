@@ -96,7 +96,12 @@ class TiktokAPIScraper(object):
 
         sleep_with_entropy(TIKTOK_DEFAULT_THROTTLE, TIKTOK_MAX_RANDOM_ADDENDUM)
 
-        return response.json()
+        try:
+            return response.json()
+        except json.decoder.JSONDecodeError:
+            raise TiktokPublicAPIInvalidResponseError(
+                url, response.status, response.text()
+            )
 
     def search_commercial_contents(
         self,
