@@ -4228,7 +4228,7 @@ Optional Arguments:
                                 commercial contents were published. Defaults to
                                 current date.
   --min-date MIN_DATE           Needs to be after October 1st, 2022. Defaults to
-                                `20221001`.
+                                `2022-10-01`.
   --secret SECRET               Tiktok API identification secret. Can also be
                                 configured in a .minetrc file as
                                 "tiktok.api_secret" or read from the
@@ -4257,8 +4257,8 @@ Optional Arguments:
 
 Example:
 
-. Searching all commercial contents published in Romania from October 1st to October 2nd 2024:
-    $ minet tiktok scrape-commercials --country RO --min-date 20241001 --max-date 20241002 > romania.csv
+. Searching commercial contents from October 1st 2024 00:00:00 to October 2nd 2024 12:00:00 in Romania:
+    $ minet tiktok scrape-commercials --country RO --min-date 2024-10-01 --max-date 2024-10-02T12:00:00 > romania.csv
 ```
 
 ### search-commercials

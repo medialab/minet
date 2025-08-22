@@ -121,8 +121,8 @@ TIKTOK_SCRAPE_COMMERCIALS_SUBCOMMAND = command(
     epilog="""
         Example:
 
-        . Searching all commercial contents published in Romania from October 1st to October 2nd 2024:
-            $ minet tiktok scrape-commercials --country RO --min-date 20241001 --max-date 20241002 > romania.csv
+        . Searching commercial contents from October 1st 2024 00:00:00 to October 2nd 2024 12:00:00 in Romania:
+            $ minet tiktok scrape-commercials --country RO --min-date 2024-10-01 --max-date 2024-10-02T12:00:00 > romania.csv
     """,
     arguments=[
         {
@@ -135,13 +135,13 @@ TIKTOK_SCRAPE_COMMERCIALS_SUBCOMMAND = command(
             "flags": ["--min-date"],
             "help": "Needs to be after October 1st, 2022.",
             "type": str,
-            "default": "20221001",
+            "default": "2022-10-01",
         },
         {
             "flags": ["--max-date"],
             "help": "The end of the time range during which the commercial contents were published.",
             "type": str,
-            "default": date.today().strftime("%Y%m%d"),
+            "default": date.today().strftime("%Y-%m-%d"),
         },
         {
             "flags": ["-t", "--total"],

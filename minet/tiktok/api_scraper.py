@@ -4,12 +4,13 @@
 #
 # Tiktok public API "scraper".
 #
+import json
 from ebbe import getpath
 from urllib.parse import quote
 from typing import Optional, Dict
-from datetime import datetime
 
 from minet.utils import sleep_with_entropy
+from minet.dates import datetime_from_partial_iso_format
 from minet.cookies import coerce_cookie_for_url_from_browser
 from minet.web import (
     create_pool_manager,
@@ -105,8 +106,10 @@ class TiktokAPIScraper(object):
         username: str = "",
     ):
         search_id = ""
-        min_timestamp = int(datetime.strptime(min_date, "%Y%m%d").timestamp())
-        max_timestamp = int(datetime.strptime(max_date, "%Y%m%d").timestamp())
+        min_timestamp = int(datetime_from_partial_iso_format(min_date).timestamp())
+        max_timestamp = int(
+            datetime_from_partial_iso_format(max_date, upper_bound=True).timestamp()
+        )
         url = (
             "https://library.tiktok.com/api/v1/other-commercial-contents/search?region=%s&start_time=%i&end_time=%i"
             % (country, min_timestamp, max_timestamp)

@@ -164,7 +164,7 @@ class TiktokCommercialContent(TabularRecord):
     id: str
     creator_username: str
     brand_names: List[str]
-    create_date: str
+    create_date_utc: str
     create_timestamp: int
     label: str
     video_cover_image_urls: List[str]
@@ -184,7 +184,7 @@ class TiktokCommercialContent(TabularRecord):
         timestamp = payload.get("create_timestamp")
         if timestamp is None:
             timestamp = payload["posted_time"]
-        date = timestamp_to_isoformat(timestamp)
+        date_utc = timestamp_to_isoformat(timestamp)
 
         if videos:
             for video in videos:
@@ -204,7 +204,7 @@ class TiktokCommercialContent(TabularRecord):
             id=payload["id"],
             creator_username=creator["username"],
             brand_names=payload["brand_names"],
-            create_date=date,
+            create_date_utc=date_utc,
             create_timestamp=timestamp,
             label=label,
             video_cover_image_urls=video_cover_image_urls,
