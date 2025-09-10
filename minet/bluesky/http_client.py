@@ -108,13 +108,38 @@ class BlueskyHTTPClient:
 
         return response
 
-    def search_posts(self, query: str) -> Iterator[BlueskyPost]:
+    def search_posts(
+        self,
+        query: str,
+        lang: Optional[str] = None,
+        since: Optional[str] = None,
+        until: Optional[str] = None,
+        mentions: Optional[str] = None,
+        author: Optional[str] = None,
+        domain: Optional[str] = None,
+        url: Optional[str] = None,
+        tag: Optional[List[str]] = None,
+        not_keywords: Optional[List[str]] = None,
+    ) -> Iterator[BlueskyPost]:
         cursor = None
 
-        while True:
-            url = self.urls.search_posts(query, cursor=cursor)
 
-            response = self.request(url)
+        while True:
+            request_url = self.urls.search_posts(
+                query,
+                cursor=cursor,
+                lang=lang,
+                since=since,
+                until=until,
+                mentions=mentions,
+                author=author,
+                domain=domain,
+                url=url,
+                tag=tag,
+                not_keywords=not_keywords,
+            )
+
+            response = self.request(request_url)
             data = response.json()
 
             for post in data["posts"]:
