@@ -53,11 +53,50 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
         )
 
     def search_posts(
-        self, q: str, cursor: Optional[str] = None, limit: int = 100
+        self,
+        q: str,
+        cursor: Optional[str] = None,
+        limit: int = 100,
+        lang: Optional[str] = None,
+        since: Optional[str] = None,
+        until: Optional[str] = None,
+        mentions: Optional[str] = None,
+        author: Optional[str] = None,
+        domain: Optional[str] = None,
+        url: Optional[str] = None,
+        tag: Optional[List[str]] = None,
+        not_keywords: Optional[List[str]] = None,
     ) -> str:
+        args = {"q": q, "cursor": cursor, "limit": limit}
+
+        if lang:
+            args["lang"] = lang
+        if since:
+            args["since"] = since
+        if until:
+            args["until"] = until
+        if mentions:
+            args["mentions"] = mentions
+        if author:
+            args["author"] = author
+        if domain:
+            args["domain"] = domain
+        if url:
+            args["url"] = url
+        if tag:
+            # TODO : use the tag argument of the API properly, as for now it seems to not work at all. An issue has been opened on the Bluesky repo about it: https://github.com/bluesky-social/atproto/issues/3301
+            # args["tag"] = tag
+            # NOTE : we add the hashtags to the query instead, as it works in classic search syntax.
+            for hashtag in tag:
+                args["q"] += f" #{hashtag}"
+        if not_keywords:
+            # NOTE : we add the not_keywords to the query instead, as it works in classic search syntax.
+            for not_keyword in not_keywords:
+                args["q"] += f" -{not_keyword}"
+
         return self.format(
             path="app.bsky.feed.searchPosts",
-            args={"q": q, "cursor": cursor, "limit": limit},
+            args=args,
         )
 
     def get_user_posts(
