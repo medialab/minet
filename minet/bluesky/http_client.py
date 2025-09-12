@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import Iterator, Iterable, Optional, Any, List, Dict
 
 from time import time, sleep
@@ -5,6 +6,9 @@ from ebbe import as_reconciled_chunks
 
 from twitwi.bluesky import normalize_profile, normalize_post
 from twitwi.bluesky.types import BlueskyPost, BlueskyProfile
+from twitwi.utils import get_dates
+from twitwi.constants import FORMATTED_FULL_DATETIME_FORMAT
+
 
 from minet.web import (
     create_request_retryer,
@@ -123,11 +127,22 @@ class BlueskyHTTPClient:
         not_keywords: Optional[List[str]] = None,
     ) -> Iterator[BlueskyPost]:
         cursor = None
+        oldest_post = None
+        oldest_post_uris: set[str] = set()
+        oldest_post_time_published = None
+        time_range_until: str = ""
 
+        # Search with time seems to work with millisecond precision
+        time_overlap_delta = timedelta(milliseconds=1)
 
-        while True:
+        # to avoid infinite loop when we find the final post,
+        # as it will always appears in the next request because of the time overlap for paging with time range
+        found_the_last_post: bool = False
+
+        while not found_the_last_post:
+
             request_url = self.urls.search_posts(
-                query,
+                query + time_range_until,
                 cursor=cursor,
                 lang=lang,
                 since=since,
@@ -153,14 +168,64 @@ class BlueskyHTTPClient:
                 else:
                     raise Exception(data["message"])
 
+            if "posts" not in data or len(data["posts"]) == 0:
+                break
+            elif len(data["posts"]) == 1:
+                found_the_last_post = True
+
             for post in data["posts"]:
+                if post["uri"] in oldest_post_uris:
+                    continue
+
                 # TODO : handle locale + extract_referenced_posts + collected_via
                 yield normalize_post(post)
+
+            oldest_post = data["posts"][-1]
+
+            _, new_oldest_post_time_published = get_dates(
+                oldest_post["record"]["createdAt"], source="bluesky"
+            )
+
+            if (
+                oldest_post_time_published
+                and new_oldest_post_time_published != oldest_post_time_published
+            ):
+                oldest_post_uris = set()
+
+            oldest_post_time_published = new_oldest_post_time_published
+
+            # adding posts within the time range of the oldest post to the "already seen uris" list,
+            # because they will be in the next request because of the little
+            # (but still existing) time overlap for paging with time range
+            oldest_post_time_published_dt = datetime.strptime(
+                oldest_post_time_published, FORMATTED_FULL_DATETIME_FORMAT
+            )
+            oldest_post_time_published_plus_one_dt = (
+                oldest_post_time_published_dt + time_overlap_delta
+            )
+
+            for post in data["posts"][::-1]:
+                post_local_time = get_dates(
+                    post["record"]["createdAt"], source="bluesky"
+                )[1]
+
+                post_time_published_dt = datetime.strptime(
+                    post_local_time, FORMATTED_FULL_DATETIME_FORMAT
+                )
+
+                if post_time_published_dt > oldest_post_time_published_plus_one_dt:
+                    break
+                oldest_post_uris.add(post["uri"])
 
             cursor = data.get("cursor")
 
             if cursor is None:
-                break
+                time_range_until = (
+                    " until:"
+                    + oldest_post_time_published_plus_one_dt.strftime(
+                        FORMATTED_FULL_DATETIME_FORMAT
+                    )
+                )
 
     def resolve_handle(self, identifier: str, _alternate_api=False) -> str:
         url = self.urls.resolve_handle(identifier, _alternate_api=_alternate_api)
