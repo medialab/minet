@@ -132,6 +132,11 @@ class BlueskyHTTPClient:
         oldest_post_time_published = None
         time_range_until: str = ""
 
+
+        number_of_upstreams_failure_retries = 0
+        timeout_limit = 10
+        default_time_sleeping = 0.5
+
         # Search with time seems to work with millisecond precision
         time_overlap_delta = timedelta(milliseconds=1)
 
@@ -158,8 +163,20 @@ class BlueskyHTTPClient:
             response = self.request(request_url)
             data = response.json()
 
-            if "error" in data:
-                if data["error"] in ("BadRequest", "InvalidRequest"):
+            while "error" in data:
+                e = data["error"]
+                if e == "UpstreamFailure":
+                    number_of_upstreams_failure_retries += 1
+                    if number_of_upstreams_failure_retries > timeout_limit:
+                        raise Exception(
+                            f"UpstreamFailure retry limit reached ({timeout_limit}), aborting."
+                        )
+
+                    sleep(default_time_sleeping * number_of_upstreams_failure_retries)
+                    response = self.request(request_url)
+                    data = response.json()
+
+                elif e in ("BadRequest", "InvalidRequest"):
                     message: str = (
                         data["message"]
                         + ".\nAdvice : check your query and flag syntax."
@@ -167,6 +184,7 @@ class BlueskyHTTPClient:
                     raise BlueskyBadRequestError(message)
                 else:
                     raise Exception(data["message"])
+            number_of_upstreams_failure_retries = 0
 
             if "posts" not in data or len(data["posts"]) == 0:
                 break
