@@ -15,3 +15,7 @@ class BlueskySessionRefreshError(BlueskyError):
 
 class BlueskyBadRequestError(BlueskyError):
     pass
+
+
+class BlueskyUpstreamFailureError(BlueskyError):
+    pass
