@@ -23,7 +23,7 @@ from minet.bluesky.jwt import parse_jwt_for_expiration
 from minet.bluesky.exceptions import (
     BlueskyAuthenticationError,
     BlueskySessionRefreshError,
-    BlueskyBadRequestError,
+    BlueskyError,
 )
 
 
@@ -124,7 +124,6 @@ class BlueskyHTTPClient:
     ) -> Iterator[BlueskyPost]:
         cursor = None
 
-
         while True:
             request_url = self.urls.search_posts(
                 query,
@@ -149,9 +148,9 @@ class BlueskyHTTPClient:
                         data["message"]
                         + ".\nAdvice : check your query and flag syntax."
                     )
-                    raise BlueskyBadRequestError(message)
+                    raise BlueskyError(message)
                 else:
-                    raise Exception(data["message"])
+                    raise BlueskyError(data["message"])
 
             for post in data["posts"]:
                 # TODO : handle locale + extract_referenced_posts + collected_via
@@ -182,7 +181,9 @@ class BlueskyHTTPClient:
         return format_post_at_uri(did, rkey)
 
     # NOTE: this API route does not return any results for at-uris containing handles!
-    def get_posts(self, did_at_uris: Iterable[str], return_raw=False) -> Iterator[BlueskyPost]:
+    def get_posts(
+        self, did_at_uris: Iterable[str], return_raw=False
+    ) -> Iterator[BlueskyPost]:
         def work(chunk: List[str]) -> Dict[str, Any]:
             url = self.urls.get_posts(chunk)
             response = self.request(url)
@@ -199,7 +200,6 @@ class BlueskyHTTPClient:
             # TODO : handle locale + extract_referenced_posts + collected_via
             else:
                 yield normalize_post(post_data)
-
 
     def get_user_posts(
         self, identifier: str, limit: Optional[int] = -1
