@@ -183,7 +183,7 @@ class BlueskyHTTPClient:
 
             for post in data["posts"]:
                 if post["uri"] in oldest_post_uris:
-		 	continue
+                    continue
 
                 # TODO : handle locale + extract_referenced_posts + collected_via
                 yield normalize_post(post)  # type: ignore
