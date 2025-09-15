@@ -23,6 +23,7 @@ from minet.bluesky.jwt import parse_jwt_for_expiration
 from minet.bluesky.exceptions import (
     BlueskyAuthenticationError,
     BlueskySessionRefreshError,
+    BlueskyBadRequestError,
     BlueskyError,
 )
 
@@ -144,11 +145,7 @@ class BlueskyHTTPClient:
 
             if "error" in data:
                 if data["error"] in ("BadRequest", "InvalidRequest"):
-                    message: str = (
-                        data["message"]
-                        + ".\nAdvice : check your query and flag syntax."
-                    )
-                    raise BlueskyError(message)
+                    raise BlueskyBadRequestError(data["message"])
                 else:
                     raise BlueskyError(data["message"])
 
