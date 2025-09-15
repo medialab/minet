@@ -24,6 +24,7 @@ from minet.bluesky.exceptions import (
     BlueskyAuthenticationError,
     BlueskySessionRefreshError,
     BlueskyBadRequestError,
+    BlueskyUpstreamFailureError,
     BlueskyError,
 )
 
@@ -32,7 +33,9 @@ class BlueskyHTTPClient:
     def __init__(self, identifier: str, password: str):
         self.urls = BlueskyHTTPAPIUrlFormatter()
         self.pool_manager = create_pool_manager()
-        self.retryer = create_request_retryer()
+        self.retryer = create_request_retryer(
+            additional_exceptions=[BlueskyUpstreamFailureError]
+        )
         self.rate_limit_reset: Optional[int] = None
 
         # First auth
@@ -103,6 +106,24 @@ class BlueskyHTTPClient:
             headers=headers,
         )
 
+        if response.status < 200 or response.status >= 300:
+            data = response.json()
+            if "error" in data:
+                e = data["error"]
+                if response.status == 400:
+                    if e == "UpstreamFailure":
+                        raise BlueskyUpstreamFailureError(
+                            "Bluesky is currently experiencing upstream issues."
+                        )
+                    elif e in (
+                        "BadRequest",
+                        "InvalidRequest",
+                        "must pass non-empty search query",
+                    ):
+                        raise BlueskyBadRequestError(data["message"])
+                raise BlueskyError(f"{e}: {data['message']}")
+            raise BlueskyError(f"HTTP {response.status}")
+
         remaining = int(response.headers["RateLimit-Remaining"])
 
         if remaining <= 0:
@@ -138,12 +159,6 @@ class BlueskyHTTPClient:
 
             response = self.request(request_url)
             data = response.json()
-
-            if "error" in data:
-                if data["error"] in ("BadRequest", "InvalidRequest"):
-                    raise BlueskyBadRequestError(data["message"])
-                else:
-                    raise BlueskyError(data["message"])
 
             for post in data["posts"]:
                 # TODO : handle locale + extract_referenced_posts + collected_via
