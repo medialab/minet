@@ -120,8 +120,6 @@ class BlueskyHTTPClient:
         author: Optional[str] = None,
         domain: Optional[str] = None,
         url: Optional[str] = None,
-        tag: Optional[List[str]] = None,
-        not_keywords: Optional[List[str]] = None,
     ) -> Iterator[BlueskyPost]:
         cursor = None
 
@@ -136,8 +134,6 @@ class BlueskyHTTPClient:
                 author=author,
                 domain=domain,
                 url=url,
-                tag=tag,
-                not_keywords=not_keywords,
             )
 
             response = self.request(request_url)
