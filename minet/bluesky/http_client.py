@@ -180,7 +180,7 @@ class BlueskyHTTPClient:
                     continue
 
                 # TODO : handle locale + extract_referenced_posts + collected_via
-                yield normalized_post
+                yield normalize_post(post)
 
             oldest_post = data["posts"][-1]
 
