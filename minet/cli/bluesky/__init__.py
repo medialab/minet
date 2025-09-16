@@ -35,31 +35,31 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
     arguments=[
         {
             "flags": ["-l", "--lang"],
-            "help": 'Filter to posts in the given language. Expected to be based on post language field, though server may override language detection. Equivalent to "lang:<lang>" in classic search syntax.',
+            "help": 'Filter posts in the given language. Expected to be based on post language field, though server may override language detection. Equivalent to "lang:<lang>" in classic search syntax.',
         },
         {
             "flag": "--since",
-            "help": "Filter results for posts after the indicated datetime (inclusive). Expected to use 'sortAt' timestamp, which is the minimum of 'createdAt' and 'indexedAt'. Can be a datetime, or just an ISO date (yyyy-mm-dd, yyyy-mm-ddThh, ..., yyyy-mm-ddThh:mm:ssZ or yyyy-mm-ddThh:mm:ss.µsZ). Equivalent to \"since:<date>\" in classic search syntax.",
+            "help": "Filter results for posts after the indicated datetime (inclusive). Expected to use 'createdAt' timestamp, with a millisecond precision. Can be a datetime, or just an ISO date (YYYY-MM-DD, YYYY-MM-DDTHH, ..., YYYY-MM-DDTHH:mm:SSZ or YYYY-MM-DDTHH:mm:SS.µSµSµSZ). Equivalent to \"since:<date>\" in classic search syntax.",
         },
         {
             "flag": "--until",
-            "help": "Filter results for posts before the indicated datetime (NOT inclusive). Expected to use 'sortAt' timestamp, which is the minimum of 'createdAt' and 'indexedAt'. Can be a datetime, or just an ISO date (yyyy-mm-ddThh:mm:ssZ or yyyy-mm-ddThh:mm:ss.msZ). Equivalent to \"until:<date>\" in classic search syntax.",
+            "help": "Filter results for posts before the indicated datetime (NOT inclusive). Expected to use 'createdAt' timestamp, with a millisecond precision. Can be a datetime, or just an ISO date (YYYY-MM-DDTHH:mm:SSZ or YYYY-MM-DDTHH:mm:SS.µSµSµSZ). Equivalent to \"until:<date>\" in classic search syntax.",
         },
         {
             "flag": "--mentions",
-            "help": 'Filter to posts which mention the given account (with or without the @). Handles are resolved to DID before query-time. Only matches rich-text facet mentions. Equivalent to "mentions:<account>" in classic search syntax.',
+            "help": 'Filter posts which mention the given account (with or without the @). Handles are resolved to DID before query-time. Only matches rich-text facet mentions. Equivalent to "mentions:<account>" in classic search syntax.',
         },
         {
             "flag": "--author",
-            "help": 'Filter to posts by the given account (with or without the @). Handles are resolved to DID before query-time. Equivalent to "from:<account>" in classic search syntax.',
+            "help": 'Filter posts by the given account (with or without the @). Handles are resolved to DID before query-time. Equivalent to "from:<account>" in classic search syntax.',
         },
         {
             "flag": "--domain",
-            "help": 'Filter to posts with URLs (facet links or embeds) linking to the given domain (hostname). Server may apply hostname normalization. Equivalent to "domain:<domain>" in classic search syntax.',
+            "help": 'Filter posts with URLs (facet links or embeds) linking to the given domain (hostname). Server may apply hostname normalization. Equivalent to "domain:<domain>" in classic search syntax.',
         },
         {
             "flag": "--url",
-            "help": "Filter to posts with links (facet links or embeds) pointing to this URL. Server may apply URL normalization or fuzzy matching. The only equivalent in classic search syntax could be typing the URL as a keyword.",
+            "help": "Filter posts with links (facet links or embeds) pointing to this URL. Server may apply URL normalization or fuzzy matching. The only equivalent in classic search syntax could be typing the URL as a keyword.",
         },
         {
             "flag": "--limit",
@@ -71,12 +71,9 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
     epilog="""
         Examples:
         
-        . Collect last 500 posts containing the word "new" until 2024-01-01:
-            $ minet bsky search-posts "new" --until 2024-01-01T00:00:00.000000Z --limit 500 > posts.csv
-            or equivalently
-            $ minet bsky search-posts "new" --until 2024-01-01 --limit 500 > posts.csv
+        . Collect last 500 posts containing the word "new" until 2024-01-01 at 16:15 UTC:
+            $ minet bsky search-posts "new" --until 2024-01-01T16:15 --limit 500 > posts.csv
 
-                        
         . Collect the posts containing the word "new" mentionning user "alice.bsky.social" since 2025-01-01:
             $ minet bsky search-posts "new" --mentions alice.bsky.social --since 2025-01-01 > posts.csv
         
