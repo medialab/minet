@@ -151,6 +151,9 @@ class BlueskyHTTPClient:
         # to avoid infinite loop when we find the final post,
         # as it will always appears in the next request because of the time overlap for paging with time range
         found_the_last_post: bool = False
+        oldest_date_changed: bool = False
+        oldest_uris_changed: bool = False
+        old_len_oldest_post_uris = 0
 
         while not found_the_last_post:
 
@@ -171,15 +174,13 @@ class BlueskyHTTPClient:
 
             if "posts" not in data or len(data["posts"]) == 0:
                 break
-            elif len(data["posts"]) == 1:
-                found_the_last_post = True
 
             for post in data["posts"]:
                 if post["uri"] in oldest_post_uris:
                     continue
 
                 # TODO : handle locale + extract_referenced_posts + collected_via
-                yield normalize_post(post)  # type: ignore
+                yield normalized_post
 
             oldest_post = data["posts"][-1]
 
@@ -187,13 +188,16 @@ class BlueskyHTTPClient:
                 oldest_post["record"]["createdAt"], source="bluesky"
             )
 
+            oldest_date_changed = False
+
             # posts are sorted by createdAt to the millisecond precision, so we cut the last 3 digits (that are microseconds)
             if (
                 oldest_post_time_published
                 and new_oldest_post_time_published[:-3]
                 < oldest_post_time_published[:-3]
             ):
-                oldest_post_uris = set()
+                oldest_date_changed = True
+                oldest_post_uris.clear()
 
             oldest_post_time_published = new_oldest_post_time_published
 
@@ -211,6 +215,8 @@ class BlueskyHTTPClient:
                 oldest_post_time_published_plus_delta_dt, FORMATTED_FULL_DATETIME_FORMAT
             )
 
+            old_len_oldest_post_uris = len(oldest_post_uris)
+
             for post in data["posts"][::-1]:
                 _, post_local_time = get_dates(
                     post["record"]["createdAt"], source="bluesky"
@@ -224,12 +230,21 @@ class BlueskyHTTPClient:
                     break
                 oldest_post_uris.add(post["uri"])
 
+            # We are not changing the oldest_post_uris manually in the loop,
+            # as oldest_post_uris is only changed by adding NEW uris,
+            # and uris already in the set are ignored when added again, i.e. the set isn't changed.
+            oldest_uris_changed = len(oldest_post_uris) != old_len_oldest_post_uris
+
             cursor = data.get("cursor")
 
             if cursor is None:
                 until = oldest_post_time_published_plus_delta_dt.strftime(
                     SOURCE_DATETIME_FORMAT_V2
                 )
+
+            # If the oldest post date did not change, and no new uris were added to the "already seen uris" list,
+            # it means we have reached the end of the available posts
+            found_the_last_post = not oldest_uris_changed and not oldest_date_changed
 
     def resolve_handle(self, identifier: str, _alternate_api=False) -> str:
         url = self.urls.resolve_handle(identifier, _alternate_api=_alternate_api)
