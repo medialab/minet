@@ -29,7 +29,6 @@ from minet.bluesky.exceptions import (
     BlueskySessionRefreshError,
     BlueskyBadRequestError,
     BlueskyUpstreamFailureError,
-    BlueskyError,
 )
 
 
@@ -110,23 +109,18 @@ class BlueskyHTTPClient:
             headers=headers,
         )
 
-        if response.status < 200 or response.status >= 300:
+        if response.status >= 400:
             data = response.json()
             if "error" in data:
                 e = data["error"]
-                if response.status == 400:
-                    if e == "UpstreamFailure":
-                        raise BlueskyUpstreamFailureError(
-                            "Bluesky is currently experiencing upstream issues."
-                        )
-                    elif e in (
-                        "BadRequest",
-                        "InvalidRequest",
-                        "must pass non-empty search query",
-                    ):
-                        raise BlueskyBadRequestError(data["message"])
-                raise BlueskyError(f"{e}: {data['message']}")
-            raise BlueskyError(f"HTTP {response.status}")
+                if e == "UpstreamFailure":
+                    raise BlueskyUpstreamFailureError(
+                        "Bluesky is currently experiencing upstream issues."
+                    )
+                raise BlueskyBadRequestError(
+                    f"HTTP {response.status} {e}: {data['message']}"
+                )
+            raise BlueskyBadRequestError(f"HTTP {response.status}")
 
         remaining = int(response.headers["RateLimit-Remaining"])
 
