@@ -7,7 +7,7 @@ from ebbe import as_reconciled_chunks
 from twitwi.bluesky import normalize_profile, normalize_post
 from twitwi.bluesky.types import BlueskyPost, BlueskyProfile
 from twitwi.utils import get_dates
-from twitwi.constants import FORMATTED_FULL_DATETIME_FORMAT
+from twitwi.constants import FORMATTED_FULL_DATETIME_FORMAT, SOURCE_DATETIME_FORMAT_V2
 
 
 from minet.web import (
@@ -144,7 +144,6 @@ class BlueskyHTTPClient:
         oldest_post = None
         oldest_post_uris: set[str] = set()
         oldest_post_time_published = None
-        time_range_until: str = ""
 
         # Search with time seems to work with millisecond precision
         time_overlap_delta = timedelta(milliseconds=1)
@@ -156,7 +155,7 @@ class BlueskyHTTPClient:
         while not found_the_last_post:
 
             request_url = self.urls.search_posts(
-                query + time_range_until,
+                q=query,
                 cursor=cursor,
                 lang=lang,
                 since=since,
@@ -228,11 +227,8 @@ class BlueskyHTTPClient:
             cursor = data.get("cursor")
 
             if cursor is None:
-                time_range_until = (
-                    " until:"
-                    + oldest_post_time_published_plus_delta_dt.strftime(
-                        FORMATTED_FULL_DATETIME_FORMAT
-                    )
+                until = oldest_post_time_published_plus_delta_dt.strftime(
+                    SOURCE_DATETIME_FORMAT_V2
                 )
 
     def resolve_handle(self, identifier: str, _alternate_api=False) -> str:
