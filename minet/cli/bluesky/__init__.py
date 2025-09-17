@@ -15,6 +15,17 @@ BLUESKY_HTTP_API_COMMON_ARGUMENTS = [
     },
 ]
 
+BLUESKY_RESOLVE_HANDLE_COMMAND = command(
+    "resolve-handle",
+    "minet.cli.bluesky.resolve_handle",
+    title="Minet Bluesky Resolve Handle Command",
+    description="""
+        Resolve a Bluesky handle to its DID.
+    """,
+    arguments=[*BLUESKY_HTTP_API_COMMON_ARGUMENTS],
+    variadic_input={"dummy_column": "handle"},
+)
+
 BLUESKY_FIREHOSE_COMMAND = command(
     "firehose",
     "minet.cli.bluesky.firehose",
@@ -43,5 +54,9 @@ BLUESKY_COMMAND = command(
     description="""
         Collect data from Bluesky.
     """,
-    subcommands=[BLUESKY_FIREHOSE_COMMAND, BLUESKY_SEARCH_POSTS_COMMAND],
+    subcommands=[
+        BLUESKY_FIREHOSE_COMMAND,
+        BLUESKY_SEARCH_POSTS_COMMAND,
+        BLUESKY_RESOLVE_HANDLE_COMMAND,
+    ],
 )
