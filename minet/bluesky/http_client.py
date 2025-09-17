@@ -6,9 +6,7 @@ from ebbe import as_reconciled_chunks
 
 from twitwi.bluesky import normalize_profile, normalize_post
 from twitwi.bluesky.types import BlueskyPost, BlueskyProfile
-from twitwi.utils import get_dates
 from twitwi.constants import FORMATTED_FULL_DATETIME_FORMAT, SOURCE_DATETIME_FORMAT_V2
-
 
 from minet.web import (
     create_request_retryer,
@@ -144,6 +142,7 @@ class BlueskyHTTPClient:
         oldest_post = None
         oldest_post_uris: set[str] = set()
         oldest_post_time_published = None
+        normalized_posts: List[BlueskyPost] = []
 
         # Search with time seems to work with millisecond precision
         time_overlap_delta = timedelta(milliseconds=1)
@@ -175,18 +174,21 @@ class BlueskyHTTPClient:
             if "posts" not in data or len(data["posts"]) == 0:
                 break
 
+            normalized_posts.clear()
+
             for post in data["posts"]:
+                normalized_post = normalize_post(post)
+                normalized_posts.append(normalized_post)
+                # We're using the uri as a unique identifier for posts, as it exists cids that are not unique
                 if post["uri"] in oldest_post_uris:
                     continue
 
                 # TODO : handle locale + extract_referenced_posts + collected_via
-                yield normalize_post(post)
+                yield normalized_post
 
-            oldest_post = data["posts"][-1]
+            oldest_post = normalized_posts[-1]
 
-            _, new_oldest_post_time_published = get_dates(
-                oldest_post["record"]["createdAt"], source="bluesky"
-            )
+            new_oldest_post_time_published = oldest_post["local_time"]
 
             oldest_date_changed = False
 
@@ -217,14 +219,12 @@ class BlueskyHTTPClient:
 
             old_len_oldest_post_uris = len(oldest_post_uris)
 
-            for post in data["posts"][::-1]:
-                _, post_local_time = get_dates(
-                    post["record"]["createdAt"], source="bluesky"
-                )
+            for post in reversed(normalized_posts):
+                post_time_published = post["local_time"]
 
                 # posts are sorted by createdAt to the millisecond precision, so we cut the last 3 digits (that are microseconds)
                 if (
-                    post_local_time[:-3]
+                    post_time_published[:-3]
                     > oldest_post_time_published_plus_delta_str[:-3]
                 ):
                     break
@@ -284,7 +284,7 @@ class BlueskyHTTPClient:
                 yield post_data
             # TODO : handle locale + extract_referenced_posts + collected_via
             else:
-                yield normalize_post(post_data)  # type: ignore
+                yield normalize_post(post_data)
 
     def get_user_posts(
         self, identifier: str, limit: Optional[int] = -1
@@ -305,7 +305,7 @@ class BlueskyHTTPClient:
 
             for post in data["feed"]:
                 # TODO : handle locale + extract_referenced_posts + collected_via
-                yield normalize_post(post)  # type: ignore
+                yield normalize_post(post)
                 count += 1
                 if count == limit:
                     break
