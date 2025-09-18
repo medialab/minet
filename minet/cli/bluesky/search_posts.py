@@ -28,12 +28,10 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
     cli_args.author = cli_args.author.lstrip("@") if cli_args.author else None
 
     # We accept partial ISO dates, but the API needs full datetimes
-    cli_args.since = str(
-        PartialISODatetimeType(True)(cli_args.since) if cli_args.since else None
-    )
-    cli_args.until = str(
-        PartialISODatetimeType(True)(cli_args.until) if cli_args.until else None
-    )
+    if cli_args.since:
+        cli_args.since = str(PartialISODatetimeType(True)(cli_args.since))
+    if cli_args.until:
+        cli_args.until = str(PartialISODatetimeType(True)(cli_args.until))
 
     wanted_flags = [
         "lang",
