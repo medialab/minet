@@ -27,6 +27,8 @@ PARTIAL_ISO_FORMATS = {
     16: (r"%Y-%m-%dT%H:%M", "minute"),
     19: (r"%Y-%m-%dT%H:%M:%S", "second"),
     20: (r"%Y-%m-%dT%H:%M:%SZ", "second"),
+    26: (r"%Y-%m-%dT%H:%M:%S.%f", "microsecond"),
+    27: (r"%Y-%m-%dT%H:%M:%S.%fZ", "microsecond"),
 }
 
 
@@ -42,15 +44,21 @@ def datetime_from_partial_iso_format(
 
     if upper_bound:
         if precision == "year":
-            result = result.replace(month=12, day=31, hour=23, minute=59, second=59)
+            result = result.replace(
+                month=12, day=31, hour=23, minute=59, second=59, microsecond=999999
+            )
         elif precision == "month":
             _, last_day = calendar.monthrange(result.year, result.month)
-            result = result.replace(day=last_day, hour=23, minute=59, second=59)
+            result = result.replace(
+                day=last_day, hour=23, minute=59, second=59, microsecond=999999
+            )
         elif precision == "day":
-            result = result.replace(hour=23, minute=59, second=59)
+            result = result.replace(hour=23, minute=59, second=59, microsecond=999999)
         elif precision == "hour":
-            result = result.replace(minute=59, second=59)
+            result = result.replace(minute=59, second=59, microsecond=999999)
         elif precision == "minute":
-            result = result.replace(second=59)
+            result = result.replace(second=59, microsecond=999999)
+        elif precision == "second":
+            result = result.replace(microsecond=999999)
 
     return result
