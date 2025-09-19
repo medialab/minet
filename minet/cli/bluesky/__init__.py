@@ -15,6 +15,26 @@ BLUESKY_HTTP_API_COMMON_ARGUMENTS = [
     },
 ]
 
+BLUESKY_FIREHOSE_COMMAND = command(
+    "firehose",
+    "minet.cli.bluesky.firehose",
+    title="Minet Bluesky Firehose Command",
+    description="""
+        Plug into the Bluesky Firehose.
+    """,
+)
+
+BLUESKY_POST_URL_TO_DID_AT_URI_COMMAND = command(
+    "post-url-to-did-at-uri",
+    "minet.cli.bluesky.post_url_to_did_at_uri",
+    title="Minet Bluesky URL to URI Command",
+    description="""
+        Resolve a Bluesky post URL to its URI.
+    """,
+    arguments=[*BLUESKY_HTTP_API_COMMON_ARGUMENTS],
+    variadic_input={"dummy_column": "url"},
+)
+
 BLUESKY_RESOLVE_HANDLE_COMMAND = command(
     "resolve-handle",
     "minet.cli.bluesky.resolve_handle",
@@ -24,15 +44,6 @@ BLUESKY_RESOLVE_HANDLE_COMMAND = command(
     """,
     arguments=[*BLUESKY_HTTP_API_COMMON_ARGUMENTS],
     variadic_input={"dummy_column": "handle"},
-)
-
-BLUESKY_FIREHOSE_COMMAND = command(
-    "firehose",
-    "minet.cli.bluesky.firehose",
-    title="Minet Bluesky Firehose Command",
-    description="""
-        Plug into the Bluesky Firehose.
-    """,
 )
 
 BLUESKY_SEARCH_POSTS_COMMAND = command(
@@ -56,7 +67,8 @@ BLUESKY_COMMAND = command(
     """,
     subcommands=[
         BLUESKY_FIREHOSE_COMMAND,
-        BLUESKY_SEARCH_POSTS_COMMAND,
+        BLUESKY_POST_URL_TO_DID_AT_URI_COMMAND,
         BLUESKY_RESOLVE_HANDLE_COMMAND,
+        BLUESKY_SEARCH_POSTS_COMMAND,
     ],
 )
