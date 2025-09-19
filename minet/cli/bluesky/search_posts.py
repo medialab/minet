@@ -44,8 +44,6 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
         "limit",
     ]
 
-    limit = None
-
     flags_list = []
 
     for flag in wanted_flags:
@@ -57,7 +55,8 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
     for row, query in enricher.cells(cli_args.column, with_rows=True):
         with loading_bar.step(
-            f"{query}\n{flags_str}" if flags_str else query, sub_total=limit
+            f"{query}\n{flags_str}" if flags_str else query,
+            sub_total=int(cli_args.limit) if cli_args.limit else None,
         ):
             for post in islice(
                 client.search_posts(

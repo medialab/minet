@@ -186,7 +186,15 @@ class BlueskyHTTPClient:
                 # TODO : handle locale + extract_referenced_posts + collected_via
                 yield normalized_post
 
-            oldest_post = normalized_posts[-1]
+                # Taking the minimum createdAt time to avoid issues
+                # with posts not being perfectly sorted by createdAt (local_time parameter is createdAt in UTC)
+                if (
+                    oldest_post
+                    and oldest_post["local_time"][:-3]
+                    < normalized_post["local_time"][:-3]
+                ):
+                    continue
+                oldest_post = normalized_post
 
             new_oldest_post_time_published = oldest_post["local_time"]
 
