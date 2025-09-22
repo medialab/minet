@@ -1,6 +1,3 @@
-from minet.bluesky import BlueskyHTTPClient
-from minet.cli.argparse import PartialISODatetimeType
-
 from casanova import Enricher
 from itertools import islice
 
@@ -10,6 +7,7 @@ from twitwi.bluesky import format_post_as_csv_row
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.loading_bar import LoadingBar
 
+from minet.bluesky import BlueskyHTTPClient
 from minet.cli.bluesky.utils import with_bluesky_fatal_errors
 
 
@@ -26,12 +24,6 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
     cli_args.mentions = cli_args.mentions.lstrip("@") if cli_args.mentions else None
     cli_args.author = cli_args.author.lstrip("@") if cli_args.author else None
-
-    # We accept partial ISO dates, but the API needs full datetimes
-    if cli_args.since:
-        cli_args.since = str(PartialISODatetimeType(True)(cli_args.since))
-    if cli_args.until:
-        cli_args.until = str(PartialISODatetimeType(True)(cli_args.until))
 
     wanted_flags = [
         "lang",

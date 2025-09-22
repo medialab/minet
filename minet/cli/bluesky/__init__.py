@@ -1,4 +1,4 @@
-from minet.cli.argparse import command, ConfigAction
+from minet.cli.argparse import command, ConfigAction, PartialISODatetimeType
 
 BLUESKY_HTTP_API_COMMON_ARGUMENTS = [
     {
@@ -39,10 +39,12 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
         },
         {
             "flag": "--since",
+            "type": PartialISODatetimeType(True),
             "help": "Filter results for posts after the indicated datetime (inclusive). Expected to use 'createdAt' timestamp, with a millisecond precision. Can be a datetime, or just an ISO date (YYYY-MM-DD, YYYY-MM-DDTHH, ..., YYYY-MM-DDTHH:mm:SSZ or YYYY-MM-DDTHH:mm:SS.µSµSµSZ). Equivalent to \"since:<date>\" in classic search syntax.",
         },
         {
             "flag": "--until",
+            "type": PartialISODatetimeType(True),
             "help": "Filter results for posts before the indicated datetime (NOT inclusive). Expected to use 'createdAt' timestamp, with a millisecond precision. Can be a datetime, or just an ISO date (YYYY-MM-DDTHH:mm:SSZ or YYYY-MM-DDTHH:mm:SS.µSµSµSZ). Equivalent to \"until:<date>\" in classic search syntax.",
         },
         {
