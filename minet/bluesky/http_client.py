@@ -127,6 +127,8 @@ class BlueskyHTTPClient:
                 break
 
     def resolve_handle(self, identifier: str, _alternate_api=False) -> str:
+        identifier = identifier.lstrip("@")
+
         url = self.urls.resolve_handle(identifier, _alternate_api=_alternate_api)
 
         response = self.request(url)
@@ -166,6 +168,7 @@ class BlueskyHTTPClient:
             else:
                 yield normalize_post(post_data)
 
+    @retrying_method()
     def get_user_posts(
         self, identifier: str, limit: Optional[int] = -1
     ) -> Iterator[BlueskyPost]:

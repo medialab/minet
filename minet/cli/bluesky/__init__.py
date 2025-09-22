@@ -48,6 +48,37 @@ BLUESKY_GET_POSTS_COMMAND = command(
     """,
 )
 
+BLUESKY_GET_USER_POSTS_COMMAND = command(
+    "get-user-posts",
+    "minet.cli.bluesky.get_user_posts",
+    title="Minet Bluesky Get User Posts Command",
+    description="""
+        Search for Bluesky posts by user using their handle (e.g. @bsky.app) or DID (did:...).
+    """,
+    variadic_input={"dummy_column": "user"},
+    arguments=[
+        {
+            "flag": "--limit",
+            "type": int,
+            "help": "Limit the number of posts to retrieve for each user. Will collect all posts by default.",
+        },
+        *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
+    ],
+    epilog="""
+        Examples:
+        
+        . Get posts from a user by their handle:
+            $ minet bluesky get-user-posts @bsky.app
+        
+        . Get posts from a user by their DID:
+            $ minet bluesky get-user-posts did:plc:z72i7hdynmk6r22z27h6tvur
+
+        Tips:
+
+        - If you pass the handle, it can be with or without the '@' symbol (e.g. '@bsky.app' or 'bsky.app').
+    """,
+)
+
 BLUESKY_POST_URL_TO_DID_AT_URI_COMMAND = command(
     "post-url-to-did-at-uri",
     "minet.cli.bluesky.post_url_to_did_at_uri",
@@ -68,6 +99,11 @@ BLUESKY_RESOLVE_HANDLE_COMMAND = command(
     """,
     arguments=[*BLUESKY_HTTP_API_COMMON_ARGUMENTS],
     variadic_input={"dummy_column": "handle"},
+    epilog="""
+        Tips:
+
+        - You can pass the handle with or without the '@' symbol (e.g. '@bsky.app' or 'bsky.app').
+    """,
 )
 
 BLUESKY_SEARCH_POSTS_COMMAND = command(
@@ -92,6 +128,7 @@ BLUESKY_COMMAND = command(
     subcommands=[
         BLUESKY_FIREHOSE_COMMAND,
         BLUESKY_GET_POSTS_COMMAND,
+        BLUESKY_GET_USER_POSTS_COMMAND,
         BLUESKY_POST_URL_TO_DID_AT_URI_COMMAND,
         BLUESKY_RESOLVE_HANDLE_COMMAND,
         BLUESKY_SEARCH_POSTS_COMMAND,
