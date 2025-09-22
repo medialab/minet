@@ -48,6 +48,30 @@ BLUESKY_GET_POSTS_COMMAND = command(
     """,
 )
 
+BLUESKY_GET_PROFILES_COMMAND = command(
+    "get-profiles",
+    "minet.cli.bluesky.get_profiles",
+    title="Minet Bluesky Get Profile From Handle Or DID Command",
+    description="""
+        Get Bluesky profile from its handle or DID.
+    """,
+    arguments=[*BLUESKY_HTTP_API_COMMON_ARGUMENTS],
+    variadic_input={"dummy_column": "handle-or-did"},
+    epilog="""
+        Examples:
+        
+        . Get profile from a user by their handle:
+            $ minet bluesky get-profiles @bsky.app
+
+        . Get profile from a user by their DID:
+            $ minet bluesky get-profiles did:plc:z72i7hdynmk6r22z27h6tvur
+
+        Tips:
+
+        - If you pass the handle, it can be with or without the '@' symbol (e.g. '@bsky.app' or 'bsky.app').
+    """,
+)
+
 BLUESKY_GET_USER_POSTS_COMMAND = command(
     "get-user-posts",
     "minet.cli.bluesky.get_user_posts",
@@ -128,6 +152,7 @@ BLUESKY_COMMAND = command(
     subcommands=[
         BLUESKY_FIREHOSE_COMMAND,
         BLUESKY_GET_POSTS_COMMAND,
+        BLUESKY_GET_PROFILES_COMMAND,
         BLUESKY_GET_USER_POSTS_COMMAND,
         BLUESKY_POST_URL_TO_DID_AT_URI_COMMAND,
         BLUESKY_RESOLVE_HANDLE_COMMAND,
