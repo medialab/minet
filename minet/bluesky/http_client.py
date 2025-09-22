@@ -141,21 +141,21 @@ class BlueskyHTTPClient:
         cursor = None
         oldest_post = None
         oldest_post_uris: set[str] = set()
-        oldest_post_time_published = None
+        time_published_of_oldest_post = None
+        timestamp_utc_of_oldest_post = None
         normalized_posts: List[BlueskyPost] = []
 
-        # Search with time seems to work with millisecond precision
-        time_overlap_delta = timedelta(milliseconds=1)
+        # Search with time seems to work with millisecond precision, but as timestamp is in seconds, we are using a 1 second overlap
+        time_overlap = 1
+        time_overlap_delta = timedelta(seconds=time_overlap)
 
         # to avoid infinite loop when we find the final post,
         # as it will always appears in the next request because of the time overlap for paging with time range
-        found_the_last_post: bool = False
         oldest_date_changed: bool = False
         oldest_uris_changed: bool = False
         old_len_oldest_post_uris = 0
 
-        while not found_the_last_post:
-
+        while True:
             request_url = self.urls.search_posts(
                 q=query,
                 cursor=cursor,
@@ -188,6 +188,7 @@ class BlueskyHTTPClient:
 
                 # Taking the minimum createdAt time to avoid issues
                 # with posts not being perfectly sorted by createdAt (local_time parameter is createdAt in UTC)
+                # TODO: handle locale timezone wanted by user
                 if (
                     oldest_post
                     and oldest_post["local_time"][:-3]
@@ -196,45 +197,41 @@ class BlueskyHTTPClient:
                     continue
                 oldest_post = normalized_post
 
-            new_oldest_post_time_published = oldest_post["local_time"]
+            new_time_published_of_oldest_post = oldest_post["local_time"]
+            new_timestamp_utc_of_oldest_post = oldest_post["timestamp_utc"]
 
             oldest_date_changed = False
 
-            # posts are sorted by createdAt to the millisecond precision, so we cut the last 3 digits (that are microseconds)
             if (
-                oldest_post_time_published
-                and new_oldest_post_time_published[:-3]
-                < oldest_post_time_published[:-3]
+                timestamp_utc_of_oldest_post
+                and new_timestamp_utc_of_oldest_post < timestamp_utc_of_oldest_post
             ):
                 oldest_date_changed = True
                 oldest_post_uris.clear()
 
-            oldest_post_time_published = new_oldest_post_time_published
+            time_published_of_oldest_post = new_time_published_of_oldest_post
+            timestamp_utc_of_oldest_post = new_timestamp_utc_of_oldest_post
 
             # adding posts within the time range of the oldest post to the "already seen uris" list,
             # because they will be in the next request because of the little
             # (but still existing) time overlap for paging with time range
-            oldest_post_time_published_dt = datetime.strptime(
-                oldest_post_time_published, FORMATTED_FULL_DATETIME_FORMAT
+            time_published_of_oldest_post_dt = datetime.strptime(
+                time_published_of_oldest_post, FORMATTED_FULL_DATETIME_FORMAT
             )
-            oldest_post_time_published_plus_delta_dt = (
-                oldest_post_time_published_dt + time_overlap_delta
+            time_published_of_oldest_post_plus_delta_dt = (
+                time_published_of_oldest_post_dt + time_overlap_delta
             )
 
-            oldest_post_time_published_plus_delta_str = datetime.strftime(
-                oldest_post_time_published_plus_delta_dt, FORMATTED_FULL_DATETIME_FORMAT
+            timestamp_utc_of_oldest_post_plus_delta = (
+                timestamp_utc_of_oldest_post + time_overlap
             )
 
             old_len_oldest_post_uris = len(oldest_post_uris)
 
-            for post in reversed(normalized_posts):
-                post_time_published = post["local_time"]
+            for post in sorted(normalized_posts, key=lambda p: p["timestamp_utc"]):
+                timestamp_utc_of_post = post["timestamp_utc"]
 
-                # posts are sorted by createdAt to the millisecond precision, so we cut the last 3 digits (that are microseconds)
-                if (
-                    post_time_published[:-3]
-                    > oldest_post_time_published_plus_delta_str[:-3]
-                ):
+                if timestamp_utc_of_post > timestamp_utc_of_oldest_post_plus_delta:
                     break
                 oldest_post_uris.add(post["uri"])
 
@@ -246,13 +243,14 @@ class BlueskyHTTPClient:
             cursor = data.get("cursor")
 
             if cursor is None:
-                until = oldest_post_time_published_plus_delta_dt.strftime(
+                until = time_published_of_oldest_post_plus_delta_dt.strftime(
                     SOURCE_DATETIME_FORMAT_V2
                 )
 
             # If the oldest post date did not change, and no new uris were added to the "already seen uris" list,
             # it means we have reached the end of the available posts
-            found_the_last_post = not oldest_uris_changed and not oldest_date_changed
+            if not oldest_uris_changed and not oldest_date_changed:
+                break
 
     def resolve_handle(self, identifier: str, _alternate_api=False) -> str:
         url = self.urls.resolve_handle(identifier, _alternate_api=_alternate_api)
