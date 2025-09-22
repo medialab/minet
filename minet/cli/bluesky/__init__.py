@@ -24,6 +24,30 @@ BLUESKY_FIREHOSE_COMMAND = command(
     """,
 )
 
+BLUESKY_GET_POSTS_COMMAND = command(
+    "get-posts",
+    "minet.cli.bluesky.get_posts",
+    title="Minet Bluesky Get Post From URI or URL Command",
+    description="""
+        Get Bluesky post from its URI or URL.
+    """,
+    arguments=[*BLUESKY_HTTP_API_COMMON_ARGUMENTS],
+    variadic_input={"dummy_column": "uri-or-url"},
+    epilog="""
+        Examples:
+        
+        . Get posts from their URIs:
+            $ minet bluesky get-posts <uri>
+        
+        . Get posts from their URLs:
+            $ minet bluesky get-posts <url>
+
+        Tips:
+
+        - You can pass either Bluesky post URIs (at://did:...) or full URLs (https://bsky.app/profile/...) and Minet will handle the conversion for you.
+    """,
+)
+
 BLUESKY_POST_URL_TO_DID_AT_URI_COMMAND = command(
     "post-url-to-did-at-uri",
     "minet.cli.bluesky.post_url_to_did_at_uri",
@@ -67,6 +91,7 @@ BLUESKY_COMMAND = command(
     """,
     subcommands=[
         BLUESKY_FIREHOSE_COMMAND,
+        BLUESKY_GET_POSTS_COMMAND,
         BLUESKY_POST_URL_TO_DID_AT_URI_COMMAND,
         BLUESKY_RESOLVE_HANDLE_COMMAND,
         BLUESKY_SEARCH_POSTS_COMMAND,

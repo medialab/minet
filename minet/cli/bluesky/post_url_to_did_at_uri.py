@@ -11,8 +11,8 @@ from minet.bluesky import BlueskyHTTPClient
 @with_bluesky_fatal_errors
 @with_enricher_and_loading_bar(
     headers=["uri"],
-    title="Resolving Bluesky handles",
-    unit="handles",
+    title="Getting Bluesky URIs",
+    unit="url",
     nested=True,
 )
 def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
