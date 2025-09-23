@@ -23,19 +23,15 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
     rows, params = zip(*enricher.cells(cli_args.column, with_rows=True))
 
-    uris = []
+    with loading_bar.step(sub_total=len(params)):
+        for row, param in zip(rows, params):
+            # In case the user passed full URLs instead of at:// URIs
+            if param.startswith("at://did:"):
+                uri = param
+            else:
+                uri = client.post_url_to_did_at_uri(param)
 
-    # In case the user passed full URLs instead of at:// URIs
-    for param in params:
-        if param[0].startswith("at://did:"):
-            uris.append(param)
-        else:
-            uris.append(client.post_url_to_did_at_uri(param))
-
-    posts = [post for post in client.get_posts(uris)]
-
-    for row, uri, post in zip(rows, uris, posts):
-        with loading_bar.step(f"{uri}", sub_total=1):
+            post = next(client.get_posts([uri]), None)
             post_row = format_post_as_csv_row(post)
             enricher.writerow(row, post_row)
             loading_bar.nested_advance()
