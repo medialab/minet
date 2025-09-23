@@ -24,36 +24,40 @@ BLUESKY_FIREHOSE_COMMAND = command(
     """,
 )
 
-BLUESKY_GET_POSTS_COMMAND = command(
-    "get-posts",
+BLUESKY_POSTS_COMMAND = command(
+    "posts",
     "minet.cli.bluesky.get_posts",
     title="Minet Bluesky Get Post From URI or URL Command",
     description="""
-        Get Bluesky post from its URI or URL.
+        Get whether a Bluesky post given its URI or URL or multiple Bluesky posts given their URIs or URLs from the column of a CSV file. This command uses the Bluesky HTTP API.
     """,
     arguments=[*BLUESKY_HTTP_API_COMMON_ARGUMENTS],
     variadic_input={"dummy_column": "uri-or-url"},
     epilog="""
         Examples:
+
+        . Get a post from its URI:
+            $ minet bluesky posts <uri>
         
-        . Get posts from their URIs:
-            $ minet bluesky get-posts <uri>
+        . Get a post from its URL:
+            $ minet bluesky posts <url>
         
-        . Get posts from their URLs:
-            $ minet bluesky get-posts <url>
+        . Get multiple posts from their URIs from a CSV file:
+            $ minet bluesky posts <uri-column> -i posts.csv
 
         Tips:
 
         - You can pass either Bluesky post URIs (at://did:...) or full URLs (https://bsky.app/profile/...) and Minet will handle the conversion for you.
+
     """,
 )
 
-BLUESKY_GET_PROFILES_COMMAND = command(
-    "get-profiles",
+BLUESKY_PROFILES_COMMAND = command(
+    "profiles",
     "minet.cli.bluesky.get_profiles",
     title="Minet Bluesky Get Profile From Handle Or DID Command",
     description="""
-        Get Bluesky profile from its handle or DID.
+        Get whether a Bluesky profile given the user handle or DID or multiple Bluesky profiles given their handles or DIDs from column of a CSV file. This command uses the Bluesky HTTP API.
     """,
     arguments=[*BLUESKY_HTTP_API_COMMON_ARGUMENTS],
     variadic_input={"dummy_column": "handle-or-did"},
@@ -61,10 +65,13 @@ BLUESKY_GET_PROFILES_COMMAND = command(
         Examples:
         
         . Get profile from a user by their handle:
-            $ minet bluesky get-profiles @bsky.app
+            $ minet bluesky profiles @bsky.app
 
         . Get profile from a user by their DID:
-            $ minet bluesky get-profiles did:plc:z72i7hdynmk6r22z27h6tvur
+            $ minet bluesky profiles did:plc:z72i7hdynmk6r22z27h6tvur
+
+        . Get profiles from users by their handles from a CSV file:
+            $ minet bluesky profiles <handle-column> -i users.csv
 
         Tips:
 
@@ -72,14 +79,14 @@ BLUESKY_GET_PROFILES_COMMAND = command(
     """,
 )
 
-BLUESKY_GET_USER_POSTS_COMMAND = command(
-    "get-user-posts",
+BLUESKY_USER_POSTS_COMMAND = command(
+    "user-posts",
     "minet.cli.bluesky.get_user_posts",
     title="Minet Bluesky Get User Posts Command",
     description="""
-        Search for Bluesky posts by user using their handle (e.g. @bsky.app) or DID (did:...).
+        Retrieves Bluesky posts whether by user using its handle (e.g. @bsky.app) or DID (did:...) or multiple users given their handles or DIDs from column of a CSV file. This command uses the Bluesky HTTP API.
     """,
-    variadic_input={"dummy_column": "user"},
+    variadic_input={"dummy_column": "handle-or-did"},
     arguments=[
         {
             "flag": "--limit",
@@ -92,10 +99,13 @@ BLUESKY_GET_USER_POSTS_COMMAND = command(
         Examples:
         
         . Get posts from a user by their handle:
-            $ minet bluesky get-user-posts @bsky.app
+            $ minet bluesky user-posts @bsky.app
         
-        . Get posts from a user by their DID:
-            $ minet bluesky get-user-posts did:plc:z72i7hdynmk6r22z27h6tvur
+        . Get 150 last posts from a user by their DID:
+            $ minet bluesky user-posts did:plc:z72i7hdynmk6r22z27h6tvur --limit 150
+        
+        . Get posts from users by their handles from a CSV file:
+            $ minet bluesky user-posts <handle-column> -i users.csv
 
         Tips:
 
@@ -108,10 +118,19 @@ BLUESKY_POST_URL_TO_DID_AT_URI_COMMAND = command(
     "minet.cli.bluesky.post_url_to_did_at_uri",
     title="Minet Bluesky URL to URI Command",
     description="""
-        Resolve a Bluesky post URL to its URI.
+        Resolve whether a Bluesky post URL to its URI or multiple Bluesky post URLs to their URIs from column of a CSV file. This command does not use the Bluesky HTTP API.
     """,
     arguments=[*BLUESKY_HTTP_API_COMMON_ARGUMENTS],
     variadic_input={"dummy_column": "url"},
+    epilog="""
+        Examples:
+        
+        . Get a post URI from its URL:
+            $ minet bluesky post-url-to-did-at-uri <url>
+
+        . Get multiple post URIs from their URLs from a CSV file:
+            $ minet bluesky post-url-to-did-at-uri <url-column> -i posts.csv
+        """,
 )
 
 BLUESKY_RESOLVE_HANDLE_COMMAND = command(
@@ -119,11 +138,19 @@ BLUESKY_RESOLVE_HANDLE_COMMAND = command(
     "minet.cli.bluesky.resolve_handle",
     title="Minet Bluesky Resolve Handle Command",
     description="""
-        Resolve a Bluesky handle to its DID.
+        Resolve whether a Bluesky handle to its DID or multiple Bluesky handles to their DIDs from column of a CSV file. This command uses the Bluesky HTTP API.
     """,
     arguments=[*BLUESKY_HTTP_API_COMMON_ARGUMENTS],
     variadic_input={"dummy_column": "handle"},
     epilog="""
+        Examples:
+
+        . Get a user DID from their handle:
+            $ minet bluesky resolve-handle @bsky.app
+        
+        . Get multiple user DIDs from their handles from a CSV file:
+            $ minet bluesky resolve-handle <handle-column> -i users.csv
+
         Tips:
 
         - You can pass the handle with or without the '@' symbol (e.g. '@bsky.app' or 'bsky.app').
@@ -135,7 +162,7 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
     "minet.cli.bluesky.search_posts",
     title="Minet Bluesky Search Post Command",
     description="""
-        Search for Bluesky posts using their HTTP API.
+        Search for whether Bluesky posts matching a query or multiple Bluesky posts matching respectively successives queries from column of a CSV file. This command uses the Bluesky HTTP API.
     """,
     variadic_input={"dummy_column": "query"},
     arguments=[*BLUESKY_HTTP_API_COMMON_ARGUMENTS],
@@ -151,9 +178,9 @@ BLUESKY_COMMAND = command(
     """,
     subcommands=[
         BLUESKY_FIREHOSE_COMMAND,
-        BLUESKY_GET_POSTS_COMMAND,
-        BLUESKY_GET_PROFILES_COMMAND,
-        BLUESKY_GET_USER_POSTS_COMMAND,
+        BLUESKY_POSTS_COMMAND,
+        BLUESKY_PROFILES_COMMAND,
+        BLUESKY_USER_POSTS_COMMAND,
         BLUESKY_POST_URL_TO_DID_AT_URI_COMMAND,
         BLUESKY_RESOLVE_HANDLE_COMMAND,
         BLUESKY_SEARCH_POSTS_COMMAND,

@@ -34,7 +34,7 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
     for batch in batched(enricher.cells(cli_args.column, with_rows=True), 25):
         users = [user for _, user in batch]
-        with loading_bar.step(users, sub_total=len(users), count=len(users)):
+        with loading_bar.step(sub_total=len(batch), count=len(batch)):
             for (row, _), profile in zip(batch, client.get_profiles(users)):
                 profile_row = format_profile_as_csv_row(profile)
                 enricher.writerow(row, profile_row)
