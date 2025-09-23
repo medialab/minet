@@ -21,13 +21,16 @@ from minet.bluesky import BlueskyHTTPClient
 def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
     client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
 
-    rows, param = zip(*enricher.cells(cli_args.column, with_rows=True))
+    rows, params = zip(*enricher.cells(cli_args.column, with_rows=True))
+
+    uris = []
 
     # In case the user passed full URLs instead of at:// URIs
-    if param[0].startswith("at://did:"):
-        uris = list(param)
-    else:
-        uris = [client.post_url_to_did_at_uri(url) for url in param]
+    for param in params:
+        if param[0].startswith("at://did:"):
+            uris.append(param)
+        else:
+            uris.append(client.post_url_to_did_at_uri(param))
 
     posts = [post for post in client.get_posts(uris)]
 
