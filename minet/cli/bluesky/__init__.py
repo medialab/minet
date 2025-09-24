@@ -24,9 +24,43 @@ BLUESKY_FIREHOSE_COMMAND = command(
     """,
 )
 
+BLUESKY_FOLLOWERS_COMMAND = command(
+    "followers",
+    "minet.cli.bluesky.followers",
+    title="Minet Bluesky Get Followers From Handle Or DID Command",
+    description="""
+        Get whether followers of a user giving its handle or DID or respective followers of several users given their handle or did from the column of a CSV file. This command uses the Bluesky HTTP API.
+    """,
+    arguments=[
+        {
+            "flag": "--limit",
+            "type": int,
+            "help": "Limit the number of followers to retrieve for each user. Will collect all followers by default.",
+        },
+        *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
+    ],
+    variadic_input={"dummy_column": "handle-or-did"},
+    epilog="""
+        Examples:
+        
+        . Get followers of a user by their handle:
+            $ minet bluesky followers @bsky.app
+
+        . Get 100 followers of a user by their DID:
+            $ minet bluesky followers did:plc:z72i7hdynmk6r22z27h6tvur --limit 100
+
+        . Get followers from users by their handles from a CSV file:
+            $ minet bluesky followers <handle-column> -i users.csv
+
+        Tips:
+
+        - If you pass the handle, it can be with or without the '@' symbol (e.g. '@bsky.app' or 'bsky.app').
+    """,
+)
+
 BLUESKY_POSTS_COMMAND = command(
     "posts",
-    "minet.cli.bluesky.get_posts",
+    "minet.cli.bluesky.posts",
     title="Minet Bluesky Get Post From URI or URL Command",
     description="""
         Get whether a Bluesky post given its URI or URL or multiple Bluesky posts given their URIs or URLs from the column of a CSV file. This command uses the Bluesky HTTP API.
@@ -60,7 +94,7 @@ BLUESKY_POSTS_COMMAND = command(
 
 BLUESKY_PROFILES_COMMAND = command(
     "profiles",
-    "minet.cli.bluesky.get_profiles",
+    "minet.cli.bluesky.profiles",
     title="Minet Bluesky Get Profile From Handle Or DID Command",
     description="""
         Get whether a Bluesky profile given the user handle or DID or multiple Bluesky profiles given their handles or DIDs from column of a CSV file. This command uses the Bluesky HTTP API.
@@ -87,7 +121,7 @@ BLUESKY_PROFILES_COMMAND = command(
 
 BLUESKY_USER_POSTS_COMMAND = command(
     "user-posts",
-    "minet.cli.bluesky.get_user_posts",
+    "minet.cli.bluesky.user_posts",
     title="Minet Bluesky Get User Posts Command",
     description="""
         Retrieves Bluesky posts whether by user using its handle (e.g. @bsky.app) or DID (did:...) or multiple users given their handles or DIDs from column of a CSV file. This command uses the Bluesky HTTP API.
@@ -184,6 +218,7 @@ BLUESKY_COMMAND = command(
     """,
     subcommands=[
         BLUESKY_FIREHOSE_COMMAND,
+        BLUESKY_FOLLOWERS_COMMAND,
         BLUESKY_POSTS_COMMAND,
         BLUESKY_PROFILES_COMMAND,
         BLUESKY_USER_POSTS_COMMAND,

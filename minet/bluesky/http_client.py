@@ -147,6 +147,29 @@ class BlueskyHTTPClient:
 
         return format_post_at_uri(did, rkey)
 
+    def get_followers(
+        self, did: str, limit: Optional[int] = -1
+    ) -> Iterator[BlueskyProfile]:
+        cursor = None
+
+        count = 0
+        while True:
+            url = self.urls.get_followers(did, cursor=cursor)
+
+            response = self.request(url)
+            data = response.json()
+
+            for profile in data["followers"]:
+                yield normalize_profile(profile)
+                count += 1
+                if count == limit:
+                    break
+
+            cursor = data.get("cursor")
+
+            if cursor is None or count == limit:
+                break
+
     # NOTE: this API route does not return any results for at-uris containing handles!
     def get_posts(
         self, did_at_uris: Iterable[str], return_raw=False
@@ -169,13 +192,8 @@ class BlueskyHTTPClient:
                 yield normalize_post(post_data)
 
     def get_user_posts(
-        self, identifier: str, limit: Optional[int] = -1
+        self, did: str, limit: Optional[int] = -1
     ) -> Iterator[BlueskyPost]:
-        if not identifier.startswith("did:"):
-            did = self.resolve_handle(identifier)
-        else:
-            did = identifier
-
         cursor = None
 
         count = 0

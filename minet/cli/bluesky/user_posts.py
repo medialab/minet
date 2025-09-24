@@ -23,8 +23,12 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
     client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
 
     for row, user in enricher.cells(cli_args.column, with_rows=True):
-        with loading_bar.step(user):
-            for post in client.get_user_posts(user, limit=cli_args.limit):
+        if not user.startswith("did:"):
+            did = client.resolve_handle(user)
+        else:
+            did = user
+        with loading_bar.step(did):
+            for post in client.get_user_posts(did, limit=cli_args.limit):
                 post_row = format_post_as_csv_row(post)
                 enricher.writerow(row, post_row)
                 loading_bar.nested_advance()
