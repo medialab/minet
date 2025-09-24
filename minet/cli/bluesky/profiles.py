@@ -33,7 +33,10 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
     client = BlueskyHTTPClient(cli_args.identifier, cli_args.password)
 
     for batch in batched(enricher.cells(cli_args.column, with_rows=True), 25):
-        users = [user for _, user in batch]
+        users = [
+            user if user.startswith("did:") else client.resolve_handle(user, True)
+            for _, user in batch
+        ]
         with loading_bar.step(sub_total=len(batch), count=len(batch)):
             for (row, _), profile in zip(batch, client.get_profiles(users)):
                 profile_row = format_profile_as_csv_row(profile)
