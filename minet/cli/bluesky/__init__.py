@@ -31,7 +31,14 @@ BLUESKY_POSTS_COMMAND = command(
     description="""
         Get whether a Bluesky post given its URI or URL or multiple Bluesky posts given their URIs or URLs from the column of a CSV file. This command uses the Bluesky HTTP API.
     """,
-    arguments=[*BLUESKY_HTTP_API_COMMON_ARGUMENTS],
+    arguments=[
+        {
+            "flag": "--raw",
+            "action": "store_true",
+            "help": "Return the raw post data in JSON as received from the Bluesky API instead of a normalized version.",
+        },
+        *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
+    ],
     variadic_input={"dummy_column": "uri-or-url"},
     epilog="""
         Examples:
@@ -48,7 +55,6 @@ BLUESKY_POSTS_COMMAND = command(
         Tips:
 
         - You can pass either Bluesky post URIs (at://did:...) or full URLs (https://bsky.app/profile/...) and Minet will handle the conversion for you.
-
     """,
 )
 
