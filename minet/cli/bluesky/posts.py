@@ -35,7 +35,7 @@ def action_normalize(cli_args, enricher: Enricher, loading_bar: LoadingBar):
                 if param.startswith(
                     "at://did:"
                 )  # In case the user passed full URLs instead of at:// URIs
-                else client.post_url_to_did_at_uri(param)
+                else client.resolve_post_url(param)
                 for param in users
             ]
         )
@@ -69,7 +69,7 @@ def action_raw(cli_args, loading_bar: LoadingBar):
             if param.startswith(
                 "at://did:"
             )  # In case the user passed full URLs instead of at:// URIs
-            else client.post_url_to_did_at_uri(param)
+            else client.resolve_post_url(param)
             for param in params
         ],
         return_raw=True,

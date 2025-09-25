@@ -20,6 +20,6 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
     for row, url in enricher.cells(cli_args.column, with_rows=True):
         with loading_bar.step(f"{url}", sub_total=1):
-            uri = client.post_url_to_did_at_uri(url)
+            uri = client.resolve_post_url(url)
             enricher.writerow(row, [uri])
             loading_bar.nested_advance()

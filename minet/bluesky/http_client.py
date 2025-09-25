@@ -141,7 +141,7 @@ class BlueskyHTTPClient:
             else:
                 raise e
 
-    def post_url_to_did_at_uri(self, url: str) -> str:
+    def resolve_post_url(self, url: str) -> str:
         handle, rkey = parse_post_url(url)
         did = self.resolve_handle(handle)
 

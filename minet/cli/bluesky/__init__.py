@@ -153,10 +153,10 @@ BLUESKY_USER_POSTS_COMMAND = command(
     """,
 )
 
-BLUESKY_POST_URL_TO_DID_AT_URI_COMMAND = command(
-    "post-url-to-did-at-uri",
-    "minet.cli.bluesky.post_url_to_did_at_uri",
-    title="Minet Bluesky URL to URI Command",
+BLUESKY_RESOLVE_POST_URL_COMMAND = command(
+    "resolve-post-url",
+    "minet.cli.bluesky.resolve_post_url",
+    title="Minet Bluesky resolve URL to URI Command",
     description="""
         Resolve whether a Bluesky post URL to its URI or multiple Bluesky post URLs to their URIs from column of a CSV file. This command does not use the Bluesky HTTP API.
     """,
@@ -166,10 +166,10 @@ BLUESKY_POST_URL_TO_DID_AT_URI_COMMAND = command(
         Examples:
         
         . Get a post URI from its URL:
-            $ minet bluesky post-url-to-did-at-uri <url>
+            $ minet bluesky resolve-post-url <url>
 
         . Get multiple post URIs from their URLs from a CSV file:
-            $ minet bluesky post-url-to-did-at-uri <url-column> -i posts.csv
+            $ minet bluesky resolve-post-url <url-column> -i posts.csv
         """,
 )
 
@@ -222,7 +222,7 @@ BLUESKY_COMMAND = command(
         BLUESKY_POSTS_COMMAND,
         BLUESKY_PROFILES_COMMAND,
         BLUESKY_USER_POSTS_COMMAND,
-        BLUESKY_POST_URL_TO_DID_AT_URI_COMMAND,
+        BLUESKY_RESOLVE_POST_URL_COMMAND,
         BLUESKY_RESOLVE_HANDLE_COMMAND,
         BLUESKY_SEARCH_POSTS_COMMAND,
     ],
