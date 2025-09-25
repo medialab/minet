@@ -1,10 +1,10 @@
-from typing import Iterator, Iterable, Optional, Any, List, Dict
+from typing import Iterator, Iterable, Optional, Any, List, Dict, Union
 
 from time import time, sleep
 from ebbe import as_reconciled_chunks
 
-from twitwi.bluesky import normalize_profile, normalize_post
-from twitwi.bluesky.types import BlueskyPost, BlueskyProfile
+from twitwi.bluesky import normalize_profile, normalize_partial_profile, normalize_post
+from twitwi.bluesky.types import BlueskyPost, BlueskyProfile, BlueskyPartialProfile
 
 from minet.web import (
     create_request_retryer,
@@ -126,7 +126,32 @@ class BlueskyHTTPClient:
             if cursor is None:
                 break
 
+    def search_profiles(
+        self, query: str, limit: Optional[int] = -1
+    ) -> Iterator[BlueskyPartialProfile]:
+        cursor = None
+
+        count = 0
+        while True:
+            url = self.urls.search_profiles(query, cursor=cursor)
+
+            response = self.request(url)
+            data = response.json()
+
+            for profile in data["actors"]:
+                yield normalize_partial_profile(profile)
+                count += 1
+                if count == limit:
+                    break
+
+            cursor = data.get("cursor")
+
+            if cursor is None or count == limit:
+                break
+
     def resolve_handle(self, identifier: str, _alternate_api=False) -> str:
+        identifier = identifier.lstrip("@")
+
         url = self.urls.resolve_handle(identifier, _alternate_api=_alternate_api)
 
         response = self.request(url)
@@ -139,14 +164,62 @@ class BlueskyHTTPClient:
             else:
                 raise e
 
-    def post_url_to_did_at_uri(self, url: str) -> str:
+    def resolve_post_url(self, url: str) -> str:
         handle, rkey = parse_post_url(url)
         did = self.resolve_handle(handle)
 
         return format_post_at_uri(did, rkey)
 
+    def get_follows(
+        self, did: str, limit: Optional[int] = -1
+    ) -> Iterator[BlueskyPartialProfile]:
+        cursor = None
+
+        count = 0
+        while True:
+            url = self.urls.get_follows(did, cursor=cursor)
+
+            response = self.request(url)
+            data = response.json()
+
+            for profile in data["follows"]:
+                yield normalize_partial_profile(profile)
+                count += 1
+                if count == limit:
+                    break
+
+            cursor = data.get("cursor")
+
+            if cursor is None or count == limit:
+                break
+
+    def get_followers(
+        self, did: str, limit: Optional[int] = -1
+    ) -> Iterator[BlueskyPartialProfile]:
+        cursor = None
+
+        count = 0
+        while True:
+            url = self.urls.get_followers(did, cursor=cursor)
+
+            response = self.request(url)
+            data = response.json()
+
+            for profile in data["followers"]:
+                yield normalize_partial_profile(profile)
+                count += 1
+                if count == limit:
+                    break
+
+            cursor = data.get("cursor")
+
+            if cursor is None or count == limit:
+                break
+
     # NOTE: this API route does not return any results for at-uris containing handles!
-    def get_posts(self, did_at_uris: Iterable[str], return_raw=False) -> Iterator[BlueskyPost]:
+    def get_posts(
+        self, did_at_uris: Iterable[str], return_raw=False
+    ) -> Iterator[Union[BlueskyPost, str, Any]]:
         def work(chunk: List[str]) -> Dict[str, Any]:
             url = self.urls.get_posts(chunk)
             response = self.request(url)
@@ -164,15 +237,9 @@ class BlueskyHTTPClient:
             else:
                 yield normalize_post(post_data)
 
-
     def get_user_posts(
-        self, identifier: str, limit: Optional[int] = -1
+        self, did: str, limit: Optional[int] = -1
     ) -> Iterator[BlueskyPost]:
-        if not identifier.startswith("did:"):
-            did = self.resolve_handle(identifier)
-        else:
-            did = identifier
-
         cursor = None
 
         count = 0

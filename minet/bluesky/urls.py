@@ -36,9 +36,27 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
         # Handles resolving of special handles based on a different DNS do not work on the regular API, we need to use the alternate endpoint from the public facing API
         # cf https://github.com/bluesky-social/indigo/issues/833
         return self.format(
-            base_url=BLUESKY_HTTP_API_ALTERNATE_URL if _alternate_api else BLUESKY_HTTP_API_BASE_URL,
+            base_url=BLUESKY_HTTP_API_ALTERNATE_URL
+            if _alternate_api
+            else BLUESKY_HTTP_API_BASE_URL,
             path="com.atproto.identity.resolveHandle",
             args={"handle": handle},
+        )
+
+    def get_follows(
+        self, did: str, cursor: Optional[str] = None, limit: int = 100
+    ) -> str:
+        return self.format(
+            path="app.bsky.graph.getFollows",
+            args={"actor": did, "cursor": cursor, "limit": limit},
+        )
+
+    def get_followers(
+        self, did: str, cursor: Optional[str] = None, limit: int = 100
+    ) -> str:
+        return self.format(
+            path="app.bsky.graph.getFollowers",
+            args={"actor": did, "cursor": cursor, "limit": limit},
         )
 
     def get_posts(self, uris: List[str]) -> str:
@@ -58,6 +76,14 @@ class BlueskyHTTPAPIUrlFormatter(URLFormatter):
         return self.format(
             path="app.bsky.feed.searchPosts",
             args={"q": q, "cursor": cursor, "limit": limit},
+        )
+
+    def search_profiles(
+        self, query: str, cursor: Optional[str] = None, limit: int = 100
+    ) -> str:
+        return self.format(
+            path="app.bsky.actor.searchActors",
+            args={"term": query, "cursor": cursor, "limit": limit},
         )
 
     def get_user_posts(
