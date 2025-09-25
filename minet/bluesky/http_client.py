@@ -1,4 +1,4 @@
-from typing import Iterator, Iterable, Optional, Any, List, Dict
+from typing import Iterator, Iterable, Optional, Any, List, Dict, Union
 
 from time import time, sleep
 from ebbe import as_reconciled_chunks
@@ -173,7 +173,7 @@ class BlueskyHTTPClient:
     # NOTE: this API route does not return any results for at-uris containing handles!
     def get_posts(
         self, did_at_uris: Iterable[str], return_raw=False
-    ) -> Iterator[BlueskyPost]:
+    ) -> Iterator[Union[BlueskyPost, str, Any]]:
         def work(chunk: List[str]) -> Dict[str, Any]:
             url = self.urls.get_posts(chunk)
             response = self.request(url)
