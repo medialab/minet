@@ -24,6 +24,40 @@ BLUESKY_FIREHOSE_COMMAND = command(
     """,
 )
 
+BLUESKY_FOLLOWS_COMMAND = command(
+    "follows",
+    "minet.cli.bluesky.follows",
+    title="Minet Bluesky Get Follows From Handle Or DID Command",
+    description="""
+        Get whether follows of a user giving its handle or DID or respective follows of several users given their handle or did from the column of a CSV file. This command uses the Bluesky HTTP API.
+    """,
+    arguments=[
+        {
+            "flag": "--limit",
+            "type": int,
+            "help": "Limit the number of follows to retrieve for each user. Will collect all follows by default.",
+        },
+        *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
+    ],
+    variadic_input={"dummy_column": "handle-or-did"},
+    epilog="""
+        Examples:
+        
+        . Get follows of a user by their handle:
+            $ minet bluesky follows @bsky.app
+
+        . Get 100 follows of a user by their DID:
+            $ minet bluesky follows did:plc:z72i7hdynmk6r22z27h6tvur --limit 100
+
+        . Get follows from users by their handles from a CSV file:
+            $ minet bluesky follows <handle-column> -i users.csv
+
+        Tips:
+
+        - If you pass the handle, it can be with or without the '@' symbol (e.g. '@bsky.app' or 'bsky.app').
+    """,
+)
+
 BLUESKY_FOLLOWERS_COMMAND = command(
     "followers",
     "minet.cli.bluesky.followers",
@@ -208,6 +242,37 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
     arguments=[*BLUESKY_HTTP_API_COMMON_ARGUMENTS],
 )
 
+BLUESKY_SEARCH_PROFILES_COMMAND = command(
+    "search-users",
+    "minet.cli.bluesky.search_profiles",
+    title="Minet Bluesky Search Users Command",
+    description="""
+        Search for whether Bluesky profiles matching a query or multiple Bluesky profiles matching respectively successives queries from column of a CSV file. This command uses the Bluesky HTTP API. A profile matches a query if the user's name, handle or bio matches the query. This command is equivalent to the classic search on Bluesky when filtering by 'People'.
+    """,
+    variadic_input={"dummy_column": "query"},
+    arguments=[
+        {
+            "flag": "--limit",
+            "type": int,
+            "help": "Limit the number of users to retrieve for each query. Will collect all users by default.",
+        },
+        *BLUESKY_HTTP_API_COMMON_ARGUMENTS,
+    ],
+    epilog="""
+        Examples:
+
+        . Search user by its handle:
+            $ minet bluesky search-users @bsky.app
+
+        . Get 150 users from matching a query:
+            $ minet bluesky search-users <query> --limit 150
+
+        . Get users from a CSV file:
+            $ minet bluesky search-users <query-column> -i queries.csv
+
+    """,
+)
+
 BLUESKY_COMMAND = command(
     "bluesky",
     "minet.cli.bluesky",
@@ -218,6 +283,7 @@ BLUESKY_COMMAND = command(
     """,
     subcommands=[
         BLUESKY_FIREHOSE_COMMAND,
+        BLUESKY_FOLLOWS_COMMAND,
         BLUESKY_FOLLOWERS_COMMAND,
         BLUESKY_POSTS_COMMAND,
         BLUESKY_PROFILES_COMMAND,
@@ -225,5 +291,6 @@ BLUESKY_COMMAND = command(
         BLUESKY_RESOLVE_POST_URL_COMMAND,
         BLUESKY_RESOLVE_HANDLE_COMMAND,
         BLUESKY_SEARCH_POSTS_COMMAND,
+        BLUESKY_SEARCH_PROFILES_COMMAND,
     ],
 )

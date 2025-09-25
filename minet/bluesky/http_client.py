@@ -126,6 +126,29 @@ class BlueskyHTTPClient:
             if cursor is None:
                 break
 
+    def search_profiles(
+        self, query: str, limit: Optional[int] = -1
+    ) -> Iterator[BlueskyPartialProfile]:
+        cursor = None
+
+        count = 0
+        while True:
+            url = self.urls.search_profiles(query, cursor=cursor)
+
+            response = self.request(url)
+            data = response.json()
+
+            for profile in data["actors"]:
+                yield normalize_partial_profile(profile)
+                count += 1
+                if count == limit:
+                    break
+
+            cursor = data.get("cursor")
+
+            if cursor is None or count == limit:
+                break
+
     def resolve_handle(self, identifier: str, _alternate_api=False) -> str:
         identifier = identifier.lstrip("@")
 
@@ -146,6 +169,29 @@ class BlueskyHTTPClient:
         did = self.resolve_handle(handle)
 
         return format_post_at_uri(did, rkey)
+
+    def get_follows(
+        self, did: str, limit: Optional[int] = -1
+    ) -> Iterator[BlueskyPartialProfile]:
+        cursor = None
+
+        count = 0
+        while True:
+            url = self.urls.get_follows(did, cursor=cursor)
+
+            response = self.request(url)
+            data = response.json()
+
+            for profile in data["follows"]:
+                yield normalize_partial_profile(profile)
+                count += 1
+                if count == limit:
+                    break
+
+            cursor = data.get("cursor")
+
+            if cursor is None or count == limit:
+                break
 
     def get_followers(
         self, did: str, limit: Optional[int] = -1
