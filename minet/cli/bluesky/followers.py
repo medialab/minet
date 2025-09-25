@@ -1,7 +1,7 @@
 from casanova import Enricher
 
-from twitwi.bluesky.constants import MINIMAL_PROFILE_FIELDS
-from twitwi.bluesky import format_minimal_profile_as_csv_row
+from twitwi.bluesky.constants import PARTIAL_PROFILE_FIELDS
+from twitwi.bluesky import format_partial_profile_as_csv_row
 
 from minet.cli.utils import with_enricher_and_loading_bar
 from minet.cli.loading_bar import LoadingBar
@@ -13,7 +13,7 @@ from minet.bluesky import BlueskyHTTPClient
 
 @with_bluesky_fatal_errors
 @with_enricher_and_loading_bar(
-    headers=MINIMAL_PROFILE_FIELDS,
+    headers=PARTIAL_PROFILE_FIELDS,
     title="Getting Bluesky followers",
     unit="profiles",
     nested=True,
@@ -35,6 +35,6 @@ def action(cli_args, enricher: Enricher, loading_bar: LoadingBar):
 
         with loading_bar.step(did, sub_total=sub_total):
             for follower in client.get_followers(did, cli_args.limit):
-                follower_row = format_minimal_profile_as_csv_row(follower)
+                follower_row = format_partial_profile_as_csv_row(follower)
                 enricher.writerow(row, follower_row)
                 loading_bar.nested_advance()

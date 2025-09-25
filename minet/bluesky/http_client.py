@@ -3,8 +3,8 @@ from typing import Iterator, Iterable, Optional, Any, List, Dict, Union
 from time import time, sleep
 from ebbe import as_reconciled_chunks
 
-from twitwi.bluesky import normalize_profile, normalize_minimal_profile, normalize_post
-from twitwi.bluesky.types import BlueskyPost, BlueskyProfile, BlueskyMinimalProfile
+from twitwi.bluesky import normalize_profile, normalize_partial_profile, normalize_post
+from twitwi.bluesky.types import BlueskyPost, BlueskyProfile, BlueskyPartialProfile
 
 from minet.web import (
     create_request_retryer,
@@ -149,7 +149,7 @@ class BlueskyHTTPClient:
 
     def get_followers(
         self, did: str, limit: Optional[int] = -1
-    ) -> Iterator[BlueskyMinimalProfile]:
+    ) -> Iterator[BlueskyPartialProfile]:
         cursor = None
 
         count = 0
@@ -160,7 +160,7 @@ class BlueskyHTTPClient:
             data = response.json()
 
             for profile in data["followers"]:
-                yield normalize_minimal_profile(profile)
+                yield normalize_partial_profile(profile)
                 count += 1
                 if count == limit:
                     break
