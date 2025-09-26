@@ -34,7 +34,7 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
     variadic_input={"dummy_column": "query"},
     arguments=[
         {
-            "flags": ["-l", "--lang"],
+            "flag": "--lang",
             "help": 'Filter posts in the given language. Expected to be based on post language field, though server may override language detection. Equivalent to "lang:<lang>" in classic search syntax.',
         },
         {
@@ -64,7 +64,7 @@ BLUESKY_SEARCH_POSTS_COMMAND = command(
             "help": "Filter posts with links (facet links or embeds) pointing to this URL. Server may apply URL normalization or fuzzy matching. The only equivalent in classic search syntax could be typing the URL as a keyword.",
         },
         {
-            "flag": "--limit",
+            "flags": ["-l", "--limit"],
             "type": int,
             "help": "Limit the number of posts to retrieve for each query.",
         },
